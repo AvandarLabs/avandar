@@ -61,22 +61,25 @@ function _findCounterpart(
 /**
  * What each pair of a fill's code list becomes in the combined dataset: the
  * label (labels mode) or code (codes mode) of its counterpart in the
- * primary list, so two codings of one entry come out alike. A pair's
- * counterpart is itself when `pairs` is `primaryPairs` (pass the same
- * array), otherwise the first primary pair whose label or accepted
- * spelling matches its label. With no counterpart, labels mode keeps the
- * pair's own label and codes mode outputs nothing.
+ * primary list, so two codings of one entry come out alike. With no
+ * counterpart, labels mode keeps the pair's own label and codes mode
+ * outputs nothing. Use it to see what a list's values translate to, for
+ * example to show a preview or build a conversion.
+ *
+ * `isPrimaryList` says `pairs` is the entry's primary list itself.
  */
 function getTranslationOutputs(
   options: Readonly<{
     pairs: Pairs;
     primaryPairs: Pairs;
+    isPrimaryList: boolean;
     codesOutputAs: Crosswalk.CodesOutput;
   }>,
 ): CrosswalkSqlTranslationOutput[] {
-  const isPrimary = options.pairs === options.primaryPairs;
   return options.pairs.map((pair) => {
-    const counterpart = isPrimary
+    // A primary pair is its own counterpart. Another list's pair matches
+    // the first primary pair with the same label or accepted spelling.
+    const counterpart = options.isPrimaryList
       ? pair
       : _findCounterpart(pair.label, options.primaryPairs);
     if (options.codesOutputAs === "codes") {
@@ -105,26 +108,29 @@ function _toTranslatedPair(
 /**
  * The conversion that turns a source column holding a code list's codes
  * (or its labels, with `holdsLabels`) into what the combined dataset
- * outputs, per `getTranslationOutputs`. In codes mode a pair with no
- * counterpart becomes empty rather than passing through as a code of
- * another list; in labels mode a pair whose output is blank passes
- * through, as `ColumnConversion` treats a blank label. Its output stays
- * text; the caller casts it.
+ * outputs, per `getTranslationOutputs`. Its output stays text, so cast it.
+ * Use it to render a translation as SQL, for example with
+ * `ColumnConversion.toCaseSql`.
  */
 function toTranslation(
   options: Readonly<{
     pairs: Pairs;
     primaryPairs: Pairs;
+    isPrimaryList: boolean;
     holdsLabels: boolean;
     codesOutputAs: Crosswalk.CodesOutput;
   }>,
 ): ColumnConversion.T {
   const outputs = getTranslationOutputs(options);
+  // A pair whose output is blank is left out, so it passes through, as
+  // `ColumnConversion` treats a blank label.
   const pairs = outputs.flatMap(({ pair, output }) => {
     return output === undefined || output.trim() === ""
       ? []
       : [_toTranslatedPair(pair, output, options.holdsLabels)];
   });
+  // In codes mode a pair with no counterpart becomes empty rather than
+  // passing through as a code of another list.
   const overrides = outputs.flatMap(({ pair, output }) => {
     if (output !== undefined) {
       return [];
@@ -185,32 +191,43 @@ function _toCastSql(valueSql: string, typeSql: string): string {
   return `TRY_CAST(${valueSql} AS ${typeSql})`;
 }
 
+function _toPadSql(length: number, textSql: string): string {
+  if (!Number.isInteger(length) || length < 1) {
+    throw new Error(`A pad length must be a positive integer, not ${length}`);
+  }
+  const trimmedSql = `trim(${textSql})`;
+  return `CASE WHEN regexp_full_match(${trimmedSql}, '[0-9]+') AND length(${trimmedSql}) < ${length} THEN lpad(${trimmedSql}, ${length}, '0') ELSE ${trimmedSql} END`;
+}
+
+function _toTrimAndFixCaseSql(
+  letterCase: "keep" | "lower" | "upper",
+  textSql: string,
+): string {
+  const squashedSql = `regexp_replace(trim(${textSql}), '\\s+', ' ', 'g')`;
+  return letterCase === "keep" ? squashedSql : `${letterCase}(${squashedSql})`;
+}
+
 function _toConvertedSql(convert: Convert, valueSql: string): string {
   const textSql = `CAST(${valueSql} AS VARCHAR)`;
-  if (convert.kind === "parse_date") {
-    return `TRY_STRPTIME(${textSql}, ${quoteSqlLiteral(convert.format)})`;
-  }
-  if (convert.kind === "pad_text") {
-    if (!Number.isInteger(convert.length) || convert.length < 1) {
-      throw new Error(
-        `A pad length must be a positive integer, not ${convert.length}`,
-      );
+  switch (convert.kind) {
+    case "parse_date":
+      return `TRY_STRPTIME(${textSql}, ${quoteSqlLiteral(convert.format)})`;
+    case "pad_text":
+      return _toPadSql(convert.length, textSql);
+    case "multiply":
+      if (!Number.isFinite(convert.factor)) {
+        throw new Error(
+          `A multiply factor must be finite, not ${convert.factor}`,
+        );
+      }
+      return `TRY_CAST(${valueSql} AS DOUBLE) * ${String(convert.factor)}`;
+    case "trim_and_fix_case":
+      return _toTrimAndFixCaseSql(convert.letterCase, textSql);
+    default: {
+      const unknownConvert: never = convert;
+      throw new Error(`Unknown conversion: ${JSON.stringify(unknownConvert)}`);
     }
-    const trimmedSql = `trim(${textSql})`;
-    return `CASE WHEN regexp_full_match(${trimmedSql}, '[0-9]+') AND length(${trimmedSql}) < ${convert.length} THEN lpad(${trimmedSql}, ${convert.length}, '0') ELSE ${trimmedSql} END`;
   }
-  if (convert.kind === "multiply") {
-    if (!Number.isFinite(convert.factor)) {
-      throw new Error(
-        `A multiply factor must be finite, not ${convert.factor}`,
-      );
-    }
-    return `TRY_CAST(${valueSql} AS DOUBLE) * ${String(convert.factor)}`;
-  }
-  const squashedSql = `regexp_replace(trim(${textSql}), '\\s+', ' ', 'g')`;
-  return convert.letterCase === "keep"
-    ? squashedSql
-    : `${convert.letterCase}(${squashedSql})`;
 }
 
 function _getPrimaryCodeListId(
@@ -247,6 +264,7 @@ function _toColumnFillSql(
     const conversion = toTranslation({
       pairs: codeList.pairs,
       primaryPairs,
+      isPrimaryList: primaryId === fill.codeListId,
       holdsLabels: fill.holdsLabels,
       codesOutputAs: options.codesOutputAs,
     });
@@ -280,7 +298,7 @@ function toExpressionSql(sql: string): string {
   return sql.replace(
     CrosswalkMapping.COMBINE_PLACEHOLDER_PATTERN,
     (_placeholder, name: string) => {
-      return quoteSqlIdentifier(name.trim());
+      return quoteSqlIdentifier(name);
     },
   );
 }
@@ -388,15 +406,16 @@ function _toBranch(
 }
 
 /**
- * The combined dataset's SQL: one `SELECT` per layout, every output
- * aliased, stacked with `UNION ALL BY NAME`. A layout's datasets share
- * their column names, so they stack first with `SELECT *` under each
- * dataset's name. Layouts and datasets stay in the given order.
+ * The combined dataset's SQL, stacking every layout's datasets, and the
+ * columns it outputs. Layouts and datasets stay in the given order.
  *
  * @throws `Error("crosswalk-nothing-to-combine")` when no layout has a
  * dataset, or there is no column to output.
  */
 function compile(input: Readonly<CrosswalkSqlInput>): CrosswalkSqlOutput {
+  // One `SELECT` per layout with every output aliased, stacked with
+  // `UNION ALL BY NAME`. A layout's datasets share their column names, so
+  // they stack first with `SELECT *` under each dataset's name.
   const layouts = input.layouts.filter((layout) => {
     return layout.datasets.length > 0;
   });
@@ -431,8 +450,9 @@ function compile(input: Readonly<CrosswalkSqlInput>): CrosswalkSqlOutput {
 /**
  * Pure rules for compiling a crosswalk into its combined dataset's SQL:
  * each fill's expression, the translation that reconciles codings to the
- * primary list, a governed column's type, and the fingerprint the stale
- * banner compares. Builds SQL text only; it runs nothing.
+ * primary list, a governed column's type, and a fingerprint of a code
+ * list's pairs, for example to tell whether a list changed since it was
+ * embedded. Builds SQL text only; it runs nothing.
  */
 export const CrosswalkSqlModule = {
   SOURCE_ALIAS,

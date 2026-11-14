@@ -1,22 +1,31 @@
 import { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
+import { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
 import { validateCombineExpression } from "@/lib/crosswalks/validateCombineExpression/validateCombineExpression";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
-import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   CrosswalkDraftLayout,
+  CrosswalkDraftMapping,
   CrosswalkDraftT,
 } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft.types";
 
-/** Something step 3 says about the combined dataset before it is saved. */
+/** Something to tell the user about a combined dataset before it is saved. */
 export type CrosswalkProblem =
-  /** The dataset is left out: its columns changed since it was mapped. */
+  /**
+   * The dataset is left out: its columns changed since it was mapped, or it
+   * can no longer be read (its name is then its id).
+   */
   | { kind: "columns_changed"; datasetId: Dataset.Id; datasetName: string }
+  /**
+   * The dataset is left out: a column the layout reads has a type that
+   * cannot be stacked with the same column of the layout's first dataset.
+   */
+  | { kind: "column_types_differ"; datasetId: Dataset.Id; datasetName: string }
   /** Blocks: a Combine expression the combined dataset cannot run. */
   | {
       kind: "invalid_expression";
@@ -77,13 +86,101 @@ function _getCodeListsById(
   );
 }
 
-/** The layout's datasets whose columns still match it, and the others. */
+type DraftFills = ReadonlyArray<readonly [string, CrosswalkMapping.Fill]>;
+
+/** The Ava types DuckDB stacks into one column, when they differ. */
+const STACKABLE_TYPE_GROUPS: ReadonlyArray<ReadonlySet<AvaDataType.T>> = [
+  new Set(["bigint", "double"]),
+  new Set(["date", "timestamp"]),
+];
+
+/**
+ * Whether two columns of one name can stack: the same type, text with
+ * anything, two numbers, or a date with a timestamp. DuckDB fails the
+ * whole query on any other pair, such as a date with a boolean.
+ */
+function _areTypesStackable(
+  typeA: AvaDataType.T,
+  typeB: AvaDataType.T,
+): boolean {
+  return (
+    typeA === typeB ||
+    typeA === "varchar" ||
+    typeB === "varchar" ||
+    STACKABLE_TYPE_GROUPS.some((group) => {
+      return group.has(typeA) && group.has(typeB);
+    })
+  );
+}
+
+/** Lowercased names of the dataset columns a layout's fills read. */
+function _getReadColumnNames(fills: DraftFills): Set<string> {
+  return new Set(
+    fills.flatMap(([, fill]) => {
+      if (fill.kind === "column") {
+        return [fill.sourceColumn.toLowerCase()];
+      }
+      return fill.kind === "expression"
+        ? CrosswalkMapping.getCombineColumnNames(fill.sql).map((name) => {
+            return name.toLowerCase();
+          })
+        : [];
+    }),
+  );
+}
+
+function _hasDifferingTypes(
+  dataset: CrosswalkLayout.Dataset,
+  baseline: CrosswalkLayout.Dataset,
+  readNames: ReadonlySet<string>,
+): boolean {
+  const baselineTypes = new Map(
+    baseline.columns.map((column) => {
+      return [column.name.toLowerCase(), column.dataType] as const;
+    }),
+  );
+  return dataset.columns.some((column) => {
+    const key = column.name.toLowerCase();
+    const baselineType = baselineTypes.get(key);
+    return (
+      readNames.has(key) &&
+      baselineType !== undefined &&
+      !_areTypesStackable(column.dataType, baselineType)
+    );
+  });
+}
+
+function _toDatasetProblem(
+  kind: "columns_changed" | "column_types_differ",
+  dataset: Readonly<{ id: Dataset.Id; name: string }>,
+): CrosswalkProblem {
+  return { kind, datasetId: dataset.id, datasetName: dataset.name };
+}
+
+/**
+ * The layout's datasets that can be stacked, and a problem for each that
+ * cannot: unreadable, columns changed since mapping, or a type that clashes
+ * with the layout's first usable dataset.
+ */
 function _splitDatasets(
   layout: CrosswalkDraftLayout,
   datasetsById: CompileOptions["datasetsById"],
+  readNames: ReadonlySet<string>,
 ): { included: CrosswalkLayout.Dataset[]; problems: CrosswalkProblem[] } {
-  const datasets = layout.datasetIds.flatMap((datasetId) => {
-    const dataset = datasetsById.get(datasetId);
+  const found = layout.datasetIds.map((datasetId) => {
+    return { datasetId, dataset: datasetsById.get(datasetId) };
+  });
+  const missing = found.flatMap(({ datasetId, dataset }) => {
+    return dataset
+      ? []
+      : [
+          _toDatasetProblem("columns_changed", {
+            id: datasetId,
+            name: datasetId,
+          }),
+        ];
+  });
+  const datasets = found.flatMap(({ dataset }) => {
     return dataset ? [dataset] : [];
   });
   const changed = datasets.filter((dataset) => {
@@ -94,17 +191,28 @@ function _splitDatasets(
       }),
     });
   });
+  const intact = datasets.filter((dataset) => {
+    return !changed.includes(dataset);
+  });
+  const [baseline] = intact;
+  const differing = intact.filter((dataset) => {
+    return (
+      baseline !== undefined && _hasDifferingTypes(dataset, baseline, readNames)
+    );
+  });
   return {
-    included: datasets.filter((dataset) => {
-      return !changed.includes(dataset);
+    included: intact.filter((dataset) => {
+      return !differing.includes(dataset);
     }),
-    problems: changed.map((dataset) => {
-      return {
-        kind: "columns_changed",
-        datasetId: dataset.id,
-        datasetName: dataset.name,
-      };
-    }),
+    problems: [
+      ...missing,
+      ...changed.map((dataset) => {
+        return _toDatasetProblem("columns_changed", dataset);
+      }),
+      ...differing.map((dataset) => {
+        return _toDatasetProblem("column_types_differ", dataset);
+      }),
+    ],
   };
 }
 
@@ -133,25 +241,41 @@ function _getFillProblem(
   return undefined;
 }
 
+/** The layout's mappings for columns the draft still has, by column id. */
+function _getLayoutMappings(
+  layout: CrosswalkDraftLayout,
+  draft: CrosswalkDraftT,
+): Array<[string, CrosswalkDraftMapping]> {
+  const columnIds = new Set<string>(
+    draft.columns.map((column) => {
+      return column.id;
+    }),
+  );
+  return Object.entries(draft.mappings[layout.id] ?? {}).filter(
+    ([columnId]) => {
+      return columnIds.has(columnId);
+    },
+  );
+}
+
 function _toLayoutPart(
   layout: CrosswalkDraftLayout,
   options: CompileOptions,
   codeListsById: CodeListsById,
 ): LayoutPart {
-  const { included, problems } = _splitDatasets(layout, options.datasetsById);
+  const fills = _getLayoutMappings(layout, options.draft);
+  const { included, problems } = _splitDatasets(
+    layout,
+    options.datasetsById,
+    _getReadColumnNames(
+      fills.map(([columnId, mapping]) => {
+        return [columnId, mapping.fill] as const;
+      }),
+    ),
+  );
   if (included.length === 0) {
     return { sqlLayout: undefined, problems, unconfirmedCount: 0 };
   }
-  const columnIds = new Set<string>(
-    options.draft.columns.map((column) => {
-      return column.id;
-    }),
-  );
-  const fills = Object.entries(options.draft.mappings[layout.id] ?? {}).filter(
-    ([columnId]) => {
-      return columnIds.has(columnId);
-    },
-  );
   const fillProblems = fills.flatMap(([columnId, mapping]) => {
     const problem = _getFillProblem(
       layout,
@@ -294,7 +418,7 @@ function _compileLayouts(
   };
 }
 
-/** A fingerprint of each code list the SQL embedded, for the stale banner. */
+/** A fingerprint of each code list the SQL embedded. */
 function _getCompiledCodeLists(
   usedCodeListIds: readonly string[],
   codeListsById: CodeListsById,
@@ -314,11 +438,11 @@ function _getCompiledCodeLists(
 
 /**
  * Compiles a crosswalk draft into its combined dataset, ready for
- * `rpc_crosswalks__save_combined_dataset`. Skipped layouts, layouts with no
- * dataset, and datasets whose columns changed since they were mapped are
- * left out; every other fill is used, confirmed or not. Blocks on an
- * invalid Combine expression or when nothing is left to combine. Use it
- * for the combine step's preview, problems, and save.
+ * `rpc_crosswalks__save_combined_dataset`. Use it to preview the combined
+ * dataset, list its problems, and build what is saved.
+ *
+ * Datasets that cannot be stacked are left out and reported as problems.
+ * An invalid Combine expression, or nothing left to combine, blocks it.
  */
 export function compileCrosswalk(
   options: CompileOptions,

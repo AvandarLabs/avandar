@@ -25,7 +25,7 @@ export function validateCombineExpression(
   }
   const knownNames = new Set(
     options.columnNames.map((columnName) => {
-      return columnName.trim().toLowerCase();
+      return columnName.toLowerCase();
     }),
   );
   const unknownName = CrosswalkMapping.getCombineColumnNames(options.sql).find(

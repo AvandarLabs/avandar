@@ -9,6 +9,7 @@ import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/Da
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   CrosswalkDraftLayout,
@@ -381,6 +382,115 @@ describe("compileCrosswalk", () => {
         { kind: "skipped", datasetCount: 3 },
         { kind: "nothing_to_combine" },
       ],
+    });
+  });
+
+  it("reports a dataset it cannot read as left out, named by its id", () => {
+    const draft = _draft();
+    const result = compileCrosswalk({
+      draft,
+      datasetsById: new Map(
+        [...DATASETS_BY_ID].filter(([datasetId]) => {
+          return datasetId !== "dataset-k2";
+        }),
+      ),
+      entriesById: ENTRIES_BY_ID,
+    });
+
+    expect(result.status === "ready" && result.includedDatasetIds).toEqual([
+      "dataset-k1",
+      "dataset-q1",
+    ]);
+    expect(result.problems).toContainEqual({
+      kind: "columns_changed",
+      datasetId: "dataset-k2",
+      datasetName: "dataset-k2",
+    });
+  });
+
+  describe("when a layout's datasets type a column differently", () => {
+    function _compileKingsTypes(
+      firstType: AvaDataType.T,
+      secondType: AvaDataType.T,
+      readColumn = "GENDER",
+    ): ReturnType<typeof compileCrosswalk> {
+      const typed = (
+        id: string,
+        name: string,
+        dataType: AvaDataType.T,
+      ): CrosswalkLayout.Dataset => {
+        return {
+          id: id as Dataset.Id,
+          name,
+          columns: KINGS_COLUMNS.map((columnName) => {
+            return {
+              name: columnName,
+              dataType: columnName === readColumn ? dataType : "varchar",
+            };
+          }),
+        };
+      };
+      return compileCrosswalk({
+        draft: _draft(),
+        datasetsById: new Map([
+          ...DATASETS_BY_ID,
+          ["dataset-k1", typed("dataset-k1", "Kings 2026-03", firstType)],
+          ["dataset-k2", typed("dataset-k2", "Kings 2026-04", secondType)],
+        ]),
+        entriesById: ENTRIES_BY_ID,
+      });
+    }
+
+    it.each([
+      ["bigint", "date"],
+      ["date", "boolean"],
+      ["bigint", "timestamp"],
+      ["time", "date"],
+      ["double", "time"],
+    ] as const)(
+      "leaves out a %s dataset stacked with a %s one",
+      (first, second) => {
+        const result = _compileKingsTypes(first, second);
+
+        expect(result.status === "ready" && result.includedDatasetIds).toEqual([
+          "dataset-k1",
+          "dataset-q1",
+        ]);
+        expect(result.problems).toContainEqual({
+          kind: "column_types_differ",
+          datasetId: "dataset-k2",
+          datasetName: "Kings 2026-04",
+        });
+      },
+    );
+
+    it.each([
+      ["bigint", "double"],
+      ["date", "timestamp"],
+      ["boolean", "varchar"],
+      ["date", "varchar"],
+      ["bigint", "bigint"],
+    ] as const)("stacks a %s dataset with a %s one", (first, second) => {
+      const result = _compileKingsTypes(first, second);
+
+      expect(result.status === "ready" && result.includedDatasetIds).toEqual([
+        "dataset-k1",
+        "dataset-k2",
+        "dataset-q1",
+      ]);
+      expect(result.problems).toEqual([
+        { kind: "unconfirmed", datasetCount: 1 },
+      ]);
+    });
+
+    it("ignores a column no fill of the layout reads", () => {
+      const result = _compileKingsTypes("bigint", "date", "unread");
+
+      expect(result.status === "ready" && result.includedDatasetIds).toEqual([
+        "dataset-k1",
+        "dataset-k2",
+        "dataset-q1",
+      ]);
     });
   });
 

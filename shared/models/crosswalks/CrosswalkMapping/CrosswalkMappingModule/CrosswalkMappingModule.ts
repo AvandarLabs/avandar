@@ -12,6 +12,10 @@ const FILL_VERSION = 1;
 /** A `{column name}` placeholder in a Combine expression. */
 const COMBINE_PLACEHOLDER_PATTERN = /\{([^{}]+)\}/g;
 
+function _isNotBlank(text: string): boolean {
+  return text.trim() !== "";
+}
+
 const StoredConvertSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("parse_date"), format: z.string().min(1) }),
   z.object({ kind: z.literal("pad_text"), length: z.number().int().min(1) }),
@@ -31,7 +35,7 @@ const StoredFillV1Schema = z
     z.object({
       version: z.literal(FILL_VERSION),
       kind: z.literal("column"),
-      source_column: z.string().trim().min(1),
+      source_column: z.string().refine(_isNotBlank),
       convert: StoredConvertSchema.nullable(),
       code_list_id: z.uuid().nullable(),
       holds_labels: z.boolean(),
@@ -130,24 +134,23 @@ function fillToDBJson(fill: CrosswalkFill): StoredCrosswalkFill {
 
 /**
  * The column names a Combine expression's `{column name}` placeholders
- * name, trimmed, in order of first use, each once. A blank placeholder
- * names nothing.
+ * name, exactly as written, in order of first use, each once. A blank
+ * placeholder names nothing.
  */
 function getCombineColumnNames(sql: string): string[] {
   const names = [...sql.matchAll(COMBINE_PLACEHOLDER_PATTERN)]
     .map((match) => {
-      return (match[1] ?? "").trim();
+      return match[1] ?? "";
     })
-    .filter((name) => {
-      return name !== "";
-    });
+    .filter(_isNotBlank);
   return [...new Set(names)];
 }
 
 /**
  * Helpers for crosswalk mappings: reading and writing a fill in its
  * versioned stored shape, and the column names a Combine expression uses.
- * Used by the mapping parser, the save RPC's client, and the SQL compiler.
+ * Use it to read a fill from the database or write one to it, and to check
+ * which columns a Combine expression needs.
  */
 export const CrosswalkMappingModule = {
   COMBINE_PLACEHOLDER_PATTERN,

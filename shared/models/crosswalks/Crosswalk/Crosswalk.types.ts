@@ -35,7 +35,8 @@ export type CrosswalkCodesOutput = Enums<"crosswalks__codes_output">;
 
 /**
  * A code list the combined dataset embedded, and the fingerprint of its
- * pairs then. The stale banner compares it with the list's pairs now.
+ * pairs then. Comparing it with a fingerprint of the list's pairs now tells
+ * whether the list changed since.
  */
 export type CrosswalkCompiledCodeList = {
   codeListId: DataDictionaryCodeList.Id;

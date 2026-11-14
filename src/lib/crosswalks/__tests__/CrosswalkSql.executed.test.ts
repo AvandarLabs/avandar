@@ -1,12 +1,18 @@
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { describe, expect, it } from "vitest";
+import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
+import { compileCrosswalk } from "@/lib/crosswalks/compileCrosswalk/compileCrosswalk";
 import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
+import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
-import type { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
+import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { CrosswalkDraftT } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft.types";
 
 /*
  * The combined dataset's SQL, compiled from three layouts and run on real
@@ -306,5 +312,276 @@ describe("CrosswalkSql.compile on DuckDB", () => {
       ["Q2", null],
     ]);
     expect(types.sex).toBe("BIGINT");
+  });
+});
+
+/** Runs `setupSql`, then `sql`, and reads every row as a JSON object. */
+async function _readRows(
+  setupSql: readonly string[],
+  sql: string,
+): Promise<Array<Record<string, unknown>>> {
+  return await withDuckDb(async (connection) => {
+    for (const statement of setupSql) {
+      await connection.run(statement);
+    }
+    const reader = await connection.runAndReadAll(sql);
+    return reader.getRowObjectsJson() as Array<Record<string, unknown>>;
+  });
+}
+
+/** A one-layout draft that fills `case_id` from the layout's `CaseNo`. */
+function _singleLayoutDraft(options: {
+  columns: CrosswalkDraftT["columns"];
+  fills: Record<string, CrosswalkMapping.Fill>;
+  datasetIds: readonly string[];
+  columnNames: readonly string[];
+}): CrosswalkDraftT {
+  const layoutId = "layout-1" as CrosswalkLayout.Id;
+  return {
+    crosswalkId: "crosswalk-1" as Crosswalk.Id,
+    isSaved: true,
+    name: "Executed",
+    description: undefined,
+    codesOutputAs: "labels",
+    addsSourceColumn: false,
+    outputDatasetId: undefined,
+    columns: options.columns,
+    layouts: [
+      {
+        id: layoutId,
+        key: CrosswalkLayout.buildLayoutKey(options.columnNames),
+        signature: CrosswalkLayout.buildSignature(options.columnNames),
+        columnNames: options.columnNames,
+        isReference: true,
+        status: "mapped",
+        datasetIds: options.datasetIds as Dataset.Id[],
+      },
+    ],
+    mappings: {
+      [layoutId]: Object.fromEntries(
+        Object.entries(options.fills).map(([columnId, fill]) => {
+          return [
+            columnId,
+            {
+              id: `mapping-${columnId}` as CrosswalkMapping.Id,
+              fill,
+              status: "confirmed" as const,
+              confidence: undefined,
+              reason: undefined,
+            },
+          ];
+        }),
+      ),
+    },
+  };
+}
+
+describe("space-padded column names on DuckDB", () => {
+  const PADDED = "88888888-8888-4888-8888-888888888881";
+  const PLAIN = "88888888-8888-4888-8888-888888888882";
+  const TABLES = [
+    `CREATE TABLE "${PLAIN}" AS SELECT 'P1' AS "CaseNo"`,
+    `CREATE TABLE "${PADDED}" AS SELECT 'S1' AS "CaseNo "`,
+  ];
+
+  it("keeps `CaseNo ` apart from CaseNo when stacking, so layouts must not merge them", async () => {
+    const rows = await _readRows(
+      TABLES,
+      `SELECT * FROM "${PLAIN}" UNION ALL BY NAME SELECT * FROM "${PADDED}"`,
+    );
+
+    expect(Object.keys(rows[0] ?? {})).toEqual(["CaseNo", "CaseNo "]);
+  });
+
+  it("groups the two spellings into two layouts that each stack their own", async () => {
+    const datasets: CrosswalkLayout.Dataset[] = [
+      {
+        id: PLAIN as Dataset.Id,
+        name: "Plain",
+        columns: [{ name: "CaseNo", dataType: "varchar" }],
+      },
+      {
+        id: PADDED as Dataset.Id,
+        name: "Padded",
+        columns: [{ name: "CaseNo ", dataType: "varchar" }],
+      },
+    ];
+    const groups = CrosswalkLayout.groupDatasetsByLayout(datasets);
+    const output = CrosswalkSql.compile({
+      ...CODE_LISTS,
+      codesOutputAs: "labels",
+      sourceColumnName: undefined,
+      columns: [_column("case_id", "varchar")],
+      layouts: groups.map((group, index) => {
+        return _layout(
+          `layout-${index}`,
+          group.datasetIds.map((id) => {
+            return { id, name: id === PLAIN ? "Plain" : "Padded" };
+          }),
+          { case_id: _columnFill(group.columnNames[0] ?? "") },
+        );
+      }),
+    });
+    const rows = await _readRows(
+      TABLES,
+      `SELECT * FROM (${output.sql}) ORDER BY case_id`,
+    );
+
+    expect(groups).toHaveLength(2);
+    expect(rows).toEqual([{ case_id: "P1" }, { case_id: "S1" }]);
+  });
+});
+
+describe("stacking datasets that type a column differently on DuckDB", () => {
+  const IDS = {
+    bigint: "99999999-9999-4999-8999-999999999991",
+    double: "99999999-9999-4999-8999-999999999992",
+    date: "99999999-9999-4999-8999-999999999993",
+    text: "99999999-9999-4999-8999-999999999994",
+  };
+  const TABLES = [
+    `CREATE TABLE "${IDS.bigint}" AS SELECT 1::BIGINT AS cnt`,
+    `CREATE TABLE "${IDS.double}" AS SELECT 2.5::DOUBLE AS cnt`,
+    `CREATE TABLE "${IDS.date}" AS SELECT DATE '2026-03-02' AS cnt`,
+    `CREATE TABLE "${IDS.text}" AS SELECT '7' AS cnt`,
+  ];
+
+  function _typed(
+    id: string,
+    name: string,
+    dataType: AvaDataType.T,
+  ): CrosswalkLayout.Dataset {
+    return { id: id as Dataset.Id, name, columns: [{ name: "cnt", dataType }] };
+  }
+
+  const DATASETS = [
+    _typed(IDS.bigint, "A bigint", "bigint"),
+    _typed(IDS.double, "B double", "double"),
+    _typed(IDS.date, "C date", "date"),
+    _typed(IDS.text, "D text", "varchar"),
+  ];
+
+  function _compileTyped(): ReturnType<typeof compileCrosswalk> {
+    return compileCrosswalk({
+      draft: _singleLayoutDraft({
+        columns: [
+          {
+            id: "col-cnt" as CrosswalkColumn.Id,
+            name: "cnt",
+            position: 0,
+            dataType: "double",
+            entryId: undefined,
+          },
+        ],
+        fills: { "col-cnt": _columnFill("cnt") },
+        datasetIds: DATASETS.map((dataset) => {
+          return dataset.id;
+        }),
+        columnNames: ["cnt"],
+      }),
+      datasetsById: new Map(
+        DATASETS.map((dataset) => {
+          return [dataset.id as string, dataset] as const;
+        }),
+      ),
+      entriesById: new Map<string, DictionaryMatch.Entry>(),
+    });
+  }
+
+  it("fails on DuckDB when an incompatible dataset is stacked in", async () => {
+    await expect(
+      _readRows(
+        TABLES,
+        `SELECT cnt FROM (SELECT * FROM "${IDS.bigint}" UNION ALL BY NAME SELECT * FROM "${IDS.date}")`,
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("stacks numbers and text, and leaves the date dataset out with a problem", async () => {
+    const result = _compileTyped();
+
+    expect(result.status).toBe("ready");
+    if (result.status !== "ready") {
+      return;
+    }
+    const rows = await _readRows(
+      TABLES,
+      `SELECT * FROM (${result.sql}) ORDER BY cnt`,
+    );
+
+    expect(result.includedDatasetIds).toEqual([
+      IDS.bigint,
+      IDS.double,
+      IDS.text,
+    ]);
+    expect(result.problems).toContainEqual({
+      kind: "column_types_differ",
+      datasetId: IDS.date,
+      datasetName: "C date",
+    });
+    expect(rows).toEqual([{ cnt: 1 }, { cnt: 2.5 }, { cnt: 7 }]);
+  });
+});
+
+describe("hostile text on DuckDB", () => {
+  const HOSTILE = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const COLUMN_NAME = `it's $& -- "x"`;
+  const DATE_FORMAT = "%m'%d--%Y$&";
+  const CONSTANT = `it's $& -- ok`;
+  const LABEL = `O'Brien $& --`;
+  const HOSTILE_LIST = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+
+  it("keeps a quote, $& and -- in a column name, a constant, a date format, and a label as data", async () => {
+    const output = CrosswalkSql.compile({
+      codeListsById: new Map([
+        [
+          HOSTILE_LIST,
+          { pairs: [{ ..._pair("1", LABEL) }, { ..._pair("2", "Other") }] },
+        ],
+      ]),
+      primaryCodeListIdByEntryId: new Map(),
+      codesOutputAs: "labels",
+      sourceColumnName: undefined,
+      columns: [
+        _column("name_out", "varchar"),
+        _column("when_out", "date"),
+        _column("const_out", "varchar"),
+        _column("coded_out", "varchar"),
+        _column("expr_out", "varchar"),
+      ],
+      layouts: [
+        _layout(
+          "layout-hostile",
+          [{ id: HOSTILE as Dataset.Id, name: LABEL }],
+          {
+            name_out: _columnFill(COLUMN_NAME),
+            when_out: _columnFill("when", {
+              convert: { kind: "parse_date", format: DATE_FORMAT },
+            }),
+            const_out: { kind: "constant", value: CONSTANT },
+            coded_out: _columnFill("code", {
+              codeListId: HOSTILE_LIST as DataDictionaryCodeList.Id,
+            }),
+            expr_out: { kind: "expression", sql: `{${COLUMN_NAME}} || '--'` },
+          },
+        ),
+      ],
+    });
+    const rows = await _readRows(
+      [
+        `CREATE TABLE "${HOSTILE}" AS SELECT ${quoteSqlLiteral("row $&")} AS ${quoteSqlIdentifier(COLUMN_NAME)}, ${quoteSqlLiteral("03'02--2026$&")} AS "when", '1' AS code`,
+      ],
+      `SELECT * FROM (${output.sql})`,
+    );
+
+    expect(rows).toEqual([
+      {
+        name_out: "row $&",
+        when_out: "2026-03-02",
+        const_out: CONSTANT,
+        coded_out: LABEL,
+        expr_out: "row $&--",
+      },
+    ]);
   });
 });

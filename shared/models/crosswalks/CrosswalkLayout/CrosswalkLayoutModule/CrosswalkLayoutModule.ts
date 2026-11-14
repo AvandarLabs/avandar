@@ -24,7 +24,7 @@ function _compareCodePoints(textA: string, textB: string): number {
 }
 
 function _normalizeColumnName(columnName: string): string {
-  return columnName.trim().toLowerCase();
+  return columnName.toLowerCase();
 }
 
 function _getNormalizedNames(columnNames: readonly string[]): string[] {
@@ -111,39 +111,40 @@ function groupDatasetsByLayout(
     });
 }
 
+type NameScorer = ReturnType<typeof ColumnProfile.createNameScorer>;
+
 function _isCovered(
   columnName: string,
   candidateNames: readonly string[],
+  scorer: NameScorer,
 ): boolean {
   const normalizedName = _normalizeColumnName(columnName);
+  const columnId = scorer.getNameId(columnName);
   return candidateNames.some((candidateName) => {
     return (
       _normalizeColumnName(candidateName) === normalizedName ||
-      ColumnProfile.getNameScore(candidateName, columnName) >=
+      scorer.getScore(scorer.getNameId(candidateName), columnId) >=
         ColumnProfile.MATCH_SCORE
     );
   });
 }
 
-/**
- * How many of the other layouts' columns a candidate layout's columns
- * cover, each weighted by how many datasets have it. A column is covered
- * when a candidate column has the same name, ignoring case, or a name
- * score of at least `ColumnProfile.MATCH_SCORE`, so `zip` covers `zip_code`.
- */
-function getCoverage(
-  options: Readonly<{
-    candidate: readonly string[];
-    others: ReadonlyArray<{
-      columnNames: readonly string[];
-      datasetCount: number;
-    }>;
-  }>,
+type CoverageOptions = Readonly<{
+  candidate: readonly string[];
+  others: ReadonlyArray<{
+    columnNames: readonly string[];
+    datasetCount: number;
+  }>;
+}>;
+
+function _getCoverageWith(
+  options: CoverageOptions,
+  scorer: NameScorer,
 ): { matchedCount: number; totalCount: number } {
   return options.others.reduce(
     (counts, other) => {
       const matchedNames = other.columnNames.filter((columnName) => {
-        return _isCovered(columnName, options.candidate);
+        return _isCovered(columnName, options.candidate, scorer);
       });
       return {
         matchedCount:
@@ -156,23 +157,40 @@ function getCoverage(
   );
 }
 
+/**
+ * How many of the other layouts' columns a candidate layout's columns
+ * cover, each weighted by how many datasets have it. A column is covered
+ * when a candidate column has the same name, ignoring case, or a name
+ * score of at least `ColumnProfile.MATCH_SCORE`, so `zip` covers `zip_code`.
+ */
+function getCoverage(options: CoverageOptions): {
+  matchedCount: number;
+  totalCount: number;
+} {
+  return _getCoverageWith(options, ColumnProfile.createNameScorer());
+}
+
 function _getCoverageShare(
   group: Readonly<CrosswalkLayoutGroup>,
   groups: readonly CrosswalkLayoutGroup[],
+  scorer: NameScorer,
 ): number {
-  const { matchedCount, totalCount } = getCoverage({
-    candidate: group.columnNames,
-    others: groups
-      .filter((other) => {
-        return other.key !== group.key;
-      })
-      .map((other) => {
-        return {
-          columnNames: other.columnNames,
-          datasetCount: other.datasetIds.length,
-        };
-      }),
-  });
+  const { matchedCount, totalCount } = _getCoverageWith(
+    {
+      candidate: group.columnNames,
+      others: groups
+        .filter((other) => {
+          return other.key !== group.key;
+        })
+        .map((other) => {
+          return {
+            columnNames: other.columnNames,
+            datasetCount: other.datasetIds.length,
+          };
+        }),
+    },
+    scorer,
+  );
   return totalCount === 0 ? 1 : matchedCount / totalCount;
 }
 
@@ -185,9 +203,11 @@ function _getCoverageShare(
 function chooseReferenceLayout(
   groups: readonly CrosswalkLayoutGroup[],
 ): string | undefined {
+  // One scorer for every pair of layouts, so each pair of names is scored once.
+  const scorer = ColumnProfile.createNameScorer();
   const ranked = groups
     .map((group) => {
-      return { group, share: _getCoverageShare(group, groups) };
+      return { group, share: _getCoverageShare(group, groups, scorer) };
     })
     .sort((rankA, rankB) => {
       return (
@@ -276,8 +296,9 @@ function getStatusAfterFill(
 /**
  * Pure helpers for a crosswalk's layouts: the key and signature datasets
  * with the same columns share, grouping datasets into layouts, choosing the
- * reference layout, and finding the layout a new one is most like. Used by
- * the crosswalk view's reducer and by the combined dataset's compiler.
+ * reference layout, and finding the layout a new one is most like. Use it,
+ * for example, to group a crosswalk's datasets or to tell whether a
+ * dataset's columns changed since it was grouped.
  */
 export const CrosswalkLayoutModule = {
   buildLayoutKey,

@@ -177,14 +177,14 @@ describe("CrosswalkSql.toFillSql", () => {
     ).toBe(`TRY_CAST('2026' AS BIGINT)`);
   });
 
-  it("quotes each Combine placeholder as an identifier, even one with a space or $&", () => {
+  it("quotes each Combine placeholder as an identifier, even one with a space or $&, keeping its spaces", () => {
     const fill: CrosswalkMapping.Fill = {
       kind: "expression",
-      sql: "concat({Case No}, '-', { $& })",
+      sql: "concat({Case No}, '-', {$&}, { padded })",
     };
 
     expect(_fillSql(fill, _column("case_id", "varchar"))).toBe(
-      `TRY_CAST((concat("Case No", '-', "$&")) AS VARCHAR)`,
+      `TRY_CAST((concat("Case No", '-', "$&", " padded ")) AS VARCHAR)`,
     );
   });
 });
@@ -195,6 +195,7 @@ describe("CrosswalkSql.getTranslationOutputs", () => {
       CrosswalkSql.getTranslationOutputs({
         pairs: SEX_129,
         primaryPairs: SEX_129,
+        isPrimaryList: true,
         codesOutputAs: "labels",
       }).map(({ output }) => {
         return output;
@@ -206,6 +207,7 @@ describe("CrosswalkSql.getTranslationOutputs", () => {
     const outputs = CrosswalkSql.getTranslationOutputs({
       pairs: [_pair("M", " MALE "), _pair("F", "fem"), _pair("X", "Other")],
       primaryPairs: [_pair("1", "Male"), _pair("2", "Female", ["fem"])],
+      isPrimaryList: false,
       codesOutputAs: "labels",
     });
 
@@ -221,6 +223,7 @@ describe("CrosswalkSql.getTranslationOutputs", () => {
       CrosswalkSql.getTranslationOutputs({
         pairs: SEX_MFU,
         primaryPairs: SEX_129,
+        isPrimaryList: false,
         codesOutputAs: "codes",
       }).map(({ output }) => {
         return output;
@@ -234,6 +237,7 @@ describe("CrosswalkSql.toTranslation", () => {
     const conversion = CrosswalkSql.toTranslation({
       pairs: SEX_MFU,
       primaryPairs: SEX_129,
+      isPrimaryList: false,
       holdsLabels: false,
       codesOutputAs: "labels",
     });
@@ -255,6 +259,7 @@ describe("CrosswalkSql.toTranslation", () => {
     const conversion = CrosswalkSql.toTranslation({
       pairs: SEX_MFU,
       primaryPairs: SEX_129,
+      isPrimaryList: false,
       holdsLabels: false,
       codesOutputAs: "codes",
     });
@@ -274,6 +279,7 @@ describe("CrosswalkSql.toTranslation", () => {
     const conversion = CrosswalkSql.toTranslation({
       pairs: SEX_MFU,
       primaryPairs: SEX_129,
+      isPrimaryList: false,
       holdsLabels: true,
       codesOutputAs: "codes",
     });
@@ -294,6 +300,7 @@ describe("CrosswalkSql.toTranslation", () => {
     const conversion = CrosswalkSql.toTranslation({
       pairs: [_pair("1", "Male"), _pair("5", " ")],
       primaryPairs: [_pair("1", "Male"), _pair("5", " ")],
+      isPrimaryList: true,
       holdsLabels: false,
       codesOutputAs: "labels",
     });

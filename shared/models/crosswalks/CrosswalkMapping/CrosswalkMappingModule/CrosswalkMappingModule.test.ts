@@ -138,12 +138,20 @@ describe("CrosswalkMapping.getCombineColumnNames", () => {
     ).toEqual(["Case No"]);
   });
 
-  it("lists each name once, trimmed, in order of first use", () => {
+  it("lists each name once, exactly as written, in order of first use", () => {
     expect(
       CrosswalkMapping.getCombineColumnNames(
-        "concat({ last_name }, ', ', {first_name}, {last_name})",
+        "concat({last_name}, ', ', {first_name}, {last_name})",
       ),
     ).toEqual(["last_name", "first_name"]);
+  });
+
+  it("keeps the spaces inside a placeholder, as the column is spelled", () => {
+    expect(
+      CrosswalkMapping.getCombineColumnNames(
+        "concat({ last_name }, {last_name})",
+      ),
+    ).toEqual([" last_name ", "last_name"]);
   });
 
   it("ignores a blank placeholder", () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout.ts";
+import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
 import { fnv1a64Hex } from "$/utils/fnv1a64Hex/fnv1a64Hex.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 
@@ -37,8 +38,14 @@ function _group(
 }
 
 describe("CrosswalkLayout.buildLayoutKey", () => {
-  it("gives CaseNo and `caseno ` one key", () => {
+  it("gives CaseNo and caseno one key", () => {
     expect(CrosswalkLayout.buildLayoutKey(["CaseNo", "zip"])).toBe(
+      CrosswalkLayout.buildLayoutKey(["caseno", "ZIP"]),
+    );
+  });
+
+  it("keeps `caseno ` and caseno apart, as DuckDB does", () => {
+    expect(CrosswalkLayout.buildLayoutKey(["CaseNo", "zip"])).not.toBe(
       CrosswalkLayout.buildLayoutKey(["caseno ", "ZIP"]),
     );
   });
@@ -127,6 +134,44 @@ describe("CrosswalkLayout.getCoverage", () => {
         ],
       }),
     ).toEqual({ matchedCount: 2 * 10 + 4, totalCount: 4 * 10 + 5 });
+  });
+});
+
+describe("CrosswalkLayout.getCoverage scoring", () => {
+  it("counts exactly the columns a plain name score would, repeats included", () => {
+    const others = [
+      {
+        columnNames: [...QUEENS_COLUMNS, "ZIP_CODE", "zip_code"],
+        datasetCount: 3,
+      },
+      { columnNames: [...BRONX_COLUMNS, "onset_date"], datasetCount: 2 },
+    ];
+    const candidate = [...KINGS_COLUMNS, "rash_onset_date", "Sex"];
+    const isCovered = (columnName: string): boolean => {
+      return candidate.some((candidateName) => {
+        return (
+          candidateName.toLowerCase() === columnName.toLowerCase() ||
+          ColumnProfile.getNameScore(candidateName, columnName) >=
+            ColumnProfile.MATCH_SCORE
+        );
+      });
+    };
+    const expected = others.reduce(
+      (counts, other) => {
+        return {
+          matchedCount:
+            counts.matchedCount +
+            other.columnNames.filter(isCovered).length * other.datasetCount,
+          totalCount:
+            counts.totalCount + other.columnNames.length * other.datasetCount,
+        };
+      },
+      { matchedCount: 0, totalCount: 0 },
+    );
+
+    expect(CrosswalkLayout.getCoverage({ candidate, others })).toEqual(
+      expected,
+    );
   });
 });
 

@@ -134,9 +134,9 @@ function _findColumnName(
   name: string,
   columnNames: readonly string[],
 ): string | undefined {
-  const key = name.trim().toLowerCase();
+  const key = name.toLowerCase();
   return columnNames.find((columnName) => {
-    return columnName.trim().toLowerCase() === key;
+    return columnName.toLowerCase() === key;
   });
 }
 
@@ -245,11 +245,9 @@ function _needsPadding(
 }
 
 /**
- * The conversion a source column likely needs to fill a target: read as a
- * date when the target is a date and the source is text in a detected
- * format, or padded with zeros when every target value is a digit string of
- * one length and some source values are shorter, such as ZIP `501` against
- * `00501`. Undefined when neither applies.
+ * The conversion a source column likely needs to fill a target, such as
+ * reading text as a date or padding ZIP `501` to `00501`. Undefined when
+ * none applies.
  */
 function suggestConvert(
   options: Readonly<{
@@ -259,6 +257,9 @@ function suggestConvert(
     dateFormat: string | undefined;
   }>,
 ): CrosswalkMapping.Convert | undefined {
+  // Read as a date when the target is a date and the source is text in a
+  // detected format. Pad with zeros when every target value is a digit
+  // string of one length and some source values are shorter.
   const isDateTarget =
     options.targetDataType === "date" || options.targetDataType === "timestamp";
   if (
@@ -326,7 +327,7 @@ function _getSourceKeysUsedBy(fills: readonly CarriedFill[]): Set<string> {
   return new Set(
     fills.flatMap((item) => {
       return item.fill.kind === "column"
-        ? [item.fill.sourceColumn.trim().toLowerCase()]
+        ? [item.fill.sourceColumn.toLowerCase()]
         : [];
     }),
   );
@@ -393,7 +394,7 @@ function _getMatchPrefills(
       return !carriedIds.has(target.columnId);
     }),
     sources: options.sources.filter((source) => {
-      return !usedSourceKeys.has(source.columnName.trim().toLowerCase());
+      return !usedSourceKeys.has(source.columnName.toLowerCase());
     }),
   };
   return matchLayoutColumns(pool).flatMap((match) => {
@@ -403,14 +404,16 @@ function _getMatchPrefills(
 }
 
 /**
- * The fills a layout starts with, in column order. Fills carried over from
- * a similar layout come first, as suggestions. The scorer then fills the
- * rest from the source columns no carried fill uses: a match is confirmed,
- * a suggestion is not, and the score is the confidence. A governed
- * column's fill translates codes with `chooseCodeList`; any other column's
- * gets `suggestConvert`.
+ * The fills a layout starts with, in column order, each with its status and
+ * how sure the match was. Use it when a layout is first added to a
+ * crosswalk and again once its values are read.
  */
 function prefillLayout(options: PrefillOptions): CrosswalkPrefill[] {
+  // Fills carried over from a similar layout come first, as suggestions.
+  // The scorer then fills the rest from the source columns no carried fill
+  // uses: a match is confirmed, a suggestion is not, and the score is the
+  // confidence. A governed column's fill translates codes with
+  // `chooseCodeList`; any other column's gets `suggestConvert`.
   const columnIds = new Set(
     options.columns.map((column) => {
       return column.id;
@@ -437,8 +440,9 @@ function prefillLayout(options: PrefillOptions): CrosswalkPrefill[] {
  * Pure helpers for mapping a layout onto a crosswalk's columns: scoring its
  * columns against the combined dataset's, carrying fills over from a
  * similar layout, choosing a governed column's code list, and spotting a
- * conversion a column needs. Used by the crosswalk view's reducer, on the
- * device, so it works offline.
+ * conversion a column needs. It runs on the device, so it works offline:
+ * use it to prefill a new layout's fills, for example when datasets with a
+ * new column layout are added to a crosswalk.
  */
 export const CrosswalkMatchModule = {
   toNameAndTypeProfiles,
