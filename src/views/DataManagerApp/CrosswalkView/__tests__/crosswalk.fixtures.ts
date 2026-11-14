@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import {
   crosswalkReducer,
@@ -17,6 +18,8 @@ import type {
   CrosswalkState,
   ReferenceColumnBinding,
 } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
+import type { CrosswalkCatalog } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkCatalog/useCrosswalkCatalog";
+import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
 
 /** The crosswalk every fixture belongs to. */
 export const CROSSWALK_ID =
@@ -248,4 +251,42 @@ export function makeSeededState(
     bindingsByColumnName: bindings,
     context: CONTEXT,
   });
+}
+
+/**
+ * A flow over `makeSeededState()` on Choose datasets, with `overrides` laid
+ * on top.
+ */
+export function makeCrosswalkFlow(
+  overrides: Partial<CrosswalkFlow> = {},
+): CrosswalkFlow {
+  return {
+    state: makeSeededState(),
+    dispatch: vi.fn(),
+    step: "datasets",
+    layoutId: undefined,
+    reachableSteps: new Set(["datasets"]),
+    goToStep: vi.fn(),
+    selectLayout: vi.fn(() => {
+      return Promise.resolve();
+    }),
+    save: vi.fn(() => {
+      return Promise.resolve(true);
+    }),
+    dispatchAndSave: vi.fn(() => {
+      return Promise.resolve(true);
+    }),
+    isSaving: false,
+    ...overrides,
+  };
+}
+
+/** A catalog over `CONTEXT` that has finished loading. */
+export function makeCrosswalkCatalog(): CrosswalkCatalog {
+  return {
+    context: CONTEXT,
+    bindingsByDatasetId: new Map(),
+    columnNameById: new Map(),
+    isLoading: false,
+  };
 }

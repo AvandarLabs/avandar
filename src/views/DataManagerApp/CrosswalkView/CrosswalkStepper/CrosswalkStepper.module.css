@@ -1,0 +1,6 @@
+/* The step bar sits between the header band and the step, on the lit surface. */
+.crosswalkStepper {
+  border-block-end: 1px solid var(--ava-border-default);
+  flex: none;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
+}
