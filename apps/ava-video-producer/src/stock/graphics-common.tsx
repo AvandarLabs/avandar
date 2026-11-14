@@ -1,4 +1,5 @@
 import { loopPhase, mix, ramp, wave } from "../motion";
+import { SketchedShape } from "./primitives/SketchedShape/SketchedShape";
 import { StockRect } from "./primitives/StockRect/StockRect";
 import {
   useGraphicFilter,
@@ -359,8 +360,9 @@ export function DrawPath({
     motion.curve(edge.drawEasing),
   );
   return (
-    <path
-      d={path}
+    <SketchedShape
+      shape={{ kind: "path", d: path }}
+      profile={edge.sketch}
       pathLength={1}
       fill="none"
       stroke={edge.color}
@@ -507,11 +509,9 @@ export function Guide({
 }) {
   const guide = useGraphicProps("Guide", {});
   return (
-    <ellipse
-      cx={cx}
-      cy={cy}
-      rx={rx}
-      ry={ry}
+    <SketchedShape
+      shape={{ kind: "ellipse", cx, cy, rx, ry }}
+      profile={guide.sketch}
       fill="none"
       stroke={guide.color}
       strokeWidth={guide.strokeWidth}
@@ -619,26 +619,23 @@ export function CircleNode({
   const r = radius ?? node[NODE_RADIUS_KEYS[size]];
   return (
     <Arrive frame={frame} index={index}>
-      <circle
-        cx={x}
-        cy={y}
-        r={r + node.ringSpread}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: r + node.ringSpread }}
+        profile={node.sketch}
         fill="none"
         stroke={accent}
         strokeOpacity={active * node.ringAlpha}
       />
-      <circle
-        cx={x}
-        cy={y}
-        r={r}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r }}
+        profile={node.sketch}
         fill={node.fill}
         stroke={node.stroke}
         strokeWidth={node.strokeWidth}
       />
-      <circle
-        cx={x}
-        cy={y}
-        r={r}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r }}
+        profile={node.sketch}
         fill={accent}
         fillOpacity={active * node.tintAlpha}
         stroke={accent}

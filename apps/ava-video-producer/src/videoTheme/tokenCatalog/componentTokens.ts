@@ -133,6 +133,14 @@ function _glow(label: string, description: string) {
 function _elevation(label: string, description: string) {
   return token({ kind: "elevation", surface: "graphic", label, description });
 }
+function _sketch(label: string, description: string) {
+  return token({
+    kind: "sketchProfile",
+    surface: "graphic",
+    label,
+    description,
+  });
+}
 
 const NODE_TOKENS = {
   radiusXs: _length(
@@ -187,6 +195,7 @@ const NODE_TOKENS = {
     "Node detail offset",
     "Distance from a node's edge to its detail baseline.",
   ),
+  sketch: _sketch("Node sketch", "The sketch profile node outlines use."),
 } as const;
 
 const SHARED_GRAPHIC_TOKENS = {
@@ -215,6 +224,7 @@ const SHARED_GRAPHIC_TOKENS = {
       "Where a curved edge places its control points.",
       { min: 0, max: 1, step: 0.01 },
     ),
+    sketch: _sketch("Edge sketch", "The sketch profile edges use."),
   },
   Route: {
     strokeWidth: _stroke("Route width", "Width of a highlighted route."),
@@ -276,6 +286,7 @@ const SHARED_GRAPHIC_TOKENS = {
     alpha: _alpha("Guide opacity", "Opacity of guides."),
     strokeWidth: _stroke("Guide width", "Width of dashed guides."),
     dash: _dash("Guide dash", "Dash pattern of guides, in pixels."),
+    sketch: _sketch("Guide sketch", "The sketch profile guides use."),
   },
   Panel: {
     fill: _color("Panel fill", "Fill of a panel."),

@@ -5,6 +5,7 @@ import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import {
   Caption,
   CircleNode,
+  DrawPath,
   Eyebrow,
   Guide,
   Panel,
@@ -114,4 +115,21 @@ test("a raised panel references the theme's elevation filter", () => {
     markup,
     /filter="url\(#stock-[^"]*-fx-components-Panel-elevation\)"/,
   );
+});
+
+test("the shape sketch profile turns nodes, edges, and guides into hand-drawn paths", () => {
+  const patch: VideoThemePatch = {
+    other: {
+      video: { semantic: { sketch: { shape: "$sketch.profile.rough" } } },
+    },
+  };
+  const markup = _svg(
+    <>
+      <CircleNode x={100} y={100} label="A" frame={60} accent="#51a7ff" />
+      <DrawPath d="M0 0 L100 0" frame={60} />
+      <Guide cx={0} cy={0} rx={10} ry={5} />
+    </>,
+    patch,
+  );
+  assert.equal(markup.match(/data-rough-shape="3"/g)?.length, 5);
 });

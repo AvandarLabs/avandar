@@ -1,4 +1,4 @@
-import rough from "roughjs";
+import { getSketchPathsFromShape } from "../../../videoTheme/sketchShape/sketchShape";
 import { useGraphicTokens } from "../../theme/useGraphicTheme";
 import type { SVGProps } from "react";
 
@@ -33,18 +33,10 @@ export function StockRect(props: SVGProps<SVGRectElement>) {
   ) {
     return <rect {...props} />;
   }
-  const generator = rough.generator();
-  const paths = generator.toPaths(
-    generator.rectangle(x, y, width, height, {
-      roughness: profile.roughness,
-      bowing: profile.bowing,
-      seed: profile.seed,
-      stroke,
-      fill,
-      fillStyle: "solid",
-      strokeWidth: Number(strokeWidth),
-      maxRandomnessOffset: profile.randomness,
-    }),
+  const paths = getSketchPathsFromShape(
+    { kind: "rect", x, y, width, height },
+    profile,
+    { stroke, strokeWidth: Number(strokeWidth), fill },
   );
   return (
     <g {...attributes} data-rough-box={profile.roughness}>
