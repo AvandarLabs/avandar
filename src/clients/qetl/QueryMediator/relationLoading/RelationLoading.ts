@@ -7,6 +7,7 @@ import {
 } from "@avandar/utils";
 import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { notifyRelationFetched } from "@/clients/qetl/QueryMediator/notifyRelationFetched/notifyRelationFetched";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
 import { UNREAD_PROJECTION_KEY } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
@@ -370,7 +371,10 @@ async function _fetchRelationBytes(
         relationSource,
         relationRegistry,
       });
-      options.onRelationFetched?.(relationSource.dataset.id);
+      notifyRelationFetched(
+        options.onRelationFetched,
+        relationSource.dataset.id,
+      );
       return priorBytes.concat(relationBytes);
     },
     Promise.resolve([]),

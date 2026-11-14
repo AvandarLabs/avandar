@@ -105,9 +105,9 @@ async function _readCombinedPreview(
  * Reads the combined dataset's preview on this device: the first rows,
  * then the row count. The first read loads every source dataset, so it can
  * take minutes. `progress` counts the stacked datasets in hand meanwhile,
- * from none for each new read. Keyed by the SQL and its columns, so a
- * settings change reads again and a late reply is dropped. Nothing is read
- * without SQL.
+ * from none for each new read, and ignores the reports of an older read.
+ * Keyed by the SQL and its columns, so a settings change reads again and a
+ * late reply is dropped. Nothing is read without SQL.
  */
 export function useCombinedPreview(
   options: Readonly<{
@@ -119,18 +119,19 @@ export function useCombinedPreview(
 ): CombinedPreviewRead {
   const workspace = useCurrentWorkspace();
   const { sql, columnNames } = options;
-  const progress = useCombiningProgress(options.datasetIds);
+  const key =
+    sql === undefined ? undefined : JSON.stringify([sql, columnNames]);
+  const progress = useCombiningProgress(options.datasetIds, key);
   const read = useTaggedRead({
-    key: sql === undefined ? undefined : JSON.stringify([sql, columnNames]),
+    key,
     devMsg: "Reading the combined dataset preview failed",
     read: () => {
-      progress.reset();
       return _readCombinedPreview({
         workspaceId: workspace.id,
         sql: sql ?? "",
         columnNames,
         datasetIds: options.datasetIds,
-        onRelationFetched: progress.onRelationFetched,
+        onRelationFetched: progress.startRead(key ?? ""),
       });
     },
   });

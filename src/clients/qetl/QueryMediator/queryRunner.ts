@@ -11,6 +11,7 @@ import {
   getRelationSources,
   probeRelationCache,
 } from "@/clients/qetl/QueryMediator/getRelationSources";
+import { notifyRelationFetched } from "@/clients/qetl/QueryMediator/notifyRelationFetched/notifyRelationFetched";
 import { getVirtualRelationDefinitions } from "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions";
 import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -159,7 +160,7 @@ function _reportRelationsInHand(
   const exceptIds = new Set<string>(options.exceptIds ?? []);
   options.datasetIds.forEach((datasetId) => {
     if (!exceptIds.has(datasetId)) {
-      onRelationFetched(datasetId);
+      notifyRelationFetched(onRelationFetched, datasetId);
     }
   });
 }

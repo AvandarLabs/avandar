@@ -1,7 +1,14 @@
 import { Callout } from "@avandar/ui";
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Center, Loader, Stack, Table, Text } from "@mantine/core";
+import {
+  Center,
+  Loader,
+  Stack,
+  Table,
+  Text,
+  VisuallyHidden,
+} from "@mantine/core";
 import { useId } from "react";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import css from "@/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.module.css";
@@ -90,6 +97,33 @@ function PreviewTable(
   );
 }
 
+/** How often, in percent of the datasets read, the count is announced. */
+const ANNOUNCE_STEP_PERCENT = 10;
+
+/**
+ * Tells a screen reader how far the read has got, in steps of 10 percent,
+ * so it hears about ten updates however many datasets are stacked. The
+ * visible count changes with every dataset.
+ */
+function ReadingAnnouncement({
+  progress,
+}: Readonly<{ progress: CombiningProgressCount }>): ReactNode {
+  const { i18n, t } = useLingui();
+  const stepCount =
+    progress.totalCount === 0
+      ? 0
+      : Math.floor(
+          (progress.readCount / progress.totalCount) *
+            (100 / ANNOUNCE_STEP_PERCENT),
+        );
+  const percentLabel = i18n.number(stepCount * ANNOUNCE_STEP_PERCENT);
+  return (
+    <VisuallyHidden role="status">
+      {t`${percentLabel}% of the datasets read`}
+    </VisuallyHidden>
+  );
+}
+
 function ReadingPreview({
   datasetCount,
   progress,
@@ -103,7 +137,8 @@ function ReadingPreview({
       "Reading # datasets on this device. The first time can take a few minutes.",
   });
   return (
-    <Center py="lg" role="status">
+    <Center py="lg">
+      <ReadingAnnouncement progress={progress} />
       <Stack align="center" gap="sm" w="100%">
         <Loader size="sm" />
         <CombiningProgress

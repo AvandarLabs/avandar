@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook, waitFor } from "@/test-utils";
+import { act, renderHook, waitFor } from "@/test-utils";
 import {
   buildCombinedPreviewSql,
   useCombinedPreview,
@@ -156,5 +156,51 @@ describe("useCombinedPreview", () => {
         }),
       );
     });
+  });
+
+  it("does not count a stale read's reports after the SQL changes", async () => {
+    const listenersBySql = new Map<string, (datasetId: Dataset.Id) => void>();
+    runQueryMock.mockImplementation(
+      (params: {
+        rawSql: string;
+        onRelationFetched: (datasetId: Dataset.Id) => void;
+      }) => {
+        listenersBySql.set(params.rawSql, params.onRelationFetched);
+        return new Promise(() => {});
+      },
+    );
+    const { result, rerender } = renderHook(
+      (props: { sql: string }) => {
+        return useCombinedPreview({
+          sql: props.sql,
+          columnNames: ["case_id"],
+          datasetIds: [KINGS, QUEENS],
+        });
+      },
+      { initialProps: { sql: "SELECT 1 AS case_id" } },
+    );
+    await waitFor(() => {
+      expect(runQueryMock).toHaveBeenCalledTimes(1);
+    });
+    const firstListener = [...listenersBySql.values()][0]!;
+    act(() => {
+      firstListener(KINGS);
+    });
+    expect(result.current.progress.readCount).toBe(1);
+
+    rerender({ sql: "SELECT 2 AS case_id" });
+    await waitFor(() => {
+      expect(runQueryMock).toHaveBeenCalledTimes(2);
+    });
+    act(() => {
+      firstListener(QUEENS);
+    });
+
+    expect(result.current.progress).toEqual({ readCount: 0, totalCount: 2 });
+    const secondListener = [...listenersBySql.values()][1]!;
+    act(() => {
+      secondListener(KINGS);
+    });
+    expect(result.current.progress.readCount).toBe(1);
   });
 });

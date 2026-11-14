@@ -206,13 +206,15 @@ taking locks, and without the outer statement's `conceptSpineRestrictions`,
 because its parquet bytes are cached without them.
 
 **Progress.** A caller may pass `onRelationFetched` to `runQuery`. It is
-called once for each dataset the query loads, as soon as its relation is in
-hand: after step 8 for one the queryable tier serves, after step 9 for a
-storage tier hit, and after each source's bytes arrive in step 11. A
-virtual dataset's nested query receives the same callback, so its sources
-report too, and a caller that counts progress counts only the datasets it
-asked about. A crosswalk's combined preview uses it to say how many of its
-datasets are read.
+called at least once for each dataset the query loads, as soon as its
+relation is in hand: after step 8 for one the queryable tier serves, after
+step 9 for a storage tier hit, and after each source's bytes arrive in step
+11. A virtual dataset's nested query receives the same callback, so its
+sources report too, and a dataset is reported again by a nested query that
+reads the same dataset. A caller that counts progress counts each dataset it
+asked about once, and ignores the rest. A listener that throws is logged and
+ignored, so it cannot fail the query. A crosswalk's combined preview uses it
+to say how many of its datasets are read.
 
 ## 5. Components, their paths, and their dependencies
 

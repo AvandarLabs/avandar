@@ -3,7 +3,7 @@
  * and how the loader applies each relation's precomputed replacements.
  */
 
-import { MIMEType } from "@avandar/utils";
+import { MIMEType, prop } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
@@ -253,5 +253,33 @@ describe("RelationLoading.fetchRelationBytes progress", () => {
       `acquire ${SECOND_ID}`,
       `fetched ${SECOND_ID}`,
     ]);
+  });
+
+  it("still returns every relation when the listener throws", async () => {
+    getWrapperForRefMock.mockReturnValue({
+      acquire: async (request: { ref: { id: string } }) => {
+        return {
+          ref: request.ref,
+          parquetBlob: new Blob(["rows"]),
+          sourceVersion: undefined,
+          maxAgeMs: undefined,
+        };
+      },
+    });
+    const onRelationFetched = vi.fn(() => {
+      throw new Error("listener failed");
+    });
+
+    const fetched = await RelationLoading.fetchRelationBytes({
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      growFromColumnsByDatasetId: {},
+      neededByDatasetId: {},
+      relationSources: [_csvSource(DATASET_ID), _csvSource(SECOND_ID)],
+      runQuery: vi.fn() as unknown as QetlRunQuery,
+      onRelationFetched,
+    });
+
+    expect(fetched.map(prop("datasetId"))).toEqual([DATASET_ID, SECOND_ID]);
+    expect(onRelationFetched).toHaveBeenCalledTimes(2);
   });
 });

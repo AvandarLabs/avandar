@@ -10,6 +10,10 @@ describe("CombiningProgress", () => {
     expect(
       screen.getByRole("progressbar", { name: "Read 37 of 100 datasets" }),
     ).toHaveAttribute("aria-valuenow", "37");
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-labelledby",
+      screen.getByText("Read 37 of 100 datasets").id,
+    );
   });
 
   it("reads one dataset in the singular", () => {

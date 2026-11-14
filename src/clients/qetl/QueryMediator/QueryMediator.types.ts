@@ -193,10 +193,12 @@ export type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
 export type DatasetsById = Record<Dataset.Id, Dataset.T | undefined>;
 
 /**
- * Called once for each dataset a query loads, as soon as its relation is
- * in hand: at once for one DuckDB already serves, after the storage tier's
- * bytes are read, or after its source returns them. A virtual dataset's
- * nested query reports its own datasets through the same callback. Lets a
+ * Called at least once for each dataset a query loads, as soon as its
+ * relation is in hand: at once for one DuckDB already serves, after the
+ * storage tier's bytes are read, or after its source returns them. A
+ * virtual dataset's nested query reports its own datasets through the same
+ * callback, so a dataset is reported again from a nested query that reads
+ * the same dataset. A listener that throws is logged and ignored. Lets a
  * caller show progress across a query that reads many datasets.
  */
 export type RelationFetchedListener = (datasetId: Dataset.Id) => void;
