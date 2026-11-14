@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
+import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm/CreateWorkspaceForm";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 

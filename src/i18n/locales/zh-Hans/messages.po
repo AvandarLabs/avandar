@@ -624,6 +624,10 @@ msgstr "上传文件"
 msgid "Privacy log cleared."
 msgstr "隐私日志已清除。"
 
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "{slug} 已被占用。请尝试其他 ID。"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "导出 CSV"
@@ -674,7 +678,7 @@ msgstr "免费"
 msgid "The table visualization has no extra settings."
 msgstr "表格可视化没有额外设置。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "关于您"
 
@@ -1628,10 +1632,6 @@ msgstr "显示 {datasetName} 的前 20 行"
 msgid "Map of {0}"
 msgstr "{0} 的地图"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "工作区 ID 必须少于 {SLUG_MAX_LENGTH} 个字符"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "已从 Google Sheets 刷新"
@@ -1838,10 +1838,6 @@ msgstr "表格视图没有图表设置。"
 msgid "You save {discount}% compared to monthly billing"
 msgstr "与按月计费相比，您节省了 {discount}%"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "工作区 ID 必须至少包含 {SLUG_MIN_LENGTH} 个字符"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "内置预设"
@@ -1925,6 +1921,10 @@ msgstr "间距"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "选择数据源"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is available"
+msgstr "{slug} 可用"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
@@ -2041,7 +2041,7 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "您确定要继续此操作吗？此操作无法撤销。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "这是您组织在 URL 中使用的唯一 ID。"
 
@@ -2072,6 +2072,10 @@ msgstr "{totalRowCount} 行中的 {droppedRowCount} 行无法映射"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "您确定要将此用户从工作区中移除吗？"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Enter an ID for your workspace."
+msgstr "输入工作区 ID。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -2127,6 +2131,11 @@ msgstr "检测到偏见："
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "正文"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "我们无法检查此 ID。请检查网络连接，然后修改 ID 重试。"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -2317,10 +2326,6 @@ msgstr "手动"
 msgid "Understanding your question…"
 msgstr "正在理解你的问题…"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "工作区 ID 不能为空"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "默认情况下，我们使用基于 UUID 的直接链接。"
@@ -2377,6 +2382,10 @@ msgstr "角色与权限"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "100% 堆叠"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "请使用不超过 {WORKSPACE_SLUG_MAX_LENGTH} 个字符。"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -2541,7 +2550,7 @@ msgstr "WHERE 子句左侧使用了不是列引用的表达式。"
 msgid "PDF downloaded."
 msgstr "PDF 已下载。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "工作区 ID"
 
@@ -2743,6 +2752,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "第 5 列"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "只能使用字母、数字和连字符。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -3455,6 +3468,10 @@ msgstr "无法捕获仪表板"
 msgid "Processing dataset…"
 msgstr "正在处理数据集…"
 
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "请至少使用 {WORKSPACE_SLUG_MIN_LENGTH} 个字符。"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "离线聊天模型已准备好。点击切换或重新下载。"
@@ -3528,7 +3545,7 @@ msgstr "如果您希望获得访问权限，请<0>给我们发送邮件</0>。"
 msgid "Private maps"
 msgstr "私有地图"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "关于您的工作区"
 
@@ -4857,10 +4874,6 @@ msgstr "按 {groupByColumn} 统计 {datasetName} 中的行数"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未应用 SQL。请登录以批准筛选值。"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "工作区 ID 只能包含字母、数字和连字符"
-
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
@@ -4906,7 +4919,7 @@ msgstr "让 AI 决定（遗留）"
 msgid "New field"
 msgstr "新字段"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "工作区创建成功！"
 
@@ -5317,7 +5330,7 @@ msgstr "方向"
 msgid "Dashboard deleted successfully!"
 msgstr "仪表板删除成功！"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "您希望其他团队成员看到的名称。"
 
@@ -6514,6 +6527,10 @@ msgstr "不以……结尾"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "添加图层"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "Checking if {slug} is available…"
+msgstr "正在检查 {slug} 是否可用…"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -7760,10 +7777,6 @@ msgstr "不为空"
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "此地图上没有可用于查询 P-code 的边界图层。"
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "工作区 ID 不能包含空格"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
