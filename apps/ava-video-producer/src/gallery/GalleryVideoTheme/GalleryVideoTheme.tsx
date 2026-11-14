@@ -10,16 +10,14 @@ import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVid
 import { VideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
 import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
-import {
-  createSavedDocumentFromDraft,
-  type ThemeDraft,
-} from "../../videoThemeEditor/themeDraft/themeDraft";
+import { createThemeJsonFromDraft } from "../../videoThemeEditor/themeJson/themeJson";
 import {
   useVideoThemeDraft,
   type VideoThemeDraftState,
 } from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
 import { copyTextToClipboard } from "../copyText/copyText";
 import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
+import type { ThemeDraft } from "../../videoThemeEditor/themeDraft/themeDraft";
 
 /** The gallery's theme state plus what previews and exports need from it. */
 export type GalleryVideoThemeValue = VideoThemeDraftState &
@@ -48,21 +46,16 @@ export function useGalleryVideoTheme(): GalleryVideoThemeValue {
   return value;
 }
 
-/** Copies the active theme, as saving the draft would write it, as JSON. */
+/** Copies the active theme and its draft as the JSON a save would write. */
 function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
   const { t } = useLingui();
   const { library, themeId, draft, setCopyStatus } = state;
   return useCallback(async () => {
-    const document = library.get(themeId);
-    if (!document) {
+    const json = createThemeJsonFromDraft({ library, themeId, draft });
+    if (json === undefined) {
       return;
     }
     try {
-      const json = JSON.stringify(
-        createSavedDocumentFromDraft(document, draft),
-        null,
-        2,
-      );
       await copyTextToClipboard(json, t`Theme JSON`);
       setCopyStatus("copied");
     } catch {
