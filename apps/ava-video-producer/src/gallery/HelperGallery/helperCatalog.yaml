@@ -1389,7 +1389,7 @@ helpers:
     goodFor: "Subtle halos and proximity emphasis."
     avoid: "Strong pulses on text, which read as flashing."
     usedBy:
-      - src/stock/graphics-networks/PlexusField.tsx
+      - src/stock/graphics-common.tsx
       - src/stock/graphics-networks/NetworkGraph.tsx
     demo: { id: wave, frames: 90 }
 
