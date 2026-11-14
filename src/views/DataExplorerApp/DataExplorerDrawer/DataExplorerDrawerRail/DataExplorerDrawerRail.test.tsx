@@ -1,6 +1,7 @@
 /**
  * Tests for the drawer rail's trailing section: which control belongs to the
- * active tab, what survives collapsing, and the chevron's reported state.
+ * active tab, what stays hidden while collapsed, and the chevron's reported
+ * state.
  */
 import { describe, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
@@ -59,12 +60,22 @@ describe("DataExplorerDrawerRail", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("keeps the out-of-sync badge while shut on the Visualizations tab", () => {
-    // The badge reports on the query, not on whichever editor is showing, so
-    // neither collapsing nor the active tab should take it away.
+  it("hides the out-of-sync badge while the drawer is collapsed", () => {
     _renderRail({
       activeTab: "visualizations",
       isCollapsed: true,
+      isStructuredQueryInSync: false,
+    });
+
+    expect(
+      screen.queryByText(/form is an approximation/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the out-of-sync badge once the drawer is open", () => {
+    _renderRail({
+      activeTab: "visualizations",
+      isCollapsed: false,
       isStructuredQueryInSync: false,
     });
 
