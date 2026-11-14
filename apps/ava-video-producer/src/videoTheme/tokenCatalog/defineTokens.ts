@@ -147,7 +147,7 @@ export function isCompositeTokenKind(
 }
 
 /**
- * The editor control for each token kind (spec §3.3). Exported in the JSON
+ * The editor control for each token kind. Exported in the JSON
  * Schema as `control`, so a theme generator knows how a value is edited.
  */
 export const TOKEN_CONTROLS = {

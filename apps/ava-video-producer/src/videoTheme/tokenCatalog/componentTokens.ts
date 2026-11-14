@@ -1020,8 +1020,8 @@ const TRANSITION_TOKENS = {
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
- * a reference or a deliberate literal one-off. Plan 2 adds one entry per
- * themed shape as each renderer adopts tokens.
+ * a reference or a deliberate literal one-off. Each themed shape has one
+ * entry here, merged from the shared, stage, overlay, and transition groups.
  */
 export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,

@@ -51,8 +51,9 @@ const CAPTION_BAND: ParityRegion = { x: 0, y: 520, width: 960, height: 70 };
 const CAPTION_REASON = "Shared caption style: 17 px at baseline 551";
 
 /**
- * The only pixel differences `classic` may show, from spec §1.6. Regions are
- * in the stock viewBox (960 × 600).
+ * The only pixel differences `classic` may show against the reference frames
+ * captured before renderers read tokens, each a deliberate rounding of an old
+ * literal. Regions are in the stock viewBox (960 × 600).
  */
 const PARITY_ALLOWANCES: readonly ParityAllowance[] = [
   { id: "radial-network", reason: CAPTION_REASON, region: CAPTION_BAND },
