@@ -9,6 +9,7 @@ export default defineConfig({
     "motion-content.spec.ts",
     "motion-navigation.spec.ts",
     "composition-appearance.spec.ts",
+    "design-tokens.spec.ts",
   ],
   timeout: 45000,
   fullyParallel: false,

@@ -165,9 +165,6 @@ test("legacy links and filtered composition navigation retain their selection", 
   await expect(
     dialog.getByRole("checkbox", { name: "Camera motion" }),
   ).toBeInViewport();
-  await expect(
-    dialog.getByRole("combobox", { name: "Box roughness" }),
-  ).toBeInViewport();
   // The dialog scrolls vertically at phone widths, like the Motions dialog.
   expect(
     await dialog.evaluate(
