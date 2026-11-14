@@ -32,7 +32,8 @@ export type ThemeSavingState = Readonly<{
   status: ThemeSaveStatus;
   setStatus: (status: ThemeSaveStatus) => void;
   save: () => Promise<void>;
-  saveAsNew: (label: string) => Promise<void>;
+  /** Resolves true when the new theme was created, false when it was not. */
+  saveAsNew: (label: string) => Promise<boolean>;
 }>;
 
 type SaveOptions = Readonly<{
@@ -53,34 +54,36 @@ function _buildFailureStatusFromError(error: unknown): ThemeSaveStatus {
 }
 
 /**
- * Runs one theme request with its status updates. A request started while
- * another is in flight is ignored, so a double click cannot send the same
- * stale hash twice.
+ * Runs one theme request with its status updates and resolves true when it
+ * succeeded. A request started while another is in flight is ignored and
+ * resolves false, so a double click cannot send the same stale hash twice.
  */
-async function _runThemeRequest(
+export async function runThemeRequest(
   options: Readonly<{
     inFlight: RefObject<boolean>;
     setStatus: (status: ThemeSaveStatus) => void;
     request: () => Promise<void>;
   }>,
-): Promise<void> {
+): Promise<boolean> {
   const { inFlight, setStatus, request } = options;
   if (inFlight.current) {
-    return;
+    return false;
   }
   inFlight.current = true;
   setStatus({ kind: "saving" });
   try {
     await request();
     setStatus({ kind: "saved" });
+    return true;
   } catch (error) {
     setStatus(_buildFailureStatusFromError(error));
+    return false;
   } finally {
     inFlight.current = false;
   }
 }
 
-type RunThemeRequest = (request: () => Promise<void>) => Promise<void>;
+type RunThemeRequest = (request: () => Promise<void>) => Promise<boolean>;
 
 /** Saves the draft into its custom theme file, guarded by the file's hash. */
 function useSaveInPlace(options: SaveOptions, run: RunThemeRequest) {
@@ -105,11 +108,11 @@ function useSaveAsNew(options: SaveOptions, run: RunThemeRequest) {
     async (label: string) => {
       const base = library.get(themeId);
       if (!base) {
-        return;
+        return false;
       }
       const id = buildThemeIdFromLabel(label, [...library.keys()]);
       const document = createNewThemeDocument({ base, draft, id, label });
-      await run(async () => {
+      return run(async () => {
         const { hash } = await ThemeApi.create(document);
         storeTheme({ document, hash });
         discard();
@@ -130,7 +133,7 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const [status, setStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
   const inFlight = useRef(false);
   const run = useCallback<RunThemeRequest>(
-    (request) => _runThemeRequest({ inFlight, setStatus, request }),
+    (request) => runThemeRequest({ inFlight, setStatus, request }),
     [],
   );
   const save = useSaveInPlace(options, run);

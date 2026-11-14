@@ -22,7 +22,8 @@ type Props = Readonly<{
   status: ThemeSaveStatus;
   onSelectTheme: (themeId: string) => void;
   onSave: () => void;
-  onSaveAsNew: (label: string) => void;
+  /** Resolves true when the theme was created. */
+  onSaveAsNew: (label: string) => Promise<boolean>;
   onDiscard: () => void;
   onCopyJson: () => void;
 }>;
@@ -48,7 +49,10 @@ function useStatusText(): (message: ThemeBarMessage) => string {
 function SaveAsNewForm({
   onSubmit,
   onCancel,
-}: Readonly<{ onSubmit: (label: string) => void; onCancel: () => void }>) {
+}: Readonly<{
+  onSubmit: (label: string) => Promise<void>;
+  onCancel: () => void;
+}>) {
   const { t } = useLingui();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +64,7 @@ function SaveAsNewForm({
       onSubmit={(event) => {
         event.preventDefault();
         if (label) {
-          onSubmit(label);
+          void onSubmit(label);
         }
       }}
     >
@@ -161,7 +165,8 @@ function ThemeActions(
  * only), Save as new theme, Discard, and Copy theme JSON, with an unsaved
  * indicator, a polite status line that also says why saving is unavailable,
  * and, for a built-in theme, a notice that its changes are saved as a new
- * theme.
+ * theme. The new theme's name form stays open, with the typed name, until
+ * the theme is created, so a failed save does not lose the name.
  */
 export function ThemeBar(props: Props) {
   const { t } = useLingui();
@@ -188,9 +193,10 @@ export function ThemeBar(props: Props) {
       {isNaming ? (
         <SaveAsNewForm
           onCancel={closeNaming}
-          onSubmit={(label) => {
-            closeNaming();
-            props.onSaveAsNew(label);
+          onSubmit={async (label) => {
+            if (await props.onSaveAsNew(label)) {
+              closeNaming();
+            }
           }}
         />
       ) : null}
