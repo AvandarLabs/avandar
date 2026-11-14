@@ -35,17 +35,13 @@
 }
 
 /*
- * On a phone the title may take up to three lines, with the subtitle under it,
- * instead of cutting a long title to a few letters. The full title is also
- * the heading's tooltip.
+ * On a phone the title may take two lines, with the subtitle under it,
+ * instead of cutting a long title to a few letters. The header keeps its fixed
+ * height, which the pinned player strip's offset is measured from, so a title
+ * longer than two lines ends in an ellipsis. The full title is the heading's
+ * tooltip.
  */
 @media (width <= 760px) {
-  .header:global(.dialog-header) {
-    height: auto;
-    min-height: 64px;
-    padding-block: 8px;
-  }
-
   .heading {
     align-items: flex-start;
     flex-direction: column;
@@ -56,11 +52,17 @@
   .heading h2 {
     -webkit-box-orient: vertical;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    line-height: 1.2;
+    font-size: 17px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    line-height: 1.15;
     overflow: hidden;
     overflow-wrap: anywhere;
     white-space: normal;
+  }
+
+  .heading > span {
+    font-size: 11px;
+    line-height: 1.2;
   }
 }
