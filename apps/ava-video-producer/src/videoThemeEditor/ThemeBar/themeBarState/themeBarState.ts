@@ -25,6 +25,7 @@ export type ThemeBarMessage =
   | "readOnlyTheme"
   | "changedOnDisk"
   | "changedOnDiskUseBanner"
+  | "themeNameTaken"
   | "themeTooLarge"
   | "saveFailed";
 
@@ -67,6 +68,10 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
     case "saved":
     case "copied":
       return status.kind;
+    case "createFailed":
+      return status.status === 409
+        ? "themeNameTaken"
+        : _getFailureMessage(status.status, status.issues.length > 0);
     case "failed":
       if (status.status === 409 && input.isChangedOnDisk) {
         return "changedOnDiskUseBanner";

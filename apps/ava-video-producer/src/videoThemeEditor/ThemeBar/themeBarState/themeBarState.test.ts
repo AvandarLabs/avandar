@@ -218,3 +218,44 @@ test("while the banner waits, the status line points at it before any token prob
     "changedOnDiskUseBanner",
   );
 });
+
+function _createFailed(status: number) {
+  return { kind: "createFailed", status, issues: [] } as const;
+}
+
+test("a new theme refused because its name is taken says so, not that the file changed", () => {
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: _createFailed(409) }),
+    "themeNameTaken",
+  );
+  assert.equal(
+    getThemeBarMessage({
+      ...QUIET,
+      isChangedOnDisk: true,
+      status: _createFailed(409),
+    }),
+    "themeNameTaken",
+  );
+});
+
+test("a name clash offers no Reload from file", () => {
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: _createFailed(409) }).showsReload,
+    false,
+  );
+});
+
+test("a new theme refused for another reason is explained like a refused save", () => {
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: _createFailed(400) }),
+    "invalidTheme",
+  );
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: _createFailed(413) }),
+    "themeTooLarge",
+  );
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: _createFailed(0) }),
+    "saveFailed",
+  );
+});

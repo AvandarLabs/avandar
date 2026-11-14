@@ -166,3 +166,20 @@ test("a request that throws a plain error ends in a failed status with code 0", 
     issues: [],
   });
 });
+
+test("a request marked as a create reports its failure as a create failure", async () => {
+  const harness = createHarness();
+  const didSucceed = await runThemeRequest({
+    ...harness,
+    failureKind: "createFailed",
+    request: async () => {
+      throw new ThemeApiError(409, "exists", []);
+    },
+  });
+  assert.equal(didSucceed, false);
+  assert.deepEqual(harness.statuses.at(-1), {
+    kind: "createFailed",
+    status: 409,
+    issues: [],
+  });
+});

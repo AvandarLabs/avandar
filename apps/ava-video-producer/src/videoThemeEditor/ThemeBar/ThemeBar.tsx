@@ -42,6 +42,7 @@ function useStatusText(): (message: ThemeBarMessage) => string {
     readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,
     changedOnDisk: t`This theme changed on disk. Reload it from file, then save again.`,
     changedOnDiskUseBanner: t`This theme changed on disk. Keep, discard, or reload in the notice below, then save again.`,
+    themeNameTaken: t`A theme with that name already exists. Pick another name.`,
     themeTooLarge: t`This theme is too large to save.`,
     saveFailed: t`The theme could not be saved. Check the showcase terminal.`,
   };

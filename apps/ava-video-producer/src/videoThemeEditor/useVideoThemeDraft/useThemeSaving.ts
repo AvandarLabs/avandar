@@ -33,7 +33,15 @@ export type ThemeSaveStatus =
       kind: "failed";
       status: number;
       issues: readonly VideoThemeIssue[];
+    }>
+  /** Saving as a new theme was refused. A 409 means the name is taken. */
+  | Readonly<{
+      kind: "createFailed";
+      status: number;
+      issues: readonly VideoThemeIssue[];
     }>;
+
+type FailureKind = "failed" | "createFailed";
 
 /** Saving actions and their status. */
 export type ThemeSavingState = Readonly<{
@@ -61,25 +69,31 @@ type SaveOptions = Readonly<{
 /** The draft as it is now, read when a request finishes. */
 type LatestDraft = RefObject<ThemeDraft>;
 
-function _buildFailureStatusFromError(error: unknown): ThemeSaveStatus {
+function _buildFailureStatusFromError(
+  error: unknown,
+  kind: FailureKind,
+): ThemeSaveStatus {
   return error instanceof ThemeApiError
-    ? { kind: "failed", status: error.status, issues: error.issues }
-    : { kind: "failed", status: 0, issues: [] };
+    ? { kind, status: error.status, issues: error.issues }
+    : { kind, status: 0, issues: [] };
 }
 
 /**
  * Runs one theme request with its status updates and resolves true when it
  * succeeded. A request started while another is in flight is ignored and
  * resolves false, so a double click cannot send the same stale hash twice.
+ * A failure is reported as `failureKind`, which a create sets to
+ * `createFailed` so its conflict is not read as a changed file.
  */
 export async function runThemeRequest(
   options: Readonly<{
     inFlight: RefObject<boolean>;
     setStatus: (status: ThemeSaveStatus) => void;
     request: () => Promise<void>;
+    failureKind?: FailureKind;
   }>,
 ): Promise<boolean> {
-  const { inFlight, setStatus, request } = options;
+  const { inFlight, setStatus, request, failureKind = "failed" } = options;
   if (inFlight.current) {
     return false;
   }
@@ -90,7 +104,7 @@ export async function runThemeRequest(
     setStatus({ kind: "saved" });
     return true;
   } catch (error) {
-    setStatus(_buildFailureStatusFromError(error));
+    setStatus(_buildFailureStatusFromError(error, failureKind));
     return false;
   } finally {
     inFlight.current = false;
@@ -129,14 +143,17 @@ export async function reloadStoredTheme(
     setStatus({ kind: "idle" });
     return true;
   } catch (error) {
-    setStatus(_buildFailureStatusFromError(error));
+    setStatus(_buildFailureStatusFromError(error, "failed"));
     return false;
   } finally {
     inFlight.current = false;
   }
 }
 
-type RunThemeRequest = (request: () => Promise<void>) => Promise<boolean>;
+type RunThemeRequest = (
+  request: () => Promise<void>,
+  failureKind?: FailureKind,
+) => Promise<boolean>;
 
 /**
  * Saves the draft into its custom theme file, guarded by the file's hash.
@@ -232,7 +249,8 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const [status, setStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
   const inFlight = useRef(false);
   const run = useCallback<RunThemeRequest>(
-    (request) => runThemeRequest({ inFlight, setStatus, request }),
+    (request, failureKind) =>
+      runThemeRequest({ inFlight, setStatus, request, failureKind }),
     [],
   );
   const latestDraft = useRef(options.draft);
