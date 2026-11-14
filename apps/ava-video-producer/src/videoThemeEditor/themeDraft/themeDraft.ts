@@ -289,15 +289,12 @@ export function createSavedDocumentFromDraft(
   document: VideoThemeDocument,
   draft: ThemeDraft,
 ): VideoThemeDocument {
-  const overrides = Object.entries(draft.overrides).reduce<
-    Record<string, VideoThemePatch>
-  >(
-    (result, [itemId, patch]) => ({
-      ...result,
-      [itemId]: _applyPatch(result[itemId] ?? {}, patch),
-    }),
-    { ...document.overrides },
-  );
+  const overrides: Record<string, VideoThemePatch> = {
+    ...document.overrides,
+  };
+  for (const [itemId, patch] of Object.entries(draft.overrides)) {
+    overrides[itemId] = _applyPatch(overrides[itemId] ?? {}, patch);
+  }
   return {
     ..._applyPatch(document, draft.patch),
     ...(Object.keys(overrides).length > 0 ? { overrides } : {}),

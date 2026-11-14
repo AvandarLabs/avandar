@@ -187,6 +187,22 @@ test("saving replaces a composite token instead of merging its fields", () => {
   );
 });
 
+test("a save merges item edits into the stored overrides without changing the stored theme", () => {
+  const stored = JSON.stringify(STUDIO);
+  const draft = setTokenInDraft(
+    setTokenInDraft(EMPTY_THEME_DRAFT, ITEM, "color.accent", "#111111"),
+    { kind: "item", itemId: "bar-chart" },
+    "color.accent",
+    "#222222",
+  );
+  const saved = createSavedDocumentFromDraft(STUDIO, draft);
+  assert.deepEqual(Object.keys(saved.overrides ?? {}).sort(), [
+    "bar-chart",
+    "network-graph",
+  ]);
+  assert.equal(JSON.stringify(STUDIO), stored);
+});
+
 test("a new theme made from a built-in extends it and holds only the draft", () => {
   const draft = setTokenInDraft(
     EMPTY_THEME_DRAFT,
