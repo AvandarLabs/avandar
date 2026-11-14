@@ -85,14 +85,18 @@ function _handlePlayback(
   }
 }
 
-function _applyTheme(value: unknown, options: FilmControlOptions): void {
+function _applyTheme(
+  { value, requestKey }: FilmControl,
+  options: FilmControlOptions,
+): void {
   if (!options.isContinuity) {
-    options.send(createUnsupportedFilmThemeError(options.id));
+    options.send(createUnsupportedFilmThemeError(options.id, requestKey));
     return;
   }
   const { snapshot, message } = createFilmThemeAcknowledgement(
     options.id,
     value,
+    requestKey,
   );
   if (snapshot) {
     options.onTheme(snapshot);
@@ -137,9 +141,10 @@ function useUsedTokensReport(
 }
 
 function _handleSettings(
-  { action, value }: FilmControl,
+  control: FilmControl,
   options: FilmControlOptions,
 ): void {
+  const { action, value } = control;
   if (action === "appearance" && options.isContinuity) {
     const result = continuityAppearanceSchema.safeParse(value);
     if (result.success) {
@@ -147,7 +152,7 @@ function _handleSettings(
     }
   }
   if (action === "theme") {
-    _applyTheme(value, options);
+    _applyTheme(control, options);
   }
   if (action === "options") {
     _sendOptions(options);

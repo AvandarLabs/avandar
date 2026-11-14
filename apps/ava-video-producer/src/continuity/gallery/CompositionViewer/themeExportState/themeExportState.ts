@@ -1,3 +1,4 @@
+import { isFilmThemeAcknowledgement } from "../../../../showcase/filmTheme/filmTheme";
 import type { VideoThemeIssue } from "../../../../videoTheme/videoTheme.types";
 
 /** Error codes the live player sends in place of a theme issue. */
@@ -83,7 +84,7 @@ export function getThemeExportState(
   return input.isTimedOut ? { kind: "timed-out" } : { kind: "pending" };
 }
 
-/** An acknowledgement with the theme request that was current when it arrived. */
+/** An acknowledgement with the theme request the player echoed in it. */
 export type ReceivedThemeAcknowledgement = ThemeAcknowledgement &
   Readonly<{ requestKey: string | undefined }>;
 
@@ -91,7 +92,7 @@ export type ReceivedThemeAcknowledgement = ThemeAcknowledgement &
  * The acknowledgement that still answers the current theme request. A
  * resolved hash always stays, because `getThemeExportState` compares it with
  * the expected hash. A refusal names no hash, so it only counts for the
- * request it arrived under: a new snapshot or a retry waits for a new answer.
+ * request it answers: a new snapshot or a retry waits for a new answer.
  */
 export function getCurrentAcknowledgement(
   acknowledgement: ReceivedThemeAcknowledgement | undefined,
@@ -103,4 +104,24 @@ export function getCurrentAcknowledgement(
   return acknowledgement.requestKey === requestKey
     ? acknowledgement
     : undefined;
+}
+
+/**
+ * Reads a posted message as the theme answer for film `id`, tagged with the
+ * request the player says it answers. The tag comes from the message, never
+ * from whichever request is current on arrival: a refusal for an earlier
+ * request can land after a newer one is current, and must not be taken as
+ * that newer request's answer. A message that names no request answers none.
+ */
+export function receiveThemeAcknowledgement(
+  data: unknown,
+  id: string,
+): ReceivedThemeAcknowledgement | undefined {
+  if (!isFilmThemeAcknowledgement(data, id)) {
+    return undefined;
+  }
+  const { requestKey } = data;
+  return data.type === "film-theme"
+    ? { hash: data.hash, issues: [], requestKey }
+    : { issues: data.issues, requestKey };
 }

@@ -316,3 +316,63 @@ test("a usage message drops overlong paths and keeps within the path cap", () =>
   assert.equal(message.paths[0], "p0");
   assert.equal(isFilmTokensUsedMessage(message, ITEM_ID), true);
 });
+
+test("the player echoes the request a theme answers, whether it resolves or not", () => {
+  const resolved = createFilmThemeAcknowledgement(
+    ITEM_ID,
+    VALID_SNAPSHOT,
+    "film:abc:0",
+  );
+  assert.equal(resolved.message.requestKey, "film:abc:0");
+  const refused = createFilmThemeAcknowledgement(ITEM_ID, null, "film:def:1");
+  assert.equal(refused.message.requestKey, "film:def:1");
+  assert.equal(
+    createUnsupportedFilmThemeError(ITEM_ID, "film:abc:2").requestKey,
+    "film:abc:2",
+  );
+});
+
+test("an acknowledgement for a theme sent without a request names none", () => {
+  assert.equal(
+    "requestKey" in
+      createFilmThemeAcknowledgement(ITEM_ID, VALID_SNAPSHOT).message,
+    false,
+  );
+});
+
+test("a theme control carries the request it was sent for", () => {
+  assert.deepEqual(
+    parseFilmControlMessage(
+      {
+        type: "film-control",
+        id: ITEM_ID,
+        action: "theme",
+        value: VALID_SNAPSHOT,
+        requestKey: "film:abc:0",
+      },
+      ITEM_ID,
+    ),
+    { action: "theme", value: VALID_SNAPSHOT, requestKey: "film:abc:0" },
+  );
+});
+
+test("acknowledgements may carry a request, and only a short string", () => {
+  const withRequest = {
+    type: "film-theme-error",
+    id: ITEM_ID,
+    issues: [],
+    requestKey: "film:abc:0",
+  };
+  assert.equal(isFilmThemeAcknowledgement(withRequest, ITEM_ID), true);
+  assert.equal(
+    isFilmThemeAcknowledgement(
+      { ...withRequest, requestKey: "x".repeat(10_000) },
+      ITEM_ID,
+    ),
+    false,
+  );
+  assert.equal(
+    isFilmThemeAcknowledgement({ ...withRequest, requestKey: 7 }, ITEM_ID),
+    false,
+  );
+});

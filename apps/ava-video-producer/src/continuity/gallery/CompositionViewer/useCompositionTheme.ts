@@ -5,10 +5,7 @@ import {
   useState,
   type RefObject,
 } from "react";
-import {
-  isFilmThemeAcknowledgement,
-  isFilmTokensUsedMessage,
-} from "../../../showcase/filmTheme/filmTheme";
+import { isFilmTokensUsedMessage } from "../../../showcase/filmTheme/filmTheme";
 import {
   resolveVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
@@ -16,8 +13,8 @@ import {
 import {
   getCurrentAcknowledgement,
   getThemeExportState,
+  receiveThemeAcknowledgement,
   type ReceivedThemeAcknowledgement,
-  type ThemeAcknowledgement,
 } from "./themeExportState/themeExportState";
 
 /** About 100 ms, so dragging a slider does not flood the player. */
@@ -59,30 +56,18 @@ function _isOptionsFrom(data: unknown, id: string): boolean {
   );
 }
 
-function _acknowledgementFrom(
-  data: unknown,
-  id: string,
-): ThemeAcknowledgement | undefined {
-  if (!isFilmThemeAcknowledgement(data, id)) {
-    return undefined;
-  }
-  return data.type === "film-theme"
-    ? { hash: data.hash, issues: [] }
-    : { issues: data.issues };
-}
-
 /**
- * The live player's theme acknowledgement, tagged with the theme request
- * that was current when it arrived, and its token usage for film `id`.
- * Both reset whenever the id changes, so a reply from an earlier visit to
- * the same film never stands in for its new player's answer.
+ * The live player's theme acknowledgement, tagged with the request the
+ * player echoed (never the request that is current on arrival), and its
+ * token usage for film `id`. Both reset whenever the id changes, so a reply
+ * from an earlier visit to the same film never stands in for its new
+ * player's answer.
  */
 function usePlayerReplies(
-  request: Readonly<{ id: string; key: string | undefined }>,
+  id: string,
   player: Player,
   onOptions: () => void,
 ): PlayerReplies {
-  const { id, key: requestKey } = request;
   const [replies, setReplies] = useState<PlayerReplies>({ id, paths: [] });
   if (replies.id !== id) {
     setReplies({ id, paths: [] });
@@ -99,15 +84,10 @@ function usePlayerReplies(
       if (_isOptionsFrom(data, id)) {
         onOptions();
       }
-      const acknowledgement = _acknowledgementFrom(data, id);
+      const acknowledgement = receiveThemeAcknowledgement(data, id);
       if (acknowledgement) {
         setReplies((current) =>
-          current.id === id
-            ? {
-                ...current,
-                acknowledgement: { ...acknowledgement, requestKey },
-              }
-            : current,
+          current.id === id ? { ...current, acknowledgement } : current,
         );
       }
       if (isFilmTokensUsedMessage(data, id)) {
@@ -118,7 +98,7 @@ function usePlayerReplies(
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
-  }, [id, requestKey, player, onOptions]);
+  }, [id, player, onOptions]);
   return replies.id === id ? replies : { id, paths: [] };
 }
 
@@ -145,8 +125,16 @@ function useRequestTimeout(requestKey: string | undefined): boolean {
   return requestKey !== undefined && timedOutKey === requestKey;
 }
 
-/** Posts the snapshot to the player, debounced while it keeps changing. */
-function useThemeSender(id: string, player: Player, snapshotKey: string) {
+/**
+ * Posts the snapshot to the player, debounced while it keeps changing. Each
+ * post names its request, which the player echoes in its answer.
+ */
+function useThemeSender(
+  request: Readonly<{ id: string; key: string | undefined }>,
+  player: Player,
+  snapshotKey: string,
+) {
+  const { id, key: requestKey } = request;
   const send = useCallback(() => {
     if (snapshotKey) {
       player.current?.contentWindow?.postMessage(
@@ -155,11 +143,12 @@ function useThemeSender(id: string, player: Player, snapshotKey: string) {
           id,
           action: "theme",
           value: JSON.parse(snapshotKey),
+          requestKey,
         },
         location.origin,
       );
     }
-  }, [id, player, snapshotKey]);
+  }, [id, player, snapshotKey, requestKey]);
   useEffect(() => {
     const timer = setTimeout(send, THEME_SEND_DELAY_MS);
     return () => clearTimeout(timer);
@@ -191,11 +180,11 @@ export function useCompositionTheme(
     [snapshotKey, id],
   );
   const [attempt, setAttempt] = useState(0);
-  const send = useThemeSender(id, player, snapshotKey);
   const requestKey = snapshotKey
     ? `${id}:${expected?.hash}:${attempt}`
     : undefined;
-  const replies = usePlayerReplies({ id, key: requestKey }, player, send);
+  const send = useThemeSender({ id, key: requestKey }, player, snapshotKey);
+  const replies = usePlayerReplies(id, player, send);
   const isTimedOut = useRequestTimeout(requestKey);
   return {
     exportState: getThemeExportState({
@@ -209,9 +198,8 @@ export function useCompositionTheme(
       isTimedOut,
     }),
     usedTokens: replies.paths,
-    retry: () => {
-      setAttempt((current) => current + 1);
-      send();
-    },
+    // A new attempt is a new request, so the debounced sender posts it
+    // under its own key rather than the one that was refused or timed out.
+    retry: () => setAttempt((current) => current + 1),
   };
 }

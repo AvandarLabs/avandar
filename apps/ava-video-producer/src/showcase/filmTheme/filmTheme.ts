@@ -18,6 +18,7 @@ const MAX_ISSUE_MESSAGE_LENGTH = 1000;
 const MAX_TOKEN_PATHS = 4096;
 const MAX_TOKEN_PATH_LENGTH = 256;
 const MAX_FILM_ID_LENGTH = 256;
+const MAX_REQUEST_KEY_LENGTH = 512;
 
 /** Controls that change a film's look, so they must name the film they target. */
 const FILM_SCOPED_ACTIONS: ReadonlySet<string> = new Set([
@@ -42,16 +43,21 @@ const issueSchema = z.strictObject({
   message: z.string().max(MAX_ISSUE_MESSAGE_LENGTH),
 });
 
+/** Names the theme request a control carries, so the answer can echo it. */
+const requestKeySchema = z.string().max(MAX_REQUEST_KEY_LENGTH);
+
 const acknowledgementSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("film-theme"),
     id: z.string(),
     hash: z.string(),
+    requestKey: requestKeySchema.optional(),
   }),
   z.strictObject({
     type: z.literal("film-theme-error"),
     id: z.string(),
     issues: z.array(issueSchema).max(MAX_ISSUES),
+    requestKey: requestKeySchema.optional(),
   }),
 ]);
 
@@ -76,12 +82,15 @@ const filmControlSchema = z.strictObject({
     "options",
   ]),
   value: z.unknown().optional(),
+  requestKey: requestKeySchema.optional(),
 });
 
 /** A control the gallery posts to the live player, without its envelope. */
 export type FilmControl = Readonly<{
   action: z.infer<typeof filmControlSchema>["action"];
   value: unknown;
+  /** The theme request the control was sent for, echoed in the answer. */
+  requestKey?: string;
 }>;
 
 /** The live player's answer to a theme: the resolved hash, or why it refused. */
@@ -146,13 +155,23 @@ function _payloadIssue(value: unknown): VideoThemeIssue | undefined {
     : undefined;
 }
 
+function _withRequestKey(
+  message: FilmThemeAcknowledgement,
+  requestKey: string | undefined,
+): FilmThemeAcknowledgement {
+  return requestKey === undefined ? message : { ...message, requestKey };
+}
+
 /**
  * What the live player does with a `theme` message: the snapshot to apply
- * when it resolves, and the acknowledgement to post back either way.
+ * when it resolves, and the acknowledgement to post back either way. The
+ * acknowledgement echoes `requestKey`, so the gallery knows which request a
+ * refusal answers even when a newer one has been sent since.
  */
 export function createFilmThemeAcknowledgement(
   id: string,
   value: unknown,
+  requestKey?: string,
 ): Readonly<{
   snapshot?: VideoThemeSnapshot;
   message: FilmThemeAcknowledgement;
@@ -160,7 +179,10 @@ export function createFilmThemeAcknowledgement(
   const payloadIssue = _payloadIssue(value);
   if (payloadIssue) {
     return {
-      message: { type: "film-theme-error", id, issues: [payloadIssue] },
+      message: _withRequestKey(
+        { type: "film-theme-error", id, issues: [payloadIssue] },
+        requestKey,
+      ),
     };
   }
   try {
@@ -168,14 +190,16 @@ export function createFilmThemeAcknowledgement(
     // The film root resolves with the film id as its override scope, so the
     // hash matches the picture.
     const { hash } = resolveVideoThemeFromSnapshot(snapshot, [id]);
-    return { snapshot, message: { type: "film-theme", id, hash } };
+    return {
+      snapshot,
+      message: _withRequestKey({ type: "film-theme", id, hash }, requestKey),
+    };
   } catch (error) {
     return {
-      message: {
-        type: "film-theme-error",
-        id,
-        issues: _issuesFromError(error),
-      },
+      message: _withRequestKey(
+        { type: "film-theme-error", id, issues: _issuesFromError(error) },
+        requestKey,
+      ),
     };
   }
 }
@@ -186,12 +210,16 @@ export function createFilmThemeAcknowledgement(
  */
 export function createUnsupportedFilmThemeError(
   id: string,
+  requestKey?: string,
 ): FilmThemeAcknowledgement {
-  return {
-    type: "film-theme-error",
-    id,
-    issues: [{ path: "", message: FILM_UNSUPPORTED }],
-  };
+  return _withRequestKey(
+    {
+      type: "film-theme-error",
+      id,
+      issues: [{ path: "", message: FILM_UNSUPPORTED }],
+    },
+    requestKey,
+  );
 }
 
 /**
@@ -246,7 +274,14 @@ export function parseFilmControlMessage(
     message.id === undefined
       ? !FILM_SCOPED_ACTIONS.has(message.action)
       : message.id === id;
-  return isForThisFilm
+  if (!isForThisFilm) {
+    return undefined;
+  }
+  return message.requestKey === undefined
     ? { action: message.action, value: message.value }
-    : undefined;
+    : {
+        action: message.action,
+        value: message.value,
+        requestKey: message.requestKey,
+      };
 }

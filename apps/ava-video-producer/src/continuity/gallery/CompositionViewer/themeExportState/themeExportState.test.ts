@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getCurrentAcknowledgement,
   getThemeExportState,
+  receiveThemeAcknowledgement,
 } from "./themeExportState";
 
 const WAITING = {
@@ -119,4 +120,51 @@ test("a resolved hash stays current, because the hash itself says what it answer
   const resolved = { hash: "abc", issues: [], requestKey: "film:abc:0" };
   assert.equal(getCurrentAcknowledgement(resolved, "film:def:0"), resolved);
   assert.equal(getCurrentAcknowledgement(undefined, "film:abc:0"), undefined);
+});
+
+const REFUSED_A = {
+  type: "film-theme-error",
+  id: "film",
+  issues: [{ path: "color.accent", message: "Unknown reference" }],
+  requestKey: "film:hashA:0",
+} as const;
+
+test("a refusal is tagged with the request the player says it answers", () => {
+  assert.deepEqual(receiveThemeAcknowledgement(REFUSED_A, "film"), {
+    issues: REFUSED_A.issues,
+    requestKey: "film:hashA:0",
+  });
+  assert.deepEqual(
+    receiveThemeAcknowledgement(
+      { type: "film-theme", id: "film", hash: "abc", requestKey: "k" },
+      "film",
+    ),
+    { hash: "abc", issues: [], requestKey: "k" },
+  );
+  assert.equal(receiveThemeAcknowledgement(REFUSED_A, "other"), undefined);
+  assert.equal(
+    receiveThemeAcknowledgement({ type: "nope" }, "film"),
+    undefined,
+  );
+});
+
+test("a refusal for request A never shows for request B, even if B is already current", () => {
+  // The draft moved on to B while A's refusal was still in flight. The
+  // refusal must not take B's tag just because B is current when it lands.
+  const refusalForA = receiveThemeAcknowledgement(REFUSED_A, "film");
+  const requestB = "film:hashB:0";
+  assert.equal(getCurrentAcknowledgement(refusalForA, requestB), undefined);
+  assert.deepEqual(
+    getThemeExportState({
+      ...WAITING,
+      acknowledgement: getCurrentAcknowledgement(refusalForA, requestB),
+    }),
+    { kind: "pending" },
+  );
+});
+
+test("a refusal that names no request answers none", () => {
+  const { requestKey: _omitted, ...unlabelled } = REFUSED_A;
+  const refusal = receiveThemeAcknowledgement(unlabelled, "film");
+  assert.equal(getCurrentAcknowledgement(refusal, "film:hashA:0"), undefined);
 });
