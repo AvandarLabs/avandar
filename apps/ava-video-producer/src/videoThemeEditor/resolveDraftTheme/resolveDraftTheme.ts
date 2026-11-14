@@ -95,3 +95,22 @@ export function isThemeDraftValid(input: DraftInput): boolean {
     ),
   ].every((scope) => resolveDraftTheme({ ...input, scope }).ok);
 }
+
+/** The most recent draft of a theme that resolved, and the theme it belongs to. */
+export type LastValidDraft = Readonly<{ themeId: string; draft: ThemeDraft }>;
+
+/**
+ * The last valid draft after seeing the current one. A draft that does not
+ * resolve changes nothing, and an unchanged valid draft returns `current`
+ * itself so the caller can tell nothing moved.
+ */
+export function nextLastValidDraft(
+  current: LastValidDraft | undefined,
+  candidate: Readonly<{ themeId: string; draft: ThemeDraft; isValid: boolean }>,
+): LastValidDraft | undefined {
+  const { themeId, draft, isValid } = candidate;
+  if (!isValid || (current?.themeId === themeId && current.draft === draft)) {
+    return current;
+  }
+  return { themeId, draft };
+}

@@ -5,7 +5,11 @@ import {
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { EMPTY_THEME_DRAFT, setTokenInDraft } from "../themeDraft/themeDraft";
-import { isThemeDraftValid, resolveDraftTheme } from "./resolveDraftTheme";
+import {
+  isThemeDraftValid,
+  nextLastValidDraft,
+  resolveDraftTheme,
+} from "./resolveDraftTheme";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 const STUDIO: VideoThemeDocument = {
@@ -128,5 +132,65 @@ test("a draft with a broken item override is not valid", () => {
   assert.equal(
     isThemeDraftValid({ library: LIBRARY, themeId: "studio", draft }),
     false,
+  );
+});
+
+const FIRST_DRAFT = setTokenInDraft(
+  EMPTY_THEME_DRAFT,
+  THEME,
+  "atomic.swatch.mint",
+  "#123456",
+);
+const SECOND_DRAFT = setTokenInDraft(
+  EMPTY_THEME_DRAFT,
+  THEME,
+  "atomic.swatch.mint",
+  "#654321",
+);
+
+test("a valid draft becomes the last valid one", () => {
+  assert.deepEqual(
+    nextLastValidDraft(undefined, {
+      themeId: "studio",
+      draft: FIRST_DRAFT,
+      isValid: true,
+    }),
+    { themeId: "studio", draft: FIRST_DRAFT },
+  );
+});
+
+test("an invalid draft leaves the last valid one in place", () => {
+  const current = { themeId: "studio", draft: FIRST_DRAFT };
+  assert.equal(
+    nextLastValidDraft(current, {
+      themeId: "studio",
+      draft: SECOND_DRAFT,
+      isValid: false,
+    }),
+    current,
+  );
+});
+
+test("the same valid draft keeps the same record, so no re-render is requested", () => {
+  const current = { themeId: "studio", draft: FIRST_DRAFT };
+  assert.equal(
+    nextLastValidDraft(current, {
+      themeId: "studio",
+      draft: FIRST_DRAFT,
+      isValid: true,
+    }),
+    current,
+  );
+});
+
+test("a valid draft for another theme replaces the last valid one", () => {
+  const current = { themeId: "studio", draft: FIRST_DRAFT };
+  assert.deepEqual(
+    nextLastValidDraft(current, {
+      themeId: "classic",
+      draft: FIRST_DRAFT,
+      isValid: true,
+    }),
+    { themeId: "classic", draft: FIRST_DRAFT },
   );
 });

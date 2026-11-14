@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { EMPTY_THEME_DRAFT, type ThemeDraft } from "../themeDraft/themeDraft";
-import { isThemeDraftValid } from "./resolveDraftTheme";
+import {
+  isThemeDraftValid,
+  nextLastValidDraft,
+  type LastValidDraft,
+} from "./resolveDraftTheme";
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
 
 /**
@@ -20,13 +24,15 @@ export function useValidThemeDraft(
     () => isThemeDraftValid({ library, themeId, draft }),
     [library, themeId, draft],
   );
-  const [lastValid, setLastValid] =
-    useState<Readonly<{ themeId: string; draft: ThemeDraft }>>();
-  useEffect(() => {
-    if (isValid) {
-      setLastValid({ themeId, draft });
-    }
-  }, [isValid, themeId, draft]);
+  const [lastValid, setLastValid] = useState<LastValidDraft>();
+  const nextLastValid = nextLastValidDraft(lastValid, {
+    themeId,
+    draft,
+    isValid,
+  });
+  if (nextLastValid !== lastValid) {
+    setLastValid(nextLastValid);
+  }
   if (isValid) {
     return { draft, isValid };
   }
