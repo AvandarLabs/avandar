@@ -18,14 +18,14 @@ import type {
  * built-in, without the built-in's own item overrides, under an id no loaded
  * theme uses.
  */
-export function createThemeJsonFromDraft(
+export function buildThemeJsonFromDraft(
   options: Readonly<{
     library: VideoThemeLibrary;
     themeId: string;
     draft: ThemeDraft;
   }>,
 ): string | undefined {
-  const { library, themeId, draft } = options;
+  const { library, themeId } = options;
   const base = library.get(themeId);
   if (!base) {
     return undefined;

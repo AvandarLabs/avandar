@@ -10,7 +10,7 @@ import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVid
 import { VideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
 import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
-import { createThemeJsonFromDraft } from "../../videoThemeEditor/themeJson/themeJson";
+import { buildThemeJsonFromDraft } from "../../videoThemeEditor/themeJson/themeJson";
 import {
   useVideoThemeDraft,
   type VideoThemeDraftState,
@@ -51,7 +51,7 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
   const { t } = useLingui();
   const { library, themeId, draft, setCopyStatus } = state;
   return useCallback(async () => {
-    const json = createThemeJsonFromDraft({ library, themeId, draft });
+    const json = buildThemeJsonFromDraft({ library, themeId, draft });
     if (json === undefined) {
       return;
     }

@@ -10,7 +10,7 @@ import {
   EMPTY_THEME_DRAFT,
   setTokenInDraft,
 } from "../themeDraft/themeDraft";
-import { createThemeJsonFromDraft } from "./themeJson";
+import { buildThemeJsonFromDraft } from "./themeJson";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;
@@ -55,7 +55,7 @@ const LIBRARY_WITH_CLASSIC_OVERRIDE = new Map<string, VideoThemeDocument>([
 ]);
 
 test("a custom theme copies as saving its draft in place would write it", () => {
-  const json = createThemeJsonFromDraft({
+  const json = buildThemeJsonFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft: DRAFT,
@@ -67,7 +67,7 @@ test("a custom theme copies as saving its draft in place would write it", () => 
 });
 
 test("a built-in theme copies as the sparse theme Save as new writes, without its own item overrides", () => {
-  const json = createThemeJsonFromDraft({
+  const json = buildThemeJsonFromDraft({
     library: LIBRARY_WITH_CLASSIC_OVERRIDE,
     themeId: "classic",
     draft: DRAFT,
@@ -89,7 +89,7 @@ test("a built-in theme copies as the sparse theme Save as new writes, without it
 });
 
 test("a built-in copy gets an id that no loaded theme uses", () => {
-  const json = createThemeJsonFromDraft({
+  const json = buildThemeJsonFromDraft({
     library: LIBRARY,
     themeId: "classic",
     draft: DRAFT,
@@ -101,7 +101,7 @@ test("a built-in copy gets an id that no loaded theme uses", () => {
 
 test("a theme that is not loaded copies nothing", () => {
   assert.equal(
-    createThemeJsonFromDraft({
+    buildThemeJsonFromDraft({
       library: LIBRARY,
       themeId: "missing",
       draft: DRAFT,
