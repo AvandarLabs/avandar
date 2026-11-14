@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
   CrosswalkLayoutDataset,
   CrosswalkLayoutGroup,
@@ -8,6 +8,7 @@ import type {
 } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout.types.ts";
 
 export { CrosswalkLayoutParsers } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayoutParsers.ts";
+export { CrosswalkLayoutModule as CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayoutModule/CrosswalkLayoutModule.ts";
 
 /** Public namespace for a crosswalk's layouts. */
 export namespace CrosswalkLayout {
