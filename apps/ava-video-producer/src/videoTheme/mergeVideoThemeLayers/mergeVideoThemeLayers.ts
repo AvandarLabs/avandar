@@ -34,7 +34,13 @@ function _mergeTwoLayers(
   return result;
 }
 
-function _mergeThemeLayers(
+/**
+ * Merges sparse theme patches, lowest precedence first, with the same rule
+ * `mergeVideoThemeLayers` uses: objects merge, and any other value, such as
+ * a reference, is replaced whole. Use it to fold several draft patches into
+ * the one patch an export sends.
+ */
+export function mergeVideoThemePatches(
   ...layers: readonly VideoThemePatch[]
 ): VideoThemePatch {
   return layers.reduce<Record<string, unknown>>(
@@ -118,5 +124,5 @@ export function mergeVideoThemeLayers(
     ...overrides,
     ...(scope.patches ?? []),
   ];
-  return _mergeThemeLayers(...layers);
+  return mergeVideoThemePatches(...layers);
 }
