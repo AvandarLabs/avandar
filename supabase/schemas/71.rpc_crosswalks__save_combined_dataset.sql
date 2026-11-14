@@ -8,7 +8,8 @@
  * SECURITY DEFINER because bindings are select-only for signed-in users
  * and the crosswalk's managed columns are refused to them. It checks Data
  * Sources editor on the crosswalk before it reads anything else, then
- * workspace admin to create a dataset, as any import needs, or editor
+ * refuses when a dataset it stacks is one the caller cannot view (the SQL
+ * would be written without it), then workspace admin to create a dataset, as any import needs, or editor
  * rights on the dataset to update it. A refusal at any point, including
  * after the dataset row was written, rolls the whole save back.
  *
@@ -41,6 +42,8 @@ declare
   v_output_dataset_id uuid;
 begin
   v_workspace_id := public.crosswalks__authorize (p_crosswalk_id);
+
+  perform public.crosswalks__check_members_viewable (p_crosswalk_id);
 
   if coalesce(btrim(p_dataset_name), '') = '' then
     raise exception 'The combined dataset needs a name'
@@ -77,10 +80,40 @@ end;
 $$;
 
 /**
+ * Raises `crosswalk_has_unreadable_datasets` when a layout that is not
+ * skipped holds a dataset the caller cannot view. Such a dataset is not in
+ * the SQL the caller compiled, so saving it would overwrite the combined
+ * dataset without that member.
+ */
+create or replace function public.crosswalks__check_members_viewable (p_crosswalk_id uuid) returns void language plpgsql
+set
+  search_path = '' as $$
+begin
+  if exists (
+    select 1
+    from public.crosswalks__datasets cd
+    join public.crosswalks__layouts l on l.id = cd.layout_id and l.crosswalk_id = cd.crosswalk_id
+    where
+      cd.crosswalk_id = p_crosswalk_id and
+      l.status <> 'skipped' and
+      not public.util__auth_user_can_access_resource (
+        'dataset'::public.resource_type,
+        cd.dataset_id,
+        'viewer'::public.role_level
+      )
+  ) then
+    raise exception 'This crosswalk combines a dataset you cannot open, so you cannot update the combined dataset'
+      using errcode = '42501', hint = 'crosswalk_has_unreadable_datasets';
+  end if;
+end;
+$$;
+
+/**
  * Raises `combined_columns_invalid` unless the three sets are arrays, the
  * columns are at least one `{ name, data_type }` with a non-blank name, a
- * known type, and no two names equal ignoring case, and the bindings and
- * code lists are well formed. Runs before anything casts the payload.
+ * known type, and no two names equal ignoring case and surrounding spaces,
+ * and the bindings and code lists are well formed. Runs before anything
+ * casts the payload.
  */
 create or replace function public.crosswalks__check_combined_payload (
   p_columns jsonb,
@@ -117,7 +150,7 @@ begin
   if exists (
     select 1
     from jsonb_array_elements(p_columns) as e (col)
-    group by lower(e.col ->> 'name')
+    group by lower(btrim(e.col ->> 'name'))
     having count(*) > 1
   ) then
     raise exception 'Two columns of the combined dataset cannot share a name'
@@ -157,7 +190,7 @@ begin
   ) or exists (
     select 1
     from jsonb_array_elements(p_bindings) as e (binding)
-    group by lower(e.binding ->> 'column_name')
+    group by lower(btrim(e.binding ->> 'column_name'))
     having count(*) > 1
   ) then
     raise exception 'Every binding needs a column, a dictionary, an entry, a code list, and a direction, with no column twice'
@@ -197,7 +230,7 @@ begin
     where not exists (
       select 1
       from jsonb_array_elements(p_columns) as e (col)
-      where lower(e.col ->> 'name') = lower(b.column_name)
+      where lower(btrim(e.col ->> 'name')) = lower(btrim(b.column_name))
     )
   ) then
     raise exception 'Every binding must name a column of the combined dataset'
@@ -228,7 +261,7 @@ $$;
 
 /**
  * The combined dataset's columns as rows, in the payload's order, with
- * `column_idx` counting from 0.
+ * names trimmed and `column_idx` counting from 0.
  */
 create or replace function public.crosswalks__read_combined_columns (p_columns jsonb) returns table (
   name text,
@@ -238,7 +271,7 @@ create or replace function public.crosswalks__read_combined_columns (p_columns j
 set
   search_path = '' as $$
   select
-    e.col ->> 'name',
+    btrim(e.col ->> 'name'),
     (e.col ->> 'data_type')::public.datasets__ava_data_type,
     (e.column_index - 1)::integer
   from jsonb_array_elements(p_columns) with ordinality as e (col, column_index);
@@ -424,7 +457,7 @@ begin
   from jsonb_to_recordset(p_bindings) as b (
     column_name text, dictionary_id uuid, entry_id uuid, code_list_id uuid, direction text
   )
-  join public.dataset_columns dc on dc.dataset_id = p_dataset_id and lower(dc.name) = lower(b.column_name)
+  join public.dataset_columns dc on dc.dataset_id = p_dataset_id and lower(dc.name) = lower(btrim(b.column_name))
   join public.data_dictionaries d on d.id = b.dictionary_id;
 end;
 $$;
@@ -460,6 +493,14 @@ execute on function public.rpc_crosswalks__save_combined_dataset (
 
 -- The helpers run inside the SECURITY DEFINER RPC and are never called
 -- directly, so no Data API role gets EXECUTE.
+revoke
+execute on function public.crosswalks__check_members_viewable (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 revoke
 execute on function public.crosswalks__check_combined_payload (jsonb, jsonb, jsonb)
 from

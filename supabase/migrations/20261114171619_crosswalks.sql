@@ -396,7 +396,7 @@ begin
   ) or exists (
     select 1
     from jsonb_array_elements(p_bindings) as e (binding)
-    group by lower(e.binding ->> 'column_name')
+    group by lower(btrim(e.binding ->> 'column_name'))
     having count(*) > 1
   ) then
     raise exception 'Every binding needs a column, a dictionary, an entry, a code list, and a direction, with no column twice'
@@ -429,7 +429,7 @@ begin
     where not exists (
       select 1
       from jsonb_array_elements(p_columns) as e (col)
-      where lower(e.col ->> 'name') = lower(b.column_name)
+      where lower(btrim(e.col ->> 'name')) = lower(btrim(b.column_name))
     )
   ) then
     raise exception 'Every binding must name a column of the combined dataset'
@@ -492,7 +492,7 @@ begin
   if exists (
     select 1
     from jsonb_array_elements(p_columns) as e (col)
-    group by lower(e.col ->> 'name')
+    group by lower(btrim(e.col ->> 'name'))
     having count(*) > 1
   ) then
     raise exception 'Two columns of the combined dataset cannot share a name'
@@ -537,6 +537,16 @@ begin
   ) then
     raise exception 'Every dataset must be one you can open in this workspace'
       using errcode = '42501', hint = 'dataset_not_readable';
+  end if;
+
+  -- The combined dataset reads every member, so it cannot be one.
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_datasets) as d (dataset_id uuid)
+    join public.crosswalks c on c.id = p_crosswalk_id and c.output_dataset_id = d.dataset_id
+  ) then
+    raise exception 'The combined dataset cannot be one of the datasets it combines'
+      using errcode = '23514', hint = 'output_dataset_in_crosswalk';
   end if;
 
   if exists (
@@ -715,6 +725,32 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.crosswalks__check_members_viewable(p_crosswalk_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+begin
+  if exists (
+    select 1
+    from public.crosswalks__datasets cd
+    join public.crosswalks__layouts l on l.id = cd.layout_id and l.crosswalk_id = cd.crosswalk_id
+    where
+      cd.crosswalk_id = p_crosswalk_id and
+      l.status <> 'skipped' and
+      not public.util__auth_user_can_access_resource (
+        'dataset'::public.resource_type,
+        cd.dataset_id,
+        'viewer'::public.role_level
+      )
+  ) then
+    raise exception 'This crosswalk combines a dataset you cannot open, so you cannot update the combined dataset'
+      using errcode = '42501', hint = 'crosswalk_has_unreadable_datasets';
+  end if;
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.crosswalks__check_membership_and_mapping_fields(p_datasets jsonb, p_mappings jsonb)
  RETURNS void
  LANGUAGE plpgsql
@@ -862,6 +898,24 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.crosswalks__delete_left_out_layouts(p_crosswalk_id uuid, p_layouts jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+begin
+  delete from public.crosswalks__layouts l
+  where
+    l.crosswalk_id = p_crosswalk_id and
+    not exists (
+      select 1
+      from jsonb_to_recordset(p_layouts) as pl (id uuid)
+      where pl.id = l.id
+    );
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.crosswalks__guard_managed_columns()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -882,6 +936,7 @@ begin
         using errcode = '42501';
     end if;
   elsif
+    new.id is distinct from old.id or
     new.owner_id is distinct from old.owner_id or
     new.owner_profile_id is distinct from old.owner_profile_id or
     new.output_dataset_id is distinct from old.output_dataset_id or
@@ -945,7 +1000,7 @@ CREATE OR REPLACE FUNCTION public.crosswalks__read_combined_columns(p_columns js
  SET search_path TO ''
 AS $function$
   select
-    e.col ->> 'name',
+    btrim(e.col ->> 'name'),
     (e.col ->> 'data_type')::public.datasets__ava_data_type,
     (e.column_index - 1)::integer
   from jsonb_array_elements(p_columns) with ordinality as e (col, column_index);
@@ -1124,7 +1179,7 @@ begin
   from jsonb_to_recordset(p_bindings) as b (
     column_name text, dictionary_id uuid, entry_id uuid, code_list_id uuid, direction text
   )
-  join public.dataset_columns dc on dc.dataset_id = p_dataset_id and lower(dc.name) = lower(b.column_name)
+  join public.dataset_columns dc on dc.dataset_id = p_dataset_id and lower(dc.name) = lower(btrim(b.column_name))
   join public.data_dictionaries d on d.id = b.dictionary_id;
 end;
 $function$
@@ -1186,18 +1241,6 @@ begin
     is_reference = excluded.is_reference,
     status = excluded.status
   where public.crosswalks__layouts.crosswalk_id = excluded.crosswalk_id;
-
-  -- Their memberships and mappings go with them. The checks already
-  -- refused dropping a layout that holds a membership the caller cannot
-  -- view.
-  delete from public.crosswalks__layouts l
-  where
-    l.crosswalk_id = p_crosswalk_id and
-    not exists (
-      select 1
-      from jsonb_to_recordset(p_layouts) as pl (id uuid)
-      where pl.id = l.id
-    );
 end;
 $function$
 ;
@@ -1246,23 +1289,22 @@ CREATE OR REPLACE FUNCTION public.rpc_crosswalks__save(p_crosswalk_id uuid, p_se
 AS $function$
 declare
   v_workspace_id uuid;
-  v_columns jsonb := coalesce(p_columns, '[]'::jsonb);
-  v_layouts jsonb := coalesce(p_layouts, '[]'::jsonb);
-  v_datasets jsonb := coalesce(p_datasets, '[]'::jsonb);
-  v_mappings jsonb := coalesce(p_mappings, '[]'::jsonb);
 begin
   v_workspace_id := public.crosswalks__authorize (p_crosswalk_id);
 
-  perform public.crosswalks__check_payload (p_settings, v_columns, v_layouts, v_datasets, v_mappings);
-  perform public.crosswalks__check_columns (p_crosswalk_id, v_workspace_id, p_settings, v_columns);
-  perform public.crosswalks__check_layouts (p_crosswalk_id, v_layouts);
-  perform public.crosswalks__check_datasets (p_crosswalk_id, v_workspace_id, v_layouts, v_datasets);
-  perform public.crosswalks__check_mappings (p_crosswalk_id, v_columns, v_layouts, v_mappings);
+  perform public.crosswalks__check_payload (p_settings, p_columns, p_layouts, p_datasets, p_mappings);
+  perform public.crosswalks__check_columns (p_crosswalk_id, v_workspace_id, p_settings, p_columns);
+  perform public.crosswalks__check_layouts (p_crosswalk_id, p_layouts);
+  perform public.crosswalks__check_datasets (p_crosswalk_id, v_workspace_id, p_layouts, p_datasets);
+  perform public.crosswalks__check_mappings (p_crosswalk_id, p_columns, p_layouts, p_mappings);
 
-  perform public.crosswalks__write_columns (p_crosswalk_id, v_workspace_id, v_columns);
-  perform public.crosswalks__write_layouts (p_crosswalk_id, v_workspace_id, v_layouts);
-  perform public.crosswalks__write_datasets (p_crosswalk_id, v_workspace_id, v_datasets);
-  perform public.crosswalks__write_mappings (p_crosswalk_id, v_workspace_id, v_mappings);
+  -- Layouts are deleted only after the memberships are moved, so a dataset
+  -- moved out of a dropped layout keeps its membership.
+  perform public.crosswalks__write_columns (p_crosswalk_id, v_workspace_id, p_columns);
+  perform public.crosswalks__write_layouts (p_crosswalk_id, v_workspace_id, p_layouts);
+  perform public.crosswalks__write_datasets (p_crosswalk_id, v_workspace_id, p_datasets);
+  perform public.crosswalks__delete_left_out_layouts (p_crosswalk_id, p_layouts);
+  perform public.crosswalks__write_mappings (p_crosswalk_id, v_workspace_id, p_mappings);
 
   -- Always written, so `updated_at` moves on every save.
   update public.crosswalks
@@ -1287,6 +1329,8 @@ declare
   v_output_dataset_id uuid;
 begin
   v_workspace_id := public.crosswalks__authorize (p_crosswalk_id);
+
+  perform public.crosswalks__check_members_viewable (p_crosswalk_id);
 
   if coalesce(btrim(p_dataset_name), '') = '' then
     raise exception 'The combined dataset needs a name'
@@ -1481,9 +1525,11 @@ revoke all privileges on function public.crosswalks__check_datasets(p_crosswalk_
 revoke all privileges on function public.crosswalks__check_layout_fields(p_layouts jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__check_layouts(p_crosswalk_id uuid, p_layouts jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__check_mappings(p_crosswalk_id uuid, p_columns jsonb, p_layouts jsonb, p_mappings jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.crosswalks__check_members_viewable(p_crosswalk_id uuid) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__check_membership_and_mapping_fields(p_datasets jsonb, p_mappings jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__check_payload(p_settings jsonb, p_columns jsonb, p_layouts jsonb, p_datasets jsonb, p_mappings jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__create_combined_dataset(p_workspace_id uuid, p_dataset_id uuid, p_name text, p_raw_sql text, p_columns jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.crosswalks__delete_left_out_layouts(p_crosswalk_id uuid, p_layouts jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__guard_managed_columns() from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__is_fill_valid(p_fill jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__prevent_workspace_id_change() from public, anon, authenticated, service_role;

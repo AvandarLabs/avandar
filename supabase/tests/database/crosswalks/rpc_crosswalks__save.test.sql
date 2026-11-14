@@ -152,7 +152,8 @@ values
   ('c4450002-0000-4000-8000-000000000002'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Kings line list 2026-04', 'csv_file'::public.datasets__source_type, false),
   ('c4450003-0000-4000-8000-000000000003'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Queens line list', 'csv_file'::public.datasets__source_type, false),
   ('c4450004-0000-4000-8000-000000000004'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Bronx line list', 'csv_file'::public.datasets__source_type, true),
-  ('c4450005-0000-4000-8000-000000000005'::uuid, 'c4100002-0000-4000-8000-000000000002'::uuid, 'c4000004-0000-4000-8000-000000000004'::uuid, 'c4300004-0000-4000-8000-000000000004'::uuid, 'Other workspace list', 'csv_file'::public.datasets__source_type, false)
+  ('c4450005-0000-4000-8000-000000000005'::uuid, 'c4100002-0000-4000-8000-000000000002'::uuid, 'c4000004-0000-4000-8000-000000000004'::uuid, 'c4300004-0000-4000-8000-000000000004'::uuid, 'Other workspace list', 'csv_file'::public.datasets__source_type, false),
+  ('c4450006-0000-4000-8000-000000000006'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Kings and Queens (combined)', 'virtual'::public.datasets__source_type, false)
 on conflict (id) do nothing;
 
 insert into public.data_dictionaries (id, workspace_id, owner_id, owner_profile_id, name)
@@ -168,14 +169,16 @@ values
   ('c4600001-0000-4000-8000-000000000001'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4400001-0000-4000-8000-000000000001'::uuid, 'sex', 'categorical', 0),
   ('c4600009-0000-4000-8000-000000000009'::uuid, 'c4100002-0000-4000-8000-000000000002'::uuid, 'c4400002-0000-4000-8000-000000000002'::uuid, 'sex', 'categorical', 0);
 
--- The crosswalk under test starts empty, last updated long ago. Another
+-- The crosswalk under test starts empty, last updated long ago, with a
+-- combined dataset already (set here as the table owner, which the managed
+-- column guard lets through). Another
 -- crosswalk owns a layout, a column, and a mapping the first must not
 -- take. A third starts empty and stays without layouts.
-insert into public.crosswalks (id, workspace_id, owner_id, owner_profile_id, name, created_at, updated_at)
+insert into public.crosswalks (id, workspace_id, owner_id, owner_profile_id, name, created_at, updated_at, output_dataset_id)
 values
-  ('c4700001-0000-4000-8000-000000000001'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', '2020-01-01T00:00:00Z', '2020-01-01T00:00:00Z'),
-  ('c4700002-0000-4000-8000-000000000002'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Another crosswalk', now(), now()),
-  ('c4700003-0000-4000-8000-000000000003'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', now(), now());
+  ('c4700001-0000-4000-8000-000000000001'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', '2020-01-01T00:00:00Z', '2020-01-01T00:00:00Z', 'c4450006-0000-4000-8000-000000000006'::uuid),
+  ('c4700002-0000-4000-8000-000000000002'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Another crosswalk', now(), now(), null),
+  ('c4700003-0000-4000-8000-000000000003'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', now(), now(), null);
 
 insert into public.crosswalks__layouts (id, workspace_id, crosswalk_id, signature, column_names, is_reference, status)
 values ('c4710009-0000-4000-8000-000000000009'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4700002-0000-4000-8000-000000000002'::uuid, 'l1.0000000000000009', array['id'], true, 'mapped');
@@ -186,7 +189,7 @@ values ('c4720009-0000-4000-8000-000000000009'::uuid, 'c4100001-0000-4000-8000-0
 insert into public.crosswalks__mappings (id, workspace_id, crosswalk_id, layout_id, column_id, fill, status)
 values ('c4730009-0000-4000-8000-000000000009'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4700002-0000-4000-8000-000000000002'::uuid, 'c4710009-0000-4000-8000-000000000009'::uuid, 'c4720009-0000-4000-8000-000000000009'::uuid, '{"version":1,"kind":"column","source_column":"id","convert":null,"code_list_id":null,"holds_labels":false}'::jsonb, 'confirmed');
 
-select plan (44);
+select plan (59);
 
 -- 1.
 select has_function (
@@ -326,17 +329,25 @@ select is (
 );
 reset role;
 
--- 18.
+-- 18. The mapping that used the swapped layout follows it, so the only
+-- thing wrong is that another crosswalk owns the layout.
 select is (
-  pg_temp.save (p_layouts => jsonb_set(pg_temp.base_layouts (), '{2,id}', '"c4710009-0000-4000-8000-000000000009"')),
+  pg_temp.save (
+    p_layouts => jsonb_set(pg_temp.base_layouts (), '{2,id}', '"c4710009-0000-4000-8000-000000000009"'),
+    p_mappings => jsonb_set(pg_temp.base_mappings (), '{3,layout_id}', '"c4710009-0000-4000-8000-000000000009"')
+  ),
   'item_not_in_crosswalk',
   'a layout of another crosswalk cannot be saved into this one'
 );
 reset role;
 
--- 19.
+-- 19. The mapping that filled the swapped column follows it, so the only
+-- thing wrong is that another crosswalk owns the column.
 select is (
-  pg_temp.save (p_columns => jsonb_set(pg_temp.base_columns (), '{2,id}', '"c4720009-0000-4000-8000-000000000009"')),
+  pg_temp.save (
+    p_columns => jsonb_set(pg_temp.base_columns (), '{2,id}', '"c4720009-0000-4000-8000-000000000009"'),
+    p_mappings => jsonb_set(pg_temp.base_mappings (), '{4,column_id}', '"c4720009-0000-4000-8000-000000000009"')
+  ),
   'item_not_in_crosswalk',
   'a column of another crosswalk cannot be saved into this one'
 );
@@ -448,23 +459,53 @@ select is (
 );
 reset role;
 
--- 33. Nothing above changed the crosswalk.
+-- A null set is refused, never read as empty. Refused saves are not
+-- checked for leftovers: the error handler that returns the hint rolls
+-- every write back, so such a check could not fail.
+
+-- 33.
 select is (
-  format(
-    'name=%s children=%s',
-    (select name from public.crosswalks where id = 'c4700001-0000-4000-8000-000000000001'::uuid),
-    (select count(*) from public.crosswalks__columns where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid) +
-    (select count(*) from public.crosswalks__layouts where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid) +
-    (select count(*) from public.crosswalks__datasets where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid) +
-    (select count(*) from public.crosswalks__mappings where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid)
-  ),
-  'name=Untitled crosswalk children=0',
-  'refused saves leave the crosswalk as it was'
+  pg_temp.save (p_columns => null::jsonb),
+  'crosswalk_payload_invalid',
+  'null columns are refused'
 );
+reset role;
+
+-- 34.
+select is (
+  pg_temp.save (p_layouts => null::jsonb),
+  'crosswalk_payload_invalid',
+  'null layouts are refused'
+);
+reset role;
+
+-- 35.
+select is (
+  pg_temp.save (p_datasets => null::jsonb),
+  'crosswalk_payload_invalid',
+  'null datasets are refused'
+);
+reset role;
+
+-- 36.
+select is (
+  pg_temp.save (p_mappings => null::jsonb),
+  'crosswalk_payload_invalid',
+  'null mappings are refused'
+);
+reset role;
+
+-- 37.
+select is (
+  pg_temp.save (p_datasets => jsonb_set(pg_temp.base_datasets (), '{2,dataset_id}', '"c4450006-0000-4000-8000-000000000006"')),
+  'output_dataset_in_crosswalk',
+  'the combined dataset cannot be one of the datasets it combines'
+);
+reset role;
 
 -- Saves that succeed.
 
--- 34. A first save before any dataset is added.
+-- 38. A first save before any dataset is added.
 select is (
   pg_temp.save (
     p_settings => pg_temp.base_settings () || '{"name":"Empty for now","description":null}'::jsonb,
@@ -479,7 +520,7 @@ select is (
 );
 reset role;
 
--- 35. Read in its own statement: the outer query of a statement does not
+-- 39. Read in its own statement: the outer query of a statement does not
 -- see writes made by a function it calls.
 select is (
   format(
@@ -492,7 +533,7 @@ select is (
   'the empty save wrote its settings'
 );
 
--- 36.
+-- 40.
 select is (
   pg_temp.save (p_settings => pg_temp.base_settings () || '{"codes_output_as":"codes"}'::jsonb),
   'no error',
@@ -500,7 +541,7 @@ select is (
 );
 reset role;
 
--- 37.
+-- 41.
 select is (
   format(
     'name=%s description=%s codes=%s source=%s columns=%s layouts=%s memberships=%s mappings=%s reference=%s entry=%s',
@@ -519,7 +560,7 @@ select is (
   'the save wrote the settings and every set'
 );
 
--- 38.
+-- 42.
 select results_eq (
   $q$
     select fill, status::text, confidence, reason::text, layout_id, column_id
@@ -539,7 +580,7 @@ select results_eq (
   'a mapping keeps its fill, status, confidence, and reason as sent'
 );
 
--- 39.
+-- 43.
 select ok (
   (select updated_at > '2020-01-02T00:00:00Z'::timestamptz from public.crosswalks where id = 'c4700001-0000-4000-8000-000000000001'::uuid),
   'a save moves the crosswalk''s updated_at'
@@ -555,7 +596,7 @@ select id, dataset_id
 from public.crosswalks__datasets
 where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid;
 
--- 40. A second save renames case_id, drops the third layout (its mapping
+-- 44. A second save renames case_id, drops the third layout (its mapping
 -- goes with it), moves Kings 2026-04 to the reference layout, and turns
 -- one fill into a fixed value. It leaves out the Bronx membership, which
 -- the editor cannot see.
@@ -575,7 +616,7 @@ select is (
 );
 reset role;
 
--- 41.
+-- 45.
 select is (
   format(
     'column=%s layouts=%s status=%s m4=%s m2=%s/%s',
@@ -590,7 +631,7 @@ select is (
   'the column and the mapping kept their ids, and the dropped layout took its mapping'
 );
 
--- 42.
+-- 46.
 select results_eq (
   $q$
     select d.dataset_id, d.layout_id, b.id is not null
@@ -609,7 +650,7 @@ select results_eq (
   'memberships keep their ids, the moved one changed layout, and the hidden one survived'
 );
 
--- 43. Dropping the layout that holds the hidden membership would delete
+-- 47. Dropping the layout that holds the hidden membership would delete
 -- it, so the save is refused.
 select is (
   pg_temp.save (
@@ -622,7 +663,7 @@ select is (
 );
 reset role;
 
--- 44.
+-- 48.
 select is (
   format(
     'layouts=%s bronx=%s',
@@ -631,6 +672,150 @@ select is (
   ),
   'layouts=2 bronx=c4710002-0000-4000-8000-000000000002',
   'the refused save kept the layout and the hidden membership'
+);
+
+-- Later saves, from the state above: layouts one (the reference) and two,
+-- columns case_number, sex, and onset, and the Bronx membership on layout two.
+-- Layout three comes back holding Kings 2026-03, and the next save drops it
+-- again, moving that dataset to the reference layout.
+
+-- 49.
+select is (
+  pg_temp.save (
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710003-0000-4000-8000-000000000003"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450003-0000-4000-8000-000000000003","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb
+  ),
+  'no error',
+  'a save adds a layout and moves a dataset onto it'
+);
+reset role;
+
+create temporary table cw_membership_before_drop as
+select id
+from public.crosswalks__datasets
+where
+  crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid and
+  dataset_id = 'c4450001-0000-4000-8000-000000000001'::uuid;
+
+-- 50.
+select is (
+  pg_temp.save (
+    p_layouts => pg_temp.base_layouts () - 2,
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450003-0000-4000-8000-000000000003","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => pg_temp.base_mappings () - 3
+  ),
+  'no error',
+  'a save drops a layout and moves its dataset to a kept layout'
+);
+reset role;
+
+-- 51.
+select is (
+  format(
+    'same_membership=%s layout=%s dropped_layout=%s',
+    (select count(*) from cw_membership_before_drop b join public.crosswalks__datasets d on d.id = b.id),
+    (select layout_id from public.crosswalks__datasets where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid and dataset_id = 'c4450001-0000-4000-8000-000000000001'::uuid),
+    (select count(*) from public.crosswalks__layouts where id = 'c4710003-0000-4000-8000-000000000003'::uuid)
+  ),
+  'same_membership=1 layout=c4710001-0000-4000-8000-000000000001 dropped_layout=0',
+  'the moved dataset kept its membership when its old layout was dropped in the same save'
+);
+
+-- 52. Queens is left out of the memberships, and the editor can view it, so
+-- its membership is deleted. The Bronx one, which the editor cannot view,
+-- stays.
+select is (
+  pg_temp.save (
+    p_layouts => pg_temp.base_layouts () - 2,
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => pg_temp.base_mappings () - 3
+  ),
+  'no error',
+  'a save leaves a viewable membership out'
+);
+reset role;
+
+-- 53.
+select is (
+  (select string_agg(dataset_id::text, ',' order by dataset_id) from public.crosswalks__datasets where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid),
+  'c4450001-0000-4000-8000-000000000001,c4450002-0000-4000-8000-000000000002,c4450004-0000-4000-8000-000000000004',
+  'the viewable membership left out was deleted and the hidden one stayed'
+);
+
+-- 54. Onset is left out of the columns, and so is its mapping.
+select is (
+  pg_temp.save (
+    p_columns => pg_temp.base_columns () - 2,
+    p_layouts => pg_temp.base_layouts () - 2,
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => pg_temp.base_mappings () - 3 - 3
+  ),
+  'no error',
+  'a save leaves a column out'
+);
+reset role;
+
+-- 55.
+select is (
+  format(
+    'columns=%s onset=%s onset_mapping=%s',
+    (select count(*) from public.crosswalks__columns where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid),
+    (select count(*) from public.crosswalks__columns where id = 'c4720003-0000-4000-8000-000000000003'::uuid),
+    (select count(*) from public.crosswalks__mappings where id = 'c4730005-0000-4000-8000-000000000005'::uuid)
+  ),
+  'columns=2 onset=0 onset_mapping=0',
+  'the column left out was deleted with its mapping'
+);
+
+-- 56. Two columns swap names in one save.
+select is (
+  pg_temp.save (
+    p_columns => jsonb_set(jsonb_set(pg_temp.base_columns () - 2, '{0,name}', '"sex"'), '{1,name}', '"case_id"'),
+    p_layouts => pg_temp.base_layouts () - 2,
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => pg_temp.base_mappings () - 3 - 3
+  ),
+  'no error',
+  'a save swaps the names of two columns'
+);
+reset role;
+
+-- 57.
+select is (
+  format(
+    'first=%s second=%s',
+    (select name from public.crosswalks__columns where id = 'c4720001-0000-4000-8000-000000000001'::uuid),
+    (select name from public.crosswalks__columns where id = 'c4720002-0000-4000-8000-000000000002'::uuid)
+  ),
+  'first=sex second=case_id',
+  'each column kept its id and took the other''s name'
+);
+
+-- 58. The reference moves from layout one to layout two.
+select is (
+  pg_temp.save (
+    p_columns => pg_temp.base_columns () - 2,
+    p_layouts => jsonb_set(
+      jsonb_set(
+        jsonb_set(jsonb_set(pg_temp.base_layouts () - 2, '{0,is_reference}', 'false'), '{0,status}', '"to_do"'),
+        '{1,is_reference}',
+        'true'
+      ),
+      '{1,status}',
+      '"mapped"'
+    ),
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => pg_temp.base_mappings () - 3 - 3
+  ),
+  'no error',
+  'a save moves the reference to another layout'
+);
+reset role;
+
+-- 59.
+select is (
+  (select string_agg(id::text || ':' || is_reference::text || ':' || status::text, ',' order by id) from public.crosswalks__layouts where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid),
+  'c4710001-0000-4000-8000-000000000001:false:to_do,c4710002-0000-4000-8000-000000000002:true:mapped',
+  'layout two is the only reference, and layout one is no longer mapped'
 );
 
 select * from finish ();

@@ -3443,6 +3443,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      crosswalks__check_members_viewable: {
+        Args: { p_crosswalk_id: string }
+        Returns: undefined
+      }
       crosswalks__check_membership_and_mapping_fields: {
         Args: { p_datasets: Json; p_mappings: Json }
         Returns: undefined
@@ -3465,6 +3469,10 @@ export type Database = {
           p_raw_sql: string
           p_workspace_id: string
         }
+        Returns: undefined
+      }
+      crosswalks__delete_left_out_layouts: {
+        Args: { p_crosswalk_id: string; p_layouts: Json }
         Returns: undefined
       }
       crosswalks__is_fill_valid: { Args: { p_fill: Json }; Returns: boolean }

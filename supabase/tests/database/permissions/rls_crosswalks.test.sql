@@ -9,7 +9,7 @@
  *
  * A signed-in user cannot move a crosswalk to another workspace, set or
  * change its combined dataset, when it was compiled, or the code lists it
- * embedded, or change its owner. Deleting the combined dataset clears
+ * embedded, or change its owner or id. Deleting the combined dataset clears
  * `output_dataset_id` and keeps the crosswalk.
  */
 begin;
@@ -80,7 +80,7 @@ values
   ('c1400004-0000-4000-8000-000000000004'::uuid, 'c1100002-0000-4000-8000-000000000002'::uuid, 'c1000004-0000-4000-8000-000000000004'::uuid, 'c1300004-0000-4000-8000-000000000004'::uuid, 'Other workspace crosswalk')
 on conflict (id) do nothing;
 
-select plan (26);
+select plan (27);
 
 -- 1. A viewer reads a crosswalk in their workspace.
 select lives_ok (
@@ -319,7 +319,21 @@ select throws_ok (
 );
 reset role;
 
--- 17. A whole-row update, as the CRUD client sends, carries the same
+-- 17. A signed-in user cannot change a crosswalk's id either: the children
+-- would follow it through the cascade.
+select throws_ok (
+  $t17a$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"c1000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  update public.crosswalks set id = 'c14000ff-0000-4000-8000-0000000000ff'::uuid where id = 'c1400002-0000-4000-8000-000000000002'::uuid;
+  $t17a$,
+  '42501',
+  'a crosswalk''s owner and combined dataset are managed',
+  'an editor cannot change a crosswalk''s id'
+);
+reset role;
+
+-- 18. A whole-row update, as the CRUD client sends, carries the same
 -- managed values and passes.
 select lives_ok (
   $t17$
@@ -349,7 +363,7 @@ select lives_ok (
 
 -- Deleting.
 
--- 18. An editor cannot delete another member's crosswalk.
+-- 19. An editor cannot delete another member's crosswalk.
 select lives_ok (
   $t18$
   set local role authenticated;
@@ -366,7 +380,7 @@ select lives_ok (
   'an editor cannot delete another member''s crosswalk'
 );
 
--- 19. A viewer cannot delete.
+-- 20. A viewer cannot delete.
 select lives_ok (
   $t19$
   set local role authenticated;
@@ -383,7 +397,7 @@ select lives_ok (
   'a viewer cannot delete a crosswalk'
 );
 
--- 20. An editor deletes their own crosswalk.
+-- 21. An editor deletes their own crosswalk.
 select lives_ok (
   $t20$
   set local role authenticated;
@@ -400,7 +414,7 @@ select lives_ok (
   'an editor deletes their own crosswalk'
 );
 
--- 21. A Data Sources admin deletes another member's crosswalk.
+-- 22. A Data Sources admin deletes another member's crosswalk.
 select lives_ok (
   $t21$
   set local role authenticated;
@@ -428,7 +442,7 @@ set
   compiled_code_lists = '[{"code_list_id":"c1500001-0000-4000-8000-000000000001","fingerprint":"p1.0123456789abcdef"}]'::jsonb
 where id = 'c1400001-0000-4000-8000-000000000001'::uuid;
 
--- 22.
+-- 23.
 select lives_ok (
   $t22$
   set local role authenticated;
@@ -439,7 +453,7 @@ select lives_ok (
 );
 reset role;
 
--- 23.
+-- 24.
 select results_eq (
   $q$
     select
@@ -453,13 +467,13 @@ select results_eq (
 
 -- Shape.
 
--- 24.
+-- 25.
 select col_type_is ('public', 'crosswalks', 'codes_output_as', 'public', 'crosswalks__codes_output', 'codes_output_as is the codes output enum');
 
--- 25.
+-- 26.
 select fk_ok ('public', 'crosswalks', 'output_dataset_id', 'public', 'datasets', 'id', 'a crosswalk names its combined dataset');
 
--- 26.
+-- 27.
 select has_index ('public', 'crosswalks', 'idx_crosswalks__output_dataset_id', 'a dataset finds the crosswalk that combines it by index');
 
 select * from finish ();

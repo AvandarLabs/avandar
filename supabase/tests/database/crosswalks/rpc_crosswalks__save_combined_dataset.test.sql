@@ -7,7 +7,10 @@
  * records `output_dataset_id`, `compiled_at`, and `compiled_code_lists`.
  * Only a Data Sources editor can call it; creating also needs workspace
  * admin, and updating needs editor rights on the dataset. Every refusal
- * raises a stable `hint` and changes nothing.
+ * raises a stable `hint` and changes nothing. A caller who cannot view a
+ * dataset the crosswalk stacks (on a layout that is not skipped) cannot
+ * combine, and column and binding names are compared without their
+ * surrounding spaces.
  */
 begin;
 
@@ -180,9 +183,28 @@ values
   ('c5100002-0000-4000-8000-000000000002'::uuid, 'c5400002-0000-4000-8000-000000000002'::uuid, 'c5600009-0000-4000-8000-000000000009'::uuid, 'c5500009-0000-4000-8000-000000000009'::uuid, true);
 
 insert into public.crosswalks (id, workspace_id, owner_id, owner_profile_id, name)
-values ('c5700001-0000-4000-8000-000000000001'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5300001-0000-4000-8000-000000000001'::uuid, 'Kings and Queens');
+values
+  ('c5700001-0000-4000-8000-000000000001'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5300001-0000-4000-8000-000000000001'::uuid, 'Kings and Queens'),
+  ('c5700002-0000-4000-8000-000000000002'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5300001-0000-4000-8000-000000000001'::uuid, 'With a restricted member');
 
-select plan (29);
+-- The second crosswalk stacks a dataset everyone can view (on the reference
+-- layout) and a restricted one the editor cannot view (on another layout).
+insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
+values
+  ('c5450003-0000-4000-8000-000000000003'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5300001-0000-4000-8000-000000000001'::uuid, 'Kings line list', 'csv_file'::public.datasets__source_type, false),
+  ('c5450004-0000-4000-8000-000000000004'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5000001-0000-4000-8000-000000000001'::uuid, 'c5300001-0000-4000-8000-000000000001'::uuid, 'Bronx line list', 'csv_file'::public.datasets__source_type, true);
+
+insert into public.crosswalks__layouts (id, workspace_id, crosswalk_id, signature, column_names, is_reference, status)
+values
+  ('c5710001-0000-4000-8000-000000000001'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'l1.00000000000000a1', array['case_id'], true, 'mapped'),
+  ('c5710002-0000-4000-8000-000000000002'::uuid, 'c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'l1.00000000000000a2', array['CaseNo'], false, 'to_do');
+
+insert into public.crosswalks__datasets (workspace_id, crosswalk_id, dataset_id, layout_id)
+values
+  ('c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'c5450003-0000-4000-8000-000000000003'::uuid, 'c5710001-0000-4000-8000-000000000001'::uuid),
+  ('c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'c5450004-0000-4000-8000-000000000004'::uuid, 'c5710002-0000-4000-8000-000000000002'::uuid);
+
+select plan (38);
 
 -- 1.
 select has_function (
@@ -503,13 +525,144 @@ select results_eq (
   'the update records the code lists it embedded now'
 );
 
+-- A kept original copy of a converted column, as an apply with conversions
+-- leaves it. The combined dataset's own bindings are reference bindings, so
+-- the copy must not survive an update.
+update public.dataset_columns__dictionary_bindings
+set mode = 'convert', keeps_original = true, replaced_data_type = 'varchar'
+where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
+
+insert into public.dataset_columns (dataset_id, workspace_id, original_name, name, original_data_type, detected_data_type, data_type, column_idx, dictionary_binding_id)
+select
+  dc.dataset_id, dc.workspace_id, dc.original_name, 'sex_original', dc.original_data_type, dc.detected_data_type, 'varchar', 4, b.id
+from public.dataset_columns__dictionary_bindings b
+join public.dataset_columns dc on dc.id = b.dataset_column_id
+where b.dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
+
+-- 28.
+select is (
+  pg_temp.combine (
+    p_dataset_name => 'Kings and Queens (v2)',
+    p_columns => '[{"name":"source_dataset","data_type":"varchar"},{"name":"CASE_ID","data_type":"varchar"},{"name":"sex","data_type":"bigint"},{"name":"county","data_type":"varchar"}]'::jsonb,
+    p_bindings => '[{"column_name":"sex","dictionary_id":"c5400001-0000-4000-8000-000000000001","entry_id":"c5600001-0000-4000-8000-000000000001","code_list_id":"c5500001-0000-4000-8000-000000000001","direction":"decode"}]'::jsonb
+  ),
+  'no error',
+  'an update runs on a dataset that has a kept original copy'
+);
+reset role;
+
+-- 29.
+select is (
+  format(
+    'columns=%s binding_modes=%s',
+    (select string_agg(name, ',' order by column_idx) from public.dataset_columns where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid),
+    (select string_agg(mode::text, ',') from public.dataset_columns__dictionary_bindings where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid)
+  ),
+  'columns=source_dataset,CASE_ID,sex,county binding_modes=reference',
+  'the kept original copy is gone and the binding is a reference binding again'
+);
+
+create temporary table cw_columns_before_trim as
+select id, name
+from public.dataset_columns
+where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
+
+-- 30. Names are compared and stored without surrounding spaces, as the save
+-- compares them.
+select is (
+  pg_temp.combine (
+    p_columns => '[{"name":"source_dataset","data_type":"varchar"},{"name":" CASE_ID ","data_type":"varchar"},{"name":"case_id ","data_type":"varchar"},{"name":"county","data_type":"varchar"}]'::jsonb,
+    p_bindings => '[]'::jsonb
+  ),
+  'combined_columns_invalid',
+  'two columns cannot share a name ignoring case and surrounding spaces'
+);
+reset role;
+
+-- 31.
+select is (
+  pg_temp.combine (
+    p_dataset_name => 'Kings and Queens (v2)',
+    p_columns => '[{"name":" source_dataset ","data_type":"varchar"},{"name":"  CASE_ID","data_type":"varchar"},{"name":"sex ","data_type":"bigint"},{"name":"county","data_type":"varchar"}]'::jsonb,
+    p_bindings => '[{"column_name":" SEX ","dictionary_id":"c5400001-0000-4000-8000-000000000001","entry_id":"c5600001-0000-4000-8000-000000000001","code_list_id":"c5500001-0000-4000-8000-000000000001","direction":"decode"}]'::jsonb
+  ),
+  'no error',
+  'columns and bindings with surrounding spaces in their names are accepted'
+);
+reset role;
+
+-- 32.
+select is (
+  format(
+    'columns=%s kept_ids=%s bound=%s',
+    (select string_agg(name, ',' order by column_idx) from public.dataset_columns where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid),
+    (select count(*) from public.dataset_columns dc join cw_columns_before_trim b on b.id = dc.id where dc.dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid),
+    (select string_agg(dc.name, ',') from public.dataset_columns__dictionary_bindings b join public.dataset_columns dc on dc.id = b.dataset_column_id where b.dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid)
+  ),
+  'columns=source_dataset,CASE_ID,sex,county kept_ids=4 bound=sex',
+  'names are stored trimmed, every column kept its id, and the binding found its column'
+);
+
+-- A combine on a crosswalk that stacks a dataset the caller cannot view.
+
+-- 33.
+select is (
+  pg_temp.combine (
+    p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid,
+    p_crosswalk_id => 'c5700002-0000-4000-8000-000000000002'::uuid,
+    p_dataset_id => 'c5450010-0000-4000-8000-000000000010'::uuid
+  ),
+  'crosswalk_has_unreadable_datasets',
+  'an editor who cannot view a member dataset cannot combine, or the combined dataset would lose it'
+);
+reset role;
+
+update public.crosswalks__layouts
+set status = 'skipped'
+where id = 'c5710002-0000-4000-8000-000000000002'::uuid;
+
+-- 34. The restricted dataset is on a skipped layout now, so the SQL never
+-- stacks it. The editor gets past the check and meets the next refusal.
+select is (
+  pg_temp.combine (
+    p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid,
+    p_crosswalk_id => 'c5700002-0000-4000-8000-000000000002'::uuid,
+    p_dataset_id => 'c5450010-0000-4000-8000-000000000010'::uuid
+  ),
+  'dataset_creator_required',
+  'a member dataset on a skipped layout does not stop the combine'
+);
+reset role;
+
+update public.crosswalks__layouts
+set status = 'to_do'
+where id = 'c5710002-0000-4000-8000-000000000002'::uuid;
+
+-- 35. The owner can view every dataset, so the same crosswalk combines.
+select is (
+  pg_temp.combine (
+    p_crosswalk_id => 'c5700002-0000-4000-8000-000000000002'::uuid,
+    p_dataset_id => 'c5450010-0000-4000-8000-000000000010'::uuid
+  ),
+  'no error',
+  'a caller who can view every member dataset combines'
+);
+reset role;
+
+-- 36.
+select is (
+  (select output_dataset_id from public.crosswalks where id = 'c5700002-0000-4000-8000-000000000002'::uuid),
+  'c5450010-0000-4000-8000-000000000010'::uuid,
+  'that combine created the combined dataset'
+);
+
 -- The owner restricts the combined dataset, so the editor's app role no
 -- longer reaches it.
 update public.datasets
 set is_restricted = true
 where id = 'c5450001-0000-4000-8000-000000000001'::uuid;
 
--- 28.
+-- 37.
 select is (
   pg_temp.combine (
     p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid,
@@ -520,7 +673,7 @@ select is (
 );
 reset role;
 
--- 29.
+-- 38.
 select is (
   (select name from public.datasets where id = 'c5450001-0000-4000-8000-000000000001'::uuid),
   'Kings and Queens (v2)',

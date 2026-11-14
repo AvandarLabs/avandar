@@ -1,8 +1,8 @@
--- Generated from supabase/migrations/20261114165927_crosswalks.sql by
+-- Generated from supabase/migrations/20261114171619_crosswalks.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 26
--- Statements dropped (RLS/funcs/triggers/data/etc.): 141
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 145
 -- FK constraints dropped (target not synced to SQLite): 1
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 20
 CREATE TABLE "crosswalks" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "owner_id" UUID NOT NULL, "owner_profile_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "description" TEXT, "output_dataset_id" UUID, "codes_output_as" crosswalks__codes_output NOT NULL DEFAULT 'labels', "adds_source_column" INTEGER NOT NULL DEFAULT TRUE, "compiled_at" TIMESTAMPTZ, "compiled_code_lists" JSONB);

@@ -10,7 +10,8 @@
  * refusal raises with a stable `hint` that the client maps to copy.
  *
  * Columns, layouts, and mappings are upserted by id, and the ones left out
- * are deleted. Memberships are upserted by dataset, and one left out is
+ * are deleted (a layout only after the memberships are written). A null set
+ * is refused, never read as empty. Memberships are upserted by dataset, and one left out is
  * deleted only when the caller can view its dataset, so a save never
  * removes a dataset the caller cannot see. For the same reason, a layout
  * that holds such a membership must stay in the set.
@@ -39,23 +40,22 @@ set
   search_path = '' as $$
 declare
   v_workspace_id uuid;
-  v_columns jsonb := coalesce(p_columns, '[]'::jsonb);
-  v_layouts jsonb := coalesce(p_layouts, '[]'::jsonb);
-  v_datasets jsonb := coalesce(p_datasets, '[]'::jsonb);
-  v_mappings jsonb := coalesce(p_mappings, '[]'::jsonb);
 begin
   v_workspace_id := public.crosswalks__authorize (p_crosswalk_id);
 
-  perform public.crosswalks__check_payload (p_settings, v_columns, v_layouts, v_datasets, v_mappings);
-  perform public.crosswalks__check_columns (p_crosswalk_id, v_workspace_id, p_settings, v_columns);
-  perform public.crosswalks__check_layouts (p_crosswalk_id, v_layouts);
-  perform public.crosswalks__check_datasets (p_crosswalk_id, v_workspace_id, v_layouts, v_datasets);
-  perform public.crosswalks__check_mappings (p_crosswalk_id, v_columns, v_layouts, v_mappings);
+  perform public.crosswalks__check_payload (p_settings, p_columns, p_layouts, p_datasets, p_mappings);
+  perform public.crosswalks__check_columns (p_crosswalk_id, v_workspace_id, p_settings, p_columns);
+  perform public.crosswalks__check_layouts (p_crosswalk_id, p_layouts);
+  perform public.crosswalks__check_datasets (p_crosswalk_id, v_workspace_id, p_layouts, p_datasets);
+  perform public.crosswalks__check_mappings (p_crosswalk_id, p_columns, p_layouts, p_mappings);
 
-  perform public.crosswalks__write_columns (p_crosswalk_id, v_workspace_id, v_columns);
-  perform public.crosswalks__write_layouts (p_crosswalk_id, v_workspace_id, v_layouts);
-  perform public.crosswalks__write_datasets (p_crosswalk_id, v_workspace_id, v_datasets);
-  perform public.crosswalks__write_mappings (p_crosswalk_id, v_workspace_id, v_mappings);
+  -- Layouts are deleted only after the memberships are moved, so a dataset
+  -- moved out of a dropped layout keeps its membership.
+  perform public.crosswalks__write_columns (p_crosswalk_id, v_workspace_id, p_columns);
+  perform public.crosswalks__write_layouts (p_crosswalk_id, v_workspace_id, p_layouts);
+  perform public.crosswalks__write_datasets (p_crosswalk_id, v_workspace_id, p_datasets);
+  perform public.crosswalks__delete_left_out_layouts (p_crosswalk_id, p_layouts);
+  perform public.crosswalks__write_mappings (p_crosswalk_id, v_workspace_id, p_mappings);
 
   -- Always written, so `updated_at` moves on every save.
   update public.crosswalks
@@ -408,7 +408,8 @@ $$;
 /**
  * Raises with a stable hint when a set of memberships cannot be saved: one
  * names a layout that is not in the set, or a dataset that is missing, in
- * another workspace, or one the caller cannot view. Also refuses a set of
+ * another workspace, or one the caller cannot view, or names the crosswalk's
+ * own combined dataset. Also refuses a set of
  * layouts that leaves out a layout still holding a membership the caller
  * cannot view, because deleting the layout would delete that membership.
  */
@@ -448,6 +449,16 @@ begin
   ) then
     raise exception 'Every dataset must be one you can open in this workspace'
       using errcode = '42501', hint = 'dataset_not_readable';
+  end if;
+
+  -- The combined dataset reads every member, so it cannot be one.
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_datasets) as d (dataset_id uuid)
+    join public.crosswalks c on c.id = p_crosswalk_id and c.output_dataset_id = d.dataset_id
+  ) then
+    raise exception 'The combined dataset cannot be one of the datasets it combines'
+      using errcode = '23514', hint = 'output_dataset_in_crosswalk';
   end if;
 
   if exists (
@@ -601,7 +612,7 @@ begin
 end;
 $$;
 
-/** Upserts a crosswalk's layouts and deletes the ones left out. */
+/** Upserts a crosswalk's layouts. */
 create or replace function public.crosswalks__write_layouts (
   p_crosswalk_id uuid,
   p_workspace_id uuid,
@@ -631,10 +642,20 @@ begin
     is_reference = excluded.is_reference,
     status = excluded.status
   where public.crosswalks__layouts.crosswalk_id = excluded.crosswalk_id;
+end;
+$$;
 
-  -- Their memberships and mappings go with them. The checks already
-  -- refused dropping a layout that holds a membership the caller cannot
-  -- view.
+/**
+ * Deletes the crosswalk's layouts that the given set leaves out. Their
+ * memberships and mappings go with them. The checks already refused
+ * dropping a layout that holds a membership the caller cannot view, and the
+ * memberships of the given set were moved off these layouts before this
+ * runs.
+ */
+create or replace function public.crosswalks__delete_left_out_layouts (p_crosswalk_id uuid, p_layouts jsonb) returns void language plpgsql
+set
+  search_path = '' as $$
+begin
   delete from public.crosswalks__layouts l
   where
     l.crosswalk_id = p_crosswalk_id and
@@ -820,6 +841,14 @@ from
 
 revoke
 execute on function public.crosswalks__write_layouts (uuid, uuid, jsonb)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke
+execute on function public.crosswalks__delete_left_out_layouts (uuid, jsonb)
 from
   public,
   anon,

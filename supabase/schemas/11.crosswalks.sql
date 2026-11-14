@@ -150,8 +150,8 @@ from
  * Refuses direct writes by a signed-in user to the columns this schema
  * manages: the combined dataset, when it was compiled, and the code lists
  * it embedded, which only `rpc_crosswalks__save_combined_dataset` sets and
- * which a new crosswalk leaves empty, and ownership, which no client flow
- * changes after insert. A whole-row update that sends the same values
+ * which a new crosswalk leaves empty, and the id and ownership, which no
+ * client flow changes after insert. A whole-row update that sends the same values
  * passes. The RPCs run as the function owner, and the foreign key's
  * `on delete set null` runs as the table's owner, so both pass.
  */
@@ -173,6 +173,7 @@ begin
         using errcode = '42501';
     end if;
   elsif
+    new.id is distinct from old.id or
     new.owner_id is distinct from old.owner_id or
     new.owner_profile_id is distinct from old.owner_profile_id or
     new.output_dataset_id is distinct from old.output_dataset_id or
