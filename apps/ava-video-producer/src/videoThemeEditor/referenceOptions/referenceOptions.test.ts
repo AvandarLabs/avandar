@@ -6,6 +6,7 @@ import { EMPTY_THEME_DRAFT } from "../themeDraft/themeDraft";
 import { listTokenRows } from "../tokenRows/tokenRows";
 import {
   getReferenceOptionRole,
+  getUnresolvedReference,
   isCameraCurveToken,
   listReferenceOptions,
   orderReferenceOptions,
@@ -126,4 +127,25 @@ test("an option's role says whether it is the primary colour, a custom value, or
     }),
     "named",
   );
+});
+
+test("a reference no option offers is unresolved, and a listed or unset value is not", () => {
+  const options = [
+    {
+      reference: "$atomic.swatch.mint",
+      path: "atomic.swatch.mint",
+      kind: "color",
+      value: "#5ee8c0",
+    },
+  ] as const;
+  assert.equal(
+    getUnresolvedReference("$atomic.swatch.missingSwatch", options),
+    "$atomic.swatch.missingSwatch",
+  );
+  assert.equal(
+    getUnresolvedReference("$atomic.swatch.mint", options),
+    undefined,
+  );
+  assert.equal(getUnresolvedReference("#ff0000", options), undefined);
+  assert.equal(getUnresolvedReference(undefined, options), undefined);
 });

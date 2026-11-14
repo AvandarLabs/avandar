@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import { isTokenReference } from "../../videoTheme/themeReferences/themeReferences";
 import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
@@ -9,6 +9,7 @@ import { getCustomScaleFromReference } from "../customTokenValue/customTokenValu
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";
 import {
   getReferenceOptionRole,
+  getUnresolvedReference,
   isCameraCurveToken,
   listReferenceOptions,
   orderReferenceOptions,
@@ -225,16 +226,34 @@ export function ReferenceControl(props: ReferenceControlProps) {
   const options = useReferenceOptions(props);
   const chips = useOptionChips(options);
   const hasIssue = useRowHasIssue();
+  const container = useRef<HTMLDivElement>(null);
+  const unresolved = hasIssue
+    ? getUnresolvedReference(props.value, options)
+    : undefined;
+  const isColor = props.kind === "color" || props.kind === "fill";
+  const name = props.label;
+  const data = options.map((option) => ({
+    value: option.reference,
+    label: toLabel(option),
+  }));
   return (
-    <div className={css.reference}>
+    <div className={css.reference} ref={container}>
       <AtlasSelect
         aria-label={props.label}
         error={hasIssue}
         searchable
-        data={options.map((option) => ({
-          value: option.reference,
-          label: toLabel(option),
-        }))}
+        data={
+          unresolved
+            ? [
+                ...data,
+                {
+                  value: unresolved,
+                  label: isColor ? t`Missing colour` : t`Missing value`,
+                  disabled: true,
+                },
+              ]
+            : data
+        }
         value={isTokenReference(props.value) ? props.value : null}
         placeholder={props.value === undefined ? t`Not set` : t`Custom value`}
         nothingFoundMessage={t`No matching settings`}
@@ -243,6 +262,17 @@ export function ReferenceControl(props: ReferenceControlProps) {
           <_OptionRow label={option.label} chip={chips.get(option.value)} />
         )}
       />
+      {unresolved ? (
+        <Button
+          className={css.customToggle}
+          size="compact-xs"
+          variant="light"
+          aria-label={t`Pick another for ${name}`}
+          onClick={() => container.current?.querySelector("input")?.focus()}
+        >
+          {isColor ? t`Pick a colour` : t`Pick a value`}
+        </Button>
+      ) : null}
       <CustomValue {...props} options={options} />
     </div>
   );

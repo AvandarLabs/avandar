@@ -281,6 +281,27 @@ export function findTokenRowIssue(
   );
 }
 
+/** What a row's resolver message means, so the row can say it in plain words. */
+export type RowIssueDescription =
+  | Readonly<{ kind: "missingReference"; reference: string }>
+  | Readonly<{ kind: "loop" }>
+  | Readonly<{ kind: "other" }>;
+
+/**
+ * Sorts a resolver message into the cases the editor words for a producer: a
+ * reference to a token that is gone, a reference loop, or anything else. The
+ * raw message stays available as secondary detail.
+ */
+export function describeRowIssue(issue: VideoThemeIssue): RowIssueDescription {
+  const missing = /^(\$\S+) does not point at a token$/.exec(issue.message);
+  if (missing) {
+    return { kind: "missingReference", reference: missing[1] };
+  }
+  return issue.message.startsWith("Reference cycle:")
+    ? { kind: "loop" }
+    : { kind: "other" };
+}
+
 /**
  * The key for a value added to a scale group: the first `custom<n>` no entry
  * of that scale uses. Pass every row, not a filtered view, so a value hidden

@@ -56,6 +56,11 @@ falls to about 2.5:1 on `--paper` and `--ink` to about 4:1, both under the
 
 An issue puts the row's control in its Mantine `error` state (a 1 px `red.6`
 border on the input) and adds an alert line with an icon under the control.
+The alert says the problem in plain words (for a deleted swatch, "This colour
+is missing. Pick another.") and shows the resolver's own message below it as
+muted detail. A reference that no longer exists shows in the select as
+"Missing colour", with a "Pick a colour" action beside the custom value
+toggle, and the row's value reads "Last working value" until it is fixed.
 Rows never get a coloured left stripe: `DESIGN.md` bans left accent stripes on
 list rows.
 

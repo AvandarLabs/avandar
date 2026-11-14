@@ -35,6 +35,21 @@ export function getReferenceOptionRole(
   return isCustomScaleKey(option.key) ? "custom" : "named";
 }
 
+/**
+ * The reference a value holds when no option offers it, such as a swatch that
+ * was deleted. Undefined for a literal, an unset value, or a listed reference.
+ */
+export function getUnresolvedReference(
+  value: unknown,
+  options: readonly ReferenceOption[],
+): TokenReference | undefined {
+  return typeof value === "string" &&
+    value.startsWith("$") &&
+    !options.some((option) => option.reference === value)
+    ? (value as TokenReference)
+    : undefined;
+}
+
 function _effectiveKind(path: string, kind: TokenKind): TokenKind {
   if (kind === "cssLength") {
     return "length";

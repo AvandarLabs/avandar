@@ -10,11 +10,15 @@ import { TokenControl } from "../TokenControl/TokenControl";
 import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import {
+  describeRowIssue,
   findTokenRowIssue,
   type TokenRow as TokenRowModel,
 } from "../tokenRows/tokenRows";
 import css from "./TokenRow.module.css";
-import type { VideoThemeIssue } from "../../videoTheme/videoTheme.types";
+import type {
+  TokenKind,
+  VideoThemeIssue,
+} from "../../videoTheme/videoTheme.types";
 
 /** A row's visible name: the catalog label, plus the key for a scale entry. */
 export function useTokenRowLabel(): (row: TokenRowModel) => string {
@@ -50,11 +54,13 @@ type HeaderProps = Readonly<{
   row: TokenRowModel;
   label: string;
   isInherited: boolean;
+  hasIssue: boolean;
 }>;
 
-function TokenRowHeader({ row, label, isInherited }: HeaderProps) {
+function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
   const { t } = useLingui();
   const editor = useTokenEditor();
+  const value = formatTokenValue(row.definition.kind, row.resolved);
   return (
     <div className={css.header}>
       <span className={css.label}>{label}</span>
@@ -63,7 +69,7 @@ function TokenRowHeader({ row, label, isInherited }: HeaderProps) {
         <span className={css.inheritedTag}>{t`Same as the theme`}</span>
       ) : null}
       <span className={css.value}>
-        {formatTokenValue(row.definition.kind, row.resolved)}
+        {hasIssue ? t`Last working value: ${value}` : value}
       </span>
       {row.overrideState === "draft" ? (
         <ActionIcon
@@ -80,16 +86,38 @@ function TokenRowHeader({ row, label, isInherited }: HeaderProps) {
   );
 }
 
-function TokenRowIssue({ issue }: Readonly<{ issue: VideoThemeIssue }>) {
+function useIssueSentence(): (
+  issue: VideoThemeIssue,
+  kind: TokenKind,
+) => string {
   const { t } = useLingui();
+  return (issue, kind) => {
+    const description = describeRowIssue(issue);
+    if (description.kind === "missingReference") {
+      return kind === "color" || kind === "fill"
+        ? t`This colour is missing. Pick another.`
+        : t`This value is missing. Pick another.`;
+    }
+    return description.kind === "loop"
+      ? t`This value points back at itself. Pick another.`
+      : t`This value cannot be used.`;
+  };
+}
+
+/** A problem in plain words, with the resolver's own message as secondary detail. */
+function TokenRowIssue({
+  issue,
+  kind,
+}: Readonly<{ issue: VideoThemeIssue; kind: TokenKind }>) {
+  const toSentence = useIssueSentence();
   return (
-    <p className={css.issue} role="alert">
+    <div className={css.issue} role="alert">
       <IconAlertCircle className={css.issueIcon} size={14} aria-hidden="true" />
-      <span>
-        {t`This value does not resolve.`}{" "}
+      <div>
+        <p className={css.issueSentence}>{toSentence(issue, kind)}</p>
         <code className={css.issueMessage}>{issue.message}</code>
-      </span>
-    </p>
+      </div>
+    </div>
   );
 }
 
@@ -111,7 +139,12 @@ export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
       className={clsx(css.row, isInherited && css.inherited)}
       data-token-path={row.path}
     >
-      <TokenRowHeader row={row} label={label} isInherited={isInherited} />
+      <TokenRowHeader
+        row={row}
+        label={label}
+        isInherited={isInherited}
+        hasIssue={issue !== undefined}
+      />
       <RowIssueContext.Provider value={issue !== undefined}>
         <TokenControl row={row} label={label} />
       </RowIssueContext.Provider>
@@ -119,7 +152,9 @@ export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
         <code className={css.path}>{row.path}</code>{" "}
         {copy(row.definition.description)}
       </p>
-      {issue ? <TokenRowIssue issue={issue} /> : null}
+      {issue ? (
+        <TokenRowIssue issue={issue} kind={row.definition.kind} />
+      ) : null}
     </div>
   );
 }

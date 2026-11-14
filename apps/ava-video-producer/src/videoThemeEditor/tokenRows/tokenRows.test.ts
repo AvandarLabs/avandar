@@ -13,6 +13,7 @@ import {
 } from "../themeDraft/themeDraft";
 import {
   buildNextCustomScaleKey,
+  describeRowIssue,
   filterTokenRows,
   findTokenRowIssue,
   getEssentialRows,
@@ -241,4 +242,31 @@ test("a new scale value takes the first free custom key in its whole scale", () 
   assert.ok(!visible.some((row) => row.scaleKey === "custom1"));
   assert.equal(buildNextCustomScaleKey(rows, "atomic:swatch"), "custom2");
   assert.equal(buildNextCustomScaleKey(rows, "atomic:textShadow"), "custom1");
+});
+
+test("a reference to a token that does not exist is a missing reference", () => {
+  assert.deepEqual(
+    describeRowIssue({
+      path: "color.accent",
+      message: "$atomic.swatch.missingSwatch does not point at a token",
+    }),
+    { kind: "missingReference", reference: "$atomic.swatch.missingSwatch" },
+  );
+});
+
+test("a reference cycle is reported as a loop", () => {
+  assert.deepEqual(
+    describeRowIssue({
+      path: "color.accent",
+      message: "Reference cycle: $color.accent → $color.text → $color.accent",
+    }),
+    { kind: "loop" },
+  );
+});
+
+test("any other resolver message is a general problem", () => {
+  assert.deepEqual(
+    describeRowIssue({ path: "stroke.default", message: "Expected a length" }),
+    { kind: "other" },
+  );
 });

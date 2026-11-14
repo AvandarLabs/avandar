@@ -82,7 +82,14 @@
   margin-block-start: 1px;
 }
 
+.issueSentence {
+  margin: 0;
+}
+
+/* The resolver's own message is detail, so it is muted and small. */
 .issueMessage {
+  color: var(--muted);
+  display: block;
   font: 10px var(--mono);
   overflow-wrap: anywhere;
 }
