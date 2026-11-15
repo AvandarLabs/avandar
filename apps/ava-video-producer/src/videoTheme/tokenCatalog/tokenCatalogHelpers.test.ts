@@ -6,7 +6,7 @@ import {
   TOKEN_CONTROLS,
 } from "./defineTokensHelpers";
 import { MANTINE_TOKENS } from "./mantineTokens";
-import { SEMANTIC_TOKENS } from "./semanticTokens";
+import { SEMANTIC_TOKENS } from "./semanticTokens/semanticTokens";
 import {
   getTokenDefinitionFromPath,
   listTokenDefinitions,

@@ -1,6 +1,6 @@
 import { useProps } from "@mantine/core";
 import { createContext, useContext, useMemo } from "react";
-import { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens";
+import { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens/semanticTokens";
 import {
   createTokenUsageProxy,
   VideoTokenUsageContext,

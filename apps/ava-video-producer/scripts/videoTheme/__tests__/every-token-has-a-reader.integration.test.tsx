@@ -23,7 +23,7 @@ import {
   getTargetFromTokenReference,
   isTokenReference,
 } from "../../../src/videoTheme/themeReferenceHelpers/themeReferenceHelpers";
-import { SEMANTIC_TOKENS } from "../../../src/videoTheme/tokenCatalog/semanticTokens";
+import { SEMANTIC_TOKENS } from "../../../src/videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,

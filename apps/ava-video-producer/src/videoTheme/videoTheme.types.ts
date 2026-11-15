@@ -1,6 +1,6 @@
 import type { ATOMIC_TOKENS } from "./tokenCatalog/atomicTokens";
-import type { COMPONENT_TOKENS } from "./tokenCatalog/componentTokens";
-import type { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens";
+import type { COMPONENT_TOKENS } from "./tokenCatalog/componentTokens/componentTokens";
+import type { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens/semanticTokens";
 import type { VideoFontId } from "./videoFontRegistry/videoFontRegistryHelpers";
 /*
  * Types shared by the video theme model: authored values, token metadata,

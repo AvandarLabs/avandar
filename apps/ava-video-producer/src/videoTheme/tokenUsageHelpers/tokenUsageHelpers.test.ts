@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SEMANTIC_TOKENS } from "../tokenCatalog/semanticTokens";
+import { SEMANTIC_TOKENS } from "../tokenCatalog/semanticTokens/semanticTokens";
 import {
   createTokenUsageCollector,
   createTokenUsageProxy,

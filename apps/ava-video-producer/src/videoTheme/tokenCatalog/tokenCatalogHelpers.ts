@@ -1,8 +1,8 @@
 import { ATOMIC_TOKENS } from "./atomicTokens";
-import { COMPONENT_TOKENS } from "./componentTokens";
+import { COMPONENT_TOKENS } from "./componentTokens/componentTokens";
 import { isTokenDefinition, isTokenScale } from "./defineTokensHelpers";
 import { MANTINE_TOKENS } from "./mantineTokens";
-import { SEMANTIC_TOKENS } from "./semanticTokens";
+import { SEMANTIC_TOKENS } from "./semanticTokens/semanticTokens";
 import type { CatalogNode, TokenDefinition } from "../videoTheme.types";
 
 /**

@@ -6,7 +6,7 @@ import {
   type VideoMotion,
 } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { SEMANTIC_TOKENS } from "../../videoTheme/tokenCatalog/semanticTokens";
+import { SEMANTIC_TOKENS } from "../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import {
   createTokenUsageProxy,
   VideoTokenUsageContext,

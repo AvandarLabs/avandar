@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens";
+import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import { legacyColorSchema } from "../../presets/legacy/legacyColorSchema.constants";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 
