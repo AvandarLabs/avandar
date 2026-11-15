@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { contentColorSchema } from "../../theme/resolveContentColor/resolveContentColor";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
 
 /** Strict authored content within the fixed SourceMerge layout. */

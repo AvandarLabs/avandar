@@ -14,7 +14,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { NetworkGraphInput } from "../presets/NetworkGraph/NetworkGraph.schema";
 import type { ReactNode } from "react";
 

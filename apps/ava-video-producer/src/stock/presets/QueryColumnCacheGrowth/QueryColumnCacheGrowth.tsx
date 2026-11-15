@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CachedRelation } from "./CachedRelation";
 import { CacheRequests } from "./CacheRequests";
 import { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";

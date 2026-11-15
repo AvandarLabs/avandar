@@ -17,7 +17,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { SchemaMappingInput } from "../presets/SchemaMapping/SchemaMapping.schema";
 
 type Props = GraphicProps & { input: SchemaMappingInput };

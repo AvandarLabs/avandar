@@ -7,7 +7,7 @@ import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { StockRequest } from "../contracts/StockContract.types";
 
 /** Renders a stock request at frame 120 inside a theme patch. */
-function renderPresetWithPatch(
+function _renderPresetWithPatch(
   request: StockRequest,
   patch: VideoThemePatch,
 ): string {
@@ -27,7 +27,7 @@ function _componentPatch(
 
 test("network-graph draws its highlighted edges at the themed opacity", () => {
   assert.match(
-    renderPresetWithPatch(
+    _renderPresetWithPatch(
       { preset: "network-graph" },
       _componentPatch("NetworkGraph", { highlightEdgeAlpha: 0.37 }),
     ),
@@ -37,7 +37,7 @@ test("network-graph draws its highlighted edges at the themed opacity", () => {
 
 test("node-traversal draws off-route nodes in the inactive colour", () => {
   assert.match(
-    renderPresetWithPatch(
+    _renderPresetWithPatch(
       { preset: "node-traversal" },
       { other: { video: { atomic: { swatch: { muted: "#a1b2c3" } } } } },
     ),
@@ -47,7 +47,7 @@ test("node-traversal draws off-route nodes in the inactive colour", () => {
 
 test("radial-network draws its hub glow at the themed opacity", () => {
   assert.match(
-    renderPresetWithPatch(
+    _renderPresetWithPatch(
       { preset: "radial-network" },
       _componentPatch("RadialNetwork", { hubGlowAlpha: 0.21 }),
     ),
@@ -57,7 +57,7 @@ test("radial-network draws its hub glow at the themed opacity", () => {
 
 test("plexus-field draws links at the themed width", () => {
   assert.match(
-    renderPresetWithPatch(
+    _renderPresetWithPatch(
       { preset: "plexus-field" },
       _componentPatch("PlexusField", { linkWidth: 2.25 }),
     ),
@@ -67,7 +67,7 @@ test("plexus-field draws links at the themed width", () => {
 
 test("orbital-system draws its core at the themed radius", () => {
   assert.match(
-    renderPresetWithPatch(
+    _renderPresetWithPatch(
       { preset: "orbital-system" },
       _componentPatch("OrbitalSystem", { coreRadius: 44 }),
     ),

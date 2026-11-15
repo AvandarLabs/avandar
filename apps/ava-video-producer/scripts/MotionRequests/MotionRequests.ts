@@ -30,15 +30,23 @@ const MOTION_USAGE =
 function _parseFlags(
   extra: readonly string[],
 ): Readonly<Record<string, string>> {
-  const flags: Record<string, string> = {};
-  for (let index = 0; index < extra.length; index += 2) {
-    const [flag, value] = [extra[index], extra[index + 1]];
-    if (!["--input", "--theme"].includes(flag) || !value || flag in flags) {
-      throw new Error(MOTION_USAGE);
-    }
-    flags[flag] = value;
+  const pairs = Array.from(
+    { length: Math.ceil(extra.length / 2) },
+    (_, pairIndex): [string, string] => [
+      extra[pairIndex * 2],
+      extra[pairIndex * 2 + 1],
+    ],
+  );
+  const isInvalid = pairs.some(
+    ([flag, value], pairIndex) =>
+      !["--input", "--theme"].includes(flag) ||
+      !value ||
+      pairs.findIndex(([otherFlag]) => otherFlag === flag) !== pairIndex,
+  );
+  if (isInvalid) {
+    throw new Error(MOTION_USAGE);
   }
-  return flags;
+  return Object.fromEntries(pairs);
 }
 
 /** Resolve stable CLI selections, the optional complete-input file, and the theme. */

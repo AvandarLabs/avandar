@@ -1,7 +1,10 @@
 import { Card, GRAPHIC_WIDTH, Pill } from "../../graphics-common";
 import { FitText } from "../../primitives/FitText/FitText";
 import { wrapTextToLines } from "../../primitives/FitText/wrapTextToLines";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getLegacyWidthFromText } from "../legacy/getLegacyWidthFromText/getLegacyWidthFromText";
 import type { ReactNode } from "react";
 

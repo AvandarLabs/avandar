@@ -14,11 +14,15 @@ export type CaptionFilesResult<FilmValue extends CaptionFilm> =
   | Readonly<{ status: 400 }>
   | Readonly<{ status: 404 }>;
 
-async function _statusOfFailedLoad(
-  id: string,
-  error: unknown,
-  load: (id: string) => Promise<unknown>,
-): Promise<400 | 404> {
+async function _statusOfFailedLoad({
+  id,
+  error,
+  load,
+}: Readonly<{
+  id: string;
+  error: unknown;
+  load: (id: string) => Promise<unknown>;
+}>): Promise<400 | 404> {
   const isKnownFilm = await load(id).then(
     () => true,
     () => false,
@@ -56,7 +60,7 @@ export async function createCaptionFilesFromRequest<
   try {
     film = await load(id, options ?? {});
   } catch (error) {
-    return { status: await _statusOfFailedLoad(id, error, load) };
+    return { status: await _statusOfFailedLoad({ id, error, load }) };
   }
   if (!film.plan) {
     return { status: 404 };

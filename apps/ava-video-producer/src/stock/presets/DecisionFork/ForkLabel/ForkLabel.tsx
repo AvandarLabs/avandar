@@ -3,7 +3,7 @@ import { getConservativeWidthFromText } from "../../../text/getConservativeWidth
 import {
   useGraphicProps,
   useGraphicTokens,
-} from "../../../theme/useGraphicTheme";
+} from "../../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 const GRAPHEME_SEGMENTER: Intl.Segmenter = new Intl.Segmenter(undefined, {
@@ -32,19 +32,23 @@ function _append({ lines, text, width, size }: AppendOptions): string[] {
     : [...lines, text];
 }
 
-function _wrap(text: string, width: number, size: number): string[] {
+function _wrap({
+  text,
+  width,
+  fontSize,
+}: Readonly<{ text: string; width: number; fontSize: number }>): string[] {
   const tokens = text.match(/\S+\s*|\s+/g) ?? [""];
   return tokens.reduce<string[]>((result, token) => {
     return getConservativeWidthFromText({
       text: token.trimEnd(),
-      fontSize: size,
+      fontSize,
     }) > width
       ? Array.from(GRAPHEME_SEGMENTER.segment(token)).reduce(
           (chunks, { segment }) =>
-            _append({ lines: chunks, text: segment, width, size }),
+            _append({ lines: chunks, text: segment, width, size: fontSize }),
           result,
         )
-      : _append({ lines: result, text: token, width, size });
+      : _append({ lines: result, text: token, width, size: fontSize });
   }, []);
 }
 
@@ -61,7 +65,7 @@ export function ForkLabel({
   const roleStyle = useGraphicTokens().text.graphic[role];
   const fontSize = size ?? roleStyle.fontSize;
   const { lineGap } = useGraphicProps("DecisionFork", {});
-  const lines = _wrap(text, width, fontSize);
+  const lines = _wrap({ text, width, fontSize });
   return (
     <g aria-label={text}>
       {lines.map((line, index) => (

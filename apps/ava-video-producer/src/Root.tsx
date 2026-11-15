@@ -7,7 +7,7 @@ import { TitleStudy, TITLE_STUDY_LEN } from "./compositions/TitleStudy";
 import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
-import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
+import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
 import { TITLE_LEN, TitleCard } from "./title-card";
 
 export const FPS = 30;

@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 const FONT_REGISTRY_FILE = new URL(
-  "../../src/videoTheme/videoFontRegistry/videoFontRegistry.json",
+  "../../../src/videoTheme/videoFontRegistry/videoFontRegistry.json",
   import.meta.url,
 );
 

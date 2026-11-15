@@ -1,27 +1,27 @@
 import { filterProps } from "@mantine/core";
 import { createContext, useContext, useMemo } from "react";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import {
   createVideoMotion,
   type VideoMotion,
-} from "../../videoTheme/createVideoMotion/createVideoMotion";
-import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { SEMANTIC_TOKENS } from "../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
+} from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { makeResolvedVideoThemeFromSource } from "../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import {
   createTokenUsageProxy,
   VideoTokenUsageContext,
-} from "../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
-import { useVideoThemeContext } from "../../videoTheme/useVideoTheme";
+} from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
+import { useVideoThemeContext } from "../../../videoTheme/useVideoTheme";
 import {
   buildEffectFilterId,
   listVideoEffectFilters,
-} from "../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
+} from "../../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
 import type {
   ResolvedVideoComponents,
   ResolvedVideoSemantic,
   ResolvedVideoTheme,
   VideoComponentName,
-} from "../../videoTheme/videoTheme.types";
+} from "../../../videoTheme/videoTheme.types";
 
 /**
  * The SVG id of the stock graphic being drawn, so shapes can reference the
@@ -77,11 +77,9 @@ export function useGraphicProps<
   const report = useContext(VideoTokenUsageContext);
   const given: Readonly<Record<string, unknown>> = filterProps(props);
   if (report) {
-    for (const key of Object.keys(defaults)) {
-      if (!(key in given)) {
-        report(`components.${name}.${key}`);
-      }
-    }
+    Object.keys(defaults)
+      .filter((key) => !(key in given))
+      .forEach((key) => report(`components.${name}.${key}`));
   }
   return { ...defaults, ...given } as ResolvedVideoComponents[Name] & Props;
 }

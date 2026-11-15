@@ -1,5 +1,5 @@
 import { match, P } from "ts-pattern";
-import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
 import type {
   StockControl,
   StockJsonValue,

@@ -1,5 +1,5 @@
 import { getSketchPathsFromShape } from "../../../videoTheme/sketchShape/sketchShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { SVGProps } from "react";
 
 /**

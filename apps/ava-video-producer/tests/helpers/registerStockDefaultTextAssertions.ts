@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getStockValueFromPath } from "../../src/stock/copy/getStockValueFromPath/getStockValueFromPath";
-import { makeStockDataFromContract } from "../../src/stock/copy/makeStockDataFromContract";
+import { getStockValueFromPath } from "../../src/stock/copy/getStockValueFromPath";
+import { makeStockDataFromContract } from "../../src/stock/copy/makeStockDataFromContract/makeStockDataFromContract";
 import type { StockContract } from "../../src/stock/contracts/StockContract.types";
 
 type Options<Input extends object> = {

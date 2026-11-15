@@ -1,5 +1,5 @@
 import { propEq, prop } from "@avandar/utils";
-import { makeStockDataFromContract } from "./copy/makeStockDataFromContract";
+import { makeStockDataFromContract } from "./copy/makeStockDataFromContract/makeStockDataFromContract";
 import { stockContracts } from "./registry/stockContracts";
 import type { StockPresetId } from "./contracts/StockContract.types";
 

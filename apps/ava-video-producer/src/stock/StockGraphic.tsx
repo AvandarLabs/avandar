@@ -13,7 +13,7 @@ import {
   GraphicIdContext,
   useGraphicTheme,
   useGraphicTokens,
-} from "./theme/useGraphicTheme";
+} from "./theme/useGraphicTheme/useGraphicTheme";
 import type { StockRequest } from "./contracts/StockContract.types";
 
 /** Preset-discriminated content with explicit local frame and display size. */

@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
 import { ContentFields } from "./ContentFields/ContentFields";
 import type { StockControl } from "../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "./ContentField/ContentField";

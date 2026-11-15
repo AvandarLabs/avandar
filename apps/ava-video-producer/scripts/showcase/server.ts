@@ -16,17 +16,17 @@ import { buildLivePlayers } from "./build";
 import {
   type CaptionFilesResult,
   createCaptionFilesFromRequest,
-} from "./captionFileOptions/captionFileOptions";
+} from "./createCaptionFilesFromRequest/createCaptionFilesFromRequest";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
+import {
+  createThemeStore,
+  THEME_FILE_MAX_BYTES,
+} from "./createThemeStore/createThemeStore";
+import { handleThemeRequest } from "./handleThemeRequest/handleThemeRequest";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
 import { appRoot, ShowcaseFilms, PLANS } from "./ShowcaseFilms/ShowcaseFilms";
 import { servedFile, streamFile } from "./staticFileHelpers/staticFileHelpers";
-import { handleThemeRequest } from "./themeRoutes/themeRoutes";
-import {
-  createThemeStore,
-  THEME_FILE_MAX_BYTES,
-} from "./themeStore/themeStore";
 import type { Film } from "../../src/showcase/showcase.types";
 
 requireLicense();
@@ -134,7 +134,7 @@ async function filmForPlayer(id: string) {
  * same origin check, byte cap, and strict schema. Answers the request itself
  * and returns undefined when the body is refused.
  */
-async function readFilmRequest(
+async function _readFilmRequest(
   req: IncomingMessage,
   res: ServerResponse,
 ): Promise<z.infer<typeof requestSchema> | undefined> {
@@ -162,11 +162,15 @@ async function readFilmRequest(
   }
 }
 /** Sends a transcript or caption file, or the status its request earned. */
-function sendCaptionFile(
-  res: ServerResponse,
-  result: CaptionFilesResult<Film>,
-  fileName: "transcript.txt" | "captions.srt",
-) {
+function _sendCaptionFile({
+  res,
+  result,
+  fileName,
+}: Readonly<{
+  res: ServerResponse;
+  result: CaptionFilesResult<Film>;
+  fileName: "transcript.txt" | "captions.srt";
+}>) {
   if (result.status === 404) {
     res.writeHead(404).end();
     return;
@@ -188,19 +192,19 @@ function sendCaptionFile(
     );
 }
 /** Captions timed by the same options and theme an export sends. */
-async function captionRequest(req: IncomingMessage, res: ServerResponse) {
-  const request = await readFilmRequest(req, res);
+async function _captionRequest(req: IncomingMessage, res: ServerResponse) {
+  const request = await _readFilmRequest(req, res);
   if (request) {
     const result = await createCaptionFilesFromRequest({
       id: request.id,
       options: request.options,
       load: ShowcaseFilms.load,
     });
-    sendCaptionFile(res, result, "captions.srt");
+    _sendCaptionFile({ res, result, fileName: "captions.srt" });
   }
 }
 async function exportRequest(req: IncomingMessage, res: ServerResponse) {
-  const request = await readFilmRequest(req, res);
+  const request = await _readFilmRequest(req, res);
   if (!request) {
     return;
   }
@@ -240,7 +244,7 @@ async function api(
     return;
   }
   if (pathname === "/api/captions" && req.method === "POST") {
-    await captionRequest(req, res);
+    await _captionRequest(req, res);
     return;
   }
   if (!["GET", "HEAD"].includes(req.method ?? "")) {
@@ -263,11 +267,12 @@ async function api(
       options: undefined,
       load: ShowcaseFilms.load,
     });
-    sendCaptionFile(
+    _sendCaptionFile({
       res,
       result,
-      filmMatch[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
-    );
+      fileName:
+        filmMatch[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
+    });
     return;
   }
   const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(

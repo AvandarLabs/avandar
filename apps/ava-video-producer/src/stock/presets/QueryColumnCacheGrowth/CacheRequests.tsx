@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheRequestCards } from "./CacheRequestCards";
 import { CacheRequestRoutes } from "./CacheRequestRoutes";
 import { MissingCacheColumns } from "./MissingCacheColumns";

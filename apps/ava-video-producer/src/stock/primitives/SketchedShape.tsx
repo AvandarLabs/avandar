@@ -1,8 +1,8 @@
 import {
   getSketchPathsFromShape,
   type SketchShape,
-} from "../../../videoTheme/sketchShape/sketchShape";
-import type { ResolvedSketchProfile } from "../../../videoTheme/videoTheme.types";
+} from "../../videoTheme/sketchShape/sketchShape";
+import type { ResolvedSketchProfile } from "../../videoTheme/videoTheme.types";
 import type { SVGProps } from "react";
 
 type PathAttributes = Pick<

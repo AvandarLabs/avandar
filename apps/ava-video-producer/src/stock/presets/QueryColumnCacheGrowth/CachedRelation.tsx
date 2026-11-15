@@ -1,5 +1,8 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheColumn } from "./CacheColumn";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";

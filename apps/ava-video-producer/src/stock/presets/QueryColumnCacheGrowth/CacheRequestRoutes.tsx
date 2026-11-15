@@ -4,7 +4,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../../theme/useGraphicTheme";
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";

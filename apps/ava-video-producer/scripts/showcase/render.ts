@@ -19,7 +19,7 @@ import {
 import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../require-license.mjs";
 import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
-import { getDeliveryThemeFromFilm } from "./deliveryTheme/deliveryTheme";
+import { getDeliveryThemeFromFilm } from "./getDeliveryThemeFromFilm/getDeliveryThemeFromFilm";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
 

@@ -85,11 +85,27 @@ const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => ({
 
 /** The last beat-local frame before the next beat's transition starts covering this one. */
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
-  const next = beats[index + 1];
-  const outgoing = next
-    ? getMotionDuration(next.transition.frames, next.transition.motion)
+  const nextBeat = beats[index + 1];
+  const outgoing = nextBeat
+    ? getMotionDuration(nextBeat.transition.frames, nextBeat.transition.motion)
     : 0;
   return beats[index].duration - outgoing - 1;
+}
+
+/** One row per beat of every in-scope composition, with its shot's beats and its index in them. */
+function _listBeatRows(): Array<
+  Readonly<{
+    id: string;
+    beat: ContinuityBeat;
+    index: number;
+    beats: readonly ContinuityBeat[];
+  }>
+> {
+  return COMPOSITIONS.flatMap(({ id, shots }) =>
+    shots.flatMap((beats) =>
+      beats.map((beat, index) => ({ id, beat, index, beats })),
+    ),
+  );
 }
 
 /** When each tempo-scaled stage animation of a beat ends, in beat-local frames. */
@@ -116,50 +132,40 @@ function _stageAnimationEnds(
 }
 
 test("every in-scope stock loop finishes its animations before the loop ends", () => {
-  for (const preset of PARITY_STOCK_PRESET_IDS) {
+  PARITY_STOCK_PRESET_IDS.forEach((preset) => {
     assert.equal(
       _picture({ preset }, LAST_LOOP_FRAME, true),
       _picture({ preset }, LAST_LOOP_FRAME, false),
       preset,
     );
-  }
+  });
 });
 
 test("every in-scope composition's stage animations finish inside their beats", () => {
-  for (const { id, shots } of COMPOSITIONS) {
-    for (const beats of shots) {
-      for (const [index, beat] of beats.entries()) {
-        const readableEnd = _readableEnd(beats, index);
-        for (const [name, end] of Object.entries(
-          _stageAnimationEnds(beats, index),
-        )) {
-          assert.ok(
-            end <= readableEnd,
-            `${id} ${beat.id} ${name} ends at ${end}, readable until ${readableEnd}`,
-          );
-        }
-      }
-    }
-  }
+  _listBeatRows().forEach(({ id, beat, index, beats }) => {
+    const readableEnd = _readableEnd(beats, index);
+    Object.entries(_stageAnimationEnds(beats, index)).forEach(([name, end]) => {
+      assert.ok(
+        end <= readableEnd,
+        `${id} ${beat.id} ${name} ends at ${end}, readable until ${readableEnd}`,
+      );
+    });
+  });
 });
 
 test("every nested stock graphic has settled before its beat stops being readable", () => {
-  for (const { id, shots } of COMPOSITIONS) {
-    for (const beats of shots) {
-      for (const [index, beat] of beats.entries()) {
-        const content = beat.content;
-        if (content.kind === "stock") {
-          const frame = sampleStockFrame(
-            _readableEnd(beats, index),
-            content.settleFrame,
-          );
-          assert.equal(
-            _picture(content.request, frame, true),
-            _picture(content.request, frame, false),
-            `${id} ${beat.id}`,
-          );
-        }
-      }
+  _listBeatRows().forEach(({ id, beat, index, beats }) => {
+    const content = beat.content;
+    if (content.kind === "stock") {
+      const frame = sampleStockFrame(
+        _readableEnd(beats, index),
+        content.settleFrame,
+      );
+      assert.equal(
+        _picture(content.request, frame, true),
+        _picture(content.request, frame, false),
+        `${id} ${beat.id}`,
+      );
     }
-  }
+  });
 });

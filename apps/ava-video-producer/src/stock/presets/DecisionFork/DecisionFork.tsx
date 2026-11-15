@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { DrawPath, Text } from "../../graphics-common";
-import { useGraphicMotion } from "../../theme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DecisionBranch } from "./DecisionBranch";
 import { DecisionHeading } from "./DecisionHeading";
 import { DecisionMarker } from "./DecisionMarker";

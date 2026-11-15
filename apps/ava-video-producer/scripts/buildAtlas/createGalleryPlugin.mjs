@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { refreshPalette } from "./refreshPalette.mjs";
+import { refreshPalette } from "./refreshPalette/refreshPalette.mjs";
 /** A bundler plugin that refreshes theme inputs on rebuild. */
 export function createGalleryPlugin({
   root,

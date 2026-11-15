@@ -9,7 +9,7 @@ import {
   createVideoThemeSnapshot,
   makeResolvedVideoThemeFromSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
-import { getDeliveryThemeFromFilm } from "./deliveryTheme";
+import { getDeliveryThemeFromFilm } from "./getDeliveryThemeFromFilm";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
 const GROUND = {

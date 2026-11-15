@@ -1,7 +1,7 @@
 import type {
   StockContract,
   StockMessageDescriptor,
-} from "../contracts/StockContract.types";
+} from "../../contracts/StockContract.types";
 
 type ResolvedCopy<Value> = Value extends StockMessageDescriptor
   ? string
@@ -20,7 +20,9 @@ function _isDescriptor(value: object): value is StockMessageDescriptor {
   );
 }
 
-function _resolveDescriptors<Value>(value: Value): ResolvedCopy<Value> {
+function _buildPlainCopyFromDescriptors<Value>(
+  value: Value,
+): ResolvedCopy<Value> {
   if (!value || typeof value !== "object") {
     return value as ResolvedCopy<Value>;
   }
@@ -28,12 +30,12 @@ function _resolveDescriptors<Value>(value: Value): ResolvedCopy<Value> {
     return value.message as ResolvedCopy<Value>;
   }
   if (Array.isArray(value)) {
-    return value.map(_resolveDescriptors) as ResolvedCopy<Value>;
+    return value.map(_buildPlainCopyFromDescriptors) as ResolvedCopy<Value>;
   }
   return Object.fromEntries(
     Object.entries(value).map(([key, item]) => [
       key,
-      _resolveDescriptors(item),
+      _buildPlainCopyFromDescriptors(item),
     ]),
   ) as ResolvedCopy<Value>;
 }
@@ -52,8 +54,8 @@ export function makeStockDataFromContract<
   defaultInput: Contract["defaultInput"];
 } {
   return {
-    metadata: _resolveDescriptors(contract.metadata),
-    controls: _resolveDescriptors(contract.controls),
+    metadata: _buildPlainCopyFromDescriptors(contract.metadata),
+    controls: _buildPlainCopyFromDescriptors(contract.controls),
     defaultInput: structuredClone(contract.defaultInput),
   };
 }

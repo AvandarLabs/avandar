@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
 import { ContentDraftModule } from "./ContentDraftModule/ContentDraftModule";
 import type { StockJsonValue } from "../../../stock/contracts/StockContract.types";
 import type { Props } from "./ContentField/ContentField";

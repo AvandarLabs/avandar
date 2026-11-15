@@ -29,7 +29,7 @@ export const contentColorSchema = z.union([
  * The colour a content colour field draws with. `accent` is the legacy
  * keyword some content uses for the graphic's accent.
  */
-export function resolveContentColor(
+export function getContentColorFromValue(
   value: string,
   options: Readonly<{ tokens: ResolvedVideoSemantic; accent: string }>,
 ): string {

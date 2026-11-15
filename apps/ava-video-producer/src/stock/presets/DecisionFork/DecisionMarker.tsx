@@ -1,6 +1,9 @@
 import { mix, ramp } from "../../../motion";
 import { cubicPoint } from "../../graphics-common";
-import { useGraphicMotion, useGraphicProps } from "../../theme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; x: number; accent: string; branchId: string };

@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
+import { createVideoThemeLibrary } from "../../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { makeResolvedVideoThemeFromLibrary } from "../../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
+import { readAvandarThemeSource } from "../readAvandarThemeSource";
 import {
   createAvandarTheme,
   getShadowFromCss,
   getHexFromCssColor,
 } from "./createAvandarTheme";
-import { readAvandarThemeSource } from "./readAvandarThemeSource";
 
 const THEME_FILE = fileURLToPath(
-  new URL("../../../themes/avandar.theme.json", import.meta.url),
+  new URL("../../../../themes/avandar.theme.json", import.meta.url),
 );
 
 test("the tracked avandar theme matches a fresh sync from the Avandar theme", async () => {

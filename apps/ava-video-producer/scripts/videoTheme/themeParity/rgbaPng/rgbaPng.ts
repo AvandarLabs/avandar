@@ -55,11 +55,15 @@ export async function readRgbaFromPng(
 /**
  * Encodes raw RGBA bytes as a lossless PNG, for example a parity diff image.
  */
-export async function writePngFromRgba(
-  file: string,
-  rgba: Uint8Array,
-  size: FrameSize,
-): Promise<void> {
+export async function writePngFromRgba({
+  file,
+  rgba,
+  size,
+}: Readonly<{
+  file: string;
+  rgba: Uint8Array;
+  size: FrameSize;
+}>): Promise<void> {
   await _runFfmpeg(
     [
       "-v",

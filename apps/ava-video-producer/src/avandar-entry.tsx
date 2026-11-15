@@ -8,7 +8,7 @@ import {
   durationInFrames,
   type Storyboard,
 } from "./storyboard/schema/schema";
-import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
+import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
 import type { VideoThemeSnapshot } from "./videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 
 const defaults = storyboardSchema.parse(importPlan);

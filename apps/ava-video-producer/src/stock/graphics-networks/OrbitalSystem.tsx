@@ -8,8 +8,11 @@ import {
   type GraphicProps,
 } from "../graphics-common";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { resolveContentColor } from "../theme/resolveContentColor/resolveContentColor";
-import { useGraphicProps, useGraphicTokens } from "../theme/useGraphicTheme";
+import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { OrbitalSystemInput } from "../presets/OrbitalSystem/OrbitalSystem.schema";
 
 type Props = GraphicProps & { input: OrbitalSystemInput };
@@ -92,7 +95,7 @@ export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
           key={i}
           orbit={orbit}
           frame={frame}
-          color={resolveContentColor(orbit.color, { tokens, accent })}
+          color={getContentColorFromValue(orbit.color, { tokens, accent })}
           showOrbit={input.showOrbits}
         />
       ))}

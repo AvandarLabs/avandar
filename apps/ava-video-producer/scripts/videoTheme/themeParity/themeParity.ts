@@ -10,7 +10,7 @@ import { requireLicense } from "../../require-license.mjs";
 import {
   bundleShowcaseFilms,
   SHOWCASE_STILL_BROWSER_OPTIONS,
-} from "../../showcase/bundleShowcaseFilms/bundleShowcaseFilms";
+} from "../../showcase/bundleShowcaseFilms";
 import {
   appRoot,
   ShowcaseFilms,
@@ -42,7 +42,11 @@ type TargetResult = Readonly<{
   missingFrames: number;
 }>;
 
-function _frameFile(stage: ParityStage, id: string, frame: number) {
+function _frameFile({
+  stage,
+  id,
+  frame,
+}: Readonly<{ stage: ParityStage; id: string; frame: number }>) {
   return path.join(
     PARITY_DIRECTORY,
     stage,
@@ -89,7 +93,7 @@ async function _renderTargets(
         envVariables: {},
       });
       for (const frame of frames) {
-        const output = _frameFile(stage, target.id, frame);
+        const output = _frameFile({ stage, id: target.id, frame });
         await fs.mkdir(path.dirname(output), { recursive: true });
         await renderStill({
           licenseKey: privateKey,
@@ -124,7 +128,7 @@ async function _compareTarget({
   let missingFrames = 0;
   for (const frame of frames) {
     const reference = await readRgbaFromPng(
-      _frameFile("reference", target.id, frame),
+      _frameFile({ stage: "reference", id: target.id, frame }),
       size,
     ).catch(() => undefined);
     if (!reference) {
@@ -132,7 +136,7 @@ async function _compareTarget({
       continue;
     }
     const current = await readRgbaFromPng(
-      _frameFile("current", target.id, frame),
+      _frameFile({ stage: "current", id: target.id, frame }),
       size,
     );
     const comparison = compareRgbaFrames({
@@ -146,9 +150,13 @@ async function _compareTarget({
     }
     differingFrames += 1;
     unexplainedPixels += comparison.unexplainedPixels;
-    const diffFile = _frameFile("diff", target.id, frame);
+    const diffFile = _frameFile({ stage: "diff", id: target.id, frame });
     await fs.mkdir(path.dirname(diffFile), { recursive: true });
-    await writePngFromRgba(diffFile, comparison.diff, size);
+    await writePngFromRgba({
+      file: diffFile,
+      rgba: comparison.diff,
+      size,
+    });
   }
   return {
     id: target.id,
@@ -186,11 +194,15 @@ async function _writeManifest(targets: readonly LoadedTarget[]) {
  * all of them. A comparison fails on any pixel difference outside the
  * allowances, or on a frame with no reference.
  */
-async function runThemeParity(
-  mode: "capture" | "compare",
-  ids: readonly string[],
-  themeId: string,
-): Promise<void> {
+async function _runThemeParity({
+  mode,
+  ids,
+  themeId,
+}: Readonly<{
+  mode: "capture" | "compare";
+  ids: readonly string[];
+  themeId: string;
+}>): Promise<void> {
   const targets = await _loadTargets(ids, themeId);
   const stages: readonly ParityStage[] =
     mode === "capture" ? ["reference"] : ["current", "diff"];
@@ -238,7 +250,7 @@ const [mode, ...ids] =
 PARITY_DIRECTORY =
   themeId === "classic" ? PARITY_ROOT : path.join(PARITY_ROOT, themeId);
 if ((mode === "capture" || mode === "compare") && themeId) {
-  await runThemeParity(mode, ids, themeId);
+  await _runThemeParity({ mode, ids, themeId });
 } else {
   console.error(
     "Usage: pnpm theme:parity <capture|compare> [target ids...] [--theme id]",

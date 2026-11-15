@@ -179,7 +179,7 @@ const _render = ({
 test("original twenty samples preserve every SVG label and geometry at all sixty gates", () => {
   assert.equal(BASELINE.records.length, 60);
   BASELINE.records.forEach(({ preset, frame, svg }) => {
-    // The baseline was captured under the old mint default; the theme accent replaced it.
+    // The test passes the mint accent and the ground explicitly so the output matches the recorded markup.
     const actual = renderToStaticMarkup(
       createElement(StockGraphic, {
         preset,

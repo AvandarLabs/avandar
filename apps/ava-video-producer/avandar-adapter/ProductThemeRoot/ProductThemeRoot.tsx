@@ -2,7 +2,7 @@
 // `src`, so this file opts in itself when the node test runner loads it.
 /** @jsxRuntime automatic */
 import { MantineProvider, type MantineProviderProps } from "@mantine/core";
-import { ReenactmentThemeBoundary } from "../src/videoTheme/ReenactmentThemeBoundary/ReenactmentThemeBoundary";
+import { ReenactmentThemeBoundary } from "../../src/videoTheme/ReenactmentThemeBoundary/ReenactmentThemeBoundary";
 
 /**
  * The product's `MantineProvider`, behind a boundary that hides any video

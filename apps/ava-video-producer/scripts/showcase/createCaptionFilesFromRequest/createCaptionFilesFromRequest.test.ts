@@ -4,7 +4,7 @@ import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continu
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { captionFiles } from "../../lib/planHelpers";
 import { ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
-import { createCaptionFilesFromRequest } from "./captionFileOptions";
+import { createCaptionFilesFromRequest } from "./createCaptionFilesFromRequest";
 
 const FILM_ID = "shared-object-handoff";
 

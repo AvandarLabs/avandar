@@ -1,9 +1,9 @@
 import { createVideoThemeJsonSchema } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   THEME_FILE_MAX_BYTES,
-  ThemeStoreError,
   type ThemeStore,
-} from "../themeStore/themeStore";
+} from "../createThemeStore/createThemeStore";
+import { ThemeStoreError } from "../ThemeStoreError";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 const THEME_ROUTE = /^\/api\/themes(?:\/([^/]+))?$/;
@@ -15,7 +15,15 @@ type ThemeRequest = Readonly<{
   store: ThemeStore;
 }>;
 
-function _send(res: ServerResponse, status: number, body: unknown): void {
+function _send({
+  res,
+  status,
+  body,
+}: Readonly<{
+  res: ServerResponse;
+  status: number;
+  body: unknown;
+}>): void {
   res
     .writeHead(status, {
       "Content-Type": "application/json",
@@ -52,18 +60,22 @@ async function _route(
 ): Promise<void> {
   const method = req.method ?? "GET";
   if (id === undefined && method === "GET") {
-    return _send(res, 200, await store.list());
+    return _send({ res, status: 200, body: await store.list() });
   }
   if (id === undefined && method === "POST") {
     _assertSameOrigin(req);
     const stored = await store.create(await _readJsonBody(req));
-    return _send(res, 201, { id: stored.document.id, hash: stored.hash });
+    return _send({
+      res,
+      status: 201,
+      body: { id: stored.document.id, hash: stored.hash },
+    });
   }
   if (id === "schema.json" && method === "GET") {
-    return _send(res, 200, createVideoThemeJsonSchema());
+    return _send({ res, status: 200, body: createVideoThemeJsonSchema() });
   }
   if (id !== undefined && method === "GET") {
-    return _send(res, 200, await store.read(id));
+    return _send({ res, status: 200, body: await store.read(id) });
   }
   if (id !== undefined && method === "PUT") {
     _assertSameOrigin(req);
@@ -72,7 +84,7 @@ async function _route(
       throw new ThemeStoreError(428, "Send the theme's hash in If-Match");
     }
     const stored = await store.save(id, await _readJsonBody(req), ifMatch);
-    return _send(res, 200, { hash: stored.hash });
+    return _send({ res, status: 200, body: { hash: stored.hash } });
   }
   res.writeHead(405).end();
 }
@@ -93,14 +105,19 @@ export async function handleThemeRequest(
     await _route(request, match[1]);
   } catch (error) {
     if (error instanceof ThemeStoreError) {
-      _send(request.res, error.status, {
-        message: error.message,
-        issues: error.issues,
+      _send({
+        res: request.res,
+        status: error.status,
+        body: { message: error.message, issues: error.issues },
       });
     } else {
       console.error("Theme request failed:", error);
-      _send(request.res, 500, {
-        message: "The theme request failed. Check the showcase terminal.",
+      _send({
+        res: request.res,
+        status: 500,
+        body: {
+          message: "The theme request failed. Check the showcase terminal.",
+        },
       });
     }
   }

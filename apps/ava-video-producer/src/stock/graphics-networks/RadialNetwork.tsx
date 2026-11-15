@@ -16,7 +16,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { RadialNetworkInput } from "../presets/RadialNetwork/RadialNetwork.schema";
 import type { ReactNode } from "react";
 

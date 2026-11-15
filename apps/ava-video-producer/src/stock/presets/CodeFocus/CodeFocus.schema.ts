@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { z } from "zod";
-import { contentColorSchema } from "../../theme/resolveContentColor/resolveContentColor";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
 import { getLegacyWidthFromText } from "../legacy/getLegacyWidthFromText/getLegacyWidthFromText";
 

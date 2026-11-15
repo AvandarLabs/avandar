@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import type { AvandarThemeSource } from "./createAvandarTheme";
+import type { AvandarThemeSource } from "./createAvandarTheme/createAvandarTheme";
 
 const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 

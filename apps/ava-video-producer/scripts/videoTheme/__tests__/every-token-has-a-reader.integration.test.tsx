@@ -60,21 +60,21 @@ const AUDITED_TOKEN_PATHS = TOKEN_PATHS.filter(
   (tokenPath) => !tokenPath.startsWith("atomic."),
 );
 
-function _stockReads(): readonly string[] {
+function _stockReads(): string[] {
   const collector = createTokenUsageCollector();
-  for (const preset of PARITY_STOCK_PRESET_IDS) {
-    for (const frame of SAMPLE_FRAMES) {
+  PARITY_STOCK_PRESET_IDS.forEach((preset) => {
+    SAMPLE_FRAMES.forEach((frame) => {
       renderToStaticMarkup(
         <VideoTokenUsageContext.Provider value={collector.report}>
           <StockGraphic preset={preset} frame={frame} />
         </VideoTokenUsageContext.Provider>,
       );
-    }
-  }
-  return collector.getPaths();
+    });
+  });
+  return [...collector.getPaths()];
 }
 
-function _planBuilderReads(): readonly string[] {
+function _planBuilderReads(): string[] {
   const collector = createTokenUsageCollector();
   const plans = PARITY_COMPOSITION_IDS.map((id) => {
     const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
@@ -88,7 +88,7 @@ function _planBuilderReads(): readonly string[] {
       ),
     );
   });
-  for (const cameraPreset of CAMERA_PRESETS) {
+  CAMERA_PRESETS.forEach((cameraPreset) => {
     const patch = {
       other: { video: { semantic: { camera: { preset: cameraPreset } } } },
     };
@@ -108,8 +108,8 @@ function _planBuilderReads(): readonly string[] {
     plans.forEach((plan) =>
       createContinuityPlanFromVideoTheme(plan, { semantic }),
     );
-  }
-  return collector.getPaths();
+  });
+  return [...collector.getPaths()];
 }
 
 /** The text of every stage renderer file with one of the extensions, tests and gallery UI excluded. */
@@ -142,7 +142,7 @@ function _variablePrefix(tokenPath: string): string {
     : `--video-${[root, ...rest].map(_kebab).join("-")}`;
 }
 
-function _cssReads(): readonly string[] {
+function _cssReads(): string[] {
   const names = new Set(
     [..._readStageSources(/\.css$/).matchAll(/var\((--video-[a-z0-9-]+)/g)].map(
       (match) => match[1],
@@ -161,7 +161,7 @@ function _cssReads(): readonly string[] {
   });
 }
 
-function _scriptReads(): readonly string[] {
+function _scriptReads(): string[] {
   const source = _readStageSources(/\.tsx?$/);
   const components = new Set(
     [...source.matchAll(/useVideoProps\("(\w+)"/g)].map((match) => match[1]),
@@ -196,7 +196,7 @@ function _rawValue(document: VideoThemeDocument, tokenPath: string): unknown {
     : getValueAtPath(document, ["other", "video", "semantic", root, ...rest]);
 }
 
-function _referencedTokenPaths(value: unknown): readonly string[] {
+function _referencedTokenPaths(value: unknown): string[] {
   if (isTokenReference(value)) {
     const target = getTargetFromTokenReference(value);
     if (target.tier === "primary" || target.tier === "mantine") {
@@ -215,7 +215,7 @@ function _referencedTokenPaths(value: unknown): readonly string[] {
 }
 
 /** A token plus, when it belongs to a menu group, every other choice in that menu. */
-function _withPaletteSiblings(tokenPath: string): readonly string[] {
+function _withPaletteSiblings(tokenPath: string): string[] {
   const group = PALETTE_GROUPS.find((prefix) =>
     tokenPath.startsWith(`${prefix}.`),
   );
@@ -225,7 +225,7 @@ function _withPaletteSiblings(tokenPath: string): readonly string[] {
 }
 
 /** Every token read directly, plus every token a live token references in a built-in theme. */
-function _liveTokenPaths(directReads: readonly string[]): ReadonlySet<string> {
+function _liveTokenPaths(directReads: readonly string[]): Set<string> {
   const documents = [...BUILT_IN_VIDEO_THEMES.values()];
   const live = new Set<string>();
   const pending: string[] = [];
@@ -256,14 +256,12 @@ function _liveTokenPaths(directReads: readonly string[]): ReadonlySet<string> {
 }
 
 test("every reader source finds tokens, so a broken collector cannot pass the audit", () => {
-  for (const [name, reads] of Object.entries({
+  Object.entries({
     stock: _stockReads(),
     planBuilder: _planBuilderReads(),
     css: _cssReads(),
     script: _scriptReads(),
-  })) {
-    assert.ok(reads.length > 0, name);
-  }
+  }).forEach(([name, reads]) => assert.ok(reads.length > 0, name));
 });
 
 test("every token is read by an in-scope renderer or referenced by one that is", () => {

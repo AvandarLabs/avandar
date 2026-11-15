@@ -1,5 +1,5 @@
 import { parseStockInput } from "../../../../stock/contracts/parseStockInput/parseStockInput";
-import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
 import { stockContracts } from "../../../../stock/registry/stockContracts";
 import type {
   StockInputByPreset,

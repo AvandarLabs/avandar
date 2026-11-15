@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromLibrary } from "../../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
-import { contentColorSchema, resolveContentColor } from "./resolveContentColor";
+import {
+  contentColorSchema,
+  getContentColorFromValue,
+} from "./getContentColorFromValue";
 
 const tokens = makeResolvedVideoThemeFromLibrary(
   BUILT_IN_VIDEO_THEMES,
@@ -11,21 +14,21 @@ const tokens = makeResolvedVideoThemeFromLibrary(
 
 test("a colour role in content resolves through the theme", () => {
   assert.equal(
-    resolveContentColor("$color.accentAlt", { tokens, accent: "#51a7ff" }),
+    getContentColorFromValue("$color.accentAlt", { tokens, accent: "#51a7ff" }),
     "#82c8f2",
   );
 });
 
 test("the legacy accent keyword resolves to the graphic's accent", () => {
   assert.equal(
-    resolveContentColor("accent", { tokens, accent: "#ff0000" }),
+    getContentColorFromValue("accent", { tokens, accent: "#ff0000" }),
     "#ff0000",
   );
 });
 
 test("a literal hex is a deliberate bypass of the theme", () => {
   assert.equal(
-    resolveContentColor("#123456", { tokens, accent: "#51a7ff" }),
+    getContentColorFromValue("#123456", { tokens, accent: "#51a7ff" }),
     "#123456",
   );
 });

@@ -1,6 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 

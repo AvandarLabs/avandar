@@ -11,7 +11,7 @@ import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { StockRequest } from "../contracts/StockContract.types";
 
 /** Renders a stock request at frame 120 with one component's defaults patched. */
-function renderPresetWithComponentPatch(
+function _renderPresetWithComponentPatch(
   request: StockRequest,
   name: string,
   defaultProps: VideoThemePatch,
@@ -26,7 +26,7 @@ function renderPresetWithComponentPatch(
 
 test("data-pipeline draws its stage icons at the themed radius", () => {
   assert.match(
-    renderPresetWithComponentPatch(
+    _renderPresetWithComponentPatch(
       { preset: "data-pipeline" },
       "DataPipeline",
       {
@@ -39,7 +39,7 @@ test("data-pipeline draws its stage icons at the themed radius", () => {
 
 test("predicate-pushdown-boundary dashes its boundary with the themed pattern", () => {
   assert.match(
-    renderPresetWithComponentPatch(
+    _renderPresetWithComponentPatch(
       { preset: "predicate-pushdown-boundary" },
       "PredicatePushdownBoundary",
       { boundaryDash: [4, 4] },
@@ -50,7 +50,7 @@ test("predicate-pushdown-boundary dashes its boundary with the themed pattern", 
 
 test("code-focus draws its window at the themed radius", () => {
   assert.match(
-    renderPresetWithComponentPatch({ preset: "code-focus" }, "CodeWindow", {
+    _renderPresetWithComponentPatch({ preset: "code-focus" }, "CodeWindow", {
       radius: 21,
     }),
     /rx="21"/,
@@ -59,7 +59,7 @@ test("code-focus draws its window at the themed radius", () => {
 
 test("schema-mapping draws its match rings at the themed radius", () => {
   assert.match(
-    renderPresetWithComponentPatch(
+    _renderPresetWithComponentPatch(
       { preset: "schema-mapping" },
       "SchemaMapping",
       { ringRadius: 11 },
@@ -70,7 +70,7 @@ test("schema-mapping draws its match rings at the themed radius", () => {
 
 test("query-column-cache-growth dashes missing columns with the themed pattern", () => {
   assert.match(
-    renderPresetWithComponentPatch(
+    _renderPresetWithComponentPatch(
       { preset: "query-column-cache-growth" },
       "QueryColumnCacheGrowth",
       { missingDash: [6, 2] },
@@ -81,7 +81,7 @@ test("query-column-cache-growth dashes missing columns with the themed pattern",
 
 test("source-merge draws its merge node at the themed radius", () => {
   assert.match(
-    renderPresetWithComponentPatch({ preset: "source-merge" }, "SourceMerge", {
+    _renderPresetWithComponentPatch({ preset: "source-merge" }, "SourceMerge", {
       mergeRadius: 41,
     }),
     /r="41"/,
@@ -90,7 +90,7 @@ test("source-merge draws its merge node at the themed radius", () => {
 
 test("decision-fork draws its marker at the themed radius", () => {
   assert.match(
-    renderPresetWithComponentPatch(
+    _renderPresetWithComponentPatch(
       { preset: "decision-fork" },
       "DecisionFork",
       { markerRadius: 15 },

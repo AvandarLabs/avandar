@@ -10,12 +10,12 @@ import {
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { STOCK } from "../stockPalette";
-import { resolveContentColor } from "../theme/resolveContentColor/resolveContentColor";
+import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
 import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import { CodeWindow } from "./CodeWindow";
 import type { CodeFocusInput } from "../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
@@ -109,7 +109,7 @@ function CodeLineRow({
         {codeTokens.map((token, j) => (
           <tspan
             key={j}
-            fill={resolveContentColor(
+            fill={getContentColorFromValue(
               token.color === STOCK.mint ? "accent" : token.color,
               { tokens, accent },
             )}

@@ -42,7 +42,7 @@ import {
   OntologyScreen,
   ONTOLOGY_BEATS,
 } from "./OntologyScreen/OntologyScreen";
-import { ProductThemeRoot } from "./ProductThemeRoot";
+import { ProductThemeRoot } from "./ProductThemeRoot/ProductThemeRoot";
 import { VideoRouteContext } from "./shims/router";
 import "./stage.css";
 

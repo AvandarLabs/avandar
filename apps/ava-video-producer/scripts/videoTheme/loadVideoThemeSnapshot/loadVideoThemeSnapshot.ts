@@ -6,7 +6,7 @@ import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
-import { createThemeStore } from "../../showcase/themeStore/themeStore";
+import { createThemeStore } from "../../showcase/createThemeStore/createThemeStore";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
 
 const THEMES_DIRECTORY = fileURLToPath(
@@ -42,7 +42,7 @@ export async function loadVideoThemeSnapshot(
   const patch =
     request.patch === undefined
       ? undefined
-      : (videoThemePatchSchema.parse(request.patch) as VideoThemePatch);
+      : videoThemePatchSchema.parse(request.patch);
   const snapshot = createSnapshotFromThemeRequest({
     library,
     id: request.id,

@@ -33,15 +33,21 @@ async function _openSharedObjectHandoffTokens(page: Page): Promise<Locator> {
   return dialog;
 }
 
-async function _setEssentialAccent(
+const ACCENT_TOKEN = { path: "color.accent", label: "Accent" };
+const GROUND_TOKEN = { path: "color.ground", label: "Ground" };
+
+async function _setEssentialColor(
   dialog: Locator,
+  token: Readonly<{ path: string; label: string }>,
   color: string,
 ): Promise<void> {
-  const accent = dialog
+  const row = dialog
     .getByRole("region", { name: "Look and feel" })
-    .locator('[data-token-path="color.accent"]');
-  await accent.getByRole("button", { name: "Custom value for Accent" }).click();
-  const input = accent.getByRole("textbox", { name: "Custom Accent" });
+    .locator(`[data-token-path="${token.path}"]`);
+  await row
+    .getByRole("button", { name: `Custom value for ${token.label}` })
+    .click();
+  const input = row.getByRole("textbox", { name: `Custom ${token.label}` });
   await input.fill(color);
   await input.press("Enter");
 }
@@ -54,7 +60,7 @@ test("changing the accent in Look and feel updates a motion thumbnail and the mo
   page,
 }) => {
   const dialog = await _openFirstMotionTokens(page);
-  await _setEssentialAccent(dialog, "#ff0000");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#ff0000");
   await expect(
     _strokesIn(dialog.locator(".dialog-canvas"), "#ff0000").first(),
   ).toBeAttached();
@@ -67,7 +73,7 @@ test("a theme-scope accent edit recolours a composition's live player", async ({
   page,
 }) => {
   const dialog = await _openSharedObjectHandoffTokens(page);
-  await _setEssentialAccent(dialog, "#ff00ff");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#ff00ff");
   await expect(
     page
       .frameLocator("iframe")
@@ -81,7 +87,7 @@ test("an item override changes only that item, and its reset clears it", async (
 }) => {
   const dialog = await _openFirstMotionTokens(page);
   await dialog.getByText("This motion only", { exact: true }).click();
-  await _setEssentialAccent(dialog, "#00ff00");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#00ff00");
   const cards = page.locator(".motion-card");
   await expect(
     _strokesIn(dialog.locator(".dialog-canvas"), "#00ff00").first(),
@@ -97,7 +103,7 @@ test("an item override changes only that item, and its reset clears it", async (
 
 test("a draft survives a reload", async ({ page }) => {
   let dialog = await _openFirstMotionTokens(page);
-  await _setEssentialAccent(dialog, "#abcdef");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#abcdef");
   await expect(dialog.getByText("Unsaved changes")).toBeVisible();
   await page.reload();
   dialog = page.getByRole("dialog");
@@ -136,7 +142,7 @@ test("a download waits for the player to acknowledge the theme, then carries it"
     });
   });
   const dialog = await _openSharedObjectHandoffTokens(page);
-  await _setEssentialAccent(dialog, "#ff00ff");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#ff00ff");
   await dialog.getByRole("tab", { name: "Details" }).click();
   await expect(
     dialog.getByRole("button", {
@@ -186,7 +192,7 @@ test("the captions button posts the export's theme to /api/captions", async ({
     });
   });
   const dialog = await _openSharedObjectHandoffTokens(page);
-  await _setEssentialAccent(dialog, "#ff00ff");
+  await _setEssentialColor(dialog, ACCENT_TOKEN, "#ff00ff");
   await dialog.getByRole("tab", { name: "Details" }).click();
   const downloadPromise = page.waitForEvent("download");
   await dialog.getByRole("button", { name: "Captions", exact: true }).click();
@@ -241,19 +247,6 @@ test("Escape closes the colour picker first, then the modal", async ({
   await expect(dialog).toBeHidden();
 });
 
-async function _setEssentialGround(
-  dialog: Locator,
-  color: string,
-): Promise<void> {
-  const ground = dialog
-    .getByRole("region", { name: "Look and feel" })
-    .locator('[data-token-path="color.ground"]');
-  await ground.getByRole("button", { name: "Custom value for Ground" }).click();
-  const input = ground.getByRole("textbox", { name: "Custom Ground" });
-  await input.fill(color);
-  await input.press("Enter");
-}
-
 async function _pickAccentSwatch(dialog: Locator): Promise<void> {
   await dialog
     .getByRole("region", { name: "Look and feel" })
@@ -276,7 +269,7 @@ test("save as new theme writes a theme file, and saving it in place then editing
   await page.route("**/events", (route) => route.abort());
   try {
     const dialog = await _openFirstMotionTokens(page);
-    await _setEssentialAccent(dialog, "#123456");
+    await _setEssentialColor(dialog, ACCENT_TOKEN, "#123456");
     await dialog.getByRole("button", { name: "Save as new theme" }).click();
     await dialog.getByRole("textbox", { name: "New theme name" }).fill(label);
     await dialog.getByRole("button", { name: "Create theme" }).click();
@@ -295,7 +288,7 @@ test("save as new theme writes a theme file, and saving it in place then editing
     await expect(dialog.getByRole("combobox", { name: "Theme" })).toHaveValue(
       label,
     );
-    await _setEssentialGround(dialog, "#222222");
+    await _setEssentialColor(dialog, GROUND_TOKEN, "#222222");
     await dialog.getByRole("button", { name: "Save", exact: true }).click();
     await expect(
       dialog.getByRole("status").filter({ hasText: "Theme saved." }),

@@ -1,5 +1,8 @@
 import { DrawPath } from "../../graphics-common";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DecisionCondition } from "./DecisionCondition";
 import { DecisionGate } from "./DecisionGate";
 import { DecisionOutcome } from "./DecisionOutcome";

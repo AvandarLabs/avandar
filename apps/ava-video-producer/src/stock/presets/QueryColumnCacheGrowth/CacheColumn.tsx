@@ -1,5 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheCell } from "./CacheCell";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";

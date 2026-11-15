@@ -1,12 +1,12 @@
 import { loopPhase, mix, ramp, wave } from "../motion";
-import { SketchedShape } from "./primitives/SketchedShape/SketchedShape";
+import { SketchedShape } from "./primitives/SketchedShape";
 import { StockRect } from "./primitives/StockRect/StockRect";
 import {
   useGraphicFilter,
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "./theme/useGraphicTheme";
+} from "./theme/useGraphicTheme/useGraphicTheme";
 import type {
   ResolvedTypeStyle,
   ResolvedVideoSemantic,

@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { type TextBounds, wrapTextToLines } from "./wrapTextToLines";
 import type { ReactNode } from "react";
 

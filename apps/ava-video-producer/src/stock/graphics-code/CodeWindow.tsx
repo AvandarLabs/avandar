@@ -1,5 +1,8 @@
 import { Panel, Text } from "../graphics-common";
-import { useGraphicProps, useGraphicTokens } from "../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 const DOT_COUNT = 3;

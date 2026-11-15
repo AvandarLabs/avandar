@@ -1,4 +1,4 @@
-import { makeStockDataFromContract } from "../../copy/makeStockDataFromContract";
+import { makeStockDataFromContract } from "../../copy/makeStockDataFromContract/makeStockDataFromContract";
 import { stockContracts } from "../../registry/stockContracts";
 import type { StockInputByPreset, StockPresetId } from "../StockContract.types";
 import type { z } from "zod";

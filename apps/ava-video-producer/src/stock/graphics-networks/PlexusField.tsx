@@ -13,7 +13,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { PlexusFieldInput } from "../presets/PlexusField/PlexusField.schema";
 import type { ReactNode } from "react";
 

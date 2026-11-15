@@ -14,10 +14,8 @@ import {
   VIDEO_THEME_MAX_BYTES,
   VIDEO_THEME_SLUG_PATTERN,
 } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
-import type {
-  VideoThemeDocument,
-  VideoThemeIssue,
-} from "../../../src/videoTheme/videoTheme.types";
+import { ThemeStoreError } from "../ThemeStoreError";
+import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
 /** Largest theme file the store writes, and the largest body the routes read. */
 export const THEME_FILE_MAX_BYTES = VIDEO_THEME_MAX_BYTES;
@@ -48,23 +46,6 @@ export type ThemeStore = Readonly<{
     ifMatch: string,
   ) => Promise<StoredTheme>;
 }>;
-
-/** A refused theme operation, with the HTTP status the routes send. */
-export class ThemeStoreError extends Error {
-  readonly status: 400 | 403 | 404 | 409 | 413 | 428;
-  readonly issues: readonly VideoThemeIssue[];
-
-  constructor(
-    status: ThemeStoreError["status"],
-    message: string,
-    issues: readonly VideoThemeIssue[] = [],
-  ) {
-    super(message);
-    this.name = "ThemeStoreError";
-    this.status = status;
-    this.issues = issues;
-  }
-}
 
 function _hashText(text: string): string {
   return createHash("sha256").update(text).digest("hex");
@@ -113,11 +94,11 @@ function _assertResolves(
   ]);
   try {
     makeResolvedVideoThemeFromLibrary(library, document.id);
-    for (const overrideId of Object.keys(document.overrides ?? {})) {
+    Object.keys(document.overrides ?? {}).forEach((overrideId) => {
       makeResolvedVideoThemeFromLibrary(library, document.id, {
         overrideIds: [overrideId],
       });
-    }
+    });
   } catch (error) {
     if (error instanceof VideoThemeError) {
       throw new ThemeStoreError(
@@ -146,11 +127,15 @@ function _serializeWithinCap(document: VideoThemeDocument): string {
  * it fails with EEXIST when the file already exists and never shows a
  * half-written file.
  */
-async function _writeAtomically(
-  file: string,
-  text: string,
-  mode: "replace" | "create",
-): Promise<void> {
+async function _writeAtomically({
+  file,
+  text,
+  mode,
+}: Readonly<{
+  file: string;
+  text: string;
+  mode: "replace" | "create";
+}>): Promise<void> {
   const temporary = path.join(
     path.dirname(file),
     `.${path.basename(file)}.${randomUUID()}.tmp`,
@@ -188,15 +173,16 @@ async function _readTheme(directory: string, id: string): Promise<StoredTheme> {
         ? new ThemeStoreError(404, `No theme named "${id}"`)
         : error;
     });
-  let value: unknown;
-  try {
-    value = JSON.parse(text);
-  } catch {
-    throw new ThemeStoreError(
-      400,
-      `themes/${id}${THEME_FILE_SUFFIX} is not valid JSON`,
-    );
-  }
+  const value: unknown = (() => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new ThemeStoreError(
+        400,
+        `themes/${id}${THEME_FILE_SUFFIX} is not valid JSON`,
+      );
+    }
+  })();
   const document = _parse(value);
   // Every lookup is by file name, so a document under another id would be
   // listed but never found, breaking each render that loads the library.
@@ -231,14 +217,23 @@ async function _readAllThemes(
   return results.flatMap((result) => (result ? [result.document] : []));
 }
 
-async function _writeTheme(
-  directory: string,
-  document: VideoThemeDocument,
-  text: string,
-  mode: "replace" | "create",
-): Promise<StoredTheme> {
+async function _writeTheme({
+  directory,
+  document,
+  text,
+  mode,
+}: Readonly<{
+  directory: string;
+  document: VideoThemeDocument;
+  text: string;
+  mode: "replace" | "create";
+}>): Promise<StoredTheme> {
   try {
-    await _writeAtomically(_fileFromId(directory, document.id), text, mode);
+    await _writeAtomically({
+      file: _fileFromId(directory, document.id),
+      text,
+      mode,
+    });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "EEXIST") {
       throw new ThemeStoreError(
@@ -287,12 +282,17 @@ function _documentToSummary(document: VideoThemeDocument): ThemeSummary {
 }
 
 /** Saves a custom theme in place when `ifMatch` is the file's current hash. */
-async function _saveTheme(
-  directory: string,
-  id: string,
-  value: unknown,
-  ifMatch: string,
-): Promise<StoredTheme> {
+async function _saveTheme({
+  directory,
+  id,
+  value,
+  ifMatch,
+}: Readonly<{
+  directory: string;
+  id: string;
+  value: unknown;
+  ifMatch: string;
+}>): Promise<StoredTheme> {
   _assertNotReserved(id);
   if (_isBuiltIn(id)) {
     throw new ThemeStoreError(
@@ -315,7 +315,7 @@ async function _saveTheme(
     );
   }
   _assertResolves(document, await _readAllThemes(directory));
-  return _writeTheme(directory, document, text, "replace");
+  return _writeTheme({ directory, document, text, mode: "replace" });
 }
 
 /**
@@ -357,10 +357,10 @@ export function createThemeStore(
           );
         }
         _assertResolves(document, await _readAllThemes(directory));
-        return _writeTheme(directory, document, text, "create");
+        return _writeTheme({ directory, document, text, mode: "create" });
       });
     },
     save: (id, value, ifMatch) =>
-      runExclusively(id, () => _saveTheme(directory, id, value, ifMatch)),
+      runExclusively(id, () => _saveTheme({ directory, id, value, ifMatch })),
   };
 }

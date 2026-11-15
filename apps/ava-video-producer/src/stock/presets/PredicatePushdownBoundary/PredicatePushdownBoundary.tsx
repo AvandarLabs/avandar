@@ -4,7 +4,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../../theme/useGraphicTheme";
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PushdownLedger } from "./PushdownLedger";
 import { PushdownPredicate } from "./PushdownPredicate";
 import { PushdownRows } from "./PushdownRows";

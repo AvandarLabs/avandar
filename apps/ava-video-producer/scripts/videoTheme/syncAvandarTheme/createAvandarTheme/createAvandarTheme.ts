@@ -1,18 +1,18 @@
-import { parseCssPixels } from "../../../src/videoTheme/parseCssPixels/parseCssPixels";
+import { parseCssPixels } from "../../../../src/videoTheme/parseCssPixels/parseCssPixels";
 import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
-} from "../../../src/videoTheme/videoFontRegistry/videoFontRegistryHelpers";
+} from "../../../../src/videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import type {
   ShadowValue,
   VideoThemeDocument,
-} from "../../../src/videoTheme/videoTheme.types";
+} from "../../../../src/videoTheme/videoTheme.types";
 
 type Shades = readonly string[];
 type Surfaces = Readonly<
   Record<"body" | "raised" | "overlay" | "sunken" | "panelHeader", string>
 >;
-type SizeScale = Readonly<Record<"xs" | "sm" | "md" | "lg" | "xl", string>>;
+type SizeScale = Readonly<Record<(typeof SIZE_KEYS)[number], string>>;
 
 /** The Avandar theme values `read-theme.mjs --for-video` prints. */
 export type AvandarThemeSource = Readonly<{

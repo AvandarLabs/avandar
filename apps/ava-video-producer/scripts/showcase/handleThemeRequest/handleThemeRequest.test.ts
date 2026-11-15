@@ -5,8 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { createThemeStore } from "../themeStore/themeStore";
-import { handleThemeRequest } from "./themeRoutes";
+import { createThemeStore } from "../createThemeStore/createThemeStore";
+import { handleThemeRequest } from "./handleThemeRequest";
 import type { AddressInfo } from "node:net";
 
 const CLASSIC_FILE = fileURLToPath(
@@ -41,13 +41,19 @@ async function _withServer(run: (origin: string) => Promise<void>) {
   }
 }
 
-function _write(
-  origin: string,
-  method: string,
-  pathname: string,
-  body: unknown,
+function _write({
+  origin,
+  method,
+  pathname,
+  body,
   headers = {},
-) {
+}: Readonly<{
+  origin: string;
+  method: string;
+  pathname: string;
+  body: unknown;
+  headers?: Readonly<Record<string, string>>;
+}>) {
   return fetch(`${origin}${pathname}`, {
     method,
     headers: { "Content-Type": "application/json", Origin: origin, ...headers },
@@ -76,34 +82,60 @@ test("the JSON Schema is served at schema.json, not read as a theme id", () =>
 test("a theme is created with POST and saved with PUT using its hash", () =>
   _withServer(async (origin) => {
     const created = (await (
-      await _write(origin, "POST", "/api/themes", WARM)
+      await _write({
+        origin,
+        method: "POST",
+        pathname: "/api/themes",
+        body: WARM,
+      })
     ).json()) as { hash: string };
-    const saved = await _write(
+    const saved = await _write({
       origin,
-      "PUT",
-      "/api/themes/warm",
-      { ...WARM, label: "Warmer" },
-      { "If-Match": created.hash },
-    );
+      method: "PUT",
+      pathname: "/api/themes/warm",
+      body: { ...WARM, label: "Warmer" },
+      headers: { "If-Match": created.hash },
+    });
     assert.equal(saved.status, 200);
   }));
 
 test("a save without If-Match is refused with 428", () =>
   _withServer(async (origin) => {
-    await _write(origin, "POST", "/api/themes", WARM);
+    await _write({
+      origin,
+      method: "POST",
+      pathname: "/api/themes",
+      body: WARM,
+    });
     assert.equal(
-      (await _write(origin, "PUT", "/api/themes/warm", WARM)).status,
+      (
+        await _write({
+          origin,
+          method: "PUT",
+          pathname: "/api/themes/warm",
+          body: WARM,
+        })
+      ).status,
       428,
     );
   }));
 
 test("a stale If-Match is a conflict", () =>
   _withServer(async (origin) => {
-    await _write(origin, "POST", "/api/themes", WARM);
+    await _write({
+      origin,
+      method: "POST",
+      pathname: "/api/themes",
+      body: WARM,
+    });
     assert.equal(
       (
-        await _write(origin, "PUT", "/api/themes/warm", WARM, {
-          "If-Match": "stale",
+        await _write({
+          origin,
+          method: "PUT",
+          pathname: "/api/themes/warm",
+          body: WARM,
+          headers: { "If-Match": "stale" },
         })
       ).status,
       409,
@@ -112,8 +144,12 @@ test("a stale If-Match is a conflict", () =>
 
 test("a cross-origin write is refused", () =>
   _withServer(async (origin) => {
-    const response = await _write(origin, "POST", "/api/themes", WARM, {
-      Origin: "http://evil.test",
+    const response = await _write({
+      origin,
+      method: "POST",
+      pathname: "/api/themes",
+      body: WARM,
+      headers: { Origin: "http://evil.test" },
     });
     assert.equal(response.status, 403);
   }));

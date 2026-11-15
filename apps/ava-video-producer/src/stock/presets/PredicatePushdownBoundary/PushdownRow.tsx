@@ -1,7 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 

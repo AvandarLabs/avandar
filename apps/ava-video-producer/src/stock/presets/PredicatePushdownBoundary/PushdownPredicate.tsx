@@ -5,7 +5,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../../theme/useGraphicTheme";
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 

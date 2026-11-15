@@ -4,7 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { createThemeStore, ThemeStoreError } from "./themeStore";
+import { ThemeStoreError } from "../ThemeStoreError";
+import { createThemeStore } from "./createThemeStore";
 
 const CLASSIC_FILE = fileURLToPath(
   new URL("../../../themes/classic.theme.json", import.meta.url),

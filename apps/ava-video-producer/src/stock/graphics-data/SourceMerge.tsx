@@ -11,8 +11,11 @@ import {
 } from "../graphics-common";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
-import { resolveContentColor } from "../theme/resolveContentColor/resolveContentColor";
-import { useGraphicProps, useGraphicTokens } from "../theme/useGraphicTheme";
+import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { SourceMergeInput } from "../presets/SourceMerge/SourceMerge.schema";
 import type { ReactNode } from "react";
 
@@ -265,7 +268,7 @@ export function SourceMerge({
           color={
             index === 1
               ? accent
-              : resolveContentColor(source.color, { tokens, accent })
+              : getContentColorFromValue(source.color, { tokens, accent })
           }
           showPackets={input.showPackets}
         />

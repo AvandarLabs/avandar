@@ -1,4 +1,4 @@
-import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
 import { CollectionItem } from "../CollectionItem/CollectionItem";
 import { ContentDraftModule } from "../ContentDraftModule/ContentDraftModule";
 import styles from "./CollectionField.module.css";

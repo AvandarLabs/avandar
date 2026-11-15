@@ -3,7 +3,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../../theme/useGraphicTheme";
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
 

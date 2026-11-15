@@ -14,7 +14,7 @@ import { requireLicense } from "../../require-license.mjs";
 import {
   bundleShowcaseFilms,
   SHOWCASE_STILL_BROWSER_OPTIONS,
-} from "../bundleShowcaseFilms/bundleShowcaseFilms";
+} from "../bundleShowcaseFilms";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 import { getPosterFrameFromFilm } from "./getPosterFrameFromFilm/getPosterFrameFromFilm";
 import type { Film } from "../../../src/showcase/showcase.types";

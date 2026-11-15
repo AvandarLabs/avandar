@@ -76,10 +76,8 @@ const PARITY_ALLOWANCES: readonly ParityAllowance[] = [
  * at the Atlas gallery default colours. Compositions load with their
  * authored values.
  */
-export function listParityTargets(
-  ids: readonly string[] = [],
-): readonly ParityTarget[] {
-  const targets: readonly ParityTarget[] = [
+export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
+  const targets = [
     ...PARITY_STOCK_PRESET_IDS.map((id) => ({
       id,
       filmId: `stock-${id}`,
@@ -104,7 +102,7 @@ export function listParityTargets(
  */
 export function getParityFramesFromFilm(
   film: Pick<Film, "kind" | "plan">,
-): readonly number[] {
+): number[] {
   if (film.kind === "stock") {
     return StockFingerprintModule.SAMPLE_PARAMETERS.samples;
   }
@@ -118,7 +116,7 @@ export function getParityFramesFromFilm(
 export function getAllowedRegionsFromFilm(
   id: string,
   film: Pick<Film, "kind" | "width">,
-): readonly ParityRegion[] {
+): ParityRegion[] {
   const scale = film.kind === "stock" ? film.width / STOCK_VIEWBOX_WIDTH : 1;
   return PARITY_ALLOWANCES.filter((allowance) => allowance.id === id).map(
     ({ region }) => ({

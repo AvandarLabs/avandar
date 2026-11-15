@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { stockContracts } from "../registry/stockContracts";
-import { getStockValueFromPath } from "./getStockValueFromPath/getStockValueFromPath";
+import { stockContracts } from "../../registry/stockContracts";
+import { getStockValueFromPath } from "../getStockValueFromPath";
 import { makeStockDataFromContract } from "./makeStockDataFromContract";
 
 test("every default prose path holds text and resolves into an independent copy of the default", () => {

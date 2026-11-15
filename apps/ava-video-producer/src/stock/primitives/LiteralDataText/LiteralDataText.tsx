@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { value: string; x: number; y: number; color?: string };

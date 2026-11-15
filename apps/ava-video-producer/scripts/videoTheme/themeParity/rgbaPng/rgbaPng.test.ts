@@ -12,7 +12,11 @@ test("RGBA pixels survive a PNG round trip unchanged", async () => {
     const pixels = Uint8Array.from([
       255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 12, 34, 56, 255,
     ]);
-    await writePngFromRgba(file, pixels, { width: 2, height: 2 });
+    await writePngFromRgba({
+      file,
+      rgba: pixels,
+      size: { width: 2, height: 2 },
+    });
     const decoded = await readRgbaFromPng(file, { width: 2, height: 2 });
     assert.deepEqual([...decoded], [...pixels]);
   } finally {

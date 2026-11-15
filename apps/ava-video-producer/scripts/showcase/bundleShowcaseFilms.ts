@@ -1,11 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
-import { buildProduct } from "../../build-avandar.mjs";
-import { assetReferences, publicAsset } from "../../lib/planHelpers";
-import { withWorkspaceAliases } from "../../lib/withWorkspaceAliases.mjs";
-import { appRoot } from "../ShowcaseFilms/ShowcaseFilms";
-import type { Film } from "../../../src/showcase/showcase.types";
+import { buildProduct } from "../build-avandar.mjs";
+import { assetReferences, publicAsset } from "../lib/planHelpers";
+import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
+import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
+import type { Film } from "../../src/showcase/showcase.types";
 
 /**
  * Headless Chrome options for rendering showcase stills. Every still script

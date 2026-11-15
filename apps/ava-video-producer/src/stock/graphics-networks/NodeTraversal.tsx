@@ -10,7 +10,10 @@ import {
 } from "../graphics-common";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary";
-import { useGraphicMotion, useGraphicTokens } from "../theme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { NodeTraversalInput } from "../presets/NodeTraversal/NodeTraversal.schema";
 import type { ReactNode } from "react";
 

@@ -16,7 +16,7 @@ import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
-} from "../theme/useGraphicTheme";
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { DataPipelineInput } from "../presets/DataPipeline/DataPipeline.schema";
 import type { ReactNode } from "react";
 
