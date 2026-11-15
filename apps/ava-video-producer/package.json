@@ -34,8 +34,7 @@
     "video:new": "node scripts/require-license.mjs && node scripts/new-video.mjs",
     "component:watch": "node scripts/require-license.mjs && node scripts/build-avandar.mjs --watch",
     "pretest": "node scripts/require-license.mjs && node scripts/build-avandar.mjs",
-    "pretypecheck": "node scripts/require-license.mjs && node scripts/build-motion-gallery.mjs",
-    "gallery:messages": "node scripts/require-license.mjs && lingui extract --config lingui.gallery.config.ts && lingui compile --config lingui.gallery.config.ts"
+    "pretypecheck": "node scripts/require-license.mjs && node scripts/build-motion-gallery.mjs"
   },
   "dependencies": {
     "@avandar/utils": "workspace:*",
@@ -103,11 +102,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
-    "@babel/preset-typescript": "^7.27.0",
     "@lingui/babel-plugin-lingui-macro": "^6.2.0",
-    "@lingui/cli": "6.2.0",
-    "@lingui/conf": "6.2.0",
-    "@lingui/format-po": "6.2.0",
     "@playwright/test": "^1.59.1",
     "@types/d3-geo": "3.1.0",
     "@types/node": "^22.15.0",
