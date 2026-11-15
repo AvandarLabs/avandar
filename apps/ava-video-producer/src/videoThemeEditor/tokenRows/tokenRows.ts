@@ -1,12 +1,10 @@
 import { createDraftThemeTarget } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import {
-  getResolvedTokenValue,
-  getValueAtPath,
-} from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getResolvedTokenValue } from "../../videoTheme/getResolvedTokenValue";
+import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../../videoTheme/tokenCatalog/tokenCatalog";
+} from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import {
   getDocumentPathFromTokenPath,
   isThemeDraftEmpty,

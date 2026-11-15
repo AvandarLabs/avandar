@@ -1,7 +1,7 @@
 import { useCurrentFrame } from "remotion";
 import { enter } from "../motion";
-import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
-import { useVideoProps } from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps } from "../videoTheme/useVideoTheme";
 import { ContinuityContent } from "./ContinuityContent";
 import css from "./ContinuityScene.module.css";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";

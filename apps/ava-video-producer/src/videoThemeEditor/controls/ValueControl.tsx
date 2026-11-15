@@ -1,4 +1,4 @@
-import { TOKEN_CONTROLS } from "../../videoTheme/tokenCatalog/defineTokens";
+import { TOKEN_CONTROLS } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import {
   BooleanValueControl,

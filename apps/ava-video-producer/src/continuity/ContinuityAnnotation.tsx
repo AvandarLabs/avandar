@@ -5,11 +5,8 @@ import {
   Highlight,
   Underline,
 } from "@remotion/rough-notation";
-import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
-import {
-  useVideoProps,
-  useVideoTokens,
-} from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityOverlays.module.css";
 import { getAnnotationProgress } from "./overlayMotion";

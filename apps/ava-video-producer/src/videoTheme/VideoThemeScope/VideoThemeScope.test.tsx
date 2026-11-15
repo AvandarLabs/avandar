@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
-import { useVideoTokens } from "../useVideoTheme/useVideoTheme";
+import { useVideoTokens } from "../useVideoTheme";
 import {
   createScopedVideoThemeSource,
   VideoThemeScope,

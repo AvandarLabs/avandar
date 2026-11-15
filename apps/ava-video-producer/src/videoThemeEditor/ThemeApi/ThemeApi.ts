@@ -1,4 +1,4 @@
-import { parseVideoThemeDocument } from "../../videoTheme/videoThemeSchema/videoThemeSchema";
+import { parseVideoThemeDocument } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import type {
   VideoThemeDocument,
   VideoThemeIssue,

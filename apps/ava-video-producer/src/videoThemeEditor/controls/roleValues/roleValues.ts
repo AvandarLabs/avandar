@@ -3,7 +3,7 @@ import {
   getWcagLevelFromContrast,
   isLargeTypeStyle,
   type WcagLevel,
-} from "../../../videoTheme/textContrast/textContrast";
+} from "../../../videoTheme/textContrastHelpers/textContrastHelpers";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
 
 /** A colour role that differs on dark and light grounds. */

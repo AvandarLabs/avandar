@@ -3,14 +3,14 @@ import {
   mergeMantineTheme,
   type MantineTheme,
 } from "@mantine/core";
-import { isCameraSafeEasing } from "../cameraEasing/cameraEasing";
-import { elevationToBoxShadow } from "../cssValues/cssValues";
-import { getResolvedTokenValue } from "../getResolvedTokenValue/getResolvedTokenValue";
-import { buildVideoThemeHashFromContent } from "../hashVideoTheme/hashVideoTheme";
+import { elevationToBoxShadow } from "../cssValueHelpers/cssValueHelpers";
+import { getResolvedTokenValue } from "../getResolvedTokenValue";
+import { buildVideoThemeHashFromContent } from "../hashVideoThemeHelpers/hashVideoThemeHelpers";
+import { isCameraSafeEasing } from "../isCameraSafeEasing/isCameraSafeEasing";
 import { mergeVideoThemeLayers } from "../mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { listTokenDefinitions } from "../tokenCatalog/tokenCatalog";
-import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/videoFontRegistry";
-import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
+import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers";
+import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/videoFontRegistryHelpers";
+import { VideoThemeError } from "../VideoThemeError";
 import { makeResolvedTokenTiersFromMergedTheme } from "./makeResolvedTokenTiersFromMergedTheme";
 import type {
   ResolvedTypeStyle,

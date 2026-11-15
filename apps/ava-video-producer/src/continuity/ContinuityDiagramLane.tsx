@@ -1,12 +1,9 @@
 import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic";
-import { elevationToDropShadowFilter } from "../videoTheme/cssValues/cssValues";
-import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
-import {
-  useVideoProps,
-  useVideoTokens,
-} from "../videoTheme/useVideoTheme/useVideoTheme";
+import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityOverlays.module.css";

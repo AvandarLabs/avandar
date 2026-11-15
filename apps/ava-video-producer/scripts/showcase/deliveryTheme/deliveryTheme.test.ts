@@ -4,11 +4,11 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
+import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest";
 import {
   createVideoThemeSnapshot,
   makeResolvedVideoThemeFromSnapshot,
-} from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { getDeliveryThemeFromFilm } from "./deliveryTheme";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
-import { createVideoThemeSourceFromSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { createVideoThemeSourceFromSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { StoryFilm } from "../StoryFilm/StoryFilm";
-import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Storyboard } from "../schema/schema";
 import type { ProductSceneRenderer } from "../StoryFilm/ShotView";
 

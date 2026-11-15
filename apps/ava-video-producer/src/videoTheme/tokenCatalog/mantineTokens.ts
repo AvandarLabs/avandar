@@ -1,4 +1,4 @@
-import { scale, token } from "./defineTokens";
+import { scale, token } from "./defineTokensHelpers";
 
 const PALETTE_NAMES = [
   "primary",

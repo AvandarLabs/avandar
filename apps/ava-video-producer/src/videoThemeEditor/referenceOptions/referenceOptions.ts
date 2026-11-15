@@ -1,5 +1,5 @@
-import { isCameraSafeEasing } from "../../videoTheme/cameraEasing/cameraEasing";
-import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
+import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
+import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { isCustomScaleKey } from "../customScaleKey/customScaleKey";
 import type {
   EasingValue,

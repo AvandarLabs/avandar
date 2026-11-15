@@ -1,11 +1,11 @@
 import { fileURLToPath } from "node:url";
 import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
-import { videoThemePatchSchema } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest";
+import { videoThemePatchSchema } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
-} from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { createThemeStore } from "../../showcase/themeStore/themeStore";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
 

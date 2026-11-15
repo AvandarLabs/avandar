@@ -1,10 +1,7 @@
 import { Underline } from "@remotion/rough-notation";
 import { enter, ramp } from "../motion";
-import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
-import {
-  useVideoProps,
-  useVideoTokens,
-} from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityScene.module.css";
 import type { ContinuityBeat } from "./continuitySchema";

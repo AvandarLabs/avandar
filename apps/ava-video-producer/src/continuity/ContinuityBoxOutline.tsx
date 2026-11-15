@@ -1,5 +1,5 @@
 import { Box } from "@remotion/rough-notation";
-import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import css from "./ContinuityOverlays.module.css";
 
 /** A stationary sketch border for the enclosing editorial card or token, in the theme's box sketch profile. */

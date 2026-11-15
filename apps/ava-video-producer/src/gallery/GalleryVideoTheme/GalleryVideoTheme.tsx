@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
-import { VideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
+import { VideoThemeContext } from "../../videoTheme/useVideoTheme";
 import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
 import { buildThemeJsonFromDraft } from "../../videoThemeEditor/themeJson/themeJson";

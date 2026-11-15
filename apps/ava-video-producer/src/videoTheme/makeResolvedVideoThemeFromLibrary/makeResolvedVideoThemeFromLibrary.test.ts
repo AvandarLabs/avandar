@@ -4,7 +4,7 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../builtInVideoThemes/builtInVideoThemes";
-import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
+import { VideoThemeError } from "../VideoThemeError";
 import { makeResolvedVideoThemeFromLibrary } from "./makeResolvedVideoThemeFromLibrary";
 import type { VideoThemeDocument, VideoThemePatch } from "../videoTheme.types";
 

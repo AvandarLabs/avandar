@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { StockGraphic } from "../../../stock/StockGraphic";
-import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsage/tokenUsage";
+import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import { useObservedTokenUsage } from "../../../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
 import { AtlasPanelTabs } from "../../AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
 import { useRememberedPanelTab } from "../../AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";

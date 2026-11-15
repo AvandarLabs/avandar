@@ -1,7 +1,7 @@
 import {
   getTargetFromTokenReference,
   isTokenReference,
-} from "../../videoTheme/themeReferences/themeReferences";
+} from "../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { CUSTOM_SCALE_KEY_PREFIX } from "../customScaleKey/customScaleKey";
 import {
   setTokenInDraft,

@@ -10,7 +10,7 @@ import { safeInputFile } from "../lib/planHelpers";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { loadVideoThemeSnapshot } from "../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { ResolvedStockRequest } from "../../src/stock/contracts/stockRequestSchema/stockRequestSchema";
-import type { VideoThemeSnapshot } from "../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 
 const ROOT: string = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

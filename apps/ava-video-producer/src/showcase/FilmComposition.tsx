@@ -15,7 +15,7 @@ import { absoluteCues } from "../storyboard/schema/schema";
 import { StoryFilm } from "../storyboard/StoryFilm/StoryFilm";
 import { TitleCard, TITLE_LEN } from "../title-card";
 import { VideoThemeProvider } from "../videoTheme/VideoThemeProvider/VideoThemeProvider";
-import { createVideoThemeSourceFromSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { createVideoThemeSourceFromSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
 
 /** The film's picture, drawn inside its theme by `FilmComposition`. */

@@ -1,6 +1,6 @@
 import avandarTheme from "../../../themes/avandar.theme.json";
 import classicTheme from "../../../themes/classic.theme.json";
-import { parseVideoThemeDocument } from "../videoThemeSchema/videoThemeSchema";
+import { parseVideoThemeDocument } from "../videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,

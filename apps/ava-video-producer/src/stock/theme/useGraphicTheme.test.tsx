@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   createTokenUsageCollector,
   VideoTokenUsageContext,
-} from "../../videoTheme/tokenUsage/tokenUsage";
+} from "../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
 import {
   useGraphicMotion,

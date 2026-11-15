@@ -17,22 +17,22 @@ import { createContinuityPlanFromVideoTheme } from "../../../src/continuity/crea
 import { StockGraphic } from "../../../src/stock/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { getValueAtPath } from "../../../src/videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../../../src/videoTheme/getValueAtPath";
 import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
   getTargetFromTokenReference,
   isTokenReference,
-} from "../../../src/videoTheme/themeReferences/themeReferences";
+} from "../../../src/videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { SEMANTIC_TOKENS } from "../../../src/videoTheme/tokenCatalog/semanticTokens";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../../../src/videoTheme/tokenCatalog/tokenCatalog";
+} from "../../../src/videoTheme/tokenCatalog/tokenCatalogHelpers";
 import {
   createTokenUsageCollector,
   createTokenUsageProxy,
   VideoTokenUsageContext,
-} from "../../../src/videoTheme/tokenUsage/tokenUsage";
+} from "../../../src/videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import {
   PARITY_COMPOSITION_IDS,
   PARITY_STOCK_PRESET_IDS,

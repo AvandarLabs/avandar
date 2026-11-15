@@ -1,9 +1,9 @@
 import { useId } from "react";
 import { loopEnvelope } from "../motion";
-import { fillToCss } from "../videoTheme/cssValues/cssValues";
-import { createThemePatchFromStockColors } from "../videoTheme/themePatches/themePatches";
+import { createThemePatchFromStockColors } from "../videoTheme/createThemePatchFromStockColors/createThemePatchFromStockColors";
+import { fillToCss } from "../videoTheme/cssValueHelpers/cssValueHelpers";
 import { VideoEffectDefs } from "../videoTheme/VideoEffectDefs/VideoEffectDefs";
-import { listVideoEffectFilters } from "../videoTheme/videoEffectFilters/videoEffectFilters";
+import { listVideoEffectFilters } from "../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
 import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
 import { getStockDisplayCopyFromDescriptor } from "./copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";

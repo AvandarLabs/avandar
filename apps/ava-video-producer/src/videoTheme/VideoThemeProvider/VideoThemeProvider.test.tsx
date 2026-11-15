@@ -5,8 +5,8 @@ import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoTh
 import {
   createTokenUsageCollector,
   VideoTokenUsageContext,
-} from "../tokenUsage/tokenUsage";
-import { useVideoProps, useVideoTokens } from "../useVideoTheme/useVideoTheme";
+} from "../tokenUsageHelpers/tokenUsageHelpers";
+import { useVideoProps, useVideoTokens } from "../useVideoTheme";
 import { VideoThemeProvider } from "./VideoThemeProvider";
 
 function TokenProbe() {

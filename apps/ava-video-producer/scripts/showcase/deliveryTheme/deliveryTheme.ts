@@ -2,7 +2,7 @@ import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/c
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
-} from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 // A built-in theme's draft renders as the unsaved theme that extends it, so

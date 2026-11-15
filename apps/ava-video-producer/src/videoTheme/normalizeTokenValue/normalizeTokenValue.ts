@@ -2,12 +2,12 @@ import {
   colorValueSchema,
   createValueSchemaFromDefinition,
   gradientValueSchema,
-} from "../tokenValueSchemas/tokenValueSchemas";
+} from "../tokenValueSchemas";
 import {
   getVideoFontIdFromStack,
   VIDEO_FONT_REGISTRY,
-} from "../videoFontRegistry/videoFontRegistry";
-import type { FieldSpec } from "../tokenCatalog/defineTokens";
+} from "../videoFontRegistry/videoFontRegistryHelpers";
+import type { FieldSpec } from "../tokenCatalog/defineTokensHelpers";
 
 /** A value converted to its kind, or why it could not be. */
 export type NormalizedTokenValue =

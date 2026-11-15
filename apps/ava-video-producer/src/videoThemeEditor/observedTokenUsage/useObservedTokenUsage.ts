@@ -1,6 +1,6 @@
 import { useState, useSyncExternalStore } from "react";
 import { createObservedTokenUsage } from "./observedTokenUsage";
-import type { TokenUsageReporter } from "../../videoTheme/tokenUsage/tokenUsage";
+import type { TokenUsageReporter } from "../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 
 /**
  * A reporter to put in `VideoTokenUsageContext` around a preview, and the

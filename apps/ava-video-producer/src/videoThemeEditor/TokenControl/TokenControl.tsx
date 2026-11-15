@@ -1,4 +1,4 @@
-import { isCompositeTokenKind } from "../../videoTheme/tokenCatalog/defineTokens";
+import { isCompositeTokenKind } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
 import { ColorRoleControl } from "../controls/ColorRoleControl";
 import { CompositeControl } from "../controls/CompositeControl";
 import { ReferenceControl } from "../controls/ReferenceControl";

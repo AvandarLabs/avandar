@@ -4,16 +4,16 @@ import {
   DRAFT_THEME_ID,
   type DraftThemeTarget,
 } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { mergeVideoThemePatches } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemeLayers";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../../videoTheme/tokenCatalog/tokenCatalog";
+} from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import {
   createVideoThemeSnapshot,
   type VideoThemeSnapshot,
-} from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { isCustomScaleEntryPath } from "../customScaleKey/customScaleKey";
 import type {
   VideoThemeDocument,

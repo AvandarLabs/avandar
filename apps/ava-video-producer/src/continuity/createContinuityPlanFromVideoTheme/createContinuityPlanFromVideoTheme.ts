@@ -1,7 +1,7 @@
 import { retimeCameraTrack } from "../../motion-components/cameraTrack";
 import { motionOptionsSchema } from "../../motion-components/motionSettings";
-import { isCameraSafeEasing } from "../../videoTheme/cameraEasing/cameraEasing";
-import { makeResolvedVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
+import { makeResolvedVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { getContinuityTimeline } from "../continuityTimeline";
 import type {
   MotionEasing,
@@ -13,7 +13,7 @@ import type {
   ResolvedRange,
   ResolvedVideoTheme,
 } from "../../videoTheme/videoTheme.types";
-import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { ContinuityBeat } from "../continuitySchema";
 
 type ThemeSemantic = ResolvedVideoTheme["semantic"];

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createVideoThemeLibrary } from "../builtInVideoThemes/builtInVideoThemes";
-import { getValueAtPath } from "../getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../getValueAtPath";
 import { mergeVideoThemeLayers } from "./mergeVideoThemeLayers";
 import type { VideoThemeDocument } from "../videoTheme.types";
 

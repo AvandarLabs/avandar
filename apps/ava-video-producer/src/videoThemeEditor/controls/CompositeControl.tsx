@@ -1,9 +1,9 @@
-import { isTokenReference } from "../../videoTheme/themeReferences/themeReferences";
+import { isTokenReference } from "../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import {
   COMPOSITE_TOKEN_FIELDS,
   type CompositeTokenKind,
   type FieldSpec,
-} from "../../videoTheme/tokenCatalog/defineTokens";
+} from "../../videoTheme/tokenCatalog/defineTokensHelpers";
 import { getFieldName } from "../tokenCopy/editorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { EnumValueControl } from "./ChoiceControls";

@@ -1,4 +1,4 @@
-import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import {
   EMPTY_THEME_DRAFT,
   getDocumentPathFromTokenPath,

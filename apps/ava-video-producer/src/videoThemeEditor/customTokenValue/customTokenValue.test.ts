@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { EMPTY_THEME_DRAFT } from "../themeDraft/themeDraft";
 import {
   getCustomScaleFromReference,

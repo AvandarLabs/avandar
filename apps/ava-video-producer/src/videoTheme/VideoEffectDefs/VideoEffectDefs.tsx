@@ -3,7 +3,7 @@ import {
   buildEffectFilterId,
   type EffectPrimitive,
   type VideoEffectFilter,
-} from "../videoEffectFilters/videoEffectFilters";
+} from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
 
 type Props = Readonly<{
   graphicId: string;

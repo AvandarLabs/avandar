@@ -5,13 +5,13 @@ import {
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { DRAFT_THEME_ID } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import { createSnapshotFromThemeRequest } from "../../videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
-import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { createSnapshotFromThemeRequest } from "../../videoTheme/createSnapshotFromThemeRequest";
+import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import {
   CLASSIC_VIDEO_THEME_SNAPSHOT,
   makeResolvedVideoThemeFromSnapshot,
-} from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { setCustomValueInDraft } from "../customTokenValue/customTokenValue";
 import {
   buildThemeIdFromLabel,

@@ -1,8 +1,8 @@
 import { Button } from "@mantine/core";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
-import { isTokenReference } from "../../videoTheme/themeReferences/themeReferences";
-import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
+import { isTokenReference } from "../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
+import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
 import { getCustomScaleFromReference } from "../customTokenValue/customTokenValue";
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";

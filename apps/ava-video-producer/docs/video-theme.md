@@ -95,4 +95,4 @@ An edit made while a save runs is kept on top of the saved theme. A successful s
 ## Checks
 
 - `pnpm theme:parity capture` records reference frames in `out/theme-parity/`, and `pnpm theme:parity compare` renders current frames and fails on any pixel difference outside the allowed regions. Both take `--theme <id>`. Capture before a renderer change, then compare, to prove `classic` still renders today's pixels.
-- `src/videoTheme/textContrast/textContrast.test.ts` holds every `classic` and `avandar` text role to AA on dark and light grounds.
+- `src/videoTheme/textContrastHelpers/textContrastHelpers.test.ts` holds every `classic` and `avandar` text role to AA on dark and light grounds.

@@ -1,4 +1,4 @@
-import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
+import { VideoThemeError } from "../VideoThemeError";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,

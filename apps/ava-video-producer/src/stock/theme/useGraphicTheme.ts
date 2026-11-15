@@ -10,12 +10,12 @@ import { SEMANTIC_TOKENS } from "../../videoTheme/tokenCatalog/semanticTokens";
 import {
   createTokenUsageProxy,
   VideoTokenUsageContext,
-} from "../../videoTheme/tokenUsage/tokenUsage";
-import { useVideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
+} from "../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
+import { useVideoThemeContext } from "../../videoTheme/useVideoTheme";
 import {
   buildEffectFilterId,
   listVideoEffectFilters,
-} from "../../videoTheme/videoEffectFilters/videoEffectFilters";
+} from "../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
 import type {
   ResolvedVideoComponents,
   ResolvedVideoSemantic,

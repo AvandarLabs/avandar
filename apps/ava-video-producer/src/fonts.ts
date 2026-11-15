@@ -7,7 +7,7 @@ import {
 import {
   listBundledVideoFonts,
   VIDEO_FONT_REGISTRY,
-} from "./videoTheme/videoFontRegistry/videoFontRegistry";
+} from "./videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 
 // Register every bundled face once per document and hold rendering until each
 // one is ready, so previews and exports never depend on a font CDN.

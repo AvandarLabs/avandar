@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchema/videoThemeSchema";
+import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import { isThemeDraftEmpty, type ThemeDraft } from "../themeDraft/themeDraft";
 
 const DRAFT_KEY_PREFIX = "video-theme-draft:v1:";

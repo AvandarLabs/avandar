@@ -3,7 +3,7 @@ import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
-} from "../../videoTheme/videoFontRegistry/videoFontRegistry";
+} from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import {
   useRowHasIssue,
   useRowIssueAriaProps,

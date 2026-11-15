@@ -1,11 +1,8 @@
 import { ramp } from "../motion";
 import { getMotionProgress } from "../motion-components/motionSettings";
 import { SharedElement } from "../motion-components/SharedElement";
-import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
-import {
-  useVideoProps,
-  useVideoTokens,
-} from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";

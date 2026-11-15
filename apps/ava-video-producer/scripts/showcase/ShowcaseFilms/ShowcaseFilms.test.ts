@@ -6,7 +6,7 @@ import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { DECISION_FORK_DENSE_INPUT } from "../../../src/stock/presets/DecisionFork/DecisionFork.fixtures";
-import { makeResolvedVideoThemeFromSnapshot } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { makeResolvedVideoThemeFromSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 
 test("unknown IDs and unsafe render options cannot become render inputs", async () => {

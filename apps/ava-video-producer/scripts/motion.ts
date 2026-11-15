@@ -11,7 +11,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../src/stock/catalog";
-import { makeResolvedVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { makeResolvedVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { run, ffmpeg, probe } from "./lib/mediaHelpers";
 import { ensureDirectory, fileHash } from "./lib/planHelpers";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";

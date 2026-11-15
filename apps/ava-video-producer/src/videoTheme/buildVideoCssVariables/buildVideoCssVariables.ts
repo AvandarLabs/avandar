@@ -4,12 +4,12 @@ import {
   elevationToDropShadowFilter,
   fillToCss,
   textShadowToCss,
-} from "../cssValues/cssValues";
-import { getResolvedTokenValue } from "../getResolvedTokenValue/getResolvedTokenValue";
+} from "../cssValueHelpers/cssValueHelpers";
+import { getResolvedTokenValue } from "../getResolvedTokenValue";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../tokenCatalog/tokenCatalog";
+} from "../tokenCatalog/tokenCatalogHelpers";
 import type {
   GlowValue,
   ResolvedBox,

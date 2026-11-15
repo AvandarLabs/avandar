@@ -1,4 +1,4 @@
-import { scale } from "./defineTokens";
+import { scale } from "./defineTokensHelpers";
 
 /**
  * Atomic scales under `other.video.atomic`: the only literal values in a

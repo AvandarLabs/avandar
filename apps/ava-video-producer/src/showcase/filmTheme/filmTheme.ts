@@ -1,15 +1,15 @@
 import { z, ZodError } from "zod";
-import { VideoThemeError } from "../../videoTheme/VideoThemeError/VideoThemeError";
+import { VideoThemeError } from "../../videoTheme/VideoThemeError";
 import {
   VIDEO_THEME_MAX_BYTES,
   VIDEO_THEME_SLUG_PATTERN,
   videoThemeDocumentSchema,
   videoThemePatchSchema,
-} from "../../videoTheme/videoThemeSchema/videoThemeSchema";
+} from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
-} from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { VideoThemeIssue } from "../../videoTheme/videoTheme.types";
 
 const MAX_ISSUES = 100;

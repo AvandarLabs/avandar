@@ -9,7 +9,7 @@ import { isFilmTokensUsedMessage } from "../../../showcase/filmTheme/filmTheme";
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
-} from "../../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import {
   getCurrentAcknowledgement,
   getThemeExportState,

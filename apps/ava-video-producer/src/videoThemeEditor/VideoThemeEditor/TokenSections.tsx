@@ -1,6 +1,6 @@
 import { Accordion, Button } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
+import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getDefaultLiteralFromKind } from "../controls/defaultLiterals";
 import { getGroupName } from "../tokenCopy/editorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";

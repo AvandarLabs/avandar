@@ -5,7 +5,7 @@ import type {
 import type { ResolvedStockRequest } from "../stock/contracts/stockRequestSchema/stockRequestSchema";
 import type { Storyboard } from "../storyboard/schema/schema";
 import type { VideoThemePatch } from "../videoTheme/videoTheme.types";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 /** Data for Film. */
 type FilmResult = {
   kind: "storyboard" | "title-study" | "motion-lab";

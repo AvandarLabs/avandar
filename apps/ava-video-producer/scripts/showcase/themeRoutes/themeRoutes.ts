@@ -1,4 +1,4 @@
-import { createVideoThemeJsonSchema } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+import { createVideoThemeJsonSchema } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   THEME_FILE_MAX_BYTES,
   ThemeStoreError,

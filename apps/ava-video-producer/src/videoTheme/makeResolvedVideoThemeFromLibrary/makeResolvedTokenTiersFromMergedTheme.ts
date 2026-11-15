@@ -1,10 +1,10 @@
 import { luminance, type MantineTheme } from "@mantine/core";
-import { getValueAtPath } from "../getResolvedTokenValue/getResolvedTokenValue";
+import { getValueAtPath } from "../getValueAtPath";
 import { normalizeTokenValue } from "../normalizeTokenValue/normalizeTokenValue";
 import {
   getTargetFromTokenReference,
   isTokenReference,
-} from "../themeReferences/themeReferences";
+} from "../themeReferenceHelpers/themeReferenceHelpers";
 import {
   COMPOSITE_TOKEN_FIELDS,
   isCompositeTokenKind,
@@ -12,12 +12,12 @@ import {
   isTokenScale,
   type CompositeTokenKind,
   type FieldSpec,
-} from "../tokenCatalog/defineTokens";
-import { VIDEO_TOKEN_CATALOG } from "../tokenCatalog/tokenCatalog";
+} from "../tokenCatalog/defineTokensHelpers";
+import { VIDEO_TOKEN_CATALOG } from "../tokenCatalog/tokenCatalogHelpers";
 import {
   VIDEO_FONT_REGISTRY,
   type VideoFontId,
-} from "../videoFontRegistry/videoFontRegistry";
+} from "../videoFontRegistry/videoFontRegistryHelpers";
 import type {
   CatalogNode,
   GlowValue,

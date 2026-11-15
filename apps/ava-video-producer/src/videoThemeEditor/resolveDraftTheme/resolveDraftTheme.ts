@@ -1,7 +1,7 @@
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { mergeVideoThemeLayers } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { VideoThemeError } from "../../videoTheme/VideoThemeError/VideoThemeError";
-import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchema/videoThemeSchema";
+import { VideoThemeError } from "../../videoTheme/VideoThemeError";
+import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   createVideoThemeSourceFromDraft,
   getTokenPathFromDocumentPath,

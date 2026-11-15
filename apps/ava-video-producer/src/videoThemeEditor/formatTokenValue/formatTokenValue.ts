@@ -3,7 +3,7 @@ import {
   getVideoFontIdFromStack,
   VIDEO_FONT_REGISTRY,
   type VideoFontId,
-} from "../../videoTheme/videoFontRegistry/videoFontRegistry";
+} from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import type {
   EasingValue,
   GlowValue,

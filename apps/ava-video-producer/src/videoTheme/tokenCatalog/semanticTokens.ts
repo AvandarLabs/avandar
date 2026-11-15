@@ -1,4 +1,4 @@
-import { token } from "./defineTokens";
+import { token } from "./defineTokensHelpers";
 
 const CAMERA_PRESET_OPTIONS = [
   "authored",

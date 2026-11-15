@@ -2,7 +2,7 @@ import {
   buildColorWithAlpha,
   fillToCss,
   textShadowToCss,
-} from "../../videoTheme/cssValues/cssValues";
+} from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { ContrastBadge } from "./ContrastBadge";
 import css from "./controls.module.css";

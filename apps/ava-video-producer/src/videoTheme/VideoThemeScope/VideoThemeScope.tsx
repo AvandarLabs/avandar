@@ -1,6 +1,6 @@
 import { useMemo, type ReactNode } from "react";
 import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
-import { useVideoThemeContext } from "../useVideoTheme/useVideoTheme";
+import { useVideoThemeContext } from "../useVideoTheme";
 import { VideoThemeProvider } from "../VideoThemeProvider/VideoThemeProvider";
 import type {
   VideoThemePatch,

@@ -17,7 +17,7 @@ import {
 import {
   VIDEO_THEME_SLUG_PATTERN,
   videoThemePatchSchema,
-} from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+} from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import {
   buildStockContracts,
   type StockContractGeneration,

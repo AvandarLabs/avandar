@@ -4,7 +4,7 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { getResolvedTokenValue } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
+import { getResolvedTokenValue } from "../../videoTheme/getResolvedTokenValue";
 import { resolveDraftTheme } from "../resolveDraftTheme/resolveDraftTheme";
 import {
   EMPTY_THEME_DRAFT,

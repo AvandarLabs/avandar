@@ -20,7 +20,7 @@ import {
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
-} from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+} from "../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { buildProduct } from "./build-avandar.mjs";
 import {
   ffmpeg,

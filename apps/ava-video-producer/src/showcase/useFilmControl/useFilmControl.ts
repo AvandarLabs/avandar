@@ -10,7 +10,7 @@ import {
   parseFilmControlMessage,
   type FilmControl,
 } from "../filmTheme/filmTheme";
-import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { PlayerRef } from "@remotion/player";
 
 const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];

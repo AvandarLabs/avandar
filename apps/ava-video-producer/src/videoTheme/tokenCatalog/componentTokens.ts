@@ -1,4 +1,4 @@
-import { token } from "./defineTokens";
+import { token } from "./defineTokensHelpers";
 import type { TokenSurface } from "../videoTheme.types";
 
 const CAPS = ["butt", "round", "square"] as const;

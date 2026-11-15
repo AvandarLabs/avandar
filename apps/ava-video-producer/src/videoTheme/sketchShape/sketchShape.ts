@@ -1,5 +1,5 @@
 import rough from "roughjs";
-import { buildCanonicalJsonFromValue } from "../hashVideoTheme/hashVideoTheme";
+import { buildCanonicalJsonFromValue } from "../hashVideoThemeHelpers/hashVideoThemeHelpers";
 import type { ResolvedSketchProfile } from "../videoTheme.types";
 
 /** A shape to sketch, in the SVG coordinates of the graphic that draws it. */

@@ -9,11 +9,11 @@ import {
 import { createContinuityPlanFromVideoThemeSnapshot } from "../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer";
 import { durationInFrames } from "../storyboard/schema/timeline";
-import { VideoTokenUsageContext } from "../videoTheme/tokenUsage/tokenUsage";
+import { VideoTokenUsageContext } from "../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
 import { FilmComposition } from "./FilmComposition";
 import { useFilmControl } from "./useFilmControl/useFilmControl";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
 import "../theme.css";
 import "./player.css";

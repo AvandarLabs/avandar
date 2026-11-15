@@ -8,12 +8,12 @@ import {
 } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
-import { VideoThemeError } from "../../../src/videoTheme/VideoThemeError/VideoThemeError";
+import { VideoThemeError } from "../../../src/videoTheme/VideoThemeError";
 import {
   parseVideoThemeDocument,
   VIDEO_THEME_MAX_BYTES,
   VIDEO_THEME_SLUG_PATTERN,
-} from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+} from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import type {
   VideoThemeDocument,
   VideoThemeIssue,

@@ -9,7 +9,7 @@ import {
   type Storyboard,
 } from "./storyboard/schema/schema";
 import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
-import type { VideoThemeSnapshot } from "./videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import type { VideoThemeSnapshot } from "./videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 
 const defaults = storyboardSchema.parse(importPlan);
 function ProductFilm({

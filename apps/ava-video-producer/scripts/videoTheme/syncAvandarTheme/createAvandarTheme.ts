@@ -2,7 +2,7 @@ import { parseCssPixels } from "../../../src/videoTheme/normalizeTokenValue/norm
 import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
-} from "../../../src/videoTheme/videoFontRegistry/videoFontRegistry";
+} from "../../../src/videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import type {
   ShadowValue,
   VideoThemeDocument,

@@ -2,7 +2,7 @@ import { MantineThemeProvider } from "@mantine/core";
 import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { buildVideoCssVariables } from "../buildVideoCssVariables/buildVideoCssVariables";
 import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { VideoThemeContext } from "../useVideoTheme/useVideoTheme";
+import { VideoThemeContext } from "../useVideoTheme";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
 type Props = Readonly<{

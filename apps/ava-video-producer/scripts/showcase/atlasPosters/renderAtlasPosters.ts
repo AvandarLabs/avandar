@@ -9,7 +9,7 @@ import {
   CONTINUITY_CATALOG,
   isSceneEntry,
 } from "../../../src/continuity/continuityCatalog";
-import { VIDEO_THEME_SLUG_PATTERN } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+import { VIDEO_THEME_SLUG_PATTERN } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
 import { requireLicense } from "../../require-license.mjs";
 import {
   bundleShowcaseFilms,

@@ -5,7 +5,7 @@ import {
   SegmentedControl,
   TextInput,
 } from "@mantine/core";
-import { elevationToBoxShadow } from "../../videoTheme/cssValues/cssValues";
+import { elevationToBoxShadow } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import {
   useRowHasIssue,
   useRowIssueAriaProps,
