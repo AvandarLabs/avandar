@@ -1,8 +1,3 @@
-.compositionViewer {
-  min-width: 0;
-  padding: 16px;
-}
-
 .compositionViewerSummary {
   display: grid;
   gap: 24px;
@@ -49,21 +44,22 @@
 /*
  * The viewer fills the Atlas preview modal: the player, its summary and
  * reuse guidance scroll in the left column, and the settings keep the right.
+ * The rows are content height: auto rows would shrink to fit the modal and
+ * overlap.
  */
 .compositionViewer {
   align-content: start;
   column-gap: 24px;
   display: grid;
-  grid-template-areas:
-    "stage settings"
-    "details settings"
-    "guidance settings";
-  grid-template-columns: minmax(0, 1fr) 380px;
-
-  /* Content height: auto rows would shrink to fit the modal and overlap. */
-  grid-template-rows: repeat(3, max-content);
+  grid-template:
+    "stage settings" max-content
+    "details settings" max-content
+    "guidance settings" max-content
+    / minmax(0, 1fr) 380px;
   height: 100%;
+  min-width: 0;
   overflow-y: auto;
+  padding: 16px;
 }
 
 .details {
@@ -91,13 +87,12 @@
 
 @media (width <= 800px) {
   .compositionViewer {
-    grid-template-areas:
-      "stage"
-      "settings"
-      "details"
-      "guidance";
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(4, max-content);
+    grid-template:
+      "stage" max-content
+      "settings" max-content
+      "details" max-content
+      "guidance" max-content
+      / minmax(0, 1fr);
     padding: 10px;
   }
 
