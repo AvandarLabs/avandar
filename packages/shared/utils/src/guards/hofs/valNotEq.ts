@@ -3,7 +3,7 @@
  * @param value - The value to check.
  * @returns A function that checks if a value is not equal to a given value.
  */
-export function valNotEq<V>(value: V): <T>(v: T) => v is Exclude<T, V> {
+export function valNotEq<const V>(value: V): <T>(v: T) => v is Exclude<T, V> {
   return <T>(v: T): v is Exclude<T, V> => {
     return v !== (value as unknown as T);
   };

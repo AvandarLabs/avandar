@@ -1,0 +1,14 @@
+{
+  "preset": "word-reveal",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "21b2f6295ef52b5db8a3149a0b0e9aa6ad5860fb75cac8875cddb5fc8a528bac",
+  "posterSha256": "085476ce9a9512e865c42de26f3d0106575122da2ced97e0f11e54a88a18c9e4",
+  "generatedAt": "2026-10-14T23:56:20.086Z"
+}

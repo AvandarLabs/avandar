@@ -1,0 +1,89 @@
+import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
+import { hydratePieFromQuery } from "$/models/vizs/hydrations/fromQuery/hydratePieFromQuery/hydratePieFromQuery.ts";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
+import type { AvaPieChartVizConfig } from "$/models/vizs/AvaPieChartVizConfig/AvaPieChartVizConfig.types.ts";
+
+function makePieConfig(
+  overrides: Partial<AvaPieChartVizConfig> = {},
+): AvaPieChartVizConfig {
+  return {
+    vizType: "pie",
+    nameKey: undefined,
+    valueKey: undefined,
+    isDonut: false,
+    withLabels: false,
+    labelsType: "value",
+    ...overrides,
+  };
+}
+
+function makeCol(name: string, dataType: DatasetColumn.T["dataType"]) {
+  return {
+    ...QueryColumn.makeFromDatasetColumn(
+      Model.make("DatasetColumn", {
+        id: name as DatasetColumn.T["id"],
+        name,
+        dataType,
+        columnIdx: 0,
+      }) as DatasetColumn.T,
+    ),
+    id: name as QueryColumn.Id,
+  };
+}
+
+function makeQuery(
+  columns: ReadonlyArray<ReturnType<typeof makeCol>>,
+): ReturnType<typeof StructuredQuery.makeEmpty> {
+  return {
+    ...StructuredQuery.makeEmpty(),
+    queryColumns: columns,
+  };
+}
+
+describe("hydratePieFromQuery", () => {
+  it("picks first non-numeric as nameKey and first numeric as valueKey", () => {
+    const out = hydratePieFromQuery(
+      makePieConfig(),
+      makeQuery([makeCol("category", "varchar"), makeCol("amount", "double")]),
+    );
+    expect(out.nameKey).toBe("category");
+    expect(out.valueKey).toBe("amount");
+  });
+
+  it("falls back to a second numeric nameKey when no non-numeric column", () => {
+    const out = hydratePieFromQuery(
+      makePieConfig(),
+      makeQuery([makeCol("x", "bigint"), makeCol("y", "double")]),
+    );
+    expect(out.valueKey).toBe("x");
+    expect(out.nameKey).toBe("y");
+  });
+
+  it("retains nameKey when the selected ID is missing", () => {
+    const out = hydratePieFromQuery(
+      makePieConfig({ nameKey: "stale_col" as QueryColumn.Id }),
+      makeQuery([makeCol("category", "varchar"), makeCol("total", "double")]),
+    );
+    expect(out.nameKey).toBe("stale_col");
+  });
+
+  it("does not overwrite already valid keys", () => {
+    const out = hydratePieFromQuery(
+      makePieConfig({
+        nameKey: "category" as QueryColumn.Id,
+        valueKey: "total" as QueryColumn.Id,
+      }),
+      makeQuery([makeCol("category", "varchar"), makeCol("total", "double")]),
+    );
+    expect(out.nameKey).toBe("category");
+    expect(out.valueKey).toBe("total");
+  });
+
+  it("returns unchanged when the query has no columns", () => {
+    const cfg = makePieConfig();
+    expect(hydratePieFromQuery(cfg, makeQuery([]))).toEqual(cfg);
+  });
+});

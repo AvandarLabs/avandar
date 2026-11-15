@@ -1,0 +1,357 @@
+{
+  "version": 1,
+  "id": "product-to-qetl",
+  "title": "A source is the beginning",
+  "description": "The actual import sequence opens into an explanation of integration and execution placement.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1626,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "A source is the beginning",
+        "category": "product-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#f0ba83",
+        "beats": [
+          {
+            "id": "import",
+            "title": "Bring in a source.",
+            "subtitle": "Actual import components, fictional Harborfield records.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "import",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 659,
+                "leadIn": 30
+              },
+              "annotations": [
+                {
+                  "at": 320,
+                  "until": 405,
+                  "kind": "underline",
+                  "target": {
+                    "x": 517,
+                    "y": 376.48,
+                    "width": 432,
+                    "height": 36
+                  },
+                  "seed": 37
+                }
+              ]
+            },
+            "duration": 720,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "sources",
+            "title": "One source becomes part of a question.",
+            "subtitle": "Connected-source integration is the architectural explanation.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "source-merge",
+                "schemaVersion": 1,
+                "input": {
+                  "sources": [
+                    {
+                      "name": "Cases",
+                      "kind": "CSV",
+                      "color": "#82c8f2"
+                    },
+                    {
+                      "name": "Visits",
+                      "kind": "API",
+                      "color": "#9fefca"
+                    },
+                    {
+                      "name": "Facilities",
+                      "kind": "DB",
+                      "color": "#f0ba83"
+                    }
+                  ],
+                  "destination": {
+                    "label": "Query inputs",
+                    "detail": "Requested subsets"
+                  },
+                  "showPackets": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 290,
+                  "y": 275,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 290,
+                  "y": 275,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 650,
+                  "y": 325,
+                  "zoom": 1.7,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 650,
+                  "y": 325,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            }
+          },
+          {
+            "id": "placement",
+            "title": "Choose where the work belongs.",
+            "subtitle": "Placement depends on source support and workload.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "decision-fork",
+                "schemaVersion": 1,
+                "input": {
+                  "prompt": "Where should this request run?",
+                  "branches": [
+                    {
+                      "id": "local",
+                      "condition": "Data available locally",
+                      "outcome": "Device"
+                    },
+                    {
+                      "id": "remote",
+                      "condition": "Source can compute",
+                      "outcome": "Source"
+                    },
+                    {
+                      "id": "cloud",
+                      "condition": "Remote capacity needed",
+                      "outcome": "Cloud"
+                    }
+                  ],
+                  "selectedBranchId": "local",
+                  "scenarioLabel": "Illustrative placement choice",
+                  "selectionLabel": "Local execution in this example",
+                  "showUnchosenOutcomes": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 480,
+                  "y": 210,
+                  "zoom": 1.65,
+                  "ease": "push"
+                },
+                {
+                  "at": 163,
+                  "x": 480,
+                  "y": 210,
+                  "zoom": 1.65,
+                  "ease": "glide"
+                },
+                {
+                  "at": 177,
+                  "x": 660,
+                  "y": 360,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 288,
+                  "x": 660,
+                  "y": 360,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 316,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 330,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          },
+          {
+            "id": "result",
+            "title": "The source serves the question.",
+            "subtitle": "Import is demonstrated; planning is illustrated.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Connect the needed inputs.",
+                "Place the computation deliberately."
+              ],
+              "emphasis": "Keep the result close to the work."
+            },
+            "duration": 310,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "import-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 178,
+      "text": "Data begins in sources that need names and context.",
+      "beatId": "import"
+    },
+    {
+      "id": "import-1",
+      "shotId": "explanation",
+      "startFrame": 183,
+      "endFrame": 343,
+      "text": "An import preview makes the source structure visible.",
+      "beatId": "import"
+    },
+    {
+      "id": "import-2",
+      "shotId": "explanation",
+      "startFrame": 348,
+      "endFrame": 508,
+      "text": "A name and description identify what this dataset represents.",
+      "beatId": "import"
+    },
+    {
+      "id": "import-3",
+      "shotId": "explanation",
+      "startFrame": 513,
+      "endFrame": 673,
+      "text": "This example prepares a source for later questions.",
+      "beatId": "import"
+    },
+    {
+      "id": "sources-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "A useful question can reach beyond a single file.",
+      "beatId": "sources"
+    },
+    {
+      "id": "sources-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "QETL can integrate relevant information across sources.",
+      "beatId": "sources"
+    },
+    {
+      "id": "placement-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 164,
+      "text": "The query plan also needs an execution location.",
+      "beatId": "placement"
+    },
+    {
+      "id": "placement-1",
+      "shotId": "explanation",
+      "startFrame": 169,
+      "endFrame": 291,
+      "text": "Availability and supported operations shape that choice.",
+      "beatId": "placement"
+    },
+    {
+      "id": "result-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "Integration follows the question and the data it requires.",
+      "beatId": "result"
+    },
+    {
+      "id": "result-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 289,
+      "text": "The aim is to avoid unnecessary transfer and repeated work.",
+      "beatId": "result"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

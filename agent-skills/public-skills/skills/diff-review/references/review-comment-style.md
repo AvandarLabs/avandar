@@ -9,8 +9,18 @@ answering a reviewer's comment, follow
 [`reply-style.md`](reply-style.md) instead. The two voices are different: a
 reviewer opens a topic, an engineer closes one.
 
+Explainer threads on your own diff are not findings: they have no ask and no
+verdict. Write them per
+[Explainer threads](../contracts/transcript.md#explainer-threads), and of this
+file apply only the [Non-negotiables](#non-negotiables).
+
 A personal override may exist at `~/.diff-review/review-comment-style.md`.
 When it does, read it and let it win on any conflict with this file.
+
+Every comment also follows [`contracts/prose.md`](../contracts/prose.md):
+ground the vocabulary a reader new to this code would not know, and cut the
+tells in [Factual prose](../contracts/prose.md#factual-prose). This file sets
+the voice and the length; that one sets what each sentence must do.
 
 ## Non-negotiables
 

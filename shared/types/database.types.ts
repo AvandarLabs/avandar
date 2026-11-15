@@ -959,6 +959,7 @@ export type Database = {
           created_at: string
           external_id: string
           id: string
+          missing_from_source_at: string | null
           name: string
           status: string
           updated_at: string
@@ -970,8 +971,9 @@ export type Database = {
           created_at?: string
           external_id: string
           id?: string
+          missing_from_source_at?: string | null
           name: string
-          status: string
+          status?: string
           updated_at?: string
           workspace_id: string
         }
@@ -981,6 +983,7 @@ export type Database = {
           created_at?: string
           external_id?: string
           id?: string
+          missing_from_source_at?: string | null
           name?: string
           status?: string
           updated_at?: string

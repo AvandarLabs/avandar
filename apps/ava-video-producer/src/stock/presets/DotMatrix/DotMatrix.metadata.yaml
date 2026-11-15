@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.dot-matrix.name
+  message: Cohort matrix
+description:
+  id: motionAtlas.dot-matrix.description
+  message: Individual dots build a compact grouped population.
+category:
+  id: motionAtlas.dot-matrix.category
+  message: Charts
+tags:
+  - id: motionAtlas.dot-matrix.tags.0
+    message: dots
+  - id: motionAtlas.dot-matrix.tags.1
+    message: cohort
+  - id: motionAtlas.dot-matrix.tags.2
+    message: population
+  - id: motionAtlas.dot-matrix.tags.3
+    message: matrix
+useWhen:
+  id: motionAtlas.dot-matrix.useWhen
+  message: Explain a supplied count or proportion with discrete units and a clear denominator.
+prompt:
+  id: motionAtlas.dot-matrix.prompt
+  message:
+    Use Motion Atlas "Cohort matrix" (dot-matrix) as a conceptual graphic. Explain
+    a supplied count or proportion with discrete units and a clear denominator. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.dot-matrix.creativeDirection
+  message: Individual dots build a compact grouped population.
+goodFor:
+  - id: motionAtlas.dot-matrix.goodFor.0
+    message: Explain a supplied count or proportion with discrete units and a clear denominator.
+intent:
+  id: motionAtlas.dot-matrix.intent
+  message: Explain a supplied count or proportion with discrete units and a clear denominator.
+domains:
+  - id: motionAtlas.dot-matrix.domains.0
+    message: Charts
+aliases:
+  - id: motionAtlas.dot-matrix.aliases.0
+    message: dots
+  - id: motionAtlas.dot-matrix.aliases.1
+    message: cohort
+  - id: motionAtlas.dot-matrix.aliases.2
+    message: population
+  - id: motionAtlas.dot-matrix.aliases.3
+    message: matrix
+notFor:
+  - id: motionAtlas.dot-matrix.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.dot-matrix.distinction
+  message: Individual dots build a compact grouped population.

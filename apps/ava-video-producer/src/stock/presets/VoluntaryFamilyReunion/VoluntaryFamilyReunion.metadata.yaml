@@ -1,0 +1,119 @@
+name:
+  id: motionAtlas.voluntary-family-reunion.name
+  message: Meet by mutual agreement
+description:
+  id: motionAtlas.voluntary-family-reunion.description
+  message:
+    Two fictional family groups independently accept an arranged meeting and travel
+    toward a shared meeting place. The scene centers their decisions and reunion rather
+    than surveillance or automatic identity matching.
+category:
+  id: motionAtlas.voluntary-family-reunion.category
+  message: Human connection and movement
+useWhen:
+  id: motionAtlas.voluntary-family-reunion.useWhen
+  message:
+    Show a reunion as a mutually chosen meeting between people, not a system
+    matching records.
+intent:
+  id: motionAtlas.voluntary-family-reunion.intent
+  message:
+    Show a reunion as a mutually chosen meeting between people, not a system
+    matching records.
+creativeDirection:
+  id: motionAtlas.voluntary-family-reunion.creativeDirection
+  message:
+    Over six seconds, reveal the two groups on opposite sides of a schematic local
+    setting, each holding their own invitation. Each group actively marks its invitation
+    accepted; only after both marks appear do the groups begin walking toward the chosen
+    meeting place. They arrive, turn toward each other, and make the configured greeting
+    gesture without merging their silhouettes. Hold the gathering and the two accepted
+    invitations, then fade with the standard opaque envelope.
+distinction:
+  id: motionAtlas.voluntary-family-reunion.distinction
+  message:
+    Two independent acts of agreement precede self-directed physical movement and a
+    human greeting. Unlike source-merge, the people remain individuals; unlike
+    schema-mapping, there is no inferred identity match.
+prompt:
+  id: motionAtlas.voluntary-family-reunion.prompt
+  message:
+    Meet by mutual agreement. Show a reunion as a mutually chosen meeting between
+    people, not a system matching records.
+tags:
+  - id: motionAtlas.voluntary-family-reunion.tags.0
+    message: family reunification
+  - id: motionAtlas.voluntary-family-reunion.tags.1
+    message: displacement
+  - id: motionAtlas.voluntary-family-reunion.tags.2
+    message: mutual agreement
+  - id: motionAtlas.voluntary-family-reunion.tags.3
+    message: reunion
+  - id: motionAtlas.voluntary-family-reunion.tags.4
+    message: restoring contact
+  - id: motionAtlas.voluntary-family-reunion.tags.5
+    message: meeting point
+  - id: motionAtlas.voluntary-family-reunion.tags.6
+    message: participant agency
+  - id: motionAtlas.voluntary-family-reunion.tags.7
+    message: humanitarian coordination
+goodFor:
+  - id: motionAtlas.voluntary-family-reunion.goodFor.0
+    message: Illustrate an agreed reunion in a fictional displacement story
+  - id: motionAtlas.voluntary-family-reunion.goodFor.1
+    message: Explain why both parties participate in arranging a meeting
+  - id: motionAtlas.voluntary-family-reunion.goodFor.2
+    message: Show restored contact without implying automated identification
+domains:
+  - id: motionAtlas.voluntary-family-reunion.domains.0
+    message: Human connection and movement
+aliases:
+  - id: motionAtlas.voluntary-family-reunion.aliases.0
+    message: family reunification
+  - id: motionAtlas.voluntary-family-reunion.aliases.1
+    message: displacement
+  - id: motionAtlas.voluntary-family-reunion.aliases.2
+    message: mutual agreement
+notFor:
+  - id: motionAtlas.voluntary-family-reunion.notFor.0
+    message:
+      This portrays an already arranged fictional meeting, not tracing operations,
+      identity verification, legal reunification, or safeguarding assessment.
+  - id: motionAtlas.voluntary-family-reunion.notFor.1
+    message:
+      Group membership and silhouette counts come only from the supplied arrays and
+      are illustrative, not statistics about displaced families.
+  - id: motionAtlas.voluntary-family-reunion.notFor.2
+    message:
+      The setting has no geographic scale, real addresses, border crossings, or
+      recommendations for travel.
+  - id: motionAtlas.voluntary-family-reunion.notFor.3
+    message:
+      No photographs, biometric matching, distress imagery, or real personal data are
+      used.
+motionBeats:
+  - startFrame: 12
+    endFrame: 59
+    description:
+      id: motionAtlas.voluntary-family-reunion.motionBeats.0
+      message: Groups independently mark their invitations accepted in sequence.
+  - startFrame: 60
+    endFrame: 107
+    description:
+      id: motionAtlas.voluntary-family-reunion.motionBeats.1
+      message: Only after both acceptances, each distinct person walks toward the meeting.
+  - startFrame: 108
+    endFrame: 130
+    description:
+      id: motionAtlas.voluntary-family-reunion.motionBeats.2
+      message: Turn toward one another and perform the configured greeting.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.voluntary-family-reunion.motionBeats.3
+      message: Hold every separate silhouette and both accepted invitations.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.voluntary-family-reunion.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

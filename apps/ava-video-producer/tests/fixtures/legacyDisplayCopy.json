@@ -1,0 +1,292 @@
+[
+  {
+    "preset": "network-graph",
+    "id": "motionAtlas.network-graph.display.relationshipNetwork",
+    "message": "RELATIONSHIP NETWORK"
+  },
+  {
+    "preset": "network-graph",
+    "id": "motionAtlas.network-graph.display.nodeCount",
+    "message": "{count} NODES"
+  },
+  {
+    "preset": "node-traversal",
+    "id": "motionAtlas.node-traversal.display.directedTraversal",
+    "message": "DIRECTED TRAVERSAL"
+  },
+  {
+    "preset": "node-traversal",
+    "id": "motionAtlas.node-traversal.display.aSelectedPathThroughAConnectedSystem",
+    "message": "A selected path through a connected system"
+  },
+  {
+    "preset": "radial-network",
+    "id": "motionAtlas.radial-network.display.hubSpoke",
+    "message": "HUB & SPOKE"
+  },
+  {
+    "preset": "radial-network",
+    "id": "motionAtlas.radial-network.display.manyEndpointsOneSharedCenter",
+    "message": "Many endpoints. One shared center."
+  },
+  {
+    "preset": "plexus-field",
+    "id": "motionAtlas.plexus-field.display.ambientConnections",
+    "message": "AMBIENT CONNECTIONS"
+  },
+  {
+    "preset": "plexus-field",
+    "id": "motionAtlas.plexus-field.display.particleCount",
+    "message": "{count} PARTICLES"
+  },
+  {
+    "preset": "plexus-field",
+    "id": "motionAtlas.plexus-field.display.deterministicField",
+    "message": "DETERMINISTIC FIELD"
+  },
+  {
+    "preset": "orbital-system",
+    "id": "motionAtlas.orbital-system.display.orbitalSystem",
+    "message": "ORBITAL SYSTEM"
+  },
+  {
+    "preset": "orbital-system",
+    "id": "motionAtlas.orbital-system.display.independentMotionSharedGravity",
+    "message": "Independent motion. Shared gravity."
+  },
+  {
+    "preset": "source-merge",
+    "id": "motionAtlas.source-merge.display.unifyTheInputs",
+    "message": "UNIFY THE INPUTS"
+  },
+  {
+    "preset": "source-merge",
+    "id": "motionAtlas.source-merge.display.merge",
+    "message": "MERGE"
+  },
+  {
+    "preset": "source-merge",
+    "id": "motionAtlas.source-merge.display.conceptualDataFlow",
+    "message": "CONCEPTUAL DATA FLOW"
+  },
+  {
+    "preset": "data-pipeline",
+    "id": "motionAtlas.data-pipeline.display.dataPipeline",
+    "message": "DATA PIPELINE"
+  },
+  {
+    "preset": "data-pipeline",
+    "id": "motionAtlas.data-pipeline.display.input",
+    "message": "INPUT"
+  },
+  {
+    "preset": "data-pipeline",
+    "id": "motionAtlas.data-pipeline.display.output",
+    "message": "OUTPUT"
+  },
+  {
+    "preset": "schema-mapping",
+    "id": "motionAtlas.schema-mapping.display.schemaMapping",
+    "message": "SCHEMA MAPPING"
+  },
+  {
+    "preset": "schema-mapping",
+    "id": "motionAtlas.schema-mapping.display.differentNamesExplicitConnections",
+    "message": "Different names. Explicit connections."
+  },
+  {
+    "preset": "packet-stream",
+    "id": "motionAtlas.packet-stream.display.packetStream",
+    "message": "PACKET STREAM"
+  },
+  {
+    "preset": "packet-stream",
+    "id": "motionAtlas.packet-stream.display.produce",
+    "message": "PRODUCE"
+  },
+  {
+    "preset": "packet-stream",
+    "id": "motionAtlas.packet-stream.display.transport",
+    "message": "TRANSPORT"
+  },
+  {
+    "preset": "packet-stream",
+    "id": "motionAtlas.packet-stream.display.receive",
+    "message": "RECEIVE"
+  },
+  {
+    "preset": "event-bus",
+    "id": "motionAtlas.event-bus.display.producerNumber",
+    "message": "PRODUCER {number}"
+  },
+  {
+    "preset": "event-bus",
+    "id": "motionAtlas.event-bus.display.subscriberNumber",
+    "message": "SUBSCRIBER {number}"
+  },
+  {
+    "preset": "code-focus",
+    "id": "motionAtlas.code-focus.display.codeFocus",
+    "message": "CODE FOCUS"
+  },
+  {
+    "preset": "code-focus",
+    "id": "motionAtlas.code-focus.display.exampleCode",
+    "message": "EXAMPLE CODE"
+  },
+  {
+    "preset": "terminal-type",
+    "id": "motionAtlas.terminal-type.display.terminalType",
+    "message": "TERMINAL TYPE"
+  },
+  {
+    "preset": "scan-lines",
+    "id": "motionAtlas.scan-lines.display.scanningPass",
+    "message": "SCANNING PASS"
+  },
+  {
+    "preset": "scan-lines",
+    "id": "motionAtlas.scan-lines.display.sampleRecords",
+    "message": "SAMPLE RECORDS"
+  },
+  {
+    "preset": "scan-lines",
+    "id": "motionAtlas.scan-lines.display.inspect",
+    "message": "INSPECT"
+  },
+  {
+    "preset": "scan-lines",
+    "id": "motionAtlas.scan-lines.display.verify",
+    "message": "VERIFY"
+  },
+  {
+    "preset": "bar-race",
+    "id": "motionAtlas.bar-race.display.rankingInMotion",
+    "message": "RANKING IN MOTION"
+  },
+  {
+    "preset": "bar-race",
+    "id": "motionAtlas.bar-race.display.fictionalData",
+    "message": "FICTIONAL DATA"
+  },
+  {
+    "preset": "bar-race",
+    "id": "motionAtlas.bar-race.display.illustrativeValuesFixed0100Scale",
+    "message": "Illustrative values · fixed 0–100 scale"
+  },
+  {
+    "preset": "bar-race",
+    "id": "motionAtlas.bar-race.display.periodTransition",
+    "message": "PERIOD 01 → 02"
+  },
+  {
+    "preset": "bar-race",
+    "id": "motionAtlas.bar-race.display.periodFinal",
+    "message": "PERIOD 02"
+  },
+  {
+    "preset": "line-trace",
+    "id": "motionAtlas.line-trace.display.lineTrace",
+    "message": "LINE TRACE"
+  },
+  {
+    "preset": "line-trace",
+    "id": "motionAtlas.line-trace.display.fictionalData",
+    "message": "FICTIONAL DATA"
+  },
+  {
+    "preset": "line-trace",
+    "id": "motionAtlas.line-trace.display.samplePeriods",
+    "message": "SAMPLE PERIODS"
+  },
+  {
+    "preset": "metric-counter",
+    "id": "motionAtlas.metric-counter.display.metricCounter",
+    "message": "METRIC COUNTER"
+  },
+  {
+    "preset": "metric-counter",
+    "id": "motionAtlas.metric-counter.display.fictionalData",
+    "message": "FICTIONAL DATA"
+  },
+  {
+    "preset": "metric-counter",
+    "id": "motionAtlas.metric-counter.display.sampleTotal",
+    "message": "SAMPLE TOTAL"
+  },
+  {
+    "preset": "metric-counter",
+    "id": "motionAtlas.metric-counter.display.aMeasuredArrivalFollowedByAReadingHold",
+    "message": "A measured arrival, followed by a reading hold."
+  },
+  {
+    "preset": "dot-matrix",
+    "id": "motionAtlas.dot-matrix.display.cohortMatrix",
+    "message": "COHORT MATRIX"
+  },
+  {
+    "preset": "dot-matrix",
+    "id": "motionAtlas.dot-matrix.display.fictionalData",
+    "message": "FICTIONAL DATA"
+  },
+  {
+    "preset": "dot-matrix",
+    "id": "motionAtlas.dot-matrix.display.cohortTotal",
+    "message": "of {count}"
+  },
+  {
+    "preset": "dot-matrix",
+    "id": "motionAtlas.dot-matrix.display.illustrativeCohort",
+    "message": "ILLUSTRATIVE COHORT · {count} EXAMPLES"
+  },
+  {
+    "preset": "stagger-cards",
+    "id": "motionAtlas.stagger-cards.display.staggeredAssembly",
+    "message": "STAGGERED ASSEMBLY"
+  },
+  {
+    "preset": "stagger-cards",
+    "id": "motionAtlas.stagger-cards.display.conceptualCards",
+    "message": "CONCEPTUAL CARDS"
+  },
+  {
+    "preset": "stagger-cards",
+    "id": "motionAtlas.stagger-cards.display.siblingsArriveInSequence",
+    "message": "SIBLINGS ARRIVE IN SEQUENCE"
+  },
+  {
+    "preset": "word-reveal",
+    "id": "motionAtlas.word-reveal.display.maskedWordReveal",
+    "message": "MASKED WORD REVEAL"
+  },
+  {
+    "preset": "word-reveal",
+    "id": "motionAtlas.word-reveal.display.kineticTypographyOneWordAtATime",
+    "message": "Kinetic typography, one word at a time."
+  },
+  {
+    "preset": "word-reveal",
+    "id": "motionAtlas.word-reveal.display.translationMaskFixedTypeSize",
+    "message": "TRANSLATION + MASK · FIXED TYPE SIZE"
+  },
+  {
+    "preset": "status-cycle",
+    "id": "motionAtlas.status-cycle.display.statusCycle",
+    "message": "STATUS CYCLE"
+  },
+  {
+    "preset": "status-cycle",
+    "id": "motionAtlas.status-cycle.display.exampleState",
+    "message": "EXAMPLE STATE"
+  },
+  {
+    "preset": "status-cycle",
+    "id": "motionAtlas.status-cycle.display.runStatus",
+    "message": "RUN STATUS"
+  },
+  {
+    "preset": "status-cycle",
+    "id": "motionAtlas.status-cycle.display.sampleTask",
+    "message": "SAMPLE TASK"
+  }
+]

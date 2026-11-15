@@ -1,0 +1,14 @@
+{
+  "preset": "code-focus",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "2caafe7f8e6e0e1757a519dda814e05ecbdc8bacebdf2f3cb7387ac11f4a6e3d",
+  "posterSha256": "9bdff81b2ef2eee21406feb33c3aa9b280b7c7d5df05c2b16992bed29534b78b",
+  "generatedAt": "2026-10-14T23:55:26.939Z"
+}

@@ -1,0 +1,78 @@
+.vocabularyGuide {
+  border-top: 1px solid #c8cec4;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.vocabularyGuide h3 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 18px;
+}
+
+.vocabularyGuide h4 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+
+.vocabularyGuide p {
+  color: #4b5b52;
+  line-height: 1.5;
+}
+
+.vocabularyGuideAdvice {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+}
+
+.vocabularyGuideAdvice dt {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.vocabularyGuideAdvice dd {
+  color: #4b5b52;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.vocabularyGuideControls {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+}
+
+.vocabularyGuideControls li {
+  border-bottom: 1px solid #d5dad1;
+  padding: 14px 0;
+}
+
+.vocabularyGuideControls strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.vocabularyGuideControls code {
+  color: #246650;
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.vocabularyGuideControls p {
+  margin: 8px 0 0;
+}
+
+.vocabularyGuideSource {
+  margin-top: 20px;
+}
+
+@media (width <= 700px) {
+  .vocabularyGuideAdvice {
+    gap: 20px;
+    grid-template-columns: 1fr;
+  }
+}

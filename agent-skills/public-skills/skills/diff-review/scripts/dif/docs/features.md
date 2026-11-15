@@ -70,7 +70,8 @@ right **Claude/Codex** pane.
     `dif`'s own activity lines (see below). Read-only; scroll with the mouse
     wheel, arrows/PageUp/PageDown, `Alt+U`/`Alt+D` for a half-page, or
     `Alt+K`/`Alt+J` for one line. The `Alt` bindings also scroll while the
-    Claude or Codex pane is focused.
+    Claude or Codex pane is focused. Drag to select text in any pane and it is
+    copied on release (see [Mouse](#mouse)).
   - **Test plan view** (`Test plan`): the review's manual test plan, rendered
     from markdown. The `diff-review` skill writes it as a separate artifact from
     the diff guide, and `dif` refreshes it in place.
@@ -92,6 +93,20 @@ right **Claude/Codex** pane.
 The diff itself is reviewed in the **browser** difit opens; the log view is the
 server console, not the diff.
 
+### Mouse
+
+The wheel scrolls whichever pane is under the pointer, and a click focuses it.
+Dragging selects text in a pane the way tmux does: the selection is highlighted,
+releasing the button copies it to the clipboard, and the statusline briefly
+shows `Copied N characters`. A double-click copies the word under the pointer
+(a whole path or URL), and a triple-click copies its line, clipped to the pane
+so it never picks up the pane beside it. It works in the log view, the Claude or Codex
+pane, and the markdown views. Dragging past a terminal pane's top or bottom
+edge scrolls it, so a selection can be longer than the pane. iTerm2's ⌘-click
+on links still works. Hold Option (iTerm2) or Fn (Terminal) to use the
+terminal's own selection instead. Details are in
+[keybindings.md](keybindings.md#mouse).
+
 ### Activity log in the log view
 
 `dif` writes its own status lines into the log view so it doubles as an activity
@@ -99,15 +114,15 @@ log:
 
 - **`💬 Added response to comment on <file>:Lx`** (cyan) each time the agent posts a
   reply back to difit.
-- **A restart-needed warning** (orange) when the code changes since launch. The
-  wording names the likely author: **`⚠️  Claude made code changes - restart
-  difit (Ctrl+R) 🔁`** when the LLM likely just edited (it was handed a comment
+- **A refresh-needed warning** (orange) when the code changes since launch. The
+  wording names the likely author: **`⚠️  Claude made code changes. Refresh the
+  diff to show them (Ctrl+R) 🔁`** when the LLM likely just edited (it was handed a comment
   or a `Ctrl+G` moments before), or **`⚠️  New manual changes detected - …`** when the
   change came from outside the shell. It appears once the change settles, and
-  `dif` **never auto-restarts**; that would drop a comment you're mid-typing in
-  the browser. Press `Ctrl+R` (or run "Restart diff server" from the palette) when ready.
+  `dif` **never auto-refreshes**; that would drop a comment you're mid-typing in
+  the browser. Press `Ctrl+R` (or run "Refresh diff" from the palette) when ready.
   The warning **re-arms on each new change**, so a manual edit after a prior
-  warning still alerts; it also re-baselines after a restart.
+  warning still alerts; it also re-baselines after a refresh.
 
 ## Live comment handling
 
@@ -121,10 +136,129 @@ live); a change gets edited (committing or not per the
 the chat, with at most a terse `Done.` posted to the thread. You never have to
 tell the agent to "address the comments," and replies appear without a restart.
 (Code *changes* are different: the diff difit rendered at launch goes stale, so
-`dif` logs a restart warning in the left pane; see below.)
+`dif` logs a refresh warning in the left pane; see below.)
 
 Comments that already exist when `dif` launches are treated as a baseline and
-are not auto-dispatched; only comments added after launch trigger work.
+are not auto-dispatched; only comments added after launch trigger work. The
+exception is comments still held for **Send all** when `dif` quit: they stay
+held across the relaunch.
+
+### Bulk vs eager delivery
+
+The browser shell's top bar has a **Bulk / Eager** toggle.
+
+- **Bulk (the default)** holds every new comment. A **Send all (N)** button
+  shows how many are waiting; pressing it types them into the LLM pane as **one**
+  numbered prompt. One prompt per pass of comments costs far fewer tokens than
+  one per comment. A held comment that you edit is sent in its edited form, and
+  one you delete is never sent. Held comments survive quitting and relaunching
+  `dif`.
+- **Eager** types each comment into the LLM pane as soon as you save it.
+  Switching to Eager also sends anything still held.
+- **Send one now.** In Bulk, **Cmd+Alt+Enter** (Ctrl+Alt+Enter off macOS) in
+  a comment box set to TUI saves that one comment and types it into the LLM pane
+  at once. Everything else stays held for **Send all**. The submit button's
+  tooltip shows the shortcut while it applies.
+
+The mode resets to Bulk on every launch. Hovering **Bulk** or **Eager** (or
+any other control in the browser shell) shows a tooltip explaining it.
+
+### Keeping the GitHub PR in sync
+
+When the branch has an open PR, `dif` keeps it and the review in step. The only
+thing that never goes to GitHub is the local conversation: comments and replies
+sent to the TUI (the default).
+
+**Header.** The browser shell's top bar shows the PR (`#42`, linking to it), a
+**Sync** button, and a **Review (N)** button counting draft PR comments. With no
+open PR (or no `gh`), it shows a yellow **No linked PR** instead, with the
+reason on hover, and looks again every minute. Problems worth acting on (the PR
+has commits you can't pull yet, a failed sync) appear as a short notice beside
+them.
+
+**PR comments are drafts until you submit.** Every comment box in difit has a
+**TUI / PR** toggle beside its buttons. **PR** adds the comment to your pending
+GitHub review (what "Start a review" does on github.com) and never sends it to
+the LLM. A reply box inside a PR thread defaults to PR. **Ctrl+G** (macOS) or
+**Alt+Shift+G** (Windows/Linux) flips the toggle without leaving the box; the
+box shows the hint beside the toggle. The submit button names where the
+comment goes: **Add to PR review** (blue) for PR, and **Queue for TUI** in
+Bulk mode or **Send to TUI** in Eager mode for the TUI ("reply" is added in a
+reply box).
+**Cmd+Enter** (Ctrl+Enter off macOS) saves to the destination the toggle shows;
+**Cmd+Shift+Enter** saves to the other one for that comment only, without
+flipping the toggle. A comment sent to the TUI either way follows the Bulk /
+Eager mode. With no PR, Cmd+Shift+Enter from a TUI box does nothing. Hovering
+the submit button shows the alternate shortcut.
+
+- Drafts are visible only to you, here and on github.com, until you submit.
+  A draft you start on github.com shows up in dif too.
+- **Review (N)** opens the submit panel: an optional summary and, on someone
+  else's PR, **Comment**, **Approve**, or **Request changes**, as on GitHub. On
+  your own PR GitHub only lets you comment, so the panel offers **Submit
+  comments** alone.
+- PR comments are restyled: a blue thread border and a GitHub badge linking to
+  the comment. Drafts are dashed and say **PR draft**; published comments say
+  **On PR**; a red **PR sync failed** means GitHub rejected the comment (hover
+  for GitHub's message; editing the comment retries).
+- Editing a PR comment edits it on GitHub. Deleting a reply deletes it.
+  Resolving a thread resolves the conversation on GitHub (a draft thread is
+  deleted instead).
+- GitHub only accepts comments on lines that are part of the PR's diff. If `dif`
+  compares something other than the PR (say `dif .`), a comment on a line the PR
+  does not change fails with GitHub's message.
+
+**Everything on the PR flows back.** dif pulls every minute, and at once when
+you click **Sync** or submit a review:
+
+- New comments and replies from anyone appear under their author's login,
+  including bots (`coderabbitai[bot]`). They are PR comments: the LLM never sees
+  them. Your own comments from github.com come in editable.
+- Edits made on GitHub replace the local text, unless you have an unsent edit of
+  the same comment, which wins. Comments deleted on GitHub, and conversations
+  resolved there, disappear locally.
+- New commits on the PR are pulled in when your branch is simply behind. The
+  minute-by-minute pull does that only when no tracked file has uncommitted
+  changes, and the diff then reloads in place.
+- Clicking **Sync** goes further: it stashes your uncommitted changes,
+  fast-forwards to the PR head, and restores them. Once the sync finishes, the
+  page reloads, keeping your view, sidebar tab, and **With comments** filter.
+- If restoring your changes conflicts, a modal lists the conflicted files and
+  asks who resolves them. **I'll resolve them** (or Esc) leaves them to you; the
+  header reminds you to `git stash drop` afterward, since git keeps the stash
+  when a restore conflicts. **Auto-resolve with the LLM** types a request into
+  the LLM pane to resolve them, leave the changes unstaged, and drop the stash,
+  without committing.
+- Unpushed commits or a diverged branch are never touched; the header says why.
+
+**Nothing is lost offline.** If your network drops (or you are on a plane),
+keep reviewing. PR comments, edits, deletions, resolved threads, viewed files,
+and a submitted review are all saved and queued; the header says "Offline." and
+lists what is waiting, and a queued comment's badge reads **Queued for PR**.
+When the connection returns, dif sends everything in order and pulls. The queue
+is saved to disk, so it survives quitting dif: a review you submitted offline
+goes out on the next launch that can reach GitHub. Viewed files marked while
+viewed sync is paused (say, your checkout is behind the PR) wait until it can
+run. dif notices the network itself too: when GitHub stops
+answering it holds everything and tries again every 20 seconds.
+
+**Viewed files stay in sync both ways.** Marking a file viewed in difit marks it
+on GitHub at once, and the reverse arrives with the next pull. Marking a whole
+directory in difit marks each of its files on GitHub (GitHub has no bulk
+version). When a session starts, GitHub's viewed state wins. This only runs
+while dif shows the PR's own diff (comparing against the PR's base, with your
+checkout at the PR head); otherwise the PR link's tooltip says why it is
+paused. When GitHub's state changes a file, difit's view reloads once you have
+no comment half-typed.
+
+### Only files with comments
+
+For a big diff, the browser shell's top bar has a **With comments** toggle (a
+comment icon and a count of the files with comments). Turning it on narrows the
+diff to the files that have at least one comment thread, on top of whichever view
+is open (the full diff or a group). The command palette has the same toggle:
+**Show only files with comments** / **Show all files**. Below 1440px wide the
+toggle shows only its icon and count.
 
 ## Command palette
 
@@ -134,21 +268,28 @@ with a filter input and a numbered command list. Type to filter, `↑`/`↓` (or
 `Ctrl+C`) to close. The available commands are a fixed in-code registry; see
 [config.md](config.md#command-registry).
 
-### Restart Diff Server
+### Refresh Diff
 
-"Restart diff server", the palette command, or its direct **`Ctrl+R`** shortcut (shown
-dimmed as `[^R]` on the palette row), restarts only the **difit server** (the
-left pane), not the whole shell and not the LLM session. It:
+"Refresh diff", the palette command, or its direct **`Ctrl+R`** shortcut (shown
+dimmed as `[^R]` on the palette row), relaunches only the **difit server** (the
+left pane) so it shows the current diff, not the whole shell and not the LLM
+session. It:
 
 1. Kills the running difit server.
 2. Waits for the port to free, then relaunches difit with the **same**
    comparison and port it was started with (`dif` → `dif`, `dif <args>` →
    `dif <args>`), reseeding the current `.difit` transcript.
 
-The log view is **not cleared**: `dif` writes `[dif] Stopping…` /
-`[dif] Restarting…` status lines into the log and the new server output appends
+The log view is **not cleared**: `dif` writes `[dif] Refreshing diff: stopping
+difit…` / `[dif] Refreshing diff: starting difit…` status lines into the log and the new server output appends
 below them, so it reads as one continuous log. The poller keeps running and
 reconnects automatically once difit is back on the same port.
+
+A refresh **never opens a browser tab**. The browser shell keeps serving on the
+same port, and the tab you already have open reloads itself once it sees the
+refresh, keeping your view, sidebar tab, and **With comments** filter. A manual
+browser refresh restores them the same way. If no tab is open, `Ctrl+O` opens
+one.
 
 ### Regenerate diff guide
 
@@ -156,7 +297,7 @@ reconnects automatically once difit is back on the same port.
 shortcut (shown dimmed as `[^G]` on the palette row), asks the LLM to rebuild the
 diff guide for this review via the `/diff-review` skill. `dif` only types
 the request into the LLM pane; the skill writes the guide markdown file, and
-the diff guide view picks it up automatically on its next refresh (no restart).
+the diff guide view picks it up automatically on its next refresh (no Refresh diff needed).
 Use it after the agent (or you) changes code so the guide reflects the current diff.
 
 ### Open Diff In Browser
@@ -164,7 +305,7 @@ Use it after the agent (or you) changes code so the guide reflects the current d
 "Open diff in browser", the palette command, or its direct **`Ctrl+O`**
 shortcut (shown dimmed as `[^O]` on the palette row), opens the running difit
 server's URL (`http://localhost:<port>`) in the system default browser. It does
-**not** restart the server; it just reopens the same review page (handy if you
+**not** refresh the diff; it just reopens the same review page (handy if you
 closed the tab difit opened on launch).
 
 ### New LLM Session
@@ -181,6 +322,19 @@ reuses the pane, so its size and scrollback log carry over; the difit server and
 the poller are untouched. Claude fresh session ids are persisted, so a later
 `dif` launch can resume them when possible. Codex fresh sessions currently do
 not persist a `dif`-chosen id because the Codex CLI does not expose that option.
+
+### Resync With GitHub
+
+"Resync with GitHub", the palette command, or its direct **`Ctrl+S`** shortcut
+(shown dimmed as `[^S]` on the palette row), does exactly what the browser's
+**Sync** button does: it pulls new PR comments, replies, and commits now instead
+of waiting for the once-a-minute pull, stashing and restoring your uncommitted
+changes to bring in new commits (see
+[Keeping the GitHub PR in sync](#keeping-the-github-pr-in-sync)). The log view shows
+`↻ Resyncing with GitHub…`, and the open browser tab reloads itself once the
+pull finishes. On a branch with no open PR it logs that there is nothing to
+resync and asks for nothing. `Ctrl+S` is intercepted before the LLM pane, so it
+does not reach Claude Code's own `Ctrl+S` (stash prompt).
 
 ## The diff guide, test plan, and reviewed state
 

@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "id": "ontology-to-product",
+  "title": "A model becomes a workspace",
+  "description": "Entity grain resolves into actual ontology inspection and attribute lists.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1664,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "A model becomes a workspace",
+        "category": "motion-product",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#f0ba83",
+        "beats": [
+          {
+            "id": "record",
+            "title": "Start with the thing being tracked.",
+            "subtitle": "Repeated observations should not multiply its identity.",
+            "content": {
+              "kind": "thesis",
+              "lines": ["One entity.", "Many observations."],
+              "emphasis": "Keep the record grain clear."
+            },
+            "duration": 308,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "spine",
+            "title": "Assemble fields around stable identities.",
+            "subtitle": "A fictional entity spine keeps one record per entity.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "entity-spine-assembly",
+                "schemaVersion": 1,
+                "input": {
+                  "entities": [
+                    {
+                      "id": "a",
+                      "label": "Site A"
+                    },
+                    {
+                      "id": "b",
+                      "label": "Site B"
+                    },
+                    {
+                      "id": "c",
+                      "label": "Site C"
+                    }
+                  ],
+                  "observations": [
+                    {
+                      "id": "o1",
+                      "entityId": "a",
+                      "value": 2
+                    },
+                    {
+                      "id": "o2",
+                      "entityId": "a",
+                      "value": 3
+                    },
+                    {
+                      "id": "o3",
+                      "entityId": "b",
+                      "value": 4
+                    }
+                  ],
+                  "field": {
+                    "label": "Recorded items",
+                    "unit": "items",
+                    "missingLabel": "No observation"
+                  },
+                  "showSourceRows": true,
+                  "copy": {
+                    "context": "Fictional example",
+                    "before": "Before",
+                    "after": "After"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 105,
+                  "x": 480,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 480,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 480,
+                  "y": 255,
+                  "zoom": 2.0,
+                  "ease": "whip"
+                },
+                {
+                  "at": 296,
+                  "x": 480,
+                  "y": 255,
+                  "zoom": 2.0,
+                  "ease": "glide"
+                },
+                {
+                  "at": 324,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 338,
+            "transition": {
+              "kind": "aperture",
+              "frames": 24,
+              "origin": {
+                "x": 800,
+                "y": 480
+              }
+            },
+            "token": {
+              "label": "Record model",
+              "anchor": {
+                "x": 1130,
+                "y": 690,
+                "width": 340,
+                "height": 64
+              },
+              "appearance": "label"
+            }
+          },
+          {
+            "id": "ontology",
+            "title": "Inspect the model in Avandar.",
+            "subtitle": "Actual concept navigation and attribute components.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "ontology",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 599,
+                "leadIn": 30
+              },
+              "annotations": [
+                {
+                  "at": 260,
+                  "until": 345,
+                  "kind": "highlight",
+                  "target": {
+                    "x": 1189.969,
+                    "y": 348.875,
+                    "width": 65.031,
+                    "height": 18.594
+                  },
+                  "seed": 37
+                }
+              ]
+            },
+            "duration": 780,
+            "transition": {
+              "kind": "morph",
+              "frames": 30
+            },
+            "token": {
+              "label": "Record model",
+              "anchor": {
+                "x": 473,
+                "y": 49,
+                "width": 1120,
+                "height": 758
+              },
+              "appearance": "outline"
+            }
+          },
+          {
+            "id": "workspace",
+            "title": "The model gives the workspace its vocabulary.",
+            "subtitle": "The inspection is a deterministic product-component demo.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Names identify the domain.",
+                "Attributes describe what matters."
+              ],
+              "emphasis": "Modeling becomes inspectable."
+            },
+            "duration": 310,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "record-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "Many observations can describe one entity.",
+      "beatId": "record"
+    },
+    {
+      "id": "record-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 263,
+      "text": "A stable identity keeps those observations together.",
+      "beatId": "record"
+    },
+    {
+      "id": "spine-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Descriptive fields assemble around that identity.",
+      "beatId": "spine"
+    },
+    {
+      "id": "spine-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "Missing observations remain missing.",
+      "beatId": "spine"
+    },
+    {
+      "id": "ontology-0",
+      "shotId": "explanation",
+      "startFrame": 48,
+      "endFrame": 215,
+      "text": "Avandar defines concepts and their attributes.",
+      "beatId": "ontology"
+    },
+    {
+      "id": "ontology-1",
+      "shotId": "explanation",
+      "startFrame": 220,
+      "endFrame": 395,
+      "text": "A response case has its own identifier, fields and sources.",
+      "beatId": "ontology"
+    },
+    {
+      "id": "ontology-2",
+      "shotId": "explanation",
+      "startFrame": 400,
+      "endFrame": 567,
+      "text": "A facility has a different set of attributes.",
+      "beatId": "ontology"
+    },
+    {
+      "id": "ontology-3",
+      "shotId": "explanation",
+      "startFrame": 572,
+      "endFrame": 739,
+      "text": "The same product surfaces can inspect both models.",
+      "beatId": "ontology"
+    },
+    {
+      "id": "workspace-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 164,
+      "text": "The model gives the workspace its own vocabulary.",
+      "beatId": "workspace"
+    },
+    {
+      "id": "workspace-1",
+      "shotId": "explanation",
+      "startFrame": 169,
+      "endFrame": 289,
+      "text": "The vision joins ontology with case management.",
+      "beatId": "workspace"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

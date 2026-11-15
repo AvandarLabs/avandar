@@ -85,6 +85,8 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - If a docstring fits on one line within 80 characters, keep it single-line.
+  This is a formatting rule only: never cut a docstring's content to make it
+  fit on one line.
 
 - Never use single-line `if` statements: always keep braces.
 

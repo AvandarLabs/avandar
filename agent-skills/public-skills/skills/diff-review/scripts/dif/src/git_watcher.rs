@@ -71,10 +71,10 @@ fn run(
     stop: &Arc<AtomicBool>,
 ) {
     while !stop.load(Ordering::Relaxed) {
-        if let Some(sig) = git::diff_signature(repo_root) {
-            if let Ok(mut slot) = current.lock() {
-                *slot = Some(sig);
-            }
+        if let Some(sig) = git::diff_signature(repo_root)
+            && let Ok(mut slot) = current.lock()
+        {
+            *slot = Some(sig);
         }
         sleep_interruptible(interval, stop);
     }

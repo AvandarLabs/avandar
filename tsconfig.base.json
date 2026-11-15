@@ -51,6 +51,7 @@
       "@query-hooks/*": ["./packages/web/query-hooks/src/*"],
       "@browser-utils": ["./packages/web/browser-utils/src/index.ts"],
       "@browser-utils/*": ["./packages/web/browser-utils/src/*"],
+      "@product-assets/*": ["./public/*"],
 
       /* Apps */
       "@ava-cli/*": ["./apps/ava-cli/src/*"],

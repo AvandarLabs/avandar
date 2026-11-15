@@ -3,22 +3,22 @@ import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Display label for the picker. */
   label: string;
   /** Columns the user can pick from. */
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   /**
    * Restricts the pickable columns to those whose data type matches. `any`
    * (or `undefined`) allows every column.
    */
   dataType: "numeric" | "any" | "temporal" | "text" | undefined;
-  /** Currently selected column name, if any. */
+  /** Currently selected column ID, if any. */
   value: string | undefined;
-  /** Called with the selected column name (or `undefined` when cleared). */
+  /** Called with the selected column ID (or `undefined` when cleared). */
   onChange: (next: unknown) => void;
 };
 
@@ -50,7 +50,7 @@ export function ColumnPickerControl({
 
   const options = useMemo(() => {
     return makeSelectOptions(filtered, {
-      valueKey: "name",
+      valueKey: "id",
       labelKey: "name",
     });
   }, [filtered]);

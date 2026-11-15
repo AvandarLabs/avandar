@@ -5,7 +5,7 @@ import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { act, renderHook } from "@/test-utils";
+import { act, renderHook, TestProviders } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { makeTextAnnotationFeature } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
@@ -84,6 +84,16 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
+  return {
+    ConceptAttributeClient: {
+      useGetAll: () => {
+        return [undefined, false, { isSuccess: false }];
+      },
+    },
+  };
+});
+
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
@@ -129,9 +139,12 @@ describe("useGisApp annotation inspector", () => {
 
   it("expands the inspector when a new annotation is created", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
-    const { rerender } = renderHook(() => {
-      return useGisApp(_createAvaMap());
-    });
+    const { rerender } = renderHook(
+      () => {
+        return useGisApp(_createAvaMap());
+      },
+      { wrapper: TestProviders },
+    );
 
     expect(expandPanelMock).not.toHaveBeenCalled();
 
@@ -143,9 +156,12 @@ describe("useGisApp annotation inspector", () => {
 
   it("expands the inspector when an annotation feature is clicked on the map", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
-    const { result } = renderHook(() => {
-      return useGisApp(_createAvaMap());
-    });
+    const { result } = renderHook(
+      () => {
+        return useGisApp(_createAvaMap());
+      },
+      { wrapper: TestProviders },
+    );
 
     act(() => {
       result.current.onMapFeatureClick(

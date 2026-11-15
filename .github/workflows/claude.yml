@@ -10,6 +10,23 @@ on:
   pull_request_review:
     types: [submitted]
 
+env:
+  NODE_VERSION: 24.15.0
+  # Strips credentials such as CLAUDE_CODE_OAUTH_TOKEN from every command
+  # Claude runs, including the git hooks and any PR code those commands
+  # execute. Claude keeps them for its own API calls, and GitHub tokens stay
+  # so gh and git push still work. It also forces Claude Code's permission
+  # mode to default, which overrides the action's acceptEdits mode, so every
+  # tool Claude uses, file edits included, must be allowed explicitly.
+  CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
+
+# Both jobs run read-only on a PR from a fork. The GitHub App token Claude
+# holds can write to this repo, so a fork's code must never run in the job
+# (pnpm scripts, eslint configs, and tests all execute it), and Claude must
+# not commit or push it here. Only users with write access can trigger
+# either job, so this applies when a maintainer mentions @claude on an
+# external contributor's PR.
+
 jobs:
   # Structured PR review, driven by the code-review plugin. Kept as its own job
   # so it keeps the specialized prompt and plugin rather than freeform @claude.
@@ -27,10 +44,64 @@ jobs:
       id-token: write
 
     steps:
+      # A failed lookup stops the job. Every later step checks
+      # is_fork == 'false', so an unexpected value leaves the job read-only.
+      - name: Detect fork PR
+        id: origin
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          is_fork="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json isCrossRepository --jq .isCrossRepository)"
+          echo "is_fork=$is_fork" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history so the review can read git log and blame.
+          fetch-depth: 0
+
+      # Same toolchain as pr-develop.yaml's lint-typecheck job, so the review
+      # can verify claims with the type checker and linter.
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: corepack enable
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: pnpm install --frozen-lockfile
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB runs every Bash command in Claude
+      # Code's sandbox, which needs bubblewrap and socat. The runner image
+      # ships neither. Ubuntu 24.04's AppArmor policy blocks the user
+      # namespaces bwrap creates, so this also grants bwrap, and only bwrap,
+      # that permission. The last two commands fail the step here rather than
+      # leaving every Bash command in the Claude step to fail.
+      - name: Install sandbox dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap socat
+          if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ]; then
+            sudo tee /etc/apparmor.d/bwrap > /dev/null <<'PROFILE'
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+            include if exists <local/bwrap>
+          }
+          PROFILE
+            sudo systemctl reload apparmor
+          fi
+          bwrap --ro-bind / / --dev /dev --proc /proc --unshare-all true
+          socat -V > /dev/null
 
       - name: Run Claude Code Review
         id: claude-review
@@ -40,6 +111,12 @@ jobs:
           plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
           plugins: "code-review@claude-code-plugins"
           prompt: "/code-review:code-review ${{ github.repository }}/pull/${{ github.event.issue.number }}"
+          # The plugin's command grants its own gh tools. These add read-only
+          # git history on top, and type-check and lint only for internal PRs.
+          # The first line must be a flag. See READ_ONLY_ARGS in the claude job.
+          claude_args: |
+            --allowedTools "Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git blame:*)"
+            ${{ steps.origin.outputs.is_fork == 'false' && '--allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm exec tsc:*),Bash(pnpm exec eslint:*)"' || '--append-system-prompt "This PR comes from a fork, so you cannot run project scripts. Read the CI results with gh pr checks instead."' }}
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
@@ -51,21 +128,186 @@ jobs:
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: read
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
+    env:
+      # Tools for every run: read code, history, PRs, and CI results.
+      # The action already allows Read, Glob, Grep, git add/commit/rm, and its
+      # own push script. Anything not listed here or there is denied, because
+      # a headless run cannot ask for approval.
+      #
+      # Lines starting with # are stripped before parsing, but the first line
+      # must be a flag. The action appends claude_args to its own flags on the
+      # same line, so a leading # line is not stripped, and the shell parser
+      # then reads it and every line after it as one comment. That silently
+      # drops every flag below.
+      #
+      # Deliberately left out: gh api (its token can write to the repo),
+      # pnpm add/remove (supply-chain risk), rm, xargs, awk, WebSearch, and
+      # WebFetch (a way to send data out of the job). git rebase -x and git
+      # fetch --upload-pack can each run any command, and cat, head, and tail
+      # duplicate Read, so none of them are allowed either.
+      READ_ONLY_ARGS: |
+        --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+        # GitHub reads
+        --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr list:*),Bash(gh run view:*),Bash(gh issue view:*)"
+        # Text
+        --allowedTools "Bash(grep:*),Bash(ls:*),Bash(wc:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(jq:*)"
+        # Agent tools
+        --allowedTools "Task,TodoWrite"
+      # Tools for issues and PRs from branches in this repo: edit, run
+      # checks, and push. sed is allowed only with --sandbox, which rejects
+      # its e, r, and w commands, so it can replace text but not run commands
+      # or touch other files.
+      INTERNAL_ARGS: |
+        # Git: rename, undo, and sync with other @claude jobs
+        --allowedTools "Bash(git mv:*),Bash(git restore:*),Bash(git reset:*)"
+        --allowedTools "Bash(claude-sync-branch),Bash(git fetch origin),Bash(git rebase --continue),Bash(git rebase --abort),Bash(git merge:*)"
+        # Files. Edit(./**) covers Edit and Write inside the checkout and
+        # nowhere else. The env scrub turns off the action's acceptEdits mode,
+        # so without it every file edit is denied.
+        --allowedTools "Edit(./**)"
+        --allowedTools "Bash(mv:*),Bash(cp:*),Bash(mkdir:*),Bash(sed --sandbox:*),Bash(claude-replace:*)"
+        # Checks
+        --allowedTools "Bash(pnpm type-check:*),Bash(pnpm lint:*),Bash(pnpm test:*),Bash(pnpm format:*)"
+        --allowedTools "Bash(pnpm exec tsc:*),Bash(pnpm exec vitest:*),Bash(pnpm exec eslint:*)"
+        # Generators and Lingui catalogs (ava new only, never ava supabase)
+        --allowedTools "Bash(pnpm new:component:*),Bash(pnpm new:route:*),Bash(pnpm build:ava-cli:*),Bash(ava new:*)"
+        --allowedTools "Bash(pnpm i18n:extract:*),Bash(pnpm i18n:compile:*)"
+        # Need Supabase, Docker, or browsers that this job does not set up
+        --disallowedTools "Bash(pnpm test:db:*),Bash(pnpm test:e2e:*)"
+      # Tools for PRs from forks: denies the action's own edit, commit, and
+      # push grants. The * in the push rule matches the action's install path.
+      FORK_ARGS: |
+        --disallowedTools "Edit,Write,NotebookEdit,Bash(git add *),Bash(git commit *),Bash(git rm *),Bash(git push *),Bash(*git-push.sh *)"
+      # System prompt text, joined into the one --append-system-prompt flag in
+      # the Run Claude Code step. Once its expressions are evaluated, none of
+      # it may contain a double quote or a $, since it is spliced into a
+      # double-quoted shell argument.
+      INTERNAL_PROMPT: >-
+        Other @claude jobs may push to this branch while you work. Before every
+        push, run claude-sync-branch, which rebases onto the remote branch. If
+        the rebase stops on a conflict, resolve it with Edit, git add the files,
+        run git rebase --continue, then push. To bring in another branch, run
+        git fetch origin, then git merge origin/<branch>. If the pre-push hook
+        blocks a push because it updated translation catalogs or formatting,
+        commit those files and push again. This job has no OpenAI key, so leave
+        untranslated msgstr entries empty for a developer's next push to fill.
+        For find-and-replace across files, run claude-replace [--fixed]
+        <pattern> <replacement> [<pathspec>...], which edits every tracked file
+        that matches, then review git diff. For a single file, sed --sandbox -i
+        also works. Plain sed, git grep, and xargs are not allowed.
+      FORK_PROMPT: >-
+        This PR comes from a fork, so you are read-only: you can review code and
+        answer questions, but you cannot edit files, commit, push, or run
+        project scripts. Read the CI results with gh pr checks instead of
+        running checks. If asked for changes, describe them in your reply so
+        the contributor can make them.
+      # The action gives Claude an inline review comment's text but not its
+      # file or line. It fetches those only from the PR's review history, and
+      # drops every review submitted at or after the comment, which always
+      # includes the review that holds the comment. The webhook payload has
+      # them, so this points Claude at it. Used only for review comments, the
+      # one event with a location.
+      REVIEW_COMMENT_PROMPT: >-
+        You were triggered by an inline PR review comment. Its text is in the
+        trigger_comment tag, but the file and lines it is attached to are not
+        in the prompt. Before acting, read them from this event's webhook
+        payload with jq '.comment | {path, line, side, start_line, start_side,
+        original_line, original_start_line, subject_type, in_reply_to_id,
+        diff_hunk}' ${{ github.event_path }} or by opening that file with Read.
+        path is the file. line, with start_line for a range, is the line the
+        comment is on; side LEFT means a line of the base branch that the PR
+        deletes. When line is null the code changed after the comment, so find
+        it with original_line and diff_hunk. subject_type file means the
+        comment is about the whole file. in_reply_to_id means the comment
+        replies to an earlier one in the same thread, at the same location.
     steps:
+      # Issues have no PR, so they count as internal. A failed lookup stops
+      # the job. Every later step checks is_fork == 'false', so an unexpected
+      # value leaves the job read-only.
+      - name: Detect fork PR
+        id: origin
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || (github.event.issue.pull_request && github.event.issue.number) || '' }}
+        run: |
+          is_fork=false
+          if [ -n "$PR_NUMBER" ]; then
+            is_fork="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json isCrossRepository --jq .isCrossRepository)"
+          fi
+          echo "is_fork=$is_fork" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history so Claude can rebase onto commits pushed by other
+          # @claude jobs and answer questions about older commits.
+          fetch-depth: 0
+
+      # Same toolchain as pr-develop.yaml's lint-typecheck job, so Claude can
+      # run the type checker, linter, tests, and repo generators.
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: corepack enable
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - if: steps.origin.outputs.is_fork == 'false'
+        run: pnpm install --frozen-lockfile
+      - if: steps.origin.outputs.is_fork == 'false'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # Fixed commands for work whose usual tools can run any command:
+      # claude-sync-branch replaces git pull --rebase (--upload-pack), and
+      # claude-replace replaces git grep (-O) piped to xargs. Copied out of
+      # the checkout before Claude switches to the PR branch, so for PR
+      # conversation comments the default branch's copies run, not the PR's.
+      - name: Install @claude helpers
+        if: steps.origin.outputs.is_fork == 'false'
+        run: sudo install -m 755 .github/claude-bot/claude-sync-branch .github/claude-bot/claude-replace /usr/local/bin/
+
+      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB runs every Bash command in Claude
+      # Code's sandbox, which needs bubblewrap and socat. The runner image
+      # ships neither. Ubuntu 24.04's AppArmor policy blocks the user
+      # namespaces bwrap creates, so this also grants bwrap, and only bwrap,
+      # that permission. The last two commands fail the step here rather than
+      # leaving every Bash command in the Claude step to fail.
+      - name: Install sandbox dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap socat
+          if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ]; then
+            sudo tee /etc/apparmor.d/bwrap > /dev/null <<'PROFILE'
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+            include if exists <local/bwrap>
+          }
+          PROFILE
+            sudo systemctl reload apparmor
+          fi
+          bwrap --ro-bind / / --dev /dev --proc /proc --unshare-all true
+          socat -V > /dev/null
 
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
+        env:
+          # git rebase --continue and git merge would otherwise wait on an
+          # editor that a headless run cannot open.
+          GIT_EDITOR: "true"
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -76,7 +318,13 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Optional: Add claude_args to customize behavior and configuration
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
+          #
+          # The action merges repeated --allowedTools and --disallowedTools,
+          # but a second --append-system-prompt replaces the first, so every
+          # prompt goes into the last line's single flag.
+          claude_args: |
+            ${{ env.READ_ONLY_ARGS }}
+            ${{ steps.origin.outputs.is_fork == 'false' && env.INTERNAL_ARGS || env.FORK_ARGS }}
+            --append-system-prompt "${{ steps.origin.outputs.is_fork == 'false' && env.INTERNAL_PROMPT || env.FORK_PROMPT }}${{ github.event_name == 'pull_request_review_comment' && format(' {0}', env.REVIEW_COMMENT_PROMPT) || '' }}"

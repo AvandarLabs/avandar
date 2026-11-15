@@ -2,10 +2,11 @@ import { DashboardSeedHelpers } from "./DashboardSeedHelpers";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Shape of the per-viz-type config payload seeded into the DataViz block.
- * Mirrors the in-app `VizConfig` discriminated union but is duplicated here
- * so this helper has no compile-time dependency on application code (which
- * keeps Playwright fixtures lightweight and reusable across versions).
+ * The viz config a seeded DataViz block saves, in the version 2 dashboard
+ * shape: keyed by `QueryResult` column name, which the dashboard migrations
+ * upgrade when the dashboard loads. Use it to seed a chart of any viz type,
+ * for example to check that each type draws in the dashboard editor. It is
+ * written out here so this helper has no compile-time dependency on app code.
  */
 export type SeededVizConfig =
   | { vizType: "table" }

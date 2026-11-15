@@ -100,10 +100,10 @@ fn message_ids(snapshot: &Snapshot, pred: impl Fn(Option<&str>) -> bool) -> Hash
     let mut ids = HashSet::new();
     for thread in &snapshot.threads {
         for message in &thread.messages {
-            if pred(message.author.as_deref()) {
-                if let Some(id) = &message.id {
-                    ids.insert(id.clone());
-                }
+            if pred(message.author.as_deref())
+                && let Some(id) = &message.id
+            {
+                ids.insert(id.clone());
             }
         }
     }

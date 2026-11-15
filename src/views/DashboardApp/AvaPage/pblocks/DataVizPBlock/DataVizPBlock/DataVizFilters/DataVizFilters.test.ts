@@ -17,10 +17,10 @@ const NAME: DashboardFilterRecord = {
   value: undefined,
 };
 
-describe("resolveSubscribedFilterIds", () => {
+describe("getSubscribedFilterIdsFromSubscription", () => {
   it("returns undefined for mode=all (means: subscribe to every filter)", () => {
     expect(
-      DataVizFilters.resolveSubscribedFilterIds({
+      DataVizFilters.getSubscribedFilterIdsFromSubscription({
         subscription: { mode: "all", subscribedFilterIds: [] },
         registeredFilters: [REGION, NAME],
       }),
@@ -29,7 +29,7 @@ describe("resolveSubscribedFilterIds", () => {
 
   it("returns an empty array for mode=none", () => {
     expect(
-      DataVizFilters.resolveSubscribedFilterIds({
+      DataVizFilters.getSubscribedFilterIdsFromSubscription({
         subscription: { mode: "none", subscribedFilterIds: ["f-region"] },
         registeredFilters: [REGION, NAME],
       }),
@@ -38,7 +38,7 @@ describe("resolveSubscribedFilterIds", () => {
 
   it("returns the explicit list for mode=selected", () => {
     expect(
-      DataVizFilters.resolveSubscribedFilterIds({
+      DataVizFilters.getSubscribedFilterIdsFromSubscription({
         subscription: { mode: "selected", subscribedFilterIds: ["f-region"] },
         registeredFilters: [REGION, NAME],
       }),
@@ -47,7 +47,7 @@ describe("resolveSubscribedFilterIds", () => {
 
   it("drops subscribed ids that no longer exist in registered filters", () => {
     expect(
-      DataVizFilters.resolveSubscribedFilterIds({
+      DataVizFilters.getSubscribedFilterIdsFromSubscription({
         subscription: {
           mode: "selected",
           subscribedFilterIds: ["f-region", "f-deleted", "f-name"],

@@ -1,0 +1,214 @@
+import { identity, isDefined, prop, propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName.ts";
+import { makeColumnSlotsFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeColumnSlotsFromAvaVizConfig.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
+import type { VizColumnSlot } from "$/models/vizs/AvaVizConfig/makeColumnSlotsFromAvaVizConfig.ts";
+import type {
+  AvaBubbleSeries,
+  AvaScatterSeries,
+} from "$/models/vizs/series.types.ts";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";
+
+type GetSlotColumnId = ({
+  key,
+  target,
+}: Readonly<{
+  key: string | undefined;
+  target: string;
+}>) => QueryColumn.Id | undefined;
+
+function _mapSeries<Series extends { key: string }>(
+  options: Readonly<{
+    series: readonly Series[];
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): Array<Series & { key: QueryColumn.Id }> {
+  return options.series.flatMap((series, index) => {
+    const key = options.getSlotColumnId({
+      key: series.key,
+      target: `series.${index}.key`,
+    });
+    return key === undefined ? [] : [{ ...series, key }];
+  });
+}
+
+function _mapScatterSeries(
+  options: Readonly<{
+    series: Readonly<Extract<UiVizConfig, { vizType: "scatter" }>["series"]>;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): AvaScatterSeries[] {
+  return options.series.flatMap((series, index) => {
+    const key = options.getSlotColumnId({
+      key: series.key,
+      target: `series.${index}.key`,
+    });
+    const xKey = options.getSlotColumnId({
+      key: series.xKey,
+      target: `series.${index}.xKey`,
+    });
+    return key === undefined || xKey === undefined
+      ? []
+      : [{ ...series, key, xKey }];
+  });
+}
+
+function _mapBubbleSeries(
+  options: Readonly<{
+    series: Readonly<Extract<UiVizConfig, { vizType: "bubble" }>["series"]>;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): AvaBubbleSeries[] {
+  return options.series.flatMap((series, index) => {
+    const key = options.getSlotColumnId({
+      key: series.key,
+      target: `series.${index}.key`,
+    });
+    const xKey = options.getSlotColumnId({
+      key: series.xKey,
+      target: `series.${index}.xKey`,
+    });
+    const sizeKey = options.getSlotColumnId({
+      key: series.sizeKey,
+      target: `series.${index}.sizeKey`,
+    });
+    return key === undefined || xKey === undefined || sizeKey === undefined
+      ? []
+      : [{ ...series, key, xKey, sizeKey }];
+  });
+}
+
+function _mapXYConfig(
+  options: Readonly<{
+    config: Extract<UiVizConfig, { vizType: "bar" | "line" | "area" }>;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): Extract<AvaVizConfig.T, { vizType: "bar" | "line" | "area" }> {
+  const { config, getSlotColumnId } = options;
+  return {
+    ...config,
+    xAxisKey: getSlotColumnId({ key: config.xAxisKey, target: "xAxisKey" }),
+    series: _mapSeries({ series: config.series, getSlotColumnId }),
+  };
+}
+
+function _mapCategoryConfig(
+  options: Readonly<{
+    config: Extract<UiVizConfig, { vizType: "pie" | "funnel" }>;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): Extract<AvaVizConfig.T, { vizType: "pie" | "funnel" }> {
+  const { config, getSlotColumnId } = options;
+  return {
+    ...config,
+    nameKey: getSlotColumnId({ key: config.nameKey, target: "nameKey" }),
+    valueKey: getSlotColumnId({ key: config.valueKey, target: "valueKey" }),
+  };
+}
+
+function _mapConfig(
+  options: Readonly<{
+    config: Readonly<UiVizConfig>;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): AvaVizConfig.T {
+  const { config, getSlotColumnId } = options;
+  return match(config)
+    .with({ vizType: "table" }, identity)
+    .with(
+      { vizType: "bar" },
+      { vizType: "line" },
+      { vizType: "area" },
+      (chart) => {
+        return _mapXYConfig({ config: chart, getSlotColumnId });
+      },
+    )
+    .with({ vizType: "radar" }, (chart) => {
+      return {
+        ...chart,
+        nameKey: getSlotColumnId({ key: chart.nameKey, target: "nameKey" }),
+        series: _mapSeries({ series: chart.series, getSlotColumnId }),
+      };
+    })
+    .with({ vizType: "scatter" }, (chart) => {
+      return {
+        ...chart,
+        series: _mapScatterSeries({ series: chart.series, getSlotColumnId }),
+      };
+    })
+    .with({ vizType: "bubble" }, (chart) => {
+      return {
+        ...chart,
+        series: _mapBubbleSeries({ series: chart.series, getSlotColumnId }),
+      };
+    })
+    .with({ vizType: "pie" }, { vizType: "funnel" }, (chart) => {
+      return _mapCategoryConfig({ config: chart, getSlotColumnId });
+    })
+    .exhaustive();
+}
+
+function _bindSlotToColumnId({
+  slot,
+  columns,
+}: {
+  slot: VizColumnSlot<string>;
+  columns: readonly QueryResult.ColumnWithId[];
+}): {
+  target: string;
+  id: QueryColumn.Id | undefined;
+  issue: QueryResultColumnBindingIssue | undefined;
+} {
+  const id =
+    slot.key === undefined
+      ? undefined
+      : getQueryColumnIdFromQueryResultColumnName({ name: slot.key, columns });
+  const hasCandidate =
+    slot.key !== undefined &&
+    columns.some((column) => {
+      return column.name.toLowerCase() === slot.key!.toLowerCase();
+    });
+  return {
+    target: slot.target,
+    id,
+    issue:
+      slot.key !== undefined && id === undefined
+        ? {
+            target: slot.target,
+            reason: hasCandidate ? "ambiguous" : "missing",
+          }
+        : undefined,
+  };
+}
+
+/**
+ * Replaces each `QueryResult` column name in a chart config with the column
+ * ID of the one `QueryResult` column that has that name. A name that matches
+ * no column, or several, is returned in `issues`, and its axis is left unset
+ * or its series dropped. Leaves the input config unchanged.
+ *
+ * Use it to bind a name-keyed chart config to column IDs, for example one
+ * restored from a URL or saved on a dashboard before column IDs.
+ */
+export function makeAvaVizConfigFromUiVizConfig({
+  config,
+  columns,
+}: Readonly<{
+  config: Readonly<UiVizConfig>;
+  columns: readonly QueryResult.ColumnWithId[];
+}>): { config: AvaVizConfig.T; issues: QueryResultColumnBindingIssue[] } {
+  const slots = makeColumnSlotsFromAvaVizConfig(config).map((slot) => {
+    return _bindSlotToColumnId({ slot, columns });
+  });
+  const getSlotColumnId: GetSlotColumnId = ({ target }) => {
+    return slots.find(propEq("target", target))?.id;
+  };
+  return {
+    config: _mapConfig({ config, getSlotColumnId }),
+    issues: slots.map(prop("issue")).filter(isDefined),
+  };
+}

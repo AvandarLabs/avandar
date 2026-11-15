@@ -2,11 +2,19 @@ import { describe, expect, it } from "vitest";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 function _having(group: QueryFilterGroup): string {
   const builder = sqlBuilder.queryBuilder().select("*").from("t").groupBy("g");
-  return applyHaving(builder, group).toQuery();
+  return applyHaving(builder, group, {
+    getColumn: (columnId) => {
+      return {
+        sql: `"${columnId}"`,
+        dataType: columnId === "total" ? "bigint" : "varchar",
+      };
+    },
+  }).toQuery();
 }
 
 describe("applyHaving", () => {
@@ -21,7 +29,7 @@ describe("applyHaving", () => {
       rules: [
         {
           type: "rule",
-          columnName: "total",
+          columnId: "total" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: 1000,
@@ -38,7 +46,7 @@ describe("applyHaving", () => {
       rules: [
         {
           type: "rule",
-          columnName: "label",
+          columnId: "label" as QueryColumn.Id,
           columnDataType: "varchar",
           operator: "contains",
           value: "san",
@@ -55,7 +63,7 @@ describe("applyHaving", () => {
       rules: [
         {
           type: "rule",
-          columnName: "total",
+          columnId: "total" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: "",

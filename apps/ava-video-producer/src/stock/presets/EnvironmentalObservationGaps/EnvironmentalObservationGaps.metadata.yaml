@@ -1,0 +1,111 @@
+name:
+  id: motionAtlas.environmental-observation-gaps.name
+  message: Keep gaps visible in the evidence
+description:
+  id: motionAtlas.environmental-observation-gaps.description
+  message:
+    A recognizable globe opens onto a schematic environmental observation tile. A
+    cloud mask leaves missing cells blank, and a field-check marker adds point evidence
+    without filling the surrounding unsampled area.
+category:
+  id: motionAtlas.environmental-observation-gaps.category
+  message: Globe-to-tile reveal with masked observations
+useWhen:
+  id: motionAtlas.environmental-observation-gaps.useWhen
+  message:
+    Show that an additional observation does not automatically resolve every nearby
+    evidence gap.
+prompt:
+  id: motionAtlas.environmental-observation-gaps.prompt
+  message:
+    Use Keep gaps visible in the evidence (environmental-observation-gaps) with
+    complete authored inputs and preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.environmental-observation-gaps.creativeDirection
+  message:
+    Reveal the globe as geographic context, then unfold a detached schematic
+    observation tile. A cloud layer lifts to reveal supplied cell readings while missing
+    cells retain their hatch. A field team places the supplied point checks without
+    replacing any whole-cell missing value. Hold the distinction between point sampling
+    and area coverage, then fade.
+intent:
+  id: motionAtlas.environmental-observation-gaps.intent
+  message:
+    Show that an additional observation does not automatically resolve every nearby
+    evidence gap.
+distinction:
+  id: motionAtlas.environmental-observation-gaps.distinction
+  message:
+    Masks preserve spatial gaps while a second sampling support is layered over
+    them. This is neither a scanning band nor a node network, and it avoids converting
+    point evidence into invented area coverage.
+tags:
+  - id: motionAtlas.environmental-observation-gaps.tags.0
+    message: environmental monitoring
+  - id: motionAtlas.environmental-observation-gaps.tags.1
+    message: satellite observation
+  - id: motionAtlas.environmental-observation-gaps.tags.2
+    message: cloud mask
+  - id: motionAtlas.environmental-observation-gaps.tags.3
+    message: missing data
+  - id: motionAtlas.environmental-observation-gaps.tags.4
+    message: field verification
+  - id: motionAtlas.environmental-observation-gaps.tags.5
+    message: sampling support
+  - id: motionAtlas.environmental-observation-gaps.tags.6
+    message: surface temperature
+  - id: motionAtlas.environmental-observation-gaps.tags.7
+    message: geospatial uncertainty
+goodFor:
+  - id: motionAtlas.environmental-observation-gaps.goodFor.0
+    message: Explain cloud gaps in environmental observations
+  - id: motionAtlas.environmental-observation-gaps.goodFor.1
+    message: Distinguish area samples from point field checks
+  - id: motionAtlas.environmental-observation-gaps.goodFor.2
+    message: Show monitoring evidence requiring a follow-up visit
+domains:
+  - id: motionAtlas.environmental-observation-gaps.domains.0
+    message: Globe-to-tile reveal with masked observations
+aliases:
+  - id: motionAtlas.environmental-observation-gaps.aliases.0
+    message: environmental monitoring
+  - id: motionAtlas.environmental-observation-gaps.aliases.1
+    message: satellite observation
+  - id: motionAtlas.environmental-observation-gaps.aliases.2
+    message: cloud mask
+notFor:
+  - id: motionAtlas.environmental-observation-gaps.notFor.0
+    message:
+      Observed area + missing area = number of cells times cellAreaHa. Field checks
+      have point support and contribute no hectares to coverage totals.
+  - id: motionAtlas.environmental-observation-gaps.notFor.1
+    message:
+      The globe is recognizable context only; the tile is explicitly schematic. No
+      real region, live sensor, remote basemap, satellite accuracy or environmental
+      trend is implied.
+  - id: motionAtlas.environmental-observation-gaps.notFor.2
+    message:
+      Values are fictional and share one variable, unit and authored observation
+      period. The graphic cannot establish measurement comparability or field validation
+      accuracy.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.environmental-observation-gaps.motionBeats.0
+      message: Reveal the authored setup.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.environmental-observation-gaps.motionBeats.1
+      message:
+        Reveal the globe as geographic context, then unfold a detached schematic
+        observation tile. A cloud layer lifts to reveal supplied cell readings while
+        missing cells retain their hatch. A field team places the supplied point checks
+        without replacing any whole-cell missing value. Hold the distinction between
+        point sampling and area coverage, then fade.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.environmental-observation-gaps.motionBeats.2
+      message: Hold the resolved authored state and complete accounting.

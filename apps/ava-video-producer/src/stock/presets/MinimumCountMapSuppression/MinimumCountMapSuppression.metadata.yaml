@@ -1,0 +1,122 @@
+name:
+  id: motionAtlas.minimum-count-map-suppression.name
+  message: Keep small-cell counts undisclosed
+description:
+  id: motionAtlas.minimum-count-map-suppression.description
+  message:
+    A derived cell-count map applies a minimum-release threshold. Cells below it
+    receive a distinct suppressed pattern and no public numeric label, while zeros,
+    missing cells and released counts retain separate meanings.
+category:
+  id: motionAtlas.minimum-count-map-suppression.category
+  message: Thresholded aggregate release
+useWhen:
+  id: motionAtlas.minimum-count-map-suppression.useWhen
+  message: Keep release thresholds distinct from zero and missing observations.
+prompt:
+  id: motionAtlas.minimum-count-map-suppression.prompt
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 show only the aggregate-count sheet inside a local analysis boundary, with no
+    individual points. Frames 51-105 apply a threshold shutter cell by cell. Frames
+    106-139 copy only permitted count labels to a public map and use distinct symbols
+    for suppressed, zero and missing states. Hold at frames 140-165; fade to the same
+    opaque ground at frames 166-179 for an editorial loop.
+creativeDirection:
+  id: motionAtlas.minimum-count-map-suppression.creativeDirection
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 show only the aggregate-count sheet inside a local analysis boundary, with no
+    individual points. Frames 51-105 apply a threshold shutter cell by cell. Frames
+    106-139 copy only permitted count labels to a public map and use distinct symbols
+    for suppressed, zero and missing states. Hold at frames 140-165; fade to the same
+    opaque ground at frames 166-179 for an editorial loop.
+intent:
+  id: motionAtlas.minimum-count-map-suppression.intent
+  message: Keep release thresholds distinct from zero and missing observations.
+distinction:
+  id: motionAtlas.minimum-count-map-suppression.distinction
+  message:
+    Unlike disclosure-aperture, an explicit numerical release rule is applied to
+    aggregate cells, with zero, suppression and no data distinct. No source point or
+    location is ever exposed.
+tags:
+  - id: motionAtlas.minimum-count-map-suppression.tags.0
+    message: small-cell suppression
+  - id: motionAtlas.minimum-count-map-suppression.tags.1
+    message: aggregate-only
+  - id: motionAtlas.minimum-count-map-suppression.tags.2
+    message: protection data
+  - id: motionAtlas.minimum-count-map-suppression.tags.3
+    message: release threshold
+goodFor:
+  - id: motionAtlas.minimum-count-map-suppression.goodFor.0
+    message: Explain minimum-count release rules for sensitive maps
+  - id: motionAtlas.minimum-count-map-suppression.goodFor.1
+    message: Distinguish suppressed, zero and missing cells
+domains:
+  - id: motionAtlas.minimum-count-map-suppression.domains.0
+    message: Thresholded aggregate release
+aliases:
+  - id: motionAtlas.minimum-count-map-suppression.aliases.0
+    message: small-cell suppression
+  - id: motionAtlas.minimum-count-map-suppression.aliases.1
+    message: aggregate-only
+  - id: motionAtlas.minimum-count-map-suppression.aliases.2
+    message: protection data
+notFor:
+  - id: motionAtlas.minimum-count-map-suppression.notFor.0
+    message:
+      A minimum-count threshold is one release rule, not a complete privacy guarantee
+      or anonymization proof.
+  - id: motionAtlas.minimum-count-map-suppression.notFor.1
+    message: Do not show grand totals from which hidden cells can be recovered by subtraction.
+  - id: motionAtlas.minimum-count-map-suppression.notFor.2
+    message:
+      Illustrative policy releases reported zero separately; real policies may also
+      suppress zeros.
+  - id: motionAtlas.minimum-count-map-suppression.notFor.3
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.minimum-count-map-suppression.notFor.4
+    message:
+      Authored prose must identify schematic geography and accurately describe the
+      selected example. Runtime validation preserves supplied prose and checks explicit
+      structural and numeric rules without natural-language classification.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.0
+      message: Reveal the schematic study.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.1
+      message: Show aggregate cells within the local analysis boundary.
+  - startFrame: 51
+    endFrame: 105
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.2
+      message: Apply threshold shutters to positive small-count cells.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.3
+      message:
+        Copy only released counts and zero to the public map, preserving suppression
+        and missing symbols.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.4
+      message: Hold without public grand totals.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.minimum-count-map-suppression.beat.5
+      message: The enclosing StockGraphic returns to opaque ground.

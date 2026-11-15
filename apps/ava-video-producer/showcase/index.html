@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eeede7" />
+    <title>Avandar / Motion room</title>
+    <meta
+      name="description"
+      content="An Avandar product demo and two motion studies built with our Remotion production toolkit."
+    />
+    <link rel="stylesheet" href="showcase-theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="masthead wrap">
+      <a class="brand" href="#"
+        ><span class="brand-mark" aria-hidden="true">a.</span> AVANDAR
+        <span class="brand-divider">/</span>
+        <span class="room">Motion room</span></a
+      >
+      <a
+        class="text-link"
+        href="https://github.com/AvandarLabs/avandar/tree/develop/apps/ava-video-producer"
+        target="_blank"
+        rel="noreferrer"
+        >View repository <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main class="wrap">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">
+            <span class="status-dot"></span> AVANDAR SHOWCASE
+            <span class="edition">001 / REMOTION</span>
+          </p>
+          <h1 id="page-title">A little code.<br />A lot of <em>motion.</em></h1>
+        </div>
+        <div class="intro-note">
+          <p>Real product. Deliberate motion.</p>
+          <p>
+            One Avandar component film and two small studies built with our
+            starter toolkit. Play, slow down, and see what each piece does.
+          </p>
+          <div class="specs">
+            <span>3 clips</span><span>30 fps</span
+            ><span>Live local previews</span>
+          </div>
+          <p>
+            <a class="text-link" href="motion.html"
+              >Explore the motion vocabulary
+              <span aria-hidden="true">↗</span></a
+            >
+          </p>
+          <p>
+            <a class="text-link" href="productions.html"
+              >Watch the new productions <span aria-hidden="true">↗</span></a
+            >
+          </p>
+        </div>
+      </section>
+      <section class="screening-room" aria-label="Video showcase">
+        <div class="screening-top">
+          <span><span class="live-dot"></span> THE SCREENING ROOM</span
+          ><span id="clip-count">CLIP 01 / 03</span>
+        </div>
+        <div class="screening-grid">
+          <div class="viewer">
+            <iframe
+              id="player"
+              data-src="/live.html?id=avandar-home"
+              title="From query to comparison: live preview"
+              allowfullscreen
+            ></iframe>
+            <div class="transport">
+              <button id="replay" type="button">
+                <span aria-hidden="true">↻</span> Replay</button
+              ><label
+                >Speed
+                <select id="speed" aria-label="Playback speed">
+                  <option value="0.5">0.5×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="1.5">1.5×</option>
+                </select></label
+              ><label class="loop-control"
+                ><input type="checkbox" id="loop" /> Loop</label
+              ><button
+                id="download"
+                type="button"
+                aria-describedby="export-status"
+              >
+                Download MP4 <span aria-hidden="true">↓</span>
+              </button>
+            </div>
+            <p
+              id="export-status"
+              class="export-status"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></p>
+          </div>
+          <aside class="playlist" aria-label="Choose a clip">
+            <p class="playlist-label">PRESS PLAY. LOOK CLOSER.</p>
+            <button
+              class="clip-choice selected"
+              type="button"
+              data-clip="0"
+              aria-pressed="true"
+            >
+              <img
+                src="assets/avandar-home-poster.jpg?v=83129cdbb0e7"
+                alt=""
+                width="160"
+                height="100"
+              /><span class="choice-body"
+                ><span class="choice-kicker">01 / AVANDAR</span
+                ><strong>From query to comparison</strong
+                ><span class="choice-meta"
+                  >19.7 sec <span>590 frames</span></span
+                ></span
+              ><span class="choice-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button
+              class="clip-choice"
+              type="button"
+              data-clip="1"
+              aria-pressed="false"
+            >
+              <img
+                src="assets/title-study-poster.jpg"
+                alt=""
+                width="160"
+                height="100"
+              /><span class="choice-body"
+                ><span class="choice-kicker">02 / COMPONENT STUDY</span
+                ><strong>Words in motion</strong
+                ><span class="choice-meta"
+                  >8.4 sec <span>252 frames</span></span
+                ></span
+              ><span class="choice-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button
+              class="clip-choice"
+              type="button"
+              data-clip="2"
+              aria-pressed="false"
+            >
+              <img
+                src="assets/motion-lab-poster.jpg"
+                alt=""
+                width="160"
+                height="100"
+              /><span class="choice-body"
+                ><span class="choice-kicker">03 / COMPONENT STUDY</span
+                ><strong>The small details</strong
+                ><span class="choice-meta"
+                  >12.0 sec <span>360 frames</span></span
+                ></span
+              ><span class="choice-arrow" aria-hidden="true">↗</span>
+            </button>
+            <div class="playlist-foot">
+              <span aria-hidden="true">◌</span>
+              <p>Silent by design.<br />Watch the movement itself.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section class="clip-notes" aria-live="polite" aria-atomic="true">
+        <div>
+          <p id="provenance" class="eyebrow">
+            AVANDAR COMPONENTS / FICTIONAL DATA
+          </p>
+          <h2 id="clip-title">From query to comparison</h2>
+          <p id="clip-description">
+            Avandar’s actual Data Explorer: write a query, run a district
+            comparison, and reveal the bar chart. Real product components and
+            styles, animated with fictional Harborfield data.
+          </p>
+          <a
+            id="source-link"
+            class="text-link"
+            href="https://github.com/AvandarLabs/avandar/blob/develop/apps/ava-video-producer/storyboards/home.json"
+            target="_blank"
+            rel="noreferrer"
+            >Read the composition <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <div class="look-for">
+          <p class="eyebrow">JUMP TO A MOMENT</p>
+          <div id="chapters" class="chapters"></div>
+          <p id="watch-note" class="watch-note"></p>
+        </div>
+      </section>
+      <section class="toolkit" aria-labelledby="toolkit-title">
+        <div class="section-head">
+          <p class="eyebrow">THE BUILDING BLOCKS</p>
+          <h2 id="toolkit-title">What’s already in the box.</h2>
+          <p>A small production kit for your coding agent.</p>
+        </div>
+        <div class="toolkit-row">
+          <span class="row-number">01</span>
+          <div>
+            <h3>A playbook for the agent</h3>
+            <p>
+              Instructions for planning a shot list, reading a product,
+              arranging scenes, and reviewing the result. Claude or Codex still
+              does the thinking and coding.
+            </p>
+          </div>
+          <span class="file-tag"
+            >apps/ava-video-producer/.claude/skills/product-demo/SKILL.md<br />apps/ava-video-producer/AGENTS.md</span
+          >
+        </div>
+        <div class="toolkit-row">
+          <span class="row-number">02</span>
+          <div>
+            <h3>A shared motion vocabulary</h3>
+            <p>
+              Titles, typed text, counters, staggered arrivals, easing, an app
+              frame, and a pointer. The two studies above arrange these existing
+              pieces in new ways.
+            </p>
+          </div>
+          <span class="file-tag"
+            >apps/ava-video-producer/src/motion.ts<br />apps/ava-video-producer/src/title-card.tsx</span
+          >
+        </div>
+        <div class="toolkit-row">
+          <span class="row-number">03</span>
+          <div>
+            <h3>A local rendering pipeline</h3>
+            <p>
+              React scenes play live in the browser. Download MP4 renders the
+              current composition on demand. Preview sheets and automated checks
+              support the final picture review.
+            </p>
+          </div>
+          <span class="file-tag">preview → render → check</span>
+        </div>
+      </section>
+      <section class="scope" aria-labelledby="scope-title">
+        <div>
+          <p class="eyebrow">PRODUCTION TOOLKIT CHECKLIST</p>
+          <h2 id="scope-title">Built so far.<br />Still to do.</h2>
+          <p>
+            Avandar component films, browser capture, reusable scenes, and
+            narrated storyboards are available locally.
+          </p>
+          <p>
+            All gallery previews play live and refresh after source changes.
+            Download MP4 renders the current film and selected options. Motion
+            Atlas also exports the selected brand and background colors.
+          </p>
+        </div>
+        <div class="scope-table">
+          <div class="scope-line scope-header">
+            <span>Available now</span><span>Status</span>
+          </div>
+          <div class="scope-line">
+            <span>Motion helpers, graphs, flowcharts & metrics</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>Local MP4 rendering & frame checks</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>Real-app browser capture</span>
+            <span class="included">Done · local flows</span>
+          </div>
+          <div class="scope-line">
+            <span>Avandar component films & homepage demo</span>
+            <span class="included">Done · fictional data</span>
+          </div>
+          <div class="scope-line">
+            <span>Storyboards, scratch narration & captions</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>Live Showcase & Productions playback</span>
+            <span class="included">Done · no MP4 preview</span>
+          </div>
+          <div class="scope-line">
+            <span>Motion Atlas & live brand/background colors</span>
+            <span class="included">Done · 20 presets</span>
+          </div>
+          <div class="scope-line">
+            <span>Direct component imports & source-watched previews</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>On-demand MP4 downloads & selected Atlas colors</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>Production captions toggle & matching exports</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line">
+            <span>Ignored private video projects</span>
+            <span class="included">Done</span>
+          </div>
+          <div class="scope-line scope-header">
+            <span>Still missing</span><span>Status</span>
+          </div>
+          <div class="scope-line">
+            <span>Production brand & background color controls</span>
+            <span>Not implemented</span>
+          </div>
+          <div class="scope-line">
+            <span>Automatic speech-to-caption alignment</span>
+            <span>Not implemented</span>
+          </div>
+          <div class="scope-line">
+            <span>Final narration & full listening review</span>
+            <span>Still needed · scratch voice only</span>
+          </div>
+        </div>
+      </section>
+      <section class="closing">
+        <div>
+          <p class="eyebrow">READY TO EXPLORE THE TIMELINE?</p>
+          <h2>Every frame is editable.</h2>
+          <p>
+            Edit <code>apps/ava-video-producer/storyboards/home.json</code>. The
+            live preview updates after a successful rebuild. From the repository
+            root, run
+            <code
+              >pnpm --filter @avandar/ava-video-producer video preview
+              "$PWD/apps/ava-video-producer/storyboards/home.json"</code
+            >
+            to generate the homepage contact sheet.
+          </p>
+        </div>
+        <span class="closing-mark" aria-hidden="true">↗</span>
+      </section>
+    </main>
+    <footer class="wrap">
+      <span>AVANDAR / MOTION ROOM</span>
+      <p>
+        Built from
+        <a
+          href="https://github.com/Alexwtlf/agentic-product-demo"
+          target="_blank"
+          rel="noreferrer"
+          >agentic-product-demo</a
+        >
+        by Alexwtlf. Starter code licensed under MIT.
+      </p>
+    </footer>
+  </body>
+</html>

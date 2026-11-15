@@ -38,14 +38,15 @@ The global command palette (`Ctrl+P`, see
 rather than an editable file: the flat, ordered table `PALETTE_COMMANDS` in
 `src/tui/palette.rs`. Each entry is a `PaletteCommand { label, action }`, and
 each `PaletteAction` variant is dispatched by `App::execute_palette_action`
-(`src/tui/app.rs`).
+(`src/tui/app/mod.rs`).
 
-Today the registry has four entries: "Restart diff server" → `PaletteAction::RestartDifit`
+Today the registry has five entries: "Refresh diff" → `PaletteAction::RestartDifit`
 (`Ctrl+R`), "Regenerate diff guide" → `PaletteAction::RegenerateGuide`
 (`Ctrl+G`), "Open diff in browser" → `PaletteAction::OpenInBrowser`
-(`Ctrl+O`), and "New LLM session" → `PaletteAction::NewLlmSession`
-(`Ctrl+N`), each shown with its direct key as a dimmed
-`[^R]` / `[^G]` / `[^O]` / `[^N]` hint on its row (`palette::shortcut_for`). Adding a command is three edits: add a
+(`Ctrl+O`), "New LLM session" → `PaletteAction::NewLlmSession`
+(`Ctrl+N`), and "Resync with GitHub" → `PaletteAction::ResyncGithub`
+(`Ctrl+S`), each shown with its direct key as a dimmed
+`[^R]` / `[^G]` / `[^O]` / `[^N]` / `[^S]` hint on its row (`palette::shortcut_for`). Adding a command is three edits: add a
 `PaletteAction` variant, add a row to `PALETTE_COMMANDS`, and handle the variant
 in `execute_palette_action`; add a `shortcut_for` arm if it also gets a direct
 key (and the dimmed hint then renders automatically; keep it current with the

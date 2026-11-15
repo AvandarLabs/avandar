@@ -1,0 +1,47 @@
+.explorerRoot {
+  background: var(--ava-surface-body);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.explorerToolbar {
+  border-bottom: 1px solid var(--mantine-color-neutral-2);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.explorerCanvas {
+  background: white;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.explorerSummary {
+  background: white;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+}
+
+.explorerDrawerBody {
+  overflow: hidden;
+}
+
+.explorerSqlGroup {
+  min-width: 0;
+}
+
+.explorerFictional {
+  margin-right: auto;
+}
+
+.explorerRoot :global(.cm-cursorLayer) {
+  animation: none !important;
+  opacity: var(--explorer-caret-opacity);
+}
+
+.explorerRoot :global([data-testid="filter-value-scalar"]) {
+  caret-color: transparent;
+}

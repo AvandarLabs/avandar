@@ -1,0 +1,13 @@
+Avandar: layered map preview
+
+Inspect 240 fictional case locations.
+
+Select the 12 facility locations.
+
+Hide the facility layer to compare.
+
+Restore the separate facility layer.
+
+Move closer to inspect one location.
+
+Read the selected facility's details.

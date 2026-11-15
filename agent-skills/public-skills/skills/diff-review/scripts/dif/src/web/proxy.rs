@@ -28,13 +28,22 @@ fn url(difit_port: u16, path_and_query: &str) -> String {
     format!("http://localhost:{difit_port}{path_and_query}")
 }
 
-fn collect(status: u16, resp: ureq::Response) -> Result<Upstream> {
-    let content_type = resp
-        .header("content-type")
-        .unwrap_or("application/octet-stream")
-        .to_owned();
+fn content_type(resp: &ureq::http::Response<ureq::Body>, fallback: &str) -> String {
+    resp.headers()
+        .get("content-type")
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or(fallback)
+        .to_owned()
+}
+
+fn collect(resp: ureq::http::Response<ureq::Body>) -> Result<Upstream> {
+    let status = resp.status().as_u16();
+    let content_type = content_type(&resp, "application/octet-stream");
     let mut body = Vec::new();
-    resp.into_reader()
+    // The reader is unlimited, unlike `read_to_vec`'s 10MB cap: a large
+    // `/api/diff` must reach the browser whole.
+    resp.into_body()
+        .into_reader()
         .read_to_end(&mut body)
         .context("reading upstream body")?;
     Ok(Upstream {
@@ -47,9 +56,13 @@ fn collect(status: u16, resp: ureq::Response) -> Result<Upstream> {
 /// Buffered GET. Forwards a non-2xx upstream status + body rather than erroring.
 pub fn get(difit_port: u16, path_and_query: &str) -> Result<Upstream> {
     let url = url(difit_port, path_and_query);
-    match ureq::get(&url).call() {
-        Ok(resp) => collect(resp.status(), resp),
-        Err(ureq::Error::Status(code, resp)) => collect(code, resp),
+    match ureq::get(&url)
+        .config()
+        .http_status_as_error(false)
+        .build()
+        .call()
+    {
+        Ok(resp) => collect(resp),
         Err(e) => Err(anyhow!("proxy GET {url}: {e}")),
     }
 }
@@ -63,11 +76,13 @@ pub fn post(
 ) -> Result<Upstream> {
     let url = url(difit_port, path_and_query);
     match ureq::post(&url)
-        .set("Content-Type", content_type)
-        .send_bytes(body)
+        .config()
+        .http_status_as_error(false)
+        .build()
+        .header("Content-Type", content_type)
+        .send(body)
     {
-        Ok(resp) => collect(resp.status(), resp),
-        Err(ureq::Error::Status(code, resp)) => collect(code, resp),
+        Ok(resp) => collect(resp),
         Err(e) => Err(anyhow!("proxy POST {url}: {e}")),
     }
 }
@@ -84,9 +99,6 @@ pub fn open_stream(
     let resp = ureq::get(&url)
         .call()
         .map_err(|e| anyhow!("proxy stream {url}: {e}"))?;
-    let content_type = resp
-        .header("content-type")
-        .unwrap_or("text/event-stream")
-        .to_owned();
-    Ok((content_type, resp.into_reader()))
+    let content_type = content_type(&resp, "text/event-stream");
+    Ok((content_type, Box::new(resp.into_body().into_reader())))
 }

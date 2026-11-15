@@ -47,10 +47,10 @@ any step is how a correct pattern gets mis-flagged as a bug.
   the isolation rule (rule #1 in the module headers).
 - The migration module that **IS** the current version (its `SCHEMA_VERSION`
   equals `CURRENT_SCHEMA_VERSION`) MAY import the live `AvaPageTypes` / model
-  types (e.g. `import type { VizConfig } from "$/models/vizs/..."`), because
+  types (e.g. `import type { AvaVizConfig } from "$/models/vizs/..."`), because
   for the current version the snapshot shape and the live shape are the same
   thing by definition. Aliasing live in the latest migration
-  (`export type V<N>_VizConfig = VizConfig`) is **correct and intended**, not
+  (`export type V<N>_VizConfig = AvaVizConfig`) is **correct and intended**, not
   a violation.
 
 ### What TO flag
@@ -65,7 +65,7 @@ any step is how a correct pattern gets mis-flagged as a bug.
 ### What NOT to flag
 
 - The **current-version** migration aliasing or importing live types
-  (`V<N>_VizConfig = VizConfig`, etc.). This is the documented pattern and
+  (`V<N>_VizConfig = AvaVizConfig`, etc.). This is the documented pattern and
   there is a built-in guardrail: the latest migration's upgrade function
   returns the live type, so the day someone reshapes those models the latest
   migration fails to compile, forcing whoever introduces `V<N+1>` to freeze

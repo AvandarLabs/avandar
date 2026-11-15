@@ -8,6 +8,7 @@ import { getFilterValueFromLibraryValue } from "@/views/DataExplorerApp/QueryFor
 import { FilterValueEditor } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor";
 import { MatchCaseToggle } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle";
 import classes from "./FilterValueEditorControl.module.css";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
 import type { ValueEditorProps } from "react-querybuilder";
@@ -28,14 +29,14 @@ export function FilterValueEditorControl({
 }: Props): ReactNode {
   const filterContext = getFilterControlsContext(context);
   const ruleId = rule.id ?? "";
-  const dataType = filterContext.columnTypes[field];
+  const dataType = filterContext.columnTypes[field as QueryColumn.Id];
   // react-querybuilder types `value` as `any`, so it is narrowed before every
   // downstream check runs against it.
   const filterValue = getFilterValueFromLibraryValue(value);
   const filterRule: StructuredQuery.FilterRule = {
     type: "rule",
     id: ruleId,
-    columnName: field,
+    columnId: field as QueryColumn.Id,
     ...(dataType === undefined ? {} : { columnDataType: dataType }),
     operator: QueryFilterOperator.isOperator(operator) ? operator : "=",
     value: filterValue,

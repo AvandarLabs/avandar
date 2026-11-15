@@ -1,31 +1,29 @@
 import { Model } from "@avandar/models";
 import { useEffect, useRef } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { fetchDatasetRowCount } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import {
   largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
-import { fetchDatasetRowCount } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-
-type Options = {
-  query: PartialStructuredQuery;
-  /**
-   * When a `rawSql` string is present (set by direct SQL edits or
-   * LLM-generated SQL) the auto-limit is suppressed — those SQL strings are
-   * sacrosanct and must run verbatim.
-   */
-  rawSql: string | undefined;
-  onApplyAutoLimit: (limit: number) => void;
-};
 
 /**
  * When the manual query can return unbounded rows from a large dataset,
- * resolves row count (cached) and writes the auto LIMIT into structured-query
- * state so the
- * form and executed SQL stay aligned.
+ * resolves the row count (cached) and passes the automatic LIMIT to
+ * `onApplyAutoLimit` to store on the query, so the form and the executed SQL
+ * use the same limit.
  */
-export function useSyncLargeDatasetAutoLimit(opts: Options): void {
+export function useSyncLargeDatasetAutoLimit(opts: {
+  query: PartialStructuredQuery;
+  /**
+   * When a `rawSql` string is present (set by direct SQL edits or
+   * LLM-generated SQL) the auto-limit is suppressed: those SQL strings must
+   * run verbatim.
+   */
+  rawSql: string | undefined;
+  onApplyAutoLimit: (limit: number) => void;
+}): void {
   const { query, rawSql, onApplyAutoLimit } = opts;
   const workspace = useCurrentWorkspace();
   const syncRequestIdRef = useRef(0);

@@ -1,7 +1,7 @@
-//! Wording for the "code changed: restart difit" alert shown in the log view.
+//! Wording for the "code changed: refresh the diff" alert shown in the log view.
 //!
 //! When the repo's diff signature diverges from what difit is serving, `dif`
-//! warns that a restart is needed. Best-effort attribution distinguishes a
+//! warns that a refresh is needed. Best-effort attribution distinguishes a
 //! change the LLM just made (it was injected a prompt moments ago) from a manual
 //! edit made outside the shell, so the alert can name the author. The decision
 //! is a pure function of "how long since `dif` last injected a prompt", which
@@ -44,10 +44,12 @@ pub fn change_alert(author: ChangeAuthor) -> String {
 pub fn change_alert_for(author: ChangeAuthor, agent_label: &str) -> String {
     let body = match author {
         ChangeAuthor::Claude => {
-            format!("⚠️  {agent_label} made code changes. Restart difit to show them (Ctrl+R) 🔁")
+            format!(
+                "⚠️  {agent_label} made code changes. Refresh the diff to show them (Ctrl+R) 🔁"
+            )
         }
         ChangeAuthor::Manual => {
-            "⚠️  New manual changes detected. Restart difit to show them (Ctrl+R) 🔁".to_owned()
+            "⚠️  New manual changes detected. Refresh the diff to show them (Ctrl+R) 🔁".to_owned()
         }
     };
     format!("\r\n\x1b[1;38;5;208m{body}\x1b[0m\r\n")
@@ -85,6 +87,8 @@ mod tests {
         assert!(change_alert(ChangeAuthor::Claude).contains("Claude made"));
         assert!(change_alert(ChangeAuthor::Manual).contains("manual changes"));
         // Both still tell the reviewer how to refresh.
+        assert!(change_alert(ChangeAuthor::Claude).contains("Refresh the diff"));
+        assert!(change_alert(ChangeAuthor::Manual).contains("Refresh the diff"));
         assert!(change_alert(ChangeAuthor::Claude).contains("Ctrl+R"));
         assert!(change_alert(ChangeAuthor::Manual).contains("Ctrl+R"));
     }

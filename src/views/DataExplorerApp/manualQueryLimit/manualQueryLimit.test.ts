@@ -10,6 +10,7 @@ import {
   shouldAutoLimitLargeDataset,
   shouldDefaultManualQueryLimit,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 describe("manualQueryLimit", () => {
@@ -70,7 +71,7 @@ describe("manualQueryLimit", () => {
         rules: [
           {
             type: "rule" as const,
-            columnName: "id",
+            columnId: "id" as QueryColumn.Id,
             operator: "=" as const,
             value: 1,
           },

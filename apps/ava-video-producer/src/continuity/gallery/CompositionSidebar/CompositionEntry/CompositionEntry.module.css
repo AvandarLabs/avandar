@@ -1,0 +1,32 @@
+.compositionEntry {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  display: block;
+  padding: 14px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+.compositionEntry:hover {
+  background: var(--ava-neutral-1);
+}
+
+.compositionEntry[aria-current="true"] {
+  background: var(--ava-primary-0);
+}
+
+.compositionEntry strong {
+  display: block;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.compositionEntry small {
+  color: var(--muted);
+  display: block;
+  line-height: 1.4;
+  margin-top: 6px;
+}

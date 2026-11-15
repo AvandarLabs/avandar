@@ -1,0 +1,14 @@
+.option {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tooltip {
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: calc(100vw - 32px);
+  white-space: pre-line;
+}

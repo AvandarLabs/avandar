@@ -1,23 +1,27 @@
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
+import { synchronizeUiVizType } from "./synchronizeUiVizType";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
 
 /**
- * The last config the user saw for each viz type, per DataViz block.
+ * The last config each DataViz block showed for each viz type, so switching
+ * a chart back to a viz type restores the settings it had. Held by
+ * `useDataVizPBlockConfig` and updated on a viz type change by
+ * `makeDataVizPBlockStateFromProps` and `synchronizeUiVizType`.
  *
- * Keyed by block id first because Puck registers one `ComponentConfig` per
- * component *type*, so a single `resolveData` closure serves every DataViz
- * block on the page. Without the outer key, two blocks would overwrite each
- * other's memory, which looks correct until a dashboard holds more than one
- * chart.
- *
- * The inner map is a `Partial<VizConfigRegistry>`, so each entry's config is
- * correlated with the viz type it is filed under: a bar config cannot be
- * stored under `"pie"`.
+ * Keyed by block ID because Puck runs one `resolveData` for every DataViz
+ * block. Configs keyed by column ID sit under their viz type, and version 0
+ * configs keyed by `QueryResult` column name sit under `uiVizConfigs`.
  */
-export type DataVizConfigMemory = Record<string, Partial<VizConfigRegistry>>;
+export type DataVizConfigMemory = Record<
+  string,
+  Partial<AvaVizConfig.Registry> & {
+    uiVizConfigs?: Partial<Record<AvaVizConfig.Type, UiVizConfig>>;
+  }
+>;
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 
@@ -51,16 +55,35 @@ export function makeDataVizPBlockStateFromProps(options: {
     return { props: props as DataVizPBlockProps, vizConfigMemory };
   }
 
-  const nextProps: DataVizPBlockProps = {
-    nlQuery: props.nlQuery ?? DEFAULT_NL_QUERY,
-    vizType: props.vizType ?? DEFAULT_VIZ_TYPE,
+  if (props.columnBindingVersion === 0) {
+    return synchronizeUiVizType({
+      props,
+      changed,
+      blockId,
+      vizConfigMemory,
+    });
+  }
+  const columnIdProps = props as Partial<
+    Extract<DataVizPBlockProps, { columnBindingVersion: 1 }>
+  >;
+  const nextProps: Extract<DataVizPBlockProps, { columnBindingVersion: 1 }> = {
+    columnBindingVersion: 1,
+    columnBindings: columnIdProps.columnBindings ?? {
+      version: 1,
+      scopeKey: blockId,
+      sqlKey: "",
+      columns: [],
+    },
+    globalFilterTargets: columnIdProps.globalFilterTargets ?? {},
+    nlQuery: columnIdProps.nlQuery ?? DEFAULT_NL_QUERY,
+    vizType: columnIdProps.vizType ?? DEFAULT_VIZ_TYPE,
     vizConfig:
-      props.vizConfig ??
-      VizConfigs.makeEmptyConfig(props.vizType ?? DEFAULT_VIZ_TYPE),
+      columnIdProps.vizConfig ??
+      AvaVizConfigs.makeEmptyConfig(columnIdProps.vizType ?? DEFAULT_VIZ_TYPE),
     globalFilterSubscription:
-      props.globalFilterSubscription ??
+      columnIdProps.globalFilterSubscription ??
       DataVizFilters.defaultGlobalFilterSubscription,
-    localFilters: props.localFilters ?? [],
+    localFilters: columnIdProps.localFilters ?? [],
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {
@@ -69,12 +92,12 @@ export function makeDataVizPBlockStateFromProps(options: {
     const rememberedVizConfig = blockVizConfigMemory[nextProps.vizType];
 
     // A remembered config can name columns the current query no longer
-    // returns. `DataVizPBlock` runs `applyVizConfigFromQueryResult` on every
-    // render, so it is reconciled there rather than here, where the result
-    // columns are not available.
+    // returns. `DataVizPBlock` runs `AvaVizConfigs.hydrateFromQueryResult` on
+    // every render, so it is reconciled there rather than here, where the
+    // result columns are not available.
     nextProps.vizConfig =
       rememberedVizConfig ??
-      VizConfigs.convertVizConfig(outgoingVizConfig, nextProps.vizType);
+      AvaVizConfigs.convertVizConfig(outgoingVizConfig, nextProps.vizType);
 
     // TypeScript widens the computed union key to `string` and so cannot see
     // that the outgoing config lands under its own `vizType`. The key is taken
@@ -82,7 +105,7 @@ export function makeDataVizPBlockStateFromProps(options: {
     const nextBlockVizConfigMemory = {
       ...blockVizConfigMemory,
       [outgoingVizConfig.vizType]: outgoingVizConfig,
-    } as Partial<VizConfigRegistry>;
+    } as Partial<AvaVizConfig.Registry>;
 
     return {
       props: nextProps,

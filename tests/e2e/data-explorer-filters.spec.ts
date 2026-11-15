@@ -1,3 +1,20 @@
+import { expect, test } from "./fixtures/e2e.fixture";
+import { signInWithEmailPassword } from "./helpers/auth";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
+import {
+  dismissBlockingOverlays,
+  openDataExplorerDrawerTab,
+} from "./helpers/dataExplorerFlow";
+import { deleteDatasetFixture } from "./helpers/deleteDatasetFixture";
+import {
+  ensureCloudStorageCheckedAndSaveDataset,
+  parseDatasetIdFromDataManagerUrl,
+} from "./helpers/manualUploadCloudSyncFlow";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
+import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 /**
  * Filter semantics, driven through the filter panel.
  *
@@ -13,24 +30,9 @@
  * toggle that turns it off, are what these cover: they are the semantics with
  * no other end-to-end coverage and the ones a person is most likely to notice.
  */
-import { expect, test } from "./fixtures/e2e.fixture";
-import { signInWithEmailPassword } from "./helpers/auth";
-import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
-import {
-  dismissBlockingOverlays,
-  openDataExplorerDrawerTab,
-} from "./helpers/dataExplorerFlow";
-import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
-import {
-  ensureCloudStorageCheckedAndSaveDataset,
-  parseDatasetIdFromDataManagerUrl,
-} from "./helpers/manualUploadCloudSyncFlow";
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-} from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
+
+test.use({ trace: "retain-on-failure" });
 
 const DATASET_NAME = "small-california-covid-sample.csv";
 
@@ -157,10 +159,6 @@ async function _getColumnCellTexts(options: {
 }
 
 test.describe("Data Explorer filter semantics", () => {
-  // Importing a dataset and running two queries against it exceeds the default
-  // per-test budget.
-  test.slow();
-
   test("a text filter built in the panel matches regardless of case, until Match case is on", async ({
     page,
     e2eWorkerDb,
@@ -221,14 +219,7 @@ test.describe("Data Explorer filter semantics", () => {
         )
         .toEqual([]);
     } finally {
-      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-      await deleteDatasetViaDataManagerUiAndVerify({
-        admin,
-        datasetId,
-        page,
-        workspaceId,
-        workspaceSlug,
-      });
+      await deleteDatasetFixture({ admin, datasetId, workspaceId });
     }
   });
 
@@ -276,14 +267,7 @@ test.describe("Data Explorer filter semantics", () => {
           expect.arrayContaining([COUNTY_VALUE_IN_DATA, "Alpine", "Amador"]),
         );
     } finally {
-      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-      await deleteDatasetViaDataManagerUiAndVerify({
-        admin,
-        datasetId,
-        page,
-        workspaceId,
-        workspaceSlug,
-      });
+      await deleteDatasetFixture({ admin, datasetId, workspaceId });
     }
   });
 });

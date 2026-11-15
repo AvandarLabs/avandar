@@ -2,6 +2,7 @@ import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/
 import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
 import { AvaPageDataMigrationV3 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3";
 import { AvaPageDataMigrationV4 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV4/AvaPageDataMigrationV4";
+import { AvaPageDataMigrationV5 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV5/AvaPageDataMigrationV5";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   AvaPageData,
@@ -13,6 +14,7 @@ const versionTransforms = [
   AvaPageDataMigrationV2,
   AvaPageDataMigrationV3,
   AvaPageDataMigrationV4,
+  AvaPageDataMigrationV5,
 ];
 
 AvaPageDataMigrator.registerMigrations(versionTransforms);

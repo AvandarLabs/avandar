@@ -41,14 +41,17 @@ contract under `.difit/` (filenames, JSON/markdown shapes). You cannot reason
 about one without the other.
 
 - **Always load the `diff-review` skill as reference before changing code
-  here.** Its source of truth is the skill's `SKILL.md` two directories up
-  (`../../SKILL.md`) — this crate is bundled inside that skill at
-  `scripts/dif/`. Read it, don't guess what it produces.
-- **"Update the skill" always means `../../SKILL.md`**, even though it does not
+  here.** Its source of truth is the skill two directories up: `../../SKILL.md`
+  and the files it routes to (`../../modes/`, `../../contracts/`,
+  `../../walkthrough/`). This crate is bundled inside that skill at
+  `scripts/dif/`. Read them, don't guess what it produces.
+- **"Update the skill" always means those files**, even though they do not
   live in this directory. When the user asks to change diff-guide content
-  rules, the reviewed-state behavior, the group/file review semantics, or the
-  summary format, edit `../../SKILL.md` — not this crate. The Rust crate only
-  renders and triggers; the *content* rules live in the skill.
+  rules, the reviewed-state behavior, or the group/file review semantics, edit
+  `../../contracts/guide.md`; for the transcript shape, edit
+  `../../contracts/transcript.md`; for the summary format, edit
+  `../../contracts/reporting.md`, not this crate. The Rust crate only renders
+  and triggers; the *content* rules live in the skill.
 - **The diff guide must stay current.** Whenever code changes during a review,
   the guide markdown under `.difit/` must be regenerated so it always reflects
   the present diff. That regeneration is the skill's job; `dif` only triggers

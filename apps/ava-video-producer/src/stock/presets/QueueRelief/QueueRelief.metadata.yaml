@@ -1,0 +1,117 @@
+name:
+  id: motionAtlas.queue-relief.name
+  message: Relieve the bottleneck
+description:
+  id: motionAtlas.queue-relief.description
+  message:
+    A visible queue builds behind limited service capacity. Additional service
+    slots open and the same waiting items clear through them.
+category:
+  id: motionAtlas.queue-relief.category
+  message: Capacity and queues
+useWhen:
+  id: motionAtlas.queue-relief.useWhen
+  message: Show that opening more service capacity allows an existing backlog to move.
+creativeDirection:
+  id: motionAtlas.queue-relief.creativeDirection
+  message:
+    Frames 0..12 reveal a queue corridor and named service slots. During 12..54,
+    every supplied item arrives and only initially open slots accept work, making the
+    waiting line visible. Keep initial service items occupied until the capacity
+    expansion beat so a backlog remains visible. During 54..90, the additional slots
+    unfold from closed outlines into usable bays. During 90..138, waiting items enter
+    those bays without changing their original order and emerge into a completed tray.
+    Hold the emptied queue and all completed items through frame 168, then fade to the
+    opaque ground by 179. The hero action is the release of accumulated work after
+    capacity changes.
+intent:
+  id: motionAtlas.queue-relief.intent
+  message: Show that opening more service capacity allows an existing backlog to move.
+distinction:
+  id: motionAtlas.queue-relief.distinction
+  message:
+    Unlike packet-stream, movement is initially constrained and the waiting
+    inventory matters. Unlike status-cycle, the central change is service capacity
+    across several work items, not the status of one task.
+prompt:
+  id: motionAtlas.queue-relief.prompt
+  message:
+    Use Motion Atlas "Relieve the bottleneck" (queue-relief) as a conceptual
+    graphic. Show that opening more service capacity allows an existing backlog to move.
+    Replace fictional sample content with approved authored content before making
+    product claims.
+tags:
+  - id: motionAtlas.queue-relief.tags.0
+    message: queue
+  - id: motionAtlas.queue-relief.tags.1
+    message: bottleneck
+  - id: motionAtlas.queue-relief.tags.2
+    message: backlog
+  - id: motionAtlas.queue-relief.tags.3
+    message: capacity
+  - id: motionAtlas.queue-relief.tags.4
+    message: throughput
+  - id: motionAtlas.queue-relief.tags.5
+    message: waiting line
+  - id: motionAtlas.queue-relief.tags.6
+    message: service slots
+  - id: motionAtlas.queue-relief.tags.7
+    message: congestion relief
+goodFor:
+  - id: motionAtlas.queue-relief.goodFor.0
+    message: Explaining why a backlog forms around limited service capacity
+  - id: motionAtlas.queue-relief.goodFor.1
+    message: Introducing additional processing slots or staffed counters
+  - id: motionAtlas.queue-relief.goodFor.2
+    message: Distinguishing waiting work from work being serviced
+domains:
+  - id: motionAtlas.queue-relief.domains.0
+    message: Capacity and queues
+aliases:
+  - id: motionAtlas.queue-relief.aliases.0
+    message: queue
+  - id: motionAtlas.queue-relief.aliases.1
+    message: bottleneck
+  - id: motionAtlas.queue-relief.aliases.2
+    message: backlog
+  - id: motionAtlas.queue-relief.aliases.3
+    message: capacity
+notFor:
+  - id: motionAtlas.queue-relief.notFor.0
+    message:
+      The default is a fictional five-request example; each token represents exactly
+      one supplied item.
+  - id: motionAtlas.queue-relief.notFor.1
+    message:
+      Timing demonstrates the authored sequence, not a measured arrival rate,
+      throughput increase, or staffing forecast.
+  - id: motionAtlas.queue-relief.notFor.2
+    message:
+      All work is homogeneous and completes within the scene; priorities, varying
+      task durations, and continuous arrivals are outside this proposal.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.queue-relief.motionBeats.0
+      message: Reveal queue and service bays.
+  - startFrame: 12
+    endFrame: 54
+    description:
+      id: motionAtlas.queue-relief.motionBeats.1
+      message: Accumulate supplied work behind initial capacity.
+  - startFrame: 54
+    endFrame: 90
+    description:
+      id: motionAtlas.queue-relief.motionBeats.2
+      message: Unfold additional capacity while preserving waiting work.
+  - startFrame: 90
+    endFrame: 138
+    description:
+      id: motionAtlas.queue-relief.motionBeats.3
+      message: Release work in original order and collect every completion.
+  - startFrame: 138
+    endFrame: 168
+    description:
+      id: motionAtlas.queue-relief.motionBeats.4
+      message: Hold the empty queue and conserved completed inventory.

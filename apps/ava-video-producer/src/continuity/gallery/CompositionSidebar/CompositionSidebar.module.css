@@ -1,0 +1,44 @@
+.compositionSidebar {
+  border-right: 1px solid var(--line);
+  max-height: 920px;
+  overflow-y: auto;
+  padding-right: 20px;
+}
+
+.compositionSidebarFilters {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 18px;
+}
+
+.compositionSidebarFilters button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 9px 12px;
+}
+
+.compositionSidebarFilters button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.compositionSidebarSearch {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ink);
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+@media (width <= 900px) {
+  .compositionSidebar {
+    border-right: 0;
+    max-height: 280px;
+    padding-right: 0;
+  }
+}

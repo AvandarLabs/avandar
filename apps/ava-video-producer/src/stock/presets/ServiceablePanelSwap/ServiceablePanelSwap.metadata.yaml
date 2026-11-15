@@ -1,0 +1,105 @@
+name:
+  id: motionAtlas.serviceable-panel-swap.name
+  message: Change one part through a designed seam
+description:
+  id: motionAtlas.serviceable-panel-swap.description
+  message:
+    A modular enclosure exposes one replaceable panel. A worker removes and
+    replaces only that part while the surrounding modules retain their positions, labels
+    and identities.
+category:
+  id: motionAtlas.serviceable-panel-swap.category
+  message: Resilience and maintenance
+useWhen:
+  id: motionAtlas.serviceable-panel-swap.useWhen
+  message: Make planned replaceability visible through one bounded operation.
+prompt:
+  id: motionAtlas.serviceable-panel-swap.prompt
+  message: Make planned replaceability visible through one bounded operation.
+creativeDirection:
+  id: motionAtlas.serviceable-panel-swap.creativeDirection
+  message:
+    Frames 12..42 reveal a single enclosure with a bounded row of modules. Frames
+    43..78 open a service latch around the targeted module and expose its existing
+    connector. Frames 79..116 withdraw that module into a retained-parts tray, seat the
+    supplied replacement on the same connector and close the latch. Frames 117..167 hold
+    the changed module, unchanged neighbors and removed original together. Never
+    dissolve or rebuild the enclosure to suggest local maintainability. Use
+    deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the
+    shared palette. Reveal during frames 0..11 and fade to the common opaque ground
+    during frames 168..179.
+intent:
+  id: motionAtlas.serviceable-panel-swap.intent
+  message: Make planned replaceability visible through one bounded operation.
+distinction:
+  id: motionAtlas.serviceable-panel-swap.distinction
+  message:
+    Unlike component-material-return, the object is not dismantled into recovery
+    streams or rebuilt from mixed material. Unlike revision-restore, it does not revert
+    the whole artifact to an earlier snapshot. Only one designed seam opens around a
+    local replacement.
+tags:
+  - id: motionAtlas.serviceable-panel-swap.tags.0
+    message: maintainability
+  - id: motionAtlas.serviceable-panel-swap.tags.1
+    message: modularity
+  - id: motionAtlas.serviceable-panel-swap.tags.2
+    message: designed seam
+  - id: motionAtlas.serviceable-panel-swap.tags.3
+    message: replaceable component
+  - id: motionAtlas.serviceable-panel-swap.tags.4
+    message: local change
+  - id: motionAtlas.serviceable-panel-swap.tags.5
+    message: interface
+goodFor:
+  - id: motionAtlas.serviceable-panel-swap.goodFor.0
+    message: Explain design for later change
+  - id: motionAtlas.serviceable-panel-swap.goodFor.1
+    message: Show a stable interface supporting a local replacement
+  - id: motionAtlas.serviceable-panel-swap.goodFor.2
+    message: Distinguish replacing one component from rebuilding a whole system
+domains:
+  - id: motionAtlas.serviceable-panel-swap.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.serviceable-panel-swap.aliases.0
+    message: serviceable panel swap
+notFor:
+  - id: motionAtlas.serviceable-panel-swap.notFor.0
+    message:
+      This is a physical metaphor for maintainability, not a claim that a software
+      dependency can always be replaced independently.
+  - id: motionAtlas.serviceable-panel-swap.notFor.1
+    message:
+      A seated replacement is not a functional test, a compatibility guarantee or
+      evidence of zero downtime.
+  - id: motionAtlas.serviceable-panel-swap.notFor.2
+    message:
+      "All original modules remain accounted for: unchanged modules stay inside and
+      the removed module remains in its tray."
+  - id: motionAtlas.serviceable-panel-swap.notFor.3
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.serviceable-panel-swap.motionBeats.0
+      message: Reveal the fixed enclosure and modules.
+  - startFrame: 43
+    endFrame: 78
+    description:
+      id: motionAtlas.serviceable-panel-swap.motionBeats.1
+      message: Open only the selected service latch.
+  - startFrame: 79
+    endFrame: 116
+    description:
+      id: motionAtlas.serviceable-panel-swap.motionBeats.2
+      message: Retain the removed original and seat its replacement.
+  - startFrame: 117
+    endFrame: 167
+    description:
+      id: motionAtlas.serviceable-panel-swap.motionBeats.3
+      message: Hold the changed slot and unchanged neighbors.

@@ -10,6 +10,18 @@ use std::time::{Duration, Instant};
 
 use dif::web::WebShell;
 
+/// The response's media type without parameters (`text/css; charset=utf-8` ->
+/// `text/css`).
+fn mime(resp: &ureq::http::Response<ureq::Body>) -> String {
+    resp.headers()
+        .get("content-type")
+        .and_then(|value| value.to_str().ok())
+        .and_then(|value| value.split(';').next())
+        .unwrap_or_default()
+        .trim()
+        .to_owned()
+}
+
 fn free_port() -> u16 {
     TcpListener::bind("127.0.0.1:0")
         .unwrap()
@@ -104,6 +116,10 @@ fn injects_and_filters_against_real_difit() {
         "web-shell".into(),
         root.join("summary.md"),
         root.join("test-plan.md"),
+        dif::web::CommentChannels {
+            dispatch: std::sync::Arc::new(dif::inject::mode::DispatchControl::new()),
+            github: dif::github::registry::SharedRegistry::load(root.join("r-github.json")),
+        },
     )
     .unwrap();
     std::thread::sleep(Duration::from_millis(50));
@@ -113,7 +129,8 @@ fn injects_and_filters_against_real_difit() {
     let doc = ureq::get(&format!("{base}/__wrap/difit"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         doc.contains(r#"<script src="/__wrap/inject.js"></script>"#),
@@ -128,7 +145,8 @@ fn injects_and_filters_against_real_difit() {
     let full: serde_json::Value = ureq::get(&format!("{base}/api/diff"))
         .call()
         .unwrap()
-        .into_json()
+        .into_body()
+        .read_json()
         .unwrap();
     let full_paths: Vec<&str> = full["files"]
         .as_array()
@@ -144,10 +162,11 @@ fn injects_and_filters_against_real_difit() {
     // 3) With a group-1 Referer, /api/diff is filtered to just a.ts, and the
     //    identity-bearing fields are unchanged (so the shared viewed key holds).
     let filtered: serde_json::Value = ureq::get(&format!("{base}/api/diff"))
-        .set("Referer", &format!("{base}/__wrap/difit?group=1"))
+        .header("Referer", &format!("{base}/__wrap/difit?group=1"))
         .call()
         .unwrap()
-        .into_json()
+        .into_body()
+        .read_json()
         .unwrap();
     let filtered_paths: Vec<&str> = filtered["files"]
         .as_array()
@@ -170,13 +189,16 @@ fn injects_and_filters_against_real_difit() {
     // 4) SSE endpoint STREAMS (not buffered): headers must arrive promptly with
     //    the event-stream content type. difit's /api/watch never ends, so if the
     //    shell buffered it, this call would block until the client timeout.
-    let sse = ureq::builder().timeout(Duration::from_secs(3)).build();
+    let sse: ureq::Agent = ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(3)))
+        .build()
+        .into();
     let watch = sse
         .get(&format!("{base}/api/watch"))
         .call()
         .expect("SSE headers should stream through promptly (not buffer)");
     assert_eq!(
-        watch.content_type(),
+        mime(&watch),
         "text/event-stream",
         "watch is streamed as SSE"
     );
@@ -187,13 +209,14 @@ fn injects_and_filters_against_real_difit() {
     //    path the shell must carry.
     let import = r#"[{"type":"thread","id":"live-test-c1","filePath":"a.ts","position":{"side":"new","line":1},"body":"live-test-marker","author":"claude","createdAt":"2026-07-25T00:00:00Z","updatedAt":"2026-07-25T00:00:00Z"}]"#;
     ureq::post(&format!("{base}/api/comment-imports"))
-        .set("Content-Type", "application/json")
-        .send_string(import)
+        .header("Content-Type", "application/json")
+        .send(import)
         .expect("comment-import POST proxied to difit");
     let comments = ureq::get(&format!("{base}/api/comments-json"))
         .call()
         .unwrap()
-        .into_string()
+        .into_body()
+        .read_to_string()
         .unwrap();
     assert!(
         comments.contains("live-test-marker") || comments.contains("live-test-c1"),

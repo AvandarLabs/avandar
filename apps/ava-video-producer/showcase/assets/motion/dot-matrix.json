@@ -1,0 +1,14 @@
+{
+  "preset": "dot-matrix",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "07e32104846450b50a1807b1316199a0bccb33b512ba0aa82f99a9b8812f1ed7",
+  "posterSha256": "94acd55c1225f6992665199215bd55331fd17b9dda00abd7eae744b6e8bc105f",
+  "generatedAt": "2026-10-14T23:56:06.897Z"
+}

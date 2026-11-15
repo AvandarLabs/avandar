@@ -69,10 +69,16 @@ export { isUndefined } from "@utils/guards/isUndefined/isUndefined.ts";
 export { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
 export { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue.ts";
 export { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
+export { isNotEmpty } from "@utils/guards/isNotEmpty/isNotEmpty.ts";
+export { isEmpty } from "@utils/guards/isEmpty/isEmpty.ts";
+export type { Empty } from "@utils/types/Empty/Empty.ts";
+export type { NonEmpty } from "@utils/types/NonEmpty/NonEmpty.ts";
 
 // guards - higher order functions
 export { valEq } from "@utils/guards/hofs/valEq.ts";
 export { valNotEq } from "@utils/guards/hofs/valNotEq.ts";
+export { valIsEmpty } from "@utils/guards/hofs/valIsEmpty.ts";
+export { valIsNotEmpty } from "@utils/guards/hofs/valIsNotEmpty.ts";
 
 // maps
 export { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap.ts";

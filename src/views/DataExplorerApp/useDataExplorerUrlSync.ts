@@ -19,11 +19,11 @@ import {
   serializeStateToUrl,
 } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
+import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
-import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
-type Options = {
+type UseDataExplorerUrlSyncOptions = {
   urlSearch: DataExplorerUrlSearch;
   navigate: (options: {
     search: DataExplorerUrlSearch;
@@ -51,7 +51,10 @@ type Options = {
  *   history stays clean. Failed queries do not write `sql` to the URL; once a
  *   bad `?sql=` link errors, the param is removed so refresh does not loop.
  */
-export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
+export function useDataExplorerUrlSync({
+  urlSearch,
+  navigate,
+}: UseDataExplorerUrlSyncOptions): void {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();
@@ -242,6 +245,8 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setRawSql(urlState.rawSql);
           const mapping = sqlToStructuredQuery({
             sql: urlState.rawSql,
+            previousQuery: state.query,
+            sourceColumns: state.query.sourceColumns,
             datasets: buildSqlMappingDatasets(
               datasets ?? [],
               allDatasetColumns ?? [],
@@ -258,10 +263,12 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setOpenDataset(urlState.openDataset);
         }
 
-        // Restore viz config last: may overwrite the result of
-        // hydrateFromQuery that setColumns triggered above.
+        // Restore viz config last so it replaces the defaults that setColumns
+        // seeded above. The URL keys it by `QueryResult` column name, so it
+        // stays pending until the first query result binds those names to
+        // column IDs.
         if (urlState.vizConfig) {
-          dispatch.setVizConfig(urlState.vizConfig);
+          dispatch.restoreVizConfigFromUrl(urlState.vizConfig);
         }
 
         // Stamped last on purpose. Stamping earlier would not survive: the

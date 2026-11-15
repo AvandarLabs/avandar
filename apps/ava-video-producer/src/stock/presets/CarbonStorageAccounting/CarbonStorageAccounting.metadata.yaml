@@ -1,0 +1,112 @@
+name:
+  id: motionAtlas.carbon-storage-accounting.name
+  message: Account for captured carbon
+description:
+  id: motionAtlas.carbon-storage-accounting.description
+  message:
+    A cutaway follows atmospheric CO2 into storage while separately accounting for
+    releases and operating emissions. The retained mass and the net accounting result
+    remain visibly different quantities.
+category:
+  id: motionAtlas.carbon-storage-accounting.category
+  message: Subsurface cutaway and accounting bracket
+useWhen:
+  id: motionAtlas.carbon-storage-accounting.useWhen
+  message: Show exactly what is counted before presenting a carbon removal total.
+intent:
+  id: motionAtlas.carbon-storage-accounting.intent
+  message: Show exactly what is counted before presenting a carbon removal total.
+creativeDirection:
+  id: motionAtlas.carbon-storage-accounting.creativeDirection
+  message:
+    Reveal an air boundary, capture unit and underground vessel. At the operator
+    cue, divide the supplied captured-carbon ribbon into retained and released portions
+    while a separate operating-emissions ribbon enters the accounting bracket. Hold the
+    explicit retained-minus-operating-emissions calculation, including a negative result
+    when supplied, then fade to the shared opaque ground without emptying the store on
+    screen.
+distinction:
+  id: motionAtlas.carbon-storage-accounting.distinction
+  message:
+    Uses a split physical mass stream, a visible storage boundary and a separate
+    emissions subtraction. It is neither a renamed data pipeline nor a standalone metric
+    counter.
+prompt:
+  id: motionAtlas.carbon-storage-accounting.prompt
+  message:
+    Account for captured carbon. Show exactly what is counted before presenting a
+    carbon removal total.
+tags:
+  - id: motionAtlas.carbon-storage-accounting.tags.0
+    message: carbon capture
+  - id: motionAtlas.carbon-storage-accounting.tags.1
+    message: direct air capture
+  - id: motionAtlas.carbon-storage-accounting.tags.2
+    message: carbon storage
+  - id: motionAtlas.carbon-storage-accounting.tags.3
+    message: net removal
+  - id: motionAtlas.carbon-storage-accounting.tags.4
+    message: CO2 accounting
+  - id: motionAtlas.carbon-storage-accounting.tags.5
+    message: retained carbon
+  - id: motionAtlas.carbon-storage-accounting.tags.6
+    message: operating emissions
+  - id: motionAtlas.carbon-storage-accounting.tags.7
+    message: mass balance
+goodFor:
+  - id: motionAtlas.carbon-storage-accounting.goodFor.0
+    message: Explain why gross capture differs from net removal accounting
+  - id: motionAtlas.carbon-storage-accounting.goodFor.1
+    message: Introduce a supplied capture-to-storage balance
+  - id: motionAtlas.carbon-storage-accounting.goodFor.2
+    message: Make operating emissions and a reporting boundary visible
+domains:
+  - id: motionAtlas.carbon-storage-accounting.domains.0
+    message: Subsurface cutaway and accounting bracket
+aliases:
+  - id: motionAtlas.carbon-storage-accounting.aliases.0
+    message: carbon capture
+  - id: motionAtlas.carbon-storage-accounting.aliases.1
+    message: direct air capture
+  - id: motionAtlas.carbon-storage-accounting.aliases.2
+    message: carbon storage
+notFor:
+  - id: motionAtlas.carbon-storage-accounting.notFor.0
+    message:
+      Retained CO2 = captured CO2 - released CO2. Net result = retained CO2 expressed
+      as CO2e - summed operating emissions. CO2 has a conversion factor of one here; no
+      other captured gas is modeled.
+  - id: motionAtlas.carbon-storage-accounting.notFor.1
+    message:
+      Storage beyond the named reporting period, additionality, displacement and
+      verification are not inferred. A positive balance is not a durability certificate.
+  - id: motionAtlas.carbon-storage-accounting.notFor.2
+    message:
+      All defaults are fictional. The six-second motion compresses one supplied
+      reporting period and is not a capture-rate simulation.
+motionBeats:
+  - startFrame: 12
+    endFrame: 43
+    description:
+      id: motionAtlas.carbon-storage-accounting.motionBeats.0
+      message: Reveal the air boundary, capture unit and storage vessel.
+  - startFrame: 44
+    endFrame: 59
+    description:
+      id: motionAtlas.carbon-storage-accounting.motionBeats.1
+      message: Operator signals the storage transfer.
+  - startFrame: 60
+    endFrame: 108
+    description:
+      id: motionAtlas.carbon-storage-accounting.motionBeats.2
+      message: Separate retained and released CO2 streams and the operating CO2e lane.
+  - startFrame: 109
+    endFrame: 167
+    description:
+      id: motionAtlas.carbon-storage-accounting.motionBeats.3
+      message: Hold retained mass, boundary and optional signed net subtraction.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.carbon-storage-accounting.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

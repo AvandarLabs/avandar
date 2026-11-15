@@ -1,0 +1,107 @@
+name:
+  id: motionAtlas.grouped-value-picker.name
+  message: Say how repeated observations become one value
+description:
+  id: motionAtlas.grouped-value-picker.description
+  message:
+    Several observations for one entity line up in their recorded order. An
+    explicit aggregation rule selects or calculates the one value shown on the entity
+    record, with the original observations retained.
+category:
+  id: motionAtlas.grouped-value-picker.category
+  message: Explicit value aggregation
+useWhen:
+  id: motionAtlas.grouped-value-picker.useWhen
+  message: Make a field aggregation rule and its missing-value semantics explicit.
+prompt:
+  id: motionAtlas.grouped-value-picker.prompt
+  message: Make a field aggregation rule and its missing-value semantics explicit.
+creativeDirection:
+  id: motionAtlas.grouped-value-picker.creativeDirection
+  message:
+    "960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-55 place observations on an ordered rail. Frames
+    56-105 reveal the selected rule: first highlights the first tile; most-frequent
+    stacks equal values; numeric rules fold values onto one calculation line. Frames
+    106-139 attach the derived result without erasing the rail. Hold the resolved
+    meaning during frames 140-165. Frames 166-179 return to the same opaque ground for a
+    six-second loop; reset is editorial."
+intent:
+  id: motionAtlas.grouped-value-picker.intent
+  message: Make a field aggregation rule and its missing-value semantics explicit.
+distinction:
+  id: motionAtlas.grouped-value-picker.distinction
+  message:
+    Field-conflict-choice chooses among authored alternatives by human decision.
+    This calculates a deterministic field from repeated observations under a stated
+    rule, preserving order and missingness.
+tags:
+  - id: motionAtlas.grouped-value-picker.tags.0
+    message: aggregation
+  - id: motionAtlas.grouped-value-picker.tags.1
+    message: value picker
+  - id: motionAtlas.grouped-value-picker.tags.2
+    message: mode
+  - id: motionAtlas.grouped-value-picker.tags.3
+    message: first observation
+  - id: motionAtlas.grouped-value-picker.tags.4
+    message: null semantics
+goodFor:
+  - id: motionAtlas.grouped-value-picker.goodFor.0
+    message: Explain first, mode and aggregate field selection
+  - id: motionAtlas.grouped-value-picker.goodFor.1
+    message: Compare missing-value policies in case records
+domains:
+  - id: motionAtlas.grouped-value-picker.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.grouped-value-picker.aliases.0
+    message: grouped value picker
+notFor:
+  - id: motionAtlas.grouped-value-picker.notFor.0
+    message:
+      No rule is inherently correct for a real domain; choosing the rule is an author
+      responsibility.
+  - id: motionAtlas.grouped-value-picker.notFor.1
+    message: Null policy is explicit and must not silently change between views.
+  - id: motionAtlas.grouped-value-picker.notFor.2
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
+      performance claim. All text is authored; no JSX, functions or URLs in props.
+  - id: motionAtlas.grouped-value-picker.notFor.3
+    message:
+      Count uses labels.countUnit; first, mode, sum, mean, min and max use
+      labels.unit for non-null results. Null uses labels.missing. Mean is calculated
+      exactly as sum/non-null count; display rounds to two decimals with a visible
+      approximation mark when rounding changes the value. No rounded intermediate feeds
+      another calculation.
+  - id: motionAtlas.grouped-value-picker.notFor.4
+    message:
+      Supplied prose is preserved. Fictional framing, source completeness and
+      agreement between labels and structured state are author responsibilities. Runtime
+      validation enforces structural bounds and exact cross-field rules.
+  - id: motionAtlas.grouped-value-picker.notFor.5
+    message:
+      Literal IDs and row values preserve exact whitespace using visible whitespace
+      marks at a fixed readable size.
+motionBeats:
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.grouped-value-picker.motionBeats.0
+      message: Place observations on their recorded-order rail.
+  - startFrame: 56
+    endFrame: 105
+    description:
+      id: motionAtlas.grouped-value-picker.motionBeats.1
+      message: Select the first, stack equal values or fold a numeric calculation.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.grouped-value-picker.motionBeats.2
+      message: Attach the result while retaining the source rail.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.grouped-value-picker.motionBeats.3
+      message: Hold the resolved meaning.

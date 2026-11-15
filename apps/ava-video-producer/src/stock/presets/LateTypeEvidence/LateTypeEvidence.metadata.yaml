@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.late-type-evidence.name
+  message: Keep the late value that changes the column
+description:
+  id: motionAtlas.late-type-evidence.description
+  message:
+    A column initially appears numeric. A later text value widens the proposed type
+    to text while every original cell stays intact, showing why a short initial sample
+    must not silently discard contrary evidence.
+category:
+  id: motionAtlas.late-type-evidence.category
+  message: Schema inference and evidence
+useWhen:
+  id: motionAtlas.late-type-evidence.useWhen
+  message: Preserve contrary late evidence during column-type inference.
+prompt:
+  id: motionAtlas.late-type-evidence.prompt
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-55 reveal the initial numeric-looking rows under a
+    provisional numeric type label. Frames 56-100 append the authored text row and open
+    a type-review bracket. Frames 101-139 widen the column type to text or hold the
+    import for review according to policy, preserving all input values. Hold the
+    resolved state at 140-165; fade to the same opaque ground at 166-179. Reset is
+    editorial.
+creativeDirection:
+  id: motionAtlas.late-type-evidence.creativeDirection
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-55 reveal the initial numeric-looking rows under a
+    provisional numeric type label. Frames 56-100 append the authored text row and open
+    a type-review bracket. Frames 101-139 widen the column type to text or hold the
+    import for review according to policy, preserving all input values. Hold the
+    resolved state at 140-165; fade to the same opaque ground at 166-179. Reset is
+    editorial.
+intent:
+  id: motionAtlas.late-type-evidence.intent
+  message: Preserve contrary late evidence during column-type inference.
+distinction:
+  id: motionAtlas.late-type-evidence.distinction
+  message:
+    Cell-normalization edits explicitly supplied characters. This changes a
+    proposed column type in response to late evidence while refusing to change or
+    discard any cell.
+tags:
+  - id: motionAtlas.late-type-evidence.tags.0
+    message: CSV import
+  - id: motionAtlas.late-type-evidence.tags.1
+    message: type inference
+  - id: motionAtlas.late-type-evidence.tags.2
+    message: late evidence
+  - id: motionAtlas.late-type-evidence.tags.3
+    message: row preservation
+  - id: motionAtlas.late-type-evidence.tags.4
+    message: schema review
+goodFor:
+  - id: motionAtlas.late-type-evidence.goodFor.0
+    message: Explain import inference challenged by a late text value
+  - id: motionAtlas.late-type-evidence.goodFor.1
+    message: Show why all source rows must survive schema review
+domains:
+  - id: motionAtlas.late-type-evidence.domains.0
+    message: Schema inference and evidence
+aliases:
+  - id: motionAtlas.late-type-evidence.aliases.0
+    message: CSV import
+  - id: motionAtlas.late-type-evidence.aliases.1
+    message: type inference
+  - id: motionAtlas.late-type-evidence.aliases.2
+    message: late evidence
+notFor:
+  - id: motionAtlas.late-type-evidence.notFor.0
+    message:
+      The widening rule is illustrative, not a claim that all import engines infer
+      types this way.
+  - id: motionAtlas.late-type-evidence.notFor.1
+    message: Text preservation does not make the column ready for numeric aggregation.
+  - id: motionAtlas.late-type-evidence.notFor.2
+    message:
+      One column and one contradictory value are shown; general type lattices and
+      date inference are outside scope.
+  - id: motionAtlas.late-type-evidence.notFor.3
+    message:
+      No external requests, URLs, JSX or functions in props. Supplied examples are
+      fictional.
+  - id: motionAtlas.late-type-evidence.notFor.4
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
+      preserves supplied text without classifying its language or factual claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.late-type-evidence.beat.0
+      message: Reveal the column.
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.late-type-evidence.beat.1
+      message: Reveal numeric-looking strings under provisional type.
+  - startFrame: 56
+    endFrame: 100
+    description:
+      id: motionAtlas.late-type-evidence.beat.2
+      message: Append contradictory evidence and open review bracket.
+  - startFrame: 101
+    endFrame: 139
+    description:
+      id: motionAtlas.late-type-evidence.beat.3
+      message: Widen to text or hold for review without changing cells.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.late-type-evidence.beat.4
+      message: Hold the resolved study.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.late-type-evidence.beat.5
+      message: The enclosing StockGraphic fades to opaque ground.

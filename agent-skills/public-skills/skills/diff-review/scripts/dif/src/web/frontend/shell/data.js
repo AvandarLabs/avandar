@@ -49,15 +49,25 @@
       .catch(function () { /* keep last known test plan */ });
   }
 
-  // ---- data: header identity (branch + worktree pill) ----
+  // ---- data: header identity (branch + worktree pill), difit restarts ----
   function applyMeta(meta) {
     if (!meta || typeof meta !== "object") return;
+    // A TUI Ctrl+R Refresh diff relaunched difit. A refresh never opens a new
+    // tab, so this one reloads itself to show the fresh server.
+    if (typeof meta.difitRestarts === "number") {
+      if (seenDifitRestarts !== null && meta.difitRestarts > seenDifitRestarts) {
+        reloadShell();
+        return;
+      }
+      seenDifitRestarts = meta.difitRestarts;
+    }
     if (meta.branch) {
       els.brandTitle.textContent = meta.branch;
-      els.brandTitle.title = meta.branch;
+      setTip(els.brandTitle, "Branch under review: " + meta.branch);
     }
     if (meta.showWorktree && meta.worktree) {
       els.worktreePill.textContent = meta.worktree;
+      setTip(els.worktreePill, "Worktree folder: " + meta.worktree + ". Shown because its name differs from the branch.");
       els.worktreePill.hidden = false;
     } else {
       els.worktreePill.hidden = true;
@@ -67,7 +77,7 @@
     fetch("/__wrap/meta.json", { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("meta " + r.status)); })
       .then(applyMeta)
-      .catch(function () { /* keep the default title */ });
+      .catch(function () { /* keep the last known title */ });
   }
 
   // ---- data: the authoritative diff (difit's real /api/diff, unfiltered) ----
@@ -114,6 +124,7 @@
       renderedDiffSig = liveDiffSig;
     }
     setChangesAvailable(liveDiffSig !== renderedDiffSig);
+    maybeAutoShowChanges(); // a GitHub sync fast-forwarded the branch
 
     // If we're on the "new files" view and nothing is ungrouped anymore (the
     // guide was regenerated to cover them), fall back to Full.

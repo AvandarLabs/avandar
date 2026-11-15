@@ -76,6 +76,12 @@ impl Guide {
         &self.path
     }
 
+    /// The plain text of each rendered line, as of the last draw.
+    #[must_use]
+    pub fn lines(&self) -> &[String] {
+        &self.lines
+    }
+
     /// Record the plain text of the lines the draw layer just rendered and clamp
     /// the cursor back onto them (the content may have shrunk or re-wrapped).
     pub fn set_lines(&mut self, lines: Vec<String>) {

@@ -1,0 +1,110 @@
+name:
+  id: motionAtlas.referral-consent-withdrawal.name
+  message: Stop the next contact when consent changes
+description:
+  id: motionAtlas.referral-consent-withdrawal.description
+  message:
+    A participant withdraws permission for one planned referral contact. The worker
+    sets that outgoing contact aside while an earlier sharing record remains visibly
+    intact.
+category:
+  id: motionAtlas.referral-consent-withdrawal.category
+  message: Participant-directed contact preparation
+useWhen:
+  id: motionAtlas.referral-consent-withdrawal.useWhen
+  message:
+    Show that a changed permission stops the specified future contact without
+    rewriting the past.
+prompt:
+  id: motionAtlas.referral-consent-withdrawal.prompt
+  message: Show the participant beside a worker's desk with the supplied
+    destination-specific permission slips and prepared contact cards. The participant
+    turns the withdrawn slips to their withdrawn faces. For each affected contact, the
+    worker stops before reaching the phone and sets the card in a held tray. Any
+    still-permitted contacts remain ready. Hold the changed permission scopes and, when
+    supplied, dated prior-sharing receipts. Earlier records never reverse or disappear;
+    omit the history region when none are supplied.
+creativeDirection:
+  id: motionAtlas.referral-consent-withdrawal.creativeDirection
+  message: Show the participant beside a worker's desk with the supplied
+    destination-specific permission slips and prepared contact cards. The participant
+    turns the withdrawn slips to their withdrawn faces. For each affected contact, the
+    worker stops before reaching the phone and sets the card in a held tray. Any
+    still-permitted contacts remain ready. Hold the changed permission scopes and, when
+    supplied, dated prior-sharing receipts. Earlier records never reverse or disappear;
+    omit the history region when none are supplied.
+intent:
+  id: motionAtlas.referral-consent-withdrawal.intent
+  message:
+    Show that a changed permission stops the specified future contact without
+    rewriting the past.
+distinction:
+  id: motionAtlas.referral-consent-withdrawal.distinction
+  message:
+    The person actively changes a recipient-specific instruction while a worker
+    interrupts a prepared real-world contact. Unlike expiring-lease, permission does not
+    end because a timer runs out; unlike disclosure-aperture, this governs a future
+    action after a prior disclosure has already occurred.
+tags:
+  - id: motionAtlas.referral-consent-withdrawal.tags.0
+    message: consent withdrawal
+  - id: motionAtlas.referral-consent-withdrawal.tags.1
+    message: referral permission
+  - id: motionAtlas.referral-consent-withdrawal.tags.2
+    message: case management
+  - id: motionAtlas.referral-consent-withdrawal.tags.3
+    message: stop contact
+  - id: motionAtlas.referral-consent-withdrawal.tags.4
+    message: revocation
+  - id: motionAtlas.referral-consent-withdrawal.tags.5
+    message: participant agency
+  - id: motionAtlas.referral-consent-withdrawal.tags.6
+    message: information sharing
+  - id: motionAtlas.referral-consent-withdrawal.tags.7
+    message: prospective consent
+goodFor:
+  - id: motionAtlas.referral-consent-withdrawal.goodFor.0
+    message: Explaining prospective withdrawal of referral consent
+  - id: motionAtlas.referral-consent-withdrawal.goodFor.1
+    message: Distinguishing a contact permission from a historical disclosure record
+  - id: motionAtlas.referral-consent-withdrawal.goodFor.2
+    message: Showing different permission choices for different services
+notFor:
+  - id: motionAtlas.referral-consent-withdrawal.notFor.0
+    message:
+      This depicts an authored process, not a statement about legal rights or a
+      product's security guarantees.
+  - id: motionAtlas.referral-consent-withdrawal.notFor.1
+    message:
+      Revocation does not erase information already shared; the retained record must
+      not animate backward.
+  - id: motionAtlas.referral-consent-withdrawal.notFor.2
+    message: No contact is portrayed as completed merely because permission remains active.
+domains:
+  - id: motionAtlas.referral-consent-withdrawal.domains.0
+    message: Participant-directed contact preparation
+aliases:
+  - id: motionAtlas.referral-consent-withdrawal.aliases.0
+    message: consent withdrawal
+  - id: motionAtlas.referral-consent-withdrawal.aliases.1
+    message: referral permission
+  - id: motionAtlas.referral-consent-withdrawal.aliases.2
+    message: case management
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.referral-consent-withdrawal.beat.0
+      message: Show separate permission slips, preparations and supplied earlier receipts.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.referral-consent-withdrawal.beat.1
+      message:
+        Participant turns withdrawn slips during 36–60; worker holds affected cards
+        during 60–108.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.referral-consent-withdrawal.beat.2
+      message: Hold withdrawn scopes, ready permitted cards and unchanged earlier receipts.

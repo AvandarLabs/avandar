@@ -1,0 +1,37 @@
+district_id,district_name,week_start,reported_cases,awaiting_contact,reporting_status
+D01,North Quay,2026-08-03,8,0,reported
+D01,North Quay,2026-08-10,9,0,reported
+D01,North Quay,2026-08-17,10,0,reported
+D01,North Quay,2026-08-24,9,0,reported
+D01,North Quay,2026-08-31,8,0,reported
+D01,North Quay,2026-09-07,7,0,reported
+D02,Eastbank,2026-08-03,4,0,reported
+D02,Eastbank,2026-08-10,5,0,reported
+D02,Eastbank,2026-08-17,7,0,reported
+D02,Eastbank,2026-08-24,10,0,reported
+D02,Eastbank,2026-08-31,13,8,reported
+D02,Eastbank,2026-09-07,17,11,reported
+D03,South Gardens,2026-08-03,6,0,reported
+D03,South Gardens,2026-08-10,7,0,reported
+D03,South Gardens,2026-08-17,6,0,reported
+D03,South Gardens,2026-08-24,8,0,reported
+D03,South Gardens,2026-08-31,7,0,reported
+D03,South Gardens,2026-09-07,6,0,reported
+D04,Ridge,2026-08-03,3,0,reported
+D04,Ridge,2026-08-10,4,0,reported
+D04,Ridge,2026-08-17,5,0,reported
+D04,Ridge,2026-08-24,5,0,reported
+D04,Ridge,2026-08-31,6,0,reported
+D04,Ridge,2026-09-07,6,0,reported
+D05,Lakeside,2026-08-03,5,0,reported
+D05,Lakeside,2026-08-10,6,0,reported
+D05,Lakeside,2026-08-17,6,0,reported
+D05,Lakeside,2026-08-24,7,0,reported
+D05,Lakeside,2026-08-31,7,0,reported
+D05,Lakeside,2026-09-07,8,0,reported
+D06,West Marsh,2026-08-03,6,0,reported
+D06,West Marsh,2026-08-10,7,0,reported
+D06,West Marsh,2026-08-17,6,0,reported
+D06,West Marsh,2026-08-24,6,0,reported
+D06,West Marsh,2026-08-31,,,not_received
+D06,West Marsh,2026-09-07,,,not_received

@@ -24,6 +24,33 @@ pub fn build_prompt(comment: &PendingComment) -> String {
     )
 }
 
+/// Build one prompt for a bulk "Send all": every comment's location and quoted
+/// body, numbered, then a single handoff to the `/diff-review` skill.
+///
+/// One prompt for the whole pass keeps the per-prompt overhead (and the skill
+/// load it triggers) to once per batch instead of once per comment. A single
+/// comment reads exactly like an eager one.
+#[must_use]
+pub fn build_batch_prompt(comments: &[PendingComment]) -> String {
+    if let [only] = comments {
+        return build_prompt(only);
+    }
+    let items: Vec<String> = comments
+        .iter()
+        .enumerate()
+        .map(|(index, comment)| {
+            let location = location_label(comment.file_path.as_deref(), &comment.line_label);
+            format!("{}. On {location}:\n\"{}\"", index + 1, comment.body)
+        })
+        .collect();
+    format!(
+        "{count} new review comments:\n\n{items}\n\n\
+         Address them using the /diff-review skill.",
+        count = comments.len(),
+        items = items.join("\n\n"),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -60,6 +87,29 @@ mod tests {
             !p.contains("api/comment-imports"),
             "no endpoint in the prompt: {p}"
         );
+    }
+
+    #[test]
+    fn batch_prompt_numbers_every_comment_with_one_handoff() {
+        let second = PendingComment {
+            message_id: "m2".to_owned(),
+            file_path: Some("src/b.rs".to_owned()),
+            line_label: "L7-9".to_owned(),
+            body: "rename this".to_owned(),
+        };
+        let p = build_batch_prompt(&[comment(), second]);
+        assert!(p.starts_with("2 new review comments"), "{p}");
+        assert!(
+            p.contains("1. On src/a.rs:L42:\n\"drop this fallback\""),
+            "{p}"
+        );
+        assert!(p.contains("2. On src/b.rs:L7-9:\n\"rename this\""), "{p}");
+        assert_eq!(p.matches("/diff-review skill").count(), 1);
+    }
+
+    #[test]
+    fn batch_of_one_reads_like_a_single_comment() {
+        assert_eq!(build_batch_prompt(&[comment()]), build_prompt(&comment()));
     }
 
     #[test]

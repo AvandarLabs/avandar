@@ -1,0 +1,100 @@
+name:
+  id: motionAtlas.pdf-nearest-label-review.name
+  message: Review a number near two labels
+description:
+  id: motionAtlas.pdf-nearest-label-review.description
+  message:
+    A figure on a schematic page measures its distance to two possible labels. A
+    close runner-up leaves the pairing flagged until an authored human choice identifies
+    the intended label.
+category:
+  id: motionAtlas.pdf-nearest-label-review.category
+  message: Ambiguous spatial association
+useWhen:
+  id: motionAtlas.pdf-nearest-label-review.useWhen
+  message: Keep uncertain document associations reviewable.
+prompt:
+  id: motionAtlas.pdf-nearest-label-review.prompt
+  message: Keep uncertain document associations reviewable.
+creativeDirection:
+  id: motionAtlas.pdf-nearest-label-review.creativeDirection
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-50 reveal one numeric token and two nearby label
+    boxes. Frames 51-95 extend distance guides from the token to both boxes. Frames
+    96-139 show either the reviewer choosing one label or an unresolved bracket
+    retaining both candidates; the extracted row carries the same source position. Hold
+    the resolved relationship at frames 140-165, then fade to the same opaque ground at
+    166-179. Reset is editorial.
+intent:
+  id: motionAtlas.pdf-nearest-label-review.intent
+  message: Keep uncertain document associations reviewable.
+distinction:
+  id: motionAtlas.pdf-nearest-label-review.distinction
+  message:
+    Unlike keyed-row-zipper, labels are associated by spatial evidence rather than
+    equal keys. Unlike location-uncertainty-boundary, uncertainty concerns document
+    interpretation, not a position on Earth.
+tags:
+  - id: motionAtlas.pdf-nearest-label-review.tags.0
+    message: PDF figures
+  - id: motionAtlas.pdf-nearest-label-review.tags.1
+    message: proximity matching
+  - id: motionAtlas.pdf-nearest-label-review.tags.2
+    message: ambiguity
+  - id: motionAtlas.pdf-nearest-label-review.tags.3
+    message: human review
+  - id: motionAtlas.pdf-nearest-label-review.tags.4
+    message: source provenance
+goodFor:
+  - id: motionAtlas.pdf-nearest-label-review.goodFor.0
+    message: Explain uncertain number-to-label matching on a PDF map
+  - id: motionAtlas.pdf-nearest-label-review.goodFor.1
+    message: Show human review of ambiguous proximity pairs
+domains:
+  - id: motionAtlas.pdf-nearest-label-review.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.pdf-nearest-label-review.aliases.0
+    message: pdf nearest label review
+notFor:
+  - id: motionAtlas.pdf-nearest-label-review.notFor.0
+    message:
+      Distance is an association heuristic, not evidence that a number truly belongs
+      to a region.
+  - id: motionAtlas.pdf-nearest-label-review.notFor.1
+    message:
+      No default association should silently become accepted when a close alternative
+      exists.
+  - id: motionAtlas.pdf-nearest-label-review.notFor.2
+    message: Source text stays unchanged after review.
+  - id: motionAtlas.pdf-nearest-label-review.notFor.3
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
+      authored explanation, not actual document extraction or product evidence.
+  - id: motionAtlas.pdf-nearest-label-review.notFor.4
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.pdf-nearest-label-review.motionBeats.0
+      message: Reveal the literal figure and two keyed label boxes.
+  - startFrame: 51
+    endFrame: 95
+    description:
+      id: motionAtlas.pdf-nearest-label-review.motionBeats.1
+      message: Extend Euclidean guides to the original anchors.
+  - startFrame: 96
+    endFrame: 139
+    description:
+      id: motionAtlas.pdf-nearest-label-review.motionBeats.2
+      message: Carry the reviewer choice or retain both unresolved candidates.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.pdf-nearest-label-review.motionBeats.3
+      message: Hold the resolved relationship.

@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "id": "scene-library",
+  "title": "The reusable scene library",
+  "description": "An internal capability study using fictional Harborfield demo data and editorial graphics. This is not a reconstruction of Avandar's interface.",
+  "sourceNotes": [
+    "demo-data/manifest.json: 240 fictional cases, six districts, and related visits/facilities",
+    "The graph and process diagram explain the demo workflow; they are not Avandar UI screenshots."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "props": {
+        "name": "Stories from data",
+        "kicker": "Reusable scenes, fictional demo data"
+      }
+    },
+    {
+      "id": "type",
+      "scene": "typography",
+      "durationInFrames": 150,
+      "props": {
+        "title": "A common visual language",
+        "kicker": "Editorial example with fictional demo data",
+        "lines": ["Connect the evidence.", "Explain the decision."],
+        "emphasis": ["evidence.", "decision."],
+        "align": "left"
+      }
+    },
+    {
+      "id": "graph",
+      "scene": "graph",
+      "durationInFrames": 180,
+      "props": {
+        "title": "One connected dataset bundle",
+        "kicker": "Shared identifiers make the story repeatable",
+        "nodes": [
+          {
+            "id": "cases",
+            "label": "240 cases",
+            "detail": "Fictional response records",
+            "x": 0.5,
+            "y": 0
+          },
+          {
+            "id": "visits",
+            "label": "297 visits",
+            "detail": "Related by case_id",
+            "x": 0.08,
+            "y": 0.62
+          },
+          {
+            "id": "facilities",
+            "label": "12 facilities",
+            "detail": "Related by facility_id",
+            "x": 0.92,
+            "y": 0.62
+          },
+          {
+            "id": "districts",
+            "label": "6 districts",
+            "detail": "Geography and summaries",
+            "x": 0.5,
+            "y": 1
+          }
+        ],
+        "edges": [
+          {
+            "id": "case-visits",
+            "from": "cases",
+            "to": "visits",
+            "label": "case_id"
+          },
+          {
+            "id": "case-facility",
+            "from": "cases",
+            "to": "facilities",
+            "label": "facility_id"
+          },
+          {
+            "id": "case-district",
+            "from": "cases",
+            "to": "districts",
+            "label": "district_id"
+          }
+        ],
+        "traversal": [
+          {
+            "nodeId": "cases",
+            "atFrame": 20
+          },
+          {
+            "nodeId": "visits",
+            "atFrame": 70
+          },
+          {
+            "nodeId": "districts",
+            "atFrame": 120
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "flowchart",
+      "durationInFrames": 180,
+      "props": {
+        "title": "From source to decision",
+        "kicker": "An editorial process diagram, not a product screen",
+        "steps": [
+          {
+            "id": "import",
+            "label": "Import",
+            "detail": "Preview and save CSV"
+          },
+          {
+            "id": "explore",
+            "label": "Explore",
+            "detail": "Inspect and query rows"
+          },
+          {
+            "id": "dashboard",
+            "label": "Communicate",
+            "detail": "Save a view to a dashboard"
+          }
+        ],
+        "connectors": [
+          {
+            "from": "import",
+            "to": "explore"
+          },
+          {
+            "from": "explore",
+            "to": "dashboard"
+          }
+        ],
+        "stepAtFrames": [0, 60, 120]
+      }
+    },
+    {
+      "id": "metric",
+      "scene": "metric",
+      "durationInFrames": 150,
+      "props": {
+        "title": "An evidence-backed metric",
+        "label": "Fictional cases in the bundle",
+        "value": 240,
+        "from": 0,
+        "precision": 0,
+        "detail": "Generated deterministically across six districts",
+        "countAtFrame": 20,
+        "countDurationInFrames": 36
+      }
+    },
+    {
+      "id": "closing",
+      "scene": "typography",
+      "durationInFrames": 120,
+      "props": {
+        "title": "Ready for the next story",
+        "lines": ["Plan. Capture. Narrate.", "Render locally."],
+        "emphasis": ["locally."],
+        "align": "center"
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "type-voice",
+      "shotId": "type",
+      "startFrame": 12,
+      "endFrame": 138,
+      "text": "Connect the evidence. Explain the decision."
+    },
+    {
+      "id": "graph-voice",
+      "shotId": "graph",
+      "startFrame": 12,
+      "endFrame": 168,
+      "text": "These fictional cases connect to visits, facilities, and districts."
+    },
+    {
+      "id": "flow-voice",
+      "shotId": "flow",
+      "startFrame": 12,
+      "endFrame": 168,
+      "text": "Import the source, explore the records, then communicate a finding."
+    },
+    {
+      "id": "metric-voice",
+      "shotId": "metric",
+      "startFrame": 12,
+      "endFrame": 138,
+      "text": "One repeatable bundle contains two hundred forty fictional cases."
+    },
+    {
+      "id": "closing-voice",
+      "shotId": "closing",
+      "startFrame": 8,
+      "endFrame": 112,
+      "text": "Plan, capture, narrate, and render locally."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

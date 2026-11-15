@@ -1,0 +1,590 @@
+{
+  "version": 1,
+  "id": "plugin-ecosystem",
+  "title": "A platform shaped by its community",
+  "description": "A future plugin ecosystem moves from mission needs to modules, integration and contributions.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1818,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "A platform shaped by its community",
+        "category": "motion-motion",
+        "evidence": "Future product vision \u00b7 Conceptual illustrations",
+        "accent": "#f0ba83",
+        "beats": [
+          {
+            "id": "mission",
+            "title": "One platform cannot predict every mission.",
+            "subtitle": "Future product vision",
+            "content": {
+              "kind": "thesis",
+              "lines": ["A shared foundation.", "Tools that fit the mission."],
+              "emphasis": "A plugin ecosystem."
+            },
+            "duration": 308,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "needs",
+            "title": "Begin with what the mission needs.",
+            "subtitle": "Health and volunteer programs need different capabilities.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "capability-matrix",
+                "schemaVersion": 1,
+                "input": {
+                  "options": [
+                    {
+                      "id": "health",
+                      "label": "Health"
+                    },
+                    {
+                      "id": "volunteer",
+                      "label": "Volunteer"
+                    }
+                  ],
+                  "capabilities": [
+                    {
+                      "id": "curve",
+                      "label": "Epicurves",
+                      "cells": [
+                        {
+                          "optionId": "health",
+                          "state": "included",
+                          "note": ""
+                        },
+                        {
+                          "optionId": "volunteer",
+                          "state": "absent",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "id": "outreach",
+                      "label": "Outreach",
+                      "cells": [
+                        {
+                          "optionId": "health",
+                          "state": "conditional",
+                          "note": "By mission"
+                        },
+                        {
+                          "optionId": "volunteer",
+                          "state": "included",
+                          "note": ""
+                        }
+                      ]
+                    }
+                  ],
+                  "stateLabels": {
+                    "included": "Included",
+                    "absent": "Absent",
+                    "conditional": "Conditional",
+                    "unknown": "Unknown"
+                  },
+                  "focus": {
+                    "kind": "row",
+                    "id": "curve"
+                  },
+                  "showNotes": true,
+                  "caption": "Illustrative future capabilities"
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 400,
+                  "y": 230,
+                  "zoom": 1.55,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 400,
+                  "y": 230,
+                  "zoom": 1.55,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 580,
+                  "y": 390,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 580,
+                  "y": 390,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "wipe",
+              "frames": 24
+            },
+            "token": {
+              "label": "Shared platform",
+              "anchor": {
+                "x": 1120,
+                "y": 716,
+                "width": 340,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "module",
+            "title": "Add a tool to the shared workspace.",
+            "subtitle": "Conceptual modules, not a marketplace interface.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "dashboard-slot-assembly",
+                "schemaVersion": 1,
+                "input": {
+                  "boardTitle": "Future mission workspace",
+                  "widgets": [
+                    {
+                      "id": "curve",
+                      "title": "Cholera",
+                      "kind": "value",
+                      "lines": ["Epicurves"]
+                    },
+                    {
+                      "id": "care",
+                      "title": "HIV and PrEP",
+                      "kind": "list",
+                      "lines": ["Follow-up", "Risk tools"]
+                    },
+                    {
+                      "id": "outreach",
+                      "title": "Volunteers",
+                      "kind": "note",
+                      "lines": ["Outreach tools"]
+                    }
+                  ],
+                  "featuredWidgetId": "curve",
+                  "layout": "feature-left",
+                  "scopeLabel": "Future product vision",
+                  "showGuides": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 310,
+                  "y": 260,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 310,
+                  "y": 260,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 650,
+                  "y": 375,
+                  "zoom": 1.7,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 650,
+                  "y": 375,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "handoff",
+              "frames": 24
+            },
+            "token": {
+              "label": "Shared platform",
+              "anchor": {
+                "x": 100,
+                "y": 716,
+                "width": 340,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "integrate",
+            "title": "Let modules participate in a common system.",
+            "subtitle": "Illustrative integration; no plugin API is being asserted.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "event-bus",
+                "schemaVersion": 1,
+                "input": {
+                  "producers": ["Create", "Update", "Event"],
+                  "subscribers": ["Chart", "Report", "Notify"],
+                  "heading": "A connected tool ecosystem",
+                  "showPackets": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 280,
+                  "y": 250,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 280,
+                  "y": 250,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 675,
+                  "y": 370,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 675,
+                  "y": 370,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          },
+          {
+            "id": "community",
+            "title": "Let the community contribute its expertise.",
+            "subtitle": "Company-built tools can seed a wider ecosystem.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "contribution-weave",
+                "schemaVersion": 1,
+                "input": {
+                  "warp": [
+                    {
+                      "id": "platform",
+                      "label": "Shared platform",
+                      "pattern": "solid"
+                    },
+                    {
+                      "id": "mission",
+                      "label": "Mission knowledge",
+                      "pattern": "stripe"
+                    }
+                  ],
+                  "weft": [
+                    {
+                      "id": "tools",
+                      "label": "Specialist tools",
+                      "pattern": "dot"
+                    },
+                    {
+                      "id": "community",
+                      "label": "Community",
+                      "pattern": "solid"
+                    }
+                  ],
+                  "copy": {
+                    "result": "A mission-specific workspace",
+                    "example": "Future product vision"
+                  },
+                  "weaveStart": "over-first",
+                  "showContributorEnds": true,
+                  "showLabels": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 78,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 102,
+                  "x": 420,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 420,
+                  "y": 300,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 580,
+                  "y": 300,
+                  "zoom": 2.1,
+                  "ease": "whip"
+                },
+                {
+                  "at": 284,
+                  "x": 580,
+                  "y": 300,
+                  "zoom": 2.1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 312,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 326,
+            "transition": {
+              "kind": "aperture",
+              "frames": 24,
+              "origin": {
+                "x": 800,
+                "y": 480
+              }
+            }
+          },
+          {
+            "id": "future",
+            "title": "More missions. More useful tools.",
+            "subtitle": "A long-term product direction",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Reuse the common foundation.",
+                "Extend it with domain expertise."
+              ],
+              "emphasis": "The ecosystem is future work."
+            },
+            "duration": 302,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "mission-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "The plugin ecosystem is a future product vision.",
+      "beatId": "mission"
+    },
+    {
+      "id": "mission-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 263,
+      "text": "Its purpose is to fit more specific missions.",
+      "beatId": "mission"
+    },
+    {
+      "id": "needs-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Different programs need different capabilities.",
+      "beatId": "needs"
+    },
+    {
+      "id": "needs-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "A common foundation need not force an identical toolset.",
+      "beatId": "needs"
+    },
+    {
+      "id": "module-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "A module could add a specialized visualization or workflow.",
+      "beatId": "module"
+    },
+    {
+      "id": "module-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "The plan gives cholera, HIV and volunteer examples.",
+      "beatId": "module"
+    },
+    {
+      "id": "integrate-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Modules would need to participate in the wider platform.",
+      "beatId": "integrate"
+    },
+    {
+      "id": "integrate-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "This diagram illustrates integration, not a shipped API.",
+      "beatId": "integrate"
+    },
+    {
+      "id": "community-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Company-built plugins could seed the marketplace.",
+      "beatId": "community"
+    },
+    {
+      "id": "community-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "Community knowledge could then extend its reach.",
+      "beatId": "community"
+    },
+    {
+      "id": "future-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "The long-term aim is reusable tools for specific missions.",
+      "beatId": "future"
+    },
+    {
+      "id": "future-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 281,
+      "text": "The marketplace is not presented as available today.",
+      "beatId": "future"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

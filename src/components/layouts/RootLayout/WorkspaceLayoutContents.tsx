@@ -3,7 +3,7 @@ import { AppDropzone } from "@/components/AppDropzone/AppDropzone";
 import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
-import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
+import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions";
 import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";

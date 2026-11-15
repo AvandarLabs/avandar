@@ -3,11 +3,11 @@ import {
   shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerUrlHydration/dataExplorerUrlHydration";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
-const _minimalBarViz: VizConfig = {
+const _minimalBarViz: UiVizConfig = {
   vizType: "bar",
   xAxisKey: "a",
   series: [{ renderAs: "bar", key: "b" }],

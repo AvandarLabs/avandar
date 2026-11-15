@@ -1,0 +1,4 @@
+{
+  "@/views/OntologyDesignerApp/ConceptMetaView/useHydratedConcept": "avandar-adapter/OntologyScreen/useHydratedConcept.tsx",
+  "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions": "avandar-adapter/OntologyScreen/CaseTypeActions.tsx"
+}

@@ -74,7 +74,7 @@
       + '</svg>';
   }
   function copyButton(value, label) {
-    return '<button class="copy-btn" type="button" data-copy="' + esc(value) + '" title="' + esc(label || "Copy") + '" aria-label="' + esc(label || "Copy") + '">'
+    return '<button class="copy-btn" type="button" data-copy="' + esc(value) + '" data-tip="' + esc(label || "Copy") + '" aria-label="' + esc(label || "Copy") + '">'
       + copyIconSvg()
       + '</button>';
   }

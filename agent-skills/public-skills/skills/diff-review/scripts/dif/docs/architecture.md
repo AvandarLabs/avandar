@@ -16,24 +16,49 @@ src/
 ├── slug.rs            slugify, branch_slug, deterministic port_for
 ├── git.rs             repo_root, current_branch, default-comparison, diff_signature
 ├── git_watcher.rs     background thread publishing the repo's diff signature
-├── paths.rs           .difit transcript + session-id + guide + summary + test-plan + reviewed-state paths
+├── paths.rs           .difit transcript + session-id + guide + summary + test-plan + reviewed-state + github-sync paths
 ├── session.rs         pure LLM command builder (resume/fresh + prompt)
 ├── pty_pane.rs        PTY-backed pane parsed through vt100 (reused by both panes)
 ├── difit/
 │   ├── imports.rs     server↔import comment shapes + conversion
 │   ├── transcript.rs  atomic read/write/create of the .difit transcript
 │   ├── importer.rs    entries an out-of-band transcript write adds → POST to difit (pure + POST)
+│   ├── editor.rs      add / edit / remove difit comments in place via comments-json + POST /api/comments
 │   ├── server.rs      build the difit command, pick a free port, spawn, wait-ready
-│   └── poller.rs      background thread: poll comments-json → import inbound, publish + mirror
+│   └── poller.rs      background thread: poll comments-json → import inbound, GitHub sync, publish + mirror
+├── github/
+│   ├── registry.rs    the -github.json record of PR comments + the shared lock over it and the session (atomic saves)
+│   ├── session.rs     live GitHub state: PR, viewer, pending review, queued requests, pull status, viewed sync; /__wrap/github.json
+│   ├── anchor.rs      difit thread position → GitHub path / side / line range (pure)
+│   ├── plan.rs        push: difit comments vs the registry → draft / reply / update / delete / resolve actions (pure)
+│   ├── pull.rs        pull: the PR's threads vs the registry + difit → difit edits + registry changes; viewed changes (pure)
+│   ├── graphql.rs     the GraphQL documents + pure parsing of GitHub's answers
+│   ├── client.rs      GithubApi trait + the `gh api graphql` implementation (30s timeout per call)
+│   ├── connection.rs  whether GitHub is reachable: browser reports, network-error detection, retry (pure)
+│   ├── checkout.rs    branch vs PR head, fast-forward only when safe, stashing around it on Sync (Checkout trait + git)
+│   ├── conflicts.rs   a Sync's merge conflicts: who resolves them, the notices, the LLM prompt (pure)
+│   ├── sync.rs        the per-snapshot pass: PR lookup, push, review submit
+│   ├── sync_pull.rs   the pull half: fetch, branch step, comments, viewed events
+│   └── sync_queue.rs  holding interactions while GitHub is unreachable; sending the viewed queue
 ├── inject/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
-│   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver (pure)
+│   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver: eager, hold, or send-all (pure)
+│   ├── mode.rs        DispatchControl: bulk vs eager, the send-all request, the held count (atomics)
+│   ├── held.rs        HeldComments: the held message ids saved to -held.json across relaunches
 │   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()
-    ├── startup.rs     create the transcript, start difit + shell + poller, spawn LLM, assemble App
-    ├── app.rs         App state + guide-ready transition + comparison retarget + focus + main-view switching + inject + scroll + palette/restart
+    ├── startup/
+    │   ├── mod.rs     resolve the launch target (repo, agent, comparison, ports, paths) and assemble App
+    │   ├── surface.rs create the transcript, start difit + poller + browser shell
+    │   └── llm_command.rs  the LLM pane's launch command: resume or fresh, never seeding a review
+    ├── app/
+    │   ├── mod.rs     App state + focus + main-view switching + palette
+    │   ├── review_surface.rs  web-shell requests, comparison retarget, relaunch, new LLM session, difit restart
+    │   ├── llm.rs     difit log, session meta, guide-ready transition, code-change warning, comment injection
+    │   ├── scroll.rs  markdown scroll + vim motions + open-under-cursor; per-pane scrolling for the wheel
+    │   └── select.rs  drag-to-copy: map mouse cells onto a pane, extend, copy on release
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
@@ -51,7 +76,10 @@ src/
     ├── markdown/      diff-guide markdown → ratatui Text (mod.rs walk, inline.rs, table.rs)
     ├── change_alert.rs  pure change-author attribution + restart-alert wording
     ├── session_meta.rs  the live-session metadata file
-    ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys + mouse hover)
+    ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys)
+    ├── mouse.rs       mouse routing: wheel scrolls the pane under the pointer, click focuses, drag selects; the mouse modes dif enables
+    ├── multi_click.rs  double/triple-click counting and the word / line under the pointer (pure)
+    ├── selection.rs   the selection model in content coordinates, its highlight, and text extraction from vt100 / rendered markdown (pure)
     └── keymap.rs      key→bytes encoder + prompt injection into the LLM pane
 ```
 
@@ -89,23 +117,49 @@ We render the cursor ourselves (rather than using a text-editor widget like
 keeping the colored markdown render matters more than offloading the small
 cursor/scroll overlay.
 
-## Mouse capture and native ⌘-click links
+## Mouse: wheel, click, drag-to-copy
 
-All three sibling shells (`dif`, `tasks`, `brain`) capture the mouse for the
-scroll wheel, but right after `EnableMouseCapture` they emit `\x1b[?1002l\x1b[?1003l`
-to turn **off** mouse *motion* reporting (button-drag + any-event) that crossterm
-also enables. Motion reporting suppresses iTerm2's native ⌘-hover / ⌘-click link
-and Semantic-History handling; with only button + wheel reporting, holding ⌘
-bypasses to the native handler while the wheel still scrolls. `dif` therefore
-does **not** track the mouse position itself (the keyboard `o` opens under the
-cursor instead).
+`dif` runs on the alternate screen, which has no terminal scrollback, so the
+terminal cannot scroll or select inside the panes by itself. `dif` turns on
+mouse reporting for button presses (DECSET 1000), drags while a button is held
+(1002), and SGR coordinates (1006), and does the rest itself (`tui/mouse.rs`):
+
+- **Wheel** scrolls the pane under the pointer (vt100 scrollback for a PTY
+  pane, the cursor for a markdown view), whichever pane has focus.
+- **Click** focuses the pane under the pointer.
+- **Drag** selects text, tmux-style, and **release** copies it
+  (`clipboard.rs`). The selection lives in *content* coordinates (a PTY line is
+  its viewport row minus the vt100 scrollback offset), so it stays on the same
+  text while the pane scrolls. Copying reads the cells back out of the vt100
+  screen, stepping the scrollback so a selection taller than the pane copies in
+  full, and joining soft-wrapped rows without a newline. Markdown views copy
+  from the plain text of their rendered lines.
+- **Double-click** selects the word under the pointer and **triple-click** its
+  line (`tui/multi_click.rs` counts presses on one cell within 500ms). A line
+  is bounded by its pane, never the terminal: a PTY row is already the pane's
+  width (plus soft-wrapped rows in view), and a markdown line is clipped to the
+  visible columns.
+
+Bare pointer motion (1003) stays off: hover never floods the loop, and iTerm2
+keeps its ⌘-hover link underline and ⌘-click. iTerm2 keeps 1000/1002/1003 in
+one slot, and resetting any of them turns reporting off entirely, so `dif`
+only ever sets modes and never resets one until teardown. (Before this, `dif`
+reset 1002/1003 after crossterm's `EnableMouseCapture`, which silently turned
+off the wheel too.)
+
+The clipboard is written with `pbcopy`. Over SSH (`SSH_CONNECTION` /
+`SSH_TTY`), `dif` also emits an OSC 52 escape so the user's own terminal sets
+its clipboard. Inside tmux it sends the escape both plain (accepted with
+`set-clipboard on`) and wrapped in a DCS passthrough (forwarded with
+`allow-passthrough on`); with neither option set, tmux drops it. The base64 for
+OSC 52 is a few lines in `clipboard.rs` rather than a new dependency.
 
 ## Threads
 
 - **Main thread** — the TUI event loop (draw + input at ~50ms).
 - **Per-pane reader/writer/waiter threads** — each `PtyPane` spawns three (PTY
   master → vt100 parser, mpsc channel → PTY master, child wait → exit status).
-  Two panes (difit, LLM) → six. A "Restart diff server" respawns the difit pane: its
+  Two panes (difit, LLM) → six. A "Refresh diff" respawns the difit pane: its
   old three threads wind down on EOF and three fresh ones start against the same
   parser.
 - **Poller thread** — polls difit's `/api/comments-json` once a second,
@@ -115,6 +169,9 @@ cursor instead).
   POSTed to `/api/comment-imports` and the mirror is skipped for that tick. It
   starts with difit at launch, and is momentarily absent only while a comparison
   retarget swaps difit out.
+  The same thread runs the GitHub sync pass (`github::sync`) over every
+  snapshot, so `gh` and `git` calls (pushing PR comments, submitting the review,
+  the minute-by-minute pull, fast-forwarding) never block the TUI.
 - **Git-watcher thread** — recomputes the repo's diff signature once a second
   (`git rev-parse HEAD` + `status` + `diff HEAD`, hashed) and publishes it under
   a lock, so the UI loop can notice stale-diff state without spawning git itself.
@@ -168,9 +225,41 @@ the comparison is settled (control endpoint stops accepting updates)
 ```
 
 The reviewer never has to ask the agent to "address the comments": the poller
-sees each new reviewer comment and the loop types it into the LLM. The agent posts
-its reply back to the live server, which pushes it to the browser over SSE — no
-restart. See [integrations.md](integrations.md).
+sees each new reviewer comment and the loop types it into the LLM, either at once
+(eager) or when the reviewer presses **Send all** in the browser (bulk, the
+default). A comment the reviewer sent to the GitHub PR instead takes a separate
+path and never reaches the LLM:
+
+```
+comment box toggle = PR  →  inject.js tags the save (X-Dif-Destination: github)
+        │
+        ▼
+web shell (review_routes.rs): new message ids vs difit's comments-json
+        │  marks them pending in .difit/<…>-github.json, then proxies the save
+        ▼
+difit holds the comment (and the transcript mirrors it, as for any comment)
+        │
+        ├─► Dispatcher skips every id in the registry
+        │
+        └─► Poller thread: github::sync plans against the registry
+              drafts / replies / edits / deletes / resolves  →  pending review
+              Review (N) → submit  →  published on the PR
+
+Browser online / offline  →  POST /__wrap/github/connection
+        offline, or a gh call that cannot reach GitHub  →  no calls; everything queued
+        back online (or the 20s retry)  →  queue sent, then a pull
+
+Poller thread, every 60s or on Sync: github::sync_pull
+        PR threads + viewed files  →  difit (editor.rs) + registry
+        PR head ahead + clean branch  →  fast-forward  →  shell reloads difit
+        reviewer's Sync + dirty branch  →  stash, fast-forward, restore  →  page reloads
+        restore conflicts  →  browser modal  →  reviewer, or the LLM pane via the TUI
+        viewed changes  →  /__wrap/github.json events  →  inject/viewed.js
+```
+
+For a local comment, the agent posts its reply back to the live server, which
+pushes it to the browser over SSE, with no restart. See
+[integrations.md](integrations.md), which also covers the GitHub sync contract.
 
 ## Difit-pane activity log
 
@@ -200,14 +289,14 @@ uses), so the pane reads as a running activity log. Each UI tick,
     ("Claude made code changes…"), otherwise it reads as a manual edit ("New
     manual changes detected…").
 
-## Command palette & difit restart
+## Command palette, Refresh diff & Resync with GitHub
 
 `Ctrl+P` opens an in-memory command palette (`palette.rs`); the event loop
 captures its keys while open and `App::execute_palette_action` dispatches the
-chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`, or
-`NewLlmSession`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N` run those
-directly; each is also the palette row's dimmed `[^R]` / `[^G]` / `[^O]` /
-`[^N]` shortcut hint, via `palette::shortcut_for` (the source of truth
+chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`,
+`NewLlmSession`, or `ResyncGithub`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N`
+/ `Ctrl+S` run those directly; each is also the palette row's dimmed `[^R]` /
+`[^G]` / `[^O]` / `[^N]` / `[^S]` shortcut hint, via `palette::shortcut_for` (the source of truth
 for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the LLM pane; the skill writes the guide
 file and the diff guide view picks it up on its next refresh. "New LLM
@@ -220,7 +309,11 @@ typing `/new` so it takes effect immediately even when the LLM is mid-thought. T
 palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.
 
-The "Restart diff server" action restarts the difit server **in place**. `PtyPane`
+"Resync with GitHub" calls `Session::request_reviewer_pull`, the same request
+the browser's **Sync** button makes, and writes a status line into the log
+view. The pull itself runs on the poller thread like every GitHub call.
+
+The "Refresh diff" action relaunches the difit server **in place**. `PtyPane`
 gained two capabilities for this:
 
 - `kill_child()` — signal the current child without tearing down the pane.
@@ -236,7 +329,9 @@ gained two capabilities for this:
 kill difit, `server::wait_until_port_free` (so the relaunch rebinds the same
 port rather than letting difit auto-reassign), then respawn with the same
 comparison/port and a freshly re-read transcript. The poller and LLM pane are
-untouched; the poller reconnects on its own.
+untouched; the poller reconnects on its own. It then bumps the web shell's
+restart counter instead of opening the browser: the open tab sees it in
+`meta.json` and reloads itself, so a refresh never adds a tab.
 
 ## Dependencies
 
@@ -254,5 +349,9 @@ anyhow, clap, serde/serde_json, chrono, uuid) plus two additions:
   plaintext (crucially **tables**), and integrates with our pane layout. The
   diff guide view draws this styled output directly and overlays its own cursor
   (see "Diff guide navigation" above), so no text-editor widget is needed.
+
+`vt100` is held at 0.16: `tui-term` implements its `Screen` trait for one
+`vt100` line, and 0.16 is the newest one it supports. Move to 0.18 once
+`tui-term` does.
 
 `#![forbid(unsafe_code)]`.

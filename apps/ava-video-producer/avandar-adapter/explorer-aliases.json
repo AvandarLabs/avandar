@@ -1,0 +1,5 @@
+{
+  "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState/useFilterTreeState": "avandar-adapter/shims/useFilterTreeState.ts",
+  "@/views/DataExplorerApp/useQueryColumnsForDataSource": "avandar-adapter/shims/useQueryColumnsForDataSource.ts",
+  "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel": "avandar-adapter/shims/ExplorerQueryEditorModes.constants.ts"
+}

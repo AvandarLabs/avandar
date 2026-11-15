@@ -45,6 +45,12 @@ export type StructuredQueryRead = Model.Versioned<
     /** The columns that are being queried. */
     queryColumns: readonly QueryColumnRead[];
 
+    /**
+     * Every column of the data source, selected or not. WHERE filters target
+     * these by ID, so a filter can use a column the query does not select.
+     */
+    sourceColumns?: readonly QueryColumnRead[];
+
     /** The column that we are ordering by. */
     orderByColumn: QueryColumnId | undefined;
 
@@ -87,6 +93,12 @@ type EmptyStructuredQuery = Model.Versioned<
     dataSource: undefined;
     nestedSubquery?: NestedSubquerySource;
     queryColumns: readonly QueryColumnRead[];
+
+    /**
+     * Every column of the data source, selected or not. WHERE filters target
+     * these by ID, so a filter can use a column the query does not select.
+     */
+    sourceColumns?: readonly QueryColumnRead[];
     orderByColumn: QueryColumnId | undefined;
     orderByDirection: OrderByDirection | undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;

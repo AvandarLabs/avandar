@@ -1,0 +1,64 @@
+name:
+  id: motionAtlas.status-cycle.name
+  message: State progression
+description:
+  id: motionAtlas.status-cycle.description
+  message: A task moves through waiting, active, and complete states.
+category:
+  id: motionAtlas.status-cycle.category
+  message: Interface
+tags:
+  - id: motionAtlas.status-cycle.tags.0
+    message: status
+  - id: motionAtlas.status-cycle.tags.1
+    message: loading
+  - id: motionAtlas.status-cycle.tags.2
+    message: progress
+  - id: motionAtlas.status-cycle.tags.3
+    message: confirmation
+useWhen:
+  id: motionAtlas.status-cycle.useWhen
+  message:
+    Explain a generic state progression; show real product footage to prove actual
+    behavior.
+prompt:
+  id: motionAtlas.status-cycle.prompt
+  message:
+    Use Motion Atlas "State progression" (status-cycle) as a conceptual graphic.
+    Explain a generic state progression; show real product footage to prove actual
+    behavior. Keep the restrained motion and readable labels; replace sample content
+    with approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.status-cycle.creativeDirection
+  message: A task moves through waiting, active, and complete states.
+goodFor:
+  - id: motionAtlas.status-cycle.goodFor.0
+    message:
+      Explain a generic state progression; show real product footage to prove actual
+      behavior.
+intent:
+  id: motionAtlas.status-cycle.intent
+  message:
+    Explain a generic state progression; show real product footage to prove actual
+    behavior.
+domains:
+  - id: motionAtlas.status-cycle.domains.0
+    message: Interface
+aliases:
+  - id: motionAtlas.status-cycle.aliases.0
+    message: status
+  - id: motionAtlas.status-cycle.aliases.1
+    message: loading
+  - id: motionAtlas.status-cycle.aliases.2
+    message: progress
+  - id: motionAtlas.status-cycle.aliases.3
+    message: confirmation
+notFor:
+  - id: motionAtlas.status-cycle.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.status-cycle.distinction
+  message: A task moves through waiting, active, and complete states.

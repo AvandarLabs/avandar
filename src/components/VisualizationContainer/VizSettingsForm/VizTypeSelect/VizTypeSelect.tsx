@@ -1,17 +1,17 @@
 import { Select } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import { VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { SelectData } from "@avandar/ui";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Currently selected visualization type. */
-  value: VizConfig.Type;
+  value: AvaVizConfig.Type;
 
   /** Called when the user picks a different visualization type. */
-  onChange: (vizType: VizConfig.Type) => void;
+  onChange: (vizType: AvaVizConfig.Type) => void;
 
   /** Mantine input size. Defaults to the theme default. */
   size?: string;
@@ -35,12 +35,14 @@ export function VizTypeSelect({
   className,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const vizTypeOptions: SelectData<VizConfig.Type> = VizTypes.map((vizType) => {
-    return {
-      label: vizTypeLabel(vizType),
-      value: vizType,
-    };
-  });
+  const vizTypeOptions: SelectData<AvaVizConfig.Type> = VizTypes.map(
+    (vizType) => {
+      return {
+        label: vizTypeLabel(vizType),
+        value: vizType,
+      };
+    },
+  );
 
   return (
     <Select

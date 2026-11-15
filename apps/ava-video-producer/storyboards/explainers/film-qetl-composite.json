@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "id": "qetl-composite",
+  "title": "Follow the result back",
+  "description": "Full-stage native product with timed, source-anchored explanatory overlays and measured annotations.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1675,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Follow the result back",
+        "category": "composite",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "trace",
+            "title": "A chart has dependencies.",
+            "subtitle": "Explain the route from a displayed result to its source.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "How many cases are in each district?",
+                "A result has a data dependency."
+              ],
+              "emphasis": "Let the question define the work."
+            },
+            "duration": 322,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "dashboard",
+            "title": "Follow a district count back to its source.",
+            "subtitle": "Native product with anchored explanatory overlays.",
+            "content": {
+              "kind": "composite",
+              "segment": {
+                "feature": "dashboards",
+                "mode": "full",
+                "fromFrame": 500,
+                "toFrame": 719,
+                "leadIn": 60
+              },
+              "diagrams": [
+                {
+                  "at": 0,
+                  "request": {
+                    "preset": "provenance-peelback",
+                    "schemaVersion": 1,
+                    "input": {
+                      "summary": {
+                        "label": "District chart",
+                        "text": "A district count depends on the source records."
+                      },
+                      "sources": [
+                        {
+                          "id": "cases",
+                          "title": "Harborfield cases",
+                          "locator": "district_name",
+                          "excerpt": "Group fictional cases by district."
+                        },
+                        {
+                          "id": "query",
+                          "title": "Query definition",
+                          "locator": "COUNT",
+                          "excerpt": "Count the rows in each group."
+                        }
+                      ],
+                      "selectedSourceId": "cases",
+                      "citationLabel": "Source passage",
+                      "showLocators": true,
+                      "sourceArrangement": "fan"
+                    }
+                  },
+                  "label": "The result points back to its source.",
+                  "detail": {
+                    "x": 480,
+                    "y": 80,
+                    "width": 430,
+                    "height": 286
+                  },
+                  "overlay": {
+                    "at": 210,
+                    "until": 558,
+                    "target": {
+                      "x": 700,
+                      "y": 230,
+                      "width": 750,
+                      "height": 350
+                    }
+                  }
+                },
+                {
+                  "at": 570,
+                  "request": {
+                    "preset": "cache-reuse",
+                    "schemaVersion": 1,
+                    "input": {
+                      "request": {
+                        "key": "district-count",
+                        "label": "District count"
+                      },
+                      "result": {
+                        "label": "Grouped result",
+                        "value": "Fictional result"
+                      },
+                      "systemLabels": {
+                        "requester": "Dashboard",
+                        "cache": "Reusable result",
+                        "origin": "Source computation"
+                      },
+                      "pathLabels": {
+                        "miss": "Not stored yet",
+                        "store": "Keep a copy",
+                        "hit": "Use stored copy"
+                      },
+                      "showStoredValue": true,
+                      "showPathLabels": true
+                    }
+                  },
+                  "label": "A reusable result can avoid repeated work.",
+                  "detail": {
+                    "x": 400,
+                    "y": 128,
+                    "width": 530,
+                    "height": 382
+                  },
+                  "overlay": {
+                    "at": 594,
+                    "until": 1035,
+                    "target": {
+                      "x": 700,
+                      "y": 240,
+                      "width": 750,
+                      "height": 500
+                    }
+                  }
+                }
+              ],
+              "signalAt": 230,
+              "source": {
+                "x": 387.2333,
+                "y": 279.1605,
+                "width": 153,
+                "height": 322.9333
+              },
+              "effect": "signal",
+              "annotations": [
+                {
+                  "at": 186,
+                  "until": 1035,
+                  "kind": "box",
+                  "target": {
+                    "x": 387.2333,
+                    "y": 279.1605,
+                    "width": 153,
+                    "height": 322.9333
+                  },
+                  "seed": 17
+                }
+              ]
+            },
+            "duration": 1080,
+            "transition": {
+              "kind": "wipe",
+              "frames": 30
+            }
+          },
+          {
+            "id": "meaning",
+            "title": "The question determines what is needed.",
+            "subtitle": "The lane is conceptual, not backend telemetry.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Request the relevant data.",
+                "Reuse work when it remains valid."
+              ],
+              "emphasis": "Query intent guides the work."
+            },
+            "duration": 321,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "trace-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 146,
+      "text": "A district count begins with a question about response cases.",
+      "beatId": "trace"
+    },
+    {
+      "id": "trace-1",
+      "shotId": "explanation",
+      "startFrame": 151,
+      "endFrame": 271,
+      "text": "QETL lets that question guide the data work.",
+      "beatId": "trace"
+    },
+    {
+      "id": "dashboard-0",
+      "shotId": "explanation",
+      "startFrame": 48,
+      "endFrame": 203,
+      "text": "This dashboard groups fictional cases by district.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "dashboard-1",
+      "shotId": "explanation",
+      "startFrame": 208,
+      "endFrame": 371,
+      "text": "The result needs a district field and a counting rule.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "dashboard-2",
+      "shotId": "explanation",
+      "startFrame": 376,
+      "endFrame": 531,
+      "text": "Other source fields are not required for this question.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "dashboard-3",
+      "shotId": "explanation",
+      "startFrame": 536,
+      "endFrame": 721,
+      "text": "Follow the result back to the data and query it depends on.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "dashboard-4",
+      "shotId": "explanation",
+      "startFrame": 726,
+      "endFrame": 881,
+      "text": "A reusable result can avoid repeating the same computation.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "dashboard-5",
+      "shotId": "explanation",
+      "startFrame": 886,
+      "endFrame": 1041,
+      "text": "Freshness and cache policy determine when to reuse it.",
+      "beatId": "dashboard"
+    },
+    {
+      "id": "meaning-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 175,
+      "text": "The goal is to move and process what the question needs.",
+      "beatId": "meaning"
+    },
+    {
+      "id": "meaning-1",
+      "shotId": "explanation",
+      "startFrame": 180,
+      "endFrame": 300,
+      "text": "The benefit depends on the sources and the workload.",
+      "beatId": "meaning"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

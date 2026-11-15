@@ -1,0 +1,5 @@
+{
+  "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls": "avandar-adapter/shims/import-dashboard/DatasetParseControls.tsx",
+  "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig": "avandar-adapter/shims/import-dashboard/useDataVizPBlockConfig.tsx",
+  "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig": "avandar-adapter/shims/import-dashboard/useFilterPBlockConfig.tsx"
+}

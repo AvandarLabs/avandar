@@ -19,14 +19,14 @@ const {
   ensureSpatialMock,
   runStructuredQueryWithMetadataMock,
   runSpatialQueryMock,
-  resolveManualQueryForExecutionMock,
+  makeExecutableQueryFromManualQueryMock,
   spatialAvailability,
 } = vi.hoisted(() => {
   return {
     ensureSpatialMock: vi.fn(),
     runStructuredQueryWithMetadataMock: vi.fn(),
     runSpatialQueryMock: vi.fn(),
-    resolveManualQueryForExecutionMock: vi.fn(),
+    makeExecutableQueryFromManualQueryMock: vi.fn(),
     spatialAvailability: { value: "available" },
   };
 });
@@ -72,10 +72,11 @@ vi.mock(
 // undefined. A separate test loads the real implementation to prove a
 // resolvable lat/lng layer never reaches it.
 vi.mock(
-  "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution",
+  "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
     return {
-      resolveManualQueryForExecution: resolveManualQueryForExecutionMock,
+      makeExecutableQueryFromManualQuery:
+        makeExecutableQueryFromManualQueryMock,
     };
   },
 );
@@ -162,7 +163,7 @@ describe("useMapLayersData", () => {
     ensureSpatialMock.mockReset();
     runStructuredQueryWithMetadataMock.mockReset();
     runSpatialQueryMock.mockReset();
-    resolveManualQueryForExecutionMock.mockReset();
+    makeExecutableQueryFromManualQueryMock.mockReset();
     spatialAvailability.value = "available";
   });
 
@@ -529,7 +530,7 @@ describe("useMapLayersData", () => {
   it("runs a plain lat/lng layer with no injected LIMIT and without consulting the auto-limit resolver", async () => {
     // Wires in the real `runStructuredQueryWithMetadata` (rather than the
     // mock every other test in this file uses) so this proves the actual
-    // guarantee: `resolveManualQueryForExecution` is not merely uncalled in
+    // guarantee: `makeExecutableQueryFromManualQuery` is not merely uncalled in
     // some mock's bookkeeping, it is not consulted by the real execution
     // path, and the SQL that reaches `WorkspaceQuerySession.runQuery` is the
     // compiled overlay SQL verbatim, with no LIMIT clause appended anywhere
@@ -557,7 +558,7 @@ describe("useMapLayersData", () => {
       expect(result.current.get(layer.id)?.data?.type).toBe("rows");
     });
 
-    expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
+    expect(makeExecutableQueryFromManualQueryMock).not.toHaveBeenCalled();
     expect(expectedSql).not.toMatch(/limit/i);
     expect(getDataSql()).toEqual([expectedSql]);
   });

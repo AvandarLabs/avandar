@@ -42,7 +42,7 @@ export function FilterSection({
         <ApplyAoiFilterSwitch layer={layer} onLayerChange={onLayerChange} />
       ) : null}
       <QueryFiltersField
-        columns={layer.source.queryColumns}
+        columns={layer.source.sourceColumns ?? []}
         value={layer.source.filters}
         onChange={(filters) => {
           onLayerChange((current) => {

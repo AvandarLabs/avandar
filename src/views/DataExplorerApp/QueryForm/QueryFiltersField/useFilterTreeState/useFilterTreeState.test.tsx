@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useFilterTreeState } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState/useFilterTreeState";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 const COLUMN_TYPES: Readonly<Record<string, AvaDataType.T>> = {
@@ -23,7 +24,7 @@ function _oneRule(value: string): StructuredQuery.FilterGroup {
       {
         type: "rule",
         id: "r1",
-        columnName: "Admin2",
+        columnId: "Admin2" as QueryColumn.Id,
         columnDataType: "varchar",
         operator: "=",
         value,

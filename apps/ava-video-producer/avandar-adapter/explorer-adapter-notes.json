@@ -1,0 +1,48 @@
+{
+  "screen": "Data Explorer",
+  "layoutSources": [
+    "src/views/DataExplorerApp/DataExplorerApp.tsx",
+    "src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx",
+    "src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx",
+    "src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx"
+  ],
+  "originalLeaves": [
+    "src/lib/ui/viz/DataGrid.tsx",
+    "src/lib/ui/viz/BarChart.tsx",
+    "src/components/sql/SqlEditor/SqlEditor.tsx",
+    "src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx",
+    "src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx",
+    "src/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields.tsx",
+    "src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx",
+    "src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx",
+    "src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx",
+    "src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx",
+    "src/components/SettingsColumns/SettingsColumns.tsx",
+    "src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx"
+  ],
+  "adapterBoundaries": [
+    "The application controller and network query execution are replaced by pure frame state and fixture selection/grouping.",
+    "The source picker uses the unchanged Avandar Select leaf with one fixture-bound dataset, replacing QueryDataSourceSelect's network-loaded options.",
+    "The toolbar uses DataExplorerApp's exact labels, icons, variants, spacing and order. Save menu controllers are not mounted.",
+    "The drawer retains product CSS, Tabs, rail and resize handle. Frame-calculated height replaces Mantine Collapse and pointer resize state.",
+    "The SQL editor retains original CodeMirror and SQL pill extensions. Frame-owned strings and caret selection replace event-driven draft state. Its supported minRows prop is set to nine to keep the Edit query button visible in the bounded film drawer.",
+    "Filter tree ownership and dataset-column fetching are narrowly aliased as recorded in explorer-aliases.json. Product filter controls and validation remain original.",
+    "Product chart series animation is already disabled in the installed Mantine BarChart. The film animates the chart container's short entrance using shared motion helpers. DataGrid's public onGridReady callback disables AG Grid's wall-clock animateRows option.",
+    "Fictional demonstration data is an editorial provenance label in the toolbar, not an asserted product feature."
+  ],
+  "fixtureSource": "demo-data/cases.csv",
+  "sqlDatasetId": "00000000-0000-4000-8000-000000000240",
+  "sqlDatasetIdKind": "synthetic local demonstration catalog identity, not an imported backend ID",
+  "queryResults": {
+    "allCases": 240,
+    "eastbankCases": 56,
+    "districtCounts": {
+      "Eastbank": 56,
+      "North Quay": 51,
+      "South Gardens": 40,
+      "Lakeside": 39,
+      "Ridge": 29,
+      "West Marsh": 25
+    }
+  }
+}

@@ -85,6 +85,27 @@ pub const ALL: &[Shortcut] = &[
         group: Group::Focus,
         in_footer: true,
     },
+    Shortcut {
+        keys: "Wheel",
+        label: "scroll",
+        desc: "Scroll the pane under the pointer; a click focuses it",
+        group: Group::Focus,
+        in_footer: false,
+    },
+    Shortcut {
+        keys: "Drag",
+        label: "copy",
+        desc: "Select text in a pane and copy it on release (Option-drag for iTerm2's own selection)",
+        group: Group::Focus,
+        in_footer: false,
+    },
+    Shortcut {
+        keys: "2× / 3× click",
+        label: "word",
+        desc: "Copy the word / the line under the pointer (a line never runs past its pane)",
+        group: Group::Focus,
+        in_footer: false,
+    },
     // --- Commands (from either pane) ---
     Shortcut {
         keys: "^P",
@@ -109,10 +130,17 @@ pub const ALL: &[Shortcut] = &[
     },
     Shortcut {
         keys: "^R",
-        label: "restart",
-        desc: "Restart the difit server",
+        label: "refresh",
+        desc: "Refresh the diff",
         group: Group::Commands,
         in_footer: true,
+    },
+    Shortcut {
+        keys: "^S",
+        label: "resync",
+        desc: "Resync with GitHub: pull new PR comments and commits now",
+        group: Group::Commands,
+        in_footer: false,
     },
     Shortcut {
         keys: "^N",
@@ -262,12 +290,44 @@ mod tests {
     }
 
     #[test]
-    fn footer_advertises_restart_shortcut() {
+    fn footer_advertises_refresh_shortcut() {
         assert!(
             footer_subset()
                 .iter()
-                .any(|s| s.keys == "^R" && s.label == "restart")
+                .any(|s| s.keys == "^R" && s.label == "refresh")
         );
+    }
+
+    #[test]
+    fn commands_group_lists_the_github_resync() {
+        let cmds = in_group(Group::Commands);
+        assert!(
+            cmds.iter()
+                .any(|s| s.keys == "^S" && s.desc.contains("GitHub"))
+        );
+    }
+
+    #[test]
+    fn focus_group_lists_mouse_scroll_and_drag_to_copy() {
+        let focus = in_group(Group::Focus);
+        assert!(
+            focus
+                .iter()
+                .any(|s| s.keys == "Wheel" && s.desc.contains("under the pointer"))
+        );
+        assert!(
+            focus
+                .iter()
+                .any(|s| s.keys == "Drag" && s.desc.contains("copy"))
+        );
+    }
+
+    #[test]
+    fn focus_group_lists_double_and_triple_click_selection() {
+        let focus = in_group(Group::Focus);
+        assert!(focus.iter().any(|s| s.keys == "2× / 3× click"
+            && s.desc.contains("word")
+            && s.desc.contains("line")));
     }
 
     #[test]

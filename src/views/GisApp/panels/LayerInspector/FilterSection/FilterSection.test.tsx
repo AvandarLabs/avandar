@@ -85,7 +85,7 @@ vi.mock(
           rules: [
             {
               type: "rule",
-              columnName: "Name",
+              columnId: "Name" as QueryColumn.Id,
               operator: "=",
               value: "Ada",
             },
@@ -137,7 +137,7 @@ describe("FilterSection", () => {
     const layer = _makeLayerWithFilters([
       {
         type: "rule",
-        columnName: "Name",
+        columnId: "Name" as QueryColumn.Id,
         operator: "=",
         value: "Ada",
       },
@@ -226,7 +226,7 @@ describe("FilterSection", () => {
     expect(updatedLayer.source.filters.rules).toEqual([
       {
         type: "rule",
-        columnName: "Name",
+        columnId: "Name" as QueryColumn.Id,
         operator: "=",
         value: "Ada",
       },

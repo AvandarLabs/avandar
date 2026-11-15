@@ -1,0 +1,137 @@
+name:
+  id: motionAtlas.equal-count-unequal-volume.name
+  message: The same count can hold different amounts
+description:
+  id: motionAtlas.equal-count-unequal-volume.description
+  message:
+    Two equal-count collections begin with matching item marks. Each item unfolds
+    into a strip proportional to its supplied byte size, revealing different total data
+    volumes on one common ruler without changing the item count.
+category:
+  id: motionAtlas.equal-count-unequal-volume.category
+  message: Measurement and proxies
+useWhen:
+  id: motionAtlas.equal-count-unequal-volume.useWhen
+  message: Expose what an item count does not tell us about the amount of data.
+creativeDirection:
+  id: motionAtlas.equal-count-unequal-volume.creativeDirection
+  message:
+    Frames 0-11 reveal two labeled shelves containing the same number of authored
+    items. Frames 12-48 align their count marks one for one. Frames 49-110 unfold each
+    item horizontally into an adjacent byte-length strip while retaining its small
+    identity tab; both shelves share one fixed zero and scale. Frames 111-145 show the
+    derived collection totals beneath the unchanged count marks. Hold through frame 167
+    with the supplied measurement basis and proxy note, then fade to the shared opaque
+    ground through frame 179. Use the same palette, 960x600 React/SVG canvas,
+    deterministic 180-frame timing, and 30fps.
+intent:
+  id: motionAtlas.equal-count-unequal-volume.intent
+  message: Expose what an item count does not tell us about the amount of data.
+distinction:
+  id: motionAtlas.equal-count-unequal-volume.distinction
+  message:
+    Unlike capability-matrix, this changes the represented measure from a discrete
+    count to item-weighted size. Unlike bar-race, no rank changes over time and no data
+    values evolve. Unlike population-normalized-map, no denominator division or
+    geographic fill is used; the animation opens each counted object to expose its
+    unequal weight.
+prompt:
+  id: motionAtlas.equal-count-unequal-volume.prompt
+  message: Use Motion Atlas "The same count can hold different amounts"
+    (equal-count-unequal-volume) as a conceptual graphic. Expose what an item count does
+    not tell us about the amount of data. Replace fictional examples with approved
+    authored content before making product claims.
+tags:
+  - id: motionAtlas.equal-count-unequal-volume.tags.0
+    message: measurement proxy
+  - id: motionAtlas.equal-count-unequal-volume.tags.1
+    message: dataset count
+  - id: motionAtlas.equal-count-unequal-volume.tags.2
+    message: row count
+  - id: motionAtlas.equal-count-unequal-volume.tags.3
+    message: data size
+  - id: motionAtlas.equal-count-unequal-volume.tags.4
+    message: bytes
+  - id: motionAtlas.equal-count-unequal-volume.tags.5
+    message: storage volume
+  - id: motionAtlas.equal-count-unequal-volume.tags.6
+    message: equal counts
+  - id: motionAtlas.equal-count-unequal-volume.tags.7
+    message: unequal amounts
+goodFor:
+  - id: motionAtlas.equal-count-unequal-volume.goodFor.0
+    message: Explain why dataset count is an imperfect storage proxy
+  - id: motionAtlas.equal-count-unequal-volume.goodFor.1
+    message: Show why the same number of rows can occupy different byte sizes
+  - id: motionAtlas.equal-count-unequal-volume.goodFor.2
+    message: Separate a simple allowance metric from a measured resource quantity
+domains:
+  - id: motionAtlas.equal-count-unequal-volume.domains.0
+    message: Measurement and proxies
+aliases:
+  - id: motionAtlas.equal-count-unequal-volume.aliases.0
+    message: measurement proxy
+  - id: motionAtlas.equal-count-unequal-volume.aliases.1
+    message: dataset count
+  - id: motionAtlas.equal-count-unequal-volume.aliases.2
+    message: row count
+  - id: motionAtlas.equal-count-unequal-volume.aliases.3
+    message: data size
+notFor:
+  - id: motionAtlas.equal-count-unequal-volume.notFor.0
+    message:
+      Exactly two equal-count groups and at most three items per group. Quantities
+      are fictional measurement examples, not actual compression, transfer, memory, or
+      storage benchmarks.
+  - id: motionAtlas.equal-count-unequal-volume.notFor.1
+    message:
+      Every displayed total equals the sum of item bytes. Item count and byte volume
+      remain distinct units; no conversion from count to bytes is inferred.
+  - id: motionAtlas.equal-count-unequal-volume.notFor.2
+    message:
+      Both shelves use one zero, one scale, and one measurement basis. An empty-byte
+      item keeps its count mark even though its size strip has zero length.
+  - id: motionAtlas.equal-count-unequal-volume.notFor.3
+    message:
+      The selected datasets or rows grain applies to all items. A dataset and a row
+      must never count as interchangeable units.
+  - id: motionAtlas.equal-count-unequal-volume.notFor.4
+    message:
+      This does not assess whether a pricing policy is fair or predict actual costs.
+      It illustrates a limitation of a proxy named in the strategy.
+  - id: motionAtlas.equal-count-unequal-volume.notFor.5
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
+      are authoring responsibilities. Runtime validation enforces structure, numeric
+      bounds, identities and references.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.0
+      message: Reveal two equal-count shelves.
+  - startFrame: 12
+    endFrame: 48
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.1
+      message: Align persistent count marks.
+  - startFrame: 49
+    endFrame: 110
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.2
+      message: Unfold exact byte strips on a common scale.
+  - startFrame: 111
+    endFrame: 145
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.3
+      message: Reveal derived collection totals.
+  - startFrame: 146
+    endFrame: 167
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.4
+      message: Hold count and measurement basis.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.equal-count-unequal-volume.motionBeats.5
+      message: Shared opaque exit.

@@ -1,0 +1,88 @@
+{
+  "kind": "actual-product-component-render",
+  "sourceRevision": "3c164aa32b8a60b30885081e7bb0986135e99f70",
+  "sourceFiles": 665,
+  "fps": 30,
+  "width": 1536,
+  "height": 960,
+  "frames": 2246,
+  "seconds": 74.866667,
+  "posterFrame": 2174,
+  "posterSource": "Decoded final MP4 at the completed result hold",
+  "videoSha256": "bdcfcb308dcccf3cfb68c9962a17a24a2e96df92849dd32ba1d816f2e1822e03",
+  "posterSha256": "770e893f18651cdc54bb1deae4e89aa19f63ea31d1f0515cbfd513e8e1c6e482",
+  "fingerprint": {
+    "sourcePlanSha256": "631ef055d4becd7cf9c28655ca2129d789271c57192a64beb2776f5010b5b355",
+    "parsedPlanSha256": "0f161ce1c58a7ab64c2df71de16f4c6857f6fc209cbedd3627eaf30f3a7f2186",
+    "assets": [
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-name-dashboard.wav",
+        "sha256": "d5c99d8aa8b177249c705d3ad7a9a79dfb0ba2d1196bafc9cadd77e9e8db6e45"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-open-preview.wav",
+        "sha256": "406c7c395ddf827b86ae184493a33954e8ac7d17950f6207ee6c0119ab96cbab"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-review-editor.wav",
+        "sha256": "532e386e89729cfeb236a746cac598c70df6302b67831ec97a7a5f3a0cda61b6"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-save-chart.wav",
+        "sha256": "235d5c1c2d91fa5920305505a42d3561ab9196846960310ed1bf80b94d5513c9"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-unpublished-draft.wav",
+        "sha256": "55663dd772815530a146e58a6de9307c96fec844dd69624f949f0e6f6ddbc049"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-eastbank-count.wav",
+        "sha256": "d19c108115ff26bdc83a2b4bed8a25c5ac8e23773e7cc7f5b80717b9e1d70499"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-filter-eastbank.wav",
+        "sha256": "3c8739821ac44c2eaae68c22ebdbd645f97c304c6fc1925a56bcdc88c330d64a"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-make-chart.wav",
+        "sha256": "96d2262ec752b85fb4f12aceaf365ccd9660e1ce4d08f962bc94d38ff2f55ed9"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-open-query.wav",
+        "sha256": "592c078dea05b19b681c2c66f65975e893654c9f90784398d9638335f180427a"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-run-query.wav",
+        "sha256": "a6c32b4291de689645eabf0f3d4b91f26f4605d88f808755dce89352ab79af98"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-write-query.wav",
+        "sha256": "129bf0753edd9c473eaa4bc607cec8c8bdd851bb17344cfecea50eeaa0ad88c0"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-choose-csv.wav",
+        "sha256": "67af830413c2544d443810b4da026a89e14b93c882e7b8d247ebcbc804346907"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-name-dataset.wav",
+        "sha256": "f4e3a626a3d31c5113375dea566c737d042e31b37aaa2e62d3ec3f54e06a7966"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-review-preview.wav",
+        "sha256": "a6144032bfcd268513eaa659320a504be25817ddcac8e6de2f7fb9c34240e34f"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-save-dataset.wav",
+        "sha256": "123f709eb134adbc77feda9108ec37cc98ea4dfd30c1faffcd466dee40aa66ab"
+      },
+      {
+        "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-saved-row-count.wav",
+        "sha256": "627d6280a75bb7dba24ed3053f5336fa4c67bec98652d001778fc7a62a06aad3"
+      }
+    ],
+    "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+  },
+  "pictureGate": "passed",
+  "audio": "macOS Samantha scratch narration; duration and signal checked",
+  "generatedAt": "2026-10-15T10:30:47.213Z"
+}

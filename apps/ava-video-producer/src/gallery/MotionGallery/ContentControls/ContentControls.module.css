@@ -1,0 +1,46 @@
+.contentControlsEditor {
+  border-top: 1px solid var(--line);
+  margin-top: 26px;
+  padding-top: 22px;
+}
+
+.contentControlsHeading {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.contentControlsHeading h3 {
+  font-size: 16px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.contentControlsHeading button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 9px;
+}
+
+.contentControlsHelp {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 5px 0 12px;
+}
+
+.contentControlsEditor button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.contentControlsEditor button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

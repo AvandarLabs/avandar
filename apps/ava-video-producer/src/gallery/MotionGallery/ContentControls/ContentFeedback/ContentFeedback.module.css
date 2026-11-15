@@ -1,0 +1,13 @@
+.contentFeedbackError {
+  color: #a73135;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 5px 0;
+  overflow-wrap: anywhere;
+}
+
+.contentFeedbackStatus {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}

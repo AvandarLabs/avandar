@@ -1,0 +1,106 @@
+name:
+  id: motionAtlas.release-repair-obligations.name
+  message: Deliver with the remaining repair obligations visible
+description:
+  id: motionAtlas.release-repair-obligations.description
+  message:
+    An artifact may move to a recipient only when no open blocking issue remains.
+    Every open follow-up issue stays attached as a visible limitation and creates an
+    owned, dated repair obligation.
+category:
+  id: motionAtlas.release-repair-obligations.category
+  message: Resilience and maintenance
+useWhen:
+  id: motionAtlas.release-repair-obligations.useWhen
+  message: Separate delivery from the continuing duty to address known flaws.
+prompt:
+  id: motionAtlas.release-repair-obligations.prompt
+  message: Separate delivery from the continuing duty to address known flaws.
+creativeDirection:
+  id: motionAtlas.release-repair-obligations.creativeDirection
+  message:
+    Frames 12..40 reveal an artifact with its authored issue tabs and an empty
+    repair register. Frames 41..90 unfold each open follow-up tab into a matching
+    register entry with its owner and due label, leaving the original limitation
+    attached to the artifact. Resolved issues keep a resolved mark. Frames 91..130 move
+    the artifact to the recipient only if every blocking issue is resolved. Otherwise
+    keep it behind a held bracket. Frames 131..167 hold the actual artifact location and
+    all unresolved obligations. A due label is a commitment, never a completed repair.
+    Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the
+    shared palette. Reveal during frames 0..11 and fade to the common opaque ground
+    during frames 168..179.
+intent:
+  id: motionAtlas.release-repair-obligations.intent
+  message: Separate delivery from the continuing duty to address known flaws.
+distinction:
+  id: motionAtlas.release-repair-obligations.distinction
+  message:
+    Unlike readiness-latch, the result may move while explicitly classified
+    follow-up obligations remain open. Unlike feedback-refinement, delivery does not
+    imply a finished revision cycle; unresolved work retains identity, an owner and a
+    due label.
+tags:
+  - id: motionAtlas.release-repair-obligations.tags.0
+    message: release
+  - id: motionAtlas.release-repair-obligations.tags.1
+    message: known limitations
+  - id: motionAtlas.release-repair-obligations.tags.2
+    message: technical debt
+  - id: motionAtlas.release-repair-obligations.tags.3
+    message: follow-through
+  - id: motionAtlas.release-repair-obligations.tags.4
+    message: ownership
+  - id: motionAtlas.release-repair-obligations.tags.5
+    message: blocking issue
+goodFor:
+  - id: motionAtlas.release-repair-obligations.goodFor.0
+    message: Explain a bounded release without erasing known limitations
+  - id: motionAtlas.release-repair-obligations.goodFor.1
+    message: Keep technical debt ownership visible after delivery
+  - id: motionAtlas.release-repair-obligations.goodFor.2
+    message: Distinguish an open blocker from an explicitly deferred follow-up
+domains:
+  - id: motionAtlas.release-repair-obligations.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.release-repair-obligations.aliases.0
+    message: release repair obligations
+notFor:
+  - id: motionAtlas.release-repair-obligations.notFor.0
+    message:
+      Issue severity and release acceptability are authored, never inferred from
+      text. The renderer cannot decide whether a flaw is safe.
+  - id: motionAtlas.release-repair-obligations.notFor.1
+    message:
+      Do not use the generic example to justify releasing software with dangerous or
+      unknown consequences.
+  - id: motionAtlas.release-repair-obligations.notFor.2
+    message:
+      The register proves only that a commitment was stated. It does not show or
+      guarantee that a later repair occurs.
+  - id: motionAtlas.release-repair-obligations.notFor.3
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.release-repair-obligations.motionBeats.0
+      message: Reveal the artifact, attached issue marks and empty repair register.
+  - startFrame: 41
+    endFrame: 90
+    description:
+      id: motionAtlas.release-repair-obligations.motionBeats.1
+      message: Unfold every open follow-up into its owned, dated register entry.
+  - startFrame: 91
+    endFrame: 130
+    description:
+      id: motionAtlas.release-repair-obligations.motionBeats.2
+      message: Deliver only when no open blocker remains.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.release-repair-obligations.motionBeats.3
+      message: Hold the actual location with every open limitation and obligation.

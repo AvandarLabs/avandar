@@ -1,3 +1,7 @@
+import { describe, expect, it } from "vitest";
+import { compilePointCoordinateAuditSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointCoordinateAuditSql";
+import { parsePointCoordinateAuditRow } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/parsePointCoordinateAuditRow";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 /**
  * Row-level tests for {@link compilePointCoordinateAuditSql}, the query that
  * decides whether a point layer needs SQL-side aggregation and counts the rows
@@ -7,10 +11,6 @@
  * "N of M rows mapped" status reports once the browser no longer sees every
  * row, so a wrong count here means the map claims coverage it does not have.
  */
-import { describe, expect, it } from "vitest";
-import { compilePointCoordinateAuditSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointCoordinateAuditSql";
-import { parsePointCoordinateAuditRow } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/parsePointCoordinateAuditRow";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { PointCoordinateAudit } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 import type { DuckDBConnection } from "@duckdb/node-api";
 

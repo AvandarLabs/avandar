@@ -1,0 +1,86 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { describe, expect, it } from "vitest";
+import { AvaBarChartVizConfigs } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfigs";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
+import { render, screen } from "@/test-utils";
+import { SeriesAwareVizForm } from "../SeriesAwareVizForm";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
+
+i18n.load("en", {});
+i18n.activate("en");
+
+const fields: readonly QueryResult.ColumnWithId[] = [
+  {
+    id: "region" as QueryColumn.Id,
+    name: "region",
+    dataType: "varchar",
+  } as QueryResult.ColumnWithId,
+  {
+    id: "count" as QueryColumn.Id,
+    name: "count",
+    dataType: "double",
+  } as QueryResult.ColumnWithId,
+];
+
+function renderForm(config: AvaBarChartVizConfig): HTMLElement {
+  const { container } = render(
+    <I18nProvider i18n={i18n}>
+      <AvandarAppProvider>
+        <SeriesAwareVizForm
+          fields={fields}
+          config={config}
+          onConfigChange={() => {}}
+        />
+      </AvandarAppProvider>
+    </I18nProvider>,
+  );
+  return container as HTMLElement;
+}
+
+describe("SeriesAwareVizForm layout", () => {
+  it("renders Series before X axis in document order", () => {
+    const container = renderForm({
+      ...AvaBarChartVizConfigs.makeEmptyConfig(),
+      xAxisKey: "region" as QueryColumn.Id,
+      series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
+    });
+    const legends = Array.from(container.querySelectorAll("legend")).map(
+      (l) => {
+        return l.textContent ?? "";
+      },
+    );
+    const seriesIdx = legends.indexOf("Series");
+    const xAxisIdx = legends.indexOf("X axis");
+    expect(seriesIdx).toBeGreaterThanOrEqual(0);
+    expect(xAxisIdx).toBeGreaterThanOrEqual(0);
+    expect(seriesIdx).toBeLessThan(xAxisIdx);
+  });
+
+  it("wraps each settings group in a Mantine Fieldset", () => {
+    const container = renderForm({
+      ...AvaBarChartVizConfigs.makeEmptyConfig(),
+      xAxisKey: "region" as QueryColumn.Id,
+      series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
+    });
+    const legends = Array.from(container.querySelectorAll("legend")).map(
+      (l) => {
+        return l.textContent ?? "";
+      },
+    );
+    expect(legends).toEqual(expect.arrayContaining(["Series", "X axis"]));
+  });
+
+  it("still shows the Add series button in the Series fieldset", () => {
+    renderForm({
+      ...AvaBarChartVizConfigs.makeEmptyConfig(),
+      xAxisKey: "region" as QueryColumn.Id,
+      series: [],
+    });
+    expect(
+      screen.getByRole("button", { name: "Add series" }),
+    ).toBeInTheDocument();
+  });
+});

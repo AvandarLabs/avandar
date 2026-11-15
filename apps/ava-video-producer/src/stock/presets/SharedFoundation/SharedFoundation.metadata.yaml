@@ -1,0 +1,105 @@
+name:
+  id: motionAtlas.shared-foundation.name
+  message: Find the common ground
+description:
+  id: motionAtlas.shared-foundation.description
+  message:
+    Two different approaches lift to reveal one explicitly shared foundation. Their
+    distinguishing traits remain attached, so commonality does not erase their
+    differences.
+category:
+  id: motionAtlas.shared-foundation.category
+  message: Editorial connectors
+useWhen:
+  id: motionAtlas.shared-foundation.useWhen
+  message: Reveal the shared principle beneath two distinct approaches.
+prompt:
+  id: motionAtlas.shared-foundation.prompt
+  message:
+    Use Motion Atlas "Find the common ground" (shared-foundation) as a conceptual
+    graphic. Reveal the shared principle beneath two distinct approaches. Replace
+    fictional sample content with approved authored content before making product
+    claims.
+creativeDirection:
+  id: motionAtlas.shared-foundation.creativeDirection
+  message:
+    Two labeled structures stand apart with their distinct traits underneath. Their
+    lower edges rise in parallel, exposing matching fragments of a shared foundation
+    phrase. The fragments join into one continuous base spanning both structures, then
+    short supports reconnect each approach to it. The final hold reads as two approaches
+    resting on the same principle before the shared exit.
+intent:
+  id: motionAtlas.shared-foundation.intent
+  message: Reveal the shared principle beneath two distinct approaches.
+distinction:
+  id: motionAtlas.shared-foundation.distinction
+  message:
+    Unlike source-merge, the two approaches never collapse into a single output.
+    Unlike a comparison panel, the hero action uncovers and connects one common base
+    while preserving the two distinct identities.
+tags:
+  - id: motionAtlas.shared-foundation.tags.0
+    message: common ground
+  - id: motionAtlas.shared-foundation.tags.1
+    message: shared principle
+  - id: motionAtlas.shared-foundation.tags.2
+    message: foundation
+  - id: motionAtlas.shared-foundation.tags.3
+    message: similarity
+  - id: motionAtlas.shared-foundation.tags.4
+    message: both
+  - id: motionAtlas.shared-foundation.tags.5
+    message: agreement
+  - id: motionAtlas.shared-foundation.tags.6
+    message: underlying idea
+  - id: motionAtlas.shared-foundation.tags.7
+    message: common requirement
+goodFor:
+  - id: motionAtlas.shared-foundation.goodFor.0
+    message: Connect two different methods through a common principle
+  - id: motionAtlas.shared-foundation.goodFor.1
+    message: Transition from disagreement to shared requirements
+  - id: motionAtlas.shared-foundation.goodFor.2
+    message: Introduce a shared foundation before explaining separate implementations
+domains:
+  - id: motionAtlas.shared-foundation.domains.0
+    message: Editorial connectors
+aliases:
+  - id: motionAtlas.shared-foundation.aliases.0
+    message: common ground
+  - id: motionAtlas.shared-foundation.aliases.1
+    message: shared principle
+  - id: motionAtlas.shared-foundation.aliases.2
+    message: foundation
+  - id: motionAtlas.shared-foundation.aliases.3
+    message: similarity
+notFor:
+  - id: motionAtlas.shared-foundation.notFor.0
+    message: Exactly two approaches and one shared principle are supported.
+  - id: motionAtlas.shared-foundation.notFor.1
+    message: The base width does not measure the amount of agreement or similarity.
+  - id: motionAtlas.shared-foundation.notFor.2
+    message:
+      The commonality must be explicitly authored and should not imply identical
+      capabilities or interchangeable outcomes.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.shared-foundation.motionBeats.0
+      message: Establish the authored starting arrangement.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.shared-foundation.motionBeats.1
+      message:
+        Two labeled structures stand apart with their distinct traits underneath. Their
+        lower edges rise in parallel, exposing matching fragments of a shared foundation
+        phrase. The fragments join into one continuous base spanning both structures,
+        then short supports reconnect each approach to it. The final hold reads as two
+        approaches resting on the same principle before the shared exit.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.shared-foundation.motionBeats.2
+      message: Hold the resolved authored relationships before the shared exit.

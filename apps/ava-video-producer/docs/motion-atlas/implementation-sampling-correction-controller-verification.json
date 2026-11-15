@@ -1,0 +1,253 @@
+{
+  "status": "R67 held omission resolved in current source; R68 unchanged169SVGcomparison passed; historical media remains versioned",
+  "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+  "sourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+  "preset": "stratified-spatial-sample",
+  "defaultConfigurationHash": "6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2",
+  "review": {
+    "spec": "compliant",
+    "quality": "approved with minor",
+    "critical": 0,
+    "important": 0,
+    "minor": [
+      {
+        "id": "sampling-summary-test-helper-roro",
+        "file": "src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts:45",
+        "finding": "Two positional helper arguments violate RO-RO convention",
+        "status": "deferred to final whole-branch review"
+      }
+    ]
+  },
+  "personallyViewedImageCount": 13,
+  "viewedImages": [
+    {
+      "kind": "live",
+      "phase": "entrance",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/entrance.png",
+      "sha256": "3646a7f98bf2695fa9848b391eada9d5928571e6edddea77195158041f8ecc52",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-entrance.png",
+      "capture": {
+        "phase": "entrance",
+        "requestedWindow": [18, 40],
+        "observedBefore": 19,
+        "observedAfter": 21,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/entrance.png"
+      }
+    },
+    {
+      "kind": "live",
+      "phase": "action-early",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-early.png",
+      "sha256": "2cfb469ba516b8c921f794e54bfb9152a8a47f75ce173e2f34862cc306819b8e",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-action-early.png",
+      "capture": {
+        "phase": "action-early",
+        "requestedWindow": [85, 103],
+        "observedBefore": 85,
+        "observedAfter": 87,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-early.png"
+      }
+    },
+    {
+      "kind": "live",
+      "phase": "action-late",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-late.png",
+      "sha256": "bdaf41f2284523592f4de68b580cc04fb5e68f1e02898f300c0e8d8c449ad4f5",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-action-late.png",
+      "capture": {
+        "phase": "action-late",
+        "requestedWindow": [120, 137],
+        "observedBefore": 120,
+        "observedAfter": 123,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-late.png"
+      }
+    },
+    {
+      "kind": "live",
+      "phase": "hold",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/hold.png",
+      "sha256": "f69480d7a6b1f5ab1ea32cde1c789a46e2a0e2b771f607bf7aa21f6f708877b1",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-hold.png",
+      "capture": {
+        "phase": "hold",
+        "requestedWindow": [145, 165],
+        "observedBefore": 145,
+        "observedAfter": 148,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/hold.png"
+      }
+    },
+    {
+      "kind": "live",
+      "phase": "seam",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/seam.png",
+      "sha256": "ecbc3925d1f69b230a7ff0056c2e701d28e1bc7a4ae4dea53200998e71712ceb",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-seam.png",
+      "capture": {
+        "phase": "seam",
+        "requestedWindow": [174, 179],
+        "observedBefore": 174,
+        "observedAfter": 176,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/seam.png"
+      }
+    },
+    {
+      "kind": "live",
+      "phase": "decisive",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/decisive.png",
+      "sha256": "f69480d7a6b1f5ab1ea32cde1c789a46e2a0e2b771f607bf7aa21f6f708877b1",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-decisive.png",
+      "capture": {
+        "frame": 150,
+        "event": "Resolved aggregate sampling totals2selected5eligible3unselected below unchanged stratum fractions.",
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/decisive.png",
+        "method": "Actual keyboard slider input after natural clock observation completed",
+        "phase": "decisive"
+      }
+    },
+    {
+      "kind": "mp4",
+      "phase": "entrance",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/entrance.png",
+      "sha256": "14f190295c3bcb490c480cad9bd2fb3acb71dc4e98c232e494cec7131936023e",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-entrance.png",
+      "capture": {
+        "phase": "entrance",
+        "window": [0.6, 1.3],
+        "before": 0.607345,
+        "after": 0.697109,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/entrance.png"
+      }
+    },
+    {
+      "kind": "mp4",
+      "phase": "action-early",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-early.png",
+      "sha256": "e6432915286044e1f20a5e89ae64539400d7e62207ade823739e52b589399b96",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-action-early.png",
+      "capture": {
+        "phase": "action-early",
+        "window": [2.8, 3.4],
+        "before": 2.807897,
+        "after": 2.900504,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-early.png"
+      }
+    },
+    {
+      "kind": "mp4",
+      "phase": "action-late",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-late.png",
+      "sha256": "8b6f5173c3fbaeb97bf731dc2c6048740cc1242ed74957a85f20113dcc7b8551",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-action-late.png",
+      "capture": {
+        "phase": "action-late",
+        "window": [4, 4.6],
+        "before": 4.007735,
+        "after": 4.094504,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-late.png"
+      }
+    },
+    {
+      "kind": "mp4",
+      "phase": "hold",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/hold.png",
+      "sha256": "8b6f5173c3fbaeb97bf731dc2c6048740cc1242ed74957a85f20113dcc7b8551",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-hold.png",
+      "capture": {
+        "phase": "hold",
+        "window": [4.8, 5.5],
+        "before": 4.807615,
+        "after": 4.896313,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/hold.png"
+      }
+    },
+    {
+      "kind": "mp4",
+      "phase": "seam",
+      "path": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/seam.png",
+      "sha256": "5b9790997a921a1fcba62e8f0057a608324e352bc692dbb4970661654018fcb0",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-seam.png",
+      "capture": {
+        "phase": "seam",
+        "window": [5.8, 6],
+        "before": 5.807454,
+        "after": 5.888723,
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/seam.png"
+      }
+    },
+    {
+      "kind": "preview",
+      "phase": "default-150",
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/stratified-spatial-sample/6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2/still-004.jpg",
+      "sha256": "7b35e45fc4650debc1178aa22ea38a8dc313102f90b6e5f3eac21ae1b7c752a5",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/default-preview150.jpg"
+    },
+    {
+      "kind": "preview",
+      "phase": "dense-150",
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/stratified-spatial-sample/630b4dc2f79e24d46135f8f6396fe8382ea8593bb91b19daea566a47d6dcc4ee/still-004.jpg",
+      "sha256": "b05b0adeab59254160abb29eeb70a49d30735cbca78a1ad2b8d40cb99ab20bea",
+      "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/dense-preview150.jpg"
+    }
+  ],
+  "observations": [
+    "Root personally inspected default and dense current public preview150: correct2/5/3and8/12/4, perstratumfractions retained, noclipping of quantity/unit/captions.",
+    "Root personally viewed all5natural gallery and all5decodedMP4captures plus separatekeyboard150 gallery still. Entrance/early deliberatelyhave noaggregate quantities, late introduces counts, helddisplay has correct2/5/3clear beneath headings and aboveunit. West1/3East1/2andallsites remain.",
+    "Seam samples visiblyfade scene against opaqueground; unchangedframegate separatelypassed loopseamjump0.",
+    "Nativevideo controls faintlyappear in entrance capture only; not asserted as encodedvisualcontent."
+  ],
+  "liveTelemetry": {
+    "uniqueFrames": 180,
+    "wraps": 1,
+    "errors": []
+  },
+  "mp4Telemetry": {
+    "callbacks": 179,
+    "endedSeconds": 6,
+    "totalVideoFrames": 180,
+    "droppedVideoFrames": 0,
+    "error": null
+  },
+  "findings": [],
+  "evidence": [
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-source-continuity.json",
+      "sha256": "2ece859572b104640d343211d14299f9834c77ba574c1f9f289116ca571536ce"
+    },
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-delivery.json",
+      "sha256": "9bb74ce59d0d89e076cd08304242eead46fdb3643a0ba64bdbb367cd9dc059b2"
+    },
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-live-evidence.json",
+      "sha256": "0e7b47affd6f796430766c7d361815126491798e748e2005817c38ec51ae68dc"
+    },
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-mp4-evidence.json",
+      "sha256": "090046de5adba30369565f89b118bb25414f8cd926b8c6a83f178ad939aa58fe"
+    },
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-sampling-summary-report.md",
+      "sha256": "9007d238e220fe5b6e142cc45d9ea7d09097589c97d8c445228cf2154e3e1885"
+    },
+    {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-sampling-summary-review.md",
+      "sha256": "d091f1f3c5543dced2fcd14035dcd38b13a5cf543b5c059145272547df70aa5f"
+    }
+  ],
+  "supplementalGalleryManifest": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-freeze/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/supplemental-gallery-source.json",
+  "limits": [
+    "Finite screenshots are not continuous personally inspected pixels or exact natural source-frame identities.",
+    "All old167MP4s retain original498c/source2ad. Only changedpreset defaultMP4is freshly rendered and decoded atsource38c; dense has actualcurrentstillinspection.",
+    "Other169presets carried under R68 exact754fixture/6786framehashcomparison and strict3localfilediff; not newly rerendered media.",
+    "Historical transition/readability concerns remain for finalwholebranchreview, not erased by this correction.",
+    "Fullunit suite not rerun; scoped17passingtests plus fullSVG170validation recorded separately."
+  ],
+  "createdAt": "2026-10-18T02:12:38.720553+00:00",
+  "artifactFinalizationNote": "Review MD artifact finalized after original rootverification record, with identical source verdict; its currenthash is reconciled here. No source/media/evidence observation changed.",
+  "preservedOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-controller-verification.json",
+    "sha256": "ac5e2daad30c6b55df3b661219e6f798c9c591e05c4331587f3fb7f2a6a993fb",
+    "bytes": 16963
+  },
+  "publicationPolicy": "Curated R69 outcome/identity/limitation record; no raw callback/session trace."
+}

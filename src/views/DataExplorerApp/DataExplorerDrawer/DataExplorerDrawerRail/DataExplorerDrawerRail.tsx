@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect";
 import { QUERY_EDITOR_MODES } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
 import type { ReactNode } from "react";
@@ -22,13 +22,13 @@ type Props = {
   regionId: string;
 
   queryEditorMode: QueryEditorMode;
-  vizType: VizConfig.Type;
+  vizType: AvaVizConfig.Type;
 
   /** False when the SQL has parts the manual form cannot represent. */
   isStructuredQueryInSync: boolean;
 
   onQueryEditorModeChange: (mode: QueryEditorMode) => void;
-  onVizTypeChange: (vizType: VizConfig.Type) => void;
+  onVizTypeChange: (vizType: AvaVizConfig.Type) => void;
   onToggleCollapsed: () => void;
 };
 
@@ -37,9 +37,9 @@ type Props = {
  * tab, plus the collapse toggle. Rendered through the shared `Tabs`
  * `listRightSection` slot so it shares the row with the tab list.
  *
- * While the drawer is shut there is no open tab, so the tab-scoped control is
- * hidden. The out-of-sync badge is not tab-scoped: it reports on the query
- * itself, so it survives collapsing whichever tab was last showing.
+ * While the drawer is shut there is no open tab, so the tab-scoped control
+ * and the out-of-sync badge stay hidden. The badge reports on the query
+ * itself, so it returns on either tab once the drawer opens.
  */
 export function DataExplorerDrawerRail({
   activeTab,
@@ -96,7 +96,7 @@ export function DataExplorerDrawerRail({
 
   return (
     <Group gap="xs" wrap="nowrap">
-      {isStructuredQueryInSync ? null : (
+      {isCollapsed || isStructuredQueryInSync ? null : (
         <Tooltip
           label={t`Parts of the SQL cannot be represented in the manual form.`}
         >

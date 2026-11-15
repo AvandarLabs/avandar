@@ -1,0 +1,102 @@
+name:
+  id: motionAtlas.parcel-setback-inset.name
+  message: Leave room around the site
+description:
+  id: motionAtlas.parcel-setback-inset.description
+  message:
+    Schematic parcels shrink inward by a supplied clearance distance to reveal
+    their buildable envelopes. A chosen public-service structure seats inside one
+    envelope with its surrounding space still visible.
+category:
+  id: motionAtlas.parcel-setback-inset.category
+  message: geometric site feasibility
+useWhen:
+  id: motionAtlas.parcel-setback-inset.useWhen
+  message: Show why the whole structure and its clearance must fit inside a site.
+prompt:
+  id: motionAtlas.parcel-setback-inset.prompt
+  message:
+    Start with parcel edges and dimension ticks. Slide an inner edge inward equally
+    on every side, leaving the setback as a hatched perimeter band. Lower the authored
+    structure footprint into the remaining envelope and hold the original parcel,
+    clearance band and occupied footprint together.
+creativeDirection:
+  id: motionAtlas.parcel-setback-inset.creativeDirection
+  message:
+    Start with parcel edges and dimension ticks. Slide an inner edge inward equally
+    on every side, leaving the setback as a hatched perimeter band. Lower the authored
+    structure footprint into the remaining envelope and hold the original parcel,
+    clearance band and occupied footprint together.
+intent:
+  id: motionAtlas.parcel-setback-inset.intent
+  message: Show why the whole structure and its clearance must fit inside a site.
+distinction:
+  id: motionAtlas.parcel-setback-inset.distinction
+  message:
+    The hero motion erodes parcel edges by a measured inset and fits an entire
+    footprint. It neither relocates a service along a route nor exchanges rejected
+    options; unlike layer intersection, the second geometry is derived from clearance
+    rather than an independent map layer.
+tags:
+  - id: motionAtlas.parcel-setback-inset.tags.0
+    message: resource siting
+  - id: motionAtlas.parcel-setback-inset.tags.1
+    message: parcel
+  - id: motionAtlas.parcel-setback-inset.tags.2
+    message: setback
+  - id: motionAtlas.parcel-setback-inset.tags.3
+    message: clearance
+  - id: motionAtlas.parcel-setback-inset.tags.4
+    message: buildable envelope
+  - id: motionAtlas.parcel-setback-inset.tags.5
+    message: public service
+  - id: motionAtlas.parcel-setback-inset.tags.6
+    message: spatial planning
+  - id: motionAtlas.parcel-setback-inset.tags.7
+    message: footprint
+goodFor:
+  - id: motionAtlas.parcel-setback-inset.goodFor.0
+    message: Explain geometric resource-siting constraints
+  - id: motionAtlas.parcel-setback-inset.goodFor.1
+    message: Distinguish parcel area from a usable building envelope
+  - id: motionAtlas.parcel-setback-inset.goodFor.2
+    message: Show an authored kiosk or service-post placement
+notFor:
+  - id: motionAtlas.parcel-setback-inset.notFor.0
+    message:
+      This is rectangular schematic geometry, not a legal setback, construction
+      recommendation, or optimized site choice.
+  - id: motionAtlas.parcel-setback-inset.notFor.1
+    message:
+      Clearance is an authored illustration. Accessibility, utilities, terrain and
+      operating capacity require separate evidence.
+  - id: motionAtlas.parcel-setback-inset.notFor.2
+    message:
+      All dimensions share one coordinate unit; there is no implied geographic scale
+      or population denominator.
+domains:
+  - id: motionAtlas.parcel-setback-inset.domains.0
+    message: geometric site feasibility
+aliases:
+  - id: motionAtlas.parcel-setback-inset.aliases.0
+    message: resource siting
+  - id: motionAtlas.parcel-setback-inset.aliases.1
+    message: parcel
+  - id: motionAtlas.parcel-setback-inset.aliases.2
+    message: setback
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.parcel-setback-inset.beat.0
+      message: Show original parcels and optional dimension ticks.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.parcel-setback-inset.beat.1
+      message: Inset edges during frames 36–84, then lower the footprint during 84–108.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.parcel-setback-inset.beat.2
+      message: Hold the parcel, hatched clearance, inset and structure together.

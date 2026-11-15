@@ -1,0 +1,9 @@
+.ontologyScreen {
+  background: var(--mantine-color-neutral-0);
+  overflow: hidden;
+}
+
+.ontologyScreenNavigation {
+  flex-shrink: 0;
+  width: 240px;
+}

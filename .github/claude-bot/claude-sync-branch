@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Rebases the current branch onto its remote copy, if one exists yet.
+#
+# The @claude bot runs this before every push so it picks up commits that
+# other @claude jobs pushed to the same branch. It takes no arguments, so the
+# bot cannot pass flags such as --upload-pack that make git run a command.
+
+set -euo pipefail
+
+if [[ $# -ne 0 ]]; then
+  echo "Error: claude-sync-branch takes no arguments" >&2
+  exit 1
+fi
+
+branch="$(git branch --show-current)"
+if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+  git pull --rebase origin "$branch"
+fi

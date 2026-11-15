@@ -1,0 +1,106 @@
+name:
+  id: motionAtlas.portable-work-transfer.name
+  message: Take the work to another tool
+description:
+  id: motionAtlas.portable-work-transfer.description
+  message:
+    A person packs copies of their work into a portable folio and brings it to
+    another workbench. Artifact identities survive the transfer, and the original work
+    remains visible at the source.
+category:
+  id: motionAtlas.portable-work-transfer.category
+  message: Agency and shared infrastructure
+useWhen:
+  id: motionAtlas.portable-work-transfer.useWhen
+  message: Show that changing a tool should not erase the person's work.
+prompt:
+  id: motionAtlas.portable-work-transfer.prompt
+  message: Show that changing a tool should not erase the person's work.
+creativeDirection:
+  id: motionAtlas.portable-work-transfer.creativeDirection
+  message:
+    Frames 12..42 reveal the owner with a bounded collection at the source tool.
+    Frames 43..92 lift one labeled copy of each artifact into a single portable folio
+    while originals stay anchored in place. Frames 93..130 let the owner carry the folio
+    to the destination. For accepted, open it and place each same-ID copy on the
+    destination surface. For awaiting-open, retain the closed folio without a success
+    mark. Frames 131..167 hold both tool labels, the owner and the actual transfer
+    state. Do not animate format conversion or infer compatibility. Use deterministic
+    frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette.
+    Reveal during frames 0..11 and fade to the common opaque ground during frames
+    168..179.
+intent:
+  id: motionAtlas.portable-work-transfer.intent
+  message: Show that changing a tool should not erase the person's work.
+distinction:
+  id: motionAtlas.portable-work-transfer.distinction
+  message:
+    Unlike report-page-bind, a heterogeneous existing work collection changes tool
+    without being rewritten into a new report. Unlike custody-transfer, ownership stays
+    with the same person and source originals remain present. Unlike sealed-handoff,
+    confidentiality is not the explanatory purpose.
+tags:
+  - id: motionAtlas.portable-work-transfer.tags.0
+    message: portability
+  - id: motionAtlas.portable-work-transfer.tags.1
+    message: vendor lock-in
+  - id: motionAtlas.portable-work-transfer.tags.2
+    message: ownership
+  - id: motionAtlas.portable-work-transfer.tags.3
+    message: tool choice
+  - id: motionAtlas.portable-work-transfer.tags.4
+    message: export
+  - id: motionAtlas.portable-work-transfer.tags.5
+    message: retained identity
+goodFor:
+  - id: motionAtlas.portable-work-transfer.goodFor.0
+    message: Explain ownership across a change of tool
+  - id: motionAtlas.portable-work-transfer.goodFor.1
+    message: Illustrate portability as a response to vendor dependence
+  - id: motionAtlas.portable-work-transfer.goodFor.2
+    message: Keep source retention separate from destination acceptance
+domains:
+  - id: motionAtlas.portable-work-transfer.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.portable-work-transfer.aliases.0
+    message: portable work transfer
+notFor:
+  - id: motionAtlas.portable-work-transfer.notFor.0
+    message:
+      The portable folio illustrates a portability principle. It is not evidence of
+      an implemented export or import feature.
+  - id: motionAtlas.portable-work-transfer.notFor.1
+    message:
+      No file format, schema conversion, compatibility, migration completeness or
+      vendor policy is demonstrated.
+  - id: motionAtlas.portable-work-transfer.notFor.2
+    message:
+      Source and destination copies represent the same unique work IDs and must not
+      inflate a unique-artifact total.
+  - id: motionAtlas.portable-work-transfer.notFor.3
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.portable-work-transfer.motionBeats.0
+      message: Reveal the owner and retained source originals.
+  - startFrame: 43
+    endFrame: 92
+    description:
+      id: motionAtlas.portable-work-transfer.motionBeats.1
+      message: Lift one copy per artifact into the folio.
+  - startFrame: 93
+    endFrame: 130
+    description:
+      id: motionAtlas.portable-work-transfer.motionBeats.2
+      message: Carry the loaded folio and open it only when accepted.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.portable-work-transfer.motionBeats.3
+      message: Hold originals and the actual transfer state.

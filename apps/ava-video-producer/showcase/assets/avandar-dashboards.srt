@@ -1,0 +1,19 @@
+1
+00:00:03,000 --> 00:00:06,000
+Save the district chart to a dashboard.
+
+2
+00:00:06,600 --> 00:00:11,600
+Name the briefing view.
+
+3
+00:00:12,200 --> 00:00:16,200
+Review the saved chart in the editor.
+
+4
+00:00:16,800 --> 00:00:20,800
+Open the dashboard preview.
+
+5
+00:00:21,600 --> 00:00:25,600
+This draft has not been published.

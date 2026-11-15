@@ -1,0 +1,13 @@
+facility_id,facility_name,district_id,facility_type,latitude,longitude,staff_count,supply_kits_available,stock_as_of
+F01,North Quay Hub,D01,response_hub,10.025,10.025,4,40,2026-09-13
+F02,North Quay Outreach,D01,outreach_post,10.055,10.055,5,52,2026-09-13
+F03,Eastbank Hub,D02,response_hub,10.025,10.105,5,7,2026-09-13
+F04,Eastbank Outreach,D02,outreach_post,10.055,10.135,6,10,2026-09-13
+F05,South Gardens Hub,D03,response_hub,10.025,10.185,6,58,2026-09-13
+F06,South Gardens Outreach,D03,outreach_post,10.055,10.215,7,70,2026-09-13
+F07,Ridge Hub,D04,response_hub,10.105,10.025,7,67,2026-09-13
+F08,Ridge Outreach,D04,outreach_post,10.135,10.055,8,79,2026-09-13
+F09,Lakeside Hub,D05,response_hub,10.105,10.105,8,76,2026-09-13
+F10,Lakeside Outreach,D05,outreach_post,10.135,10.135,4,88,2026-09-13
+F11,West Marsh Hub,D06,response_hub,10.105,10.185,4,85,2026-09-13
+F12,West Marsh Outreach,D06,outreach_post,10.135,10.215,5,97,2026-09-13

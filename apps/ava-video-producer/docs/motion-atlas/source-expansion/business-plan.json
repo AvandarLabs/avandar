@@ -1,0 +1,2868 @@
+{
+  "sourceGroup": "business-plan",
+  "sources": [
+    {
+      "sourceId": "business-plan-primary",
+      "path": "~/brain/areas/avandar/docs/avandar-business-plan.pdf",
+      "title": "Avandar Business Plan",
+      "pages": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+      ],
+      "headings": [
+        "History",
+        "Problem",
+        "Solution",
+        "Business Model",
+        "Projections",
+        "The Team",
+        "Competitive Analysis",
+        "Risks"
+      ],
+      "status": "strategy",
+      "sha256": "4322e6cc449d9127992dcc4640b1e42afe717fc091c057ea169765e02fd0e7d6",
+      "locationKind": "personal-vault"
+    },
+    {
+      "sourceId": "business-plan-dated-comparison",
+      "path": "~/brain/areas/avandar/fundraising/avandar-business-plan-2026-02-20.pdf",
+      "title": "Avandar Business Plan (dated comparison copy)",
+      "pages": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+      ],
+      "headings": ["Budget", "Projections", "The Team"],
+      "status": "strategy",
+      "sha256": "6c690b23cabf467672675526f541fcb8a2b744eab2308cf514970c45d234a0b6",
+      "locationKind": "personal-vault"
+    }
+  ],
+  "coverage": [
+    {
+      "concept": "Preparation for a data-dependent emergency response",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 2-3, History",
+          "rationale": "The narrative describes the difficulty of building essential case-investigation tools after an emergency has already begun."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["readiness-latch", "work-decomposition"],
+      "reason": "A bounded readiness condition and explicit work breakdown already express preparedness. The historical outcome and response speed are not generalized into claims."
+    },
+    {
+      "concept": "Collection schemas change while work continues",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 2, History",
+          "rationale": "The source explicitly raises changing data schemas during a crisis."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["schema-column-evolution"],
+      "reason": "Adding a field while preserving earlier missingness is a distinct explanatory transformation not represented by cell corrections or field correspondence."
+    },
+    {
+      "concept": "Field work during intermittent connectivity",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 2-3 and 6-7, History / Offline-First Data Stack",
+          "rationale": "Work in low-connectivity contexts motivates local continuity."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["offline-ledger"],
+      "reason": "Reuse local entry retention and clarify which bounded task continues offline."
+    },
+    {
+      "concept": "Defining the social-sector scope",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 3, Definitions",
+          "rationale": "The plan supplies a particular scope for mission-oriented organizations and distinguishes adjacent sectors."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["scope-aperture"],
+      "reason": "An authored semantic boundary can explain the chosen scope without classifying organizations automatically or treating one business definition as universal."
+    },
+    {
+      "concept": "A data lifecycle contains several distinct activities",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 3 and 5, Definitions / Product Overview",
+          "rationale": "Collection, integration, exploration, visualization, and reporting are described as different parts of a broad workflow."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "data-pipeline",
+        "dashboard-slot-assembly",
+        "report-page-bind"
+      ],
+      "reason": "Existing stage order, dashboard composition, and report construction cover bounded excerpts. The full lifecycle should not be compressed into one six-second clip."
+    },
+    {
+      "concept": "Tool capability and complexity can be poorly matched to a team",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 3-5, The Market / The Problem",
+          "rationale": "The strategy contrasts underpowered tools, unnecessarily complex systems, and specialized custom implementations."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["capability-matrix"],
+      "reason": "Compare explicit requirements and states without repeating unsupported market sizes or a universal winner."
+    },
+    {
+      "concept": "Resource-constrained teams face budget and workload tradeoffs",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 4-6, The Problem / Sector transformation",
+          "rationale": "The plan foregrounds limited money, limited staff capacity, and local teams carrying more work."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["tradeoff-pivot"],
+      "reason": "The existing benefit/concession form preserves a stated constraint and human priority without implying more impact from less input."
+    },
+    {
+      "concept": "Custom-tool maintenance can lapse after a specialist leaves",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 4, Bespoke solutions",
+          "rationale": "The plan identifies maintenance discontinuity after temporary engineers, volunteers, or contractors leave."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["custody-transfer"],
+      "reason": "Explicitly accepted maintenance responsibility is a useful bounded aspect; the scene must not claim the handoff alone ensures maintainability."
+    },
+    {
+      "concept": "Case investigation and disease surveillance",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 2 and 18-20, History / Team experience",
+          "rationale": "The source repeatedly names case-level investigation, disease surveillance, and public-health program monitoring."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "cluster-epicurve-link",
+        "contact-window-overlap",
+        "surveillance-reporting-backfill"
+      ],
+      "reason": "Existing identity-preserving place/time and reporting examples supply concrete mechanisms. No historical health outcome is reproduced."
+    },
+    {
+      "concept": "Crop disease and public-health early warning",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 4 and 19, Example bespoke tools / Team experience",
+          "rationale": "Early-warning systems are named but their detection criteria and decision rules are not given."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "An independent algorithm animation would invent thresholds, validation, prediction quality, or response rules. A longer supplied scenario is needed."
+    },
+    {
+      "concept": "Interoperable access to existing data sources",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 5, Key Differentiators",
+          "rationale": "The plan favors connecting established sources rather than requiring a complete data relocation."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "source-merge",
+        "predicate-pushdown-boundary",
+        "query-column-cache-growth"
+      ],
+      "reason": "Generic source integration and the architecture group's bounded extraction/cache proposals express the data boundary without claiming zero copying."
+    },
+    {
+      "concept": "One common architecture can support multiple domain descriptions",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 5 and 8-9, Customizability / Generalizable Data Modeling",
+          "rationale": "The strategy reuses common entity, descriptor, and relationship concepts across different social missions."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "shared-foundation",
+        "entity-spine-assembly",
+        "schema-mapping",
+        "network-graph"
+      ],
+      "reason": "Existing common-foundation and typed data-relationship actions cover reuse of structure. Domain names alone do not justify separate presets."
+    },
+    {
+      "concept": "On-device analytical execution",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 6-7, Technological advancement / Offline-First Data Stack",
+          "rationale": "Embedded analytics is proposed as a way to run bounded data operations on user devices."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["schema-plan-local-execution"],
+      "reason": "The architecture group owns the concrete separation of remote metadata planning and local analytical rows. No speed, capacity, or energy advantage is inferred here."
+    },
+    {
+      "concept": "Persistent local storage",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 6, Offline-First Data Stack",
+          "rationale": "Browser-accessible offline storage is part of the proposed device stack."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["offline-ledger"],
+      "reason": "The existing retained local impression already explains the storage location, with explicit limits on durability and remote synchronization."
+    },
+    {
+      "concept": "Compiled browser runtime and desktop shell",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 6, Technological advancement",
+          "rationale": "The source names in-browser compiled computation and a desktop application shell as enabling technology."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["paired-contrast", "schema-plan-local-execution"],
+      "reason": "The useful generic distinction is where the same bounded operation executes. Runtime internals are not described, so no compilation or desktop-IPC algorithm is invented."
+    },
+    {
+      "concept": "Query-first subset extraction",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 7-8, On-Demand Data Integration",
+          "rationale": "The architecture is described as requesting only the datasets and subsets needed for one query."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["predicate-pushdown-boundary", "query-column-cache-growth"],
+      "reason": "Architecture-owned proposals provide concrete source filtering and retained-cache containment; another pipeline would duplicate them."
+    },
+    {
+      "concept": "Choosing execution location from declared conditions",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 7-8, On-Demand Data Integration",
+          "rationale": "The plan proposes local/cloud processing decisions based on feasibility and cost."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["decision-fork"],
+      "reason": "One authored condition can explain one choice, without inventing a cost-optimization algorithm."
+    },
+    {
+      "concept": "Incrementally retaining fetched data",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 7-8, On-Demand Data Integration",
+          "rationale": "The proposed query-first design stores retrieved subsets incrementally."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["query-column-cache-growth", "cache-reuse"],
+      "reason": "The architecture proposal explains column-set growth; the baseline already explains a basic cache hit."
+    },
+    {
+      "concept": "Copied data can lag its source",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 7, Traditional ETL limitations",
+          "rationale": "The source contrasts a last-refreshed copy with more recent source data."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["state-preserving-source-refresh"],
+      "reason": "The architecture group owns a refresh mechanism with source and user-state boundaries. The business plan's universal currentness claims are not adopted."
+    },
+    {
+      "concept": "Entities, descriptors, and relationships",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 8, Abstract Data Modeling",
+          "rationale": "The plan names abstract structures used to describe a domain."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["entity-spine-assembly", "schema-mapping", "network-graph"],
+      "reason": "The source adds domain motivation to existing and architecture-owned structures, not a separately specified logical inference algorithm."
+    },
+    {
+      "concept": "Natural-language description becomes a proposed model",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 8, User-Configured Generalization",
+          "rationale": "The strategy proposes turning descriptions into entity, descriptor, and relationship structures."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["utterance-to-model-draft"],
+      "reason": "Phrase identity and an authored interpretation remain visible across a language-to-structure transformation; human review is an illustrative boundary added for inspectability."
+    },
+    {
+      "concept": "Universal generalization and cost/performance superiority",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 6-9, Architecture advantage claims",
+          "rationale": "The plan makes broad claims about generality, processing speed, costs, and synchronization."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "These are unverified business assertions rather than bounded mechanisms. No unlimited-domain, zero-sync, fastest, cheapest, or first-of-kind claim belongs in a stock animation."
+    },
+    {
+      "concept": "Installing a mission-specific optional utility",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace",
+          "rationale": "A future marketplace would let teams add utilities suited to their mission."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["plugin-capability-install"],
+      "reason": "A chosen module adds an operation over retained records. This is more specific than layout assembly or a catalog of cards, and it remains a planned concept rather than shipped evidence."
+    },
+    {
+      "concept": "Epidemic-curve utility",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace examples",
+          "rationale": "The plan names a disease epicurve as a possible specialized visualization."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["cluster-epicurve-link"],
+      "reason": "The existing linked map/epicurve contract already explains a genuine identity-preserving action; a disease-specific plugin wrapper would duplicate it."
+    },
+    {
+      "concept": "Medication continuation and drop-off",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace examples",
+          "rationale": "A suggested health utility would examine continued participation in medication programs."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["dose-cohort-return-paths", "missed-visit-reconnect"],
+      "reason": "The retained-cohort denominator and distinct contacted/booked/attended outcomes already express the useful generic concern without a new disease-specific preset."
+    },
+    {
+      "concept": "Individual clinical risk computation",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace examples",
+          "rationale": "The source mentions patient risk calculations without specifying a model or validation."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "No algorithm, outcome definition, calibration, or clinical decision rule is supplied. An animation would invent medical risk behavior."
+    },
+    {
+      "concept": "Volunteer outreach channels",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace examples",
+          "rationale": "A suggested utility would support message campaigns for volunteer coordination."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["event-bus", "custody-transfer"],
+      "reason": "The baseline already depicts channel fan-out and acknowledged responsibility. No real outreach, recipient selection, or implied delivery is required for a generic explanation."
+    },
+    {
+      "concept": "Comparing billed charges with a matched published reference",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 9-10, Healthcare cost example",
+          "rationale": "The plan describes matching procedure prices by provider and insurer to inspect billed charges."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["charge-reference-alignment"],
+      "reason": "Exact comparison context gates a signed amount difference. It does not correct a payment or decide legal entitlement."
+    },
+    {
+      "concept": "Malformed source data requires explicit cleanup",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 9-10, Healthcare cost example",
+          "rationale": "The motivating example includes difficult or malformed tabular files."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["cell-normalization", "schema-mapping"],
+      "reason": "Existing controlled character edits and field correspondence explain bounded cleanup. Parsing failures and repairs need supplied cases rather than a generic success sweep."
+    },
+    {
+      "concept": "Historical demos, conference reception, press recognition, and customer outcomes",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 2-3 and 9-10, History / Early Results",
+          "rationale": "The plan includes named histories, demonstrations, publications, and reported outcomes."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "These are company-specific evidence claims. They require verified product footage or a sourced case study, not fictional stock motion or copied beneficiary details."
+    },
+    {
+      "concept": "Privacy-preserving AI and limited remote context",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 10 and 29, Conference feedback / Differentiation",
+          "rationale": "The source identifies privacy-focused AI as a desired product attribute."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["disclosure-aperture"],
+      "reason": "An explicit disclosure subset can be shown without claiming privacy compliance or undocumented model behavior."
+    },
+    {
+      "concept": "One person can participate in several workspaces",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 10-11, Business Model",
+          "rationale": "The plan describes multiple workspaces associated with a user and a per-workspace plan."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["scope-aperture", "paired-contrast"],
+      "reason": "A bounded scope or plan comparison covers the conceptual separation. Neither is proof of technical tenant isolation, billing enforcement, or permission correctness."
+    },
+    {
+      "concept": "Price sensitivity differs from unwillingness to pay",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 11, Market Research",
+          "rationale": "Interview-derived observations distinguish a need for demonstrated value from an unwillingness to ever pay."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["qualify-apparent-conflict"],
+      "reason": "The existing context qualification resolves the apparent contradiction without stereotyping a whole sector."
+    },
+    {
+      "concept": "Limited research evidence and conservative planning assumptions",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 11 and 14, Market Research / Projections discussion",
+          "rationale": "The source acknowledges a small survey and uncertainty around extrapolating willingness to pay."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["uncertainty-unfold"],
+      "reason": "A supplied scenario range is useful, but the document's adjustment must not be treated as a statistical confidence interval."
+    },
+    {
+      "concept": "Dataset and row counts are imperfect size proxies",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 11 and 23-24, Market Research / Data-scale note",
+          "rationale": "The plan intentionally simplifies measurement through counts while acknowledging byte-size differences."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["equal-count-unequal-volume"],
+      "reason": "The objects keep equal counts while their byte strips expose unequal amounts. This adds a clear measurement action rather than another chart skin."
+    },
+    {
+      "concept": "Free usage before a voluntary capacity upgrade",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 11-13, Freemium / Subscription Plans",
+          "rationale": "The strategy links adoption to users experiencing value and later choosing more capacity as their work grows."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["workspace-capacity-extension"],
+      "reason": "The unchanged workspace expands only after an authored choice and retains pending requests when declined."
+    },
+    {
+      "concept": "Publishing selected work to an external audience",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 12 and 15, Public content / Product-driven adoption",
+          "rationale": "The plan describes outward-facing dashboards alongside internal team work."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["disclosure-aperture"],
+      "reason": "The existing permitted-copy boundary can represent approved summary fields while retaining private details. It does not compute anonymization or safe aggregation."
+    },
+    {
+      "concept": "Public content as an acquisition or market-share mechanism",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 12 and 15, Organic growth strategy",
+          "rationale": "The plan expects publicly visible work to support future discovery and customer acquisition."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "A causal growth loop or conversion rate is not supported by supplied evidence. Publication can be illustrated, but audience behavior and commercial outcomes must not be invented."
+    },
+    {
+      "concept": "Team size, data allowance, and AI allowance as value metrics",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 12-13, Aligning tiers with value generation",
+          "rationale": "The proposed plan structure scales charges and allowances with explicitly selected metrics."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["linked-parameter-rehearsal"],
+      "reason": "Use one bounded affine example with fictional quantities. No automatic value score or model-quality improvement follows from higher allowance."
+    },
+    {
+      "concept": "Price cutoff optimization from survey responses",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 13-14, Price cutoff explanation",
+          "rationale": "The plan mentions a custom script for revenue-oriented price thresholds without giving its objective function or method."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "The exact optimization algorithm and input sample are absent. A quantitative animation would invent a method and expose private strategy."
+    },
+    {
+      "concept": "Price anchoring and inferred quality",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 14, Enterprise-plan discussion",
+          "rationale": "The strategy discusses a pricing ceiling as a perception cue and separates affordability from quality."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["qualify-apparent-conflict", "tradeoff-pivot"],
+      "reason": "Qualitative distinctions can be stated. No animation should assert a psychological effect, optimum price, or actual customer reaction."
+    },
+    {
+      "concept": "Relationship-intensive trust building has an effort cost",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 14-16, Go-to-Market Strategy",
+          "rationale": "The plan contrasts personal engagement and education with the ability to scale acquisition."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["tradeoff-pivot"],
+      "reason": "Keep the time/effort concession alongside the stated relationship benefit rather than using an unmeasured trust meter."
+    },
+    {
+      "concept": "Educational content and expert communication",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 15 and 19, Strategy / Team experience",
+          "rationale": "The plan names explanatory writing, workshops, videos, and scientific communication."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "report-page-bind",
+        "provenance-peelback",
+        "argument-bridge"
+      ],
+      "reason": "Existing editorial construction and inspectable-source support cover these outputs. A brand reputation increase is not inferred."
+    },
+    {
+      "concept": "Users contribute to a shared maintained tool",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 15-16 and 29-30, Open source community growth",
+          "rationale": "The strategy invites community contributions and participation in maintaining shared software."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["feedback-refinement"],
+      "reason": "A supplied contribution, response, and revision are sufficient. A new upstream-patch animation would duplicate the review loop."
+    },
+    {
+      "concept": "Distinct professional and community contributions support shared work",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 15-16 and 18-20, Community participation / Team",
+          "rationale": "The source combines engineering, domain research, operations, and direct community experience."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["contribution-weave"],
+      "reason": "Existing distinct contributions retain attribution within a shared result without implying equal effort or a productivity ranking."
+    },
+    {
+      "concept": "Community priorities should shape a shared project",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 16 and 19-20, Community participation / Community liaison experience",
+          "rationale": "The source describes learning directly from communities and bringing their needs into projects."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "community-coordination-table",
+        "person-led-support-calendar"
+      ],
+      "reason": "Existing participant-led actions change a plan. No specific geographic or beneficiary detail from the biographies is copied."
+    },
+    {
+      "concept": "Operating costs have separate categories",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 16-18, Budget and Projections",
+          "rationale": "The source separates infrastructure, staffing, operations, financing, and retained results in its private planning tables."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["work-decomposition", "term-limited-revenue-share"],
+      "reason": "A bounded fictional decomposition or conserved cash example carries the generic concept. All source amounts and personnel costs are excluded."
+    },
+    {
+      "concept": "Scenario-dependent growth and break-even projections",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 17-18, Projections",
+          "rationale": "The source lists assumptions behind projected revenue and costs."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["linked-parameter-rehearsal", "uncertainty-unfold"],
+      "reason": "Only bounded fictional assumption effects or labeled scenario ranges are suitable. Full compounding forecasts and source figures exceed this six-second stock scope."
+    },
+    {
+      "concept": "Funding choices can constrain available resources and priorities",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 18 and 27-28 and 31, Financing discussions",
+          "rationale": "The strategy weighs financing sources against retained resources and mission priorities."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["tradeoff-pivot", "term-limited-revenue-share"],
+      "reason": "The generic tradeoff and temporary-distribution arithmetic are retained without legal, fiduciary, valuation, or investment assertions."
+    },
+    {
+      "concept": "Named staff qualifications, historical achievements, and personal experience",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 18-20, The Team",
+          "rationale": "The plan records individual biographies and claims about prior work."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "These are company- and person-specific facts, not reusable stock concepts. General cross-functional collaboration and community participation are covered separately."
+    },
+    {
+      "concept": "Health, education, agriculture, livelihoods, food security, and humanitarian needs",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 4-5 and 18-20, Domain examples / Team experience",
+          "rationale": "The plan names a broad set of social missions but does not define a new intervention mechanism for each."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "cluster-epicurve-link",
+        "school-transition-rehearsal",
+        "saved-seed-season-return",
+        "household-market-choice",
+        "school-lunch-tray-composition",
+        "community-coordination-table"
+      ],
+      "reason": "Existing concrete social-sector actions cover these domains. Merely renaming a preset by mission would add no explanatory value."
+    },
+    {
+      "concept": "Multi-criterion competitive fit and self-serve access",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 21-24, Competitive Analysis",
+          "rationale": "The source compares audience, cost, usability, breadth, and onboarding conditions."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["capability-matrix"],
+      "reason": "The existing categorical matrix can compare supplied criteria. Named competitor ratings, current pricing, and unsupported uniqueness claims are excluded."
+    },
+    {
+      "concept": "Documentation, tests, and reusable foundations reduce repeated work",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 24-25 and 27, Small-team risk / Mitigation",
+          "rationale": "The strategy emphasizes maintained foundations and reusable work over repeated repair or short-term shortcuts."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "shared-jig-preparation",
+        "shared-foundation",
+        "feedback-refinement"
+      ],
+      "reason": "The values group's shared-jig preparation action makes reusable team enablement concrete. No multiplier, future productivity, or quality guarantee is adopted."
+    },
+    {
+      "concept": "Shared accounts can obscure collaborative value",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 25-26, Account-sharing risk / Mitigation",
+          "rationale": "The source prefers communicating the value of separate participation over punitive sharing restrictions."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["actor-attribution-split"],
+      "reason": "A fictional account-stamping example makes one bounded collaboration benefit visible while preserving historical attribution limits. The exact mechanism is an illustrative interpretation, not a described product feature."
+    },
+    {
+      "concept": "An architecture hypothesis remains unvalidated at operational scale",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 26, Architecture risk",
+          "rationale": "The source explicitly recognizes uncertainty about cost assumptions under real user load."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["uncertainty-unfold"],
+      "reason": "Keep the hypothesis label separate from evidence and avoid reclassifying a strategy claim as a benchmark."
+    },
+    {
+      "concept": "Moving processing changes who supplies the resources",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 27, Local-processing mitigation",
+          "rationale": "The source links reduced vendor cloud work to work performed on user devices."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["paired-contrast"],
+      "reason": "Compare responsibility boundaries rather than claiming the computation has no cost anywhere."
+    },
+    {
+      "concept": "A temporary distribution ends at an authored term",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 27-28, Revenue or profit-share discussion",
+          "rationale": "The plan describes finite-duration distributions and their effect on retained resources."
+        }
+      ],
+      "disposition": "new",
+      "targetIds": ["term-limited-revenue-share"],
+      "reason": "Two equal-period cash partitions isolate the ending distribution while preserving exact accounting and avoiding private figures."
+    },
+    {
+      "concept": "Employee and company incentive alignment",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 27-28, Employee-share discussion",
+          "rationale": "The plan asserts that a compensation structure improves motivation and aligns interests."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "A stock animation cannot establish motivation, wealth creation, perfect alignment, or long-term sustainability. These would require evidence and a longer qualified explanation."
+    },
+    {
+      "concept": "An initial product focus is narrower than an end-to-end vision",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 5-6 and 28, Vision / Messaging risk",
+          "rationale": "The strategy separates broad future scope from the first focus that user research will shape."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["scope-aperture"],
+      "reason": "The existing aperture preserves deferred topics and can label current versus planned scope without inventing delivery milestones."
+    },
+    {
+      "concept": "User feedback changes product direction",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 28, Messaging-risk mitigation",
+          "rationale": "The source proposes research-led adjustment of which workflow receives attention first."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["feedback-refinement"],
+      "reason": "A specific authored feedback/revision example is covered by the baseline, with no unsupported claim of market fit."
+    },
+    {
+      "concept": "Affordability is distinct from technical quality",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 5 and 14 and 29, Differentiation / Pricing",
+          "rationale": "The plan argues for affordability without treating price as a direct quality measure."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["qualify-apparent-conflict"],
+      "reason": "Separate the two statements and contexts, without adopting comparative quality claims."
+    },
+    {
+      "concept": "License protection, branding obligations, and risk of commercial copying",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 29, Open-source risk / Mitigation",
+          "rationale": "The strategy makes assertions about license effects and commercial copying behavior."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "The license text and required legal analysis are absent, and the user requested stock concepts rather than legal guidance. Do not animate asserted enforcement, obligations, or actor motives as established facts."
+    },
+    {
+      "concept": "Choosing between hosted service and self-hosting",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 29-30, Self-hosting discussion",
+          "rationale": "The source encourages a choice while noting differing operating resources and governance priorities."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["paired-contrast"],
+      "reason": "The existing two-approach comparison handles who operates and maintains the same tool. It must not imply self-hosting is free or universally more expensive."
+    },
+    {
+      "concept": "Software-source access and curated-directory access are different objects",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 30, Curated marketplace discussion",
+          "rationale": "The strategy applies different access and release policies to application code and curated directory data."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["qualify-apparent-conflict"],
+      "reason": "The apparent conflict resolves through object-specific policy scope. No legal conclusion or default entitlement is inferred."
+    },
+    {
+      "concept": "Discovering and selecting an optional extension",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 9 and 30, Plugin Marketplace / Curated directory",
+          "rationale": "The strategy values a searchable directory for finding a mission-relevant utility."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["plugin-capability-install", "capability-matrix"],
+      "reason": "Utility selection can use an explicit criterion and then the new installation action. Search ranking and licensing are not specified, so no discovery algorithm is invented."
+    },
+    {
+      "concept": "Mission drift under pressure for higher-growth customers",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Workload-fit risk",
+          "rationale": "The source explains a preference to retain the intended mission despite possible pressure toward other markets."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["tradeoff-pivot"],
+      "reason": "An authored priority and concession convey the choice. No generalized claim about investors or private-sector organizations is adopted."
+    },
+    {
+      "concept": "Out-of-scope workload can exceed an operating assumption",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Workload-fit risk",
+          "rationale": "The plan worries about workloads beyond the scale for which the service was designed."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": [
+        "capability-matrix",
+        "scope-aperture",
+        "equal-count-unequal-volume"
+      ],
+      "reason": "Explicit scope, requirements, and the difference between simple counts and resource amounts cover the concern. Do not infer an organization's data scale from its sector."
+    },
+    {
+      "concept": "Declared use case can select a stated plan condition",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Mitigation",
+          "rationale": "The plan proposes an authored declaration of use case affecting offered pricing."
+        }
+      ],
+      "disposition": "enrich",
+      "targetIds": ["decision-fork"],
+      "reason": "A single supplied condition can explain a path while remaining separate from a legal or automated eligibility finding."
+    },
+    {
+      "concept": "Inferring mission or eligibility from metadata and enforcing terms",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Mitigation",
+          "rationale": "The source proposes inspection of descriptive metadata to identify mismatched use cases."
+        }
+      ],
+      "disposition": "unsuitable",
+      "targetIds": [],
+      "reason": "No reliable classifier, appeal process, validation, consent basis, or decision procedure is supplied. A six-second stock scene must not invent automated judgments about organizational purpose or service termination."
+    },
+    {
+      "concept": "Comparison copy adds no distinct retained generic mechanism",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-dated-comparison",
+          "locator": "pages 16-20, Budget / Projections / The Team",
+          "rationale": "A complete text comparison found changed private financial details and a different biography set, while generic architecture and strategy concepts matched."
+        }
+      ],
+      "disposition": "covered",
+      "targetIds": ["work-decomposition", "community-coordination-table"],
+      "reason": "Use the docs copy as primary. Do not create a second proposal from changed figures, staffing details, or the earlier copy's expense categories."
+    }
+  ],
+  "proposals": [
+    {
+      "id": "schema-column-evolution",
+      "title": "Add a field without inventing the past",
+      "description": "A small table gains one new field while every earlier record keeps its identity and its uncollected value. A later record supplies a value under the expanded schema, leaving the older gaps visible.",
+      "creativeDirection": "On a 960x600 React/SVG canvas, frames 0-11 reveal a compact table of earlier records. Frames 12-48 slide the existing columns left and unfold one new column from the header seam. Frames 49-92 place an explicit not-collected mark in that column for each earlier record without changing any original value. Frames 93-132 seat one later record in the same table, with its authored new-field value or missing mark. Frames 133-167 hold both generations under the new header and optional version captions. Frames 168-179 fade to the shared opaque palette ground, giving a deterministic six-second loop at 30fps.",
+      "goodFor": [
+        "Explain an evolving collection form during a changing field program",
+        "Show why adding a question does not supply historical answers",
+        "Introduce a schema extension before discussing any backfill process"
+      ],
+      "tags": [
+        "schema evolution",
+        "new field",
+        "missing values",
+        "historical records",
+        "changing forms",
+        "crisis data",
+        "optional field"
+      ],
+      "intent": "Separate the addition of a field from the collection of a value for that field.",
+      "family": "Schema change and retained evidence",
+      "inputs": [
+        {
+          "name": "earlierRecords",
+          "type": "Array<{id:string;label:string;recordedValue:string}>",
+          "default": [
+            {
+              "id": "r-a",
+              "label": "Demo record A",
+              "recordedValue": "North"
+            },
+            {
+              "id": "r-b",
+              "label": "Demo record B",
+              "recordedValue": "South"
+            }
+          ],
+          "control": "collection",
+          "description": "Earlier rows whose recorded values remain unchanged throughout the extension.",
+          "constraints": "1..3 items; unique IDs 1..16 characters; labels 1..22 characters; recordedValue 1..18 characters; these rows have no supplied value for the new field"
+        },
+        {
+          "name": "fields",
+          "type": "{existingLabel:string;addedLabel:string;missingLabel:string}",
+          "default": {
+            "existingLabel": "Site",
+            "addedLabel": "Visit mode",
+            "missingLabel": "Not collected"
+          },
+          "control": "object",
+          "description": "The retained column, newly introduced column, and explicit meaning of earlier empty cells.",
+          "constraints": "All keys required; labels 1..20 characters; missingLabel must mean not collected, never zero, false, or a negative finding"
+        },
+        {
+          "name": "laterRecord",
+          "type": "{id:string;label:string;recordedValue:string;addedValue:string|null}",
+          "default": {
+            "id": "r-c",
+            "label": "Demo record C",
+            "recordedValue": "East",
+            "addedValue": "In person"
+          },
+          "control": "object",
+          "description": "One later row created under the expanded schema. Null retains a missing mark rather than manufacturing an answer.",
+          "constraints": "id 1..16 characters and absent from earlierRecords; label 1..22 characters; recordedValue 1..18 characters; addedValue null or 1..18 characters"
+        },
+        {
+          "name": "phaseLabels",
+          "type": "{before:string;expanded:string;later:string}",
+          "default": {
+            "before": "Earlier collection",
+            "expanded": "One question added",
+            "later": "Later record arrives"
+          },
+          "control": "object",
+          "description": "Labels the collection change and the later record without assigning real dates.",
+          "constraints": "All keys required; each label 1..30 characters"
+        },
+        {
+          "name": "showVersionLabels",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keeps the before and expanded captions beside the corresponding header outlines.",
+          "constraints": "boolean; hiding captions cannot remove missing-value marks or the later-record distinction"
+        },
+        {
+          "name": "evidenceLabel",
+          "type": "string",
+          "default": "Fictional records; no historical backfill",
+          "control": "text",
+          "description": "Keeps the illustrative status and missing-data boundary visible.",
+          "constraints": "1..64 characters; fictional defaults retain an explicit fictional qualifier"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional outreach form initially records a site. It later adds visit mode. Two earlier records retain not-collected visit modes, while a new East record supplies In person.",
+        "inputBindings": {
+          "earlierRecords": [
+            {
+              "id": "r-a",
+              "label": "Demo record A",
+              "recordedValue": "North"
+            },
+            {
+              "id": "r-b",
+              "label": "Demo record B",
+              "recordedValue": "South"
+            }
+          ],
+          "fields": {
+            "existingLabel": "Site",
+            "addedLabel": "Visit mode",
+            "missingLabel": "Not collected"
+          },
+          "laterRecord": {
+            "id": "r-c",
+            "label": "Demo record C",
+            "recordedValue": "East",
+            "addedValue": "In person"
+          },
+          "phaseLabels": {
+            "before": "Earlier collection",
+            "expanded": "One question added",
+            "later": "Later record arrives"
+          },
+          "showVersionLabels": true,
+          "evidenceLabel": "Fictional records; no historical backfill"
+        }
+      },
+      "distinction": "Unlike cell-normalization, this changes the available field structure without correcting existing values. Unlike schema-mapping, no fields are paired across two schemas. Unlike state-preserving-source-refresh, the visible change is a new collection question and its historical absence, not refreshing values from an existing source.",
+      "limits": [
+        "One retained field, one added field, one later row, and at most three earlier rows fit the six-second explanation.",
+        "The ending record count is earlierRecords.length + 1. A new column does not create or remove earlier records.",
+        "The earlier records always retain missing marks in the added column. No default, imputation, migration, enrichment, or retrospectively inferred answer is shown.",
+        "The sequence is a conceptual collection example. It makes no claim about a particular database migration system or any shipped form-editing feature.",
+        "The editorial fade resets the illustration, not the stored records. All labels are supplied inputs."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Each earlier record retains its ID and existing value, its added-field value stays not collected, and exactly one supplied later record enters. A null later value remains visibly missing.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 2, History",
+          "rationale": "The history identifies rapidly changing collection schemas as a practical crisis-data problem."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 5, Key Differentiators and Product Vision",
+          "rationale": "The strategy calls for configuration across changing domain needs; the proposal isolates one bounded schema extension."
+        }
+      ]
+    },
+    {
+      "id": "plugin-capability-install",
+      "title": "Fit one new tool to existing data",
+      "description": "An optional utility seats into a workspace only after an authored installation choice. Its category-count stencil then reads the retained records and reveals one derived tally, making added capability distinct from data replacement.",
+      "creativeDirection": "Frames 0-11 reveal a work surface, a bounded record strip, and an empty tool socket on the 960x600 canvas. Frames 12-55 bring the named utility beside the socket and display the supplied decision. For install, frames 56-90 seat the utility and align its counting stencil with the unchanged category field. Frames 91-132 draw one tally mark per retained record into its category, resolving compact bars on a common integer scale. For defer, the utility stays beside the empty socket and no tally appears. Hold the retained records, decision, and resulting capability through frame 167, then use the shared opaque exit through frame 179. All movement is frame-driven React/SVG at 30fps.",
+      "goodFor": [
+        "Explain an optional extension adding one task-specific capability",
+        "Show a team choosing a reusable utility without replacing its dataset",
+        "Introduce a plugin concept before a verified installation demonstration"
+      ],
+      "tags": [
+        "plugin",
+        "extension",
+        "optional capability",
+        "modular software",
+        "reusable utility",
+        "category tally",
+        "installation choice"
+      ],
+      "intent": "Show that a chosen extension adds an operation over retained data.",
+      "family": "Modular capability",
+      "inputs": [
+        {
+          "name": "records",
+          "type": "Array<{id:string;categoryId:string}>",
+          "default": [
+            {
+              "id": "demo-1",
+              "categoryId": "book"
+            },
+            {
+              "id": "demo-2",
+              "categoryId": "tool"
+            },
+            {
+              "id": "demo-3",
+              "categoryId": "book"
+            },
+            {
+              "id": "demo-4",
+              "categoryId": "book"
+            }
+          ],
+          "control": "collection",
+          "description": "Small fictional records counted by the illustrated utility after installation.",
+          "constraints": "1..8 items; unique IDs 1..16 characters; categoryId must reference categories; each record contributes exactly one count"
+        },
+        {
+          "name": "categories",
+          "type": "Array<{id:string;label:string}>",
+          "default": [
+            {
+              "id": "book",
+              "label": "Books"
+            },
+            {
+              "id": "tool",
+              "label": "Tools"
+            }
+          ],
+          "control": "collection",
+          "description": "Category labels and display order, including a category with no records if supplied.",
+          "constraints": "2..3 items; unique IDs 1..16 characters; labels 1..18 characters; zero-count categories remain labeled"
+        },
+        {
+          "name": "utility",
+          "type": "{label:string;fieldLabel:string;operationLabel:string}",
+          "default": {
+            "label": "Demo count utility",
+            "fieldLabel": "Category",
+            "operationLabel": "Count by category"
+          },
+          "control": "object",
+          "description": "Names the optional utility and its fixed count-by-category operation.",
+          "constraints": "All keys required; labels 1..26 characters; operationLabel must describe counting supplied records by category, not an arbitrary executable operation"
+        },
+        {
+          "name": "installation",
+          "type": "{choice:'install'|'defer';decisionLabel:string}",
+          "default": {
+            "choice": "install",
+            "decisionLabel": "Team chooses to install"
+          },
+          "control": "object",
+          "description": "Authored human decision controlling whether the capability becomes available.",
+          "constraints": "choice install or defer; decisionLabel 1..32 characters and consistent with choice; no automatic install"
+        },
+        {
+          "name": "copy",
+          "type": "{workspace:string;records:string;emptySocket:string;installed:string;deferred:string;result:string;example:string}",
+          "default": {
+            "workspace": "Demo lending workspace",
+            "records": "Retained source records",
+            "emptySocket": "Optional tool position",
+            "installed": "Utility available",
+            "deferred": "Install deferred",
+            "result": "Records by category",
+            "example": "Fictional modular-tool example"
+          },
+          "control": "object",
+          "description": "Every workspace, status, result, and example caption.",
+          "constraints": "All keys required; each string 1..36 characters; result must describe record counts"
+        },
+        {
+          "name": "showRecordIds",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows record IDs on the retained strip while each record becomes a tally mark.",
+          "constraints": "boolean; each underlying record and category membership remains unchanged"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional lending team chooses to install a category-count utility. The same four source records produce three Books counts and one Tools count. Deferring installation leaves the source records available and the tool slot empty.",
+        "inputBindings": {
+          "records": [
+            {
+              "id": "demo-1",
+              "categoryId": "book"
+            },
+            {
+              "id": "demo-2",
+              "categoryId": "tool"
+            },
+            {
+              "id": "demo-3",
+              "categoryId": "book"
+            },
+            {
+              "id": "demo-4",
+              "categoryId": "book"
+            }
+          ],
+          "categories": [
+            {
+              "id": "book",
+              "label": "Books"
+            },
+            {
+              "id": "tool",
+              "label": "Tools"
+            }
+          ],
+          "utility": {
+            "label": "Demo count utility",
+            "fieldLabel": "Category",
+            "operationLabel": "Count by category"
+          },
+          "installation": {
+            "choice": "install",
+            "decisionLabel": "Team chooses to install"
+          },
+          "copy": {
+            "workspace": "Demo lending workspace",
+            "records": "Retained source records",
+            "emptySocket": "Optional tool position",
+            "installed": "Utility available",
+            "deferred": "Install deferred",
+            "result": "Records by category",
+            "example": "Fictional modular-tool example"
+          },
+          "showRecordIds": true
+        }
+      },
+      "distinction": "Unlike dashboard-slot-assembly, a new operation becomes available before it acts on retained data. Unlike pipeline-step-splice, no processing chain is rewired. The socketed stencil visibly derives a result from the existing records rather than introducing a renamed card collection.",
+      "limits": [
+        "One optional utility and one fixed tally operation. No executable code, external URLs, marketplace requests, dependency resolution, or security review occur.",
+        "The sum of category counts must equal records.length and each record is counted exactly once. Installation never adds, removes, or edits source records.",
+        "The default is fictional. This is not evidence of a shipped plugin system, one-click installation, compatibility with arbitrary data, or a particular installation time.",
+        "The defer outcome produces no result and no installed-state marker. Zero-count categories remain visible.",
+        "No medical prediction, automated risk assessment, or clinical decision is represented by the utility."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "The install choice seats exactly one utility and produces category totals from retained record IDs. Defer leaves the socket empty and produces no tally. Changing category membership changes only derived counts.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 9, Plugin Marketplace",
+          "rationale": "The long-term strategy describes teams installing mission-specific utilities over a common platform; the proposal uses a non-clinical counting example."
+        }
+      ]
+    },
+    {
+      "id": "charge-reference-alignment",
+      "title": "Match the reference before comparing a charge",
+      "description": "A fictional invoice line is laid over a separate price reference. Only matching procedure, provider, payer, period, and quantity windows permit the amounts to align on one scale; an unmatched context leaves the comparison unresolved.",
+      "creativeDirection": "Frames 0-11 reveal a short invoice strip and a separate reference sheet on a 960x600 canvas. Frames 12-70 slide their context windows into vertical registration, retaining a visible notch at each mismatched key. When every key and quantity agrees, frames 71-125 extend the two total-amount rulers from the same zero and open a signed difference bracket. Otherwise the amounts stay separate without a difference bracket. Frames 126-167 hold the matched or unresolved context, source labels, and review caption. Exit to the shared opaque ground at frames 168-179. The six-second React/SVG sequence is deterministic at 30fps.",
+      "goodFor": [
+        "Explain why published prices need the same billing context",
+        "Support a fictional price-transparency investigation",
+        "Show a discrepancy for review without implying a refund or legal entitlement"
+      ],
+      "tags": [
+        "price transparency",
+        "invoice review",
+        "reference price",
+        "billing context",
+        "matched keys",
+        "charge comparison",
+        "healthcare costs"
+      ],
+      "intent": "Make the context required for a monetary comparison explicit before showing a difference.",
+      "family": "Reference reconciliation",
+      "inputs": [
+        {
+          "name": "invoice",
+          "type": "{procedureCode:string;providerKey:string;payerKey:string;periodLabel:string;quantity:number;unitPriceMinor:number}",
+          "default": {
+            "procedureCode": "DEMO-P1",
+            "providerKey": "Demo clinic A",
+            "payerKey": "Demo plan Q",
+            "periodLabel": "Demo period A",
+            "quantity": 1,
+            "unitPriceMinor": 8400
+          },
+          "control": "object",
+          "description": "One fictional billed line with an amount in the shared smallest monetary unit.",
+          "constraints": "procedureCode 1..14 characters; providerKey and payerKey 1..22 characters; periodLabel 1..20 characters; quantity integer 1..5; unitPriceMinor integer 0..1000000; no real patient identifiers or real procedure codes in defaults"
+        },
+        {
+          "name": "reference",
+          "type": "{procedureCode:string;providerKey:string;payerKey:string;periodLabel:string;quantity:number;unitPriceMinor:number;sourceLabel:string}",
+          "default": {
+            "procedureCode": "DEMO-P1",
+            "providerKey": "Demo clinic A",
+            "payerKey": "Demo plan Q",
+            "periodLabel": "Demo period A",
+            "quantity": 1,
+            "unitPriceMinor": 6000,
+            "sourceLabel": "Fictional rate sheet A"
+          },
+          "control": "object",
+          "description": "A separately supplied reference with its own source label.",
+          "constraints": "Key bounds match invoice; quantity integer 1..5; unitPriceMinor integer 0..1000000; sourceLabel 1..34 characters; comparison eligibility requires exact equality of all four context keys and quantity"
+        },
+        {
+          "name": "money",
+          "type": "{currencyLabel:string;minorUnitsPerUnit:number}",
+          "default": {
+            "currencyLabel": "demo credits",
+            "minorUnitsPerUnit": 100
+          },
+          "control": "object",
+          "description": "Defines one common monetary unit for both lines and the signed difference.",
+          "constraints": "currencyLabel 1..18 characters; minorUnitsPerUnit exactly 1 or 100; both lines use this same currency and unit scale; no exchange-rate conversion"
+        },
+        {
+          "name": "copy",
+          "type": "{invoice:string;reference:string;procedure:string;provider:string;payer:string;period:string;quantity:string;matched:string;unmatched:string;difference:string;review:string;example:string}",
+          "default": {
+            "invoice": "Billed line",
+            "reference": "Reference line",
+            "procedure": "Procedure",
+            "provider": "Provider",
+            "payer": "Payer",
+            "period": "Period",
+            "quantity": "Quantity",
+            "matched": "Same comparison context",
+            "unmatched": "Context does not match",
+            "difference": "Billed minus reference",
+            "review": "Difference requires review",
+            "example": "Fictional amounts; no entitlement finding"
+          },
+          "control": "object",
+          "description": "All visible context, outcome, and evidence labels.",
+          "constraints": "All keys required; key labels 1..16 characters; outcome labels 1..32 characters; review and example 1..52 characters"
+        },
+        {
+          "name": "focus",
+          "type": "'keys'|'amounts'",
+          "default": "keys",
+          "control": "select",
+          "description": "Chooses whether the matched windows or the amount rulers receive the final emphasis.",
+          "constraints": "keys or amounts; amount focus never hides unmatched context or creates a comparison"
+        },
+        {
+          "name": "showDifference",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows the signed total-amount difference only after complete context agreement.",
+          "constraints": "boolean; totals are quantity times unitPriceMinor; difference equals invoice total minus reference total; mismatch suppresses both numeric difference and difference geometry"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional billed line for DEMO-P1 at Demo clinic A under Demo plan Q in Demo period A is 84 demo credits for one unit. A separately supplied reference for the same context is 60 demo credits. The illustration exposes a 24-credit difference for review, without deciding what is owed.",
+        "inputBindings": {
+          "invoice": {
+            "procedureCode": "DEMO-P1",
+            "providerKey": "Demo clinic A",
+            "payerKey": "Demo plan Q",
+            "periodLabel": "Demo period A",
+            "quantity": 1,
+            "unitPriceMinor": 8400
+          },
+          "reference": {
+            "procedureCode": "DEMO-P1",
+            "providerKey": "Demo clinic A",
+            "payerKey": "Demo plan Q",
+            "periodLabel": "Demo period A",
+            "quantity": 1,
+            "unitPriceMinor": 6000,
+            "sourceLabel": "Fictional rate sheet A"
+          },
+          "money": {
+            "currencyLabel": "demo credits",
+            "minorUnitsPerUnit": 100
+          },
+          "copy": {
+            "invoice": "Billed line",
+            "reference": "Reference line",
+            "procedure": "Procedure",
+            "provider": "Provider",
+            "payer": "Payer",
+            "period": "Period",
+            "quantity": "Quantity",
+            "matched": "Same comparison context",
+            "unmatched": "Context does not match",
+            "difference": "Billed minus reference",
+            "review": "Difference requires review",
+            "example": "Fictional amounts; no entitlement finding"
+          },
+          "focus": "keys",
+          "showDifference": true
+        }
+      },
+      "distinction": "Unlike benefit-shortfall-correction, no payment is corrected and no unpaid amount is treated as an entitlement. Unlike paired-contrast, exact context keys govern whether a numeric comparison is allowed. Unlike keyed-row-zipper, the records remain separate and open an amount ruler rather than becoming a joined dataset.",
+      "limits": [
+        "This is a fictional one-line comparison. It is not a medical billing interpretation, legal determination, price guarantee, negotiation result, or refund claim.",
+        "Totals use exact integer arithmetic in the shared smallest unit. The signed difference may be negative, positive, or zero; no automatic favorable result is implied.",
+        "A mismatch in any context key or quantity leaves the comparison unresolved. Similar text is not treated as a match, and no real CPT or payer taxonomy is inferred.",
+        "The ruler uses a common zero and a domain derived from the larger supplied total. For two zero totals use a one-minor-unit display domain without changing either value.",
+        "Currency, quantities, source label, period, and fictional status stay visible at the resolved hold. Published reference prices can have qualifications outside this bounded example."
+      ],
+      "collection": "social-sector",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Require all four context keys and quantity to match before showing a difference. Confirm exact signed arithmetic and common scale for zero, equal, larger, and smaller billed totals. A mismatched payer must never display a computed discrepancy.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 9-10, Early Results / healthcare cost comparison",
+          "rationale": "The plan describes comparing provider- and insurer-specific procedure prices with billed charges. The stock concept preserves matching context but does not repeat patient outcomes or legal assertions."
+        }
+      ]
+    },
+    {
+      "id": "workspace-capacity-extension",
+      "title": "Make room without replacing the work",
+      "description": "A bounded workspace retains its existing resources while additional requests wait outside its current allowance. An authored plan choice expands the available slots or leaves the requests pending, preserving both user agency and resource identity.",
+      "creativeDirection": "Frames 0-11 reveal the current workspace as a shallow tray with its exact slot allowance on the 960x600 canvas. Frames 12-50 bring requested resource tabs alongside the filled tray while the existing tabs stay fixed. Frames 51-80 show the supplied choice. For expand, frames 81-125 extend the same tray along a hinged side, reveal the additional slots, and seat all requested tabs. For keep, retain the original boundary and pending tabs. Frames 126-167 hold the selected allowance, existing identities, and any pending requests. Fade to the common opaque ground at frames 168-179. Use deterministic frame-driven React/SVG at 30fps.",
+      "goodFor": [
+        "Explain voluntary movement between capacity-limited software plans",
+        "Show a team retaining prior work while adding resources",
+        "Distinguish a pending need from an authorized plan change"
+      ],
+      "tags": [
+        "freemium",
+        "plan capacity",
+        "voluntary upgrade",
+        "retained work",
+        "resource allowance",
+        "pending requests",
+        "land and expand"
+      ],
+      "intent": "Show that an authorized capacity change creates room while the current work stays intact.",
+      "family": "Bounded workspace growth",
+      "inputs": [
+        {
+          "name": "existingResources",
+          "type": "Array<{id:string;label:string}>",
+          "default": [
+            {
+              "id": "s-a",
+              "label": "Demo books"
+            },
+            {
+              "id": "s-b",
+              "label": "Demo tools"
+            },
+            {
+              "id": "s-c",
+              "label": "Demo visits"
+            }
+          ],
+          "control": "collection",
+          "description": "The resources already inside the current workspace.",
+          "constraints": "1..6 items; unique IDs 1..16 characters across both resource collections; labels 1..20 characters; length cannot exceed allowances.currentAllowance.limit"
+        },
+        {
+          "name": "requestedResources",
+          "type": "Array<{id:string;label:string}>",
+          "default": [
+            {
+              "id": "s-d",
+              "label": "Demo events"
+            },
+            {
+              "id": "s-e",
+              "label": "Demo loans"
+            }
+          ],
+          "control": "collection",
+          "description": "Additional authored requests that remain pending unless the expanded allowance is chosen.",
+          "constraints": "1..3 items; unique IDs 1..16 characters across both resource collections; labels 1..20 characters; combined resource count must exceed allowances.currentAllowance.limit and not exceed allowances.expandedAllowance.limit"
+        },
+        {
+          "name": "allowances",
+          "type": "{currentAllowance:{label:string;limit:number};expandedAllowance:{label:string;limit:number}}",
+          "default": {
+            "currentAllowance": {
+              "label": "Demo starter allowance",
+              "limit": 3
+            },
+            "expandedAllowance": {
+              "label": "Demo expanded allowance",
+              "limit": 5
+            }
+          },
+          "control": "object",
+          "description": "Two explicit resource-slot allowances. These are capacities, not independent claims about the number of connected datasets.",
+          "constraints": "All keys required; labels 1..28 characters; integer limits 1..9; expanded limit strictly greater than current limit; actual resource counts derive only from the collections"
+        },
+        {
+          "name": "choice",
+          "type": "{decision:'expand'|'keep';label:string}",
+          "default": {
+            "decision": "expand",
+            "label": "Team chooses more capacity"
+          },
+          "control": "object",
+          "description": "The human authorization controlling the boundary change.",
+          "constraints": "decision expand or keep; label 1..36 characters and consistent with decision; no timer, usage threshold, or animation event authorizes an upgrade by itself"
+        },
+        {
+          "name": "copy",
+          "type": "{workspace:string;pending:string;capacity:string;retained:string;example:string}",
+          "default": {
+            "workspace": "Fictional shared workspace",
+            "pending": "Requested resources",
+            "capacity": "Resource slots",
+            "retained": "Existing work retained",
+            "example": "Fictional plans; no payment processed"
+          },
+          "control": "object",
+          "description": "All framing and evidence labels.",
+          "constraints": "All keys required; each string 1..42 characters; example retains a fictional qualifier"
+        },
+        {
+          "name": "showResourceLabels",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows resource names on the persistent tabs.",
+          "constraints": "boolean; hiding names does not change IDs, counts, pending status, or the selected allowance"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "A fictional workspace has three resource slots and three existing resources. Its team requests two more, chooses a five-slot allowance, and keeps the original three while seating the two pending requests. Keeping the current allowance leaves both requests pending.",
+        "inputBindings": {
+          "existingResources": [
+            {
+              "id": "s-a",
+              "label": "Demo books"
+            },
+            {
+              "id": "s-b",
+              "label": "Demo tools"
+            },
+            {
+              "id": "s-c",
+              "label": "Demo visits"
+            }
+          ],
+          "requestedResources": [
+            {
+              "id": "s-d",
+              "label": "Demo events"
+            },
+            {
+              "id": "s-e",
+              "label": "Demo loans"
+            }
+          ],
+          "allowances": {
+            "currentAllowance": {
+              "label": "Demo starter allowance",
+              "limit": 3
+            },
+            "expandedAllowance": {
+              "label": "Demo expanded allowance",
+              "limit": 5
+            }
+          },
+          "choice": {
+            "decision": "expand",
+            "label": "Team chooses more capacity"
+          },
+          "copy": {
+            "workspace": "Fictional shared workspace",
+            "pending": "Requested resources",
+            "capacity": "Resource slots",
+            "retained": "Existing work retained",
+            "example": "Fictional plans; no payment processed"
+          },
+          "showResourceLabels": true
+        }
+      },
+      "distinction": "Unlike stagger-cards, the explanatory action changes a finite containing boundary after an explicit choice. Unlike queue-relief, resources occupy persistent workspace slots rather than leaving after service. Unlike dashboard-slot-assembly, no layout rearrangement or content reshaping makes the new capacity.",
+      "limits": [
+        "One workspace, two allowance choices, and at most nine total resources. No actual billing, subscription entitlement, import, connection, or checkout is performed.",
+        "The combined collection lengths determine resource count. Capacity is supplied separately and must contain the final count when expansion is selected. Invalid combinations are rejected, not silently truncated.",
+        "Existing resource identity and content remain unchanged. Pending resources are not shown as already imported or connected.",
+        "No real plan names, prices, conversion rate, automatic charge, or guaranteed growth is illustrated.",
+        "A kept allowance is a valid outcome with visible pending demand. No celebratory failure mark or forced-upgrade message punishes that choice."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "The same existing resource IDs remain inside the same tray. Expand reveals exactly the supplied extra capacity and seats every requested resource; keep changes no allowance and leaves every request pending.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 11-13, Freemium and subscription value metrics",
+          "rationale": "The strategy links voluntary plan expansion to increased team and data needs after users have experienced value. The proposal isolates resource capacity without real pricing or adoption claims."
+        }
+      ]
+    },
+    {
+      "id": "equal-count-unequal-volume",
+      "title": "The same count can hold different amounts",
+      "description": "Two equal-count collections begin with matching item marks. Each item unfolds into a strip proportional to its supplied byte size, revealing different total data volumes on one common ruler without changing the item count.",
+      "creativeDirection": "Frames 0-11 reveal two labeled shelves containing the same number of authored items. Frames 12-48 align their count marks one for one. Frames 49-110 unfold each item horizontally into an adjacent byte-length strip while retaining its small identity tab; both shelves share one fixed zero and scale. Frames 111-145 show the derived collection totals beneath the unchanged count marks. Hold through frame 167 with the supplied measurement basis and proxy note, then fade to the shared opaque ground through frame 179. Use the same palette, 960x600 React/SVG canvas, deterministic 180-frame timing, and 30fps.",
+      "goodFor": [
+        "Explain why dataset count is an imperfect storage proxy",
+        "Show why the same number of rows can occupy different byte sizes",
+        "Separate a simple allowance metric from a measured resource quantity"
+      ],
+      "tags": [
+        "measurement proxy",
+        "dataset count",
+        "row count",
+        "data size",
+        "bytes",
+        "storage volume",
+        "equal counts",
+        "unequal amounts"
+      ],
+      "intent": "Expose what an item count does not tell us about the amount of data.",
+      "family": "Measurement and proxies",
+      "inputs": [
+        {
+          "name": "groups",
+          "type": "Array<{id:string;label:string;items:Array<{id:string;label:string;bytes:number}>}>",
+          "default": [
+            {
+              "id": "g-a",
+              "label": "Demo collection A",
+              "items": [
+                {
+                  "id": "a-1",
+                  "label": "Item A1",
+                  "bytes": 100
+                },
+                {
+                  "id": "a-2",
+                  "label": "Item A2",
+                  "bytes": 200
+                },
+                {
+                  "id": "a-3",
+                  "label": "Item A3",
+                  "bytes": 300
+                }
+              ]
+            },
+            {
+              "id": "g-b",
+              "label": "Demo collection B",
+              "items": [
+                {
+                  "id": "b-1",
+                  "label": "Item B1",
+                  "bytes": 500
+                },
+                {
+                  "id": "b-2",
+                  "label": "Item B2",
+                  "bytes": 800
+                },
+                {
+                  "id": "b-3",
+                  "label": "Item B3",
+                  "bytes": 900
+                }
+              ]
+            }
+          ],
+          "control": "collection",
+          "description": "Two small collections with item-level byte quantities. Counts and totals derive exclusively from these items.",
+          "constraints": "Exactly 2 groups; unique group IDs 1..16 characters; group labels 1..24 characters; each group has 1..3 items and both lengths are equal; all item IDs globally unique 1..16 characters; item labels 1..16 characters; bytes integers 0..10000000; group byte totals must differ"
+        },
+        {
+          "name": "itemKind",
+          "type": "'datasets'|'rows'",
+          "default": "datasets",
+          "control": "select",
+          "description": "Selects whether item marks stand for complete datasets or individual rows, without mixing the two grains.",
+          "constraints": "datasets or rows; every item in both groups uses the chosen grain; no separate item-count prop"
+        },
+        {
+          "name": "measure",
+          "type": "{displayUnit:'B'|'KiB'|'MiB';basisLabel:string;scaleMaximumBytes:number}",
+          "default": {
+            "displayUnit": "B",
+            "basisLabel": "Illustrative stored bytes",
+            "scaleMaximumBytes": 2400
+          },
+          "control": "object",
+          "description": "Defines the common size basis, display conversion, and fixed ruler maximum for both shelves.",
+          "constraints": "displayUnit B, KiB, or MiB uses divisors 1, 1024, or 1048576; basisLabel 1..36 characters; scaleMaximumBytes positive integer <= 60000000 and >= both group totals; both groups must share the same stored/uncompressed basis; formatted decimal values may round, geometry uses exact bytes"
+        },
+        {
+          "name": "copy",
+          "type": "{count:string;size:string;total:string;proxyNote:string;example:string}",
+          "default": {
+            "count": "Item count",
+            "size": "Data size",
+            "total": "Collection total",
+            "proxyNote": "Count alone does not determine size",
+            "example": "Fictional byte quantities"
+          },
+          "control": "object",
+          "description": "Labels the two measures and preserves the limitation of the proxy.",
+          "constraints": "All keys required; count, size, total 1..24 characters; proxyNote and example 1..52 characters"
+        },
+        {
+          "name": "showItemSizes",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows each item byte quantity beside its persistent ID tab.",
+          "constraints": "boolean; both collection totals, item counts, unit, and basis remain visible"
+        },
+        {
+          "name": "showCountGuides",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Keeps the one-for-one count alignment visible while byte strips extend.",
+          "constraints": "boolean; hiding guides never changes collection length or byte geometry"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "Two fictional collections each contain three datasets. The first stores 100, 200, and 300 illustrative bytes; the second stores 500, 800, and 900. Their equal dataset counts coexist with totals of 600 and 2200 bytes on the same size scale.",
+        "inputBindings": {
+          "groups": [
+            {
+              "id": "g-a",
+              "label": "Demo collection A",
+              "items": [
+                {
+                  "id": "a-1",
+                  "label": "Item A1",
+                  "bytes": 100
+                },
+                {
+                  "id": "a-2",
+                  "label": "Item A2",
+                  "bytes": 200
+                },
+                {
+                  "id": "a-3",
+                  "label": "Item A3",
+                  "bytes": 300
+                }
+              ]
+            },
+            {
+              "id": "g-b",
+              "label": "Demo collection B",
+              "items": [
+                {
+                  "id": "b-1",
+                  "label": "Item B1",
+                  "bytes": 500
+                },
+                {
+                  "id": "b-2",
+                  "label": "Item B2",
+                  "bytes": 800
+                },
+                {
+                  "id": "b-3",
+                  "label": "Item B3",
+                  "bytes": 900
+                }
+              ]
+            }
+          ],
+          "itemKind": "datasets",
+          "measure": {
+            "displayUnit": "B",
+            "basisLabel": "Illustrative stored bytes",
+            "scaleMaximumBytes": 2400
+          },
+          "copy": {
+            "count": "Item count",
+            "size": "Data size",
+            "total": "Collection total",
+            "proxyNote": "Count alone does not determine size",
+            "example": "Fictional byte quantities"
+          },
+          "showItemSizes": true,
+          "showCountGuides": true
+        }
+      },
+      "distinction": "Unlike capability-matrix, this changes the represented measure from a discrete count to item-weighted size. Unlike bar-race, no rank changes over time and no data values evolve. Unlike population-normalized-map, no denominator division or geographic fill is used; the animation opens each counted object to expose its unequal weight.",
+      "limits": [
+        "Exactly two equal-count groups and at most three items per group. Quantities are fictional measurement examples, not actual compression, transfer, memory, or storage benchmarks.",
+        "Every displayed total equals the sum of item bytes. Item count and byte volume remain distinct units; no conversion from count to bytes is inferred.",
+        "Both shelves use one zero, one scale, and one measurement basis. An empty-byte item keeps its count mark even though its size strip has zero length.",
+        "The selected datasets or rows grain applies to all items. A dataset and a row must never count as interchangeable units.",
+        "This does not assess whether a pricing policy is fair or predict actual costs. It illustrates a limitation of a proxy named in the strategy."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Equal collection lengths remain fixed as each strip unfolds to bytes divided by scaleMaximumBytes. Verify exact byte totals, zero-byte items retained in counts, identical scale across groups, and the same measurement basis.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 11, Market Research",
+          "rationale": "The plan explicitly distinguishes simple dataset-count pricing from precise data-size usage measurement."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 23-24, Competitive Analysis scale note",
+          "rationale": "The plan describes row counts as approximations for byte-scale categories, supporting a generic warning about counting proxies."
+        }
+      ]
+    },
+    {
+      "id": "actor-attribution-split",
+      "title": "Separate accounts preserve separate attribution",
+      "description": "Two fictional collaborators first stamp events with one shared account label. After choosing distinct accounts, their later events receive distinct account stamps while the historical shared-account events retain their limited attribution.",
+      "creativeDirection": "Frames 0-11 reveal two collaborators, one shared stamp, and an empty event ledger. Frames 12-60 let each collaborator stamp one authored historical event with that same account mark. Frames 61-95 move the shared stamp aside and place the supplied distinct account stamps beside the collaborators. Frames 96-140 stamp the later events with their assigned accounts. Frames 141-167 hold the older shared-account entries above the individually attributed later entries, retaining the limitation caption. Fade to the common opaque ground at frames 168-179. Use deterministic React/SVG on 960x600 at 30fps; no credential entry or real authentication occurs.",
+      "goodFor": [
+        "Explain one collaboration benefit of individual accounts",
+        "Show why later account separation does not repair past attribution",
+        "Distinguish an account identity recorded by software from a verified human identity"
+      ],
+      "tags": [
+        "collaboration",
+        "account attribution",
+        "shared account",
+        "individual accounts",
+        "event history",
+        "audit trail",
+        "identity boundary"
+      ],
+      "intent": "Show what separate account identities make distinguishable in future records.",
+      "family": "Identity and recorded evidence",
+      "inputs": [
+        {
+          "name": "collaborators",
+          "type": "Array<{id:string;label:string;individualAccountId:string}>",
+          "default": [
+            {
+              "id": "person-a",
+              "label": "Demo editor A",
+              "individualAccountId": "account-a"
+            },
+            {
+              "id": "person-b",
+              "label": "Demo editor B",
+              "individualAccountId": "account-b"
+            }
+          ],
+          "control": "collection",
+          "description": "Two fictional collaborators and their later account assignments.",
+          "constraints": "Exactly 2 items; unique IDs 1..16 characters; labels 1..24 characters; individualAccountId references a distinct account and is not sharedAccountId"
+        },
+        {
+          "name": "accounts",
+          "type": "Array<{id:string;label:string}>",
+          "default": [
+            {
+              "id": "shared",
+              "label": "Shared demo account"
+            },
+            {
+              "id": "account-a",
+              "label": "Demo account A"
+            },
+            {
+              "id": "account-b",
+              "label": "Demo account B"
+            }
+          ],
+          "control": "collection",
+          "description": "The shared account and two separate account identities available as stamps.",
+          "constraints": "Exactly 3 items; unique IDs 1..16 characters; labels 1..24 characters; exactly one shared account and one distinct individual account per collaborator"
+        },
+        {
+          "name": "sharedAccountId",
+          "type": "string",
+          "default": "shared",
+          "control": "select",
+          "description": "The account recorded for both earlier events.",
+          "constraints": "Must reference an accounts ID distinct from every individualAccountId"
+        },
+        {
+          "name": "events",
+          "type": "Array<{id:string;collaboratorId:string;label:string;phase:'shared'|'individual'}>",
+          "default": [
+            {
+              "id": "event-1",
+              "collaboratorId": "person-a",
+              "label": "Draft opened",
+              "phase": "shared"
+            },
+            {
+              "id": "event-2",
+              "collaboratorId": "person-b",
+              "label": "Note added",
+              "phase": "shared"
+            },
+            {
+              "id": "event-3",
+              "collaboratorId": "person-a",
+              "label": "Draft revised",
+              "phase": "individual"
+            },
+            {
+              "id": "event-4",
+              "collaboratorId": "person-b",
+              "label": "Review added",
+              "phase": "individual"
+            }
+          ],
+          "control": "collection",
+          "description": "The illustrative actions in narrative order. The recorded account is derived from phase, never retroactively inferred.",
+          "constraints": "Exactly 4 events; unique IDs 1..16 characters; labels 1..24 characters; valid collaboratorId; exactly one shared event and one individual event per collaborator; two shared events precede two individual events"
+        },
+        {
+          "name": "copy",
+          "type": "{shared:string;individual:string;choice:string;historyLimit:string;ledger:string;example:string}",
+          "default": {
+            "shared": "Earlier shared account",
+            "individual": "Later distinct accounts",
+            "choice": "Team adopts separate accounts",
+            "historyLimit": "Earlier entries keep the shared label",
+            "ledger": "Recorded account history",
+            "example": "Fictional actors; account labels only"
+          },
+          "control": "object",
+          "description": "All phase, choice, ledger, limitation, and fictional-status captions.",
+          "constraints": "All keys required; each string 1..48 characters; historyLimit must retain the earlier attribution limitation"
+        },
+        {
+          "name": "showActionGuides",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows a short guide from the acting collaborator to the currently used stamp, then removes it before the ledger hold.",
+          "constraints": "boolean; historical ledger entries may show only their recorded shared account, never a later individual account"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "Two fictional editors initially record Draft opened and Note added under one shared demo account. After choosing separate demo accounts, their later actions receive account A and account B stamps. The earlier records keep the shared label.",
+        "inputBindings": {
+          "collaborators": [
+            {
+              "id": "person-a",
+              "label": "Demo editor A",
+              "individualAccountId": "account-a"
+            },
+            {
+              "id": "person-b",
+              "label": "Demo editor B",
+              "individualAccountId": "account-b"
+            }
+          ],
+          "accounts": [
+            {
+              "id": "shared",
+              "label": "Shared demo account"
+            },
+            {
+              "id": "account-a",
+              "label": "Demo account A"
+            },
+            {
+              "id": "account-b",
+              "label": "Demo account B"
+            }
+          ],
+          "sharedAccountId": "shared",
+          "events": [
+            {
+              "id": "event-1",
+              "collaboratorId": "person-a",
+              "label": "Draft opened",
+              "phase": "shared"
+            },
+            {
+              "id": "event-2",
+              "collaboratorId": "person-b",
+              "label": "Note added",
+              "phase": "shared"
+            },
+            {
+              "id": "event-3",
+              "collaboratorId": "person-a",
+              "label": "Draft revised",
+              "phase": "individual"
+            },
+            {
+              "id": "event-4",
+              "collaboratorId": "person-b",
+              "label": "Review added",
+              "phase": "individual"
+            }
+          ],
+          "copy": {
+            "shared": "Earlier shared account",
+            "individual": "Later distinct accounts",
+            "choice": "Team adopts separate accounts",
+            "historyLimit": "Earlier entries keep the shared label",
+            "ledger": "Recorded account history",
+            "example": "Fictional actors; account labels only"
+          },
+          "showActionGuides": true
+        }
+      },
+      "distinction": "Unlike contribution-weave, this explicitly contrasts indistinguishable recorded accounts with distinguishable later accounts and retains the historical limitation. Unlike journal-receipts, the changing information is account attribution rather than receipt status. No old event is assigned a newly inferred human author.",
+      "limits": [
+        "Account attribution is one illustrative collaboration benefit. This scene does not claim a particular product implementation or prescribe punitive account-sharing restrictions.",
+        "An account label is not proof of a real person, consent, authorization, legal signature, or secure identity. No credential or permission mechanism is modeled.",
+        "The source authors of the fictional choreography are known to the animation, but the shared-account ledger retains only the shared identity. Do not add individual attribution to earlier entries.",
+        "Four authored events are the entire illustrated history. No hidden total, productivity comparison, or financial conversion is inferred.",
+        "The decision to separate accounts is authored and voluntary; the animation does not lock collaborators out or claim all collaboration problems are solved."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Shared-phase events retain sharedAccountId at every later frame. Individual-phase events derive only the assigned collaborator account. All event IDs persist and no historical account label changes after the account separation.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 25-26, Account-sharing risk and mitigation",
+          "rationale": "The strategy treats shared accounts as a loss of collaborative value and favors explaining individual participation over punitive restriction. Attribution is a bounded illustrative interpretation of that concern."
+        }
+      ]
+    },
+    {
+      "id": "term-limited-revenue-share",
+      "title": "When a temporary share ends",
+      "description": "Two equal-length fictional receipt periods expose the same operating outflow and a temporary distribution. After the authored term boundary, that distribution no longer leaves and the retained period cash increases by the exact amount, without forecasting growth or solvency.",
+      "creativeDirection": "Frames 0-11 reveal two equal-sized period trays and one common monetary ruler on the 960x600 canvas. Frames 12-65 partition the first receipt strip into operating outflow, temporary distribution, and retained cash. Frames 66-95 turn the authored term marker between the trays and close only the temporary-distribution outlet. Frames 96-140 lay the second identical receipt strip into the second tray: operating outflow stays the same and the formerly distributed portion remains in retained cash. Frames 141-167 hold both periods and their exact reconciliation side by side. Exit to shared opaque ground at frames 168-179. Use frame-driven React/SVG at 30fps and no stochastic timing.",
+      "goodFor": [
+        "Explain the arithmetic of a temporary distribution ending",
+        "Separate cash received, operating outflow, distributions, and retained period cash",
+        "Show a bounded financing tradeoff without projecting company performance"
+      ],
+      "tags": [
+        "temporary revenue share",
+        "term boundary",
+        "cash allocation",
+        "retained cash",
+        "resource accounting",
+        "distribution expiry"
+      ],
+      "intent": "Make the effect of ending one temporary cash distribution inspectable while other quantities remain fixed.",
+      "family": "Time-bounded resource accounting",
+      "inputs": [
+        {
+          "name": "periods",
+          "type": "Array<{id:string;label:string;receiptsMinor:number;operatingOutflowMinor:number;distributionActive:boolean}>",
+          "default": [
+            {
+              "id": "period-a",
+              "label": "Demo period A",
+              "receiptsMinor": 10000,
+              "operatingOutflowMinor": 6000,
+              "distributionActive": true
+            },
+            {
+              "id": "period-b",
+              "label": "Demo period B",
+              "receiptsMinor": 10000,
+              "operatingOutflowMinor": 6000,
+              "distributionActive": false
+            }
+          ],
+          "control": "collection",
+          "description": "Two separate, equal-duration periods with unchanged receipts and operating outflow so only distribution expiry explains the difference.",
+          "constraints": "Exactly 2 items; unique IDs 1..16 characters; labels 1..24 characters; first distributionActive true and second false; receiptsMinor positive integer <= 1000000 and identical between periods; operatingOutflowMinor integer 0..receiptsMinor and identical between periods; no stock balance is carried between periods"
+        },
+        {
+          "name": "arrangement",
+          "type": "{label:string;rateBasisPoints:number;termBoundaryLabel:string}",
+          "default": {
+            "label": "Demo temporary distribution",
+            "rateBasisPoints": 1000,
+            "termBoundaryLabel": "Authored term ends"
+          },
+          "control": "object",
+          "description": "The temporary distribution is receipts multiplied by a supplied basis-point rate while active.",
+          "constraints": "label 1..30 characters; termBoundaryLabel 1..30 characters; rateBasisPoints integer 1..10000; receiptsMinor * rateBasisPoints divisible by 10000; distributionMinor + operatingOutflowMinor <= receiptsMinor; no floating-point rounding or external terms"
+        },
+        {
+          "name": "money",
+          "type": "{unitLabel:string;minorUnitsPerUnit:number}",
+          "default": {
+            "unitLabel": "demo credits",
+            "minorUnitsPerUnit": 100
+          },
+          "control": "object",
+          "description": "One shared fictional monetary unit for all portions and both periods.",
+          "constraints": "unitLabel 1..18 characters; minorUnitsPerUnit exactly 1 or 100; all quantities use the same unit and both periods have the same duration"
+        },
+        {
+          "name": "copy",
+          "type": "{receipts:string;operating:string;distribution:string;retained:string;example:string}",
+          "default": {
+            "receipts": "Period receipts",
+            "operating": "Operating outflow",
+            "distribution": "Temporary distribution",
+            "retained": "Retained period cash",
+            "example": "Fictional arithmetic; no financial forecast"
+          },
+          "control": "object",
+          "description": "All accounting and evidence labels. Retained is a period-flow remainder, not working capital or cash balance.",
+          "constraints": "All keys required; accounting labels 1..28 characters; example 1..60 characters; do not relabel retained as profit, net worth, working capital, or cash on hand"
+        },
+        {
+          "name": "showAmounts",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Shows exact formatted amounts alongside conserved portion widths.",
+          "constraints": "boolean; labels, common monetary unit, term marker, and reconciliation geometry stay visible"
+        },
+        {
+          "name": "arrangementLayout",
+          "type": "'side-by-side'|'stacked'",
+          "default": "side-by-side",
+          "control": "select",
+          "description": "Chooses the arrangement of the two period trays while retaining one common numerical scale.",
+          "constraints": "side-by-side or stacked; layout changes neither arithmetic nor equal-period meaning"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "Two fictional periods each receive 100 demo credits and spend 60 on operating outflow. A temporary distribution of 10 percent sends 10 credits out in period A and leaves 30 retained. The authored term has ended in period B, so no distribution leaves and 40 are retained. These are separate period flows, not an accumulated balance.",
+        "inputBindings": {
+          "periods": [
+            {
+              "id": "period-a",
+              "label": "Demo period A",
+              "receiptsMinor": 10000,
+              "operatingOutflowMinor": 6000,
+              "distributionActive": true
+            },
+            {
+              "id": "period-b",
+              "label": "Demo period B",
+              "receiptsMinor": 10000,
+              "operatingOutflowMinor": 6000,
+              "distributionActive": false
+            }
+          ],
+          "arrangement": {
+            "label": "Demo temporary distribution",
+            "rateBasisPoints": 1000,
+            "termBoundaryLabel": "Authored term ends"
+          },
+          "money": {
+            "unitLabel": "demo credits",
+            "minorUnitsPerUnit": 100
+          },
+          "copy": {
+            "receipts": "Period receipts",
+            "operating": "Operating outflow",
+            "distribution": "Temporary distribution",
+            "retained": "Retained period cash",
+            "example": "Fictional arithmetic; no financial forecast"
+          },
+          "showAmounts": true,
+          "arrangementLayout": "side-by-side"
+        }
+      },
+      "distinction": "Unlike pooled-donor-allocation, the explanation compares two separate time-bounded receipt flows after a term changes. Unlike expiring-lease, no exclusive permission token returns to neutral custody. The expired outlet changes one conserved cash partition while equal receipts and operating outflow expose its exact effect.",
+      "limits": [
+        "This is an illustrative arithmetic model, not financial advice, investment terms, a valuation, a profit statement, or a solvency projection. It uses no company financial figures.",
+        "Each period reconciles receipts = operating outflow + active distribution + retained period cash. The second retained amount exceeds the first by the first distribution, with all other inputs fixed.",
+        "Compute the active distribution using integer basis-point arithmetic. Reject fractional minor-unit distributions or negative retained amounts.",
+        "Both periods are separate flows over equal durations. Do not carry the first remainder into the second tray or display their sum as a company balance.",
+        "Operating outflow is a supplied composite. Taxes, financing transactions, accruals, other liabilities, ownership, and legal treatment are outside the model. No claim about employee compensation or investor rights follows from the illustration."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Verify exact integer reconciliation in both periods, zero distribution after the term boundary, and a retained-flow difference equal to the first distribution. Swapping presentation layout cannot change amounts or scale.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 27-28, Revenue or profit shares reduce working capital",
+          "rationale": "The strategy discusses finite-duration distributions and the resources retained after they end. The proposal uses fictional cash-flow arithmetic and avoids the document's broader claims about working capital and incentives."
+        }
+      ]
+    },
+    {
+      "id": "utterance-to-model-draft",
+      "title": "Lift a description into a model draft",
+      "description": "Named phrases lift from a short authored sentence into an explicit entity-and-relationship draft. The original wording remains visible beside the proposed structure, and an optional human acceptance marker distinguishes a reviewed draft from a pending one.",
+      "creativeDirection": "Frames 0-11 reveal a short sentence on a 960x600 canvas. Frames 12-48 underline the supplied entity and relation tokens while all connector words remain in place. Frames 49-105 lift duplicate phrase slips from those exact spans into two entity sockets and one relationship hinge; an optional attribute slip docks to its declared entity. Frames 106-135 place the supplied review note and, only for accept, a human acceptance marker. Frames 136-167 hold the unchanged source sentence beside the complete proposed model. Fade to the common opaque palette ground at frames 168-179. All React/SVG motion is deterministic at 30fps and no language-model request is executed.",
+      "goodFor": [
+        "Explain the difference between a domain description and a proposed data model",
+        "Introduce entities, attributes, and relationships using a bounded sentence",
+        "Show a human review boundary around AI-assisted model configuration"
+      ],
+      "tags": [
+        "natural language",
+        "model draft",
+        "entities",
+        "attributes",
+        "relationships",
+        "semantic modeling",
+        "human review",
+        "configuration"
+      ],
+      "intent": "Make an authored phrase-to-model interpretation inspectable without treating it as automatic truth.",
+      "family": "Description and conceptual structure",
+      "inputs": [
+        {
+          "name": "sentenceParts",
+          "type": "Array<{id:string;text:string}>",
+          "default": [
+            {
+              "id": "tool",
+              "text": "A tool"
+            },
+            {
+              "id": "relation",
+              "text": " belongs to "
+            },
+            {
+              "id": "workshop",
+              "text": "a workshop"
+            },
+            {
+              "id": "stop",
+              "text": "."
+            }
+          ],
+          "control": "collection",
+          "description": "Ordered text fragments that join verbatim into the source description. Only mapped fragments lift into the draft.",
+          "constraints": "3..7 parts; unique IDs 1..16 characters; each text 1..28 characters; concatenated sentence 1..90 characters; no generated words"
+        },
+        {
+          "name": "draft",
+          "type": "{entities:Array<{id:string;label:string;partId:string}>;relationships:Array<{id:string;label:string;partId:string;fromEntityId:string;toEntityId:string}>;attributes:Array<{id:string;label:string;partId:string;entityId:string}>}",
+          "default": {
+            "entities": [
+              {
+                "id": "tool-entity",
+                "label": "Tool",
+                "partId": "tool"
+              },
+              {
+                "id": "workshop-entity",
+                "label": "Workshop",
+                "partId": "workshop"
+              }
+            ],
+            "relationships": [
+              {
+                "id": "belongs",
+                "label": "belongs to",
+                "partId": "relation",
+                "fromEntityId": "tool-entity",
+                "toEntityId": "workshop-entity"
+              }
+            ],
+            "attributes": []
+          },
+          "control": "object",
+          "description": "The authored conceptual model, whose entities are domain types rather than individual observed records. Each model item retains an exact source-fragment reference.",
+          "constraints": "Exactly 2 entities, exactly 1 directed relationship between distinct valid entity IDs, and 0..1 attribute attached to a valid entity; model IDs unique across arrays 1..20 characters; labels 1..24 characters; each partId valid and used by at most one model item; mapped labels must be a case-insensitive substring of their referenced text after trimming punctuation and articles; no inferred cardinality or type constraints"
+        },
+        {
+          "name": "review",
+          "type": "{outcome:'accept'|'pending';reviewerLabel:string;note:string}",
+          "default": {
+            "outcome": "pending",
+            "reviewerLabel": "Demo workspace owner",
+            "note": "Check the proposed relationship"
+          },
+          "control": "object",
+          "description": "The human review state and note shown after the authored mapping.",
+          "constraints": "outcome accept or pending; reviewerLabel 1..28 characters; note 1..44 characters; accept is supplied approval, never inferred from a well-formed draft"
+        },
+        {
+          "name": "copy",
+          "type": "{source:string;draft:string;entity:string;relationship:string;attribute:string;accepted:string;pending:string;example:string}",
+          "default": {
+            "source": "Authored description",
+            "draft": "Proposed model",
+            "entity": "Entity",
+            "relationship": "Relationship",
+            "attribute": "Attribute",
+            "accepted": "Owner accepted the draft",
+            "pending": "Awaiting owner review",
+            "example": "Fictional authored mapping; no live inference"
+          },
+          "control": "object",
+          "description": "All structure, review, and evidence labels.",
+          "constraints": "All keys required; role labels 1..18 characters; other labels 1..48 characters; draft status and example qualifier remain visible"
+        },
+        {
+          "name": "showSourceGuides",
+          "type": "boolean",
+          "default": true,
+          "control": "boolean",
+          "description": "Retains subtle alignment guides from each lifted phrase to its unchanged source fragment.",
+          "constraints": "boolean; all model part references remain valid even when guides are hidden"
+        },
+        {
+          "name": "modelLayout",
+          "type": "'horizontal'|'stacked'",
+          "default": "horizontal",
+          "control": "select",
+          "description": "Arranges the two entity sockets and the one directed relation without changing semantics.",
+          "constraints": "horizontal or stacked; from/to direction must remain unambiguous in both layouts"
+        }
+      ],
+      "bindingExample": {
+        "shortSourceText": "The fictional description A tool belongs to a workshop is mapped to Tool and Workshop entities plus one directed belongs to relationship. The supplied draft awaits the demo workspace owner's review; the animation performs no live inference.",
+        "inputBindings": {
+          "sentenceParts": [
+            {
+              "id": "tool",
+              "text": "A tool"
+            },
+            {
+              "id": "relation",
+              "text": " belongs to "
+            },
+            {
+              "id": "workshop",
+              "text": "a workshop"
+            },
+            {
+              "id": "stop",
+              "text": "."
+            }
+          ],
+          "draft": {
+            "entities": [
+              {
+                "id": "tool-entity",
+                "label": "Tool",
+                "partId": "tool"
+              },
+              {
+                "id": "workshop-entity",
+                "label": "Workshop",
+                "partId": "workshop"
+              }
+            ],
+            "relationships": [
+              {
+                "id": "belongs",
+                "label": "belongs to",
+                "partId": "relation",
+                "fromEntityId": "tool-entity",
+                "toEntityId": "workshop-entity"
+              }
+            ],
+            "attributes": []
+          },
+          "review": {
+            "outcome": "pending",
+            "reviewerLabel": "Demo workspace owner",
+            "note": "Check the proposed relationship"
+          },
+          "copy": {
+            "source": "Authored description",
+            "draft": "Proposed model",
+            "entity": "Entity",
+            "relationship": "Relationship",
+            "attribute": "Attribute",
+            "accepted": "Owner accepted the draft",
+            "pending": "Awaiting owner review",
+            "example": "Fictional authored mapping; no live inference"
+          },
+          "showSourceGuides": true,
+          "modelLayout": "horizontal"
+        }
+      },
+      "distinction": "Unlike schema-mapping, the starting material is a sentence rather than two field schemas. Unlike entity-spine-assembly, no source records are materialized and no unique-member set is calculated. The hero action preserves the origin of each authored concept as language becomes a proposed structure. Unlike prose-measurement-ledger, this proposes conceptual entity types and a relationship rather than extracting a subject's measurement, unit, reporting period, and qualifier. It defines a model, not an observation row.",
+      "limits": [
+        "One short sentence, two entities, one relation, and at most one attribute fit the six-second loop. More complex domain modeling belongs in a longer explanation.",
+        "All mappings and labels are authored inputs, not generated model output. The scene does not implement description-logic reasoning, model training, natural-language parsing, or arbitrary-domain configuration.",
+        "No cardinality, uniqueness, datatype, relationship inference, or business rule may be added unless explicitly present in a future separately specified contract.",
+        "Pending review remains pending without a success marker. Accepted marks only the supplied owner decision, not objective model correctness or a deployed workspace.",
+        "The stock animation makes no claim that a particular product provides natural-language configuration or that a proposed model has been deployed."
+      ],
+      "collection": "general",
+      "schemaVersion": 1,
+      "metadataVersion": 1,
+      "verificationFocus": "Every draft item references the exact supplied source part, all entity references resolve, the original sentence remains unchanged, and pending review never receives an acceptance marker. Layout changes preserve relation direction.",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 8, Generalizable Data Modeling / User-Configured Generalization",
+          "rationale": "The strategy describes translating natural-language domain descriptions into entities, descriptors, and relationships. The proposal makes that authored translation and its review status explicit instead of claiming general AI inference."
+        }
+      ]
+    }
+  ],
+  "enrichments": [
+    {
+      "targetId": "capability-matrix",
+      "concept": "Task-fit criteria for resource-constrained organizations",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 3-5, The Market / The Problem / Solution",
+          "rationale": "The strategy frames the problem as a mismatch between organizational needs and available tool capability, complexity, and cost."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 21-24, Competitive Analysis",
+          "rationale": "A comparison table evaluates audience, scale, usability, functions, and self-serve access."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Compare task needs with an explicitly supplied capability set",
+          "Explain fit across affordability, usability, and lifecycle coverage"
+        ],
+        "tags": [
+          "task fit",
+          "resource constraints",
+          "self-serve access",
+          "lifecycle coverage"
+        ],
+        "limits": [
+          "A capability state is a supplied statement about a specific context and version. Do not infer market-wide absence, universal superiority, or current competitor support from a strategic comparison.",
+          "Qualitative affordability requires a stated audience and context; included features are not proof that a plan is affordable to every team."
+        ]
+      },
+      "reason": "The existing bounded comparison matrix already carries the necessary row-by-row action and unknown/conditional states; another requirements chart would duplicate it."
+    },
+    {
+      "targetId": "offline-ledger",
+      "concept": "Useful local work during weak connectivity",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 2-3, History",
+          "rationale": "The history places data work in a poorly connected emergency setting."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 6-7, Optimized & Offline-First Data Stack",
+          "rationale": "The proposed architecture combines on-device computation with local storage for low-resource settings."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain a bounded local collection task in an intermittent-connectivity setting"
+        ],
+        "tags": [
+          "intermittent connectivity",
+          "field operations",
+          "device-local persistence"
+        ],
+        "limits": [
+          "Show only the illustrated local operation. Do not imply that authentication, sharing, remote queries, or every product capability continues without a connection.",
+          "A stored impression does not establish backup, encryption, eviction resistance, unlimited storage, synchronization, or zero device energy and maintenance cost."
+        ]
+      },
+      "reason": "The existing entry-to-local-impression action already explains continuity without a network. These additions clarify its use and boundaries rather than introducing another device animation."
+    },
+    {
+      "targetId": "custody-transfer",
+      "concept": "Maintenance responsibility after a specialist leaves",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 4, The Problem / bespoke solutions",
+          "rationale": "The plan identifies continuity failures when a short-term contractor or volunteer leaves a custom tool."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain an explicit maintenance-responsibility handoff before a project specialist leaves"
+        ],
+        "tags": [
+          "maintenance ownership",
+          "project continuity",
+          "specialist handoff"
+        ],
+        "limits": [
+          "Acceptance of responsibility does not prove that documentation, skills, access, funding, or a maintainable codebase are sufficient. A continuity story may need separate evidence for those prerequisites."
+        ]
+      },
+      "reason": "The existing delayed-release and acknowledged-owner contract handles the responsibility question. A separate departure animation would repeat that transfer without establishing actual maintainability."
+    },
+    {
+      "targetId": "paired-contrast",
+      "concept": "Managed hosting and self-hosting carry different responsibilities",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 29-30, Open source offering / self-hosting mitigation",
+          "rationale": "The plan distinguishes access to software from the resources and operational work required to run it."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 27, Local processing cost discussion",
+          "rationale": "The strategy attributes savings to moving processing away from the vendor cloud, which does not eliminate device-side costs."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Compare who supplies operations, maintenance, and hosting for the same software",
+          "Compare vendor-side and device-side responsibility without erasing either side"
+        ],
+        "tags": [
+          "self-hosting",
+          "managed hosting",
+          "operating responsibility",
+          "cost boundary"
+        ],
+        "limits": [
+          "Free access to source code is not zero operating cost. Comparison labels must account for the supplied hosting and maintenance responsibilities without inventing monetary amounts.",
+          "Moving computation to a user device changes the resource owner. It does not establish zero total cost, zero energy, or that one option is universally cheaper."
+        ]
+      },
+      "reason": "The existing matched qualitative-criteria action directly compares responsibilities. A new host diagram would add scenery without a new explanatory transformation."
+    },
+    {
+      "targetId": "decision-fork",
+      "concept": "Execution and eligibility decisions need explicit authored conditions",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 7-8, On-Demand Data Integration",
+          "rationale": "The plan proposes choosing local or remote processing according to data need and cost."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Workload-fit risk / mitigation",
+          "rationale": "The strategy proposes differing plan conditions by declared use case."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain one supplied local-or-remote execution choice",
+          "Show how a declared eligibility condition selects an illustrative plan path"
+        ],
+        "tags": ["execution placement", "declared conditions", "eligibility"],
+        "limits": [
+          "An authored branch is not a cost optimizer, legal eligibility assessment, or automatic classifier. No sector, intent, affordability, or trustworthiness may be inferred from dataset names or descriptive text.",
+          "If illustrating execution placement, retain the stated feasibility and data-boundary conditions. Do not imply that every task can run on either side."
+        ]
+      },
+      "reason": "A single decision with explicit conditions is already the defining action; the source adds contexts rather than a new branch mechanic."
+    },
+    {
+      "targetId": "disclosure-aperture",
+      "concept": "Published or remote context remains a bounded disclosure",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 10, Conference feedback / privacy-focused AI",
+          "rationale": "The plan identifies privacy-preserving AI exploration as an intended differentiation."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 12 and 15, Public content and product-driven growth",
+          "rationale": "The strategy describes publishing dashboards as outward-facing artifacts while teams continue their internal work."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain which authored summary fields a team chooses to publish",
+          "Show a minimal remote planning request while private details remain local"
+        ],
+        "tags": ["public summary", "publication boundary", "AI context"],
+        "limits": [
+          "A published summary field must already be approved and supplied. This preset neither computes safe aggregation nor proves anonymity, privacy, consent, or correct access control.",
+          "Public visibility of selected fields does not grant access to the underlying records or establish a customer-acquisition result."
+        ]
+      },
+      "reason": "The existing copied-subset and retained-original action explains the disclosure boundary. It should be reused rather than creating a public-dashboard card reveal with the same semantics."
+    },
+    {
+      "targetId": "linked-parameter-rehearsal",
+      "concept": "Transparent scenario arithmetic for allowances and costs",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 12-14, Value metrics and Subscription Plans",
+          "rationale": "The strategy links plan allowances and charges to explicit usage and team-size metrics."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 17-18, Projections",
+          "rationale": "Financial projections depend on authored assumptions about growth and costs."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Rehearse a fictional per-user cost and allowance rule",
+          "Expose how one planning assumption changes only declared dependent quantities"
+        ],
+        "tags": [
+          "allowance arithmetic",
+          "scenario assumptions",
+          "pricing rule"
+        ],
+        "limits": [
+          "Use the existing affine contract only. Tier cliffs, nonlinear growth, churn, caps, payment fees, and compounding require a separately specified model and must not be approximated silently.",
+          "A trial value is an authored scenario, not measured demand, market validation, or a prediction of financial performance. Use fictional values and explicit units and periods."
+        ]
+      },
+      "reason": "The source adds scenario uses for the existing coupled-ruler arithmetic. No additional financial forecasting animation is justified by the plan alone."
+    },
+    {
+      "targetId": "uncertainty-unfold",
+      "concept": "A conservative planning range is not a confidence interval",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 14, Survey-derived projections",
+          "rationale": "The plan acknowledges limited survey evidence and applies a conservative adjustment before projecting revenue."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 26, Architecture risk",
+          "rationale": "The plan separately acknowledges that operating-cost assumptions still need real-world evaluation."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Label a supplied scenario range separately from statistical uncertainty",
+          "Keep an untested operating assumption visible beside a point estimate"
+        ],
+        "tags": [
+          "small-sample limitation",
+          "scenario range",
+          "untested assumption"
+        ],
+        "limits": [
+          "A conservative adjustment or downside scenario is not a confidence interval, a validated error margin, or a representative population estimate. Match interval.kind and its visible label to the actual evidence.",
+          "No endpoints, probabilities, sample precision, or validation status are inferred from a business plan or the width of the displayed band."
+        ]
+      },
+      "reason": "The existing interval-kind distinction and fixed-scale unfolding already support this source concern. Enrichment prevents a planning haircut from being presented as statistical evidence."
+    },
+    {
+      "targetId": "tradeoff-pivot",
+      "concept": "Mission, growth, and relationship-building have stated tradeoffs",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 14-16, Go-to-Market Strategy",
+          "rationale": "The strategy balances relationship-intensive trust building against the effort required to scale it."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 27-28, Cash distribution and work culture",
+          "rationale": "The strategy discusses slower near-term expansion alongside a long-term operating preference."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 31, Financing and workload-fit risk",
+          "rationale": "The plan frames funding and customer choices in terms of preserving the intended social mission."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Explain a relationship-intensive service choice with its time requirement",
+          "Keep a mission constraint visible alongside a growth opportunity"
+        ],
+        "tags": [
+          "mission alignment",
+          "relationship building",
+          "growth tradeoff",
+          "operating preference"
+        ],
+        "limits": [
+          "A stated strategic preference does not establish investor duties, future behavior, customer conversion, financial return, or moral superiority. Keep the authored context and concession visible."
+        ]
+      },
+      "reason": "The source contains choices with benefits and concessions, which the existing hinge already explains without adding an unsupported numeric optimization."
+    },
+    {
+      "targetId": "feedback-refinement",
+      "concept": "Community input can change a maintained artifact",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 15-16, Open source community growth and community participation",
+          "rationale": "The strategy treats users and communities as potential contributors rather than passive consumers."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 28, Messaging risk / mitigation",
+          "rationale": "The plan proposes changing the initial product focus in response to user research."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Show a community contribution receiving an explicit maintainer response",
+          "Connect a participant concern to an authored product or service revision"
+        ],
+        "tags": [
+          "community contribution",
+          "maintainer review",
+          "participatory feedback",
+          "product research"
+        ],
+        "limits": [
+          "The depicted revision must follow the supplied note and closing outcome. A contribution does not imply automatic upstream acceptance, deployment, broad representativeness, or improved social outcomes."
+        ]
+      },
+      "reason": "A source-to-maintainer contribution is still a bounded feedback-and-revision loop. The existing contract keeps the note, changed artifact, and authored result visible, so a separate patch-return preset is unnecessary."
+    },
+    {
+      "targetId": "scope-aperture",
+      "concept": "A long-term platform vision differs from present scope",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 5-6, Product Vision",
+          "rationale": "The plan sets out a broad future lifecycle vision."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "page 28, Broad messaging risk / mitigation",
+          "rationale": "The plan says an initial product focus should be narrower and chosen through user feedback."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Separate a long-term lifecycle vision from a bounded present focus",
+          "Clarify the domain and tasks an example is intended to cover"
+        ],
+        "tags": [
+          "current scope",
+          "future vision",
+          "product focus",
+          "domain boundary"
+        ],
+        "limits": [
+          "Topics outside the aperture may be future, deferred, unsupported, or simply out of this explanation. Supply the correct outside label and do not imply they are shipped features."
+        ]
+      },
+      "reason": "The existing explicit inside/outside topic boundary is the exact required action; a product-roadmap reveal would duplicate it."
+    },
+    {
+      "targetId": "qualify-apparent-conflict",
+      "concept": "Different policies can govern code and curated records",
+      "sourceRefs": [
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 29-30, Open source offering and curated marketplace data",
+          "rationale": "The strategy distinguishes software-source availability from access to separately maintained directory content."
+        },
+        {
+          "sourceId": "business-plan-primary",
+          "locator": "pages 11 and 14, Price sensitivity and quality positioning",
+          "rationale": "The plan separates willingness to pay from need for demonstrated value, and affordability from software-quality claims."
+        }
+      ],
+      "suggestedChanges": {
+        "goodFor": [
+          "Separate source-code availability from access to independently curated content",
+          "Clarify that price sensitivity and willingness to pay are different statements"
+        ],
+        "tags": [
+          "policy scope",
+          "source versus content",
+          "price sensitivity",
+          "context qualification"
+        ],
+        "limits": [
+          "Show only supplied policy statements and their distinct objects. The animation does not interpret licenses, determine ownership, confer rights, or prove that any legal position is correct.",
+          "A low price, paid plan, or free offer by itself proves neither high nor low technical quality."
+        ]
+      },
+      "reason": "The existing two-statements-plus-context transformation resolves these apparent contradictions. New panels for open code versus curated content would repeat that mechanic."
+    }
+  ],
+  "limitations": [
+    "Primary source choice: use /Users/juanpablosarmiento/brain/areas/avandar/docs/avandar-business-plan.pdf. The similarly titled fundraising copy dated 2026-02-20 was compared across all 31 extracted pages and adds no distinct retained generic mechanism. Its differences concern private budget/projection details, financing wording, and biographies.",
+    "All 31 primary pages were read using page-preserving text extraction. Relevant prose, diagrams, and tables were visually inspected from local PNG renders, including the architecture figures on pages 7-8, plan table on page 13, financial layout on page 18, competitive tables on pages 21-23, and risk pages 24-31. Temporary source text and page renders remain only in the assigned ignored business-review directory.",
+    "This is a strategy document, not a current implementation inventory, a validated market study, clinical evidence, legal advice, or measured product performance. Planned plugin, natural-language configuration, execution-placement, pricing, and growth ideas must remain concept status.",
+    "The source includes strong generality, comparative performance, cost, and synchronization claims while also acknowledging that some operating assumptions need evaluation. Those assertions are not adopted. No outside verification or private-source upload was performed.",
+    "Market-size estimates, survey percentages, real prices, budgets, projections, financing amounts, staff compensation, named beneficiaries, patient outcomes, and company-specific claims are omitted from stock defaults and examples. All new quantities and people are fictional.",
+    "The source uses different row-count categorizations in its market segmentation and competitive table and contains differing timing statements in its projections. No source cutoff, timing target, or extrapolated quantity is encoded in the proposed contracts.",
+    "The document names clinical risk tools, crop early warning, model fine-tuning, description-logic reasoning, price optimization, search/discovery, and automated mission classification without enough method detail to animate their algorithms responsibly. These absences are explicit rather than filled with invented processes.",
+    "Several coverage targets belong to parallel groups: schema-plan-local-execution, query-column-cache-growth, predicate-pushdown-boundary, state-preserving-source-refresh, entity-spine-assembly, and shared-jig-preparation. The coordinator must resolve any renamed or merged IDs against those outputs before finalizing the combined catalog.",
+    "Actor attribution, human model review, the schema-extension table, and the conserved temporary cash example are original bounded illustrations motivated by source concerns. They are not claims that the plan itself specifies those UI or implementation mechanics.",
+    "No source repository, personal knowledge file, production record, runtime animation, or central catalog artifact was modified. The required read-only retrieval scope superseded local cleanup commands that would mutate the source workspace."
+  ],
+  "review": {
+    "date": "2026-10-16",
+    "reasoningEffort": "xhigh",
+    "mode": "read-only source extraction",
+    "status": "proposal inventory; coordinator decisions govern acceptance"
+  }
+}

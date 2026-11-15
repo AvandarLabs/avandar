@@ -22,6 +22,18 @@
         run: showNewChanges,
       });
     }
+    // Narrow the diff to files with comments (label follows the current state).
+    var numCommented = commentedInDiff().length;
+    if (commentedOnly || numCommented) {
+      acts.push({
+        kind: "action", glyph: "✎",
+        label: commentedOnly ? "Show all files" : "Show only files with comments",
+        sub: commentedOnly ? "stop narrowing the diff to commented files" : plural(numCommented, "file") + " with comments",
+        hint: null,
+        keywords: "comments commented only files filter threads big diff show all",
+        run: function () { setCommentedOnly(!commentedOnly); },
+      });
+    }
     // Collapse / expand the guide sidebar (label follows the current state).
     var collapsed = els.body.classList.contains("collapsed");
     acts.push({

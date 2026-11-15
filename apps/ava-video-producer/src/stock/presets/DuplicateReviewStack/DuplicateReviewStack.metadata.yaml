@@ -1,0 +1,114 @@
+name:
+  id: motionAtlas.duplicate-review-stack.name
+  message: Review duplicate candidates
+description:
+  id: motionAtlas.duplicate-review-stack.description
+  message:
+    Records already designated as possible duplicates align on a comparison field,
+    then fold behind an explicitly retained record. Candidate groups without a choice
+    stay fanned open for review.
+category:
+  id: motionAtlas.duplicate-review-stack.category
+  message: Identity consolidation
+useWhen:
+  id: motionAtlas.duplicate-review-stack.useWhen
+  message: Show duplicate review as a visible grouping and selection decision.
+creativeDirection:
+  id: motionAtlas.duplicate-review-stack.creativeDirection
+  message:
+    Frames 12-42 show candidate slips separated within authored group brackets.
+    During frames 42-100, each group aligns its comparison values along one shared
+    ruler, making the repeated detail visible. Where a retained record is supplied, the
+    other slips fold into an offset stack behind it while their ID tabs remain
+    available; an unresolved group stays open. Hold the retained record and unresolved
+    group through frame 166, then exit.
+intent:
+  id: motionAtlas.duplicate-review-stack.intent
+  message: Show duplicate review as a visible grouping and selection decision.
+distinction:
+  id: motionAtlas.duplicate-review-stack.distinction
+  message:
+    Unlike stagger-cards, the content aligns around a shared comparison value and
+    then consolidates through an explicit selection. Unlike field-conflict-choice, this
+    chooses a record identity rather than separate values for individual fields.
+prompt:
+  id: motionAtlas.duplicate-review-stack.prompt
+  message:
+    Use Motion Atlas "Review duplicate candidates" (duplicate-review-stack) as a
+    conceptual graphic. Show duplicate review as a visible grouping and selection
+    decision. Replace fictional sample content with approved authored content before
+    making product claims.
+tags:
+  - id: motionAtlas.duplicate-review-stack.tags.0
+    message: duplicates
+  - id: motionAtlas.duplicate-review-stack.tags.1
+    message: deduplication
+  - id: motionAtlas.duplicate-review-stack.tags.2
+    message: duplicate review
+  - id: motionAtlas.duplicate-review-stack.tags.3
+    message: record matching
+  - id: motionAtlas.duplicate-review-stack.tags.4
+    message: canonical record
+  - id: motionAtlas.duplicate-review-stack.tags.5
+    message: retain record
+  - id: motionAtlas.duplicate-review-stack.tags.6
+    message: candidate group
+  - id: motionAtlas.duplicate-review-stack.tags.7
+    message: consolidate
+goodFor:
+  - id: motionAtlas.duplicate-review-stack.goodFor.0
+    message: Explain reviewing possible duplicate records
+  - id: motionAtlas.duplicate-review-stack.goodFor.1
+    message: Show a selected record retained with alternatives still inspectable
+  - id: motionAtlas.duplicate-review-stack.goodFor.2
+    message: Distinguish duplicate candidates from confirmed consolidation
+domains:
+  - id: motionAtlas.duplicate-review-stack.domains.0
+    message: Identity consolidation
+aliases:
+  - id: motionAtlas.duplicate-review-stack.aliases.0
+    message: duplicates
+  - id: motionAtlas.duplicate-review-stack.aliases.1
+    message: deduplication
+  - id: motionAtlas.duplicate-review-stack.aliases.2
+    message: duplicate review
+  - id: motionAtlas.duplicate-review-stack.aliases.3
+    message: record matching
+notFor:
+  - id: motionAtlas.duplicate-review-stack.notFor.literal-whitespace
+    message:
+      "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+      breaks and other whitespace remain distinct from authored marker glyphs. Input,
+      accessible text and equality preserve the original values."
+  - id: motionAtlas.duplicate-review-stack.notFor.0
+    message: All default records and candidate groups are fictional.
+  - id: motionAtlas.duplicate-review-stack.notFor.1
+    message:
+      Groups are supplied by the author; no duplicate-detection algorithm, similarity
+      score, or match accuracy is implied.
+  - id: motionAtlas.duplicate-review-stack.notFor.2
+    message:
+      Matching comparison values alone do not establish that records describe the
+      same real entity.
+  - id: motionAtlas.duplicate-review-stack.notFor.3
+    message:
+      A retainedId demonstrates an authored selection, not actual deletion or merging
+      of data.
+  - id: motionAtlas.duplicate-review-stack.notFor.4
+    message: Record and group counts come only from the nested arrays.
+motionBeats:
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.duplicate-review-stack.motionBeats.0
+      message: Establish authored candidate groups.
+  - startFrame: 42
+    endFrame: 100
+    description:
+      id: motionAtlas.duplicate-review-stack.motionBeats.1
+      message: Align comparison values and fold explicitly resolved groups.
+  - startFrame: 100
+    endFrame: 166
+    description:
+      id: motionAtlas.duplicate-review-stack.motionBeats.2
+      message: Hold retained identities and open unresolved candidates.

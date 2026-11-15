@@ -1,0 +1,58 @@
+name:
+  id: motionAtlas.event-bus.name
+  message: Event bus
+description:
+  id: motionAtlas.event-bus.description
+  message: Producers send signals through a shared bus to subscribers.
+category:
+  id: motionAtlas.event-bus.category
+  message: Data flow
+tags:
+  - id: motionAtlas.event-bus.tags.0
+    message: events
+  - id: motionAtlas.event-bus.tags.1
+    message: pubsub
+  - id: motionAtlas.event-bus.tags.2
+    message: routing
+  - id: motionAtlas.event-bus.tags.3
+    message: fan-out
+useWhen:
+  id: motionAtlas.event-bus.useWhen
+  message: Explain a conceptual producer-and-subscriber event pattern.
+prompt:
+  id: motionAtlas.event-bus.prompt
+  message:
+    Use Motion Atlas "Event bus" (event-bus) as a conceptual graphic. Explain a
+    conceptual producer-and-subscriber event pattern. Keep the restrained motion and
+    readable labels; replace sample content with approved facts before making product
+    claims.
+creativeDirection:
+  id: motionAtlas.event-bus.creativeDirection
+  message: Producers send signals through a shared bus to subscribers.
+goodFor:
+  - id: motionAtlas.event-bus.goodFor.0
+    message: Explain a conceptual producer-and-subscriber event pattern.
+intent:
+  id: motionAtlas.event-bus.intent
+  message: Explain a conceptual producer-and-subscriber event pattern.
+domains:
+  - id: motionAtlas.event-bus.domains.0
+    message: Data flow
+aliases:
+  - id: motionAtlas.event-bus.aliases.0
+    message: events
+  - id: motionAtlas.event-bus.aliases.1
+    message: pubsub
+  - id: motionAtlas.event-bus.aliases.2
+    message: routing
+  - id: motionAtlas.event-bus.aliases.3
+    message: fan-out
+notFor:
+  - id: motionAtlas.event-bus.notFor.0
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.event-bus.distinction
+  message: Producers send signals through a shared bus to subscribers.

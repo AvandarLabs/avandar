@@ -1,0 +1,107 @@
+name:
+  id: motionAtlas.aquifer-allocation-balance.name
+  message: Budget the water below ground
+description:
+  id: motionAtlas.aquifer-allocation-balance.description
+  message:
+    A subsurface water store changes as recharge and approved withdrawals cross its
+    boundary. A planner reduces an authored request to an approved allocation while the
+    final storage and remaining request stay explicit.
+category:
+  id: motionAtlas.aquifer-allocation-balance.category
+  message: Subsurface reservoir and allocation valve
+useWhen:
+  id: motionAtlas.aquifer-allocation-balance.useWhen
+  message: Make the storage consequence of a human allocation decision visible.
+prompt:
+  id: motionAtlas.aquifer-allocation-balance.prompt
+  message:
+    Use Budget the water below ground (aquifer-allocation-balance) with complete
+    authored inputs and preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.aquifer-allocation-balance.creativeDirection
+  message:
+    Reveal a schematic aquifer at its supplied initial storage and the requested
+    withdrawal beside it. A planner sets the authored approved withdrawal; show recharge
+    entering while pumping and natural outflow leave through distinct paths. Hold the
+    derived remaining storage and any unmet portion of the request, then fade without
+    refilling the aquifer.
+intent:
+  id: motionAtlas.aquifer-allocation-balance.intent
+  message: Make the storage consequence of a human allocation decision visible.
+distinction:
+  id: motionAtlas.aquifer-allocation-balance.distinction
+  message:
+    The visible store changes because of bounded inflow and outflow, and a hollow
+    unfulfilled request is deliberately excluded from physical water. This is an
+    allocation-and-stock explanation rather than a generic flow chart.
+tags:
+  - id: motionAtlas.aquifer-allocation-balance.tags.0
+    message: groundwater
+  - id: motionAtlas.aquifer-allocation-balance.tags.1
+    message: aquifer
+  - id: motionAtlas.aquifer-allocation-balance.tags.2
+    message: water allocation
+  - id: motionAtlas.aquifer-allocation-balance.tags.3
+    message: recharge
+  - id: motionAtlas.aquifer-allocation-balance.tags.4
+    message: withdrawal
+  - id: motionAtlas.aquifer-allocation-balance.tags.5
+    message: water budget
+  - id: motionAtlas.aquifer-allocation-balance.tags.6
+    message: resource stewardship
+  - id: motionAtlas.aquifer-allocation-balance.tags.7
+    message: storage depletion
+goodFor:
+  - id: motionAtlas.aquifer-allocation-balance.goodFor.0
+    message: Explain withdrawal decisions within a water budget
+  - id: motionAtlas.aquifer-allocation-balance.goodFor.1
+    message: Show that recharge does not erase other outflows
+  - id: motionAtlas.aquifer-allocation-balance.goodFor.2
+    message: Distinguish requested water from water actually allocated
+domains:
+  - id: motionAtlas.aquifer-allocation-balance.domains.0
+    message: Subsurface reservoir and allocation valve
+aliases:
+  - id: motionAtlas.aquifer-allocation-balance.aliases.0
+    message: groundwater
+  - id: motionAtlas.aquifer-allocation-balance.aliases.1
+    message: aquifer
+  - id: motionAtlas.aquifer-allocation-balance.aliases.2
+    message: water allocation
+notFor:
+  - id: motionAtlas.aquifer-allocation-balance.notFor.0
+    message:
+      Initial storage + recharge = final storage + natural outflow + approved
+      withdrawal. Unallocated requests are quantities of demand, not water stored
+      elsewhere.
+  - id: motionAtlas.aquifer-allocation-balance.notFor.1
+    message:
+      The diagram treats only listed boundary flows and a single accounting period.
+      Water level, pressure, quality, ecological needs and lateral flow are not
+      simulated.
+  - id: motionAtlas.aquifer-allocation-balance.notFor.2
+    message:
+      Neither final storage nor a reduced request proves sustainable use, legal
+      compliance or equity. Defaults and the cutaway are fictional.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.aquifer-allocation-balance.motionBeats.0
+      message: Reveal the authored setup.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.aquifer-allocation-balance.motionBeats.1
+      message:
+        Reveal a schematic aquifer at its supplied initial storage and the requested
+        withdrawal beside it. A planner sets the authored approved withdrawal; show
+        recharge entering while pumping and natural outflow leave through distinct
+        paths. Hold the derived remaining storage and any unmet portion of the request,
+        then fade without refilling the aquifer.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.aquifer-allocation-balance.motionBeats.2
+      message: Hold the resolved authored state and complete accounting.

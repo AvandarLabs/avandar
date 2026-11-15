@@ -27,7 +27,7 @@ dif <branch> -cx     # short alias for --codex
 | --- | --- |
 | `Alt+H` | focus the difit log pane |
 | `Alt+L` | focus the LLM pane |
-| `Ctrl+P` | open the command palette (e.g. "Restart diff server") |
+| `Ctrl+P` | open the command palette (e.g. "Refresh diff") |
 | `Ctrl+Q` | quit |
 
 ## How it works

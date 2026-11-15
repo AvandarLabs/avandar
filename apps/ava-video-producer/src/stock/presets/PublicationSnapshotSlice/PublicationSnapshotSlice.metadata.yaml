@@ -1,0 +1,115 @@
+name:
+  id: motionAtlas.publication-snapshot-slice.name
+  message: Freeze the selected data for a published view
+description:
+  id: motionAtlas.publication-snapshot-slice.description
+  message:
+    An author chooses a bounded row and column slice, which is copied into a
+    revision-labeled snapshot. Later source edits change the workspace table while the
+    published snapshot stays at its explicit revision.
+category:
+  id: motionAtlas.publication-snapshot-slice.category
+  message: Publication boundaries
+useWhen:
+  id: motionAtlas.publication-snapshot-slice.useWhen
+  message: Separate live data from a bounded frozen publication.
+prompt:
+  id: motionAtlas.publication-snapshot-slice.prompt
+  message: Use Motion Atlas "Freeze the selected data for a published view"
+    (publication-snapshot-slice) as an authored conceptual explanation. Separate live
+    data from a bounded frozen publication. Supply approved content before making
+    product claims.
+creativeDirection:
+  id: motionAtlas.publication-snapshot-slice.creativeDirection
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-55 outline selected cells in the live table. Frames
+    56-95 copy them into a separate snapshot frame with a revision label. Frames 96-139
+    alter only the authored live cell, preserving the frozen publication and its
+    revision. Hold the resolved relationship at frames 140-165, then fade to the same
+    opaque ground at 166-179. Reset is editorial.
+intent:
+  id: motionAtlas.publication-snapshot-slice.intent
+  message: Separate live data from a bounded frozen publication.
+distinction:
+  id: motionAtlas.publication-snapshot-slice.distinction
+  message:
+    Disclosure-aperture selects fields for one handoff. This also freezes a
+    revision and shows a later live edit diverging from that immutable publication,
+    rather than implying a live share.
+tags:
+  - id: motionAtlas.publication-snapshot-slice.tags.0
+    message: published snapshot
+  - id: motionAtlas.publication-snapshot-slice.tags.1
+    message: data slice
+  - id: motionAtlas.publication-snapshot-slice.tags.2
+    message: revision
+  - id: motionAtlas.publication-snapshot-slice.tags.3
+    message: data minimization
+goodFor:
+  - id: motionAtlas.publication-snapshot-slice.goodFor.0
+    message: Explain immutable published snapshots of selected data
+  - id: motionAtlas.publication-snapshot-slice.goodFor.1
+    message: Show live-source edits diverging from a shared revision
+domains:
+  - id: motionAtlas.publication-snapshot-slice.domains.0
+    message: Publication boundaries
+aliases:
+  - id: motionAtlas.publication-snapshot-slice.aliases.0
+    message: published snapshot
+  - id: motionAtlas.publication-snapshot-slice.aliases.1
+    message: data slice
+  - id: motionAtlas.publication-snapshot-slice.aliases.2
+    message: revision
+notFor:
+  - id: motionAtlas.publication-snapshot-slice.notFor.0
+    message:
+      No publishing action is performed. Internal and public are authored audience
+      labels, not implemented access control.
+  - id: motionAtlas.publication-snapshot-slice.notFor.1
+    message: A frozen snapshot can become outdated; it must retain its revision.
+  - id: motionAtlas.publication-snapshot-slice.notFor.2
+    message:
+      Selected data may still be sensitive; selection alone is no anonymization
+      guarantee.
+  - id: motionAtlas.publication-snapshot-slice.notFor.3
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
+      authored explanation, not actual document extraction or product evidence.
+  - id: motionAtlas.publication-snapshot-slice.notFor.4
+    message:
+      Column and row IDs are exact unique strings with maximum length 18, no minimum.
+      Each source row cells length equals columns length. Selection rowIds/columnIds are
+      nonempty unique subsets of existing source IDs; empty references are valid when an
+      empty target ID exists. Live edit references a selected existing source cell and
+      differs exactly from its pre-edit value. Snapshot cells equal selected rows times
+      selected columns, in selection order, retaining pre-edit values and revision.
+      Audience is explicit and never inferred.
+  - id: motionAtlas.publication-snapshot-slice.notFor.5
+    message:
+      Prose meaning is an author responsibility. Runtime validation enforces
+      structural bounds, exact references and numeric/geometric rules.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.publication-snapshot-slice.motionBeats.0
+      message: Reveal the source table.
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.publication-snapshot-slice.motionBeats.1
+      message: Outline the selected source cells.
+  - startFrame: 56
+    endFrame: 95
+    description:
+      id: motionAtlas.publication-snapshot-slice.motionBeats.2
+      message: Copy selected values and headings into a separate revision-labeled snapshot.
+  - startFrame: 96
+    endFrame: 165
+    description:
+      id: motionAtlas.publication-snapshot-slice.motionBeats.3
+      message:
+        Fade the old live value and write the authored edit only in its live cell. Keep
+        published values, audience and revision frozen. The outer renderer fades at
+        166..179.

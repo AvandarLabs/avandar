@@ -1,0 +1,111 @@
+name:
+  id: motionAtlas.sealed-handoff.name
+  message: The Contents Stay Covered
+description:
+  id: motionAtlas.sealed-handoff.description
+  message:
+    An open brief folds into an opaque envelope, moves to its named recipient, and
+    opens only at the authored reveal point. The address remains visible while the
+    contents are covered.
+category:
+  id: motionAtlas.sealed-handoff.category
+  message: Concealment and reveal
+tags:
+  - id: motionAtlas.sealed-handoff.tags.0
+    message: sealed envelope
+  - id: motionAtlas.sealed-handoff.tags.1
+    message: covered contents
+  - id: motionAtlas.sealed-handoff.tags.2
+    message: confidential handoff
+  - id: motionAtlas.sealed-handoff.tags.3
+    message: recipient
+  - id: motionAtlas.sealed-handoff.tags.4
+    message: metadata
+  - id: motionAtlas.sealed-handoff.tags.5
+    message: private brief
+  - id: motionAtlas.sealed-handoff.tags.6
+    message: controlled reveal
+  - id: motionAtlas.sealed-handoff.tags.7
+    message: protected payload
+useWhen:
+  id: motionAtlas.sealed-handoff.useWhen
+  message: Show that routing a package and revealing its contents are separate actions.
+prompt:
+  id: motionAtlas.sealed-handoff.prompt
+  message: Use Motion Atlas "The Contents Stay Covered" (sealed-handoff) as an
+    illustrative conceptual graphic. Show that routing a package and revealing its
+    contents are separate actions. Bind complete authored inputs and preserve the stated
+    limits.
+creativeDirection:
+  id: motionAtlas.sealed-handoff.creativeDirection
+  message:
+    Begin with a short open brief resting over an unfolded envelope. Fold the lower
+    and side flaps over the brief, then lower the final flap so the contents are fully
+    occluded rather than faded. Move the closed envelope along one shallow hand-carried
+    arc to a recipient tray. If the configured reveal rule is recipient, peel the flap
+    open only after the envelope settles; otherwise hold it sealed. Resolve on the
+    authored final state before the seam-safe fade.
+goodFor:
+  - id: motionAtlas.sealed-handoff.goodFor.0
+    message: Distinguish visible routing information from covered contents
+  - id: motionAtlas.sealed-handoff.goodFor.1
+    message: Explain a confidential briefing metaphor
+  - id: motionAtlas.sealed-handoff.goodFor.2
+    message:
+      Introduce a restricted handoff before separately documenting the actual
+      security mechanism
+intent:
+  id: motionAtlas.sealed-handoff.intent
+  message: Show that routing a package and revealing its contents are separate actions.
+domains:
+  - id: motionAtlas.sealed-handoff.domains.0
+    message: Concealment and reveal
+aliases:
+  - id: motionAtlas.sealed-handoff.aliases.0
+    message: sealed envelope
+  - id: motionAtlas.sealed-handoff.aliases.1
+    message: covered contents
+  - id: motionAtlas.sealed-handoff.aliases.2
+    message: confidential handoff
+  - id: motionAtlas.sealed-handoff.aliases.3
+    message: recipient
+notFor:
+  - id: motionAtlas.sealed-handoff.notFor.0
+    message:
+      A sealed-envelope metaphor is not proof of encryption, identity verification,
+      authorization, secure deletion, or protection from any particular adversary.
+  - id: motionAtlas.sealed-handoff.notFor.1
+    message:
+      Exterior address and reference are deliberately visible. Do not describe the
+      depiction as hiding all metadata.
+  - id: motionAtlas.sealed-handoff.notFor.2
+    message:
+      The brief contains exactly the supplied lines and does not represent a measured
+      payload size.
+distinction:
+  id: motionAtlas.sealed-handoff.distinction
+  message:
+    This is a fold, opaque enclosure, and recipient-controlled reveal, unlike
+    packet-stream's visible abstract packets. It covers the complete payload rather than
+    the field subset selection in disclosure-aperture.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.sealed-handoff.motionBeats.0
+      message: Both reveal modes begin with the readable open brief.
+  - startFrame: 36
+    endFrame: 71
+    description:
+      id: motionAtlas.sealed-handoff.motionBeats.1
+      message: Lower, side and final flaps enclose the brief opaquely.
+  - startFrame: 72
+    endFrame: 108
+    description:
+      id: motionAtlas.sealed-handoff.motionBeats.2
+      message: The covered brief travels to the recipient tray.
+  - startFrame: 120
+    endFrame: 167
+    description:
+      id: motionAtlas.sealed-handoff.motionBeats.3
+      message: Only recipient mode opens after arrival. Remain-sealed keeps the cover closed.

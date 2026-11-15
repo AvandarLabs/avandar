@@ -1,0 +1,13 @@
+Avandar: explore a district comparison
+
+Open the query controls.
+
+Filter the records to Eastbank.
+
+Eastbank has 56 recorded cases.
+
+Write a query to compare all six districts.
+
+Run the grouped count for every district.
+
+Show the comparison as a bar chart.

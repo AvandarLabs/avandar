@@ -1,0 +1,141 @@
+name:
+  id: motionAtlas.feedback-refinement.name
+  message: Revise through feedback
+description:
+  id: motionAtlas.feedback-refinement.description
+  message:
+    A short draft travels to a reviewer and returns with an attached note. The
+    author changes the draft in response and sends the revised version back for the
+    supplied closing outcome.
+category:
+  id: motionAtlas.feedback-refinement.category
+  message: Iterative work
+useWhen:
+  id: motionAtlas.feedback-refinement.useWhen
+  message: Connect a concrete piece of feedback to an authored revision.
+prompt:
+  id: motionAtlas.feedback-refinement.prompt
+  message: Use Motion Atlas "Revise through feedback" (feedback-refinement) as a
+    conceptual graphic. Connect a concrete piece of feedback to an authored revision.
+    Replace fictional sample content with approved authored content before making
+    product claims.
+creativeDirection:
+  id: motionAtlas.feedback-refinement.creativeDirection
+  message:
+    Frames 12..32 establish an author station, a reviewer station, and one readable
+    draft between them. During 32..62, the draft crosses to the reviewer and an authored
+    feedback tab attaches to its edge. During 62..94, it returns with that tab visibly
+    tethered to the draft, and the draft text wipes into the supplied revised wording.
+    During 94..132, the revised draft crosses back along the same route; the feedback
+    tab detaches into a small review trail and the closing outcome settles beside the
+    draft. For two supplied rounds, divide frames 32..144 evenly between their paired
+    return trips. Hold the final draft through 168, then exit. The object changes
+    between trips rather than merely retrying the same operation.
+intent:
+  id: motionAtlas.feedback-refinement.intent
+  message: Connect a concrete piece of feedback to an authored revision.
+distinction:
+  id: motionAtlas.feedback-refinement.distinction
+  message:
+    Retry-backoff repeats an unchanged operation; this makes feedback alter the
+    artifact before it returns. Data cleanup transforms records according to a rule,
+    whereas this shows an authored human review exchange with its note retained.
+tags:
+  - id: motionAtlas.feedback-refinement.tags.0
+    message: feedback
+  - id: motionAtlas.feedback-refinement.tags.1
+    message: iteration
+  - id: motionAtlas.feedback-refinement.tags.2
+    message: revision
+  - id: motionAtlas.feedback-refinement.tags.3
+    message: review
+  - id: motionAtlas.feedback-refinement.tags.4
+    message: refinement
+  - id: motionAtlas.feedback-refinement.tags.5
+    message: draft
+  - id: motionAtlas.feedback-refinement.tags.6
+    message: return loop
+  - id: motionAtlas.feedback-refinement.tags.7
+    message: edit cycle
+  - id: motionAtlas.feedback-refinement.tags.8
+    message: community contribution
+  - id: motionAtlas.feedback-refinement.tags.9
+    message: maintainer review
+  - id: motionAtlas.feedback-refinement.tags.10
+    message: participatory feedback
+  - id: motionAtlas.feedback-refinement.tags.11
+    message: product research
+  - id: motionAtlas.feedback-refinement.tags.12
+    message: community review
+  - id: motionAtlas.feedback-refinement.tags.13
+    message: open development
+  - id: motionAtlas.feedback-refinement.tags.14
+    message: kind feedback
+  - id: motionAtlas.feedback-refinement.tags.15
+    message: user learning
+goodFor:
+  - id: motionAtlas.feedback-refinement.goodFor.0
+    message: Explaining a review-and-revision workflow
+  - id: motionAtlas.feedback-refinement.goodFor.1
+    message: Showing how a specific note changes a draft
+  - id: motionAtlas.feedback-refinement.goodFor.2
+    message: Introducing short feedback iterations without claiming an objective quality score
+  - id: motionAtlas.feedback-refinement.goodFor.3
+    message: Show a community contribution receiving an explicit maintainer response
+  - id: motionAtlas.feedback-refinement.goodFor.4
+    message: Connect a participant concern to an authored product or service revision
+  - id: motionAtlas.feedback-refinement.goodFor.5
+    message: Show an open design draft revised after an authored community comment
+  - id: motionAtlas.feedback-refinement.goodFor.6
+    message: Explain respectful peer feedback with a retained comment trail
+domains:
+  - id: motionAtlas.feedback-refinement.domains.0
+    message: Iterative work
+aliases:
+  - id: motionAtlas.feedback-refinement.aliases.0
+    message: feedback
+  - id: motionAtlas.feedback-refinement.aliases.1
+    message: iteration
+  - id: motionAtlas.feedback-refinement.aliases.2
+    message: revision
+  - id: motionAtlas.feedback-refinement.aliases.3
+    message: review
+notFor:
+  - id: motionAtlas.feedback-refinement.notFor.0
+    message: The default exchange and outcome are fictional.
+  - id: motionAtlas.feedback-refinement.notFor.1
+    message:
+      The renderer displays supplied revisions and does not generate, evaluate, or
+      infer improvements.
+  - id: motionAtlas.feedback-refinement.notFor.2
+    message: Short text snippets stand for the artifact; simultaneous reviewers,
+      contradictory notes, approvals with legal effect, and full document editing are
+      outside this scene.
+  - id: motionAtlas.feedback-refinement.notFor.3
+    message:
+      The depicted revision must follow the supplied note and closing outcome. A
+      contribution does not imply automatic upstream acceptance, deployment, broad
+      representativeness, or improved social outcomes.
+  - id: motionAtlas.feedback-refinement.notFor.4
+    message:
+      A submitted comment does not prove consent, adoption, representation of the
+      whole community or that every concern has been resolved. The closing label must
+      reflect the authored outcome.
+motionBeats:
+  - startFrame: 12
+    endFrame: 32
+    description:
+      id: motionAtlas.feedback-refinement.motionBeats.0
+      message: Establish the author, reviewer and current draft.
+  - startFrame: 32
+    endFrame: 144
+    description:
+      id: motionAtlas.feedback-refinement.motionBeats.1
+      message:
+        Carry feedback back with each draft and wipe into the supplied revision. Two
+        rounds divide this span equally.
+  - startFrame: 144
+    endFrame: 168
+    description:
+      id: motionAtlas.feedback-refinement.motionBeats.2
+      message: Hold the final authored revision, outcome and optional note trail.

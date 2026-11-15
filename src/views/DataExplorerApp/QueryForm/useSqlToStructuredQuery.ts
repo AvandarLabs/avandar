@@ -6,6 +6,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 /**
  * Provides a memoised `parseSql` callback that uses the current workspace's
@@ -15,7 +16,13 @@ import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStr
  * memoized callback is pure and may be used to derive render state.
  */
 export function useSqlToStructuredQuery(): {
-  parseSql: (sql: string) => SqlMappingResult;
+  parseSql: ({
+    sql,
+    previousQuery,
+  }: Readonly<{
+    sql: string;
+    previousQuery?: StructuredQuery.Partial;
+  }>) => SqlMappingResult;
   isReady: boolean;
 } {
   const workspace = useCurrentWorkspace();
@@ -29,9 +36,17 @@ export function useSqlToStructuredQuery(): {
   const isReady = datasets !== undefined && allColumns !== undefined;
 
   const parseSql = useCallback(
-    (sql: string): SqlMappingResult => {
+    ({
+      sql,
+      previousQuery,
+    }: {
+      sql: string;
+      previousQuery?: StructuredQuery.Partial;
+    }): SqlMappingResult => {
       return sqlToStructuredQuery({
         sql,
+        previousQuery,
+        sourceColumns: previousQuery?.sourceColumns,
         datasets: buildSqlMappingDatasets(datasets ?? [], allColumns ?? []),
       });
     },

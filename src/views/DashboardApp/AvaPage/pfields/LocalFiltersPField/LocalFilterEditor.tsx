@@ -8,19 +8,26 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName";
 import css from "./LocalFiltersPField.module.css";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type {
+  LegacyLocalFilter,
+  LocalFilter,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ReactNode } from "react";
 
 type Props = {
-  filter: LocalFilter;
-  onChange: (filter: LocalFilter) => void;
+  columns: readonly QueryResult.ColumnWithId[];
+  filter: LocalFilter | LegacyLocalFilter;
+  onChange: (filter: LocalFilter | LegacyLocalFilter) => void;
   onRemove: () => void;
 };
 
 /** Edits one visualization-local filter definition. */
 export function LocalFilterEditor({
   filter,
+  columns,
   onChange,
   onRemove,
 }: Readonly<Props>): ReactNode {
@@ -30,8 +37,10 @@ export function LocalFilterEditor({
     { value: "select_multi" as const, label: t`Multi-select` },
     { value: "contains" as const, label: t`Text contains` },
   ];
-  const updateFilter = (changes: Partial<LocalFilter>): void => {
-    onChange({ ...filter, ...changes } as LocalFilter);
+  const updateFilter = (
+    changes: Partial<LocalFilter | LegacyLocalFilter>,
+  ): void => {
+    onChange({ ...filter, ...changes });
   };
   return (
     <Box p="xs" className={css.localFilterEditorContainer}>
@@ -56,12 +65,32 @@ export function LocalFilterEditor({
             <IconTrash size={14} />
           </ActionIcon>
         </Group>
-        <TextInput
+        <Select
           size="xs"
-          placeholder={t`Column name (must match SQL)`}
-          value={filter.columnName}
-          onChange={(event) => {
-            updateFilter({ columnName: event.currentTarget.value });
+          label={t`Column`}
+          data={columns.map((column) => {
+            return { value: column.id, label: column.name };
+          })}
+          value={
+            "columnId" in filter
+              ? filter.columnId
+              : (getQueryColumnIdFromQueryResultColumnName({
+                  name: filter.columnName,
+                  columns: columns,
+                }) ?? null)
+          }
+          allowDeselect={false}
+          onChange={(value) => {
+            const column = columns.find((candidate) => {
+              return candidate.id === value;
+            });
+            if (column) {
+              updateFilter(
+                "columnId" in filter
+                  ? { columnId: column.id }
+                  : { columnName: column.name },
+              );
+            }
           }}
         />
         <Select

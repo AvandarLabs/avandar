@@ -25,12 +25,17 @@ export const QueryColumnModule = {
   },
 
   /**
-   * Get the derived name of a query column. If the column has an aggregation,
-   * return the derived column name. Otherwise, return the base column name.
+   * Gets the `QueryResult` column name this query column produces: its
+   * `outputAlias` when present, otherwise the aggregate name or the base
+   * column name. Use it wherever a query column must be found in a result by
+   * name, for example to read its values from result rows.
    * @param column - The query column to get the derived name of.
    * @returns The derived name of the query column.
    */
   getDerivedColumnName: (column: QueryColumn.T): string => {
+    if (column.outputAlias !== undefined) {
+      return column.outputAlias;
+    }
     const { aggregation } = column;
     if (
       aggregation === undefined ||

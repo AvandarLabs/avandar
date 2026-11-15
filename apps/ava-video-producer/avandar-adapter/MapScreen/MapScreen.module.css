@@ -1,0 +1,6 @@
+.facilityPointTarget {
+  height: 12px;
+  pointer-events: none;
+  position: absolute;
+  width: 12px;
+}

@@ -1,0 +1,101 @@
+name:
+  id: motionAtlas.ordered-lock-acquisition.name
+  message: Take shared resources in one order
+description:
+  id: motionAtlas.ordered-lock-acquisition.description
+  message:
+    Two operations request the same resource pair in opposite authored orders. Both
+    reorder their requests to one common sequence so the second waits without holding
+    the later resource.
+category:
+  id: motionAtlas.ordered-lock-acquisition.category
+  message: Resource ordering
+useWhen:
+  id: motionAtlas.ordered-lock-acquisition.useWhen
+  message: Show how one resource order removes a circular-wait pattern.
+prompt:
+  id: motionAtlas.ordered-lock-acquisition.prompt
+  message: Show how one resource order removes a circular-wait pattern.
+creativeDirection:
+  id: motionAtlas.ordered-lock-acquisition.creativeDirection
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-52 show each operation reaching for its first
+    requested key and a potential crossed dependency. Before any lock is granted, frames
+    53-90 sort both request strips identically. Frames 91-139 let the first operation
+    hold and release both keys, then admit the second. Hold the resolved meaning during
+    frames 140-165. Frames 166-179 return to the same opaque ground for a six-second
+    loop; reset is editorial.
+intent:
+  id: motionAtlas.ordered-lock-acquisition.intent
+  message: Show how one resource order removes a circular-wait pattern.
+distinction:
+  id: motionAtlas.ordered-lock-acquisition.distinction
+  message:
+    Unlike queue-relief, capacity does not increase. Unlike expiring-lease, there
+    is no timer; a global resource order prevents the illustrated circular wait.
+tags:
+  - id: motionAtlas.ordered-lock-acquisition.tags.0
+    message: deadlock avoidance
+  - id: motionAtlas.ordered-lock-acquisition.tags.1
+    message: global ordering
+  - id: motionAtlas.ordered-lock-acquisition.tags.2
+    message: exclusive locks
+  - id: motionAtlas.ordered-lock-acquisition.tags.3
+    message: coordination
+goodFor:
+  - id: motionAtlas.ordered-lock-acquisition.goodFor.0
+    message: Explain global resource ordering to avoid circular waits
+  - id: motionAtlas.ordered-lock-acquisition.goodFor.1
+    message: Illustrate two competing database operations
+domains:
+  - id: motionAtlas.ordered-lock-acquisition.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.ordered-lock-acquisition.aliases.0
+    message: ordered lock acquisition
+notFor:
+  - id: motionAtlas.ordered-lock-acquisition.notFor.0
+    message:
+      Illustrates ordered locking, not a proof of fairness, throughput or freedom
+      from every deadlock.
+  - id: motionAtlas.ordered-lock-acquisition.notFor.1
+    message: No two operations hold the same exclusive resource simultaneously.
+  - id: motionAtlas.ordered-lock-acquisition.notFor.2
+    message:
+      The initial crossed arrows depict a potential deadlock, not an already-held
+      state that can be fixed by renaming.
+  - id: motionAtlas.ordered-lock-acquisition.notFor.3
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
+      performance claim. All text is authored; no JSX, functions or URLs in props.
+  - id: motionAtlas.ordered-lock-acquisition.notFor.4
+    message:
+      Supplied prose is preserved. Fictional framing, source completeness and
+      agreement between labels and structured state are author responsibilities. Runtime
+      validation enforces structural bounds and exact cross-field rules.
+  - id: motionAtlas.ordered-lock-acquisition.notFor.5
+    message:
+      Literal IDs and row values preserve exact whitespace using visible whitespace
+      marks at a fixed readable size.
+motionBeats:
+  - startFrame: 13
+    endFrame: 52
+    description:
+      id: motionAtlas.ordered-lock-acquisition.motionBeats.0
+      message: Reach for opposite authored resource orders without granting locks.
+  - startFrame: 53
+    endFrame: 90
+    description:
+      id: motionAtlas.ordered-lock-acquisition.motionBeats.1
+      message: Sort both strips into the resource array order before acquisition.
+  - startFrame: 91
+    endFrame: 139
+    description:
+      id: motionAtlas.ordered-lock-acquisition.motionBeats.2
+      message: Give the first operation both locks, release them, then admit the second.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.ordered-lock-acquisition.motionBeats.3
+      message: Hold the resolved meaning.

@@ -1,0 +1,50 @@
+.control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.root {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.label {
+  color: var(--ink);
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  flex: 1;
+  min-width: 80px;
+}
+
+.input {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.dropdown {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.option {
+  font-size: 12px;
+}
+
+.option[data-combobox-selected] {
+  background: var(--ava-primary-0);
+  color: var(--ink);
+}
+
+.option[data-combobox-active] {
+  background: var(--ava-neutral-1);
+}

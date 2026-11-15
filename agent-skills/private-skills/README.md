@@ -45,3 +45,11 @@ warrant a new find-lane split in `avandar-code-review`, and keep the
 skill's sub-agent orchestration (find lanes and phase list) in sync. It
 also documents the Rule Pattern that keeps rules optimized for LLM
 interpretability and accuracy.
+
+### linear-pm
+
+Acts as the product manager for the Avandar workspace in Linear. Decides whether
+work is an initiative, project, milestone, or issue; triages the backlog; sets
+priorities, owners, and estimates; plans cycles; and writes project and
+initiative status updates. Requires an authenticated Linear MCP server
+connected to the Avandar workspace.

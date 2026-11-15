@@ -10,19 +10,16 @@ vi.mock("@/components/AppShell/Navbar/Navbar", () => {
   };
 });
 
-vi.mock(
-  "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator",
-  () => {
-    return {
-      OfflineChatDownloadIndicator: () => {
-        return null;
-      },
-    };
-  },
-);
+vi.mock("@/components/JobProgressPanel/JobProgressPanel", () => {
+  return {
+    JobProgressPanel: () => {
+      return null;
+    },
+  };
+});
 
 describe("AppShell", () => {
-  it("renders without a Nux.Provider when there is no current workspace", () => {
+  it("renders its children without crashing when there is no current workspace", () => {
     render(
       <AppShell navbarLinks={[]} showChatPanel={false}>
         <p>workspace-less shell</p>

@@ -1,0 +1,36 @@
+.compositionActionsLinks {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.compositionActionsDownload {
+  background: var(--ava-primary-7);
+  border: 0;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  padding: 12px 18px;
+}
+
+.compositionActionsDownload:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.compositionActionsStatus {
+  margin-top: 12px;
+  min-height: 24px;
+}
+
+:global(dialog:modal) .compositionActionsLinks {
+  font-size: 12px;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+:global(dialog:modal) .compositionActionsStatus:empty {
+  display: none;
+}

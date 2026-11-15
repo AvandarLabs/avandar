@@ -1,8 +1,8 @@
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
+import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types.ts";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types.ts";
 
-type BarLayout = BarChartVizConfig["layout"];
-type AreaLayout = AreaChartVizConfig["layout"];
+type BarLayout = AvaBarChartVizConfig["layout"];
+type AreaLayout = AvaAreaChartVizConfig["layout"];
 
 const BAR_TO_AREA_LAYOUT = {
   group: "default",

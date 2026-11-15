@@ -1,5 +1,5 @@
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { XYSeries } from "$/models/vizs/SeriesConfig";
+import type { XYSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 
 /**

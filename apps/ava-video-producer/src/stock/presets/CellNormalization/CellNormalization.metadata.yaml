@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.cell-normalization.name
+  message: Clean values in place
+description:
+  id: motionAtlas.cell-normalization.description
+  message:
+    A stable table exposes small inconsistencies, then replaces only the authored
+    changed characters. Original values remain available as a compact comparison rail.
+category:
+  id: motionAtlas.cell-normalization.category
+  message: In-place transformation
+useWhen:
+  id: motionAtlas.cell-normalization.useWhen
+  message: Make small, explicit data corrections understandable and reviewable.
+creativeDirection:
+  id: motionAtlas.cell-normalization.creativeDirection
+  message: Frames 12-40 reveal the table with before values and optional visible
+    whitespace marks. During frames 40-112, changed cells receive narrow edit brackets;
+    extra-space marks contract and changed glyphs crossfade into their supplied
+    replacements without moving the rows. A thin original-value rail unfolds alongside
+    the cleaned column. Hold both states through frame 166, then fade to the opaque
+    ground.
+intent:
+  id: motionAtlas.cell-normalization.intent
+  message: Make small, explicit data corrections understandable and reviewable.
+distinction:
+  id: motionAtlas.cell-normalization.distinction
+  message: Unlike schema-mapping, field identity never changes and no
+    source-to-destination connectors appear. The explanatory action occurs inside
+    characters of the same cells.
+prompt:
+  id: motionAtlas.cell-normalization.prompt
+  message:
+    Use Motion Atlas "Clean values in place" (cell-normalization) as a conceptual
+    graphic. Make small, explicit data corrections understandable and reviewable.
+    Replace fictional sample content with approved authored content before making
+    product claims.
+tags:
+  - id: motionAtlas.cell-normalization.tags.0
+    message: data cleaning
+  - id: motionAtlas.cell-normalization.tags.1
+    message: normalization
+  - id: motionAtlas.cell-normalization.tags.2
+    message: trim whitespace
+  - id: motionAtlas.cell-normalization.tags.3
+    message: standardize values
+  - id: motionAtlas.cell-normalization.tags.4
+    message: cleanup
+  - id: motionAtlas.cell-normalization.tags.5
+    message: before and after
+  - id: motionAtlas.cell-normalization.tags.6
+    message: cell edits
+  - id: motionAtlas.cell-normalization.tags.7
+    message: data preparation
+  - id: motionAtlas.cell-normalization.tags.8
+    message: PDF normalization
+  - id: motionAtlas.cell-normalization.tags.9
+    message: Unicode minus
+  - id: motionAtlas.cell-normalization.tags.10
+    message: parenthesized negatives
+  - id: motionAtlas.cell-normalization.tags.11
+    message: percent units
+goodFor:
+  - id: motionAtlas.cell-normalization.goodFor.0
+    message: Explain trimming and standardizing imported values
+  - id: motionAtlas.cell-normalization.goodFor.1
+    message: Show controlled cleanup with an inspectable before state
+  - id: motionAtlas.cell-normalization.goodFor.2
+    message: Distinguish data formatting changes from changing the underlying record
+  - id: motionAtlas.cell-normalization.goodFor.3
+    message: Explain Unicode-minus and thousands-separator cleanup
+  - id: motionAtlas.cell-normalization.goodFor.4
+    message: Show percent-scale preservation during import
+domains:
+  - id: motionAtlas.cell-normalization.domains.0
+    message: In-place transformation
+aliases:
+  - id: motionAtlas.cell-normalization.aliases.0
+    message: data cleaning
+  - id: motionAtlas.cell-normalization.aliases.1
+    message: normalization
+  - id: motionAtlas.cell-normalization.aliases.2
+    message: trim whitespace
+  - id: motionAtlas.cell-normalization.aliases.3
+    message: standardize values
+notFor:
+  - id: motionAtlas.cell-normalization.notFor.0
+    message: All default rows are fictional.
+  - id: motionAtlas.cell-normalization.notFor.1
+    message:
+      Before and after strings are authored examples; the animation performs no
+      inferred cleanup.
+  - id: motionAtlas.cell-normalization.notFor.2
+    message: An unchanged pair stays unchanged and receives no correction flourish.
+  - id: motionAtlas.cell-normalization.notFor.3
+    message: Replacement does not establish factual correctness or validate any record.
+  - id: motionAtlas.cell-normalization.notFor.4
+    message: Parentheses after a number may be a second measure rather than a negative sign.
+  - id: motionAtlas.cell-normalization.notFor.5
+    message:
+      Removing a percent sign must retain a percent-unit label and does not imply
+      division by 100.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.cell-normalization.motionBeats.0
+      message: Reveal original values and optional whitespace marks.
+  - startFrame: 40
+    endFrame: 112
+    description:
+      id: motionAtlas.cell-normalization.motionBeats.1
+      message:
+        Bracket changed cells and crossfade only authored replacements. Unfold the
+        original-value rail.
+  - startFrame: 112
+    endFrame: 166
+    description:
+      id: motionAtlas.cell-normalization.motionBeats.2
+      message: Hold supplied results and retained original values in aligned rows.

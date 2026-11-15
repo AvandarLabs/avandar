@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "id": "avandar-overview",
+  "title": "Avandar: from source to briefing",
+  "description": "Follow one fictional case source through import, an Eastbank filter, a six-district comparison and an unpublished dashboard preview. Actual React components share the same fixture state across three complete adapter timelines.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "The overview joins the complete import (660 frames), Explorer (800 frames), and dashboard (720 frames) adapters after a 66-frame title, totaling 2246 frames or 74.87 seconds at 30 fps. There are no inserted screenshot holds.",
+    "The case dataset identity and exact grouped results are shared between adapters. Eastbank has 56 cases; the full comparison is Eastbank 56, North Quay 51, South Gardens 40, Lakeside 39, Ridge 29 and West Marsh 25.",
+    "The story stops at an unpublished dashboard preview. It makes no live synchronization, publication, case-management handoff, GIS handoff, or general-availability claim. Case Manager and Maps are separate local-preview feature films.",
+    "The three bodies retain their own real component state transitions. Storyboard dissolves connect the movements over opaque outgoing frames. Frame offsets are explicit and captions follow the same authored timing as the focused films."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "From source to briefing",
+        "kicker": "Avandar \u00b7 fictional Harborfield response"
+      }
+    },
+    {
+      "id": "import",
+      "scene": "avandar",
+      "durationInFrames": 660,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "import",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "The same complete adapter timeline used by the focused feature film."
+    },
+    {
+      "id": "explorer",
+      "scene": "avandar",
+      "durationInFrames": 800,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "explorer",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "The same complete adapter timeline used by the focused feature film."
+    },
+    {
+      "id": "dashboards",
+      "scene": "avandar",
+      "durationInFrames": 720,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "dashboards",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "The same complete adapter timeline used by the focused feature film."
+    }
+  ],
+  "narration": [
+    {
+      "id": "import-choose-csv",
+      "shotId": "import",
+      "startFrame": 24,
+      "endFrame": 114,
+      "text": "Choose the fictional Harborfield CSV."
+    },
+    {
+      "id": "import-name-dataset",
+      "shotId": "import",
+      "startFrame": 126,
+      "endFrame": 216,
+      "text": "Give the dataset a clear name."
+    },
+    {
+      "id": "import-review-preview",
+      "shotId": "import",
+      "startFrame": 228,
+      "endFrame": 348,
+      "text": "Review 200 rows and 13 detected columns."
+    },
+    {
+      "id": "import-save-dataset",
+      "shotId": "import",
+      "startFrame": 390,
+      "endFrame": 480,
+      "text": "Save the dataset for later exploration."
+    },
+    {
+      "id": "import-saved-row-count",
+      "shotId": "import",
+      "startFrame": 510,
+      "endFrame": 630,
+      "text": "The saved source contains 240 cases."
+    },
+    {
+      "id": "explorer-open-query",
+      "shotId": "explorer",
+      "startFrame": 0,
+      "endFrame": 90,
+      "text": "Open the query controls."
+    },
+    {
+      "id": "explorer-filter-eastbank",
+      "shotId": "explorer",
+      "startFrame": 100,
+      "endFrame": 220,
+      "text": "Filter the records to Eastbank."
+    },
+    {
+      "id": "explorer-eastbank-count",
+      "shotId": "explorer",
+      "startFrame": 230,
+      "endFrame": 320,
+      "text": "Eastbank has 56 recorded cases."
+    },
+    {
+      "id": "explorer-write-query",
+      "shotId": "explorer",
+      "startFrame": 344,
+      "endFrame": 484,
+      "text": "Write a query to compare all six districts."
+    },
+    {
+      "id": "explorer-run-query",
+      "shotId": "explorer",
+      "startFrame": 510,
+      "endFrame": 630,
+      "text": "Run the grouped count for every district."
+    },
+    {
+      "id": "explorer-make-chart",
+      "shotId": "explorer",
+      "startFrame": 650,
+      "endFrame": 780,
+      "text": "Show the comparison as a bar chart."
+    },
+    {
+      "id": "dashboards-save-chart",
+      "shotId": "dashboards",
+      "startFrame": 24,
+      "endFrame": 114,
+      "text": "Save the district chart to a dashboard."
+    },
+    {
+      "id": "dashboards-name-dashboard",
+      "shotId": "dashboards",
+      "startFrame": 132,
+      "endFrame": 282,
+      "text": "Name the briefing view."
+    },
+    {
+      "id": "dashboards-review-editor",
+      "shotId": "dashboards",
+      "startFrame": 300,
+      "endFrame": 420,
+      "text": "Review the saved chart in the editor."
+    },
+    {
+      "id": "dashboards-open-preview",
+      "shotId": "dashboards",
+      "startFrame": 438,
+      "endFrame": 558,
+      "text": "Open the dashboard preview."
+    },
+    {
+      "id": "dashboards-unpublished-draft",
+      "shotId": "dashboards",
+      "startFrame": 582,
+      "endFrame": 702,
+      "text": "This draft has not been published."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

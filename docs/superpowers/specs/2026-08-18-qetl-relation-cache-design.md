@@ -1,3 +1,7 @@
+---
+updated_at: 2026-10-13
+---
+
 # QETL relation cache, authorization and column projection - design
 
 **Status:** Draft for review
@@ -802,6 +806,18 @@ function resolveNeededColumns(
 **This is the one place the spec fails open, and it is safe in that direction**:
 a superset satisfies a subset. Authorization fails closed; projection fails
 wide. Both fail toward correctness.
+
+> **Deviation in the built code (2026-10-13), needs fixing.** The implementation
+> does not follow the raw SQL rule above. `getNeededColumnsFromQuery`
+> (`src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/`) infers columns
+> from raw SQL tokens and can fail narrow, which this section forbids: an alias
+> written without `AS`, a typed literal's keyword (`TIMESTAMP '...'`), and
+> unqualified columns in a multi-dataset statement each produce a projection
+> that DuckDB rejects with a binder error on a cold cache. The fix is tracked as
+> P0.9 in `docs/production-plan-world-humanitarian-day.md` (Track 0, P0. QETL
+> Engine): restore "fail wide" by returning `"all"` whenever attribution is
+> ambiguous. The failure shapes are listed in `docs/qetl-architecture.md` under
+> known gaps.
 
 The motivating case is already structured. `getDatasetColumnAssertions.ts`
 builds `FROM "<datasetId>"` selecting the identifier column plus one column per

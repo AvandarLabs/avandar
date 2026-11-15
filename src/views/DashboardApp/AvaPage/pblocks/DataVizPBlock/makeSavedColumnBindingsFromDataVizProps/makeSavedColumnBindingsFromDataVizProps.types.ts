@@ -1,0 +1,37 @@
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
+import type {
+  GlobalFilterSubscription,
+  LegacyLocalFilter,
+  LocalFilter,
+} from "../DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
+
+type DataVizColumnNameProps = {
+  columnBindingVersion: 0;
+  vizConfig: UiVizConfig;
+  localFilters: readonly LegacyLocalFilter[];
+  globalFilterSubscription: GlobalFilterSubscription;
+};
+
+type DataVizColumnIdProps = {
+  columnBindingVersion: 1;
+  vizConfig: AvaVizConfig.T;
+  columnBindings: QueryResultColumnBindingRegistry;
+  localFilters: readonly LocalFilter[];
+  globalFilterSubscription: GlobalFilterSubscription;
+  globalFilterTargets: DashboardFilterTargets;
+};
+
+/**
+ * Saved column references of a DataViz block. `columnBindingVersion: 0` is the
+ * name-keyed form saved before column IDs, kept intact until every name binds.
+ * That variant, `LegacyLocalFilter`, `mergeUiVizConfigEdit`,
+ * `synchronizeUiVizType`, and `updateColumnNameProps` exist only to
+ * read and edit it, and can be deleted once no `dashboards.config` row holds
+ * a version 0 DataViz block.
+ */
+export type DataVizColumnBindingProps =
+  | DataVizColumnNameProps
+  | DataVizColumnIdProps;

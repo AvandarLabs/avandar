@@ -1,0 +1,334 @@
+  // ===== github: the linked PR, sync, the pending review, viewed files =====
+  // Fragment concatenated into the IIFE opened in shell.js. See that file for
+  // the module map. Not standalone-valid; parse the assembled shell.js.
+  //
+  // The header shows the branch's PR (or a yellow "No linked PR"), a Sync
+  // button that pulls from GitHub now (the poller also pulls every minute), and
+  // a Review button that opens the submit panel for the reviewer's pending
+  // review. A Sync may stash local changes to pull the PR's new commits; once
+  // it finishes the page reloads, and any merge conflicts it left open the
+  // modal in conflicts.js. Viewed files flow from difit to GitHub here: difit's writes reach
+  // this document as storage events, and each changed path is sent to
+  // `/__wrap/github/viewed` (marking a directory sends one change per file).
+  // GitHub -> difit viewed changes are applied inside difit by inject/viewed.js.
+  //
+  // Offline: the browser's `online` / `offline` events go to
+  // `/__wrap/github/connection`, so the server holds every GitHub call while
+  // the network is down and sends its queue the moment it is back. Everything
+  // the reviewer does in the meantime is saved locally and queued; the header
+  // says what is waiting.
+  var gh = null;
+  var ghSubmitting = false;
+  var ghFlash = "";
+  var ghFlashTimer = null;
+  var ghFastForwards = null;
+  var ghReviewerPulls = null; // Syncs finished as of the last poll
+  var autoShowChanges = false; // the branch was fast-forwarded: reload the diff
+  var ghPushedViewed = null;   // the viewed set last sent to GitHub
+  var ghEls = {
+    noPr: document.getElementById("ghNoPr"),
+    pr: document.getElementById("ghPr"),
+    prNum: document.getElementById("ghPrNum"),
+    sync: document.getElementById("ghSync"),
+    review: document.getElementById("ghReview"),
+    reviewLabel: document.getElementById("ghReviewLabel"),
+    reviewCount: document.getElementById("ghReviewCount"),
+    notice: document.getElementById("ghNotice"),
+    pop: document.getElementById("ghPop"),
+    popSub: document.getElementById("ghPopSub"),
+    popBody: document.getElementById("ghPopBody"),
+    popEvents: document.getElementById("ghPopEvents"),
+    popError: document.getElementById("ghPopError"),
+    popCancel: document.getElementById("ghPopCancel"),
+    popSubmit: document.getElementById("ghPopSubmit"),
+  };
+
+  function plural(numItems, word) { return numItems + " " + word + (numItems === 1 ? "" : "s"); }
+
+  function isOffline(state) {
+    return !!(state && state.connection && !state.connection.online);
+  }
+
+  // What is waiting for GitHub, e.g. "2 PR comments, your review".
+  function queuedSummary(queued) {
+    if (!queued) return "";
+    var parts = [];
+    if (queued.comments) parts.push(plural(queued.comments, "PR comment"));
+    if (queued.removals) parts.push(plural(queued.removals, "PR comment removal"));
+    if (queued.viewed) parts.push(plural(queued.viewed, "viewed-file change"));
+    if (queued.submit) parts.push("your review");
+    return parts.join(", ");
+  }
+
+  function offlineNotice(state) {
+    if (!isOffline(state)) return "";
+    var what = state.connection.browserOffline ? "Offline." : "Can't reach GitHub.";
+    var queued = queuedSummary(state.queued);
+    return queued
+      ? what + " Queued: " + queued + ". All of it sends when you're back online."
+      : what + " PR comments and viewed files you change now send when you're back online.";
+  }
+
+  function showNotice(notice, isOk, tip) {
+    ghEls.notice.hidden = !notice;
+    ghEls.notice.textContent = notice;
+    ghEls.notice.setAttribute("data-tip", tip || notice);
+    ghEls.notice.classList.toggle("ok", isOk);
+  }
+
+  function ghSyncTitle(sync) {
+    var what = "Sync with GitHub now: pull new PR comments and commits. Your uncommitted changes are stashed and put back, then the page reloads.\n"
+      + "dif also syncs every minute, without touching your changes.";
+    if (sync.error) return what + "\nThe last sync failed: " + sync.error;
+    if (sync.secondsSincePull == null) return what;
+    return what + "\nLast synced " + sync.secondsSincePull + "s ago.";
+  }
+
+  function renderGithub() {
+    var state = gh;
+    var available = !!(state && state.available && state.pr);
+    var offline = offlineNotice(state);
+    var offlineTip = offline && state.connection.error ? offline + "\nGitHub: " + state.connection.error : offline;
+    ghEls.noPr.hidden = !(state && state.lookedUp && !available);
+    setTip(ghEls.noPr, "No open GitHub PR for this branch" + (state && state.reason ? ": " + state.reason : "") + ".\n"
+      + "Comments go only to the TUI until a PR exists. dif checks again every minute.");
+    ghEls.pr.hidden = !available;
+    ghEls.sync.hidden = !available;
+    if (!available) {
+      ghEls.review.hidden = true;
+      showNotice(offline, false, offlineTip);
+      return;
+    }
+    var pr = state.pr;
+    ghEls.pr.href = pr.url;
+    ghEls.prNum.textContent = "#" + pr.number;
+    setTip(ghEls.pr, "Open PR #" + pr.number + " on GitHub, by " + pr.author + ".\n"
+      + (state.viewed.active ? "Viewed files sync both ways with GitHub." : (state.viewed.reason || "Viewed files are not syncing.")));
+    ghEls.sync.classList.toggle("busy", !!state.sync.pulling && !offline);
+    setTip(ghEls.sync, ghSyncTitle(state.sync));
+    var drafts = state.drafts || 0;
+    ghEls.review.hidden = !(drafts || state.failed || !pr.isOwn);
+    ghEls.reviewLabel.textContent = pr.isOwn ? "Submit comments" : "Review";
+    ghEls.reviewCount.hidden = !drafts;
+    ghEls.reviewCount.textContent = String(drafts);
+    setTip(ghEls.review, drafts
+      ? plural(drafts, "draft PR comment") + " waiting to be published. Open the panel to submit your review."
+      : (pr.isOwn ? "Publish your draft comments on your PR" : "Submit a review: comment, approve, or request changes"));
+    if (!ghFlash && offline) {
+      showNotice(offline, false, offlineTip);
+      return;
+    }
+    var notice = ghFlash || state.sync.notice || (state.sync.error ? "GitHub sync failed: " + state.sync.error : "");
+    showNotice(notice, !!ghFlash);
+  }
+
+  function flashGithub(message) {
+    ghFlash = message;
+    window.clearTimeout(ghFlashTimer);
+    ghFlashTimer = window.setTimeout(function () { ghFlash = ""; renderGithub(); }, 5000);
+    renderGithub();
+  }
+
+  // Each tab reports a submit's outcome once, including one that finished
+  // before the page loaded (a review queued offline, sent after a relaunch).
+  var SUBMIT_SEEN_KEY = "dif-gh-submit-seen";
+  function submitOutcomeId(state) {
+    return state.sessionId + ":" + state.lastSubmit.ok + ":" + state.lastSubmit.message;
+  }
+  function wasSubmitReported(id) {
+    try { return window.sessionStorage.getItem(SUBMIT_SEEN_KEY) === id; } catch (e) { return false; }
+  }
+  function markSubmitReported(id) {
+    try { window.sessionStorage.setItem(SUBMIT_SEEN_KEY, id); } catch (e) { /* ignore */ }
+  }
+
+  function applySubmit(state, isFirstState) {
+    if (state.submitting && !ghSubmitting) {
+      // Queued before this page loaded (another tab, or before a relaunch):
+      // still report how it ends.
+      ghSubmitting = true;
+      setSubmitBusy(true);
+    }
+    if (ghSubmitting && state.submitting && isOffline(state) && !ghEls.pop.hidden) {
+      closeReviewPop(); // queued: the header says the review sends once back online
+    }
+    var isEarlier = isFirstState && !state.submitting && !!state.lastSubmit;
+    if (!(ghSubmitting && !state.submitting && state.lastSubmit) && !isEarlier) return;
+    ghSubmitting = false;
+    setSubmitBusy(false);
+    var id = submitOutcomeId(state);
+    if (isEarlier && wasSubmitReported(id)) return;
+    markSubmitReported(id);
+    if (state.lastSubmit.ok) {
+      closeReviewPop();
+      ghEls.popBody.value = "";
+      flashGithub(state.lastSubmit.message);
+    } else {
+      if (ghEls.pop.hidden) openReviewPop(); // closed while the review was queued
+      showPopError(state.lastSubmit.message);
+    }
+  }
+
+  function applyGithub(state) {
+    if (!state || typeof state !== "object") return;
+    var isFirstState = gh === null;
+    gh = state;
+    var reviewerPulls = state.sync ? state.sync.reviewerPulls : null;
+    if (ghReviewerPulls !== null && reviewerPulls > ghReviewerPulls && !state.sync.error) {
+      reloadShell(); // a Sync finished: show the pulled code and comments fresh
+      return;
+    }
+    ghReviewerPulls = reviewerPulls;
+    applySubmit(state, isFirstState);
+    if (ghFastForwards !== null && state.fastForwards > ghFastForwards) {
+      autoShowChanges = true; // the next /api/diff check reloads difit in place
+      fetchDiff();
+      flashGithub("Pulled the PR's new commits.");
+    }
+    ghFastForwards = state.fastForwards;
+    renderGithub();
+    renderConflicts(state.conflicts);
+    if (!ghEls.pop.hidden) renderReviewPop();
+  }
+
+  function fetchGithub() {
+    fetch("/__wrap/github.json", { cache: "no-store" })
+      .then(function (response) {
+        return response.ok ? response.json() : Promise.reject(new Error("github " + response.status));
+      })
+      .then(applyGithub)
+      .catch(function () { /* keep the last known state */ });
+  }
+
+  // Called from data.js once a fresh /api/diff shows the fast-forwarded code.
+  function maybeAutoShowChanges() {
+    if (autoShowChanges && changesAvailable) {
+      autoShowChanges = false;
+      showNewChanges();
+    }
+  }
+
+  // ---- the network: the server holds GitHub calls while it is down ----
+  function reportConnection() {
+    fetch("/__wrap/github/connection", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ online: navigator.onLine }),
+    }).then(fetchGithub, function () { /* the shell is down; the next network event reports again */ });
+  }
+  window.addEventListener("online", reportConnection);
+  window.addEventListener("offline", reportConnection);
+
+  ghEls.sync.addEventListener("click", function () {
+    ghEls.sync.classList.add("busy");
+    fetch("/__wrap/github/pull", { method: "POST" }).then(fetchGithub, fetchGithub);
+  });
+
+  // ---- the review panel ----
+  function showPopError(message) {
+    ghEls.popError.hidden = !message;
+    ghEls.popError.textContent = message || "";
+  }
+  function setSubmitBusy(busy) {
+    ghEls.popSubmit.disabled = busy;
+    ghEls.popSubmit.textContent = busy ? "Submitting…" : (gh && gh.pr && gh.pr.isOwn ? "Submit comments" : "Submit review");
+  }
+  function renderReviewPop() {
+    if (!gh || !gh.pr) return;
+    var isOwnPr = gh.pr.isOwn;
+    var drafts = gh.drafts || 0;
+    var subtitle = drafts ? plural(drafts, "draft comment") + " will be published." : "No draft comments.";
+    if (isOwnPr) subtitle += " This is your PR, so GitHub only lets you comment.";
+    ghEls.popSub.textContent = subtitle;
+    ghEls.popEvents.hidden = isOwnPr;
+    if (!ghSubmitting) setSubmitBusy(false);
+    if (gh.failed && !ghSubmitting) {
+      showPopError(plural(gh.failed, "PR comment") + " failed to post. Fix or delete them first.");
+    }
+  }
+  function positionReviewPop() {
+    var rect = ghEls.review.getBoundingClientRect();
+    var width = Math.min(360, window.innerWidth - 32);
+    ghEls.pop.style.width = width + "px";
+    ghEls.pop.style.top = rect.bottom + 6 + "px";
+    ghEls.pop.style.left = Math.max(16, Math.min(rect.left, window.innerWidth - width - 16)) + "px";
+  }
+  function openReviewPop() {
+    showPopError("");
+    renderReviewPop();
+    positionReviewPop();
+    ghEls.pop.hidden = false;
+    ghEls.review.setAttribute("aria-expanded", "true");
+    ghEls.popBody.focus();
+  }
+  function closeReviewPop() {
+    // Focus inside the panel would be stranded on a hidden element, so hand it
+    // back to the button that opened the panel.
+    var hadFocus = ghEls.pop.contains(document.activeElement);
+    ghEls.pop.hidden = true;
+    ghEls.review.setAttribute("aria-expanded", "false");
+    if (hadFocus) ghEls.review.focus();
+  }
+  function submitReview() {
+    if (ghSubmitting || !gh || !gh.pr) return;
+    var checked = ghEls.popEvents.querySelector("input[name=ghEvent]:checked");
+    var event = gh.pr.isOwn ? "COMMENT" : (checked ? checked.value : "COMMENT");
+    showPopError("");
+    ghSubmitting = true;
+    setSubmitBusy(true);
+    fetch("/__wrap/github/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: event, body: ghEls.popBody.value }),
+    }).then(function (response) {
+      if (!response.ok) throw new Error("GitHub would not take that review (" + response.status + ").");
+      fetchGithub();
+    }).catch(function (err) {
+      ghSubmitting = false;
+      setSubmitBusy(false);
+      showPopError(err.message);
+    });
+  }
+  ghEls.review.addEventListener("click", function () {
+    if (ghEls.pop.hidden) openReviewPop(); else closeReviewPop();
+  });
+  ghEls.popCancel.addEventListener("click", closeReviewPop);
+  ghEls.popSubmit.addEventListener("click", submitReview);
+  ghEls.popBody.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) { event.preventDefault(); submitReview(); }
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !ghEls.pop.hidden) closeReviewPop();
+  });
+  document.addEventListener("mousedown", function (event) {
+    if (ghEls.pop.hidden || ghEls.pop.contains(event.target) || ghEls.review.contains(event.target)) return;
+    closeReviewPop();
+  });
+  window.addEventListener("resize", function () { if (!ghEls.pop.hidden) positionReviewPop(); });
+
+  // ---- viewed files: difit -> GitHub ----
+  function snapshotViewed() { return Object.assign({}, liveViewed); }
+  function initViewedSync() { ghPushedViewed = snapshotViewed(); }
+  // Send unless the server knows viewed files cannot sync: no PR, or difit not
+  // showing the PR's own diff. Before its first pull (say, launched offline) it
+  // cannot know, so it queues the change and drops it if sync turns out blocked.
+  function viewedMaySync() {
+    if (!gh) return true;
+    if (gh.lookedUp && !gh.available) return false;
+    return !(gh.viewed && gh.viewed.reason);
+  }
+  function pushViewedChanges() {
+    var now = snapshotViewed();
+    var before = ghPushedViewed || {};
+    ghPushedViewed = now;
+    var changes = [];
+    Object.keys(Object.assign({}, before, now)).forEach(function (path) {
+      if (!!before[path] !== !!now[path]) changes.push({ path: path, viewed: !!now[path] });
+    });
+    if (!changes.length || !viewedMaySync()) return;
+    fetch("/__wrap/github/viewed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ changes: changes }),
+    }).catch(function () { /* the shell is down: nothing reaches GitHub until it is back */ });
+  }

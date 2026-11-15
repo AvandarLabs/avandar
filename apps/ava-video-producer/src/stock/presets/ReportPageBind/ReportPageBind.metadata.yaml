@@ -1,0 +1,123 @@
+name:
+  id: motionAtlas.report-page-bind.name
+  message: Bind a shareable report
+description:
+  id: motionAtlas.report-page-bind.description
+  message:
+    Analysis excerpts flow into a paginated document, then gather into a compact
+    report at a named handoff destination. The source order stays visible through the
+    transformation.
+category:
+  id: motionAtlas.report-page-bind.category
+  message: Document transformation
+useWhen:
+  id: motionAtlas.report-page-bind.useWhen
+  message: Show information becoming a self-contained document someone else can use.
+creativeDirection:
+  id: motionAtlas.report-page-bind.creativeDirection
+  message:
+    Frames 12-38 present two or three source excerpts on a work surface. Between
+    frames 38-104, paper margins extend around the excerpts, each excerpt takes its own
+    page, and a title strip becomes the first page header. The pages slide into an
+    offset bound stack beside a destination tray during frames 104-136. Hold the report
+    and destination label through frame 166, then exit to the shared ground.
+intent:
+  id: motionAtlas.report-page-bind.intent
+  message: Show information becoming a self-contained document someone else can use.
+distinction:
+  id: motionAtlas.report-page-bind.distinction
+  message:
+    Unlike scan-lines, this constructs and paginates a document rather than
+    examining one. Unlike source-merge, source excerpts retain their page identity and
+    become a portable editorial artifact.
+prompt:
+  id: motionAtlas.report-page-bind.prompt
+  message:
+    Use Motion Atlas "Bind a shareable report" (report-page-bind) as a conceptual
+    graphic. Show information becoming a self-contained document someone else can use.
+    Replace fictional sample content with approved authored content before making
+    product claims.
+tags:
+  - id: motionAtlas.report-page-bind.tags.0
+    message: report
+  - id: motionAtlas.report-page-bind.tags.1
+    message: PDF
+  - id: motionAtlas.report-page-bind.tags.2
+    message: export
+  - id: motionAtlas.report-page-bind.tags.3
+    message: document
+  - id: motionAtlas.report-page-bind.tags.4
+    message: publish summary
+  - id: motionAtlas.report-page-bind.tags.5
+    message: pagination
+  - id: motionAtlas.report-page-bind.tags.6
+    message: share findings
+  - id: motionAtlas.report-page-bind.tags.7
+    message: handoff
+  - id: motionAtlas.report-page-bind.tags.8
+    message: map export
+  - id: motionAtlas.report-page-bind.tags.9
+    message: legend
+  - id: motionAtlas.report-page-bind.tags.10
+    message: attribution
+  - id: motionAtlas.report-page-bind.tags.11
+    message: disclaimer
+goodFor:
+  - id: motionAtlas.report-page-bind.goodFor.0
+    message: Explain turning analysis into a PDF handout
+  - id: motionAtlas.report-page-bind.goodFor.1
+    message: Introduce an editorial report assembly workflow
+  - id: motionAtlas.report-page-bind.goodFor.2
+    message: Show a portable summary prepared for a team
+  - id: motionAtlas.report-page-bind.goodFor.3
+    message: Explain binding map evidence into a situation report
+  - id: motionAtlas.report-page-bind.goodFor.4
+    message: Show a legend and source note traveling with a map
+domains:
+  - id: motionAtlas.report-page-bind.domains.0
+    message: Document transformation
+aliases:
+  - id: motionAtlas.report-page-bind.aliases.0
+    message: report
+  - id: motionAtlas.report-page-bind.aliases.1
+    message: PDF
+  - id: motionAtlas.report-page-bind.aliases.2
+    message: export
+  - id: motionAtlas.report-page-bind.aliases.3
+    message: document
+notFor:
+  - id: motionAtlas.report-page-bind.notFor.0
+    message: All default content is fictional.
+  - id: motionAtlas.report-page-bind.notFor.1
+    message: One section equals one page; this is an authored diagram, not a text-layout engine.
+  - id: motionAtlas.report-page-bind.notFor.2
+    message:
+      Arrival at the destination tray means prepared for handoff, not transmitted or
+      read.
+  - id: motionAtlas.report-page-bind.notFor.3
+    message: No actual PDF generation, network sharing, or product capability is demonstrated.
+  - id: motionAtlas.report-page-bind.notFor.4
+    message:
+      An exported map needs its units, classification legend, source and limitation
+      note; a decorative map image alone is incomplete.
+motionBeats:
+  - startFrame: 12
+    endFrame: 38
+    description:
+      id: motionAtlas.report-page-bind.motionBeats.0
+      message: Establish ordered source excerpts on the work surface.
+  - startFrame: 38
+    endFrame: 104
+    description:
+      id: motionAtlas.report-page-bind.motionBeats.1
+      message: Extend paper margins and retain each section on its own page.
+  - startFrame: 104
+    endFrame: 136
+    description:
+      id: motionAtlas.report-page-bind.motionBeats.2
+      message: Bind the pages in their supplied order beside the destination tray.
+  - startFrame: 136
+    endFrame: 166
+    description:
+      id: motionAtlas.report-page-bind.motionBeats.3
+      message: Hold every report page and the authored destination.

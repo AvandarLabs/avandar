@@ -6,7 +6,7 @@ import { useCallback, useMemo } from "react";
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
@@ -14,25 +14,28 @@ import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAware
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
 import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
-import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig";
-import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { AvaAreaChartVizConfig } from "$/models/vizs/AvaAreaChartVizConfig/AvaAreaChartVizConfig.types";
+import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
+import type { AvaLineChartVizConfig } from "$/models/vizs/AvaLineChartVizConfig/AvaLineChartVizConfig.types";
+import type { AvaRadarChartVizConfig } from "$/models/vizs/AvaRadarChartVizConfig/AvaRadarChartVizConfig.types";
+import type { AvaRadarSeries, AvaXYSeries } from "$/models/vizs/series.types";
+import type { VizSettingGroup } from "$/models/vizs/VizSettingDescriptors.types";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
 
-type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
-type RadarHostConfig = RadarChartVizConfig;
+type XYHostConfig =
+  | AvaBarChartVizConfig
+  | AvaLineChartVizConfig
+  | AvaAreaChartVizConfig;
+type RadarHostConfig = AvaRadarChartVizConfig;
 export type HostConfig = XYHostConfig | RadarHostConfig;
 
 type Props<TConfig extends HostConfig> = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.ColumnWithId[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
 
@@ -65,7 +68,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
 }: Props<TConfig>): ReactNode {
   const { t } = useLingui();
   const isRadar = config.vizType === "radar";
-  const chartDescriptors = VizConfigs.getDescriptors(config.vizType).chart;
+  const chartDescriptors = AvaVizConfigs.getDescriptors(config.vizType).chart;
 
   const numericFields = useMemo(() => {
     return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
@@ -91,7 +94,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   );
 
   const updateSeriesAt = useCallback(
-    (idx: number, nextSeries: XYSeries | RadarSeries) => {
+    (idx: number, nextSeries: AvaXYSeries | AvaRadarSeries) => {
       const series = [...config.series];
       series[idx] = nextSeries as never;
       onConfigChange({ ...config, series } as TConfig);
@@ -117,24 +120,24 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       }),
     );
     const nextNumeric = numericFields.find((c) => {
-      return !usedKeys.has(c.name);
+      return !usedKeys.has(c.id);
     });
     if (nextNumeric === undefined) {
       return;
     }
     if (isRadar) {
       const radarConfig = config as RadarHostConfig;
-      const nextSeries: RadarSeries = { key: nextNumeric.name };
+      const nextSeries: AvaRadarSeries = { key: nextNumeric.id };
       onConfigChange({
         ...radarConfig,
         series: [...radarConfig.series, nextSeries],
       } as TConfig);
     } else {
       const xyConfig = config as XYHostConfig;
-      const nextSeries: XYSeries = {
+      const nextSeries: AvaXYSeries = {
         renderAs: xyConfig.vizType,
-        key: nextNumeric.name,
-      } as XYSeries;
+        key: nextNumeric.id,
+      } as AvaXYSeries;
       onConfigChange({
         ...xyConfig,
         series: [...xyConfig.series, nextSeries],

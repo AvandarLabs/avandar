@@ -1,0 +1,473 @@
+{
+  "version": 1,
+  "id": "ontology-motion",
+  "title": "One grammar, many missions",
+  "description": "Entities, descriptors and relationships carry through mapping and schema change.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1533,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "One grammar, many missions",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#82c8f2",
+        "beats": [
+          {
+            "id": "grammar",
+            "title": "Different missions. Shared building blocks.",
+            "subtitle": "A generalizable model begins with a small grammar.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "What are the things?",
+                "What describes and connects them?"
+              ],
+              "emphasis": "Entities. Descriptors. Relationships."
+            },
+            "duration": 327,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "model",
+            "title": "Give the structure a name.",
+            "subtitle": "A fictional health example makes the grammar concrete.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "network-graph",
+                "schemaVersion": 1,
+                "input": {
+                  "nodes": [
+                    {
+                      "x": 480,
+                      "y": 288,
+                      "label": "Case",
+                      "detail": "ENTITY"
+                    },
+                    {
+                      "x": 235,
+                      "y": 190,
+                      "label": "Identifier"
+                    },
+                    {
+                      "x": 250,
+                      "y": 410,
+                      "label": "District"
+                    },
+                    {
+                      "x": 480,
+                      "y": 118,
+                      "label": "Descriptor"
+                    },
+                    {
+                      "x": 730,
+                      "y": 190,
+                      "label": "Visit"
+                    },
+                    {
+                      "x": 715,
+                      "y": 410,
+                      "label": "Facility"
+                    },
+                    {
+                      "x": 480,
+                      "y": 464,
+                      "label": "Relationship"
+                    }
+                  ],
+                  "edges": [
+                    [1, 0],
+                    [2, 0],
+                    [3, 0],
+                    [0, 4],
+                    [0, 5],
+                    [0, 6],
+                    [1, 3],
+                    [3, 4],
+                    [2, 6],
+                    [6, 5]
+                  ],
+                  "showPackets": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.1,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 650,
+                  "y": 370,
+                  "zoom": 2.1,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 650,
+                  "y": 370,
+                  "zoom": 2.1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "aperture",
+              "frames": 24,
+              "origin": {
+                "x": 800,
+                "y": 480
+              }
+            }
+          },
+          {
+            "id": "mapping",
+            "title": "Map the source into that vocabulary.",
+            "subtitle": "Correspondence connects existing fields to shared meanings.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "schema-mapping",
+                "schemaVersion": 1,
+                "input": {
+                  "mappings": [
+                    {
+                      "source": "case_id",
+                      "target": "Identifier",
+                      "type": "string"
+                    },
+                    {
+                      "source": "district_name",
+                      "target": "District",
+                      "type": "string"
+                    },
+                    {
+                      "source": "onset_date",
+                      "target": "Onset",
+                      "type": "date"
+                    }
+                  ],
+                  "sourceLabel": "Source columns",
+                  "targetLabel": "Case attributes",
+                  "showChecks": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 290,
+                  "y": 315,
+                  "zoom": 1.7,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 290,
+                  "y": 315,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 660,
+                  "y": 315,
+                  "zoom": 1.7,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 660,
+                  "y": 315,
+                  "zoom": 1.7,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            }
+          },
+          {
+            "id": "evolution",
+            "title": "Let the model grow without rewriting the past.",
+            "subtitle": "A new field does not invent historical answers.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "schema-column-evolution",
+                "schemaVersion": 1,
+                "input": {
+                  "earlierRecords": [
+                    {
+                      "id": "r-a",
+                      "label": "Demo record A",
+                      "recordedValue": "North"
+                    },
+                    {
+                      "id": "r-b",
+                      "label": "Demo record B",
+                      "recordedValue": "South"
+                    }
+                  ],
+                  "fields": {
+                    "existingLabel": "Site",
+                    "addedLabel": "Visit mode",
+                    "missingLabel": "Not collected"
+                  },
+                  "laterRecord": {
+                    "id": "r-c",
+                    "label": "Demo record C",
+                    "recordedValue": "East",
+                    "addedValue": "In person"
+                  },
+                  "phaseLabels": {
+                    "before": "Earlier collection",
+                    "expanded": "One question added",
+                    "later": "Later record arrives"
+                  },
+                  "showVersionLabels": true,
+                  "evidenceLabel": "Fictional records; no historical backfill"
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 660,
+                  "y": 230,
+                  "zoom": 2,
+                  "ease": "push"
+                },
+                {
+                  "at": 163,
+                  "x": 660,
+                  "y": 230,
+                  "zoom": 2,
+                  "ease": "glide"
+                },
+                {
+                  "at": 177,
+                  "x": 620,
+                  "y": 355,
+                  "zoom": 1.75,
+                  "ease": "whip"
+                },
+                {
+                  "at": 288,
+                  "x": 620,
+                  "y": 355,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 316,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 330,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          },
+          {
+            "id": "reuse",
+            "title": "Reuse the grammar across domains.",
+            "subtitle": "Health, education and humanitarian work have different models.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Change the domain vocabulary.",
+                "Retain the modeling foundation."
+              ],
+              "emphasis": "Generalizable structure, explicit meaning."
+            },
+            "duration": 302,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "grammar-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 157,
+      "text": "Every mission has things it tracks, facts about them and links.",
+      "beatId": "grammar"
+    },
+    {
+      "id": "grammar-1",
+      "shotId": "explanation",
+      "startFrame": 162,
+      "endFrame": 282,
+      "text": "A shared modeling grammar can express those differences.",
+      "beatId": "grammar"
+    },
+    {
+      "id": "model-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "A case has an identifier and descriptive fields.",
+      "beatId": "model"
+    },
+    {
+      "id": "model-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "Visits and facilities give it relationships and context.",
+      "beatId": "model"
+    },
+    {
+      "id": "mapping-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Source columns can map to that shared vocabulary.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "mapping-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "The mapping makes the correspondence explicit.",
+      "beatId": "mapping"
+    },
+    {
+      "id": "evolution-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 164,
+      "text": "As the model changes, new fields can be introduced.",
+      "beatId": "evolution"
+    },
+    {
+      "id": "evolution-1",
+      "shotId": "explanation",
+      "startFrame": 169,
+      "endFrame": 291,
+      "text": "Earlier records retain what was and was not collected.",
+      "beatId": "evolution"
+    },
+    {
+      "id": "reuse-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "The same foundation can support a different domain model.",
+      "beatId": "reuse"
+    },
+    {
+      "id": "reuse-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 281,
+      "text": "Customizability comes from configuration of that structure.",
+      "beatId": "reuse"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

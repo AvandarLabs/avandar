@@ -1,0 +1,132 @@
+name:
+  id: motionAtlas.provenance-peelback.name
+  message: Reveal the source behind a claim
+description:
+  id: motionAtlas.provenance-peelback.description
+  message:
+    A summary statement lifts like a transparent sheet to expose the source
+    excerpts beneath it. One cited passage is aligned with the statement so its origin
+    can be inspected without a network diagram.
+category:
+  id: motionAtlas.provenance-peelback.category
+  message: Layered evidence
+useWhen:
+  id: motionAtlas.provenance-peelback.useWhen
+  message: Connect a summary to an inspectable source passage.
+creativeDirection:
+  id: motionAtlas.provenance-peelback.creativeDirection
+  message:
+    Frames 12-40 hold a summary strip resting over a short stack of source sheets.
+    During frames 40-104, the summary lifts in place and the source sheets fan out with
+    their text kept upright. The selected source rises, its excerpt receives a narrow
+    underline, and a citation tab aligns with the summary edge. Hold the statement and
+    source passage side by side through frame 166, then return to the opaque ground.
+intent:
+  id: motionAtlas.provenance-peelback.intent
+  message: Connect a summary to an inspectable source passage.
+distinction:
+  id: motionAtlas.provenance-peelback.distinction
+  message:
+    Unlike node-traversal or network-graph, lineage is conveyed by physical layers,
+    citation alignment, and readable excerpts. Unlike scan-lines, the focal action is
+    exposing an already identified source.
+prompt:
+  id: motionAtlas.provenance-peelback.prompt
+  message:
+    Use Motion Atlas "Reveal the source behind a claim" (provenance-peelback) as a
+    conceptual graphic. Connect a summary to an inspectable source passage. Replace
+    fictional sample content with approved authored content before making product
+    claims.
+tags:
+  - id: motionAtlas.provenance-peelback.tags.0
+    message: provenance
+  - id: motionAtlas.provenance-peelback.tags.1
+    message: lineage
+  - id: motionAtlas.provenance-peelback.tags.2
+    message: source citation
+  - id: motionAtlas.provenance-peelback.tags.3
+    message: traceability
+  - id: motionAtlas.provenance-peelback.tags.4
+    message: evidence
+  - id: motionAtlas.provenance-peelback.tags.5
+    message: original passage
+  - id: motionAtlas.provenance-peelback.tags.6
+    message: audit trail
+  - id: motionAtlas.provenance-peelback.tags.7
+    message: show source
+  - id: motionAtlas.provenance-peelback.tags.8
+    message: decision rationale
+  - id: motionAtlas.provenance-peelback.tags.9
+    message: transparency
+  - id: motionAtlas.provenance-peelback.tags.10
+    message: documented choice
+  - id: motionAtlas.provenance-peelback.tags.11
+    message: cell provenance
+  - id: motionAtlas.provenance-peelback.tags.12
+    message: PDF region
+  - id: motionAtlas.provenance-peelback.tags.13
+    message: extraction review
+goodFor:
+  - id: motionAtlas.provenance-peelback.goodFor.0
+    message: Explain provenance of a reported statement
+  - id: motionAtlas.provenance-peelback.goodFor.1
+    message: Introduce traceable source citations
+  - id: motionAtlas.provenance-peelback.goodFor.2
+    message: Show why a summary should retain its supporting excerpt
+  - id: motionAtlas.provenance-peelback.goodFor.3
+    message: Show the decision record behind a design choice
+  - id: motionAtlas.provenance-peelback.goodFor.4
+    message: Explain page-and-region provenance for extracted figures
+  - id: motionAtlas.provenance-peelback.goodFor.5
+    message: Inspect a source excerpt before accepting a report value
+domains:
+  - id: motionAtlas.provenance-peelback.domains.0
+    message: Layered evidence
+aliases:
+  - id: motionAtlas.provenance-peelback.aliases.0
+    message: provenance
+  - id: motionAtlas.provenance-peelback.aliases.1
+    message: lineage
+  - id: motionAtlas.provenance-peelback.aliases.2
+    message: source citation
+  - id: motionAtlas.provenance-peelback.aliases.3
+    message: traceability
+notFor:
+  - id: motionAtlas.provenance-peelback.notFor.0
+    message: All default documents and statements are fictional.
+  - id: motionAtlas.provenance-peelback.notFor.1
+    message:
+      A citation indicates supplied attribution, not independent verification or
+      factual truth.
+  - id: motionAtlas.provenance-peelback.notFor.2
+    message: One focal source is inspected per cycle; the remaining sheets supply context.
+  - id: motionAtlas.provenance-peelback.notFor.3
+    message:
+      Source locators are literal labels, not live document links or page lookup
+      instructions.
+  - id: motionAtlas.provenance-peelback.notFor.4
+    message:
+      An exposed decision record makes reasoning inspectable. It does not prove that
+      the decision was correct or publicly accepted.
+  - id: motionAtlas.provenance-peelback.notFor.5
+    message:
+      A source locator documents attribution, not proof that extraction or
+      interpretation is correct.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.provenance-peelback.motionBeats.0
+      message: Hold the summary over its source sheets.
+  - startFrame: 40
+    endFrame: 104
+    description:
+      id: motionAtlas.provenance-peelback.motionBeats.1
+      message:
+        Lift the summary, open the source sheets and align the selected passage with
+        its citation tab.
+  - startFrame: 104
+    endFrame: 166
+    description:
+      id: motionAtlas.provenance-peelback.motionBeats.2
+      message: Hold the statement beside its exact selected excerpt and optional locator.

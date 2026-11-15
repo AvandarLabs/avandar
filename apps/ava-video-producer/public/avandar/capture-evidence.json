@@ -1,0 +1,431 @@
+{
+  "schemaVersion": 1,
+  "curatedAt": "2026-10-14T22:13:00.712Z",
+  "source": {
+    "runId": "pilot-2026-10-14T22-11-57-800Z-Z53br8",
+    "runDirectory": "out/captures/pilot-2026-10-14T22-11-57-800Z-Z53br8",
+    "manifest": "out/captures/pilot-2026-10-14T22-11-57-800Z-Z53br8/manifest.json",
+    "manifestSha256": "0f38421c4490fbd6d183ac69060d4a14c5bbb583025bcd6448fede39febb9d69",
+    "status": "passed",
+    "startedAt": "2026-10-14T22:11:57.801Z",
+    "finishedAt": "2026-10-14T22:12:43.674Z"
+  },
+  "fixtures": [
+    {
+      "path": "cases.csv",
+      "sha256": "7bea7ec9cb955948c9fda184f2a8f4dde24da7acbf81692b33088af6443c1f79",
+      "bytes": 26703
+    },
+    {
+      "path": "districts.csv",
+      "sha256": "06b15552cf2febea7bcdf6e23c0e2f4c12891d8d5b9cd7a91e2ac28fbfb6d838",
+      "bytes": 880
+    },
+    {
+      "path": "facilities.csv",
+      "sha256": "cea0c3a889bb1c8d5840632daa05199cebeb3fa0b4b6b0a33f8ef72b672d85df",
+      "bytes": 932
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "a8d1cea8c6b698067593d3974f863a99f3968d856cb5932c04ce85d13aeee1a1",
+      "bytes": 2526
+    },
+    {
+      "path": "visits.csv",
+      "sha256": "3c67bd23a5388930e22555da3be0cb0e3d024d11eb2a52577a4bb05f51124598",
+      "bytes": 12855
+    },
+    {
+      "path": "weekly_reports.csv",
+      "sha256": "c7b1b3d9b47ecc0f24e4761d449fe47a3d43682b84d872021f915e93e652bef4",
+      "bytes": 1463
+    }
+  ],
+  "actions": [
+    {
+      "id": "upload-cases",
+      "flowId": "import",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-manager/data-import",
+      "startedAtMs": 3094.721,
+      "videoStartedAtMs": 1978.395,
+      "endedAtMs": 5121.038,
+      "videoEndedAtMs": 4004.71,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-manager/data-import"
+    },
+    {
+      "id": "reuse-cases",
+      "flowId": "import",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-manager/data-import",
+      "startedAtMs": 9605.41,
+      "videoStartedAtMs": 8489.081,
+      "endedAtMs": 9725.821,
+      "videoEndedAtMs": 8609.493,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-manager/b508ca6c-f671-4c80-8202-b46e0580040b"
+    },
+    {
+      "id": "explorer-select-source",
+      "flowId": "explorer",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-manager/749f8f11-e64b-4e6b-80fa-112b0e2d611b",
+      "startedAtMs": 14959.381,
+      "videoStartedAtMs": 13843.05,
+      "endedAtMs": 16595.861,
+      "videoEndedAtMs": 15479.532,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-explorer"
+    },
+    {
+      "id": "explorer-filter-eastbank",
+      "flowId": "explorer",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "startedAtMs": 17239.884,
+      "videoStartedAtMs": 16123.554,
+      "endedAtMs": 17928.343,
+      "videoEndedAtMs": 16812.014,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-explorer"
+    },
+    {
+      "id": "explorer-aggregate-districts",
+      "flowId": "explorer",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "startedAtMs": 18629.228,
+      "videoStartedAtMs": 17512.898,
+      "endedAtMs": 19100.113,
+      "videoEndedAtMs": 17983.784,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-explorer"
+    },
+    {
+      "id": "explorer-bar-chart",
+      "flowId": "explorer",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "startedAtMs": 19754.987,
+      "videoStartedAtMs": 18638.658,
+      "endedAtMs": 20443.223,
+      "videoEndedAtMs": 19326.893,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-explorer"
+    },
+    {
+      "id": "dashboard-save-view",
+      "flowId": "dashboards",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "startedAtMs": 21105.489,
+      "videoStartedAtMs": 19989.159,
+      "endedAtMs": 21747.426,
+      "videoEndedAtMs": 20631.096,
+      "resultUrl": "http://localhost:5173/avandar-labs/data-explorer"
+    },
+    {
+      "id": "dashboard-open-editor",
+      "flowId": "dashboards",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "startedAtMs": 21748.063,
+      "videoStartedAtMs": 20631.732,
+      "endedAtMs": 22594.826,
+      "videoEndedAtMs": 21478.496,
+      "resultUrl": "http://localhost:5173/avandar-labs/dashboards/edit/1ad681aa-1bfe-4353-8e73-bec6b55fef60"
+    },
+    {
+      "id": "dashboard-preview",
+      "flowId": "dashboards",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/dashboards/edit/1ad681aa-1bfe-4353-8e73-bec6b55fef60",
+      "startedAtMs": 23237.147,
+      "videoStartedAtMs": 22120.817,
+      "endedAtMs": 23617.74,
+      "videoEndedAtMs": 22501.41,
+      "resultUrl": "http://localhost:5173/avandar-labs/dashboards/preview/1ad681aa-1bfe-4353-8e73-bec6b55fef60"
+    },
+    {
+      "id": "cases-create-type",
+      "flowId": "cases",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/dashboards/preview/1ad681aa-1bfe-4353-8e73-bec6b55fef60",
+      "startedAtMs": 24477.124,
+      "videoStartedAtMs": 23360.794,
+      "endedAtMs": 25820.331,
+      "videoEndedAtMs": 24704.003,
+      "resultUrl": "http://localhost:5173/avandar-labs/ontology-designer/0239e74b-cd03-4b78-8fa3-5cb10ff02919"
+    },
+    {
+      "id": "cases-sync-records",
+      "flowId": "cases",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/ontology-designer/0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "startedAtMs": 26890.376,
+      "videoStartedAtMs": 25774.046,
+      "endedAtMs": 27176.781,
+      "videoEndedAtMs": 26060.451,
+      "resultUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919"
+    },
+    {
+      "id": "cases-verify-240-records",
+      "flowId": "cases",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "startedAtMs": 27218.487,
+      "videoStartedAtMs": 26102.157,
+      "endedAtMs": 30654.045,
+      "videoEndedAtMs": 29537.715,
+      "resultUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919"
+    },
+    {
+      "id": "cases-open-record",
+      "flowId": "cases",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "startedAtMs": 31303.354,
+      "videoStartedAtMs": 30187.023,
+      "endedAtMs": 32847.507,
+      "videoEndedAtMs": 31731.178,
+      "resultUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919/99dd6b62-52d8-4921-a109-eff602bb8371"
+    },
+    {
+      "id": "map-create",
+      "flowId": "map",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919/99dd6b62-52d8-4921-a109-eff602bb8371",
+      "startedAtMs": 33488.38,
+      "videoStartedAtMs": 32372.049,
+      "endedAtMs": 36844.669,
+      "videoEndedAtMs": 35728.339,
+      "resultUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c"
+    },
+    {
+      "id": "map-remove-failed-fixture-layer",
+      "flowId": "map",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "startedAtMs": 36845.432,
+      "videoStartedAtMs": 35729.1,
+      "endedAtMs": 36847.422,
+      "videoEndedAtMs": 35731.091,
+      "resultUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c"
+    },
+    {
+      "id": "map-case-locations",
+      "flowId": "map",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "startedAtMs": 36848.126,
+      "videoStartedAtMs": 35731.795,
+      "endedAtMs": 39042.735,
+      "videoEndedAtMs": 37926.406,
+      "resultUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c"
+    },
+    {
+      "id": "map-facility-locations",
+      "flowId": "map",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "startedAtMs": 39936.184,
+      "videoStartedAtMs": 38819.853,
+      "endedAtMs": 41189.074,
+      "videoEndedAtMs": 40072.745,
+      "resultUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c"
+    },
+    {
+      "id": "map-verify-persistence",
+      "flowId": "map",
+      "status": "passed",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "startedAtMs": 41849.363,
+      "videoStartedAtMs": 40733.032,
+      "endedAtMs": 44964.208,
+      "videoEndedAtMs": 43847.879,
+      "resultUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c"
+    }
+  ],
+  "resources": [
+    {
+      "flowId": "import",
+      "kind": "dataset",
+      "id": "b508ca6c-f671-4c80-8202-b46e0580040b",
+      "name": "Video - Harborfield cases"
+    },
+    {
+      "flowId": "import",
+      "kind": "dataset",
+      "id": "2fa5ecfe-b885-4067-97dc-bd40f164f289",
+      "name": "Video - Harborfield visits"
+    },
+    {
+      "flowId": "import",
+      "kind": "dataset",
+      "id": "f18adf14-21e6-41c9-955e-9de71ef0ca66",
+      "name": "Video - Harborfield facilities"
+    },
+    {
+      "flowId": "import",
+      "kind": "dataset",
+      "id": "749f8f11-e64b-4e6b-80fa-112b0e2d611b",
+      "name": "Video - Harborfield districts"
+    },
+    {
+      "flowId": "dashboards",
+      "kind": "dashboard",
+      "id": "1ad681aa-1bfe-4353-8e73-bec6b55fef60",
+      "name": "Video - Harborfield response overview - pilot"
+    },
+    {
+      "flowId": "cases",
+      "kind": "case-type",
+      "id": "0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "name": "Video - Harborfield response case - pilot"
+    },
+    {
+      "flowId": "map",
+      "kind": "map",
+      "id": "410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "name": "Video - Harborfield response map - pilot"
+    }
+  ],
+  "screenshots": [
+    {
+      "flowId": "import",
+      "checkpointId": "import-preview",
+      "capturePath": "screens/import-import-preview.png",
+      "asset": "avandar/screens/import-import-preview.png",
+      "sha256": "3d071b7548d5eca144d3c2623d3d88af6d68749fe4996416e13c3e75b80168e4",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-manager/data-import",
+      "atMs": 9546.593,
+      "videoAtMs": 8430.266
+    },
+    {
+      "flowId": "import",
+      "checkpointId": "import-saved",
+      "capturePath": "screens/import-import-saved.png",
+      "asset": "avandar/screens/import-import-saved.png",
+      "sha256": "3f586d87f89168b307a6f68001284c8a9269ba6248f0b12449a541e226ac195b",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-manager/b508ca6c-f671-4c80-8202-b46e0580040b",
+      "atMs": 10899.108,
+      "videoAtMs": 9782.779
+    },
+    {
+      "flowId": "explorer",
+      "checkpointId": "explorer-records",
+      "capturePath": "screens/explorer-explorer-records.png",
+      "asset": "avandar/screens/explorer-explorer-records.png",
+      "sha256": "662be0013cc00c11d23ece6d65b413c61a6959fdc265910cd23f9b2fb3e8b45f",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "atMs": 17200.255,
+      "videoAtMs": 16083.926
+    },
+    {
+      "flowId": "explorer",
+      "checkpointId": "explorer-filtered",
+      "capturePath": "screens/explorer-explorer-filtered.png",
+      "asset": "avandar/screens/explorer-explorer-filtered.png",
+      "sha256": "69cdef10132669c5cf5497697e7b2458b0e245d09ec24bcd60723575545d6d33",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "atMs": 18543.095,
+      "videoAtMs": 17426.766
+    },
+    {
+      "flowId": "explorer",
+      "checkpointId": "explorer-query",
+      "capturePath": "screens/explorer-explorer-query.png",
+      "asset": "avandar/screens/explorer-explorer-query.png",
+      "sha256": "08788124ac10ae7207c353ee9aa70a847e9b6266ae49d10186feef8525f29690",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "atMs": 19704.892,
+      "videoAtMs": 18588.562
+    },
+    {
+      "flowId": "explorer",
+      "checkpointId": "explorer-chart",
+      "capturePath": "screens/explorer-explorer-chart.png",
+      "asset": "avandar/screens/explorer-explorer-chart.png",
+      "sha256": "d86815940a380fbf29424fe169d2ba9d8441e524e69237c187d27f181e75fdf6",
+      "sourceUrl": "http://localhost:5173/avandar-labs/data-explorer",
+      "atMs": 21048.554,
+      "videoAtMs": 19932.225
+    },
+    {
+      "flowId": "dashboards",
+      "checkpointId": "dashboard-editor",
+      "capturePath": "screens/dashboards-dashboard-editor.png",
+      "asset": "avandar/screens/dashboards-dashboard-editor.png",
+      "sha256": "d77710bbfa732edd876e080a2d43fd9a3a2641b94d38d68db4d6fce9ee179fcd",
+      "sourceUrl": "http://localhost:5173/avandar-labs/dashboards/edit/1ad681aa-1bfe-4353-8e73-bec6b55fef60",
+      "atMs": 23204.326,
+      "videoAtMs": 22087.996
+    },
+    {
+      "flowId": "dashboards",
+      "checkpointId": "dashboard-preview",
+      "capturePath": "screens/dashboards-dashboard-preview.png",
+      "asset": "avandar/screens/dashboards-dashboard-preview.png",
+      "sha256": "70e556509cf17e756eb3d8e15321274176c8cf12ab8094765ef3b44a7f865a66",
+      "sourceUrl": "http://localhost:5173/avandar-labs/dashboards/preview/1ad681aa-1bfe-4353-8e73-bec6b55fef60",
+      "atMs": 24219.426,
+      "videoAtMs": 23103.096
+    },
+    {
+      "flowId": "cases",
+      "checkpointId": "cases-type",
+      "capturePath": "screens/cases-cases-type.png",
+      "asset": "avandar/screens/cases-cases-type.png",
+      "sha256": "df590c123fe918f093e152ea890bcdc1707ef3adbe10a3b8f52dbfe1129379e1",
+      "sourceUrl": "http://localhost:5173/avandar-labs/ontology-designer/0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "atMs": 26795.085,
+      "videoAtMs": 25678.755
+    },
+    {
+      "flowId": "cases",
+      "checkpointId": "cases-records",
+      "capturePath": "screens/cases-cases-records.png",
+      "asset": "avandar/screens/cases-cases-records.png",
+      "sha256": "cdb1304d1a6cdeda5c3c2e2caf38b1ed5a9512603b49e58c5e607020a15631f6",
+      "sourceUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919",
+      "atMs": 31271.385,
+      "videoAtMs": 30155.057
+    },
+    {
+      "flowId": "cases",
+      "checkpointId": "cases-record-detail",
+      "capturePath": "screens/cases-cases-record-detail.png",
+      "asset": "avandar/screens/cases-cases-record-detail.png",
+      "sha256": "0e6f8894ce0f86596fa98ff61669d5271c25d22f91e2f71520a3217fe08add7e",
+      "sourceUrl": "http://localhost:5173/avandar-labs/individual-manager/0239e74b-cd03-4b78-8fa3-5cb10ff02919/99dd6b62-52d8-4921-a109-eff602bb8371",
+      "atMs": 33449.76,
+      "videoAtMs": 32333.43
+    },
+    {
+      "flowId": "map",
+      "checkpointId": "map-cases",
+      "capturePath": "screens/map-map-cases.png",
+      "asset": "avandar/screens/map-map-cases.png",
+      "sha256": "0f6c89f4b619d97f016a164ceb802b541cefadc8e6d3396c333454dd6cb06435",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "atMs": 39650.447,
+      "videoAtMs": 38534.117
+    },
+    {
+      "flowId": "map",
+      "checkpointId": "map-facilities",
+      "capturePath": "screens/map-map-facilities.png",
+      "asset": "avandar/screens/map-map-facilities.png",
+      "sha256": "384f938db5a5bc48574cac1fe9191d8248a2f1ba966f00fd7777f22016b06cc5",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "atMs": 41794.339,
+      "videoAtMs": 40678.009
+    },
+    {
+      "flowId": "map",
+      "checkpointId": "map-saved",
+      "capturePath": "screens/map-map-saved.png",
+      "asset": "avandar/screens/map-map-saved.png",
+      "sha256": "6c2811f547eb08c8cb001f5d6f66a06ad6dfec2aa50512685f5e35b5b61060af",
+      "sourceUrl": "http://localhost:5173/avandar-labs/map/410983b7-7f9c-430b-a38e-f3f44d70205c",
+      "atMs": 45582.483,
+      "videoAtMs": 44466.153
+    }
+  ]
+}

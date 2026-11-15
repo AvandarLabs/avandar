@@ -1,0 +1,106 @@
+name:
+  id: motionAtlas.resident-budget-ballots.name
+  message: Count residents' project ballots
+description:
+  id: motionAtlas.resident-budget-ballots.description
+  message:
+    Residents cast fictional project-choice ballots into a shared box. The same
+    ballots unfold into an inspectable tally, while abstentions remain separate and no
+    funding decision is inferred.
+category:
+  id: motionAtlas.resident-budget-ballots.category
+  message: Physical civic participation
+useWhen:
+  id: motionAtlas.resident-budget-ballots.useWhen
+  message: Show how resident choices become a transparent project-preference tally.
+prompt:
+  id: motionAtlas.resident-budget-ballots.prompt
+  message:
+    Begin with a small row of anonymous residents and a project display. Each
+    resident marks one paper behind a short screen, then places it in the ballot box or
+    keeps an abstention slip. The box opens and the same papers unfold into stacks under
+    their chosen project symbols. Hold every cast ballot, the abstention slips and
+    derived totals. Do not transform votes into money or automatically crown a winner.
+creativeDirection:
+  id: motionAtlas.resident-budget-ballots.creativeDirection
+  message:
+    Begin with a small row of anonymous residents and a project display. Each
+    resident marks one paper behind a short screen, then places it in the ballot box or
+    keeps an abstention slip. The box opens and the same papers unfold into stacks under
+    their chosen project symbols. Hold every cast ballot, the abstention slips and
+    derived totals. Do not transform votes into money or automatically crown a winner.
+intent:
+  id: motionAtlas.resident-budget-ballots.intent
+  message: Show how resident choices become a transparent project-preference tally.
+distinction:
+  id: motionAtlas.resident-budget-ballots.distinction
+  message:
+    The same privately marked paper ballots move from individual choice through a
+    ballot box into an auditable tally. Unlike pooled-donor-allocation, the units are
+    votes and never become funds; unlike bar-race, there is no animated rank change or
+    automatic winner.
+tags:
+  - id: motionAtlas.resident-budget-ballots.tags.0
+    message: participatory budgeting
+  - id: motionAtlas.resident-budget-ballots.tags.1
+    message: resident vote
+  - id: motionAtlas.resident-budget-ballots.tags.2
+    message: community choice
+  - id: motionAtlas.resident-budget-ballots.tags.3
+    message: ballot counting
+  - id: motionAtlas.resident-budget-ballots.tags.4
+    message: public participation
+  - id: motionAtlas.resident-budget-ballots.tags.5
+    message: abstention
+  - id: motionAtlas.resident-budget-ballots.tags.6
+    message: project preferences
+  - id: motionAtlas.resident-budget-ballots.tags.7
+    message: budget consultation
+goodFor:
+  - id: motionAtlas.resident-budget-ballots.goodFor.0
+    message: Introducing a participatory-budget consultation
+  - id: motionAtlas.resident-budget-ballots.goodFor.1
+    message: Showing how individual project ballots make a tally
+  - id: motionAtlas.resident-budget-ballots.goodFor.2
+    message: Distinguishing ballots cast from residents who abstain
+notFor:
+  - id: motionAtlas.resident-budget-ballots.notFor.0
+    message:
+      This is an illustrative preference count, not a secure voting system or a
+      complete electoral rule.
+  - id: motionAtlas.resident-budget-ballots.notFor.1
+    message:
+      One ballot equals one anonymous illustrative resident; no population estimate
+      is implied.
+  - id: motionAtlas.resident-budget-ballots.notFor.2
+    message:
+      Ties, eligibility, quorum, invalid ballots and final funding decisions are
+      outside the scene.
+domains:
+  - id: motionAtlas.resident-budget-ballots.domains.0
+    message: Physical civic participation
+aliases:
+  - id: motionAtlas.resident-budget-ballots.aliases.0
+    message: participatory budgeting
+  - id: motionAtlas.resident-budget-ballots.aliases.1
+    message: resident vote
+  - id: motionAtlas.resident-budget-ballots.aliases.2
+    message: community choice
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.resident-budget-ballots.beat.0
+      message: Residents mark one paper each behind a short screen.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.resident-budget-ballots.beat.1
+      message:
+        Cast papers enter the box by 78, then unfold into the tally during 84–108;
+        abstentions stay separate.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.resident-budget-ballots.beat.2
+      message: Hold every paper and optionally derived counts without a funding decision.

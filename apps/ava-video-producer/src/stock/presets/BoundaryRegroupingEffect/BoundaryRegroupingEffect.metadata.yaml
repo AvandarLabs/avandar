@@ -1,0 +1,101 @@
+name:
+  id: motionAtlas.boundary-regrouping-effect.name
+  message: Change the boundary, keep the people
+description:
+  id: motionAtlas.boundary-regrouping-effect.description
+  message:
+    The same small geographic cells regroup under two supplied zoning schemes. Zone
+    totals and population-normalized values change while every underlying cell and the
+    overall denominator stay fixed.
+category:
+  id: motionAtlas.boundary-regrouping-effect.category
+  message: spatial aggregation sensitivity
+useWhen:
+  id: motionAtlas.boundary-regrouping-effect.useWhen
+  message: Show that a geographic summary can change when only the grouping boundaries change.
+prompt:
+  id: motionAtlas.boundary-regrouping-effect.prompt
+  message:
+    Show the supplied fixed cells and the first grouping boundary. Lift only the
+    outer grouping seams, redraw them in the second arrangement, and gather each zone's
+    arithmetic along the new outline. Hold the unchanged underlying cell values and
+    unchanged overall total beneath the new summaries.
+creativeDirection:
+  id: motionAtlas.boundary-regrouping-effect.creativeDirection
+  message:
+    Show the supplied fixed cells and the first grouping boundary. Lift only the
+    outer grouping seams, redraw them in the second arrangement, and gather each zone's
+    arithmetic along the new outline. Hold the unchanged underlying cell values and
+    unchanged overall total beneath the new summaries.
+intent:
+  id: motionAtlas.boundary-regrouping-effect.intent
+  message: Show that a geographic summary can change when only the grouping boundaries change.
+distinction:
+  id: motionAtlas.boundary-regrouping-effect.distinction
+  message:
+    Only aggregation seams move; stable atomic cells produce different zone
+    summaries. Unlike nested-drilldown-window, this replaces one complete partition with
+    another rather than selecting a smaller subset.
+tags:
+  - id: motionAtlas.boundary-regrouping-effect.tags.0
+    message: aggregation
+  - id: motionAtlas.boundary-regrouping-effect.tags.1
+    message: boundary effects
+  - id: motionAtlas.boundary-regrouping-effect.tags.2
+    message: MAUP
+  - id: motionAtlas.boundary-regrouping-effect.tags.3
+    message: zoning
+  - id: motionAtlas.boundary-regrouping-effect.tags.4
+    message: geographic units
+  - id: motionAtlas.boundary-regrouping-effect.tags.5
+    message: spatial inequity
+  - id: motionAtlas.boundary-regrouping-effect.tags.6
+    message: ecological inference
+  - id: motionAtlas.boundary-regrouping-effect.tags.7
+    message: denominator
+goodFor:
+  - id: motionAtlas.boundary-regrouping-effect.goodFor.0
+    message: Explain sensitivity to aggregation boundaries
+  - id: motionAtlas.boundary-regrouping-effect.goodFor.1
+    message: Compare reporting zones without implying population movement
+  - id: motionAtlas.boundary-regrouping-effect.goodFor.2
+    message: Introduce the modifiable areal unit problem
+notFor:
+  - id: motionAtlas.boundary-regrouping-effect.notFor.0
+    message: Square cells are schematic accounting units, not real neighborhoods.
+  - id: motionAtlas.boundary-regrouping-effect.notFor.1
+    message:
+      Overall numerator and denominator must be identical across both groupings; no
+      resident moves and no record is created.
+  - id: motionAtlas.boundary-regrouping-effect.notFor.2
+    message:
+      The scene explains aggregation sensitivity, not individual risk, a preferred
+      zoning plan, or a causal explanation for inequality.
+domains:
+  - id: motionAtlas.boundary-regrouping-effect.domains.0
+    message: spatial aggregation sensitivity
+aliases:
+  - id: motionAtlas.boundary-regrouping-effect.aliases.0
+    message: aggregation
+  - id: motionAtlas.boundary-regrouping-effect.aliases.1
+    message: boundary effects
+  - id: motionAtlas.boundary-regrouping-effect.aliases.2
+    message: MAUP
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.boundary-regrouping-effect.beat.0
+      message: Hold fixed atomic cells with the first complete grouping.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.boundary-regrouping-effect.beat.1
+      message:
+        Lift only the first seams, then redraw the second grouping from frame 72 while
+        the cells remain fixed.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.boundary-regrouping-effect.beat.2
+      message: Hold the new zone arithmetic and unchanged overall numerator and denominator.

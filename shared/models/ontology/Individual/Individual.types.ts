@@ -12,6 +12,7 @@ type IndividualRead = {
   conceptId: ConceptId;
   externalId: string;
   id: IndividualId;
+  missingFromSourceAt: string | undefined;
   name: string;
   status: string;
   updatedAt: string;
@@ -30,7 +31,12 @@ export type IndividualModel = SupabaseCrudModelSpec<
       Read: IndividualRead;
       Insert: SetOptional<
         IndividualRead,
-        "assignedTo" | "createdAt" | "id" | "updatedAt"
+        | "assignedTo"
+        | "createdAt"
+        | "id"
+        | "missingFromSourceAt"
+        | "status"
+        | "updatedAt"
       >;
       Update: Partial<IndividualRead>;
     };

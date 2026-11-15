@@ -1,0 +1,25 @@
+.previewDialogHeader {
+  gap: 12px;
+}
+
+.previewDialogHeader .previewDialogHeading {
+  flex: 1;
+  overflow: hidden;
+}
+
+.previewDialogHeader h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewDialogControls {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.previewDialogControls > button {
+  height: 44px;
+  width: 44px;
+}

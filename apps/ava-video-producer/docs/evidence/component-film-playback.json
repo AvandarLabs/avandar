@@ -1,0 +1,254 @@
+{
+  "checkedAt": "2026-10-15T10:32:04.666Z",
+  "method": "Automated Chromium playback of every complete export at 1x, muted; three screenshots per film. Not a listening review.",
+  "errors": [],
+  "results": [
+    {
+      "id": "avandar-import",
+      "videoSha256": "bb7c7af51d8473b17b7001f97da0051ea56bc6983fab73ba3eeac64b26d30927",
+      "metadata": {
+        "duration": 24.2,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-import.mp4?v=bb7c7af51d84"
+      },
+      "playback": {
+        "started": 125.2000000178814,
+        "callbacks": 726,
+        "ended": true,
+        "seconds": 24.39069999998808,
+        "currentTime": 24.2,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 726,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-import-20.png",
+          "sha256": "9e289a5b44f88e2babb67aaccc8608d7d640f7a2895d3ab820ea961c0b4c8e1b"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-import-55.png",
+          "sha256": "58f754ac1d7179041b499dc6842ad41a803e61f00db70a36c28628f69a589fe9"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-import-88.png",
+          "sha256": "46b93e5d0587a8e741617356d60eeeb9cb8d878c36bd03b13b0e79c0dbd323ca"
+        }
+      ]
+    },
+    {
+      "id": "avandar-explorer",
+      "videoSha256": "29740d8b68232f0723c7dc18889ae908350f03207dbbe47df0068fa3b953eea3",
+      "metadata": {
+        "duration": 28.866667,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-explorer.mp4?v=29740d8b6823"
+      },
+      "playback": {
+        "started": 69.80000001192093,
+        "callbacks": 866,
+        "ended": true,
+        "seconds": 29.04990000000596,
+        "currentTime": 28.866667,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 866,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-explorer-20.png",
+          "sha256": "d199f7e3528abbb2e892f16fde216bc1e690eca6c99e41a1d0400c2f1196771f"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-explorer-55.png",
+          "sha256": "41789654e1b207b806a91cccd9a5630ba1459e8eca7fe611dce0a60764a85850"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-explorer-88.png",
+          "sha256": "5ccdb38c962592692d6ec3415b57b2dd9b039eb5980e710726c9559a213a0580"
+        }
+      ]
+    },
+    {
+      "id": "avandar-dashboards",
+      "videoSha256": "508ec98cf578bb4813a477317d7fb0d41c2e754c67e8837eac2173e298543e07",
+      "metadata": {
+        "duration": 26.2,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-dashboards.mp4?v=508ec98cf578"
+      },
+      "playback": {
+        "started": 80.19999998807907,
+        "callbacks": 786,
+        "ended": true,
+        "seconds": 26.378700000017883,
+        "currentTime": 26.2,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 786,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-dashboards-20.png",
+          "sha256": "ba151c140bc811f11de0e4b193e98ceae47c7302707ce23918c6428b544a0f75"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-dashboards-55.png",
+          "sha256": "26777bdc1271db9d07cdd51d3efd64ff4397d8e174836540b09a3564999eb8f8"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-dashboards-88.png",
+          "sha256": "81564e7938f0f270604f230eab29dab2be7d37de4a0691191ab61cdd116d803f"
+        }
+      ]
+    },
+    {
+      "id": "avandar-cases",
+      "videoSha256": "1b0f9d3b0f9da5638b31f0fe04cfa47d96a356644ab5ed8bbebcd64018f4f81a",
+      "metadata": {
+        "duration": 24.2,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-cases.mp4?v=1b0f9d3b0f9d"
+      },
+      "playback": {
+        "started": 80.09999999403954,
+        "callbacks": 726,
+        "ended": true,
+        "seconds": 24.37410000002384,
+        "currentTime": 24.2,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 726,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-cases-20.png",
+          "sha256": "61e153ad4445de93059247998d15b28f56e2848571883534886e61265a4ac46b"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-cases-55.png",
+          "sha256": "1fe436bbd3d06abc2ab36e9928581b1e7e881c47b0bd1ec4b5d8826259780e3c"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-cases-88.png",
+          "sha256": "6de3a06d81cae5c3e2a490abf8c8e653aadafbaa5d2e6b58f5566daa13105783"
+        }
+      ]
+    },
+    {
+      "id": "avandar-map",
+      "videoSha256": "f776b5d17a03d7c407a56468d64dbb405ec64de796ed446106c94ca9c29dd5de",
+      "metadata": {
+        "duration": 26.2,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-map.mp4?v=f776b5d17a03"
+      },
+      "playback": {
+        "started": 86.40000000596046,
+        "callbacks": 786,
+        "ended": true,
+        "seconds": 26.36920000001788,
+        "currentTime": 26.2,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 786,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-map-20.png",
+          "sha256": "9bcfab5aa6d97ddf60e30d45f4738a1c9bb1a65f25225b9d748c68918c6e9f99"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-map-55.png",
+          "sha256": "c2d89fb29c8c7e2546031635e13f6224451fda8368ef65b2f676c8987b48646d"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-map-88.png",
+          "sha256": "d8096b4492e9afab4bb4fd39114d4770e9500425cfd7ecbd5d5096f6baa7559e"
+        }
+      ]
+    },
+    {
+      "id": "avandar-overview",
+      "videoSha256": "bdcfcb308dcccf3cfb68c9962a17a24a2e96df92849dd32ba1d816f2e1822e03",
+      "metadata": {
+        "duration": 74.866667,
+        "width": 1536,
+        "height": 960,
+        "src": "http://127.0.0.1:4173/assets/avandar-overview.mp4?v=bdcfcb308dcc"
+      },
+      "playback": {
+        "started": 71.5,
+        "callbacks": 2246,
+        "ended": true,
+        "seconds": 75.03590000000597,
+        "currentTime": 74.866667,
+        "rate": 1,
+        "muted": true,
+        "quality": {
+          "totalVideoFrames": 2246,
+          "droppedVideoFrames": 0
+        },
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "file": "out/cursor-review/avandar-overview-20.png",
+          "sha256": "77a0cda5a69583c7bfe93b6f0c40a7014e6b60123bf05f3ca76ba79c192f8bd6"
+        },
+        {
+          "fraction": 0.55,
+          "file": "out/cursor-review/avandar-overview-55.png",
+          "sha256": "d21788cf0e2188ce20092b7a116ccb7541e50fb966a71971436d05d2a2c00a24"
+        },
+        {
+          "fraction": 0.88,
+          "file": "out/cursor-review/avandar-overview-88.png",
+          "sha256": "2457295dae92e239fef97ebb867371bd8be8ada79b395b23f924723a9743d482"
+        }
+      ]
+    }
+  ],
+  "kind": "automated-browser-media-playback"
+}

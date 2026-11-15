@@ -37,10 +37,37 @@ pub enum Route {
     Meta,
     /// `POST /__wrap/regenerate` — ask the TUI to regenerate the diff guide.
     Regenerate,
+    /// `GET /__wrap/dispatch.json`: comment delivery mode + held count.
+    DispatchState,
+    /// `POST /__wrap/dispatch`: switch between bulk and eager delivery.
+    SetDispatchMode,
+    /// `POST /__wrap/send-all`: send every held comment to the LLM.
+    SendAll,
+    /// `GET /__wrap/github.json`: PR availability + each PR-bound comment's
+    /// sync state.
+    GithubState,
+    /// `POST /__wrap/github/pull`: pull from GitHub now.
+    GithubPull,
+    /// `POST /__wrap/github/submit`: submit the pending review.
+    GithubSubmit,
+    /// `POST /__wrap/github/viewed`: viewed-file changes to send to GitHub.
+    GithubViewed,
+    /// `POST /__wrap/github/conflicts`: who resolves a pull's merge conflicts.
+    GithubConflicts,
+    /// `POST /__wrap/github/connection`: whether the browser has a network.
+    GithubConnection,
+    /// `POST /api/comments`: difit's comment save, inspected for PR-bound
+    /// comments before it is proxied.
+    SaveComments,
     /// `GET /__wrap/difit[?group=N|?view=new]` — proxy difit's document, inject our script.
     DifitDoc,
     /// `GET /api/diff` — proxy difit's diff, narrowed per the view (from `Referer`).
-    ApiDiff { filter: DiffFilter },
+    /// `commented_only` further narrows it to files with comments
+    /// (`&commented=1`), on top of any view.
+    ApiDiff {
+        filter: DiffFilter,
+        commented_only: bool,
+    },
     /// Anything else — proxy to difit verbatim (assets, other APIs, SSE).
     Proxy,
 }
@@ -67,6 +94,20 @@ pub fn diff_filter_in_query(query: &str) -> DiffFilter {
     group_in_query(query).map_or(DiffFilter::None, DiffFilter::Group)
 }
 
+/// Whether a query string asks to show only files with comments
+/// (`commented=1`).
+#[must_use]
+pub fn commented_only_in_query(query: &str) -> bool {
+    query.split('&').any(|pair| pair == "commented=1")
+}
+
+/// The query string of a `Referer`, or `""` when it has none.
+fn referer_query(referer: Option<&str>) -> &str {
+    referer
+        .and_then(|referer| referer.split_once('?'))
+        .map_or("", |(_, query)| query)
+}
+
 /// Extract the [`DiffFilter`] a `/api/diff` request belongs to from its
 /// `Referer`.
 ///
@@ -88,9 +129,18 @@ pub fn diff_filter_in_referer(referer: Option<&str>) -> DiffFilter {
 /// string (without `?`); `referer` is the `Referer` header, if any.
 #[must_use]
 pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Route {
-    let _ = method; // all shell routes are GET today; kept for future POST handling
     let _ = query; // difit-doc no longer branches on the query; kept for parity
     match path {
+        "/api/comments" if method == "POST" => Route::SaveComments,
+        "/__wrap/dispatch.json" => Route::DispatchState,
+        "/__wrap/dispatch" => Route::SetDispatchMode,
+        "/__wrap/send-all" => Route::SendAll,
+        "/__wrap/github.json" => Route::GithubState,
+        "/__wrap/github/pull" => Route::GithubPull,
+        "/__wrap/github/submit" => Route::GithubSubmit,
+        "/__wrap/github/viewed" => Route::GithubViewed,
+        "/__wrap/github/conflicts" => Route::GithubConflicts,
+        "/__wrap/github/connection" => Route::GithubConnection,
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
@@ -101,6 +151,7 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/__wrap/difit" => Route::DifitDoc,
         "/api/diff" => Route::ApiDiff {
             filter: diff_filter_in_referer(referer),
+            commented_only: commented_only_in_query(referer_query(referer)),
         },
         _ => path
             .strip_prefix("/__wrap/")
@@ -145,6 +196,60 @@ mod tests {
     }
 
     #[test]
+    fn delivery_and_github_routes() {
+        assert_eq!(
+            route("GET", "/__wrap/dispatch.json", "", None),
+            Route::DispatchState
+        );
+        assert_eq!(
+            route("POST", "/__wrap/dispatch", "", None),
+            Route::SetDispatchMode
+        );
+        assert_eq!(route("POST", "/__wrap/send-all", "", None), Route::SendAll);
+        assert_eq!(
+            route("GET", "/__wrap/github.json", "", None),
+            Route::GithubState
+        );
+    }
+
+    #[test]
+    fn github_request_routes() {
+        assert_eq!(
+            route("POST", "/__wrap/github/pull", "", None),
+            Route::GithubPull
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/submit", "", None),
+            Route::GithubSubmit
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/viewed", "", None),
+            Route::GithubViewed
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/conflicts", "", None),
+            Route::GithubConflicts
+        );
+        assert_eq!(
+            route("POST", "/__wrap/github/connection", "", None),
+            Route::GithubConnection
+        );
+    }
+
+    #[test]
+    fn only_a_comment_save_is_intercepted() {
+        assert_eq!(
+            route("POST", "/api/comments", "", None),
+            Route::SaveComments
+        );
+        assert_eq!(route("GET", "/api/comments", "", None), Route::Proxy);
+        assert_eq!(
+            route("POST", "/api/comment-imports", "", None),
+            Route::Proxy
+        );
+    }
+
+    #[test]
     fn difit_doc_ignores_the_query() {
         assert_eq!(route("GET", "/__wrap/difit", "", None), Route::DifitDoc);
         assert_eq!(
@@ -167,7 +272,8 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit?group=3")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::Group(3)
+                filter: DiffFilter::Group(3),
+                commented_only: false,
             }
         );
         // "new files not in guide" view
@@ -179,7 +285,8 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit?view=new")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::Ungrouped
+                filter: DiffFilter::Ungrouped,
+                commented_only: false,
             }
         );
         // full-view iframe: referer has no group/view
@@ -191,16 +298,47 @@ mod tests {
                 Some("http://localhost:4790/__wrap/difit")
             ),
             Route::ApiDiff {
-                filter: DiffFilter::None
+                filter: DiffFilter::None,
+                commented_only: false,
             }
         );
         // no referer at all
         assert_eq!(
             route("GET", "/api/diff", "", None),
             Route::ApiDiff {
-                filter: DiffFilter::None
+                filter: DiffFilter::None,
+                commented_only: false,
             }
         );
+    }
+
+    #[test]
+    fn api_diff_narrows_to_commented_files_when_the_view_asks() {
+        assert_eq!(
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?group=3&commented=1")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::Group(3),
+                commented_only: true,
+            }
+        );
+        assert_eq!(
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?commented=1")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::None,
+                commented_only: true,
+            }
+        );
+        assert!(!commented_only_in_query("commented=0&group=1"));
     }
 
     #[test]
