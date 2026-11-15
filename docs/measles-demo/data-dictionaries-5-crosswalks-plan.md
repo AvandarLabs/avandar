@@ -1,5 +1,19 @@
 # Data Dictionaries 5: Crosswalks Implementation Plan
 
+> **WARNING: KNOWN PRIVACY GAP, DEMO ONLY. FIX BEFORE THIS REACHES `develop`.**
+>
+> Crosswalk layouts and mappings are readable by every Data Sources viewer,
+> even when the member dataset is restricted to other people. A viewer who
+> cannot open a restricted dataset can still read its **column names, source
+> columns, and fill rules** when that dataset is alone in its layout. The
+> membership rows themselves stay hidden. We accepted this for the
+> `demo/measles` demo only. Hiding layouts from viewers is not a fix: the save
+> payload would lose them and `rpc_crosswalks__save` would delete them.
+> A real fix needs a different mechanism (for example, per-layout read
+> filtering plus a save that preserves layouts the caller cannot see).
+> Details: [design doc section 11](data-dictionaries-design.md#11-permissions-and-rls)
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let a Data Sources editor map many datasets with different column layouts (`zip_code`, `zip`, `postal_code`) onto one reference layout, one layout family at a time, and save the result as a **combined dataset**: a virtual dataset that stacks every mapped dataset, with codes reconciled through dictionary code lists, a `source_dataset` column, a mapping that exports as CSV, and a banner when a code list it decoded with has changed.

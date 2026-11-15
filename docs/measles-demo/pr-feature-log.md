@@ -1,5 +1,19 @@
 # `demo/measles` PR feature log
 
+> **WARNING: KNOWN PRIVACY GAP, DEMO ONLY. FIX BEFORE THIS REACHES `develop`.**
+>
+> Crosswalk layouts and mappings are readable by every Data Sources viewer,
+> even when the member dataset is restricted to other people. A viewer who
+> cannot open a restricted dataset can still read its **column names, source
+> columns, and fill rules** when that dataset is alone in its layout. The
+> membership rows themselves stay hidden. We accepted this for the
+> `demo/measles` demo only. Hiding layouts from viewers is not a fix: the save
+> payload would lose them and `rpc_crosswalks__save` would delete them.
+> A real fix needs a different mechanism (for example, per-layout read
+> filtering plus a save that preserves layouts the caller cannot see).
+> Details: [design doc section 11](data-dictionaries-design.md#11-permissions-and-rls)
+
+
 The running list of features built on `demo/measles` that must each land
 in `develop` as their own PR. When every feature below reads `merged`,
 everything this branch built is in `develop`.
