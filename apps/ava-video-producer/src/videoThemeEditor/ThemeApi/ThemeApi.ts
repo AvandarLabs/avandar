@@ -1,4 +1,5 @@
 import { parseVideoThemeDocument } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
+import { ThemeApiError } from "./ThemeApiError";
 import type {
   VideoThemeDocument,
   VideoThemeIssue,
@@ -18,26 +19,10 @@ export type StoredTheme = Readonly<{
   hash: string;
 }>;
 
-/** A refused theme request: its HTTP status and any token problems. */
-export class ThemeApiError extends Error {
-  readonly status: number;
-  readonly issues: readonly VideoThemeIssue[];
-
-  constructor(
-    status: number,
-    message: string,
-    issues: readonly VideoThemeIssue[],
-  ) {
-    super(message);
-    this.name = "ThemeApiError";
-    this.status = status;
-    this.issues = issues;
-  }
-}
-
-function _errorBody(
-  body: unknown,
-): Readonly<{ message: string; issues: readonly VideoThemeIssue[] }> {
+function _errorBody(body: unknown): {
+  message: string;
+  issues: VideoThemeIssue[];
+} {
   const record =
     typeof body === "object" && body !== null
       ? (body as Readonly<Record<string, unknown>>)
@@ -47,9 +32,7 @@ function _errorBody(
       typeof record.message === "string"
         ? record.message
         : "Theme request failed",
-    issues: Array.isArray(record.issues)
-      ? (record.issues as VideoThemeIssue[])
-      : [],
+    issues: Array.isArray(record.issues) ? record.issues : [],
   };
 }
 
@@ -79,12 +62,10 @@ async function _read(id: string): Promise<StoredTheme> {
   };
 }
 
-async function _loadAll(): Promise<
-  Readonly<{
-    themes: readonly ThemeSummary[];
-    stored: ReadonlyMap<string, StoredTheme>;
-  }>
-> {
+async function _loadAll(): Promise<{
+  themes: ThemeSummary[];
+  stored: Map<string, StoredTheme>;
+}> {
   const themes = await _request<ThemeSummary[]>("/api/themes");
   const stored = await Promise.all(
     themes.map(async (theme) => [theme.id, await _read(theme.id)] as const),
@@ -105,13 +86,13 @@ export const ThemeApi = {
       method: "POST",
       body: JSON.stringify(document),
     }),
-  save: (document: VideoThemeDocument, hash: string) =>
+  save: (options: Readonly<{ document: VideoThemeDocument; hash: string }>) =>
     _request<{ hash: string }>(
-      `/api/themes/${encodeURIComponent(document.id)}`,
+      `/api/themes/${encodeURIComponent(options.document.id)}`,
       {
         method: "PUT",
-        headers: { "If-Match": hash },
-        body: JSON.stringify(document),
+        headers: { "If-Match": options.hash },
+        body: JSON.stringify(options.document),
       },
     ),
 };

@@ -94,7 +94,10 @@ function useSaveInPlace(options: SaveHookOptions) {
     }
     const document = createSavedDocumentFromDraft(storedTheme.document, draft);
     await run(async () => {
-      const { hash } = await ThemeApi.save(document, storedTheme.hash);
+      const { hash } = await ThemeApi.save({
+        document,
+        hash: storedTheme.hash,
+      });
       storeTheme({ document, hash });
       rebaseDraft({
         baseHash: hash,

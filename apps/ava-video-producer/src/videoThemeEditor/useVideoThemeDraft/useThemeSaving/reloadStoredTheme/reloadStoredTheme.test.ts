@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ThemeApiError, type StoredTheme } from "../../../ThemeApi/ThemeApi";
+import { ThemeApiError } from "../../../ThemeApi/ThemeApiError";
 import { createRequestHarness } from "../createRequestHarness";
 import { runThemeRequest } from "../runThemeRequest/runThemeRequest";
 import { reloadStoredTheme } from "./reloadStoredTheme";
+import type { StoredTheme } from "../../../ThemeApi/ThemeApi";
 
 const STORED_THEME = {
   document: { id: "harbor", label: "Harbor" },

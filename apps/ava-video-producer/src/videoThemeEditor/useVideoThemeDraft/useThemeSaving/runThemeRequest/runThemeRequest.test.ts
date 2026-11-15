@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ThemeApiError } from "../../../ThemeApi/ThemeApi";
+import { ThemeApiError } from "../../../ThemeApi/ThemeApiError";
 import { createRequestHarness } from "../createRequestHarness";
 import { runThemeRequest } from "./runThemeRequest";
 

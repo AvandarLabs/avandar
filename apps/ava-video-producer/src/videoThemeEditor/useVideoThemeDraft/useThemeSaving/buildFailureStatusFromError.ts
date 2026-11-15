@@ -1,4 +1,4 @@
-import { ThemeApiError } from "../../ThemeApi/ThemeApi";
+import { ThemeApiError } from "../../ThemeApi/ThemeApiError";
 import type { FailureKind, ThemeSaveStatus } from "./useThemeSaving.types";
 
 /**

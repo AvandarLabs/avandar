@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test, { afterEach, mock } from "node:test";
 import classicTheme from "../../../themes/classic.theme.json";
-import { ThemeApi, ThemeApiError } from "./ThemeApi";
+import { ThemeApi } from "./ThemeApi";
+import { ThemeApiError } from "./ThemeApiError";
 
 const WARM = {
   schemaVersion: 1,
@@ -40,7 +41,7 @@ test("a refused save keeps the server's status and issues", async () => {
     ],
   });
   await assert.rejects(
-    ThemeApi.save(WARM, "hash"),
+    ThemeApi.save({ document: WARM, hash: "hash" }),
     (error: unknown) =>
       error instanceof ThemeApiError &&
       error.status === 400 &&
