@@ -2,13 +2,12 @@ import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
-import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityOverlays.module.css";
 import { sampleStockFrame } from "./continuityTimeline";
-import { getOverlayPose, getConnectorProgress } from "./overlayMotion";
+import { DiagramConnector } from "./DiagramConnector";
 import type { ContinuityBeat } from "./continuitySchema";
 
 type Content = Extract<ContinuityBeat["content"], { kind: "composite" }>;
@@ -78,47 +77,9 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
 
 /** Timed spotlight and anchored artwork share the full native product stage. */
 export function ContinuityDiagramLane({ content, frame, accent }: Props) {
-  const active = content.diagrams.find(
-    (diagram) => frame >= diagram.overlay.at && frame < diagram.overlay.until,
-  );
-  const opacity = active?.overlay
-    ? getOverlayPose(frame, active.overlay, content.source).opacity
-    : 0;
-  const { source } = content;
-  const spotlight = useVideoProps("Spotlight", {});
-  const connector = useVideoProps("Connector", {});
-  const motion = useVideoMotion();
-  const signal = getConnectorProgress(frame, content.effect, content.signalAt, {
-    duration: motion.scale(connector.drawIn),
-    easing: motion.curve(connector.easing),
-  });
   return (
     <>
-      <div
-        className={css.spotlight}
-        style={{
-          left: source.x - spotlight.padding,
-          top: source.y - spotlight.padding,
-          width: source.width + spotlight.padding * 2,
-          height: source.height + spotlight.padding * 2,
-          opacity,
-        }}
-      />
-      {active && signal > 0 && (
-        <svg
-          className={css.connector}
-          viewBox="0 0 1600 840"
-          style={{ opacity: opacity * signal }}
-        >
-          <path
-            d={`M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${active.overlay.target.x} ${source.y + source.height / 2} ${active.overlay.target.x + connector.bend} ${active.overlay.target.y + connector.drop}`}
-            fill="none"
-            stroke={accent}
-            strokeWidth={connector.strokeWidth}
-            strokeDasharray={connector.dash.join(" ")}
-          />
-        </svg>
-      )}
+      <DiagramConnector content={content} frame={frame} accent={accent} />
       {content.diagrams.map((diagram) => (
         <FloatingDiagram
           key={diagram.at}
