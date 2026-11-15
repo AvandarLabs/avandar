@@ -14,7 +14,7 @@ import {
   useVideoThemeDraft,
   type VideoThemeDraftState,
 } from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
-import { copyTextToClipboard } from "../copyText/copyText";
+import { copyTextToClipboard } from "../copyText";
 import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
 import type { ThemeDraft } from "../../videoThemeEditor/themeDraft/themeDraft";
 

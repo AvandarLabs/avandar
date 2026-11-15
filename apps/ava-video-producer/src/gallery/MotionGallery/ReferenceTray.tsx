@@ -21,7 +21,6 @@ export function ReferenceTray({
   background,
   onCopy,
 }: Readonly<Props>): ReactNode {
-  const referenceBrief = buildReferenceBrief();
   return (
     <div className="reference-tray" aria-label="Saved reference actions">
       <div className="tray-count">
@@ -38,7 +37,7 @@ export function ReferenceTray({
         className="button button-primary"
         onClick={() =>
           onCopy(
-            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => referenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
+            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => buildReferenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
             "Reference brief copied",
           )
         }

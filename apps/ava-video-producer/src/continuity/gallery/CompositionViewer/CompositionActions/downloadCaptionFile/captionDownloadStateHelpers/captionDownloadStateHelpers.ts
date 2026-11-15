@@ -22,9 +22,9 @@ export function startCaptionDownload(
 /** The state once a film's caption download finishes or fails. */
 export function finishCaptionDownload(
   state: CaptionDownloadState,
-  id: string,
-  hasFailed: boolean,
+  options: { id: string; hasFailed: boolean },
 ): CaptionDownloadState {
+  const { id, hasFailed } = options;
   if (state.busyId !== id) {
     return state;
   }

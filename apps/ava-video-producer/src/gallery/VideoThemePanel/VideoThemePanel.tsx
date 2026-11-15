@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import { ChangedOnDiskBanner } from "../../videoThemeEditor/ThemeBar/ChangedOnDiskBanner/ChangedOnDiskBanner";
-import { ThemeBar } from "../../videoThemeEditor/ThemeBar/ThemeBar";
 import { reloadThenFocus } from "../../videoThemeEditor/ThemeBar/themeBarHelpers/themeBarHelpers";
 import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoThemeEditor";
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
+import { ThemePanelHeader } from "./ThemePanelHeader";
 import css from "./VideoThemePanel.module.css";
 import type { ThemeEditScope } from "../../videoThemeEditor/themeDraft/themeDraft";
 import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar/EditorToolbar";
@@ -28,7 +27,7 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
       focus: () => barRef.current?.focus(),
     });
   return (
-    <div className={css.panel}>
+    <div className={css.videoThemePanel}>
       <VideoThemeEditor
         library={gallery.library}
         themeId={gallery.themeId}
@@ -37,32 +36,11 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
         item={item}
         usedTokens={usedTokens}
         header={
-          <>
-            <ThemeBar
-              themes={gallery.themes}
-              themeId={gallery.themeId}
-              isBuiltIn={gallery.isBuiltIn}
-              isDirty={gallery.isDirty}
-              hasIssues={gallery.hasIssues}
-              isChangedOnDisk={gallery.isChangedOnDisk}
-              status={gallery.status}
-              copyStatus={gallery.copyStatus}
-              onSelectTheme={gallery.selectTheme}
-              onSave={() => void gallery.save()}
-              onSaveAsNew={gallery.saveAsNew}
-              onDiscard={gallery.discard}
-              onReloadTheme={reloadTheme}
-              barRef={barRef}
-              onCopyJson={() => void gallery.copyThemeJson()}
-            />
-            {gallery.isChangedOnDisk ? (
-              <ChangedOnDiskBanner
-                onKeep={gallery.keepDraft}
-                onDiscard={gallery.discard}
-                onReload={reloadTheme}
-              />
-            ) : null}
-          </>
+          <ThemePanelHeader
+            gallery={gallery}
+            barRef={barRef}
+            onReloadTheme={reloadTheme}
+          />
         }
         onDraftChange={gallery.setDraft}
         onScopeChange={setScope}

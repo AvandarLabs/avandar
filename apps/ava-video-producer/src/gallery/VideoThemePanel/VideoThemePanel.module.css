@@ -1,4 +1,4 @@
-.panel {
+.videoThemePanel {
   display: grid;
   gap: 12px;
   min-width: 0;
@@ -54,7 +54,7 @@
  * go on the library's stable class names.
  */
 @media (width <= 760px) {
-  .panel {
+  .videoThemePanel {
     padding: 12px;
 
     :global(.mantine-Button-root),

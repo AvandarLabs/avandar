@@ -72,33 +72,36 @@ function usePlayerReplies(
   if (replies.id !== id) {
     setReplies({ id, paths: [] });
   }
-  useEffect(() => {
-    const receive = (event: MessageEvent<unknown>) => {
-      if (
-        event.origin !== location.origin ||
-        event.source !== player.current?.contentWindow
-      ) {
-        return;
-      }
-      const { data } = event;
-      if (_isOptionsFrom(data, id)) {
-        onOptions();
-      }
-      const acknowledgement = receiveThemeAcknowledgement(data, id);
-      if (acknowledgement) {
-        setReplies((current) =>
-          current.id === id ? { ...current, acknowledgement } : current,
-        );
-      }
-      if (isFilmTokensUsedMessage(data, id)) {
-        setReplies((current) =>
-          current.id === id ? { ...current, paths: data.paths } : current,
-        );
-      }
-    };
-    window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
-  }, [id, player, onOptions]);
+  useEffect(
+    function receivePlayerReplies() {
+      const receive = (event: MessageEvent<unknown>) => {
+        if (
+          event.origin !== location.origin ||
+          event.source !== player.current?.contentWindow
+        ) {
+          return;
+        }
+        const { data } = event;
+        if (_isOptionsFrom(data, id)) {
+          onOptions();
+        }
+        const acknowledgement = receiveThemeAcknowledgement(data, id);
+        if (acknowledgement) {
+          setReplies((current) =>
+            current.id === id ? { ...current, acknowledgement } : current,
+          );
+        }
+        if (isFilmTokensUsedMessage(data, id)) {
+          setReplies((current) =>
+            current.id === id ? { ...current, paths: data.paths } : current,
+          );
+        }
+      };
+      window.addEventListener("message", receive);
+      return () => window.removeEventListener("message", receive);
+    },
+    [id, player, onOptions],
+  );
   return replies.id === id ? replies : { id, paths: [] };
 }
 
@@ -109,19 +112,22 @@ function usePlayerReplies(
  */
 function useRequestTimeout(requestKey: string | undefined): boolean {
   const [timedOutKey, setTimedOutKey] = useState<string>();
-  useEffect(() => {
-    if (requestKey === undefined) {
-      return;
-    }
-    const timer = setTimeout(
-      () => setTimedOutKey(requestKey),
-      ACKNOWLEDGEMENT_TIMEOUT_MS,
-    );
-    return () => {
-      clearTimeout(timer);
-      setTimedOutKey(undefined);
-    };
-  }, [requestKey]);
+  useEffect(
+    function timeOutUnansweredRequest() {
+      if (requestKey === undefined) {
+        return;
+      }
+      const timer = setTimeout(
+        () => setTimedOutKey(requestKey),
+        ACKNOWLEDGEMENT_TIMEOUT_MS,
+      );
+      return () => {
+        clearTimeout(timer);
+        setTimedOutKey(undefined);
+      };
+    },
+    [requestKey],
+  );
   return requestKey !== undefined && timedOutKey === requestKey;
 }
 
@@ -149,10 +155,13 @@ function useThemeSender(
       );
     }
   }, [id, player, snapshotKey, requestKey]);
-  useEffect(() => {
-    const timer = setTimeout(send, THEME_SEND_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [send]);
+  useEffect(
+    function sendThemeAfterDelay() {
+      const timer = setTimeout(send, THEME_SEND_DELAY_MS);
+      return () => clearTimeout(timer);
+    },
+    [send],
+  );
   return send;
 }
 

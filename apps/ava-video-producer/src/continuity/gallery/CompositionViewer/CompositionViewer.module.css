@@ -3,15 +3,6 @@
   padding: 16px;
 }
 
-.compositionViewerPlayer {
-  aspect-ratio: 1.6;
-  background: #0b1219;
-  border: 0;
-  border-radius: 6px;
-  display: block;
-  width: 100%;
-}
-
 .compositionViewerSummary {
   display: grid;
   gap: 24px;
@@ -48,7 +39,6 @@
   }
 }
 
-.stage,
 .settings,
 .details,
 .guidance {
@@ -74,17 +64,6 @@
   grid-template-rows: repeat(3, max-content);
   height: 100%;
   overflow-y: auto;
-}
-
-.stage {
-  background: var(--ava-neutral-9);
-  border-radius: 6px;
-  grid-area: stage;
-}
-
-.compositionViewerPlayer {
-  margin: 0 auto;
-  max-width: calc((100dvh - 150px) * 1.6);
 }
 
 .details {
@@ -164,24 +143,6 @@
 
     display: flex;
     flex-direction: column;
-  }
-
-  .isTokenPanel .stage {
-    border-radius: 0;
-    display: grid;
-    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-    height: var(--atlas-strip-height, calc(14dvh + 48px));
-    inset-block-start: var(--atlas-header-height, 64px);
-    margin: -10px -10px 0;
-    place-items: center;
-    position: sticky;
-    z-index: 4;
-  }
-
-  .isTokenPanel .compositionViewerPlayer {
-    height: 100%;
-    max-width: 100%;
-    width: auto;
   }
 
   .isTokenPanel .settings {

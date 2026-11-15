@@ -4,7 +4,7 @@ import {
   CAPTION_DOWNLOAD_IDLE,
   finishCaptionDownload,
   startCaptionDownload,
-} from "./captionDownloadState";
+} from "./captionDownloadStateHelpers";
 
 test("starting a caption download marks it busy and clears a stale failure", () => {
   assert.deepEqual(startCaptionDownload({ failedId: "intro" }, "intro"), {
@@ -19,10 +19,11 @@ test("a caption download already in flight cannot start again", () => {
 test("a finished caption download is idle, or failed for its film", () => {
   const busy = { busyId: "intro" };
   assert.deepEqual(
-    finishCaptionDownload(busy, "intro", false),
+    finishCaptionDownload(busy, { id: "intro", hasFailed: false }),
     CAPTION_DOWNLOAD_IDLE,
   );
-  assert.deepEqual(finishCaptionDownload(busy, "intro", true), {
-    failedId: "intro",
-  });
+  assert.deepEqual(
+    finishCaptionDownload(busy, { id: "intro", hasFailed: true }),
+    { failedId: "intro" },
+  );
 });

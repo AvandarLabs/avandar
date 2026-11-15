@@ -1,6 +1,6 @@
 import { Tabs } from "@mantine/core";
 import { useState, type ReactNode } from "react";
-import { AtlasChromeProvider } from "../AtlasChromeProvider/AtlasChromeProvider";
+import { AtlasChromeProvider } from "../AtlasChromeProvider";
 import css from "./AtlasPanelTabs.module.css";
 
 /** Which panel of an Atlas modal's right column is open. */
@@ -37,10 +37,10 @@ export function AtlasPanelTabs({ tab, onTabChange, details, tokens }: Props) {
           onTabChange(chosen);
         }}
         classNames={{
-          root: css.root,
-          list: css.list,
-          tab: css.tab,
-          panel: css.panel,
+          root: css.atlasPanelTabsRoot,
+          list: css.atlasPanelTabsList,
+          tab: css.atlasPanelTabsTab,
+          panel: css.atlasPanelTabsPanel,
         }}
       >
         <Tabs.List grow aria-label="Preview panels">

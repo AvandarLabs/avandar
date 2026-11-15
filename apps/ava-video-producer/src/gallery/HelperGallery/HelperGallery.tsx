@@ -14,15 +14,13 @@ import { HelperPreview } from "./HelperPreview/HelperPreview";
 import { useHelperGallery } from "./useHelperGallery";
 
 /** Each helper category with its helper count, in catalog order. */
-function useHelperCategories() {
-  return HELPER_CATALOG.categories.map((category) => ({
-    id: category.id,
-    label: category.title,
-    count: HELPER_CATALOG.helpers.filter(
-      (helper) => helper.category === category.id,
-    ).length,
-  }));
-}
+const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => ({
+  id: category.id,
+  label: category.title,
+  count: HELPER_CATALOG.helpers.filter(
+    (helper) => helper.category === category.id,
+  ).length,
+}));
 
 /**
  * The Helpers section of the Motion Atlas: the shared helpers motions and
@@ -31,11 +29,10 @@ function useHelperCategories() {
  */
 export function HelperGallery() {
   const gallery = useHelperGallery();
-  const categories = useHelperCategories();
   const [playing, setPlaying] = useState(() => !isReducedMotionPreferred());
   const { selection, open, previous, next } = gallery;
   const labelOf = (id: string) =>
-    categories.find((category) => category.id === id)?.label ?? id;
+    HELPER_CATEGORIES.find((category) => category.id === id)?.label ?? id;
   return (
     <>
       <a className="skip-link" href="#library">
@@ -49,7 +46,7 @@ export function HelperGallery() {
           eyebrow="BROWSE THE LIBRARY"
           allLabel="All helpers"
           total={HELPER_CATALOG.helpers.length}
-          categories={categories}
+          categories={HELPER_CATEGORIES}
           selected={selection.category}
           onSelect={gallery.chooseCategory}
         />
@@ -64,8 +61,8 @@ export function HelperGallery() {
             "The shared helpers every motion and composition is built from, each previewed live with the real code."
           }
           heading={
-            categories.find((item) => item.id === selection.category)?.label ??
-            "All helpers"
+            HELPER_CATEGORIES.find((item) => item.id === selection.category)
+              ?.label ?? "All helpers"
           }
           resultCount={gallery.entries.length}
           query={selection.query}

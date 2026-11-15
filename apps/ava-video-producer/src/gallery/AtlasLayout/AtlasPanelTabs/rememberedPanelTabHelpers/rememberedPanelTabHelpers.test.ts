@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readRememberedPanelTab, rememberPanelTab } from "./rememberedPanelTab";
+import {
+  readRememberedPanelTab,
+  rememberPanelTab,
+} from "./rememberedPanelTabHelpers";
 
 function _createStorage(initial: Record<string, string> = {}) {
   const values = new Map(Object.entries(initial));
@@ -18,7 +21,11 @@ function _createStorage(initial: Record<string, string> = {}) {
 
 test("a remembered tokens tab comes back for the same item", () => {
   const storage = _createStorage();
-  rememberPanelTab(storage, "shared-object-handoff", "tokens");
+  rememberPanelTab({
+    storage,
+    itemId: "shared-object-handoff",
+    tab: "tokens",
+  });
   assert.equal(
     readRememberedPanelTab(storage, "shared-object-handoff"),
     "tokens",
@@ -27,14 +34,26 @@ test("a remembered tokens tab comes back for the same item", () => {
 
 test("another item opens on Details", () => {
   const storage = _createStorage();
-  rememberPanelTab(storage, "shared-object-handoff", "tokens");
+  rememberPanelTab({
+    storage,
+    itemId: "shared-object-handoff",
+    tab: "tokens",
+  });
   assert.equal(readRememberedPanelTab(storage, "qetl-motion"), "details");
 });
 
 test("choosing Details forgets the remembered tab", () => {
   const storage = _createStorage();
-  rememberPanelTab(storage, "shared-object-handoff", "tokens");
-  rememberPanelTab(storage, "shared-object-handoff", "details");
+  rememberPanelTab({
+    storage,
+    itemId: "shared-object-handoff",
+    tab: "tokens",
+  });
+  rememberPanelTab({
+    storage,
+    itemId: "shared-object-handoff",
+    tab: "details",
+  });
   assert.equal(storage.values.size, 0);
   assert.equal(
     readRememberedPanelTab(storage, "shared-object-handoff"),
@@ -69,5 +88,7 @@ test("no storage, a corrupt value, or a throwing storage all read as Details", (
     },
   };
   assert.equal(readRememberedPanelTab(throwing, "a"), "details");
-  assert.doesNotThrow(() => rememberPanelTab(throwing, "a", "tokens"));
+  assert.doesNotThrow(() =>
+    rememberPanelTab({ storage: throwing, itemId: "a", tab: "tokens" }),
+  );
 });

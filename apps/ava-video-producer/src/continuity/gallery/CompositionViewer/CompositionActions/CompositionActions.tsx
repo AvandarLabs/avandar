@@ -1,16 +1,16 @@
-import clsx from "clsx";
 import { useId, useState } from "react";
 import css from "./CompositionActions.module.css";
+import { DownloadButton } from "./DownloadButton/DownloadButton";
 import {
   CAPTION_DOWNLOAD_IDLE,
   finishCaptionDownload,
   startCaptionDownload,
-} from "./downloadCaptionFile/captionDownloadState";
+} from "./downloadCaptionFile/captionDownloadStateHelpers/captionDownloadStateHelpers";
 import {
   type CaptionDownloadOptions,
   downloadCaptionFile,
 } from "./downloadCaptionFile/downloadCaptionFile";
-import { ThemeExportNotice } from "./ThemeExportNotice";
+import { ThemeExportNotice } from "./ThemeExportNotice/ThemeExportNotice";
 import { useCompositionDownload } from "./useCompositionDownload";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
 import type { CompositionExportOptions } from "../compositionExportOptions";
@@ -30,66 +30,20 @@ type Props = Readonly<{
   onRetryTheme: () => void;
 }>;
 
-/** The download label. A blocked download keeps its label and explains itself in the notice. */
-function useDownloadLabel(
-  isBusy: boolean,
-  options: CompositionExportOptions | undefined,
-  themeState: ThemeExportState,
-): string {
-  if (isBusy) {
-    return "Preparing export…";
-  }
-  if (options === undefined) {
-    return "Loading preview…";
-  }
-  return themeState.kind === "pending"
-    ? "Applying design tokens…"
-    : "Download MP4";
-}
-
-type DownloadButtonProps = Readonly<{
-  download: ReturnType<typeof useCompositionDownload>;
-  options: CompositionExportOptions | undefined;
-  themeState: ThemeExportState;
-  /** The notice that explains a blocked download. */
-  noticeId: string;
-}>;
-
-/** Download MP4, enabled once the player shows the options and theme the export will use. */
-function DownloadButton({
-  download,
-  options,
-  themeState,
-  noticeId,
-}: DownloadButtonProps) {
-  const label = useDownloadLabel(download.busy, options, themeState);
-  const isBlocked =
-    themeState.kind === "refused" || themeState.kind === "timed-out";
-  return (
-    <button
-      className={clsx(
-        css.compositionActionsDownload,
-        isBlocked && css.isBlocked,
-      )}
-      disabled={
-        download.busy || options === undefined || themeState.kind !== "ready"
-      }
-      aria-busy={download.busy}
-      aria-describedby={isBlocked ? noticeId : undefined}
-      onClick={() => void download.start()}
-    >
-      {label}
-    </button>
-  );
-}
-
 /** Explicit exports use only the options and theme the live player acknowledged. */
-export function CompositionActions(props: Props) {
-  const { id, options, isScene, theme, themeState } = props;
+export function CompositionActions({
+  id,
+  captions,
+  options,
+  isScene,
+  theme,
+  themeState,
+  onRetryTheme,
+}: Props) {
   const noticeId = useId();
   const download = useCompositionDownload({
     id,
-    captions: props.captions,
+    captions,
     options,
     theme: isScene ? undefined : theme,
   });
@@ -102,12 +56,14 @@ export function CompositionActions(props: Props) {
           themeState={themeState}
           noticeId={noticeId}
         />
-        {!isScene && <NarrationLinks id={id} options={options} theme={theme} />}
+        {isScene ? null : (
+          <NarrationLinks id={id} options={options} theme={theme} />
+        )}
       </div>
       <ThemeExportNotice
         id={noticeId}
         state={themeState}
-        onRetry={props.onRetryTheme}
+        onRetry={onRetryTheme}
       />
       <p className={css.compositionActionsStatus} role="status">
         {download.status}
@@ -120,7 +76,7 @@ export function CompositionActions(props: Props) {
 function useCaptionDownload(
   id: string,
   options: CaptionDownloadOptions,
-): Readonly<{ isBusy: boolean; hasFailed: boolean; start: () => void }> {
+): { isBusy: boolean; hasFailed: boolean; start: () => void } {
   const [state, setState] = useState(CAPTION_DOWNLOAD_IDLE);
   return {
     isBusy: state.busyId !== undefined,
@@ -132,8 +88,14 @@ function useCaptionDownload(
       }
       setState(started);
       downloadCaptionFile({ id, options }).then(
-        () => setState((current) => finishCaptionDownload(current, id, false)),
-        () => setState((current) => finishCaptionDownload(current, id, true)),
+        () =>
+          setState((current) =>
+            finishCaptionDownload(current, { id, hasFailed: false }),
+          ),
+        () =>
+          setState((current) =>
+            finishCaptionDownload(current, { id, hasFailed: true }),
+          ),
       );
     },
   };
@@ -169,13 +131,13 @@ function NarrationLinks({
       >
         {"Captions"}
       </button>
-      {captions.hasFailed && (
+      {captions.hasFailed ? (
         <span role="alert">
           {
             "Captions could not be made with these settings. Check the showcase terminal."
           }
         </span>
-      )}
+      ) : null}
     </>
   );
 }

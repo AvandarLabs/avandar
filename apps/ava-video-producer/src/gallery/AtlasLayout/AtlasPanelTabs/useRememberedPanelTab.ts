@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { readRememberedPanelTab, rememberPanelTab } from "./rememberedPanelTab";
+import {
+  readRememberedPanelTab,
+  rememberPanelTab,
+} from "./rememberedPanelTabHelpers/rememberedPanelTabHelpers";
 import type { AtlasPanelTab } from "./AtlasPanelTabs";
 
 function _getSessionStorage(): Storage | undefined {
@@ -18,15 +21,15 @@ function _getSessionStorage(): Storage | undefined {
  */
 export function useRememberedPanelTab(
   itemId: string,
-): readonly [AtlasPanelTab, (tab: AtlasPanelTab) => void] {
+): [AtlasPanelTab, (tab: AtlasPanelTab) => void] {
   const [tab, setTab] = useState<AtlasPanelTab>(() =>
     readRememberedPanelTab(_getSessionStorage(), itemId),
   );
   useEffect(
     function rememberOpenTab() {
-      rememberPanelTab(_getSessionStorage(), itemId, tab);
+      rememberPanelTab({ storage: _getSessionStorage(), itemId, tab });
     },
     [itemId, tab],
   );
-  return [tab, setTab] as const;
+  return [tab, setTab];
 }

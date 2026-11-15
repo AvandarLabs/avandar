@@ -1,9 +1,6 @@
-import type { AtlasPanelTab } from "./AtlasPanelTabs";
+import type { AtlasPanelTab } from "../AtlasPanelTabs";
 
 const STORAGE_KEY = "atlas-panel-tab:v1";
-
-type ReadableStorage = Pick<Storage, "getItem">;
-type WritableStorage = Pick<Storage, "setItem" | "removeItem">;
 
 /**
  * The tab an item's modal had open before the page reloaded, which Save as
@@ -12,7 +9,7 @@ type WritableStorage = Pick<Storage, "setItem" | "removeItem">;
  * value is not one this reads.
  */
 export function readRememberedPanelTab(
-  storage: ReadableStorage | undefined,
+  storage: Pick<Storage, "getItem"> | undefined,
   itemId: string,
 ): AtlasPanelTab {
   try {
@@ -38,11 +35,12 @@ export function readRememberedPanelTab(
  * worth restoring, so choosing Details forgets it. One item is remembered at a
  * time. A blocked storage is ignored.
  */
-export function rememberPanelTab(
-  storage: WritableStorage | undefined,
-  itemId: string,
-  tab: AtlasPanelTab,
-): void {
+export function rememberPanelTab(options: {
+  storage: Pick<Storage, "setItem" | "removeItem"> | undefined;
+  itemId: string;
+  tab: AtlasPanelTab;
+}): void {
+  const { storage, itemId, tab } = options;
   try {
     if (tab === "tokens") {
       storage?.setItem(STORAGE_KEY, JSON.stringify({ itemId, tab }));

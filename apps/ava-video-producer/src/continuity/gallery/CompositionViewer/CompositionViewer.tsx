@@ -1,24 +1,13 @@
 import clsx from "clsx";
-import { useMemo, useRef, type RefObject } from "react";
-import {
-  AtlasPanelTabs,
-  type AtlasPanelTab,
-} from "../../../gallery/AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
+import { useRef } from "react";
 import { useRememberedPanelTab } from "../../../gallery/AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";
-import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
-import { VideoThemePanel } from "../../../gallery/VideoThemePanel/VideoThemePanel";
-import {
-  createExportThemeFromDraft,
-  createSnapshotFromDraft,
-} from "../../../videoThemeEditor/themeDraft/themeDraft";
 import { isSceneEntry } from "../../continuityCatalog";
-import { CompositionActions } from "./CompositionActions/CompositionActions";
-import { CompositionControls } from "./CompositionControls";
+import { CompositionSettings } from "./CompositionSettings/CompositionSettings";
+import { CompositionStage } from "./CompositionStage/CompositionStage";
 import { CompositionSummary } from "./CompositionSummary";
 import css from "./CompositionViewer.module.css";
 import { useCompositionAppearance } from "./useCompositionAppearance";
 import { useCompositionPlayer } from "./useCompositionPlayer";
-import { useCompositionTheme } from "./useCompositionTheme";
 import { VocabularyGuide } from "./VocabularyGuide/VocabularyGuide";
 import type { ContinuityCatalogEntry } from "../../continuityCatalog";
 
@@ -28,124 +17,6 @@ type Props = {
   onOptions: (options: { id: string; captions: boolean }) => void;
 };
 
-type SettingsProps = Readonly<{
-  selected: ContinuityCatalogEntry;
-  captions: boolean | undefined;
-  player: RefObject<HTMLIFrameElement | null>;
-  appearance: ReturnType<typeof useCompositionAppearance>;
-  tab: AtlasPanelTab;
-  onTabChange: (tab: AtlasPanelTab) => void;
-}>;
-
-/** The draft's theme for one composition: what its player shows and what its export sends. */
-function useCompositionDraftTheme(
-  selected: ContinuityCatalogEntry,
-  player: RefObject<HTMLIFrameElement | null>,
-) {
-  const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
-  const isScene = isSceneEntry(selected);
-  const snapshot = useMemo(
-    () =>
-      isScene
-        ? undefined
-        : createSnapshotFromDraft({
-            library,
-            themeId,
-            draft: validDraft,
-            itemId: selected.id,
-          }),
-    [isScene, library, themeId, validDraft, selected.id],
-  );
-  const exportTheme = useMemo(
-    () =>
-      createExportThemeFromDraft({
-        library,
-        themeId,
-        draft: validDraft,
-        itemId: selected.id,
-      }),
-    [library, themeId, validDraft, selected.id],
-  );
-  const theme = useCompositionTheme({
-    id: selected.id,
-    player,
-    snapshot,
-    isScene,
-    hasDraftIssues: hasIssues,
-  });
-  return { isScene, exportTheme, theme };
-}
-
-function CompositionSettings({
-  selected,
-  captions,
-  player,
-  appearance,
-  tab,
-  onTabChange,
-}: SettingsProps) {
-  const { isScene, exportTheme, theme } = useCompositionDraftTheme(
-    selected,
-    player,
-  );
-  const details = (
-    <>
-      <CompositionControls appearance={appearance} isScene={isScene} />
-      <CompositionActions
-        id={selected.id}
-        captions={captions}
-        options={appearance.options}
-        isScene={isScene}
-        theme={exportTheme}
-        themeState={theme.exportState}
-        onRetryTheme={theme.retry}
-      />
-    </>
-  );
-  const tokens = isScene ? undefined : (
-    <VideoThemePanel
-      key={selected.id}
-      item={{
-        id: selected.id,
-        scopeLabel: "This composition only",
-        name: "This composition",
-      }}
-      usedTokens={theme.usedTokens}
-    />
-  );
-  return (
-    <AtlasPanelTabs
-      tab={tab}
-      onTabChange={onTabChange}
-      details={details}
-      tokens={tokens}
-    />
-  );
-}
-
-type StageProps = Readonly<{
-  selected: ContinuityCatalogEntry;
-  player: RefObject<HTMLIFrameElement | null>;
-  onLoad: () => void;
-}>;
-
-/** The live player, remounted for each composition. */
-function CompositionStage({ selected, player, onLoad }: StageProps) {
-  return (
-    <div className={css.stage}>
-      <iframe
-        key={selected.id}
-        className={css.compositionViewerPlayer}
-        ref={player}
-        src={`/live.html?id=${encodeURIComponent(selected.id)}`}
-        title={selected.title}
-        onLoad={onLoad}
-        allowFullScreen
-      />
-    </div>
-  );
-}
-
 /** One live composition with matching exports, its design tokens, and reusable study guidance. */
 export function CompositionViewer({ selected, captions, onOptions }: Props) {
   const player = useRef<HTMLIFrameElement>(null);
@@ -153,17 +24,16 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
   const appearance = useCompositionAppearance(selected.id, player, isScene);
   const [tab, setTab] = useRememberedPanelTab(selected.id);
   useCompositionPlayer({ id: selected.id, player, onOptions });
+  const isTokenPanel = tab === "tokens" && !isScene;
   return (
     <section
-      className={clsx(
-        css.compositionViewer,
-        tab === "tokens" && !isScene && css.isTokenPanel,
-      )}
+      className={clsx(css.compositionViewer, isTokenPanel && css.isTokenPanel)}
       aria-label="Composition screening"
     >
       <CompositionStage
         selected={selected}
         player={player}
+        isTokenPanel={isTokenPanel}
         onLoad={appearance.loaded}
       />
       <div className={css.details}>

@@ -1,5 +1,5 @@
 import { Checkbox } from "@mantine/core";
-import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromeProvider/AtlasChromeProvider";
+import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromeProvider";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import css from "./CompositionControls.module.css";
 import type { useCompositionAppearance } from "./useCompositionAppearance";

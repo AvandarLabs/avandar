@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { afterDownloads } from "../../../showcase/download.js";
 import { STOCK_CATALOG, type StockPresetId } from "../../stock/catalog";
-import { copyTextToClipboard } from "../copyText/copyText";
+import { copyTextToClipboard } from "../copyText";
 import {
   type ContentDraft,
   ContentDraftModule,

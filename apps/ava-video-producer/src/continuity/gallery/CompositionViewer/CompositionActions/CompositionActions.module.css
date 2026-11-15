@@ -6,20 +6,6 @@
   margin-top: 20px;
 }
 
-.compositionActionsDownload {
-  background: var(--ava-primary-7);
-  border: 0;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  padding: 12px 18px;
-}
-
-.compositionActionsDownload:disabled {
-  cursor: wait;
-  opacity: 0.55;
-}
-
 /* The caption download posts the export's theme, so it is a button styled as its sibling links. */
 .compositionActionsLink {
   background: none;
@@ -49,45 +35,4 @@
 
 :global(dialog:modal) .compositionActionsStatus:empty {
   display: none;
-}
-
-/* A download the theme blocks is unavailable, not busy: it explains itself in the notice below. */
-.compositionActionsDownload.isBlocked:disabled {
-  cursor: not-allowed;
-}
-
-.compositionActionsError {
-  align-items: flex-start;
-  color: var(--mantine-color-red-9);
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 12px;
-  gap: 6px;
-  line-height: 1.5;
-  margin: 12px 0 0;
-}
-
-.compositionActionsErrorIcon {
-  color: var(--mantine-color-red-6);
-  flex: none;
-  margin-top: 2px;
-}
-
-.compositionActionsError > span {
-  flex: 1 1 200px;
-}
-
-.compositionActionsRetry {
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--ava-primary-7);
-  cursor: pointer;
-  font: inherit;
-  padding: 4px 10px;
-}
-
-.compositionActionsRetry:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 3px;
 }

@@ -50,11 +50,12 @@ function usePlayingUnlessReducedMotion(initialPlaying: boolean) {
 }
 
 /** Remounts for each motion to isolate playback, pending exports, and the editor's scope. */
-export function PreviewDialogContent(props: Props): ReactNode {
-  const { preset, contentState } = props;
-  const [playing, setPlaying] = usePlayingUnlessReducedMotion(
-    props.initialPlaying,
-  );
+export function PreviewDialogContent({
+  initialPlaying,
+  ...detailsProps
+}: Props): ReactNode {
+  const { preset, contentState } = detailsProps;
+  const [playing, setPlaying] = usePlayingUnlessReducedMotion(initialPlaying);
   const [frame, setFrame] = useFrames(playing, preset.loopFrames);
   const [tab, setTab] = useRememberedPanelTab(preset.id);
   const usage = useObservedTokenUsage();
@@ -89,7 +90,7 @@ export function PreviewDialogContent(props: Props): ReactNode {
       <AtlasPanelTabs
         tab={tab}
         onTabChange={setTab}
-        details={<PreviewDetails {...props} />}
+        details={<PreviewDetails {...detailsProps} />}
         tokens={
           <VideoThemePanel
             item={{

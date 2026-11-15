@@ -24,7 +24,6 @@ export function PreviewDetails({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const referenceBrief = buildReferenceBrief();
   const { exporting, exportStatus, canExport, download } = usePreviewDownload({
     preset,
     contentState,
@@ -79,7 +78,7 @@ export function PreviewDetails({
           className="button button-primary"
           onClick={() =>
             onCopy(
-              referenceBrief({ preset, accent, background }),
+              buildReferenceBrief({ preset, accent, background }),
               "Creative brief copied",
             )
           }

@@ -4,8 +4,6 @@ import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft
 import { useGalleryVideoTheme } from "../../GalleryVideoTheme/GalleryVideoTheme";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
 
-type Options = Pick<PreviewProps, "preset" | "contentState">;
-
 /**
  * Tracks an MP4 download of the previewed motion with the theme the preview
  * shows, unsaved edits included, and surfaces progress and failures. An
@@ -14,7 +12,7 @@ type Options = Pick<PreviewProps, "preset" | "contentState">;
 export function usePreviewDownload({
   preset,
   contentState,
-}: Readonly<Options>): {
+}: Readonly<Pick<PreviewProps, "preset" | "contentState">>): {
   exporting: boolean;
   exportStatus: string;
   canExport: boolean;

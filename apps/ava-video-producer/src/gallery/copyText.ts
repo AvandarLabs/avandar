@@ -11,7 +11,7 @@ export async function copyTextToClipboard(
     await navigator.clipboard.writeText(value);
     return;
   } catch {
-    /* Local HTTP fallback. */
+    // Local HTTP fallback.
   }
   const previousFocus =
     document.activeElement instanceof HTMLElement ||

@@ -1,0 +1,44 @@
+.compositionStage {
+  background: var(--ava-neutral-9);
+  border-radius: 6px;
+  grid-area: stage;
+  min-height: 0;
+  min-width: 0;
+}
+
+.compositionStagePlayer {
+  aspect-ratio: 1.6;
+  background: #0b1219;
+  border: 0;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+  max-width: calc((100dvh - 150px) * 1.6);
+  width: 100%;
+}
+
+/*
+ * While the Design tokens tab is open on a phone, the player stays pinned
+ * under the dialog header as a small strip, as in the motion preview. The
+ * strip sizes come from the gallery stylesheet, with the same values as
+ * fallbacks.
+ */
+@media (width <= 760px) {
+  .compositionStageIsTokenPanel {
+    border-radius: 0;
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    height: var(--atlas-strip-height, calc(14dvh + 48px));
+    inset-block-start: var(--atlas-header-height, 64px);
+    margin: -10px -10px 0;
+    place-items: center;
+    position: sticky;
+    z-index: 4;
+  }
+
+  .compositionStageIsTokenPanel .compositionStagePlayer {
+    height: 100%;
+    max-width: 100%;
+    width: auto;
+  }
+}

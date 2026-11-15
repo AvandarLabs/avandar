@@ -31,7 +31,7 @@ const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
  */
 function useItemThemeColors(
   itemId: string | undefined,
-): Readonly<{ accent: string; background: string }> | undefined {
+): { accent: string; background: string } | undefined {
   const { library, themeId, draft } = useGalleryVideoTheme();
   return useMemo(() => {
     if (!itemId) {
