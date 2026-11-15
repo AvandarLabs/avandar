@@ -6,7 +6,9 @@ import css from "./ContinuityOverlays.module.css";
 export function ContinuityBoxOutline() {
   const { sketch, stroke } = useVideoTokens();
   const profile = sketch.box;
-  if (profile.roughness === 0) return null;
+  if (profile.roughness === 0) {
+    return null;
+  }
   return (
     <div className={css.boxOutline}>
       <Box

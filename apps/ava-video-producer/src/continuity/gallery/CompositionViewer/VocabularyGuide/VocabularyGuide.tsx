@@ -24,7 +24,7 @@ export function VocabularyGuide({ entry }: Props) {
         </div>
         <div>
           <dt>{"Keywords / tags"}</dt>
-          <dd>{entry.tags.map((tag) => tag).join(" · ")}</dd>
+          <dd>{entry.tags.join(" · ")}</dd>
         </div>
         <div>
           <dt>{"Avoid when"}</dt>

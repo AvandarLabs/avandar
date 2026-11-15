@@ -204,7 +204,7 @@ export const continuityBeatSchema = z
       .optional(),
   })
   .strict();
-/** Why a continuity plan can no longer set its own palette or sketch. */
+/** Why a continuity plan cannot set its own palette or sketch. */
 const THEMED_FIELD_MESSAGE =
   "Colours and sketch roughness come from the video theme. Set them in the theme's overrides for this composition (themes/<theme>.theme.json, overrides.<composition id>).";
 /** Strict film-use grammar shared by long explainers and isolated atlas studies. */
