@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { memo } from "react";
 import { Icon } from "../../MotionGallery/Icon";
 import type { ReactNode, Ref } from "react";
@@ -33,7 +32,6 @@ export const AtlasCard = memo(function AtlasCard({
   previewRef,
   onOpen,
 }: Props) {
-  const { t } = useLingui();
   return (
     <article className="motion-card">
       <button
@@ -41,7 +39,7 @@ export const AtlasCard = memo(function AtlasCard({
         type="button"
         className="card-preview"
         onClick={onOpen}
-        aria-label={t`Explore ${title}`}
+        aria-label={`Explore ${title}`}
       >
         {thumbnail}
         <span className="preview-open">
@@ -64,11 +62,9 @@ export const AtlasCard = memo(function AtlasCard({
           <button
             type="button"
             onClick={onOpen}
-            aria-label={t`View ${title} details`}
+            aria-label={`View ${title} details`}
           >
-            <span>
-              <Trans>Explore</Trans>
-            </span>
+            <span>Explore</span>
             <Icon name="arrow" size={15} />
           </button>
         </div>

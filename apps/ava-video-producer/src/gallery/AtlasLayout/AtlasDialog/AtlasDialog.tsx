@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 import { Icon } from "../../MotionGallery/Icon";
 import { usePreviewKeys } from "../../MotionGallery/usePreviewKeys";
@@ -87,7 +86,6 @@ export function AtlasDialog({
   onNext,
   children,
 }: Props) {
-  const { t } = useLingui();
   const dialog = useModalDialog();
   usePreviewKeys({ enabled: true, onPrevious, onNext, onClose, frame: dialog });
   return (
@@ -126,7 +124,7 @@ export function AtlasDialog({
         <div
           className={css.controls}
           role="group"
-          aria-label={t`Preview controls`}
+          aria-label="Preview controls"
         >
           <button
             type="button"
@@ -152,8 +150,8 @@ export function AtlasDialog({
             type="button"
             className="icon-button"
             onClick={onClose}
-            aria-label={t`Close preview`}
-            title={t`Close preview`}
+            aria-label="Close preview"
+            title="Close preview"
             autoFocus
           >
             <Icon name="close" />

@@ -1,5 +1,3 @@
-import { I18nProvider } from "@lingui/react";
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
@@ -10,7 +8,6 @@ import {
   useGalleryVideoTheme,
 } from "../GalleryVideoTheme/GalleryVideoTheme";
 import { HelperGallery } from "../HelperGallery/HelperGallery";
-import { galleryI18n } from "../i18n";
 import { AtlasSections, getAtlasSection } from "./AtlasSections";
 import { GalleryHeader } from "./GalleryHeader";
 import { GalleryIntroduction } from "./GalleryIntroduction";
@@ -60,7 +57,6 @@ function useItemThemeColors(
  * motion presets.
  */
 function MotionGallery() {
-  const { t } = useGalleryLingui();
   const {
     category,
     selectCategory,
@@ -94,7 +90,7 @@ function MotionGallery() {
   return (
     <>
       <a className="skip-link" href="#library">
-        <Trans>Skip to motion library</Trans>
+        Skip to motion library
       </a>
       <GalleryHeader />
       <AtlasSections section="motions" />
@@ -120,19 +116,15 @@ function MotionGallery() {
             <div className="collection-subline">
               <span>
                 {category === "Saved references"
-                  ? t`Your references, ready for a creative brief.`
-                  : t`Explore a preset. Scrub the motion. Make it yours.`}
+                  ? "Your references, ready for a creative brief."
+                  : "Explore a preset. Scrub the motion. Make it yours."}
               </span>
               <span className="loop-spec">
-                <Trans>6 SEC LOOPS</Trans>
-                <span>
-                  <Trans>·</Trans>
-                </span>
-                <Trans>30 FPS</Trans>
-                <span>
-                  <Trans>·</Trans>
-                </span>
-                <Trans>LIVE PREVIEWS</Trans>
+                6 SEC LOOPS
+                <span>·</span>
+                30 FPS
+                <span>·</span>
+                LIVE PREVIEWS
               </span>
             </div>
             {results.length ? (
@@ -162,32 +154,28 @@ function MotionGallery() {
                 />
                 <h3>
                   {category === "Saved references" && !query
-                    ? t`Keep a little inspiration.`
-                    : t`No matching motions.`}
+                    ? "Keep a little inspiration."
+                    : "No matching motions."}
                 </h3>
                 <p>
                   {category === "Saved references" && !query
-                    ? t`Use the bookmark on any preset to add it to your references.`
-                    : t`Try a different keyword, or explore the full collection.`}
+                    ? "Use the bookmark on any preset to add it to your references."
+                    : "Try a different keyword, or explore the full collection."}
                 </p>
                 <button
                   className="button"
                   onClick={() => selectCategory("All motions")}
                 >
-                  <Trans>Explore all motions</Trans>
+                  Explore all motions
                   <Icon name="arrow" size={16} />
                 </button>
               </div>
             )}
           </section>
           <footer className="library-footer">
-            <p>
-              <Trans>A visual vocabulary for your next explanation.</Trans>
-            </p>
+            <p>A visual vocabulary for your next explanation.</p>
             <span>
-              <Trans>
-                CONCEPTUAL STUDIES / {STOCK_CATALOG.length} PRESETS / VOL. 01
-              </Trans>
+              CONCEPTUAL STUDIES / {STOCK_CATALOG.length} PRESETS / VOL. 01
             </span>
           </footer>
         </main>
@@ -253,9 +241,5 @@ function AtlasSectionRoot() {
 
 const root: HTMLElement | null = document.getElementById("motion-root");
 if (root) {
-  createRoot(root).render(
-    <I18nProvider i18n={galleryI18n}>
-      <AtlasSectionRoot />
-    </I18nProvider>,
-  );
+  createRoot(root).render(<AtlasSectionRoot />);
 }

@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import {
   createContext,
   useCallback,
@@ -48,7 +47,6 @@ export function useGalleryVideoTheme(): GalleryVideoThemeValue {
 
 /** Copies the active theme and its draft as the JSON a save would write. */
 function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
-  const { t } = useLingui();
   const { library, themeId, draft, setCopyStatus } = state;
   return useCallback(async () => {
     const json = buildThemeJsonFromDraft({ library, themeId, draft });
@@ -56,12 +54,12 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
       return;
     }
     try {
-      await copyTextToClipboard(json, t`Theme JSON`);
+      await copyTextToClipboard(json, "Theme JSON");
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");
     }
-  }, [library, themeId, draft, setCopyStatus, t]);
+  }, [library, themeId, draft, setCopyStatus]);
 }
 
 /**

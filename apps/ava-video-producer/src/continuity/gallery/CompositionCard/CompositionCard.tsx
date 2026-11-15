@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { AtlasCard } from "../../../gallery/AtlasLayout/AtlasCard/AtlasCard";
 import { isSceneEntry } from "../../continuityCatalog";
@@ -26,14 +25,13 @@ function _posterSources(id: string, themeId: string): readonly string[] {
  * image when it falls back, so the fallback gets its own load and error events.
  */
 function PosterThumbnail({ id, themeId }: { id: string; themeId: string }) {
-  const { t } = useLingui();
   const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
   const sources = _posterSources(id, themeId);
   const poster = sources.find((source) => !failedSources.has(source));
   if (poster === undefined) {
-    return <span className={css.missing}>{t`NO POSTER YET`}</span>;
+    return <span className={css.missing}>{"NO POSTER YET"}</span>;
   }
   return (
     <>
@@ -48,7 +46,7 @@ function PosterThumbnail({ id, themeId }: { id: string; themeId: string }) {
         }
       />
       {poster === sources[0] ? null : (
-        <span className={css.fallback}>{t`Preview in classic theme`}</span>
+        <span className={css.fallback}>{"Preview in classic theme"}</span>
       )}
     </>
   );
@@ -66,7 +64,6 @@ export function CompositionCard({
   themeId = "classic",
   onOpen,
 }: Props) {
-  const { t } = useLingui();
   const seconds = Math.round(entry.frames / 30);
   return (
     <AtlasCard
@@ -77,8 +74,8 @@ export function CompositionCard({
       badge={
         <span className="card-state">
           <i />
-          {isSceneEntry(entry) ? t`STORYBOARD SCENES` : t`CONTINUITY`} ·{" "}
-          {t`${seconds} SEC`}
+          {isSceneEntry(entry) ? "STORYBOARD SCENES" : "CONTINUITY"} ·{" "}
+          {`${seconds} SEC`}
         </span>
       }
       thumbnail={<PosterThumbnail id={entry.id} themeId={themeId} />}

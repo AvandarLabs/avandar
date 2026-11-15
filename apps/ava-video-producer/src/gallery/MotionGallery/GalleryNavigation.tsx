@@ -1,5 +1,4 @@
 import { propEq } from "@avandar/utils";
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import {
   STOCK_CATALOG,
   STOCK_CATEGORIES,
@@ -26,23 +25,17 @@ export function GalleryNavigation({
   selectCategory,
   saved,
 }: Readonly<Props>): ReactNode {
-  const { t } = useGalleryLingui();
-
   return (
-    <aside className="sidebar" aria-label={t`Library navigation`}>
+    <aside className="sidebar" aria-label="Library navigation">
       <div className="sidebar-top">
-        <p className="eyebrow">
-          <Trans>BROWSE THE COLLECTION</Trans>
-        </p>
+        <p className="eyebrow">BROWSE THE COLLECTION</p>
         <button
           className={`category-button ${category === "All motions" ? "active" : ""}`}
           onClick={() => selectCategory("All motions")}
           aria-pressed={category === "All motions"}
         >
           <Icon name="grid" />
-          <span>
-            <Trans>All motions</Trans>
-          </span>
+          <span>All motions</span>
           <span className="category-count">{STOCK_CATALOG.length}</span>
         </button>
         <div className="category-list">
@@ -68,41 +61,34 @@ export function GalleryNavigation({
             aria-pressed={category === "Saved references"}
           >
             <Icon name="bookmark" />
-            <span>
-              <Trans>Saved references</Trans>
-            </span>
+            <span>Saved references</span>
             <span className="category-count">{saved.length}</span>
           </button>
         </div>
       </div>
       <div className="sidebar-note">
         <span className="note-symbol" aria-hidden="true">
-          <Trans>✳</Trans>
+          ✳
         </span>
         <h2>
-          <Trans>Find the movement.</Trans>
+          Find the movement.
           <br />
-          <Trans>Shape the story.</Trans>
+          Shape the story.
         </h2>
         <p>
-          <Trans>
-            Save a few references, then copy a creative brief for your next
-            film.
-          </Trans>
+          Save a few references, then copy a creative brief for your next film.
         </p>
         <div className="note-rule" />
         <span>
-          <Trans>CONCEPTUAL GRAPHICS</Trans>
+          CONCEPTUAL GRAPHICS
           <br />
-          <Trans>NOT PRODUCT FOOTAGE</Trans>
+          NOT PRODUCT FOOTAGE
         </span>
       </div>
       <div className="sidebar-bottom">
         <span className="tiny-dot" />
-        <Trans>LOCAL MOTION LIBRARY</Trans>
-        <span>
-          <Trans>01</Trans>
-        </span>
+        LOCAL MOTION LIBRARY
+        <span>01</span>
       </div>
     </aside>
   );

@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { useMemo, useRef, type RefObject } from "react";
 import {
@@ -85,7 +84,6 @@ function CompositionSettings({
   tab,
   onTabChange,
 }: SettingsProps) {
-  const { t } = useLingui();
   const { isScene, exportTheme, theme } = useCompositionDraftTheme(
     selected,
     player,
@@ -109,8 +107,8 @@ function CompositionSettings({
       key={selected.id}
       item={{
         id: selected.id,
-        scopeLabel: t`This composition only`,
-        name: t`This composition`,
+        scopeLabel: "This composition only",
+        name: "This composition",
       }}
       usedTokens={theme.usedTokens}
     />

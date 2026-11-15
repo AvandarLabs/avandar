@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { useId, useState } from "react";
 import css from "./CompositionActions.module.css";
@@ -37,7 +36,6 @@ function useDownloadLabel(
   options: CompositionExportOptions | undefined,
   themeState: ThemeExportState,
 ): string {
-  const { t } = useLingui();
   if (isBusy) {
     return "Preparing export…";
   }
@@ -45,7 +43,7 @@ function useDownloadLabel(
     return "Loading preview…";
   }
   return themeState.kind === "pending"
-    ? t`Applying design tokens…`
+    ? "Applying design tokens…"
     : "Download MP4";
 }
 
@@ -154,7 +152,6 @@ function NarrationLinks({
   options: CompositionExportOptions | undefined;
   theme: ExportTheme;
 }>) {
-  const { t } = useLingui();
   const cameraMotion =
     options && "cameraMotion" in options ? options.cameraMotion : true;
   const captions = useCaptionDownload(id, { cameraMotion, theme });
@@ -174,7 +171,9 @@ function NarrationLinks({
       </button>
       {captions.hasFailed && (
         <span role="alert">
-          {t`Captions could not be made with these settings. Check the showcase terminal.`}
+          {
+            "Captions could not be made with these settings. Check the showcase terminal."
+          }
         </span>
       )}
     </>

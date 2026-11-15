@@ -1,4 +1,3 @@
-import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { downloadFilm } from "../../../../showcase/download.js";
 import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
@@ -21,7 +20,6 @@ export function usePreviewDownload({
   canExport: boolean;
   download: () => Promise<void>;
 } {
-  const { t } = useGalleryLingui();
   const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState("");
@@ -44,7 +42,7 @@ export function usePreviewDownload({
       });
     } catch (error) {
       setExportStatus(
-        error instanceof Error ? error.message : t`Export failed. Try again.`,
+        error instanceof Error ? error.message : "Export failed. Try again.",
       );
     } finally {
       setExporting(false);

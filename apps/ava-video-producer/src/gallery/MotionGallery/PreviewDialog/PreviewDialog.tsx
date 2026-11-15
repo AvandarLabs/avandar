@@ -1,4 +1,3 @@
-import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { AtlasDialog } from "../../AtlasLayout/AtlasDialog/AtlasDialog";
 import {
   PreviewDialogContent,
@@ -20,14 +19,13 @@ export function PreviewDialog({
   onNext,
   ...contentProps
 }: Readonly<Props>): React.ReactNode {
-  const { t } = useGalleryLingui();
   const { preset } = contentProps;
   return (
     <AtlasDialog
       title={preset.name}
       subtitle={preset.category}
-      previousLabel={t`Previous motion`}
-      nextLabel={t`Next motion`}
+      previousLabel="Previous motion"
+      nextLabel="Next motion"
       describedBy="dialog-description"
       onClose={onClose}
       onPrevious={onPrevious}

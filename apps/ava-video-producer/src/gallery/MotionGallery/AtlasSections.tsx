@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { CONTINUITY_CATALOG } from "../../continuity/continuityCatalog";
 import css from "./AtlasSections.module.css";
@@ -32,9 +31,8 @@ export function getAtlasSection(): AtlasSection {
 
 /** Shared top-level collection navigation for every Atlas section. */
 export function AtlasSections({ section }: { section: AtlasSection }) {
-  const { t } = useLingui();
   return (
-    <nav className={css.sections} aria-label={t`Atlas sections`}>
+    <nav className={css.sections} aria-label="Atlas sections">
       {ATLAS_SECTIONS.map((item) => (
         <a
           key={item}
@@ -42,15 +40,13 @@ export function AtlasSections({ section }: { section: AtlasSection }) {
           className={clsx(css.section, item === section && css.active)}
           aria-current={item === section ? "page" : undefined}
         >
-          {item === "motions" ? (
-            <Trans>Motions</Trans>
-          ) : item === "compositions" ? (
-            <Trans>Compositions</Trans>
-          ) : item === "films" ? (
-            <Trans>Sample films</Trans>
-          ) : (
-            <Trans>Helpers</Trans>
-          )}
+          {item === "motions"
+            ? "Motions"
+            : item === "compositions"
+              ? "Compositions"
+              : item === "films"
+                ? "Sample films"
+                : "Helpers"}
         </a>
       ))}
     </nav>

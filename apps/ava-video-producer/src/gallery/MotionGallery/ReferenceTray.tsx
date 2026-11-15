@@ -1,4 +1,3 @@
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { type StockPresetId } from "../../stock/catalog";
 import { Icon } from "./Icon";
 import { useReferenceBrief } from "./useReferenceBrief";
@@ -22,31 +21,30 @@ export function ReferenceTray({
   background,
   onCopy,
 }: Readonly<Props>): ReactNode {
-  const { t } = useGalleryLingui();
   const referenceBrief = useReferenceBrief();
   return (
-    <div className="reference-tray" aria-label={t`Saved reference actions`}>
+    <div className="reference-tray" aria-label="Saved reference actions">
       <div className="tray-count">
         <Icon name="bookmark" size={17} />
         <strong>{saved.length}</strong>
         <span>
-          {saved.length === 1 ? t`reference saved` : t`references saved`}
+          {saved.length === 1 ? "reference saved" : "references saved"}
         </span>
       </div>
       <button className="tray-clear" onClick={() => setSaved([])}>
-        <Trans>Clear</Trans>
+        Clear
       </button>
       <button
         className="button button-primary"
         onClick={() =>
           onCopy(
-            t`Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => referenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
-            t`Reference brief copied`,
+            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => referenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
+            "Reference brief copied",
           )
         }
       >
         <Icon name="copy" size={15} />
-        <Trans>Copy brief</Trans>
+        Copy brief
         <Icon name="arrow" size={16} />
       </button>
     </div>

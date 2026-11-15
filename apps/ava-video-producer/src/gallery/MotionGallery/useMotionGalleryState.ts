@@ -1,5 +1,4 @@
 import { propEq } from "@avandar/utils";
-import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { afterDownloads } from "../../../showcase/download.js";
 import { STOCK_CATALOG, type StockPresetId } from "../../stock/catalog";
@@ -53,8 +52,6 @@ export type MotionGalleryState = {
  * playback.
  */
 export function useMotionGalleryState(): MotionGalleryState {
-  const { t } = useGalleryLingui();
-
   useEffect(function reloadOnRebuildNotification() {
     const events = new EventSource("/events");
     let generation: string | undefined;
@@ -191,15 +188,15 @@ export function useMotionGalleryState(): MotionGalleryState {
   const onCopy = useCallback(
     async (value: string, label: string) => {
       try {
-        await copyTextToClipboard(value, t`Text to copy`);
+        await copyTextToClipboard(value, "Text to copy");
         announce(label);
       } catch {
         announce(
-          t`Copy unavailable. Select the reference text and copy it manually.`,
+          "Copy unavailable. Select the reference text and copy it manually.",
         );
       }
     },
-    [announce, t],
+    [announce],
   );
 
   const results = useMemo(

@@ -1,7 +1,3 @@
-import { i18n } from "@lingui/core";
-import { compileMessage } from "@lingui/message-utils/compileMessage";
-import { I18nProvider } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
 import { Player, type PlayerRef } from "@remotion/player";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createRoot } from "react-dom/client";
@@ -22,8 +18,6 @@ import type { Film } from "./showcase.types";
 import "../theme.css";
 import "./player.css";
 
-i18n.setMessagesCompiler(compileMessage);
-i18n.loadAndActivate({ locale: "en", messages: {} });
 const id = new URLSearchParams(location.search).get("id") ?? "avandar-home";
 
 type SavedPlayback = Readonly<{
@@ -176,9 +170,7 @@ function LiveFilm(props: LiveFilmProps) {
       spaceKeyToPlayOrPause
       errorFallback={() => (
         <p className="liveError">
-          <Trans>
-            Preview unavailable. Check the showcase terminal, then reload.
-          </Trans>
+          Preview unavailable. Check the showcase terminal, then reload.
         </p>
       )}
     />
@@ -255,7 +247,7 @@ function CaptionToggle({ captions, onChange }: CaptionToggleProps) {
         checked={captions}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <Trans>Captions</Trans>
+      Captions
     </label>
   );
 }
@@ -317,23 +309,21 @@ function LivePlayer({ film }: { film: Film }) {
     usedTokens: usage.paths,
   });
   return (
-    <I18nProvider i18n={i18n}>
-      <div className="liveFilm">
-        <VideoTokenUsageContext.Provider value={usage.report}>
-          <LiveFilm
-            film={{ ...film, theme, plan: previewPlan }}
-            player={player}
-            previewFrames={previewFrames}
-            captions={captions}
-            speed={speed}
-            loop={loop}
-          />
-        </VideoTokenUsageContext.Provider>
-        {film.plan?.captions && !continuity ? (
-          <CaptionToggle captions={captions} onChange={state.setCaptions} />
-        ) : null}
-      </div>
-    </I18nProvider>
+    <div className="liveFilm">
+      <VideoTokenUsageContext.Provider value={usage.report}>
+        <LiveFilm
+          film={{ ...film, theme, plan: previewPlan }}
+          player={player}
+          previewFrames={previewFrames}
+          captions={captions}
+          speed={speed}
+          loop={loop}
+        />
+      </VideoTokenUsageContext.Provider>
+      {film.plan?.captions && !continuity ? (
+        <CaptionToggle captions={captions} onChange={state.setCaptions} />
+      ) : null}
+    </div>
   );
 }
 

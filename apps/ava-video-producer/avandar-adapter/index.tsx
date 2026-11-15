@@ -8,7 +8,6 @@ import "@fontsource-variable/figtree";
 import { i18n } from "@lingui/core";
 import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
 import { Group, Text, ActionIcon, Title, Box } from "@mantine/core";
 import logo from "@product-assets/logoWhite.png";
 import {
@@ -64,8 +63,8 @@ const names = {
   dashboards: "Dashboards",
   cases: "Case Manager",
   map: "Maps",
-  ontology: <Trans>Case Manager</Trans>,
-  "attribute-mapping": <Trans>Case Manager</Trans>,
+  ontology: "Case Manager",
+  "attribute-mapping": "Case Manager",
 };
 const routeIndex = {
   import: 1,

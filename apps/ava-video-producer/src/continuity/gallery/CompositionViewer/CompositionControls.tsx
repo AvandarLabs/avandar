@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Checkbox } from "@mantine/core";
 import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromeProvider/AtlasChromeProvider";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
@@ -22,11 +21,9 @@ export function CompositionControls({ appearance, isScene }: ControlsProps) {
       <div className={css.controls}>
         {isScene ? (
           <p className={css.help}>
-            <Trans>
-              Storyboard scenes play with their authored theme and per-shot
-              field colors. Design tokens, camera motion, motion blur, and
-              annotation settings apply to continuity compositions only.
-            </Trans>
+            Storyboard scenes play with their authored theme and per-shot field
+            colors. Design tokens, camera motion, motion blur, and annotation
+            settings apply to continuity compositions only.
           </p>
         ) : null}
         <TransportControls appearance={appearance} isScene={isScene} />
@@ -36,20 +33,13 @@ export function CompositionControls({ appearance, isScene }: ControlsProps) {
 }
 
 function TransportControls({ appearance, isScene }: ControlsProps) {
-  const { t } = useLingui();
   return (
     <div className={css.transport}>
-      <button onClick={() => appearance.send("play")}>
-        <Trans>Play</Trans>
-      </button>
-      <button onClick={() => appearance.send("pause")}>
-        <Trans>Pause</Trans>
-      </button>
-      <button onClick={() => appearance.send("replay")}>
-        <Trans>Replay</Trans>
-      </button>
+      <button onClick={() => appearance.send("play")}>Play</button>
+      <button onClick={() => appearance.send("pause")}>Pause</button>
+      <button onClick={() => appearance.send("replay")}>Replay</button>
       <AtlasSelect
-        label={t`Speed`}
+        label="Speed"
         value={String(appearance.transport.speed)}
         data={[0.5, 1, 1.5, 2].map((speed) => ({
           value: String(speed),
@@ -64,7 +54,7 @@ function TransportControls({ appearance, isScene }: ControlsProps) {
       />
       <Checkbox
         size="xs"
-        label={t`Loop`}
+        label="Loop"
         checked={appearance.transport.loop}
         onChange={(event) => {
           const loop = event.currentTarget.checked;
@@ -77,12 +67,11 @@ function TransportControls({ appearance, isScene }: ControlsProps) {
 }
 
 function AppearanceToggles({ appearance }: Props) {
-  const { t } = useLingui();
   const labels = {
-    cameraMotion: t`Camera motion`,
-    motionBlur: t`Motion blur`,
-    annotations: t`Annotations`,
-    captions: t`Captions`,
+    cameraMotion: "Camera motion",
+    motionBlur: "Motion blur",
+    annotations: "Annotations",
+    captions: "Captions",
   };
   return (
     <>

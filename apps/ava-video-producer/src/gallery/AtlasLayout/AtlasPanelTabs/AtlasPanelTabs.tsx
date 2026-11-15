@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Tabs } from "@mantine/core";
 import { useState, type ReactNode } from "react";
 import { AtlasChromeProvider } from "../AtlasChromeProvider/AtlasChromeProvider";
@@ -21,7 +20,6 @@ type Props = Readonly<{
  * and both panels stay mounted, so a running export keeps its status.
  */
 export function AtlasPanelTabs({ tab, onTabChange, details, tokens }: Props) {
-  const { t } = useLingui();
   const [hasVisitedTokens, setVisitedTokens] = useState(tab === "tokens");
   if (!tokens) {
     return <>{details}</>;
@@ -45,9 +43,9 @@ export function AtlasPanelTabs({ tab, onTabChange, details, tokens }: Props) {
           panel: css.panel,
         }}
       >
-        <Tabs.List grow aria-label={t`Preview panels`}>
-          <Tabs.Tab value="details">{t`Details`}</Tabs.Tab>
-          <Tabs.Tab value="tokens">{t`Design tokens`}</Tabs.Tab>
+        <Tabs.List grow aria-label="Preview panels">
+          <Tabs.Tab value="details">{"Details"}</Tabs.Tab>
+          <Tabs.Tab value="tokens">{"Design tokens"}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="details">{details}</Tabs.Panel>
         <Tabs.Panel value="tokens">

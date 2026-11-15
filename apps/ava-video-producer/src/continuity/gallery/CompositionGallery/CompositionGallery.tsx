@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { AtlasCategoryNav } from "../../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../../../gallery/AtlasLayout/AtlasCollection/AtlasCollection";
 import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialog";
@@ -17,33 +16,34 @@ type Props = {
 
 /** Section copy, so one gallery serves both Compositions and Sample films. */
 function useSectionCopy(section: Props["section"]) {
-  const { t } = useLingui();
   return section === "films"
     ? {
-        eyebrow: t`SAMPLE FILMS`,
+        eyebrow: "SAMPLE FILMS",
         title: (
-          <Trans>
+          <>
             Stories, <em>start to finish.</em>
-          </Trans>
+          </>
         ),
-        description: t`Complete films built from the motion library. Each one sequences several compositions into a single argument.`,
-        all: t`All films`,
-        navigation: t`Film categories`,
-        search: t`Search films`,
-        empty: t`No matching films.`,
+        description:
+          "Complete films built from the motion library. Each one sequences several compositions into a single argument.",
+        all: "All films",
+        navigation: "Film categories",
+        search: "Search films",
+        empty: "No matching films.",
       }
     : {
-        eyebrow: t`THE COMPOSITION COLLECTION`,
+        eyebrow: "THE COMPOSITION COLLECTION",
         title: (
-          <Trans>
+          <>
             Motions, <em>combined.</em>
-          </Trans>
+          </>
         ),
-        description: t`Reusable compositions: transitions, compositing and recipes that sequence or layer two or more motions.`,
-        all: t`All compositions`,
-        navigation: t`Composition categories`,
-        search: t`Search compositions`,
-        empty: t`No matching compositions.`,
+        description:
+          "Reusable compositions: transitions, compositing and recipes that sequence or layer two or more motions.",
+        all: "All compositions",
+        navigation: "Composition categories",
+        search: "Search compositions",
+        empty: "No matching compositions.",
       };
 }
 
@@ -52,7 +52,6 @@ function useSectionCopy(section: Props["section"]) {
  * card per entry, and the live player in the shared preview modal.
  */
 export function CompositionGallery({ section }: Props) {
-  const { t } = useLingui();
   const getCategoryLabel = useCategoryLabel();
   const copy = useSectionCopy(section);
   const { themeId } = useGalleryVideoTheme();
@@ -66,14 +65,14 @@ export function CompositionGallery({ section }: Props) {
   return (
     <>
       <a className="skip-link" href="#library">
-        <Trans>Skip to the collection</Trans>
+        Skip to the collection
       </a>
       <GalleryHeader />
       <AtlasSections section={section} />
       <div className="workspace">
         <AtlasCategoryNav
           label={copy.navigation}
-          eyebrow={t`BROWSE THE COLLECTION`}
+          eyebrow="BROWSE THE COLLECTION"
           allLabel={copy.all}
           total={categories.reduce((total, item) => total + item.count, 0)}
           categories={categories}
@@ -92,7 +91,7 @@ export function CompositionGallery({ section }: Props) {
           query={selection.query}
           onQueryChange={gallery.setQuery}
           searchLabel={copy.search}
-          searchPlaceholder={t`Search titles, ideas, tags…`}
+          searchPlaceholder="Search titles, ideas, tags…"
           emptyTitle={copy.empty}
           onReset={() => {
             gallery.setQuery("");
@@ -115,8 +114,8 @@ export function CompositionGallery({ section }: Props) {
         <AtlasDialog
           title={open.title}
           subtitle={getCategoryLabel(open.category)}
-          previousLabel={t`Previous preview`}
-          nextLabel={t`Next preview`}
+          previousLabel="Previous preview"
+          nextLabel="Next preview"
           onClose={gallery.close}
           onPrevious={
             previous ? () => gallery.openEntry(previous.id) : undefined

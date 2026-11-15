@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Flex, ScrollArea } from "@mantine/core";
 import { useLayoutEffect, useRef } from "react";
 import { uuid } from "../../../../shared/lib/uuid";
@@ -66,17 +65,16 @@ export function OntologyScreen({ frame, width, height }: Props) {
 function useOntologyFixture(
   stage: ReturnType<typeof createOntologyStageFromFrame>,
 ): OntologyFixtureProjection {
-  const { t } = useLingui();
   const concepts: readonly OntologyConceptProjection[] = [
     {
       id: CONCEPT_IDS.response,
-      name: t`Response case`,
-      description: t`Fictional Harborfield response records.`,
+      name: "Response case",
+      description: "Fictional Harborfield response records.",
     },
     {
       id: CONCEPT_IDS.facility,
-      name: t`Facility`,
-      description: t`Fictional Harborfield facilities and available supplies.`,
+      name: "Facility",
+      description: "Fictional Harborfield facilities and available supplies.",
     },
   ];
   const concept = concepts[stage.conceptKey === "response" ? 0 : 1]!;

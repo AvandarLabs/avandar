@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Icon } from "../../MotionGallery/Icon";
 import type { ReactNode } from "react";
 
@@ -42,7 +41,6 @@ export function AtlasCollection({
   resetLabel,
   children,
 }: Props) {
-  const { t } = useLingui();
   return (
     <main className="library-main" id="library" tabIndex={-1}>
       <section className="library-intro" aria-labelledby="page-title">
@@ -79,7 +77,7 @@ export function AtlasCollection({
                 <button
                   type="button"
                   onClick={() => onQueryChange("")}
-                  aria-label={t`Clear search`}
+                  aria-label="Clear search"
                 >
                   <Icon name="close" size={14} />
                 </button>
@@ -94,11 +92,7 @@ export function AtlasCollection({
           <div className="empty-state">
             <Icon name="search" size={30} />
             <h3>{emptyTitle}</h3>
-            <p>
-              <Trans>
-                Try a different keyword, or explore the full collection.
-              </Trans>
-            </p>
+            <p>Try a different keyword, or explore the full collection.</p>
             <button type="button" className="button" onClick={onReset}>
               {resetLabel}
               <Icon name="arrow" size={16} />

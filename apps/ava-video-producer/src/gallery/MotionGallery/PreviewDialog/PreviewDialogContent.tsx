@@ -1,4 +1,3 @@
-import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { StockGraphic } from "../../../stock/StockGraphic";
@@ -52,7 +51,6 @@ function usePlayingUnlessReducedMotion(initialPlaying: boolean) {
 
 /** Remounts for each motion to isolate playback, pending exports, and the editor's scope. */
 export function PreviewDialogContent(props: Props): ReactNode {
-  const { t } = useGalleryLingui();
   const { preset, contentState } = props;
   const [playing, setPlaying] = usePlayingUnlessReducedMotion(
     props.initialPlaying,
@@ -96,8 +94,8 @@ export function PreviewDialogContent(props: Props): ReactNode {
           <VideoThemePanel
             item={{
               id: preset.id,
-              scopeLabel: t`This motion only`,
-              name: t`This motion`,
+              scopeLabel: "This motion only",
+              name: "This motion",
             }}
             usedTokens={usage.paths}
           />

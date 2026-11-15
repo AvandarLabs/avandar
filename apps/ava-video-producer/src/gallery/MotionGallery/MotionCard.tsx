@@ -1,4 +1,3 @@
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { memo } from "react";
 import { StockGraphic } from "../../stock/StockGraphic";
 import { GalleryItemTheme } from "../GalleryVideoTheme/GalleryItemTheme";
@@ -25,7 +24,6 @@ export const MotionCard = memo(function MotionCard({
   onOpen: (preset: Preset) => void;
   onSave: (id: StockPresetId) => void;
 }) {
-  const { t } = useGalleryLingui();
   const [element, visible] = useVisible();
   const [frame] = useFrames(
     playing && visible,
@@ -38,7 +36,7 @@ export const MotionCard = memo(function MotionCard({
         ref={element}
         className="card-preview"
         onClick={() => onOpen(preset)}
-        aria-label={t`Explore ${preset.name}`}
+        aria-label={`Explore ${preset.name}`}
       >
         {visible ? (
           <GalleryItemTheme itemId={preset.id}>
@@ -66,7 +64,7 @@ export const MotionCard = memo(function MotionCard({
             className={`card-state ${playing && visible ? "is-playing" : ""}`}
           >
             <i />
-            {playing && visible ? t`LIVE` : t`PAUSED`}
+            {playing && visible ? "LIVE" : "PAUSED"}
           </span>
         </div>
         <div className="card-heading">
@@ -78,8 +76,8 @@ export const MotionCard = memo(function MotionCard({
             onClick={() => onSave(preset.id)}
             aria-label={
               saved
-                ? t`Remove ${preset.name} from references`
-                : t`Save ${preset.name} to references`
+                ? `Remove ${preset.name} from references`
+                : `Save ${preset.name} to references`
             }
             aria-pressed={saved}
           >
@@ -89,17 +87,13 @@ export const MotionCard = memo(function MotionCard({
         <p>{preset.description}</p>
         <div className="card-foot">
           <code>
-            {String(index + 1).padStart(2, "0")}
-            <Trans>/</Trans>
-            {preset.id}
+            {String(index + 1).padStart(2, "0")}/{preset.id}
           </code>
           <button
             onClick={() => onOpen(preset)}
-            aria-label={t`View ${preset.name} details`}
+            aria-label={`View ${preset.name} details`}
           >
-            <span>
-              <Trans>Explore</Trans>
-            </span>
+            <span>Explore</span>
             <Icon name="arrow" size={15} />
           </button>
         </div>

@@ -1,5 +1,3 @@
-import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
 import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
 import { CollectionItem } from "../CollectionItem/CollectionItem";
 import { ContentDraftModule } from "../ContentDraftModule/ContentDraftModule";
@@ -28,14 +26,13 @@ export function CollectionField({
   onChange,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
-  const { i18n } = useLingui();
   const value = getStockValueFromPath({
     value: state.draft,
     path: context.path,
   });
   const items = Array.isArray(value) ? value : [];
   const keys = state.rowKeys[JSON.stringify(context.path)] ?? [];
-  const label = i18n._(control.label);
+  const label = control.label.message;
   return (
     <fieldset
       className={styles.collectionFieldCollection}
@@ -66,7 +63,7 @@ export function CollectionField({
           )
         }
       >
-        <Trans>Add {label} item</Trans>
+        Add {label} item
       </button>
     </fieldset>
   );
