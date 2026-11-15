@@ -30,7 +30,7 @@ const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
 });
 
 vi.mock("jspdf", () => {
-  return { default: jsPDFMock };
+  return { jsPDF: jsPDFMock };
 });
 
 // Imported after the mock so the module under test picks up the fake ctor.
