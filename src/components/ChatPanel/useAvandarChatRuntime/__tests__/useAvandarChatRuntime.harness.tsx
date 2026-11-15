@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { act, render, waitFor } from "@testing-library/react";
 import { expect } from "vitest";
+import { parseChatSessionIndex } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import { DataExplorerStandIn } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/DataExplorerStandIn";
 import {
   DATASET_A_ID,
@@ -24,7 +25,6 @@ import {
   harness,
   runQueryMock,
 } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
-import { parseChatSessionIndex } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Route as WorkspaceRootRoute } from "@/routes/_auth/$workspaceSlug/route";
 import type { Workspace } from "$/models/Workspace/Workspace";
