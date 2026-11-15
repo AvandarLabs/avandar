@@ -1,7 +1,7 @@
 import { Player, type PlayerRef } from "@remotion/player";
 import { FilmComposition } from "./FilmComposition/FilmComposition";
-import type { RefObject } from "react";
 import type { Film } from "./showcase.types";
+import type { RefObject } from "react";
 
 type Props = Readonly<{
   film: Film;
