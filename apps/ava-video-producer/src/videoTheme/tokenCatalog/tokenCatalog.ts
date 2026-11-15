@@ -47,7 +47,7 @@ function _listNode(node: CatalogNode, path: readonly string[]): CatalogEntry[] {
  * `color.accent`, `components.ProgressBar.height`. Use it to iterate tokens,
  * for example to build controls or check metadata.
  */
-export function listTokenDefinitions(): readonly CatalogEntry[] {
+export function listTokenDefinitions(): CatalogEntry[] {
   return [
     ..._listNode(MANTINE_TOKENS, []),
     ..._listNode(ATOMIC_TOKENS, ["atomic"]),
@@ -58,7 +58,7 @@ export function listTokenDefinitions(): readonly CatalogEntry[] {
 
 function _getSectionFromPath(
   segments: readonly string[],
-): readonly [CatalogNode, readonly string[]] {
+): [CatalogNode, string[]] {
   const [root = "", ...rest] = segments;
   if (root === "atomic") {
     return [ATOMIC_TOKENS, rest];
@@ -68,7 +68,7 @@ function _getSectionFromPath(
   }
   return [
     isMantineTokenRoot(root) ? MANTINE_TOKENS : SEMANTIC_TOKENS,
-    segments,
+    [...segments],
   ];
 }
 

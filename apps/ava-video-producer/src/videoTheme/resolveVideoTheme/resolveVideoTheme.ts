@@ -1,7 +1,7 @@
 import {
   DEFAULT_THEME,
   mergeMantineTheme,
-  type MantineThemeOverride,
+  type MantineTheme,
 } from "@mantine/core";
 import { isCameraSafeEasing } from "../cameraEasing/cameraEasing";
 import { elevationToBoxShadow } from "../cssValues/cssValues";
@@ -33,10 +33,7 @@ function _createMantineTheme(merged: VideoThemePatch) {
     ),
   );
   try {
-    return mergeMantineTheme(
-      DEFAULT_THEME,
-      mantineKeys as MantineThemeOverride,
-    );
+    return mergeMantineTheme(DEFAULT_THEME, mantineKeys);
   } catch (error) {
     throw new VideoThemeError([
       {
@@ -107,6 +104,39 @@ function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
   );
 }
 
+type ResolvedContent = Readonly<{
+  atomic: ResolvedVideoAtomic;
+  semantic: ResolvedVideoSemantic;
+  components: ResolvedVideoComponents;
+  isDarkGround: boolean;
+}>;
+
+function _findRuleIssues(content: ResolvedContent): VideoThemeIssue[] {
+  return [
+    ..._findUnmeasuredGraphicText(content),
+    ..._findUnsafeCameraCurves(content.semantic),
+  ];
+}
+
+function _buildMantineFromContent(
+  mantine: MantineTheme,
+  content: ResolvedContent,
+): MantineTheme {
+  return mergeMantineTheme(mantine, {
+    shadows: _deriveMantineShadows(
+      content.atomic,
+      content.semantic.color.shadowColor,
+    ),
+    components: Object.fromEntries(
+      Object.entries(content.components).map(([name, defaultProps]) => [
+        name,
+        { defaultProps },
+      ]),
+    ),
+    other: { video: { atomic: content.atomic, semantic: content.semantic } },
+  });
+}
+
 /**
  * Resolves a theme for one item: merges its layers (see
  * `mergeVideoThemeLayers`), resolves every token, enforces measured fonts
@@ -133,16 +163,13 @@ export function resolveVideoTheme(
   if (tiers.issues.length > 0) {
     throw new VideoThemeError(tiers.issues);
   }
-  const content = {
+  const content: ResolvedContent = {
     atomic: tiers.atomic as ResolvedVideoAtomic,
     semantic: tiers.semantic as ResolvedVideoSemantic,
     components: tiers.components as ResolvedVideoComponents,
     isDarkGround: tiers.isDarkGround,
   };
-  const ruleIssues = [
-    ..._findUnmeasuredGraphicText(content),
-    ..._findUnsafeCameraCurves(content.semantic),
-  ];
+  const ruleIssues = _findRuleIssues(content);
   if (ruleIssues.length > 0) {
     throw new VideoThemeError(ruleIssues);
   }
@@ -151,18 +178,6 @@ export function resolveVideoTheme(
     label: document.label,
     hash: buildVideoThemeHashFromContent(content),
     ...content,
-    mantine: mergeMantineTheme(mantine, {
-      shadows: _deriveMantineShadows(
-        content.atomic,
-        content.semantic.color.shadowColor,
-      ),
-      components: Object.fromEntries(
-        Object.entries(content.components).map(([name, defaultProps]) => [
-          name,
-          { defaultProps },
-        ]),
-      ),
-      other: { video: { atomic: content.atomic, semantic: content.semantic } },
-    }),
+    mantine: _buildMantineFromContent(mantine, content),
   };
 }

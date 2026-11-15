@@ -46,6 +46,18 @@ export const glowValueSchema = z.strictObject({
   blur: z.number().min(0).max(100),
   opacity: unitInterval,
 });
+const colorTupleSchema = z.array(colorValueSchema).length(10);
+const shadeValueSchema = z.union([
+  shadeIndex,
+  z.strictObject({ light: shadeIndex, dark: shadeIndex }),
+]);
+const cssLengthSchema = z
+  .string()
+  .regex(/^-?\d+(?:\.\d+)?px$/, "Expected pixels such as 18px");
+const cssNumberSchema = z
+  .string()
+  .regex(/^-?\d+(?:\.\d+)?$/, "Expected a number such as 1.3");
+const dashSchema = z.array(z.number().min(0).max(1000)).max(8);
 export const textShadowValueSchema = z.strictObject({
   offsetX: z.number().min(-50).max(50),
   offsetY: z.number().min(-50).max(50),
@@ -64,48 +76,24 @@ function _boundedNumber(definition: Pick<TokenDefinition, "min" | "max">) {
   return schema;
 }
 
-/**
- * The zod schema for a token kind's literal value, or undefined for kinds
- * that have no literal form of their own (composites and fills). Used by
- * the theme schema for atomic and Mantine values and component one-offs, and
- * by the resolver to validate a value a reference reached.
- */
-export function createValueSchemaFromDefinition(
-  definition: FieldSpec & Pick<TokenDefinition, "min" | "max">,
+function _createFixedSchemaFromKind(
+  kind: FieldSpec["kind"],
 ): z.ZodType | undefined {
-  switch (definition.kind) {
+  switch (kind) {
     case "color":
       return colorValueSchema;
     case "colorTuple":
-      return z.array(colorValueSchema).length(10);
-    case "paletteName":
-    case "enum":
-      return z.enum(definition.options ?? []);
+      return colorTupleSchema;
     case "shade":
-      return z.union([
-        shadeIndex,
-        z.strictObject({ light: shadeIndex, dark: shadeIndex }),
-      ]);
+      return shadeValueSchema;
     case "gradient":
       return gradientValueSchema;
     case "fontStack":
       return z.enum(VIDEO_FONT_STACKS);
     case "cssLength":
-      return z
-        .string()
-        .regex(/^-?\d+(?:\.\d+)?px$/, "Expected pixels such as 18px");
+      return cssLengthSchema;
     case "cssNumber":
-      return z
-        .string()
-        .regex(/^-?\d+(?:\.\d+)?$/, "Expected a number such as 1.3");
-    case "length":
-    case "number":
-    case "opacity":
-    case "letterSpacing":
-      return _boundedNumber(definition);
-    case "duration":
-    case "fontWeight":
-      return _boundedNumber(definition).int();
+      return cssNumberSchema;
     case "easing":
       return easingValueSchema;
     case "spring":
@@ -117,12 +105,38 @@ export function createValueSchemaFromDefinition(
     case "textShadow":
       return textShadowValueSchema;
     case "dash":
-      return z.array(z.number().min(0).max(1000)).max(8);
+      return dashSchema;
     case "fontFamily":
       return z.enum(VIDEO_FONT_IDS);
     case "boolean":
       return z.boolean();
     default:
       return undefined;
+  }
+}
+
+/**
+ * The zod schema for a token kind's literal value, or undefined for kinds
+ * that have no literal form of their own (composites and fills). Used by
+ * the theme schema for atomic and Mantine values and component one-offs, and
+ * by the resolver to validate a value a reference reached.
+ */
+export function createValueSchemaFromDefinition(
+  definition: FieldSpec & Pick<TokenDefinition, "min" | "max">,
+): z.ZodType | undefined {
+  switch (definition.kind) {
+    case "paletteName":
+    case "enum":
+      return z.enum(definition.options ?? []);
+    case "length":
+    case "number":
+    case "opacity":
+    case "letterSpacing":
+      return _boundedNumber(definition);
+    case "duration":
+    case "fontWeight":
+      return _boundedNumber(definition).int();
+    default:
+      return _createFixedSchemaFromKind(definition.kind);
   }
 }

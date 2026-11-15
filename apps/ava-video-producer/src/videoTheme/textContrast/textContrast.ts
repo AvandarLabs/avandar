@@ -52,7 +52,7 @@ export function getWcagLevelFromContrast(
  */
 export function listTextContrastFromTheme(
   theme: ResolvedVideoTheme,
-): readonly TextContrast[] {
+): TextContrast[] {
   const ground = theme.semantic.color.ground;
   return listTokenDefinitions()
     .filter(({ definition }) => definition.kind === "typeStyle")

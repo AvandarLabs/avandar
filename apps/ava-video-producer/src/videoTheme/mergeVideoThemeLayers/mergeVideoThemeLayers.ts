@@ -23,15 +23,19 @@ function _mergeTwoLayers(
   base: Record<string, unknown>,
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
-  const result = { ...base };
-  for (const [key, value] of Object.entries(patch)) {
-    const baseValue = result[key];
-    result[key] =
-      _isPlainObject(value) && _isPlainObject(baseValue)
-        ? _mergeTwoLayers(baseValue, value)
-        : value;
-  }
-  return result;
+  return Object.entries(patch).reduce<Record<string, unknown>>(
+    (result, [key, value]) => {
+      const baseValue = result[key];
+      return {
+        ...result,
+        [key]:
+          _isPlainObject(value) && _isPlainObject(baseValue)
+            ? _mergeTwoLayers(baseValue, value)
+            : value,
+      };
+    },
+    { ...base },
+  );
 }
 
 /**
@@ -65,7 +69,7 @@ function _toPatch(document: VideoThemeDocument): VideoThemePatch {
 export function getExtendsChainFromThemeId(
   library: VideoThemeLibrary,
   themeId: string,
-): readonly VideoThemeDocument[] {
+): VideoThemeDocument[] {
   const chain: VideoThemeDocument[] = [];
   const seen = new Set<string>();
   let currentId: string | undefined = themeId;

@@ -19,7 +19,7 @@ const ORANGE_ACCENT = {
     video: { semantic: { color: { accent: "$atomic.swatch.orange" } } },
   },
 };
-const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic") as VideoThemeDocument;
+const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic")!;
 
 /** Classic with a per-item accent override, like the accents classic authors per composition, plus a custom theme. */
 const LIBRARY: VideoThemeLibrary = new Map<string, VideoThemeDocument>([

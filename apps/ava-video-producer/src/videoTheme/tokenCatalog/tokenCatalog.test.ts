@@ -94,7 +94,7 @@ test("semantic groups never share a name with a Mantine theme key", () => {
 });
 
 test("no catalog group uses a key reserved for token definitions", () => {
-  function visit(node: CatalogNode, path: string) {
+  const visit = (node: CatalogNode, path: string): void => {
     if (isTokenDefinition(node) || isTokenScale(node)) {
       return;
     }
@@ -102,6 +102,6 @@ test("no catalog group uses a key reserved for token definitions", () => {
       assert.ok(key !== "kind" && key !== "scale", `${path}.${key}`);
       visit(child, `${path}.${key}`);
     }
-  }
+  };
   visit(SEMANTIC_TOKENS, "semantic");
 });

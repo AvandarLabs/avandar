@@ -87,7 +87,7 @@ function _lookup(
   return getValueAtPath(source, target.path);
 }
 
-function _resolveReference(
+function _buildValueFromReference(
   context: ResolutionContext,
   reference: TokenReference,
   field: FieldSpec,
@@ -109,10 +109,13 @@ function _resolveReference(
     });
     return undefined;
   }
-  return _resolveValue(context, target, field, path, [...stack, reference]);
+  return _buildValueFromRaw(context, target, field, path, [
+    ...stack,
+    reference,
+  ]);
 }
 
-function _resolveValue(
+function _buildValueFromRaw(
   context: ResolutionContext,
   raw: unknown,
   field: FieldSpec,
@@ -120,7 +123,7 @@ function _resolveValue(
   stack: readonly string[],
 ): unknown {
   if (isTokenReference(raw)) {
-    return _resolveReference(context, raw, field, path, stack);
+    return _buildValueFromReference(context, raw, field, path, stack);
   }
   if (field.kind === "color" && _isColorPair(raw)) {
     if (context.forbidColorPairs) {
@@ -130,7 +133,7 @@ function _resolveValue(
       });
       return undefined;
     }
-    return _resolveValue(
+    return _buildValueFromRaw(
       context,
       context.isDarkGround ? raw.onDark : raw.onLight,
       field,
@@ -139,7 +142,7 @@ function _resolveValue(
     );
   }
   if (isCompositeTokenKind(field.kind)) {
-    return _resolveComposite(context, field.kind, raw, path, stack);
+    return _buildCompositeFromFields(context, field.kind, raw, path, stack);
   }
   const normalized = normalizeTokenValue(field, raw);
   if (!normalized.ok) {
@@ -190,7 +193,7 @@ function _finishElevation(fields: UnknownRecord): unknown {
   return { layers: shadow.layers, color: fields.color };
 }
 
-function _resolveComposite(
+function _buildCompositeFromFields(
   context: ResolutionContext,
   kind: CompositeTokenKind,
   raw: unknown,
@@ -204,29 +207,35 @@ function _resolveComposite(
   const spec = COMPOSITE_TOKEN_FIELDS[kind];
   const required: readonly string[] = spec.required;
   const fields: Readonly<Record<string, FieldSpec>> = spec.fields;
-  const resolved: Record<string, unknown> = {};
-  for (const [name, field] of Object.entries(fields)) {
-    if (raw[name] === undefined) {
-      if (required.includes(name)) {
-        context.issues.push({ path: `${path}.${name}`, message: "Missing" });
+  const resolved = Object.fromEntries(
+    Object.entries(fields).flatMap(([name, field]) => {
+      if (raw[name] === undefined) {
+        if (required.includes(name)) {
+          context.issues.push({ path: `${path}.${name}`, message: "Missing" });
+        }
+        return [];
       }
-      continue;
-    }
-    resolved[name] = _resolveValue(
-      context,
-      raw[name],
-      field,
-      `${path}.${name}`,
-      stack,
-    );
-  }
+      return [
+        [
+          name,
+          _buildValueFromRaw(
+            context,
+            raw[name],
+            field,
+            `${path}.${name}`,
+            stack,
+          ),
+        ],
+      ];
+    }),
+  );
   if (kind === "typeStyle") {
     return _finishTypeStyle(resolved);
   }
   return kind === "elevation" ? _finishElevation(resolved) : resolved;
 }
 
-function _resolveNode(
+function _buildNodeFromCatalog(
   context: ResolutionContext,
   node: CatalogNode,
   raw: unknown,
@@ -237,21 +246,21 @@ function _resolveNode(
       context.issues.push({ path, message: "Missing token" });
       return undefined;
     }
-    return _resolveValue(context, raw, node, path, []);
+    return _buildValueFromRaw(context, raw, node, path, []);
   }
   if (isTokenScale(node)) {
     const entries = _isRecord(raw) ? Object.entries(raw) : [];
     return Object.fromEntries(
       entries.map(([key, value]) => [
         key,
-        _resolveValue(context, value, node.scale, `${path}.${key}`, []),
+        _buildValueFromRaw(context, value, node.scale, `${path}.${key}`, []),
       ]),
     );
   }
   return Object.fromEntries(
     Object.entries(node).map(([key, child]) => [
       key,
-      _resolveNode(
+      _buildNodeFromCatalog(
         context,
         child,
         _isRecord(raw) ? raw[key] : undefined,
@@ -261,11 +270,11 @@ function _resolveNode(
   );
 }
 
-function _resolveComponents(context: ResolutionContext): unknown {
+function _buildComponentsFromCatalog(context: ResolutionContext): unknown {
   return Object.fromEntries(
     Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => [
       name,
-      _resolveNode(
+      _buildNodeFromCatalog(
         context,
         group,
         getValueAtPath(context.components, [name, "defaultProps"]),
@@ -273,6 +282,19 @@ function _resolveComponents(context: ResolutionContext): unknown {
       ),
     ]),
   );
+}
+
+function _isGroundDark(groundContext: ResolutionContext): boolean {
+  const ground = _buildValueFromRaw(
+    groundContext,
+    getValueAtPath(groundContext.semantic, ["color", "ground"]),
+    { kind: "color" },
+    "color.ground",
+    [],
+  );
+  return typeof ground === "string"
+    ? luminance(ground) < groundContext.mantine.luminanceThreshold
+    : true;
 }
 
 /**
@@ -295,36 +317,26 @@ export function resolveTokenTiers(
     forbidColorPairs: true,
     issues,
   };
-  const ground = _resolveValue(
-    groundContext,
-    getValueAtPath(groundContext.semantic, ["color", "ground"]),
-    { kind: "color" },
-    "color.ground",
-    [],
-  );
-  const isDarkGround =
-    typeof ground === "string"
-      ? luminance(ground) < options.mantine.luminanceThreshold
-      : true;
+  const isDarkGround = _isGroundDark(groundContext);
   const context: ResolutionContext = {
     ...groundContext,
     isDarkGround,
     forbidColorPairs: false,
   };
   return {
-    atomic: _resolveNode(
+    atomic: _buildNodeFromCatalog(
       context,
       VIDEO_TOKEN_CATALOG.atomic,
       context.atomic,
       "atomic",
     ),
-    semantic: _resolveNode(
+    semantic: _buildNodeFromCatalog(
       context,
       VIDEO_TOKEN_CATALOG.semantic,
       context.semantic,
       "",
     ),
-    components: _resolveComponents(context),
+    components: _buildComponentsFromCatalog(context),
     isDarkGround,
     issues,
   };

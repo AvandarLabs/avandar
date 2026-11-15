@@ -8,13 +8,8 @@ import type { VideoThemeLibrary, VideoThemePatch } from "../videoTheme.types";
 /**
  * The snapshot a server render takes from a saved theme id and an unsaved
  * patch, under the same draft rule as the gallery preview (see
- * `createDraftThemeTarget`). A present patch marks a draft, even an empty
- * one: the gallery sends `{}` when only another item's override changed.
- * The patch stays in the snapshot either way, so `delivery.json` can record
- * the draft, and an empty patch leaves the resolved hash unchanged. A draft
- * on a built-in theme renders as the unsaved theme saving would create, so
- * an MP4 matches its preview and hash. Used by
- * `loadVideoThemeSnapshot` for exports and showcase films.
+ * `createDraftThemeTarget`). A draft on a built-in theme renders as the
+ * unsaved theme saving would create, so an MP4 matches its preview.
  */
 export function createSnapshotFromThemeRequest(
   options: Readonly<{
@@ -24,6 +19,10 @@ export function createSnapshotFromThemeRequest(
   }>,
 ): VideoThemeSnapshot {
   const { library, id, patch } = options;
+  // A present patch marks a draft, even an empty one: the gallery sends `{}`
+  // when only another item's override changed. The patch stays in the
+  // snapshot so `delivery.json` can record the draft, and an empty patch
+  // leaves the resolved hash unchanged.
   const patches = patch === undefined ? [] : [patch];
   const target = createDraftThemeTarget({
     library,

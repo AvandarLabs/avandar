@@ -2,7 +2,6 @@ import { token } from "./defineTokens";
 import type { TokenSurface } from "../videoTheme.types";
 
 const CAPS = ["butt", "round", "square"] as const;
-const JOINS = ["miter", "round", "bevel"] as const;
 
 function _length(
   label: string,
@@ -127,12 +126,6 @@ function _enum<const Options extends readonly string[]>(
 function _dash(label: string, description: string) {
   return token({ kind: "dash", surface: "graphic", label, description });
 }
-function _glow(label: string, description: string) {
-  return token({ kind: "glow", surface: "graphic", label, description });
-}
-function _elevation(label: string, description: string) {
-  return token({ kind: "elevation", surface: "graphic", label, description });
-}
 function _sketch(label: string, description: string) {
   return token({
     kind: "sketchProfile",
@@ -249,7 +242,12 @@ const SHARED_GRAPHIC_TOKENS = {
     fadeIn: _duration("Packet fade-in", "How long packets take to appear."),
   },
   Halo: {
-    glow: _glow("Halo glow", "The soft disc around a packet."),
+    glow: token({
+      kind: "glow",
+      surface: "graphic",
+      label: "Halo glow",
+      description: "The soft disc around a packet.",
+    }),
   },
   Particle: {
     radius: _length("Particle radius", "Radius of an ambient particle."),
@@ -289,10 +287,12 @@ const SHARED_GRAPHIC_TOKENS = {
     stroke: _color("Panel outline colour", "Outline colour of a panel."),
     radius: _length("Panel radius", "Corner radius of a panel."),
     strokeWidth: _stroke("Panel outline width", "Outline width of a panel."),
-    elevation: _elevation(
-      "Panel elevation",
-      "The shadow under a panel. Flat panels cast none.",
-    ),
+    elevation: token({
+      kind: "elevation",
+      surface: "graphic",
+      label: "Panel elevation",
+      description: "The shadow under a panel. Flat panels cast none.",
+    }),
   },
   Card: {
     radius: _length("Card radius", "Corner radius of a tinted summary card."),
@@ -327,7 +327,11 @@ const SHARED_GRAPHIC_TOKENS = {
   Check: {
     strokeWidth: _stroke("Check width", "Stroke width of a check mark."),
     cap: _enum("Check cap", "How a check mark's ends are drawn.", CAPS),
-    join: _enum("Check join", "How a check mark's corner is drawn.", JOINS),
+    join: _enum("Check join", "How a check mark's corner is drawn.", [
+      "miter",
+      "round",
+      "bevel",
+    ]),
   },
   Rule: {
     color: _color("Rule colour", "Colour of a divider rule."),

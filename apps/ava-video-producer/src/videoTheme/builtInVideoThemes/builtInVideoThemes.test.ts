@@ -118,7 +118,7 @@ test("the built-in library holds classic", () => {
   assert.equal(BUILT_IN_VIDEO_THEMES.get("classic")?.label, "Classic");
 });
 
-/** Each continuity plan's accent before it moved into classic's overrides. */
+/** The accent swatch each continuity plan resolves to. */
 const AUTHORED_ACCENTS = {
   "qetl-motion": "mint",
   "qetl-to-product": "cyan",

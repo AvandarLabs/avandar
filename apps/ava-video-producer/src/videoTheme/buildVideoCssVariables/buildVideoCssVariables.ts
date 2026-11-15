@@ -54,6 +54,40 @@ function _typeStyleVariables(
   };
 }
 
+function _elevationVariables(
+  name: string,
+  elevation: ResolvedElevation,
+): Record<string, string> {
+  return {
+    [`${name}-box-shadow`]: elevationToBoxShadow(elevation),
+    [`${name}-drop-shadow`]: elevationToDropShadowFilter(elevation),
+  };
+}
+
+function _boxVariables(name: string, box: ResolvedBox): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(box).map(([side, pixels]) => [
+      `${name}-${side}`,
+      `${String(pixels)}px`,
+    ]),
+  );
+}
+
+function _glowVariables(name: string, glow: GlowValue): Record<string, string> {
+  return {
+    [`${name}-spread`]: `${glow.spread}px`,
+    [`${name}-blur`]: `${glow.blur}px`,
+    [`${name}-opacity`]: String(glow.opacity),
+  };
+}
+
+function _paintVariables(
+  name: string,
+  paint: ResolvedPaint,
+): Record<string, string> {
+  return { [name]: buildColorWithAlpha(paint.color, paint.alpha) };
+}
+
 function _variablesFromValue(
   kind: TokenKind,
   name: string,
@@ -75,34 +109,14 @@ function _variablesFromValue(
       return { [name]: String(value) };
     case "typeStyle":
       return _typeStyleVariables(name, value as ResolvedTypeStyle);
-    case "paint": {
-      const paint = value as ResolvedPaint;
-      return { [name]: buildColorWithAlpha(paint.color, paint.alpha) };
-    }
+    case "paint":
+      return _paintVariables(name, value as ResolvedPaint);
     case "elevation":
-      return {
-        [`${name}-box-shadow`]: elevationToBoxShadow(
-          value as ResolvedElevation,
-        ),
-        [`${name}-drop-shadow`]: elevationToDropShadowFilter(
-          value as ResolvedElevation,
-        ),
-      };
+      return _elevationVariables(name, value as ResolvedElevation);
     case "box":
-      return Object.fromEntries(
-        Object.entries(value as ResolvedBox).map(([side, pixels]) => [
-          `${name}-${side}`,
-          `${String(pixels)}px`,
-        ]),
-      );
-    case "glow": {
-      const glow = value as GlowValue;
-      return {
-        [`${name}-spread`]: `${glow.spread}px`,
-        [`${name}-blur`]: `${glow.blur}px`,
-        [`${name}-opacity`]: String(glow.opacity),
-      };
-    }
+      return _boxVariables(name, value as ResolvedBox);
+    case "glow":
+      return _glowVariables(name, value as GlowValue);
     default:
       return {};
   }
@@ -114,6 +128,16 @@ function _variableNameFromPath(segments: readonly string[]): string {
     : `--video-${segments.map(_kebab).join("-")}`;
 }
 
+function _isSkippedPath(path: string, isScale: boolean): boolean {
+  const [root = ""] = path.split(".");
+  return (
+    isScale ||
+    root === "atomic" ||
+    isMantineTokenRoot(root) ||
+    UNSTYLED_GROUPS.has(root)
+  );
+}
+
 /**
  * CSS custom properties for every styled semantic and component token, such
  * as `--video-color-ground` and `--video-text-stage-heading-font-size`.
@@ -123,27 +147,22 @@ function _variableNameFromPath(segments: readonly string[]): string {
  */
 export function buildVideoCssVariables(
   theme: ResolvedVideoTheme,
-): Readonly<Record<string, string>> {
-  const variables: Record<string, string> = {};
-  for (const { path, definition, isScale } of listTokenDefinitions()) {
-    const segments = path.split(".");
-    const [root = ""] = segments;
-    const isSkipped =
-      isScale ||
-      root === "atomic" ||
-      isMantineTokenRoot(root) ||
-      UNSTYLED_GROUPS.has(root);
-    const value = isSkipped ? undefined : getResolvedTokenValue(theme, path);
-    if (value !== undefined) {
-      Object.assign(
-        variables,
-        _variablesFromValue(
-          definition.kind,
-          _variableNameFromPath(segments),
-          value,
-        ),
-      );
-    }
-  }
-  return variables;
+): Record<string, string> {
+  const variableSets = listTokenDefinitions()
+    .filter(({ path, isScale }) => !_isSkippedPath(path, isScale))
+    .flatMap(({ path, definition }) => {
+      const value = getResolvedTokenValue(theme, path);
+      return value === undefined
+        ? []
+        : [
+            _variablesFromValue(
+              definition.kind,
+              _variableNameFromPath(path.split(".")),
+              value,
+            ),
+          ];
+    });
+  return Object.fromEntries(
+    variableSets.flatMap((variables) => Object.entries(variables)),
+  );
 }

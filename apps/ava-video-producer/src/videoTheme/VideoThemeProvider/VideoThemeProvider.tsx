@@ -5,6 +5,13 @@ import { resolveVideoThemeFromSource } from "../resolveVideoThemeFromSource/reso
 import { VideoThemeContext } from "../useVideoTheme/useVideoTheme";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
+type Props = Readonly<{
+  source: VideoThemeSource;
+  children: ReactNode;
+  /** `none` renders no wrapper, for use inside an SVG; CSS variables are then unset. */
+  element?: "div" | "none";
+}>;
+
 const CSS_STYLES = new WeakMap<ResolvedVideoTheme, CSSProperties>();
 
 function _styleFromTheme(theme: ResolvedVideoTheme): CSSProperties {
@@ -12,20 +19,13 @@ function _styleFromTheme(theme: ResolvedVideoTheme): CSSProperties {
   if (cached) {
     return cached;
   }
-  const style = {
+  const style: CSSProperties = {
     display: "contents",
     ...buildVideoCssVariables(theme),
-  } as CSSProperties;
+  };
   CSS_STYLES.set(theme, style);
   return style;
 }
-
-type Props = Readonly<{
-  source: VideoThemeSource;
-  children: ReactNode;
-  /** `none` renders no wrapper, for use inside an SVG; CSS variables are then unset. */
-  element?: "div" | "none";
-}>;
 
 /**
  * Resolves a video theme and makes it the theme of everything inside:

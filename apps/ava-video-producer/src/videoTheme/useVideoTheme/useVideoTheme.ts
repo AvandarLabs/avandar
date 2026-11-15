@@ -83,11 +83,9 @@ export function useVideoProps<
   const merged = useProps(name, {}, props);
   if (report) {
     const given: Readonly<Record<string, unknown>> = props;
-    for (const key of Object.keys(theme.components[name])) {
-      if (given[key] === undefined) {
-        report(`components.${name}.${key}`);
-      }
-    }
+    Object.keys(theme.components[name])
+      .filter((key) => given[key] === undefined)
+      .forEach((key) => report(`components.${name}.${key}`));
   }
   return merged as ResolvedVideoComponents[Name] & Props;
 }

@@ -50,7 +50,7 @@ function _union(options: readonly z.ZodType[]): z.ZodType {
   const [onlyOption] = options;
   return options.length === 1 && onlyOption !== undefined
     ? onlyOption
-    : z.union(options as [z.ZodType, z.ZodType, ...z.ZodType[]]);
+    : z.union(options);
 }
 
 function _fieldSchema(field: FieldSpec, tier: SchemaTier): z.ZodType {
@@ -229,7 +229,7 @@ export function parseVideoThemeDocument(value: unknown): VideoThemeDocument {
   if (document.extends === undefined) {
     COMPLETE_DOCUMENT_SCHEMA.parse(value);
   }
-  return document as VideoThemeDocument;
+  return document;
 }
 
 /**
