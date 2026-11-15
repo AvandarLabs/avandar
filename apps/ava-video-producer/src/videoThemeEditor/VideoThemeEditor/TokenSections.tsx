@@ -13,15 +13,14 @@ import {
 } from "../tokenRows/tokenRows";
 import css from "./VideoThemeEditor.module.css";
 
-function useGroupName(): (group: string) => string {
-  return (group) => {
-    const [tier, name] = group.split(":");
-    const scaleLabel =
-      tier === "atomic"
-        ? getTokenDefinitionFromPath(`atomic.${name}.entry`)?.label
-        : undefined;
-    return getGroupName(group) ?? (scaleLabel ? scaleLabel : name);
-  };
+/** Display name for a token group key such as `atomic:color`. */
+function _groupToName(group: string): string {
+  const [tier, name] = group.split(":");
+  const scaleLabel =
+    tier === "atomic"
+      ? getTokenDefinitionFromPath(`atomic.${name}.entry`)?.label
+      : undefined;
+  return getGroupName(group) ?? (scaleLabel ? scaleLabel : name);
 }
 
 type SectionProps = TokenRowGroup &
@@ -95,7 +94,6 @@ export function TokenSections({
   allRows: readonly TokenRowModel[];
   emptyGroups: readonly string[];
 }>) {
-  const groupName = useGroupName();
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
@@ -115,7 +113,7 @@ export function TokenSections({
       {groups.map(({ group, rows: grouped }) => (
         <Accordion.Item key={group} value={group}>
           <Accordion.Control>
-            {groupName(group)}{" "}
+            {_groupToName(group)}{" "}
             <span className={css.count}>{grouped.length}</span>
           </Accordion.Control>
           <Accordion.Panel>

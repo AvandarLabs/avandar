@@ -1,9 +1,9 @@
 import clsx from "clsx";
+import { buildReferenceBrief } from "../buildReferenceBrief";
 import { ContentControls } from "../ContentControls/ContentControls";
 import { getReferenceUrlFromPreset } from "../getReferenceUrlFromPreset";
 import { Icon } from "../Icon";
 import { makeStockRequestFromConfiguration } from "../makeStockRequestFromConfiguration";
-import { useReferenceBrief } from "../useReferenceBrief";
 import { usePreviewDownload } from "./usePreviewDownload";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
 import type { ReactNode } from "react";
@@ -24,7 +24,7 @@ export function PreviewDetails({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const referenceBrief = useReferenceBrief();
+  const referenceBrief = buildReferenceBrief();
   const { exporting, exportStatus, canExport, download } = usePreviewDownload({
     preset,
     contentState,

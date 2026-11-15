@@ -1,6 +1,6 @@
 import { type StockPresetId } from "../../stock/catalog";
+import { buildReferenceBrief } from "./buildReferenceBrief";
 import { Icon } from "./Icon";
-import { useReferenceBrief } from "./useReferenceBrief";
 import type { Preset } from "./Preset.types";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 
@@ -21,7 +21,7 @@ export function ReferenceTray({
   background,
   onCopy,
 }: Readonly<Props>): ReactNode {
-  const referenceBrief = useReferenceBrief();
+  const referenceBrief = buildReferenceBrief();
   return (
     <div className="reference-tray" aria-label="Saved reference actions">
       <div className="tray-count">

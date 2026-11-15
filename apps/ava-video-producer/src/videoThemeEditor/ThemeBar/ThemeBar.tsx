@@ -35,7 +35,7 @@ type Props = Readonly<{
   onCopyJson: () => void;
 }>;
 
-function useStatusText(): (message: ThemeBarMessage) => string {
+function _buildStatusText(): (message: ThemeBarMessage) => string {
   const texts: Readonly<Record<ThemeBarMessage, string>> = {
     none: "",
     saving: "Saving…",
@@ -198,7 +198,7 @@ function ThemeActions(
  * the theme is created, so a failed save does not lose the name.
  */
 export function ThemeBar(props: Props) {
-  const statusText = useStatusText();
+  const statusText = _buildStatusText();
   const [isNaming, setIsNaming] = useState(false);
   const saveAsNewRef = useRef<HTMLButtonElement>(null);
   const closeNaming = () => {

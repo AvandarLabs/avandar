@@ -16,6 +16,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 /** Translate a catalog category id into its display name. */
-export function useCategoryLabel() {
+export function buildCategoryLabelGetter() {
   return (category: string) => CATEGORY_LABELS[category] ?? category;
 }

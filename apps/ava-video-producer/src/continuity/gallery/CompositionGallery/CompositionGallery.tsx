@@ -4,10 +4,10 @@ import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialo
 import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
+import { buildCategoryLabelGetter } from "../buildCategoryLabelGetter/buildCategoryLabelGetter";
 import { CompositionCard } from "../CompositionCard/CompositionCard";
 import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import { countCompositionCategories } from "../gallerySelectionReducer/gallerySelectionReducer";
-import { useCategoryLabel } from "../useCategoryLabel/useCategoryLabel";
 import { useCompositionGallery } from "../useCompositionGallery";
 
 type Props = {
@@ -52,7 +52,7 @@ function useSectionCopy(section: Props["section"]) {
  * card per entry, and the live player in the shared preview modal.
  */
 export function CompositionGallery({ section }: Props) {
-  const getCategoryLabel = useCategoryLabel();
+  const getCategoryLabel = buildCategoryLabelGetter();
   const copy = useSectionCopy(section);
   const { themeId } = useGalleryVideoTheme();
   const gallery = useCompositionGallery(

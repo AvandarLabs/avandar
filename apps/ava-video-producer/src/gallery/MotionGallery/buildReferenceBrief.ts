@@ -8,7 +8,7 @@ type ReferenceOptions = {
   background?: string;
 };
 /** Builds the reference-brief text for the selected motion references. */
-export function useReferenceBrief(): (
+export function buildReferenceBrief(): (
   options: Readonly<ReferenceOptions>,
 ) => string {
   return ({

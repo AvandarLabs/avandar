@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { afterDownloads } from "../../../showcase/download.js";
 import { STOCK_CATALOG, type StockPresetId } from "../../stock/catalog";
 import { copyTextToClipboard } from "../copyText/copyText";
+import { buildReferenceBrief } from "./buildReferenceBrief";
 import {
   type ContentDraft,
   ContentDraftModule,
 } from "./ContentControls/ContentDraftModule/ContentDraftModule";
 import { isReducedMotionPreferred } from "./isReducedMotionPreferred";
-import { useReferenceBrief } from "./useReferenceBrief";
 import type { Preset } from "./Preset.types";
 import type { Dispatch, SetStateAction } from "react";
 
