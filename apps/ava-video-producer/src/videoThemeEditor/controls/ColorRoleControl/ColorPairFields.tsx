@@ -4,8 +4,6 @@ import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
 import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ColorPair } from "../roleValueHelpers/roleValueHelpers";
 
-const PAIR_SIDES = ["onDark", "onLight"] as const;
-
 type Props = Readonly<{
   row: TokenRow;
   label: string;
@@ -15,7 +13,7 @@ type Props = Readonly<{
 /** One picker per ground for a colour role that differs on light grounds. */
 export function ColorPairFields({ row, label, pair }: Props) {
   const editor = useTokenEditor();
-  return PAIR_SIDES.map((side) => {
+  return (["onDark", "onLight"] as const).map((side) => {
     const sideName = getFieldName(side);
     return (
       <ReferenceControl
