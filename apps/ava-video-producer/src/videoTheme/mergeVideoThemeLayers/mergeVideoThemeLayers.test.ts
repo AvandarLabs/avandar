@@ -72,19 +72,6 @@ test("patches apply after overrides", () => {
   assert.equal(_ground(merged), "#333333");
 });
 
-test("an extends cycle is reported", () => {
-  const library = createVideoThemeLibrary([_theme("a", "b"), _theme("b", "a")]);
-  assert.throws(() => mergeVideoThemeLayers(library, "a"), /extends itself/);
-});
-
-test("an unknown extends target is reported", () => {
-  const library = createVideoThemeLibrary([_theme("orphan", "missing")]);
-  assert.throws(
-    () => mergeVideoThemeLayers(library, "orphan"),
-    /Unknown theme "missing"/,
-  );
-});
-
 test("an object patch replaces a reference instead of merging into it", () => {
   const box = {
     roughness: "$atomic.roughness.rough",

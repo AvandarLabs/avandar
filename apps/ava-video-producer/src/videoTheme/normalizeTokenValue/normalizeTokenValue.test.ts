@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeTokenValue, parseCssPixels } from "./normalizeTokenValue";
-
-test("Mantine rem lengths resolve to pixels at the default scale", () => {
-  assert.equal(parseCssPixels("calc(0.75rem * var(--mantine-scale))"), 12);
-});
+import { normalizeTokenValue } from "./normalizeTokenValue";
 
 test("pixel strings resolve to numbers", () => {
   assert.deepEqual(normalizeTokenValue({ kind: "length" }, "48px"), {

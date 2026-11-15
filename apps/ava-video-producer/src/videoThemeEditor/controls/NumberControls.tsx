@@ -1,5 +1,5 @@
 import { Group, Slider } from "@mantine/core";
-import { parseCssPixels } from "../../videoTheme/normalizeTokenValue/normalizeTokenValue";
+import { parseCssPixels } from "../../videoTheme/parseCssPixels/parseCssPixels";
 import { useSliderIssueRef } from "../RowIssueContext/RowIssueContext";
 import css from "./controls.module.css";
 import { RangeNumberInput } from "./RangeNumberInput";

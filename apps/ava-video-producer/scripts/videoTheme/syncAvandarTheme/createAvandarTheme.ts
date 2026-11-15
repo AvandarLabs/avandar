@@ -1,4 +1,4 @@
-import { parseCssPixels } from "../../../src/videoTheme/normalizeTokenValue/normalizeTokenValue";
+import { parseCssPixels } from "../../../src/videoTheme/parseCssPixels/parseCssPixels";
 import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,

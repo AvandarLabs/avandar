@@ -1,4 +1,6 @@
 import { VideoThemeError } from "../VideoThemeError";
+import { getExtendsChainFromThemeId } from "./getExtendsChainFromThemeId/getExtendsChainFromThemeId";
+import { mergeVideoThemePatches } from "./mergeVideoThemePatches/mergeVideoThemePatches";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,
@@ -15,85 +17,12 @@ const DOCUMENT_ONLY_KEYS: readonly string[] = [
   "overrides",
 ];
 
-function _isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function _mergeTwoLayers(
-  base: Record<string, unknown>,
-  patch: Record<string, unknown>,
-): Record<string, unknown> {
-  return {
-    ...base,
-    ...Object.fromEntries(
-      Object.entries(patch).map(([key, value]) => {
-        const baseValue = base[key];
-        return [
-          key,
-          _isPlainObject(value) && _isPlainObject(baseValue)
-            ? _mergeTwoLayers(baseValue, value)
-            : value,
-        ];
-      }),
-    ),
-  };
-}
-
-/**
- * Merges sparse theme patches, lowest precedence first, with the same rule
- * `mergeVideoThemeLayers` uses: objects merge, and any other value, such as
- * a reference, is replaced whole. Use it to fold several draft patches into
- * the one patch an export sends.
- */
-export function mergeVideoThemePatches(
-  ...layers: readonly VideoThemePatch[]
-): VideoThemePatch {
-  return layers.reduce<Record<string, unknown>>(
-    (merged, layer) => _mergeTwoLayers(merged, layer),
-    {},
-  );
-}
-
 function _toPatch(document: VideoThemeDocument): VideoThemePatch {
   return Object.fromEntries(
     Object.entries(document).filter(
       ([key]) => !DOCUMENT_ONLY_KEYS.includes(key),
     ),
   );
-}
-
-/**
- * A theme and every theme it extends, root first. Throws a
- * `VideoThemeError` for an unknown theme or an `extends` cycle. Use it to
- * know which documents a theme depends on, for example to snapshot them.
- */
-export function getExtendsChainFromThemeId(
-  library: VideoThemeLibrary,
-  themeId: string,
-): VideoThemeDocument[] {
-  const chain: VideoThemeDocument[] = [];
-  const seen = new Set<string>();
-  let currentId: string | undefined = themeId;
-  while (currentId !== undefined) {
-    if (seen.has(currentId)) {
-      throw new VideoThemeError([
-        {
-          path: "extends",
-          message: `Theme "${themeId}" extends itself through "${currentId}"`,
-        },
-      ]);
-    }
-    seen.add(currentId);
-    const document = library.get(currentId);
-    if (!document) {
-      throw new VideoThemeError([
-        { path: "extends", message: `Unknown theme "${currentId}"` },
-      ]);
-    }
-    chain.unshift(document);
-    currentId = document.extends;
-  }
-  return chain;
 }
 
 /**

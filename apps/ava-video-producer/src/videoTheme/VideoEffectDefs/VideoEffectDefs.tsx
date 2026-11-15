@@ -1,47 +1,15 @@
-import { Fragment, type ReactNode } from "react";
 import {
   buildEffectFilterId,
   type EffectPrimitive,
   type VideoEffectFilter,
 } from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
+import { GlowEffect } from "./GlowEffect";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   graphicId: string;
   filters: readonly VideoEffectFilter[];
 }>;
-
-type GlowPrimitive = Extract<EffectPrimitive, { kind: "glow" }>;
-
-function _glow(
-  primitive: GlowPrimitive,
-  input: string,
-  result: string,
-): ReactNode {
-  return (
-    <Fragment key={result}>
-      <feGaussianBlur
-        in="SourceAlpha"
-        stdDeviation={primitive.stdDeviation}
-        result={`${result}-blur`}
-      />
-      <feFlood
-        floodColor={primitive.color}
-        floodOpacity={primitive.opacity}
-        result={`${result}-flood`}
-      />
-      <feComposite
-        in={`${result}-flood`}
-        in2={`${result}-blur`}
-        operator="in"
-        result={`${result}-glow`}
-      />
-      <feMerge result={result}>
-        <feMergeNode in={`${result}-glow`} />
-        <feMergeNode in={input} />
-      </feMerge>
-    </Fragment>
-  );
-}
 
 function _primitive(primitive: EffectPrimitive, index: number): ReactNode {
   const input = index === 0 ? "SourceGraphic" : `fx${index - 1}`;
@@ -70,7 +38,14 @@ function _primitive(primitive: EffectPrimitive, index: number): ReactNode {
       />
     );
   }
-  return _glow(primitive, input, result);
+  return (
+    <GlowEffect
+      key={result}
+      primitive={primitive}
+      input={input}
+      result={result}
+    />
+  );
 }
 
 /**

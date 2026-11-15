@@ -3,7 +3,7 @@ import {
   createVideoThemeLibrary,
 } from "../builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { getExtendsChainFromThemeId } from "../mergeVideoThemeLayers/mergeVideoThemeLayers";
+import { getExtendsChainFromThemeId } from "../mergeVideoThemeLayers/getExtendsChainFromThemeId/getExtendsChainFromThemeId";
 import type {
   ResolvedVideoTheme,
   VideoThemeDocument,

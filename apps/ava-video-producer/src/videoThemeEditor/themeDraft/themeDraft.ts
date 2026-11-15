@@ -5,7 +5,7 @@ import {
   type DraftThemeTarget,
 } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { getValueAtPath } from "../../videoTheme/getValueAtPath";
-import { mergeVideoThemePatches } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemeLayers";
+import { mergeVideoThemePatches } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemePatches/mergeVideoThemePatches";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
