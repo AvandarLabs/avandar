@@ -126,13 +126,17 @@ async function _assertBrowserBundle(entry: string): Promise<void> {
   test(`${entry} shares the same English defaults and untouched authored copy`, () =>
     _assertBrowserBundle(entry));
 });
-test("producer source modules do not import Lingui", async () => {
+test("producer source modules do not import Lingui, except the generated product bundle", async () => {
   const filenames = await fs.readdir(path.join(root, "src"), {
     recursive: true,
   });
   await Promise.all(
     filenames
-      .filter((filename) => /\.[tj]sx?$/.test(filename))
+      .filter(
+        (filename) =>
+          /\.[tj]sx?$/.test(filename) &&
+          !filename.startsWith(`avandar${path.sep}generated${path.sep}`),
+      )
       .map(async (filename) => {
         assert.doesNotMatch(
           await fs.readFile(path.join(root, "src", filename), "utf8"),
