@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Group, Slider } from "@mantine/core";
 import { parseCssPixels } from "../../videoTheme/normalizeTokenValue/normalizeTokenValue";
 import { useSliderIssueRef } from "../RowIssueContext/RowIssueContext";
@@ -101,7 +100,6 @@ export function DurationValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const frames = typeof value === "number" ? value : 0;
   const milliseconds = Math.round((frames / 30) * 1000);
   return (
@@ -114,11 +112,11 @@ export function DurationValueControl({
         max={definition.max ?? 600}
         step={1}
         allowDecimal={false}
-        suffix={t` frames`}
+        suffix=" frames"
         value={frames}
         onChange={onChange}
       />
-      <span className={css.readout}>{t`${milliseconds} ms`}</span>
+      <span className={css.readout}>{`${milliseconds} ms`}</span>
     </Group>
   );
 }

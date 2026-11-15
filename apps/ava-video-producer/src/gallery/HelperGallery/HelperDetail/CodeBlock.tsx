@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
 import { Icon } from "../../MotionGallery/Icon";
 import css from "./HelperDetail.module.css";
@@ -14,7 +13,6 @@ export function CodeBlock({
   code: string;
   isCopyable?: boolean;
 }) {
-  const { t } = useLingui();
   const [isCopied, setIsCopied] = useState(false);
   useEffect(() => {
     if (!isCopied) {
@@ -36,10 +34,10 @@ export function CodeBlock({
           type="button"
           className={css.copyButton}
           onClick={copy}
-          aria-label={t`Copy usage snippet`}
+          aria-label="Copy usage snippet"
         >
           <Icon name={isCopied ? "check" : "copy"} size={14} />
-          <span aria-live="polite">{isCopied ? t`Copied` : t`Copy`}</span>
+          <span aria-live="polite">{isCopied ? "Copied" : "Copy"}</span>
         </button>
       ) : null}
     </div>

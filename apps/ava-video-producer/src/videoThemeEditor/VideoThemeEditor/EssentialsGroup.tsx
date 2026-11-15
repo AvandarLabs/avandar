@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { useId } from "react";
 import { TokenRow } from "../TokenRow/TokenRow";
 import {
@@ -11,12 +10,11 @@ import css from "./VideoThemeEditor.module.css";
 export function EssentialsGroup({
   rows,
 }: Readonly<{ rows: readonly TokenRowModel[] }>) {
-  const { t } = useLingui();
   const titleId = useId();
   return (
     <section className={css.essentials} aria-labelledby={titleId}>
       <h3 id={titleId} className={css.sectionTitle}>
-        {t`Look and feel`}
+        {"Look and feel"}
       </h3>
       {getEssentialRows(rows).map((row) => (
         <TokenRow key={row.path} row={row} />

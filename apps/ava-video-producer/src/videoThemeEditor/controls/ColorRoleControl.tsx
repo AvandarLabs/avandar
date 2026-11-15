@@ -1,10 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
 import { Switch } from "@mantine/core";
 import {
   useRowHasIssue,
   useRowIssueAriaProps,
 } from "../RowIssueContext/RowIssueContext";
-import { useFieldCopy } from "../tokenCopy/useEditorCopy";
+import { getFieldName } from "../tokenCopy/editorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { ContrastBadge } from "./ContrastBadge";
 import css from "./controls.module.css";
@@ -28,15 +27,13 @@ function ColorPairFields({
   label,
   pair,
 }: RoleProps & Readonly<{ pair: ColorPair }>) {
-  const { t } = useLingui();
   const editor = useTokenEditor();
-  const fieldCopy = useFieldCopy();
   return PAIR_SIDES.map((side) => {
-    const sideName = fieldCopy(side);
+    const sideName = getFieldName(side);
     return (
       <ReferenceControl
         key={side}
-        label={t`${label}, ${sideName}`}
+        label={`${label}, ${sideName}`}
         tokenPath={row.path}
         fieldPath={[side]}
         kind="color"
@@ -56,7 +53,6 @@ function ColorPairFields({
  * grounds. Text colours show their contrast against the ground.
  */
 export function ColorRoleControl({ row, label }: RoleProps) {
-  const { t } = useLingui();
   const editor = useTokenEditor();
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();
@@ -66,12 +62,12 @@ export function ColorRoleControl({ row, label }: RoleProps) {
     <div className={css.stack}>
       <Switch
         size="xs"
-        label={t`Use another colour on light backgrounds`}
+        label="Use another colour on light backgrounds"
         error={hasIssue}
         {...issueAriaProps}
         checked={pair !== undefined}
         disabled={!canPair}
-        description={canPair ? undefined : t`Pick a colour first.`}
+        description={canPair ? undefined : "Pick a colour first."}
         onChange={(event) =>
           editor.setToken(
             row.path,

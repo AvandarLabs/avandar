@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { DEMO_COLORS } from "../demoTheme";
 
 /** Node centres of the preview diagram, on the 960 by 600 Atlas canvas. */
@@ -57,14 +56,13 @@ function DiagramNode({ x, y, label }: { x: number; y: number; label: string }) {
  * in the 960 by 600 coordinates those helpers default to.
  */
 export function DemoDiagram() {
-  const { t } = useLingui();
   const labels: Record<string, string> = {
-    source: t`Source`,
-    join: t`Join`,
-    filter: t`Filter`,
-    model: t`Model`,
-    chart: t`Chart`,
-    share: t`Share`,
+    source: "Source",
+    join: "Join",
+    filter: "Filter",
+    model: "Model",
+    chart: "Chart",
+    share: "Share",
   };
   return (
     <g>

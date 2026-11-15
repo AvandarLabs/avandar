@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { enter, mix, ramp } from "../../../motion";
 import { MediaPlane } from "../../../scenes/MediaPlane";
 import css from "./demos.module.css";
@@ -11,7 +10,6 @@ const SCREEN = "avandar/screens/explorer-explorer-chart.png";
 
 /** A still sampled through `MediaPlane`, fading in and drifting slightly. */
 export function MediaPlaneDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const drift = ramp(frame, 10, 70);
   return (
     <HelperDemoFrame
@@ -32,7 +30,7 @@ export function MediaPlaneDemo({ frame, frames }: HelperDemoProps) {
             frame={frame}
             kind="image"
             src={SCREEN}
-            alt={t`Fictional Avandar chart screen`}
+            alt="Fictional Avandar chart screen"
             // MediaPlane takes only a style, so its fill is set here.
             style={{
               width: "100%",
@@ -41,9 +39,7 @@ export function MediaPlaneDemo({ frame, frames }: HelperDemoProps) {
               objectPosition: `${mix(drift, 0, 100).toFixed(2)}% 0%`,
             }}
           />
-          <span
-            className={css.footnote}
-          >{t`Fictional demonstration data`}</span>
+          <span className={css.footnote}>{"Fictional demonstration data"}</span>
         </div>
       </div>
     </HelperDemoFrame>

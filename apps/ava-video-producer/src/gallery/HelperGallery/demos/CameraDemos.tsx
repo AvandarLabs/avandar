@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import {
   getCameraPose,
   isCameraMoving,
@@ -80,7 +79,6 @@ export function CameraTrackDemo({ frame, frames }: HelperDemoProps) {
 
 /** The same route through the camera component, with travel-only blur. */
 export function DiagramCameraDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   return (
     <HelperDemoFrame
       frame={frame}
@@ -93,7 +91,7 @@ export function DiagramCameraDemo({ frame, frames }: HelperDemoProps) {
         },
         {
           name: "blur",
-          value: isCameraMoving(TRACK, frame) ? t`shutter open` : t`at rest`,
+          value: isCameraMoving(TRACK, frame) ? "shutter open" : "at rest",
         },
       ]}
     >

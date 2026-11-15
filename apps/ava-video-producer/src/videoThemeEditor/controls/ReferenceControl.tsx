@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
@@ -16,7 +15,6 @@ import {
   type ReferenceOption,
 } from "../referenceOptions/referenceOptions";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
-import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import css from "./controls.module.css";
 import { getDefaultLiteralFromKind } from "./defaultLiterals";
@@ -49,31 +47,24 @@ type CustomValueProps = ReferenceControlProps &
   Readonly<{ options: readonly ReferenceOption[] }>;
 
 function useOptionLabel(): (option: ReferenceOption) => string {
-  const { t } = useLingui();
-  const copy = useTokenCopy();
-  return useCallback(
-    (option: ReferenceOption) => {
-      const value = formatTokenValue(option.kind, option.value);
-      const role = getReferenceOptionRole(option);
-      if (role === "primary") {
-        return t`Primary colour, ${value}`;
-      }
-      if (role === "custom") {
-        return option.kind === "color"
-          ? t`Custom colour · ${value}`
-          : t`Custom value · ${value}`;
-      }
-      const name = option.definition
-        ? copy(option.definition.label)
-        : option.path;
-      const key =
-        option.key === undefined ? undefined : humanizeScaleKey(option.key);
-      return key === undefined
-        ? t`${name} · ${value}`
-        : t`${name} ${key} · ${value}`;
-    },
-    [t, copy],
-  );
+  return useCallback((option: ReferenceOption) => {
+    const value = formatTokenValue(option.kind, option.value);
+    const role = getReferenceOptionRole(option);
+    if (role === "primary") {
+      return `Primary colour, ${value}`;
+    }
+    if (role === "custom") {
+      return option.kind === "color"
+        ? `Custom colour · ${value}`
+        : `Custom value · ${value}`;
+    }
+    const name = option.definition ? option.definition.label : option.path;
+    const key =
+      option.key === undefined ? undefined : humanizeScaleKey(option.key);
+    return key === undefined
+      ? `${name} · ${value}`
+      : `${name} ${key} · ${value}`;
+  }, []);
 }
 
 /** The bounds a custom value is edited with: the token's own, or its scale's. */
@@ -109,7 +100,6 @@ function useCustomValueWriter(
 }
 
 function CustomValue(props: CustomValueProps) {
-  const { t } = useLingui();
   const write = useCustomValueWriter(props);
   const isReference = isTokenReference(props.value);
   const scale = props.allowLiteral
@@ -132,15 +122,15 @@ function CustomValue(props: CustomValueProps) {
         className={css.customToggle}
         size="compact-xs"
         variant="subtle"
-        aria-label={t`Custom value for ${name}`}
+        aria-label={`Custom value for ${name}`}
         aria-expanded={isOpen}
         onClick={() => setOpen(!isOpen)}
       >
-        {t`Custom value`}
+        {"Custom value"}
       </Button>
       {isOpen ? (
         <ValueControl
-          label={t`Custom ${name}`}
+          label={`Custom ${name}`}
           definition={definition}
           value={current ?? getDefaultLiteralFromKind(definition.kind)}
           optionKey={props.fieldPath.at(-1) ?? props.tokenPath}
@@ -221,7 +211,6 @@ function _OptionRow({
  * value.
  */
 export function ReferenceControl(props: ReferenceControlProps) {
-  const { t } = useLingui();
   const toLabel = useOptionLabel();
   const options = useReferenceOptions(props);
   const chips = useOptionChips(options);
@@ -248,15 +237,15 @@ export function ReferenceControl(props: ReferenceControlProps) {
                 ...data,
                 {
                   value: unresolved,
-                  label: isColor ? t`Missing colour` : t`Missing value`,
+                  label: isColor ? "Missing colour" : "Missing value",
                   disabled: true,
                 },
               ]
             : data
         }
         value={isTokenReference(props.value) ? props.value : null}
-        placeholder={props.value === undefined ? t`Not set` : t`Custom value`}
-        nothingFoundMessage={t`No matching settings`}
+        placeholder={props.value === undefined ? "Not set" : "Custom value"}
+        nothingFoundMessage="No matching settings"
         onChange={(next) => next && props.onChange(next)}
         renderOption={({ option }) => (
           <_OptionRow label={option.label} chip={chips.get(option.value)} />
@@ -267,10 +256,10 @@ export function ReferenceControl(props: ReferenceControlProps) {
           className={css.customToggle}
           size="compact-xs"
           variant="light"
-          aria-label={t`Pick another for ${name}`}
+          aria-label={`Pick another for ${name}`}
           onClick={() => container.current?.querySelector("input")?.focus()}
         >
-          {isColor ? t`Pick a colour` : t`Pick a value`}
+          {isColor ? "Pick a colour" : "Pick a value"}
         </Button>
       ) : null}
       <CustomValue {...props} options={options} />

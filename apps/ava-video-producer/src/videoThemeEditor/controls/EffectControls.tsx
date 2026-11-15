@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import {
   Button,
   Fieldset,
@@ -49,35 +48,34 @@ const DEFAULT_SHADOW_LAYER = DEFAULT_SHADOW.layers[0] as ShadowLayer;
 function useEffectFields(): Readonly<
   Record<"shadow" | "glow" | "textShadow", readonly NumberField[]>
 > {
-  const { t } = useLingui();
   const offsetX = {
     key: "offsetX",
-    name: t`Offset x`,
+    name: "Offset x",
     min: -200,
     max: 200,
     step: 1,
   };
   const offsetY = {
     key: "offsetY",
-    name: t`Offset y`,
+    name: "Offset y",
     min: -200,
     max: 200,
     step: 1,
   };
-  const blur = { key: "blur", name: t`Blur`, min: 0, max: 200, step: 1 };
-  const alpha = { key: "alpha", name: t`Opacity`, min: 0, max: 1, step: 0.01 };
+  const blur = { key: "blur", name: "Blur", min: 0, max: 200, step: 1 };
+  const alpha = { key: "alpha", name: "Opacity", min: 0, max: 1, step: 0.01 };
   return {
     shadow: [
       offsetX,
       offsetY,
       blur,
-      { key: "spread", name: t`Spread`, min: -100, max: 100, step: 1 },
+      { key: "spread", name: "Spread", min: -100, max: 100, step: 1 },
       alpha,
     ],
     glow: [
-      { key: "spread", name: t`Spread`, min: -200, max: 200, step: 1 },
+      { key: "spread", name: "Spread", min: -200, max: 200, step: 1 },
       { ...blur, max: 100 },
-      { key: "opacity", name: t`Opacity`, min: 0, max: 1, step: 0.01 },
+      { key: "opacity", name: "Opacity", min: 0, max: 1, step: 0.01 },
     ],
     textShadow: [
       { ...offsetX, min: -50, max: 50 },
@@ -135,7 +133,6 @@ function ShadowLayers({
   layers: readonly ShadowLayer[];
   onChange: (layers: readonly ShadowLayer[]) => void;
 }>) {
-  const { t } = useLingui();
   const fields = useEffectFields().shadow;
   return layers.map((layer, index) => {
     const layerNumber = index + 1;
@@ -143,7 +140,7 @@ function ShadowLayers({
       <_NumberFields
         // A layer has no identity apart from its position in the stack.
         key={`layer-${String(layerNumber)}`}
-        legend={t`Layer ${layerNumber}`}
+        legend={`Layer ${layerNumber}`}
         fields={fields}
         values={layer}
         fallback={DEFAULT_SHADOW_LAYER}
@@ -164,7 +161,7 @@ function ShadowLayers({
               onChange(layers.filter((_, position) => position !== index))
             }
           >
-            {t`Remove layer ${layerNumber}`}
+            {`Remove layer ${layerNumber}`}
           </Button>
         }
       />
@@ -178,7 +175,6 @@ export function ShadowValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const { theme } = useTokenEditor();
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
   const setLayers = (nextLayers: readonly ShadowLayer[]) =>
@@ -197,7 +193,7 @@ export function ShadowValueControl({
           disabled={layers.length >= MAX_SHADOW_LAYERS}
           onClick={() => setLayers([...layers, DEFAULT_SHADOW_LAYER])}
         >
-          {t`Add layer`}
+          {"Add layer"}
         </Button>
         <span
           className={css.shadowPreview}
@@ -254,7 +250,6 @@ function DashPresets({
   pattern: readonly number[];
   onChange: (pattern: readonly number[]) => void;
 }>) {
-  const { t } = useLingui();
   const issueAriaProps = useRowIssueAriaProps();
   const patternText = formatDashPattern(pattern);
   const preset =
@@ -264,13 +259,13 @@ function DashPresets({
   return (
     <SegmentedControl
       size="xs"
-      aria-label={t`Dash preset`}
+      aria-label="Dash preset"
       {...issueAriaProps}
       value={preset}
       data={[
-        { value: "solid", label: t`Solid` },
-        { value: "dotted", label: t`Dotted` },
-        { value: "dashed", label: t`Dashed` },
+        { value: "solid", label: "Solid" },
+        { value: "dotted", label: "Dotted" },
+        { value: "dashed", label: "Dashed" },
       ]}
       onChange={(next) => onChange(DASH_PRESETS[next] ?? [])}
     />
@@ -303,7 +298,6 @@ export function DashValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const hasIssue = useRowHasIssue();
   const pattern = Array.isArray(value) ? (value as readonly number[]) : [];
   const field = useDraftValue<readonly number[], string>({
@@ -318,12 +312,12 @@ export function DashValueControl({
       <DashPresets pattern={pattern} onChange={onChange} />
       <TextInput
         size="xs"
-        label={t`Dash and gap lengths`}
+        label="Dash and gap lengths"
         value={field.draft}
         error={
           field.isValid
             ? hasIssue
-            : t`Use up to eight numbers separated by spaces.`
+            : "Use up to eight numbers separated by spaces."
         }
         onChange={(event) => field.change(event.currentTarget.value)}
       />

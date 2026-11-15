@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { createThemeStyleFromTheme } from "../../../storyboard/StoryFilm/createThemeStyleFromTheme";
 import theme from "../../theme-colors.json";
 import css from "./demos.module.css";
@@ -35,9 +34,7 @@ export function ThemeStyleDemo({ frame, frames }: HelperDemoProps) {
         .map(([name, value]) => ({ name, value: String(value) }))}
     >
       <div className={css.themedShot} style={style}>
-        <span className={css.themedCard}>
-          <Trans>Same scene, shot theme</Trans>
-        </span>
+        <span className={css.themedCard}>Same scene, shot theme</span>
         <span className={css.themedAccent} />
       </div>
     </HelperDemoFrame>

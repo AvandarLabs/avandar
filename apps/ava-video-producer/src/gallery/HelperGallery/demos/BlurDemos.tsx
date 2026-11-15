@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { DUR, EASE, mix, ramp } from "../../../motion";
 import {
   HorizontalBlurFilter,
@@ -31,7 +30,6 @@ function _getBlurAmount(frame: number): number {
 
 /** The same slide with the X-only blur filter and with no blur. */
 export function HorizontalBlurDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const amount = _getBlurAmount(frame);
   const x = _getSlideX(frame);
   return (
@@ -50,9 +48,9 @@ export function HorizontalBlurDemo({ frame, frames }: HelperDemoProps) {
       <HorizontalBlurFilter id="slide" amount={amount} />
       <div className={css.rails}>
         <div className={css.cardColumn}>
-          <span className={css.caption}>{t`X-only blur`}</span>
+          <span className={css.caption}>{"X-only blur"}</span>
           <DemoCard
-            title={t`Moving window`}
+            title="Moving window"
             style={{
               transform: `translateX(${(x - TRAVEL / 2).toFixed(2)}px)`,
               filter: getHorizontalBlurFilter("slide", amount),
@@ -60,9 +58,9 @@ export function HorizontalBlurDemo({ frame, frames }: HelperDemoProps) {
           />
         </div>
         <div className={css.cardColumn}>
-          <span className={css.caption}>{t`No blur`}</span>
+          <span className={css.caption}>{"No blur"}</span>
           <DemoCard
-            title={t`Moving window`}
+            title="Moving window"
             style={{
               transform: `translateX(${(x - TRAVEL / 2).toFixed(2)}px)`,
             }}

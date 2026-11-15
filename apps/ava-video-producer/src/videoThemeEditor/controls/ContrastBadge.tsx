@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Badge } from "@mantine/core";
 import clsx from "clsx";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
@@ -14,7 +13,6 @@ export function ContrastBadge({
   color: string;
   style?: Pick<ResolvedTypeStyle, "fontSize" | "fontWeight">;
 }>) {
-  const { t } = useLingui();
   const { theme } = useTokenEditor();
   const { level, ratio } = getContrastSummaryFromColors(
     color,
@@ -31,7 +29,7 @@ export function ContrastBadge({
         root: clsx(css.contrastBadge, isFailing && css.contrastBadgeFail),
       }}
     >
-      {level === "fail" ? t`Low contrast ${ratio}:1` : t`${level} ${ratio}:1`}
+      {level === "fail" ? `Low contrast ${ratio}:1` : `${level} ${ratio}:1`}
     </Badge>
   );
 }

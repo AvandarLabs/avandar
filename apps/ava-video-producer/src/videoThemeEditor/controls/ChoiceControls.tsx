@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { SegmentedControl, Switch } from "@mantine/core";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import {
@@ -9,7 +8,7 @@ import {
   useRowHasIssue,
   useRowIssueAriaProps,
 } from "../RowIssueContext/RowIssueContext";
-import { useOptionCopy, type OptionCopy } from "../tokenCopy/useEditorCopy";
+import { getOptionCopy, type OptionCopy } from "../tokenCopy/editorCopy";
 import css from "./controls.module.css";
 import { getEnumSelection } from "./controlValues/controlValues";
 import type { ValueControlProps } from "./valueControl.types";
@@ -21,14 +20,13 @@ export function FontValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const hasIssue = useRowHasIssue();
   const data = VIDEO_FONT_IDS.map((id) => {
     const font = VIDEO_FONT_REGISTRY[id];
     const name = font.label;
     return {
       value: definition.kind === "fontStack" ? font.stack : id,
-      label: font.measured ? t`${name}, measured widths` : name,
+      label: font.measured ? `${name}, measured widths` : name,
     };
   });
   return (
@@ -58,7 +56,6 @@ function EnumMenu({
   hasIssue: boolean;
   onChange: (option: string) => void;
 }>) {
-  const { t } = useLingui();
   const descriptions = new Map(
     options.map((entry) => [entry.option, entry.description]),
   );
@@ -67,7 +64,7 @@ function EnumMenu({
       aria-label={label}
       error={hasIssue}
       value={value ?? null}
-      placeholder={t`Not set`}
+      placeholder="Not set"
       data={options.map((entry) => ({
         value: entry.option,
         label: entry.label,
@@ -96,11 +93,10 @@ export function EnumValueControl({
   onChange,
   optionKey = "",
 }: ValueControlProps) {
-  const copy = useOptionCopy();
   const hasIssue = useRowHasIssue();
   const options = (definition.options ?? []).map((option) => ({
     option,
-    ...copy(optionKey, option),
+    ...getOptionCopy(optionKey, option),
   }));
   const selection = getEnumSelection(
     value,

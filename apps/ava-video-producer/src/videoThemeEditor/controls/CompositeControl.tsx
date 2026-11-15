@@ -1,11 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
 import { isTokenReference } from "../../videoTheme/themeReferences/themeReferences";
 import {
   COMPOSITE_TOKEN_FIELDS,
   type CompositeTokenKind,
   type FieldSpec,
 } from "../../videoTheme/tokenCatalog/defineTokens";
-import { useFieldCopy } from "../tokenCopy/useEditorCopy";
+import { getFieldName } from "../tokenCopy/editorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { EnumValueControl } from "./ChoiceControls";
 import css from "./controls.module.css";
@@ -29,10 +28,9 @@ type FieldProps = CompositeProps &
   }>;
 
 function CompositeField({ row, label, name, field, value }: FieldProps) {
-  const { t } = useLingui();
   const editor = useTokenEditor();
-  const fieldName = useFieldCopy()(name);
-  const fieldLabel = t`${label}, ${fieldName}`;
+  const fieldName = getFieldName(name);
+  const fieldLabel = `${label}, ${fieldName}`;
   const write = (next: unknown) =>
     editor.setToken(row.path, { ...value, [name]: next });
   return (

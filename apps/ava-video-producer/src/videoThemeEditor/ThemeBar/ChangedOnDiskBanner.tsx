@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Alert, Button } from "@mantine/core";
 import css from "./ThemeBar.module.css";
 import type { ReactNode } from "react";
@@ -30,44 +29,47 @@ export function ChangedOnDiskBanner({
   onDiscard: () => void;
   onReload: () => void;
 }>) {
-  const { t } = useLingui();
   return (
     <Alert
       variant="light"
       color="yellow"
-      title={t`This theme changed on disk`}
+      title="This theme changed on disk"
       classNames={{
         title: css.bannerTitle,
         message: css.bannerMessage,
       }}
     >
       <p className={css.bannerText}>
-        {t`The theme file changed after you started editing. Choose what happens to your unsaved edits. Saving waits until you do.`}
+        {
+          "The theme file changed after you started editing. Choose what happens to your unsaved edits. Saving waits until you do."
+        }
       </p>
       <ul className={css.bannerChoices}>
         <_Choice
           action={
             <Button size="compact-xs" onClick={onKeep}>
-              {t`Keep my edits`}
+              {"Keep my edits"}
             </Button>
           }
-          note={t`Apply them on top of the new file.`}
+          note="Apply them on top of the new file."
         />
         <_Choice
           action={
             <Button size="compact-xs" variant="default" onClick={onDiscard}>
-              {t`Discard my edits`}
+              {"Discard my edits"}
             </Button>
           }
-          note={t`Throw them away and use the new file.`}
+          note="Throw them away and use the new file."
         />
         <_Choice
           action={
             <Button size="compact-xs" variant="default" onClick={onReload}>
-              {t`Reload from file`}
+              {"Reload from file"}
             </Button>
           }
-          note={t`Read the file again in case it changed once more. Your edits stay.`}
+          note={
+            "Read the file again in case it changed once more. Your edits stay."
+          }
         />
       </ul>
     </Alert>

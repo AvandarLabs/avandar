@@ -6,7 +6,6 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { HELPER_CATALOG } from "./helperCatalog";
 import { HELPER_DEMO_IDS } from "./helperDemoIds";
-import { buildHelperDescriptorsSource } from "./i18n/buildHelperDescriptorsSource";
 
 const APP_ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 
@@ -139,20 +138,5 @@ test("preview assets are curated public files", () => {
         `${helper.id}: missing public/${asset}`,
       ),
     ),
-  );
-});
-
-test("generated translation descriptors match the catalog copy", () => {
-  const generated = readFileSync(
-    path.join(
-      APP_ROOT,
-      "src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts",
-    ),
-    "utf8",
-  );
-  assert.equal(
-    generated,
-    buildHelperDescriptorsSource(HELPER_CATALOG),
-    "Run npm run gallery:messages to regenerate helper descriptors",
   );
 });

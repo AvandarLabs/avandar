@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Group } from "@mantine/core";
 import css from "./controls.module.css";
 import { HexColorInput } from "./HexColorInput";
@@ -41,7 +40,6 @@ export function PaletteValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const shades = Array.isArray(value) ? (value as readonly string[]) : [];
   return (
     <div className={css.palette} role="group" aria-label={label}>
@@ -50,7 +48,7 @@ export function PaletteValueControl({
           // A shade's position is its identity: the palette always has ten.
           key={`shade-${String(index)}`}
           size="xs"
-          aria-label={t`${label}, shade ${index}`}
+          aria-label={`${label}, shade ${index}`}
           value={shade}
           allowAlpha={false}
           onChange={(color) =>
@@ -72,7 +70,6 @@ export function ShadeValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const shade: Shade =
     typeof value === "number"
       ? { light: value, dark: value }
@@ -91,8 +88,8 @@ export function ShadeValueControl({
   );
   return (
     <Group gap="xs" role="group" aria-label={label}>
-      {field("dark", t`On dark backgrounds`)}
-      {field("light", t`On light backgrounds`)}
+      {field("dark", "On dark backgrounds")}
+      {field("light", "On light backgrounds")}
     </Group>
   );
 }
@@ -103,7 +100,6 @@ export function GradientValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const gradient = value as GradientValue;
   const colorField = (side: "from" | "to", name: string) => (
     <HexColorInput
@@ -116,11 +112,11 @@ export function GradientValueControl({
   );
   return (
     <Group gap="xs" role="group" aria-label={label} wrap="nowrap">
-      {colorField("from", t`From`)}
-      {colorField("to", t`To`)}
+      {colorField("from", "From")}
+      {colorField("to", "To")}
       <RangeNumberInput
         size="xs"
-        label={t`Angle`}
+        label="Angle"
         suffix="°"
         min={0}
         max={360}

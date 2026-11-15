@@ -7,8 +7,6 @@ import {
   getHelperSelectionFromSearch,
 } from "./helperSelection";
 
-const identity = (message: string) => message;
-
 test("a deep link opens its helper and filters to its category", () => {
   assert.deepEqual(
     getHelperSelectionFromSearch(
@@ -48,14 +46,12 @@ test("filtering narrows by category and by text across titles, exports and copy"
   const masks = filterHelpers(HELPER_CATALOG.helpers, {
     category: "masks",
     query: "",
-    translate: identity,
   });
   assert.ok(masks.length > 0);
   assert.ok(masks.every((helper) => helper.category === "masks"));
   const byExport = filterHelpers(HELPER_CATALOG.helpers, {
     category: "all",
     query: "getEraseMaskStyle",
-    translate: identity,
   });
   assert.deepEqual(
     byExport.map((helper) => helper.id),
@@ -64,20 +60,6 @@ test("filtering narrows by category and by text across titles, exports and copy"
   const byCopy = filterHelpers(HELPER_CATALOG.helpers, {
     category: "all",
     query: "FLY-THROUGH",
-    translate: identity,
   });
   assert.ok(byCopy.some((helper) => helper.id === "fly-through"));
-});
-
-test("filtering searches the translated copy a reader sees", () => {
-  const results = filterHelpers(HELPER_CATALOG.helpers, {
-    category: "all",
-    query: "traducido",
-    translate: (message) =>
-      message === "Erase mask" ? "Máscara (traducido)" : message,
-  });
-  assert.deepEqual(
-    results.map((helper) => helper.id),
-    ["erase-mask"],
-  );
 });

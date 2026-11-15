@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { DUR, caretOn, enter, typed } from "../../../motion";
 import {
   getHeadingRevealStyles,
@@ -27,8 +26,7 @@ function _describeStyle(style: CSSProperties): string {
 /** Three lines staged with one `getLineRevealStyle()` mode. */
 export function createLineRevealDemo(mode: "line-fade" | "wipe" | "cut") {
   return function LineRevealDemo({ frame, frames }: HelperDemoProps) {
-    const { t } = useLingui();
-    const lines = [t`Every line arrives`, t`on its own beat,`, t`then holds.`];
+    const lines = ["Every line arrives", "on its own beat,", "then holds."];
     const styles = lines.map((_, index) =>
       getLineRevealStyle(frame, LINE_AT + index * LINE_STAGGER, mode),
     );
@@ -70,7 +68,7 @@ export function WipeExitDemo({ frame, frames }: HelperDemoProps) {
             className={css.headline}
             style={getLineRevealStyle(frame, 8, "wipe")}
           >
-            <Trans>Motion Atlas</Trans>
+            Motion Atlas
           </p>
         </div>
       </div>
@@ -103,10 +101,10 @@ export function HeadingRevealDemo({ frame, frames }: HelperDemoProps) {
               <span className={css.caption}>{`mode: "${mode}"`}</span>
               <div>
                 <p className={css.headline} style={styles.title}>
-                  <Trans>Shared helpers</Trans>
+                  Shared helpers
                 </p>
                 <p className={css.kicker} style={styles.kicker}>
-                  <Trans>The kicker follows a panel later</Trans>
+                  The kicker follows a panel later
                 </p>
               </div>
             </div>
@@ -121,11 +119,10 @@ const STAGED_EXIT = { atFrame: 50 };
 
 /** A statement leaving line by line, its icon last. */
 export function StagedExitDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const lines = [
-    t`The statement leaves`,
-    t`one line at a time,`,
-    t`then its icon.`,
+    "The statement leaves",
+    "one line at a time,",
+    "then its icon.",
   ];
   const iconExit = getStagedExitStyle(frame, STAGED_EXIT, lines.length);
   return (
@@ -188,11 +185,10 @@ const HEADLINE_FRAMES = [{ atFrame: 0 }, { atFrame: 30 }, { atFrame: 60 }];
 
 /** Timed headlines replacing one another through `getActiveHeadline()`. */
 export function ActiveHeadlineDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const headlines = [
-    t`Open the record.`,
-    t`Check the change.`,
-    t`Share the answer.`,
+    "Open the record.",
+    "Check the change.",
+    "Share the answer.",
   ];
   const active = getActiveHeadline(frame, HEADLINE_FRAMES);
   const reveal = getLineRevealStyle(

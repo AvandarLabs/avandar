@@ -1,10 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
 import { Accordion, Button } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
 import { getDefaultLiteralFromKind } from "../controls/defaultLiterals";
-import { useGroupCopy } from "../tokenCopy/useEditorCopy";
-import { useTokenCopy } from "../tokenCopy/useTokenCopy";
+import { getGroupName } from "../tokenCopy/editorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { TokenRow } from "../TokenRow/TokenRow";
 import {
@@ -16,15 +14,13 @@ import {
 import css from "./VideoThemeEditor.module.css";
 
 function useGroupName(): (group: string) => string {
-  const groupCopy = useGroupCopy();
-  const copy = useTokenCopy();
   return (group) => {
     const [tier, name] = group.split(":");
     const scaleLabel =
       tier === "atomic"
         ? getTokenDefinitionFromPath(`atomic.${name}.entry`)?.label
         : undefined;
-    return groupCopy(group) ?? (scaleLabel ? copy(scaleLabel) : name);
+    return getGroupName(group) ?? (scaleLabel ? scaleLabel : name);
   };
 }
 
@@ -35,7 +31,6 @@ type SectionProps = TokenRowGroup &
   }>;
 
 function AddScaleValue({ group, allRows }: SectionProps) {
-  const { t } = useLingui();
   const editor = useTokenEditor();
   const scalePath = `atomic.${group.split(":")[1]}`;
   const kind = getTokenDefinitionFromPath(`${scalePath}.entry`)?.kind;
@@ -53,7 +48,7 @@ function AddScaleValue({ group, allRows }: SectionProps) {
         )
       }
     >
-      {t`Add value`}
+      {"Add value"}
     </Button>
   );
 }
@@ -100,12 +95,11 @@ export function TokenSections({
   allRows: readonly TokenRowModel[];
   emptyGroups: readonly string[];
 }>) {
-  const { t } = useLingui();
   const groupName = useGroupName();
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
-    return <p className={css.empty}>{t`No settings match.`}</p>;
+    return <p className={css.empty}>{"No settings match."}</p>;
   }
   return (
     <Accordion

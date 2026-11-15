@@ -5,7 +5,6 @@ import {
   filterHelpers,
   getHelperSelectionFromSearch,
 } from "./helperSelection/helperSelection";
-import { useHelperCopy } from "./useHelperCopy";
 import type { HelperSelection } from "./helperSelection/helperSelection";
 
 /** Keeps the deep link in step with the open helper and category filter. */
@@ -15,14 +14,10 @@ function _replaceUrl(selection: HelperSelection): void {
 
 /** Helper filters, the open preview and its neighbours, deep linked. */
 export function useHelperGallery() {
-  const translate = useHelperCopy();
   const [selection, setSelection] = useState(() =>
     getHelperSelectionFromSearch(location.search, HELPER_CATALOG),
   );
-  const entries = filterHelpers(HELPER_CATALOG.helpers, {
-    ...selection,
-    translate,
-  });
+  const entries = filterHelpers(HELPER_CATALOG.helpers, selection);
   const open = HELPER_CATALOG.helpers.find(
     (helper) => helper.id === selection.helperId,
   );

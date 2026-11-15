@@ -1,9 +1,7 @@
-import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 import { afterDownloads } from "../../../../showcase/download.js";
 import { watchFilms } from "../../../../showcase/watch-films.js";
 import { buildHelperFilmId } from "../helperCatalog";
-import { useHelperCopy } from "../useHelperCopy";
 import css from "./HelperPreview.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
 import type { RefObject } from "react";
@@ -38,25 +36,25 @@ function useSourceWatch(
  * owns the title and the previous and next buttons.
  */
 export function HelperPreview({ helper }: Props) {
-  const { t } = useLingui();
-  const translate = useHelperCopy();
   const player = useRef<HTMLIFrameElement>(null);
   useSourceWatch(helper.id, player);
-  const title = translate(helper.title);
+  const title = helper.title;
   return (
-    <section className={css.preview} aria-label={t`Live preview`}>
+    <section className={css.preview} aria-label="Live preview">
       <div className={css.stage}>
         <iframe
           key={helper.id}
           ref={player}
           className={css.player}
           src={`/live.html?id=${encodeURIComponent(buildHelperFilmId(helper))}`}
-          title={t`Live preview of ${title}`}
+          title={`Live preview of ${title}`}
           allowFullScreen
         />
       </div>
       <p className={css.notice}>
-        {t`Live React preview of the real helper, frame-driven and looping. Pause or scrub with the player controls.`}
+        {
+          "Live React preview of the real helper, frame-driven and looping. Pause or scrub with the player controls."
+        }
       </p>
     </section>
   );

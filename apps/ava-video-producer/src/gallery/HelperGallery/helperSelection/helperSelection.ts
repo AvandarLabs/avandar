@@ -45,17 +45,14 @@ export function buildHelperSearch(
   return `?${parameters.toString()}`;
 }
 
-/** Everything a reader might search a helper by, in the language they see. */
-function _buildSearchText(
-  helper: HelperEntry,
-  translate: (message: string) => string,
-): string {
+/** Everything a reader might search a helper by. */
+function _buildSearchText(helper: HelperEntry): string {
   return [
     helper.id,
-    translate(helper.title),
-    translate(helper.description),
-    translate(helper.goodFor),
-    translate(helper.avoid),
+    helper.title,
+    helper.description,
+    helper.goodFor,
+    helper.avoid,
     ...helper.exports,
   ]
     .join(" ")
@@ -71,7 +68,6 @@ export function filterHelpers(
   options: {
     category: string;
     query: string;
-    translate: (message: string) => string;
   },
 ): HelperEntry[] {
   const query = options.query.trim().toLowerCase();
@@ -79,6 +75,6 @@ export function filterHelpers(
     (helper) =>
       (options.category === ALL_ATLAS_CATEGORIES ||
         helper.category === options.category) &&
-      (!query || _buildSearchText(helper, options.translate).includes(query)),
+      (!query || _buildSearchText(helper).includes(query)),
   );
 }

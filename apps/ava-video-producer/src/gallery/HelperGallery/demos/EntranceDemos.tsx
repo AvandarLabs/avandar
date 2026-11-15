@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   DUR,
   enter,
@@ -26,7 +25,6 @@ const ENTER_VARIANTS = [
 
 /** `enter()` with its default rise, a sideways arrival and a small scale. */
 export function EnterDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const style = enter(frame, ENTER_AT);
   return (
     <HelperDemoFrame
@@ -43,7 +41,7 @@ export function EnterDemo({ frame, frames }: HelperDemoProps) {
           {ENTER_VARIANTS.map((variant) => (
             <div key={variant.code} className={css.cardColumn}>
               <DemoCard
-                title={t`Saved view`}
+                title="Saved view"
                 style={enter(frame, ENTER_AT, variant.options)}
               />
               <span className={css.caption}>{variant.code}</span>
@@ -89,7 +87,6 @@ const LEAVE_AT = 48;
 
 /** A card entering, then `leave()` reversing the same rise. */
 export function LeaveDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const style = frame < LEAVE_AT ? enter(frame, 6) : leave(frame, LEAVE_AT);
   return (
     <HelperDemoFrame
@@ -102,7 +99,7 @@ export function LeaveDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.centered}>
-        <DemoCard title={t`Draft`} style={style} />
+        <DemoCard title="Draft" style={style} />
       </div>
     </HelperDemoFrame>
   );
@@ -112,7 +109,6 @@ const POP_AT = 15;
 
 /** A card landing on a spring, beside the spring's own curve. */
 export function PopDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const landing = pop(frame, POP_AT);
   const time = Math.min(1, Math.max(0, (frame - POP_AT) / DUR.sheet));
   return (
@@ -135,7 +131,7 @@ export function PopDemo({ frame, frames }: HelperDemoProps) {
         </div>
         <div className={css.centered}>
           <DemoCard
-            title={t`Export ready`}
+            title="Export ready"
             style={{
               opacity: ramp(frame, POP_AT, DUR.chip),
               transform: `translateY(${mix(landing, -80, 0).toFixed(2)}px)`,
@@ -161,7 +157,7 @@ export function PressDemo({ frame, frames }: HelperDemoProps) {
     >
       <div className={css.centered}>
         <div className={css.button} style={{ transform: `scale(${scale})` }}>
-          <Trans>Publish</Trans>
+          Publish
         </div>
       </div>
     </HelperDemoFrame>

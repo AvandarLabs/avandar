@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { DUR, countTo, mix, mixToken, ramp } from "../../../motion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
@@ -63,7 +62,7 @@ export function MixTokenDemo({ frame, frames }: HelperDemoProps) {
       <div className={css.centered}>
         <div className={css.cardColumn}>
           <div className={css.chip} style={{ borderColor: color, color }}>
-            <Trans>Selected</Trans>
+            Selected
           </div>
           <div className={css.swatchStrip}>
             {SWATCH_STEPS.map((step) => (

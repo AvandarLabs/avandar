@@ -1,4 +1,3 @@
-import { Plural, useLingui } from "@lingui/react/macro";
 import { Badge, SegmentedControl, Switch, TextInput } from "@mantine/core";
 import css from "./VideoThemeEditor.module.css";
 import type { ThemeEditScope } from "../themeDraft/themeDraft";
@@ -45,16 +44,15 @@ function ScopeSwitch({
   overrideCount,
   onScopeChange,
 }: ScopeSwitchProps) {
-  const { t } = useLingui();
   return (
     <div className={css.scope}>
       <SegmentedControl
         size="xs"
         fullWidth
-        aria-label={t`Edit scope`}
+        aria-label="Edit scope"
         value={scope.kind}
         data={[
-          { value: "theme", label: t`Whole theme` },
+          { value: "theme", label: "Whole theme" },
           { value: "item", label: item.scopeLabel },
         ]}
         onChange={(kind) =>
@@ -71,7 +69,7 @@ function ScopeSwitch({
           variant="light"
           classNames={{ root: css.overridesBadge }}
         >
-          <Plural value={overrideCount} one="# change" other="# changes" />
+          {`${overrideCount} ${overrideCount === 1 ? "change" : "changes"}`}
         </Badge>
       ) : null}
     </div>
@@ -85,12 +83,11 @@ function UsageFilter({
   filters: EditorFilters;
   onFiltersChange: (filters: EditorFilters) => void;
 }>) {
-  const { t } = useLingui();
   return (
     <div className={css.usage}>
       <Switch
         size="xs"
-        label={t`Only settings used by this preview`}
+        label="Only settings used by this preview"
         checked={filters.isUsedOnly}
         onChange={(event) =>
           onFiltersChange({
@@ -101,7 +98,9 @@ function UsageFilter({
       />
       {filters.isUsedOnly ? (
         <p className={css.hint}>
-          {t`Shows what the preview has used so far. Play it once to find the rest.`}
+          {
+            "Shows what the preview has used so far. Play it once to find the rest."
+          }
         </p>
       ) : null}
     </div>
@@ -118,7 +117,6 @@ export function EditorToolbar({
   hasUsage,
   onScopeChange,
 }: Props) {
-  const { t } = useLingui();
   return (
     <div className={css.toolbar}>
       {item ? (
@@ -132,8 +130,8 @@ export function EditorToolbar({
       <TextInput
         size="xs"
         type="search"
-        aria-label={t`Search settings`}
-        placeholder={t`Search by name, path, or description`}
+        aria-label="Search settings"
+        placeholder="Search by name, path, or description"
         value={filters.query}
         onChange={(event) =>
           onFiltersChange({ ...filters, query: event.currentTarget.value })

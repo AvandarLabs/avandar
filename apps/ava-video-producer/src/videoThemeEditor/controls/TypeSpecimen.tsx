@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import {
   buildColorWithAlpha,
   fillToCss,
@@ -15,7 +14,6 @@ const SPECIMEN_MAX_SIZE = 40;
 export function TypeSpecimen({
   style,
 }: Readonly<{ style: ResolvedTypeStyle | undefined }>) {
-  const { t } = useLingui();
   const { theme } = useTokenEditor();
   if (!style) {
     return null;
@@ -43,7 +41,7 @@ export function TypeSpecimen({
             : undefined,
         }}
       >
-        {t`Data moves through the pipeline`}
+        {"Data moves through the pipeline"}
       </p>
       <ContrastBadge color={style.color} style={style} />
     </div>

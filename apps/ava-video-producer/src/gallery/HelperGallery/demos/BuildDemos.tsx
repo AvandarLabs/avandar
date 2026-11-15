@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   EASE,
   STAGGER,
@@ -116,7 +115,7 @@ export function FlyThroughDemo({ frame, frames }: HelperDemoProps) {
           className={css.wordmark}
           style={{ clipPath: `inset(0 ${(retract * 100).toFixed(2)}% 0 0)` }}
         >
-          <Trans>Motion Atlas</Trans>
+          Motion Atlas
         </p>
         <FlightColumns flight={flight} cover={cover} />
       </DemoCanvas>
@@ -148,7 +147,7 @@ export function CtaBeatsDemo({ frame, frames }: HelperDemoProps) {
           className={css.kicker}
           style={getLineRevealStyle(frame, beats.subtitleAt, "line-fade")}
         >
-          <Trans>Every helper, previewed live.</Trans>
+          Every helper, previewed live.
         </p>
         <p
           className={css.headline}
@@ -165,7 +164,7 @@ export function CtaBeatsDemo({ frame, frames }: HelperDemoProps) {
           <span style={{ opacity: caretOn(frame) ? 1 : 0 }}>▍</span>
         </div>
         <span className={css.badge} style={enter(frame, beats.badgeAt)}>
-          <Trans>Live previews</Trans>
+          Live previews
         </span>
       </div>
     </HelperDemoFrame>
@@ -214,10 +213,9 @@ function BarRow({ frame, beats, index, label, value, fraction }: BarRowProps) {
 
 /** A bar panel building on its computed beats: hero, labels, bars, values. */
 export function BarBeatsDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const beats = getBarComparisonBeats(8, 0, 3);
   const fractions = getBarFractions(ROWS);
-  const labels = [t`North`, t`Harbor`, t`Valley`, t`Ridge`];
+  const labels = ["North", "Harbor", "Valley", "Ridge"];
   return (
     <HelperDemoFrame
       frame={frame}
@@ -244,7 +242,7 @@ export function BarBeatsDemo({ frame, frames }: HelperDemoProps) {
           />
         ))}
       </div>
-      <span className={css.footnote}>{t`Fictional demonstration data`}</span>
+      <span className={css.footnote}>{"Fictional demonstration data"}</span>
     </HelperDemoFrame>
   );
 }

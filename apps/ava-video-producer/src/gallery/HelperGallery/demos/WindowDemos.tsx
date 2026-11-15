@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { DUR, EASE, mix, ramp } from "../../../motion";
 import {
@@ -319,7 +318,6 @@ function BoxOutlines({ activeIndex }: { activeIndex: number }) {
 
 /** Every window and headline box on the canvas, highlighted in turn. */
 export function WindowBoxesDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const activeIndex = Math.floor(frame / 30) % NAMED_BOXES.length;
   const active = NAMED_BOXES[activeIndex];
   return (
@@ -336,7 +334,7 @@ export function WindowBoxesDemo({ frame, frames }: HelperDemoProps) {
           value:
             "height" in active.boxes[0]
               ? String(active.boxes[0].height)
-              : t`fits its lines`,
+              : "fits its lines",
         },
       ]}
     >

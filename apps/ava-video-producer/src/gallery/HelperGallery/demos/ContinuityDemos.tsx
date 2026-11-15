@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import {
   AnchoredOverlay,
   getOverlayPose,
@@ -43,7 +42,6 @@ function RectOutline({ rect, label }: { rect: MotionRect; label: string }) {
 
 /** One chip travelling from a list into a header as the same element. */
 export function SharedElementDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   const progress = getMotionProgress(frame, SHARE_AT, SHARE_FRAMES);
   return (
     <HelperDemoFrame
@@ -62,7 +60,7 @@ export function SharedElementDemo({ frame, frames }: HelperDemoProps) {
         durationInFrames={SHARE_FRAMES}
         className={css.sharedToken}
       >
-        {t`Response cases`}
+        {"Response cases"}
       </SharedElement>
     </HelperDemoFrame>
   );
@@ -116,7 +114,7 @@ export function AnchoredOverlayDemo({ frame, frames }: HelperDemoProps) {
         cue={CUE}
         className={css.callout}
       >
-        <Trans>Callout drawn from this cell</Trans>
+        Callout drawn from this cell
       </AnchoredOverlay>
     </HelperDemoFrame>
   );

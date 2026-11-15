@@ -11,7 +11,7 @@ export function VocabularyGuide({ entry }: Props) {
     (film) => film.family === "films" && film.id === entry.sourceFilm,
   );
   return (
-    <section className={css.vocabularyGuide} aria-label={"Reuse this study"}>
+    <section className={css.vocabularyGuide} aria-label="Reuse this study">
       <h3>{"Reuse this study"}</h3>
       <dl className={css.vocabularyGuideAdvice}>
         <div>

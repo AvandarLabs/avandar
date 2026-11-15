@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { SegmentedControl } from "@mantine/core";
 import { useMemo, useState, type ReactNode } from "react";
 import { useDraftTheme } from "../resolveDraftTheme/useDraftTheme";
@@ -7,7 +6,6 @@ import {
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
-import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { TokenEditorContext } from "../TokenEditorContext/TokenEditorContext";
 import { useTokenRowLabel } from "../TokenRow/TokenRow";
 import {
@@ -48,7 +46,6 @@ function useVisibleRows(
   filters: EditorFilters,
   usedTokens: readonly string[] | undefined,
 ) {
-  const copy = useTokenCopy();
   const toLabel = useTokenRowLabel();
   return useMemo(
     () =>
@@ -57,9 +54,9 @@ function useVisibleRows(
           filters.tier === "atomic" ? ["atomic", "mantine"] : [filters.tier],
         query: filters.query,
         usedTokens: filters.isUsedOnly ? usedTokens : undefined,
-        getText: (row) => `${toLabel(row)} ${copy(row.definition.description)}`,
+        getText: (row) => `${toLabel(row)} ${row.definition.description}`,
       }),
-    [rows, filters, usedTokens, copy, toLabel],
+    [rows, filters, usedTokens, toLabel],
   );
 }
 
@@ -141,20 +138,19 @@ type TierSwitchProps = Readonly<{
 }>;
 
 function TierSwitch({ filters, onFiltersChange }: TierSwitchProps) {
-  const { t } = useLingui();
   return (
     <SegmentedControl
       size="xs"
       fullWidth
-      aria-label={t`Kind of setting`}
+      aria-label="Kind of setting"
       value={filters.tier}
       data={[
         {
           value: "component",
-          label: t`Parts`,
+          label: "Parts",
         },
-        { value: "semantic", label: t`Styles` },
-        { value: "atomic", label: t`Base values` },
+        { value: "semantic", label: "Styles" },
+        { value: "atomic", label: "Base values" },
       ]}
       onChange={(tier) =>
         onFiltersChange({ ...filters, tier: tier as EditorTier })
@@ -170,7 +166,6 @@ function TierSwitch({ filters, onFiltersChange }: TierSwitchProps) {
  * producer surface can host it with a theme library and a draft.
  */
 export function VideoThemeEditor(props: Props) {
-  const { t } = useLingui();
   const { rows, context } = useEditorRows(props);
   const { filters, setFilters, visibleRows, emptyGroups } = useEditorFilters(
     rows,
@@ -186,7 +181,7 @@ export function VideoThemeEditor(props: Props) {
     : 0;
   return (
     <TokenEditorContext.Provider value={context}>
-      <section className={css.editor} aria-label={t`Design tokens`}>
+      <section className={css.editor} aria-label="Design tokens">
         <div className={css.pinned}>
           {props.header}
           <EditorToolbar

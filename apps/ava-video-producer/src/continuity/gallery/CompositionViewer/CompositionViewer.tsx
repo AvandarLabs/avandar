@@ -161,7 +161,7 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
         css.compositionViewer,
         tab === "tokens" && !isScene && css.isTokenPanel,
       )}
-      aria-label={"Composition screening"}
+      aria-label="Composition screening"
     >
       <CompositionStage
         selected={selected}

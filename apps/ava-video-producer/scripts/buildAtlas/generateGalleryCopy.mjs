@@ -1,16 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { tsImport } from "tsx/esm/api";
 const LINGUI_CLI = fileURLToPath(
   new URL("./lingui.js", import.meta.resolve("@lingui/cli")),
 );
-const { buildTokenMessages } = await tsImport(
-  "../videoTheme/buildTokenMessages/buildTokenMessages.ts",
-  import.meta.url,
-);
 /** Generates and compiles the active gallery translation catalogs. */
 export async function generateGalleryCopy(root) {
-  await buildTokenMessages(root);
   execFileSync(
     process.execPath,
     [LINGUI_CLI, "extract", "--config", "lingui.gallery.config.ts"],

@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import css from "./HelperDetail.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
 
@@ -20,9 +19,7 @@ function DefaultsList({ helper }: { helper: HelperEntry }) {
   if (!helper.defaults.length) {
     return (
       <p className={css.muted}>
-        <Trans>
-          No defaults: the value is fixed or every argument is required.
-        </Trans>
+        No defaults: the value is fixed or every argument is required.
       </p>
     );
   }
@@ -43,11 +40,7 @@ function DefaultsList({ helper }: { helper: HelperEntry }) {
 /** Links to the files that import the helper, or a note that none do. */
 function UsedByList({ helper }: { helper: HelperEntry }) {
   if (!helper.usedBy.length) {
-    return (
-      <p className={css.muted}>
-        <Trans>No scene imports it yet.</Trans>
-      </p>
-    );
+    return <p className={css.muted}>No scene imports it yet.</p>;
   }
   return (
     <ul className={css.links}>
@@ -64,9 +57,7 @@ function UsedByList({ helper }: { helper: HelperEntry }) {
 export function HelperReference({ helper }: { helper: HelperEntry }) {
   return (
     <aside className={css.reference}>
-      <h3>
-        <Trans>Exports</Trans>
-      </h3>
+      <h3>Exports</h3>
       <ul className={css.exports}>
         {helper.exports.map((name) => (
           <li key={name}>
@@ -74,17 +65,11 @@ export function HelperReference({ helper }: { helper: HelperEntry }) {
           </li>
         ))}
       </ul>
-      <h3>
-        <Trans>Defaults</Trans>
-      </h3>
+      <h3>Defaults</h3>
       <DefaultsList helper={helper} />
-      <h3>
-        <Trans>Used by</Trans>
-      </h3>
+      <h3>Used by</h3>
       <UsedByList helper={helper} />
-      <h3>
-        <Trans>Source</Trans>
-      </h3>
+      <h3>Source</h3>
       <SourceLink path={helper.source} />
     </aside>
   );

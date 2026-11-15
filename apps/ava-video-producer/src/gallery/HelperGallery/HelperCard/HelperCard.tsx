@@ -1,11 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
 import { Thumbnail } from "@remotion/player";
 import { memo } from "react";
 import { AtlasCard } from "../../AtlasLayout/AtlasCard/AtlasCard";
 import { useFrames, useVisible } from "../../MotionGallery/useGalleryClock";
 import { HELPER_CANVAS } from "../helperCatalog";
 import { HelperComposition } from "../HelperPlayer/HelperComposition";
-import { useHelperCopy } from "../useHelperCopy";
 import type { HelperEntry } from "../helperCatalog.types";
 
 /**
@@ -36,8 +34,6 @@ export const HelperCard = memo(function HelperCard({
   playing,
   onOpen,
 }: Props) {
-  const { t } = useLingui();
-  const translate = useHelperCopy();
   const [element, visible] = useVisible();
   const [frame] = useFrames(
     playing && visible,
@@ -46,9 +42,9 @@ export const HelperCard = memo(function HelperCard({
   );
   return (
     <AtlasCard
-      title={translate(helper.title)}
+      title={helper.title}
       category={category}
-      description={translate(helper.description)}
+      description={helper.description}
       reference={helper.exports.join(", ")}
       previewRef={element}
       badge={
@@ -56,7 +52,7 @@ export const HelperCard = memo(function HelperCard({
           className={`card-state ${playing && visible ? "is-playing" : ""}`}
         >
           <i />
-          {playing && visible ? t`LIVE` : t`PAUSED`}
+          {playing && visible ? "LIVE" : "PAUSED"}
         </span>
       }
       thumbnail={

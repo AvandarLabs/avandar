@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { DEMO_THEME_STYLE } from "../demoTheme";
 import css from "./HelperDemoFrame.module.css";
 import type { ReactNode } from "react";
@@ -31,8 +30,7 @@ export function HelperDemoFrame({
       <header className={css.header}>
         <code className={css.label}>{label}</code>
         <span className={css.counter}>
-          <Trans>frame</Trans> {String(Math.floor(frame)).padStart(3, "0")} /{" "}
-          {frames}
+          frame {String(Math.floor(frame)).padStart(3, "0")} / {frames}
         </span>
       </header>
       <div className={css.stage}>{children}</div>

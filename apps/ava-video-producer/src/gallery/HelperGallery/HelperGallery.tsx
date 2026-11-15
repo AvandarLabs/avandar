@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { AtlasCategoryNav } from "../AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../AtlasLayout/AtlasCollection/AtlasCollection";
@@ -12,15 +11,13 @@ import { HELPER_CATALOG } from "./helperCatalog";
 import { HelperDetail } from "./HelperDetail/HelperDetail";
 import css from "./HelperGallery.module.css";
 import { HelperPreview } from "./HelperPreview/HelperPreview";
-import { useHelperCopy } from "./useHelperCopy";
 import { useHelperGallery } from "./useHelperGallery";
 
 /** Each helper category with its helper count, in catalog order. */
 function useHelperCategories() {
-  const translate = useHelperCopy();
   return HELPER_CATALOG.categories.map((category) => ({
     id: category.id,
-    label: translate(category.title),
+    label: category.title,
     count: HELPER_CATALOG.helpers.filter(
       (helper) => helper.category === category.id,
     ).length,
@@ -33,8 +30,6 @@ function useHelperCategories() {
  * opening its live preview and reference in the shared modal.
  */
 export function HelperGallery() {
-  const { t } = useLingui();
-  const translate = useHelperCopy();
   const gallery = useHelperGallery();
   const categories = useHelperCategories();
   const [playing, setPlaying] = useState(() => !isReducedMotionPreferred());
@@ -44,56 +39,58 @@ export function HelperGallery() {
   return (
     <>
       <a className="skip-link" href="#library">
-        <Trans>Skip to the helpers</Trans>
+        Skip to the helpers
       </a>
       <GalleryHeader />
       <AtlasSections section="helpers" />
       <div className="workspace">
         <AtlasCategoryNav
-          label={t`Helper categories`}
-          eyebrow={t`BROWSE THE LIBRARY`}
-          allLabel={t`All helpers`}
+          label="Helper categories"
+          eyebrow="BROWSE THE LIBRARY"
+          allLabel="All helpers"
           total={HELPER_CATALOG.helpers.length}
           categories={categories}
           selected={selection.category}
           onSelect={gallery.chooseCategory}
         />
         <AtlasCollection
-          eyebrow={t`THE HELPER LIBRARY`}
+          eyebrow="THE HELPER LIBRARY"
           title={
-            <Trans>
+            <>
               The code <em>behind the motion.</em>
-            </Trans>
+            </>
           }
-          description={t`The shared helpers every motion and composition is built from, each previewed live with the real code.`}
+          description={
+            "The shared helpers every motion and composition is built from, each previewed live with the real code."
+          }
           heading={
             categories.find((item) => item.id === selection.category)?.label ??
-            t`All helpers`
+            "All helpers"
           }
           resultCount={gallery.entries.length}
           query={selection.query}
           onQueryChange={gallery.setQuery}
-          searchLabel={t`Search helpers`}
-          searchPlaceholder={t`Search helpers or exports…`}
+          searchLabel="Search helpers"
+          searchPlaceholder="Search helpers or exports…"
           tools={
             <button
               type="button"
               className="play-all"
               onClick={() => setPlaying((value) => !value)}
               aria-label={
-                playing ? t`Pause all animations` : t`Play all animations`
+                playing ? "Pause all animations" : "Play all animations"
               }
             >
               <Icon name={playing ? "pause" : "play"} size={15} />
-              <span>{playing ? t`Pause all` : t`Play all`}</span>
+              <span>{playing ? "Pause all" : "Play all"}</span>
             </button>
           }
-          emptyTitle={t`No matching helpers.`}
+          emptyTitle="No matching helpers."
           onReset={() => {
             gallery.setQuery("");
             gallery.chooseCategory("all");
           }}
-          resetLabel={t`All helpers`}
+          resetLabel="All helpers"
         >
           {gallery.entries.map((helper) => (
             <HelperCard
@@ -108,10 +105,10 @@ export function HelperGallery() {
       </div>
       {open ? (
         <AtlasDialog
-          title={translate(open.title)}
+          title={open.title}
           subtitle={labelOf(open.category)}
-          previousLabel={t`Previous helper`}
-          nextLabel={t`Next helper`}
+          previousLabel="Previous helper"
+          nextLabel="Next helper"
           onClose={gallery.close}
           onPrevious={
             previous ? () => gallery.openHelper(previous.id) : undefined

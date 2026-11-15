@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import clsx from "clsx";
 import { Cursor } from "../../../chrome/Cursor";
 import {
@@ -63,7 +62,7 @@ function Targets({ frame }: { frame: number }) {
           transform: `scale(${press(frame, CLICKS[1])})`,
         }}
       >
-        <Trans>Publish</Trans>
+        Publish
       </div>
     </>
   );
@@ -136,7 +135,7 @@ export function ClickFeedbackDemo({ frame, frames }: HelperDemoProps) {
           transform: `scale(${Math.min(...PRESS_CLICKS.map((at) => press(frame, at)))})`,
         }}
       >
-        <Trans>Run query</Trans>
+        Run query
       </div>
       <Cursor
         frame={frame}
@@ -189,7 +188,7 @@ export function CursorShutterDemo({ frame, frames }: HelperDemoProps) {
       </div>
       <Cursor frame={frame} path={FAST_PATH} />
       <span className={css.footnote} style={{ opacity: ramp(frame, 0, 6) }}>
-        <Trans>Inset: shutter samples relative to the pointer, enlarged</Trans>
+        Inset: shutter samples relative to the pointer, enlarged
       </span>
     </HelperDemoFrame>
   );

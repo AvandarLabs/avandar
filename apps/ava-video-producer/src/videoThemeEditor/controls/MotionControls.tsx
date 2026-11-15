@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { SegmentedControl, Text } from "@mantine/core";
 import { CurvePlot } from "../../gallery/HelperGallery/demos/parts/CurvePlot";
 import { createEasingFromToken } from "../../videoTheme/createEasingFromToken/createEasingFromToken";
@@ -38,8 +37,7 @@ function BezierFields({
   isCameraCurve: boolean;
   onChange: (points: Bezier) => void;
 }>) {
-  const { t } = useLingui();
-  const names = [t`Start x`, t`Start y`, t`End x`, t`End y`];
+  const names = ["Start x", "Start y", "End x", "End y"];
   return (
     <div className={css.fields}>
       {points.map((point, index) => (
@@ -69,18 +67,17 @@ function PowerFields({
   isCameraCurve: boolean;
   onChange: (easing: EasingValue) => void;
 }>) {
-  const { t } = useLingui();
   if (isCameraCurve) {
     return (
       <Text size="xs" c="dimmed">
-        {t`Cubic in-out. Cameras support no other power curve.`}
+        {"Cubic in-out. Cameras support no other power curve."}
       </Text>
     );
   }
   return (
     <RangeNumberInput
       size="xs"
-      label={t`Exponent`}
+      label="Exponent"
       min={1}
       max={8}
       step={0.5}
@@ -102,7 +99,6 @@ export function EasingValueControl({
   onChange,
   isCameraCurve = false,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const issueAriaProps = useRowIssueAriaProps();
   const easing = (value ?? DEFAULT_BEZIER) as EasingValue;
   const points = "powerInOut" in easing ? undefined : easing;
@@ -111,12 +107,12 @@ export function EasingValueControl({
     <div className={css.easing} role="group" aria-label={label}>
       <SegmentedControl
         size="xs"
-        aria-label={t`Curve type`}
+        aria-label="Curve type"
         {...issueAriaProps}
         value={points ? "bezier" : "power"}
         data={[
-          { value: "bezier", label: t`Bezier` },
-          { value: "power", label: t`Power` },
+          { value: "bezier", label: "Bezier" },
+          { value: "power", label: "Power" },
         ]}
         onChange={(kind) =>
           onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER)
@@ -145,15 +141,14 @@ export function SpringValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const { t } = useLingui();
   const spring: SpringValue = {
     ...DEFAULT_SPRING,
     ...(value as Partial<SpringValue> | undefined),
   };
   const fields = [
-    { key: "damping", name: t`Damping`, min: 1, max: 100, step: 1 },
-    { key: "stiffness", name: t`Stiffness`, min: 1, max: 1000, step: 1 },
-    { key: "mass", name: t`Mass`, min: 0.1, max: 10, step: 0.1 },
+    { key: "damping", name: "Damping", min: 1, max: 100, step: 1 },
+    { key: "stiffness", name: "Stiffness", min: 1, max: 1000, step: 1 },
+    { key: "mass", name: "Mass", min: 0.1, max: 10, step: 0.1 },
   ] as const;
   return (
     <div className={css.fields} role="group" aria-label={label}>

@@ -1,6 +1,3 @@
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
 import { Player } from "@remotion/player";
 import { HelperComposition } from "./HelperComposition";
 import type { Film } from "../../../showcase/showcase.types";
@@ -28,30 +25,26 @@ export function HelperPlayer({
   film: Extract<Film, { kind: "helper" }>;
 }) {
   return (
-    <I18nProvider i18n={i18n}>
-      <div className="liveFilm">
-        <Player
-          style={PLAYER_STYLE}
-          component={HelperComposition}
-          inputProps={{ helperId: film.helper }}
-          compositionWidth={film.width}
-          compositionHeight={film.height}
-          durationInFrames={film.frames}
-          fps={film.fps}
-          controls
-          loop
-          autoPlay={!_isReducedMotionPreferred()}
-          clickToPlay={false}
-          spaceKeyToPlayOrPause
-          errorFallback={() => (
-            <p className="liveError">
-              <Trans>
-                Preview unavailable. Check the showcase terminal, then reload.
-              </Trans>
-            </p>
-          )}
-        />
-      </div>
-    </I18nProvider>
+    <div className="liveFilm">
+      <Player
+        style={PLAYER_STYLE}
+        component={HelperComposition}
+        inputProps={{ helperId: film.helper }}
+        compositionWidth={film.width}
+        compositionHeight={film.height}
+        durationInFrames={film.frames}
+        fps={film.fps}
+        controls
+        loop
+        autoPlay={!_isReducedMotionPreferred()}
+        clickToPlay={false}
+        spaceKeyToPlayOrPause
+        errorFallback={() => (
+          <p className="liveError">
+            Preview unavailable. Check the showcase terminal, then reload.
+          </p>
+        )}
+      />
+    </div>
   );
 }

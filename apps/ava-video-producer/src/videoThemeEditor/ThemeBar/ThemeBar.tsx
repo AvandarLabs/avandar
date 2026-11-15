@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, TextInput } from "@mantine/core";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
@@ -37,21 +36,23 @@ type Props = Readonly<{
 }>;
 
 function useStatusText(): (message: ThemeBarMessage) => string {
-  const { t } = useLingui();
   const texts: Readonly<Record<ThemeBarMessage, string>> = {
     none: "",
-    saving: t`Saving…`,
-    saved: t`Theme saved.`,
-    copied: t`Theme JSON copied.`,
-    copyFailed: t`The theme JSON could not be copied.`,
-    fixIssuesFirst: t`Fix the marked settings before saving.`,
-    invalidTheme: t`The theme has problems. Fix the marked settings and save again.`,
-    readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,
-    changedOnDisk: t`This theme changed on disk. Reload it from file, then save again.`,
-    changedOnDiskUseBanner: t`This theme changed on disk. Keep, discard, or reload in the notice below, then save again.`,
-    themeNameTaken: t`A theme with that name already exists. Pick another name.`,
-    themeTooLarge: t`This theme is too large to save.`,
-    saveFailed: t`The theme could not be saved. Check the showcase terminal.`,
+    saving: "Saving…",
+    saved: "Theme saved.",
+    copied: "Theme JSON copied.",
+    copyFailed: "The theme JSON could not be copied.",
+    fixIssuesFirst: "Fix the marked settings before saving.",
+    invalidTheme:
+      "The theme has problems. Fix the marked settings and save again.",
+    readOnlyTheme: "Built-in themes are read-only. Save a copy as a new theme.",
+    changedOnDisk:
+      "This theme changed on disk. Reload it from file, then save again.",
+    changedOnDiskUseBanner:
+      "This theme changed on disk. Keep, discard, or reload in the notice below, then save again.",
+    themeNameTaken: "A theme with that name already exists. Pick another name.",
+    themeTooLarge: "This theme is too large to save.",
+    saveFailed: "The theme could not be saved. Check the showcase terminal.",
   };
   return (message) => texts[message];
 }
@@ -63,7 +64,6 @@ function SaveAsNewForm({
   onSubmit: (label: string) => Promise<void>;
   onCancel: () => void;
 }>) {
-  const { t } = useLingui();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const label = getThemeLabelFromInput(input);
@@ -81,7 +81,7 @@ function SaveAsNewForm({
       <TextInput
         ref={inputRef}
         size="xs"
-        label={t`New theme name`}
+        label="New theme name"
         value={input}
         onChange={(event) => setInput(event.currentTarget.value)}
         onKeyDown={(event) => {
@@ -94,10 +94,10 @@ function SaveAsNewForm({
       />
       <Group gap="xs">
         <Button size="compact-xs" type="submit" disabled={!label}>
-          {t`Create theme`}
+          {"Create theme"}
         </Button>
         <Button size="compact-xs" variant="subtle" onClick={onCancel}>
-          {t`Cancel`}
+          {"Cancel"}
         </Button>
       </Group>
     </form>
@@ -108,21 +108,22 @@ function ThemePicker(
   props: Pick<Props, "themes" | "themeId" | "isDirty" | "onSelectTheme"> &
     Readonly<{ isDisabled: boolean }>,
 ) {
-  const { t } = useLingui();
   return (
     <Group gap="xs" wrap="nowrap">
       <AtlasSelect
-        aria-label={t`Theme`}
+        aria-label="Theme"
         data={props.themes.map(({ id, label, builtIn }) => ({
           value: id,
-          label: builtIn ? t`${label} (built-in)` : label,
+          label: builtIn ? `${label} (built-in)` : label,
         }))}
         value={props.themeId}
         disabled={props.isDisabled}
         onChange={(id) => id && props.onSelectTheme(id)}
       />
       {props.isDirty ? (
-        <Badge size="sm" variant="light">{t`Unsaved changes`}</Badge>
+        <Badge size="sm" variant="light">
+          {"Unsaved changes"}
+        </Badge>
       ) : null}
     </Group>
   );
@@ -135,7 +136,6 @@ function ThemeActions(
       saveAsNewRef: RefObject<HTMLButtonElement | null>;
     }>,
 ) {
-  const { t } = useLingui();
   const actions = getThemeBarActions(props);
   return (
     <div className={css.actions}>
@@ -146,7 +146,7 @@ function ThemeActions(
             disabled={!actions.canSave}
             onClick={props.onSave}
           >
-            {t`Save`}
+            {"Save"}
           </Button>
         ) : null}
         <Button
@@ -156,7 +156,7 @@ function ThemeActions(
           disabled={!actions.canSaveAsNew}
           onClick={props.onStartNaming}
         >
-          {t`Save as new theme`}
+          {"Save as new theme"}
         </Button>
         <Button
           size="compact-xs"
@@ -164,7 +164,7 @@ function ThemeActions(
           disabled={!actions.canDiscard}
           onClick={props.onDiscard}
         >
-          {t`Discard`}
+          {"Discard"}
         </Button>
         {actions.showsReload ? (
           <Button
@@ -172,7 +172,7 @@ function ThemeActions(
             variant="default"
             onClick={props.onReloadTheme}
           >
-            {t`Reload from file`}
+            {"Reload from file"}
           </Button>
         ) : null}
       </div>
@@ -182,7 +182,7 @@ function ThemeActions(
         variant="subtle"
         onClick={props.onCopyJson}
       >
-        {t`Copy JSON`}
+        {"Copy JSON"}
       </Button>
     </div>
   );
@@ -198,7 +198,6 @@ function ThemeActions(
  * the theme is created, so a failed save does not lose the name.
  */
 export function ThemeBar(props: Props) {
-  const { t } = useLingui();
   const statusText = useStatusText();
   const [isNaming, setIsNaming] = useState(false);
   const saveAsNewRef = useRef<HTMLButtonElement>(null);
@@ -211,7 +210,7 @@ export function ThemeBar(props: Props) {
       ref={props.barRef}
       className={css.bar}
       role="group"
-      aria-label={t`Theme controls`}
+      aria-label="Theme controls"
       tabIndex={-1}
     >
       <ThemePicker
@@ -220,7 +219,9 @@ export function ThemeBar(props: Props) {
       />
       {props.isBuiltIn ? (
         <p className={css.notice}>
-          {t`Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours.`}
+          {
+            "Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours."
+          }
         </p>
       ) : null}
       <ThemeActions

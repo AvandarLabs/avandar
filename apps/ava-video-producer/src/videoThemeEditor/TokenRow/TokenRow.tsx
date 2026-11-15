@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconAlertCircle, IconArrowBackUp } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -7,7 +6,6 @@ import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl/TokenControl";
-import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import {
   describeRowIssue,
@@ -22,20 +20,18 @@ import type {
 
 /** A row's visible name: the catalog label, plus the key for a scale entry. */
 export function useTokenRowLabel(): (row: TokenRowModel) => string {
-  const copy = useTokenCopy();
   return useCallback(
     (row: TokenRowModel) =>
       row.scaleKey === undefined
-        ? copy(row.definition.label)
-        : `${copy(row.definition.label)} · ${humanizeScaleKey(row.scaleKey)}`,
-    [copy],
+        ? row.definition.label
+        : `${row.definition.label} · ${humanizeScaleKey(row.scaleKey)}`,
+    [],
   );
 }
 
 function OverrideDot({
   state,
 }: Readonly<{ state: TokenRowModel["overrideState"] }>) {
-  const { t } = useLingui();
   if (state === "none") {
     return null;
   }
@@ -45,8 +41,8 @@ function OverrideDot({
       role="img"
       aria-label={
         state === "draft"
-          ? t`Edited, not saved`
-          : t`Saved for this motion or composition only`
+          ? "Edited, not saved"
+          : "Saved for this motion or composition only"
       }
     />
   );
@@ -60,7 +56,6 @@ type HeaderProps = Readonly<{
 }>;
 
 function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
-  const { t } = useLingui();
   const editor = useTokenEditor();
   const kind = row.definition.kind;
   const value = formatTokenValue(kind, row.resolved);
@@ -68,24 +63,24 @@ function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
     row.itemOverride && formatTokenValue(kind, row.itemOverride.resolved);
   const toValueText = (): string => {
     if (hasIssue) {
-      return t`Last working value: ${value}`;
+      return `Last working value: ${value}`;
     }
-    return itemValue ? t`Used here: ${itemValue}` : value;
+    return itemValue ? `Used here: ${itemValue}` : value;
   };
   return (
     <div className={css.header}>
       <span className={css.label}>{label}</span>
       <OverrideDot state={row.overrideState} />
       {isInherited ? (
-        <span className={css.inheritedTag}>{t`Same as the theme`}</span>
+        <span className={css.inheritedTag}>{"Same as the theme"}</span>
       ) : null}
       <span className={css.value}>{toValueText()}</span>
       {row.overrideState === "draft" ? (
         <ActionIcon
           size="sm"
           variant="subtle"
-          aria-label={t`Reset ${label}`}
-          title={t`Reset ${label}`}
+          aria-label={`Reset ${label}`}
+          title={`Reset ${label}`}
           onClick={() => editor.resetToken(row.path)}
         >
           <IconArrowBackUp size={14} aria-hidden="true" />
@@ -100,7 +95,6 @@ function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
  * below edits the theme's value and not the one the preview shows.
  */
 function ItemOverrideNote({ label }: Readonly<{ label: string }>) {
-  const { t } = useLingui();
   const { item } = useTokenEditor();
   if (!item) {
     return null;
@@ -110,7 +104,7 @@ function ItemOverrideNote({ label }: Readonly<{ label: string }>) {
   const settingName = label.toLowerCase();
   return (
     <p className={css.itemNote}>
-      {t`${itemName} has its own ${settingName}. Choose "${scopeLabel}" to change it.`}
+      {`${itemName} has its own ${settingName}. Choose "${scopeLabel}" to change it.`}
     </p>
   );
 }
@@ -119,17 +113,16 @@ function useIssueSentence(): (
   issue: VideoThemeIssue,
   kind: TokenKind,
 ) => string {
-  const { t } = useLingui();
   return (issue, kind) => {
     const description = describeRowIssue(issue);
     if (description.kind === "missingReference") {
       return kind === "color" || kind === "fill"
-        ? t`This colour is missing. Pick another.`
-        : t`This value is missing. Pick another.`;
+        ? "This colour is missing. Pick another."
+        : "This value is missing. Pick another.";
     }
     return description.kind === "loop"
-      ? t`This value points back at itself. Pick another.`
-      : t`This value cannot be used.`;
+      ? "This value points back at itself. Pick another."
+      : "This value cannot be used.";
   };
 }
 
@@ -157,7 +150,6 @@ function TokenRowIssue({
  * control's inputs in Mantine's error state and adds an alert line.
  */
 export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
-  const copy = useTokenCopy();
   const editor = useTokenEditor();
   const label = useTokenRowLabel()(row);
   const issue = findTokenRowIssue(editor.issues, row.path);
@@ -180,7 +172,7 @@ export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
       </RowIssueContext.Provider>
       <p className={css.meta}>
         <code className={css.path}>{row.path}</code>{" "}
-        {copy(row.definition.description)}
+        {row.definition.description}
       </p>
       {issue ? (
         <TokenRowIssue issue={issue} kind={row.definition.kind} />

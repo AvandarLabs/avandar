@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { DUR, EASE, enter, ramp } from "../../../motion";
 import { getEraseMaskStyle } from "../../../motion-components/eraseMask";
 import {
@@ -196,7 +195,6 @@ const EDGE_DEPTH = 10;
 
 /** Bars growing with a seeded, brush-like right edge. */
 export function RoughEdgeDemo({ frame, frames }: HelperDemoProps) {
-  const { t } = useLingui();
   return (
     <HelperDemoFrame
       frame={frame}
@@ -204,7 +202,7 @@ export function RoughEdgeDemo({ frame, frames }: HelperDemoProps) {
       label={`getRoughEdgeClipPath(rowIndex, ${EDGE_DEPTH})`}
       readouts={[
         { name: "depth", value: `${EDGE_DEPTH}px` },
-        { name: "seed", value: t`row index` },
+        { name: "seed", value: "row index" },
       ]}
     >
       <div className={css.timeline}>
