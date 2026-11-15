@@ -21,14 +21,7 @@ export function ProseHeadings({ input, frame }: Readonly<Props>): ReactNode {
           [input.copy.context, 52, 40, 856, 18, 2],
           [input.copy.source, 52, 96, 856, 14, 2],
           [methodMessages[input.method].message, 52, 552, 400, 14, 2],
-          [
-            reviewMessages[input.reviewState].message,
-            508,
-            552,
-            400,
-            14,
-            2,
-          ],
+          [reviewMessages[input.reviewState].message, 508, 552, 400, 14, 2],
         ]}
       />
     </g>

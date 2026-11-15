@@ -1,4 +1,5 @@
 import { DUR, ramp, mix } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Arrive,
   Eyebrow,
@@ -8,7 +9,6 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import type { MetricCounterInput } from "../presets/MetricCounter/MetricCounter.schema";
 import type { ReactNode } from "react";

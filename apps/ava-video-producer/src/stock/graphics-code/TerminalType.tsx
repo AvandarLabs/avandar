@@ -1,4 +1,5 @@
 import { caretOn, DUR, ramp, typed } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Arrive,
   Check,
@@ -7,7 +8,6 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { CodeWindow } from "./CodeWindow";
 import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";

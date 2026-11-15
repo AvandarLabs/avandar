@@ -1,4 +1,5 @@
 import { wave } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Arrive,
   Caption,
@@ -10,7 +11,6 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import {
   useGraphicMotion,

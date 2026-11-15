@@ -31,7 +31,10 @@ function _resolveDescriptors<Value>(value: Value): ResolvedCopy<Value> {
     return value.map(_resolveDescriptors) as ResolvedCopy<Value>;
   }
   return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [key, _resolveDescriptors(item)]),
+    Object.entries(value).map(([key, item]) => [
+      key,
+      _resolveDescriptors(item),
+    ]),
   ) as ResolvedCopy<Value>;
 }
 
@@ -41,7 +44,9 @@ function _resolveDescriptors<Value>(value: Value): ResolvedCopy<Value> {
  */
 export function makeStockDataFromContract<
   Contract extends StockContract<unknown>,
->({ contract }: Readonly<{ contract: Contract }>): {
+>({
+  contract,
+}: Readonly<{ contract: Contract }>): {
   metadata: ResolvedCopy<StockContract<unknown>["metadata"]>;
   controls: ResolvedCopy<StockContract<unknown>["controls"]>;
   defaultInput: Contract["defaultInput"];

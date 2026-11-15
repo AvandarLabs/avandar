@@ -154,7 +154,6 @@ test("one basis point remains an exact minor unit with no prior remainder carrie
   assert.ok(_render({ frame: 150, input: input }).includes(">0.01</text>"));
 });
 
-
 test("maximum labels and extreme arithmetic render in both arrangements", () => {
   ["side-by-side", "stacked"].forEach((arrangementLayout) => {
     [true, false].forEach((showAmounts) => {

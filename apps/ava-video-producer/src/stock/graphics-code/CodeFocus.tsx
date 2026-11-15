@@ -1,4 +1,5 @@
 import { ramp } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Eyebrow,
   GRAPHIC_WIDTH,
@@ -6,7 +7,6 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { STOCK } from "../stockPalette";

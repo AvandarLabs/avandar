@@ -169,7 +169,6 @@ test("hinging retains its upper edge while the projected sheet opens", () => {
   );
 });
 
-
 test("three-line case captions clear the input caption below them", () => {
   const label = `界 ${"界".repeat(13)} ${"界".repeat(8)}`;
   const input = {

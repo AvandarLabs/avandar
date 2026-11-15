@@ -208,7 +208,6 @@ test("all eight blocks keep equal size across both patterns and every dispositio
   });
 });
 
-
 test("dense slot names clear their protected-kind caption band", () => {
   const label = `界 ${"界".repeat(6)} ${"界".repeat(13)}`;
   const input = {

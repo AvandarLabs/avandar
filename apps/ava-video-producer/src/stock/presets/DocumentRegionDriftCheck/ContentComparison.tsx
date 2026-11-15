@@ -34,14 +34,7 @@ export function ContentComparison({
       />
       <LabelSlots
         labels={[
-          [
-            `${pageMessage.message}: ${input.saved.page}`,
-            52,
-            360,
-            280,
-            12,
-            1,
-          ],
+          [`${pageMessage.message}: ${input.saved.page}`, 52, 360, 280, 12, 1],
         ]}
       />
       {input.showDetectorOrdinal ? (

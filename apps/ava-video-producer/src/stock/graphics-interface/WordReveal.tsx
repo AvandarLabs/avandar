@@ -1,6 +1,6 @@
 import { DUR, EASE, mix, ramp } from "../../motion";
-import { Eyebrow, STOCK, Text, type GraphicProps } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { Eyebrow, STOCK, Text, type GraphicProps } from "../graphics-common";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import type { WordRevealInput } from "../presets/WordReveal/WordReveal.schema";
 import type { ReactNode } from "react";

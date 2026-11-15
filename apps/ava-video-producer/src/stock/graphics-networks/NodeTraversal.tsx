@@ -1,4 +1,5 @@
 import { ramp } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Caption,
   CircleNode,
@@ -7,7 +8,6 @@ import {
   Route,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary";
 import { useGraphicMotion, useGraphicTokens } from "../theme/useGraphicTheme";

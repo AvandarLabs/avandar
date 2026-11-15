@@ -16,7 +16,8 @@ export function KernelDensitySpread({
 }: Readonly<Props>): ReactNode {
   const legendId = useId();
   const { radius } = getKernelSamplesFromInput({ input, frame });
-  const qualifier = "Zero modeled intensity does not establish zero population.";
+  const qualifier =
+    "Zero modeled intensity does not establish zero population.";
   return (
     <g data-legend-maximum={input.legendMaximum}>
       <KernelField input={input} frame={frame} accent={accent} />

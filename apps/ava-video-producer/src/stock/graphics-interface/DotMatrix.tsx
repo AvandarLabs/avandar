@@ -1,6 +1,7 @@
 import { prop } from "@avandar/utils";
 import { Fragment } from "react";
 import { DUR, ramp } from "../../motion";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import {
   Eyebrow,
   Pill,
@@ -8,7 +9,6 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import type { DotMatrixInput } from "../presets/DotMatrix/DotMatrix.schema";
 import type { ReactNode } from "react";

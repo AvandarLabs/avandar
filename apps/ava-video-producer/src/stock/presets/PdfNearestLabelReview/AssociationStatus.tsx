@@ -24,9 +24,7 @@ export function AssociationStatus({
       {" "}
       {input.showDistanceValues ? (
         <g data-ratio-value="true">
-          <LabelSlots
-            labels={[[ratioMessage.message, 60, 510, 400, 14, 2]]}
-          />
+          <LabelSlots labels={[[ratioMessage.message, 60, 510, 400, 14, 2]]} />
           <LiteralDataText
             value={`≈ ${association.ratio.toPrecision(3)}`}
             x={60}
