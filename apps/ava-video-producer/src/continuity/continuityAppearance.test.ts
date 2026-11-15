@@ -30,16 +30,16 @@ test("render options reach every continuity shot without mutating the plan", () 
     annotations: false,
   });
   assert.deepEqual(plan, before);
-  for (const [index, shot] of copy.shots.entries()) {
+  copy.shots.forEach((shot, index) => {
     const original = plan.shots[index];
     if (shot.scene !== "continuity" || original.scene !== "continuity") {
       assert.equal(shot, original);
-      continue;
+      return;
     }
     assert.equal(shot.props.cameraMotion, false);
     assert.equal(shot.props.annotations, false);
     assert.equal(shot.props.beats, original.props.beats);
-  }
+  });
 });
 
 test("omitted options keep the authored flags", () => {
@@ -59,16 +59,16 @@ test("every render option defaults to on", () => {
 });
 
 test("colours, sketch levels, and camera presets are not render options", () => {
-  for (const option of [
+  [
     { accent: "#123456" },
     { boxRoughness: 1 },
     { annotationRoughness: 1 },
     { cameraPreset: "whip" },
-  ]) {
+  ].forEach((option) => {
     assert.equal(
       continuityAppearanceSchema.safeParse(option).success,
       false,
       Object.keys(option)[0],
     );
-  }
+  });
 });

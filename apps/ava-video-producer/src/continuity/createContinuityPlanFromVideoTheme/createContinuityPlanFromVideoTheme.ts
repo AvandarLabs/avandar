@@ -17,7 +17,6 @@ import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshotHelp
 import type { ContinuityBeat } from "../continuitySchema";
 
 type ThemeSemantic = ResolvedVideoTheme["semantic"];
-type MotionPresetName = NonNullable<MotionOptions["preset"]>;
 type ContinuityShot = Extract<
   Storyboard["shots"][number],
   { scene: "continuity" }
@@ -26,7 +25,8 @@ type BeatContent = ContinuityBeat["content"];
 type CameraKey = NonNullable<
   Extract<BeatContent, { kind: "stock" }>["camera"]
 >[number];
-type CameraCurveName = "glide" | "push" | "whip";
+const CAMERA_CURVE_NAMES = ["glide", "push", "whip"] as const;
+type CameraCurveName = (typeof CAMERA_CURVE_NAMES)[number];
 type CameraTheme = Readonly<{
   curves: Readonly<Record<CameraCurveName, MotionEasing>>;
   zoom: ResolvedRange;
@@ -35,12 +35,6 @@ type CameraTheme = Readonly<{
 
 /** The stock diagram a continuity camera frames. */
 const STOCK_CANVAS = { width: 960, height: 600 };
-const CAMERA_CURVE_NAMES: ReadonlySet<string> = new Set([
-  "glide",
-  "push",
-  "whip",
-]);
-const presetNameSchema = motionOptionsSchema.shape.preset.unwrap();
 
 /**
  * A theme curve as a camera curve. The resolver already rejects curves that
@@ -60,7 +54,7 @@ function _toMotionEasing(easing: EasingValue, tokenPath: string): MotionEasing {
 }
 
 function _presetMotionOptions(
-  preset: MotionPresetName,
+  preset: NonNullable<MotionOptions["preset"]>,
   semantic: ThemeSemantic,
 ): MotionOptions {
   const camera = semantic.camera.presets[preset];
@@ -99,7 +93,9 @@ export function createMotionOptionsFromTheme(
 /** Reads every camera token once, so a plan's shots share one conversion. */
 function _cameraTheme(semantic: ThemeSemantic): CameraTheme {
   const { easing, zoom, preset } = semantic.camera;
-  const presetName = presetNameSchema.safeParse(preset);
+  const presetName = motionOptionsSchema.shape.preset
+    .unwrap()
+    .safeParse(preset);
   return {
     curves: {
       glide: _toMotionEasing(easing.glide, "camera.easing.glide"),
@@ -114,7 +110,7 @@ function _cameraTheme(semantic: ThemeSemantic): CameraTheme {
 }
 
 function _isCameraCurveName(ease: string): ease is CameraCurveName {
-  return CAMERA_CURVE_NAMES.has(ease);
+  return (CAMERA_CURVE_NAMES as readonly string[]).includes(ease);
 }
 
 /**
@@ -143,26 +139,31 @@ function _themeCameraKey(key: CameraKey, camera: CameraTheme): CameraKey {
   };
 }
 
-function _themeContent(
-  content: BeatContent,
+function _themeCompositeContent(
+  content: Extract<BeatContent, { kind: "composite" }>,
   semantic: ThemeSemantic,
-  camera: CameraTheme,
-  presetOptions: MotionOptions | undefined,
 ): BeatContent {
+  return {
+    ...content,
+    diagrams: content.diagrams.map((diagram) => ({
+      ...diagram,
+      overlay: {
+        ...diagram.overlay,
+        motion: createMotionOptionsFromTheme(diagram.overlay.motion, semantic),
+      },
+    })),
+  };
+}
+
+function _themeContent(options: {
+  content: BeatContent;
+  semantic: ThemeSemantic;
+  camera: CameraTheme;
+  presetOptions: MotionOptions | undefined;
+}): BeatContent {
+  const { content, semantic, camera, presetOptions } = options;
   if (content.kind === "composite") {
-    return {
-      ...content,
-      diagrams: content.diagrams.map((diagram) => ({
-        ...diagram,
-        overlay: {
-          ...diagram.overlay,
-          motion: createMotionOptionsFromTheme(
-            diagram.overlay.motion,
-            semantic,
-          ),
-        },
-      })),
-    };
+    return _themeCompositeContent(content, semantic);
   }
   if (content.kind !== "stock") {
     return content;
@@ -208,13 +209,19 @@ function _addedCameraFrames(
   return Math.max(0, after[after.length - 1].at - before[before.length - 1].at);
 }
 
-function _themeBeat(
-  beat: ContinuityBeat,
-  semantic: ThemeSemantic,
-  camera: CameraTheme,
-  presetOptions: MotionOptions | undefined,
-): ContinuityBeat {
-  const content = _themeContent(beat.content, semantic, camera, presetOptions);
+function _themeBeat(options: {
+  beat: ContinuityBeat;
+  semantic: ThemeSemantic;
+  camera: CameraTheme;
+  presetOptions: MotionOptions | undefined;
+}): ContinuityBeat {
+  const { beat, semantic, camera, presetOptions } = options;
+  const content = _themeContent({
+    content: beat.content,
+    semantic,
+    camera,
+    presetOptions,
+  });
   return {
     ...beat,
     duration: beat.duration + _addedCameraFrames(beat.content, content),
@@ -235,7 +242,7 @@ function _themeShot(
     ? camera.presetOptions
     : undefined;
   const beats = shot.props.beats.map((beat) =>
-    _themeBeat(beat, semantic, camera, presetOptions),
+    _themeBeat({ beat, semantic, camera, presetOptions }),
   );
   const isRetimed = beats.some(
     (beat, index) => beat.duration !== shot.props.beats[index].duration,

@@ -135,7 +135,7 @@ test("a theme's preset speed reaches the motion", () => {
 });
 
 test("the unthemed motion presets and blur defaults equal classic's", () => {
-  for (const preset of PRESETS) {
+  PRESETS.forEach((preset) => {
     const themed = createMotionOptionsFromTheme({ preset }, CLASSIC.semantic);
     const unthemed = resolveMotionSettings({ preset });
     assert.deepEqual(
@@ -143,14 +143,14 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
       [unthemed.speed, unthemed.shutterAngle],
       preset,
     );
-    for (const progress of [0.1, 0.25, 0.5, 0.75, 0.9]) {
+    [0.1, 0.25, 0.5, 0.75, 0.9].forEach((progress) => {
       assert.equal(
         getMotionEasing({ easing: themed.easing })(progress),
         getMotionEasing({ preset })(progress),
         preset,
       );
-    }
-  }
+    });
+  });
   const {
     shutterAngle,
     samples,
@@ -168,12 +168,12 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
 });
 
 test("classic keeps every catalog film's timing and camera path", () => {
-  for (const { id, plan } of PLANS) {
+  PLANS.forEach(({ id, plan }) => {
     const themed = createContinuityPlanFromVideoTheme(plan, CLASSIC);
     assert.equal(durationInFrames(themed), durationInFrames(plan), id);
     assert.deepEqual(_cameraPoses(themed), _cameraPoses(plan), id);
     assert.equal(storyboardSchema.safeParse(themed).success, true, id);
-  }
+  });
 });
 
 test("a theme camera preset lengthens travel without truncating holds or modifying the plan", () => {
@@ -202,7 +202,7 @@ test("a theme camera preset lengthens travel without truncating holds or modifyi
 });
 
 test("every theme camera preset moves the camera exactly as the matching motion preset", () => {
-  for (const preset of PRESETS) {
+  PRESETS.forEach((preset) => {
     const themed = createContinuityPlanFromVideoTheme(
       HANDOFF,
       _classicWithCamera(preset),
@@ -212,15 +212,15 @@ test("every theme camera preset moves the camera exactly as the matching motion 
       _cameraPoses(themed, { preset }),
       preset,
     );
-  }
+  });
 });
 
 test("every catalog film stays valid with every theme camera preset, which camera motion off ignores", () => {
-  for (const { id, plan } of PLANS) {
+  PLANS.forEach(({ id, plan }) => {
     const still = createContinuityPlanFromOptions(plan, {
       cameraMotion: false,
     });
-    for (const preset of PRESETS) {
+    PRESETS.forEach((preset) => {
       const result = storyboardSchema.safeParse(
         createContinuityPlanFromVideoTheme(plan, _classicWithCamera(preset)),
       );
@@ -234,8 +234,8 @@ test("every catalog film stays valid with every theme camera preset, which camer
         createContinuityPlanFromVideoTheme(still, CLASSIC),
         `${id}: ${preset}`,
       );
-    }
-  }
+    });
+  });
 });
 
 test("applying the same theme twice changes nothing", () => {
@@ -249,14 +249,14 @@ test("the theme's zoom limit keeps every camera key inside it and inside the dia
     other: { video: { atomic: { zoom: { max: 1.5 } } } },
   });
   assert.ok(_cameraKeys(HANDOFF).some((key) => key.zoom > 1.5));
-  for (const { id, plan } of PLANS) {
+  PLANS.forEach(({ id, plan }) => {
     const themed = createContinuityPlanFromVideoTheme(plan, theme);
     assert.ok(
       _cameraKeys(themed).every((key) => key.zoom <= 1.5),
       id,
     );
     assert.equal(storyboardSchema.safeParse(themed).success, true, id);
-  }
+  });
 });
 
 test("a camera curve that overshoots its framings is refused", () => {

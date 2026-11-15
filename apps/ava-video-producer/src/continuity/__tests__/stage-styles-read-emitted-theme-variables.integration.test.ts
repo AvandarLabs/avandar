@@ -26,7 +26,7 @@ test("every required theme variable in the stage styles is emitted by every buil
   const required = new Set(
     [...css.matchAll(/var\((--video-[a-z0-9-]+)\)/g)].map((match) => match[1]),
   );
-  for (const themeId of BUILT_IN_VIDEO_THEMES.keys()) {
+  [...BUILT_IN_VIDEO_THEMES.keys()].forEach((themeId) => {
     const emitted = buildVideoCssVariables(
       makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, themeId),
     );
@@ -35,5 +35,5 @@ test("every required theme variable in the stage styles is emitted by every buil
       [],
       themeId,
     );
-  }
+  });
 });
