@@ -1,0 +1,38 @@
+.tokenRowIssue {
+  align-items: flex-start;
+  color: var(--mantine-color-red-9);
+  display: flex;
+  font-size: 11px;
+  gap: 6px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tokenRowIssueIcon {
+  color: var(--mantine-color-red-6);
+  flex: 0 0 auto;
+  margin-block-start: 1px;
+}
+
+.tokenRowIssueSentence {
+  margin: 0;
+}
+
+/* The resolver's own message is detail, so it is muted and small. */
+.tokenRowIssueMessage {
+  color: var(--muted);
+  display: block;
+  font: 10px var(--mono);
+  overflow-wrap: anywhere;
+}
+
+/* On a phone, descriptions are 12px and the resolver's message 11px. */
+@media (width <= 760px) {
+  .tokenRowIssue {
+    font-size: 12px;
+  }
+
+  .tokenRowIssueMessage {
+    font-size: 11px;
+  }
+}

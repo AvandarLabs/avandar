@@ -1,24 +1,20 @@
 import { TOKEN_CONTROLS } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
-import {
-  BooleanValueControl,
-  EnumValueControl,
-  FontValueControl,
-} from "./ChoiceControls";
-import {
-  ColorValueControl,
-  GradientValueControl,
-  PaletteValueControl,
-  ShadeValueControl,
-} from "./ColorControls";
-import {
-  DashValueControl,
-  GlowValueControl,
-  ShadowValueControl,
-  TextShadowValueControl,
-} from "./EffectControls";
-import { EasingValueControl, SpringValueControl } from "./MotionControls";
-import { DurationValueControl, NumberValueControl } from "./NumberControls";
+import { BooleanValueControl } from "./BooleanValueControl";
+import { ColorValueControl } from "./ColorValueControl/ColorValueControl";
+import { DashValueControl } from "./DashValueControl/DashValueControl";
+import { DurationValueControl } from "./DurationValueControl/DurationValueControl";
+import { EasingValueControl } from "./EasingValueControl/EasingValueControl";
+import { EnumValueControl } from "./EnumValueControl/EnumValueControl";
+import { FontValueControl } from "./FontValueControl";
+import { GlowValueControl } from "./GlowValueControl";
+import { GradientValueControl } from "./GradientValueControl";
+import { NumberValueControl } from "./NumberValueControl/NumberValueControl";
+import { PaletteValueControl } from "./PaletteValueControl/PaletteValueControl";
+import { ShadeValueControl } from "./ShadeValueControl";
+import { ShadowValueControl } from "./ShadowValueControl/ShadowValueControl";
+import { SpringValueControl } from "./SpringValueControl/SpringValueControl";
+import { TextShadowValueControl } from "./TextShadowValueControl";
 import type { ValueControlProps } from "./valueControl.types";
 
 const LAYER_CONTROLS = {

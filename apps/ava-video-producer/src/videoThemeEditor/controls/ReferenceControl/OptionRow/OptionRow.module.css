@@ -1,0 +1,15 @@
+.optionRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.optionRowChip {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 12px;
+  width: 12px;
+}

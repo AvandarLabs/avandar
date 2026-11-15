@@ -22,34 +22,6 @@
   margin: 0;
 }
 
-/*
- * The theme's own actions stay together, and Copy JSON sits at the end
- * of the row. When the row is too narrow it drops to a row of its own at the
- * end, instead of splitting the actions.
- */
-.actions {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.actionGroup {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.copyJson {
-  margin-inline-start: auto;
-}
-
-.form {
-  display: grid;
-  gap: 8px;
-}
-
 .status {
   color: var(--muted);
   font-size: 11px;
@@ -66,53 +38,10 @@
   position: absolute;
 }
 
-/*
- * Mantine paints a light yellow alert's heading and body in an orange that is
- * under 4.5:1 on its pale yellow ground, so the banner states its own ink.
- */
-.bannerTitle,
-.bannerMessage {
-  color: var(--ink);
-}
-
-.bannerText {
-  font-size: 12px;
-  line-height: 1.45;
-  margin: 0 0 8px;
-}
-
-.bannerChoices {
-  display: grid;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.bannerChoice {
-  align-items: center;
-  display: grid;
-  gap: 4px 8px;
-  grid-template-columns: max-content minmax(0, 1fr);
-}
-
-.bannerChoice > button {
-  justify-self: start;
-}
-
-.bannerChoiceNote {
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 /* On a phone, descriptions are 12px. */
 @media (width <= 760px) {
   .notice,
   .status {
     font-size: 12px;
-  }
-
-  .bannerChoice {
-    grid-template-columns: minmax(0, 1fr);
   }
 }

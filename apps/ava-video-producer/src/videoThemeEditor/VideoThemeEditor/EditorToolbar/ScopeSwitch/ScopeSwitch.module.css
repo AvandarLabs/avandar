@@ -1,0 +1,11 @@
+.scopeSwitch {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+/* Mantine's xs badge is 9px. This one is 10px with the deeper primary text. */
+.scopeSwitchOverridesBadge {
+  color: var(--ava-primary-8);
+  font-size: 10px;
+}

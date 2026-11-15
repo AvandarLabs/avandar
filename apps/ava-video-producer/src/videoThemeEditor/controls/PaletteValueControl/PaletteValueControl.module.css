@@ -1,0 +1,5 @@
+.paletteValueGrid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}

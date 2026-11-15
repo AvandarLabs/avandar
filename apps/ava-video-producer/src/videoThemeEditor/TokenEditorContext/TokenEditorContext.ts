@@ -6,7 +6,7 @@ import type {
 import type { CustomValueRequest } from "../customTokenValue/customTokenValue";
 import type { ThemeEditScope } from "../themeDraft/themeDraft";
 import type { TokenRow } from "../tokenRows/tokenRows";
-import type { EditorItem } from "../VideoThemeEditor/EditorToolbar";
+import type { EditorItem } from "../VideoThemeEditor/EditorToolbar/EditorToolbar";
 
 /** What every token control reads and the edits it can make. */
 export type TokenEditorContextValue = Readonly<{

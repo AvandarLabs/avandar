@@ -1,14 +1,14 @@
 import { ColorInput, type ColorInputProps } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
+import { parseHexDraft } from "./controlValueHelpers/controlValueHelpers";
 import {
   isColorPopoverOpenAfter,
   type ColorPopoverEvent,
-} from "./colorPopover/colorPopover";
-import { parseHexDraft } from "./controlValues/controlValues";
+} from "./isColorPopoverOpenAfter/isColorPopoverOpenAfter";
 import { useDraftValue } from "./useDraftValue";
 
-type HexColorInputProps = Omit<
+type Props = Omit<
   ColorInputProps,
   | "value"
   | "onChange"
@@ -24,8 +24,90 @@ type HexColorInputProps = Omit<
     onChange: (color: string) => void;
   }>;
 
+type PopoverHandlerProps = Pick<
+  ColorInputProps,
+  "onChange" | "onFocus" | "onClick" | "onKeyDown" | "onBlur"
+>;
+
 // The colour chip is a non-text part, so an inherited token row dims it.
 const ATTRIBUTES = { colorPreview: { "data-inherit-dim": true } } as const;
+
+/**
+ * The keydown handler of the colour field. Enter and Escape close the picker.
+ * While it is open, Escape stops here so the preview dialog does not close
+ * with it.
+ */
+function _createKeyDownHandler(
+  options: Readonly<{
+    isOpen: boolean;
+    reactTo: (event: ColorPopoverEvent) => void;
+    onKeyDown: PopoverHandlerProps["onKeyDown"];
+  }>,
+): NonNullable<PopoverHandlerProps["onKeyDown"]> {
+  const { isOpen, reactTo, onKeyDown } = options;
+  return (event) => {
+    if (event.key === "Enter") {
+      reactTo("enter");
+    }
+    if (event.key === "Escape") {
+      if (isOpen) {
+        // The preview dialog closes on an Escape nobody handled, and it
+        // checks `defaultPrevented`, so this press only closes the picker.
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      reactTo("escape");
+    }
+    onKeyDown?.(event);
+  };
+}
+
+/** Whether the picker is open, and the field handlers that open and close it. */
+function useColorPopoverHandlers(
+  options: Readonly<{
+    field: Readonly<{
+      isValid: boolean;
+      change: (draft: string) => void;
+      revert: () => void;
+    }>;
+    onFocus: PopoverHandlerProps["onFocus"];
+    onClick: PopoverHandlerProps["onClick"];
+    onKeyDown: PopoverHandlerProps["onKeyDown"];
+    onBlur: PopoverHandlerProps["onBlur"];
+  }>,
+) {
+  const { field, onFocus, onClick, onKeyDown, onBlur } = options;
+  const [isOpen, setOpen] = useState(false);
+  const popoverProps = useMemo(
+    () => ({ withinPortal: false, opened: isOpen }),
+    [isOpen],
+  );
+  const reactTo = (event: ColorPopoverEvent) =>
+    setOpen(isColorPopoverOpenAfter(event));
+  const handlers: PopoverHandlerProps = {
+    onChange: (typedText) => {
+      reactTo("type");
+      field.change(typedText);
+    },
+    onFocus: (event) => {
+      reactTo("focus");
+      onFocus?.(event);
+    },
+    onClick: (event) => {
+      reactTo("click");
+      onClick?.(event);
+    },
+    onKeyDown: _createKeyDownHandler({ isOpen, reactTo, onKeyDown }),
+    onBlur: (event) => {
+      reactTo("blur");
+      if (!field.isValid) {
+        field.revert();
+      }
+      onBlur?.(event);
+    },
+  };
+  return { popoverProps, handlers };
+}
 
 /**
  * A Mantine colour field that keeps hand-typed hex text while it is
@@ -45,15 +127,8 @@ export function HexColorInput({
   onKeyDown,
   error,
   ...props
-}: HexColorInputProps) {
+}: Props) {
   const hasIssue = useRowHasIssue();
-  const [isOpen, setOpen] = useState(false);
-  const popoverProps = useMemo(
-    () => ({ withinPortal: false, opened: isOpen }),
-    [isOpen],
-  );
-  const reactTo = (event: ColorPopoverEvent) =>
-    setOpen(isColorPopoverOpenAfter(event));
   const field = useDraftValue<string, string>({
     value,
     toKey: (color) => color,
@@ -61,49 +136,23 @@ export function HexColorInput({
     parse: (draft) => parseHexDraft(draft, { allowAlpha }),
     onChange,
   });
+  const { popoverProps, handlers } = useColorPopoverHandlers({
+    field,
+    onFocus,
+    onClick,
+    onKeyDown,
+    onBlur,
+  });
   return (
     <ColorInput
       {...props}
+      {...handlers}
       error={error ?? hasIssue}
       value={field.draft}
       format={allowAlpha && value.length === 9 ? "hexa" : "hex"}
       withEyeDropper={false}
       popoverProps={popoverProps}
       attributes={ATTRIBUTES}
-      onChange={(next) => {
-        reactTo("type");
-        field.change(next);
-      }}
-      onFocus={(event) => {
-        reactTo("focus");
-        onFocus?.(event);
-      }}
-      onClick={(event) => {
-        reactTo("click");
-        onClick?.(event);
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "Enter") {
-          reactTo("enter");
-        }
-        if (event.key === "Escape") {
-          if (isOpen) {
-            // The preview dialog closes on an Escape nobody handled, and it
-            // checks `defaultPrevented`, so this press only closes the picker.
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          reactTo("escape");
-        }
-        onKeyDown?.(event);
-      }}
-      onBlur={(event) => {
-        reactTo("blur");
-        if (!field.isValid) {
-          field.revert();
-        }
-        onBlur?.(event);
-      }}
     />
   );
 }

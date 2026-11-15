@@ -1,0 +1,20 @@
+.durationValueRow {
+  min-width: 0;
+}
+
+.durationValueInput {
+  flex: 0 0 112px;
+}
+
+.durationValueReadout {
+  color: var(--muted);
+  font: 11px var(--mono);
+  white-space: nowrap;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .durationValueReadout {
+    font-size: 12px;
+  }
+}

@@ -1,4 +1,3 @@
-import { SegmentedControl } from "@mantine/core";
 import { useMemo, useState, type ReactNode } from "react";
 import { useDraftTheme } from "../resolveDraftTheme/useDraftTheme";
 import {
@@ -7,7 +6,7 @@ import {
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
 import { TokenEditorContext } from "../TokenEditorContext/TokenEditorContext";
-import { useTokenRowLabel } from "../TokenRow/TokenRow";
+import { useTokenRowLabel } from "../TokenRow/useTokenRowLabel";
 import {
   filterTokenRows,
   listEmptyAtomicScaleGroups,
@@ -18,10 +17,10 @@ import {
   EditorToolbar,
   type EditorFilters,
   type EditorItem,
-  type EditorTier,
-} from "./EditorToolbar";
-import { EssentialsGroup } from "./EssentialsGroup";
-import { TokenSections } from "./TokenSections";
+} from "./EditorToolbar/EditorToolbar";
+import { EssentialsGroup } from "./EssentialsGroup/EssentialsGroup";
+import { TierSwitch } from "./TierSwitch";
+import { TokenSections } from "./TokenSections/TokenSections";
 import { useTokenEditorValue } from "./useTokenEditorValue";
 import css from "./VideoThemeEditor.module.css";
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
@@ -83,21 +82,37 @@ function useEditorFilters(
   return { filters, setFilters, visibleRows, emptyGroups };
 }
 
-/** The draft's rows and the context its controls read. */
-function useEditorRows(props: Props) {
-  const { library, themeId, draft, scope, item, onDraftChange } = props;
-  const draftTheme = useDraftTheme({ library, themeId, draft, scope });
-  // Theme scope shows the previewed item's own values, so it resolves the item too.
+/**
+ * The theme as the previewed item sees it. Theme scope shows the item's own
+ * values, so it resolves the item too.
+ */
+function useItemTheme({
+  library,
+  themeId,
+  draft,
+  item,
+}: Pick<Props, "library" | "themeId" | "draft" | "item">) {
   const itemScope = useMemo<ThemeEditScope>(
     () => (item ? { kind: "item", itemId: item.id } : { kind: "theme" }),
     [item],
   );
-  const itemTheme = useDraftTheme({
-    library,
-    themeId,
-    draft,
-    scope: itemScope,
-  }).theme;
+  return useDraftTheme({ library, themeId, draft, scope: itemScope }).theme;
+}
+
+/** The draft's rows and the context its controls read. */
+function useEditorRows({
+  library,
+  themeId,
+  draft,
+  scope,
+  item,
+  onDraftChange,
+}: Pick<
+  Props,
+  "library" | "themeId" | "draft" | "scope" | "item" | "onDraftChange"
+>) {
+  const draftTheme = useDraftTheme({ library, themeId, draft, scope });
+  const itemTheme = useItemTheme({ library, themeId, draft, item });
   const rows = useMemo(
     () =>
       listTokenRows({
@@ -132,66 +147,51 @@ function useEditorRows(props: Props) {
   return { rows, context };
 }
 
-type TierSwitchProps = Readonly<{
-  filters: EditorFilters;
-  onFiltersChange: (filters: EditorFilters) => void;
-}>;
-
-function TierSwitch({ filters, onFiltersChange }: TierSwitchProps) {
-  return (
-    <SegmentedControl
-      size="xs"
-      fullWidth
-      aria-label="Kind of setting"
-      value={filters.tier}
-      data={[
-        {
-          value: "component",
-          label: "Parts",
-        },
-        { value: "semantic", label: "Styles" },
-        { value: "atomic", label: "Base values" },
-      ]}
-      onChange={(tier) =>
-        onFiltersChange({ ...filters, tier: tier as EditorTier })
-      }
-    />
-  );
-}
-
 /**
  * The design-token editor: Essentials, then component, semantic, and atomic
  * tokens in searchable sections, editing a draft for the whole theme or one
  * item. It is controlled and knows nothing about the gallery, so any
  * producer surface can host it with a theme library and a draft.
  */
-export function VideoThemeEditor(props: Props) {
-  const { rows, context } = useEditorRows(props);
+export function VideoThemeEditor({
+  library,
+  themeId,
+  draft,
+  scope,
+  item,
+  usedTokens,
+  header,
+  onDraftChange,
+  onScopeChange,
+}: Props) {
+  const { rows, context } = useEditorRows({
+    library,
+    themeId,
+    draft,
+    scope,
+    item,
+    onDraftChange,
+  });
   const { filters, setFilters, visibleRows, emptyGroups } = useEditorFilters(
     rows,
-    props.usedTokens,
+    usedTokens,
   );
-  const overrideCount = props.item
-    ? countItemOverrides({
-        library: props.library,
-        themeId: props.themeId,
-        draft: props.draft,
-        itemId: props.item.id,
-      })
+  const overrideCount = item
+    ? countItemOverrides({ library, themeId, draft, itemId: item.id })
     : 0;
   return (
     <TokenEditorContext.Provider value={context}>
-      <section className={css.editor} aria-label="Design tokens">
-        <div className={css.pinned}>
-          {props.header}
+      <section className={css.videoThemeEditor} aria-label="Design tokens">
+        <div className={css.videoThemeEditorPinned}>
+          {header}
           <EditorToolbar
             filters={filters}
             onFiltersChange={setFilters}
-            scope={props.scope}
-            item={props.item}
+            scope={scope}
+            item={item}
             overrideCount={overrideCount}
-            hasUsage={props.usedTokens !== undefined}
-            onScopeChange={props.onScopeChange}
+            hasUsage={usedTokens !== undefined}
+            onScopeChange={onScopeChange}
           />
         </div>
         {filters.query ? null : <EssentialsGroup rows={rows} />}

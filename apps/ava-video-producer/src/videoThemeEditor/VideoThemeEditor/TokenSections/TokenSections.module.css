@@ -1,0 +1,31 @@
+.tokenSection {
+  border-bottom: 1px solid var(--line);
+}
+
+.tokenSectionControl {
+  font-size: 12px;
+  padding-inline: 0;
+}
+
+.tokenSectionPanel {
+  padding-inline: 0;
+}
+
+.tokenSectionCount {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin-inline-start: 6px;
+}
+
+.tokenSectionsEmpty {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .tokenSectionCount {
+    font-size: 12px;
+  }
+}

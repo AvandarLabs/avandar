@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import { ChangedOnDiskBanner } from "../../videoThemeEditor/ThemeBar/ChangedOnDiskBanner";
+import { ChangedOnDiskBanner } from "../../videoThemeEditor/ThemeBar/ChangedOnDiskBanner/ChangedOnDiskBanner";
 import { ThemeBar } from "../../videoThemeEditor/ThemeBar/ThemeBar";
-import { reloadThenFocus } from "../../videoThemeEditor/ThemeBar/themeBarState/themeBarState";
+import { reloadThenFocus } from "../../videoThemeEditor/ThemeBar/themeBarHelpers/themeBarHelpers";
 import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoThemeEditor";
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
 import css from "./VideoThemePanel.module.css";
 import type { ThemeEditScope } from "../../videoThemeEditor/themeDraft/themeDraft";
-import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar";
+import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar/EditorToolbar";
 
 type Props = Readonly<{
   item: EditorItem;

@@ -1,4 +1,4 @@
-.editor {
+.videoThemeEditor {
   display: grid;
   gap: 12px;
   min-width: 0;
@@ -12,7 +12,7 @@
  * so the rows always keep room. The 4px of padding, offset by matching
  * negative inline margins, keeps a focus ring from clipping at the edge.
  */
-.pinned {
+.videoThemeEditorPinned {
   background: var(--paper);
   border-bottom: 1px solid var(--line);
   display: grid;
@@ -32,81 +32,7 @@
 
 /* On a phone the player strip is pinned above, so this block keeps less. */
 @media (width <= 760px) {
-  .pinned {
+  .videoThemeEditorPinned {
     max-block-size: 36dvh;
-  }
-}
-
-.toolbar {
-  display: grid;
-  gap: 8px;
-}
-
-.scope {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-}
-
-/* Mantine's xs badge is 9px. This one is 10px with the deeper primary text. */
-.overridesBadge {
-  color: var(--ava-primary-8);
-  font-size: 10px;
-}
-
-.usage {
-  display: grid;
-  gap: 4px;
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.45;
-  margin: 0;
-}
-
-.essentials {
-  border-bottom: 1px solid var(--line);
-}
-
-.sectionTitle {
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.02em;
-  margin: 0;
-}
-
-.section {
-  border-bottom: 1px solid var(--line);
-}
-
-.sectionControl {
-  font-size: 12px;
-  padding-inline: 0;
-}
-
-.sectionPanel {
-  padding-inline: 0;
-}
-
-.count {
-  color: var(--muted);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  margin-inline-start: 6px;
-}
-
-.empty {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* On a phone, descriptions are 12px. */
-@media (width <= 760px) {
-  .hint,
-  .count {
-    font-size: 12px;
   }
 }

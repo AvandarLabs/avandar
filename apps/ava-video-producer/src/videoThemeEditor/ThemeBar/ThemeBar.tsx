@@ -1,14 +1,14 @@
-import { Badge, Button, Group, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState, type RefObject } from "react";
-import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
+import { useRef, useState, type RefObject } from "react";
+import { SaveAsNewForm } from "./SaveAsNewForm/SaveAsNewForm";
+import { ThemeActions } from "./ThemeActions/ThemeActions";
 import css from "./ThemeBar.module.css";
 import {
   getThemeBarActions,
   getThemeBarMessage,
-  getThemeLabelFromInput,
   submitNewThemeName,
   type ThemeBarMessage,
-} from "./themeBarState/themeBarState";
+} from "./themeBarHelpers/themeBarHelpers";
+import { ThemePicker } from "./ThemePicker";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
 import type {
   ThemeCopyStatus,
@@ -36,7 +36,7 @@ type Props = Readonly<{
 }>;
 
 function _buildStatusText(): (message: ThemeBarMessage) => string {
-  const texts: Readonly<Record<ThemeBarMessage, string>> = {
+  const texts: Record<ThemeBarMessage, string> = {
     none: "",
     saving: "Saving…",
     saved: "Theme saved.",
@@ -57,135 +57,20 @@ function _buildStatusText(): (message: ThemeBarMessage) => string {
   return (message) => texts[message];
 }
 
-function SaveAsNewForm({
-  onSubmit,
-  onCancel,
-}: Readonly<{
-  onSubmit: (label: string) => Promise<void>;
-  onCancel: () => void;
-}>) {
-  const [input, setInput] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const label = getThemeLabelFromInput(input);
-  useEffect(() => inputRef.current?.focus(), []);
-  return (
-    <form
-      className={css.form}
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (label) {
-          void onSubmit(label);
-        }
-      }}
-    >
-      <TextInput
-        ref={inputRef}
-        size="xs"
-        label="New theme name"
-        value={input}
-        onChange={(event) => setInput(event.currentTarget.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") {
-            event.preventDefault();
-            event.stopPropagation();
-            onCancel();
-          }
-        }}
-      />
-      <Group gap="xs">
-        <Button size="compact-xs" type="submit" disabled={!label}>
-          {"Create theme"}
-        </Button>
-        <Button size="compact-xs" variant="subtle" onClick={onCancel}>
-          {"Cancel"}
-        </Button>
-      </Group>
-    </form>
-  );
-}
-
-function ThemePicker(
-  props: Pick<Props, "themes" | "themeId" | "isDirty" | "onSelectTheme"> &
-    Readonly<{ isDisabled: boolean }>,
-) {
-  return (
-    <Group gap="xs" wrap="nowrap">
-      <AtlasSelect
-        aria-label="Theme"
-        data={props.themes.map(({ id, label, builtIn }) => ({
-          value: id,
-          label: builtIn ? `${label} (built-in)` : label,
-        }))}
-        value={props.themeId}
-        disabled={props.isDisabled}
-        onChange={(id) => id && props.onSelectTheme(id)}
-      />
-      {props.isDirty ? (
-        <Badge size="sm" variant="light">
-          {"Unsaved changes"}
-        </Badge>
-      ) : null}
-    </Group>
-  );
-}
-
-function ThemeActions(
-  props: Props &
-    Readonly<{
-      onStartNaming: () => void;
-      saveAsNewRef: RefObject<HTMLButtonElement | null>;
-    }>,
-) {
-  const actions = getThemeBarActions(props);
-  return (
-    <div className={css.actions}>
-      <div className={css.actionGroup}>
-        {actions.showsSave ? (
-          <Button
-            size="compact-xs"
-            disabled={!actions.canSave}
-            onClick={props.onSave}
-          >
-            {"Save"}
-          </Button>
-        ) : null}
-        <Button
-          ref={props.saveAsNewRef}
-          size="compact-xs"
-          variant="default"
-          disabled={!actions.canSaveAsNew}
-          onClick={props.onStartNaming}
-        >
-          {"Save as new theme"}
-        </Button>
-        <Button
-          size="compact-xs"
-          variant="subtle"
-          disabled={!actions.canDiscard}
-          onClick={props.onDiscard}
-        >
-          {"Discard"}
-        </Button>
-        {actions.showsReload ? (
-          <Button
-            size="compact-xs"
-            variant="default"
-            onClick={props.onReloadTheme}
-          >
-            {"Reload from file"}
-          </Button>
-        ) : null}
-      </div>
-      <Button
-        className={css.copyJson}
-        size="compact-xs"
-        variant="subtle"
-        onClick={props.onCopyJson}
-      >
-        {"Copy JSON"}
-      </Button>
-    </div>
-  );
+/** Whether the new theme's name form is open, and where focus returns when it closes. */
+function useNamingForm() {
+  const [isNaming, setIsNaming] = useState(false);
+  const saveAsNewRef = useRef<HTMLButtonElement>(null);
+  const closeNaming = () => {
+    setIsNaming(false);
+    saveAsNewRef.current?.focus();
+  };
+  return {
+    isNaming,
+    saveAsNewRef,
+    closeNaming,
+    startNaming: () => setIsNaming(true),
+  };
 }
 
 /**
@@ -197,27 +82,22 @@ function ThemeActions(
  * theme. The new theme's name form stays open, with the typed name, until
  * the theme is created, so a failed save does not lose the name.
  */
-export function ThemeBar(props: Props) {
+export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props) {
   const statusText = _buildStatusText();
-  const [isNaming, setIsNaming] = useState(false);
-  const saveAsNewRef = useRef<HTMLButtonElement>(null);
-  const closeNaming = () => {
-    setIsNaming(false);
-    saveAsNewRef.current?.focus();
-  };
+  const { isNaming, saveAsNewRef, closeNaming, startNaming } = useNamingForm();
   return (
     <div
-      ref={props.barRef}
+      ref={barRef}
       className={css.bar}
       role="group"
       aria-label="Theme controls"
       tabIndex={-1}
     >
       <ThemePicker
-        {...props}
-        isDisabled={!getThemeBarActions(props).canSwitchTheme}
+        {...state}
+        isDisabled={!getThemeBarActions(state).canSwitchTheme}
       />
-      {props.isBuiltIn ? (
+      {state.isBuiltIn ? (
         <p className={css.notice}>
           {
             "Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours."
@@ -225,9 +105,9 @@ export function ThemeBar(props: Props) {
         </p>
       ) : null}
       <ThemeActions
-        {...props}
+        {...state}
         saveAsNewRef={saveAsNewRef}
-        onStartNaming={() => setIsNaming(true)}
+        onStartNaming={startNaming}
       />
       {isNaming ? (
         <SaveAsNewForm
@@ -235,14 +115,14 @@ export function ThemeBar(props: Props) {
           onSubmit={(label) =>
             submitNewThemeName({
               label,
-              saveAsNew: props.onSaveAsNew,
+              saveAsNew: onSaveAsNew,
               close: closeNaming,
             })
           }
         />
       ) : null}
       <p className={css.status} role="status" aria-live="polite">
-        {statusText(getThemeBarMessage(props))}
+        {statusText(getThemeBarMessage(state))}
       </p>
     </div>
   );

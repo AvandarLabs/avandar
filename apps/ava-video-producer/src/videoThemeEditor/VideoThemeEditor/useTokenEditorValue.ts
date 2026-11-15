@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { OPAQUE_HEX_COLOR } from "../controls/controlValueHelpers/controlValueHelpers";
 import { setCustomValueInDraft } from "../customTokenValue/customTokenValue";
 import {
   resetTokenInDraft,
@@ -12,21 +13,21 @@ import type {
 } from "../../videoTheme/videoTheme.types";
 import type { TokenEditorContextValue } from "../TokenEditorContext/TokenEditorContext";
 import type { TokenRow } from "../tokenRows/tokenRows";
-import type { EditorItem } from "./EditorToolbar";
+import type { EditorItem } from "./EditorToolbar/EditorToolbar";
 
-const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
+type TokenEditorValueOptions = Readonly<{
+  draft: ThemeDraft;
+  scope: ThemeEditScope;
+  rows: readonly TokenRow[];
+  theme: ResolvedVideoTheme;
+  issues: readonly VideoThemeIssue[];
+  item?: EditorItem;
+  onDraftChange: (draft: ThemeDraft) => void;
+}>;
 
 /** The context `VideoThemeEditor` gives its controls; tightly coupled to it. */
 export function useTokenEditorValue(
-  options: Readonly<{
-    draft: ThemeDraft;
-    scope: ThemeEditScope;
-    rows: readonly TokenRow[];
-    theme: ResolvedVideoTheme;
-    issues: readonly VideoThemeIssue[];
-    item?: EditorItem;
-    onDraftChange: (draft: ThemeDraft) => void;
-  }>,
+  options: TokenEditorValueOptions,
 ): TokenEditorContextValue {
   const { draft, scope, rows, theme, issues, item, onDraftChange } = options;
   const swatches = useMemo(

@@ -1,0 +1,39 @@
+.tokenRowHeader {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tokenRowHeaderLabel {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tokenRowHeaderLabelInherited {
+  color: var(--muted);
+}
+
+.tokenRowHeaderInheritedTag {
+  color: var(--muted);
+  flex: 0 0 auto;
+  font-size: 11px;
+}
+
+.tokenRowHeaderValue {
+  color: var(--muted);
+  font-size: 11px;
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+/* On a phone, descriptions and values are 12px. */
+@media (width <= 760px) {
+  .tokenRowHeaderInheritedTag,
+  .tokenRowHeaderValue {
+    font-size: 12px;
+  }
+}

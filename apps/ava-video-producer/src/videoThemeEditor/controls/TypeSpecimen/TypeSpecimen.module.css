@@ -1,0 +1,16 @@
+.typeSpecimenRow {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.typeSpecimen {
+  border-radius: 6px;
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 10px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

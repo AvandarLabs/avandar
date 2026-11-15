@@ -1,7 +1,7 @@
 import { isCompositeTokenKind } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
-import { ColorRoleControl } from "../controls/ColorRoleControl";
-import { CompositeControl } from "../controls/CompositeControl";
-import { ReferenceControl } from "../controls/ReferenceControl";
+import { ColorRoleControl } from "../controls/ColorRoleControl/ColorRoleControl";
+import { CompositeControl } from "../controls/CompositeControl/CompositeControl";
+import { ReferenceControl } from "../controls/ReferenceControl/ReferenceControl";
 import { ValueControl } from "../controls/ValueControl";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import type { TokenRow } from "../tokenRows/tokenRows";

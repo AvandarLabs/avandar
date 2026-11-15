@@ -1,0 +1,12 @@
+.shadowLayers {
+  display: grid;
+  gap: 8px;
+}
+
+.shadowPreview {
+  background: var(--paper);
+  border-radius: 6px;
+  display: inline-block;
+  height: 24px;
+  width: 48px;
+}
