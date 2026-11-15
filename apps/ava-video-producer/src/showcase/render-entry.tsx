@@ -1,7 +1,7 @@
 import { Composition, registerRoot } from "remotion";
 import "./player.css";
 import "../theme.css";
-import { FilmComposition } from "./FilmComposition";
+import { FilmComposition } from "./FilmComposition/FilmComposition";
 import type { Film } from "./showcase.types";
 
 const film: Film = {

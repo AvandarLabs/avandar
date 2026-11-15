@@ -27,10 +27,18 @@ const FILM_SCOPED_ACTIONS: ReadonlySet<string> = new Set([
 ]);
 
 /** Issue messages for failures that carry no theme issue of their own. */
-const PAYLOAD_TOO_LARGE = "payload-too-large";
-const PAYLOAD_UNREADABLE = "payload-unreadable";
-const THEME_UNRESOLVABLE = "theme-unresolvable";
-const FILM_UNSUPPORTED = "film-unsupported";
+export const FILM_REFUSAL_CODES = [
+  "payload-too-large",
+  "payload-unreadable",
+  "theme-unresolvable",
+  "film-unsupported",
+] as const;
+const [
+  PAYLOAD_TOO_LARGE,
+  PAYLOAD_UNREADABLE,
+  THEME_UNRESOLVABLE,
+  FILM_UNSUPPORTED,
+] = FILM_REFUSAL_CODES;
 
 const snapshotSchema = z.strictObject({
   themeId: z.string().regex(VIDEO_THEME_SLUG_PATTERN),
@@ -168,14 +176,15 @@ function _withRequestKey(
  * acknowledgement echoes `requestKey`, so the gallery knows which request a
  * refusal answers even when a newer one has been sent since.
  */
-export function createFilmThemeAcknowledgement(
-  id: string,
-  value: unknown,
-  requestKey?: string,
-): Readonly<{
+export function createFilmThemeAcknowledgement(options: {
+  id: string;
+  value: unknown;
+  requestKey?: string;
+}): {
   snapshot?: VideoThemeSnapshot;
   message: FilmThemeAcknowledgement;
-}> {
+} {
+  const { id, value, requestKey } = options;
   const payloadIssue = _payloadIssue(value);
   if (payloadIssue) {
     return {

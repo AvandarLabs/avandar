@@ -18,8 +18,7 @@ import {
   isFilmThemeAcknowledgement,
   isFilmTokensUsedMessage,
   parseFilmControlMessage,
-  type FilmThemeAcknowledgement,
-} from "./filmTheme";
+} from "./filmThemeMessageHelpers";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,
@@ -58,10 +57,10 @@ type Case = Readonly<{
 /** The hash the live player acknowledges for a snapshot posted to `filmId`. */
 function _playerHash(input: Case, filmId: string = ITEM_ID): string {
   const snapshot = createSnapshotFromDraft({ ...input, itemId: ITEM_ID });
-  const { message } = createFilmThemeAcknowledgement(
-    filmId,
-    JSON.parse(JSON.stringify(snapshot)),
-  );
+  const { message } = createFilmThemeAcknowledgement({
+    id: filmId,
+    value: JSON.parse(JSON.stringify(snapshot)),
+  });
   assert.equal(message.type, "film-theme");
   return message.type === "film-theme" ? message.hash : "";
 }
@@ -77,8 +76,11 @@ function _galleryHash(input: Case): string {
 }
 
 /** The issue messages of a refused snapshot. */
-function _refusal(value: unknown): readonly string[] {
-  const { snapshot, message } = createFilmThemeAcknowledgement(ITEM_ID, value);
+function _refusal(value: unknown): string[] {
+  const { snapshot, message } = createFilmThemeAcknowledgement({
+    id: ITEM_ID,
+    value,
+  });
   assert.equal(snapshot, undefined);
   assert.equal(message.type, "film-theme-error");
   return message.type === "film-theme-error"
@@ -123,12 +125,15 @@ test("a saved item override does not apply to another film", () => {
 });
 
 test("a snapshot with a literal semantic value is refused with its path", () => {
-  const { snapshot, message } = createFilmThemeAcknowledgement(ITEM_ID, {
-    themeId: "classic",
-    documents: [],
-    patches: [
-      { other: { video: { semantic: { color: { accent: "#ff0000" } } } } },
-    ],
+  const { snapshot, message } = createFilmThemeAcknowledgement({
+    id: ITEM_ID,
+    value: {
+      themeId: "classic",
+      documents: [],
+      patches: [
+        { other: { video: { semantic: { color: { accent: "#ff0000" } } } } },
+      ],
+    },
   });
   assert.equal(snapshot, undefined);
   assert.equal(message.type, "film-theme-error");
@@ -177,7 +182,7 @@ test("an unexpected failure is reported with a fixed code", () => {
 });
 
 test("acknowledgements are recognised only for their own film", () => {
-  const accepted: readonly FilmThemeAcknowledgement[] = [
+  const accepted = [
     { type: "film-theme", id: ITEM_ID, hash: "abc" },
     {
       type: "film-theme-error",
@@ -185,14 +190,14 @@ test("acknowledgements are recognised only for their own film", () => {
       issues: [{ path: "a.b", message: "bad" }],
     },
   ];
-  for (const message of accepted) {
+  accepted.forEach((message) => {
     assert.equal(isFilmThemeAcknowledgement(message, ITEM_ID), true);
     assert.equal(isFilmThemeAcknowledgement(message, OTHER_ITEM_ID), false);
-  }
+  });
 });
 
 test("malformed acknowledgements are rejected", () => {
-  const rejected: readonly unknown[] = [
+  const rejected: unknown[] = [
     null,
     "film-theme",
     [{ type: "film-theme", id: ITEM_ID, hash: "abc" }],
@@ -215,9 +220,9 @@ test("malformed acknowledgements are rejected", () => {
       issues: [{ path: "", message: "x".repeat(10_000) }],
     },
   ];
-  for (const message of rejected) {
+  rejected.forEach((message) => {
     assert.equal(isFilmThemeAcknowledgement(message, ITEM_ID), false);
-  }
+  });
 });
 
 test("usage messages are recognised only for their own film", () => {
@@ -228,16 +233,16 @@ test("usage messages are recognised only for their own film", () => {
 
 test("malformed usage messages are rejected", () => {
   const base = { type: "film-tokens-used", id: ITEM_ID };
-  const rejected: readonly unknown[] = [
+  const rejected: unknown[] = [
     [{ ...base, paths: [] }],
     { ...base, paths: [1] },
     { ...base, paths: [], extra: true },
     { ...base, paths: ["x".repeat(10_000)] },
     { ...base, paths: Array(100_000).fill("color.accent") },
   ];
-  for (const message of rejected) {
+  rejected.forEach((message) => {
     assert.equal(isFilmTokensUsedMessage(message, ITEM_ID), false);
-  }
+  });
 });
 
 test("a control message for this film yields its action and value", () => {
@@ -268,7 +273,7 @@ test("a control message for another film is ignored", () => {
 });
 
 test("a theme or appearance control must name its film", () => {
-  for (const action of ["theme", "appearance"]) {
+  ["theme", "appearance"].forEach((action) => {
     assert.equal(
       parseFilmControlMessage(
         { type: "film-control", action, value: VALID_SNAPSHOT },
@@ -276,12 +281,12 @@ test("a theme or appearance control must name its film", () => {
       ),
       undefined,
     );
-  }
+  });
 });
 
 test("malformed control messages are ignored", () => {
   const base = { type: "film-control", id: ITEM_ID };
-  const rejected: readonly unknown[] = [
+  const rejected: unknown[] = [
     null,
     "film-control",
     [{ ...base, action: "play" }],
@@ -292,9 +297,9 @@ test("malformed control messages are ignored", () => {
     { ...base, id: 7, action: "play" },
     { ...base, action: "play", extra: true },
   ];
-  for (const message of rejected) {
+  rejected.forEach((message) => {
     assert.equal(parseFilmControlMessage(message, ITEM_ID), undefined);
-  }
+  });
 });
 
 test("a film that cannot take a theme refuses it with a fixed code", () => {
@@ -318,13 +323,17 @@ test("a usage message drops overlong paths and keeps within the path cap", () =>
 });
 
 test("the player echoes the request a theme answers, whether it resolves or not", () => {
-  const resolved = createFilmThemeAcknowledgement(
-    ITEM_ID,
-    VALID_SNAPSHOT,
-    "film:abc:0",
-  );
+  const resolved = createFilmThemeAcknowledgement({
+    id: ITEM_ID,
+    value: VALID_SNAPSHOT,
+    requestKey: "film:abc:0",
+  });
   assert.equal(resolved.message.requestKey, "film:abc:0");
-  const refused = createFilmThemeAcknowledgement(ITEM_ID, null, "film:def:1");
+  const refused = createFilmThemeAcknowledgement({
+    id: ITEM_ID,
+    value: null,
+    requestKey: "film:def:1",
+  });
   assert.equal(refused.message.requestKey, "film:def:1");
   assert.equal(
     createUnsupportedFilmThemeError(ITEM_ID, "film:abc:2").requestKey,
@@ -335,7 +344,8 @@ test("the player echoes the request a theme answers, whether it resolves or not"
 test("an acknowledgement for a theme sent without a request names none", () => {
   assert.equal(
     "requestKey" in
-      createFilmThemeAcknowledgement(ITEM_ID, VALID_SNAPSHOT).message,
+      createFilmThemeAcknowledgement({ id: ITEM_ID, value: VALID_SNAPSHOT })
+        .message,
     false,
   );
 });

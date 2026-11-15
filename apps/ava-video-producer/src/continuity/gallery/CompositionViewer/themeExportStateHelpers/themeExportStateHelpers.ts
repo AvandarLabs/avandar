@@ -1,17 +1,12 @@
-import { isFilmThemeAcknowledgement } from "../../../../showcase/filmTheme/filmTheme";
+import {
+  FILM_REFUSAL_CODES,
+  isFilmThemeAcknowledgement,
+} from "../../../../showcase/filmThemeMessageHelpers/filmThemeMessageHelpers";
 import type { VideoThemeIssue } from "../../../../videoTheme/videoTheme.types";
-
-/** Error codes the live player sends in place of a theme issue. */
-const PLAYER_ERROR_CODES = [
-  "film-unsupported",
-  "payload-too-large",
-  "payload-unreadable",
-  "theme-unresolvable",
-] as const;
 
 /** Why an export cannot use the draft's theme. */
 export type ThemeRefusalReason =
-  | (typeof PLAYER_ERROR_CODES)[number]
+  | (typeof FILM_REFUSAL_CODES)[number]
   | "theme-issues"
   | "draft-issues";
 
@@ -30,8 +25,8 @@ export type ThemeAcknowledgement = Readonly<{
 
 function _isPlayerErrorCode(
   message: string,
-): message is (typeof PLAYER_ERROR_CODES)[number] {
-  return (PLAYER_ERROR_CODES as readonly string[]).includes(message);
+): message is (typeof FILM_REFUSAL_CODES)[number] {
+  return (FILM_REFUSAL_CODES as readonly string[]).includes(message);
 }
 
 function _reasonFromIssues(

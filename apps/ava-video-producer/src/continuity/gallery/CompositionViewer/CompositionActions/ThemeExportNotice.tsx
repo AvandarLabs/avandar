@@ -3,7 +3,7 @@ import css from "./CompositionActions.module.css";
 import type {
   ThemeExportState,
   ThemeRefusalReason,
-} from "../themeExportState/themeExportState";
+} from "../themeExportStateHelpers/themeExportStateHelpers";
 
 type Props = Readonly<{
   id: string;

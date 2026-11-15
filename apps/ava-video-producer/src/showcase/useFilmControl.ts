@@ -2,15 +2,15 @@ import { useEffect, useRef, type RefObject } from "react";
 import {
   continuityAppearanceSchema,
   type ContinuityAppearance,
-} from "../../continuity/continuityAppearance";
+} from "../continuity/continuityAppearance";
 import {
   createFilmThemeAcknowledgement,
   createFilmTokensUsedMessage,
   createUnsupportedFilmThemeError,
   parseFilmControlMessage,
   type FilmControl,
-} from "../filmTheme/filmTheme";
-import type { VideoThemeSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+} from "./filmThemeMessageHelpers/filmThemeMessageHelpers";
+import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { PlayerRef } from "@remotion/player";
 
 const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];
@@ -93,25 +93,15 @@ function _applyTheme(
     options.send(createUnsupportedFilmThemeError(options.id, requestKey));
     return;
   }
-  const { snapshot, message } = createFilmThemeAcknowledgement(
-    options.id,
+  const { snapshot, message } = createFilmThemeAcknowledgement({
+    id: options.id,
     value,
     requestKey,
-  );
+  });
   if (snapshot) {
     options.onTheme(snapshot);
   }
   options.send(message);
-}
-
-function _haveSamePaths(
-  left: readonly string[],
-  right: readonly string[],
-): boolean {
-  return (
-    left.length === right.length &&
-    left.every((path, index) => path === right[index])
-  );
 }
 
 /**
@@ -123,13 +113,16 @@ function useUsedTokensReport(
   usedTokens: readonly string[],
   send: (message: object) => void,
 ): void {
-  const lastSentPaths = useRef<readonly string[]>([]);
+  const lastSentPaths = useRef<string[]>([]);
   useEffect(
     function reportUsedTokens() {
       const message = createFilmTokensUsedMessage(id, usedTokens);
       if (
         message.paths.length === 0 ||
-        _haveSamePaths(message.paths, lastSentPaths.current)
+        (message.paths.length === lastSentPaths.current.length &&
+          message.paths.every(
+            (path, index) => path === lastSentPaths.current[index],
+          ))
       ) {
         return;
       }
@@ -166,15 +159,15 @@ function _handleSettings(
  * film has read.
  */
 export function useFilmControl(options: FilmControlOptions): void {
-  const latest = useRef(options);
+  const latestOptions = useRef(options);
   useEffect(() => {
-    latest.current = options;
+    latestOptions.current = options;
   });
   const { isContinuity, appearance, captions, speed, loop } = options;
   const { usedTokens, id, send } = options;
   useEffect(
     function reportOptions() {
-      _sendOptions(latest.current);
+      _sendOptions(latestOptions.current);
     },
     [isContinuity, appearance, captions, speed, loop],
   );
@@ -183,9 +176,12 @@ export function useFilmControl(options: FilmControlOptions): void {
       if (event.origin !== location.origin || event.source !== window.parent) {
         return;
       }
-      const control = parseFilmControlMessage(event.data, latest.current.id);
-      if (control && !_handlePlayback(control, latest.current)) {
-        _handleSettings(control, latest.current);
+      const control = parseFilmControlMessage(
+        event.data,
+        latestOptions.current.id,
+      );
+      if (control && !_handlePlayback(control, latestOptions.current)) {
+        _handleSettings(control, latestOptions.current);
       }
     };
     window.addEventListener("message", receive);

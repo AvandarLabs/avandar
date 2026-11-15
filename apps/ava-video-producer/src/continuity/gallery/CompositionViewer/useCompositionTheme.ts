@@ -5,7 +5,7 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { isFilmTokensUsedMessage } from "../../../showcase/filmTheme/filmTheme";
+import { isFilmTokensUsedMessage } from "../../../showcase/filmThemeMessageHelpers/filmThemeMessageHelpers";
 import {
   makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
@@ -15,7 +15,7 @@ import {
   getThemeExportState,
   receiveThemeAcknowledgement,
   type ReceivedThemeAcknowledgement,
-} from "./themeExportState/themeExportState";
+} from "./themeExportStateHelpers/themeExportStateHelpers";
 
 /** About 100 ms, so dragging a slider does not flood the player. */
 const THEME_SEND_DELAY_MS = 100;

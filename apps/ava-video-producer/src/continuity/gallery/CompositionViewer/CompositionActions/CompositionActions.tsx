@@ -14,7 +14,7 @@ import { ThemeExportNotice } from "./ThemeExportNotice";
 import { useCompositionDownload } from "./useCompositionDownload";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
 import type { CompositionExportOptions } from "../compositionExportOptions";
-import type { ThemeExportState } from "../themeExportState/themeExportState";
+import type { ThemeExportState } from "../themeExportStateHelpers/themeExportStateHelpers";
 
 type Props = Readonly<{
   id: string;

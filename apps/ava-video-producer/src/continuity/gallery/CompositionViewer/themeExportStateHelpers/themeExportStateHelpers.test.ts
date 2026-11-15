@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { FILM_REFUSAL_CODES } from "../../../../showcase/filmThemeMessageHelpers/filmThemeMessageHelpers";
 import {
   getCurrentAcknowledgement,
   getThemeExportState,
   receiveThemeAcknowledgement,
-} from "./themeExportState";
+} from "./themeExportStateHelpers";
 
 const WAITING = {
   isScene: false,
@@ -57,12 +58,7 @@ test("a matching acknowledgement wins over a timeout that fired first", () => {
 });
 
 test("a player refusal names its reason from the error code", () => {
-  for (const code of [
-    "film-unsupported",
-    "payload-too-large",
-    "payload-unreadable",
-    "theme-unresolvable",
-  ] as const) {
+  FILM_REFUSAL_CODES.forEach((code) => {
     assert.deepEqual(
       getThemeExportState({
         ...WAITING,
@@ -70,7 +66,7 @@ test("a player refusal names its reason from the error code", () => {
       }),
       { kind: "refused", reason: code },
     );
-  }
+  });
 });
 
 test("a refusal with theme issues reports them as theme issues", () => {

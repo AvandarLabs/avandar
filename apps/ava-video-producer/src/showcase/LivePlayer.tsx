@@ -1,4 +1,4 @@
-import { Player, type PlayerRef } from "@remotion/player";
+import { type PlayerRef } from "@remotion/player";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -11,8 +11,9 @@ import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer
 import { durationInFrames } from "../storyboard/schema/timeline";
 import { VideoTokenUsageContext } from "../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
-import { FilmComposition } from "./FilmComposition";
-import { useFilmControl } from "./useFilmControl/useFilmControl";
+import { CaptionToggle } from "./CaptionToggle";
+import { LiveFilm } from "./LiveFilm";
+import { useFilmControl } from "./useFilmControl";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
 import "../theme.css";
@@ -87,17 +88,6 @@ function _getInitialAppearance(
   );
 }
 
-// The film keeps its unthemed plan: FilmComposition applies the theme.
-function _createPreviewPlan(
-  film: Film,
-  appearance: ContinuityAppearance,
-  isContinuity: boolean,
-) {
-  return film.plan && isContinuity
-    ? createContinuityPlanFromOptions(film.plan, appearance)
-    : film.plan;
-}
-
 function _getInitialFrame(previewFrames: number): number {
   const fallbackFrame =
     id === "avandar-home" ? 490 : Math.min(100, previewFrames - 1);
@@ -138,45 +128,6 @@ function useSavedPlayback(
   );
 }
 
-type LiveFilmProps = Readonly<{
-  film: Film;
-  player: RefObject<PlayerRef | null>;
-  previewFrames: number;
-  captions: boolean;
-  speed: number;
-  loop: boolean;
-}>;
-
-function LiveFilm(props: LiveFilmProps) {
-  const { film, player, previewFrames, captions, speed, loop } = props;
-  return (
-    <Player
-      ref={player}
-      component={FilmComposition}
-      inputProps={{
-        film: { ...film, frames: previewFrames, showCaptions: captions },
-      }}
-      compositionWidth={film.width}
-      compositionHeight={film.height}
-      durationInFrames={previewFrames}
-      fps={film.fps}
-      controls
-      loop={loop}
-      playbackRate={speed}
-      autoPlay={saved?.playing ?? false}
-      initialFrame={_getInitialFrame(previewFrames)}
-      style={{ width: "100%" }}
-      clickToPlay={false}
-      spaceKeyToPlayOrPause
-      errorFallback={() => (
-        <p className="liveError">
-          Preview unavailable. Check the showcase terminal, then reload.
-        </p>
-      )}
-    />
-  );
-}
-
 /**
  * The live film's appearance, theme, and transport, seeded from the film and
  * the playback saved before a source reload.
@@ -210,14 +161,19 @@ function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
  * its frames are counted with the theme applied, because the theme's camera
  * preset can lengthen beats.
  */
-function usePreviewTiming(
-  film: Film,
-  appearance: ContinuityAppearance,
-  theme: VideoThemeSnapshot | undefined,
-  isContinuity: boolean,
-) {
+function usePreviewTiming(options: {
+  film: Film;
+  appearance: ContinuityAppearance;
+  theme: VideoThemeSnapshot | undefined;
+  isContinuity: boolean;
+}) {
+  const { film, appearance, theme, isContinuity } = options;
   const previewPlan = useMemo(
-    () => _createPreviewPlan(film, appearance, isContinuity),
+    // The film keeps its unthemed plan: FilmComposition applies the theme.
+    () =>
+      film.plan && isContinuity
+        ? createContinuityPlanFromOptions(film.plan, appearance)
+        : film.plan,
     [film, appearance, isContinuity],
   );
   const previewFrames = useMemo(
@@ -232,24 +188,6 @@ function usePreviewTiming(
     [previewPlan, theme, film.id, film.frames],
   );
   return { previewPlan, previewFrames };
-}
-
-type CaptionToggleProps = Readonly<{
-  captions: boolean;
-  onChange: (captions: boolean) => void;
-}>;
-
-function CaptionToggle({ captions, onChange }: CaptionToggleProps) {
-  return (
-    <label className="captionToggle">
-      <input
-        type="checkbox"
-        checked={captions}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      Captions
-    </label>
-  );
 }
 
 type LiveFilmControlOptions = Readonly<{
@@ -294,12 +232,12 @@ function LivePlayer({ film }: { film: Film }) {
   const state = useLiveFilmState(film, continuity);
   const { appearance, theme, captions, speed, loop } = state;
   const usage = useObservedTokenUsage();
-  const { previewPlan, previewFrames } = usePreviewTiming(
+  const { previewPlan, previewFrames } = usePreviewTiming({
     film,
     appearance,
     theme,
-    Boolean(continuity),
-  );
+    isContinuity: Boolean(continuity),
+  });
   useSavedPlayback(player, { captions, speed, loop });
   useLiveFilmControl({
     player,
@@ -318,6 +256,8 @@ function LivePlayer({ film }: { film: Film }) {
           captions={captions}
           speed={speed}
           loop={loop}
+          autoPlay={saved?.playing ?? false}
+          initialFrame={_getInitialFrame(previewFrames)}
         />
       </VideoTokenUsageContext.Provider>
       {film.plan?.captions && !continuity ? (
