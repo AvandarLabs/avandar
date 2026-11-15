@@ -24,7 +24,9 @@
 }
 
 .cardBarShort {
-  composes: cardbar;
+  /* The composed name is a class reference, not a CSS keyword, so its case must match. */
+  /* stylelint-disable-next-line value-keyword-case */
+  composes: cardBar;
   width: 60%;
 }
 
