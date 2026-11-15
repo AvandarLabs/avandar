@@ -70,19 +70,22 @@ function useStoredDraftRecord(options: StoredDraftOptions) {
   return { record, store };
 }
 
-/**
- * The draft of the active theme, stored per viewer with the hash of the
- * file it was made against. The gallery reloads whenever a theme file
- * changes, so the stored hash is what tells a stale draft apart. The state
- * and its functions keep their identity until the draft, theme, or hash
- * changes, so a shared context does not re-render every consumer.
- */
-export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
-  const { baseHash } = options;
-  const { record, store } = useStoredDraftRecord(options);
-  const draft = record?.draft ?? EMPTY_THEME_DRAFT;
-  const recordHash = record?.baseHash;
-  const isDirty = !isThemeDraftEmpty(draft);
+/** The writes a stored draft offers, each a stable function over one record. */
+type StoredDraftActions = Pick<
+  StoredDraftState,
+  "setDraft" | "keepDraft" | "rebaseDraft" | "discard"
+>;
+
+function useStoredDraftActions(
+  options: Readonly<{
+    store: (record: StoredThemeDraft) => void;
+    draft: ThemeDraft;
+    baseHash: string;
+    recordHash: string | undefined;
+    isDirty: boolean;
+  }>,
+): StoredDraftActions {
+  const { store, draft, baseHash, recordHash, isDirty } = options;
   const setDraft = useCallback(
     (nextDraft: ThemeDraft) =>
       store(
@@ -113,6 +116,29 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     () => store(createDiscardedRecord(baseHash)),
     [store, baseHash],
   );
+  return { setDraft, keepDraft, rebaseDraft, discard };
+}
+
+/**
+ * The draft of the active theme, stored per viewer with the hash of the
+ * file it was made against. The gallery reloads whenever a theme file
+ * changes, so the stored hash is what tells a stale draft apart. The state
+ * and its functions keep their identity until the draft, theme, or hash
+ * changes, so a shared context does not re-render every consumer.
+ */
+export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
+  const { baseHash } = options;
+  const { record, store } = useStoredDraftRecord(options);
+  const draft = record?.draft ?? EMPTY_THEME_DRAFT;
+  const recordHash = record?.baseHash;
+  const isDirty = !isThemeDraftEmpty(draft);
+  const { setDraft, keepDraft, rebaseDraft, discard } = useStoredDraftActions({
+    store,
+    draft,
+    baseHash,
+    recordHash,
+    isDirty,
+  });
   const isChangedOnDisk = isRecordChangedOnDisk({ record, fileHash: baseHash });
   return useMemo(
     () => ({
