@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
 import { useId, useState } from "react";
-import { useContinuityCopy } from "../../../useContinuityCopy";
 import css from "./CompositionActions.module.css";
 import {
   CAPTION_DOWNLOAD_IDLE,
@@ -39,16 +38,15 @@ function useDownloadLabel(
   themeState: ThemeExportState,
 ): string {
   const { t } = useLingui();
-  const translate = useContinuityCopy();
   if (isBusy) {
-    return translate("Preparing export…");
+    return "Preparing export…";
   }
   if (options === undefined) {
-    return translate("Loading preview…");
+    return "Loading preview…";
   }
   return themeState.kind === "pending"
     ? t`Applying design tokens…`
-    : translate("Download MP4");
+    : "Download MP4";
 }
 
 type DownloadButtonProps = Readonly<{
@@ -90,7 +88,6 @@ function DownloadButton({
 /** Explicit exports use only the options and theme the live player acknowledged. */
 export function CompositionActions(props: Props) {
   const { id, options, isScene, theme, themeState } = props;
-  const translate = useContinuityCopy();
   const noticeId = useId();
   const download = useCompositionDownload({
     id,
@@ -115,7 +112,7 @@ export function CompositionActions(props: Props) {
         onRetry={props.onRetryTheme}
       />
       <p className={css.compositionActionsStatus} role="status">
-        {translate(download.status)}
+        {download.status}
       </p>
     </div>
   );
@@ -158,14 +155,13 @@ function NarrationLinks({
   theme: ExportTheme;
 }>) {
   const { t } = useLingui();
-  const translate = useContinuityCopy();
   const cameraMotion =
     options && "cameraMotion" in options ? options.cameraMotion : true;
   const captions = useCaptionDownload(id, { cameraMotion, theme });
   return (
     <>
       <a href={`/api/films/${encodeURIComponent(id)}/transcript.txt`} download>
-        {translate("Transcript")}
+        {"Transcript"}
       </a>
       <button
         type="button"
@@ -174,7 +170,7 @@ function NarrationLinks({
         aria-busy={captions.isBusy}
         onClick={captions.start}
       >
-        {translate("Captions")}
+        {"Captions"}
       </button>
       {captions.hasFailed && (
         <span role="alert">

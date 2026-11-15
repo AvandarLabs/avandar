@@ -12,7 +12,6 @@ import { ContinuityBeatView } from "./ContinuityBeatView";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
 import { ContinuityToken } from "./ContinuityToken";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityPlan } from "./continuitySchema";
 
@@ -27,7 +26,6 @@ export function ContinuityScene({
   productScene?: ProductSceneRenderer;
 }) {
   const parentFrame = useCurrentFrame();
-  const translate = useContinuityCopy();
   const { color } = useVideoTokens();
   const bar = useVideoProps("ProgressBar", {});
   const morph = useVideoProps("Morph", {});
@@ -72,8 +70,8 @@ export function ContinuityScene({
         </Sequence>
         <ContinuityToken plan={plan} frame={frame} />
         <div className={css.continuityEvidence}>
-          <span>{translate(plan.evidence)}</span>
-          <span>{translate(plan.title)}</span>
+          <span>{plan.evidence}</span>
+          <span>{plan.title}</span>
         </div>
         <div
           className={css.continuityProgress}

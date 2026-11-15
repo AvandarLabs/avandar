@@ -5,7 +5,6 @@ import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialo
 import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
-import { useContinuityCopy } from "../../useContinuityCopy";
 import { CompositionCard } from "../CompositionCard/CompositionCard";
 import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import { countCompositionCategories } from "../gallerySelectionReducer/gallerySelectionReducer";
@@ -54,7 +53,6 @@ function useSectionCopy(section: Props["section"]) {
  */
 export function CompositionGallery({ section }: Props) {
   const { t } = useLingui();
-  const translate = useContinuityCopy();
   const getCategoryLabel = useCategoryLabel();
   const copy = useSectionCopy(section);
   const { themeId } = useGalleryVideoTheme();
@@ -115,7 +113,7 @@ export function CompositionGallery({ section }: Props) {
       </div>
       {open ? (
         <AtlasDialog
-          title={translate(open.title)}
+          title={open.title}
           subtitle={getCategoryLabel(open.category)}
           previousLabel={t`Previous preview`}
           nextLabel={t`Next preview`}

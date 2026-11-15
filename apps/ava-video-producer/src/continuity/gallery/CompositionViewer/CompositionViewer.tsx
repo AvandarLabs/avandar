@@ -13,7 +13,6 @@ import {
   createSnapshotFromDraft,
 } from "../../../videoThemeEditor/themeDraft/themeDraft";
 import { isSceneEntry } from "../../continuityCatalog";
-import { useContinuityCopy } from "../../useContinuityCopy";
 import { CompositionActions } from "./CompositionActions/CompositionActions";
 import { CompositionControls } from "./CompositionControls";
 import { CompositionSummary } from "./CompositionSummary";
@@ -134,7 +133,6 @@ type StageProps = Readonly<{
 
 /** The live player, remounted for each composition. */
 function CompositionStage({ selected, player, onLoad }: StageProps) {
-  const translate = useContinuityCopy();
   return (
     <div className={css.stage}>
       <iframe
@@ -142,7 +140,7 @@ function CompositionStage({ selected, player, onLoad }: StageProps) {
         className={css.compositionViewerPlayer}
         ref={player}
         src={`/live.html?id=${encodeURIComponent(selected.id)}`}
-        title={translate(selected.title)}
+        title={selected.title}
         onLoad={onLoad}
         allowFullScreen
       />
@@ -152,7 +150,6 @@ function CompositionStage({ selected, player, onLoad }: StageProps) {
 
 /** One live composition with matching exports, its design tokens, and reusable study guidance. */
 export function CompositionViewer({ selected, captions, onOptions }: Props) {
-  const translate = useContinuityCopy();
   const player = useRef<HTMLIFrameElement>(null);
   const isScene = isSceneEntry(selected);
   const appearance = useCompositionAppearance(selected.id, player, isScene);
@@ -164,7 +161,7 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
         css.compositionViewer,
         tab === "tokens" && !isScene && css.isTokenPanel,
       )}
-      aria-label={translate("Composition screening")}
+      aria-label={"Composition screening"}
     >
       <CompositionStage
         selected={selected}
@@ -195,14 +192,11 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
 }
 
 function CompositionNotice({ isScene }: { isScene: boolean }) {
-  const translate = useContinuityCopy();
   return (
     <p className={css.compositionViewerNotice}>
-      {translate(
-        isScene
-          ? "Live React storyboard scenes. Fictional demonstration data. Window contents are curated fictional screenshots; figures, timings and diagrams are illustrations. Downloads render the current composition as authored."
-          : "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection.",
-      )}
+      {isScene
+        ? "Live React storyboard scenes. Fictional demonstration data. Window contents are curated fictional screenshots; figures, timings and diagrams are illustrations. Downloads render the current composition as authored."
+        : "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection."}
     </p>
   );
 }

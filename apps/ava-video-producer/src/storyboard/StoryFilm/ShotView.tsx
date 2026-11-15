@@ -1,5 +1,4 @@
 import { ContinuityScene } from "../../continuity/ContinuityScene";
-import { ContinuityI18nProvider } from "../../continuity/i18n/ContinuityI18nProvider/ContinuityI18nProvider";
 import { BarComparisonScene } from "../../scenes/BarComparisonScene/BarComparisonScene";
 import { BrandLockupScene } from "../../scenes/BrandLockupScene/BrandLockupScene";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
@@ -41,13 +40,11 @@ export function ShotView({
   switch (shot.scene) {
     case "continuity":
       return (
-        <ContinuityI18nProvider>
-          <ContinuityScene
-            plan={shot.props}
-            frame={frame}
-            productScene={productScene}
-          />
-        </ContinuityI18nProvider>
+        <ContinuityScene
+          plan={shot.props}
+          frame={frame}
+          productScene={productScene}
+        />
       );
     case "avandar": {
       if (!productScene)

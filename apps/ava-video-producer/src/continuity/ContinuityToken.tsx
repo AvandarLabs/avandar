@@ -9,7 +9,6 @@ import {
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ContinuityPlan } from "./continuitySchema";
 
 /** A single persistent object carries identity across a scene boundary. */
@@ -20,7 +19,6 @@ export function ContinuityToken({
   plan: ContinuityPlan;
   frame: number;
 }) {
-  const translate = useContinuityCopy();
   const tokens = useVideoTokens();
   const sharedObject = useVideoProps("SharedObject", {});
   const motion = useVideoMotion();
@@ -77,7 +75,7 @@ export function ContinuityToken({
           opacity: beat.token.appearance === "outline" ? 1 - progress : 1,
         }}
       >
-        {translate(beat.token.label)}
+        {beat.token.label}
       </span>
     </SharedElement>
   );

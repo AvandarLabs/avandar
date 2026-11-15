@@ -4,7 +4,6 @@ import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
 import { useVideoProps } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { ContinuityContent } from "./ContinuityContent";
 import css from "./ContinuityScene.module.css";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
 
@@ -17,7 +16,6 @@ type Props = {
 /** A single editorial or native-product beat in a continuity film. */
 export function ContinuityBeatView({ beat, accent, productScene }: Props) {
   const frame = useCurrentFrame();
-  const translate = useContinuityCopy();
   const heading = useVideoProps("Heading", {});
   const motion = useVideoMotion();
   return (
@@ -31,8 +29,8 @@ export function ContinuityBeatView({ beat, accent, productScene }: Props) {
             easing: motion.curve(heading.entranceEasing),
           })}
         >
-          <h1>{translate(beat.title)}</h1>
-          <p>{translate(beat.subtitle)}</p>
+          <h1>{beat.title}</h1>
+          <p>{beat.subtitle}</p>
         </header>
       )}
       <ContinuityContent

@@ -2,7 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { AtlasCard } from "../../../gallery/AtlasLayout/AtlasCard/AtlasCard";
 import { isSceneEntry } from "../../continuityCatalog";
-import { useContinuityCopy } from "../../useContinuityCopy";
 import css from "./CompositionCard.module.css";
 import type { ContinuityCatalogEntry } from "../../continuityCatalog";
 
@@ -68,13 +67,12 @@ export function CompositionCard({
   onOpen,
 }: Props) {
   const { t } = useLingui();
-  const translate = useContinuityCopy();
   const seconds = Math.round(entry.frames / 30);
   return (
     <AtlasCard
-      title={translate(entry.title)}
+      title={entry.title}
       category={category}
-      description={translate(entry.description)}
+      description={entry.description}
       reference={entry.id}
       badge={
         <span className="card-state">

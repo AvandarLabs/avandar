@@ -7,7 +7,6 @@ import {
 } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityScene.module.css";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ContinuityBeat } from "./continuitySchema";
 
 type Props = {
@@ -20,7 +19,6 @@ const UNDERLINE_CUE = 95;
 
 /** Staggered statement with a single deterministic teaching underline. */
 export function ContinuityThesis({ content, frame, accent }: Props) {
-  const translate = useContinuityCopy();
   const { annotations } = useContinuityAppearance();
   const { sketch } = useVideoTokens();
   const thesis = useVideoProps("Thesis", {});
@@ -38,7 +36,7 @@ export function ContinuityThesis({ content, frame, accent }: Props) {
             easing: motion.curve(thesis.lineEasing),
           })}
         >
-          {translate(line)}
+          {line}
         </div>
       ))}
       <div className={css.continuityEmphasis}>
@@ -50,7 +48,7 @@ export function ContinuityThesis({ content, frame, accent }: Props) {
           seed={underline.seed}
           strokeWidth={underline.strokeWidth}
         >
-          {translate(content.emphasis)}
+          {content.emphasis}
         </Underline>
       </div>
     </div>

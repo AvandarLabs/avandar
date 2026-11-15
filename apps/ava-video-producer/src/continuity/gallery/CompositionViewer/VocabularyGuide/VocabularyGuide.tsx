@@ -1,5 +1,4 @@
 import { CONTINUITY_CATALOG, isSceneEntry } from "../../../continuityCatalog";
-import { useContinuityCopy } from "../../../useContinuityCopy";
 import { VocabularyControl } from "./VocabularyControl";
 import css from "./VocabularyGuide.module.css";
 import type { ContinuityVocabularyEntry } from "../../../continuityCatalog";
@@ -8,41 +7,35 @@ type Props = { entry: ContinuityVocabularyEntry };
 
 /** Practical reuse guidance linked to the study's complete source argument. */
 export function VocabularyGuide({ entry }: Props) {
-  const translate = useContinuityCopy();
   const source = CONTINUITY_CATALOG.find(
     (film) => film.family === "films" && film.id === entry.sourceFilm,
   );
   return (
-    <section
-      className={css.vocabularyGuide}
-      aria-label={translate("Reuse this study")}
-    >
-      <h3>{translate("Reuse this study")}</h3>
+    <section className={css.vocabularyGuide} aria-label={"Reuse this study"}>
+      <h3>{"Reuse this study"}</h3>
       <dl className={css.vocabularyGuideAdvice}>
         <div>
-          <dt>{translate("Good for")}</dt>
-          <dd>{translate(entry.goodFor)}</dd>
+          <dt>{"Good for"}</dt>
+          <dd>{entry.goodFor}</dd>
         </div>
         <div>
-          <dt>{translate("Creative direction")}</dt>
-          <dd>{translate(entry.creativeDirection)}</dd>
+          <dt>{"Creative direction"}</dt>
+          <dd>{entry.creativeDirection}</dd>
         </div>
         <div>
-          <dt>{translate("Keywords / tags")}</dt>
-          <dd>{entry.tags.map((tag) => translate(tag)).join(" · ")}</dd>
+          <dt>{"Keywords / tags"}</dt>
+          <dd>{entry.tags.map((tag) => tag).join(" · ")}</dd>
         </div>
         <div>
-          <dt>{translate("Avoid when")}</dt>
-          <dd>{translate(entry.avoid)}</dd>
+          <dt>{"Avoid when"}</dt>
+          <dd>{entry.avoid}</dd>
         </div>
       </dl>
-      <h4>{translate("Controls to adapt")}</h4>
+      <h4>{"Controls to adapt"}</h4>
       <p>
-        {translate(
-          isSceneEntry(entry)
-            ? "These paths are fields of a storyboard shot: its scene props, transition and theme. Adjust the plan in storyboards/vocabulary, then validate and preview it with the video CLI."
-            : "These paths refer to the continuity beat schema. Adjust the authored input, then inspect the result at native scale.",
-        )}
+        {isSceneEntry(entry)
+          ? "These paths are fields of a storyboard shot: its scene props, transition and theme. Adjust the plan in storyboards/vocabulary, then validate and preview it with the video CLI."
+          : "These paths refer to the continuity beat schema. Adjust the authored input, then inspect the result at native scale."}
       </p>
       <ul className={css.vocabularyGuideControls}>
         {entry.controls.map((control) => (
@@ -51,10 +44,8 @@ export function VocabularyGuide({ entry }: Props) {
       </ul>
       {source && (
         <p className={css.vocabularyGuideSource}>
-          {translate("See it in a full film:")}{" "}
-          <a href={`?film=${encodeURIComponent(source.id)}`}>
-            {translate(source.title)}
-          </a>
+          {"See it in a full film:"}{" "}
+          <a href={`?film=${encodeURIComponent(source.id)}`}>{source.title}</a>
         </p>
       )}
     </section>

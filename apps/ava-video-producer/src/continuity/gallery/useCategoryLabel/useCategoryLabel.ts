@@ -1,5 +1,3 @@
-import { useContinuityCopy } from "../../useContinuityCopy";
-
 /**
  * Display names for the catalog's film and study categories. A
  * "reenactment" is real Avandar UI performed programmatically from fixture
@@ -19,6 +17,5 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 /** Translate a catalog category id into its display name. */
 export function useCategoryLabel() {
-  const translate = useContinuityCopy();
-  return (category: string) => translate(CATEGORY_LABELS[category] ?? category);
+  return (category: string) => CATEGORY_LABELS[category] ?? category;
 }

@@ -12,7 +12,6 @@ import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityOverlays.module.css";
 import { sampleStockFrame } from "./continuityTimeline";
 import { getOverlayPose, getConnectorProgress } from "./overlayMotion";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ContinuityBeat } from "./continuitySchema";
 
 type Content = Extract<ContinuityBeat["content"], { kind: "composite" }>;
@@ -24,7 +23,6 @@ type DiagramProps = Omit<Props, "accent"> & {
 /** Extracted explanatory artwork travels from the UI without cloning the UI itself. */
 function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
   const clipId = `overlay-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  const translate = useContinuityCopy();
   const appearance = useContinuityAppearance();
   const tokens = useVideoTokens();
   const floating = useVideoProps("FloatingDiagram", {});
@@ -49,7 +47,7 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
         }}
       >
         <ContinuityBoxOutline />
-        {translate(diagram.label)}
+        {diagram.label}
       </div>
       <svg
         width="100%"
