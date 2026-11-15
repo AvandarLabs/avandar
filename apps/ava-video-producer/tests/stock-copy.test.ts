@@ -126,8 +126,8 @@ async function _assertBrowserBundle(entry: string): Promise<void> {
   test(`${entry} shares the same English defaults and untouched authored copy`, () =>
     _assertBrowserBundle(entry));
 });
-test("stock source modules contain no macro imports", async () => {
-  const filenames = await fs.readdir(path.join(root, "src/stock"), {
+test("producer source modules do not import Lingui", async () => {
+  const filenames = await fs.readdir(path.join(root, "src"), {
     recursive: true,
   });
   await Promise.all(
@@ -135,8 +135,8 @@ test("stock source modules contain no macro imports", async () => {
       .filter((filename) => /\.[tj]sx?$/.test(filename))
       .map(async (filename) => {
         assert.doesNotMatch(
-          await fs.readFile(path.join(root, "src/stock", filename), "utf8"),
-          /(?:from\s*|import\s*\()["'][^"']*\/macro["']/,
+          await fs.readFile(path.join(root, "src", filename), "utf8"),
+          /(?:from\s*|import\s*\()["']@lingui\//,
           filename,
         );
       }),

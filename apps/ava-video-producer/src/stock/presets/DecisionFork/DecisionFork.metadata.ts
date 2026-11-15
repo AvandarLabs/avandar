@@ -142,7 +142,7 @@ export const decisionForkControls: StockControl[] = [
   },
 ];
 
-/** Visible example-copy paths for consumers localizing an omitted input. */
+/** Visible example-copy paths of an omitted input. */
 export const DECISION_FORK_DEFAULT_TEXT_PATHS: Array<Array<string | number>> = [
   ["prompt"],
   ["branches", 0, "condition"],

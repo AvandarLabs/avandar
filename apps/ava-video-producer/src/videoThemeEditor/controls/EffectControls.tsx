@@ -44,7 +44,7 @@ const MAX_SHADOW_LAYERS = 4;
 const DEFAULT_SHADOW = getDefaultLiteralFromKind("shadow") as ShadowValue;
 const DEFAULT_SHADOW_LAYER = DEFAULT_SHADOW.layers[0] as ShadowLayer;
 
-/** Field names and ranges for each effect kind, translated. */
+/** Field names and ranges for each effect kind. */
 function useEffectFields(): Readonly<
   Record<"shadow" | "glow" | "textShadow", readonly NumberField[]>
 > {

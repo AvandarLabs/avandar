@@ -31,7 +31,7 @@ const METADATA = z.strictObject({
   distinction: MESSAGE,
 });
 
-/** Validates authored YAML copy while preserving its stable translation IDs. */
+/** Validates authored YAML copy while preserving its stable copy IDs. */
 export function parseStockMetadata(value: unknown): StockMetadata {
   return METADATA.parse(value);
 }

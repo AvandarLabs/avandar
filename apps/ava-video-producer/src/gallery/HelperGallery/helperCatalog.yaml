@@ -1,8 +1,8 @@
 # The Motion Atlas helper catalog. Validated by parseHelperCatalog and kept in
 # step with the source by helperCatalogDrift.test.ts: every runtime export of
 # a listed module is either catalogued below or excluded with a reason.
-# After editing copy, run `npm run gallery:messages` to regenerate the
-# translation descriptors.
+# The titles, descriptions and guidance are plain English. The gallery shows
+# them as written.
 
 categories:
   - id: curves

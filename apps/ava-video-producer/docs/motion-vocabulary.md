@@ -329,7 +329,7 @@ a link to its source.
   longer exists, when a runtime export is neither catalogued nor listed under
   the module's `excluded` with a reason, when a member of `EASE` or `DUR` has
   no entry, when a `usedBy` file does not import the helper, when a preview id
-  is unregistered or unused, or when the translation descriptors are stale.
+  is unregistered or unused.
 - **Live previews.** Each preview is a small frame-driven React component in
   [demos/](../src/gallery/HelperGallery/demos/) that calls the real helper and
   shows the call, a frame counter and the values the helper returns. The
@@ -338,9 +338,9 @@ a link to its source.
   player plays it through `HelperPlayer` and `HelperComposition` instead of
   `FilmComposition`. Helper previews are live only; the export route refuses
   them. Colours come from the Avandar theme in `theme-colors.json`.
-- **Copy.** Catalog prose is display copy. `npm run gallery:messages` first
-  regenerates `helperDescriptors.generated.ts` from the YAML, then extracts and
-  compiles the gallery catalog; `useHelperCopy` resolves it at runtime.
+- **Copy.** Catalog prose is plain English display copy. The gallery reads the
+  titles, descriptions and guidance straight from the YAML. There is no
+  catalog to regenerate after editing it.
 
 Deliberately excluded: `getTypographyRevealFrames` (TypographyScene's own
 icon-then-lines timing), `getRowValueLabel` (number formatting), and the
@@ -364,6 +364,6 @@ and continuity's internal camera and overlay modules are not listed modules.
    it in [helperDemoRegistry.ts](../src/gallery/HelperGallery/demos/helperDemoRegistry.ts).
    The registry is typed against the id list, so a missing preview fails to
    compile.
-5. Run `npm run gallery:messages`, `npm run motion:build`, `npm run typecheck`
+5. Run `npm run motion:build`, `npm run typecheck`
    and `npm test`, then open `motion.html?section=helpers&helper=<id>` under
    `pnpm showcase` and watch the preview loop.

@@ -10,7 +10,7 @@ separate and unchanged.
 combine the shared scene props with `StockRequest`:
 `{preset, schemaVersion?:1, input?, accent?, background?, frame, width?, height?, title?, kicker?}`.
 The typed `input` belongs to the selected preset. Only omitted input resolves a
-cloned, localized complete fictional default; supplied input must be complete.
+cloned complete fictional default; supplied input must be complete.
 Both palette fields require six-digit hex colors. Unknown fields/presets,
 other versions, bad references and invalid content fail validation.
 

@@ -15,8 +15,8 @@ export type ThemeBarInput = Readonly<{
 }>;
 
 /**
- * Which sentence the theme bar's status line shows. The component translates
- * each key, so failures are explained from their status and issues and never
+ * Which sentence the theme bar's status line shows. The component writes the
+ * sentence for each key, so failures are explained from their status and issues and never
  * from the server's English message.
  */
 export type ThemeBarMessage =

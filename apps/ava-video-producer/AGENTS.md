@@ -5,6 +5,37 @@ governs how they are shot. Compositions are React; output is mp4. The local
 pipeline adds real Avandar capture, validated storyboards, reusable scenes,
 narration/captions, and reproducible fictional demo data.
 
+## No translation
+
+This app is an internal tool. It has no Lingui catalogs and no translation
+hooks. Write displayable text as plain English strings and JSX.
+
+The repo-wide rule that all displayable frontend text must be translated
+through Lingui does **not** apply anywhere under `apps/ava-video-producer`, and
+this file overrides it. Do not add `<Trans>`, `t`, `msg`, `useLingui` for copy,
+message extraction, compiled catalogs, `.po` files or locale folders here.
+Stock, continuity, helper and token copy is read straight from its YAML
+catalog, token catalog or source literal.
+
+The one exception is `avandar-adapter/`. Its product components bring their
+own translations, so the adapter keeps only the minimum needed to host them:
+
+- `avandar-adapter/index.tsx` creates an English `i18n` instance
+  (`@lingui/core`, `@lingui/message-utils`) and wraps the stage in
+  `I18nProvider` (`@lingui/react`) because product components call the
+  product's own `useLingui` and `<Trans>`.
+- `avandar-adapter/DashboardScreen/DashboardScreen.tsx` reads that `i18n`
+  instance with `useLingui` from `@lingui/react` to hand it to the product's
+  dashboard config hook.
+- `scripts/build-avandar.mjs` runs `@lingui/babel-plugin-lingui-macro` over the
+  product source it compiles, so the product's macros expand.
+
+That is why `@lingui/core`, `@lingui/message-utils`, `@lingui/react`,
+`@lingui/babel-plugin-lingui-macro` and `@babel/core` stay in `package.json`.
+Strings the adapter itself owns (fixture names, labels it passes to product
+components) are plain English like everything else. Never import Lingui from
+`src/`. A test fails if you do.
+
 ## Read the skill first
 
 **`.claude/skills/product-demo/SKILL.md` before writing or editing any

@@ -7,7 +7,7 @@ type ReferenceOptions = {
   accent?: string;
   background?: string;
 };
-/** Translates reference-brief copy in the gallery's active UI context. */
+/** Builds the reference-brief text for the selected motion references. */
 export function useReferenceBrief(): (
   options: Readonly<ReferenceOptions>,
 ) => string {

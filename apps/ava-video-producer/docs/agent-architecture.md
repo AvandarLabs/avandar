@@ -131,7 +131,7 @@ The runtime registry contains 170 strict content contracts and matching typed
 renderers: 20 legacy entries plus 150 additions, split into 106 general and
 64 social-sector entries. React, the storyboard `stock` scene, the gallery and
 the motion CLI share one complete request schema. Omitted input resolves a cloned
-localized fictional default. Supplied input is complete, exact and validated;
+fictional default. Supplied input is complete, exact and validated;
 collection lengths, structured quantities and references drive the picture.
 The gallery exposes nested controls, retains invalid drafts separately from the
 last valid preview, and passes the identical validated content/palette to configured
@@ -140,8 +140,7 @@ JSON and download jobs. A creative brief or saved preset ID is not that payload.
 Contracts, descriptors, schemas, controls and retrieval text remain renderer-free.
 Motion descriptions and continuity catalogs are authored directly in YAML and
 validated when loaded. Browser, CLI and renderer builds consume the same files,
-without a separate catalog export. Optional marked default-span bindings keep localized text
-and UTF-16 offsets aligned only for omitted input. Fixed renderer prose is distinct
+without a separate catalog export. Fixed renderer prose is distinct
 from authored content. These interfaces do not implement document ingestion,
 segmentation, extraction, embeddings, a vector index, ranking, automatic binding,
 transcript processing or autonomous film generation.

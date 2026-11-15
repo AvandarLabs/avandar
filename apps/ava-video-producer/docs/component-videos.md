@@ -70,7 +70,7 @@ The captions toggle does not add brand or background controls to product films.
 | `src/avandar/AvandarScene.tsx` | Storyboard integration and pointer choreography over the product stage. |
 | `src/avandar/cursor-targets.json` | Pointer locations measured from rendered `data-video-target` elements. |
 
-`scripts/build-avandar.mjs` resolves product aliases and workspace packages, compiles TypeScript and Lingui macros, processes source CSS modules and Mantine variables, and adds the required Tailwind utilities. Installed dependencies provide the original Mantine, AG Grid, CodeMirror, Puck and MapLibre runtimes. React and Remotion remain shared with the film renderer. The bridge installs the product theme and navigation components, local Figtree font, English Lingui message compiler and fixture router.
+`scripts/build-avandar.mjs` resolves product aliases and workspace packages, compiles TypeScript and the product's own Lingui macros (producer code under `src/` has none), processes source CSS modules and Mantine variables, and adds the required Tailwind utilities. Installed dependencies provide the original Mantine, AG Grid, CodeMirror, Puck and MapLibre runtimes. React and Remotion remain shared with the film renderer. The bridge installs the product theme and navigation components, local Figtree font, English Lingui message compiler and fixture router.
 
 The build always reads the enclosing Avandar worktree. `component:build` compiles
 its actual imported source files without copying them. `component:watch` watches

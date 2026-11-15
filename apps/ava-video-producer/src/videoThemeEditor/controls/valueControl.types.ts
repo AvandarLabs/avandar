@@ -2,7 +2,7 @@ import type { TokenDefinition } from "../../videoTheme/videoTheme.types";
 
 /** What every literal value control receives. */
 export type ValueControlProps = Readonly<{
-  /** Accessible name naming the token, already translated. */
+  /** Accessible name naming the token. */
   label: string;
   definition: Pick<
     TokenDefinition,

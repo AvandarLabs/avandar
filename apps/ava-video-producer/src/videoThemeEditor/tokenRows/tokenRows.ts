@@ -60,7 +60,7 @@ export type TokenRowFilter = Readonly<{
   query: string;
   /** When set, semantic and component rows must appear here. */
   usedTokens?: readonly string[];
-  /** The translated label and description of a row, for search. */
+  /** The label and description of a row, for search. */
   getText: (row: TokenRow) => string;
 }>;
 

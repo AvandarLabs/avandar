@@ -96,7 +96,7 @@ describes the visual treatment, attention sequence, and intended feel of the
 authored study. The Atlas searches these semantic fields and displays the guidance
 and tags in the reuse guide.
 
-Edit this YAML directly. The Atlas, CLI, translation collector, and renderer load
+Edit this YAML directly. The Atlas, CLI, and renderer load
 the same source and validate its structure. Sample-film metadata lives alongside
 it in `src/continuity/films/filmCatalog.yaml`. There is no catalog export step or
 generated JSON copy to synchronize. Normal showcase rebuilds consume YAML edits.
@@ -138,11 +138,11 @@ Narration uses `shotId`, optional `beatId`, and start/end frames. With `beatId`,
 
 Product features include Import, Explorer, Dashboards, Cases, Map, Ontology, and Attribute Mapping. Existing native `avandar` scenes keep their original feature set; the two new adapters are exposed through continuity. Product scenes require a 1600 × 840 stage, typically a 1600 × 1000 film with single-line captions. The CLI detects product and map requirements inside continuity scenes and includes the product build in preview fingerprints.
 
-Use `pnpm video validate <plan>` and `pnpm video preview <plan>` from the producer app. Preview frames include nested boundaries and resolved poses. Inspect the frames and playback after editing. `pnpm showcase` regenerates localized copy and watches source changes. A successful rebuild refreshes the gallery and live player while preserving the selected film and the player's saved state.
+Use `pnpm video validate <plan>` and `pnpm video preview <plan>` from the producer app. Preview frames include nested boundaries and resolved poses. Inspect the frames and playback after editing. `pnpm showcase` watches source changes. A successful rebuild refreshes the gallery and live player while preserving the selected film and the player's saved state.
 
-## Localized copy
+## Copy
 
-`pnpm continuity:messages` generates extractable descriptors from the authored films, studies and gallery copy, then extracts and compiles the Lingui catalog. The existing stock-message lifecycle invokes it for tests, showcase startup and video commands. Add translations under `src/continuity/i18n/locales/`; regional locales fall back to their base language and then English. Existing providers keep their locale and product translator. Standalone continuity scenes receive an English provider when their caller has none.
+Film, study and gallery copy is plain English authored in the catalog YAML and the plan JSON. Components render it as written. There are no message catalogs, locale folders or translation providers for it.
 
 ## Remotion implementation
 

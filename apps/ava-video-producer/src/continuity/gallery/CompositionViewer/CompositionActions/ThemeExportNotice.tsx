@@ -11,7 +11,7 @@ type Props = Readonly<{
   onRetry: () => void;
 }>;
 
-/** Translated explanations for each reason an export cannot use the draft's theme. */
+/** Explanations for each reason an export cannot use the draft's theme. */
 function useRefusalCopy(): (reason: ThemeRefusalReason) => string {
   const copy: Record<ThemeRefusalReason, string> = {
     "film-unsupported":
