@@ -44,6 +44,10 @@ msgstr "{0} rows"
 msgid "We couldn't load a preview of this dataset."
 msgstr "We couldn't load a preview of this dataset."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Confirm and next"
+msgstr "Confirm and next"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
 msgid "What to do"
 msgstr "What to do"
@@ -172,6 +176,11 @@ msgstr "Keywords"
 msgid "This query isn't written correctly, so it couldn't be read."
 msgstr "This query isn't written correctly, so it couldn't be read."
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Codes"
+msgstr "Codes"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
 msgid "Its conversions follow the dictionaries, so later edits to them show up "
 "here right away."
@@ -214,6 +223,10 @@ msgid "This query uses a function, {functionName}, that the query engine "
 msgstr "This query uses a function, {functionName}, that the query engine "
 "doesn't support."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Change to the values"
+msgstr "Change to the values"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
 "existing datasets, or add fields to fill in by hand."
@@ -224,6 +237,12 @@ msgstr "Name this case type and say where its fields come from. Map columns "
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "Value column"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Values made only of digits get leading zeros up to this length. Longer "
+"values stay as they are."
+msgstr "Values made only of digits get leading zeros up to this length. Longer "
+"values stay as they are."
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Could not refresh this dataset"
@@ -252,6 +271,14 @@ msgstr "Remove access for {name}."
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
 msgid "Match case"
 msgstr "Match case"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{datasetCount, plural, one {Reading # dataset on this device. The first "
+"time can take a few minutes.} other {Reading # datasets on this device. "
+"The first time can take a few minutes.}}"
+msgstr "{datasetCount, plural, one {Reading # dataset on this device. The first "
+"time can take a few minutes.} other {Reading # datasets on this device. "
+"The first time can take a few minutes.}}"
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -319,9 +346,23 @@ msgid "Rewrites the uploaded data in place. It is synced to the workspace, so "
 msgstr "Rewrites the uploaded data in place. It is synced to the workspace, so "
 "this changes it for everyone who uses it."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Becomes empty"
+msgstr "Becomes empty"
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
 msgstr "\"{value}\" is not a number."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "{datasetName} was saved, but this device may still show its old rows. "
+"Reload the page to refresh them."
+msgstr "{datasetName} was saved, but this device may still show its old rows. "
+"Reload the page to refresh them."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "UPPERCASE"
+msgstr "UPPERCASE"
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to map tools"
@@ -393,13 +434,19 @@ msgstr "An error occurred while loading the file"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
 msgstr "Type"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "Nothing was saved. Please try again."
 msgstr "Nothing was saved. Please try again."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "lowercase"
+msgstr "lowercase"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
 msgid "How to apply the dictionary"
@@ -408,6 +455,12 @@ msgstr "How to apply the dictionary"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
 msgstr " access"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "A dictionary entry this crosswalk uses was deleted. Choose another entry "
+"for that column."
+msgstr "A dictionary entry this crosswalk uses was deleted. Choose another "
+"entry for that column."
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -482,6 +535,10 @@ msgstr "This chart needs the {pluginId} plugin, which is not available."
 msgid "New case type"
 msgstr "New case type"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "A code list that is not available"
+msgstr "A code list that is not available"
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
 msgid "Code lists · {codeListCount}"
 msgstr "Code lists · {codeListCount}"
@@ -495,6 +552,10 @@ msgstr "No filters yet. Add one to let viewers refine this chart without "
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
 msgstr "Not everyone can see every map"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Match"
+msgstr "Match"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -577,6 +638,8 @@ msgid "Go to a coordinate or P-code"
 msgstr "Go to a coordinate or P-code"
 
 #. placeholder {0}: drop.count
+#. placeholder {0}: props.preview.result.rowCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "{0, plural, one {# row} other {# rows}}"
 msgstr "{0, plural, one {# row} other {# rows}}"
@@ -678,12 +741,17 @@ msgid "Could not open the place."
 msgstr "Could not open the place."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 msgid "Datasets"
 msgstr "Datasets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "Custom role"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Dictionary entry"
+msgstr "Dictionary entry"
 
 #: src/routes/signin.tsx
 msgid "Create account"
@@ -717,6 +785,10 @@ msgstr "Cannot add dataset"
 msgid "No activity on this case yet"
 msgstr "No activity on this case yet"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/OpenCrosswalkLink.tsx
+msgid "Open crosswalk"
+msgstr "Open crosswalk"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Members still assigned to this group must be moved first."
 msgstr "Members still assigned to this group must be moved first."
@@ -734,6 +806,10 @@ msgstr "Sidebar layout"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "Add status"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Pad with zeros to {length} characters"
+msgstr "Pad with zeros to {length} characters"
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "Search dashboards, datasets, maps..."
@@ -777,6 +853,10 @@ msgstr "These statuses changed somewhere else. Close this window and try again."
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 msgid "Paste a list"
 msgstr "Paste a list"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Reject"
+msgstr "Reject"
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCardHeader.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -1113,6 +1193,20 @@ msgstr "Filter by assignee"
 msgid "← Back"
 msgstr "← Back"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Changes:"
+msgstr "Changes:"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "A column is already named {sourceColumnName}. Rename it in Map each "
+"dataset first."
+msgstr "A column is already named {sourceColumnName}. Rename it in Map each "
+"dataset first."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Accept all suggestions"
+msgstr "Accept all suggestions"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
@@ -1134,6 +1228,10 @@ msgstr "Cannot display {chartName}"
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
 msgstr "Dataset failed to process"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Enter a name for the combined dataset."
+msgstr "Enter a name for the combined dataset."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
@@ -1315,6 +1413,10 @@ msgstr "Post the first update below. Type @ to mention a teammate or link a "
 msgid "Collapse at"
 msgstr "Collapse at"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "In this dataset"
+msgstr "In this dataset"
+
 #: shared/copy/vizTypeLabel.ts
 msgid "Bubble Chart"
 msgstr "Bubble Chart"
@@ -1405,6 +1507,10 @@ msgstr "Map"
 msgid "Table"
 msgstr "Table"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Same values · {percent}"
+msgstr "Same values · {percent}"
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
 msgstr "First tick value"
@@ -1431,11 +1537,19 @@ msgstr "Changes the values in this column using the dictionary. For example, "
 msgid "Orange"
 msgstr "Orange"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "The code list this used was deleted. Choose another."
+msgstr "The code list this used was deleted. Choose another."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "Plugins add features to this workspace. Installing or removing a plugin "
 "affects every member."
 msgstr "Plugins add features to this workspace. Installing or removing a plugin "
 "affects every member."
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Crosswalk failed to load"
+msgstr "Crosswalk failed to load"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -1508,6 +1622,10 @@ msgstr "No keywords"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "Updated {0}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "{columnName} isn't a column of this dataset."
+msgstr "{columnName} isn't a column of this dataset."
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairList.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
@@ -1617,6 +1735,12 @@ msgstr "Could not load"
 msgid "The source file is empty."
 msgstr "The source file is empty."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "There are too many columns to look for matches at once. Mapping still "
+"works."
+msgstr "There are too many columns to look for matches at once. Mapping still "
+"works."
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
 msgid "Give this entry a name."
@@ -1645,6 +1769,10 @@ msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Review"
+msgstr "Review"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
 msgid "Assign to"
@@ -1682,6 +1810,10 @@ msgstr "Sheet"
 msgid "Getting {0} from {1}"
 msgstr "Getting {0} from {1}"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "The example could not be read. The column is still filled this way."
+msgstr "The example could not be read. The column is still filled this way."
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Published to workspace"
@@ -1693,8 +1825,16 @@ msgstr "Single select"
 #: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+#: src/views/DataManagerApp/CrosswalkView/useSaveCrosswalk/useSaveCrosswalk.ts
 msgid "You're offline. Reconnect to save this."
 msgstr "You're offline. Reconnect to save this."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Only workspace admins can add datasets."
+msgstr "Only workspace admins can add datasets."
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
@@ -1794,6 +1934,10 @@ msgstr "Build your first dashboard"
 msgid "Close sidebar"
 msgstr "Close sidebar"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Filled from"
+msgstr "Filled from"
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown user"
@@ -1818,6 +1962,10 @@ msgstr "Seat limit reached"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "Could not unpublish dashboard"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "Created {datasetName}."
+msgstr "Created {datasetName}."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Technical details"
@@ -1876,6 +2024,10 @@ msgstr "Retry"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "JOIN subquery at position {index} could not be re-serialised."
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Give the crosswalk a name."
+msgstr "Give the crosswalk a name."
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
 msgid "{issueCount, plural, one {# thing to fix before saving} other {# things "
 "to fix before saving}}"
@@ -1893,6 +2045,12 @@ msgstr "Search datasets"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Enter email"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombiningProgress/CombiningProgress.tsx
+msgid "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
+msgstr "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per week"
@@ -1926,9 +2084,17 @@ msgid "Reading a sample of this dataset to confirm its columns and their types. 
 msgstr "Reading a sample of this dataset to confirm its columns and their "
 "types. The list below may change."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Pad with zeros"
+msgstr "Pad with zeros"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Add a column to the combined dataset"
+msgstr "Add a column to the combined dataset"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
@@ -1962,9 +2128,17 @@ msgstr "Regular expression"
 msgid "Skip"
 msgstr "Skip"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Meaning"
+msgstr "Meaning"
+
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "Copied"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Translated with a code list that was deleted"
+msgstr "Translated with a code list that was deleted"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Copy link to comment"
@@ -2003,6 +2177,8 @@ msgstr "The catalog is in <0/> and grows from what people ask for. Missing a "
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
@@ -2148,6 +2324,10 @@ msgstr "Per period"
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Select a layer to edit how it is queried and drawn."
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Fix the problems above to combine."
+msgstr "Fix the problems above to combine."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "Approved"
@@ -2170,6 +2350,10 @@ msgstr "Actions"
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
 msgstr "Assignment not changed"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Translate codes"
+msgstr "Translate codes"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
@@ -2282,6 +2466,10 @@ msgstr "No dataset has that name"
 msgid "Couldn't export PDF"
 msgstr "Couldn't export PDF"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
+msgid "A code list changed since it was combined"
+msgstr "A code list changed since it was combined"
+
 #. placeholder {0}: attribute.name
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
@@ -2320,6 +2508,10 @@ msgstr "ORDER BY references multiple columns; the form keeps only the first."
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveWarnings.tsx
 msgid "Fix these before saving"
 msgstr "Fix these before saving"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "Already in this crosswalk"
+msgstr "Already in this crosswalk"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "One standard deviation around the mean"
@@ -2517,6 +2709,12 @@ msgstr "Show the first 20 rows of {datasetName}"
 msgid "Map of {0}"
 msgstr "Map of {0}"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk would include its own combined dataset. Remove it from "
+"the datasets and try again."
+msgstr "This crosswalk would include its own combined dataset. Remove it from "
+"the datasets and try again."
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
@@ -2555,6 +2753,10 @@ msgstr "Every case type already has a status. Choose another name."
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "{0, plural, one {Show all # value} other {Show all # values}}"
 msgstr "{0, plural, one {Show all # value} other {Show all # values}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SourceColumnSelect.tsx
+msgid "For example: {example}"
+msgstr "For example: {example}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -2668,9 +2870,18 @@ msgstr "Filters for this chart"
 msgid "Align"
 msgstr "Align"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Skipped"
+msgstr "Skipped"
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Give the place a name."
 msgstr "Give the place a name."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Reading the values of {datasetName} on this device"
+msgstr "Reading the values of {datasetName} on this device"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
@@ -2733,9 +2944,17 @@ msgstr "{distinctCount, plural, one {# different value} other {# different "
 msgid "One dataset is one tab."
 msgstr "One dataset is one tab."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useExportMapping.ts
+msgid "{crosswalkName} mapping"
+msgstr "{crosswalkName} mapping"
+
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Label each ring with"
 msgstr "Label each ring with"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Multiply by"
+msgstr "Multiply by"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
 msgid "I understand this changes {datasetName} for the whole workspace"
@@ -2748,6 +2967,11 @@ msgstr "Data it can read"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "Changed the data"
 msgstr "Changed the data"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "You need edit access to the combined dataset to update it."
+msgstr "You need edit access to the combined dataset to update it."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -2769,6 +2993,12 @@ msgstr "{labeledText} of {valueText}"
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Excel file"
 msgstr "Excel file"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Combine"
+msgstr "Combine"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture the dashboard for annotation."
@@ -2833,6 +3063,12 @@ msgstr "Could not load this cluster's features."
 msgid "Table view has no chart settings."
 msgstr "Table view has no chart settings."
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk includes a dataset you can't open, so it can't be updated "
+"by you."
+msgstr "This crosswalk includes a dataset you can't open, so it can't be "
+"updated by you."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
 msgstr "You save {discount}% compared to monthly billing"
@@ -2883,6 +3119,10 @@ msgstr "Medium"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading case"
 msgstr "Loading case"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Add column"
+msgstr "Add column"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
@@ -3026,6 +3266,10 @@ msgstr "The code {code} is added twice to {listName}. Change one of them on "
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "The custom URL can only contain lowercase letters, numbers, and hyphens"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "You need edit access to {existingName} to update it."
+msgstr "You need edit access to {existingName} to update it."
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "3857 - Web Mercator"
 msgstr "3857 - Web Mercator"
@@ -3041,6 +3285,11 @@ msgstr "Smooth"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Enter a name for the field"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Choose datasets"
+msgstr "Choose datasets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Select Plan"
@@ -3066,6 +3315,14 @@ msgstr "Description added to the column"
 msgid "Avandar couldn't download that link. Check it and try again."
 msgstr "Avandar couldn't download that link. Check it and try again."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Write a formula, or choose another way to fill this column."
+msgstr "Write a formula, or choose another way to fill this column."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Read as a date"
+msgstr "Read as a date"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "Default value (optional)"
@@ -3085,6 +3342,20 @@ msgstr "Sum"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Top right"
 msgstr "Top right"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can update the combined dataset."
+msgstr "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can update the combined dataset."
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "You need edit access to Data Sources to change this crosswalk."
+msgstr "You need edit access to Data Sources to change this crosswalk."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed, UPPERCASE"
+msgstr "Spaces trimmed, UPPERCASE"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "Set up offline mode to chat without an internet connection."
@@ -3151,6 +3422,11 @@ msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "Are you sure you want to proceed with this action? This cannot be "
 "undone."
+
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/LayoutName.tsx
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/useLayoutNamer.ts
+msgid "No datasets left"
+msgstr "No datasets left"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
@@ -3243,6 +3519,14 @@ msgstr "An unexpected error occurred. You can try again, or return home."
 msgid "Remove code list"
 msgstr "Remove code list"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{datasetName} was left out: a column it fills from holds a different "
+"kind of values than the same column of the first dataset with its "
+"layout. Remove it, or fix that column's type at its source."
+msgstr "{datasetName} was left out: a column it fills from holds a different "
+"kind of values than the same column of the first dataset with its "
+"layout. Remove it, or fix that column's type at its source."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Save URL"
@@ -3326,6 +3610,10 @@ msgstr "You shared your first dashboard with your workspace. Anyone there can "
 #: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 msgid "You can no longer read {dictionaryName}, so it was not re-applied."
 msgstr "You can no longer read {dictionaryName}, so it was not re-applied."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Coded columns come out as"
+msgstr "Coded columns come out as"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
@@ -3415,6 +3703,10 @@ msgstr "All formats"
 msgid "No columns are available"
 msgstr "No columns are available"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConstantInput.tsx
+msgid "Every row from these datasets gets this value."
+msgstr "Every row from these datasets gets this value."
+
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "{layerText} · {updatedDate}"
 msgstr "{layerText} · {updatedDate}"
@@ -3455,6 +3747,10 @@ msgstr "A local record of every time you approved (or cancelled) sending data "
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
 msgstr "{0, plural, one {# record} other {# records}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "From a similar layout"
+msgstr "From a similar layout"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
@@ -3670,6 +3966,12 @@ msgstr "Could not save the place."
 msgid "is before"
 msgstr "is before"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+#~ msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+#~ "for access to it, then try again."
+#~ msgstr "This change involves a dataset you can't open, so nothing was saved. "
+#~ "Ask for access to it, then try again."
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
 "and discover insights from your data."
@@ -3752,6 +4054,13 @@ msgstr "Recent"
 msgid "Report a bug"
 msgstr "Report a bug"
 
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/LayoutName.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "{otherDatasetCount, plural, one {+# with the same layout} other {+# with "
+"the same layout}}"
+msgstr "{otherDatasetCount, plural, one {+# with the same layout} other {+# "
+"with the same layout}}"
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Pan, zoom and tap a feature to read it. To edit layers, open this map on "
 "a tablet or a laptop."
@@ -3804,6 +4113,7 @@ msgid "Audience"
 msgstr "Audience"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
 msgid "Updated {datasetName}."
 msgstr "Updated {datasetName}."
 
@@ -3824,6 +4134,10 @@ msgstr "Update available"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I ran the query, but it failed."
 msgstr "I ran the query, but it failed."
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Crosswalk deleted"
+msgstr "Crosswalk deleted"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -3903,6 +4217,7 @@ msgstr "{keyboardShortcut} to save"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -3934,9 +4249,18 @@ msgstr "Your workspace is on the Free plan, which lets you share or publish one 
 msgid "Disable"
 msgstr "Disable"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "How it is filled"
+msgstr "How it is filled"
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is no longer in the download. Choose another one."
 msgstr "That file is no longer in the download. Choose another one."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStubList/LayoutStubList.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Map each dataset"
+msgstr "Map each dataset"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -4088,6 +4412,10 @@ msgstr "Minimum"
 msgid "Dashboard unpublished."
 msgstr "Dashboard unpublished."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
+msgid "Reference: {layoutName}"
+msgstr "Reference: {layoutName}"
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Show SQL"
@@ -4101,6 +4429,12 @@ msgstr "Feature list"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "Grid"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "There is nothing to combine yet. Map at least one dataset that isn't "
+"skipped."
+msgstr "There is nothing to combine yet. Map at least one dataset that isn't "
+"skipped."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who "
@@ -4158,6 +4492,10 @@ msgstr "Unable to publish dashboard"
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{convertedCount, plural, one {# converted} other {# converted}}"
 msgstr "{convertedCount, plural, one {# converted} other {# converted}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "No change"
+msgstr "No change"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
@@ -4233,6 +4571,10 @@ msgstr "{pluginName} uninstalled"
 msgid "Apply"
 msgstr "Apply"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "{layoutName} (reference)"
+msgstr "{layoutName} (reference)"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "Enter a name for this dataset"
@@ -4306,6 +4648,8 @@ msgstr "Geometry support is still downloading. This can take a moment on a slow 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
@@ -4362,9 +4706,17 @@ msgstr "Draw a box around a table, chart, map or block of text to extract it."
 msgid "Listing tables..."
 msgstr "Listing tables..."
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Datasets with the same columns are mapped once, together."
+msgstr "Datasets with the same columns are mapped once, together."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "Data scope"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete crosswalk"
+msgstr "Delete crosswalk"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
@@ -4379,6 +4731,7 @@ msgstr "This address isn't allowed"
 msgid "Your Google connection expired"
 msgstr "Your Google connection expired"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryFromDatasetsView.tsx
 msgid "Checking your access"
 msgstr "Checking your access"
@@ -4394,6 +4747,10 @@ msgstr "This query was stopped before it finished."
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "Needs geometry"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Another format"
+msgstr "Another format"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
@@ -4432,6 +4789,12 @@ msgstr "Pick a chart type above to configure one."
 msgid "Attach to {datasetName}"
 msgstr "Attach to {datasetName}"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk changed while you were working on it. Reload the page and "
+"try again."
+msgstr "This crosswalk changed while you were working on it. Reload the page "
+"and try again."
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
 "app to clear cached data and try once more."
@@ -4451,9 +4814,20 @@ msgstr "to"
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
 msgstr "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
 
+#. placeholder {0}: props.count
+#. placeholder {0}: props.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{0, plural, one {# dataset} other {# datasets}}"
+msgstr "{0, plural, one {# dataset} other {# datasets}}"
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Review matches"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Combined dataset"
+msgstr "Combined dataset"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 msgid "Saved to Dictionaries like any other dictionary. {originDatasetName} is "
@@ -4494,6 +4868,10 @@ msgstr "Layers"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
 msgstr "{0} areas suppressed"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "Matches {percent} of the columns in the other datasets."
+msgstr "Matches {percent} of the columns in the other datasets."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
@@ -4634,6 +5012,10 @@ msgstr "Disabled"
 msgid "is at most"
 msgstr "is at most"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Translate labels"
+msgstr "Translate labels"
+
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Per year"
 msgstr "Per year"
@@ -4693,6 +5075,12 @@ msgstr "All organizations"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
 msgstr "Drop a file here, or click to browse"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Two columns of the combined dataset have the same name, or one is named "
+"{sourceColumnName}. Rename one of them."
+msgstr "Two columns of the combined dataset have the same name, or one is named "
+"{sourceColumnName}. Rename one of them."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -4818,6 +5206,10 @@ msgstr "Publish"
 msgid "Entries"
 msgstr "Entries"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Multiplied by {factor}"
+msgstr "Multiplied by {factor}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Rows {rowIndexes}."
 msgstr "Rows {rowIndexes}."
@@ -4874,6 +5266,10 @@ msgstr "New dictionary"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Manual form shows an approximation"
 msgstr "Manual form shows an approximation"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggest matches"
+msgstr "Suggest matches"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
@@ -4939,6 +5335,10 @@ msgstr "Feature"
 msgid "Draft"
 msgstr "Draft"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Accept the suggestion for {columnName}"
+msgstr "Accept the suggestion for {columnName}"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
@@ -4950,6 +5350,13 @@ msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
 msgstr "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
+
+#. placeholder {0}: problem.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{0, plural, one {# dataset has mappings you haven't confirmed.} other {# "
+"datasets have mappings you haven't confirmed.}}"
+msgstr "{0, plural, one {# dataset has mappings you haven't confirmed.} other "
+"{# datasets have mappings you haven't confirmed.}}"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Bind geometry on the selected layer to buffer it."
@@ -4991,9 +5398,19 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 msgstr "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 
+#. placeholder {0}: props.pickedCount
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "{0, plural, one {Add # dataset} other {Add # datasets}}"
+msgstr "{0, plural, one {Add # dataset} other {Add # datasets}}"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed"
 msgstr "Removed"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkNameField/CrosswalkNameField.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Untitled crosswalk"
+msgstr "Untitled crosswalk"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
 msgid "Could not create those case types"
@@ -5064,6 +5481,8 @@ msgstr "Write an update. Type @ to mention a teammate or link a dashboard, "
 "dataset, or case."
 
 #. placeholder {0}: _sumColumns(pickedDatasetIds, columnCounts)
+#. placeholder {0}: draft.columns.length
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsStep.tsx
 msgid "{0, plural, one {# column} other {# columns}}"
 msgstr "{0, plural, one {# column} other {# columns}}"
@@ -5159,6 +5578,16 @@ msgstr "Split (+/-)"
 msgid "Active"
 msgstr "Active"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "No other matches found."
+msgstr "No other matches found."
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
+msgid "Combining datasets needs edit access to Data Sources. Ask a workspace "
+"admin for it."
+msgstr "Combining datasets needs edit access to Data Sources. Ask a workspace "
+"admin for it."
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "Default values, comma-separated or JSON array"
@@ -5194,6 +5623,10 @@ msgstr "No topics"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Padding"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Through {crosswalkName}"
+msgstr "Through {crosswalkName}"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "ft"
@@ -5378,6 +5811,10 @@ msgstr "Column 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "You do not have permission to open this part of the workspace."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/MappedProgress.tsx
+msgid "{mapped} of {total} mapped"
+msgstr "{mapped} of {total} mapped"
+
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Please check your email"
@@ -5519,6 +5956,10 @@ msgstr "Private maps"
 msgid "About your workspace"
 msgstr "About your workspace"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Same values"
+msgstr "Same values"
+
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are 0, 0."
 msgstr "Some coordinates are 0, 0."
@@ -5558,6 +5999,10 @@ msgid "{resultCount, plural, =0 {No addresses found} one {# address found} "
 "other {# addresses found}}"
 msgstr "{resultCount, plural, =0 {No addresses found} one {# address found} "
 "other {# addresses found}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Accept"
+msgstr "Accept"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
@@ -5760,6 +6205,10 @@ msgstr "Type the workspace name to confirm"
 msgid "Save failed"
 msgstr "Save failed"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Months to years"
+msgstr "Months to years"
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Chat is enabled in Data Explorer and Dashboards"
 msgstr "Chat is enabled in Data Explorer and Dashboards"
@@ -5828,6 +6277,12 @@ msgstr "Change password"
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Checkout Successful!"
 msgstr "Checkout Successful!"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "The crosswalk failed to load. Please try again later or reach out to "
+"support."
+msgstr "The crosswalk failed to load. Please try again later or reach out to "
+"support."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
@@ -5929,6 +6384,10 @@ msgstr "Move the pointer over the map to read a coordinate"
 #~ msgid "The name could not be saved: {0}"
 #~ msgstr "The name could not be saved: {0}"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Trim spaces, lowercase"
+msgstr "Trim spaces, lowercase"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
 "flip the layout automatically."
@@ -5942,6 +6401,11 @@ msgstr "No plans available."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or after"
 msgstr "is on or after"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Trim spaces"
+msgstr "Trim spaces"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
@@ -6028,6 +6492,11 @@ msgstr "Apply every global filter on the dashboard."
 msgid "Collapse"
 msgstr "Collapse"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Labels"
+msgstr "Labels"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "code {code}"
 msgstr "code {code}"
@@ -6089,6 +6558,12 @@ msgstr "Distance to nearest {sourceName}"
 msgid "is any of"
 msgstr "is any of"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Update combined dataset"
+msgstr "Update combined dataset"
+
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
 msgstr "New map"
@@ -6138,6 +6613,10 @@ msgstr "That region is not on a page we read. Kept the rule-based results."
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Advanced geometry settings"
 msgstr "Advanced geometry settings"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "There are no datasets you can add."
+msgstr "There are no datasets you can add."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -6201,6 +6680,10 @@ msgstr "New chat"
 msgid "Unavailable result"
 msgstr "Unavailable result"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Reject the suggestion for {columnName}"
+msgstr "Reject the suggestion for {columnName}"
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Create places dataset"
 msgstr "Create places dataset"
@@ -6258,6 +6741,10 @@ msgstr "Updated in the past year"
 msgid "1 filter"
 msgstr "1 filter"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Example"
+msgstr "Example"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
 msgstr "Shown under the map and in every export. Required."
@@ -6272,6 +6759,12 @@ msgstr "Sized"
 msgid "Save to dashboard"
 msgstr "Save to dashboard"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "The formula that fills {columnName} for {layoutName} isn't a valid "
+"expression. Fix it in Map each dataset."
+msgstr "The formula that fills {columnName} for {layoutName} isn't a valid "
+"expression. Fix it in Map each dataset."
+
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
@@ -6284,6 +6777,12 @@ msgstr "Label type"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "Displace within"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "The crosswalk could not be deleted. Please try again or reach out to "
+"support."
+msgstr "The crosswalk could not be deleted. Please try again or reach out to "
+"support."
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Number"
@@ -6394,6 +6893,10 @@ msgstr "Dataset is now offline-only"
 msgid "{0} copy"
 msgstr "{0} copy"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Crosswalks"
+msgstr "Crosswalks"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Original"
 msgstr "Original"
@@ -6408,6 +6911,7 @@ msgstr "Number: a measurement or a count"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsFooter.tsx
 msgid "Next"
 msgstr "Next"
 
@@ -6537,6 +7041,10 @@ msgstr "is true"
 msgid "URL"
 msgstr "URL"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Add the datasets to combine first."
+msgstr "Add the datasets to combine first."
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY uses a non-column expression."
@@ -6612,6 +7120,7 @@ msgstr "Linear"
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -6741,6 +7250,18 @@ msgstr "Password update failed"
 msgid "Row {0}: {1}"
 msgstr "Row {0}: {1}"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can create the combined dataset."
+msgstr "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can create the combined dataset."
+
+#. placeholder {0}: problem.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{0, plural, one {# dataset is skipped.} other {# datasets are skipped.}}"
+msgstr "{0, plural, one {# dataset is skipped.} other {# datasets are "
+"skipped.}}"
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "Anyone in {app}"
@@ -6806,6 +7327,21 @@ msgstr "Breadcrumb"
 msgid "Add dataset to workspace"
 msgstr "Add dataset to workspace"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "One SQL expression. Put column names in braces, such as "
+"{exampleFormula}."
+msgstr "One SQL expression. Put column names in braces, such as "
+"{exampleFormula}."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Create combined dataset"
+msgstr "Create combined dataset"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Don't translate"
+msgstr "Don't translate"
+
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #. placeholder {1}: totalRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -6841,6 +7377,10 @@ msgstr "Count how many rows there are in {datasetName}"
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 #~ msgid "Attached as reference"
 #~ msgstr "Attached as reference"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Column name"
+msgstr "Column name"
 
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
@@ -6878,6 +7418,13 @@ msgstr "{0}"
 msgid "X axis label rotation"
 msgstr "X axis label rotation"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "A dataset in this crosswalk couldn't be read, so it can't be part of the "
+"combined dataset. Check that it still exists and that you can open it."
+msgstr "A dataset in this crosswalk couldn't be read, so it can't be part of "
+"the combined dataset. Check that it still exists and that you can open "
+"it."
+
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Refreshed from the database"
 msgstr "Refreshed from the database"
@@ -6887,6 +7434,10 @@ msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
 msgstr "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/ExportMappingButton.tsx
+msgid "Export mapping"
+msgstr "Export mapping"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
 msgid "Suggested labels filled in. Check them before saving."
@@ -6920,6 +7471,11 @@ msgstr "Label, e.g. Region"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
 msgid "Up to date"
 msgstr "Up to date"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "A column"
+msgstr "A column"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Records can only move to a status in this list."
@@ -6994,6 +7550,12 @@ msgstr "More actions"
 msgid "Horizontal gridlines"
 msgstr "Horizontal gridlines"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "{datasetName} was saved, but it could not be opened. Open it from the "
+"dataset list."
+msgstr "{datasetName} was saved, but it could not be opened. Open it from the "
+"dataset list."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Number range"
@@ -7014,6 +7576,7 @@ msgstr "{formattedNumResults}+ datasets"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead.tsx
@@ -7060,6 +7623,16 @@ msgstr "The person who added this sheet needs to reconnect their Google "
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
 msgstr "Could not render this page."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{columnName} for {layoutName} translates with a code list that was "
+"deleted, so its values come through unchanged."
+msgstr "{columnName} for {layoutName} translates with a code list that was "
+"deleted, so its values come through unchanged."
+
+#: src/views/DataManagerApp/CrosswalkView/useSaveCrosswalk/useSaveCrosswalk.ts
+msgid "Your profile is still loading. Try again."
+msgstr "Your profile is still loading. Try again."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
 msgid "Create a new linked dataset"
@@ -7185,6 +7758,12 @@ msgstr "CTEs (WITH clauses) are not supported in the form."
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} km²"
 msgstr "{areaValue} km²"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
+msgstr "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
@@ -7387,6 +7966,10 @@ msgstr "Pick one or more"
 msgid "Large"
 msgstr "Large"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed, lowercase"
+msgstr "Spaces trimmed, lowercase"
+
 #: src/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable.ts
 msgid "The map's data is still loading. Try again in a moment."
 msgstr "The map's data is still loading. Try again in a moment."
@@ -7406,6 +7989,10 @@ msgstr "Sent password reset email"
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Aggregation"
 msgstr "Aggregation"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Letter case"
+msgstr "Letter case"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}"
@@ -7428,6 +8015,10 @@ msgstr "You can view this dataset because it was shared with you."
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles.tsx
 msgid "Break {0} of {1}, {value}"
 msgstr "Break {0} of {1}, {value}"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Blocks:"
+msgstr "Blocks:"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
@@ -7515,6 +8106,7 @@ msgstr "EPSG code"
 msgid "Allow manual edit"
 msgstr "Allow manual edit"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Format"
 msgstr "Format"
@@ -7565,6 +8157,8 @@ msgid "Download PDF"
 msgstr "Download PDF"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
 msgid "Enter a name."
 msgstr "Enter a name."
 
@@ -7577,6 +8171,10 @@ msgstr "From {dictionaryName} › {entryName}. Attached as reference. The values
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
 msgstr "Bold"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Confirmed"
+msgstr "Confirmed"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically first"
@@ -7761,6 +8359,7 @@ msgstr "I applied the query in the Data Explorer."
 msgid " Not published yet."
 msgstr " Not published yet."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useReviewHeadline.ts
 msgid "{datasetCount, plural, one {# dataset} other {# datasets}}"
@@ -7793,6 +8392,12 @@ msgstr "Type your answer..."
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Built by hand"
 msgstr "Built by hand"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "This isn't a single SQL expression. Check its brackets, quotes, and "
+"commas."
+msgstr "This isn't a single SQL expression. Check its brackets, quotes, and "
+"commas."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -7849,13 +8454,29 @@ msgstr "Privacy Policy"
 msgid "Sign out failed"
 msgstr "Sign out failed"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
+"column is filled and try again."
+msgstr "One of the mappings is incomplete, so nothing was saved. Check how each "
+"column is filled and try again."
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField.tsx
 msgid "Apply it to {firstName} next"
 msgstr "Apply it to {firstName} next"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete {crosswalkName}? Its mappings are deleted."
+msgstr "Delete {crosswalkName}? Its mappings are deleted."
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Fix the entry names marked above to go on."
 msgstr "Fix the entry names marked above to go on."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
+msgstr "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry support is unavailable"
@@ -7879,6 +8500,7 @@ msgstr "Choose the most frequent value"
 msgid "Please try again. The PDF was not created."
 msgstr "Please try again. The PDF was not created."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Date format"
@@ -7923,6 +8545,10 @@ msgstr "is none of"
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Other spellings of value {rowNumber}"
 msgstr "Other spellings of value {rowNumber}"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Names the dataset each row came from."
+msgstr "Names the dataset each row came from."
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
@@ -7972,6 +8598,10 @@ msgstr "App"
 msgid "/month (paid yearly)"
 msgstr "/month (paid yearly)"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner.tsx
+msgid "A dictionary this crosswalk uses has changed."
+msgstr "A dictionary this crosswalk uses has changed."
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
 msgstr "Back to dashboards"
@@ -8010,6 +8640,10 @@ msgstr "Each series is a numeric column plotted on the radial value. Values are 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading case type"
 msgstr "Loading case type"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Formula"
+msgstr "Formula"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -8074,6 +8708,10 @@ msgstr "Number of rows to skip"
 #: src/components/badges/SourceBadge.tsx
 msgid "From CSV"
 msgstr "From CSV"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Years to months"
+msgstr "Years to months"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
@@ -8270,6 +8908,10 @@ msgstr "Orientation"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashboard deleted successfully!"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "Reference layout"
+msgstr "Reference layout"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these values are codes."
 msgstr "Chosen from the data: these values are codes."
@@ -8293,6 +8935,10 @@ msgstr "Draw an arrow"
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Purple"
 msgstr "Purple"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "More crosswalk actions"
+msgstr "More crosswalk actions"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
@@ -8417,6 +9063,9 @@ msgid "{pluginName}: the command failed"
 msgstr "{pluginName}: the command failed"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Leave empty"
 msgstr "Leave empty"
 
@@ -8435,6 +9084,11 @@ msgstr "Reconnect your Google account and try again."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "Direction"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "A fixed value"
+msgstr "A fixed value"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Edited"
@@ -8528,6 +9182,12 @@ msgstr "Add series"
 msgid "{0} km"
 msgstr "{0} km"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/FilledFromCell.tsx
+msgid "Not filled yet"
+msgstr "Not filled yet"
+
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
@@ -8607,6 +9267,9 @@ msgstr "X axis label"
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "This custom URL is reserved. Try adding a word to it."
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "Reference"
 msgstr "Reference"
@@ -8637,6 +9300,10 @@ msgstr "Offline models downloaded"
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Maximum rows"
 msgstr "Maximum rows"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Keep case"
+msgstr "Keep case"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -8700,9 +9367,17 @@ msgstr "Ignore all global filters: this visualization is unfiltered."
 msgid "Google Sheet"
 msgstr "Google Sheet"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Length"
+msgstr "Length"
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "You wrote:"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
+msgid "You can't edit crosswalks"
+msgstr "You can't edit crosswalks"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per day"
@@ -8736,6 +9411,11 @@ msgstr "Share failed"
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "Measure readout"
 msgstr "Measure readout"
+
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/DataManagerApp/DataManagerToolbarActions/NewCrosswalkButton.tsx
+msgid "New crosswalk"
+msgstr "New crosswalk"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Both ways"
@@ -9019,6 +9699,8 @@ msgstr "The values were converted to these codes. The dictionary entry they "
 msgid "Ascending"
 msgstr "Ascending"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag.tsx
 msgid "Suggested"
@@ -9106,6 +9788,10 @@ msgstr "Edit case type"
 msgid "Dictionaries failed to load"
 msgstr "Dictionaries failed to load"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "It may have been deleted. Open another one from Data Sources."
+msgstr "It may have been deleted. Open another one from Data Sources."
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "Coded columns"
 msgstr "Coded columns"
@@ -9136,6 +9822,10 @@ msgstr "{usedByCount, plural, one {Used by # dataset} other {Used by # "
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
 msgstr "Rows from this table"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Days to years"
+msgstr "Days to years"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
@@ -9269,6 +9959,10 @@ msgstr "Case type name"
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
 msgstr "Natural breaks used an evenly ranked sample of 5,000 values."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Translated with {codeListName}"
+msgstr "Translated with {codeListName}"
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
 "to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
@@ -9333,6 +10027,7 @@ msgid "Assigned to: {label}"
 msgstr "Assigned to: {label}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
 msgid "Remove {datasetName}"
 msgstr "Remove {datasetName}"
 
@@ -9462,6 +10157,11 @@ msgstr "Roughness ({0})"
 msgid "Search an address"
 msgstr "Search an address"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Add datasets"
+msgstr "Add datasets"
+
 #. placeholder {0}: columns.length
 #. placeholder {1}: numRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
@@ -9555,6 +10255,15 @@ msgstr "Converting {datasetName} creates a linked dataset, and only workspace "
 msgid "No basemap"
 msgstr "No basemap"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Translate codes with"
+msgstr "Translate codes with"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggestions need a connection or the offline model. Mapping still works."
+msgstr "Suggestions need a connection or the offline model. Mapping still "
+"works."
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical: named groups, such as sex or outcome"
 msgstr "Categorical: named groups, such as sex or outcome"
@@ -9607,6 +10316,16 @@ msgstr "The Google file picker could not be opened. Please try again."
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/seat"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Reading an example"
+msgstr "Reading an example"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete {crosswalkName}? Its mappings are deleted. {combinedDatasetName} "
+"stays, but stops updating."
+msgstr "Delete {crosswalkName}? Its mappings are deleted. {combinedDatasetName} "
+"stays, but stops updating."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Sort direction"
@@ -9673,6 +10392,10 @@ msgstr "does not match regex"
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical"
 msgstr "Categorical"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+msgid "Rows from these datasets leave {columnName} empty."
+msgstr "Rows from these datasets leave {columnName} empty."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -9759,6 +10482,10 @@ msgstr "is blank"
 msgid "Create a new workspace. You can always edit it later."
 msgstr "Create a new workspace. You can always edit it later."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "{crosswalkName} was deleted."
+msgstr "{crosswalkName} was deleted."
+
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
@@ -9778,6 +10505,10 @@ msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
 msgstr "A linked dataset reads {datasetName}, so it can't be changed in place. "
 "Convert in the linked dataset instead."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Multiply"
+msgstr "Multiply"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "{datasetName} is already up to date."
 msgstr "{datasetName} is already up to date."
@@ -9791,6 +10522,10 @@ msgstr "The database user should ideally have read-only access to the table or "
 #: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
 msgid "Close chat"
 msgstr "Close chat"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Loading the crosswalk"
+msgstr "Loading the crosswalk"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The latitude must be between -90 and 90."
@@ -9984,6 +10719,12 @@ msgstr "Your name"
 msgid "Disputed status column"
 msgstr "Disputed status column"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "The combined dataset needs at least one column, and no two columns can "
+"share a name."
+msgstr "The combined dataset needs at least one column, and no two columns can "
+"share a name."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Remove row filter"
@@ -10020,6 +10761,10 @@ msgstr "Next: save as"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
 msgstr "Start tour"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Add a {sourceColumnName} column"
+msgstr "Add a {sourceColumnName} column"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -10083,6 +10828,10 @@ msgstr "That link isn't a CSV, Excel, or PDF file."
 msgid "Import dataset"
 msgstr "Import dataset"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Trim spaces, UPPERCASE"
+msgstr "Trim spaces, UPPERCASE"
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol sizes from {firstLabel} to {lastLabel}"
 msgstr "Symbol sizes from {firstLabel} to {lastLabel}"
@@ -10136,6 +10885,7 @@ msgid "does not end with"
 msgstr "does not end with"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/PreviewTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "empty"
 msgstr "empty"
 
@@ -10159,6 +10909,10 @@ msgstr "This tool needs geometry support, which could not be loaded."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Save your changes first: the PDF reflects the saved dashboard."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Remove column"
+msgstr "Remove column"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
 msgid "Edit {entryName}"
@@ -10387,6 +11141,10 @@ msgstr "Lower bound"
 msgid "This sheet can't be read right now"
 msgstr "This sheet can't be read right now"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "How this column is filled"
+msgstr "How this column is filled"
+
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Untitled status"
@@ -10431,8 +11189,20 @@ msgstr "Global filters"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Layout"
 msgstr "Layout"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "Preview"
+msgstr "Preview"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Matches use column names and types only. You can still map "
+"{datasetName}."
+msgstr "Matches use column names and types only. You can still map "
+"{datasetName}."
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Move annotation text"
@@ -10501,11 +11271,19 @@ msgstr "Dataset Name"
 msgid "Copy share link"
 msgstr "Copy share link"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "This fill is a suggestion. Accept it, change it, or reject it."
+msgstr "This fill is a suggestion. Accept it, change it, or reject it."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
 msgstr "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Filled from this dataset"
+msgstr "Filled from this dataset"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading map"
@@ -10531,6 +11309,10 @@ msgstr "{0} areas are suppressed"
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
 msgid "Apply conversions"
 msgstr "Apply conversions"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Fixed value"
+msgstr "Fixed value"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
@@ -10655,10 +11437,24 @@ msgstr "Dictionary deleted"
 msgid "Loading dashboard"
 msgstr "Loading dashboard"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "Avandar could not combine these datasets on this device. Check the "
+"mappings and try again."
+msgstr "Avandar could not combine these datasets on this device. Check the "
+"mappings and try again."
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Boundary dataset"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Padded with zeros to {length}"
+msgstr "Padded with zeros to {length}"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/OpenCrosswalkLink.tsx
+msgid "Open crosswalk {crosswalkName}"
+msgstr "Open crosswalk {crosswalkName}"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared with me"
@@ -10707,6 +11503,10 @@ msgid "{count, plural, one {Hide # column with no match} other {Hide # columns "
 msgstr "{count, plural, one {Hide # column with no match} other {Hide # columns "
 "with no match}}"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Name and type · {percent}"
+msgstr "Name and type · {percent}"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
 "question, or turn offline mode off to use online chat."
@@ -10748,6 +11548,7 @@ msgstr "Dictionaries"
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "There was an error while trying to authenticate with Google Sheets."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge.tsx
 msgid "To do"
 msgstr "To do"
@@ -10774,6 +11575,12 @@ msgstr "Loading private resources"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "Choose the first value we see"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Use %Y for the year, %m for the month, and %d for the day, such as "
+"{exampleFormat}."
+msgstr "Use %Y for the year, %m for the month, and %d for the day, such as "
+"{exampleFormat}."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "ID"
@@ -10808,6 +11615,10 @@ msgstr "Created \"{dashboardName}\""
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "Past month"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Multiply by {factor}"
+msgstr "Multiply by {factor}"
 
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -10904,6 +11715,11 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 msgstr "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Column of the combined dataset"
+msgstr "Column of the combined dataset"
+
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} ambiguous source keys"
@@ -10930,6 +11746,7 @@ msgstr "This workspace does not have a valid subscription."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead.tsx
@@ -11040,6 +11857,10 @@ msgstr "Error"
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
 msgid "dictionary name"
 msgstr "dictionary name"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed"
+msgstr "Spaces trimmed"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show feature {position} on the map"
@@ -11161,6 +11982,10 @@ msgstr "Suggestions need a connection or the offline model. Labeling still "
 msgid "Choose what to read"
 msgstr "Choose what to read"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Change the values"
+msgstr "Change the values"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Suggested rewrite:"
@@ -11197,6 +12022,10 @@ msgstr "Remove"
 msgid "+{numHidden} more"
 msgstr "+{numHidden} more"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkNameField/CrosswalkNameField.tsx
+msgid "crosswalk name"
+msgstr "crosswalk name"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "1 dataset"
 msgstr "1 dataset"
@@ -11205,6 +12034,10 @@ msgstr "1 dataset"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "No numeric columns"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Insert column"
+msgstr "Insert column"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Service"
@@ -11243,6 +12076,10 @@ msgstr "Loading more datasets"
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "Could not make private"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing is left to match in this dataset."
+msgstr "Nothing is left to match in this dataset."
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
@@ -11313,6 +12150,10 @@ msgstr "This dataset will no longer be stored online and can only be accessed "
 msgid "{entryName} · {codeListText} · from {dictionaryName}"
 msgstr "{entryName} · {codeListText} · from {dictionaryName}"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing was sent. No matches were suggested."
+msgstr "Nothing was sent. No matches were suggested."
+
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 msgid "Highest valid value"
 msgstr "Highest valid value"
@@ -11320,6 +12161,10 @@ msgstr "Highest valid value"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
 msgstr "Edit permissions"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Mapped"
+msgstr "Mapped"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Change status"
@@ -11440,6 +12285,10 @@ msgid "Give each value the label people should see. Suggestions are only a "
 msgstr "Give each value the label people should see. Suggestions are only a "
 "starting point."
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Your plan's dataset limit is reached, so a new dataset can't be added."
+msgstr "Your plan's dataset limit is reached, so a new dataset can't be added."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install"
 msgstr "Install"
@@ -11499,6 +12348,10 @@ msgstr "Grouped"
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
 msgid "Also matches {names}."
 msgstr "Also matches {names}."
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Every column of the combined dataset needs a name."
+msgstr "Every column of the combined dataset needs a name."
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
@@ -11757,6 +12610,7 @@ msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. "
 msgid "Avandar turns your question into a query to show you the answers."
 msgstr "Avandar turns your question into a query to show you the answers."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 msgid "Status"
 msgstr "Status"
@@ -11780,6 +12634,10 @@ msgstr "Row {0}, {1}"
 msgid "{0} features"
 msgstr "{0} features"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Another number"
+msgstr "Another number"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -11799,6 +12657,10 @@ msgstr "Organization"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 msgid "Type a column name and press Enter"
 msgstr "Type a column name and press Enter"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
+msgid "{trimmedName} is already a column of the combined dataset."
+msgstr "{trimmedName} is already a column of the combined dataset."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
@@ -11877,6 +12739,11 @@ msgstr "Case Records"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Purchase {seatsToAdd} seats"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Read as a date ({format})"
+msgstr "Read as a date ({format})"
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Loading dataset"
@@ -11913,6 +12780,12 @@ msgstr "Bring in your first dataset"
 msgid "Left"
 msgstr "Left"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Avandar couldn't check your access to {existingName}. Reload the page "
+"and try again."
+msgstr "Avandar couldn't check your access to {existingName}. Reload the page "
+"and try again."
+
 #. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
@@ -11946,6 +12819,10 @@ msgstr "Avandar can import CSV, Excel, and PDF files."
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
 msgstr "Some rows have an empty latitude or longitude."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Map this dataset"
+msgstr "Map this dataset"
 
 #. placeholder {0}: capitalize(role)
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
@@ -12032,6 +12909,10 @@ msgstr "Delete the view {0}"
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "This record's fields failed to load"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{percentLabel}% of the datasets read"
+msgstr "{percentLabel}% of the datasets read"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -12156,10 +13037,15 @@ msgstr "Try again."
 msgid "contains"
 msgstr "contains"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "{datasetName} has no values to show here."
+msgstr "{datasetName} has no values to show here."
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the notes under 2,000 characters."
 msgstr "Keep the notes under 2,000 characters."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "No code list"
 msgstr "No code list"
@@ -12168,6 +13054,10 @@ msgstr "No code list"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "If there are multiple {attributeName} values for one {0}, then..."
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "This dataset has no columns yet."
+msgstr "This dataset has no columns yet."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -12320,9 +13210,18 @@ msgstr "Entry"
 msgid "Horizontal padding"
 msgstr "Horizontal padding"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Crosswalk"
+msgstr "Crosswalk"
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
 msgid "New dictionary from {originDatasetName}"
 msgstr "New dictionary from {originDatasetName}"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Before you combine"
+msgstr "Before you combine"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source requires a login to download this dataset."
@@ -12341,6 +13240,14 @@ msgid "Your data will change. The labels stay attached too, so the column is "
 "still explained."
 msgstr "Your data will change. The labels stay attached too, so the column is "
 "still explained."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "In the combined dataset"
+msgstr "In the combined dataset"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Entry no longer available"
+msgstr "Entry no longer available"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
@@ -12457,6 +13364,10 @@ msgstr "linear"
 msgid "Source ID"
 msgstr "Source ID"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "This crosswalk no longer exists"
+msgstr "This crosswalk no longer exists"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
 msgstr "{droppedRowCount} rows unmapped"
@@ -12476,6 +13387,12 @@ msgstr "Attach dictionaries only as references"
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "Dictionary"
 msgstr "Dictionary"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
+msgid "{sourceColumnName} is the column that names each row's dataset. Choose "
+"another name."
+msgstr "{sourceColumnName} is the column that names each row's dataset. Choose "
+"another name."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
@@ -12545,6 +13462,9 @@ msgid "Failed to update display name"
 msgstr "Failed to update display name"
 
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingRow.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "Code list"
 msgstr "Code list"
@@ -12584,6 +13504,7 @@ msgstr "{valueCount, plural, one {# value in {listNames} has no label yet. It "
 "can finish them on the dictionary.}}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
 msgid "The values could not be read"
 msgstr "The values could not be read"
 
@@ -12675,6 +13596,10 @@ msgstr "An unexpected error occurred."
 msgid "Pay what you want"
 msgstr "Pay what you want"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Give the combined dataset a name."
+msgstr "Give the combined dataset a name."
+
 #. placeholder {0}: region.label
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Remove {0}"
@@ -12754,6 +13679,10 @@ msgstr "{datasetName} (converted)"
 msgid "I ran the query, but no data matched it."
 msgstr "I ran the query, but no data matched it."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Name and type"
+msgstr "Name and type"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Dictionary suggestions"
 msgstr "Dictionary suggestions"
@@ -12827,6 +13756,10 @@ msgstr "Dashboard tile"
 msgid "Source"
 msgstr "Source"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Factor"
+msgstr "Factor"
+
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
@@ -12861,6 +13794,10 @@ msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
 msgstr "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Choose a reference layout before saving."
+msgstr "Choose a reference layout before saving."
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "data unchanged, always current"
@@ -12945,6 +13882,10 @@ msgstr "This comment was deleted."
 msgid "Filter entries or column names"
 msgstr "Filter entries or column names"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "The column holds"
+msgstr "The column holds"
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Answers are slower and less accurate than online chat."
 msgstr "Answers are slower and less accurate than online chat."
@@ -12974,9 +13915,16 @@ msgstr "Point geometry"
 msgid "Let's move these results to a dashboard"
 msgstr "Let's move these results to a dashboard"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+#~ msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+#~ "that it still exists and that you can open it."
+#~ msgstr "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+#~ "that it still exists and that you can open it."
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConstantInput.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "Value"
@@ -13010,6 +13958,10 @@ msgstr "Removed: {0}"
 msgid "New code list for this entry"
 msgstr "New code list for this entry"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Add the datasets to combine."
+msgstr "Add the datasets to combine."
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr "Popup"
@@ -13021,6 +13973,12 @@ msgstr "Condition"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 msgid "Give this dictionary a name."
 msgstr "Give this dictionary a name."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Avandar couldn't check your access to the combined dataset. Reload the "
+"page and try again."
+msgstr "Avandar couldn't check your access to the combined dataset. Reload the "
+"page and try again."
 
 #. placeholder {0}: load.savedConnections?.length ?? 0
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
@@ -13084,6 +14042,7 @@ msgstr "Keyword: {keyword}"
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SourceColumnSelect.tsx
 msgid "Column"
 msgstr "Column"
 
@@ -13104,6 +14063,12 @@ msgstr "This removes the user group from members and resources that use it."
 msgid "Largest radius"
 msgstr "Largest radius"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk's combined dataset changed while you were working. Reload "
+"the page and try again."
+msgstr "This crosswalk's combined dataset changed while you were working. "
+"Reload the page and try again."
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr "Top"
@@ -13119,6 +14084,10 @@ msgstr "From your prompt:"
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Keep this tab open until it finishes."
 msgstr "Keep this tab open until it finishes."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Remove column {columnName}"
+msgstr "Remove column {columnName}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -13284,6 +14253,14 @@ msgstr "Show datasets tagged {keyword}"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group deleted"
 msgstr "Role group deleted"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+"for access to it, or reload the crosswalk to go back to what was last "
+"saved."
+msgstr "This change involves a dataset you can't open, so nothing was saved. "
+"Ask for access to it, or reload the crosswalk to go back to what was "
+"last saved."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select sort order"
@@ -13592,6 +14569,10 @@ msgstr "No maps yet"
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "Add a prompt and generate SQL to configure this visualization."
 
+#: src/views/DataManagerApp/DatasetMetaView/CombinedByFact/CombinedByFact.tsx
+msgid "Combined by"
+msgstr "Combined by"
+
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy link"
@@ -13699,6 +14680,10 @@ msgid "{codedCount, plural, one {# with a code list: open the tag to read it} "
 msgstr "{codedCount, plural, one {# with a code list: open the tag to read it} "
 "other {# with a code list: open the tag to read it}}"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Note:"
+msgstr "Note:"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "Search by name or user group"
@@ -13707,9 +14692,18 @@ msgstr "Search by name or user group"
 msgid "Failed to update email"
 msgstr "Failed to update email"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Skip this dataset"
+msgstr "Skip this dataset"
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Every value needs a code."
 msgstr "Every value needs a code."
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "A dictionary this crosswalk uses changed. Reload the page and try again."
+msgstr "A dictionary this crosswalk uses changed. Reload the page and try "
+"again."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Published to your workspace."
@@ -13827,6 +14821,12 @@ msgstr "Stroke ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "Publish to workspace"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "You confirmed mappings against this layout, so the reference can't "
+"change."
+msgstr "You confirmed mappings against this layout, so the reference can't "
+"change."
+
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
@@ -13877,6 +14877,12 @@ msgstr "Remove this dataset"
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "CSV or Excel file"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{datasetName} was left out: its columns changed since it was mapped. "
+"Remove it and add it again to map its new columns."
+msgstr "{datasetName} was left out: its columns changed since it was mapped. "
+"Remove it and add it again to map its new columns."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
@@ -13959,6 +14965,10 @@ msgstr "Clear {label}"
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
 msgstr "Scatter Plot"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Layouts"
+msgstr "Layouts"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow.ts
 msgid "This dataset is no longer available. Pick the datasets to learn from."
@@ -14130,6 +15140,7 @@ msgid "Anyone"
 msgstr "Anyone"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "The preview could not be read"
 msgstr "The preview could not be read"
 
@@ -14166,6 +15177,10 @@ msgstr "Back to results"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
 msgstr "Heat"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{rowsText} from {datasetsText}"
+msgstr "{rowsText} from {datasetsText}"
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to layer settings"

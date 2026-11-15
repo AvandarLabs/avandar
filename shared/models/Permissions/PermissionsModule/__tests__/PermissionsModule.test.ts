@@ -90,6 +90,17 @@ describe("Permissions.getPermissionsForAppRole", () => {
     expect(keys.has("data_sources__can_edit_dataset")).toBe(false);
     expect(keys.has("data_sources__can_view_dictionaries")).toBe(true);
     expect(keys.has("data_sources__can_edit_dictionaries")).toBe(false);
+    expect(keys.has("data_sources__can_edit_crosswalks")).toBe(false);
+  });
+
+  it("lets a Data Sources editor edit crosswalks", () => {
+    const keys = Permissions.getPermissionsForAppRole({
+      app: "data_sources",
+      role: "editor",
+    });
+
+    expect(keys.has("data_sources__can_edit_crosswalks")).toBe(true);
+    expect(keys.has("data_sources__can_manage_sources")).toBe(false);
   });
 
   it("includes all tiers for admin", () => {
@@ -100,6 +111,7 @@ describe("Permissions.getPermissionsForAppRole", () => {
 
     expect(keys.has("data_sources__can_manage_sources")).toBe(true);
     expect(keys.has("data_sources__can_edit_dictionaries")).toBe(true);
+    expect(keys.has("data_sources__can_edit_crosswalks")).toBe(true);
     expect(keys.has("data_sources__can_edit_dataset")).toBe(true);
     expect(keys.has("data_sources__can_view_dataset")).toBe(true);
   });

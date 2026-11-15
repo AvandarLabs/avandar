@@ -10,10 +10,33 @@ type Props = {
   action?: ReactNode;
 };
 
+function UpToDateBadge(): ReactNode {
+  return (
+    <Badge size="sm" variant="light" color="success" tt="none">
+      <Trans>Up to date</Trans>
+    </Badge>
+  );
+}
+
+function BehindStatus({
+  children,
+  action,
+}: Readonly<{ children: ReactNode; action: ReactNode }>): ReactNode {
+  return (
+    <Stack gap={4} align="flex-start">
+      <Text size="xs" fw={500}>
+        {children}
+      </Text>
+      {action}
+    </Stack>
+  );
+}
+
 /**
- * The Used by tab's Status cell: "Up to date", or the version a dataset
- * changed in place was given beside the dictionary's current one, with
- * `action` under it.
+ * The Used by tab's Status cell: "Up to date"; for a dataset changed in
+ * place, the version it was given beside the dictionary's current one;
+ * for a crosswalk's combined dataset, that a code list changed since it
+ * was combined. `action` goes under a status that is behind.
  */
 export function UsageStatusCell({
   row,
@@ -21,23 +44,25 @@ export function UsageStatusCell({
   action,
 }: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
-  if (!row.isBehind || row.appliedVersion === undefined) {
-    return (
-      <Badge size="sm" variant="light" color="success" tt="none">
-        <Trans>Up to date</Trans>
-      </Badge>
+  if (row.howApplied === "crosswalk") {
+    return row.isBehind ? (
+      <BehindStatus action={action}>
+        <Trans>A code list changed since it was combined</Trans>
+      </BehindStatus>
+    ) : (
+      <UpToDateBadge />
     );
+  }
+  if (!row.isBehind || row.appliedVersion === undefined) {
+    return <UpToDateBadge />;
   }
   const appliedVersion = i18n.number(row.appliedVersion);
   const nowVersion = i18n.number(currentVersion);
   return (
-    <Stack gap={4} align="flex-start">
-      <Text size="xs" fw={500}>
-        <Trans>
-          Applied version {appliedVersion}, now version {nowVersion}
-        </Trans>
-      </Text>
-      {action}
-    </Stack>
+    <BehindStatus action={action}>
+      <Trans>
+        Applied version {appliedVersion}, now version {nowVersion}
+      </Trans>
+    </BehindStatus>
   );
 }

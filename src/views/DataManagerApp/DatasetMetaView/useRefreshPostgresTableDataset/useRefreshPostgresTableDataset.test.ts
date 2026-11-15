@@ -50,6 +50,16 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/crosswalks/CrosswalkDatasetClient", () => {
+  return {
+    CrosswalkDatasetClient: {
+      getAll: async () => {
+        return [];
+      },
+    },
+  };
+});
+
 vi.mock(
   "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache",
   () => {

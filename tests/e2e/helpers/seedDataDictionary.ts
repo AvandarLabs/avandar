@@ -4,13 +4,22 @@ import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDicti
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-/** One entry to seed, with the code list it uses, if any. */
+/** A code list to seed, by name and pairs. */
+export type SeedCodeList = {
+  name: string;
+  pairs: readonly DataDictionaryCodeList.Pair[];
+};
+
+/** One entry to seed, with the code lists it uses, if any. */
 export type SeedEntry = {
   name: string;
   columnNames: readonly string[];
   kind: DataDictionaryEntry.Kind;
   description?: string;
-  codeList?: { name: string; pairs: readonly DataDictionaryCodeList.Pair[] };
+  /** The entry's primary code list. */
+  codeList?: SeedCodeList;
+  /** More code lists the entry recognizes, after the primary one. */
+  otherCodeLists?: readonly SeedCodeList[];
 };
 
 async function _getOwnerProfile(
@@ -31,6 +40,40 @@ async function _getOwnerProfile(
     .single()
     .throwOnError();
   return profile;
+}
+
+async function _seedCodeList(
+  options: Readonly<{
+    admin: AvaSupabaseDBClient;
+    workspaceId: string;
+    dictionaryId: string;
+    entryId: string;
+    codeList: SeedCodeList;
+    isPrimary: boolean;
+  }>,
+): Promise<void> {
+  const { admin, workspaceId, dictionaryId } = options;
+  const { data: codeList } = await admin
+    .from("data_dictionaries__code_lists")
+    .insert({
+      workspace_id: workspaceId,
+      dictionary_id: dictionaryId,
+      name: options.codeList.name,
+      pairs: codePairsToDBJson(options.codeList.pairs),
+    })
+    .select("id")
+    .single()
+    .throwOnError();
+  await admin
+    .from("data_dictionaries__entry_codings")
+    .insert({
+      workspace_id: workspaceId,
+      dictionary_id: dictionaryId,
+      entry_id: options.entryId,
+      code_list_id: codeList.id,
+      is_primary: options.isPrimary,
+    })
+    .throwOnError();
 }
 
 async function _seedEntry(
@@ -57,30 +100,22 @@ async function _seedEntry(
     .select("id")
     .single()
     .throwOnError();
-  if (!entry.codeList) {
-    return;
+  const codeLists = [
+    ...(entry.codeList ? [{ codeList: entry.codeList, isPrimary: true }] : []),
+    ...(entry.otherCodeLists ?? []).map((codeList) => {
+      return { codeList, isPrimary: false };
+    }),
+  ];
+  for (const { codeList, isPrimary } of codeLists) {
+    await _seedCodeList({
+      admin,
+      workspaceId,
+      dictionaryId,
+      entryId: entryRow.id,
+      codeList,
+      isPrimary,
+    });
   }
-  const { data: codeList } = await admin
-    .from("data_dictionaries__code_lists")
-    .insert({
-      workspace_id: workspaceId,
-      dictionary_id: dictionaryId,
-      name: entry.codeList.name,
-      pairs: codePairsToDBJson(entry.codeList.pairs),
-    })
-    .select("id")
-    .single()
-    .throwOnError();
-  await admin
-    .from("data_dictionaries__entry_codings")
-    .insert({
-      workspace_id: workspaceId,
-      dictionary_id: dictionaryId,
-      entry_id: entryRow.id,
-      code_list_id: codeList.id,
-      is_primary: true,
-    })
-    .throwOnError();
 }
 
 /**

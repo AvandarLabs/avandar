@@ -1,5 +1,19 @@
 # Data dictionaries and crosswalks - design
 
+> **WARNING: KNOWN PRIVACY GAP, DEMO ONLY. FIX BEFORE THIS REACHES `develop`.**
+>
+> Crosswalk layouts and mappings are readable by every Data Sources viewer,
+> even when the member dataset is restricted to other people. A viewer who
+> cannot open a restricted dataset can still read its **column names, source
+> columns, and fill rules** when that dataset is alone in its layout. The
+> membership rows themselves stay hidden. We accepted this for the
+> `demo/measles` demo only. Hiding layouts from viewers is not a fix: the save
+> payload would lose them and `rpc_crosswalks__save` would delete them.
+> A real fix needs a different mechanism (for example, per-layout read
+> filtering plus a save that preserves layouts the caller cannot see).
+> Details: [design doc section 11](data-dictionaries-design.md#11-permissions-and-rls)
+
+
 - **Status:** Approved in brainstorming and prototype review, awaiting
   written-spec review
 - **Date:** 2026-11-11
@@ -105,7 +119,7 @@ Applying a dictionary to a column does one of two things, chosen per column:
 
 | Topic | Decision |
 |---|---|
-| Crosswalk output | A combined virtual dataset that stacks every mapped dataset, plus a documentation mapping that exports as CSV. |
+| Crosswalk output | A combined virtual dataset that stacks every mapped dataset, plus a documentation mapping that exports as CSV. The combined dataset carries reference bindings for its coded columns, owned by the crosswalk, so the code-list tag, Ask Avandar, and Used by work with no new agent code. |
 | Where codes live | In dictionaries only. A crosswalk reads its code translations from dictionary code lists. |
 | Code list reuse | Code lists are reusable within a dictionary and shared by entries. An entry can also own a one-off list. |
 | Direction | Pairs are bidirectional. Apply detects whether a column holds codes or labels and picks decode or encode; the user can flip it. |
@@ -144,6 +158,8 @@ UI says (see the copy rule in `AGENTS.md`).
 | `CrosswalkLayout` | layout | Datasets that share the same column names, mapped once together. |
 | `CrosswalkColumn` | column of the combined dataset | One output column, optionally governed by a dictionary entry. |
 | `CrosswalkMapping` | how a column is filled | For one layout and one output column: a source column with a conversion, a fixed value, an expression, or empty. |
+| `holdsLabels` | The column holds | On a fill that translates codes: whether the source column holds the list's labels (`true`) or its codes (`false`). Replaces the earlier `alreadyLabels`. |
+| mapping `reason` | Name and type, Same values, Similar layout, Meaning | Why a fill was prefilled: `name_and_type`, `same_values`, `similar_layout` (carried over from the most similar layout already mapped), or `meaning` (an AI suggestion). |
 | combined dataset | combined dataset | The crosswalk's output virtual dataset. |
 
 ## 5. Data model
@@ -267,47 +283,85 @@ the source of a linked dataset (section 7.5).
 
 ### 5.4 Crosswalks
 
-`10.crosswalks.sql`: `id`, `workspace_id`, owner columns, `name`,
+Four enums, one file each: `crosswalks__codes_output` (`labels`, `codes`),
+`crosswalks__layout_status` (`to_do`, `review`, `mapped`, `skipped`),
+`crosswalks__mapping_status` (`suggested`, `confirmed`), and
+`crosswalks__mapping_reason` (`name_and_type`, `same_values`,
+`similar_layout`, `meaning`). `reason` is an enum key the UI translates, not
+free text.
+
+`11.crosswalks.sql`: `id`, `workspace_id`, owner columns, `name`,
 `description`, `output_dataset_id uuid null references datasets on delete set
 null`, `codes_output_as` (`labels` or `codes`, default `labels`),
 `adds_source_column boolean not null default true`, `compiled_at
-timestamptz`, `compiled_code_list_versions jsonb` (code list id to the
-`updated_at` it was compiled against, for the stale banner).
+timestamptz`, and `compiled_code_lists jsonb`. `compiled_code_lists` is an
+array, `[{ "code_list_id": uuid, "fingerprint": text }]`, one element per
+code list the combined dataset embedded, where `fingerprint` hashes that
+list's pairs when it was compiled. It replaces the earlier
+`compiled_code_list_versions` (code list id to `updated_at`): a dictionary
+save upserts every code list and moves every `updated_at`, so that design
+would raise the stale banner after any edit, and an object keyed by uuid
+would not survive the parsers' key transform. `output_dataset_id`,
+`compiled_at`, and `compiled_code_lists` are managed: a signed-in user cannot
+set them, and the combine RPC writes them.
 
-`20.crosswalks__layouts.sql`: `id`, `crosswalk_id`, `workspace_id`,
-`signature text` (a hash of the sorted, normalized column names), `column_names
-text[]`, `is_reference boolean`, `status` (`to_do`, `review`, `mapped`,
-`skipped`). Exactly one reference layout per crosswalk.
+The four child tables carry `workspace_id`, `crosswalk_id` (with a composite
+foreign key to `crosswalks (id, workspace_id)` that cascades), and
+`created_at`. Signed-in users can only `select` them. They are written only
+by `rpc_crosswalks__save`, as whole sets, so a crosswalk is never half-saved
+(a column deleted while its mappings remain, two reference layouts).
 
-`20.crosswalks__datasets.sql`: `crosswalk_id`, `dataset_id` (cascades),
-`layout_id`, primary key `(crosswalk_id, dataset_id)`. A dataset joins the
+`20.crosswalks__layouts.sql`: `id`, `signature text` (a hash of the sorted,
+normalized column names, section 8.3), `column_names text[]`, `is_reference
+boolean`, `status` (`to_do`, `review`, `mapped`, `skipped`). Unique on
+`(crosswalk_id, signature)` and `(id, crosswalk_id)`. A unique index allows
+one reference layout per crosswalk, a reference layout must be `mapped`, and
+`column_names` is never empty.
+
+`21.crosswalks__datasets.sql`: `id` (it has its own key because
+`createRdbCrudClient` needs a single-column one), `dataset_id` (cascades),
+`layout_id`, and `unique (crosswalk_id, dataset_id)`. A dataset joins the
 layout whose signature it matches; a new signature creates a new layout,
-prefilled from the closest existing one (section 8.3).
+prefilled from the closest existing one (section 8.3). A membership row is
+readable only by someone who can view its dataset.
 
-`20.crosswalks__columns.sql`: `id`, `crosswalk_id`, `name`, `position`,
-`data_type` (`datasets__ava_data_type`), `entry_id uuid null` (the governing
-dictionary entry, `on delete set null`).
+`21.crosswalks__columns.sql`: `id`, `name`, `position`, `data_type`
+(`datasets__ava_data_type`), `entry_id uuid null` (the governing dictionary
+entry, `on delete set null`). Names are trimmed and unique ignoring case.
 
-`30.crosswalks__mappings.sql`: `id`, `crosswalk_id`, `layout_id`, `column_id`,
-`fill jsonb not null`, `status` (`suggested`, `confirmed`), `confidence
-numeric`, `reason text` ("Same values", "Name and type", "Meaning"). Unique on
-`(layout_id, column_id)`.
+`22.crosswalks__mappings.sql`: `id`, `layout_id`, `column_id`, `fill jsonb
+not null` (an object), `status` (`suggested`, `confirmed`), `confidence
+numeric` (0 to 1), `reason` (the enum above). Unique on `(layout_id,
+column_id)`.
 
-`fill` is a versioned Zod schema:
+`fill` is a versioned Zod schema, stored as snake_case JSON with
+`version: 1` and parsed back to this shape:
 
 ```ts
 type CrosswalkFill =
-  | { kind: "column"; sourceColumn: string; convert?: CrosswalkConvert; codeListId?: string; alreadyLabels?: boolean }
+  | {
+      kind: "column";
+      sourceColumn: string;
+      convert: CrosswalkConvert | undefined;
+      codeListId: string | undefined;
+      holdsLabels: boolean;
+    }
   | { kind: "constant"; value: string }
-  | { kind: "expression"; sql: string }
+  | { kind: "expression"; sql: string } // names columns as {column name}
   | { kind: "empty" };
 
 type CrosswalkConvert =
   | { kind: "parse_date"; format: string }      // e.g. "%m/%d/%Y"
   | { kind: "pad_text"; length: number }         // ZIP 10451 -> "10451", 501 -> "00501"
-  | { kind: "multiply"; factor: number; label: string } // months -> years: 1/12
-  | { kind: "trim_and_fix_case" };
+  | { kind: "multiply"; factor: number }         // months -> years: 1/12
+  | { kind: "trim_and_fix_case"; letterCase: "keep" | "lower" | "upper" };
 ```
+
+A `column` fill either converts (`convert`) or translates codes through a
+code list (`codeListId`), never both. `multiply` keeps only the `factor`; the
+UI names the presets. A Combine expression names the layout's columns as
+`{column name}` placeholders, checked against the layout's columns and then
+by `assertSingleSqlExpression`.
 
 ### 5.5 Models and clients
 
@@ -329,6 +383,24 @@ type CrosswalkConvert =
   any values the user added to code lists. A linked dataset goes through
   `rpc_dataset_columns__apply_dictionaries_as_linked_dataset` (section 5.3),
   and **Re-apply** through `rpc_dataset_columns__reapply_dictionary`.
+- A crosswalk is saved through `rpc_crosswalks__save`, which replaces one
+  crosswalk's settings, columns, layouts, memberships, and mappings in one
+  transaction. It checks the caller is a Data Sources editor, locks the
+  crosswalk row, refuses a dataset the caller cannot view, and never deletes
+  a membership whose dataset the caller cannot view: one editor's save never
+  drops another's restricted dataset, and a save that would drop a layout
+  still holding one is refused. A membership keeps its id when its dataset
+  moves to another layout. A missing or null payload set is refused.
+- The combined dataset goes through
+  `rpc_crosswalks__save_combined_dataset`, which creates it (through
+  `rpc_datasets__add_virtual_dataset`) or updates it: its name, `raw_sql`,
+  columns reconciled by name (keeping ids, so descriptions and bindings
+  survive), and the reference bindings of its coded columns, replaced whole.
+  It records `compiled_at` and `compiled_code_lists`. The browser builds the
+  SQL, the columns, and the bindings; the RPC stores them. Both RPCs are
+  `SECURITY DEFINER` with `search_path = ''`, raise one error for a missing
+  and a forbidden crosswalk, and return stable error hints the client maps to
+  copy.
 
 ## 6. How a dictionary reaches the data
 
@@ -476,8 +548,11 @@ and `DESIGN.md`. Each surface reuses `AppView`, `AppViewHeader`,
 groups: **Datasets** (the current `DatasetNavbar` rows), **Dictionaries**,
 and **Crosswalks**. The "withhold chrome" rules still apply: an empty group
 is hidden, and the filter appears once the combined list passes eight rows.
-The toolbar **Add** menu gains "New dictionary" and "New crosswalk" beside
-"Import data".
+The toolbar has no Add menu: **New dictionary** and **New crosswalk** are
+buttons beside "Import data", **New crosswalk** after **New dictionary**. The
+Crosswalks group, **New crosswalk**, and the crosswalk view are for Data
+Sources editors (`data_sources__can_edit_crosswalks`). Viewers still see a
+combined dataset as an ordinary dataset.
 
 Task views (create, apply, and crosswalk mapping) collapse the list pane by
 default to free width for dictionary columns, with a **Show list** / **Hide
@@ -518,8 +593,13 @@ Tabs:
   Male`). A note explains that pairs work both ways.
 - **Used by.** Dataset, How it was applied (**Reference**: data unchanged,
   always current; **Linked**: updates when this dictionary changes;
-  **Changed the data**; **Crosswalk**), Entries, Status ("Up to date" or
-  "Applied version 2, now version 3"), and **Re-apply** where pinned.
+  **Changed the data**; **Crosswalk**, which lists a combined dataset as
+  "Through <crosswalk>"), Entries, Status ("Up to date" or "Applied version
+  2, now version 3"; a Crosswalk row reads "A code list changed since it was
+  combined" when a code list its combined dataset embedded has changed),
+  and **Re-apply** where pinned. A behind Crosswalk row offers **Open
+  crosswalk** to Data Sources editors, which opens the crosswalk on its
+  Create combined dataset step.
 
 **Apply to a dataset** lists only the workspace's datasets the user can
 edit, read in one call to `rpc_datasets__get_editable_ids`, and says "You
@@ -588,6 +668,13 @@ The section meta reads "7 with a code list: hover the tag to read it". A
 column with a bound entry and no description of its own shows the entry's
 description in its Description column, captioned "From <dictionary>". A
 column's own description always wins.
+
+A combined dataset's rail adds a line, "Combined by <crosswalk>", a link for
+Data Sources editors and plain text for everyone else. **Apply a dictionary**
+is hidden on a combined dataset, since the crosswalk owns its reference
+bindings and replaces them on every update. Refreshing a source dataset also
+clears the cached rows of the combined datasets that read it, as it does for
+linked datasets.
 
 Rail (`DatasetSourceRail`): a **Dictionaries** group listing each dictionary
 with how it was applied ("Attached as reference · data unchanged", "Linked
@@ -700,9 +787,12 @@ column, fill kind, source column, conversion, code list, status). Step bar:
 
 1. **Choose datasets.** Layouts table (layout, datasets, columns, reference
    tag) and **Add datasets**. A **Reference layout** Select, defaulting to
-   the layout whose columns best cover the others ("matches 12 of 14 columns
-   in most datasets"). The reference layout's columns seed the combined
-   dataset's columns.
+   the layout whose columns best cover the others, as a percentage of the
+   other datasets' columns weighted by dataset count ("Matches 86% of the
+   columns in the other datasets."). The reference layout's columns seed the
+   combined dataset's columns. The reference changes only while no other
+   layout is confirmed ("You confirmed mappings against this layout, so the
+   reference can't change."), and changing it reseeds the columns.
 2. **Map each dataset.** Stub column (about 260px) with a progress bar
    (`36 of 100 mapped`, counting datasets) and one row per layout: name, "+23
    with the same layout", and a stamp: Reference, Mapped, Review, To do,
@@ -710,23 +800,42 @@ column, fill kind, source column, conversion, code list, status). Step bar:
    (name, type, "governed" when bound to an entry), a connector line (solid
    for a match, dashed for a suggestion, none for empty), Filled from this
    dataset (source column and its conversion, a fixed value, or Leave empty),
-   and Match (`Name and type · 91%` or a Suggested tag). The side pane edits
-   the selected row: **A column** · **A fixed value** · **Combine** · **Leave
+   and Match (`Name and type · 91%` or a Suggested tag). A match scoring 0.9
+   or more is filled and confirmed at once (a solid line); 0.6 to 0.9 is
+   filled as a suggestion (dashed) that waits for **Accept**. The connector
+   lines are decorative: the Match cell says the same thing in text. The
+   side pane edits the selected row: **A column** · **A fixed value** · **Combine** · **Leave
    empty**; Column Select with an example value; Convert Select (section
    5.4); Decode codes with (governed columns); a before/after example; and
    **Accept** / **Reject** for suggestions. **Add a column to the combined
    dataset** sits under the table. Footer: **Skip this dataset**, **Accept
    all suggestions**, **Confirm and next**, which stamps the layout and
-   jumps to the next layout that is To do or Review.
+   jumps to the next layout that is To do or Review. A layout is Mapped only
+   after **Confirm and next**, which also confirms its suggestions and gives
+   every unfilled column an explicit empty fill. The crosswalk saves on
+   actions, not on a timer: **Next**, every footer action, choosing another
+   layout, changing steps, renaming, and creating or updating the combined
+   dataset. Two editors saving one crosswalk at once: the last save wins.
 3. **Create combined dataset.** Name, "Add a source_dataset column",
    coded columns come out as **Labels** · **Codes**, a preview of the
-   stacked rows with a row count and how many datasets are skipped, and
-   **Create combined dataset**. After creation the step is titled **Update
-   combined dataset**.
+   stacked rows with a row count ("{rowCount} rows from {datasetCount}
+   datasets"), and **Create combined dataset**. The problems it lists count
+   datasets, not rows ("3 datasets have mappings you haven't confirmed."),
+   since counting rows would read every unconfirmed dataset before the user
+   asked to. A dataset whose columns or column types changed since it was
+   mapped is left out, named here, until it is removed and added again (which
+   maps its new layout). Only workspace admins can add datasets, so the
+   button is disabled for other editors. After creation the step is titled
+   **Update combined dataset**. Deleting a crosswalk keeps its combined
+   dataset, which stops updating (the confirmation names it). Deleting the
+   combined dataset leaves the crosswalk, whose step 3 offers **Create
+   combined dataset** again.
 
 When a code list the crosswalk decodes with has changed since it was
-compiled, the crosswalk header shows "A dictionary this crosswalk uses has
-changed." with **Update combined dataset**.
+compiled, a banner above the stepper (not in the header band) says "A
+dictionary this crosswalk uses has changed." with **Update combined
+dataset**. On step 3 the banner has no button, since the footer already
+offers the update. A code list the viewer cannot read counts as changed.
 
 ## 8. Smart guesses
 
@@ -778,11 +887,15 @@ reference in crosswalks.
 
 ### 8.3 Crosswalk layouts
 
-A layout's signature is a hash of its sorted, normalized column names. A
-dataset added to a crosswalk joins a layout with the same signature and is
-mapped already. A new signature becomes a new layout prefilled from the most
-similar existing layout (by column name overlap), with every carried-over
-mapping marked suggested.
+A layout's signature is an FNV-1a 64 hash of its sorted, normalized column
+names (lowercased, trimmed, de-duplicated; names are never otherwise
+altered). It is computed synchronously in shared TypeScript, so the reducer
+and the stale check need no async hashing. It only groups and compares:
+nothing relies on it being cryptographic. A dataset added to a crosswalk
+joins a layout with the same signature and is mapped already. A new
+signature becomes a new layout prefilled from the most similar existing
+layout (by column name overlap), with every carried-over fill marked
+suggested and given the reason `similar_layout`.
 
 ### 8.4 AI suggestions
 
@@ -807,7 +920,7 @@ changes.
 ```sql
 SELECT 'Kings line list 2026-03' AS "source_dataset",
        CAST("CaseNo" AS VARCHAR) AS "case_id",
-       strptime("onset_dt", '%m/%d/%Y')::DATE AS "rash_onset_date",
+       TRY_STRPTIME("onset_dt", '%m/%d/%Y')::DATE AS "rash_onset_date",
        CASE lower(trim(CAST("GENDER" AS VARCHAR))) WHEN '1' THEN 'Male' ... END AS "sex",
        "age_mo" / 12.0 AS "age_years",
        'Bronx' AS "county",
@@ -817,6 +930,22 @@ UNION ALL BY NAME
 SELECT ...
 ```
 
+- Each layout's branch stacks that layout's datasets with `SELECT *`
+  (`SELECT <fills> FROM (SELECT '<name>' AS "__ava_source_dataset", * FROM
+  "<id>" UNION ALL BY NAME ...)`): datasets of one layout share their column
+  names ignoring case, so conversions are written once per layout. Every
+  output expression is aliased, since `UNION ALL BY NAME` makes a new column
+  for an unaliased one.
+- One bad value never breaks the combined dataset. Every fill is cast with
+  `TRY_CAST`, dates parse with `TRY_STRPTIME`, and `pad_text` pads only a
+  digit string shorter than the length (DuckDB's `lpad` truncates longer
+  ones). A value that cannot convert becomes empty, and the pane's example
+  and the preview show which.
+- Codes mode reconciles to the entry's primary list: every coded column
+  outputs the primary list's codes, and a layout using another coding
+  translates through matching labels. A pair with no counterpart in the
+  primary list becomes empty. A value that matches no pair of its list at all
+  passes through as text, as conversions keep unmatched values.
 - Skipped layouts are left out. A layout still To do or Review is included
   with whatever is confirmed or suggested, and step 3 says how many rows come
   from unconfirmed mappings.
@@ -824,10 +953,18 @@ SELECT ...
   `src/lib/plugins/derivedColumns/` and may reference only the layout's own
   columns.
 - Decoding embeds the code lists' current pairs, so the combined dataset is
-  a snapshot of the lists at compile time. `compiled_code_list_versions`
-  drives the stale banner (section 7.6). Re-compiling is always the crosswalk
-  editor's own action, so no recompile fans out to datasets they cannot edit.
-- The output is saved as `datasets__virtual.raw_sql` of `output_dataset_id`.
+  a snapshot of the lists at compile time. `compiled_code_lists` stores a
+  fingerprint of each embedded list's pairs, and the browser compares them
+  to drive the stale banner (section 7.6). Re-compiling is always the
+  crosswalk editor's own action, so no recompile fans out to datasets they
+  cannot edit.
+- The browser compiles and the RPC stores (section 5.5). The output is saved
+  as `datasets__virtual.raw_sql` of `output_dataset_id`, and the RPC
+  reconciles the dataset's columns by name. After an update the browser
+  clears the dataset's cached rows and the virtual dataset query cache, since
+  the loaded view is not keyed by the SQL. A source's Refresh clears the
+  combined datasets that read it, because a virtual dataset's definition
+  token does not follow its sources' rows.
 - `VirtualDatasetWrapper` gets a real freshness signal, built in slice 4: the
   storage key's definition token is the virtual dataset's defining SQL, so
   an updated combined dataset never serves its old materialization from
@@ -894,7 +1031,19 @@ so that change needs no data migration.
 - Permission keys in `PermissionRegistry.ts`:
   `data_sources__can_view_dictionaries`,
   `data_sources__can_edit_dictionaries`,
-  `data_sources__can_edit_crosswalks`.
+  `data_sources__can_edit_crosswalks`. The one crosswalk key gates the
+  Crosswalks group, **New crosswalk**, and the view. Viewers still read
+  crosswalk rows under RLS, so Used by and the rail can name them.
+- The four crosswalk child tables are select-only for signed-in users and
+  written only through `rpc_crosswalks__save` (section 5.4). A
+  `crosswalks__datasets` row is readable only by someone who can view its
+  dataset, so a reader never learns about a dataset they cannot open, and a
+  save never removes a membership its caller cannot see.
+- Accepted trade-off: Data Sources viewers can read a crosswalk's layouts and
+  mappings, so the column names, source columns, and fills of a restricted
+  dataset that is alone in its layout are readable. The membership rows
+  themselves stay hidden. Hiding the layouts would hide them from the save
+  payload, and the save would then delete them, so they stay readable.
 - pgTAP: a file per table group under `supabase/tests/database/permissions/`,
   following `rls_maps.test.sql`, with the negative cases from
   `docs/rules/sql.md`.
@@ -956,6 +1105,11 @@ reference" to mean "look it up, don't change it".
 | Applying with no edit rights on the dataset | The menu items are hidden; the route redirects to the dataset with a toast. |
 | Code list with codes that differ only in case (`m`, `M`) | Matching is case-insensitive, so the save is refused with "Two values in this list only differ in capitalization: m and M." |
 | 200 datasets in a crosswalk | Allowed; the stub list virtualizes past 100 layouts. |
+| A mapped dataset's columns change | The dataset is left out of the combined dataset and named in step 3, rather than failing the combined dataset on a missing column. Removing it and adding it again maps its new layout. |
+| The combined dataset is deleted | The crosswalk stays; its step 3 offers **Create combined dataset** again. |
+| A crosswalk is deleted | The combined dataset stays and stops updating. The confirmation names it. |
+| A code list a fill translates with is deleted | Step 3 names the fill, and its values pass through unchanged. |
+| Two editors save one crosswalk at once | The last save wins. |
 
 ## 15. Testing
 
@@ -1018,7 +1172,15 @@ Each slice is one PR into `demo/measles`, recorded in
    as two PRs: the engine, schema, linked datasets, and every surface first;
    then converting in place, its warning, and **Re-apply**, frontend only.
 5. **Crosswalks.** Schema, layouts, the three steps, mapping fills and
-   conversions, compilation, export, the stale banner.
+   conversions, compilation, export, the stale banner. Planned in
+   [data-dictionaries-5-crosswalks-plan.md](data-dictionaries-5-crosswalks-plan.md)
+   as two PRs, with the owner decisions approved on 2026-11-14:
+   - **Part A (F136), built on `feat/crosswalks`.** The schema, the engine,
+     every crosswalk surface, **Export mapping**, the stale banner, and Used
+     by.
+   - **Part B (F137), built on `feat/crosswalks`.** Meaning suggestions, long
+     layout lists, combining progress, and the 100-dataset measurement,
+     frontend only.
 
 ## 17. Roadmap
 
@@ -1038,6 +1200,9 @@ Each slice is one PR into `demo/measles`, recorded in
 - **Crosswalk joins** (side by side), building on the joined-cases key
   matching.
 - **Parallel acquisition** for virtual datasets with many dependencies.
+  Measured in slice 5: a cold combine over 100 datasets on a throttled network
+  spends about 32 s reading them one at a time
+  ([crosswalks-materialization.md](crosswalks-materialization.md)).
 
 ## 18. Open decisions
 
@@ -1056,8 +1221,17 @@ Each slice is one PR into `demo/measles`, recorded in
 3. **AI suggestion endpoint.** Whether label suggestions reuse the Pi data
    agent's proxy (`PostAgentStream`) with a dedicated prompt, or get their own
    small route. Depends on where the agent work stands when slice 2 starts.
-4. **Crosswalk materialization time at 100 datasets.** Measure in slice 5
-   before deciding on parallel acquisition.
+4. **Crosswalk materialization time at 100 datasets.** Settled by
+   measurement in slice 5 ([crosswalks-materialization.md](crosswalks-materialization.md)).
+   The rule was set before measuring: build parallel acquisition when the
+   median cold first preview of 100 datasets, on a throttled network, exceeds
+   60 seconds and at least 70% of it is spent reading datasets. Cold,
+   throttled took 67.7 s with 100% reading: parallel acquisition is worth
+   building, as a follow-up feature on the roadmap. About 36 s of that is the
+   browser fetching the DuckDB engine and its Parquet extension before the
+   first dataset arrives, and about 32 s is the datasets themselves, so the
+   follow-up shortens only the second part. Unthrottled, the same preview
+   takes 2.1 s cold, 1.3 s warm, and 0.2 s hot.
 5. **A reference binding whose code list is deleted.** Settled with the
    slice 4 plan (owner decision 4): the save that deletes the list re-points
    the binding when its entry is left exactly one code list; otherwise it

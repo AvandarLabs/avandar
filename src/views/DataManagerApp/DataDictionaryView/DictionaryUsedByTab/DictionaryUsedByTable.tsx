@@ -4,8 +4,10 @@ import { Table } from "@mantine/core";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ReapplyButton } from "@/components/dataDictionaries/ReapplyButton/ReapplyButton";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { HowAppliedCell } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell";
+import { OpenCrosswalkLink } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/OpenCrosswalkLink";
 import { UsageStatusCell } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell";
 import type {
   DictionaryUsage,
@@ -20,33 +22,50 @@ type Props = {
 type RowProps = {
   row: DictionaryUsageRow;
   usage: DictionaryUsage;
+  /** Whether the user can edit the row's dataset. */
   canEdit: boolean;
+  /** Whether the user can edit crosswalks. */
+  canEditCrosswalks: boolean;
 };
 
-/** A row's status, with Re-apply when it is behind and the user can edit. */
-function RowStatusCell({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
-  return (
-    <UsageStatusCell
-      row={row}
-      currentVersion={usage.currentVersion}
-      action={
-        canEdit && row.isBehind ? (
-          <ReapplyButton
-            dataset={{
-              id: row.datasetId,
-              name: row.datasetName,
-              sourceType: row.sourceType,
-            }}
-            dictionaryId={usage.dictionaryId}
-            dictionaryName={usage.dictionaryName}
-          />
-        ) : undefined
-      }
+/**
+ * What a row that is behind offers: Open crosswalk on a crosswalk's
+ * combined dataset, for crosswalk editors, and Re-apply on any other
+ * dataset the user can edit.
+ */
+function RowStatusAction({
+  row,
+  usage,
+  canEdit,
+  canEditCrosswalks,
+}: Readonly<RowProps>): ReactNode {
+  if (!row.isBehind) {
+    return null;
+  }
+  if (row.crosswalk) {
+    return canEditCrosswalks ? (
+      <OpenCrosswalkLink crosswalk={row.crosswalk} />
+    ) : null;
+  }
+  return canEdit ? (
+    <ReapplyButton
+      dataset={{
+        id: row.datasetId,
+        name: row.datasetName,
+        sourceType: row.sourceType,
+      }}
+      dictionaryId={usage.dictionaryId}
+      dictionaryName={usage.dictionaryName}
     />
-  );
+  ) : null;
 }
 
-function UsageRow({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
+function UsageRow({
+  row,
+  usage,
+  canEdit,
+  canEditCrosswalks,
+}: Readonly<RowProps>): ReactNode {
   const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const link = AppLinks.dataManagerDatasetView({
@@ -62,11 +81,25 @@ function UsageRow({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
         </Link>
       </Table.Td>
       <Table.Td>
-        <HowAppliedCell howApplied={row.howApplied} />
+        <HowAppliedCell
+          howApplied={row.howApplied}
+          crosswalkName={row.crosswalk?.name}
+        />
       </Table.Td>
       <Table.Td ta="end">{i18n.number(row.entryCount)}</Table.Td>
       <Table.Td>
-        <RowStatusCell row={row} usage={usage} canEdit={canEdit} />
+        <UsageStatusCell
+          row={row}
+          currentVersion={usage.currentVersion}
+          action={
+            <RowStatusAction
+              row={row}
+              usage={usage}
+              canEdit={canEdit}
+              canEditCrosswalks={canEditCrosswalks}
+            />
+          }
+        />
       </Table.Td>
     </Table.Tr>
   );
@@ -74,10 +107,14 @@ function UsageRow({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
 
 /**
  * One row per dataset the dictionary is applied to, and how, with
- * Re-apply on a dataset that is behind and that the user can edit.
+ * Re-apply on a dataset that is behind and that the user can edit, and
+ * Open crosswalk on a combined dataset whose code lists changed.
  */
 export function DictionaryUsedByTable({ usage }: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
+  const canEditCrosswalks = useHasPermission(
+    "data_sources__can_edit_crosswalks",
+  );
   const [editableIds] = DatasetClient.useGetEditableIds({
     workspaceId: workspace.id,
   });
@@ -108,6 +145,7 @@ export function DictionaryUsedByTable({ usage }: Readonly<Props>): ReactNode {
               row={row}
               usage={usage}
               canEdit={editableIdSet.has(row.datasetId)}
+              canEditCrosswalks={canEditCrosswalks}
             />
           );
         })}

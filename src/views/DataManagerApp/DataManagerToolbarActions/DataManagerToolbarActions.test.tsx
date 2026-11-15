@@ -5,14 +5,16 @@ import { DataManagerToolbarActions } from "@/views/DataManagerApp/DataManagerToo
 const { navigateMock, permissionState } = vi.hoisted(() => {
   return {
     navigateMock: vi.fn(),
-    permissionState: { canEditDictionaries: true },
+    permissionState: { canEditDictionaries: true, canEditCrosswalks: true },
   };
 });
 
 vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
   return {
-    useHasPermission: () => {
-      return permissionState.canEditDictionaries;
+    useHasPermission: (key: string) => {
+      return key === "data_sources__can_edit_crosswalks"
+        ? permissionState.canEditCrosswalks
+        : permissionState.canEditDictionaries;
     },
   };
 });
@@ -40,6 +42,7 @@ describe("DataManagerToolbarActions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     permissionState.canEditDictionaries = true;
+    permissionState.canEditCrosswalks = true;
   });
 
   it("opens learning a dictionary from the New dictionary menu", async () => {
@@ -85,6 +88,33 @@ describe("DataManagerToolbarActions", () => {
       />,
     );
     expect(screen.queryByRole("button", { name: "New dictionary" })).toBeNull();
+  });
+
+  it("opens a new crosswalk from New crosswalk", () => {
+    render(
+      <DataManagerToolbarActions
+        onNewDictionary={vi.fn()}
+        listToggle={undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "New crosswalk" }));
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "/$workspaceSlug/data-manager/crosswalks/new",
+        params: { workspaceSlug: "demo" },
+      }),
+    );
+  });
+
+  it("shows no New crosswalk to someone who cannot edit crosswalks", () => {
+    permissionState.canEditCrosswalks = false;
+    render(
+      <DataManagerToolbarActions
+        onNewDictionary={vi.fn()}
+        listToggle={undefined}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "New crosswalk" })).toBeNull();
   });
 
   it("shows the list again from Show list", () => {

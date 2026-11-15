@@ -14,6 +14,10 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       hasBindings: false,
       hasBindingsError: false,
       isLoadingLinkedDatasets: false,
+      combiningCrosswalk: undefined as unknown,
+      isLoadingCombiningCrosswalk: false,
+      hasCombiningCrosswalkError: false,
+      combiningCrosswalkOptions: undefined as unknown,
     },
   };
 });
@@ -27,6 +31,22 @@ vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
     },
   };
 });
+
+vi.mock(
+  "@/hooks/crosswalks/useCombiningCrosswalk/useCombiningCrosswalk",
+  () => {
+    return {
+      useCombiningCrosswalk: (_datasetId: string, options: unknown) => {
+        permissionState.combiningCrosswalkOptions = options;
+        return {
+          crosswalk: permissionState.combiningCrosswalk,
+          isLoading: permissionState.isLoadingCombiningCrosswalk,
+          isError: permissionState.hasCombiningCrosswalkError,
+        };
+      },
+    };
+  },
+);
 
 vi.mock("@/hooks/datasets/useCanEditDataset/useCanEditDataset", () => {
   return {
@@ -120,6 +140,8 @@ const DATASET = Model.make("Dataset", {
   isRestricted: false,
 });
 
+const VIRTUAL_DATASET = { ...DATASET, sourceType: "virtual" } as Dataset.T;
+
 describe("DatasetActionsMenu", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -129,6 +151,10 @@ describe("DatasetActionsMenu", () => {
     permissionState.hasBindings = false;
     permissionState.hasBindingsError = false;
     permissionState.isLoadingLinkedDatasets = false;
+    permissionState.combiningCrosswalk = undefined;
+    permissionState.isLoadingCombiningCrosswalk = false;
+    permissionState.hasCombiningCrosswalkError = false;
+    permissionState.combiningCrosswalkOptions = undefined;
   });
 
   it("opens learning a dictionary from this dataset", async () => {
@@ -246,5 +272,71 @@ describe("DatasetActionsMenu", () => {
     expect(
       await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
     ).toBeDisabled();
+  });
+
+  it("does not offer Apply on a dataset a crosswalk combined", async () => {
+    permissionState.combiningCrosswalk = {
+      id: "crosswalk-1",
+      name: "Borough line lists",
+    };
+    render(<DatasetActionsMenu dataset={VIRTUAL_DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toBeNull();
+  });
+
+  it("holds Apply back while it looks up whether a crosswalk combined the dataset", async () => {
+    permissionState.isLoadingCombiningCrosswalk = true;
+    render(<DatasetActionsMenu dataset={VIRTUAL_DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toBeNull();
+  });
+
+  it("still offers Apply when the crosswalk lookup fails", async () => {
+    permissionState.hasCombiningCrosswalkError = true;
+    render(<DatasetActionsMenu dataset={VIRTUAL_DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("looks for a combining crosswalk only on a virtual dataset", async () => {
+    const { unmount } = render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+    await screen.findByRole("menuitem", { name: /Delete Dataset/ });
+    expect(permissionState.combiningCrosswalkOptions).toEqual({
+      isEnabled: false,
+    });
+    unmount();
+
+    render(<DatasetActionsMenu dataset={VIRTUAL_DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+    await screen.findByRole("menuitem", { name: /Delete Dataset/ });
+    expect(permissionState.combiningCrosswalkOptions).toEqual({
+      isEnabled: true,
+    });
   });
 });

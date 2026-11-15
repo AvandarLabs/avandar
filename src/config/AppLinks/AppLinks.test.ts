@@ -34,3 +34,46 @@ describe("AppLinks learn-a-dictionary destination", () => {
     expect(link.label()).toBe("New dictionary");
   });
 });
+
+describe("AppLinks crosswalk destinations", () => {
+  it("points New crosswalk at the create route and works offline", () => {
+    const link = AppLinks.dataManagerNewCrosswalk("workspace-slug");
+
+    expect(link).toMatchObject({
+      key: "data-manager-new-crosswalk",
+      to: "/$workspaceSlug/data-manager/crosswalks/new",
+      params: { workspaceSlug: "workspace-slug" },
+      isAvailableOffline: true,
+    });
+    expect(link.label()).toBe("New crosswalk");
+  });
+
+  it("opens a crosswalk at a step and layout, labelled with its name", () => {
+    const link = AppLinks.dataManagerCrosswalkView({
+      workspaceSlug: "workspace-slug",
+      crosswalkId: "crosswalk-id",
+      crosswalkName: "Measles line lists",
+      step: "map",
+      layoutId: "layout-id",
+    });
+
+    expect(link).toMatchObject({
+      key: "data-manager-crosswalk-view",
+      to: "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+      params: { workspaceSlug: "workspace-slug", crosswalkId: "crosswalk-id" },
+      search: { step: "map", layoutId: "layout-id" },
+      isAvailableOffline: true,
+    });
+    expect(link.label()).toBe("Measles line lists");
+  });
+
+  it("leaves the step and layout out when none are given", () => {
+    const link = AppLinks.dataManagerCrosswalkView({
+      workspaceSlug: "workspace-slug",
+      crosswalkId: "crosswalk-id",
+      crosswalkName: "Measles line lists",
+    });
+
+    expect(link.search).toEqual({ step: undefined, layoutId: undefined });
+  });
+});

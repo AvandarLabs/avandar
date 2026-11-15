@@ -12,8 +12,10 @@ type Props = {
 };
 
 /**
- * The datasets a dictionary is applied to, how each uses it, and whether a
- * dataset changed in place is behind the dictionary's current version.
+ * The datasets a dictionary is applied to, how each uses it, and whether it
+ * is behind: a dataset changed in place against the dictionary's current
+ * version, or a crosswalk's combined dataset against the code lists it
+ * embedded.
  */
 export function DictionaryUsedByTab({ usage }: Readonly<Props>): ReactNode {
   const { t } = useLingui();

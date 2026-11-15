@@ -27,6 +27,8 @@ import type {
   DictionarySuggestionsMessage,
   DictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
@@ -75,6 +77,17 @@ export type DictionarySuggestionsApproval =
   | { type: "declined" }
   | { type: "edited" }
   | { type: "ack_missing" };
+
+/**
+ * One column of a meaning-match request that is not a dictionary entry,
+ * such as a crosswalk's combined-dataset column or a layout's column: its
+ * name, its type, and its profile when its values were read.
+ */
+export type DictionaryMatchColumn = {
+  name: string;
+  dataType: AvaDataType.T;
+  profile: ColumnProfile.T | undefined;
+};
 
 // The words that keep a column's values here, and every cap on a request
 // (codes, code length, other names, columns, total length), come from the
@@ -329,6 +342,74 @@ function makeMatchesRequestFromProposal(
   );
 }
 
+/** A column's kind from its profile, or from its type when it was not read. */
+function _getMatchColumnKind(
+  column: Readonly<DictionaryMatchColumn>,
+): DataDictionaryEntry.Kind {
+  if (column.profile) {
+    return ColumnProfile.getEntryKind(column.profile);
+  }
+  if (column.dataType === "date" || column.dataType === "timestamp") {
+    return "date";
+  }
+  return column.dataType === "bigint" || column.dataType === "double"
+    ? "number"
+    : "text";
+}
+
+/**
+ * The codes a column may send in a matches request: none unless profiling
+ * calls it coded and none of its names identify a person, and none when a
+ * code is over the schema's length, since a cut code is never sent.
+ */
+function _getMatchColumnValues(
+  column: Readonly<DictionaryMatchColumn>,
+): string[] {
+  const { profile } = column;
+  if (
+    !profile ||
+    !ColumnProfile.isCodedColumn(profile) ||
+    [column.name, profile.columnName].some(isIdentifyingColumnName)
+  ) {
+    return [];
+  }
+  const values = (profile.values ?? [])
+    .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES)
+    .map(prop("value"));
+  return _areValuesShortEnough(values) ? values : [];
+}
+
+function makeMatchesRequestFromColumns(
+  options: Readonly<{
+    columns: readonly DictionaryMatchColumn[];
+    locale: string;
+    model: DictionarySuggestionModel;
+  }>,
+): DictionarySuggestionsRequest | undefined {
+  // A name is never cut: the reply names columns, and a cut name would
+  // match nothing back.
+  const columns = options.columns
+    .filter((column) => {
+      return (
+        column.name.length > 0 &&
+        column.name.length <= DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH
+      );
+    })
+    .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS)
+    .map((column) => {
+      return {
+        name: column.name,
+        otherNames: [],
+        kind: _getMatchColumnKind(column),
+        values: _getMatchColumnValues(column),
+      };
+    });
+  return _fitMatchesRequest(
+    { task: "matches", locale: options.locale, columns },
+    options.model,
+  );
+}
+
 /**
  * Whether one request fits where it will run: the route's cap on the consent
  * text online, or the offline model's context window on device. The window
@@ -408,7 +489,7 @@ function _fitMatchesRequest(
  * columns are sent, never rows, and never the values of a column named
  * after a person or a contact detail. Online sends go through the chat's
  * consent gate first. Used by the create flow's Review and Label values
- * steps.
+ * steps, and by a crosswalk's Suggest matches.
  */
 export const DictionarySuggestions = {
   /** Which model answers, the same way chat decides where a turn runs. */
@@ -449,4 +530,12 @@ export const DictionarySuggestions = {
    * Cut to fit the model that will answer, codes first on device.
    */
   makeMatchesRequestFromProposal,
+
+  /**
+   * The request for meaning matches across columns that are not dictionary
+   * entries, such as a crosswalk's: names always, codes only for a coded
+   * column not named after a person, cut to fit the model that will answer.
+   * Undefined when fewer than two columns are left.
+   */
+  makeMatchesRequestFromColumns,
 };

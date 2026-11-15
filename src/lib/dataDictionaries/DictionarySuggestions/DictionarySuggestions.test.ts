@@ -718,3 +718,139 @@ describe("DictionarySuggestions.getLabelsBlockReason", () => {
     ).toBe("too_large_for_model");
   });
 });
+
+describe("DictionarySuggestions.makeMatchesRequestFromColumns", () => {
+  it("sends every name, and a coded column's codes, in a request the route takes", () => {
+    const request = DictionarySuggestions.makeMatchesRequestFromColumns({
+      columns: [
+        {
+          name: "sex",
+          dataType: "varchar",
+          profile: _column("sex", ["Male", "Female"]),
+        },
+        {
+          name: "GENDER",
+          dataType: "varchar",
+          profile: _column("GENDER", ["1", "2"], ERIE_ID),
+        },
+        { name: "dob", dataType: "date", profile: undefined },
+      ],
+      locale: "en",
+      model: "online",
+    });
+
+    expect(request).toEqual({
+      task: "matches",
+      locale: "en",
+      columns: [
+        {
+          name: "sex",
+          otherNames: [],
+          kind: "categorical",
+          values: ["Male", "Female"],
+        },
+        {
+          name: "GENDER",
+          otherNames: [],
+          kind: "categorical",
+          values: ["1", "2"],
+        },
+        { name: "dob", otherNames: [], kind: "date", values: [] },
+      ],
+    });
+    expect(DictionarySuggestionsRequestSchema.safeParse(request).success).toBe(
+      true,
+    );
+  });
+
+  it("names a column with no profile by its type, and sends none of its values", () => {
+    const request = DictionarySuggestions.makeMatchesRequestFromColumns({
+      columns: [
+        { name: "age_mo", dataType: "bigint", profile: undefined },
+        { name: "notes", dataType: "varchar", profile: undefined },
+      ],
+      locale: "en",
+      model: "online",
+    });
+
+    expect(
+      request?.task === "matches"
+        ? request.columns.map((column) => {
+            return [column.kind, column.values];
+          })
+        : undefined,
+    ).toEqual([
+      ["number", []],
+      ["text", []],
+    ]);
+  });
+
+  it("never sends the codes of a column named after a person", () => {
+    const request = DictionarySuggestions.makeMatchesRequestFromColumns({
+      columns: [
+        {
+          name: "guardian_relation",
+          dataType: "varchar",
+          profile: _column("guardian_relation", ["M", "F"]),
+        },
+        { name: "sex", dataType: "varchar", profile: _column("sex", ["M"]) },
+      ],
+      locale: "en",
+      model: "online",
+    });
+
+    expect(
+      request?.task === "matches" ? request.columns[0]?.values : [],
+    ).toEqual([]);
+  });
+
+  it("sends no codes for a column with one over the schema's limit", () => {
+    const longCode = "x".repeat(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH + 1);
+    const request = DictionarySuggestions.makeMatchesRequestFromColumns({
+      columns: [
+        {
+          name: "status",
+          dataType: "varchar",
+          profile: _column("status", ["a", longCode]),
+        },
+        { name: "sex", dataType: "varchar", profile: undefined },
+      ],
+      locale: "en",
+      model: "online",
+    });
+
+    expect(
+      request?.task === "matches" ? request.columns[0]?.values : [],
+    ).toEqual([]);
+  });
+
+  it("leaves out a column whose name the schema would refuse", () => {
+    const request = DictionarySuggestions.makeMatchesRequestFromColumns({
+      columns: [
+        { name: "a".repeat(201), dataType: "varchar", profile: undefined },
+        { name: "dob", dataType: "date", profile: undefined },
+        { name: "birth_date", dataType: "date", profile: undefined },
+      ],
+      locale: "en",
+      model: "online",
+    });
+
+    expect(
+      request?.task === "matches"
+        ? request.columns.map((column) => {
+            return column.name;
+          })
+        : [],
+    ).toEqual(["dob", "birth_date"]);
+  });
+
+  it("asks nothing with fewer than two columns", () => {
+    expect(
+      DictionarySuggestions.makeMatchesRequestFromColumns({
+        columns: [{ name: "dob", dataType: "date", profile: undefined }],
+        locale: "en",
+        model: "online",
+      }),
+    ).toBeUndefined();
+  });
+});

@@ -30,6 +30,7 @@ export const PermissionRegistry = {
       "data_sources__can_create_dataset",
       "data_sources__can_view_dictionaries",
       "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
     admin: [
       "data_sources__can_view_dataset",
@@ -39,6 +40,7 @@ export const PermissionRegistry = {
       "data_sources__can_manage_sources",
       "data_sources__can_view_dictionaries",
       "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
   },
   data_explorer: {

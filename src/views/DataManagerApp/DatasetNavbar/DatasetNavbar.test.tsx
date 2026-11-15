@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar";
+import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -232,5 +233,71 @@ describe("DatasetNavbar dictionaries", () => {
       await screen.findByText("Nothing matches your filter"),
     ).toBeInTheDocument();
     expect(screen.queryByText("No data yet")).not.toBeInTheDocument();
+  });
+});
+
+function _createCrosswalk(
+  name: string,
+  id = "33333333-3333-4333-8333-333333333333",
+): Crosswalk.T {
+  return { id, name } as Crosswalk.T;
+}
+
+describe("DatasetNavbar crosswalks", () => {
+  it("lists crosswalks under their own heading, after the dictionaries", () => {
+    render(
+      <DatasetNavbar
+        datasets={[_createDataset("Bronx line list")]}
+        dictionaries={[_createDictionary("NYS measles case report")]}
+        crosswalks={[_createCrosswalk("Measles line lists")]}
+        isLoading={false}
+      />,
+    );
+
+    const dictionariesHeading = screen.getByText("Dictionaries");
+    const crosswalksHeading = screen.getByText("Crosswalks");
+    expect(screen.getByText("Measles line lists")).toBeInTheDocument();
+    expect(
+      dictionariesHeading.compareDocumentPosition(crosswalksHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("shows no Crosswalks heading when there are none", () => {
+    render(
+      <DatasetNavbar
+        datasets={[_createDataset("Bronx line list")]}
+        dictionaries={[_createDictionary("NYS measles case report")]}
+        crosswalks={[]}
+        isLoading={false}
+      />,
+    );
+
+    expect(screen.queryByText("Crosswalks")).not.toBeInTheDocument();
+  });
+
+  it("counts crosswalks toward the filter and filters them by name", async () => {
+    const datasets = Array.from({ length: 7 }, (_, index) => {
+      return {
+        ..._createDataset(`Dataset ${index}`),
+        id: `11111111-1111-4111-8111-11111111111${index}`,
+      } as Dataset.T;
+    });
+    render(
+      <DatasetNavbar
+        datasets={datasets}
+        crosswalks={[_createCrosswalk("Measles line lists")]}
+        isLoading={false}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Filter data"), {
+      target: { value: "measles" },
+    });
+
+    expect(await screen.findByText("Measles line lists")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("Dataset 0")).not.toBeInTheDocument();
+    });
   });
 });

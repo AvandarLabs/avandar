@@ -700,6 +700,290 @@ export type Database = {
           },
         ]
       }
+      crosswalks: {
+        Row: {
+          adds_source_column: boolean
+          codes_output_as: Database["public"]["Enums"]["crosswalks__codes_output"]
+          compiled_at: string | null
+          compiled_code_lists: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          output_dataset_id: string | null
+          owner_id: string
+          owner_profile_id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          adds_source_column?: boolean
+          codes_output_as?: Database["public"]["Enums"]["crosswalks__codes_output"]
+          compiled_at?: string | null
+          compiled_code_lists?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          output_dataset_id?: string | null
+          owner_id?: string
+          owner_profile_id: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          adds_source_column?: boolean
+          codes_output_as?: Database["public"]["Enums"]["crosswalks__codes_output"]
+          compiled_at?: string | null
+          compiled_code_lists?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          output_dataset_id?: string | null
+          owner_id?: string
+          owner_profile_id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crosswalks_output_dataset_id_fkey"
+            columns: ["output_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crosswalks_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crosswalks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crosswalks__columns: {
+        Row: {
+          created_at: string
+          crosswalk_id: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          entry_id: string | null
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          crosswalk_id: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          entry_id?: string | null
+          id?: string
+          name: string
+          position: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          crosswalk_id?: string
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
+          entry_id?: string | null
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crosswalks__columns_crosswalk_id_workspace_id_fkey"
+            columns: ["crosswalk_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "crosswalks__columns_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries__entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crosswalks__datasets: {
+        Row: {
+          created_at: string
+          crosswalk_id: string
+          dataset_id: string
+          id: string
+          layout_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          crosswalk_id: string
+          dataset_id: string
+          id?: string
+          layout_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          crosswalk_id?: string
+          dataset_id?: string
+          id?: string
+          layout_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crosswalks__datasets_crosswalk_id_workspace_id_fkey"
+            columns: ["crosswalk_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "crosswalks__datasets_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crosswalks__datasets_layout_id_crosswalk_id_fkey"
+            columns: ["layout_id", "crosswalk_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks__layouts"
+            referencedColumns: ["id", "crosswalk_id"]
+          },
+        ]
+      }
+      crosswalks__layouts: {
+        Row: {
+          column_names: string[]
+          created_at: string
+          crosswalk_id: string
+          id: string
+          is_reference: boolean
+          signature: string
+          status: Database["public"]["Enums"]["crosswalks__layout_status"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          column_names: string[]
+          created_at?: string
+          crosswalk_id: string
+          id?: string
+          is_reference?: boolean
+          signature: string
+          status?: Database["public"]["Enums"]["crosswalks__layout_status"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          column_names?: string[]
+          created_at?: string
+          crosswalk_id?: string
+          id?: string
+          is_reference?: boolean
+          signature?: string
+          status?: Database["public"]["Enums"]["crosswalks__layout_status"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crosswalks__layouts_crosswalk_id_workspace_id_fkey"
+            columns: ["crosswalk_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      crosswalks__mappings: {
+        Row: {
+          column_id: string
+          confidence: number | null
+          created_at: string
+          crosswalk_id: string
+          fill: Json
+          id: string
+          layout_id: string
+          reason:
+            | Database["public"]["Enums"]["crosswalks__mapping_reason"]
+            | null
+          status: Database["public"]["Enums"]["crosswalks__mapping_status"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          column_id: string
+          confidence?: number | null
+          created_at?: string
+          crosswalk_id: string
+          fill: Json
+          id?: string
+          layout_id: string
+          reason?:
+            | Database["public"]["Enums"]["crosswalks__mapping_reason"]
+            | null
+          status?: Database["public"]["Enums"]["crosswalks__mapping_status"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          column_id?: string
+          confidence?: number | null
+          created_at?: string
+          crosswalk_id?: string
+          fill?: Json
+          id?: string
+          layout_id?: string
+          reason?:
+            | Database["public"]["Enums"]["crosswalks__mapping_reason"]
+            | null
+          status?: Database["public"]["Enums"]["crosswalks__mapping_status"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crosswalks__mappings_column_id_crosswalk_id_fkey"
+            columns: ["column_id", "crosswalk_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks__columns"
+            referencedColumns: ["id", "crosswalk_id"]
+          },
+          {
+            foreignKeyName: "crosswalks__mappings_crosswalk_id_workspace_id_fkey"
+            columns: ["crosswalk_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "crosswalks__mappings_layout_id_crosswalk_id_fkey"
+            columns: ["layout_id", "crosswalk_id"]
+            isOneToOne: false
+            referencedRelation: "crosswalks__layouts"
+            referencedColumns: ["id", "crosswalk_id"]
+          },
+        ]
+      }
       dashboards: {
         Row: {
           config: Json
@@ -3104,6 +3388,161 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crosswalks__authorize: {
+        Args: { p_crosswalk_id: string }
+        Returns: string
+      }
+      crosswalks__check_column_fields: {
+        Args: { p_columns: Json }
+        Returns: undefined
+      }
+      crosswalks__check_columns: {
+        Args: {
+          p_columns: Json
+          p_crosswalk_id: string
+          p_settings: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__check_combined_binding_fields: {
+        Args: { p_bindings: Json; p_compiled_code_lists: Json }
+        Returns: undefined
+      }
+      crosswalks__check_combined_bindings: {
+        Args: { p_bindings: Json; p_columns: Json; p_workspace_id: string }
+        Returns: undefined
+      }
+      crosswalks__check_combined_payload: {
+        Args: { p_bindings: Json; p_columns: Json; p_compiled_code_lists: Json }
+        Returns: undefined
+      }
+      crosswalks__check_datasets: {
+        Args: {
+          p_crosswalk_id: string
+          p_datasets: Json
+          p_layouts: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__check_layout_fields: {
+        Args: { p_layouts: Json }
+        Returns: undefined
+      }
+      crosswalks__check_layouts: {
+        Args: { p_crosswalk_id: string; p_layouts: Json }
+        Returns: undefined
+      }
+      crosswalks__check_mappings: {
+        Args: {
+          p_columns: Json
+          p_crosswalk_id: string
+          p_layouts: Json
+          p_mappings: Json
+        }
+        Returns: undefined
+      }
+      crosswalks__check_members_viewable: {
+        Args: { p_crosswalk_id: string }
+        Returns: undefined
+      }
+      crosswalks__check_membership_and_mapping_fields: {
+        Args: { p_datasets: Json; p_mappings: Json }
+        Returns: undefined
+      }
+      crosswalks__check_payload: {
+        Args: {
+          p_columns: Json
+          p_datasets: Json
+          p_layouts: Json
+          p_mappings: Json
+          p_settings: Json
+        }
+        Returns: undefined
+      }
+      crosswalks__create_combined_dataset: {
+        Args: {
+          p_columns: Json
+          p_dataset_id: string
+          p_name: string
+          p_raw_sql: string
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__delete_left_out_layouts: {
+        Args: { p_crosswalk_id: string; p_layouts: Json }
+        Returns: undefined
+      }
+      crosswalks__has_unreadable_members: {
+        Args: { p_crosswalk_id: string }
+        Returns: boolean
+      }
+      crosswalks__is_fill_valid: { Args: { p_fill: Json }; Returns: boolean }
+      crosswalks__read_combined_columns: {
+        Args: { p_columns: Json }
+        Returns: {
+          column_idx: number
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          name: string
+        }[]
+      }
+      crosswalks__reconcile_combined_columns: {
+        Args: { p_columns: Json; p_dataset_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
+      crosswalks__require_editor: {
+        Args: { p_crosswalk_id: string }
+        Returns: string
+      }
+      crosswalks__update_combined_dataset: {
+        Args: {
+          p_columns: Json
+          p_dataset_id: string
+          p_name: string
+          p_output_dataset_id: string
+          p_raw_sql: string
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__write_columns: {
+        Args: {
+          p_columns: Json
+          p_crosswalk_id: string
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__write_combined_bindings: {
+        Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
+      crosswalks__write_datasets: {
+        Args: {
+          p_crosswalk_id: string
+          p_datasets: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__write_layouts: {
+        Args: {
+          p_crosswalk_id: string
+          p_layouts: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      crosswalks__write_mappings: {
+        Args: {
+          p_crosswalk_id: string
+          p_mappings: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
       data_catalog_facet_counts__refresh: { Args: never; Returns: undefined }
       data_catalog_listings__count_facet: {
         Args: {
@@ -3468,6 +3907,33 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: undefined
+      }
+      rpc_crosswalks__has_unreadable_datasets: {
+        Args: { p_crosswalk_id: string }
+        Returns: boolean
+      }
+      rpc_crosswalks__save: {
+        Args: {
+          p_columns: Json
+          p_crosswalk_id: string
+          p_datasets: Json
+          p_layouts: Json
+          p_mappings: Json
+          p_settings: Json
+        }
+        Returns: undefined
+      }
+      rpc_crosswalks__save_combined_dataset: {
+        Args: {
+          p_bindings: Json
+          p_columns: Json
+          p_compiled_code_lists: Json
+          p_crosswalk_id: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_raw_sql: string
+        }
+        Returns: string
       }
       rpc_data_catalog_listings__fail_parquet_cache: {
         Args: {
@@ -4373,6 +4839,14 @@ export type Database = {
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       connections__connection_type: "postgres"
       connections__postgres_ssl_mode: "disable" | "require"
+      crosswalks__codes_output: "labels" | "codes"
+      crosswalks__layout_status: "to_do" | "review" | "mapped" | "skipped"
+      crosswalks__mapping_reason:
+        | "name_and_type"
+        | "same_values"
+        | "similar_layout"
+        | "meaning"
+      crosswalks__mapping_status: "suggested" | "confirmed"
       dashboard_snapshot_transition_kind:
         | "publish"
         | "abort_publish"
@@ -4687,6 +5161,15 @@ export const Constants = {
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       connections__connection_type: ["postgres"],
       connections__postgres_ssl_mode: ["disable", "require"],
+      crosswalks__codes_output: ["labels", "codes"],
+      crosswalks__layout_status: ["to_do", "review", "mapped", "skipped"],
+      crosswalks__mapping_reason: [
+        "name_and_type",
+        "same_values",
+        "similar_layout",
+        "meaning",
+      ],
+      crosswalks__mapping_status: ["suggested", "confirmed"],
       dashboard_snapshot_transition_kind: [
         "publish",
         "abort_publish",

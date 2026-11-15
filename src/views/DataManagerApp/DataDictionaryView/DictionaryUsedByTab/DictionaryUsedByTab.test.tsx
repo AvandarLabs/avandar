@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@/test-utils";
 import { DictionaryUsedByTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab";
+import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -15,14 +16,31 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   const original = await importOriginal<object>();
   return {
     ...original,
-    Link: (props: { children: string }) => {
-      return <a href="#dataset">{props.children}</a>;
+    Link: (props: LinkProps) => {
+      mocks.linkProps.push(props);
+      return (
+        <a href="#link" aria-label={props["aria-label"]}>
+          {props.children}
+        </a>
+      );
     },
   };
 });
 
+type LinkProps = {
+  children: string;
+  to?: string;
+  params?: unknown;
+  search?: unknown;
+  "aria-label"?: string;
+};
+
 const mocks = vi.hoisted(() => {
-  return { editableIds: [] as string[] };
+  return {
+    editableIds: [] as string[],
+    canEditCrosswalks: true,
+    linkProps: [] as unknown[],
+  };
 });
 
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
@@ -31,6 +49,15 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       useGetEditableIds: () => {
         return [mocks.editableIds, false];
       },
+    },
+  };
+});
+vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
+  return {
+    useHasPermission: (permission: string) => {
+      return permission === "data_sources__can_edit_crosswalks"
+        ? mocks.canEditCrosswalks
+        : true;
     },
   };
 });
@@ -49,7 +76,41 @@ vi.mock("@/components/dataDictionaries/ReapplyButton/ReapplyButton", () => {
   };
 });
 
+/** Used by with one crosswalk's combined dataset in it. */
+function _renderCombinedDataset(isBehind: boolean): void {
+  render(
+    <DictionaryUsedByTab
+      usage={{
+        dictionaryId: "dict-1" as DataDictionary.Id,
+        dictionaryName: "NYS codes",
+        isLoading: false,
+        hasError: false,
+        currentVersion: 3,
+        rows: [
+          {
+            datasetId: "dataset-combined" as Dataset.Id,
+            datasetName: "Measles, all boroughs",
+            sourceType: "virtual",
+            entryCount: 1,
+            howApplied: "crosswalk",
+            appliedVersion: undefined,
+            isBehind,
+            crosswalk: {
+              id: "crosswalk-1" as Crosswalk.Id,
+              name: "Borough line lists",
+            },
+          },
+        ],
+      }}
+    />,
+  );
+}
+
 describe("DictionaryUsedByTab", () => {
+  beforeEach(() => {
+    mocks.linkProps = [];
+  });
+
   it("lists each dataset with how the dictionary was applied", () => {
     render(
       <DictionaryUsedByTab
@@ -68,6 +129,7 @@ describe("DictionaryUsedByTab", () => {
               howApplied: "reference",
               appliedVersion: undefined,
               isBehind: false,
+              crosswalk: undefined,
             },
           ],
         }}
@@ -157,6 +219,7 @@ describe("DictionaryUsedByTab", () => {
               howApplied: "linked",
               appliedVersion: undefined,
               isBehind: false,
+              crosswalk: undefined,
             },
           ],
         }}
@@ -189,6 +252,7 @@ describe("DictionaryUsedByTab", () => {
               howApplied: "changed",
               appliedVersion: 2,
               isBehind: true,
+              crosswalk: undefined,
             },
           ],
         }}
@@ -221,6 +285,7 @@ describe("DictionaryUsedByTab", () => {
               howApplied: "changed",
               appliedVersion: 2,
               isBehind: true,
+              crosswalk: undefined,
             },
           ],
         }}
@@ -253,6 +318,7 @@ describe("DictionaryUsedByTab", () => {
               howApplied: "changed",
               appliedVersion: 2,
               isBehind: true,
+              crosswalk: undefined,
             },
           ],
         }}
@@ -263,5 +329,49 @@ describe("DictionaryUsedByTab", () => {
       screen.getByRole("row", { name: /Bronx line list/ }),
     ).toHaveTextContent("Applied version 2, now version 3");
     expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
+  });
+
+  it("says a combined dataset comes through its crosswalk and is up to date", () => {
+    mocks.canEditCrosswalks = true;
+    _renderCombinedDataset(false);
+
+    const row = screen.getByRole("row", { name: /Measles, all boroughs/ });
+    expect(row).toHaveTextContent("Crosswalk");
+    expect(row).toHaveTextContent("Through Borough line lists");
+    expect(row).toHaveTextContent("Up to date");
+    expect(screen.queryByRole("link", { name: /Open crosswalk/ })).toBeNull();
+  });
+
+  it("offers Open crosswalk, not Re-apply, once a code list the crosswalk embedded changed", () => {
+    mocks.canEditCrosswalks = true;
+    mocks.editableIds = ["dataset-combined"];
+    _renderCombinedDataset(true);
+
+    const row = screen.getByRole("row", { name: /Measles, all boroughs/ });
+    expect(row).toHaveTextContent("A code list changed since it was combined");
+    expect(
+      screen.getByRole("link", {
+        name: "Open crosswalk Borough line lists",
+      }),
+    ).toBeInTheDocument();
+    expect(mocks.linkProps).toContainEqual(
+      expect.objectContaining({
+        to: "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+        params: { workspaceSlug: "demo", crosswalkId: "crosswalk-1" },
+        search: { step: "combine", layoutId: undefined },
+        "aria-label": "Open crosswalk Borough line lists",
+      }),
+    );
+    expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
+  });
+
+  it("does not offer Open crosswalk to someone who cannot edit crosswalks", () => {
+    mocks.canEditCrosswalks = false;
+    _renderCombinedDataset(true);
+
+    expect(
+      screen.getByRole("row", { name: /Measles, all boroughs/ }),
+    ).toHaveTextContent("A code list changed since it was combined");
+    expect(screen.queryByRole("link", { name: /Open crosswalk/ })).toBeNull();
   });
 });

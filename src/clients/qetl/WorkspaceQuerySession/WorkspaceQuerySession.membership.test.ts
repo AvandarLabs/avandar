@@ -244,6 +244,20 @@ describe("WorkspaceQuerySession membership authorization", () => {
     );
   });
 
+  it("passes a member's progress callback to the mediator", async () => {
+    const onRelationFetched = vi.fn();
+
+    await WorkspaceQuerySession.runQuery({
+      rawSql: `SELECT * FROM "${DATASET_ID}"`,
+      workspaceId: MEMBER_WORKSPACE_ID,
+      onRelationFetched,
+    });
+
+    expect(innerRunQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ onRelationFetched }),
+    );
+  });
+
   it("runs a parquet query for a member", async () => {
     const parquetBlob = new Blob(["parquet"]);
     innerRunQueryMock.mockResolvedValue(parquetBlob);
