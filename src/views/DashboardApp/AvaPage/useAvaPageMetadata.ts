@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import z from "zod";
+import { z } from "zod";
 import { uuidType } from "$/lib/zodHelpers";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { Workspace } from "$/models/Workspace/Workspace";

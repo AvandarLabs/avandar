@@ -8,7 +8,7 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import z from "zod";
+import { z } from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";

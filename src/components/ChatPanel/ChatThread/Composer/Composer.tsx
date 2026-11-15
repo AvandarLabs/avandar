@@ -2,7 +2,7 @@ import { ComposerPrimitive } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";

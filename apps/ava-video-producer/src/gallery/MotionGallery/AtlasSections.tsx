@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { CONTINUITY_CATALOG } from "../../continuity/continuityCatalog";
 import css from "./AtlasSections.module.css";
 

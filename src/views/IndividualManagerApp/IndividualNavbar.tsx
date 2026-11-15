@@ -1,7 +1,7 @@
 import { NavLinkList } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, ScrollArea, Text } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/views/IndividualManagerApp/IndividualNavbar.module.css";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
 import { useVirtualIndividualLinks } from "@/views/IndividualManagerApp/useVirtualIndividualLinks";

@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/layouts/AppListPane/AppListPane.module.css";
 import type { ReactNode } from "react";
 

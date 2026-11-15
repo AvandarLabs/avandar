@@ -1,5 +1,5 @@
 import { EditorView } from "@codemirror/view";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo, useRef, useState } from "react";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";

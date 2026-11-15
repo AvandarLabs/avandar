@@ -1,5 +1,5 @@
 import { Stack, Text, UnstyledButton } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList/OpenDataCatalogEntryList.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { ReactNode } from "react";

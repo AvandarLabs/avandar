@@ -1,5 +1,5 @@
 import { Group, Text } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/layouts/AppView/AppViewSection/AppViewSection.module.css";
 import type { ReactNode } from "react";
 

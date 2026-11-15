@@ -1,5 +1,5 @@
 import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { ContentControls } from "../ContentControls/ContentControls";
 import { getReferenceUrlFromPreset } from "../getReferenceUrlFromPreset";
 import { Icon } from "../Icon";

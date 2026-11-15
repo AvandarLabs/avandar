@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import { match } from "ts-pattern";
 import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";

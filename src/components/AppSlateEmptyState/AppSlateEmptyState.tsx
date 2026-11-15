@@ -1,5 +1,5 @@
 import { Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/AppSlateEmptyState/AppSlateEmptyState.module.css";
 import type { ReactNode } from "react";
 
