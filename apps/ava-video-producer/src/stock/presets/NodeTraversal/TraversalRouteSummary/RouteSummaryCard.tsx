@@ -1,10 +1,7 @@
 import { Card } from "../../../graphics-common/Card";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { wrapTextToLines } from "../../../primitives/FitText/wrapTextToLines";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTokens } from "../../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 const SUMMARY_TOP = 44;
@@ -12,12 +9,31 @@ const CARD_WIDTH = 376;
 const CARD_FONT_SIZE = 12;
 const CARD_MAX_LINES = 4;
 
-type Props = Readonly<{ label: string; accent: string; right: number }>;
+/** The Card component values the summary layout depends on. */
+export type RouteSummaryCardMetrics = Readonly<{
+  padding: number;
+  baseHeight: number;
+  textBaseline: number;
+}>;
 
-/** A long authored summary wrapped onto a few lines inside a card. */
-export function RouteSummaryCard({ label, accent, right }: Props): ReactNode {
+type Props = Readonly<{
+  label: string;
+  accent: string;
+  right: number;
+  card: RouteSummaryCardMetrics;
+}>;
+
+/**
+ * A long authored summary wrapped onto a few lines inside a card. The card
+ * values come from the caller, which reads them on every render.
+ */
+export function RouteSummaryCard({
+  label,
+  accent,
+  right,
+  card,
+}: Props): ReactNode {
   const tokens = useGraphicTokens();
-  const card = useGraphicProps("Card", {});
   const innerWidth = CARD_WIDTH - card.padding * 2;
   const lines = wrapTextToLines({
     text: label,

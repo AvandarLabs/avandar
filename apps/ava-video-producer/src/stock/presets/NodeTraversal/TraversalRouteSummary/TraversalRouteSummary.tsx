@@ -1,6 +1,9 @@
 import { GRAPHIC_WIDTH } from "../../../graphics-common/graphicCanvas.constants";
 import { Pill } from "../../../graphics-common/Pill";
-import { useGraphicTokens } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../../theme/useGraphicTheme/useGraphicTheme";
 import { getLegacyWidthFromText } from "../../legacy/getLegacyWidthFromText/getLegacyWidthFromText";
 import { RouteSummaryCard } from "./RouteSummaryCard";
 import type { ReactNode } from "react";
@@ -26,13 +29,15 @@ function _buildPillWidthFromTextWidth(textWidth: number): number | undefined {
 /**
  * Keeps short route badges compact and long authored summaries in the header.
  * Widths are measured at the pill role's size, so the badge fits the text
- * the theme draws.
+ * the theme draws. The Card values are read before the shape is chosen, so
+ * every render reports them whichever shape it draws.
  */
 export function TraversalRouteSummary({
   label,
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const card = useGraphicProps("Card", {});
   const right = GRAPHIC_WIDTH - tokens.layout.graphic.margin;
   const pillWidth = _buildPillWidthFromTextWidth(
     getLegacyWidthFromText({
@@ -42,7 +47,14 @@ export function TraversalRouteSummary({
     }),
   );
   if (pillWidth === undefined) {
-    return <RouteSummaryCard label={label} accent={accent} right={right} />;
+    return (
+      <RouteSummaryCard
+        label={label}
+        accent={accent}
+        right={right}
+        card={card}
+      />
+    );
   }
   return (
     <Pill
