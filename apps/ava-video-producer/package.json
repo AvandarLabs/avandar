@@ -14,7 +14,7 @@
     "showcase": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/showcase/server.ts",
     "typecheck": "node scripts/require-license.mjs && tsc --noEmit && tsc --noEmit -p tsconfig.tools.json",
     "test": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/testing/runProducerTests.ts",
-    "video": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/video.ts",
+    "video": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/video/video.ts",
     "capture": "node scripts/require-license.mjs && node scripts/capture-avandar/capture-avandar.mjs",
     "data:generate": "node scripts/require-license.mjs && python3 demo-data/generate.py",
     "data:validate": "node scripts/require-license.mjs && python3 demo-data/validate.py",

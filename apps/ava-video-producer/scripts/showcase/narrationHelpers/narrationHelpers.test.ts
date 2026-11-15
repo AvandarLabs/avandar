@@ -6,7 +6,7 @@ import test from "node:test";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { createNarrationLoader } from "./narrationHelpers";
 import type { Film } from "../../../src/showcase/showcase.types";
-import type { scratchTts } from "../../video";
+import type { scratchTts } from "../../video/scratchTts/scratchTts";
 
 function _film(text: string): Film {
   const plan = storyboardSchema.parse({

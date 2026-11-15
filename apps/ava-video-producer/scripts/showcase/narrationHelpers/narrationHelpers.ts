@@ -6,7 +6,7 @@ import {
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
 import { assetReferences, publicAsset } from "../../lib/planHelpers";
-import { scratchTts } from "../../video";
+import { scratchTts } from "../../video/scratchTts/scratchTts";
 import { appRoot, PLANS } from "../ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../../src/showcase/showcase.types";
 

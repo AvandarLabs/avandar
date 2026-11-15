@@ -1,6 +1,6 @@
 # Local storyboard video pipeline
 
-`scripts/video.ts` takes a versioned JSON storyboard through validation, review artifacts, composed-film previews, picture rendering, and optional audio assembly. It orchestrates Remotion and the existing JPEG/FFmpeg/frame-gate pipeline locally. It does not draft a story, drive the product browser, perform speech recognition, publish a video, or certify that product claims are true.
+`scripts/video/video.ts` takes a versioned JSON storyboard through validation, review artifacts, composed-film previews, picture rendering, and optional audio assembly. It orchestrates Remotion and the existing JPEG/FFmpeg/frame-gate pipeline locally. It does not draft a story, drive the product browser, perform speech recognition, publish a video, or certify that product claims are true.
 
 The input schema is [schema.ts](../src/storyboard/schema.ts). The generic Remotion composition is `story-film`, with props `{ "plan": <storyboard> }`. Its duration, canvas and FPS come from the validated plan. A generic film does not require a 66-frame opening: only a shot explicitly using the existing `title` scene has that duration requirement.
 

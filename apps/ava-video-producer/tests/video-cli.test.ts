@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseArgs } from "../scripts/video";
+import { parseArgs } from "../scripts/video/parseArgs";
 
 test("CLI rejects unknown or unsafe numeric options and requires manual-alignment inputs", () => {
   assert.throws(

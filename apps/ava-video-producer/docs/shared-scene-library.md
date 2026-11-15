@@ -164,7 +164,7 @@ evidence; update delivery records after those artifacts have been inspected.
 | [theme.css](../src/theme.css) | Original generic surface, foreground, border, brand, ground and radius tokens |
 | [adopt-theme.mjs](../scripts/adopt-theme.mjs) | Product token/easing adoption for faithful reconstructions; not a scene |
 | [capture runner](../scripts/capture-avandar/capture-avandar.mjs) | Produces real footage and capture evidence; see [capture pipeline](capture-pipeline.md) |
-| [video CLI](../scripts/video.ts) | Validates plans/media, exports shot lists/transcripts, renders composed previews, gates picture, and assembles audio |
+| [video CLI](../scripts/video/video.ts) | Validates plans/media, exports shot lists/transcripts, renders composed previews, gates picture, and assembles audio |
 
 [Scene tests](../tests/scenes.test.ts) check geometry, content fitting, traversal,
 formatting, asset paths and caption boundaries. [Storyboard tests](../tests/storyboard.test.ts)

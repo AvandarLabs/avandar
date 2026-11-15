@@ -152,7 +152,7 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 `storyboards/` reviewed film inputs · `capture-flows/` real UI actions ·
 `avandar-adapter/` frame-controlled product adapters · the enclosing Avandar `src/`, `shared/`, and `packages/` supply product source ·
 `src/avandar/` generated bridge and measured pointer choreography ·
-`demo-data/` fictional inputs and validators · `scripts/video.ts` assembly ·
+`demo-data/` fictional inputs and validators · `scripts/video/video.ts` assembly ·
 `scripts/beats/<id>.txt` legacy sound scores · `.claude/skills/product-demo/` the skill.
 
 ## Clips shot against a real product

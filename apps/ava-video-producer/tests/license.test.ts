@@ -28,7 +28,7 @@ test("the direct video command refuses to start without license keys", async () 
         "tsx",
         "--import",
         "./scripts/yaml/registerYaml.mjs",
-        "scripts/video.ts",
+        "scripts/video/video.ts",
         "--help",
       ],
       {

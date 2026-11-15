@@ -334,7 +334,6 @@ export async function fingerprintPlan(
     "scripts/render-sequence.mjs",
     "scripts/check-frames.mjs",
     "scripts/lib/frameGate.mjs",
-    "scripts/video.ts",
     "scripts/lib/plan.ts",
     "scripts/lib/media.ts",
     "scripts/yaml/compileYaml.cjs",
@@ -347,6 +346,16 @@ export async function fingerprintPlan(
       /* Optional in isolated tests. */
     }
   }
+  files.push(
+    ...(await _rendererFiles(root, "scripts/video").catch(
+      (error: NodeJS.ErrnoException) => {
+        if (error.code === "ENOENT") {
+          return [];
+        }
+        throw error;
+      },
+    )),
+  );
   const hash = createHash("sha256");
   for (const file of files.sort())
     hash.update(`${file}\0${await fileHash(path.join(root, file))}\n`);
