@@ -1,11 +1,12 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
-import { DrawPath, Text } from "../../graphics-common";
+import { DrawPath } from "../../graphics-common/DrawPath";
+import { Text } from "../../graphics-common/Text";
 import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DecisionBranch } from "./DecisionBranch";
 import { DecisionHeading } from "./DecisionHeading";
-import { DecisionMarker } from "./DecisionMarker";
-import type { GraphicProps } from "../../graphics-common";
+import { DecisionMarker } from "./DecisionMarker/DecisionMarker";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
 

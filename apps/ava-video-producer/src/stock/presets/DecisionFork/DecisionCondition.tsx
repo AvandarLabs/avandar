@@ -1,5 +1,5 @@
 import { ramp } from "../../../motion";
-import { Arrive } from "../../graphics-common";
+import { Arrive } from "../../graphics-common/Arrive";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,

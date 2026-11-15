@@ -1391,7 +1391,7 @@ helpers:
     avoid: "Values that must not jump; the phase resets at the cycle boundary."
     usedBy:
       - src/scenes/StockScene.tsx
-      - src/stock/graphics-networks/OrbitalSystem.tsx
+      - src/stock/graphics-networks/OrbitalSystem/OrbitingBody/OrbitingBody.tsx
     demo: { id: loop-phase, frames: 120 }
 
   - id: wave
@@ -1409,7 +1409,7 @@ helpers:
     goodFor: "Subtle halos and proximity emphasis."
     avoid: "Strong pulses on text, which read as flashing."
     usedBy:
-      - src/stock/graphics-common.tsx
+      - src/stock/graphics-common/Particle.tsx
       - src/stock/graphics-networks/NetworkGraph.tsx
     demo: { id: wave, frames: 90 }
 
@@ -1428,7 +1428,7 @@ helpers:
     goodFor: "Graphics that loop in a page without a seam."
     avoid: "Durations shorter than twice the fade; they throw."
     usedBy:
-      - src/stock/StockGraphic.tsx
+      - src/stock/StockGraphic/StockCanvas.tsx
     demo: { id: loop-envelope, frames: 90 }
 
   # ------------------------------------------------------------ builds --

@@ -1,4 +1,5 @@
-import { Arrive, Text } from "../../graphics-common";
+import { Arrive } from "../../graphics-common/Arrive";
+import { Text } from "../../graphics-common/Text";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";

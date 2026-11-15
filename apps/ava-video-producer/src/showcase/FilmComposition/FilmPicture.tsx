@@ -8,7 +8,7 @@ import {
 import { AvandarScene } from "../../avandar/AvandarScene";
 import { MotionLab } from "../../compositions/MotionLab";
 import { TitleStudy } from "../../compositions/TitleStudy";
-import { StockGraphic } from "../../stock/StockGraphic";
+import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { absoluteCues } from "../../storyboard/schema/schema";
 import { StoryFilm } from "../../storyboard/StoryFilm/StoryFilm";
 import { TitleCard, TITLE_LEN } from "../../title-card";

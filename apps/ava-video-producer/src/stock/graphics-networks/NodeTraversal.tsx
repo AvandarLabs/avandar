@@ -1,19 +1,17 @@
 import { ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Caption,
-  CircleNode,
-  DrawPath,
-  Eyebrow,
-  Route,
-  type GraphicProps,
-} from "../graphics-common";
+import { Caption } from "../graphics-common/Caption";
+import { CircleNode } from "../graphics-common/CircleNode";
+import { DrawPath } from "../graphics-common/DrawPath";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Route } from "../graphics-common/Route";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary";
+import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary/TraversalRouteSummary";
 import {
   useGraphicMotion,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { NodeTraversalInput } from "../presets/NodeTraversal/NodeTraversal.schema";
 import type { ReactNode } from "react";
 

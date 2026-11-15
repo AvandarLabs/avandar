@@ -3,7 +3,7 @@ import { AtomicCell } from "./AtomicCell";
 import { GroupingLedger } from "./GroupingLedger";
 import { GroupingSeams } from "./GroupingSeams";
 import { GroupingTotals } from "./GroupingTotals";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
 /** Explicit authored scene props. */

@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { STOCK } from "../../stockPalette";

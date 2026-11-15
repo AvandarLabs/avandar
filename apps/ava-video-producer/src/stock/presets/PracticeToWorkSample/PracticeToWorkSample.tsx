@@ -1,7 +1,7 @@
 import { MeasuringLearner } from "./MeasuringLearner";
 import { PracticeFurniture } from "./PracticeFurniture";
 import { PracticeLabels } from "./PracticeLabels";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 /** Inputs for PracticeToWorkSample. */

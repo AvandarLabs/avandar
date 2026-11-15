@@ -6,7 +6,7 @@ import { CacheParticipants } from "./CacheParticipants";
 import { CacheResponse } from "./CacheResponse";
 import { CacheStoredEntry } from "./CacheStoredEntry";
 import { getCacheJourneyFromFrame } from "./getCacheJourneyFromFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 

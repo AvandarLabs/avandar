@@ -14,7 +14,7 @@ import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createContinuityPlanFromVideoTheme } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
-import { StockGraphic } from "../../../src/stock/StockGraphic";
+import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../../src/videoTheme/getValueAtPath";

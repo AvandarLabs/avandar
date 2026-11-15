@@ -1,7 +1,7 @@
-import { DrawPath } from "../../graphics-common";
+import { DrawPath } from "../../graphics-common/DrawPath";
 import { TradeoffCopy } from "./TradeoffCopy";
 import { TradeoffLeaf } from "./TradeoffLeaf";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
 /** Frame-controlled qualitative tradeoff with an authored priority. */

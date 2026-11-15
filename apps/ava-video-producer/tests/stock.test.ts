@@ -15,7 +15,7 @@ import {
 } from "../src/stock/catalog";
 import { DECISION_FORK_DENSE_INPUT } from "../src/stock/presets/DecisionFork/DecisionFork.fixtures";
 import { StockCompositions } from "../src/stock/StockCompositions";
-import { StockGraphic } from "../src/stock/StockGraphic";
+import { StockGraphic } from "../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../src/storyboard/schema/schema";
 
 const { ShotView } = await import("../src/storyboard/StoryFilm/ShotView");

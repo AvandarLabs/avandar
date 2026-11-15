@@ -1,15 +1,13 @@
 import { caretOn, DUR, ramp, typed } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Arrive,
-  Check,
-  Eyebrow,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Arrive } from "../graphics-common/Arrive";
+import { Check } from "../graphics-common/Check";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { STOCK } from "../stockPalette";
 import { CodeWindow } from "./CodeWindow";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";
 import type { ReactNode } from "react";
 

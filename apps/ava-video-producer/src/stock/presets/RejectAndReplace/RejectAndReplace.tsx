@@ -1,6 +1,6 @@
 import { SelectionCriterion } from "./SelectionCriterion";
 import { SelectionOption } from "./SelectionOption";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 /** Frame-controlled replacement of one authored selection. */

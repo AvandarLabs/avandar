@@ -3,7 +3,7 @@ import test from "node:test";
 import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { StockGraphic } from "../../StockGraphic";
+import { StockGraphic } from "../../StockGraphic/StockGraphic";
 import { DECISION_FORK_DENSE_INPUT } from "./DecisionFork.fixtures";
 
 test("the SVG shows the authored selected outcome without default-only content", () => {

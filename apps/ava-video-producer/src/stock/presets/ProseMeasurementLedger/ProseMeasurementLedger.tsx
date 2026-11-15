@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { ObservationSlot } from "./ObservationSlot";
 import { ProseHeadings } from "./ProseHeadings";
 import { SentenceSpans } from "./SentenceSpans";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 /** Complete validated authored content and frame palette. */

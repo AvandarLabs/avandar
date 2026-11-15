@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { STOCK } from "../../stockPalette";
 import type { ReactNode } from "react";
 /** Inclusive latitude and longitude ruler extents remain schematic. */

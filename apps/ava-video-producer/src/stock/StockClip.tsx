@@ -1,7 +1,7 @@
 import { useCurrentFrame } from "remotion";
 import { VideoThemeProvider } from "../videoTheme/VideoThemeProvider/VideoThemeProvider";
 import { createVideoThemeSourceFromSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
-import { StockGraphic } from "./StockGraphic";
+import { StockGraphic } from "./StockGraphic/StockGraphic";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { StockRequest } from "./contracts/StockContract.types";
 import type { ReactNode } from "react";

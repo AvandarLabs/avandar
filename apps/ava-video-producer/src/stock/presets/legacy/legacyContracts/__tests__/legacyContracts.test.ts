@@ -12,7 +12,7 @@ import { LEGACY_IDS } from "../../../../../../tests/fixtures/legacyStockIds";
 import { parseStockInput } from "../../../../contracts/parseStockInput/parseStockInput";
 import { stockContracts } from "../../../../registry/stockContracts";
 import { stockRenderers } from "../../../../registry/stockRenderers/stockRenderers";
-import { StockGraphic } from "../../../../StockGraphic";
+import { StockGraphic } from "../../../../StockGraphic/StockGraphic";
 import { STOCK } from "../../../../stockPalette";
 
 const BASELINE: {

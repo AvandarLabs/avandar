@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import { ShelterAccounting } from "./ShelterAccounting";
 import { ShelterFloor } from "./ShelterFloor";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
 /** Explicit authored scene props. */

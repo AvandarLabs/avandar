@@ -2,7 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { DeviceCopy } from "./DeviceCopy";
 import { InternalWriting } from "./InternalWriting";
 import { ModelCartridge } from "./ModelCartridge";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 /** Complete contained computation illustration input. */

@@ -2,7 +2,7 @@ import { propEq, propNotEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { ProvenanceSource } from "./ProvenanceSource";
 import { ProvenanceSummary } from "./ProvenanceSummary";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
 /** Complete provenance props. The shared renderer owns the loop envelope. */

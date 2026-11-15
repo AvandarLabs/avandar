@@ -4,7 +4,7 @@ import { CustodyAcceptance } from "./CustodyAcceptance";
 import { CustodyCaptions } from "./CustodyCaptions";
 import { CustodyObject } from "./CustodyObject";
 import { CustodySupport } from "./CustodySupport";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
 

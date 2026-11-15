@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LeakPipe } from "./LeakPipe";
 import { LeakRepairWorker } from "./LeakRepairWorker";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 

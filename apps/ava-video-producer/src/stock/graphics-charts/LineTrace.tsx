@@ -1,13 +1,11 @@
 import { EASE, mix, ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Eyebrow,
-  Pill,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Pill } from "../graphics-common/Pill";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { STOCK } from "../stockPalette";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
 import type { ReactNode } from "react";
 

@@ -1,20 +1,18 @@
 import { wave } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  CircleNode,
-  DrawPath,
-  Eyebrow,
-  GRAPHIC_WIDTH,
-  Packet,
-  Pill,
-  type GraphicProps,
-} from "../graphics-common";
+import { CircleNode } from "../graphics-common/CircleNode";
+import { DrawPath } from "../graphics-common/DrawPath";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { GRAPHIC_WIDTH } from "../graphics-common/graphicCanvas.constants";
+import { Packet } from "../graphics-common/Packet";
+import { Pill } from "../graphics-common/Pill";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { NetworkGraphInput } from "../presets/NetworkGraph/NetworkGraph.schema";
 import type { ReactNode } from "react";
 

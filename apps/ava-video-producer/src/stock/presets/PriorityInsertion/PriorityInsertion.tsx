@@ -3,7 +3,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import { PriorityQueueItem } from "./PriorityQueueItem";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PriorityInsertion.schema";
 import type { ReactNode } from "react";
 

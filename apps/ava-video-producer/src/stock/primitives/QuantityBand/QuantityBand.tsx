@@ -1,5 +1,5 @@
 import { prop } from "@avandar/utils";
-import { STOCK } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { getQuantitySegmentsFromValues } from "./getQuantitySegmentsFromValues";
 import type { ReactNode } from "react";
 

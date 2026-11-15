@@ -3,7 +3,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { RecognitionExchange } from "./RecognitionExchange";
 import { RecognitionObjects } from "./RecognitionObjects";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 

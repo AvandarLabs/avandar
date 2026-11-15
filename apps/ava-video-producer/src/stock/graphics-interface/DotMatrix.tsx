@@ -2,14 +2,12 @@ import { prop } from "@avandar/utils";
 import { Fragment } from "react";
 import { DUR, ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Eyebrow,
-  Pill,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Pill } from "../graphics-common/Pill";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { STOCK } from "../stockPalette";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { DotMatrixInput } from "../presets/DotMatrix/DotMatrix.schema";
 import type { ReactNode } from "react";
 

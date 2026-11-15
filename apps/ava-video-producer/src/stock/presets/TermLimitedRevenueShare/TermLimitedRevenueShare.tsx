@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { RevenueLegend } from "./RevenueLegend";
 import { RevenuePeriod } from "./RevenuePeriod";
 import { RevenueTerm } from "./RevenueTerm";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
 /** Frame-driven independent cash-flow comparison. */

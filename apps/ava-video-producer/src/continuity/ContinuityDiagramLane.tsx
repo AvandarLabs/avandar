@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
-import { StockGraphic } from "../stock/StockGraphic";
+import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";

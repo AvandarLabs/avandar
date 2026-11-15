@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { VolumeShelf } from "./VolumeShelf";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
 /** Two equal-cardinality collections and one byte measurement scale. */

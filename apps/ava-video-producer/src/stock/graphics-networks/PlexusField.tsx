@@ -1,19 +1,17 @@
 import { loopPhase } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Eyebrow,
-  GRAPHIC_WIDTH,
-  Particle,
-  Rule,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { GRAPHIC_WIDTH } from "../graphics-common/graphicCanvas.constants";
+import { Particle } from "../graphics-common/Particle";
+import { Rule } from "../graphics-common/Rule";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import {
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { PlexusFieldInput } from "../presets/PlexusField/PlexusField.schema";
 import type { ReactNode } from "react";
 

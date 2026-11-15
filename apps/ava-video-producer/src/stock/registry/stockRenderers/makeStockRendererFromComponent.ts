@@ -4,7 +4,7 @@ import type {
   StockInputByPreset,
   StockPresetId,
 } from "../../contracts/StockContract.types";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { ComponentType } from "react";
 
 /** Retains each preset and renderer input relationship at registration. */

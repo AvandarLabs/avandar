@@ -2,7 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { EvidenceCells } from "./EvidenceCells";
 import { TypeEvidenceHeadings } from "./TypeEvidenceHeadings";
 import { TypeReviewBracket } from "./TypeReviewBracket";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
 

@@ -1,7 +1,7 @@
 import { DialogueBubble } from "./DialogueBubble";
 import { DialogueLegend } from "./DialogueLegend";
 import { DialoguePeople } from "./DialoguePeople";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
 

@@ -2,7 +2,7 @@ import { BookingRequest } from "./BookingRequest";
 import { SharedMachine } from "./SharedMachine";
 import { WorkshopCaptions } from "./WorkshopCaptions";
 import { WorkshopTimeRuler } from "./WorkshopTimeRuler";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
 

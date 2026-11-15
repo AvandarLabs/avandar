@@ -1,4 +1,5 @@
-import { Panel, Text } from "../graphics-common";
+import { Panel } from "../graphics-common/Panel";
+import { Text } from "../graphics-common/Text";
 import {
   useGraphicProps,
   useGraphicTokens,

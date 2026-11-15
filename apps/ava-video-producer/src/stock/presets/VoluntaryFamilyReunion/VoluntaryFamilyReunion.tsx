@@ -1,8 +1,9 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { FitText } from "../../primitives/FitText/FitText";
+import { STOCK } from "../../stockPalette";
 import { ReunionInvitation } from "./ReunionInvitation";
 import { ReunionMember } from "./ReunionMember";
 import { DEFAULT_INPUT } from "./VoluntaryFamilyReunion.fixtures";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
 

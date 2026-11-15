@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { ScopeBoundary } from "./ScopeBoundary";
 import { ScopeTopic } from "./ScopeTopic";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
 /** Complete authored scope and membership. */

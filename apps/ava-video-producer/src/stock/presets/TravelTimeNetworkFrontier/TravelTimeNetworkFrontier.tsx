@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { NetworkCosts } from "./NetworkCosts";
 import { NetworkDestinations } from "./NetworkDestinations";
 import { NetworkRoads } from "./NetworkRoads";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
 

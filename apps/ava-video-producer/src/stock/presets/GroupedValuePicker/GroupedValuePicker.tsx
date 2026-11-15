@@ -7,7 +7,7 @@ import { getPickedValueFromInput } from "./getPickedValueFromInput";
 import { controls } from "./GroupedValuePicker.controls";
 import { PickerCalculation } from "./PickerCalculation";
 import { PickerObservation } from "./PickerObservation";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

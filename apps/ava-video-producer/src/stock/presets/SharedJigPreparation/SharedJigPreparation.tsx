@@ -1,12 +1,13 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { STOCK } from "../../stockPalette";
 import { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import { JigGuide } from "./JigGuide";
 import { JigMakingTool } from "./JigMakingTool";
 import { JigMarkingHand } from "./JigMarkingHand";
 import { JigStation } from "./JigStation";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 /** Inputs for SharedJigPreparation. */

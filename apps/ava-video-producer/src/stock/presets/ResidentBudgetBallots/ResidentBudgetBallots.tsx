@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { BallotBox } from "./BallotBox";
 import { BallotPapers } from "./BallotPapers";
 import { ProjectDisplay } from "./ProjectDisplay";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
 

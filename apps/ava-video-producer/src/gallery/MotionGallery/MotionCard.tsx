@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { StockGraphic } from "../../stock/StockGraphic";
+import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { GalleryItemTheme } from "../GalleryVideoTheme/GalleryItemTheme";
 import { Icon } from "./Icon";
 import { useFrames, useVisible } from "./useGalleryClock";

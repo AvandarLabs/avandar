@@ -1,6 +1,6 @@
 import { FractionDesk } from "./FractionDesk";
 import { SceneText } from "./SceneText";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
 

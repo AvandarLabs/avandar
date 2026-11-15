@@ -1,8 +1,9 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { CohortLane } from "./CohortLane";
 import { CohortLegend } from "./CohortLegend";
 import { SceneLabel } from "./SceneLabel";
 import { VisitHeader } from "./VisitHeader";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 

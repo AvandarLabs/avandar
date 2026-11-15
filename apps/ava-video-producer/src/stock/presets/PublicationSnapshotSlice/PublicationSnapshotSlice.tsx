@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SnapshotCell } from "./SnapshotCell";
 import { SnapshotHeadings } from "./SnapshotHeadings";
 import { SnapshotRowGuide } from "./SnapshotRowGuide";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
 /** Complete source table, selected slice, revision and later live edit. */

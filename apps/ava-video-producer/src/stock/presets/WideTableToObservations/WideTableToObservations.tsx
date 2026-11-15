@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { MeasurementStrip } from "./MeasurementStrip";
 import { WideLedgerCaptions } from "./WideLedgerCaptions";
 import { WideSourceGuides } from "./WideSourceGuides";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./WideTableToObservations.schema";
 import type { ReactNode } from "react";
 /** Complete validated source measurements and frame palette. */

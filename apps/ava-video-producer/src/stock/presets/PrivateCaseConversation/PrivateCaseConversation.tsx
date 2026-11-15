@@ -1,8 +1,8 @@
-import { type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ConversationFurniture } from "./ConversationFurniture";
 import { ConversationPartition } from "./ConversationPartition";
 import { ConversationPeople } from "./ConversationPeople";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
 

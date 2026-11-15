@@ -1,4 +1,4 @@
-import { Text } from "../../../graphics-common";
+import { Text } from "../../../graphics-common/Text";
 import { getConservativeWidthFromText } from "../../../text/getConservativeWidthFromText";
 import {
   useGraphicProps,

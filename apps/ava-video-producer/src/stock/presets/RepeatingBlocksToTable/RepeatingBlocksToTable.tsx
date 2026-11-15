@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { BlockCellStrip } from "./BlockCellStrip";
 import { BlockIdentity } from "./BlockIdentity";
 import { TableFieldHeadings } from "./TableFieldHeadings";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 /** Complete validated repeated blocks and shared frame palette. */

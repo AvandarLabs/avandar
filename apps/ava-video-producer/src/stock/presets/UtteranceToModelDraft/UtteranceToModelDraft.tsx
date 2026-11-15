@@ -3,7 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { DraftModel } from "./DraftModel";
 import { DraftReview } from "./DraftReview";
 import { SourceSentence } from "./SourceSentence";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored mapping and supplied review state. */

@@ -4,7 +4,7 @@ import { WeaveBandPattern } from "./WeaveBandPattern";
 import { WeaveCaptions } from "./WeaveCaptions";
 import { WeaveShuttle } from "./WeaveShuttle";
 import { WeaveWarp } from "./WeaveWarp";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContributionWeave.schema";
 import type { ComponentProps, ReactNode } from "react";
 

@@ -163,7 +163,7 @@ at the producer app root. The data describes a fictional qualitative comparison,
 not measured review speed or a product capability.
 
 ```tsx
-import { StockGraphic } from "./src/stock/StockGraphic";
+import { StockGraphic } from "./src/stock/StockGraphic/StockGraphic";
 import type { StockRequest } from "./src/stock/contracts/StockContract";
 
 const request = {

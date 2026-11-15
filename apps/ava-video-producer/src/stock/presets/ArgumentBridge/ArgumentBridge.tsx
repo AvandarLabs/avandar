@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { ArgumentDeck } from "./ArgumentDeck";
 import { ArgumentPremise } from "./ArgumentPremise";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 /** Complete authored reasons and conclusion. */

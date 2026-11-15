@@ -13,7 +13,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { sampleStockFrame } from "../../../src/continuity/continuityTimeline";
 import { getMotionDuration } from "../../../src/motion-components/motionSettings";
-import { StockGraphic } from "../../../src/stock/StockGraphic";
+import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { createVideoMotion } from "../../../src/videoTheme/createVideoMotion/createVideoMotion";

@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { getRehearsalFromFrame } from "./getRehearsalFromFrame";
 import { PracticeInterior } from "./PracticeInterior";
 import { PracticePeople } from "./PracticePeople";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
 

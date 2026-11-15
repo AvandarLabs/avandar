@@ -1,4 +1,4 @@
-import { DrawPath } from "../../graphics-common";
+import { DrawPath } from "../../graphics-common/DrawPath";
 import {
   useGraphicProps,
   useGraphicTokens,

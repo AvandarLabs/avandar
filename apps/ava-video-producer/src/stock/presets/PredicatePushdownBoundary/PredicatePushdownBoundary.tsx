@@ -6,9 +6,9 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PushdownLedger } from "./PushdownLedger";
-import { PushdownPredicate } from "./PushdownPredicate";
-import { PushdownRows } from "./PushdownRows";
-import type { GraphicProps } from "../../graphics-common";
+import { PushdownPredicate } from "./PushdownPredicate/PushdownPredicate";
+import { PushdownRows } from "./PushdownRows/PushdownRows";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 

@@ -2,7 +2,7 @@ import { ConvoyCopy } from "./ConvoyCopy";
 import { ConvoyMap } from "./ConvoyMap";
 import { ConvoyVehicle } from "./ConvoyVehicle";
 import { getConvoyJourneyFromInputAndFrame } from "./getConvoyJourneyFromInputAndFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 /** Complete authored input and shared frame parameters. */

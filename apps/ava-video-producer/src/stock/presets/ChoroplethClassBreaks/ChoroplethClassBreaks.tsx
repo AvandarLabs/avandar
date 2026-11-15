@@ -4,7 +4,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ClassLegends } from "./ClassLegends";
 import { ClassRuler } from "./ClassRuler";
 import { ClassZone } from "./ClassZone";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 

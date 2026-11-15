@@ -5,7 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { DashboardContext } from "./DashboardContext";
 import { DashboardGuides } from "./DashboardGuides";
 import { DashboardWidgetPanel } from "./DashboardWidgetPanel";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ComponentProps, ReactNode } from "react";
 

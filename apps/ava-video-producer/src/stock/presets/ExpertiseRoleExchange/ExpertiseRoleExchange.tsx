@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
-import { type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ExpertiseParticipants } from "./ExpertiseParticipants";
 import { ExpertiseWorktable } from "./ExpertiseWorktable";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
 

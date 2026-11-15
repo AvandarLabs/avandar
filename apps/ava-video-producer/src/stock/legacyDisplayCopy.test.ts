@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import copy from "../../tests/fixtures/legacyDisplayCopy.json";
 import { stockContracts } from "./registry/stockContracts";
-import { StockGraphic } from "./StockGraphic";
+import { StockGraphic } from "./StockGraphic/StockGraphic";
 import type { StockContract } from "./contracts/StockContract.types";
 
 test("fixed legacy display units keep their authored English copy", () => {

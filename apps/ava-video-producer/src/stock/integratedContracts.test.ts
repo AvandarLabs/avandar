@@ -6,7 +6,7 @@ import acceptedAdditions from "../../docs/motion-atlas/catalog-expansion.json";
 import { STOCK_IDS } from "./catalog";
 import { parseStockInput } from "./contracts/parseStockInput/parseStockInput";
 import { stockContracts } from "./registry/stockContracts";
-import { StockGraphic } from "./StockGraphic";
+import { StockGraphic } from "./StockGraphic/StockGraphic";
 
 test("the integrated additions preserve every independent accepted default", () => {
   acceptedAdditions.forEach(({ id, inputs }) => {

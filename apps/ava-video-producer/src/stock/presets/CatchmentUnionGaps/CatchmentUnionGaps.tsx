@@ -2,7 +2,7 @@ import { EASE, ramp } from "../../../motion";
 import { CatchmentGeometry } from "./CatchmentGeometry";
 import { CatchmentRoster } from "./CatchmentRoster";
 import { CatchmentSummary } from "./CatchmentSummary";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for CatchmentUnionGaps. */

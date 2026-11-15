@@ -4,7 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import { WorkCutLines } from "./WorkCutLines";
 import { WorkPiece } from "./WorkPiece";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./WorkDecomposition.schema";
 import type { ReactNode } from "react";
 

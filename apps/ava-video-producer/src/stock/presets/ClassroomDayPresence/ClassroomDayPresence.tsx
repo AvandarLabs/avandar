@@ -2,7 +2,7 @@ import { ClassroomDays } from "./ClassroomDays";
 import { ClassroomDesk } from "./ClassroomDesk";
 import { ClassroomTotals } from "./ClassroomTotals";
 import { makeClassroomStateFromInputAndFrame } from "./makeClassroomStateFromInputAndFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomDayPresence. */

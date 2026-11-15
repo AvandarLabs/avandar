@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { CapacityTray } from "./CapacityTray";
 import { PendingResources } from "./PendingResources";
 import { ResourceTab } from "./ResourceTab";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
 /** Authored resource collections, allowances and explicit choice. */

@@ -1,5 +1,5 @@
 import { SvgObjectDeparture } from "../../motion-components/SvgObjectDeparture";
-import { StockGraphic } from "../../stock/StockGraphic";
+import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { sampleStockFrame } from "../continuityTimeline";
 import type { ContinuityBeat } from "../continuitySchema";

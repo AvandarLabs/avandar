@@ -1,8 +1,9 @@
 import { EASE, mix, ramp } from "../../../motion";
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { STOCK } from "../../stockPalette";
 import { ReleaseArtifact } from "./ReleaseArtifact";
 import { RepairRegister } from "./RepairRegister";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 

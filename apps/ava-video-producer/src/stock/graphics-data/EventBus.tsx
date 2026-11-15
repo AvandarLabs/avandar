@@ -1,16 +1,14 @@
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Arrive,
-  DrawPath,
-  Eyebrow,
-  Packet,
-  Panel,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Arrive } from "../graphics-common/Arrive";
+import { DrawPath } from "../graphics-common/DrawPath";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Packet } from "../graphics-common/Packet";
+import { Panel } from "../graphics-common/Panel";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
+import { STOCK } from "../stockPalette";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { EventBusInput } from "../presets/EventBus/EventBus.schema";
 import type { ReactNode } from "react";
 

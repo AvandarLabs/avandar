@@ -4,7 +4,7 @@ import { ByteChunk } from "./ByteChunk";
 import { ByteCounters } from "./ByteCounters";
 import { getByteTransferFromFrame } from "./getByteTransferFromFrame";
 import { RetryCheckpoint } from "./RetryCheckpoint";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ResumableByteTransfer.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

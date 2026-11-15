@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";

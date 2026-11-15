@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import { KernelField } from "./KernelField";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
 

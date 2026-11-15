@@ -1,4 +1,4 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
 import { ShelfActors } from "./ShelfActors";
@@ -7,6 +7,7 @@ import { ShelfLabels } from "./ShelfLabels";
 import { ShelfOrder } from "./ShelfOrder";
 import { ShelfStructure } from "./ShelfStructure";
 import { ShelfUnit } from "./ShelfUnit";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 

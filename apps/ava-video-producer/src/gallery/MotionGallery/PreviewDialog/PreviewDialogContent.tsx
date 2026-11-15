@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import { StockGraphic } from "../../../stock/StockGraphic";
+import { StockGraphic } from "../../../stock/StockGraphic/StockGraphic";
 import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import { useObservedTokenUsage } from "../../../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
 import { AtlasPanelTabs } from "../../AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";

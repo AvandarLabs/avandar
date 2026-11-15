@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
-import { StockGraphic } from "../StockGraphic";
+import { StockGraphic } from "../StockGraphic/StockGraphic";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { StockRequest } from "../contracts/StockContract.types";
 

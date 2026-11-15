@@ -1,15 +1,13 @@
 import { DUR, ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import {
-  Arrive,
-  Check,
-  Eyebrow,
-  Panel,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
+import { Arrive } from "../graphics-common/Arrive";
+import { Check } from "../graphics-common/Check";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Panel } from "../graphics-common/Panel";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { STOCK } from "../stockPalette";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StaggerCardsInput } from "../presets/StaggerCards/StaggerCards.schema";
 import type { ReactNode } from "react";
 

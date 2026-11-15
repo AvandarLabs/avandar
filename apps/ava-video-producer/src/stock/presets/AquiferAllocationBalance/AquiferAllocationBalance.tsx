@@ -2,7 +2,7 @@ import { AllocationPlanner } from "./AllocationPlanner";
 import { AquiferBudget } from "./AquiferBudget";
 import { AquiferCaptions } from "./AquiferCaptions";
 import { AquiferCutaway } from "./AquiferCutaway";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AquiferAllocationBalance. */

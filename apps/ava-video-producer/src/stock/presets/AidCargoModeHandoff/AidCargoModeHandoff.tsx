@@ -3,7 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { CargoCarrier } from "./CargoCarrier";
 import { CargoLabels } from "./CargoLabels";
 import { CargoParcel } from "./CargoParcel";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
 /** Complete input with frame-controlled graphic properties. */

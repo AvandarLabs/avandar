@@ -1,9 +1,9 @@
-import { type GraphicProps } from "../../graphics-common";
 import { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import { ServiceCaptions } from "./ServiceCaptions";
 import { ServiceEnclosure } from "./ServiceEnclosure";
 import { ServiceModule } from "./ServiceModule";
 import { ServiceWorker } from "./ServiceWorker";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
 /** Inputs for ServiceablePanelSwap. */

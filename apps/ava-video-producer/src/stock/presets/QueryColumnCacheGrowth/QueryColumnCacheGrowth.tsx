@@ -3,7 +3,7 @@ import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CachedRelation } from "./CachedRelation";
 import { CacheRequests } from "./CacheRequests";
 import { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 /** Inputs for QueryColumnCacheGrowth. */

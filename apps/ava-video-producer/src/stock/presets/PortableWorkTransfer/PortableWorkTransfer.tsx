@@ -1,9 +1,10 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import { TransferArtifact } from "./TransferArtifact";
 import { TransferCaptions } from "./TransferCaptions";
 import { TransferFolio } from "./TransferFolio";
 import { TransferOwner } from "./TransferOwner";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
 /** Inputs for PortableWorkTransfer. */

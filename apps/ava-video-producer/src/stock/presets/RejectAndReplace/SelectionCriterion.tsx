@@ -1,5 +1,5 @@
 import { ramp } from "../../../motion";
-import { DrawPath } from "../../graphics-common";
+import { DrawPath } from "../../graphics-common/DrawPath";
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./RejectAndReplace.schema";

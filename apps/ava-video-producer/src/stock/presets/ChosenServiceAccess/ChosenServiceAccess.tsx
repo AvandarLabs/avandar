@@ -1,10 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { FitText } from "../../primitives/FitText/FitText";
+import { STOCK } from "../../stockPalette";
 import { AccessParticipant } from "./AccessParticipant";
 import { DEFAULT_INPUT } from "./ChosenServiceAccess.fixtures";
 import { ServiceEntrance } from "./ServiceEntrance";
 import { ServiceStaff } from "./ServiceStaff";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
