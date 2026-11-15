@@ -29,8 +29,12 @@ const DRAFT = {
 
 test("a stored draft reads back with its base hash", () => {
   const storage = _storage();
-  writeStoredThemeDraft(storage, "classic", { baseHash: "abc", draft: DRAFT });
-  assert.deepEqual(readStoredThemeDraft(storage, "classic"), {
+  writeStoredThemeDraft({
+    storage,
+    themeId: "classic",
+    stored: { baseHash: "abc", draft: DRAFT },
+  });
+  assert.deepEqual(readStoredThemeDraft({ storage, themeId: "classic" }), {
     baseHash: "abc",
     draft: DRAFT,
   });
@@ -50,22 +54,30 @@ test("a stored draft that no longer matches the theme schema is ignored", () => 
       },
     }),
   });
-  assert.equal(readStoredThemeDraft(storage, "classic"), undefined);
+  assert.equal(
+    readStoredThemeDraft({ storage, themeId: "classic" }),
+    undefined,
+  );
 });
 
 test("storing an empty draft forgets the stored one", () => {
   const storage = _storage();
-  writeStoredThemeDraft(storage, "classic", { baseHash: "abc", draft: DRAFT });
-  writeStoredThemeDraft(storage, "classic", {
-    baseHash: "abc",
-    draft: EMPTY_THEME_DRAFT,
+  writeStoredThemeDraft({
+    storage,
+    themeId: "classic",
+    stored: { baseHash: "abc", draft: DRAFT },
+  });
+  writeStoredThemeDraft({
+    storage,
+    themeId: "classic",
+    stored: { baseHash: "abc", draft: EMPTY_THEME_DRAFT },
   });
   assert.equal(storage.values.size, 0);
 });
 
 test("the theme in the URL wins over the remembered one", () => {
   const storage = _storage();
-  rememberActiveThemeId(storage, "avandar");
+  rememberActiveThemeId({ storage, themeId: "avandar" });
   assert.equal(
     getActiveThemeIdFromLocation({
       search: "?theme=classic",
@@ -78,7 +90,7 @@ test("the theme in the URL wins over the remembered one", () => {
 
 test("an unknown theme in the URL falls back to the remembered theme", () => {
   const storage = _storage();
-  rememberActiveThemeId(storage, "avandar");
+  rememberActiveThemeId({ storage, themeId: "avandar" });
   assert.equal(
     getActiveThemeIdFromLocation({
       search: "?theme=missing",

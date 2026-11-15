@@ -29,12 +29,12 @@ const STUDIO: VideoThemeDocument = {
   },
 };
 const LIBRARY = createVideoThemeLibrary([STUDIO]);
-const DRAFT = setTokenInDraft(
-  EMPTY_THEME_DRAFT,
-  THEME,
-  "color.accent",
-  "$atomic.swatch.cyan",
-);
+const DRAFT = setTokenInDraft({
+  draft: EMPTY_THEME_DRAFT,
+  scope: THEME,
+  tokenPath: "color.accent",
+  value: "$atomic.swatch.cyan",
+});
 
 /** Classic with a per-item accent the built-in carries itself. */
 const LIBRARY_WITH_CLASSIC_OVERRIDE = new Map<string, VideoThemeDocument>([
@@ -42,7 +42,7 @@ const LIBRARY_WITH_CLASSIC_OVERRIDE = new Map<string, VideoThemeDocument>([
   [
     "classic",
     {
-      ...(BUILT_IN_VIDEO_THEMES.get("classic") as VideoThemeDocument),
+      ...BUILT_IN_VIDEO_THEMES.get("classic")!,
       overrides: {
         "network-graph": {
           other: {
@@ -61,7 +61,7 @@ test("a custom theme copies as saving its draft in place would write it", () => 
     draft: DRAFT,
   });
   assert.deepEqual(
-    JSON.parse(json as string),
+    JSON.parse(json!),
     createSavedDocumentFromDraft(STUDIO, DRAFT),
   );
 });
@@ -72,7 +72,7 @@ test("a built-in theme copies as the sparse theme Save as new writes, without it
     themeId: "classic",
     draft: DRAFT,
   });
-  const copied = JSON.parse(json as string);
+  const copied = JSON.parse(json!);
   assert.equal(copied.extends, "classic");
   assert.equal(copied.overrides, undefined);
   assert.notEqual(copied.id, "classic");
@@ -80,7 +80,7 @@ test("a built-in theme copies as the sparse theme Save as new writes, without it
   assert.deepEqual(
     copied,
     createNewThemeDocument({
-      base: LIBRARY_WITH_CLASSIC_OVERRIDE.get("classic") as VideoThemeDocument,
+      base: LIBRARY_WITH_CLASSIC_OVERRIDE.get("classic")!,
       draft: DRAFT,
       id,
       label,
@@ -94,7 +94,7 @@ test("a built-in copy gets an id that no loaded theme uses", () => {
     themeId: "classic",
     draft: DRAFT,
   });
-  const copied = JSON.parse(json as string);
+  const copied = JSON.parse(json!);
   assert.equal(LIBRARY.has(copied.id), false);
   assert.match(copied.label, /Classic/);
 });

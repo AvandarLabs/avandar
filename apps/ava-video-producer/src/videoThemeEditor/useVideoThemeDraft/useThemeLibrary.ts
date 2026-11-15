@@ -47,7 +47,7 @@ const BUILT_IN_COLLECTION: ThemeCollection = {
 export function useThemeLibrary(): ThemeLibraryState {
   const [collection, setCollection] =
     useState<ThemeCollection>(BUILT_IN_COLLECTION);
-  useEffect(() => {
+  useEffect(function loadThemeCollectionFromApi() {
     let isCurrent = true;
     ThemeApi.loadAll().then(
       (loaded) => {

@@ -4,7 +4,7 @@ import {
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
-import { resolveDraftTheme } from "./resolveDraftTheme";
+import { makeDraftThemeResultFromDraft } from "./resolveDraftTheme";
 import type {
   ResolvedVideoTheme,
   VideoThemeIssue,
@@ -44,11 +44,17 @@ export function useDraftTheme({
     [scopeKey],
   );
   const result = useMemo(
-    () => resolveDraftTheme({ library, themeId, draft, scope: stableScope }),
+    () =>
+      makeDraftThemeResultFromDraft({
+        library,
+        themeId,
+        draft,
+        scope: stableScope,
+      }),
     [library, themeId, draft, stableScope],
   );
   const saved = useMemo(() => {
-    const unedited = resolveDraftTheme({
+    const unedited = makeDraftThemeResultFromDraft({
       library,
       themeId,
       draft: EMPTY_THEME_DRAFT,
@@ -59,11 +65,14 @@ export function useDraftTheme({
   const [lastValid, setLastValid] =
     useState<Readonly<{ key: string; theme: ResolvedVideoTheme }>>();
   const key = `${themeId}:${scopeKey}`;
-  useEffect(() => {
-    if (result.ok) {
-      setLastValid({ key, theme: result.theme });
-    }
-  }, [result, key]);
+  useEffect(
+    function rememberLastValidTheme() {
+      if (result.ok) {
+        setLastValid({ key, theme: result.theme });
+      }
+    },
+    [result, key],
+  );
   const fallback = lastValid?.key === key ? lastValid.theme : saved;
   if (result.ok) {
     return { merged: result.merged, theme: result.theme, issues: [] };

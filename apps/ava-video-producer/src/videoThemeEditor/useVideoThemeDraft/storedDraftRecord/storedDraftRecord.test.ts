@@ -21,18 +21,18 @@ import {
 import type { VideoThemeDocument } from "../../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;
-const ACCENT_DRAFT = setTokenInDraft(
-  EMPTY_THEME_DRAFT,
-  THEME,
-  "color.accent",
-  "$atomic.swatch.cyan",
-);
-const MORE_DRAFT = setTokenInDraft(
-  ACCENT_DRAFT,
-  THEME,
-  "color.text",
-  "$atomic.swatch.mint",
-);
+const ACCENT_DRAFT = setTokenInDraft({
+  draft: EMPTY_THEME_DRAFT,
+  scope: THEME,
+  tokenPath: "color.accent",
+  value: "$atomic.swatch.cyan",
+});
+const MORE_DRAFT = setTokenInDraft({
+  draft: ACCENT_DRAFT,
+  scope: THEME,
+  tokenPath: "color.text",
+  value: "$atomic.swatch.mint",
+});
 
 test("the first edit is stored against the file as it is now", () => {
   const record = createEditedRecord({
@@ -166,64 +166,64 @@ test("an equal copy of the saved draft is cleared too", () => {
 test("an edit made during the save is kept, and the saved values are folded in", () => {
   assert.deepEqual(
     _settle(ACCENT_DRAFT, MORE_DRAFT),
-    setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      THEME,
-      "color.text",
-      "$atomic.swatch.mint",
-    ),
+    setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: THEME,
+      tokenPath: "color.text",
+      value: "$atomic.swatch.mint",
+    }),
   );
 });
 
 test("a saved token edited again during the save keeps its newer value", () => {
-  const newer = setTokenInDraft(
-    ACCENT_DRAFT,
-    THEME,
-    "color.accent",
-    "$atomic.swatch.orange",
-  );
+  const newer = setTokenInDraft({
+    draft: ACCENT_DRAFT,
+    scope: THEME,
+    tokenPath: "color.accent",
+    value: "$atomic.swatch.orange",
+  });
   assert.deepEqual(
     _settle(ACCENT_DRAFT, newer),
-    setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      THEME,
-      "color.accent",
-      "$atomic.swatch.orange",
-    ),
+    setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: THEME,
+      tokenPath: "color.accent",
+      value: "$atomic.swatch.orange",
+    }),
   );
 });
 
 test("item edits are folded in against the saved item overrides", () => {
-  const saved = setTokenInDraft(
-    ACCENT_DRAFT,
-    ITEM,
-    "color.accent",
-    "$atomic.swatch.mint",
-  );
-  const newer = setTokenInDraft(
-    saved,
-    ITEM,
-    "color.text",
-    "$atomic.swatch.cyan",
-  );
+  const saved = setTokenInDraft({
+    draft: ACCENT_DRAFT,
+    scope: ITEM,
+    tokenPath: "color.accent",
+    value: "$atomic.swatch.mint",
+  });
+  const newer = setTokenInDraft({
+    draft: saved,
+    scope: ITEM,
+    tokenPath: "color.text",
+    value: "$atomic.swatch.cyan",
+  });
   assert.deepEqual(
     _settle(saved, newer),
-    setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      ITEM,
-      "color.text",
-      "$atomic.swatch.cyan",
-    ),
+    setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: ITEM,
+      tokenPath: "color.text",
+      value: "$atomic.swatch.cyan",
+    }),
   );
 });
 
 test("a newer draft that lacks a saved token keeps only its own edits", () => {
-  const unrelated = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "color.text",
-    "$atomic.swatch.mint",
-  );
+  const unrelated = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "color.text",
+    value: "$atomic.swatch.mint",
+  });
   const result = _settle(ACCENT_DRAFT, unrelated);
   assert.deepEqual(result, unrelated);
 });
@@ -248,12 +248,12 @@ test("drafts are unchanged only when every edit matches", () => {
 });
 
 test("switching to another theme during a save does not copy its draft into the saved theme", () => {
-  const otherThemeDraft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "color.text",
-    "$atomic.swatch.orange",
-  );
+  const otherThemeDraft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "color.text",
+    value: "$atomic.swatch.orange",
+  });
   const result = createDraftAfterSave({
     themeId: "studio",
     savedDraft: ACCENT_DRAFT,
@@ -267,20 +267,20 @@ test("switching to another theme during a save does not copy its draft into the 
 });
 
 test("edits made to the saved theme before switching away during a save are kept", () => {
-  const otherThemeDraft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "color.text",
-    "$atomic.swatch.orange",
-  );
+  const otherThemeDraft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "color.text",
+    value: "$atomic.swatch.orange",
+  });
   assert.deepEqual(
     _settle(ACCENT_DRAFT, MORE_DRAFT, new Map([["other", otherThemeDraft]])),
-    setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      THEME,
-      "color.text",
-      "$atomic.swatch.mint",
-    ),
+    setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: THEME,
+      tokenPath: "color.text",
+      value: "$atomic.swatch.mint",
+    }),
   );
 });
 

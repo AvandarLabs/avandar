@@ -5,8 +5,8 @@ import {
   isMantineTokenRoot,
   listTokenDefinitions,
 } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { getDocumentPathFromTokenPath } from "../getDocumentPathFromTokenPath/getDocumentPathFromTokenPath";
 import {
-  getDocumentPathFromTokenPath,
   isThemeDraftEmpty,
   type ThemeDraft,
   type ThemeEditScope,

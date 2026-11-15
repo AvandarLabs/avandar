@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
-import { resolveDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
+import { makeDraftThemeResultFromDraft } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
 import {
   GalleryVideoTheme,
   useGalleryVideoTheme,
@@ -37,7 +37,7 @@ function useItemThemeColors(
     if (!itemId) {
       return undefined;
     }
-    const result = resolveDraftTheme({
+    const result = makeDraftThemeResultFromDraft({
       library,
       themeId,
       draft,

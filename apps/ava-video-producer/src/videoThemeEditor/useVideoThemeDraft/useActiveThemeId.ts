@@ -25,22 +25,25 @@ export function useActiveThemeId(
       available: availableKey.split(","),
     }),
   );
-  useEffect(() => {
-    if (!hasChosen.current) {
-      setThemeId(
-        getActiveThemeIdFromLocation({
-          search: location.search,
-          storage,
-          available: availableKey.split(","),
-        }),
-      );
-    }
-  }, [availableKey, storage]);
+  useEffect(
+    function adoptActiveThemeIdFromLocation() {
+      if (!hasChosen.current) {
+        setThemeId(
+          getActiveThemeIdFromLocation({
+            search: location.search,
+            storage,
+            available: availableKey.split(","),
+          }),
+        );
+      }
+    },
+    [availableKey, storage],
+  );
   const selectTheme = useCallback(
     (id: string) => {
       hasChosen.current = true;
       setThemeId(id);
-      rememberActiveThemeId(storage, id);
+      rememberActiveThemeId({ storage, themeId: id });
       const url = new URL(location.href);
       url.searchParams.set("theme", id);
       try {

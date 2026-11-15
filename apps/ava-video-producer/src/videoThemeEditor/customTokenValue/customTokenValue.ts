@@ -3,9 +3,9 @@ import {
   isTokenReference,
 } from "../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { CUSTOM_SCALE_KEY_PREFIX } from "../customScaleKey/customScaleKey";
+import { setValueAtPath } from "../setValueAtPath";
 import {
   setTokenInDraft,
-  setValueAtPath,
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
@@ -116,12 +116,12 @@ export function setCustomValueInDraft(
     ...request.fieldPath,
   ]);
   const reference = `$${scale}.${key}`;
-  const withEntry = setTokenInDraft(
+  const withEntry = setTokenInDraft({
     draft,
     scope,
-    `${scale}.${key}`,
-    _toScaleLiteral(scale, request.literal),
-  );
+    tokenPath: `${scale}.${key}`,
+    value: _toScaleLiteral(scale, request.literal),
+  });
   const current =
     typeof request.currentValue === "object" && request.currentValue !== null
       ? (request.currentValue as Readonly<Record<string, unknown>>)
@@ -129,6 +129,15 @@ export function setCustomValueInDraft(
   const tokenValue =
     request.fieldPath.length === 0
       ? reference
-      : setValueAtPath(current, request.fieldPath, reference);
-  return setTokenInDraft(withEntry, scope, request.tokenPath, tokenValue);
+      : setValueAtPath({
+          source: current,
+          path: request.fieldPath,
+          value: reference,
+        });
+  return setTokenInDraft({
+    draft: withEntry,
+    scope,
+    tokenPath: request.tokenPath,
+    value: tokenValue,
+  });
 }

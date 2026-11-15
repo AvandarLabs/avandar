@@ -11,7 +11,7 @@ type StubThumb = {
   removeAttribute: (name: string) => void;
 };
 
-function createStubThumb(): StubThumb {
+function _createStubThumb(): StubThumb {
   const attributes = new Map<string, string>();
   return {
     attributes,
@@ -20,7 +20,7 @@ function createStubThumb(): StubThumb {
   };
 }
 
-function createStubRoot(thumb: StubThumb | null) {
+function _createStubRoot(thumb: StubThumb | null) {
   return {
     querySelector: (selector: string) =>
       selector === '[role="slider"]' ? thumb : null,
@@ -36,15 +36,15 @@ test("createIssueAriaProps adds nothing for a row without an issue", () => {
 });
 
 test("markSliderThumbInvalid sets and clears aria-invalid on the thumb", () => {
-  const thumb = createStubThumb();
-  const root = createStubRoot(thumb);
-  markSliderThumbInvalid(root, true);
+  const thumb = _createStubThumb();
+  const root = _createStubRoot(thumb);
+  markSliderThumbInvalid({ root, isInvalid: true });
   assert.equal(thumb.attributes.get("aria-invalid"), "true");
-  markSliderThumbInvalid(root, false);
+  markSliderThumbInvalid({ root, isInvalid: false });
   assert.equal(thumb.attributes.has("aria-invalid"), false);
 });
 
 test("markSliderThumbInvalid ignores a missing root or thumb", () => {
-  markSliderThumbInvalid(null, true);
-  markSliderThumbInvalid(createStubRoot(null), true);
+  markSliderThumbInvalid({ root: undefined, isInvalid: true });
+  markSliderThumbInvalid({ root: _createStubRoot(null), isInvalid: true });
 });

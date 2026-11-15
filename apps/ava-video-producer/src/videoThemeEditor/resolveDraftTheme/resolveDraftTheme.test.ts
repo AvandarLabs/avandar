@@ -8,7 +8,7 @@ import { EMPTY_THEME_DRAFT, setTokenInDraft } from "../themeDraft/themeDraft";
 import {
   isThemeDraftValid,
   nextLastValidDraft,
-  resolveDraftTheme,
+  makeDraftThemeResultFromDraft,
 } from "./resolveDraftTheme";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
@@ -29,7 +29,7 @@ const LIBRARY = createVideoThemeLibrary([STUDIO]);
 const THEME = { kind: "theme" } as const;
 
 test("an unedited theme resolves with no patches", () => {
-  const result = resolveDraftTheme({
+  const result = makeDraftThemeResultFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft: EMPTY_THEME_DRAFT,
@@ -39,13 +39,13 @@ test("an unedited theme resolves with no patches", () => {
 });
 
 test("a draft reference to a missing token reports the token path", () => {
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "color.accent",
-    "$atomic.swatch.nope",
-  );
-  const result = resolveDraftTheme({
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "color.accent",
+    value: "$atomic.swatch.nope",
+  });
+  const result = makeDraftThemeResultFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft,
@@ -60,13 +60,13 @@ test("a draft reference to a missing token reports the token path", () => {
 });
 
 test("a draft value that breaks the schema reports the token path", () => {
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "color.accent",
-    "#ff0000",
-  );
-  const result = resolveDraftTheme({
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "color.accent",
+    value: "#ff0000",
+  });
+  const result = makeDraftThemeResultFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft,
@@ -79,7 +79,7 @@ test("a draft value that breaks the schema reports the token path", () => {
 });
 
 test("item scope resolves the item's saved override", () => {
-  const result = resolveDraftTheme({
+  const result = makeDraftThemeResultFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft: EMPTY_THEME_DRAFT,
@@ -94,7 +94,7 @@ test("a built-in theme with a draft resolves without its per-item overrides", ()
     [
       "classic",
       {
-        ...(BUILT_IN_VIDEO_THEMES.get("classic") as VideoThemeDocument),
+        ...BUILT_IN_VIDEO_THEMES.get("classic")!,
         overrides: {
           "network-graph": {
             other: {
@@ -107,13 +107,13 @@ test("a built-in theme with a draft resolves without its per-item overrides", ()
       },
     ],
   ]);
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    THEME,
-    "stroke.default",
-    "$atomic.strokeWidth.lg",
-  );
-  const result = resolveDraftTheme({
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    tokenPath: "stroke.default",
+    value: "$atomic.strokeWidth.lg",
+  });
+  const result = makeDraftThemeResultFromDraft({
     library,
     themeId: "classic",
     draft,
@@ -123,34 +123,35 @@ test("a built-in theme with a draft resolves without its per-item overrides", ()
 });
 
 test("a draft with a broken item override is not valid", () => {
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    { kind: "item", itemId: "data-pipeline" },
-    "color.line",
-    "$atomic.swatch.nope",
-  );
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: { kind: "item", itemId: "data-pipeline" },
+    tokenPath: "color.line",
+    value: "$atomic.swatch.nope",
+  });
   assert.equal(
     isThemeDraftValid({ library: LIBRARY, themeId: "studio", draft }),
     false,
   );
 });
 
-const FIRST_DRAFT = setTokenInDraft(
-  EMPTY_THEME_DRAFT,
-  THEME,
-  "atomic.swatch.mint",
-  "#123456",
-);
-const SECOND_DRAFT = setTokenInDraft(
-  EMPTY_THEME_DRAFT,
-  THEME,
-  "atomic.swatch.mint",
-  "#654321",
-);
+const FIRST_DRAFT = setTokenInDraft({
+  draft: EMPTY_THEME_DRAFT,
+  scope: THEME,
+  tokenPath: "atomic.swatch.mint",
+  value: "#123456",
+});
+const SECOND_DRAFT = setTokenInDraft({
+  draft: EMPTY_THEME_DRAFT,
+  scope: THEME,
+  tokenPath: "atomic.swatch.mint",
+  value: "#654321",
+});
 
 test("a valid draft becomes the last valid one", () => {
   assert.deepEqual(
-    nextLastValidDraft(undefined, {
+    nextLastValidDraft({
+      current: undefined,
       themeId: "studio",
       draft: FIRST_DRAFT,
       isValid: true,
@@ -162,7 +163,8 @@ test("a valid draft becomes the last valid one", () => {
 test("an invalid draft leaves the last valid one in place", () => {
   const current = { themeId: "studio", draft: FIRST_DRAFT };
   assert.equal(
-    nextLastValidDraft(current, {
+    nextLastValidDraft({
+      current,
       themeId: "studio",
       draft: SECOND_DRAFT,
       isValid: false,
@@ -174,7 +176,8 @@ test("an invalid draft leaves the last valid one in place", () => {
 test("the same valid draft keeps the same record, so no re-render is requested", () => {
   const current = { themeId: "studio", draft: FIRST_DRAFT };
   assert.equal(
-    nextLastValidDraft(current, {
+    nextLastValidDraft({
+      current,
       themeId: "studio",
       draft: FIRST_DRAFT,
       isValid: true,
@@ -186,7 +189,8 @@ test("the same valid draft keeps the same record, so no re-render is requested",
 test("a valid draft for another theme replaces the last valid one", () => {
   const current = { themeId: "studio", draft: FIRST_DRAFT };
   assert.deepEqual(
-    nextLastValidDraft(current, {
+    nextLastValidDraft({
+      current,
       themeId: "classic",
       draft: FIRST_DRAFT,
       isValid: true,

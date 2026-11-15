@@ -2,9 +2,9 @@ import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolved
 import { mergeVideoThemeLayers } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemeLayers";
 import { VideoThemeError } from "../../videoTheme/VideoThemeError";
 import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
+import { getTokenPathFromDocumentPath } from "../getTokenPathFromDocumentPath/getTokenPathFromDocumentPath";
 import {
   createVideoThemeSourceFromDraft,
-  getTokenPathFromDocumentPath,
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
@@ -53,7 +53,7 @@ function _schemaIssues(patches: readonly VideoThemePatch[]): VideoThemeIssue[] {
  * item with its draft on top. Reports schema and reference problems by
  * token path instead of throwing, so the editor can mark them.
  */
-export function resolveDraftTheme(
+export function makeDraftThemeResultFromDraft(
   input: DraftInput & Readonly<{ scope: ThemeEditScope }>,
 ): DraftThemeResult {
   const itemId = input.scope.kind === "item" ? input.scope.itemId : undefined;
@@ -93,7 +93,7 @@ export function isThemeDraftValid(input: DraftInput): boolean {
     ...Object.keys(input.draft.overrides).map(
       (itemId) => ({ kind: "item", itemId }) as const,
     ),
-  ].every((scope) => resolveDraftTheme({ ...input, scope }).ok);
+  ].every((scope) => makeDraftThemeResultFromDraft({ ...input, scope }).ok);
 }
 
 /** The most recent draft of a theme that resolved, and the theme it belongs to. */
@@ -105,10 +105,14 @@ export type LastValidDraft = Readonly<{ themeId: string; draft: ThemeDraft }>;
  * itself so the caller can tell nothing moved.
  */
 export function nextLastValidDraft(
-  current: LastValidDraft | undefined,
-  candidate: Readonly<{ themeId: string; draft: ThemeDraft; isValid: boolean }>,
+  options: Readonly<{
+    current: LastValidDraft | undefined;
+    themeId: string;
+    draft: ThemeDraft;
+    isValid: boolean;
+  }>,
 ): LastValidDraft | undefined {
-  const { themeId, draft, isValid } = candidate;
+  const { current, themeId, draft, isValid } = options;
   if (!isValid || (current?.themeId === themeId && current.draft === draft)) {
     return current;
   }

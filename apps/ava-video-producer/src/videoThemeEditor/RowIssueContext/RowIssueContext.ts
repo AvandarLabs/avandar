@@ -16,9 +16,9 @@ export function useRowHasIssue(): boolean {
  * The ARIA props that mark a control invalid. For controls that have no
  * Mantine error state, such as a segmented control.
  */
-export function createIssueAriaProps(
-  hasIssue: boolean,
-): Readonly<{ "aria-invalid"?: true }> {
+export function createIssueAriaProps(hasIssue: boolean): {
+  "aria-invalid"?: true;
+} {
   return hasIssue ? { "aria-invalid": true } : {};
 }
 
@@ -27,22 +27,25 @@ export function useRowIssueAriaProps(): Readonly<{ "aria-invalid"?: true }> {
   return createIssueAriaProps(useRowHasIssue());
 }
 
-type SliderRoot = Readonly<{
-  querySelector: (selector: string) => {
-    setAttribute: (name: string, value: string) => void;
-    removeAttribute: (name: string) => void;
-  } | null;
-}>;
-
 /**
  * Sets or clears `aria-invalid` on the thumb inside a Mantine slider. The
  * slider drops unknown props before they reach its thumb, so the attribute is
  * written on the thumb element directly.
  */
 export function markSliderThumbInvalid(
-  root: SliderRoot | null,
-  isInvalid: boolean,
+  options: Readonly<{
+    root:
+      | Readonly<{
+          querySelector: (selector: string) => {
+            setAttribute: (name: string, value: string) => void;
+            removeAttribute: (name: string) => void;
+          } | null;
+        }>
+      | undefined;
+    isInvalid: boolean;
+  }>,
 ): void {
+  const { root, isInvalid } = options;
   const thumb = root?.querySelector('[role="slider"]');
   if (!thumb) {
     return;
@@ -64,7 +67,10 @@ export function useSliderIssueRef(): React.RefObject<HTMLDivElement | null> {
   // No dependency list: the effect re-applies the attribute after every
   // render, so a remounted thumb is marked again.
   useEffect(() => {
-    markSliderThumbInvalid(sliderRef.current, hasIssue);
+    markSliderThumbInvalid({
+      root: sliderRef.current ?? undefined,
+      isInvalid: hasIssue,
+    });
   });
   return sliderRef;
 }

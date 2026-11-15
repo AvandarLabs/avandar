@@ -1,4 +1,4 @@
-import { BUILT_IN_VIDEO_THEME_IDS } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import {
   createDraftThemeTarget,
   DRAFT_THEME_ID,
@@ -6,15 +6,16 @@ import {
 } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { mergeVideoThemePatches } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemePatches/mergeVideoThemePatches";
-import {
-  isMantineTokenRoot,
-  listTokenDefinitions,
-} from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import {
   createVideoThemeSnapshot,
   type VideoThemeSnapshot,
 } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { isCustomScaleEntryPath } from "../customScaleKey/customScaleKey";
+import { getDocumentPathFromTokenPath } from "../getDocumentPathFromTokenPath/getDocumentPathFromTokenPath";
+import { isRecord } from "../isRecord";
+import { removeValueAtPath } from "../removeValueAtPath";
+import { setValueAtPath } from "../setValueAtPath";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,
@@ -50,14 +51,6 @@ type DraftTarget = Readonly<{
   itemId?: string;
 }>;
 
-function _isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function _isBuiltIn(themeId: string): boolean {
-  return (BUILT_IN_VIDEO_THEME_IDS as readonly string[]).includes(themeId);
-}
-
 function _getDocument(
   library: VideoThemeLibrary,
   themeId: string,
@@ -69,106 +62,23 @@ function _getDocument(
   return document;
 }
 
-/**
- * Where a token lives in a theme file, such as
- * `other.video.semantic.color.accent` for `color.accent`. Use it to read or
- * write a token in a document or patch.
- */
-export function getDocumentPathFromTokenPath(
-  tokenPath: string,
-): readonly string[] {
-  const [root, ...rest] = tokenPath.split(".");
-  if (root === "atomic") {
-    return ["other", "video", "atomic", ...rest];
-  }
-  if (root === "components") {
-    const [name, ...props] = rest;
-    return ["components", name, "defaultProps", ...props];
-  }
-  return isMantineTokenRoot(root)
-    ? [root, ...rest]
-    : ["other", "video", "semantic", root, ...rest];
-}
-
-/**
- * The token path for a theme file path, such as a zod issue path. Use it to
- * attach a schema problem to the editor row it belongs to.
- */
-export function getTokenPathFromDocumentPath(
-  documentPath: readonly PropertyKey[],
-): string {
-  const segments = documentPath.map(String);
-  const isVideo = segments[0] === "other" && segments[1] === "video";
-  if (isVideo && segments[2] === "atomic") {
-    return ["atomic", ...segments.slice(3)].join(".");
-  }
-  if (isVideo && segments[2] === "semantic") {
-    return segments.slice(3).join(".");
-  }
-  if (segments[0] === "components" && segments[2] === "defaultProps") {
-    return ["components", segments[1], ...segments.slice(3)].join(".");
-  }
-  return segments.join(".");
-}
-
-/** A copy of a nested object with one value set, creating parents as needed. */
-export function setValueAtPath(
-  source: Readonly<Record<string, unknown>>,
-  path: readonly string[],
-  value: unknown,
-): Readonly<Record<string, unknown>> {
-  const [key, ...rest] = path;
-  if (key === undefined) {
-    return source;
-  }
-  const child = source[key];
-  return {
-    ...source,
-    [key]:
-      rest.length === 0
-        ? value
-        : setValueAtPath(_isRecord(child) ? child : {}, rest, value),
-  };
-}
-
-/** A copy of a nested object with one value removed and empty parents pruned. */
-export function removeValueAtPath(
-  source: Readonly<Record<string, unknown>>,
-  path: readonly string[],
-): Readonly<Record<string, unknown>> {
-  const [key, ...rest] = path;
-  if (key === undefined || !Object.hasOwn(source, key)) {
-    return source;
-  }
-  if (rest.length === 0) {
-    return Object.fromEntries(
-      Object.entries(source).filter(([entry]) => entry !== key),
-    );
-  }
-  const child = source[key];
-  if (!_isRecord(child)) {
-    return source;
-  }
-  const pruned = removeValueAtPath(child, rest);
-  return Object.keys(pruned).length === 0
-    ? removeValueAtPath(source, [key])
-    : { ...source, [key]: pruned };
-}
-
 function _scopePatch(
-  draft: ThemeDraft,
-  scope: ThemeEditScope,
+  options: Readonly<{ draft: ThemeDraft; scope: ThemeEditScope }>,
 ): VideoThemePatch {
+  const { draft, scope } = options;
   return scope.kind === "theme"
     ? draft.patch
     : (draft.overrides[scope.itemId] ?? {});
 }
 
 function _withScopePatch(
-  draft: ThemeDraft,
-  scope: ThemeEditScope,
-  patch: VideoThemePatch,
+  options: Readonly<{
+    draft: ThemeDraft;
+    scope: ThemeEditScope;
+    patch: VideoThemePatch;
+  }>,
 ): ThemeDraft {
+  const { draft, scope, patch } = options;
   if (scope.kind === "theme") {
     return { ...draft, patch };
   }
@@ -188,30 +98,36 @@ function _withScopePatch(
 
 /** A draft with one token set in a scope, replacing any earlier draft value. */
 export function setTokenInDraft(
-  draft: ThemeDraft,
-  scope: ThemeEditScope,
-  tokenPath: string,
-  value: unknown,
+  options: Readonly<{
+    draft: ThemeDraft;
+    scope: ThemeEditScope;
+    tokenPath: string;
+    value: unknown;
+  }>,
 ): ThemeDraft {
-  const patch = setValueAtPath(
-    _scopePatch(draft, scope),
-    getDocumentPathFromTokenPath(tokenPath),
+  const { draft, scope, tokenPath, value } = options;
+  const patch = setValueAtPath({
+    source: _scopePatch({ draft, scope }),
+    path: getDocumentPathFromTokenPath(tokenPath),
     value,
-  );
-  return _withScopePatch(draft, scope, patch);
+  });
+  return _withScopePatch({ draft, scope, patch });
 }
 
 /** A draft with one token's draft value removed from a scope. */
 export function resetTokenInDraft(
-  draft: ThemeDraft,
-  scope: ThemeEditScope,
-  tokenPath: string,
+  options: Readonly<{
+    draft: ThemeDraft;
+    scope: ThemeEditScope;
+    tokenPath: string;
+  }>,
 ): ThemeDraft {
-  const patch = removeValueAtPath(
-    _scopePatch(draft, scope),
-    getDocumentPathFromTokenPath(tokenPath),
-  );
-  return _withScopePatch(draft, scope, patch);
+  const { draft, scope, tokenPath } = options;
+  const patch = removeValueAtPath({
+    source: _scopePatch({ draft, scope }),
+    path: getDocumentPathFromTokenPath(tokenPath),
+  });
+  return _withScopePatch({ draft, scope, patch });
 }
 
 /** Whether a draft holds any edit. */
@@ -235,7 +151,7 @@ export function listTokenPathsFromPatch(
     if (value === undefined) {
       return [];
     }
-    return isScale && _isRecord(value)
+    return isScale && isRecord(value)
       ? Object.keys(value).map((key) => `${path}.${key}`)
       : [path];
   });
@@ -278,11 +194,11 @@ function _applyPatch(
 ): VideoThemePatch {
   return listTokenPathsFromPatch(patch).reduce((result, tokenPath) => {
     const documentPath = getDocumentPathFromTokenPath(tokenPath);
-    return setValueAtPath(
-      result,
-      documentPath,
-      getValueAtPath(patch, documentPath),
-    );
+    return setValueAtPath({
+      source: result,
+      path: documentPath,
+      value: getValueAtPath(patch, documentPath),
+    });
   }, target);
 }
 
@@ -294,12 +210,15 @@ export function createSavedDocumentFromDraft(
   document: VideoThemeDocument,
   draft: ThemeDraft,
 ): VideoThemeDocument {
-  const overrides: Record<string, VideoThemePatch> = {
+  const overrides = {
     ...document.overrides,
+    ...Object.fromEntries(
+      Object.entries(draft.overrides).map(([itemId, patch]) => [
+        itemId,
+        _applyPatch(document.overrides?.[itemId] ?? {}, patch),
+      ]),
+    ),
   };
-  for (const [itemId, patch] of Object.entries(draft.overrides)) {
-    overrides[itemId] = _applyPatch(overrides[itemId] ?? {}, patch);
-  }
   return {
     ..._applyPatch(document, draft.patch),
     ...(Object.keys(overrides).length > 0 ? { overrides } : {}),
@@ -320,7 +239,7 @@ export function createNewThemeDocument(
   }>,
 ): VideoThemeDocument {
   const { base, draft, id, label } = options;
-  if (!_isBuiltIn(base.id)) {
+  if (!BUILT_IN_VIDEO_THEMES.has(base.id)) {
     return { ...createSavedDocumentFromDraft(base, draft), id, label };
   }
   const overrides = Object.fromEntries(
@@ -336,7 +255,7 @@ export function createNewThemeDocument(
     extends: base.id,
     ..._applyPatch({}, draft.patch),
     ...(Object.keys(overrides).length > 0 ? { overrides } : {}),
-  } as VideoThemeDocument;
+  };
 }
 
 /**
@@ -360,7 +279,10 @@ export function createDraftPatchesForItem(
         ] ?? {});
   const themePatch = listTokenPathsFromPatch(saved).reduce(
     (patch, tokenPath) =>
-      removeValueAtPath(patch, getDocumentPathFromTokenPath(tokenPath)),
+      removeValueAtPath({
+        source: patch,
+        path: getDocumentPathFromTokenPath(tokenPath),
+      }),
     draft.patch,
   );
   const itemPatch = itemId === undefined ? {} : (draft.overrides[itemId] ?? {});

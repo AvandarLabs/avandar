@@ -1,10 +1,10 @@
 import { getValueAtPath } from "../../../videoTheme/getValueAtPath";
+import { getDocumentPathFromTokenPath } from "../../getDocumentPathFromTokenPath/getDocumentPathFromTokenPath";
+import { removeValueAtPath } from "../../removeValueAtPath";
 import {
   EMPTY_THEME_DRAFT,
-  getDocumentPathFromTokenPath,
   isThemeDraftEmpty,
   listTokenPathsFromPatch,
-  removeValueAtPath,
   type ThemeDraft,
 } from "../../themeDraft/themeDraft";
 import type {
@@ -110,7 +110,10 @@ function _omitSavedTokens(
         getValueAtPath(patch, documentPath),
         getValueAtPath(saved, documentPath),
       )
-        ? (removeValueAtPath(result, documentPath) as VideoThemePatch)
+        ? (removeValueAtPath({
+            source: result,
+            path: documentPath,
+          }) as VideoThemePatch)
         : result;
     },
     patch,

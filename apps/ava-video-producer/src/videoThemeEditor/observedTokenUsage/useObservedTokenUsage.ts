@@ -7,10 +7,10 @@ import type { TokenUsageReporter } from "../../videoTheme/tokenUsageHelpers/toke
  * token paths it has seen so far. One collector lives as long as the
  * component that calls this.
  */
-export function useObservedTokenUsage(): Readonly<{
+export function useObservedTokenUsage(): {
   report: TokenUsageReporter;
   paths: readonly string[];
-}> {
+} {
   const [usage] = useState(createObservedTokenUsage);
   const paths = useSyncExternalStore(
     usage.subscribe,

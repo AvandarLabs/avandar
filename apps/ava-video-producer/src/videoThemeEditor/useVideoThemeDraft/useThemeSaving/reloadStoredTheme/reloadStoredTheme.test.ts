@@ -9,7 +9,7 @@ import type { StoredTheme } from "../../../ThemeApi/ThemeApi";
 const STORED_THEME = {
   document: { id: "harbor", label: "Harbor" },
   hash: "fresh",
-} as unknown as StoredTheme;
+} as StoredTheme;
 
 function _createReloadOptions(
   overrides: Partial<Parameters<typeof reloadStoredTheme>[0]> = {},

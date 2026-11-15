@@ -4,7 +4,7 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { resolveDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
+import { makeDraftThemeResultFromDraft } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
 import {
   createSnapshotFromDraft,
   EMPTY_THEME_DRAFT,
@@ -27,24 +27,24 @@ import type {
 
 const ITEM_ID = "shared-object-handoff";
 const OTHER_ITEM_ID = "occlusion-wipe";
-const DRAFT = setTokenInDraft(
-  EMPTY_THEME_DRAFT,
-  { kind: "theme" },
-  "atomic.swatch.cyan",
-  "#123456",
-);
+const DRAFT = setTokenInDraft({
+  draft: EMPTY_THEME_DRAFT,
+  scope: { kind: "theme" },
+  tokenPath: "atomic.swatch.cyan",
+  value: "#123456",
+});
 const CUSTOM_THEME: VideoThemeDocument = {
   schemaVersion: 1,
   id: "harbor",
   label: "Harbor",
   extends: "classic",
   overrides: {
-    [ITEM_ID]: setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      { kind: "theme" },
-      "atomic.swatch.cyan",
-      "#654321",
-    ).patch,
+    [ITEM_ID]: setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: { kind: "theme" },
+      tokenPath: "atomic.swatch.cyan",
+      value: "#654321",
+    }).patch,
   },
 };
 const CUSTOM_LIBRARY = createVideoThemeLibrary([CUSTOM_THEME]);
@@ -68,7 +68,7 @@ function _playerHash(input: Case, filmId: string = ITEM_ID): string {
 
 /** The hash the gallery resolves for the item. */
 function _galleryHash(input: Case): string {
-  const gallery = resolveDraftTheme({
+  const gallery = makeDraftThemeResultFromDraft({
     ...input,
     scope: { kind: "item", itemId: ITEM_ID },
   });

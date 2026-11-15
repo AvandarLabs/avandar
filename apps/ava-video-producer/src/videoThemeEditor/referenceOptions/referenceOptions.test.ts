@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { resolveDraftTheme } from "../resolveDraftTheme/resolveDraftTheme";
+import { makeDraftThemeResultFromDraft } from "../resolveDraftTheme/resolveDraftTheme";
 import { EMPTY_THEME_DRAFT } from "../themeDraft/themeDraft";
 import { listTokenRows } from "../tokenRows/tokenRows";
 import {
@@ -14,7 +14,7 @@ import {
 import type { TokenKind } from "../../videoTheme/videoTheme.types";
 
 const SCOPE = { kind: "theme" } as const;
-const RESOLVED = resolveDraftTheme({
+const RESOLVED = makeDraftThemeResultFromDraft({
   library: BUILT_IN_VIDEO_THEMES,
   themeId: "classic",
   draft: EMPTY_THEME_DRAFT,

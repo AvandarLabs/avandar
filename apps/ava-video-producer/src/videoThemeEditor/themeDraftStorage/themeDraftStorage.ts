@@ -28,14 +28,14 @@ type WritableStorage = Pick<Storage, "setItem" | "removeItem">;
  * survive a reload.
  */
 export function readStoredThemeDraft(
-  storage: ReadableStorage,
-  themeId: string,
+  options: Readonly<{ storage: ReadableStorage; themeId: string }>,
 ): StoredThemeDraft | undefined {
+  const { storage, themeId } = options;
   try {
     const parsed = storedDraftSchema.safeParse(
       JSON.parse(storage.getItem(`${DRAFT_KEY_PREFIX}${themeId}`) ?? "null"),
     );
-    return parsed.success ? (parsed.data as StoredThemeDraft) : undefined;
+    return parsed.success ? parsed.data : undefined;
   } catch {
     return undefined;
   }
@@ -43,10 +43,13 @@ export function readStoredThemeDraft(
 
 /** Stores a theme's draft, or forgets it when the draft is empty. */
 export function writeStoredThemeDraft(
-  storage: WritableStorage,
-  themeId: string,
-  stored: StoredThemeDraft,
+  options: Readonly<{
+    storage: WritableStorage;
+    themeId: string;
+    stored: StoredThemeDraft;
+  }>,
 ): void {
+  const { storage, themeId, stored } = options;
   const key = `${DRAFT_KEY_PREFIX}${themeId}`;
   try {
     if (isThemeDraftEmpty(stored.draft)) {
@@ -74,12 +77,13 @@ export function getActiveThemeIdFromLocation(
   if (fromUrl && options.available.includes(fromUrl)) {
     return fromUrl;
   }
-  let remembered: string | undefined;
-  try {
-    remembered = options.storage.getItem(ACTIVE_THEME_KEY) ?? undefined;
-  } catch {
-    remembered = undefined;
-  }
+  const remembered = (() => {
+    try {
+      return options.storage.getItem(ACTIVE_THEME_KEY) ?? undefined;
+    } catch {
+      return undefined;
+    }
+  })();
   return remembered && options.available.includes(remembered)
     ? remembered
     : "classic";
@@ -87,9 +91,9 @@ export function getActiveThemeIdFromLocation(
 
 /** Remembers the viewer's theme choice for their next visit. */
 export function rememberActiveThemeId(
-  storage: WritableStorage,
-  themeId: string,
+  options: Readonly<{ storage: WritableStorage; themeId: string }>,
 ): void {
+  const { storage, themeId } = options;
   try {
     storage.setItem(ACTIVE_THEME_KEY, themeId);
   } catch {

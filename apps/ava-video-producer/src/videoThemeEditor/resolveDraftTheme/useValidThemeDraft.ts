@@ -18,14 +18,15 @@ export function useValidThemeDraft(
     themeId: string;
     draft: ThemeDraft;
   }>,
-): Readonly<{ draft: ThemeDraft; isValid: boolean }> {
+): { draft: ThemeDraft; isValid: boolean } {
   const { library, themeId, draft } = options;
   const isValid = useMemo(
     () => isThemeDraftValid({ library, themeId, draft }),
     [library, themeId, draft],
   );
   const [lastValid, setLastValid] = useState<LastValidDraft>();
-  const nextLastValid = nextLastValidDraft(lastValid, {
+  const nextLastValid = nextLastValidDraft({
+    current: lastValid,
     themeId,
     draft,
     isValid,

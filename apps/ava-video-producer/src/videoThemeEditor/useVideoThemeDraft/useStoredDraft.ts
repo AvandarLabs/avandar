@@ -51,18 +51,18 @@ function useStoredDraftRecord(options: StoredDraftOptions) {
   const { themeId, storage } = options;
   const [state, setState] = useState(() => ({
     themeId,
-    record: readStoredThemeDraft(storage, themeId),
+    record: readStoredThemeDraft({ storage, themeId }),
   }));
   const record =
     state.themeId === themeId
       ? state.record
-      : readStoredThemeDraft(storage, themeId);
+      : readStoredThemeDraft({ storage, themeId });
   if (state.themeId !== themeId) {
     setState({ themeId, record });
   }
   const store = useCallback(
     (nextRecord: StoredThemeDraft) => {
-      writeStoredThemeDraft(storage, themeId, nextRecord);
+      writeStoredThemeDraft({ storage, themeId, stored: nextRecord });
       setState({ themeId, record: nextRecord });
     },
     [storage, themeId],

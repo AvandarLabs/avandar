@@ -5,7 +5,7 @@ import {
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getResolvedTokenValue } from "../../videoTheme/getResolvedTokenValue";
-import { resolveDraftTheme } from "../resolveDraftTheme/resolveDraftTheme";
+import { makeDraftThemeResultFromDraft } from "../resolveDraftTheme/resolveDraftTheme";
 import {
   EMPTY_THEME_DRAFT,
   setTokenInDraft,
@@ -44,7 +44,7 @@ function _rows(
   scope: ThemeEditScope,
   draft: ThemeDraft = EMPTY_THEME_DRAFT,
 ): readonly TokenRow[] {
-  const resolved = resolveDraftTheme({
+  const resolved = makeDraftThemeResultFromDraft({
     library: LIBRARY,
     themeId: "studio",
     draft,
@@ -99,12 +99,12 @@ test("rows group by tier and first segment", () => {
 });
 
 test("item-scope rows tell draft edits from saved overrides", () => {
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    ITEM,
-    "stroke.default",
-    "$atomic.strokeWidth.lg",
-  );
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: ITEM,
+    tokenPath: "stroke.default",
+    value: "$atomic.strokeWidth.lg",
+  });
   const rows = _rows(ITEM, draft);
   assert.deepEqual(
     ["color.accent", "stroke.default", "color.line"].map(
@@ -120,7 +120,7 @@ test("on a built-in theme with a draft, item rows show no saved overrides", () =
     [
       "classic",
       {
-        ...(BUILT_IN_VIDEO_THEMES.get("classic") as VideoThemeDocument),
+        ...BUILT_IN_VIDEO_THEMES.get("classic")!,
         overrides: {
           "network-graph": {
             other: {
@@ -133,13 +133,13 @@ test("on a built-in theme with a draft, item rows show no saved overrides", () =
       },
     ],
   ]);
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    { kind: "theme" },
-    "stroke.default",
-    "$atomic.strokeWidth.lg",
-  );
-  const resolved = resolveDraftTheme({
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: { kind: "theme" },
+    tokenPath: "stroke.default",
+    value: "$atomic.strokeWidth.lg",
+  });
+  const resolved = makeDraftThemeResultFromDraft({
     library,
     themeId: "classic",
     draft,
@@ -223,17 +223,17 @@ test("a row's issue is one at its path or inside it, never a sibling's", () => {
 });
 
 test("a new scale value takes the first free custom key in its whole scale", () => {
-  const draft = setTokenInDraft(
-    setTokenInDraft(
-      EMPTY_THEME_DRAFT,
-      { kind: "theme" },
-      "atomic.swatch.custom1",
-      "#123456",
-    ),
-    { kind: "theme" },
-    "atomic.swatch.custom3",
-    "#654321",
-  );
+  const draft = setTokenInDraft({
+    draft: setTokenInDraft({
+      draft: EMPTY_THEME_DRAFT,
+      scope: { kind: "theme" },
+      tokenPath: "atomic.swatch.custom1",
+      value: "#123456",
+    }),
+    scope: { kind: "theme" },
+    tokenPath: "atomic.swatch.custom3",
+    value: "#654321",
+  });
   const rows = _rows({ kind: "theme" }, draft);
   const visible = filterTokenRows(rows, {
     tiers: ["atomic"],
@@ -274,8 +274,11 @@ test("any other resolver message is a general problem", () => {
 
 function _themeRowsWithItem(draft: ThemeDraft) {
   const input = { library: LIBRARY, themeId: "studio", draft };
-  const themeResult = resolveDraftTheme({ ...input, scope: { kind: "theme" } });
-  const itemResult = resolveDraftTheme({ ...input, scope: ITEM });
+  const themeResult = makeDraftThemeResultFromDraft({
+    ...input,
+    scope: { kind: "theme" },
+  });
+  const itemResult = makeDraftThemeResultFromDraft({ ...input, scope: ITEM });
   if (!themeResult.ok || !itemResult.ok) {
     throw new Error("The test theme must resolve");
   }
@@ -302,12 +305,12 @@ test("in theme scope, a row the previewed item overrides carries the item's own 
 });
 
 test("in theme scope, an unsaved item edit also counts as the item's own value", () => {
-  const draft = setTokenInDraft(
-    EMPTY_THEME_DRAFT,
-    ITEM,
-    "stroke.default",
-    "$atomic.strokeWidth.lg",
-  );
+  const draft = setTokenInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: ITEM,
+    tokenPath: "stroke.default",
+    value: "$atomic.strokeWidth.lg",
+  });
   const { rows } = _themeRowsWithItem(draft);
   assert.ok(_row(rows, "stroke.default")?.itemOverride);
 });

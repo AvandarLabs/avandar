@@ -49,11 +49,11 @@ export function useTokenEditorValue(
       swatches,
       item,
       setToken: (tokenPath, value) =>
-        onDraftChange(setTokenInDraft(draft, scope, tokenPath, value)),
+        onDraftChange(setTokenInDraft({ draft, scope, tokenPath, value })),
       setCustomValue: (request) =>
         onDraftChange(setCustomValueInDraft(draft, scope, request)),
       resetToken: (tokenPath) =>
-        onDraftChange(resetTokenInDraft(draft, scope, tokenPath)),
+        onDraftChange(resetTokenInDraft({ draft, scope, tokenPath })),
     }),
     [draft, scope, rows, theme, issues, swatches, item, onDraftChange],
   );
