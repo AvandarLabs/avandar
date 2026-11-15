@@ -4,7 +4,7 @@ import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialo
 import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
-import { buildCategoryLabelGetter } from "../buildCategoryLabelGetter/buildCategoryLabelGetter";
+import { categoryLabel } from "../categoryLabel";
 import { CompositionCard } from "../CompositionCard/CompositionCard";
 import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import { countCompositionCategories } from "../gallerySelectionReducer/gallerySelectionReducer";
@@ -15,7 +15,7 @@ type Props = {
 };
 
 /** Section copy, so one gallery serves both Compositions and Sample films. */
-function useSectionCopy(section: Props["section"]) {
+function _sectionCopy(section: Props["section"]) {
   return section === "films"
     ? {
         eyebrow: "SAMPLE FILMS",
@@ -52,15 +52,14 @@ function useSectionCopy(section: Props["section"]) {
  * card per entry, and the live player in the shared preview modal.
  */
 export function CompositionGallery({ section }: Props) {
-  const getCategoryLabel = buildCategoryLabelGetter();
-  const copy = useSectionCopy(section);
+  const copy = _sectionCopy(section);
   const { themeId } = useGalleryVideoTheme();
   const gallery = useCompositionGallery(
     section === "films" ? "films" : "vocabulary",
   );
   const { selection, open, previous, next } = gallery;
   const categories = countCompositionCategories(selection.family).map(
-    (category) => ({ ...category, label: getCategoryLabel(category.id) }),
+    (category) => ({ ...category, label: categoryLabel(category.id) }),
   );
   return (
     <>
@@ -103,7 +102,7 @@ export function CompositionGallery({ section }: Props) {
             <CompositionCard
               key={entry.id}
               entry={entry}
-              category={getCategoryLabel(entry.category)}
+              category={categoryLabel(entry.category)}
               themeId={themeId}
               onOpen={gallery.openEntry}
             />
@@ -113,7 +112,7 @@ export function CompositionGallery({ section }: Props) {
       {open ? (
         <AtlasDialog
           title={open.title}
-          subtitle={getCategoryLabel(open.category)}
+          subtitle={categoryLabel(open.category)}
           previousLabel="Previous preview"
           nextLabel="Next preview"
           onClose={gallery.close}

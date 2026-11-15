@@ -18,7 +18,7 @@
   position: absolute;
 }
 
-.fallback {
+.posterThumbnailFallback {
   background: var(--ava-neutral-9);
   border-radius: 4px;
   bottom: 8px;
