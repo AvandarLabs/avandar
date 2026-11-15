@@ -181,8 +181,8 @@ Then edit:
 4. `tests/stock.test.ts`: update the hardcoded general / social-sector counts.
 5. `docs/stock-motion-library.md` and `docs/motion-atlas/catalog-expansion.md`:
    update counts and add the preset.
-6. Run `pnpm stock:messages` (regenerates `src/stock/i18n/messages.en.generated.ts`;
-   never edit it by hand), then `npm run motion:build`.
+6. Run `npm run motion:build`. Stock text is plain strings under `src/stock/copy`,
+   so there is no message catalog to regenerate.
 7. `npm run motion -- preview <id>` and read
    `out/motion/preview/<id>/<hash>/contact-sheet.jpg`.
 
@@ -262,7 +262,7 @@ pnpm video validate ../../.videos/<slug>/storyboard.json
 pnpm video preview  ../../.videos/<slug>/storyboard.json   # .videos/<slug>/out/<plan.id>/preview/contact-sheet.jpg
 pnpm video render   ../../.videos/<slug>/storyboard.json   # .videos/<slug>/out/<plan.id>/render/final.mp4
 npm run typecheck                                          # also runs motion:build
-npm test                                                   # also runs stock:messages and component build
+npm test                                                   # also runs the component build
 node --import tsx --import ./scripts/yaml/registerYaml.mjs --test tests/storyboard.test.ts
 ```
 
