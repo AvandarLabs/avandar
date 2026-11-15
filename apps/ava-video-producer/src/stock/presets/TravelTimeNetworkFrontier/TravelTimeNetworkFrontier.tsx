@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { NetworkCosts } from "./NetworkCosts";
 import { NetworkDestinations } from "./NetworkDestinations";
@@ -14,10 +13,7 @@ export function TravelTimeNetworkFrontier({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const minutes = stockI18n._({
-    id: "motionAtlas.travel-time-network-frontier.minutes",
-    message: "minutes",
-  });
+  const minutes = "minutes";
   return (
     <g>
       <NetworkRoads input={input} frame={frame} accent={accent} />

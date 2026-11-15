@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react";
 import { useLingui as useLinguiMacro } from "@lingui/react/macro";
 import { useId } from "react";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
 import { ContentDraftModule } from "./ContentDraftModule/ContentDraftModule";
 import type { StockJsonValue } from "../../../stock/contracts/StockContract.types";
 import type { Props } from "./ContentField/ContentField";
@@ -52,7 +52,7 @@ export function useContentField({
   return {
     path,
     label,
-    value: StockCopyMessages.getValueFromPath({ value: state.draft, path }),
+    value: getStockValueFromPath({ value: state.draft, path }),
     help: control.help ? i18n._(control.help) : undefined,
     update: (replacement: StockJsonValue) =>
       onChange(

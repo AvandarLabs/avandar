@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { StockCopyMessages } from "../../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
 import { CollectionItem } from "../CollectionItem/CollectionItem";
 import { ContentDraftModule } from "../ContentDraftModule/ContentDraftModule";
 import styles from "./CollectionField.module.css";
@@ -29,7 +29,7 @@ export function CollectionField({
   ...remainingProps
 }: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
-  const value = StockCopyMessages.getValueFromPath({
+  const value = getStockValueFromPath({
     value: state.draft,
     path: context.path,
   });

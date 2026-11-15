@@ -90,7 +90,7 @@ test("selected value copies cross into a separate snapshot before only the live 
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { publicationSnapshotSliceContract as contract } from "./PublicationSnapshotSlice.contract";
 
@@ -139,7 +139,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["table", "columns", 0, "label"],

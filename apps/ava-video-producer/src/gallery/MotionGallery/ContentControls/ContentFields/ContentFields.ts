@@ -1,5 +1,5 @@
 import { match, P } from "ts-pattern";
-import { StockCopyMessages } from "../../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
 import type {
   StockControl,
   StockJsonValue,
@@ -30,7 +30,7 @@ function _getOptionsFromControl({
     return control.options;
   }
   const source = control.optionsFrom;
-  const values = StockCopyMessages.getValueFromPath({
+  const values = getStockValueFromPath({
     value: source.scope === "item" ? item : root,
     path: source.path.split(".").filter(Boolean),
   });

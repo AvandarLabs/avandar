@@ -53,7 +53,6 @@ async function _withCatalogCopy(
     const files = [
       "scripts/showcase/ShowcaseFilms/ShowcaseFilms.ts",
       "scripts/stock/buildStockContracts/buildStockContracts.ts",
-      "scripts/stock/buildStockMessages/buildStockMessages.ts",
       "scripts/require-license.mjs",
       "scripts/lib/readLicense.mjs",
       "scripts/stock/StockFingerprintModule/StockFingerprintModule.ts",
@@ -255,15 +254,6 @@ test("nested default and schema edits refresh together while frozen films retain
     await assert.rejects(fingerprint(original), /changed during/);
     const current = await load("stock-decision-fork");
     await fingerprint(current);
-    const englishCatalog = await fs.readFile(
-      path.join(root, "src/stock/i18n/messages.en.generated.ts"),
-      "utf8",
-    );
-    assert.match(englishCatalog, /An edited complete fictional default/);
-    assert.doesNotMatch(
-      englishCatalog,
-      /Where does the fictional sketch belong\?/,
-    );
     assert.equal(
       (await fs.readdir(path.join(root, "out/showcase/contracts"))).length,
       2,

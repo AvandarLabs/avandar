@@ -96,7 +96,7 @@ test("keys physically return to their tray before the waiting operation reuses t
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { orderedLockAcquisitionContract } from "./OrderedLockAcquisition.contract";
 import { inputSchema } from "./OrderedLockAcquisition.schema";
@@ -136,7 +136,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
     ["resources", 0, "label"],

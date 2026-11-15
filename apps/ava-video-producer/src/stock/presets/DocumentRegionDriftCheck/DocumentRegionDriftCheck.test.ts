@@ -127,7 +127,7 @@ test("saved and current outlines register at exact supplied page coordinates eve
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { documentRegionDriftCheckContract as contract } from "./DocumentRegionDriftCheck.contract";
 
@@ -165,7 +165,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["saved", "header"],

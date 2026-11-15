@@ -1,5 +1,4 @@
 import { mix, ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { missingMessage } from "./WideTableToObservations.controls";
 import type { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
@@ -32,7 +31,7 @@ export function MeasurementStripLabels({
         labels={[
           [subject.label, x + 10, y, mix(progress, 150, 180), 12, 4],
           [
-            value === null ? stockI18n._(missingMessage) : String(value),
+            value === null ? missingMessage.message : String(value),
             x + mix(progress, 174, 440),
             y,
             mix(progress, 70, 190),

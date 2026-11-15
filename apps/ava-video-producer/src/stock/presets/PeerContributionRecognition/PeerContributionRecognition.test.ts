@@ -3,14 +3,11 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { setupI18n } from "@lingui/core";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
 import { PeerContributionRecognition } from "./PeerContributionRecognition";
 import { peerContributionRecognitionContract } from "./PeerContributionRecognition.contract";
 import {
@@ -138,47 +135,6 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-test("every indexed default-copy path resolves while authored input remains exact", () => {
-  const contract = peerContributionRecognitionContract;
-  const supplied = structuredClone(DEFAULT_INPUT);
-  const messages = Object.fromEntries(
-    contract.defaultTextPaths.map((path, index) => [
-      StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path }),
-      `Traduit ${index}`,
-    ]),
-  );
-  const i18n = setupI18n({ locale: "fr", messages: { fr: messages } });
-  const resolved = makeLocalizedStockDataFromContract({ contract, i18n });
-  contract.defaultTextPaths.forEach((path, index) => {
-    const value = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      resolved.defaultInput,
-    );
-    assert.equal(value, `Traduit ${index}`);
-  });
-  assert.deepEqual(DEFAULT_INPUT, supplied);
-  assert.notEqual(resolved.defaultInput, DEFAULT_INPUT);
-});
-
-test("copy extraction includes every explicit indexed default without changing author input", () => {
-  const contract = peerContributionRecognitionContract;
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [contract.id]: contract,
-  });
-  contract.defaultTextPaths.forEach((path) => {
-    const original = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      DEFAULT_INPUT,
-    );
-    assert.equal(
-      messages[
-        StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path })
-      ],
-      original,
-    );
-  });
-});
-
 test("hidden authorship stays visibly beside the focused stationary work throughout hold", () => {
   [0, 1].forEach((index) => {
     const input = {

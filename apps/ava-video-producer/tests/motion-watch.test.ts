@@ -22,7 +22,6 @@ async function _createWatchFixture(root: string) {
     "scripts/lib/readLicense.mjs",
     "scripts/lib/copyRootEnvFile.mjs",
     "scripts/lib/product-source.mjs",
-    "scripts/stock/buildStockMessages",
     "lingui.gallery.config.ts",
     "src/gallery",
     "src/continuity",
@@ -60,7 +59,7 @@ async function _createWatchFixture(root: string) {
     'import fs from "node:fs"; process.stdout.write(fs.readFileSync(new URL("../src/gallery/theme-colors.json",import.meta.url),"utf8"));',
   );
 }
-test("actual buildAtlas watch refreshes translated defaults once without a restart or rebuild loop", async () => {
+test("actual buildAtlas watch refreshes edited stock defaults once without a restart or rebuild loop", async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "atlas-copy-watch-"));
   let watcher:
     | {
@@ -132,16 +131,13 @@ test("actual buildAtlas watch refreshes translated defaults once without a resta
       ).prompt,
       "Where does the fictional sketch belong?",
     );
-    const messages = path.join(root, "src/stock/i18n/messages.en.generated.ts");
-    const modified = (await fs.stat(messages)).mtimeMs;
     const settledBuilds = builds;
     await pause(1200);
     assert.equal(
       builds,
       settledBuilds,
-      "Generated messages must not repeatedly trigger the watcher",
+      "A settled build must not repeatedly trigger the watcher",
     );
-    assert.equal((await fs.stat(messages)).mtimeMs, modified);
     await release();
   } finally {
     await watcher?.dispose();

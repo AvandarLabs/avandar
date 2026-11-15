@@ -1,5 +1,4 @@
 import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import {
   methodMessages,
@@ -21,9 +20,9 @@ export function ProseHeadings({ input, frame }: Readonly<Props>): ReactNode {
         labels={[
           [input.copy.context, 52, 40, 856, 18, 2],
           [input.copy.source, 52, 96, 856, 14, 2],
-          [stockI18n._(methodMessages[input.method]), 52, 552, 400, 14, 2],
+          [methodMessages[input.method].message, 52, 552, 400, 14, 2],
           [
-            stockI18n._(reviewMessages[input.reviewState]),
+            reviewMessages[input.reviewState].message,
             508,
             552,
             400,

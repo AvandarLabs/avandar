@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react";
 import { useLingui as useLinguiMacro } from "@lingui/react/macro";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath/getStockValueFromPath";
 import { ContentFields } from "./ContentFields/ContentFields";
 import type { StockControl } from "../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "./ContentField/ContentField";
@@ -31,7 +31,7 @@ export function SelectField({
   const options = ContentFields.getOptionsFromControl({
     control,
     root: state.draft,
-    item: StockCopyMessages.getValueFromPath({
+    item: getStockValueFromPath({
       value: state.draft,
       path: itemPath,
     }),

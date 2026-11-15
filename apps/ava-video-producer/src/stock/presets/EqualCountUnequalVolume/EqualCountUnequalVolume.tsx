@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { VolumeShelf } from "./VolumeShelf";
 import type { GraphicProps } from "../../graphics-common";
@@ -14,10 +13,7 @@ export function EqualCountUnequalVolume({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const grain = stockI18n._({
-    id: `motionAtlas.equal-count-unequal-volume.controls.itemKind.${input.itemKind}`,
-    message: input.itemKind,
-  });
+  const grain = input.itemKind;
   return (
     <g>
       <LabelSlots

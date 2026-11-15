@@ -5,7 +5,6 @@ import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 import { ensureDirectory } from "../../lib/planHelpers";
 import { yamlPlugin } from "../../yaml/yamlPlugin/yamlPlugin";
-import { buildStockMessages } from "../buildStockMessages/buildStockMessages";
 import { StockFingerprintModule } from "../StockFingerprintModule/StockFingerprintModule";
 
 type Contracts = Pick<
@@ -179,7 +178,6 @@ async function _dependencyHash(
 async function _buildGeneration(
   root: string,
 ): Promise<StockContractGeneration> {
-  await buildStockMessages(root);
   const sourceHash = await StockFingerprintModule.getSourceHashFromRoot(root);
   const result = await build({
     absWorkingDir: root,

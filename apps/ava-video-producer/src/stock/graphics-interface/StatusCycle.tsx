@@ -8,7 +8,7 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import type { StatusCycleInput } from "../presets/StatusCycle/StatusCycle.schema";
 import type { ReactNode } from "react";

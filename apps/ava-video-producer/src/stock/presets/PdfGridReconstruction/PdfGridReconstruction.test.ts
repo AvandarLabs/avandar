@@ -94,7 +94,7 @@ test("actual result cells travel horizontally into an equal sized adjacent grid"
   assert.doesNotMatch(hidden, /data-source-link=/);
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { GridLiteralCell } from "./GridLiteralCell";
@@ -125,7 +125,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: pdfGridReconstructionContract,
   expectedTextPaths: [
     ["grid", "columnLabels", 0],

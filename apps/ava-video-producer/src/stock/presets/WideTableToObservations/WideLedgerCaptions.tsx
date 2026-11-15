@@ -1,5 +1,4 @@
 import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import {
   ledgerMessage,
@@ -26,7 +25,7 @@ export function WideLedgerCaptions({
         )
       : 0;
   const resultHeading = frame < 111 ? input.copy.source : input.copy.result;
-  const omissionCaption = `${stockI18n._(ledgerMessage)}: ${omitted}`;
+  const omissionCaption = `${ledgerMessage.message}: ${omitted}`;
   return (
     <g>
       <LabelSlots
@@ -38,7 +37,7 @@ export function WideLedgerCaptions({
       <g opacity={ramp(frame, 111, 10)}>
         <LabelSlots
           labels={Object.values(headingMessages).map((message, index) => [
-            stockI18n._(message),
+            message.message,
             62 + [0, 218, 440, 650][index],
             130,
             [180, 200, 190, 186][index],

@@ -6,8 +6,8 @@ import { VideoEffectDefs } from "../videoTheme/VideoEffectDefs/VideoEffectDefs";
 import { listVideoEffectFilters } from "../videoTheme/videoEffectFilters/videoEffectFilters";
 import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
-import { getStockDisplayCopyFromDescriptor } from "./i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import { STOCK_GRAPHIC_COPY } from "./i18n/stockGraphicCopy";
+import { getStockDisplayCopyFromDescriptor } from "./copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { STOCK_GRAPHIC_COPY } from "./copy/stockGraphicCopy";
 import { stockRenderers } from "./registry/stockRenderers/stockRenderers";
 import {
   GraphicIdContext,

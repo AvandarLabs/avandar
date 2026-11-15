@@ -6,7 +6,6 @@ import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
-import { transformAsync } from "@babel/core";
 import { build, type Plugin } from "esbuild";
 import { buildStockContracts } from "../scripts/stock/buildStockContracts/buildStockContracts";
 import { yamlPlugin } from "../scripts/yaml/yamlPlugin/yamlPlugin";
@@ -24,51 +23,9 @@ const expected: { omitted: typeof authored; supplied: typeof authored } = {
   omitted: parseStockInput({ preset: "decision-fork" }),
   supplied: authored,
 };
-const macros: Plugin = {
-  name: "actual-ui-macros",
+const productBundle: Plugin = {
+  name: "product-bundle",
   setup(builder) {
-    builder.onLoad(
-      {
-        filter: /\.[tj]sx?$/,
-      },
-      async ({ path: filename }) => {
-        if (
-          !filename.includes("/src/gallery/") &&
-          !filename.endsWith("/src/showcase/LivePlayer.tsx")
-        ) {
-          return undefined;
-        }
-        const transformed = await transformAsync(
-          await fs.readFile(filename, "utf8"),
-          {
-            filename,
-            babelrc: false,
-            configFile: false,
-            presets: [
-              [
-                "@babel/preset-typescript",
-                {
-                  allExtensions: true,
-                  isTSX: filename.endsWith("tsx"),
-                },
-              ],
-            ],
-            plugins: [
-              [
-                "@lingui/babel-plugin-lingui-macro",
-                {
-                  descriptorFields: "message",
-                },
-              ],
-            ],
-          },
-        );
-        return {
-          contents: transformed!.code!,
-          loader: filename.endsWith("tsx") ? "tsx" : "ts",
-        };
-      },
-    );
     builder.onResolve(
       {
         filter: /generated\/product\.(js|css)$/,
@@ -141,16 +98,13 @@ async function _assertBrowserBundle(entry: string): Promise<void> {
       loader: {
         ".woff2": "dataurl",
       },
-      plugins: [yamlPlugin, macros],
+      plugins: [yamlPlugin, productBundle],
       metafile: true,
       logLevel: "silent",
     });
-    const stockInputs = Object.keys(result.metafile!.inputs).filter(
-      (filename) => filename.startsWith("src/stock/"),
-    );
     assert.ok(
-      stockInputs.some((filename) =>
-        filename.endsWith("messages.en.generated.ts"),
+      Object.keys(result.metafile!.inputs).some((filename) =>
+        filename.startsWith("src/stock/"),
       ),
     );
     const loaded = await import(

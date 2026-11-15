@@ -1,5 +1,4 @@
 import { useId } from "react";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
@@ -17,10 +16,7 @@ export function KernelDensitySpread({
 }: Readonly<Props>): ReactNode {
   const legendId = useId();
   const { radius } = getKernelSamplesFromInput({ input, frame });
-  const qualifier = stockI18n._({
-    id: "motionAtlas.kernel-density-spread.zeroQualifier",
-    message: "Zero modeled intensity does not establish zero population.",
-  });
+  const qualifier = "Zero modeled intensity does not establish zero population.";
   return (
     <g data-legend-maximum={input.legendMaximum}>
       <KernelField input={input} frame={frame} accent={accent} />

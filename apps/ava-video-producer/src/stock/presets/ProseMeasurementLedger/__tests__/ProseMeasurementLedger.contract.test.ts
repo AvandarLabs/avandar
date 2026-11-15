@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -74,7 +74,7 @@ registerStockPresetAssertions(options);
 
 registerStockTextLayoutAssertions(options);
 
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["fragments", 0, "text"],
@@ -86,50 +86,6 @@ registerStockLocalizationAssertions({
     ["copy", "context"],
     ["copy", "source"],
     ["copy", "result"],
-  ],
-  boundTranslations: [
-    {
-      path: ["fragments", 0, "text"],
-      template: "<content>Lieu</content> ",
-      text: "Lieu ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 1, "text"],
-      template: "<content>env.</content> ",
-      text: "env. ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 2, "text"],
-      template: "<content>-0.5</content> ",
-      text: "-0.5 ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 3, "text"],
-      template: "<content>boîtes</content> ",
-      text: "boîtes ",
-      start: 0,
-      end: 6,
-    },
-    {
-      path: ["fragments", 4, "text"],
-      template: "<content>reçues</content> ",
-      text: "reçues ",
-      start: 0,
-      end: 6,
-    },
-    {
-      path: ["fragments", 5, "text"],
-      template: "en <content>semaine 3</content>.",
-      text: "en semaine 3.",
-      start: 3,
-      end: 12,
-    },
   ],
   suppliedInputs: fixtures.map(prop("input")),
 });
