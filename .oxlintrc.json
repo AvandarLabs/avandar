@@ -92,12 +92,6 @@
     "import/no-named-as-default": "warn",
     "import/no-named-as-default-member": "warn",
     "import/no-duplicates": "warn",
-    "import-js/no-unresolved": [
-      "error",
-      {
-        "ignore": ["^virtual:"]
-      }
-    ],
     "eslint-js/max-len": [
       "error",
       {
@@ -277,19 +271,7 @@
     {
       "files": ["supabase/functions/**/*.ts"],
       "rules": {
-        "import-js/no-unresolved": "off",
         "import-js/extensions": "off"
-      }
-    },
-    {
-      "files": ["apps/desktop/**/*.{ts,tsx}"],
-      "rules": {
-        "import-js/no-unresolved": [
-          "error",
-          {
-            "ignore": ["^bun:", "^duckdb$"]
-          }
-        ]
       }
     },
     {
@@ -471,17 +453,6 @@
       ],
       "rules": {
         "typescript/no-explicit-any": "off"
-      }
-    },
-    {
-      "files": ["apps/ava-video-producer/avandar-adapter/index.tsx"],
-      "rules": {
-        "import-js/no-unresolved": [
-          "error",
-          {
-            "ignore": ["^@product-assets/"]
-          }
-        ]
       }
     },
     {
