@@ -18,9 +18,10 @@ type Props = Readonly<{
 export function TokenRowHeader({ row, label, isInherited, hasIssue }: Props) {
   const editor = useTokenEditor();
   const kind = row.definition.kind;
-  const value = formatTokenValue(kind, row.resolved);
+  const value = formatTokenValue({ kind, value: row.resolved });
   const itemValue =
-    row.itemOverride && formatTokenValue(kind, row.itemOverride.resolved);
+    row.itemOverride &&
+    formatTokenValue({ kind, value: row.itemOverride.resolved });
   const toValueText = (): string => {
     if (hasIssue) {
       return `Last working value: ${value}`;

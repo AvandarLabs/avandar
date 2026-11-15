@@ -87,7 +87,7 @@ export function CustomValue({
   const isReference = isTokenReference(value);
   const scale = allowLiteral
     ? undefined
-    : getCustomScaleFromReference(value, kind);
+    : getCustomScaleFromReference({ reference: value, kind });
   const [isOpen, setOpen] = useState(
     allowLiteral && value !== undefined && !isReference,
   );

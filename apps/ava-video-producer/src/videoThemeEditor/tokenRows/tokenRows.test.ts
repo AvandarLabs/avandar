@@ -160,11 +160,14 @@ test("on a built-in theme with a draft, item rows show no saved overrides", () =
 });
 
 test("the used filter keeps atomic rows and drops unused semantic rows", () => {
-  const filtered = filterTokenRows(_rows({ kind: "theme" }), {
-    tiers: ["semantic", "atomic"],
-    query: "",
-    usedTokens: ["color.accent"],
-    getText: () => "",
+  const filtered = filterTokenRows({
+    rows: _rows({ kind: "theme" }),
+    filter: {
+      tiers: ["semantic", "atomic"],
+      query: "",
+      usedTokens: ["color.accent"],
+      getText: () => "",
+    },
   });
   assert.ok(filtered.some((row) => row.path === "color.accent"));
   assert.ok(filtered.some((row) => row.path === "atomic.swatch.mint"));
@@ -172,10 +175,13 @@ test("the used filter keeps atomic rows and drops unused semantic rows", () => {
 });
 
 test("search matches a row's text or its path", () => {
-  const filtered = filterTokenRows(_rows({ kind: "theme" }), {
-    tiers: ["semantic"],
-    query: "corner.pill",
-    getText: () => "",
+  const filtered = filterTokenRows({
+    rows: _rows({ kind: "theme" }),
+    filter: {
+      tiers: ["semantic"],
+      query: "corner.pill",
+      getText: () => "",
+    },
   });
   assert.deepEqual(
     filtered.map((row) => row.path),
@@ -211,13 +217,16 @@ test("a row's issue is one at its path or inside it, never a sibling's", () => {
     { path: "color.accentSoft", message: "sibling" },
     { path: "text.stage.title.color", message: "inside" },
   ];
-  assert.equal(findTokenRowIssue(issues, "color.accent"), undefined);
   assert.equal(
-    findTokenRowIssue(issues, "text.stage.title")?.message,
+    findTokenRowIssue({ issues, tokenPath: "color.accent" }),
+    undefined,
+  );
+  assert.equal(
+    findTokenRowIssue({ issues, tokenPath: "text.stage.title" })?.message,
     "inside",
   );
   assert.equal(
-    findTokenRowIssue(issues, "color.accentSoft")?.message,
+    findTokenRowIssue({ issues, tokenPath: "color.accentSoft" })?.message,
     "sibling",
   );
 });
@@ -235,14 +244,23 @@ test("a new scale value takes the first free custom key in its whole scale", () 
     value: "#654321",
   });
   const rows = _rows({ kind: "theme" }, draft);
-  const visible = filterTokenRows(rows, {
-    tiers: ["atomic"],
-    query: "mint",
-    getText: () => "",
+  const visible = filterTokenRows({
+    rows,
+    filter: {
+      tiers: ["atomic"],
+      query: "mint",
+      getText: () => "",
+    },
   });
   assert.ok(!visible.some((row) => row.scaleKey === "custom1"));
-  assert.equal(buildNextCustomScaleKey(rows, "atomic:swatch"), "custom2");
-  assert.equal(buildNextCustomScaleKey(rows, "atomic:textShadow"), "custom1");
+  assert.equal(
+    buildNextCustomScaleKey({ rows, group: "atomic:swatch" }),
+    "custom2",
+  );
+  assert.equal(
+    buildNextCustomScaleKey({ rows, group: "atomic:textShadow" }),
+    "custom1",
+  );
 });
 
 test("a reference to a token that does not exist is a missing reference", () => {

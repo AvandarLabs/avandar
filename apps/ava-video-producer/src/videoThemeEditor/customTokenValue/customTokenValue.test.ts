@@ -17,13 +17,17 @@ const SUBTITLE = {
 };
 
 test("a custom colour on a semantic token becomes a named swatch", () => {
-  const draft = setCustomValueInDraft(EMPTY_THEME_DRAFT, THEME, {
-    tokenPath: "color.accent",
-    fieldPath: [],
-    currentValue: "$primary",
-    currentReference: "$primary",
-    kind: "color",
-    literal: "#ff0000",
+  const draft = setCustomValueInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    request: {
+      tokenPath: "color.accent",
+      fieldPath: [],
+      currentValue: "$primary",
+      currentReference: "$primary",
+      kind: "color",
+      literal: "#ff0000",
+    },
   });
   assert.equal(
     getValueAtPath(draft.patch, [
@@ -48,13 +52,17 @@ test("a custom colour on a semantic token becomes a named swatch", () => {
 });
 
 test("a custom size keeps the scale its field already points at", () => {
-  const draft = setCustomValueInDraft(EMPTY_THEME_DRAFT, THEME, {
-    tokenPath: "text.stage.subtitle",
-    fieldPath: ["size"],
-    currentValue: SUBTITLE,
-    currentReference: "$fontSizes.7xl",
-    kind: "length",
-    literal: 27,
+  const draft = setCustomValueInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: THEME,
+    request: {
+      tokenPath: "text.stage.subtitle",
+      fieldPath: ["size"],
+      currentValue: SUBTITLE,
+      currentReference: "$fontSizes.7xl",
+      kind: "length",
+      literal: 27,
+    },
   });
   assert.equal(
     getValueAtPath(draft.patch, ["fontSizes", "customTextStageSubtitleSize"]),
@@ -78,7 +86,10 @@ test("a custom size keeps the scale its field already points at", () => {
 
 test("a length that points at another semantic token has no custom scale", () => {
   assert.equal(
-    getCustomScaleFromReference("$stroke.default", "length"),
+    getCustomScaleFromReference({
+      reference: "$stroke.default",
+      kind: "length",
+    }),
     undefined,
   );
 });

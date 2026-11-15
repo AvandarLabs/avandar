@@ -51,7 +51,7 @@ export function useTokenEditorValue(
       setToken: (tokenPath, value) =>
         onDraftChange(setTokenInDraft({ draft, scope, tokenPath, value })),
       setCustomValue: (request) =>
-        onDraftChange(setCustomValueInDraft(draft, scope, request)),
+        onDraftChange(setCustomValueInDraft({ draft, scope, request })),
       resetToken: (tokenPath) =>
         onDraftChange(resetTokenInDraft({ draft, scope, tokenPath })),
     }),

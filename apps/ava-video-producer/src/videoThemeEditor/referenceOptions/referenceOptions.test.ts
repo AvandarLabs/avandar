@@ -72,10 +72,14 @@ test("a fill picker offers the ground gradient", () => {
 });
 
 test("options from the current reference's scale come first", () => {
-  const ordered = orderReferenceOptions(
-    listReferenceOptions({ kind: "length", rows: ROWS, theme: THEME }),
-    "$fontSizes.7xl",
-  );
+  const ordered = orderReferenceOptions({
+    referenceOptions: listReferenceOptions({
+      kind: "length",
+      rows: ROWS,
+      theme: THEME,
+    }),
+    current: "$fontSizes.7xl",
+  });
   assert.ok(ordered[0].path.startsWith("fontSizes."));
 });
 
@@ -139,13 +143,25 @@ test("a reference no option offers is unresolved, and a listed or unset value is
     },
   ] as const;
   assert.equal(
-    getUnresolvedReference("$atomic.swatch.missingSwatch", options),
+    getUnresolvedReference({
+      value: "$atomic.swatch.missingSwatch",
+      referenceOptions: options,
+    }),
     "$atomic.swatch.missingSwatch",
   );
   assert.equal(
-    getUnresolvedReference("$atomic.swatch.mint", options),
+    getUnresolvedReference({
+      value: "$atomic.swatch.mint",
+      referenceOptions: options,
+    }),
     undefined,
   );
-  assert.equal(getUnresolvedReference("#ff0000", options), undefined);
-  assert.equal(getUnresolvedReference(undefined, options), undefined);
+  assert.equal(
+    getUnresolvedReference({ value: "#ff0000", referenceOptions: options }),
+    undefined,
+  );
+  assert.equal(
+    getUnresolvedReference({ value: undefined, referenceOptions: options }),
+    undefined,
+  );
 });

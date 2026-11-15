@@ -16,7 +16,7 @@ export function EnumValueControl({
   const hasIssue = useRowHasIssue();
   const options = (definition.options ?? []).map((option) => ({
     option,
-    ...getOptionCopy(optionKey, option),
+    ...getOptionCopy({ key: optionKey, option }),
   }));
   const selection = getEnumSelection(
     value,

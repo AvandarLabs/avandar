@@ -110,10 +110,7 @@ function _omitSavedTokens(
         getValueAtPath(patch, documentPath),
         getValueAtPath(saved, documentPath),
       )
-        ? (removeValueAtPath({
-            source: result,
-            path: documentPath,
-          }) as VideoThemePatch)
+        ? removeValueAtPath({ source: result, path: documentPath })
         : result;
     },
     patch,

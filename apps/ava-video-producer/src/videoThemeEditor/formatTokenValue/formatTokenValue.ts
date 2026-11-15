@@ -41,12 +41,6 @@ function _fontLabel(value: string): string {
   return id ? VIDEO_FONT_REGISTRY[id].label : value;
 }
 
-function _easing(value: EasingValue): string {
-  return "powerInOut" in value
-    ? `x^${value.powerInOut}`
-    : `cubic-bezier(${value.map(_number).join(", ")})`;
-}
-
 function _formatEffect(kind: TokenKind, value: unknown): string | undefined {
   switch (kind) {
     case "shadow":
@@ -144,7 +138,10 @@ function _formatCollection(
  * `300 ms`, or `Arial 17 px 400`. Use it wherever a control must show its
  * value as text, for example token rows and reference pickers.
  */
-export function formatTokenValue(kind: TokenKind, value: unknown): string {
+export function formatTokenValue(
+  options: Readonly<{ kind: TokenKind; value: unknown }>,
+): string {
+  const { kind, value } = options;
   if (value === undefined || value === null) {
     return "";
   }
@@ -164,8 +161,12 @@ export function formatTokenValue(kind: TokenKind, value: unknown): string {
     case "fontWeight":
     case "cssNumber":
       return _number(parseCssPixels(value) ?? 0);
-    case "easing":
-      return _easing(value as EasingValue);
+    case "easing": {
+      const easing = value as EasingValue;
+      return "powerInOut" in easing
+        ? `x^${easing.powerInOut}`
+        : `cubic-bezier(${easing.map(_number).join(", ")})`;
+    }
     case "fontFamily":
     case "fontStack":
       return _fontLabel(String(value));

@@ -16,7 +16,7 @@ export function TokenControl({
 }: Readonly<{ row: TokenRow; label: string }>) {
   const editor = useTokenEditor();
   const kind = row.definition.kind;
-  const write = (next: unknown) => editor.setToken(row.path, next);
+  const write = (value: unknown) => editor.setToken(row.path, value);
   if (
     row.tier === "atomic" ||
     row.tier === "mantine" ||

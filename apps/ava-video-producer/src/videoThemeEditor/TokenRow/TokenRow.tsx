@@ -21,7 +21,10 @@ import { useTokenRowLabel } from "./useTokenRowLabel";
 export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
   const editor = useTokenEditor();
   const label = useTokenRowLabel()(row);
-  const issue = findTokenRowIssue(editor.issues, row.path);
+  const issue = findTokenRowIssue({
+    issues: editor.issues,
+    tokenPath: row.path,
+  });
   const isInherited =
     editor.scope.kind === "item" && row.overrideState === "none";
   return (

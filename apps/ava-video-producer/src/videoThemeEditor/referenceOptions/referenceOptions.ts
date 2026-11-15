@@ -40,17 +40,23 @@ export function getReferenceOptionRole(
  * was deleted. Undefined for a literal, an unset value, or a listed reference.
  */
 export function getUnresolvedReference(
-  value: unknown,
-  options: readonly ReferenceOption[],
+  options: Readonly<{
+    value: unknown;
+    referenceOptions: readonly ReferenceOption[];
+  }>,
 ): TokenReference | undefined {
+  const { value, referenceOptions } = options;
   return typeof value === "string" &&
     value.startsWith("$") &&
-    !options.some((option) => option.reference === value)
+    !referenceOptions.some((option) => option.reference === value)
     ? (value as TokenReference)
     : undefined;
 }
 
-function _effectiveKind(path: string, kind: TokenKind): TokenKind {
+function _effectiveKind(
+  options: Readonly<{ path: string; kind: TokenKind }>,
+): TokenKind {
+  const { path, kind } = options;
   if (kind === "cssLength") {
     return "length";
   }
@@ -58,12 +64,6 @@ function _effectiveKind(path: string, kind: TokenKind): TokenKind {
     return path.endsWith("fontWeight") ? "fontWeight" : "number";
   }
   return kind;
-}
-
-function _accepts(target: TokenKind, candidate: TokenKind): boolean {
-  return target === "fill"
-    ? candidate === "color" || candidate === "gradient"
-    : candidate === target;
 }
 
 function _primaryOption(theme: ResolvedVideoTheme): ReferenceOption {
@@ -87,7 +87,7 @@ function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
     const definition = getTokenDefinitionFromPath(`colors.${name}`);
     return definition
       ? shades.map((value, index) => ({
-          reference: `$colors.${name}.${index}` as TokenReference,
+          reference: `$colors.${name}.${index}`,
           path: `colors.${name}.${index}`,
           kind: "color" as const,
           definition,
@@ -133,15 +133,24 @@ export function listReferenceOptions(
   const { kind, excludePath, rows, theme, isCameraCurve = false } = options;
   const isColor = kind === "color" || kind === "fill";
   const fromRows: ReferenceOption[] = rows
-    .filter(
-      (row) =>
+    .filter((row) => {
+      const candidate = _effectiveKind({
+        path: row.path,
+        kind: row.definition.kind,
+      });
+      const isAccepted =
+        kind === "fill"
+          ? candidate === "color" || candidate === "gradient"
+          : candidate === kind;
+      return (
         row.tier !== "component" &&
         row.path !== excludePath &&
-        _accepts(kind, _effectiveKind(row.path, row.definition.kind)) &&
-        (!isCameraCurve || isCameraSafeEasing(row.resolved as EasingValue)),
-    )
+        isAccepted &&
+        (!isCameraCurve || isCameraSafeEasing(row.resolved as EasingValue))
+      );
+    })
     .map((row) => ({
-      reference: `$${row.path}` as TokenReference,
+      reference: `$${row.path}`,
       path: row.path,
       kind: row.definition.kind,
       definition: row.definition,
@@ -161,15 +170,18 @@ function _scaleOf(path: string): string {
 
 /** Options with those from the current reference's scale first, the likeliest picks. */
 export function orderReferenceOptions(
-  options: readonly ReferenceOption[],
-  current: unknown,
+  options: Readonly<{
+    referenceOptions: readonly ReferenceOption[];
+    current: unknown;
+  }>,
 ): readonly ReferenceOption[] {
+  const { referenceOptions, current } = options;
   if (typeof current !== "string" || !current.startsWith("$")) {
-    return options;
+    return referenceOptions;
   }
   const scale = _scaleOf(current.slice(1));
   return [
-    ...options.filter((option) => _scaleOf(option.path) === scale),
-    ...options.filter((option) => _scaleOf(option.path) !== scale),
+    ...referenceOptions.filter((option) => _scaleOf(option.path) === scale),
+    ...referenceOptions.filter((option) => _scaleOf(option.path) !== scale),
   ];
 }

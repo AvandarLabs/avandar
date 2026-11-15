@@ -28,7 +28,7 @@ export function AddScaleValue({ group, allRows }: Props) {
       variant="subtle"
       onClick={() =>
         editor.setToken(
-          `${scalePath}.${buildNextCustomScaleKey(allRows, group)}`,
+          `${scalePath}.${buildNextCustomScaleKey({ rows: allRows, group })}`,
           getDefaultLiteralFromKind(kind),
         )
       }

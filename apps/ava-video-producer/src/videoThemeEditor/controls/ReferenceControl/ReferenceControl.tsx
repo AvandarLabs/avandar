@@ -42,7 +42,7 @@ export type Props = Readonly<{
 
 function useOptionLabel(): (option: ReferenceOption) => string {
   return useCallback((option: ReferenceOption) => {
-    const value = formatTokenValue(option.kind, option.value);
+    const value = formatTokenValue({ kind: option.kind, value: option.value });
     const role = getReferenceOptionRole(option);
     if (role === "primary") {
       return `Primary colour, ${value}`;
@@ -74,16 +74,16 @@ function useReferenceOptions({
   const isCameraCurve = isCameraCurveToken(tokenPath, fieldPath);
   return useMemo(
     () =>
-      orderReferenceOptions(
-        listReferenceOptions({
+      orderReferenceOptions({
+        referenceOptions: listReferenceOptions({
           kind,
           excludePath: tokenPath,
           rows,
           theme,
           isCameraCurve,
         }),
-        value,
-      ),
+        current: value,
+      }),
     [kind, tokenPath, value, rows, theme, isCameraCurve],
   );
 }
@@ -150,7 +150,7 @@ export function ReferenceControl({
   const hasIssue = useRowHasIssue();
   const container = useRef<HTMLDivElement>(null);
   const unresolved = hasIssue
-    ? getUnresolvedReference(value, options)
+    ? getUnresolvedReference({ value, referenceOptions: options })
     : undefined;
   const isColor = kind === "color" || kind === "fill";
   const chips = _buildChipsFromOptions(options);

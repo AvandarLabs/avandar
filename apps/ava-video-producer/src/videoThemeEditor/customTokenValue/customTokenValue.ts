@@ -1,3 +1,4 @@
+import { capitalize } from "@avandar/utils";
 import {
   getTargetFromTokenReference,
   isTokenReference,
@@ -55,9 +56,9 @@ export type CustomValueRequest = Readonly<{
  * so a custom value becomes a named scale entry.
  */
 export function getCustomScaleFromReference(
-  reference: unknown,
-  kind: TokenKind,
+  options: Readonly<{ reference: unknown; kind: TokenKind }>,
 ): string | undefined {
+  const { reference, kind } = options;
   if (isTokenReference(reference)) {
     const target = getTargetFromTokenReference(reference);
     if (target.tier === "atomic" && target.path.length === 2) {
@@ -79,7 +80,7 @@ export function buildCustomScaleKeyFromPath(path: readonly string[]): string {
   const words = path
     .flatMap((segment) => segment.split(/[^A-Za-z0-9]+/))
     .filter(Boolean);
-  return `${CUSTOM_SCALE_KEY_PREFIX}${words.map((word) => word[0].toUpperCase() + word.slice(1)).join("")}`.slice(
+  return `${CUSTOM_SCALE_KEY_PREFIX}${words.map((word) => capitalize(word)).join("")}`.slice(
     0,
     32,
   );
@@ -100,14 +101,17 @@ function _toScaleLiteral(scale: string, literal: unknown): unknown {
  * scale fits.
  */
 export function setCustomValueInDraft(
-  draft: ThemeDraft,
-  scope: ThemeEditScope,
-  request: CustomValueRequest,
+  options: Readonly<{
+    draft: ThemeDraft;
+    scope: ThemeEditScope;
+    request: CustomValueRequest;
+  }>,
 ): ThemeDraft {
-  const scale = getCustomScaleFromReference(
-    request.currentReference,
-    request.kind,
-  );
+  const { draft, scope, request } = options;
+  const scale = getCustomScaleFromReference({
+    reference: request.currentReference,
+    kind: request.kind,
+  });
   if (!scale) {
     return draft;
   }

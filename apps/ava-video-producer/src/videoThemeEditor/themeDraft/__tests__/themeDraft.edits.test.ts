@@ -94,13 +94,17 @@ test("a built-in theme's draft counts no saved item overrides", () => {
 });
 
 test("one custom value counts as one override, not a token plus its generated swatch", () => {
-  const draft = setCustomValueInDraft(EMPTY_THEME_DRAFT, ITEM, {
-    tokenPath: "color.accent",
-    fieldPath: [],
-    currentValue: "$primary",
-    currentReference: "$primary",
-    kind: "color",
-    literal: "#00ff00",
+  const draft = setCustomValueInDraft({
+    draft: EMPTY_THEME_DRAFT,
+    scope: ITEM,
+    request: {
+      tokenPath: "color.accent",
+      fieldPath: [],
+      currentValue: "$primary",
+      currentReference: "$primary",
+      kind: "color",
+      literal: "#00ff00",
+    },
   });
   assert.equal(
     countItemOverrides({

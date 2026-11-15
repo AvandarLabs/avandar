@@ -137,23 +137,26 @@ function _savedOverride(
     library: VideoThemeLibrary;
     themeId: string;
     draft: ThemeDraft;
+    itemId: string;
   }>,
-  itemId: string,
 ): VideoThemePatch {
   const target = createDraftThemeTarget({
     library: options.library,
     themeId: options.themeId,
     hasDraft: !isThemeDraftEmpty(options.draft),
   });
-  return target.library.get(target.themeId)?.overrides?.[itemId] ?? {};
+  return target.library.get(target.themeId)?.overrides?.[options.itemId] ?? {};
 }
 
 function _createRow(
-  context: RowContext,
-  path: string,
-  definition: TokenDefinition,
-  scaleKey?: string,
+  options: Readonly<{
+    context: RowContext;
+    path: string;
+    definition: TokenDefinition;
+    scaleKey?: string;
+  }>,
 ): TokenRow {
+  const { context, path, definition, scaleKey } = options;
   const segments = path.split(".");
   const tier = _tierFromRoot(segments[0]);
   const documentPath = getDocumentPathFromTokenPath(path);
@@ -185,25 +188,20 @@ function _createRow(
   };
 }
 
-/**
- * Every token as one scope sees it, one row per scale entry, in catalog
- * order. The editor filters and groups these rows; reference pickers read
- * them for their options.
- */
-export function listTokenRows(
-  options: Readonly<{
-    library: VideoThemeLibrary;
-    themeId: string;
-    draft: ThemeDraft;
-    scope: ThemeEditScope;
-    merged: VideoThemePatch;
-    theme: ResolvedVideoTheme;
-    /** The previewed item and the theme it resolves to, so theme scope can show its own values. */
-    item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
-  }>,
-): readonly TokenRow[] {
+type TokenRowsOptions = Readonly<{
+  library: VideoThemeLibrary;
+  themeId: string;
+  draft: ThemeDraft;
+  scope: ThemeEditScope;
+  merged: VideoThemePatch;
+  theme: ResolvedVideoTheme;
+  /** The previewed item and the theme it resolves to, so theme scope can show its own values. */
+  item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
+}>;
+
+function _createRowContext(options: TokenRowsOptions): RowContext {
   const { scope, draft, item } = options;
-  const context: RowContext = {
+  return {
     merged: options.merged,
     theme: options.theme,
     scopePatch:
@@ -211,12 +209,14 @@ export function listTokenRows(
         ? draft.patch
         : (draft.overrides[scope.itemId] ?? {}),
     savedOverride:
-      scope.kind === "item" ? _savedOverride(options, scope.itemId) : {},
+      scope.kind === "item"
+        ? _savedOverride({ ...options, itemId: scope.itemId })
+        : {},
     ...(scope.kind === "theme" && item
       ? {
           itemOwn: {
             patches: [
-              _savedOverride(options, item.id),
+              _savedOverride({ ...options, itemId: item.id }),
               draft.overrides[item.id] ?? {},
             ],
             theme: item.theme,
@@ -224,9 +224,18 @@ export function listTokenRows(
         }
       : {}),
   };
+}
+
+/**
+ * Every token as one scope sees it, one row per scale entry, in catalog
+ * order. The editor filters and groups these rows; reference pickers read
+ * them for their options.
+ */
+export function listTokenRows(options: TokenRowsOptions): readonly TokenRow[] {
+  const context = _createRowContext(options);
   return listTokenDefinitions().flatMap(({ path, definition, isScale }) => {
     if (!isScale) {
-      return [_createRow(context, path, definition)];
+      return [_createRow({ context, path, definition })];
     }
     const entries = getValueAtPath(
       options.merged,
@@ -237,7 +246,12 @@ export function listTokenRows(
         ? Object.keys(entries)
         : [];
     return keys.map((key) =>
-      _createRow(context, `${path}.${key}`, definition, key),
+      _createRow({
+        context,
+        path: `${path}.${key}`,
+        definition,
+        scaleKey: key,
+      }),
     );
   });
 }
@@ -248,9 +262,9 @@ export function listTokenRows(
  * the semantic and component tokens they read, not what those point at.
  */
 export function filterTokenRows(
-  rows: readonly TokenRow[],
-  filter: TokenRowFilter,
+  options: Readonly<{ rows: readonly TokenRow[]; filter: TokenRowFilter }>,
 ): readonly TokenRow[] {
+  const { rows, filter } = options;
   const query = filter.query.trim().toLowerCase();
   return rows.filter(
     (row) =>
@@ -269,10 +283,11 @@ export function filterTokenRows(
 export function groupTokenRows(
   rows: readonly TokenRow[],
 ): readonly TokenRowGroup[] {
-  const groups = new Map<string, TokenRow[]>();
-  for (const row of rows) {
-    groups.set(row.group, [...(groups.get(row.group) ?? []), row]);
-  }
+  const groups = rows.reduce(
+    (grouped, row) =>
+      grouped.set(row.group, [...(grouped.get(row.group) ?? []), row]),
+    new Map<string, TokenRow[]>(),
+  );
   return [...groups].map(([group, grouped]) => ({ group, rows: grouped }));
 }
 
@@ -304,9 +319,12 @@ export function listEmptyAtomicScaleGroups(
  * one of its fields, such as `text.stage.title.color` for `text.stage.title`.
  */
 export function findTokenRowIssue(
-  issues: readonly VideoThemeIssue[],
-  tokenPath: string,
+  options: Readonly<{
+    issues: readonly VideoThemeIssue[];
+    tokenPath: string;
+  }>,
 ): VideoThemeIssue | undefined {
+  const { issues, tokenPath } = options;
   return issues.find(
     (issue) =>
       issue.path === tokenPath || issue.path.startsWith(`${tokenPath}.`),
@@ -340,9 +358,9 @@ export function describeRowIssue(issue: VideoThemeIssue): RowIssueDescription {
  * by search is never overwritten.
  */
 export function buildNextCustomScaleKey(
-  rows: readonly TokenRow[],
-  group: string,
+  options: Readonly<{ rows: readonly TokenRow[]; group: string }>,
 ): string {
+  const { rows, group } = options;
   const taken = new Set(
     rows.filter((row) => row.group === group).map((row) => row.scaleKey),
   );

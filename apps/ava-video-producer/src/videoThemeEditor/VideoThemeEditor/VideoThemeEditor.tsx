@@ -48,12 +48,15 @@ function useVisibleRows(
   const toLabel = useTokenRowLabel();
   return useMemo(
     () =>
-      filterTokenRows(rows, {
-        tiers:
-          filters.tier === "atomic" ? ["atomic", "mantine"] : [filters.tier],
-        query: filters.query,
-        usedTokens: filters.isUsedOnly ? usedTokens : undefined,
-        getText: (row) => `${toLabel(row)} ${row.definition.description}`,
+      filterTokenRows({
+        rows,
+        filter: {
+          tiers:
+            filters.tier === "atomic" ? ["atomic", "mantine"] : [filters.tier],
+          query: filters.query,
+          usedTokens: filters.isUsedOnly ? usedTokens : undefined,
+          getText: (row) => `${toLabel(row)} ${row.definition.description}`,
+        },
       }),
     [rows, filters, usedTokens, toLabel],
   );

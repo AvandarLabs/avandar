@@ -1,3 +1,6 @@
+import { capitalize } from "@avandar/utils";
+import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
+
 /*
  * Names the editor shows that are not catalog copy: section names, composite
  * field names, and enum options.
@@ -5,8 +8,7 @@
 
 /** Readable words for a component name, such as `Progress bar` for `ProgressBar`. */
 function _humanize(name: string): string {
-  const words = name.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
-  return words.charAt(0).toUpperCase() + words.slice(1);
+  return capitalize(humanizeScaleKey(name));
 }
 
 const GROUP_NAMES: Readonly<Record<string, string>> = {
@@ -144,6 +146,9 @@ const OPTION_COPY: Readonly<
 };
 
 /** Names for enum options by token path or composite field name. */
-export function getOptionCopy(key: string, option: string): OptionCopy {
+export function getOptionCopy(
+  options: Readonly<{ key: string; option: string }>,
+): OptionCopy {
+  const { key, option } = options;
   return OPTION_COPY[key]?.[option] ?? { label: option };
 }
