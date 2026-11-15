@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
   getContrastRatioFromColors,
   getWcagLevelFromContrast,
@@ -13,7 +13,7 @@ const LIGHT_GROUND = {
 };
 
 function _failures(themeId: string, isLightGround: boolean): string[] {
-  const theme = resolveVideoTheme(
+  const theme = makeResolvedVideoThemeFromLibrary(
     BUILT_IN_VIDEO_THEMES,
     themeId,
     isLightGround ? { patches: [LIGHT_GROUND] } : {},

@@ -1,7 +1,7 @@
 import { MantineThemeProvider } from "@mantine/core";
 import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { buildVideoCssVariables } from "../buildVideoCssVariables/buildVideoCssVariables";
-import { resolveVideoThemeFromSource } from "../resolveVideoThemeFromSource/resolveVideoThemeFromSource";
+import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { VideoThemeContext } from "../useVideoTheme/useVideoTheme";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
@@ -40,7 +40,10 @@ export function VideoThemeProvider({
   children,
   element = "div",
 }: Props) {
-  const theme = useMemo(() => resolveVideoThemeFromSource(source), [source]);
+  const theme = useMemo(
+    () => makeResolvedVideoThemeFromSource(source),
+    [source],
+  );
   const value = useMemo(() => ({ theme, source }), [theme, source]);
   const style = _styleFromTheme(theme);
   const content = (

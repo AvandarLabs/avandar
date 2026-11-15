@@ -1,4 +1,4 @@
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
 const RESOLVED_THEMES = new WeakMap<VideoThemeSource, ResolvedVideoTheme>();
@@ -8,14 +8,18 @@ const RESOLVED_THEMES = new WeakMap<VideoThemeSource, ResolvedVideoTheme>();
  * are treated as immutable, so providers that share a source (for example
  * the ten motion-blur samples of one stock graphic) share the result.
  */
-export function resolveVideoThemeFromSource(
+export function makeResolvedVideoThemeFromSource(
   source: VideoThemeSource,
 ): ResolvedVideoTheme {
   const cached = RESOLVED_THEMES.get(source);
   if (cached) {
     return cached;
   }
-  const theme = resolveVideoTheme(source.library, source.themeId, source.scope);
+  const theme = makeResolvedVideoThemeFromLibrary(
+    source.library,
+    source.themeId,
+    source.scope,
+  );
   RESOLVED_THEMES.set(source, theme);
   return theme;
 }

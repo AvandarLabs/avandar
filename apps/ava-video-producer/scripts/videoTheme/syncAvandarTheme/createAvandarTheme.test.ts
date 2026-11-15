@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
   createAvandarTheme,
   getShadowFromCss,
@@ -51,7 +51,7 @@ test("the avandar theme resolves on Avandar's dark body surface", () => {
   const library = createVideoThemeLibrary([
     createAvandarTheme(readAvandarThemeSource()),
   ]);
-  const theme = resolveVideoTheme(library, "avandar");
+  const theme = makeResolvedVideoThemeFromLibrary(library, "avandar");
   assert.equal(theme.semantic.color.ground, "#102a43");
   assert.equal(theme.semantic.corner.panel, 12);
 });

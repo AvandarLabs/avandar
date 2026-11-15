@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { listVideoEffectFilters } from "./videoEffectFilters";
 import type { VideoThemePatch } from "../videoTheme.types";
 
@@ -22,15 +22,21 @@ const SHADOWED_LABEL: VideoThemePatch = {
 
 test("classic needs no SVG filters", () => {
   assert.deepEqual(
-    listVideoEffectFilters(resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic")),
+    listVideoEffectFilters(
+      makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic"),
+    ),
     [],
   );
 });
 
 test("a text shadow on a graphic role becomes a drop-shadow filter", () => {
-  const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
-    patches: [SHADOWED_LABEL],
-  });
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+    {
+      patches: [SHADOWED_LABEL],
+    },
+  );
   assert.deepEqual(listVideoEffectFilters(theme), [
     {
       path: "text.graphic.label",

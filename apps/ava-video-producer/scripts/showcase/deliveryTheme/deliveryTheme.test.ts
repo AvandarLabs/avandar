@@ -7,7 +7,7 @@ import {
 import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
 import {
   createVideoThemeSnapshot,
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { getDeliveryThemeFromFilm } from "./deliveryTheme";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
@@ -25,7 +25,7 @@ const WARM: VideoThemeDocument = {
 test("a film without a theme records classic and classic's hash", () => {
   assert.deepEqual(getDeliveryThemeFromFilm({ id: "occlusion-wipe" }), {
     themeId: "classic",
-    themeHash: resolveVideoThemeFromSnapshot(undefined, ["occlusion-wipe"])
+    themeHash: makeResolvedVideoThemeFromSnapshot(undefined, ["occlusion-wipe"])
       .hash,
   });
 });

@@ -9,7 +9,7 @@ import {
 import { storyboardSchema } from "../../storyboard/schema/schema";
 import { durationInFrames } from "../../storyboard/schema/timeline";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { createContinuityPlanFromOptions } from "../continuityAppearance";
 import { CONTINUITY_CATALOG } from "../continuityCatalog";
 import {
@@ -21,7 +21,10 @@ import type { Storyboard } from "../../storyboard/schema/schema";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 
 const PRESETS = ["deliberate", "gentle", "balanced", "brisk", "whip"] as const;
-const CLASSIC = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic");
+const CLASSIC = makeResolvedVideoThemeFromLibrary(
+  BUILT_IN_VIDEO_THEMES,
+  "classic",
+);
 const CLASSIC_BLUR = {
   samples: 10,
   velocityBlurFactor: 0.09,
@@ -30,7 +33,7 @@ const CLASSIC_BLUR = {
 };
 
 function _classicWith(patch: VideoThemePatch) {
-  return resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
+  return makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
     patches: [patch],
   });
 }

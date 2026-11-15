@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { buildVideoCssVariables } from "./buildVideoCssVariables";
 
 const variables = buildVideoCssVariables(
-  resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic"),
+  makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic"),
 );
 
 test("semantic colours become video variables", () => {

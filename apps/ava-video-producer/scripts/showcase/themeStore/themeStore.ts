@@ -7,7 +7,7 @@ import {
   createVideoThemeLibrary,
 } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeError } from "../../../src/videoTheme/VideoThemeError/VideoThemeError";
 import {
   parseVideoThemeDocument,
@@ -112,9 +112,11 @@ function _assertResolves(
     document,
   ]);
   try {
-    resolveVideoTheme(library, document.id);
+    makeResolvedVideoThemeFromLibrary(library, document.id);
     for (const overrideId of Object.keys(document.overrides ?? {})) {
-      resolveVideoTheme(library, document.id, { overrideIds: [overrideId] });
+      makeResolvedVideoThemeFromLibrary(library, document.id, {
+        overrideIds: [overrideId],
+      });
     }
   } catch (error) {
     if (error instanceof VideoThemeError) {

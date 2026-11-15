@@ -7,7 +7,7 @@ import {
   videoThemePatchSchema,
 } from "../../videoTheme/videoThemeSchema/videoThemeSchema";
 import {
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import type { VideoThemeIssue } from "../../videoTheme/videoTheme.types";
@@ -189,7 +189,7 @@ export function createFilmThemeAcknowledgement(
     const snapshot = parseVideoThemeSnapshot(value);
     // The film root resolves with the film id as its override scope, so the
     // hash matches the picture.
-    const { hash } = resolveVideoThemeFromSnapshot(snapshot, [id]);
+    const { hash } = makeResolvedVideoThemeFromSnapshot(snapshot, [id]);
     return {
       snapshot,
       message: _withRequestKey({ type: "film-theme", id, hash }, requestKey),

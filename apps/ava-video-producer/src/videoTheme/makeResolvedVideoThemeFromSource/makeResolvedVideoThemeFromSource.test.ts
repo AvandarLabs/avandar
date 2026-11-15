@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
 import { getScopedVideoThemeSource } from "../VideoThemeScope/VideoThemeScope";
-import { resolveVideoThemeFromSource } from "./resolveVideoThemeFromSource";
+import { makeResolvedVideoThemeFromSource } from "./makeResolvedVideoThemeFromSource";
 
 test("one source resolves to the same theme object every time", () => {
   assert.equal(
-    resolveVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE),
-    resolveVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE),
+    makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE),
+    makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE),
   );
 });
 

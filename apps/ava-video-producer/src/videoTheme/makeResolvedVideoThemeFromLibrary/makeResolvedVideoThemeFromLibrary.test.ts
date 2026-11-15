@@ -5,7 +5,7 @@ import {
   createVideoThemeLibrary,
 } from "../builtInVideoThemes/builtInVideoThemes";
 import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
-import { resolveVideoTheme } from "./resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "./makeResolvedVideoThemeFromLibrary";
 import type { VideoThemeDocument, VideoThemePatch } from "../videoTheme.types";
 
 const LIGHT_GROUND: VideoThemePatch = {
@@ -38,23 +38,32 @@ function _issuesOf(run: () => unknown): string {
 }
 
 test("classic resolves the gallery default accent on its dark ground", () => {
-  const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic");
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+  );
   assert.equal(theme.isDarkGround, true);
   assert.equal(theme.semantic.color.accent, "#51a7ff");
 });
 
 test("colour pairs switch to their on-light value on a light ground", () => {
-  const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
-    patches: [LIGHT_GROUND],
-  });
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+    {
+      patches: [LIGHT_GROUND],
+    },
+  );
   assert.equal(theme.isDarkGround, false);
   assert.equal(theme.semantic.color.text, "#182d27");
   assert.equal(theme.semantic.color.accent, "#0b4aea");
 });
 
 test("type styles resolve their size, weight, and font from Mantine headings", () => {
-  const heading = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").semantic
-    .text.stage.heading;
+  const heading = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+  ).semantic.text.stage.heading;
   assert.deepEqual(
     [
       heading.fontFamily,
@@ -75,7 +84,7 @@ test("a reference to a missing token is reported with its path", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => resolveVideoTheme(library, "broken")),
+    _issuesOf(() => makeResolvedVideoThemeFromLibrary(library, "broken")),
     /^color\.accent: .*nope/m,
   );
 });
@@ -90,7 +99,7 @@ test("a reference cycle is reported", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => resolveVideoTheme(library, "loop")),
+    _issuesOf(() => makeResolvedVideoThemeFromLibrary(library, "loop")),
     /Reference cycle/,
   );
 });
@@ -105,20 +114,26 @@ test("graphic text rejects a font without measured widths", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => resolveVideoTheme(library, "figtree-labels")),
+    _issuesOf(() =>
+      makeResolvedVideoThemeFromLibrary(library, "figtree-labels"),
+    ),
     /^text\.graphic\.label: /m,
   );
 });
 
 test("Mantine shadows derive from atomic shadows and the shadow colour", () => {
   assert.equal(
-    resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").mantine.shadows.lg,
+    makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic").mantine
+      .shadows.lg,
     "0px 16px 22px 0px #06101455",
   );
 });
 
 test("component defaults reach Mantine's theme for useProps", () => {
-  const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic");
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+  );
   assert.equal(theme.mantine.components.ProgressBar?.defaultProps?.height, 3);
 });
 
@@ -139,7 +154,7 @@ test("a nested preset override ranks below the composition override", () => {
       },
     }),
   ]);
-  const theme = resolveVideoTheme(library, "studio", {
+  const theme = makeResolvedVideoThemeFromLibrary(library, "studio", {
     overrideIds: ["data-pipeline", "shared-object-handoff"],
   });
   assert.equal(theme.semantic.color.accentAlt, "#333333");
@@ -160,15 +175,15 @@ test("the hash ignores authoring key order", () => {
     }),
   ]);
   assert.equal(
-    resolveVideoTheme(library, "one").hash,
-    resolveVideoTheme(library, "two").hash,
+    makeResolvedVideoThemeFromLibrary(library, "one").hash,
+    makeResolvedVideoThemeFromLibrary(library, "two").hash,
   );
 });
 
 test("the hash changes when a resolved value changes", () => {
   assert.notEqual(
-    resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").hash,
-    resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
+    makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic").hash,
+    makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
       patches: [LIGHT_GROUND],
     }).hash,
   );
@@ -182,14 +197,18 @@ test("a camera curve that overshoots its framings is rejected", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => resolveVideoTheme(library, "bouncy-camera")),
+    _issuesOf(() =>
+      makeResolvedVideoThemeFromLibrary(library, "bouncy-camera"),
+    ),
     /^camera\.easing\.push: /m,
   );
 });
 
 test("an elevation resolves to its shadow layers and colour", () => {
-  const floating = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").semantic
-    .elevation.floating;
+  const floating = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+  ).semantic.elevation.floating;
   assert.deepEqual(floating, {
     layers: [{ offsetX: 0, offsetY: 16, blur: 22, spread: 0, alpha: 1 }],
     color: "#06101455",

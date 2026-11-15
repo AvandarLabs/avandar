@@ -5,7 +5,7 @@ import {
   createVideoMotion,
   type VideoMotion,
 } from "../../videoTheme/createVideoMotion/createVideoMotion";
-import { resolveVideoThemeFromSource } from "../../videoTheme/resolveVideoThemeFromSource/resolveVideoThemeFromSource";
+import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { SEMANTIC_TOKENS } from "../../videoTheme/tokenCatalog/semanticTokens";
 import {
   createTokenUsageProxy,
@@ -37,7 +37,7 @@ export const GraphicIdContext = createContext("stock-graphic");
 export function useGraphicTheme(): ResolvedVideoTheme {
   return (
     useVideoThemeContext()?.theme ??
-    resolveVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE)
+    makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE)
   );
 }
 

@@ -23,19 +23,20 @@ function _mergeTwoLayers(
   base: Record<string, unknown>,
   patch: Record<string, unknown>,
 ): Record<string, unknown> {
-  return Object.entries(patch).reduce<Record<string, unknown>>(
-    (result, [key, value]) => {
-      const baseValue = result[key];
-      return {
-        ...result,
-        [key]:
+  return {
+    ...base,
+    ...Object.fromEntries(
+      Object.entries(patch).map(([key, value]) => {
+        const baseValue = base[key];
+        return [
+          key,
           _isPlainObject(value) && _isPlainObject(baseValue)
             ? _mergeTwoLayers(baseValue, value)
             : value,
-      };
-    },
-    { ...base },
-  );
+        ];
+      }),
+    ),
+  };
 }
 
 /**

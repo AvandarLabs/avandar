@@ -18,7 +18,7 @@ import {
   type Storyboard,
 } from "../src/storyboard/schema/schema";
 import {
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { buildProduct } from "./build-avandar.mjs";
@@ -235,7 +235,7 @@ async function _fingerprintThemedPlan(
 ) {
   return {
     ...(await fingerprintPlan(ROOT, filename, plan, workspace)),
-    themeHash: resolveVideoThemeFromSnapshot(theme, [plan.id]).hash,
+    themeHash: makeResolvedVideoThemeFromSnapshot(theme, [plan.id]).hash,
   };
 }
 

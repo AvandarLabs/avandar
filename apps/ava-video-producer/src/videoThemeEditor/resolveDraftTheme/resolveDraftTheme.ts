@@ -1,5 +1,5 @@
+import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { mergeVideoThemeLayers } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
 import { VideoThemeError } from "../../videoTheme/VideoThemeError/VideoThemeError";
 import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchema/videoThemeSchema";
 import {
@@ -73,7 +73,7 @@ export function resolveDraftTheme(
       ok: true,
       merged,
       patches,
-      theme: resolveVideoTheme(library, themeId, scope),
+      theme: makeResolvedVideoThemeFromLibrary(library, themeId, scope),
     };
   } catch (error) {
     if (error instanceof VideoThemeError) {

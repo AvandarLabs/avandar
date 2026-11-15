@@ -2,14 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DUR, EASE, STAGGER } from "../../motion";
 import { BUILT_IN_VIDEO_THEMES } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { createVideoMotion } from "./createVideoMotion";
 
 function _motionAtTempo(tempo: number) {
   const patch = { other: { video: { atomic: { tempo: { md: tempo } } } } };
   return createVideoMotion(
-    resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", { patches: [patch] })
-      .semantic.motion,
+    makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
+      patches: [patch],
+    }).semantic.motion,
   );
 }
 

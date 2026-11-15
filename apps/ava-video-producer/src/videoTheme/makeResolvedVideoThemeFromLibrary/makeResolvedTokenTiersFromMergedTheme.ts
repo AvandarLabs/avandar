@@ -303,7 +303,7 @@ function _isGroundDark(groundContext: ResolutionContext): boolean {
  * composite tokens, and converts Mantine CSS strings to numbers. Collects
  * issues instead of throwing so one pass reports every problem.
  */
-export function resolveTokenTiers(
+export function makeResolvedTokenTiersFromMergedTheme(
   options: Readonly<{ merged: VideoThemePatch; mantine: MantineTheme }>,
 ): ResolvedTokenTiers {
   const video = getValueAtPath(options.merged, ["other", "video"]);

@@ -17,7 +17,7 @@ import { StockGraphic } from "../../../src/stock/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { createVideoMotion } from "../../../src/videoTheme/createVideoMotion/createVideoMotion";
-import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
 import {
   PARITY_COMPOSITION_IDS,
@@ -36,9 +36,13 @@ const LAST_LOOP_FRAME = 179;
 const SHARED_OBJECT_FADE_IN_AT = 12;
 const OUTLINE_FADE_AT = 60;
 
-const slowest = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
-  patches: [SLOWEST_TEMPO],
-});
+const slowest = makeResolvedVideoThemeFromLibrary(
+  BUILT_IN_VIDEO_THEMES,
+  "classic",
+  {
+    patches: [SLOWEST_TEMPO],
+  },
+);
 const motion = createVideoMotion(slowest.semantic.motion);
 
 function _picture(

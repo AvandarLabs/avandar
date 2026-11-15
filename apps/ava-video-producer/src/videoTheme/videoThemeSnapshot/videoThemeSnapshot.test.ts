@@ -6,7 +6,7 @@ import {
   CLASSIC_VIDEO_THEME_SNAPSHOT,
   createVideoThemeSnapshot,
   createVideoThemeSourceFromSnapshot,
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
 } from "./videoThemeSnapshot";
 import type { VideoThemeDocument } from "../videoTheme.types";
 
@@ -27,7 +27,7 @@ const RED_GROUND = {
 };
 
 test("an undefined snapshot means classic", () => {
-  const theme = resolveVideoThemeFromSnapshot(undefined, []);
+  const theme = makeResolvedVideoThemeFromSnapshot(undefined, []);
   assert.equal(theme.id, "classic");
 });
 
@@ -48,8 +48,8 @@ test("a snapshot resolves the item override before its patches", () => {
     [RED_GROUND],
   );
   assert.equal(
-    resolveVideoThemeFromSnapshot(snapshot, ["shared-object-handoff"]).semantic
-      .color.ground,
+    makeResolvedVideoThemeFromSnapshot(snapshot, ["shared-object-handoff"])
+      .semantic.color.ground,
     "#330000",
   );
 });

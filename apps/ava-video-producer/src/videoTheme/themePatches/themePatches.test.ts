@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { createThemePatchFromStockColors } from "./themePatches";
 import type { VideoThemePatch } from "../videoTheme.types";
 
 function _classicWith(patch: VideoThemePatch) {
-  return resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
+  return makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
     patches: [patch],
   });
 }
@@ -30,6 +30,6 @@ test("a picked stock background becomes the ground swatch", () => {
 test("no colours make an empty patch that changes nothing", () => {
   assert.equal(
     _classicWith(createThemePatchFromStockColors({})).hash,
-    resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").hash,
+    makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic").hash,
   );
 });

@@ -2,8 +2,8 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../builtInVideoThemes/builtInVideoThemes";
+import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { getExtendsChainFromThemeId } from "../mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { resolveVideoThemeFromSource } from "../resolveVideoThemeFromSource/resolveVideoThemeFromSource";
 import type {
   ResolvedVideoTheme,
   VideoThemeDocument,
@@ -90,11 +90,11 @@ export function createVideoThemeSourceFromSnapshot(
 }
 
 /** The resolved theme of one item rendered from a snapshot. */
-export function resolveVideoThemeFromSnapshot(
+export function makeResolvedVideoThemeFromSnapshot(
   snapshot: VideoThemeSnapshot | undefined,
   overrideIds: readonly string[],
 ): ResolvedVideoTheme {
-  return resolveVideoThemeFromSource(
+  return makeResolvedVideoThemeFromSource(
     createVideoThemeSourceFromSnapshot(snapshot, overrideIds),
   );
 }

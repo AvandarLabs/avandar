@@ -14,7 +14,7 @@ import {
 } from "../../motion-components/motionSettings";
 import { STOCK } from "../../stock/stockPalette";
 import { createEasingFromToken } from "../createEasingFromToken/createEasingFromToken";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { BUILT_IN_VIDEO_THEMES } from "./builtInVideoThemes";
 import type { EasingValue } from "../videoTheme.types";
 
@@ -147,9 +147,13 @@ const AUTHORED_ACCENTS = {
 
 test("every continuity composition keeps its authored accent through classic's overrides", () => {
   for (const [id, swatch] of Object.entries(AUTHORED_ACCENTS)) {
-    const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
-      overrideIds: [id],
-    });
+    const theme = makeResolvedVideoThemeFromLibrary(
+      BUILT_IN_VIDEO_THEMES,
+      "classic",
+      {
+        overrideIds: [id],
+      },
+    );
     assert.equal(theme.semantic.color.accent, STOCK[swatch], id);
   }
 });

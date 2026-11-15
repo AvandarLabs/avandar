@@ -1,6 +1,6 @@
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import {
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
@@ -31,7 +31,7 @@ export function getDeliveryThemeFromFilm(
     (film.theme.themeId === DRAFT_THEME_ID || film.theme.patches.length > 0);
   return {
     themeId: _savedThemeId(film.theme),
-    themeHash: resolveVideoThemeFromSnapshot(film.theme, [film.id]).hash,
+    themeHash: makeResolvedVideoThemeFromSnapshot(film.theme, [film.id]).hash,
     ...(hasDraft ? { themeDraft: true as const } : {}),
   };
 }

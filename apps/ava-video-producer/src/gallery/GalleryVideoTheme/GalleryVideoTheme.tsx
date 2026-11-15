@@ -5,7 +5,7 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
 import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
@@ -84,7 +84,7 @@ export function GalleryVideoTheme({
   const valid = useValidThemeDraft({ library, themeId, draft });
   const copyThemeJson = useCopyThemeJson(state);
   const savedTheme = useMemo(
-    () => resolveVideoTheme(library, themeId),
+    () => makeResolvedVideoThemeFromLibrary(library, themeId),
     [library, themeId],
   );
   const videoContext = useMemo(

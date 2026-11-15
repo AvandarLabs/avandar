@@ -4,7 +4,7 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
   createDraftThemeTarget,
   DRAFT_THEME_ID,
@@ -73,12 +73,13 @@ test("the unsaved theme does not inherit the built-in's per-item overrides", () 
     hasDraft: true,
   });
   assert.equal(
-    resolveVideoTheme(LIBRARY, "classic", scope).semantic.color.accent,
+    makeResolvedVideoThemeFromLibrary(LIBRARY, "classic", scope).semantic.color
+      .accent,
     "#f0ba83",
   );
   assert.notEqual(
-    resolveVideoTheme(target.library, target.themeId, scope).semantic.color
-      .accent,
+    makeResolvedVideoThemeFromLibrary(target.library, target.themeId, scope)
+      .semantic.color.accent,
     "#f0ba83",
   );
 });

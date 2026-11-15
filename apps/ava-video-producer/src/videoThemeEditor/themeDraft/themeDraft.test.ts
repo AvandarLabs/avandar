@@ -7,10 +7,10 @@ import {
 import { DRAFT_THEME_ID } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { createSnapshotFromThemeRequest } from "../../videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
 import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
-import { resolveVideoThemeFromSource } from "../../videoTheme/resolveVideoThemeFromSource/resolveVideoThemeFromSource";
+import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import {
   CLASSIC_VIDEO_THEME_SNAPSHOT,
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
 } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { setCustomValueInDraft } from "../customTokenValue/customTokenValue";
 import {
@@ -456,8 +456,9 @@ test("an export from a built-in draft carries a patch even when only another ite
     patch: exportTheme.patch,
   });
   assert.equal(
-    resolveVideoThemeFromSnapshot(serverSnapshot, ["network-graph"]).hash,
-    resolveVideoThemeFromSource(createVideoThemeSourceFromDraft(target)).hash,
+    makeResolvedVideoThemeFromSnapshot(serverSnapshot, ["network-graph"]).hash,
+    makeResolvedVideoThemeFromSource(createVideoThemeSourceFromDraft(target))
+      .hash,
   );
 });
 
@@ -474,8 +475,8 @@ function _exportAndPreviewHashes(
     patch: exported.patch,
   });
   return [
-    resolveVideoThemeFromSnapshot(exportSnapshot, ["network-graph"]).hash,
-    resolveVideoThemeFromSnapshot(createSnapshotFromDraft(target), [
+    makeResolvedVideoThemeFromSnapshot(exportSnapshot, ["network-graph"]).hash,
+    makeResolvedVideoThemeFromSnapshot(createSnapshotFromDraft(target), [
       "network-graph",
     ]).hash,
   ];

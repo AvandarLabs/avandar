@@ -3,7 +3,7 @@ import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThe
 import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
 import { videoThemePatchSchema } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
 import {
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { createThemeStore } from "../../showcase/themeStore/themeStore";
@@ -48,6 +48,6 @@ export async function loadVideoThemeSnapshot(
     id: request.id,
     patch,
   });
-  resolveVideoThemeFromSnapshot(snapshot, []);
+  makeResolvedVideoThemeFromSnapshot(snapshot, []);
   return snapshot;
 }

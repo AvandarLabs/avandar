@@ -11,7 +11,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../src/stock/catalog";
-import { resolveVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { makeResolvedVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { run, ffmpeg, probe } from "./lib/mediaHelpers";
 import { ensureDirectory, fileHash } from "./lib/planHelpers";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
@@ -258,7 +258,7 @@ async function _render(requests: MotionRequest[]) {
       fingerprint,
       request,
       themeId: theme.themeId,
-      themeHash: resolveVideoThemeFromSnapshot(theme, [entry.id]).hash,
+      themeHash: makeResolvedVideoThemeFromSnapshot(theme, [entry.id]).hash,
       frames: STOCK_LOOP_FRAMES,
       fps: STOCK_FPS,
       width: 1280,

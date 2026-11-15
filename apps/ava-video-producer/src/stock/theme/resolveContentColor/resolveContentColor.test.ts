@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { resolveVideoTheme } from "../../../videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { contentColorSchema, resolveContentColor } from "./resolveContentColor";
 
-const tokens = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").semantic;
+const tokens = makeResolvedVideoThemeFromLibrary(
+  BUILT_IN_VIDEO_THEMES,
+  "classic",
+).semantic;
 
 test("a colour role in content resolves through the theme", () => {
   assert.equal(

@@ -7,7 +7,7 @@ import {
 } from "react";
 import { isFilmTokensUsedMessage } from "../../../showcase/filmTheme/filmTheme";
 import {
-  resolveVideoThemeFromSnapshot,
+  makeResolvedVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import {
@@ -36,7 +36,7 @@ function _expectedTheme(snapshotKey: string, id: string) {
     return undefined;
   }
   try {
-    return resolveVideoThemeFromSnapshot(
+    return makeResolvedVideoThemeFromSnapshot(
       JSON.parse(snapshotKey) as VideoThemeSnapshot,
       [id],
     );

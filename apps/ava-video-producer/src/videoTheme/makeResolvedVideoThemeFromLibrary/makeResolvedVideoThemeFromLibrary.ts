@@ -11,7 +11,7 @@ import { mergeVideoThemeLayers } from "../mergeVideoThemeLayers/mergeVideoThemeL
 import { listTokenDefinitions } from "../tokenCatalog/tokenCatalog";
 import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/videoFontRegistry";
 import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
-import { resolveTokenTiers } from "./resolveTokenTiers";
+import { makeResolvedTokenTiersFromMergedTheme } from "./makeResolvedTokenTiersFromMergedTheme";
 import type {
   ResolvedTypeStyle,
   ResolvedVideoAtomic,
@@ -146,7 +146,7 @@ function _buildMantineFromContent(
  * listing every problem. It is pure and DOM-free, so the gallery, the live
  * player, renders, and the save route all resolve the same way.
  */
-export function resolveVideoTheme(
+export function makeResolvedVideoThemeFromLibrary(
   library: VideoThemeLibrary,
   themeId: string,
   scope: VideoThemeScope = {},
@@ -159,7 +159,7 @@ export function resolveVideoTheme(
   }
   const merged = mergeVideoThemeLayers(library, themeId, scope);
   const mantine = _createMantineTheme(merged);
-  const tiers = resolveTokenTiers({ merged, mantine });
+  const tiers = makeResolvedTokenTiersFromMergedTheme({ merged, mantine });
   if (tiers.issues.length > 0) {
     throw new VideoThemeError(tiers.issues);
   }

@@ -18,7 +18,7 @@ import { StockGraphic } from "../../../src/stock/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../../src/videoTheme/getResolvedTokenValue/getResolvedTokenValue";
-import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
   getTargetFromTokenReference,
   isTokenReference,
@@ -92,9 +92,13 @@ function _planBuilderReads(): readonly string[] {
     const patch = {
       other: { video: { semantic: { camera: { preset: cameraPreset } } } },
     };
-    const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
-      patches: [patch],
-    });
+    const theme = makeResolvedVideoThemeFromLibrary(
+      BUILT_IN_VIDEO_THEMES,
+      "classic",
+      {
+        patches: [patch],
+      },
+    );
     const semantic = createTokenUsageProxy({
       value: theme.semantic,
       catalog: SEMANTIC_TOKENS,

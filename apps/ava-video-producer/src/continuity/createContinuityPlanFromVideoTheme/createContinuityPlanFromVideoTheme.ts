@@ -1,7 +1,7 @@
 import { retimeCameraTrack } from "../../motion-components/cameraTrack";
 import { motionOptionsSchema } from "../../motion-components/motionSettings";
 import { isCameraSafeEasing } from "../../videoTheme/cameraEasing/cameraEasing";
-import { resolveVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { makeResolvedVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { getContinuityTimeline } from "../continuityTimeline";
 import type {
   MotionEasing,
@@ -286,6 +286,6 @@ export function createContinuityPlanFromVideoThemeSnapshot(
 ): Storyboard {
   return createContinuityPlanFromVideoTheme(
     plan,
-    resolveVideoThemeFromSnapshot(snapshot, overrideIds),
+    makeResolvedVideoThemeFromSnapshot(snapshot, overrideIds),
   );
 }
