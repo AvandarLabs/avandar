@@ -1,7 +1,5 @@
-import type {
-  ThemeCopyStatus,
-  ThemeSaveStatus,
-} from "../../useVideoThemeDraft/useThemeSaving";
+import type { ThemeCopyStatus } from "../../useVideoThemeDraft/useThemeSaving/useThemeSaving";
+import type { ThemeSaveStatus } from "../../useVideoThemeDraft/useThemeSaving/useThemeSaving.types";
 
 /** What the theme bar knows about the active theme and its last action. */
 export type ThemeBarInput = Readonly<{

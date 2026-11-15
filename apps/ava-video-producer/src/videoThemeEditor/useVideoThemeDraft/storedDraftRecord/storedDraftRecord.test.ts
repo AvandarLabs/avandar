@@ -6,7 +6,7 @@ import {
   isThemeDraftEmpty,
   setTokenInDraft,
   type ThemeDraft,
-} from "../themeDraft/themeDraft";
+} from "../../themeDraft/themeDraft";
 import {
   createDraftAfterSave,
   createEditedRecord,
@@ -18,7 +18,7 @@ import {
   isRecordChangedOnDisk,
   type DraftRecord,
 } from "./storedDraftRecord";
-import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
+import type { VideoThemeDocument } from "../../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;
 const ACCENT_DRAFT = setTokenInDraft(

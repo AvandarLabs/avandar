@@ -6,45 +6,22 @@ import {
   useState,
   type RefObject,
 } from "react";
-import {
-  ThemeApi,
-  ThemeApiError,
-  type StoredTheme,
-} from "../ThemeApi/ThemeApi";
+import { ThemeApi, type StoredTheme } from "../../ThemeApi/ThemeApi";
 import {
   buildThemeIdFromLabel,
   createNewThemeDocument,
   createSavedDocumentFromDraft,
   type ThemeDraft,
-} from "../themeDraft/themeDraft";
+} from "../../themeDraft/themeDraft";
 import {
   createDraftAfterSave,
   getLatestDraftOfTheme,
   isDraftUnchanged,
-} from "./storedDraftRecord";
-import type {
-  VideoThemeIssue,
-  VideoThemeLibrary,
-} from "../../videoTheme/videoTheme.types";
-
-/** What the last theme action did, for the theme bar's status line. */
-export type ThemeSaveStatus =
-  | Readonly<{ kind: "idle" }>
-  | Readonly<{ kind: "saving" }>
-  | Readonly<{ kind: "saved" }>
-  | Readonly<{
-      kind: "failed";
-      status: number;
-      issues: readonly VideoThemeIssue[];
-    }>
-  /** Saving as a new theme was refused. A 409 means the name is taken. */
-  | Readonly<{
-      kind: "createFailed";
-      status: number;
-      issues: readonly VideoThemeIssue[];
-    }>;
-
-type FailureKind = "failed" | "createFailed";
+} from "../storedDraftRecord/storedDraftRecord";
+import { reloadStoredTheme } from "./reloadStoredTheme/reloadStoredTheme";
+import { runThemeRequest } from "./runThemeRequest/runThemeRequest";
+import type { VideoThemeLibrary } from "../../../videoTheme/videoTheme.types";
+import type { FailureKind, ThemeSaveStatus } from "./useThemeSaving.types";
 
 /**
  * What the last Copy JSON did. It is kept apart from the save status so a
@@ -73,7 +50,9 @@ type SaveOptions = Readonly<{
   storeTheme: (stored: StoredTheme) => void;
   selectTheme: (themeId: string) => void;
   discard: () => void;
-  rebaseDraft: (baseHash: string, nextDraft?: ThemeDraft) => void;
+  rebaseDraft: (
+    options: Readonly<{ baseHash: string; draft?: ThemeDraft }>,
+  ) => void;
 }>;
 
 /**
@@ -82,103 +61,33 @@ type SaveOptions = Readonly<{
  */
 type LatestDrafts = RefObject<Map<string, ThemeDraft>>;
 
-function _buildFailureStatusFromError(
-  error: unknown,
-  kind: FailureKind,
-): ThemeSaveStatus {
-  return error instanceof ThemeApiError
-    ? { kind, status: error.status, issues: error.issues }
-    : { kind, status: 0, issues: [] };
-}
-
-/**
- * Runs one theme request with its status updates and resolves true when it
- * succeeded. A request started while another is in flight is ignored and
- * resolves false, so a double click cannot send the same stale hash twice.
- * A failure is reported as `failureKind`, which a create sets to
- * `createFailed` so its conflict is not read as a changed file.
- */
-export async function runThemeRequest(
-  options: Readonly<{
-    inFlight: RefObject<boolean>;
-    setStatus: (status: ThemeSaveStatus) => void;
-    request: () => Promise<void>;
-    failureKind?: FailureKind;
-  }>,
-): Promise<boolean> {
-  const { inFlight, setStatus, request, failureKind = "failed" } = options;
-  if (inFlight.current) {
-    return false;
-  }
-  inFlight.current = true;
-  setStatus({ kind: "saving" });
-  try {
-    await request();
-    setStatus({ kind: "saved" });
-    return true;
-  } catch (error) {
-    setStatus(_buildFailureStatusFromError(error, failureKind));
-    return false;
-  } finally {
-    inFlight.current = false;
-  }
-}
-
-/**
- * Re-reads one theme's file, stores it, and records the draft as made against
- * it, resolving true when it worked. The draft's edits stay, so nothing on
- * disk or in the draft is overwritten. It shares the in-flight guard with
- * saving: while a save runs it does nothing, so a late read cannot replace
- * the document and hash a save just stored. A successful reload clears the
- * status line, since a stale-hash failure no longer applies. A failed one
- * reports why.
- */
-export async function reloadStoredTheme(
-  options: Readonly<{
-    themeId: string;
-    inFlight: RefObject<boolean>;
-    read: (themeId: string) => Promise<StoredTheme>;
-    storeTheme: (stored: StoredTheme) => void;
-    rebaseDraft: (baseHash: string) => void;
-    setStatus: (status: ThemeSaveStatus) => void;
-  }>,
-): Promise<boolean> {
-  const { themeId, inFlight, read, storeTheme, rebaseDraft, setStatus } =
-    options;
-  if (inFlight.current) {
-    return false;
-  }
-  inFlight.current = true;
-  try {
-    const stored = await read(themeId);
-    storeTheme(stored);
-    rebaseDraft(stored.hash);
-    setStatus({ kind: "idle" });
-    return true;
-  } catch (error) {
-    setStatus(_buildFailureStatusFromError(error, "failed"));
-    return false;
-  } finally {
-    inFlight.current = false;
-  }
-}
-
 type RunThemeRequest = (
   request: () => Promise<void>,
   failureKind?: FailureKind,
 ) => Promise<boolean>;
 
+/** The save options plus the request runner and latest drafts a save hook shares. */
+type SaveHookOptions = SaveOptions &
+  Readonly<{
+    run: RunThemeRequest;
+    latestDrafts: LatestDrafts;
+  }>;
+
 /**
  * Saves the draft into its custom theme file, guarded by the file's hash.
  * Edits made while the save runs stay, on top of the saved theme.
  */
-function useSaveInPlace(
-  options: SaveOptions,
-  run: RunThemeRequest,
-  latestDrafts: LatestDrafts,
-) {
-  const { themeId, isBuiltIn, storedTheme, draft, storeTheme, rebaseDraft } =
-    options;
+function useSaveInPlace(options: SaveHookOptions) {
+  const {
+    themeId,
+    isBuiltIn,
+    storedTheme,
+    draft,
+    storeTheme,
+    rebaseDraft,
+    run,
+    latestDrafts,
+  } = options;
   return useCallback(async () => {
     if (isBuiltIn || !storedTheme) {
       return;
@@ -187,15 +96,15 @@ function useSaveInPlace(
     await run(async () => {
       const { hash } = await ThemeApi.save(document, storedTheme.hash);
       storeTheme({ document, hash });
-      rebaseDraft(
-        hash,
-        createDraftAfterSave({
+      rebaseDraft({
+        baseHash: hash,
+        draft: createDraftAfterSave({
           themeId,
           savedDraft: draft,
           savedDocument: document,
           latestDrafts: latestDrafts.current,
         }),
-      );
+      });
     });
   }, [
     themeId,
@@ -215,12 +124,17 @@ function useSaveInPlace(
  * base theme's draft is cleared only when it did not change during the save,
  * so edits made meanwhile are not lost.
  */
-function useSaveAsNew(
-  options: SaveOptions,
-  run: RunThemeRequest,
-  latestDrafts: LatestDrafts,
-) {
-  const { library, themeId, draft, storeTheme, discard, selectTheme } = options;
+function useSaveAsNew(options: SaveHookOptions) {
+  const {
+    library,
+    themeId,
+    draft,
+    storeTheme,
+    discard,
+    selectTheme,
+    run,
+    latestDrafts,
+  } = options;
   return useCallback(
     (label: string) =>
       run(async () => {
@@ -283,8 +197,8 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   useEffect(() => {
     latestDrafts.current.set(options.themeId, options.draft);
   }, [options.themeId, options.draft]);
-  const save = useSaveInPlace(options, run, latestDrafts);
-  const saveAsNew = useSaveAsNew(options, run, latestDrafts);
+  const save = useSaveInPlace({ ...options, run, latestDrafts });
+  const saveAsNew = useSaveAsNew({ ...options, run, latestDrafts });
   const { themeId, storeTheme, rebaseDraft } = options;
   const reloadTheme = useCallback(
     () =>

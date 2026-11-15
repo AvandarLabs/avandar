@@ -1,6 +1,6 @@
 import { Button, Group } from "@mantine/core";
 import { elevationToBoxShadow } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { DEFAULT_SHADOW_LAYER } from "../effectControls.constants";
 import { ShadowLayers } from "./ShadowLayers";
 import css from "./ShadowValueControl.module.css";

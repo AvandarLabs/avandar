@@ -2,7 +2,7 @@ import { ActionIcon } from "@mantine/core";
 import { IconArrowBackUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { formatTokenValue } from "../../formatTokenValue/formatTokenValue";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { OverrideDot } from "./OverrideDot/OverrideDot";
 import css from "./TokenRowHeader.module.css";
 import type { TokenRow } from "../../tokenRows/tokenRows";

@@ -3,7 +3,7 @@ import {
   useRowHasIssue,
   useRowIssueAriaProps,
 } from "../../RowIssueContext/RowIssueContext";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
 import {

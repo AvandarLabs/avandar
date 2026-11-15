@@ -4,7 +4,7 @@ import {
   rememberActiveThemeId,
 } from "../themeDraftStorage/themeDraftStorage";
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
-import type { BrowserStorage } from "./browserStorage";
+import type { BrowserStorage } from "./getBrowserStorage";
 
 /**
  * The theme being edited and a way to switch it. Reads `?theme=` and the

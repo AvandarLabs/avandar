@@ -1,5 +1,5 @@
 import { getFieldName } from "../../../tokenCopy/editorCopy";
-import { useTokenEditor } from "../../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../../TokenEditorContext";
 import { EnumValueControl } from "../../EnumValueControl/EnumValueControl";
 import { ReferenceControl } from "../../ReferenceControl/ReferenceControl";
 import css from "./CompositeField.module.css";

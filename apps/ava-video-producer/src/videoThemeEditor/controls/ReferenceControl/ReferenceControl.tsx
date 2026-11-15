@@ -12,7 +12,7 @@ import {
   type ReferenceOption,
 } from "../../referenceOptions/referenceOptions";
 import { useRowHasIssue } from "../../RowIssueContext/RowIssueContext";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { CustomValue } from "./CustomValue/CustomValue";
 import { OptionRow } from "./OptionRow/OptionRow";
 import { PickAnotherButton } from "./PickAnotherButton/PickAnotherButton";

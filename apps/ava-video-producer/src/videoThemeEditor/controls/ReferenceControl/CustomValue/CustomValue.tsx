@@ -7,7 +7,7 @@ import {
   isCameraCurveToken,
   type ReferenceOption,
 } from "../../../referenceOptions/referenceOptions";
-import { useTokenEditor } from "../../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../../TokenEditorContext";
 import { getDefaultLiteralFromKind } from "../../getDefaultLiteralFromKind";
 import { ValueControl } from "../../ValueControl";
 import css from "./CustomValue.module.css";

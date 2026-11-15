@@ -1,4 +1,4 @@
-import { useTokenEditor } from "../../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../../TokenEditorContext";
 import { ReferenceControl } from "../../ReferenceControl/ReferenceControl";
 import { CompositeSketchPreview } from "../CompositeSketchPreview";
 import css from "./CompositeReference.module.css";

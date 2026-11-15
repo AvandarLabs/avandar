@@ -10,7 +10,7 @@ import {
   EMPTY_THEME_DRAFT,
   setTokenInDraft,
 } from "../themeDraft/themeDraft";
-import { buildThemeJsonFromDraft } from "./themeJson";
+import { buildThemeJsonFromDraft } from "./buildThemeJsonFromDraft";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;

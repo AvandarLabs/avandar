@@ -1,4 +1,4 @@
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import css from "./ItemOverrideNote.module.css";
 
 type Props = Readonly<{ label: string }>;

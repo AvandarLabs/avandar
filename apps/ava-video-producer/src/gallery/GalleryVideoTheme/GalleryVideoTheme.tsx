@@ -7,9 +7,9 @@ import {
 } from "react";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeContext } from "../../videoTheme/useVideoTheme";
+import { buildThemeJsonFromDraft } from "../../videoThemeEditor/buildThemeJsonFromDraft/buildThemeJsonFromDraft";
 import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
-import { buildThemeJsonFromDraft } from "../../videoThemeEditor/themeJson/themeJson";
 import {
   useVideoThemeDraft,
   type VideoThemeDraftState,

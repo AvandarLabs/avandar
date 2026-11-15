@@ -5,7 +5,7 @@ import {
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
-import { TokenEditorContext } from "../TokenEditorContext/TokenEditorContext";
+import { TokenEditorContext } from "../TokenEditorContext";
 import { useTokenRowLabel } from "../TokenRow/useTokenRowLabel";
 import {
   filterTokenRows,

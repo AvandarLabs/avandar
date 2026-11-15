@@ -1,5 +1,5 @@
 import { getFieldName } from "../../tokenCopy/editorCopy";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
 import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ColorPair } from "../roleValueHelpers/roleValueHelpers";

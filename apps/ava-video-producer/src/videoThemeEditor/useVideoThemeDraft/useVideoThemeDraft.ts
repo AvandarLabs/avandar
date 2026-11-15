@@ -1,10 +1,13 @@
 import { useMemo } from "react";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { getBrowserStorage } from "./browserStorage";
+import { getBrowserStorage } from "./getBrowserStorage";
 import { useActiveThemeId } from "./useActiveThemeId";
 import { useStoredDraft, type StoredDraftState } from "./useStoredDraft";
 import { useThemeLibrary } from "./useThemeLibrary";
-import { useThemeSaving, type ThemeSavingState } from "./useThemeSaving";
+import {
+  useThemeSaving,
+  type ThemeSavingState,
+} from "./useThemeSaving/useThemeSaving";
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
 

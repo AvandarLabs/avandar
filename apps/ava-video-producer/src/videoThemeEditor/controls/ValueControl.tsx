@@ -1,5 +1,5 @@
 import { TOKEN_CONTROLS } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
-import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../TokenEditorContext";
 import { BooleanValueControl } from "./BooleanValueControl";
 import { ColorValueControl } from "./ColorValueControl/ColorValueControl";
 import { DashValueControl } from "./DashValueControl/DashValueControl";

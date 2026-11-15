@@ -10,10 +10,8 @@ import {
 } from "./themeBarHelpers/themeBarHelpers";
 import { ThemePicker } from "./ThemePicker";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
-import type {
-  ThemeCopyStatus,
-  ThemeSaveStatus,
-} from "../useVideoThemeDraft/useThemeSaving";
+import type { ThemeCopyStatus } from "../useVideoThemeDraft/useThemeSaving/useThemeSaving";
+import type { ThemeSaveStatus } from "../useVideoThemeDraft/useThemeSaving/useThemeSaving.types";
 
 type Props = Readonly<{
   themes: readonly ThemeSummary[];

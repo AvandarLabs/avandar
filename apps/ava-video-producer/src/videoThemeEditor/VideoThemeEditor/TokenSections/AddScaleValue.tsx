@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getDefaultLiteralFromKind } from "../../controls/getDefaultLiteralFromKind";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import {
   buildNextCustomScaleKey,
   type TokenRow as TokenRowModel,

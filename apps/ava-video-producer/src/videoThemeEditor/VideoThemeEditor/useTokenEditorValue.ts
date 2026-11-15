@@ -11,7 +11,7 @@ import type {
   ResolvedVideoTheme,
   VideoThemeIssue,
 } from "../../videoTheme/videoTheme.types";
-import type { TokenEditorContextValue } from "../TokenEditorContext/TokenEditorContext";
+import type { TokenEditorContextValue } from "../TokenEditorContext";
 import type { TokenRow } from "../tokenRows/tokenRows";
 import type { EditorItem } from "./EditorToolbar/EditorToolbar";
 

@@ -15,8 +15,8 @@ import {
   createKeptRecord,
   createRebasedRecord,
   isRecordChangedOnDisk,
-} from "./storedDraftRecord";
-import type { BrowserStorage } from "./browserStorage";
+} from "./storedDraftRecord/storedDraftRecord";
+import type { BrowserStorage } from "./getBrowserStorage";
 
 /** One theme's persisted draft and what can be done with it. */
 export type StoredDraftState = Readonly<{
@@ -31,7 +31,9 @@ export type StoredDraftState = Readonly<{
    * Records the edits, or the given ones in their place, as made against the
    * file with this hash.
    */
-  rebaseDraft: (baseHash: string, nextDraft?: ThemeDraft) => void;
+  rebaseDraft: (
+    options: Readonly<{ baseHash: string; draft?: ThemeDraft }>,
+  ) => void;
   discard: () => void;
 }>;
 
@@ -98,11 +100,11 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     [store, baseHash, draft],
   );
   const rebaseDraft = useCallback(
-    (nextBaseHash: string, nextDraft?: ThemeDraft) =>
+    (rebaseOptions: Readonly<{ baseHash: string; draft?: ThemeDraft }>) =>
       store(
         createRebasedRecord({
-          baseHash: nextBaseHash,
-          draft: nextDraft ?? draft,
+          baseHash: rebaseOptions.baseHash,
+          draft: rebaseOptions.draft ?? draft,
         }),
       ),
     [store, draft],

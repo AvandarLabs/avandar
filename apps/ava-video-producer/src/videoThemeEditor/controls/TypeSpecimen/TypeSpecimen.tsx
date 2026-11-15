@@ -3,7 +3,7 @@ import {
   fillToCss,
   textShadowToCss,
 } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
-import { useTokenEditor } from "../../TokenEditorContext/TokenEditorContext";
+import { useTokenEditor } from "../../TokenEditorContext";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import css from "./TypeSpecimen.module.css";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";

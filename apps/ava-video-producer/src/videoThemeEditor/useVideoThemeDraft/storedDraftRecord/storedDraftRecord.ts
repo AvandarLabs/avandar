@@ -1,4 +1,4 @@
-import { getValueAtPath } from "../../videoTheme/getValueAtPath";
+import { getValueAtPath } from "../../../videoTheme/getValueAtPath";
 import {
   EMPTY_THEME_DRAFT,
   getDocumentPathFromTokenPath,
@@ -6,12 +6,12 @@ import {
   listTokenPathsFromPatch,
   removeValueAtPath,
   type ThemeDraft,
-} from "../themeDraft/themeDraft";
+} from "../../themeDraft/themeDraft";
 import type {
   VideoThemeDocument,
   VideoThemePatch,
-} from "../../videoTheme/videoTheme.types";
-import type { StoredThemeDraft } from "../themeDraftStorage/themeDraftStorage";
+} from "../../../videoTheme/videoTheme.types";
+import type { StoredThemeDraft } from "../../themeDraftStorage/themeDraftStorage";
 
 /** The stored record of one theme, or undefined when nothing is stored. */
 export type DraftRecord = StoredThemeDraft | undefined;

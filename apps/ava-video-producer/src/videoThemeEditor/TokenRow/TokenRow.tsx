@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
-import { TokenControl } from "../TokenControl/TokenControl";
-import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
+import { TokenControl } from "../TokenControl";
+import { useTokenEditor } from "../TokenEditorContext";
 import {
   findTokenRowIssue,
   type TokenRow as TokenRowModel,

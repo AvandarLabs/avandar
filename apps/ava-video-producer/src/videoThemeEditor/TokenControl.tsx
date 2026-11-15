@@ -1,10 +1,10 @@
-import { isCompositeTokenKind } from "../../videoTheme/tokenCatalog/defineTokensHelpers";
-import { ColorRoleControl } from "../controls/ColorRoleControl/ColorRoleControl";
-import { CompositeControl } from "../controls/CompositeControl/CompositeControl";
-import { ReferenceControl } from "../controls/ReferenceControl/ReferenceControl";
-import { ValueControl } from "../controls/ValueControl";
-import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
-import type { TokenRow } from "../tokenRows/tokenRows";
+import { isCompositeTokenKind } from "../videoTheme/tokenCatalog/defineTokensHelpers";
+import { ColorRoleControl } from "./controls/ColorRoleControl/ColorRoleControl";
+import { CompositeControl } from "./controls/CompositeControl/CompositeControl";
+import { ReferenceControl } from "./controls/ReferenceControl/ReferenceControl";
+import { ValueControl } from "./controls/ValueControl";
+import { useTokenEditor } from "./TokenEditorContext";
+import type { TokenRow } from "./tokenRows/tokenRows";
 
 /**
  * The control for a token row: literal values in the atomic and Mantine
