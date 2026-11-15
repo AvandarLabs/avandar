@@ -70,12 +70,6 @@ msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 msgid "No records yet"
 msgstr "No records yet"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
-#~ msgid "You can no longer read one of these dictionaries, so it was not "
-#~ "attached. Ask an admin for access to dictionaries."
-#~ msgstr "You can no longer read one of these dictionaries, so it was not "
-#~ "attached. Ask an admin for access to dictionaries."
-
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "Return online to view or make the page available offline."
@@ -3413,10 +3407,6 @@ msgstr "avg"
 msgid "Generating…"
 msgstr "Generating…"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
-#~ msgid "Apply dictionaries to {datasetName}"
-#~ msgstr "Apply dictionaries to {datasetName}"
-
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
@@ -3966,12 +3956,6 @@ msgstr "Could not save the place."
 msgid "is before"
 msgstr "is before"
 
-#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
-#~ msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
-#~ "for access to it, then try again."
-#~ msgstr "This change involves a dataset you can't open, so nothing was saved. "
-#~ "Ask for access to it, then try again."
-
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
 "and discover insights from your data."
@@ -4399,10 +4383,6 @@ msgid "Matched by meaning, not just by name. Keep apart if these record "
 "different things."
 msgstr "Matched by meaning, not just by name. Keep apart if these record "
 "different things."
-
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
-#~ msgid "Datasets this dictionary is applied to will be listed here."
-#~ msgstr "Datasets this dictionary is applied to will be listed here."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
@@ -6117,10 +6097,6 @@ msgstr "{maxAllowed, plural, one {Your plan allows # shared or public "
 msgid "You are offline"
 msgstr "You are offline"
 
-#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-#~ msgid "Filter datasets"
-#~ msgstr "Filter datasets"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
 "layers."
@@ -6181,11 +6157,6 @@ msgstr "Rose"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/ConvertedTypeNote.tsx
 msgid "Set by {dictionaryName}"
 msgstr "Set by {dictionaryName}"
-
-#. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
-#~ msgid "Are you sure you want to delete {0}?"
-#~ msgstr "Are you sure you want to delete {0}?"
 
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
@@ -6378,11 +6349,6 @@ msgstr "Re-run query"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
 msgstr "Move the pointer over the map to read a coordinate"
-
-#. placeholder {0}: error.message
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
-#~ msgid "The name could not be saved: {0}"
-#~ msgstr "The name could not be saved: {0}"
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Trim spaces, lowercase"
@@ -7374,10 +7340,6 @@ msgstr "Go home"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Count how many rows there are in {datasetName}"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
-#~ msgid "Attached as reference"
-#~ msgstr "Attached as reference"
-
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
 msgid "Column name"
 msgstr "Column name"
@@ -8046,11 +8008,6 @@ msgstr "Press Space or Enter to pick up this value, move it with the arrow "
 "keys, then press Space or Enter to drop it. Or hold Alt and press the "
 "up or down arrow to move it one place."
 
-#. placeholder {0}: error.message
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
-#~ msgid "The dictionary could not be deleted: {0}"
-#~ msgstr "The dictionary could not be deleted: {0}"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the bbox-epsg-3857 placeholder where the server expects the "
 "bounding box."
@@ -8528,10 +8485,6 @@ msgstr "is false"
 msgid "Bar Chart"
 msgstr "Bar Chart"
 
-#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
-#~ msgid "Every value needs a code and a label."
-#~ msgstr "Every value needs a code and a label."
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Offline mode answers your questions with models that run on this "
 "computer instead of on Avandar's servers."
@@ -8959,10 +8912,6 @@ msgstr "Ask about your data..."
 msgid "Title"
 msgstr "Title"
 
-#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-#~ msgid "No datasets match your filter"
-#~ msgstr "No datasets match your filter"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "Curve"
@@ -9199,11 +9148,6 @@ msgid "Either way, the code lists and descriptions are attached to "
 "{datasetName} for reference."
 msgstr "Either way, the code lists and descriptions are attached to "
 "{datasetName} for reference."
-
-#. placeholder {0}: dictionary.name
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
-#~ msgid "Delete {0} and all of its entries and code lists?"
-#~ msgstr "Delete {0} and all of its entries and code lists?"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -12191,10 +12135,6 @@ msgstr "{conceptName} fields"
 msgid "Collapse the legend"
 msgstr "Collapse the legend"
 
-#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-#~ msgid "No datasets yet"
-#~ msgstr "No datasets yet"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Chat message"
@@ -12529,10 +12469,6 @@ msgstr "Could not delete the place."
 msgid "Switch Workspace"
 msgstr "Switch Workspace"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
-#~ msgid "Show what codes mean and add column descriptions"
-#~ msgstr "Show what codes mean and add column descriptions"
-
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "You can view this dashboard because it was shared with you."
@@ -12691,10 +12627,6 @@ msgstr "The map's saved view"
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
 msgstr "You haven't chosen a value column"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
-#~ msgid "The dictionaries were not attached. Please try again."
-#~ msgstr "The dictionaries were not attached. Please try again."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Text contains"
@@ -13914,12 +13846,6 @@ msgstr "Point geometry"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's move these results to a dashboard"
 msgstr "Let's move these results to a dashboard"
-
-#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
-#~ msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
-#~ "that it still exists and that you can open it."
-#~ msgstr "A dataset in this crosswalk couldn't be read, so it was left out. Check "
-#~ "that it still exists and that you can open it."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
