@@ -7,10 +7,6 @@
       "specifier": "oxlint-plugin-eslint"
     },
     {
-      "name": "import-js",
-      "specifier": "eslint-plugin-import-x"
-    },
-    {
       "name": "react-js",
       "specifier": "eslint-plugin-react"
     },
@@ -30,23 +26,6 @@
   "settings": {
     "react": {
       "version": "19.2.5"
-    },
-    "import-x/resolver": {
-      "typescript": {
-        "project": [
-          "tsconfig.json",
-          "tsconfig.app.json",
-          "tsconfig.node.json",
-          "tsconfig.base.json",
-          "shared/tsconfig.json",
-          "apps/ava-video-producer/avandar-adapter/tsconfig.json",
-          "apps/*/tsconfig.json",
-          "apps/*/tsconfig.*.json",
-          "packages/*/*/tsconfig.json"
-        ],
-        "alwaysTryTypes": true,
-        "noWarnOnMultipleProjects": true
-      }
     }
   },
   "ignorePatterns": [
@@ -226,7 +205,7 @@
         "curly": "off",
         "prefer-template": "off",
         "typescript/consistent-type-imports": "off",
-        "import-js/extensions": [
+        "import/extensions": [
           "error",
           "ignorePackages",
           {
@@ -270,19 +249,19 @@
     {
       "files": ["supabase/functions/**/*.ts"],
       "rules": {
-        "import-js/extensions": "off"
+        "import/extensions": "off"
       }
     },
     {
       "files": ["eslint/**/*.js"],
       "rules": {
-        "import-js/extensions": ["error", "ignorePackages", { "js": "always" }]
+        "import/extensions": ["error", "ignorePackages", { "js": "always" }]
       }
     },
     {
       "files": ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
       "rules": {
-        "import-js/extensions": [
+        "import/extensions": [
           "error",
           "ignorePackages",
           {
