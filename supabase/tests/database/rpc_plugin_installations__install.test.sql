@@ -5,7 +5,7 @@
  * slot bindings in one transaction. A settings admin installs with bindings
  * that take the new install's id and workspace. A binding that fails rolls
  * the install back with it. Anyone who is not a settings admin of the
- * workspace cannot install.
+ * workspace cannot install. A binding that names no source fails the call.
  */
 begin;
 
@@ -42,7 +42,7 @@ values
   ('d1705001-0000-4000-8000-000000000001'::uuid, 'd1701001-0000-4000-8000-000000000001'::uuid, 'd1704001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
   ('d1705002-0000-4000-8000-000000000002'::uuid, 'd1701002-0000-4000-8000-000000000002'::uuid, 'd1704002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0);
 
-select plan (9);
+select plan (12);
 
 -- 1. The owner installs with a case type binding. The binding takes the new
 -- install's id and workspace, and both rows are attributed to the owner.
@@ -197,6 +197,60 @@ select throws_ok (
   '42501',
   null,
   'an outsider cannot install into another workspace through the rpc'
+);
+
+-- 7. An install whose case type binding names no case type fails.
+select throws_ok (
+  $t7$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1700001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_installations__install(
+    'd1701001-0000-4000-8000-000000000001'::uuid,
+    'avandar.sourceless-concept',
+    '0.1.0',
+    array['data:slots'],
+    '[{"slot_id": "cases", "source_type": "concept", "concept_id": null, "dataset_id": null, "attribute_map": {}}]'::jsonb
+  );
+  $t7$,
+  '23514',
+  'A data slot binding must name the case type its source type says',
+  'an install whose case type binding names no case type fails'
+);
+
+-- 8. An install whose dataset binding names no dataset fails.
+select throws_ok (
+  $t8$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1700001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_installations__install(
+    'd1701001-0000-4000-8000-000000000001'::uuid,
+    'avandar.sourceless-dataset',
+    '0.1.0',
+    array['data:slots'],
+    '[{"slot_id": "cases", "source_type": "dataset", "concept_id": null, "dataset_id": null, "attribute_map": {}}]'::jsonb
+  );
+  $t8$,
+  '23514',
+  'A data slot binding must name the dataset its source type says',
+  'an install whose dataset binding names no dataset fails'
+);
+
+-- 9. The failed install leaves nothing behind.
+select lives_ok (
+  $t9$
+  reset role;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_installations
+      where plugin_id in ('avandar.sourceless-concept', 'avandar.sourceless-dataset')
+    ) <> 0 then
+      raise exception 'an install with a sourceless binding was left behind';
+    end if;
+  end $chk$;
+  $t9$,
+  'an install with a binding that names no source leaves no install behind'
 );
 
 reset role;

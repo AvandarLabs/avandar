@@ -4,7 +4,8 @@
  * `rpc_plugin_data_slot_bindings__save` binds one data slot of an install,
  * replacing the slot's binding when it has one. A settings admin binds and
  * rebinds a slot, and it keeps one row. Nobody else can bind, and a binding
- * still cannot read another workspace's case type.
+ * still cannot read another workspace's case type. A save must name the
+ * source its type says, whether it adds a binding or replaces one.
  */
 begin;
 
@@ -76,7 +77,7 @@ values (
   array['data:slots']
 );
 
-select plan (8);
+select plan (12);
 
 -- 1. The owner binds a slot that had no binding.
 select lives_ok (
@@ -202,6 +203,96 @@ select throws_ok (
   '23514',
   null,
   'a data slot cannot be bound to a case type of another workspace'
+);
+
+-- 6. A new case type binding saved with no case type is refused.
+select throws_ok (
+  $t6$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1800001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_data_slot_bindings__save(
+    'd180a001-0000-4000-8000-000000000001'::uuid,
+    'deaths',
+    'concept',
+    null,
+    null,
+    '{}'::jsonb
+  );
+  $t6$,
+  '23514',
+  'A data slot binding must name the case type its source type says',
+  'a new case type binding saved with no case type is refused'
+);
+
+-- 7. A new dataset binding saved with no dataset is refused.
+select throws_ok (
+  $t7$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1800001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_data_slot_bindings__save(
+    'd180a001-0000-4000-8000-000000000001'::uuid,
+    'deaths',
+    'dataset',
+    null,
+    null,
+    '{}'::jsonb
+  );
+  $t7$,
+  '23514',
+  'A data slot binding must name the dataset its source type says',
+  'a new dataset binding saved with no dataset is refused'
+);
+
+-- 8. Switching a bound slot to a case type with no case type is refused.
+select throws_ok (
+  $t8$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1800001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_data_slot_bindings__save(
+    'd180a001-0000-4000-8000-000000000001'::uuid,
+    'cases',
+    'concept',
+    null,
+    null,
+    '{}'::jsonb
+  );
+  $t8$,
+  '23514',
+  'A data slot binding must name the case type its source type says',
+  'switching a bound slot to a case type with no case type is refused'
+);
+
+-- 9. Switching a bound slot back to a case type works when it names one.
+select lives_ok (
+  $t9$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1800001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_data_slot_bindings__save(
+    'd180a001-0000-4000-8000-000000000001'::uuid,
+    'cases',
+    'concept',
+    'd1804001-0000-4000-8000-000000000001'::uuid,
+    null,
+    '{}'::jsonb
+  );
+  reset role;
+  do $chk$
+  begin
+    if not exists (
+      select 1
+      from public.plugin_data_slot_bindings binding
+      where
+        binding.installation_id = 'd180a001-0000-4000-8000-000000000001'::uuid and
+        binding.slot_id = 'cases' and
+        binding.source_type = 'concept' and
+        binding.concept_id = 'd1804001-0000-4000-8000-000000000001'::uuid and
+        binding.dataset_id is null
+    ) then
+      raise exception 'switching the slot back to a case type did not take it';
+    end if;
+  end $chk$;
+  $t9$,
+  'switching a bound slot to a case type works when it names the case type'
 );
 
 reset role;

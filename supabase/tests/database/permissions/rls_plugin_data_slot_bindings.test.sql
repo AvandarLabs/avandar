@@ -10,7 +10,10 @@
  * the dataset keeps the binding with a null source, and uninstalling deletes
  * it. Later cases rely on rows the earlier ones leave: the `forged` binding
  * is unbound in 19, the case type and dataset are deleted in 20 and 21, and
- * 22 uninstalls what is left.
+ * 22 uninstalls what is left. Cases 23 to 30 use their own install, case
+ * type, and dataset. They cover a binding that names no source: it is refused
+ * when created or when its type changes, and a deleted source still leaves
+ * one.
  */
 begin;
 
@@ -102,7 +105,7 @@ values (
   '{"onsetDate": "d1507001-0000-4000-8000-000000000001"}'::jsonb
 );
 
-select plan (22);
+select plan (30);
 
 -- 1. A plain member reads their workspace's binding.
 select lives_ok (
@@ -514,6 +517,173 @@ select lives_ok (
   end $chk$;
   $t22$,
   'uninstalling a plugin deletes its data slot bindings'
+);
+
+-- Fixtures for cases 23 to 30: an install, a case type, and a dataset the
+-- earlier cases did not touch.
+reset role;
+
+insert into public.plugin_installations (id, workspace_id, plugin_id, installed_version, granted_permissions)
+values (
+  'd150a003-0000-4000-8000-000000000003'::uuid,
+  'd1501001-0000-4000-8000-000000000001'::uuid,
+  'avandar.sourceless',
+  '0.1.0',
+  array['data:slots']
+);
+
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('d1504003-0000-4000-8000-000000000003'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'slot bindings cases c', true, 'd1505003-0000-4000-8000-000000000003'::uuid);
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values ('d1505003-0000-4000-8000-000000000003'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd1504003-0000-4000-8000-000000000003'::uuid, 'Active', '#40c057', 0);
+
+insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type)
+values ('d1506003-0000-4000-8000-000000000003'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid, 'd1503001-0000-4000-8000-000000000001'::uuid, 'slot bindings dataset c', 'csv_file'::public.datasets__source_type);
+
+-- 23. A case type binding with no case type is refused.
+select throws_ok (
+  $t23$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type)
+  values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a003-0000-4000-8000-000000000003'::uuid, 'cases', 'concept');
+  $t23$,
+  '23514',
+  'A data slot binding must name the case type its source type says',
+  'a case type binding with no case type is refused'
+);
+
+-- 24. A dataset binding with no dataset is refused.
+select throws_ok (
+  $t24$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type)
+  values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a003-0000-4000-8000-000000000003'::uuid, 'deaths', 'dataset');
+  $t24$,
+  '23514',
+  'A data slot binding must name the dataset its source type says',
+  'a dataset binding with no dataset is refused'
+);
+
+-- 25. Two valid bindings for the next cases: one case type, one dataset.
+select lives_ok (
+  $t25$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type, concept_id, dataset_id)
+  values
+    ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a003-0000-4000-8000-000000000003'::uuid, 'cases', 'concept', 'd1504003-0000-4000-8000-000000000003'::uuid, null),
+    ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a003-0000-4000-8000-000000000003'::uuid, 'deaths', 'dataset', null, 'd1506003-0000-4000-8000-000000000003'::uuid);
+  $t25$,
+  'a binding that names the source its type says is accepted'
+);
+
+-- 26. Changing a binding to dataset while no dataset is named is refused.
+select throws_ok (
+  $t26$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set source_type = 'dataset', concept_id = null
+  where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'cases';
+  $t26$,
+  '23514',
+  'A data slot binding must name the dataset its source type says',
+  'changing a binding to dataset while no dataset is named is refused'
+);
+
+-- 27. Clearing the source of a binding directly is refused.
+select throws_ok (
+  $t27$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set dataset_id = null
+  where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'deaths';
+  $t27$,
+  '23514',
+  'A data slot binding must name the dataset its source type says',
+  'clearing the source of a binding directly is refused'
+);
+
+-- 28. Changing the type works when the new type's source is named.
+select lives_ok (
+  $t28$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set source_type = 'concept', dataset_id = null, concept_id = 'd1504003-0000-4000-8000-000000000003'::uuid
+  where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'deaths';
+  reset role;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_data_slot_bindings
+      where
+        installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and
+        source_type = 'concept' and
+        concept_id = 'd1504003-0000-4000-8000-000000000003'::uuid and
+        dataset_id is null
+    ) <> 2 then
+      raise exception 'changing the binding type did not take the new source';
+    end if;
+  end $chk$;
+  $t28$,
+  'a binding changes type when it names the new type source'
+);
+
+-- 29. Deleting the bound case type still leaves the bindings with a null id
+-- and the same type. The foreign key action nulls the id, and the trigger
+-- allows that because it runs inside the action.
+select lives_ok (
+  $t29$
+  reset role;
+  delete from public.concepts where id = 'd1504003-0000-4000-8000-000000000003'::uuid;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_data_slot_bindings
+      where
+        installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and
+        source_type = 'concept' and
+        concept_id is null
+    ) <> 2 then
+      raise exception 'deleting the case type did not leave the bindings with a null concept_id and the same type';
+    end if;
+  end $chk$;
+  $t29$,
+  'deleting the bound case type leaves bindings with a null source and the same type'
+);
+
+-- 30. A broken binding can still be edited: a map-only update, and a repeat
+-- of its null source, both work for a settings admin.
+select lives_ok (
+  $t30$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set attribute_map = '{"onsetDate": "d1507004-0000-4000-8000-000000000004"}'::jsonb
+  where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'cases';
+  update public.plugin_data_slot_bindings
+  set concept_id = null
+  where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'cases';
+  reset role;
+  do $chk$
+  begin
+    if (
+      select attribute_map ->> 'onsetDate'
+      from public.plugin_data_slot_bindings
+      where installation_id = 'd150a003-0000-4000-8000-000000000003'::uuid and slot_id = 'cases'
+    ) is distinct from 'd1507004-0000-4000-8000-000000000004' then
+      raise exception 'a broken binding could not be edited';
+    end if;
+  end $chk$;
+  $t30$,
+  'a binding that already has no source can still be edited'
 );
 
 select * from finish ();
