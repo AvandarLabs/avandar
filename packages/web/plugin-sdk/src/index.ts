@@ -28,6 +28,7 @@ export type {
   PluginNotifyOptions,
   PluginOverlayOptions,
   QueryHandle,
+  QuerySlotResult,
   TranslationValues,
 } from "@plugin-sdk/PluginApi.types";
 export type {

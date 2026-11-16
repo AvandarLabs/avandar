@@ -72,6 +72,22 @@ export type FetchRowsResult = Readonly<{
   isTruncated: boolean;
 }>;
 
+/**
+ * What `avandar.data.querySlot` resolves to: a handle to the records bound to
+ * one of the plugin's data slots, with one column per slot attribute, named
+ * by its attribute key. A command reads the rows by passing `queryHandle` to
+ * `avandar.data.fetchRows`.
+ */
+export type QuerySlotResult = Readonly<{
+  queryHandle: QueryHandle;
+  columns: ReadonlyArray<
+    Readonly<{ name: string; dataType: PluginColumnDataType }>
+  >;
+  rowCount: number;
+  /** True when the slot holds more records than the host read. */
+  isTruncated: boolean;
+}>;
+
 /** One computed column for `avandar.dataExplorer.addColumns`. */
 export type DerivedColumn = Readonly<{
   /** Lowercase snake case, matching `^[a-z][a-z0-9_]*$`. */
@@ -140,6 +156,14 @@ export type AvandarApi = Readonly<{
       queryHandle: QueryHandle,
       options: FetchRowsOptions,
     ) => Promise<FetchRowsResult>;
+    /**
+     * Reads the records an admin bound to one of the plugin's data slots,
+     * with the current user's access. Present only for commands. Rejects
+     * with a `PluginError`: `InvalidSlot` for a slot id the manifest does
+     * not declare, `SlotNotBound` or `SlotBroken` when the slot cannot be
+     * read, and `PermissionDenied` when the user cannot read its records.
+     */
+    querySlot?: (slotId: string) => Promise<QuerySlotResult>;
   }>;
   ui: Readonly<{
     openModal: (options: PluginOverlayOptions) => void;
@@ -150,6 +174,14 @@ export type AvandarApi = Readonly<{
     closeModal: () => void;
     openDrawer: (options: PluginOverlayOptions) => void;
     notify: (options: PluginNotifyOptions) => void;
+    /**
+     * Lets the user choose the records a data slot reads: a settings admin
+     * gets the binding form for that slot, and anyone else a message to ask
+     * an admin, in the same modal. Resolves once the modal closes. Present
+     * only for commands. Rejects with `PluginError("InvalidSlot")` for a
+     * slot id the manifest does not declare.
+     */
+    openDataSlotBinding?: (slotId: string) => Promise<void>;
   }>;
   i18n: Readonly<{
     t: (key: string, values?: TranslationValues) => string;

@@ -15,6 +15,14 @@
  * - `InvalidToolInput`: an AI tool handler rejected the arguments the model
  *   passed it. The host may show this error's message to the model so it can
  *   correct the call, so write it for the model and keep it free of secrets.
+ * - `SlotNotBound`: `avandar.data.querySlot` named a data slot the manifest
+ *   declares, but no admin has chosen the records it reads yet.
+ * - `SlotBroken`: the data slot's binding no longer fits the slot: its case
+ *   type or dataset was deleted, a chosen field is gone or changed type, or
+ *   a required attribute has no field. The message names the attribute and
+ *   the reason, never a value.
+ * - `InvalidSlot`: the call named a data slot id the manifest does not
+ *   declare.
  */
 export type PluginErrorCode =
   | "PermissionDenied"
@@ -22,7 +30,10 @@ export type PluginErrorCode =
   | "LoadFailed"
   | "CommandFailed"
   | "InvalidExpression"
-  | "InvalidToolInput";
+  | "InvalidToolInput"
+  | "SlotNotBound"
+  | "SlotBroken"
+  | "InvalidSlot";
 
 /**
  * A typed error from the plugin API. A plugin command can branch on `code`
