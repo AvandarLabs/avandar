@@ -77,7 +77,7 @@ values (
   array['data:slots']
 );
 
-select plan (12);
+select plan (13);
 
 -- 1. The owner binds a slot that had no binding.
 select lives_ok (
@@ -243,7 +243,9 @@ select throws_ok (
   'a new dataset binding saved with no dataset is refused'
 );
 
--- 8. Switching a bound slot to a case type with no case type is refused.
+-- 8. A save with no source for a slot that already has a binding is refused.
+-- The check on the proposed insert fires before the conflict is found, so the
+-- existing binding is never reached and stays as it was.
 select throws_ok (
   $t8$
   set local role authenticated;
@@ -259,10 +261,11 @@ select throws_ok (
   $t8$,
   '23514',
   'A data slot binding must name the case type its source type says',
-  'switching a bound slot to a case type with no case type is refused'
+  'a save with no case type for an already bound slot is refused before it replaces the binding'
 );
 
--- 9. Switching a bound slot back to a case type works when it names one.
+-- 9. Switching a bound slot back to a case type works when it names one. The
+-- slot already has a binding, so this takes the replace branch of the upsert.
 select lives_ok (
   $t9$
   set local role authenticated;
@@ -293,6 +296,39 @@ select lives_ok (
   end $chk$;
   $t9$,
   'switching a bound slot to a case type works when it names the case type'
+);
+
+-- 10. A conflicting save that keeps the source and changes only the field
+-- mapping takes the replace branch too, and still leaves one binding.
+select lives_ok (
+  $t10$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1800001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  select public.rpc_plugin_data_slot_bindings__save(
+    'd180a001-0000-4000-8000-000000000001'::uuid,
+    'cases',
+    'concept',
+    'd1804001-0000-4000-8000-000000000001'::uuid,
+    null,
+    '{"onsetDate": "d1807003-0000-4000-8000-000000000003"}'::jsonb
+  );
+  reset role;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_data_slot_bindings binding
+      where
+        binding.installation_id = 'd180a001-0000-4000-8000-000000000001'::uuid and
+        binding.slot_id = 'cases' and
+        binding.concept_id = 'd1804001-0000-4000-8000-000000000001'::uuid and
+        binding.attribute_map ->> 'onsetDate' = 'd1807003-0000-4000-8000-000000000003'
+    ) <> 1 then
+      raise exception 'a conflicting save with the same source did not replace the field mapping';
+    end if;
+  end $chk$;
+  $t10$,
+  'saving a bound slot with the same source replaces only its field mapping'
 );
 
 reset role;

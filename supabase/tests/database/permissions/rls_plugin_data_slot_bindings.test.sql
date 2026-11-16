@@ -13,7 +13,11 @@
  * 22 uninstalls what is left. Cases 23 to 30 use their own install, case
  * type, and dataset. They cover a binding that names no source: it is refused
  * when created or when its type changes, and a deleted source still leaves
- * one.
+ * one. Cases 31 to 34 use another install and delete through the `authenticated`
+ * role: a source deleted by an admin who did not bind it keeps its binder,
+ * a case type binding cannot be cleared directly, a null `source_type` fails
+ * the not null constraint, deleting a workspace removes a healthy binding, and
+ * deleting the binder's account keeps the binding with no binder.
  */
 begin;
 
@@ -105,7 +109,7 @@ values (
   '{"onsetDate": "d1507001-0000-4000-8000-000000000001"}'::jsonb
 );
 
-select plan (30);
+select plan (35);
 
 -- 1. A plain member reads their workspace's binding.
 select lives_ok (
@@ -684,6 +688,148 @@ select lives_ok (
   end $chk$;
   $t30$,
   'a binding that already has no source can still be edited'
+);
+
+-- Fixtures for cases 31 to 34: an install with a dataset that was imported
+-- from plugin content, a case type, and a healthy binding in the other
+-- workspace. The owner bound the slots, and the admin never did. The claims of
+-- the previous case outlive `reset role`, so clear them: with no signed-in
+-- user, the binder is left as written.
+reset role;
+select set_config('request.jwt.claims', '', true);
+
+insert into public.plugin_installations (id, workspace_id, plugin_id, installed_version, granted_permissions)
+values (
+  'd150a004-0000-4000-8000-000000000004'::uuid,
+  'd1501001-0000-4000-8000-000000000001'::uuid,
+  'avandar.deleted-source',
+  '0.1.0',
+  array['data:slots']
+);
+
+insert into public.concepts (id, owner_id, workspace_id, name, allow_manual_creation, default_status_id)
+values ('d1504004-0000-4000-8000-000000000004'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'slot bindings cases d', true, 'd1505004-0000-4000-8000-000000000004'::uuid);
+
+insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
+values ('d1505004-0000-4000-8000-000000000004'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd1504004-0000-4000-8000-000000000004'::uuid, 'Active', '#40c057', 0);
+
+insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type)
+values ('d1506004-0000-4000-8000-000000000004'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid, 'd1503001-0000-4000-8000-000000000001'::uuid, 'slot bindings dataset d', 'csv_file'::public.datasets__source_type);
+
+insert into public.plugin_content_imports (id, workspace_id, plugin_id, content_id, dataset_id, imported_by)
+values ('d150c001-0000-4000-8000-000000000001'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'avandar.deleted-source', 'deaths', 'd1506004-0000-4000-8000-000000000004'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid);
+
+insert into public.plugin_data_slot_bindings (id, workspace_id, installation_id, slot_id, source_type, concept_id, dataset_id, bound_by)
+values
+  ('d150b004-0000-4000-8000-000000000004'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd150a004-0000-4000-8000-000000000004'::uuid, 'deaths', 'dataset', null, 'd1506004-0000-4000-8000-000000000004'::uuid, 'd1500001-0000-4000-8000-000000000001'::uuid),
+  ('d150b005-0000-4000-8000-000000000005'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd150a004-0000-4000-8000-000000000004'::uuid, 'cases', 'concept', 'd1504004-0000-4000-8000-000000000004'::uuid, null, 'd1500001-0000-4000-8000-000000000001'::uuid),
+  ('d150b006-0000-4000-8000-000000000006'::uuid, 'd1501002-0000-4000-8000-000000000002'::uuid, 'd150a002-0000-4000-8000-000000000002'::uuid, 'cases', 'concept', 'd1504002-0000-4000-8000-000000000002'::uuid, null, 'd1500003-0000-4000-8000-000000000003'::uuid);
+
+-- 31. A settings admin deletes a dataset that another user bound and that
+-- plugin content created. The binding stays with its type and no source, the
+-- import row goes, and the binding keeps its original binder: the foreign key
+-- action must not restamp it with the admin who deleted the dataset.
+select lives_ok (
+  $t31$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  delete from public.datasets where id = 'd1506004-0000-4000-8000-000000000004'::uuid;
+  reset role;
+  do $chk$
+  begin
+    if (select count(*)::int from public.datasets where id = 'd1506004-0000-4000-8000-000000000004'::uuid) <> 0 then
+      raise exception 'the admin could not delete the dataset';
+    end if;
+    if (select count(*)::int from public.plugin_content_imports where id = 'd150c001-0000-4000-8000-000000000001'::uuid) <> 0 then
+      raise exception 'deleting the dataset left its content import row';
+    end if;
+    if not exists (
+      select 1
+      from public.plugin_data_slot_bindings
+      where
+        id = 'd150b004-0000-4000-8000-000000000004'::uuid and
+        source_type = 'dataset' and
+        dataset_id is null and
+        bound_by = 'd1500001-0000-4000-8000-000000000001'::uuid
+    ) then
+      raise exception 'deleting the dataset did not keep the binding, its type, and its original binder';
+    end if;
+  end $chk$;
+  $t31$,
+  'an admin deleting a bound dataset keeps the binding and its original binder'
+);
+
+-- 32. A case type binding cannot be cleared directly. The foreign key action
+-- may null the id, but a user write may not.
+select throws_ok (
+  $t32$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set concept_id = null
+  where id = 'd150b005-0000-4000-8000-000000000005'::uuid;
+  $t32$,
+  '23514',
+  'A data slot binding must name the case type its source type says',
+  'clearing the case type of a binding directly is refused'
+);
+
+-- 33. A binding with no source type fails the not null constraint, not the
+-- source check.
+select throws_ok (
+  $t33$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id)
+  values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a004-0000-4000-8000-000000000004'::uuid, 'noType');
+  $t33$,
+  '23502',
+  'null value in column "source_type" of relation "plugin_data_slot_bindings" violates not-null constraint',
+  'a binding with no source type fails the not null constraint'
+);
+
+-- 34. Deleting a workspace removes its healthy binding. Its case type, install,
+-- and binding all go in one cascade.
+select lives_ok (
+  $t34$
+  reset role;
+  delete from public.workspaces where id = 'd1501002-0000-4000-8000-000000000002'::uuid;
+  do $chk$
+  begin
+    if (select count(*)::int from public.workspaces where id = 'd1501002-0000-4000-8000-000000000002'::uuid) <> 0 then
+      raise exception 'the workspace was not deleted';
+    end if;
+    if (select count(*)::int from public.plugin_data_slot_bindings where workspace_id = 'd1501002-0000-4000-8000-000000000002'::uuid) <> 0 then
+      raise exception 'deleting the workspace left data slot bindings behind';
+    end if;
+  end $chk$;
+  $t34$,
+  'deleting a workspace removes its data slot bindings'
+);
+
+-- 35. Deleting the account of the user who bound a slot keeps the binding and
+-- clears its binder. The binder stamp must not restore the deleted user.
+select lives_ok (
+  $t35$
+  reset role;
+  select set_config('request.jwt.claims', '', true);
+  insert into auth.users (id, email, aud, role)
+  values ('d1500009-0000-4000-8000-000000000009'::uuid, 'slot_bindings_leaver@test.dev', 'authenticated', 'authenticated');
+  insert into public.plugin_data_slot_bindings (id, workspace_id, installation_id, slot_id, source_type, concept_id, bound_by)
+  values ('d150b009-0000-4000-8000-000000000009'::uuid, 'd1501001-0000-4000-8000-000000000001'::uuid, 'd150a004-0000-4000-8000-000000000004'::uuid, 'leaver', 'concept', 'd1504004-0000-4000-8000-000000000004'::uuid, 'd1500009-0000-4000-8000-000000000009'::uuid);
+  delete from auth.users where id = 'd1500009-0000-4000-8000-000000000009'::uuid;
+  do $chk$
+  begin
+    if not exists (
+      select 1
+      from public.plugin_data_slot_bindings
+      where id = 'd150b009-0000-4000-8000-000000000009'::uuid and bound_by is null
+    ) then
+      raise exception 'deleting the binder did not keep the binding with no binder';
+    end if;
+  end $chk$;
+  $t35$,
+  'deleting the user who bound a slot keeps the binding with no binder'
 );
 
 select * from finish ();
