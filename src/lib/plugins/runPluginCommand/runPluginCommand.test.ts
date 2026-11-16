@@ -20,6 +20,20 @@ const { openBindingModalMock } = vi.hoisted(() => {
 });
 
 vi.mock(
+  "@/clients/plugins/PluginInstallationClient/PluginInstallationClient",
+  () => {
+    return {
+      PluginInstallationClient: {
+        getById: vi.fn().mockResolvedValue({
+          isEnabled: true,
+          grantedPermissions: ["data:slots"],
+        }),
+      },
+    };
+  },
+);
+
+vi.mock(
   "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal",
   () => {
     return { openDataSlotBindingModal: openBindingModalMock };
@@ -44,7 +58,7 @@ const PLUGIN = {
   entry: { id: "avandar.test" },
   installation: { id: "installation_1" } as PluginInstallation.T,
   manifestModule: {
-    manifest: { dataSlots: DATA_SLOTS },
+    manifest: { dataSlots: DATA_SLOTS, permissions: ["data:slots"] },
   } as PluginManifestModule,
 } as ActivePlugin;
 

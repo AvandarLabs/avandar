@@ -2,6 +2,7 @@ import { PluginError } from "@avandar/plugin-sdk";
 import { isDefined } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
+import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { getDataSlotBindingStatus } from "@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus";
 import { loadDataSlotSource } from "@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource";
@@ -10,6 +11,7 @@ import {
   QUERY_SLOT_MAX_ROWS,
 } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
 import { runDataSlotQuery } from "@/lib/pluginDataSlots/runDataSlotQuery/runDataSlotQuery";
+import { getPluginInstallStatusFromInstallation } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import {
   makeQueryHandleRegistry,
@@ -100,6 +102,9 @@ const UNMAPPED_DATA_TYPE_BY_ATTRIBUTE_TYPE: Readonly<
 
 const PERMISSION_DENIED_MESSAGE =
   "You cannot read the records this data slot is bound to.";
+
+const PLUGIN_NOT_ACTIVE_MESSAGE =
+  "This plugin is not available in this workspace right now.";
 
 // Generic on purpose. A host or DuckDB error can name a table, a workspace
 // field, or a cell value, none of which the plugin was given.
@@ -276,6 +281,25 @@ function _getColumnsFromSlot(
   );
 }
 
+/**
+ * Rejects unless the plugin is still installed, enabled, and granted what its
+ * manifest asks for. The `ActivePlugin` a command started with is a snapshot,
+ * and an overlay the command opened keeps using it long after an admin
+ * disables the plugin, so each read asks the database again.
+ */
+async function _assertPluginIsInstalled(plugin: ActivePlugin): Promise<void> {
+  const installation = await PluginInstallationClient.getById({
+    id: plugin.installation.id,
+  });
+  const status = getPluginInstallStatusFromInstallation({
+    installation,
+    manifestPermissions: plugin.manifestModule.manifest.permissions,
+  });
+  if (status !== "installed") {
+    throw new PluginError("PermissionDenied", PLUGIN_NOT_ACTIVE_MESSAGE);
+  }
+}
+
 async function _querySlot(
   options: Readonly<{
     plugin: ActivePlugin;
@@ -286,6 +310,7 @@ async function _querySlot(
 ): Promise<QuerySlotResult> {
   const { plugin, slotId, host, rowsStore } = options;
   host.assertFromCurrentHost();
+  await _assertPluginIsInstalled(plugin);
   const slot = _getSlotFromPlugin({ plugin, slotId });
   const { source, fieldsByAttributeKey } = await _loadBoundFields({
     plugin,
@@ -340,11 +365,11 @@ function _getPluginErrorFromFailure(
   return new PluginError("CommandFailed", QUERY_FAILED_MESSAGE);
 }
 
-async function _querySlotWithoutLeaks(
-  options: Parameters<typeof _querySlot>[0],
-): Promise<QuerySlotResult> {
+async function _runWithoutLeaks<Result>(
+  options: Readonly<{ host: InvocationHost; run: () => Promise<Result> }>,
+): Promise<Result> {
   try {
-    return await _querySlot(options);
+    return await options.run();
   } catch (error) {
     throw _getPluginErrorFromFailure({ error, host: options.host });
   }
@@ -360,15 +385,36 @@ async function _openDataSlotBinding(
 ): Promise<void> {
   const { plugin, pluginName, slotId, host } = options;
   host.assertFromCurrentHost();
+  await _assertPluginIsInstalled(plugin);
   _getSlotFromPlugin({ plugin, slotId });
   const { openDataSlotBindingModal } =
     await import("@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal");
+  // The workspace can change while the modal code loads, and the modal must
+  // not open in the next workspace with this one's installation.
+  host.assertFromCurrentHost();
   await openDataSlotBindingModal({
     pluginName,
     manifestModule: plugin.manifestModule,
     installation: plugin.installation,
     slotId,
   });
+}
+
+/**
+ * Makes a function that runs the jobs it is given one at a time, in call
+ * order. A job that fails does not stop the next one.
+ */
+function _makeSerialRunner(): <Result>(
+  job: () => Promise<Result>,
+) => Promise<Result> {
+  let queue: Promise<unknown> = Promise.resolve();
+  return (job) => {
+    const result = queue.then(job);
+    queue = result.catch(() => {
+      return undefined;
+    });
+    return result;
+  };
 }
 
 /**
@@ -383,7 +429,10 @@ async function _openDataSlotBinding(
  * Nothing a plugin receives from a failed read comes from the host or
  * DuckDB: a failure is a `PluginError` written for the plugin. Once the
  * drawer host generation the invocation started in changes, both members
- * reject with `InvalidHandle` and a running query is aborted.
+ * reject with `InvalidHandle` and a running query is aborted. Each call also
+ * asks the database whether the plugin is still installed and enabled, and
+ * rejects with `PermissionDenied` when it is not. `querySlot` calls run one
+ * at a time, so a plugin cannot hold several large results in flight.
  *
  * `runPluginCommand` calls it once per invocation. It reaches the binding
  * client and the slot query, so import it only from the lazy command
@@ -393,6 +442,7 @@ export function makeDataSlotApiForInvocation(
   options: Readonly<InvocationOptions>,
 ): DataSlotInvocationApi {
   const host = _makeHostFromCurrentGeneration();
+  const runSerially = _makeSerialRunner();
   const rowsStore: SlotRowsStore = {
     registry: makeQueryHandleRegistry({
       maxLiveHandles: MAX_LIVE_QUERY_HANDLES,
@@ -403,15 +453,27 @@ export function makeDataSlotApiForInvocation(
     // `async` turns a thrown `PluginError` into a rejected promise, which is
     // how a plugin receives it.
     querySlot: async (slotId) => {
-      return _querySlotWithoutLeaks({
-        plugin: options.plugin,
-        slotId,
-        host,
-        rowsStore,
+      return runSerially(() => {
+        return _runWithoutLeaks({
+          host,
+          run: () => {
+            return _querySlot({
+              plugin: options.plugin,
+              slotId,
+              host,
+              rowsStore,
+            });
+          },
+        });
       });
     },
     openDataSlotBinding: async (slotId) => {
-      return _openDataSlotBinding({ ...options, slotId, host });
+      return _runWithoutLeaks({
+        host,
+        run: () => {
+          return _openDataSlotBinding({ ...options, slotId, host });
+        },
+      });
     },
     getSlotRows: (handle) => {
       return rowsStore.registry.getRows(handle);

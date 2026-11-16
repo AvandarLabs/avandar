@@ -22,6 +22,7 @@ import type { MockInstance } from "vitest";
 
 const {
   getBindingsMock,
+  getInstallationMock,
   loadSourceMock,
   openModalMock,
   runQueryMock,
@@ -29,6 +30,7 @@ const {
 } = vi.hoisted(() => {
   return {
     getBindingsMock: vi.fn(),
+    getInstallationMock: vi.fn(),
     loadSourceMock: vi.fn(),
     openModalMock: vi.fn(),
     runQueryMock: vi.fn(),
@@ -40,6 +42,13 @@ vi.mock(
   "@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus",
   () => {
     return { getDataSlotBindingStatus: statusMock };
+  },
+);
+
+vi.mock(
+  "@/clients/plugins/PluginInstallationClient/PluginInstallationClient",
+  () => {
+    return { PluginInstallationClient: { getById: getInstallationMock } };
   },
 );
 
@@ -100,8 +109,13 @@ const INSTALLATION = {
 } as PluginInstallation.T;
 
 const MANIFEST_MODULE = {
-  manifest: { dataSlots: DATA_SLOTS },
+  manifest: { dataSlots: DATA_SLOTS, permissions: ["data:slots"] },
 } as PluginManifestModule;
+
+const INSTALLED_ROW = {
+  isEnabled: true,
+  grantedPermissions: ["data:slots"],
+} as PluginInstallation.T;
 
 const PLUGIN = {
   installation: INSTALLATION,
@@ -172,6 +186,7 @@ describe("makeDataSlotApiForInvocation", () => {
       return undefined;
     });
     statusMock.mockImplementation(actualGetStatus);
+    getInstallationMock.mockResolvedValue(INSTALLED_ROW);
     getBindingsMock.mockResolvedValue([_makeBinding()]);
     loadSourceMock.mockResolvedValue(SOURCE);
     runQueryMock.mockResolvedValue({ data: _makeRows(2) });
@@ -373,7 +388,147 @@ describe("makeDataSlotApiForInvocation", () => {
     });
   });
 
+  describe("when the plugin is no longer installed", () => {
+    it.each([
+      ["disabled mid-invocation", { ...INSTALLED_ROW, isEnabled: false }],
+      [
+        "needing review",
+        { ...INSTALLED_ROW, grantedPermissions: [] as string[] },
+      ],
+      ["uninstalled", undefined],
+    ])(
+      "rejects querySlot with PermissionDenied when %s",
+      async (_state, row) => {
+        getInstallationMock.mockResolvedValue(row);
+
+        const error = await _getQuerySlotError("cases");
+
+        expect(error.code).toBe("PermissionDenied");
+        expect(error.message).toBe(
+          "This plugin is not available in this workspace right now.",
+        );
+        expect(getBindingsMock).not.toHaveBeenCalled();
+        expect(runQueryMock).not.toHaveBeenCalled();
+      },
+    );
+
+    it("rereads the installation on every call", async () => {
+      const api = _makeApi();
+      await api.querySlot("cases");
+      getInstallationMock.mockResolvedValue({
+        ...INSTALLED_ROW,
+        isEnabled: false,
+      });
+
+      await expect(api.querySlot("cases")).rejects.toMatchObject({
+        code: "PermissionDenied",
+      });
+      expect(getInstallationMock).toHaveBeenCalledTimes(2);
+      expect(getInstallationMock).toHaveBeenCalledWith({
+        id: INSTALLATION.id,
+      });
+    });
+
+    it("reports a failed installation read generically", async () => {
+      getInstallationMock.mockRejectedValue(
+        new Error('relation "plugin_installations" policy secret_policy'),
+      );
+
+      const error = await _getQuerySlotError("cases");
+
+      expect(error.code).toBe("CommandFailed");
+      expect(error.message).toBe("The data slot could not be read.");
+    });
+
+    it("rejects openDataSlotBinding with PermissionDenied and opens no modal", async () => {
+      getInstallationMock.mockResolvedValue({
+        ...INSTALLED_ROW,
+        isEnabled: false,
+      });
+
+      await expect(
+        _makeApi().openDataSlotBinding("cases"),
+      ).rejects.toMatchObject({ code: "PermissionDenied" });
+      expect(openModalMock).not.toHaveBeenCalled();
+    });
+
+    it("reports a failed installation read from openDataSlotBinding generically", async () => {
+      getInstallationMock.mockRejectedValue(new Error("secret_policy"));
+
+      await expect(
+        _makeApi().openDataSlotBinding("cases"),
+      ).rejects.toMatchObject({
+        code: "CommandFailed",
+        message: "The data slot could not be read.",
+      });
+      expect(openModalMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("parallel querySlot calls", () => {
+    it("runs one call after the other", async () => {
+      const events: string[] = [];
+      const firstQuery = Promise.withResolvers<{ data: unknown[] }>();
+      runQueryMock
+        .mockImplementationOnce(async () => {
+          events.push("first start");
+          const result = await firstQuery.promise;
+          events.push("first end");
+          return result;
+        })
+        .mockImplementationOnce(async () => {
+          events.push("second start");
+          return { data: _makeRows(1) };
+        });
+      const api = _makeApi();
+
+      const calls = Promise.all([
+        api.querySlot("cases"),
+        api.querySlot("cases"),
+      ]);
+      await vi.waitFor(() => {
+        expect(events).toEqual(["first start"]);
+      });
+      firstQuery.resolve({ data: _makeRows(2) });
+      await calls;
+
+      expect(events).toEqual(["first start", "first end", "second start"]);
+    });
+
+    it("runs the next call after one failed", async () => {
+      runQueryMock.mockRejectedValueOnce(new Error("DuckDB is not ready"));
+      const api = _makeApi();
+
+      const results = await Promise.allSettled([
+        api.querySlot("cases"),
+        api.querySlot("cases"),
+      ]);
+
+      expect(
+        results.map((result) => {
+          return result.status;
+        }),
+      ).toEqual(["rejected", "fulfilled"]);
+    });
+  });
+
   describe("after the host the command started in is gone", () => {
+    it("rejects openDataSlotBinding when the host goes while the modal code loads", async () => {
+      openModalMock.mockImplementation(() => {
+        throw new Error("must not open");
+      });
+      const api = _makeApi();
+      getInstallationMock.mockImplementation(async () => {
+        PluginDrawerStore.clear();
+        return INSTALLED_ROW;
+      });
+
+      await expect(api.openDataSlotBinding("cases")).rejects.toMatchObject({
+        code: "InvalidHandle",
+      });
+      expect(openModalMock).not.toHaveBeenCalled();
+    });
+
     it("rejects querySlot with InvalidHandle and reads nothing", async () => {
       const api = _makeApi();
       PluginDrawerStore.clear();
