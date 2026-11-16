@@ -36,20 +36,29 @@ async function _loadRow(
   };
 }
 
+/** The data slot rows of an installed plugin, or why they did not load. */
+export type DataSlotStatusRows = Readonly<{
+  /** Undefined while loading, and when loading failed. */
+  rows: readonly DataSlotStatusRow[] | undefined;
+  isError: boolean;
+}>;
+
 /**
  * Loads every data slot of an installed plugin with its binding, the source
- * the binding reads, and its status, in manifest order. Undefined while
- * loading. A plugin's card reads it for its Records section.
+ * the binding reads, and its status, in manifest order. The rows stay in
+ * place while a save or a remove reloads them, and a slot's source is read
+ * again every time, so a change made elsewhere shows up. A plugin's card
+ * reads it for its Records section.
  */
 export function useDataSlotStatusRows(options: {
   manifest: PluginManifest;
   installation: PluginInstallation.T;
-}): readonly DataSlotStatusRow[] | undefined {
+}): DataSlotStatusRows {
   const { manifest, installation } = options;
-  const [bindings] = PluginDataSlotBindingClient.useGetAll(
+  const [bindings, , bindingsResult] = PluginDataSlotBindingClient.useGetAll(
     where("installation_id", "eq", installation.id),
   );
-  const [rows] = useQuery({
+  const [rows, , rowsResult] = useQuery({
     queryKey: [
       "pluginDataSlots",
       "statusRows",
@@ -58,6 +67,9 @@ export function useDataSlotStatusRows(options: {
       bindings,
     ],
     enabled: bindings !== undefined,
+    usePreviousDataAsPlaceholder: true,
+    // A source can change elsewhere without touching the bindings.
+    staleTime: 0,
     // The rows name workspace records, so they are never written to disk.
     meta: { persist: false },
     queryFn: () => {
@@ -71,5 +83,5 @@ export function useDataSlotStatusRows(options: {
       );
     },
   });
-  return rows;
+  return { rows, isError: bindingsResult.isError || rowsResult.isError };
 }

@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
+import { useRef } from "react";
 import { openDataSlotBindingModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal";
 import { RemoveDataSlotBindingButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -20,15 +21,18 @@ type Props = Readonly<{
  * A settings admin's buttons for one data slot on a plugin's card: Choose or
  * Change, which opens the slot's binding modal, and Remove for an optional
  * slot with a binding. Each is named after the slot, so a screen reader
- * tells the slots' buttons apart.
+ * tells the slots' buttons apart. Focus moves to Choose once Remove
+ * succeeds, because Remove leaves the card.
  */
 export function PluginDataSlotRowActions(props: Props): JSX.Element {
   const { pluginName, row, slotTitle } = props;
   const { t } = useLingui();
   const { binding } = row;
+  const chooseButtonRef = useRef<HTMLButtonElement>(null);
   return (
     <Group gap="xs" wrap="nowrap">
       <Button
+        ref={chooseButtonRef}
         size="compact-sm"
         variant="default"
         aria-label={
@@ -52,6 +56,9 @@ export function PluginDataSlotRowActions(props: Props): JSX.Element {
           pluginName={pluginName}
           slotTitle={slotTitle}
           binding={binding}
+          onRemoved={() => {
+            chooseButtonRef.current?.focus();
+          }}
         />
       )}
     </Group>

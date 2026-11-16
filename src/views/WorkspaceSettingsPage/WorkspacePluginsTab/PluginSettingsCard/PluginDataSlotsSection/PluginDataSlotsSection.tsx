@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { Loader, Stack } from "@mantine/core";
+import { Loader, Stack, Text } from "@mantine/core";
 import { PluginDataSlotRow } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow";
 import { PluginDataSlotRowActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions";
 import { useDataSlotStatusRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/useDataSlotStatusRows";
@@ -28,13 +28,17 @@ export function PluginDataSlotsSection({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const localize = useLocalizePluginText(manifestModule.strings);
-  const rows = useDataSlotStatusRows({
+  const { rows, isError } = useDataSlotStatusRows({
     manifest: manifestModule.manifest,
     installation,
   });
   return (
     <PluginDetailsSection title={t`Records it reads`}>
-      {rows === undefined ? (
+      {isError ? (
+        <Text size="sm" c="danger" role="alert">
+          {t`Could not load the records this plugin reads.`}
+        </Text>
+      ) : rows === undefined ? (
         <Loader size="sm" role="status" aria-label={t`Loading the records`} />
       ) : (
         <Stack gap="sm">

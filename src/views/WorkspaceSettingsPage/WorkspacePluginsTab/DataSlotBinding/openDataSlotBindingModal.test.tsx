@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => {
   return {
     appRoles: [undefined, true] as readonly [unknown, boolean],
     bindings: [] as unknown[],
+    bindingsResult: {} as { isError?: boolean },
     getAllArguments: [] as unknown[],
     saveBinding: vi.fn(),
     saveOptions: undefined as SaveOptions | undefined,
@@ -51,7 +52,7 @@ vi.mock(
         },
         useGetAll: (argument: unknown) => {
           mocks.getAllArguments.push(argument);
-          return [mocks.bindings, false, {}];
+          return [mocks.bindings, false, mocks.bindingsResult];
         },
         useSaveBinding: (options: SaveOptions) => {
           mocks.saveOptions = options;
@@ -169,6 +170,7 @@ describe("openDataSlotBindingModal", () => {
     cleanup();
     mocks.appRoles = [Permissions.RolesMatrix.Builtins.GlobalAdmin, false];
     mocks.bindings = [];
+    mocks.bindingsResult = {};
     mocks.getAllArguments = [];
     mocks.saveBinding.mockReset();
     queryClient = new QueryClient();
@@ -197,6 +199,21 @@ describe("openDataSlotBindingModal", () => {
         slot_id: { eq: "cases" },
       },
     });
+  });
+
+  it("shows an error, not an empty form, when the binding failed to load", async () => {
+    mocks.bindings = undefined as never;
+    mocks.bindingsResult = { isError: true };
+
+    void _openCasesModal();
+    const dialog = await screen.findByRole("dialog");
+
+    expect(
+      within(dialog).getByText("Could not load the records this plugin reads."),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole("button", { name: "Save" }),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps Save off until the binding is complete", async () => {

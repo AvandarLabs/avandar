@@ -2,7 +2,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
-import { cleanup, fireEvent, render, screen, within } from "@/test-utils";
+import { act, cleanup, fireEvent, render, screen, within } from "@/test-utils";
 import { PluginDataSlotsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -13,8 +13,15 @@ import type { ReactNode } from "react";
 const mocks = vi.hoisted(() => {
   return {
     bindings: [] as unknown[],
+    bindingsResult: {} as { isError?: boolean },
     sourcesByConceptId: {} as Record<string, unknown>,
+    isSourceLoadPending: false,
     deleteBinding: vi.fn(),
+    deleteOptions: undefined as
+      | { onSuccess: () => void; onError: (error: Error) => void }
+      | undefined,
+    notifySuccess: vi.fn(),
+    notifyError: vi.fn(),
     openDataSlotBindingModal: vi.fn(),
   };
 });
@@ -30,9 +37,10 @@ vi.mock(
           },
         },
         useGetAll: () => {
-          return [mocks.bindings, false, {}];
+          return [mocks.bindings, false, mocks.bindingsResult];
         },
-        useDelete: () => {
+        useDelete: (options: typeof mocks.deleteOptions) => {
+          mocks.deleteOptions = options;
           return [mocks.deleteBinding, false, {}];
         },
       },
@@ -42,9 +50,18 @@ vi.mock(
 vi.mock("@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource", () => {
   return {
     loadDataSlotSource: (options: { conceptId: string }) => {
-      return Promise.resolve(mocks.sourcesByConceptId[options.conceptId]);
+      if (mocks.isSourceLoadPending) {
+        return new Promise(() => {});
+      }
+      const source = mocks.sourcesByConceptId[options.conceptId];
+      return source instanceof Error
+        ? Promise.reject(source)
+        : Promise.resolve(source);
     },
   };
+});
+vi.mock("@/utils/notifications/notify", () => {
+  return { notifySuccess: mocks.notifySuccess, notifyError: mocks.notifyError };
 });
 vi.mock(
   "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal",
@@ -124,16 +141,19 @@ function Wrapper({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-function _renderSection(canManage = true): void {
-  render(
+function _makeSection(canManage = true): JSX.Element {
+  return (
     <PluginDataSlotsSection
       pluginName="Epidemiology"
       manifestModule={MANIFEST_MODULE}
       installation={INSTALLATION}
       canManage={canManage}
-    />,
-    { wrapper: Wrapper },
+    />
   );
+}
+
+function _renderSection(canManage = true): ReturnType<typeof render> {
+  return render(_makeSection(canManage), { wrapper: Wrapper });
 }
 
 describe("PluginDataSlotsSection", () => {
@@ -143,8 +163,12 @@ describe("PluginDataSlotsSection", () => {
       defaultOptions: { queries: { retry: false } },
     });
     mocks.bindings = [_makeBinding("cases")];
+    mocks.bindingsResult = {};
     mocks.sourcesByConceptId = { "concept-cases": MEASLES_CASES };
+    mocks.isSourceLoadPending = false;
     mocks.deleteBinding.mockReset();
+    mocks.notifySuccess.mockReset();
+    mocks.notifyError.mockReset();
     mocks.openDataSlotBindingModal.mockReset();
   });
 
@@ -221,6 +245,88 @@ describe("PluginDataSlotsSection", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Remove" }));
 
     expect(mocks.deleteBinding).toHaveBeenCalledWith({ id: "binding-cases" });
+  });
+
+  it("says the records were removed, and moves focus to Choose", async () => {
+    _renderSection();
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "Remove the records for Cases",
+      }),
+    );
+
+    act(() => {
+      mocks.deleteOptions?.onSuccess();
+    });
+
+    expect(mocks.notifySuccess).toHaveBeenCalledWith(
+      "Removed the records for Cases",
+    );
+    expect(
+      screen.getByRole("button", { name: "Change the records for Cases" }),
+    ).toHaveFocus();
+  });
+
+  it("says why when the records could not be removed", async () => {
+    _renderSection();
+    await screen.findByText("Case type: Measles cases");
+
+    act(() => {
+      mocks.deleteOptions?.onError(new Error("permission denied"));
+    });
+
+    expect(mocks.notifyError).toHaveBeenCalledWith({
+      title: "Could not remove the records for Cases",
+      message: "permission denied",
+    });
+    expect(mocks.notifySuccess).not.toHaveBeenCalled();
+  });
+
+  it("says the records did not load, rather than loading forever", async () => {
+    mocks.sourcesByConceptId = { "concept-cases": new Error("network down") };
+
+    _renderSection();
+
+    expect(
+      await screen.findByText("Could not load the records this plugin reads."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("status", { name: "Loading the records" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says the records did not load when their bindings failed to load", async () => {
+    mocks.bindings = undefined as never;
+    mocks.bindingsResult = { isError: true };
+
+    _renderSection();
+
+    expect(
+      await screen.findByText("Could not load the records this plugin reads."),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the rows on screen while a save or remove reloads them", async () => {
+    const view = _renderSection();
+    const changeButton = await screen.findByRole("button", {
+      name: "Change the records for Cases",
+    });
+    mocks.isSourceLoadPending = true;
+
+    mocks.bindings = [
+      _makeBinding("cases", "attr-onset"),
+      _makeBinding("deaths"),
+    ];
+    view.rerender(_makeSection());
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(
+      screen.queryByRole("status", { name: "Loading the records" }),
+    ).not.toBeInTheDocument();
+    expect(changeButton).toBeInTheDocument();
+    expect(screen.getByText("Case type: Measles cases")).toBeInTheDocument();
   });
 
   it("offers no Remove for a required slot", async () => {
