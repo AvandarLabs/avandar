@@ -853,10 +853,9 @@ the attribute does not accept, or a required attribute has no field. Workspace
 admins with the plugin-management permission see Choose or Change on each
 slot, and Remove on an optional slot that has a binding, bound or broken.
 Other members see the status only. The database enforces the same rule: it
-refuses a binding write
-from anyone who is not a settings admin or the workspace owner. An admin who
-approves `data:slots` under "Review new permissions" binds the slots from the
-card. Uninstalling the plugin deletes its bindings.
+refuses a binding write from anyone who is not a settings admin or the
+workspace owner. An admin who approves `data:slots` under "Review new
+permissions" binds the slots from the card. Uninstalling the plugin deletes its bindings.
 
 ### Reading a slot
 
