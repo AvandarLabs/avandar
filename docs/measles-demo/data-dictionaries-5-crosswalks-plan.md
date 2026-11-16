@@ -11306,7 +11306,7 @@ describe("compileCrosswalk", () => {
 ```ts
 import { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 
 /** Whether a Combine expression can fill a column, and if not, why not. */
 export type CombineExpressionCheck =

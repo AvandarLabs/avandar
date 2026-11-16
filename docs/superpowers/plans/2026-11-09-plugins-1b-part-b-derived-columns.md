@@ -655,7 +655,7 @@ EOF
 ```ts
 import { PluginError } from "@avandar/plugin-sdk";
 import { describe, expect, it } from "vitest";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 
 /**
  * The `PluginError` code `assertSingleSqlExpression` throws for `expression`,
@@ -728,7 +728,7 @@ describe("assertSingleSqlExpression", () => {
 - [ ] **Step 2: Run it and confirm it fails**
 
 Run: `pnpm vitest run src/lib/sql/assertSingleSqlExpression`
-Expected: FAIL, `Error: Failed to resolve import "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression"`.
+Expected: FAIL, `Error: Failed to resolve import "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression"`.
 
 - [ ] **Step 3: Implement it**
 
@@ -1065,7 +1065,7 @@ import {
   normalizeSqlForSubquery,
   quoteSqlIdentifier,
 } from "@avandar/utils/sql";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 import type { DerivedColumn } from "@avandar/plugin-sdk";
 
 /** The names a derived column may take: lowercase snake case. */
