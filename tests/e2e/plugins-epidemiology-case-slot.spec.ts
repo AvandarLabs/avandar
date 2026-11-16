@@ -9,6 +9,7 @@
  * a session loads it, so the session under test has to start after the case
  * type exists. See `CASE_LINE_LIST_CSV_PATH` for the counts the chart shows.
  */
+import { randomUUID } from "node:crypto";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { CaseTypeSeedHelpers } from "./helpers/CaseTypeSeedHelpers";
@@ -37,7 +38,12 @@ import type { Browser, Locator, Page } from "@playwright/test";
 
 const PLUGIN_ID = "avandar.epidemiology";
 const PLUGIN_NAME = "Epidemiology";
-const CASE_TYPE_NAME = "E2E plugin cases";
+/**
+ * The seeded case type's name. The per-run suffix keeps a case type leaked by
+ * an earlier failed run from putting two options of the same name in the
+ * wizard's picker.
+ */
+const CASE_TYPE_NAME = `E2E plugin cases ${randomUUID().slice(0, 8)}`;
 
 /** The line list's case ids, `C001` to `C030`, one record each. */
 const CASE_IDS = Array.from(
@@ -318,18 +324,31 @@ test.describe("Epidemiology plugin cases slot", () => {
 
   test.afterAll(async () => {
     const admin = createSupabaseAdminClient();
-    if (seededWorld.caseType) {
+    const { caseType, datasetId, workspaceId } = seededWorld;
+    // Each step runs even when an earlier one fails, and the failures are
+    // rethrown together so a leak is still visible.
+    const failureMessages: string[] = [];
+    if (caseType) {
       await CaseTypeSeedHelpers.deleteCaseType({
         supabaseAdminClient: admin,
-        conceptId: seededWorld.caseType.conceptId,
+        conceptId: caseType.conceptId,
+      }).catch((error: unknown) => {
+        failureMessages.push(
+          `case type ${caseType.conceptId}: ${String(error)}`,
+        );
       });
     }
-    if (seededWorld.datasetId && seededWorld.workspaceId) {
-      await deleteDatasetFixture({
-        admin,
-        datasetId: seededWorld.datasetId,
-        workspaceId: seededWorld.workspaceId,
-      });
+    if (datasetId && workspaceId) {
+      await deleteDatasetFixture({ admin, datasetId, workspaceId }).catch(
+        (error: unknown) => {
+          failureMessages.push(`dataset ${datasetId}: ${String(error)}`);
+        },
+      );
+    }
+    if (failureMessages.length > 0) {
+      throw new Error(
+        `Could not clean up ${failureMessages.length} seeded item(s): ${failureMessages.join("; ")}`,
+      );
     }
   });
 
