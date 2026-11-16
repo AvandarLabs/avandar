@@ -14143,6 +14143,12 @@ msgstr "You are currently subscribed to this plan."
 msgid "Upload a dataset"
 msgstr "Upload a dataset"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "Its features are removed from this workspace. The datasets it imported "
+"stay in Data Sources."
+msgstr "Its features are removed from this workspace. The datasets it imported "
+"stay in Data Sources."
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
 msgstr "This Google Drive link is a folder. Paste a link to one file."
