@@ -734,6 +734,27 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     );
     expect(issues).toEqual([]);
   });
+
+  it.each([
+    ["runQuery", "run_query"],
+    ["runquery", "run_query"],
+    ["lookupValues", "lookup_values"],
+    ["askUser", "ask_user"],
+  ])(
+    "rejects the tool name %s, which only differs from %s in case and underscores",
+    (name, reservedName) => {
+      expect(_getIssuesForAiTool({ name })).toEqual([
+        {
+          path: "contributes.aiTools.0.name",
+          message: `ai tool name "${name}" is reserved for the built-in "${reservedName}" tool`,
+        },
+      ]);
+    },
+  );
+
+  it("accepts a tool name that only contains a reserved name", () => {
+    expect(_getIssuesForAiTool({ name: "runQueryTwice" })).toEqual([]);
+  });
 });
 
 function _makeDataSlot(

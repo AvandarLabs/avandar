@@ -1,6 +1,10 @@
 import { getIssuesFromVizTypes } from "@plugin-manifest/PluginManifest/getIssuesFromVizTypes.ts";
 import { getIssuesFromWhenCondition } from "@plugin-manifest/PluginManifest/getIssuesFromWhenCondition.ts";
 import {
+  makeComparableAiToolName,
+  RESERVED_AI_TOOL_NAMES,
+} from "@plugin-manifest/PluginManifest/makeComparableAiToolName.ts";
+import {
   COMMAND_ID_MESSAGE,
   COMMAND_ID_PATTERN,
   IconNameSchema,
@@ -234,14 +238,28 @@ function _refineAiTools(
 ): void {
   const seenNames = new Set<string>();
   manifest.contributes.aiTools.forEach((tool, index) => {
+    const path = ["contributes", "aiTools", index, "name"];
     if (seenNames.has(tool.name)) {
       context.addIssue({
         code: "custom",
-        path: ["contributes", "aiTools", index, "name"],
+        path,
         message: `duplicate ai tool name "${tool.name}"`,
       });
     }
     seenNames.add(tool.name);
+    const reservedName = RESERVED_AI_TOOL_NAMES.find((candidate) => {
+      return (
+        makeComparableAiToolName(candidate) ===
+        makeComparableAiToolName(tool.name)
+      );
+    });
+    if (reservedName !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path,
+        message: `ai tool name "${tool.name}" is reserved for the built-in "${reservedName}" tool`,
+      });
+    }
   });
 }
 

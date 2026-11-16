@@ -34,6 +34,7 @@ export {
   getUnapprovedDependenciesFromPackageJson,
 } from "@plugin-manifest/dependencies/getUnapprovedDependenciesFromPackageJson.ts";
 export { makeTablerComponentNameFromIconName } from "@plugin-manifest/icons/makeTablerComponentNameFromIconName.ts";
+export { RESERVED_AI_TOOL_NAMES } from "@plugin-manifest/PluginManifest/makeComparableAiToolName.ts";
 export { MAX_CONTENT_FILE_BYTES } from "@plugin-manifest/PluginManifest/PluginContentSchema.ts";
 export { DATA_SLOT_ATTRIBUTE_TYPES } from "@plugin-manifest/PluginManifest/PluginDataSlotSchema.ts";
 export {
