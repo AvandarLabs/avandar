@@ -292,6 +292,77 @@ describe("PluginVizSettingsForm", () => {
     ).toBeInTheDocument();
   });
 
+  it.each([
+    ["settings is not a record", { settings: "broken" }],
+    ["columnSettings is missing", { columnSettings: undefined }],
+    [
+      "a column setting names no column of the result",
+      { columnSettings: { dateColumn: "dropped-id" } },
+    ],
+    [
+      "a segmented value is not one of its options",
+      { settings: { interval: "fortnight" } },
+    ],
+    [
+      "a select value is not one of its options",
+      { settings: { palette: "cold" } },
+    ],
+    ["a switch value is not a boolean", { settings: { showTotals: "yes" } }],
+    ["a number value is not a number", { settings: { window: "7" } }],
+    ["a text value is not a string", { settings: { note: 5 } }],
+    ["a color value is not a string", { settings: { barColor: true } }],
+  ])(
+    "shows that the settings can't be read instead of the controls when %s",
+    async (_label, overrides) => {
+      _renderForm({
+        ...CONFIG,
+        ...overrides,
+      } as unknown as AvaVizConfig.Plugin);
+
+      expect(
+        await screen.findByText("These chart settings can't be read."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("combobox", { name: "Date column" }),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it("draws the controls for a column setting while the result has no columns to check it against", async () => {
+    const onConfigChange = vi.fn();
+    render(
+      <PluginVizSettingsForm
+        fields={[]}
+        config={{ ...CONFIG, columnSettings: { dateColumn: ONSET_ID } }}
+        onConfigChange={onConfigChange}
+      />,
+      { wrapper: QueryWrapper },
+    );
+
+    expect(
+      await screen.findByRole("combobox", { name: "Date column" }),
+    ).toBeInTheDocument();
+  });
+
+  it("resets unreadable settings to the defaults a new pick of the chart type gets", async () => {
+    const onConfigChange = _renderForm({
+      ...CONFIG,
+      settings: { interval: "fortnight" },
+    });
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Reset chart settings" }),
+    );
+
+    expect(onConfigChange).toHaveBeenCalledWith({
+      vizType: "plugin",
+      pluginId: EPIDEMIOLOGY_ID,
+      pluginVizId: "epicurve",
+      columnSettings: { dateColumn: ONSET_ID },
+      settings: { interval: "day" },
+    });
+  });
+
   it("says the settings are unavailable when the plugin is not bundled", async () => {
     _renderForm({ ...CONFIG, pluginId: "avandar.removed" });
 

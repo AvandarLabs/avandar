@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { PluginVizSettingControls } from "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingControls";
+import { PluginVizSettingsGroup } from "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsGroup";
 import { usePluginVizType } from "@/lib/plugins/vizs/usePluginVizType/usePluginVizType";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
@@ -21,8 +20,10 @@ type Props = {
  * The settings form of a plugin chart, drawn from the settings its plugin's
  * manifest declares, in declaration order, in one group. It loads the
  * manifest but never the plugin's code. Column settings are stored by column
- * ID in `columnSettings`, and every other setting in `settings`.
- * `VizSettingsFormBody` renders it for plugin charts.
+ * ID in `columnSettings`, and every other setting in `settings`. A stored
+ * config it cannot read shows a notice with a reset to the chart type's
+ * defaults instead of the controls. `VizSettingsFormBody` renders it for
+ * plugin charts.
  */
 export function PluginVizSettingsForm({
   fields,
@@ -48,23 +49,13 @@ export function PluginVizSettingsForm({
     );
   }
   return (
-    <SettingsColumns
+    <PluginVizSettingsGroup
+      fields={fields}
+      config={config}
+      manifestModule={lookup.manifestModule}
+      vizType={lookup.vizType}
       layout={layout}
-      groups={[
-        {
-          id: "plugin-settings",
-          title: t`Chart settings`,
-          content: (
-            <PluginVizSettingControls
-              fields={fields}
-              config={config}
-              manifestModule={lookup.manifestModule}
-              settings={lookup.vizType.settings}
-              onConfigChange={onConfigChange}
-            />
-          ),
-        },
-      ]}
+      onConfigChange={onConfigChange}
     />
   );
 }
