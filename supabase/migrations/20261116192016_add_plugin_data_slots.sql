@@ -101,6 +101,47 @@ alter table "public"."plugin_data_slot_bindings" validate constraint "plugin_dat
 
 set check_function_bodies = off;
 
+CREATE OR REPLACE FUNCTION public.plugin_data_slot_bindings__check_source()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+declare
+  v_is_source_missing boolean;
+  v_is_source_unchanged boolean;
+begin
+  v_is_source_missing := case new.source_type
+    when 'concept' then new.concept_id is null
+    else new.dataset_id is null
+  end;
+
+  if not v_is_source_missing then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' and new.source_type = old.source_type then
+    v_is_source_unchanged := case new.source_type
+      when 'concept' then old.concept_id is null
+      else old.dataset_id is null
+    end;
+
+    if v_is_source_unchanged or pg_trigger_depth () > 1 then
+      return new;
+    end if;
+  end if;
+
+  raise exception 'A data slot binding must name the % its source type says', case new.source_type
+      when 'concept' then 'case type'
+      else 'dataset'
+    end
+    using
+      errcode = '23514',
+      hint = 'source_required',
+      detail = format('slot_id %s, source_type %s', new.slot_id, new.source_type);
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.plugin_data_slot_bindings__check_workspace()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -381,6 +422,8 @@ using (public.util__can_manage_workspace_settings(workspace_id))
 with check (public.util__can_manage_workspace_settings(workspace_id));
 
 
+CREATE TRIGGER tr__plugin_data_slot_bindings__check_source BEFORE INSERT OR UPDATE OF source_type, concept_id, dataset_id ON public.plugin_data_slot_bindings FOR EACH ROW EXECUTE FUNCTION public.plugin_data_slot_bindings__check_source();
+
 CREATE TRIGGER tr__plugin_data_slot_bindings__check_workspace BEFORE INSERT OR UPDATE OF workspace_id, installation_id, concept_id, dataset_id ON public.plugin_data_slot_bindings FOR EACH ROW EXECUTE FUNCTION public.plugin_data_slot_bindings__check_workspace();
 
 CREATE TRIGGER tr__plugin_data_slot_bindings__set_updated_at BEFORE UPDATE ON public.plugin_data_slot_bindings FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
@@ -392,6 +435,7 @@ CREATE TRIGGER tr__plugin_data_slot_bindings__stamp_bound_by BEFORE INSERT OR UP
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
+revoke all privileges on function public.plugin_data_slot_bindings__check_source() from public, anon, authenticated, service_role;
 revoke all privileges on function public.plugin_data_slot_bindings__check_workspace() from public, anon, authenticated, service_role;
 revoke all privileges on function public.plugin_data_slot_bindings__stamp_bound_by() from public, anon, authenticated, service_role;
 revoke all privileges on function public.rpc_plugin_data_slot_bindings__save(p_installation_id uuid, p_slot_id text, p_source_type plugin_data_slot_bindings__source_type, p_concept_id uuid, p_dataset_id uuid, p_attribute_map jsonb) from public, anon, authenticated, service_role;

@@ -149,6 +149,78 @@ dataset_id on public.plugin_data_slot_bindings for each row
 execute function public.plugin_data_slot_bindings__check_workspace ();
 
 /**
+ * Refuses a binding that is broken from the start: one whose `source_type`
+ * names a case type or a dataset but whose matching id is null. The table's
+ * check constraint has to allow that state, because deleting the bound case
+ * type or dataset sets the id to null while `source_type` stays, and the
+ * client reads it as a broken binding. This trigger allows the state only
+ * for that delete.
+ *
+ * An insert must name the source its type says. An update that changes
+ * `source_type` must name the new type's source. An update that nulls the id
+ * of an unchanged `source_type` is allowed only inside the `on delete set
+ * null` foreign key action, which runs as a trigger of its own, so
+ * `pg_trigger_depth()` is greater than 1 there. A direct write is depth 1 and
+ * is refused: to remove a binding, delete it. An update that leaves an
+ * already null id as it is (a change to `attribute_map`, or a repeat of the
+ * null) is allowed, so a broken binding can still be rebound or edited.
+ *
+ * SECURITY INVOKER: it only reads the row being written.
+ */
+create or replace function public.plugin_data_slot_bindings__check_source () returns trigger language plpgsql
+set
+  search_path = '' as $$
+declare
+  v_is_source_missing boolean;
+  v_is_source_unchanged boolean;
+begin
+  v_is_source_missing := case new.source_type
+    when 'concept' then new.concept_id is null
+    else new.dataset_id is null
+  end;
+
+  if not v_is_source_missing then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' and new.source_type = old.source_type then
+    v_is_source_unchanged := case new.source_type
+      when 'concept' then old.concept_id is null
+      else old.dataset_id is null
+    end;
+
+    if v_is_source_unchanged or pg_trigger_depth () > 1 then
+      return new;
+    end if;
+  end if;
+
+  raise exception 'A data slot binding must name the % its source type says', case new.source_type
+      when 'concept' then 'case type'
+      else 'dataset'
+    end
+    using
+      errcode = '23514',
+      hint = 'source_required',
+      detail = format('slot_id %s, source_type %s', new.slot_id, new.source_type);
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE.
+revoke
+execute on function public.plugin_data_slot_bindings__check_source ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__plugin_data_slot_bindings__check_source before insert or
+update of source_type,
+concept_id,
+dataset_id on public.plugin_data_slot_bindings for each row
+execute function public.plugin_data_slot_bindings__check_source ();
+
+/**
  * Stamps `bound_by` from the signed-in user, so a caller can neither name
  * another user as the binder nor leave the previous binder on a binding they
  * changed. An insert always takes the caller. An update takes the caller only
