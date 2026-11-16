@@ -12,6 +12,7 @@ const PLUGIN = {
   folderName: "epidemiology",
   directory: "/repo/plugins/epidemiology",
   entryPath: "/repo/plugins/epidemiology/src/index.tsx",
+  contentPathsById: {},
   compiled: {
     manifest: {
       id: "avandar.epidemiology",
@@ -33,6 +34,15 @@ const PLUGIN = {
 const PLUGIN_WITHOUT_ENTRY = {
   ...PLUGIN,
   entryPath: undefined,
+} as PluginDirectory;
+
+/** A copy of `PLUGIN_WITHOUT_ENTRY` that bundles two content files. */
+const PLUGIN_WITH_CONTENT = {
+  ...PLUGIN_WITHOUT_ENTRY,
+  contentPathsById: {
+    provinces: "/repo/plugins/epidemiology/content/mz-adm1.csv",
+    districts: "/repo/plugins/epidemiology/content/mz-adm2.csv",
+  },
 } as PluginDirectory;
 
 /** A copy of `PLUGIN` whose plugin icon and command icons are replaced. */
@@ -121,6 +131,30 @@ describe("makeIndexModuleSourceFromPlugins", () => {
     expect(code).toContain(
       'definition: { kind: "avandar-plugin", commands: {}, vizTypes: {}, aiTools: {} }',
     );
+  });
+
+  it("gives a plugin with content a loadContentUrls that imports each file as a URL and keys it by content id", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITH_CONTENT],
+      repoRoot: "/repo",
+    });
+    expect(code).toContain(
+      'import("/plugins/epidemiology/content/mz-adm1.csv?url"),',
+    );
+    expect(code).toContain(
+      'import("/plugins/epidemiology/content/mz-adm2.csv?url"),',
+    );
+    expect(code).toContain(
+      'return { "provinces": urls[0].default, "districts": urls[1].default };',
+    );
+  });
+
+  it("leaves out loadContentUrls for a plugin without content", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain("loadContentUrls");
   });
 
   it("emits an empty index when nothing is bundled", () => {

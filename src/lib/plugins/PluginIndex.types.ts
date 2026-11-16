@@ -26,4 +26,11 @@ export type PluginIndexEntry = Readonly<{
   id: string;
   loadManifest: () => Promise<PluginManifestModule>;
   loadCode: () => Promise<PluginCodeModule>;
+
+  /**
+   * Present only when the manifest declares content. Resolves each content
+   * id to the URL its bundled file is served from, for example to fetch the
+   * file when the install wizard imports it. Loading it fetches no content.
+   */
+  loadContentUrls?: () => Promise<Readonly<Record<string, string>>>;
 }>;

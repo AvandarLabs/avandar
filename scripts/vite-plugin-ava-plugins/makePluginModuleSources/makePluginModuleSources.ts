@@ -47,6 +47,34 @@ function _makeLoadCodeSourceLinesFromPlugin(options: {
   ];
 }
 
+function _makeLoadContentUrlsSourceLinesFromPlugin(options: {
+  plugin: PluginDirectory;
+  repoRoot: string;
+}): string[] {
+  const { plugin, repoRoot } = options;
+  const contentEntries = Object.entries(plugin.contentPathsById);
+  if (contentEntries.length === 0) {
+    return [];
+  }
+  // `?url` makes Vite emit each file as an asset and import only its URL, so
+  // no content bytes reach a JavaScript chunk.
+  const importLines = contentEntries.map(([, path]) => {
+    const rootRelativePath = _makeRootRelativePathFromPath({ path, repoRoot });
+    return `        import(${JSON.stringify(`${rootRelativePath}?url`)}),`;
+  });
+  const urlProperties = contentEntries.map(([contentId], index) => {
+    return `${JSON.stringify(contentId)}: urls[${index}].default`;
+  });
+  return [
+    "    loadContentUrls: async () => {",
+    "      const urls = await Promise.all([",
+    ...importLines,
+    "      ]);",
+    `      return { ${urlProperties.join(", ")} };`,
+    "    },",
+  ];
+}
+
 function _makeIndexEntrySourceFromPlugin(options: {
   plugin: PluginDirectory;
   repoRoot: string;
@@ -58,6 +86,7 @@ function _makeIndexEntrySourceFromPlugin(options: {
     `    id: ${JSON.stringify(pluginId)},`,
     `    loadManifest: () => import(${JSON.stringify(manifestModuleId)}),`,
     ..._makeLoadCodeSourceLinesFromPlugin(options),
+    ..._makeLoadContentUrlsSourceLinesFromPlugin(options),
     "  },",
   ].join("\n");
 }
@@ -92,9 +121,10 @@ function _getIconBindingsFromPlugin(plugin: PluginDirectory): IconBinding[] {
  * Source for `virtual:ava-plugin-index`: one entry per bundled plugin with
  * lazy `loadManifest` and `loadCode` loaders. A plugin with no entry gets a
  * `loadCode` that loads only its locales and returns a definition with no
- * handlers. It must contain no static imports, so the main bundle carries
- * only these few bytes per plugin. `vitePluginAvaPlugins`'s `load` hook
- * calls it.
+ * handlers, and a plugin with content gets a `loadContentUrls` that resolves
+ * each content id to its file's URL. It must contain no static imports, so
+ * the main bundle carries only these few bytes per plugin.
+ * `vitePluginAvaPlugins`'s `load` hook calls it.
  */
 export function makeIndexModuleSourceFromPlugins(options: {
   plugins: readonly PluginDirectory[];
