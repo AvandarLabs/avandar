@@ -1,5 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { cleanup, render, screen, waitFor } from "@/test-utils";
 import { DataSlotCheckPreview } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -181,5 +189,57 @@ describe("DataSlotCheckPreview", () => {
       );
     });
     expect(checkDataSlotBindingMock).toHaveBeenCalledTimes(2);
+  });
+
+  describe("date cells", () => {
+    // DuckDB-Wasm hands a DATE or TIMESTAMP over as epoch milliseconds in UTC.
+    const JAN_19_2026 = 1_768_780_800_000;
+    const JAN_19_2026_AT_1230 = 1_768_825_845_000;
+    const originalTimezone = process.env.TZ;
+
+    beforeAll(() => {
+      // A viewer west of UTC is where a UTC-midnight date slips a day back.
+      process.env.TZ = "America/New_York";
+    });
+
+    afterAll(() => {
+      process.env.TZ = originalTimezone;
+    });
+
+    async function _renderSampleOnsetDates(
+      onsetDates: readonly number[],
+    ): Promise<void> {
+      checkDataSlotBindingMock.mockResolvedValue({
+        rowCount: onsetDates.length,
+        filledCountsByAttributeKey: {
+          onsetDate: onsetDates.length,
+          district: 0,
+        },
+        sampleRows: onsetDates.map((onsetDate) => {
+          return { onsetDate, district: null };
+        }),
+      });
+      render(_makePreview(ONSET_FIELD), { wrapper: QueryWrapper });
+      await screen.findByRole("columnheader", { name: "Onset date" });
+    }
+
+    it("shows a date as its calendar day, not epoch milliseconds or the day before", async () => {
+      await _renderSampleOnsetDates([JAN_19_2026]);
+
+      expect(
+        screen.getByRole("cell", { name: "2026-01-19" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows the time of day when the sample holds timestamps", async () => {
+      await _renderSampleOnsetDates([JAN_19_2026, JAN_19_2026_AT_1230]);
+
+      expect(
+        screen.getByRole("cell", { name: "2026-01-19 12:30:45" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("cell", { name: "2026-01-19 00:00:00" }),
+      ).toBeInTheDocument();
+    });
   });
 });

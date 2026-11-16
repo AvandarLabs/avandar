@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Table } from "@mantine/core";
+import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
 import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import type { DataSlotCheckResult } from "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding";
 import type { PluginDataSlot } from "@avandar/plugin-manifest/runtime";
@@ -11,13 +12,36 @@ type Props = Readonly<{
   sampleRows: DataSlotCheckResult["sampleRows"];
 }>;
 
-function _getTextFromCellValue(value: unknown, locale: string): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return value instanceof Date
-    ? value.toLocaleDateString(locale)
-    : String(value);
+/**
+ * Makes a function that writes one sample cell as text, the way the data
+ * grid does: a `date` attribute shows as a calendar day (with the time when
+ * the sample holds times), in UTC so it matches the stored value for every
+ * viewer, and other values read like any grid cell.
+ */
+function _makeCellFormatter(
+  options: Readonly<{
+    slot: PluginDataSlot;
+    sampleRows: Props["sampleRows"];
+  }>,
+): (attributeKey: string, value: unknown) => string {
+  const { slot, sampleRows } = options;
+  const attributeKeys = Object.keys(slot.attributes);
+  const columnDefs = makeDataGridColumnDefs({
+    columnNames: attributeKeys,
+    data: [...sampleRows],
+    dateColumns: new Set(
+      attributeKeys.filter((attributeKey) => {
+        return getOwnValue(slot.attributes, attributeKey)?.type === "date";
+      }),
+    ),
+    dateFormat: "YYYY-MM-DD HH:mm:ss",
+  });
+  return (attributeKey, value) => {
+    const columnDef = columnDefs.find((candidate) => {
+      return candidate.field === attributeKey;
+    });
+    return columnDef?.valueFormatter({ value }) ?? "";
+  };
 }
 
 /**
@@ -31,8 +55,9 @@ export function DataSlotCheckSampleTable({
   localize,
   sampleRows,
 }: Props): JSX.Element {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
   const attributeKeys = Object.keys(slot.attributes);
+  const formatCell = _makeCellFormatter({ slot, sampleRows });
   return (
     <Table.ScrollContainer minWidth={320}>
       <Table withTableBorder fz="sm">
@@ -58,10 +83,7 @@ export function DataSlotCheckSampleTable({
                 {attributeKeys.map((attributeKey) => {
                   return (
                     <Table.Td key={attributeKey}>
-                      {_getTextFromCellValue(
-                        getOwnValue(row, attributeKey),
-                        i18n.locale,
-                      )}
+                      {formatCell(attributeKey, getOwnValue(row, attributeKey))}
                     </Table.Td>
                   );
                 })}
