@@ -2779,6 +2779,122 @@ export type Database = {
         }
         Relationships: []
       }
+      plugin_content_imports: {
+        Row: {
+          content_id: string
+          created_at: string
+          dataset_id: string
+          id: string
+          imported_by: string | null
+          plugin_id: string
+          workspace_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          dataset_id: string
+          id?: string
+          imported_by?: string | null
+          plugin_id: string
+          workspace_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          dataset_id?: string
+          id?: string
+          imported_by?: string | null
+          plugin_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plugin_content_imports__dataset_in_workspace_fkey"
+            columns: ["dataset_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "plugin_content_imports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plugin_data_slot_bindings: {
+        Row: {
+          attribute_map: Json
+          bound_by: string | null
+          concept_id: string | null
+          created_at: string
+          dataset_id: string | null
+          id: string
+          installation_id: string
+          slot_id: string
+          source_type: Database["public"]["Enums"]["plugin_data_slot_bindings__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          attribute_map?: Json
+          bound_by?: string | null
+          concept_id?: string | null
+          created_at?: string
+          dataset_id?: string | null
+          id?: string
+          installation_id: string
+          slot_id: string
+          source_type: Database["public"]["Enums"]["plugin_data_slot_bindings__source_type"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          attribute_map?: Json
+          bound_by?: string | null
+          concept_id?: string | null
+          created_at?: string
+          dataset_id?: string | null
+          id?: string
+          installation_id?: string
+          slot_id?: string
+          source_type?: Database["public"]["Enums"]["plugin_data_slot_bindings__source_type"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plugin_data_slot_bindings_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plugin_data_slot_bindings_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plugin_data_slot_bindings_installation_id_fkey"
+            columns: ["installation_id"]
+            isOneToOne: false
+            referencedRelation: "plugin_installations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plugin_data_slot_bindings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plugin_installations: {
         Row: {
           created_at: string
@@ -4555,6 +4671,61 @@ export type Database = {
         Args: { p_execution: Json }
         Returns: string
       }
+      rpc_plugin_data_slot_bindings__save: {
+        Args: {
+          p_attribute_map?: Json
+          p_concept_id?: string
+          p_dataset_id?: string
+          p_installation_id: string
+          p_slot_id: string
+          p_source_type: Database["public"]["Enums"]["plugin_data_slot_bindings__source_type"]
+        }
+        Returns: {
+          attribute_map: Json
+          bound_by: string | null
+          concept_id: string | null
+          created_at: string
+          dataset_id: string | null
+          id: string
+          installation_id: string
+          slot_id: string
+          source_type: Database["public"]["Enums"]["plugin_data_slot_bindings__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "plugin_data_slot_bindings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      rpc_plugin_installations__install: {
+        Args: {
+          p_bindings: Json
+          p_granted_permissions: string[]
+          p_installed_version: string
+          p_plugin_id: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          granted_permissions: string[]
+          id: string
+          installed_by: string | null
+          installed_version: string
+          is_enabled: boolean
+          plugin_id: string
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "plugin_installations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_resources__make_private: {
         Args: {
           p_resource_id: string
@@ -4949,6 +5120,7 @@ export type Database = {
         | "partially_failed"
         | "failed"
         | "cancelled"
+      plugin_data_slot_bindings__source_type: "concept" | "dataset"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -5282,6 +5454,7 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      plugin_data_slot_bindings__source_type: ["concept", "dataset"],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],
