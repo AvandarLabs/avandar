@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261116192016_add_plugin_data_slots.sql by
+-- Generated from supabase/migrations/20261116192935_add_plugin_data_slots.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0

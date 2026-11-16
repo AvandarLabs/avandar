@@ -110,6 +110,10 @@ declare
   v_is_source_missing boolean;
   v_is_source_unchanged boolean;
 begin
+  if new.source_type is null then
+    return new;
+  end if;
+
   v_is_source_missing := case new.source_type
     when 'concept' then new.concept_id is null
     else new.dataset_id is null
@@ -202,6 +206,10 @@ CREATE OR REPLACE FUNCTION public.plugin_data_slot_bindings__stamp_bound_by()
  SET search_path TO ''
 AS $function$
 begin
+  if tg_op = 'UPDATE' and pg_trigger_depth () > 1 then
+    return new;
+  end if;
+
   if auth.uid () is null then
     return new;
   end if;

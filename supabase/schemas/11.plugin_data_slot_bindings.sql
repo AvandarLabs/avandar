@@ -163,7 +163,14 @@ execute function public.plugin_data_slot_bindings__check_workspace ();
  * `pg_trigger_depth()` is greater than 1 there. A direct write is depth 1 and
  * is refused: to remove a binding, delete it. An update that leaves an
  * already null id as it is (a change to `attribute_map`, or a repeat of the
- * null) is allowed, so a broken binding can still be rebound or edited.
+ * null) is allowed, so a broken binding can still be rebound or edited. A
+ * null `source_type` is passed through, so the column's not null constraint
+ * reports it instead of a misleading source error.
+ *
+ * The `pg_trigger_depth() > 1` exemption relies on nothing else writing this
+ * table from inside a trigger or a function a trigger calls. Any other writer
+ * that updates these columns at that depth would skip the check, so a future
+ * one must keep this in mind and not do it.
  *
  * SECURITY INVOKER: it only reads the row being written.
  */
@@ -174,6 +181,10 @@ declare
   v_is_source_missing boolean;
   v_is_source_unchanged boolean;
 begin
+  if new.source_type is null then
+    return new;
+  end if;
+
   v_is_source_missing := case new.source_type
     when 'concept' then new.concept_id is null
     else new.dataset_id is null
@@ -228,12 +239,24 @@ execute function public.plugin_data_slot_bindings__check_source ();
  * `dataset_id`, or `attribute_map`), and otherwise keeps the existing binder.
  * With no signed-in user (the service role, tests), the value is left alone.
  *
+ * An update inside the `on delete set null` foreign key action, which runs as
+ * a trigger of its own (`pg_trigger_depth()` is greater than 1), is left
+ * alone: the action changes only its own column, so the existing binder stays.
+ * Otherwise deleting a bound case type or dataset would restamp the binding
+ * with whoever deleted it instead of whoever bound it. The same action also
+ * clears `bound_by` when the binder's account is deleted, so the row must not
+ * be restored to the old value here.
+ *
  * SECURITY INVOKER: it only reads `auth.uid()` and the row being written.
  */
 create or replace function public.plugin_data_slot_bindings__stamp_bound_by () returns trigger language plpgsql
 set
   search_path = '' as $$
 begin
+  if tg_op = 'UPDATE' and pg_trigger_depth () > 1 then
+    return new;
+  end if;
+
   if auth.uid () is null then
     return new;
   end if;
