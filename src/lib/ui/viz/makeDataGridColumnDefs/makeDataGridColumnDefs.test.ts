@@ -28,6 +28,16 @@ function _formatCell(
   return columnDef!.valueFormatter({ value: options.value });
 }
 
+function _formatPlainCell(field: string, value: unknown): string {
+  const [columnDef] = makeDataGridColumnDefs({
+    columnNames: [field],
+    data: [{ [field]: value }],
+    dateColumns: undefined,
+    dateFormat: "YYYY-MM-DD",
+  });
+  return columnDef!.valueFormatter({ value });
+}
+
 describe("makeDataGridColumnDefs", () => {
   const originalTimezone = process.env.TZ;
 
@@ -270,5 +280,34 @@ describe("makeDataGridColumnDefs", () => {
         _formatPeriods({ value: ["Fever", "Cough"], bucketGrain: "month" }),
       ).toBe("Fever; Cough");
     });
+  });
+});
+
+describe("struct cells", () => {
+  it("shows a struct as its fields, not [object Object]", () => {
+    expect(_formatPlainCell("location", { lat: 1.5, lng: -2 })).toBe(
+      '{"lat":1.5,"lng":-2}',
+    );
+  });
+
+  it("shows a struct holding a bigint", () => {
+    expect(_formatPlainCell("location", { count: 12n })).toBe(
+      '{"count":"12"}',
+    );
+  });
+
+  it("uses a value's own toJSON, as an Arrow struct row has", () => {
+    const structRow = {
+      toJSON: () => {
+        return { district: "Maputo" };
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe('{"district":"Maputo"}');
+  });
+
+  it("shows a list of structs separated by semicolons", () => {
+    expect(_formatPlainCell("places", [{ id: 1 }, { id: 2 }])).toBe(
+      '{"id":1}; {"id":2}',
+    );
   });
 });

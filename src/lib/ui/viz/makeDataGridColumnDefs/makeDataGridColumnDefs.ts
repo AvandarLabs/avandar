@@ -81,9 +81,21 @@ function _listItemTexts(
 }
 
 /**
+ * A struct cell as JSON, so its fields read as `{"lat":1.5}` rather than
+ * `[object Object]`. A bigint becomes its digits. A value with its own
+ * `toJSON`, such as an Arrow struct row, is read through it.
+ */
+function _formatStructValue(value: object): string {
+  return JSON.stringify(value, (_key, fieldValue: unknown) => {
+    return typeof fieldValue === "bigint" ? String(fieldValue) : fieldValue;
+  });
+}
+
+/**
  * The text of one non-date cell. A list, such as a case type field that
  * keeps every value, shows its values separated by semicolons, which never
- * collide with a number's thousands separator. An empty list is blank.
+ * collide with a number's thousands separator. An empty list is blank. A
+ * struct shows as JSON.
  */
 function _formatCellValue(value: unknown, columnName: string): string {
   if (Array.isArray(value)) {
@@ -91,6 +103,9 @@ function _formatCellValue(value: unknown, columnName: string): string {
   }
   if (typeof value === "number") {
     return _formatGridNumber(value, columnName);
+  }
+  if (typeof value === "object" && value !== null && !(value instanceof Date)) {
+    return _formatStructValue(value);
   }
   return value == null ? "" : String(value);
 }
