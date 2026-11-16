@@ -13,6 +13,15 @@ import {
 } from "./mozambiqueBoundaryHelpers/mozambiqueBoundaryHelpers";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
+/*
+ * Source: geoBoundaries' gbHumanitarian release of Mozambique, built from
+ * Mozambique INE (Instituto Nacional de Estatistica) census 2007 data, cleaned
+ * by UN OCHA ROSEA, and published through HDX. License: Creative Commons
+ * Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO). Anyone who
+ * ships or redistributes the generated CSVs must credit the source and
+ * indicate that the shapes were simplified. The release ids written into the
+ * CSVs are recorded in `plugins/mozambique/content/README.md`.
+ */
 const GEOBOUNDARIES_API_URL =
   "https://www.geoboundaries.org/api/current/gbHumanitarian/MOZ";
 const CONTENT_DIRECTORY = "plugins/mozambique/content";

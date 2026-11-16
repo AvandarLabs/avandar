@@ -32,9 +32,8 @@ export function makeToleranceLadder(options: {
 }
 
 /**
- * Finds the first tolerance whose CSV text is under `limitBytes` UTF-8 bytes,
- * trying each in order and stopping at the first that fits. Throws, naming
- * the size at the last tolerance, when none fits.
+ * Picks the least-simplified tolerance that keeps a generated file under the
+ * content size limit. Throws if none fits.
  */
 export async function findSimplifyToleranceUnderLimit(options: {
   tolerances: readonly number[];
