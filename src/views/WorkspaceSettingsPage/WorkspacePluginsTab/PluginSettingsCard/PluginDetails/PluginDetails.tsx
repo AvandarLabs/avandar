@@ -87,6 +87,7 @@ export function PluginDetails({
               toolbarCommandTitles={toolbarCommandTitles}
               chartTypeTitles={chartTypeTitles}
               dataSlotTitles={dataSlotTitles}
+              contentCount={manifest.contributes.content.length}
             />
             <PluginDataAccessSection
               permissions={manifest.permissions}

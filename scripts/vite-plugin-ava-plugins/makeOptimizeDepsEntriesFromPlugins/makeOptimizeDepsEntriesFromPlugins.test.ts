@@ -4,7 +4,9 @@ import type { PluginDirectory } from "@avandar/plugin-manifest/node";
 
 // A partial fixture: it carries only the field the entries read, so the cast
 // skips filling in the rest of the directory shape.
-function _makePluginWithEntryPath(entryPath: string): PluginDirectory {
+function _makePluginWithEntryPath(
+  entryPath: string | undefined,
+): PluginDirectory {
   return { entryPath } as unknown as PluginDirectory;
 }
 
@@ -29,5 +31,17 @@ describe("makeOptimizeDepsEntriesFromPlugins", () => {
       "plugins/epidemiology/src/index.tsx",
       "plugins/hello/main.ts",
     ]);
+  });
+
+  it("leaves out a plugin with no entry, which has no code to scan", () => {
+    const entries = makeOptimizeDepsEntriesFromPlugins({
+      plugins: [
+        _makePluginWithEntryPath(undefined),
+        _makePluginWithEntryPath("/repo/plugins/hello/main.ts"),
+      ],
+      repoRoot: "/repo",
+    });
+
+    expect(entries).toEqual(["**/*.html", "plugins/hello/main.ts"]);
   });
 });

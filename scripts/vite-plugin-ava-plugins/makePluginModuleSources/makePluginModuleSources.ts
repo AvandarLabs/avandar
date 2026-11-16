@@ -13,22 +13,30 @@ function _makeRootRelativePathFromPath(options: {
   return `/${relative(options.repoRoot, options.path).split(sep).join("/")}`;
 }
 
-function _makeIndexEntrySourceFromPlugin(options: {
+// What `definePlugin` returns for a plugin that declares nothing, so the host
+// accepts the code module of a plugin with no entry like any other.
+const EMPTY_DEFINITION_SOURCE =
+  '{ kind: "avandar-plugin", commands: {}, vizTypes: {}, aiTools: {} }';
+
+function _makeLoadCodeSourceLinesFromPlugin(options: {
   plugin: PluginDirectory;
   repoRoot: string;
-}): string {
+}): string[] {
   const { plugin, repoRoot } = options;
-  const pluginId = plugin.compiled.manifest.id;
+  const localesModuleId = `${PLUGIN_LOCALES_MODULE_PREFIX}${plugin.compiled.manifest.id}`;
+  if (plugin.entryPath === undefined) {
+    return [
+      "    loadCode: async () => {",
+      `      const locales = await import(${JSON.stringify(localesModuleId)});`,
+      `      return { definition: ${EMPTY_DEFINITION_SOURCE}, messages: locales.default };`,
+      "    },",
+    ];
+  }
   const entryPath = _makeRootRelativePathFromPath({
     path: plugin.entryPath,
     repoRoot,
   });
-  const manifestModuleId = `${PLUGIN_MANIFEST_MODULE_PREFIX}${pluginId}`;
-  const localesModuleId = `${PLUGIN_LOCALES_MODULE_PREFIX}${pluginId}`;
   return [
-    "  {",
-    `    id: ${JSON.stringify(pluginId)},`,
-    `    loadManifest: () => import(${JSON.stringify(manifestModuleId)}),`,
     "    loadCode: async () => {",
     "      const [code, locales] = await Promise.all([",
     `        import(${JSON.stringify(entryPath)}),`,
@@ -36,6 +44,20 @@ function _makeIndexEntrySourceFromPlugin(options: {
     "      ]);",
     "      return { definition: code.default, messages: locales.default };",
     "    },",
+  ];
+}
+
+function _makeIndexEntrySourceFromPlugin(options: {
+  plugin: PluginDirectory;
+  repoRoot: string;
+}): string {
+  const pluginId = options.plugin.compiled.manifest.id;
+  const manifestModuleId = `${PLUGIN_MANIFEST_MODULE_PREFIX}${pluginId}`;
+  return [
+    "  {",
+    `    id: ${JSON.stringify(pluginId)},`,
+    `    loadManifest: () => import(${JSON.stringify(manifestModuleId)}),`,
+    ..._makeLoadCodeSourceLinesFromPlugin(options),
     "  },",
   ].join("\n");
 }
@@ -68,9 +90,11 @@ function _getIconBindingsFromPlugin(plugin: PluginDirectory): IconBinding[] {
 
 /**
  * Source for `virtual:ava-plugin-index`: one entry per bundled plugin with
- * lazy `loadManifest` and `loadCode` loaders. It must contain no static
- * imports, so the main bundle carries only these few bytes per plugin.
- * `vitePluginAvaPlugins`'s `load` hook calls it.
+ * lazy `loadManifest` and `loadCode` loaders. A plugin with no entry gets a
+ * `loadCode` that loads only its locales and returns a definition with no
+ * handlers. It must contain no static imports, so the main bundle carries
+ * only these few bytes per plugin. `vitePluginAvaPlugins`'s `load` hook
+ * calls it.
  */
 export function makeIndexModuleSourceFromPlugins(options: {
   plugins: readonly PluginDirectory[];

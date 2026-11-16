@@ -19,6 +19,7 @@ import {
   readPluginDirectory,
 } from "@avandar/plugin-manifest/node";
 import type { PluginCommandHelp } from "@ava-cli/PluginCli/makePluginCommandHelpText";
+import type { PluginDirectory } from "@avandar/plugin-manifest/node";
 
 type CommandResult = Readonly<{ isOk: boolean; output: string }>;
 
@@ -76,19 +77,22 @@ const _runCommandWithSpawn: RunCommand = (command, args, cwd) => {
   };
 };
 
-function _getManifestProblems(options: {
+function _readPluginOrProblems(options: {
   folderName: string;
   repoRoot: string;
-}): string[] {
+}): Readonly<{ plugin: PluginDirectory | undefined; problems: string[] }> {
   const { folderName, repoRoot } = options;
   try {
-    readPluginDirectory({
+    const plugin = readPluginDirectory({
       directory: join(repoRoot, "plugins", folderName),
       repoRoot,
     });
-    return [];
+    return { plugin, problems: [] };
   } catch (error: unknown) {
-    return [error instanceof Error ? error.message : String(error)];
+    return {
+      plugin: undefined,
+      problems: [error instanceof Error ? error.message : String(error)],
+    };
   }
 }
 
@@ -123,20 +127,27 @@ function _validateOnePlugin(options: {
 }): string[] {
   const { folderName, repoRoot } = options;
   printInfo(`🔎 Validating plugins/${folderName}...`);
-  printInfo("  Checking ava.yaml, locales, icons, and dependencies...");
-  const manifestProblems = _getManifestProblems({ folderName, repoRoot });
-  if (manifestProblems.length > 0) {
+  printInfo(
+    "  Checking ava.yaml, locales, icons, content, and dependencies...",
+  );
+  const { plugin, problems } = _readPluginOrProblems({ folderName, repoRoot });
+  if (plugin === undefined) {
     printWarn("  ⚠️ Skipped tsc and eslint: fix the manifest problems first.");
-    return manifestProblems;
+    return problems;
+  }
+  if (plugin.entryPath === undefined) {
+    printInfo("  No plugin code, skipping tsc and eslint.");
+    return [];
   }
   return _getToolProblems(options);
 }
 
 /**
  * Validates one plugin, or every bundled plugin when no name is given:
- * manifest schema, locale keys, icons, approved dependencies, `tsc`, and the
- * import lint. Prints the result for each plugin, then throws when any
- * failed, so a script such as CI sees a nonzero exit.
+ * manifest schema, locale keys, icons, content files, approved dependencies,
+ * and, for a plugin with code, `tsc` and the import lint. Prints the result
+ * for each plugin, then throws when any failed, so a script such as CI sees
+ * a nonzero exit.
  */
 export function validatePluginCommand(options: {
   name?: string;

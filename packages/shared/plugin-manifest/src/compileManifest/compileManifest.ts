@@ -146,6 +146,9 @@ export function getMessageKeysFromManifest(manifest: PluginManifest): string[] {
     ...Object.values(manifest.dataSlots).flatMap((slot) => {
       return _getDataSlotStrings(slot);
     }),
+    ...manifest.contributes.content.flatMap((item) => {
+      return [item.title, item.description];
+    }),
   ];
   const keys = values.flatMap((value) => {
     const key = getMessageKeyFromManifestString(value);

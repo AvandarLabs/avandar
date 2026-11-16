@@ -8,6 +8,7 @@ export type { CompiledPluginManifest } from "@plugin-manifest/compileManifest/co
 export type { DataSlotAttributeType } from "@plugin-manifest/PluginManifest/PluginDataSlotSchema.ts";
 export type {
   PluginCommand,
+  PluginContentItem,
   PluginDataSlot,
   PluginDataSlotAttribute,
   PluginManifest,

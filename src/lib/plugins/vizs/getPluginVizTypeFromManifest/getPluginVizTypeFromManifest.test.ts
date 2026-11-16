@@ -31,7 +31,13 @@ const MANIFEST: PluginManifest = {
   icon: "virus",
   permissions: [],
   dataSlots: {},
-  contributes: { commands: [], menus: {}, vizTypes: [EPICURVE], aiTools: [] },
+  contributes: {
+    commands: [],
+    menus: {},
+    vizTypes: [EPICURVE],
+    aiTools: [],
+    content: [],
+  },
 };
 
 describe("getPluginVizTypeFromManifest", () => {

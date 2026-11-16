@@ -21,12 +21,14 @@ function _makeManifest(options: {
   hasChartTypes: boolean;
   permissions: string[];
   dataSlots?: Record<string, unknown>;
+  contentCount?: number;
 }): PluginManifest {
   const {
     hasToolbarCommand,
     hasChartTypes,
     permissions,
     dataSlots = {},
+    contentCount = 0,
   } = options;
   return {
     id: "avandar.epidemiology",
@@ -49,6 +51,9 @@ function _makeManifest(options: {
             { id: "rate-plot", title: "%viz.ratePlot.title%" },
           ]
         : [],
+      content: Array.from({ length: contentCount }, (_value, index) => {
+        return { id: `item-${index}`, kind: "dataset" };
+      }),
     },
   } as unknown as PluginManifest;
 }
@@ -212,6 +217,26 @@ describe("PluginDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it.each([
+    ["1 dataset to import", 1],
+    ["2 datasets to import", 2],
+  ])(
+    "lists %s when the plugin bundles that many content items",
+    async (text, contentCount) => {
+      await _renderExpandedDetails(
+        _makeManifest({
+          hasToolbarCommand: false,
+          hasChartTypes: false,
+          permissions: [],
+          contentCount,
+        }),
+      );
+
+      expect(screen.getByText(text)).toBeInTheDocument();
+      expect(screen.queryByText("Nothing yet.")).not.toBeInTheDocument();
+    },
+  );
+
   it("says its charts see only their own rows when the plugin adds chart types", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 
@@ -243,6 +268,7 @@ describe("PluginDetails", () => {
     expect(
       screen.queryByText(/Records you choose for it:/),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText(/to import/)).not.toBeInTheDocument();
   });
 
   it("says the plugin uses no workspace data when it has no permissions and no chart types", async () => {

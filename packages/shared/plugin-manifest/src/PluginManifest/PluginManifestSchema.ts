@@ -6,6 +6,7 @@ import {
   IconNameSchema,
   LocalizedStringSchema,
 } from "@plugin-manifest/PluginManifest/manifestFieldSchemas.ts";
+import { PluginContentItemSchema } from "@plugin-manifest/PluginManifest/PluginContentSchema.ts";
 import { PluginDataSlotsSchema } from "@plugin-manifest/PluginManifest/PluginDataSlotSchema.ts";
 import { PluginVizTypeSchema } from "@plugin-manifest/PluginManifest/PluginVizTypeSchema.ts";
 import {
@@ -194,7 +195,8 @@ const BasePluginManifestSchema = z.strictObject({
     .regex(
       ENTRY_PATTERN,
       "must be a relative path to a .ts or .tsx file inside the plugin folder",
-    ),
+    )
+    .optional(),
   icon: IconNameSchema,
   permissions: z.array(z.enum(PLUGIN_PERMISSIONS)).default([]),
   dataSlots: PluginDataSlotsSchema.default({}),
@@ -203,6 +205,7 @@ const BasePluginManifestSchema = z.strictObject({
     menus: MenusSchema.default({}),
     vizTypes: z.array(PluginVizTypeSchema).default([]),
     aiTools: z.array(AiToolSchema).default([]),
+    content: z.array(PluginContentItemSchema).default([]),
   }),
 });
 
@@ -326,6 +329,40 @@ function _refineDataSlots(
   });
 }
 
+function _refineContent(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const seenIds = new Set<string>();
+  manifest.contributes.content.forEach((item, index) => {
+    if (seenIds.has(item.id)) {
+      context.addIssue({
+        code: "custom",
+        path: ["contributes", "content", index, "id"],
+        message: `duplicate content id "${item.id}"`,
+      });
+    }
+    seenIds.add(item.id);
+  });
+}
+
+function _refineEntry(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const { commands, vizTypes, aiTools } = manifest.contributes;
+  const hasCode =
+    commands.length > 0 || vizTypes.length > 0 || aiTools.length > 0;
+  if (hasCode && manifest.entry === undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["entry"],
+      message:
+        "required when the plugin contributes commands, chart types, or AI tools",
+    });
+  }
+}
+
 /**
  * The schema for a compiled `ava.yaml`. Strict: unknown keys fail, so a typo
  * is a build error rather than a silently ignored setting.
@@ -337,6 +374,8 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
     _refineVizTypes(manifest, context);
     _refineAiTools(manifest, context);
     _refineDataSlots(manifest, context);
+    _refineContent(manifest, context);
+    _refineEntry(manifest, context);
   },
 );
 
@@ -395,3 +434,10 @@ export type PluginDataSlot = PluginManifest["dataSlots"][string];
  * or reads its value from a bound record.
  */
 export type PluginDataSlotAttribute = PluginDataSlot["attributes"][string];
+
+/**
+ * A dataset a plugin bundles under `contributes.content`, for example to
+ * offer it in the install wizard or to import it into a workspace.
+ */
+export type PluginContentItem =
+  PluginManifest["contributes"]["content"][number];

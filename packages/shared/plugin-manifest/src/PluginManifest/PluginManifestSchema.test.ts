@@ -885,3 +885,99 @@ describe("PluginManifestSchema dataSlots", () => {
     ).toEqual(["dataSlots.cases.concept"]);
   });
 });
+
+function _makeContentItem(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: "provinces",
+    kind: "dataset",
+    title: "%content.provinces.title%",
+    description: "%content.provinces.description%",
+    file: "content/mz-adm1.csv",
+    ...overrides,
+  };
+}
+
+function _makeContentOnlyManifest(content: unknown[]): Record<string, unknown> {
+  const manifest = _makeValidManifest();
+  delete manifest.entry;
+  return {
+    ...manifest,
+    permissions: [],
+    contributes: { content },
+  };
+}
+
+describe("PluginManifestSchema contributes.content", () => {
+  it("defaults content to an empty list", () => {
+    const parsed = PluginManifestSchema.parse(_makeValidManifest());
+    expect(parsed.contributes.content).toEqual([]);
+  });
+
+  it("accepts a manifest with content and no entry", () => {
+    const parsed = PluginManifestSchema.parse(
+      _makeContentOnlyManifest([_makeContentItem()]),
+    );
+    expect(parsed.entry).toBeUndefined();
+    expect(parsed.contributes.content[0]?.file).toBe("content/mz-adm1.csv");
+  });
+
+  it.each([
+    ["commands", { commands: [{ id: "x", title: "%x%", icon: "puzzle" }] }],
+    ["chart types", { vizTypes: [_makeVizType()] }],
+    ["AI tools", { aiTools: [_makeAiTool()] }],
+  ])(
+    "requires an entry when the plugin contributes %s",
+    (_label, contributes) => {
+      const manifest = _makeContentOnlyManifest([]);
+      manifest.contributes = contributes;
+      expect(_getIssues(manifest)).toEqual([
+        {
+          path: "entry",
+          message:
+            "required when the plugin contributes commands, chart types, or AI tools",
+        },
+      ]);
+    },
+  );
+
+  it("rejects duplicate content ids", () => {
+    const manifest = _makeContentOnlyManifest([
+      _makeContentItem(),
+      _makeContentItem({ file: "content/other.csv" }),
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.content.1.id",
+        message: 'duplicate content id "provinces"',
+      },
+    ]);
+  });
+
+  it.each([
+    ["a file that is not a .csv", "content/mz-adm1.json"],
+    ["an absolute path", "/content/mz-adm1.csv"],
+    ["a path that leaves the plugin folder", "../mz-adm1.csv"],
+  ])("rejects %s", (_label, file) => {
+    const manifest = _makeContentOnlyManifest([_makeContentItem({ file })]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.content.0.file",
+        message:
+          "must be a relative path to a .csv file inside the plugin folder",
+      },
+    ]);
+  });
+
+  it("rejects a content kind other than dataset", () => {
+    const manifest = _makeContentOnlyManifest([
+      _makeContentItem({ kind: "map" }),
+    ]);
+    expect(
+      _getIssues(manifest).map((issue) => {
+        return issue.path;
+      }),
+    ).toEqual(["contributes.content.0.kind"]);
+  });
+});

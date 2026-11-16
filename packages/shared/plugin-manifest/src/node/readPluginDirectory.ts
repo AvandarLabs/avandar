@@ -1,25 +1,32 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { compileManifest } from "@plugin-manifest/compileManifest/compileManifest.ts";
 import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginManifestError/PluginManifestError.ts";
 import { getUnapprovedDependenciesFromPackageJson } from "@plugin-manifest/dependencies/getUnapprovedDependenciesFromPackageJson.ts";
 import { makeTablerComponentNameFromIconName } from "@plugin-manifest/icons/makeTablerComponentNameFromIconName.ts";
+import { MAX_CONTENT_FILE_BYTES } from "@plugin-manifest/PluginManifest/PluginContentSchema.ts";
 import { z } from "zod";
 import type { CompiledPluginManifest } from "@plugin-manifest/compileManifest/compileManifest.ts";
+import type { PluginContentItem } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import type { PluginLocaleMessages } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 
 /**
  * A plugin folder read from disk and fully validated, so a caller can use it
  * without re-checking anything. `readPluginDirectory` and `readBundledPlugins`
- * return it, for example to a Vite plugin that bundles `entryPath` or to a
- * command that reports on the folder.
+ * return it, for example to a Vite plugin that bundles `entryPath` and
+ * `contentPathsById` or to a command that reports on the folder.
  */
 export type PluginDirectory = Readonly<{
   /** The folder's own name, such as `hello` for `plugins/hello`. */
   folderName: string;
   directory: string;
-  /** The manifest's `entry` file, joined onto `directory`. */
-  entryPath: string;
+  /**
+   * The manifest's `entry` file, joined onto `directory`. Undefined for a
+   * plugin with no code, such as one that only bundles content.
+   */
+  entryPath: string | undefined;
+  /** Each content item's file, joined onto `directory`, by content id. */
+  contentPathsById: Readonly<Record<string, string>>;
   compiled: CompiledPluginManifest;
   /** Every message in every `locales/<lang>.json`, not only referenced ones. */
   locales: PluginLocaleMessages;
@@ -185,6 +192,36 @@ function _getIconIssues(options: {
   });
 }
 
+function _getEntryIssues(options: {
+  directory: string;
+  entry: string | undefined;
+}): string[] {
+  const { directory, entry } = options;
+  return entry === undefined || existsSync(join(directory, entry))
+    ? []
+    : [`entry: ${entry} does not exist`];
+}
+
+function _getContentIssues(options: {
+  directory: string;
+  content: readonly PluginContentItem[];
+}): string[] {
+  return options.content.flatMap((item, index) => {
+    const label = `contributes.content.${index}.file: ${item.file}`;
+    const stats = statSync(join(options.directory, item.file), {
+      throwIfNoEntry: false,
+    });
+    if (stats === undefined || !stats.isFile()) {
+      return [`${label} does not exist`];
+    }
+    return stats.size > MAX_CONTENT_FILE_BYTES
+      ? [
+          `${label} is ${stats.size} bytes, over the ${MAX_CONTENT_FILE_BYTES} byte limit`,
+        ]
+      : [];
+  });
+}
+
 function _getFileIssues(options: {
   directory: string;
   repoRoot: string;
@@ -192,16 +229,17 @@ function _getFileIssues(options: {
   packageJson: PackageJson;
 }): string[] {
   const { directory, repoRoot, compiled, packageJson } = options;
-  const entryIssues = existsSync(join(directory, compiled.manifest.entry))
-    ? []
-    : [`entry: ${compiled.manifest.entry} does not exist`];
   const dependencyIssues = getUnapprovedDependenciesFromPackageJson(
     packageJson,
   ).map((name) => {
     return `dependency "${name}" is not approved for plugins`;
   });
   return [
-    ...entryIssues,
+    ..._getEntryIssues({ directory, entry: compiled.manifest.entry }),
+    ..._getContentIssues({
+      directory,
+      content: compiled.manifest.contributes.content,
+    }),
     ..._getIconIssues({ repoRoot, compiled }),
     ...dependencyIssues,
   ];
@@ -223,7 +261,8 @@ function _readSupportingFiles(options: {
 /**
  * Reads one plugin folder from disk into a validated `PluginDirectory`: its
  * `ava.yaml` compiled against its `locales/*.json` files, plus checks that
- * the entry file exists, every icon is a real Tabler icon, and every
+ * the entry file and every content file exist, no content file is over
+ * `MAX_CONTENT_FILE_BYTES`, every icon is a real Tabler icon, and every
  * `package.json` dependency is approved.
  *
  * Use it wherever a plugin's source must be loaded and trusted, such as a
@@ -232,7 +271,7 @@ function _readSupportingFiles(options: {
  * Throws `PluginManifestError` for the first stage that finds problems and
  * lists every problem within that stage. The stages run in order: malformed
  * locale files or `package.json`, then `ava.yaml` compilation, then the
- * entry, icon, and dependency checks.
+ * entry, content, icon, and dependency checks.
  */
 export function readPluginDirectory(options: {
   directory: string;
@@ -260,10 +299,16 @@ export function readPluginDirectory(options: {
   if (issues.length > 0) {
     throw new PluginManifestError({ sourcePath, issues });
   }
+  const { entry, contributes } = compiled.manifest;
   return {
     folderName: basename(directory),
     directory,
-    entryPath: join(directory, compiled.manifest.entry),
+    entryPath: entry === undefined ? undefined : join(directory, entry),
+    contentPathsById: Object.fromEntries(
+      contributes.content.map((item) => {
+        return [item.id, join(directory, item.file)];
+      }),
+    ),
     compiled,
     locales,
   };

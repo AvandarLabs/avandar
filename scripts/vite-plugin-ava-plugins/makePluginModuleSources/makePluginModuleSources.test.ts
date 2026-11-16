@@ -29,6 +29,12 @@ const PLUGIN = {
   locales: { en: { t: "Linear regression", "modal.fit": "Fit regression" } },
 } as unknown as PluginDirectory;
 
+/** A copy of `PLUGIN` with no entry, as a plugin with only content has. */
+const PLUGIN_WITHOUT_ENTRY = {
+  ...PLUGIN,
+  entryPath: undefined,
+} as PluginDirectory;
+
 /** A copy of `PLUGIN` whose plugin icon and command icons are replaced. */
 function _makePluginWithIcons(options: {
   pluginIcon: string;
@@ -100,6 +106,20 @@ describe("makeIndexModuleSourceFromPlugins", () => {
     expect(code).toContain('import("/plugins/epidemiology/src/index.tsx")');
     expect(code).toContain(
       'import("virtual:ava-plugin-locales/avandar.epidemiology")',
+    );
+  });
+
+  it("gives a plugin with no entry a loadCode that imports only its locales and returns an empty definition", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITHOUT_ENTRY],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain("/plugins/epidemiology/src/index.tsx");
+    expect(code).toContain(
+      'const locales = await import("virtual:ava-plugin-locales/avandar.epidemiology");',
+    );
+    expect(code).toContain(
+      'definition: { kind: "avandar-plugin", commands: {}, vizTypes: {}, aiTools: {} }',
     );
   });
 

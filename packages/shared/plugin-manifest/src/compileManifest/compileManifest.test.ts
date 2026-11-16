@@ -127,6 +127,20 @@ function _omitDataSlotMessage(key: string): Record<string, string> {
   );
 }
 
+const CONTENT_YAML = `${VALID_YAML}  content:
+    - id: provinces
+      kind: dataset
+      title: "%content.provinces.title%"
+      description: "%content.provinces.description%"
+      file: content/mz-adm1.csv
+`;
+
+const CONTENT_EN_MESSAGES: Record<string, string> = {
+  ...LOCALES.en,
+  "content.provinces.title": "Provinces",
+  "content.provinces.description": "Province boundaries.",
+};
+
 describe("compileManifest", () => {
   it("returns the manifest and only the strings it references", () => {
     const { manifest, strings } = _compile(VALID_YAML);
@@ -340,6 +354,21 @@ describe("compileManifest", () => {
         "viz.caption": "Caption",
         "viz.caption.placeholder": "Add a caption",
       });
+    });
+  });
+
+  describe("content strings", () => {
+    it.each([
+      ["title", "content.provinces.title"],
+      ["description", "content.provinces.description"],
+    ])("requires a content item's %s in locales/en.json", (_label, key) => {
+      const messages = { ...CONTENT_EN_MESSAGES };
+      delete messages[key];
+      expect(
+        _getIssues(() => {
+          return _compile(CONTENT_YAML, { en: messages });
+        }),
+      ).toEqual([`"${key}" is referenced but missing from locales/en.json`]);
     });
   });
 

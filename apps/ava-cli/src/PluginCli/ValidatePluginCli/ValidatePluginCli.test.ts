@@ -36,6 +36,42 @@ function _writeValidPlugin(name: string): void {
   });
 }
 
+// A plugin folder with no entry that only bundles one content file, so it
+// has no code for tsc or eslint to check.
+function _writeContentOnlyPlugin(name: string): void {
+  _writeRepoFile(
+    `plugins/${name}/ava.yaml`,
+    [
+      `id: avandar.${name}`,
+      'name: "%plugin.name%"',
+      'description: "%plugin.description%"',
+      'version: "0.1.0"',
+      "license: MIT",
+      "engines:",
+      '  avandar: "^1"',
+      "icon: puzzle",
+      "contributes:",
+      "  content:",
+      "    - id: provinces",
+      "      kind: dataset",
+      '      title: "%content.provinces.title%"',
+      '      description: "%content.provinces.description%"',
+      "      file: content/provinces.csv",
+      "",
+    ].join("\n"),
+  );
+  _writeRepoFile(
+    `plugins/${name}/locales/en.json`,
+    JSON.stringify({
+      "plugin.name": "Boundaries",
+      "plugin.description": "Province boundaries.",
+      "content.provinces.title": "Provinces",
+      "content.provinces.description": "Province boundaries.",
+    }),
+  );
+  _writeRepoFile(`plugins/${name}/content/provinces.csv`, "code,name\n");
+}
+
 function _writeBundledList(names: string[]): void {
   _writeRepoFile(
     "plugins/bundled.yaml",
@@ -148,6 +184,16 @@ describe("validatePluginCommand", () => {
     }).toThrow(/1 plugin failed validation/);
     expect(runCommand).not.toHaveBeenCalled();
     expect(_getLoggedLines().join("\n")).toContain("ava.yaml not found");
+  });
+
+  it("skips tsc and eslint for a plugin with no code and reports it valid", () => {
+    _writeContentOnlyPlugin("boundaries");
+    const runCommand = _makePassingRunCommand();
+    validatePluginCommand({ name: "boundaries", repoRoot, runCommand });
+    expect(runCommand).not.toHaveBeenCalled();
+    const output = _getLoggedLines().join("\n");
+    expect(output).toContain("No plugin code, skipping tsc and eslint.");
+    expect(output).toContain("plugins/boundaries is valid.");
   });
 
   it("refuses a name that is not kebab-case before running anything", () => {

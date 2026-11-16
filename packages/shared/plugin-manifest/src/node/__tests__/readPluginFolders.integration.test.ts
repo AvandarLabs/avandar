@@ -23,6 +23,33 @@ contributes:
       icon: hand-stop
 `;
 
+const CONTENT_MANIFEST_YAML = `
+id: avandar.boundaries
+name: "%plugin.name%"
+description: "%plugin.description%"
+version: "0.1.0"
+license: MIT
+engines:
+  avandar: "^1"
+icon: puzzle
+contributes:
+  content:
+    - id: provinces
+      kind: dataset
+      title: "%content.provinces.title%"
+      description: "%content.provinces.description%"
+      file: content/provinces.csv
+`;
+
+const CONTENT_LOCALE_MESSAGES = {
+  "plugin.name": "Boundaries",
+  "plugin.description": "Province boundaries.",
+  "content.provinces.title": "Provinces",
+  "content.provinces.description": "Province boundaries of a country.",
+};
+
+const MAX_CONTENT_FILE_BYTES = 1_048_576;
+
 let repoRoot: string;
 
 const ICONS_DIRECTORY_PATH = "node_modules/@tabler/icons-react/dist/esm/icons";
@@ -95,6 +122,21 @@ function _writePluginWithVizTypeIcon(iconName: string): string {
       }),
     },
   });
+}
+
+/**
+ * Writes a plugin with no entry and one content item. `contentFile` is the
+ * content file's contents, or undefined to leave the file out.
+ */
+function _writeContentPlugin(contentFile: string | undefined): string {
+  const directory = _writePlugin("boundaries", {
+    yaml: CONTENT_MANIFEST_YAML,
+    localeFiles: { "en.json": JSON.stringify(CONTENT_LOCALE_MESSAGES) },
+  });
+  if (contentFile !== undefined) {
+    _writeFile(join(directory, "content/provinces.csv"), contentFile);
+  }
+  return directory;
 }
 
 beforeEach(() => {
@@ -182,6 +224,45 @@ describe("readPluginDirectory", () => {
         return vizType.icon;
       }),
     ).toEqual(["chart-histogram"]);
+  });
+
+  it("returns no entry path and each content file's absolute path for a plugin without code", () => {
+    const directory = _writeContentPlugin("code,name\nMZ-P,Cabo Delgado\n");
+    const plugin = readPluginDirectory({ directory, repoRoot });
+    expect(plugin.entryPath).toBeUndefined();
+    expect(plugin.contentPathsById).toEqual({
+      provinces: join(directory, "content/provinces.csv"),
+    });
+  });
+
+  it("reports a content file that does not exist", () => {
+    const directory = _writeContentPlugin(undefined);
+    expect(
+      _getError(() => {
+        return readPluginDirectory({ directory, repoRoot });
+      }).issues,
+    ).toEqual([
+      "contributes.content.0.file: content/provinces.csv does not exist",
+    ]);
+  });
+
+  it("reports a content file one byte over the 1 MiB limit", () => {
+    const directory = _writeContentPlugin(
+      "a".repeat(MAX_CONTENT_FILE_BYTES + 1),
+    );
+    expect(
+      _getError(() => {
+        return readPluginDirectory({ directory, repoRoot });
+      }).issues,
+    ).toEqual([
+      "contributes.content.0.file: content/provinces.csv is 1048577 bytes, over the 1048576 byte limit",
+    ]);
+  });
+
+  it("accepts a content file of exactly 1 MiB", () => {
+    const directory = _writeContentPlugin("a".repeat(MAX_CONTENT_FILE_BYTES));
+    const plugin = readPluginDirectory({ directory, repoRoot });
+    expect(Object.keys(plugin.contentPathsById)).toEqual(["provinces"]);
   });
 
   it("reports ava.yaml not found for a plugin folder without one", () => {
