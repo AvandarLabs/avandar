@@ -734,14 +734,6 @@ msgstr "Checking these records"
 msgid "NYS measles case report"
 msgstr "NYS measles case report"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
-"differed from the import preview and have been overwritten with the "
-"actual values."
-msgstr "Detected column types for {changedCount} columns in "
-"\"{sourceFileName}\" differed from the import preview and have been "
-"overwritten with the actual values."
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "Geometry"
@@ -1461,6 +1453,10 @@ msgstr "Bubble Chart"
 msgid "Restart tutorial"
 msgstr "Restart tutorial"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" finished processing and is ready to use."
+msgstr "\"{displayName}\" finished processing and is ready to use."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
 msgstr "{publisher} · version {version} · {license} license"
@@ -1528,6 +1524,12 @@ msgstr "Design case types in chat"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
 msgstr "Choose a default status."
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{displayName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr "Detected column types for 1 column in \"{displayName}\" differed from "
+"the import preview and have been overwritten with the actual values."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1720,6 +1722,10 @@ msgstr "No layers yet."
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Label {rowNumber}"
 msgstr "Label {rowNumber}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
+msgid "Could not read these records."
+msgstr "Could not read these records."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -2314,6 +2320,10 @@ msgstr "{fieldName} per month"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "Coordinate is 0, 0"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
+msgid "Failed"
+msgstr "Failed"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
@@ -3724,13 +3734,6 @@ msgstr "Payment Methods"
 msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
 msgstr "{applied, plural, one {# filter applied} other {# filters applied}}"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
-"the import preview and have been overwritten with the actual values."
-msgstr "Detected column types for 1 column in \"{sourceFileName}\" differed "
-"from the import preview and have been overwritten with the actual "
-"values."
-
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No values were returned from {column}. Describe what you need instead."
@@ -3911,10 +3914,6 @@ msgstr "{0} duplicate boundary keys"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
 msgstr "Fix the custom URL before publishing."
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr "\"{sourceFileName}\" finished processing and is ready to use."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{attachedCount, plural, one {# attached as reference} other {# attached "
@@ -6126,6 +6125,14 @@ msgstr "Preparing offline models"
 msgid "URL template"
 msgstr "URL template"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{displayName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr "Detected column types for {changedCount} columns in \"{displayName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google is rate limiting this request"
 msgstr "Google is rate limiting this request"
@@ -6331,10 +6338,6 @@ msgstr "No {conceptName} records yet"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "More dataset actions"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
-msgid "Failed: {reason}"
-msgstr "Failed: {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -9795,10 +9798,6 @@ msgstr "Rows from this chart"
 msgid "member"
 msgstr "member"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr "\"{sourceFileName}\" could not be parsed: {message}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
 msgstr "Typography"
@@ -12162,6 +12161,10 @@ msgid "Suggestions need a connection or the offline model. Labeling still "
 msgstr "Suggestions need a connection or the offline model. Labeling still "
 "works."
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed: {message}"
+msgstr "\"{displayName}\" could not be parsed: {message}"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
 msgstr "Choose what to read"
@@ -13101,10 +13104,6 @@ msgstr "This record's fields failed to load"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "{percentLabel}% of the datasets read"
 msgstr "{percentLabel}% of the datasets read"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
-msgid "Could not read these records. {reason}"
-msgstr "Could not read these records. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -14067,6 +14066,10 @@ msgstr "Previewing this dashboard"
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 msgid "Show as link"
 msgstr "Show as link"
+
+#: src/components/UntranslatedDetail/UntranslatedDetail.tsx
+msgid "Details:"
+msgstr "Details:"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx

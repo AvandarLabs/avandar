@@ -195,7 +195,7 @@ msgstr "儲存格大小（公尺）"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Could not remove the records for {slotTitle}"
-msgstr "無法移除 {slotTitle} 的紀錄"
+msgstr "無法移除 {slotTitle} 的記錄"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
@@ -340,7 +340,7 @@ msgstr "直接改寫已上傳的資料。資料會同步至工作區，因此所
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Records it reads"
-msgstr "它讀取的紀錄"
+msgstr "它讀取的記錄"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
 msgid "Becomes empty"
@@ -709,17 +709,11 @@ msgstr "備註"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Checking these records"
-msgstr "正在檢查這些紀錄"
+msgstr "正在檢查這些記錄"
 
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "NYS measles case report"
 msgstr "NYS 麻疹病例通報"
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
-"differed from the import preview and have been overwritten with the "
-"actual values."
-msgstr "在 \"{sourceFileName}\" 中檢測到 {changedCount} 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
@@ -1236,7 +1230,7 @@ msgstr "回覆中…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}"
-msgstr "移除 {slotTitle} 的紀錄"
+msgstr "移除 {slotTitle} 的記錄"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
@@ -1421,6 +1415,10 @@ msgstr "泡泡圖"
 msgid "Restart tutorial"
 msgstr "重新開始教學"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" finished processing and is ready to use."
+msgstr "\"{displayName}\" 處理完成，準備使用。"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
 msgstr "{publisher} · 版本 {version} · {license} 授權"
@@ -1485,6 +1483,11 @@ msgstr "在聊天中設計個案類型"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
 msgstr "選擇預設狀態。"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{displayName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr "在 \"{displayName}\" 中檢測到 1 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1601,7 +1604,7 @@ msgstr "資料集載入失敗"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSampleTable.tsx
 msgid "First rows of {slotTitle}"
-msgstr "{slotTitle} 的前幾筆紀錄"
+msgstr "{slotTitle} 的前幾列"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "No keywords"
@@ -1671,6 +1674,10 @@ msgstr "目前尚無圖層。"
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Label {rowNumber}"
 msgstr "標記 {rowNumber}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
+msgid "Could not read these records."
+msgstr "無法讀取這些記錄。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -2242,6 +2249,10 @@ msgstr "{fieldName}（每月）"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "座標為 0, 0"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
+msgid "Failed"
+msgstr "失敗"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
@@ -3106,7 +3117,7 @@ msgstr "來自這些區塊的列"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 msgid "Choose records for {slotTitle}"
-msgstr "選擇 {slotTitle} 的紀錄"
+msgstr "選擇 {slotTitle} 的記錄"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -3311,7 +3322,7 @@ msgstr "此對照表包含您無法開啟的資料集，因此只有能開啟所
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Case type or dataset"
-msgstr "案件類型或資料集"
+msgstr "個案類型或資料集"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
@@ -3319,7 +3330,7 @@ msgstr "您需要具備 Data Sources 的編輯存取權限才能變更此對照�
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The case type or dataset was deleted, or you cannot read it."
-msgstr "案件類型或資料集已刪除，或您沒有讀取權限。"
+msgstr "個案類型或資料集已刪除，或您沒有讀取權限。"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Spaces trimmed, UPPERCASE"
@@ -3620,11 +3631,6 @@ msgstr "付款方式"
 msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
 msgstr "{applied, plural, one {已套用 # 個篩選條件} other {已套用 # 個篩選條件}}"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
-"the import preview and have been overwritten with the actual values."
-msgstr "在 \"{sourceFileName}\" 中檢測到 1 列的類型與匯入預覽不同，已被實際值覆蓋。"
-
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
@@ -3749,7 +3755,7 @@ msgstr "正式環境報表複本"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 msgid "Ask a workspace admin to choose which records this plugin reads."
-msgstr "請工作區管理員選擇此外掛程式讀取的紀錄。"
+msgstr "請工作區管理員選擇此外掛讀取的記錄。"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
 msgid "No dictionary matches these columns yet"
@@ -3801,10 +3807,6 @@ msgstr "{0} 個重複的邊界鍵"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
 msgstr "請先修正自訂 URL，再發布。"
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr "\"{sourceFileName}\" 處理完成，準備使用。"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{attachedCount, plural, one {# attached as reference} other {# attached "
@@ -4362,7 +4364,7 @@ msgstr "圖徵清單"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "No case types or datasets match"
-msgstr "沒有符合的案件類型或資料集"
+msgstr "沒有符合的個案類型或資料集"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4838,7 +4840,7 @@ msgstr "正在準備「{0}」。大型資料集第一次開啟可能需要幾分
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Saved the records for {slotTitle}"
-msgstr "已儲存 {slotTitle} 的紀錄"
+msgstr "已儲存 {slotTitle} 的記錄"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -4994,7 +4996,7 @@ msgstr "離線模型已在這台電腦上。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "{pluginName} stops reading them until someone chooses records again."
-msgstr "在有人再次選擇紀錄前，{pluginName} 會停止讀取這些紀錄。"
+msgstr "在有人再次選擇記錄前，{pluginName} 會停止讀取這些記錄。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "A deleted dictionary"
@@ -5929,7 +5931,7 @@ msgstr "CSV 檔案"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Could not save the records for {slotTitle}"
-msgstr "無法儲存 {slotTitle} 的紀錄"
+msgstr "無法儲存 {slotTitle} 的記錄"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
@@ -5943,6 +5945,12 @@ msgstr "正在準備離線模型"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "URL 範本"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{displayName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr "在 \"{displayName}\" 中檢測到 {changedCount} 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google is rate limiting this request"
@@ -6144,10 +6152,6 @@ msgstr "尚無 {conceptName} 記錄"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "更多資料集動作"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
-msgid "Failed: {reason}"
-msgstr "失敗：{reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -6620,7 +6624,7 @@ msgstr "資料集詳細資料"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Case type: {name}"
-msgstr "案件類型：{name}"
+msgstr "個案類型：{name}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
@@ -6979,7 +6983,7 @@ msgstr "哪個 {groupByColumn} 的 {measureColumn} 總計最高？"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Could not load the records this plugin reads."
-msgstr "無法載入此外掛程式讀取的紀錄。"
+msgstr "無法載入此外掛讀取的記錄。"
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -7888,7 +7892,7 @@ msgstr "您可以查看此資料集，因為它已與您共享。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "{pluginName} needs these records before it can be installed."
-msgstr "{pluginName} 需要這些紀錄才能安裝。"
+msgstr "{pluginName} 需要這些記錄才能安裝。"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: breaks.length
@@ -8322,7 +8326,7 @@ msgstr "登出失敗"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "The records you choose for it, when someone runs one of its tools"
-msgstr "有人執行其工具時，您為它選擇的紀錄"
+msgstr "有人執行其工具時，您為它選擇的記錄"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
@@ -8860,7 +8864,7 @@ msgstr "正在為可視化準備數據…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose the records for {slotTitle}"
-msgstr "選擇 {slotTitle} 的紀錄"
+msgstr "選擇 {slotTitle} 的記錄"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a select field"
@@ -8928,7 +8932,7 @@ msgstr "創建新帳戶"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "{pluginName} reads these records when someone runs one of its tools."
-msgstr "有人執行其工具時，{pluginName} 會讀取這些紀錄。"
+msgstr "有人執行其工具時，{pluginName} 會讀取這些記錄。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
 msgid "Your reaction could not be saved. Try again."
@@ -9512,10 +9516,6 @@ msgstr "來自這張圖表的列"
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 msgid "member"
 msgstr "成員"
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr "\"{sourceFileName}\" 無法解析：{message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
@@ -10203,7 +10203,7 @@ msgstr "折線圖"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSummary.tsx
 msgid "{title}: {filledCount} of {rowCount} have a value"
-msgstr "{title}：{filledCount} / {rowCount} 個已有值"
+msgstr "{title}：{rowCount} 筆中有 {filledCount} 筆有值"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -11387,7 +11387,7 @@ msgstr "載入數據集中…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Each one becomes a dataset in this workspace that every member can use."
-msgstr "每個記錄都會成為此工作區中的資料集，所有成員都可以使用。"
+msgstr "每一項都會成為此工作區中的資料集，所有成員都可以使用。"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
 msgid "Refreshing {conceptName} records…"
@@ -11666,7 +11666,7 @@ msgstr "{threshold} 或以上"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr "關於此外掛程式"
+msgstr "關於此外掛"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -11810,6 +11810,10 @@ msgstr "適用於以其他方式寫入相同值的資料，例如使用 M 和 F 
 msgid "Suggestions need a connection or the offline model. Labeling still "
 "works."
 msgstr "建議需要網路連線或離線模型。標記功能仍可使用。"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed: {message}"
+msgstr "\"{displayName}\" 無法解析：{message}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
@@ -12387,7 +12391,7 @@ msgstr "在 {serviceName} 上開啟"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr "選用項目。您稍後可以在外掛程式卡片上選擇這些記錄。"
+msgstr "選用項目。您稍後可以在外掛卡片上選擇這些記錄。"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -12723,10 +12727,6 @@ msgstr "此記錄的欄位載入失敗"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "{percentLabel}% of the datasets read"
 msgstr "已讀取資料集的 {percentLabel}%"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
-msgid "Could not read these records. {reason}"
-msgstr "無法讀取這些記錄。{reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -13660,6 +13660,10 @@ msgstr "預覽此儀表板"
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 msgid "Show as link"
 msgstr "顯示為連結"
+
+#: src/components/UntranslatedDetail/UntranslatedDetail.tsx
+msgid "Details:"
+msgstr "詳細資料："
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
@@ -15256,7 +15260,7 @@ msgstr "距離（{unitLabel}）"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr "此外掛程式不再包含 {filePath}。"
+msgstr "此外掛不再包含 {filePath}。"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"

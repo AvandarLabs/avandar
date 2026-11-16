@@ -746,14 +746,6 @@ msgstr "Inakagua rekodi hizi"
 msgid "NYS measles case report"
 msgstr "Ripoti ya kisa cha surua ya NYS"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
-"differed from the import preview and have been overwritten with the "
-"actual values."
-msgstr "Aina za safu zilizogundulika kwa {changedCount} safu katika "
-"\"{sourceFileName}\" zilitofautiana na muonekano wa kuagiza na "
-"zimeandikwa upya kwa thamani halisi."
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "Jiometri"
@@ -1480,6 +1472,10 @@ msgstr "Chati ya Viputo"
 msgid "Restart tutorial"
 msgstr "Anzisha upya mafunzo"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" finished processing and is ready to use."
+msgstr "\"{displayName}\" imekamilisha usindikaji na iko tayari kutumika."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
 msgstr "{publisher} · toleo la {version} · leseni ya {license}"
@@ -1548,6 +1544,13 @@ msgstr "Buni aina za kesi kwenye mazungumzo"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
 msgstr "Chagua hali chaguo-msingi."
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{displayName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr "Aina za safu zilizogundulika kwa safu 1 katika \"{displayName}\" "
+"zilitofautiana na muonekano wa kuagiza na zimeandikwa upya kwa thamani "
+"halisi."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1742,6 +1745,10 @@ msgstr "Bado hakuna safu."
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Label {rowNumber}"
 msgstr "Lebo {rowNumber}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
+msgid "Could not read these records."
+msgstr "Haikuweza kusoma rekodi hizi."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -2345,6 +2352,10 @@ msgstr "{fieldName} kwa mwezi"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "Kuratibu ni 0, 0"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
+msgid "Failed"
+msgstr "Imeshindikana"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
@@ -3777,13 +3788,6 @@ msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
 msgstr "{applied, plural, one {# kichujio kimetumika} other {vichujio # "
 "vimetumika}}"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
-"the import preview and have been overwritten with the actual values."
-msgstr "Aina za safu zilizogundulika kwa safu 1 katika \"{sourceFileName}\" "
-"zilitofautiana na muonekano wa kuagiza na zimeandikwa upya kwa thamani "
-"halisi."
-
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "Hakuna thamani zilizorejeshwa kutoka {column}. Eleza unachohitaji "
@@ -3912,8 +3916,7 @@ msgstr "Nakili ya ripoti ya uzalishaji"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 msgid "Ask a workspace admin to choose which records this plugin reads."
-msgstr "Mwombe msimamizi wa workspace achague rekodi ambazo programu-jalizi hii "
-"inasoma."
+msgstr "Mwombe msimamizi wa workspace achague rekodi ambazo plugin hii inasoma."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
 msgid "No dictionary matches these columns yet"
@@ -3967,10 +3970,6 @@ msgstr "Vifunguo {0} vya mipaka vilivyorudiwa"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
 msgstr "Rekebisha URL maalum kabla ya kuchapisha."
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr "\"{sourceFileName}\" imekamilisha usindikaji na iko tayari kutumika."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{attachedCount, plural, one {# attached as reference} other {# attached "
@@ -6208,6 +6207,14 @@ msgstr "Inaandaa modeli za nje ya mtandao"
 msgid "URL template"
 msgstr "Kiolezo cha URL"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{displayName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr "Aina za safu zilizogundulika kwa {changedCount} safu katika "
+"\"{displayName}\" zilitofautiana na muonekano wa kuagiza na zimeandikwa "
+"upya kwa thamani halisi."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google is rate limiting this request"
 msgstr "Google inapunguza kasi ya maombi haya"
@@ -6415,10 +6422,6 @@ msgstr "Bado hakuna rekodi za {conceptName}"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "Vitendo zaidi vya seti ya data"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
-msgid "Failed: {reason}"
-msgstr "Imeshindikana: {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -7282,7 +7285,7 @@ msgstr "Ni {groupByColumn} ipi iliyo na jumla ya juu zaidi ya {measureColumn}?"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Could not load the records this plugin reads."
-msgstr "Haikuwezekana kupakia rekodi ambazo programu-jalizi hii inasoma."
+msgstr "Haikuwezekana kupakia rekodi ambazo plugin hii inasoma."
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -9915,10 +9918,6 @@ msgstr "Mistari kutoka kwenye chati hii"
 msgid "member"
 msgstr "mwanachama"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr "\"{sourceFileName}\" haiwezi kuchambuliwa: {message}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
 msgstr "Uchapaji"
@@ -11069,8 +11068,8 @@ msgstr "Mmiliki pekee ndiye anayeweza kuweka {resource} hii kuwa ya faragha."
 #. placeholder {0}: props.contentCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# dataset to import} other {# datasets to import}}"
-msgstr "{0, plural, one {# seti data ya kuleta} other {# seti za data za "
-"kuleta}}"
+msgstr "{0, plural, one {# seti ya data ya kuingiza} other {# seti za data za "
+"kuingiza}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
@@ -11733,7 +11732,7 @@ msgstr "Kamusi imefutwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Importing"
-msgstr "Inaleta"
+msgstr "Inaingizwa"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -12161,7 +12160,7 @@ msgstr "{threshold} au zaidi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr "Kuhusu programu-jalizi hii"
+msgstr "Kuhusu plugin hii"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -12309,6 +12308,10 @@ msgid "Suggestions need a connection or the offline model. Labeling still "
 "works."
 msgstr "Mapendekezo yanahitaji muunganisho au modeli ya nje ya mtandao. Uwekaji "
 "wa lebo bado unafanya kazi."
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed: {message}"
+msgstr "\"{displayName}\" haiwezi kuchambuliwa: {message}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
@@ -12734,7 +12737,7 @@ msgstr "Kundi la tabaka"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Datasets to import"
-msgstr "Seti za data za kuleta"
+msgstr "Seti za data za kuingiza"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed, back to the original values"
@@ -12908,8 +12911,7 @@ msgstr "Fungua kwenye {serviceName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr "Si lazima. Unaweza kuchagua rekodi hizi baadaye kwenye kadi ya "
-"programu-jalizi."
+msgstr "Si lazima. Unaweza kuchagua rekodi hizi baadaye kwenye kadi ya plugin."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -13256,10 +13258,6 @@ msgstr "Imeshindwa kupakia sehemu za rekodi hii"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "{percentLabel}% of the datasets read"
 msgstr "{percentLabel}% ya seti za data zilizosomwa"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
-msgid "Could not read these records. {reason}"
-msgstr "Haikuweza kusoma rekodi hizi. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -14231,6 +14229,10 @@ msgstr "Kuangalia dashibodi hii"
 msgid "Show as link"
 msgstr "Onyesha kama kiungo"
 
+#: src/components/UntranslatedDetail/UntranslatedDetail.tsx
+msgid "Details:"
+msgstr "Maelezo:"
+
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
@@ -14306,7 +14308,7 @@ msgstr "Pakia seti ya data"
 msgid "Its features are removed from this workspace. The datasets it imported "
 "stay in Data Sources."
 msgstr "Vipengele vyake vimeondolewa kwenye nafasi hii ya kazi. Seti za data "
-"ilizoleta zimesalia katika Vyanzo vya Data."
+"ilizoingiza zimesalia katika Vyanzo vya Data."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -14701,7 +14703,7 @@ msgstr "Kwenye ukurasa huu"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Not imported"
-msgstr "Haijaletwa"
+msgstr "Haijaingizwa"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (coded)"
@@ -15889,7 +15891,7 @@ msgstr "Umbali ({unitLabel})"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr "Programu-jalizi hii haijumuishi tena {filePath}."
+msgstr "Plugin hii haijumuishi tena {filePath}."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
