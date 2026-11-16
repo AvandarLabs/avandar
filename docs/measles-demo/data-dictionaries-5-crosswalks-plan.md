@@ -52,7 +52,7 @@ Read once:
   - `src/lib/dataDictionaries/profileDatasetColumns/`, `ColumnProfileSql/` (`DATE_FORMATS_SQL`), `DictionarySuggestions/`.
   - `src/views/DataManagerApp/`: `DataManagerApp.tsx`, `DatasetNavbar/`, `DataManagerToolbarActions/`, `useListPaneToggle/`, `NewDictionaryFromDatasetsView/` (the task-view pattern: header, `Stepper`, step heading, `NewDictionaryFooter`, `PickDatasetsTable`), `ApplyDictionariesView/` (`useTaggedRead`, `usePreviewRows`, `useApplyErrorMessage`), `DataDictionaryView/` (header with an editable name, `DictionaryUsedByTab/`, `useDictionaryUsage/`), and `DatasetMetaView/` (`DatasetActionsMenu/`, `DatasetSourceRail.tsx`, `clearCachedDatasetRows.ts`).
   - `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.ts` (`runQuery`), `src/clients/places/` (`refreshPlacesDatasetCaches`: the cache steps after a virtual dataset's SQL changes).
-  - `src/lib/plugins/derivedColumns/assertSingleSqlExpression/`.
+  - `src/lib/sql/assertSingleSqlExpression/`.
 
 House conventions (unchanged from slice 4):
 

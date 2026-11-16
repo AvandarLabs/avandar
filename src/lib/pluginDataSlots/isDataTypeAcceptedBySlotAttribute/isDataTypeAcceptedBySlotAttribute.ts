@@ -7,7 +7,7 @@ import type { DataSlotAttributeType } from "@avandar/plugin-manifest/runtime";
  * a code. Read when a binding UI lists the fields an attribute may take, and
  * when a saved binding is checked.
  */
-export const DATA_SLOT_ACCEPTED_DATA_TYPES: Readonly<
+const DATA_SLOT_ACCEPTED_DATA_TYPES: Readonly<
   Record<DataSlotAttributeType, readonly AvaDataType.T[]>
 > = {
   number: ["bigint", "double"],
