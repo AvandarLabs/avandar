@@ -9,12 +9,16 @@ import type {
   PluginDataSlot,
 } from "@avandar/plugin-manifest/runtime";
 
-/** Rows `querySlot` returns at most. It queries one more to set isTruncated. */
+/**
+ * Rows `querySlot` returns at most. A caller that wants to detect truncation
+ * passes `QUERY_SLOT_MAX_ROWS + 1` as the `limit` and compares the number of
+ * rows it gets back with `QUERY_SLOT_MAX_ROWS`.
+ */
 export const QUERY_SLOT_MAX_ROWS = 200_000;
 
 /**
- * The SQL type of the NULL an unmapped optional attribute is selected as, so
- * a slot's result has the same column types whatever is mapped.
+ * The SQL type of the NULL an unmapped optional attribute is selected as. A
+ * mapped attribute is not cast: it keeps its source column's own type.
  */
 const NULL_SQL_TYPE_BY_ATTRIBUTE_TYPE: Readonly<
   Record<DataSlotAttributeType, string>
@@ -33,15 +37,38 @@ function _getTableNameFromSource(source: DataSlotSource): string {
     : RelationRef.toTableName({ kind: "dataset", id: source.datasetId });
 }
 
+/** How the SQL names each attribute's output column. */
+type DataSlotColumnAliasStyle = "attributeKey" | "position";
+
+function _getAliasFromAttribute(
+  options: Readonly<{
+    attributeKey: string;
+    index: number;
+    aliasStyle: DataSlotColumnAliasStyle;
+  }>,
+): string {
+  return options.aliasStyle === "position"
+    ? `attr_${options.index}`
+    : options.attributeKey;
+}
+
 /**
  * Makes the SQL that reads a bound data slot: one column per slot attribute,
- * in manifest order, named by the attribute key, from the case type's view or
- * the dataset's relation. An unmapped optional attribute is a typed NULL, so
- * the plugin sees the same columns for every binding and never a workspace
- * field name.
+ * in manifest order, from the case type's view or the dataset's relation.
+ * Output columns are named by the attribute key, so a plugin sees the same
+ * column names for every binding and never a workspace field name. An
+ * unmapped optional attribute is a typed NULL. A mapped attribute keeps its
+ * source column's own type, for example a BIGINT stays a BIGINT.
  *
  * Use it wherever a slot's records are read, for example a command's
  * `querySlot` or the binding check in Settings.
+ *
+ * - `limit`: must be a non-negative safe integer. To detect truncation, pass
+ *   `QUERY_SLOT_MAX_ROWS + 1` and compare the returned row count.
+ * - `aliasStyle`: `"position"` names the columns `attr_0`, `attr_1`, ...
+ *   instead of by attribute key. Use it when the SQL is wrapped by a query
+ *   that refers to the columns, because DuckDB ignores identifier case and
+ *   so would bind `foo` to a `Foo` column.
  */
 export function makeDataSlotSqlFromBinding(
   options: Readonly<{
@@ -51,17 +78,30 @@ export function makeDataSlotSqlFromBinding(
       Record<string, DataSlotSourceField | undefined>
     >;
     limit?: number;
+    aliasStyle?: DataSlotColumnAliasStyle;
   }>,
 ): string {
-  const { slot, source, fieldsByAttributeKey, limit } = options;
+  const {
+    slot,
+    source,
+    fieldsByAttributeKey,
+    limit,
+    aliasStyle = "attributeKey",
+  } = options;
+  if (limit !== undefined && !(Number.isSafeInteger(limit) && limit >= 0)) {
+    throw new Error(
+      `A data slot query limit must be a non-negative integer, got ${limit}`,
+    );
+  }
   const selectList = Object.entries(slot.attributes).map(
-    ([attributeKey, attribute]) => {
+    ([attributeKey, attribute], index) => {
       const field = fieldsByAttributeKey[attributeKey];
       const expression =
         field === undefined
           ? `CAST(NULL AS ${NULL_SQL_TYPE_BY_ATTRIBUTE_TYPE[attribute.type]})`
           : quoteSqlIdentifier(field.columnName);
-      return `${expression} AS ${quoteSqlIdentifier(attributeKey)}`;
+      const alias = _getAliasFromAttribute({ attributeKey, index, aliasStyle });
+      return `${expression} AS ${quoteSqlIdentifier(alias)}`;
     },
   );
   const fromClause = `FROM ${quoteSqlIdentifier(_getTableNameFromSource(source))}`;

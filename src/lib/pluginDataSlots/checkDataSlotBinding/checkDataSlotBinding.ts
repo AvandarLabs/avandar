@@ -1,5 +1,4 @@
 import { isDefined } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { makeDataSlotSqlFromBinding } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
 import { runDataSlotQuery } from "@/lib/pluginDataSlots/runDataSlotQuery/runDataSlotQuery";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -16,6 +15,9 @@ const SAMPLE_ROW_COUNT = 5;
  * What a data slot's current mapping reads: how many rows, how many of them
  * have a value for each slot attribute, and the first rows. The binding UI
  * shows it so an admin can tell the mapping reads what they meant.
+ *
+ * "Filled" means not NULL. An empty or whitespace-only string counts as
+ * filled.
  */
 export type DataSlotCheckResult = Readonly<{
   rowCount: number;
@@ -40,16 +42,20 @@ function _getNumberFromCount(value: unknown): number {
 }
 
 /**
- * Counts every row, and each attribute's non-null rows, of the slot query.
- * Counts are aliased by position, so attribute keys that differ only in
- * case cannot collide.
+ * Counts every row, and each attribute's non-null rows, of a slot query whose
+ * columns are named by position (`attr_0`, ...). Positional names keep the
+ * counts apart for attribute keys that differ only in case, which DuckDB
+ * would treat as one column.
  */
-function _makeCountsSql(
-  options: Readonly<{ attributeKeys: readonly string[]; slotSql: string }>,
+function _buildCountsSql(
+  options: Readonly<{ attributeCount: number; slotSql: string }>,
 ): string {
-  const filledCounts = options.attributeKeys.map((attributeKey, index) => {
-    return `count(${quoteSqlIdentifier(attributeKey)}) AS filled_count_${index}`;
-  });
+  const filledCounts = Array.from(
+    { length: options.attributeCount },
+    (_unused, index) => {
+      return `count(attr_${index}) AS filled_count_${index}`;
+    },
+  );
   return [
     `SELECT count(*) AS row_count, ${filledCounts.join(", ")}`,
     `FROM (${options.slotSql}) AS slot_rows`,
@@ -68,17 +74,24 @@ export async function checkDataSlotBinding(
   const { workspaceId, slot, source, fieldsByAttributeKey } = options;
   const attributeKeys = Object.keys(slot.attributes);
   const mappedFields = Object.values(fieldsByAttributeKey).filter(isDefined);
+  // With nothing mapped this is `undefined`, which loads every source column.
+  // An empty list would ask the query engine to load a dataset with zero
+  // columns, a path nothing else exercises, so the safe default is kept.
   const fields = mappedFields.length > 0 ? mappedFields : undefined;
-  const slotSql = makeDataSlotSqlFromBinding({
+  const countedSlotSql = makeDataSlotSqlFromBinding({
     slot,
     source,
     fieldsByAttributeKey,
+    aliasStyle: "position",
   });
   const counts = await runDataSlotQuery({
     workspaceId,
     source,
     fields,
-    sql: _makeCountsSql({ attributeKeys, slotSql }),
+    sql: _buildCountsSql({
+      attributeCount: attributeKeys.length,
+      slotSql: countedSlotSql,
+    }),
   });
   const sample = await runDataSlotQuery({
     workspaceId,

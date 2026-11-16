@@ -103,6 +103,20 @@ describe("checkDataSlotBinding", () => {
     });
   });
 
+  it("counts the attributes by position, not by attribute key", async () => {
+    _mockQueryResults({
+      row_count: 2n,
+      filled_count_0: 2n,
+      filled_count_1: 0n,
+    });
+
+    await _checkOnsetOnly();
+
+    expect(runQueryMock.mock.calls[0]![0].rawSql).toContain(
+      "count(attr_0) AS filled_count_0, count(attr_1) AS filled_count_1",
+    );
+  });
+
   it("reads counts the engine already returned as numbers", async () => {
     _mockQueryResults({ row_count: 3, filled_count_0: 2, filled_count_1: 0 });
 

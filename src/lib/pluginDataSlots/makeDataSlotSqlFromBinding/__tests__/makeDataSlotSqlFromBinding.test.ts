@@ -134,6 +134,48 @@ describe("makeDataSlotSqlFromBinding", () => {
     );
   });
 
+  it("names columns by position when asked, whatever the attribute keys", () => {
+    expect(
+      makeDataSlotSqlFromBinding({
+        slot: CASES_SLOT,
+        source: DATASET_SOURCE,
+        fieldsByAttributeKey: {
+          onsetDate: ONSET_FIELD,
+          district: undefined,
+        },
+        aliasStyle: "position",
+      }),
+    ).toBe(
+      `SELECT "Onset date" AS "attr_0", CAST(NULL AS VARCHAR) AS "attr_1"\n` +
+        `FROM "${DATASET_ID}"`,
+    );
+  });
+
+  it.each([-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 2 ** 53])(
+    "throws for the limit %s",
+    (limit) => {
+      expect(() => {
+        makeDataSlotSqlFromBinding({
+          slot: CASES_SLOT,
+          source: DATASET_SOURCE,
+          fieldsByAttributeKey: { onsetDate: ONSET_FIELD, district: undefined },
+          limit,
+        });
+      }).toThrow("non-negative integer");
+    },
+  );
+
+  it("accepts a limit of 0", () => {
+    expect(
+      makeDataSlotSqlFromBinding({
+        slot: CASES_SLOT,
+        source: DATASET_SOURCE,
+        fieldsByAttributeKey: { onsetDate: ONSET_FIELD, district: undefined },
+        limit: 0,
+      }),
+    ).toMatch(/\nLIMIT 0$/);
+  });
+
   it.each<[DataSlotAttributeType, string]>([
     ["number", "DOUBLE"],
     ["date", "DATE"],
