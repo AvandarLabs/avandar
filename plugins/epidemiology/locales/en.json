@@ -81,6 +81,13 @@
   "caseEpicurve.stackByDistrict": "Stack by district",
   "caseEpicurve.noDistrict": "None of these cases has a district.",
   "caseEpicurve.empty": "None of these cases has an onset date to chart.",
-  "caseEpicurve.truncated": "Drawn from the first {count, plural, one {# case} other {# cases}}.",
+  "caseEpicurve.truncated": "The slot holds more than {count, number} cases. Only {count, number}, not necessarily the earliest, are counted.",
+  "caseEpicurve.noCases": "No case records yet.",
+  "caseEpicurve.bucketsCapped": "Showing the latest {count, number} {interval, select, day {days} epiWeek {epi weeks} other {months}}. {omitted, plural, one {# earlier case is} other {# earlier cases are}} not charted.",
+  "caseEpicurve.undated": "{count, plural, one {# case has} other {# cases have}} no onset date and {count, plural, one {is} other {are}} not charted.",
+  "caseEpicurve.showTable": "Show as table",
+  "caseEpicurve.hideTable": "Hide table",
+  "caseEpicurve.tableCaption": "Cases in each period of the case epicurve",
+  "caseEpicurve.tableBucket": "Period starting",
   "caseEpicurve.seriesCount": "{series}: {count, number}"
 }

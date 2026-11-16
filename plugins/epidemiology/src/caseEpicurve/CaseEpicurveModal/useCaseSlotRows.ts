@@ -9,6 +9,18 @@ const CASES_SLOT_ID = "cases";
 /** The slot attributes the epicurve reads. */
 const CASE_COLUMNS = ["onsetDate", "district"];
 
+/**
+ * A district with its padding trimmed, or null when nothing is left, so
+ * "Ilala " and "Ilala" are one district and a blank one is no district.
+ */
+function _getTrimmedDistrict(district: unknown): unknown {
+  if (typeof district !== "string") {
+    return district;
+  }
+  const trimmedDistrict = district.trim();
+  return trimmedDistrict === "" ? null : trimmedDistrict;
+}
+
 function _getStateFromError(options: {
   error: unknown;
   t: AvandarApi["i18n"]["t"];
@@ -39,7 +51,13 @@ async function _loadCaseSlotState(avandar: AvandarApi): Promise<CaseSlotState> {
       columns: CASE_COLUMNS,
       limit: slot.rowCount,
     });
-    return { kind: "loaded", rows, isTruncated: slot.isTruncated };
+    return {
+      kind: "loaded",
+      rows: rows.map((row) => {
+        return { ...row, district: _getTrimmedDistrict(row.district) };
+      }),
+      isTruncated: slot.isTruncated,
+    };
   } catch (error) {
     return _getStateFromError({ error, t: avandar.i18n.t });
   }
