@@ -76,6 +76,7 @@ export function PluginSettingsCard({
           pluginName={pluginName}
           headingId={headingId}
           canManage={canManage}
+          hasBundledContent={(manifest?.contributes.content.length ?? 0) > 0}
           actions={actions}
         />
       </Group>

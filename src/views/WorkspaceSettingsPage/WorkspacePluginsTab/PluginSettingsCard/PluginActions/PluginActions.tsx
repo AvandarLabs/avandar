@@ -12,6 +12,9 @@ type Props = Readonly<{
   /** The id of the plugin's card heading, which each action is described by. */
   headingId: string;
   canManage: boolean;
+
+  /** Whether the plugin's manifest bundles datasets that it imports. */
+  hasBundledContent: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -38,6 +41,7 @@ export function PluginActions({
   pluginName,
   headingId,
   canManage,
+  hasBundledContent,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -58,6 +62,7 @@ export function PluginActions({
             pluginName={pluginName}
             headingId={headingId}
             isDisabled={isDisabled}
+            hasBundledContent={hasBundledContent}
             actions={actions}
           />
         );

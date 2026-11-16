@@ -13,11 +13,15 @@ export type PluginActionCopy = Readonly<{
  * The translated button label and confirmation text of every plugin action
  * that asks before it runs, naming the plugin the action applies to. A
  * plugin action button reads its own entry before it asks the user to
- * confirm.
+ * confirm. For a plugin that bundles datasets, the uninstall confirmation
+ * also says that the datasets it imported stay, because uninstalling removes
+ * the plugin's features but never the data a workspace now owns.
  */
-export function usePluginActionCopy(
-  pluginName: string,
-): Record<ConfirmedPluginActionKind, PluginActionCopy> {
+export function usePluginActionCopy(options: {
+  pluginName: string;
+  hasBundledContent: boolean;
+}): Record<ConfirmedPluginActionKind, PluginActionCopy> {
+  const { pluginName, hasBundledContent } = options;
   const { t } = useLingui();
   return {
     review: {
@@ -41,7 +45,9 @@ export function usePluginActionCopy(
     uninstall: {
       label: t`Uninstall`,
       confirmTitle: t`Uninstall ${pluginName}?`,
-      confirmBody: t`Its features are removed from this workspace.`,
+      confirmBody: hasBundledContent
+        ? t`Its features are removed from this workspace. The datasets it imported stay in Data Sources.`
+        : t`Its features are removed from this workspace.`,
       confirmLabel: t`Uninstall`,
     },
   };

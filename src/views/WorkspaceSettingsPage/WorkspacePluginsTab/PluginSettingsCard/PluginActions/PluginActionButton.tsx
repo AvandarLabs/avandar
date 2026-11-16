@@ -13,6 +13,9 @@ type Props = Readonly<{
   /** The id of the plugin's card heading, which describes this button. */
   headingId: string;
   isDisabled: boolean;
+
+  /** Whether the plugin's manifest bundles datasets that it imports. */
+  hasBundledContent: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -52,10 +55,11 @@ export function PluginActionButton({
   pluginName,
   headingId,
   isDisabled,
+  hasBundledContent,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const copy = usePluginActionCopy(pluginName)[kind];
+  const copy = usePluginActionCopy({ pluginName, hasBundledContent })[kind];
   const style = STYLE_BY_KIND[kind];
   return (
     <Button
