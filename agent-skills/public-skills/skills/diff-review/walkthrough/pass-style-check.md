@@ -46,7 +46,7 @@ looks.
 
 The loop:
 
-1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf>`,
+1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf> --compact`,
    giving each round its own output name, because the tool writes a `-v2`
    copy rather than overwrite an existing PDF.
 2. Find the pages that carry diagrams, for example by searching each
