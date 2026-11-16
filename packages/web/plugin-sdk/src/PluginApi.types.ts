@@ -191,10 +191,11 @@ export type AvandarApi = Readonly<{
      * Lets the user choose the records a data slot reads: a settings admin
      * gets the binding form for that slot, and anyone else a message to ask
      * an admin, in the same modal. Resolves once the modal closes. Present
-     * only for commands. Rejects with `PluginError("InvalidSlot")` for a
-     * slot id the manifest does not declare, and with
-     * `PluginError("InvalidHandle")` once the workspace the command started
-     * in is no longer open.
+     * only for commands. Rejects with a `PluginError`: `InvalidSlot` for a
+     * slot id the manifest does not declare, `PermissionDenied` when the
+     * plugin is no longer installed and enabled, `InvalidHandle` once the
+     * workspace the command started in is no longer open, and
+     * `CommandFailed` for any other failure.
      */
     openDataSlotBinding?: (slotId: string) => Promise<void>;
   }>;
