@@ -194,4 +194,56 @@ describe("gradeEvalAnswer with fitRegression", () => {
 
     expect(graded.pass).toBe(false);
   });
+
+  it.each([
+    "y = 2x + 1",
+    "The fitted line is y = 2x + 1.",
+    "y = 1 + 2x",
+    "The line is y = 2 x + 1.",
+    "The line is y = 2*x + 1.",
+    "The line is y = 2\u00b7x + 1.",
+    "The line is y = 2 \u00d7 x + 1.",
+    "The slope is 2.",
+    "The slope is -2.",
+  ])("passes R01 when the reply states the slope as %j", (assistantText) => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText, toolNames: ["fitRegression"] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+
+  it.each([
+    "y = 12x + 1",
+    "y = 2.5x + 1",
+    "The slope is 2.5.",
+    "The slope is 1.2.",
+    "The slope is 20.",
+    "y = 20x + 1",
+    "y = x2 + 1",
+    "y = 3x + 1",
+  ])("fails R01 when the reply states the wrong slope %j", (assistantText) => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText, toolNames: ["fitRegression"] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it("passes R01 when the reply states the slope and also names another slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "The slope is 2, not 2.5.",
+        toolNames: ["fitRegression"],
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
 });
