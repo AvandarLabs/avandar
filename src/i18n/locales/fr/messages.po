@@ -206,7 +206,7 @@ msgstr "Taille de cellule (mètres)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Could not remove the records for {slotTitle}"
-msgstr ""
+msgstr "Impossible de supprimer les enregistrements pour {slotTitle}"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
@@ -289,7 +289,7 @@ msgstr "{datasetCount, plural, one {Lecture de # jeu de données sur cet "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Dataset: {name}"
-msgstr ""
+msgstr "Jeu de données : {name}"
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -363,7 +363,7 @@ msgstr "Réécrit les données importées sur place. Elles sont synchronisées a
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Records it reads"
-msgstr ""
+msgstr "Enregistrements lus"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
 msgid "Becomes empty"
@@ -650,7 +650,7 @@ msgstr "Avandar {appVersion}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "These chart settings can't be read."
-msgstr ""
+msgstr "Ces paramètres de graphique ne peuvent pas être lus."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records are unassigned"
@@ -746,7 +746,7 @@ msgstr "Notes"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Checking these records"
-msgstr ""
+msgstr "Vérification de ces enregistrements"
 
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "NYS measles case report"
@@ -814,7 +814,7 @@ msgstr "La latitude et la longitude semblent inversées"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} no longer exists."
-msgstr ""
+msgstr "Le champ pour {attributeTitle} n’existe plus."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
@@ -1289,7 +1289,7 @@ msgstr "Saisissez un nom pour le jeu de données combiné."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Broken"
-msgstr ""
+msgstr "Défectueux"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
@@ -1301,12 +1301,12 @@ msgstr "Réponse en cours…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}"
-msgstr ""
+msgstr "Supprimer les enregistrements pour {slotTitle}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Loading datasets"
-msgstr ""
+msgstr "Chargement des jeux de données"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -1501,7 +1501,7 @@ msgstr "Redémarrer le tutoriel"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
-msgstr ""
+msgstr "{publisher} · version {version} · licence {license}"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -1693,7 +1693,7 @@ msgstr "Échec du chargement des jeux de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSampleTable.tsx
 msgid "First rows of {slotTitle}"
-msgstr ""
+msgstr "Premières lignes de {slotTitle}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "No keywords"
@@ -3079,7 +3079,7 @@ msgstr "Étiqueter chaque anneau avec"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeSelect.tsx
 msgid "No fields of this type"
-msgstr ""
+msgstr "Aucun champ de ce type"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Multiply by"
@@ -3283,7 +3283,7 @@ msgstr "Lignes de ces blocs"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 msgid "Choose records for {slotTitle}"
-msgstr ""
+msgstr "Choisir les enregistrements pour {slotTitle}"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -3496,7 +3496,7 @@ msgstr "Ce crosswalk inclut un jeu de données que vous ne pouvez pas ouvrir. "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Case type or dataset"
-msgstr ""
+msgstr "Type de cas ou jeu de données"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
@@ -3505,7 +3505,8 @@ msgstr "Vous devez disposer d’un accès en modification aux Sources de donnée
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The case type or dataset was deleted, or you cannot read it."
-msgstr ""
+msgstr "Le type de cas ou le jeu de données a été supprimé, ou vous ne pouvez "
+"pas le lire."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Spaces trimmed, UPPERCASE"
@@ -3960,7 +3961,8 @@ msgstr "Réplique de production pour les rapports"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 msgid "Ask a workspace admin to choose which records this plugin reads."
-msgstr ""
+msgstr "Demandez à un administrateur de l’espace de travail de choisir les "
+"enregistrements que ce plugin peut lire."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
 msgid "No dictionary matches these columns yet"
@@ -4126,7 +4128,7 @@ msgstr "Dernière mise à jour"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "{attributeTitle} has no field."
-msgstr ""
+msgstr "{attributeTitle} n’a aucun champ."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -4577,7 +4579,7 @@ msgstr "Certains filtres ont été supprimés"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "unavailable"
-msgstr ""
+msgstr "indisponible"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag.tsx
 msgid "Matched by meaning, not just by name. Keep apart if these record "
@@ -4609,7 +4611,7 @@ msgstr "Liste des entités"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "No case types or datasets match"
-msgstr ""
+msgstr "Aucun type de cas ni jeu de données correspondant"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5110,7 +5112,7 @@ msgstr "« {0} » est en cours de préparation. L’ouverture de jeux de donn�
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Saved the records for {slotTitle}"
-msgstr ""
+msgstr "Enregistrements enregistrés pour {slotTitle}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -5275,7 +5277,8 @@ msgstr "Les modèles hors ligne se trouvent sur cet ordinateur."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "{pluginName} stops reading them until someone chooses records again."
-msgstr ""
+msgstr "{pluginName} cesse de les lire jusqu’à ce que quelqu’un choisisse à "
+"nouveau les enregistrements."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "A deleted dictionary"
@@ -5466,7 +5469,7 @@ msgstr "Échec de la suppression de l’espace de travail"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotPanel.tsx
 msgid "Loading fields"
-msgstr ""
+msgstr "Chargement des champs"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
@@ -5596,7 +5599,7 @@ msgstr "Joint comme référence, valeurs inchangées"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Bound"
-msgstr ""
+msgstr "Lié"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -6265,7 +6268,7 @@ msgstr "CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Could not save the records for {slotTitle}"
-msgstr ""
+msgstr "Impossible d’enregistrer les enregistrements pour {slotTitle}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
@@ -6496,7 +6499,7 @@ msgstr "Plus d’actions sur le jeu de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Failed: {reason}"
-msgstr ""
+msgstr "Échec : {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -6992,7 +6995,7 @@ msgstr "Détails du jeu de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Case type: {name}"
-msgstr ""
+msgstr "Type de cas : {name}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
@@ -7012,13 +7015,14 @@ msgstr "Affiché sous la carte et dans chaque exportation. Obligatoire."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter.tsx
 msgid "Skip for now"
-msgstr ""
+msgstr "Ignorer pour l’instant"
 
 #. placeholder {0}: props.aiToolCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# tool Ask Avandar can use} other {# tools Ask Avandar "
 "can use}}"
-msgstr ""
+msgstr "{0, plural, one {# outil qu’Ask Avandar peut utiliser} other {# outils "
+"qu’Ask Avandar peut utiliser}}"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
@@ -7132,7 +7136,7 @@ msgstr "Activer {pluginName} ?"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Imported"
-msgstr ""
+msgstr "Importé"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -7367,7 +7371,7 @@ msgstr "Quel {groupByColumn} a le total {measureColumn} le plus élevé a0?"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Could not load the records this plugin reads."
-msgstr ""
+msgstr "Impossible de charger les enregistrements lus par ce plugin."
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -8267,7 +8271,7 @@ msgstr "Choisissez une ou plusieurs"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Import {title}"
-msgstr ""
+msgstr "Importer {title}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
@@ -8320,7 +8324,8 @@ msgstr "Vous pouvez voir ce jeu de données car il a été partagé avec vous."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "{pluginName} needs these records before it can be installed."
-msgstr ""
+msgstr "{pluginName} a besoin de ces enregistrements avant de pouvoir être "
+"installé."
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: breaks.length
@@ -8409,7 +8414,7 @@ msgstr "Zone d’intérêt appliquée"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Yes / no"
-msgstr ""
+msgstr "Oui / non"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -8782,7 +8787,8 @@ msgstr "Échec de la déconnexion"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "The records you choose for it, when someone runs one of its tools"
-msgstr ""
+msgstr "Les enregistrements que vous choisissez pour ce plugin lorsqu’une "
+"personne utilise l’un de ses outils"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
@@ -8914,7 +8920,7 @@ msgstr "WMTS"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard.tsx
 msgid "Install {pluginName}"
-msgstr ""
+msgstr "Installer {pluginName}"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to the feature list"
@@ -9351,7 +9357,7 @@ msgstr "Préparation des données pour les visualisations…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose the records for {slotTitle}"
-msgstr ""
+msgstr "Choisir les enregistrements pour {slotTitle}"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a select field"
@@ -9420,7 +9426,8 @@ msgstr "Créer un nouveau compte"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "{pluginName} reads these records when someone runs one of its tools."
-msgstr ""
+msgstr "{pluginName} lit ces enregistrements lorsqu’une personne utilise l’un "
+"de ses outils."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
 msgid "Your reaction could not be saved. Try again."
@@ -9428,7 +9435,7 @@ msgstr "Votre réaction n’a pas pu être enregistrée. Réessayez."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose"
-msgstr ""
+msgstr "Choisir"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -9519,7 +9526,7 @@ msgstr "Supprimer le jeu de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Province or region, name or code"
-msgstr ""
+msgstr "Province ou région, nom ou code"
 
 #. placeholder {0}: draft.name
 #. placeholder {0}: formatDate(concept.createdAt, { format: "MMM D, YYYY" })
@@ -9750,7 +9757,7 @@ msgstr "Impossible de charger les jeux de données du tableau de bord"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Already in this workspace"
-msgstr ""
+msgstr "Déjà dans cet espace de travail"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
@@ -9939,7 +9946,7 @@ msgstr "Certaines données doivent être saisies manuellement"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Not bound"
-msgstr ""
+msgstr "Non lié"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Running offline"
@@ -10052,11 +10059,11 @@ msgstr "mi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Records you choose for it: {dataSlots}"
-msgstr ""
+msgstr "Enregistrements que vous sélectionnez pour celui-ci : {dataSlots}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
-msgstr ""
+msgstr "Choisissez la source des enregistrements"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -10211,7 +10218,7 @@ msgstr "Jours en années"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
-msgstr ""
+msgstr "pas encore sélectionné"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
@@ -10578,7 +10585,7 @@ msgstr "Limiter {displayName} à l'accès à l'application"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}?"
-msgstr ""
+msgstr "Supprimer les enregistrements pour {slotTitle} ?"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
@@ -10748,7 +10755,7 @@ msgstr "Graphique en courbes"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSummary.tsx
 msgid "{title}: {filledCount} of {rowCount} have a value"
-msgstr ""
+msgstr "{title} : {filledCount} sur {rowCount} ont une valeur"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -11198,7 +11205,8 @@ msgstr "Seul le propriétaire peut rendre ce {resource} privé."
 #. placeholder {0}: props.contentCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# dataset to import} other {# datasets to import}}"
-msgstr ""
+msgstr "{0, plural, one {# jeu de données à importer} other {# jeux de données "
+"à importer}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
@@ -11490,10 +11498,6 @@ msgstr "Facturation"
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "Ce jeu de données reflète désormais le contenu actuel de la feuille."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-#~ msgid "Install {pluginName}?"
-#~ msgstr "Installer {pluginName} ?"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
@@ -11876,7 +11880,7 @@ msgstr "Dictionnaire supprimé"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Importing"
-msgstr ""
+msgstr "Importation"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -12014,7 +12018,8 @@ msgstr "Chargement des ensembles de données…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Each one becomes a dataset in this workspace that every member can use."
-msgstr ""
+msgstr "Chaque élément devient un jeu de données dans cet espace de travail, "
+"utilisable par tous les membres."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
 msgid "Refreshing {conceptName} records…"
@@ -12102,7 +12107,7 @@ msgstr "La description doit comporter moins de {maxDatasetDescriptionLength} "
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentItemRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Retry {title}"
-msgstr ""
+msgstr "Réessayer {title}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
@@ -12291,7 +12296,7 @@ msgstr "Identifiant"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Loading the records"
-msgstr ""
+msgstr "Chargement des enregistrements"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
@@ -12305,7 +12310,7 @@ msgstr "{threshold} ou plus"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr ""
+msgstr "À propos de ce plugin"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -12433,7 +12438,7 @@ msgstr "Impossible de publier le tableau de bord"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem.ts
 msgid "Could not download {filePath} (HTTP {status})."
-msgstr ""
+msgstr "Impossible de télécharger {filePath} (HTTP {status})."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 msgid "Nothing is unmatched"
@@ -12888,7 +12893,7 @@ msgstr "Groupe d’empilement"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Datasets to import"
-msgstr ""
+msgstr "Jeux de données à importer"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed, back to the original values"
@@ -13062,7 +13067,8 @@ msgstr "Ouvrir sur {serviceName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr ""
+msgstr "Facultatif. Vous pourrez sélectionner ces enregistrements "
+"ultérieurement sur la carte du plugin."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -13074,7 +13080,7 @@ msgstr "Filtres (Où)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmStep.tsx
 msgid "{pluginName} is installed."
-msgstr ""
+msgstr "{pluginName} est installé."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
@@ -13415,7 +13421,7 @@ msgstr "{percentLabel} % des jeux de données lus"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Could not read these records. {reason}"
-msgstr ""
+msgstr "Impossible de lire ces enregistrements. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -13436,7 +13442,7 @@ msgstr "Utilisé par {usedByText}."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Waiting"
-msgstr ""
+msgstr "En attente"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
@@ -13812,7 +13818,7 @@ msgstr "Ce navigateur ne peut pas exécuter les modèles hors ligne. Utilisez un
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Datasets it includes"
-msgstr ""
+msgstr "Jeux de données inclus"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -14226,7 +14232,7 @@ msgstr "Vous êtes sur le plan Gratuit"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "{slotTitle}: {sourceLabel}"
-msgstr ""
+msgstr "{slotTitle} : {sourceLabel}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -14480,7 +14486,8 @@ msgstr "Télécharger un ensemble de données"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace. The datasets it imported "
 "stay in Data Sources."
-msgstr ""
+msgstr "Ses fonctionnalités sont supprimées de cet espace de travail. Les jeux "
+"de données qu’il a importés restent dans Sources de données."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -14595,7 +14602,7 @@ msgstr "Supprimer le filtre local"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeFields.tsx
 msgid "Fields for {slotTitle}"
-msgstr ""
+msgstr "Champs pour {slotTitle}"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -14735,7 +14742,7 @@ msgstr "Relevés uniquement"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin.ts
 msgid "Could not install {pluginName}"
-msgstr ""
+msgstr "Impossible d’installer {pluginName}"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -14878,7 +14885,7 @@ msgstr "Sur cette page"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Not imported"
-msgstr ""
+msgstr "Non importé"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (coded)"
@@ -14977,7 +14984,7 @@ msgstr "{title} n’a pas pu être affiché"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "Reset chart settings"
-msgstr ""
+msgstr "Réinitialiser les paramètres du graphique"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -15139,7 +15146,7 @@ msgstr "Aucune carte pour le moment"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Change the records for {slotTitle}"
-msgstr ""
+msgstr "Modifier les enregistrements pour {slotTitle}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -15556,7 +15563,7 @@ msgstr "Nuage de points"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "District, name or code"
-msgstr ""
+msgstr "District, nom ou code"
 
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
 msgid "Layouts"
@@ -15740,7 +15747,7 @@ msgstr "Tout le monde"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Removed the records for {slotTitle}"
-msgstr ""
+msgstr "Enregistrements supprimés pour {slotTitle}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
@@ -16006,7 +16013,8 @@ msgstr "Dessiner une zone d’annotation"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} has the wrong type. It needs: "
 "{typeLabel}."
-msgstr ""
+msgstr "Le champ pour {attributeTitle} est d’un type incorrect. Il doit être de "
+"type : {typeLabel}."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
@@ -16083,7 +16091,7 @@ msgstr "Distance ({unitLabel})"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr ""
+msgstr "Ce plugin n’inclut plus {filePath}."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"

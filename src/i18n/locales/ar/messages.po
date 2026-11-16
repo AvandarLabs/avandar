@@ -200,7 +200,7 @@ msgstr "حجم الخلية (بالمتر)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Could not remove the records for {slotTitle}"
-msgstr ""
+msgstr "تعذّرت إزالة السجلات لـ {slotTitle}"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
@@ -279,7 +279,7 @@ msgstr "{datasetCount, plural, one {جارٍ قراءة مجموعة بيانا�
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Dataset: {name}"
-msgstr ""
+msgstr "مجموعة البيانات: {name}"
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -350,7 +350,7 @@ msgstr "يعيد كتابة البيانات التي تم تحميلها في �
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Records it reads"
-msgstr ""
+msgstr "السجلات التي يقرأها"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
 msgid "Becomes empty"
@@ -633,7 +633,7 @@ msgstr "Avandar {appVersion}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "These chart settings can't be read."
-msgstr ""
+msgstr "لا يمكن قراءة إعدادات هذا المخطط."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records are unassigned"
@@ -728,7 +728,7 @@ msgstr "ملاحظات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Checking these records"
-msgstr ""
+msgstr "جارٍ التحقق من هذه السجلات"
 
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "NYS measles case report"
@@ -795,7 +795,7 @@ msgstr "يبدو أن خط العرض وخط الطول متبادلان"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} no longer exists."
-msgstr ""
+msgstr "لم يعد الحقل الخاص بـ {attributeTitle} موجودًا."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
@@ -1254,7 +1254,7 @@ msgstr "أدخل اسمًا لمجموعة البيانات المدمجة."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Broken"
-msgstr ""
+msgstr "معطّل"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
@@ -1266,12 +1266,12 @@ msgstr "جارٍ الرد…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}"
-msgstr ""
+msgstr "إزالة السجلات لـ {slotTitle}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Loading datasets"
-msgstr ""
+msgstr "جارٍ تحميل مجموعات البيانات"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -1460,7 +1460,7 @@ msgstr "إعادة تشغيل البرنامج التعليمي"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
-msgstr ""
+msgstr "{publisher} · الإصدار {version} · ترخيص {license}"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -1647,7 +1647,7 @@ msgstr "تعذّر تحميل مجموعات البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSampleTable.tsx
 msgid "First rows of {slotTitle}"
-msgstr ""
+msgstr "الصفوف الأولى من {slotTitle}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "No keywords"
@@ -2999,7 +2999,7 @@ msgstr "تسمية كل حلقة بـ"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeSelect.tsx
 msgid "No fields of this type"
-msgstr ""
+msgstr "لا توجد حقول من هذا النوع"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Multiply by"
@@ -3196,7 +3196,7 @@ msgstr "الصفوف من هذه الكتل"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 msgid "Choose records for {slotTitle}"
-msgstr ""
+msgstr "اختيار سجلات لـ {slotTitle}"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -3404,7 +3404,7 @@ msgstr "يتضمن جدول المطابقة هذا مجموعة بيانات ل
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Case type or dataset"
-msgstr ""
+msgstr "نوع الحالة أو مجموعة البيانات"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
@@ -3412,7 +3412,7 @@ msgstr "تحتاج إلى صلاحية التعديل على مصادر البي
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The case type or dataset was deleted, or you cannot read it."
-msgstr ""
+msgstr "تم حذف نوع الحالة أو مجموعة البيانات، أو لا يمكنك قراءته."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Spaces trimmed, UPPERCASE"
@@ -3853,7 +3853,8 @@ msgstr "نسخة متماثلة لإعداد تقارير الإنتاج"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 msgid "Ask a workspace admin to choose which records this plugin reads."
-msgstr ""
+msgstr "اطلب من مسؤول مساحة العمل اختيار السجلات التي يقرأها هذا المكوّن "
+"الإضافي."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
 msgid "No dictionary matches these columns yet"
@@ -4017,7 +4018,7 @@ msgstr "آخر تحديث"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "{attributeTitle} has no field."
-msgstr ""
+msgstr "لا يحتوي {attributeTitle} على حقل."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -4454,7 +4455,7 @@ msgstr "تمت إزالة بعض عوامل التصفية"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "unavailable"
-msgstr ""
+msgstr "غير متاح"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag.tsx
 msgid "Matched by meaning, not just by name. Keep apart if these record "
@@ -4485,7 +4486,7 @@ msgstr "قائمة المعالم"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "No case types or datasets match"
-msgstr ""
+msgstr "لا تتطابق أي أنواع حالات أو مجموعات بيانات"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4974,7 +4975,7 @@ msgstr "جارٍ تجهيز \"{0}\". قد تستغرق مجموعات البيا
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Saved the records for {slotTitle}"
-msgstr ""
+msgstr "تم حفظ السجلات لـ {slotTitle}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -5135,7 +5136,7 @@ msgstr "النماذج غير المتصلة موجودة على هذا الكم
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "{pluginName} stops reading them until someone chooses records again."
-msgstr ""
+msgstr "يتوقف {pluginName} عن قراءتها إلى أن يختار أحدهم السجلات مرة أخرى."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "A deleted dictionary"
@@ -5320,7 +5321,7 @@ msgstr "تعذّر حذف مساحة العمل"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotPanel.tsx
 msgid "Loading fields"
-msgstr ""
+msgstr "جارٍ تحميل الحقول"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
@@ -5446,7 +5447,7 @@ msgstr "مرفق كمرجع، والقيم لم تتغير"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Bound"
-msgstr ""
+msgstr "مرتبط"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -6101,7 +6102,7 @@ msgstr "CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Could not save the records for {slotTitle}"
-msgstr ""
+msgstr "تعذّر حفظ السجلات لـ {slotTitle}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
@@ -6324,7 +6325,7 @@ msgstr "المزيد من إجراءات مجموعة البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Failed: {reason}"
-msgstr ""
+msgstr "فشل: {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -6809,7 +6810,7 @@ msgstr "تفاصيل مجموعة البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Case type: {name}"
-msgstr ""
+msgstr "نوع الحالة: {name}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
@@ -6829,13 +6830,16 @@ msgstr "يظهر أسفل الخريطة وفي كل عملية تصدير. مط
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter.tsx
 msgid "Skip for now"
-msgstr ""
+msgstr "تخطّي الآن"
 
 #. placeholder {0}: props.aiToolCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# tool Ask Avandar can use} other {# tools Ask Avandar "
 "can use}}"
-msgstr ""
+msgstr "{0, plural, one {أداة واحدة يمكن لـ Ask Avandar استخدامها} two {أداتان "
+"يمكن لـ Ask Avandar استخدامهما} few {# أدوات يمكن لـ Ask Avandar "
+"استخدامها} many {# أداة يمكن لـ Ask Avandar استخدامها} other {# أداة "
+"يمكن لـ Ask Avandar استخدامها}}"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
@@ -6947,7 +6951,7 @@ msgstr "تمكين {pluginName}؟"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Imported"
-msgstr ""
+msgstr "تم الاستيراد"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -7179,7 +7183,7 @@ msgstr "ما هو {groupByColumn} الذي يملك أعلى إجمالي لـ {
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Could not load the records this plugin reads."
-msgstr ""
+msgstr "تعذّر تحميل السجلات التي يقرأها هذا المكوّن الإضافي."
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -8059,7 +8063,7 @@ msgstr "اختر واحدًا أو أكثر"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Import {title}"
-msgstr ""
+msgstr "استيراد {title}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
@@ -8111,7 +8115,7 @@ msgstr "يمكنك عرض مجموعة البيانات هذه لأنها تمت
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "{pluginName} needs these records before it can be installed."
-msgstr ""
+msgstr "يحتاج {pluginName} إلى هذه السجلات قبل أن يمكن تثبيته."
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: breaks.length
@@ -8196,7 +8200,7 @@ msgstr "تم تطبيق منطقة الاهتمام"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Yes / no"
-msgstr ""
+msgstr "نعم / لا"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -8557,7 +8561,7 @@ msgstr "فشل تسجيل الخروج"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "The records you choose for it, when someone runs one of its tools"
-msgstr ""
+msgstr "السجلات التي تختارها له عند تشغيل أحد أدواته"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
@@ -8688,7 +8692,7 @@ msgstr "WMTS"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard.tsx
 msgid "Install {pluginName}"
-msgstr ""
+msgstr "تثبيت {pluginName}"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to the feature list"
@@ -9109,7 +9113,7 @@ msgstr "تحضير البيانات للتصورات…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose the records for {slotTitle}"
-msgstr ""
+msgstr "اختيار السجلات لـ {slotTitle}"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a select field"
@@ -9178,7 +9182,7 @@ msgstr "إنشاء حساب جديد"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "{pluginName} reads these records when someone runs one of its tools."
-msgstr ""
+msgstr "يقرأ {pluginName} هذه السجلات عند تشغيل أحد أدواته."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
 msgid "Your reaction could not be saved. Try again."
@@ -9186,7 +9190,7 @@ msgstr "تعذّر حفظ تفاعلك. حاول مرة أخرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose"
-msgstr ""
+msgstr "اختيار"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -9276,7 +9280,7 @@ msgstr "حذف مجموعة البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Province or region, name or code"
-msgstr ""
+msgstr "المقاطعة أو المنطقة، الاسم أو الرمز"
 
 #. placeholder {0}: draft.name
 #. placeholder {0}: formatDate(concept.createdAt, { format: "MMM D, YYYY" })
@@ -9504,7 +9508,7 @@ msgstr "غير قادر على تحميل مجموعات بيانات لوحة �
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Already in this workspace"
-msgstr ""
+msgstr "موجود بالفعل في مساحة العمل هذه"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
@@ -9689,7 +9693,7 @@ msgstr "يجب إدخال بعض البيانات يدويًا"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Not bound"
-msgstr ""
+msgstr "غير مرتبط"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Running offline"
@@ -9800,11 +9804,11 @@ msgstr "ميل"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Records you choose for it: {dataSlots}"
-msgstr ""
+msgstr "السجلات التي تختارها له: {dataSlots}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
-msgstr ""
+msgstr "اختر مصدر السجلات"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -9956,7 +9960,7 @@ msgstr "أيام إلى سنوات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
-msgstr ""
+msgstr "لم يتم الاختيار بعد"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
@@ -10316,7 +10320,7 @@ msgstr "تقييد {displayName} للوصول إلى التطبيق"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}?"
-msgstr ""
+msgstr "إزالة السجلات الخاصة بـ {slotTitle}؟"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
@@ -10480,7 +10484,7 @@ msgstr "مخطط خطي"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSummary.tsx
 msgid "{title}: {filledCount} of {rowCount} have a value"
-msgstr ""
+msgstr "{title}: تحتوي {filledCount} من أصل {rowCount} على قيمة"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -10915,7 +10919,8 @@ msgstr "يمكن للمالك فقط جعل هذا {resource} خاصًا."
 #. placeholder {0}: props.contentCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# dataset to import} other {# datasets to import}}"
-msgstr ""
+msgstr "{0, plural, one {مجموعة بيانات واحدة للاستيراد} other {# مجموعات بيانات "
+"للاستيراد}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
@@ -11196,10 +11201,6 @@ msgstr "الفوترة"
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "تعكس مجموعة البيانات هذه الآن المحتوى الحالي للجدول."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-#~ msgid "Install {pluginName}?"
-#~ msgstr "تثبيت {pluginName}؟"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
@@ -11574,7 +11575,7 @@ msgstr "تم حذف القاموس"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Importing"
-msgstr ""
+msgstr "جارٍ الاستيراد"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -11707,7 +11708,8 @@ msgstr "جارٍ تحميل مجموعات البيانات…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Each one becomes a dataset in this workspace that every member can use."
-msgstr ""
+msgstr "يصبح كل عنصر منها مجموعة بيانات في مساحة العمل هذه، ويمكن لكل عضو "
+"استخدامها."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
 msgid "Refreshing {conceptName} records…"
@@ -11793,7 +11795,7 @@ msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentItemRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Retry {title}"
-msgstr ""
+msgstr "إعادة محاولة {title}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
@@ -11980,7 +11982,7 @@ msgstr "المعرّف"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Loading the records"
-msgstr ""
+msgstr "جارٍ تحميل السجلات"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
@@ -11993,7 +11995,7 @@ msgstr "{threshold} أو أكثر"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr ""
+msgstr "حول هذه الإضافة"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -12118,7 +12120,7 @@ msgstr "تعذر نشر لوحة التحكم"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem.ts
 msgid "Could not download {filePath} (HTTP {status})."
-msgstr ""
+msgstr "تعذّر تنزيل {filePath} (HTTP {status})."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 msgid "Nothing is unmatched"
@@ -12559,7 +12561,7 @@ msgstr "مجموعة التكديس"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Datasets to import"
-msgstr ""
+msgstr "مجموعات البيانات المراد استيرادها"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed, back to the original values"
@@ -12732,7 +12734,7 @@ msgstr "افتحه على {serviceName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr ""
+msgstr "اختياري. يمكنك اختيار هذه السجلات لاحقًا من بطاقة الإضافة."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -12744,7 +12746,7 @@ msgstr "الفلاتر (أين)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmStep.tsx
 msgid "{pluginName} is installed."
-msgstr ""
+msgstr "تم تثبيت {pluginName}."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
@@ -13079,7 +13081,7 @@ msgstr "تمت قراءة {percentLabel}% من مجموعات البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Could not read these records. {reason}"
-msgstr ""
+msgstr "تعذّرت قراءة هذه السجلات. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -13100,7 +13102,7 @@ msgstr "مستخدَم بواسطة {usedByText}."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Waiting"
-msgstr ""
+msgstr "في الانتظار"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
@@ -13470,7 +13472,7 @@ msgstr "لا يمكن لهذا المتصفح تشغيل النماذج غير �
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Datasets it includes"
-msgstr ""
+msgstr "مجموعات البيانات التي تتضمنها"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -13869,7 +13871,7 @@ msgstr "أنت على الخطة المجانية"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "{slotTitle}: {sourceLabel}"
-msgstr ""
+msgstr "{slotTitle}: {sourceLabel}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -14116,7 +14118,8 @@ msgstr "تحميل مجموعة بيانات"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace. The datasets it imported "
 "stay in Data Sources."
-msgstr ""
+msgstr "تمت إزالة ميزاتها من مساحة العمل هذه. وتبقى مجموعات البيانات التي "
+"استوردتها في مصادر البيانات."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -14229,7 +14232,7 @@ msgstr "إزالة الفلتر المحلي"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeFields.tsx
 msgid "Fields for {slotTitle}"
-msgstr ""
+msgstr "الحقول الخاصة بـ {slotTitle}"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -14365,7 +14368,7 @@ msgstr "القراءات فقط"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin.ts
 msgid "Could not install {pluginName}"
-msgstr ""
+msgstr "تعذّر تثبيت {pluginName}"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -14506,7 +14509,7 @@ msgstr "في هذه الصفحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Not imported"
-msgstr ""
+msgstr "لم يتم استيرادها"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (coded)"
@@ -14603,7 +14606,7 @@ msgstr "تعذّر عرض {title}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "Reset chart settings"
-msgstr ""
+msgstr "إعادة تعيين إعدادات المخطط"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -14759,7 +14762,7 @@ msgstr "لا توجد خرائط بعد"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Change the records for {slotTitle}"
-msgstr ""
+msgstr "تغيير السجلات الخاصة بـ {slotTitle}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -15164,7 +15167,7 @@ msgstr "مخطط مبعثر"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "District, name or code"
-msgstr ""
+msgstr "المنطقة أو الاسم أو الرمز"
 
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
 msgid "Layouts"
@@ -15345,7 +15348,7 @@ msgstr "أي شخص"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Removed the records for {slotTitle}"
-msgstr ""
+msgstr "تمت إزالة السجلات الخاصة بـ {slotTitle}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
@@ -15602,7 +15605,7 @@ msgstr "رسم مساحة للتعليق التوضيحي"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} has the wrong type. It needs: "
 "{typeLabel}."
-msgstr ""
+msgstr "نوع الحقل الخاص بـ {attributeTitle} غير صحيح. يجب أن يكون: {typeLabel}."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
@@ -15678,7 +15681,7 @@ msgstr "المسافة ({unitLabel})"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr ""
+msgstr "لم تعد هذه الإضافة تتضمن {filePath}."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"

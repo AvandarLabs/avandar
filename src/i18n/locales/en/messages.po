@@ -11223,10 +11223,6 @@ msgstr "Billing"
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "This dataset now reflects the current contents of the sheet."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-#~ msgid "Install {pluginName}?"
-#~ msgstr "Install {pluginName}?"
-
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
 msgid "Another entry already has this name."

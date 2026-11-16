@@ -202,7 +202,7 @@ msgstr "Ukubwa wa seli (mita)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Could not remove the records for {slotTitle}"
-msgstr ""
+msgstr "Haikuwezekana kuondoa rekodi za {slotTitle}"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
@@ -283,7 +283,7 @@ msgstr "{datasetCount, plural, one {Inasoma seti # ya data kwenye kifaa hiki. "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Dataset: {name}"
-msgstr ""
+msgstr "Seti ya data: {name}"
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -355,7 +355,7 @@ msgstr "Inaandika upya data iliyopakiwa mahali pake. Inasawazishwa na nafasi ya 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Records it reads"
-msgstr ""
+msgstr "Rekodi inazosoma"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
 msgid "Becomes empty"
@@ -644,7 +644,7 @@ msgstr "Avandar {appVersion}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "These chart settings can't be read."
-msgstr ""
+msgstr "Mipangilio hii ya chati haiwezi kusomwa."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records are unassigned"
@@ -740,7 +740,7 @@ msgstr "Maelezo"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Checking these records"
-msgstr ""
+msgstr "Inakagua rekodi hizi"
 
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "NYS measles case report"
@@ -808,7 +808,7 @@ msgstr "Latitudo na longitudo zinaonekana kubadilishana"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} no longer exists."
-msgstr ""
+msgstr "Sehemu ya {attributeTitle} haipo tena."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
@@ -1275,7 +1275,7 @@ msgstr "Weka jina la seti ya data iliyounganishwa."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Broken"
-msgstr ""
+msgstr "Imeharibika"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
@@ -1287,12 +1287,12 @@ msgstr "Inajibu…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}"
-msgstr ""
+msgstr "Ondoa rekodi za {slotTitle}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Loading datasets"
-msgstr ""
+msgstr "Inapakia seti za data"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -1482,7 +1482,7 @@ msgstr "Anzisha upya mafunzo"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
-msgstr ""
+msgstr "{publisher} · toleo la {version} · leseni ya {license}"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -1672,7 +1672,7 @@ msgstr "Seti za data zimeshindwa kupakia"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSampleTable.tsx
 msgid "First rows of {slotTitle}"
-msgstr ""
+msgstr "Safu mlalo za kwanza za {slotTitle}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "No keywords"
@@ -3043,7 +3043,7 @@ msgstr "Weka lebo kwenye kila pete kwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeSelect.tsx
 msgid "No fields of this type"
-msgstr ""
+msgstr "Hakuna sehemu za aina hii"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Multiply by"
@@ -3243,7 +3243,7 @@ msgstr "Mistari kutoka kwenye vizuizi hivi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 msgid "Choose records for {slotTitle}"
-msgstr ""
+msgstr "Chagua rekodi za {slotTitle}"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -3453,7 +3453,7 @@ msgstr "Crosswalk hii inajumuisha seti ya data ambayo huwezi kufungua, kwa "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Case type or dataset"
-msgstr ""
+msgstr "Aina ya kesi au seti ya data"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
@@ -3462,7 +3462,7 @@ msgstr "Unahitaji ruhusa ya kuhariri Vyanzo vya Data ili kubadilisha crosswalk "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The case type or dataset was deleted, or you cannot read it."
-msgstr ""
+msgstr "Aina ya kesi au seti ya data ilifutwa, au huwezi kuisoma."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Spaces trimmed, UPPERCASE"
@@ -3912,7 +3912,8 @@ msgstr "Nakili ya ripoti ya uzalishaji"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 msgid "Ask a workspace admin to choose which records this plugin reads."
-msgstr ""
+msgstr "Mwombe msimamizi wa workspace achague rekodi ambazo programu-jalizi hii "
+"inasoma."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
 msgid "No dictionary matches these columns yet"
@@ -4078,7 +4079,7 @@ msgstr "Ilisasishwa mara ya mwisho"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "{attributeTitle} has no field."
-msgstr ""
+msgstr "{attributeTitle} haina sehemu."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -4522,7 +4523,7 @@ msgstr "Baadhi ya vichujio vimeondolewa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "unavailable"
-msgstr ""
+msgstr "haipatikani"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag.tsx
 msgid "Matched by meaning, not just by name. Keep apart if these record "
@@ -4553,7 +4554,7 @@ msgstr "Orodha ya vipengele"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "No case types or datasets match"
-msgstr ""
+msgstr "Hakuna aina za kesi au seti za data zinazolingana"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5051,7 +5052,7 @@ msgstr "\"{0}\" inatayarishwa. Seti kubwa za data zinaweza kuchukua dakika "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Saved the records for {slotTitle}"
-msgstr ""
+msgstr "Imehifadhi rekodi za {slotTitle}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -5214,7 +5215,7 @@ msgstr "Modeli za nje ya mtandao ziko kwenye kompyuta hii."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "{pluginName} stops reading them until someone chooses records again."
-msgstr ""
+msgstr "{pluginName} itaacha kuzisoma hadi mtu achague rekodi tena."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "A deleted dictionary"
@@ -5404,7 +5405,7 @@ msgstr "Imeshindikana kufuta workspace"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotPanel.tsx
 msgid "Loading fields"
-msgstr ""
+msgstr "Inapakia sehemu"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
@@ -5531,7 +5532,7 @@ msgstr "Imeambatishwa kama marejeleo, thamani hazijabadilishwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Bound"
-msgstr ""
+msgstr "Imeunganishwa"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -6191,7 +6192,7 @@ msgstr "CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Could not save the records for {slotTitle}"
-msgstr ""
+msgstr "Haikuwezekana kuhifadhi rekodi za {slotTitle}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
@@ -6417,7 +6418,7 @@ msgstr "Vitendo zaidi vya seti ya data"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Failed: {reason}"
-msgstr ""
+msgstr "Imeshindikana: {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -6909,7 +6910,7 @@ msgstr "Maelezo ya seti ya data"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels.ts
 msgid "Case type: {name}"
-msgstr ""
+msgstr "Aina ya kesi: {name}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Updated in the past year"
@@ -6929,13 +6930,14 @@ msgstr "Inaonyeshwa chini ya ramani na katika kila uhamishaji. Inahitajika."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter.tsx
 msgid "Skip for now"
-msgstr ""
+msgstr "Ruka kwa sasa"
 
 #. placeholder {0}: props.aiToolCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# tool Ask Avandar can use} other {# tools Ask Avandar "
 "can use}}"
-msgstr ""
+msgstr "{0, plural, one {# zana ambayo Ask Avandar inaweza kutumia} other {# "
+"zana ambazo Ask Avandar inaweza kutumia}}"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
@@ -7048,7 +7050,7 @@ msgstr "Washa {pluginName}?"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Imported"
-msgstr ""
+msgstr "Imeingizwa"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -7280,7 +7282,7 @@ msgstr "Ni {groupByColumn} ipi iliyo na jumla ya juu zaidi ya {measureColumn}?"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Could not load the records this plugin reads."
-msgstr ""
+msgstr "Haikuwezekana kupakia rekodi ambazo programu-jalizi hii inasoma."
 
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
@@ -8172,7 +8174,7 @@ msgstr "Chagua moja au zaidi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Import {title}"
-msgstr ""
+msgstr "Ingiza {title}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
@@ -8224,7 +8226,7 @@ msgstr "Unaweza kuona dataset hii kwa sababu ilishirikiwa nawe."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "{pluginName} needs these records before it can be installed."
-msgstr ""
+msgstr "{pluginName} inahitaji rekodi hizi kabla ya kusakinishwa."
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: breaks.length
@@ -8311,7 +8313,7 @@ msgstr "Eneo linalohusika limetumika"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Yes / no"
-msgstr ""
+msgstr "Ndiyo / hapana"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -8679,7 +8681,8 @@ msgstr "Kutoka nje kumeshindikana"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "The records you choose for it, when someone runs one of its tools"
-msgstr ""
+msgstr "Rekodi unazochagua kwa ajili yake, mtu anapoendesha mojawapo ya zana "
+"zake"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
@@ -8811,7 +8814,7 @@ msgstr "WMTS"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard.tsx
 msgid "Install {pluginName}"
-msgstr ""
+msgstr "Sakinisha {pluginName}"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to the feature list"
@@ -9237,7 +9240,7 @@ msgstr "Inatayarisha data kwa ajili ya uonyeshaji…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose the records for {slotTitle}"
-msgstr ""
+msgstr "Chagua rekodi za {slotTitle}"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a select field"
@@ -9306,7 +9309,8 @@ msgstr "Unda akaunti mpya"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "{pluginName} reads these records when someone runs one of its tools."
-msgstr ""
+msgstr "{pluginName} inasoma rekodi hizi mtu anapoendesha mojawapo ya zana "
+"zake."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/useToggleReaction.ts
 msgid "Your reaction could not be saved. Try again."
@@ -9314,7 +9318,7 @@ msgstr "Mwitikio wako haukuweza kuhifadhiwa. Jaribu tena."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Choose"
-msgstr ""
+msgstr "Chagua"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
@@ -9405,7 +9409,7 @@ msgstr "Futa Dataset"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "Province or region, name or code"
-msgstr ""
+msgstr "Mkoa au eneo, jina au msimbo"
 
 #. placeholder {0}: draft.name
 #. placeholder {0}: formatDate(concept.createdAt, { format: "MMM D, YYYY" })
@@ -9634,7 +9638,7 @@ msgstr "Haiwezekani kupakia datasets za dashibodi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Already in this workspace"
-msgstr ""
+msgstr "Tayari ziko kwenye workspace hii"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
@@ -9821,7 +9825,7 @@ msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Not bound"
-msgstr ""
+msgstr "Haijaunganishwa"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Running offline"
@@ -9933,11 +9937,11 @@ msgstr "mi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Records you choose for it: {dataSlots}"
-msgstr ""
+msgstr "Rekodi utakazochagua kwa ajili yake: {dataSlots}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
-msgstr ""
+msgstr "Chagua rekodi zinatoka wapi"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -10089,7 +10093,7 @@ msgstr "Siku hadi miaka"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
-msgstr ""
+msgstr "bado haijachaguliwa"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
@@ -10454,7 +10458,7 @@ msgstr "Punguza {displayName} kwa ufikiaji wa programu"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Remove the records for {slotTitle}?"
-msgstr ""
+msgstr "Uondoe rekodi za {slotTitle}?"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
@@ -10623,7 +10627,7 @@ msgstr "Chati ya mistari"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSummary.tsx
 msgid "{title}: {filledCount} of {rowCount} have a value"
-msgstr ""
+msgstr "{title}: {filledCount} kati ya {rowCount} zina thamani"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -11065,7 +11069,8 @@ msgstr "Mmiliki pekee ndiye anayeweza kuweka {resource} hii kuwa ya faragha."
 #. placeholder {0}: props.contentCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# dataset to import} other {# datasets to import}}"
-msgstr ""
+msgstr "{0, plural, one {# seti data ya kuleta} other {# seti za data za "
+"kuleta}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
@@ -11352,10 +11357,6 @@ msgstr "Malipo"
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "Seti hii ya data sasa inaakisi maudhui ya sasa ya laha."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-#~ msgid "Install {pluginName}?"
-#~ msgstr "Sakinisha {pluginName}?"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
@@ -11732,7 +11733,7 @@ msgstr "Kamusi imefutwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Importing"
-msgstr ""
+msgstr "Inaleta"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -11869,7 +11870,8 @@ msgstr "Inapakia seti za data…"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Each one becomes a dataset in this workspace that every member can use."
-msgstr ""
+msgstr "Kila moja inakuwa seti ya data katika nafasi hii ya kazi ambayo kila "
+"mwanachama anaweza kutumia."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
 msgid "Refreshing {conceptName} records…"
@@ -11956,7 +11958,7 @@ msgstr "Maelezo yanapaswa kuwa chini ya {maxDatasetDescriptionLength} herufi "
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentItemRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Retry {title}"
-msgstr ""
+msgstr "Jaribu tena {title}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
@@ -12146,7 +12148,7 @@ msgstr "Kitambulisho"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
 msgid "Loading the records"
-msgstr ""
+msgstr "Inapakia rekodi"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
@@ -12159,7 +12161,7 @@ msgstr "{threshold} au zaidi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr ""
+msgstr "Kuhusu programu-jalizi hii"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -12286,7 +12288,7 @@ msgstr "Haiwezekani kuchapisha dashibodi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem.ts
 msgid "Could not download {filePath} (HTTP {status})."
-msgstr ""
+msgstr "Haikuweza kupakua {filePath} (HTTP {status})."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 msgid "Nothing is unmatched"
@@ -12732,7 +12734,7 @@ msgstr "Kundi la tabaka"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 msgid "Datasets to import"
-msgstr ""
+msgstr "Seti za data za kuleta"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed, back to the original values"
@@ -12906,7 +12908,8 @@ msgstr "Fungua kwenye {serviceName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr ""
+msgstr "Si lazima. Unaweza kuchagua rekodi hizi baadaye kwenye kadi ya "
+"programu-jalizi."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -12918,7 +12921,7 @@ msgstr "Filita (Wapi)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmStep.tsx
 msgid "{pluginName} is installed."
-msgstr ""
+msgstr "{pluginName} imesakinishwa."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
@@ -13256,7 +13259,7 @@ msgstr "{percentLabel}% ya seti za data zilizosomwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
 msgid "Could not read these records. {reason}"
-msgstr ""
+msgstr "Haikuweza kusoma rekodi hizi. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -13277,7 +13280,7 @@ msgstr "Inatumiwa na {usedByText}."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
 msgid "Waiting"
-msgstr ""
+msgstr "Inasubiri"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
@@ -13649,7 +13652,7 @@ msgstr "Kivinjari hiki hakiwezi kuendesha modeli za nje ya mtandao. Tumia toleo 
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Datasets it includes"
-msgstr ""
+msgstr "Seti za data ilizo nazo"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -14053,7 +14056,7 @@ msgstr "Uko kwenye mpango wa Bure"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "{slotTitle}: {sourceLabel}"
-msgstr ""
+msgstr "{slotTitle}: {sourceLabel}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -14302,7 +14305,8 @@ msgstr "Pakia seti ya data"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace. The datasets it imported "
 "stay in Data Sources."
-msgstr ""
+msgstr "Vipengele vyake vimeondolewa kwenye nafasi hii ya kazi. Seti za data "
+"ilizoleta zimesalia katika Vyanzo vya Data."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -14416,7 +14420,7 @@ msgstr "Ondoa chujio cha ndani"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeFields.tsx
 msgid "Fields for {slotTitle}"
-msgstr ""
+msgstr "Sehemu za {slotTitle}"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -14554,7 +14558,7 @@ msgstr "Vipimo pekee"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin.ts
 msgid "Could not install {pluginName}"
-msgstr ""
+msgstr "Haikuweza kusakinisha {pluginName}"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -14697,7 +14701,7 @@ msgstr "Kwenye ukurasa huu"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
 msgid "Not imported"
-msgstr ""
+msgstr "Haijaletwa"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (coded)"
@@ -14796,7 +14800,7 @@ msgstr "{title} haikuweza kuonyeshwa"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/UnreadablePluginVizSettings.tsx
 msgid "Reset chart settings"
-msgstr ""
+msgstr "Weka upya mipangilio ya chati"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -14956,7 +14960,7 @@ msgstr "Bado hakuna ramani"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRowActions.tsx
 msgid "Change the records for {slotTitle}"
-msgstr ""
+msgstr "Badilisha rekodi za {slotTitle}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -15365,7 +15369,7 @@ msgstr "Chati ya Vitawanyiko"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
 msgid "District, name or code"
-msgstr ""
+msgstr "Wilaya, jina au msimbo"
 
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
 msgid "Layouts"
@@ -15546,7 +15550,7 @@ msgstr "Mtu yeyote"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
 msgid "Removed the records for {slotTitle}"
-msgstr ""
+msgstr "Imeondoa rekodi za {slotTitle}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
@@ -15808,7 +15812,8 @@ msgstr "Chora eneo la dokezo"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/DataSlotProblemList.tsx
 msgid "The field for {attributeTitle} has the wrong type. It needs: "
 "{typeLabel}."
-msgstr ""
+msgstr "Sehemu ya {attributeTitle} ina aina isiyo sahihi. Inahitaji: "
+"{typeLabel}."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
@@ -15884,7 +15889,7 @@ msgstr "Umbali ({unitLabel})"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr ""
+msgstr "Programu-jalizi hii haijumuishi tena {filePath}."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
