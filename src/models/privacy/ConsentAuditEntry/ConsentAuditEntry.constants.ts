@@ -12,6 +12,7 @@ export const ConsentAuditContexts = [
   "generated_sql_assumptions",
   "user_message_text",
   "clarification_answer",
+  "dictionary_suggestions",
 ] as const;
 
 /** Consent-modal modes persisted with the decision. */

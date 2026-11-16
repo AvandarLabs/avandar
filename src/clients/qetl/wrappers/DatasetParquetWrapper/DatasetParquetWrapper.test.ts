@@ -34,16 +34,24 @@ const {
   datasetColumnGetAllMock,
   datasetGetAllMock,
   downloadDatasetMock,
+  getImportJobMock,
+  localDatasetGetByIdMock,
   openDataSourceGetAllMock,
+  pdfSourceGetAllMock,
+  waitForImportMock,
   xlsxSourceGetAllMock,
 } = vi.hoisted(() => {
   return {
+    getImportJobMock: vi.fn(),
+    localDatasetGetByIdMock: vi.fn(),
+    waitForImportMock: vi.fn(),
     catalogEntryGetOneMock: vi.fn(),
     csvSourceGetAllMock: vi.fn(),
     datasetColumnGetAllMock: vi.fn(),
     datasetGetAllMock: vi.fn(),
     downloadDatasetMock: vi.fn(),
     openDataSourceGetAllMock: vi.fn(),
+    pdfSourceGetAllMock: vi.fn(),
     xlsxSourceGetAllMock: vi.fn(),
   };
 });
@@ -80,6 +88,12 @@ vi.mock("@/clients/datasets/source-datasets/XlsxFileDatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/datasets/source-datasets/PdfFileDatasetClient", () => {
+  return {
+    PdfFileDatasetClient: _cachedClient({ getAll: pdfSourceGetAllMock }),
+  };
+});
+
 vi.mock("@/clients/datasets/source-datasets/OpenDataDatasetClient", () => {
   return {
     OpenDataDatasetClient: _cachedClient({ getAll: openDataSourceGetAllMock }),
@@ -107,6 +121,21 @@ vi.mock(
   },
 );
 
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+  return {
+    LocalDatasetClient: { getById: localDatasetGetByIdMock },
+  };
+});
+
+vi.mock("@/clients/datasets/ImportJobsManager", () => {
+  return {
+    ImportJobsManager: {
+      getJob: getImportJobMock,
+      waitForCompletion: waitForImportMock,
+    },
+  };
+});
+
 function _mockDataset(sourceType: Dataset.T["sourceType"]): void {
   // `getAll` resolves a list, matching the shape every caller of this client
   // uses. The wrapper takes the first row.
@@ -124,10 +153,13 @@ beforeEach(() => {
   vi.clearAllMocks();
   csvSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   xlsxSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
+  pdfSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   openDataSourceGetAllMock.mockResolvedValue([
     { datasetId: DATASET_ID, catalogListingId: CATALOG_ENTRY_ID },
   ]);
   datasetColumnGetAllMock.mockResolvedValue([]);
+  getImportJobMock.mockReturnValue(undefined);
+  localDatasetGetByIdMock.mockResolvedValue(undefined);
 });
 
 describe("DatasetParquetWrapper", () => {
@@ -183,6 +215,109 @@ describe("DatasetParquetWrapper", () => {
     ).rejects.toThrow(
       `Failed to download data for csv_file dataset '${DATASET_ID}' (cases)`,
     );
+  });
+
+  it("reads a file kept offline from this device's copy, not storage", async () => {
+    _mockDataset("csv_file");
+    csvSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(localDatasetGetByIdMock).toHaveBeenCalledWith({ id: DATASET_ID });
+    expect(downloadDatasetMock).not.toHaveBeenCalled();
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("waits for a resumed transcode before reading a file kept offline", async () => {
+    _mockDataset("xlsx_file");
+    xlsxSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    const localParquet = new Blob(["local-parquet"]);
+    getImportJobMock.mockReturnValue({ status: "running" });
+    waitForImportMock.mockImplementation(async () => {
+      localDatasetGetByIdMock.mockResolvedValue({
+        datasetId: DATASET_ID,
+        parseStatus: "ready",
+        parquetData: localParquet,
+      });
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(waitForImportMock).toHaveBeenCalledWith(DATASET_ID);
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reads this device's copy when storage has none", async () => {
+    _mockDataset("csv_file");
+    downloadDatasetMock.mockResolvedValue(undefined);
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(downloadDatasetMock).toHaveBeenCalledTimes(1);
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reads this device's copy when the download fails", async () => {
+    _mockDataset("pdf_file");
+    downloadDatasetMock.mockRejectedValue(new Error("Failed to fetch"));
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reports a file kept offline that this device has no copy of", async () => {
+    _mockDataset("csv_file");
+    csvSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    localDatasetGetByIdMock.mockResolvedValue(undefined);
+    const wrapper = createDatasetParquetWrapper();
+
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toThrow(
+      `The csv_file dataset '${DATASET_ID}' (cases) is kept offline, and this device has no copy of its rows`,
+    );
+    expect(downloadDatasetMock).not.toHaveBeenCalled();
   });
 
   it("downloads open data from the parquet url its catalog listing names", async () => {

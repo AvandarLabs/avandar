@@ -3,6 +3,20 @@ import { match } from "ts-pattern";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 
+/**
+ * The DuckDB type each Ava type is cast to, the same names
+ * `datasets__ava_data_type_to_duckdb` gives in SQL.
+ */
+const DUCKDB_TYPE_SQL_BY_AVA_DATA_TYPE = {
+  varchar: "VARCHAR",
+  bigint: "BIGINT",
+  double: "DOUBLE",
+  time: "TIME",
+  date: "DATE",
+  timestamp: "TIMESTAMP",
+  boolean: "BOOLEAN",
+} as const satisfies Record<AvaDataType.T, string>;
+
 export const AvaDataTypeModule = {
   /** Data types that can be handled in Avandar. */
   Types: registry<AvaDataType.T>().keys(
@@ -43,6 +57,16 @@ export const AvaDataTypeModule = {
       boolean: "Boolean",
       _otherwise: avaDataType,
     });
+  },
+
+  /**
+   * The DuckDB type a value of this Ava type is cast to in SQL, for example
+   * when compiled SQL casts a column to the type its dataset column says.
+   */
+  toDuckDbTypeSql: (
+    avaDataType: AvaDataType.T,
+  ): (typeof DUCKDB_TYPE_SQL_BY_AVA_DATA_TYPE)[AvaDataType.T] => {
+    return DUCKDB_TYPE_SQL_BY_AVA_DATA_TYPE[avaDataType];
   },
 
   isTemporal: (

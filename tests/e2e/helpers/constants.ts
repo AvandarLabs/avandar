@@ -53,6 +53,51 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
 /**
+ * 24 measles cases with coded columns (GENDER 1/2/9, hosp_yn Y/N, ses_cat
+ * 1 to 4), onset dates, and case ids, for learning a dictionary from a
+ * dataset.
+ */
+export const MEASLES_LINE_LIST_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/measles-line-list-small/measles-line-list-small.csv",
+);
+
+/** Row count DuckDB reports once it parses the measles line list CSV. */
+export const MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 24;
+
+/**
+ * Two Kings measles line lists with one column layout (`CaseNo`, `GENDER`
+ * coded 1/2/9, ISO `onset_dt`, `zip`), for combining datasets with a
+ * crosswalk.
+ */
+export const CROSSWALK_KINGS_MARCH_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-kings-2026-03.csv",
+);
+
+/** The April Kings line list, in the same layout as March. */
+export const CROSSWALK_KINGS_APRIL_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-kings-2026-04.csv",
+);
+
+/** Rows DuckDB reports once it parses either Kings line list. */
+export const CROSSWALK_KINGS_CSV_EXPECTED_ROW_COUNT = 3;
+
+/**
+ * A Queens measles line list in another layout: `case_id`, `sex` coded
+ * M/F/U, `rash_onset` as month/day/year text with one unreadable value
+ * (so DuckDB keeps it text), and `zip_code`.
+ */
+export const CROSSWALK_QUEENS_MARCH_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-queens-2026-03.csv",
+);
+
+/** Rows DuckDB reports once it parses the Queens line list. */
+export const CROSSWALK_QUEENS_CSV_EXPECTED_ROW_COUNT = 12;
+
+/**
  * Seven patient visits with a date and a temperature, for a per-month case
  * type field. See the README beside it.
  */

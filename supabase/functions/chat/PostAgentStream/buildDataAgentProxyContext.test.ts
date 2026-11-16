@@ -184,20 +184,23 @@ describe("buildDataAgentProxyContext", () => {
     },
   );
 
-  it("offers fitRegression when the proxy was given the tool", () => {
-    const context = buildDataAgentProxyContext({
-      clientMessages: [],
-      datasets: [],
-      today: "2026-11-10",
-      promptId: "data-agent-v4",
-      pluginTools: [EPIDEMIOLOGY_TOOL],
-    });
-    expect(
-      context.tools?.map((tool) => {
-        return tool.name;
-      }),
-    ).toContain("fitRegression");
-  });
+  it.each(["data-agent-v4", "data-agent-v5"] as const)(
+    "offers fitRegression to %s when the proxy was given the tool",
+    (promptId) => {
+      const context = buildDataAgentProxyContext({
+        clientMessages: [],
+        datasets: [],
+        today: "2026-11-10",
+        promptId,
+        pluginTools: [EPIDEMIOLOGY_TOOL],
+      });
+      expect(
+        context.tools?.map((tool) => {
+          return tool.name;
+        }),
+      ).toContain("fitRegression");
+    },
+  );
 
   it("appends plugin tools after the built-in tools", () => {
     const context = buildDataAgentProxyContext({

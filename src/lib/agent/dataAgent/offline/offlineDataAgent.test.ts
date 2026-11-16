@@ -11,6 +11,7 @@ import {
 } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import { profileOfflineDatasets } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type {
   LocalLlm,
   LocalLlmRequest,
@@ -29,6 +30,32 @@ const WORLD = {
   id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
   name: "world.csv",
   columns: [{ name: "country", dataType: "varchar" }],
+};
+
+/** A line list whose GENDER column has a code list attached. */
+const LINE_LIST = {
+  id: "cccccccc-3333-4333-8333-cccccccccccc",
+  name: "line list",
+  columns: [
+    {
+      name: "GENDER",
+      dataType: "bigint",
+      codes: {
+        direction: "decode" as const,
+        pairs: [
+          { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+          {
+            code: "2",
+            label: "Female",
+            acceptedSpellings: ["F"],
+            isMissing: false,
+          },
+          { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+        ],
+      },
+    },
+    { name: "hosp_yn", dataType: "varchar" },
+  ],
 };
 
 /** Answers the profile and lookup queries the offline agent sends. */
@@ -126,6 +153,208 @@ describe("findQuestionValues", () => {
         return match.storedValue;
       }),
     ).toEqual(["New York"]);
+  });
+});
+
+describe("findQuestionValues with code lists", () => {
+  it("finds a label in a code list and gives the code to filter on", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : [];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const matches = await findQuestionValues(host, {
+      datasets: [LINE_LIST],
+      profiles,
+      question: "How many female cases were hospitalized?",
+    });
+
+    expect(matches).toContainEqual({
+      term: "female",
+      datasetId: LINE_LIST.id,
+      column: "GENDER",
+      storedValue: "2",
+      codeLabel: "Female",
+    });
+  });
+});
+
+describe("offline prompt with code lists", () => {
+  it("lists a coded column's codes and marks a code with no label", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : ["Y", "N"];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [LINE_LIST],
+      profiles,
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(
+      '- GENDER bigint, codes: 1 = "Male", 2 = "Female", 9 = (no label) (missing value)',
+    );
+  });
+
+  it("tells the model the code a label in the question stands for", () => {
+    const message = buildOfflineQuestionMessage({
+      question: "How many female cases?",
+      matches: [
+        {
+          term: "female",
+          datasetId: LINE_LIST.id,
+          column: "GENDER",
+          storedValue: "2",
+          codeLabel: "Female",
+        },
+      ],
+      datasets: [LINE_LIST],
+    });
+
+    expect(message).toContain(
+      '- "female" is code 2 in t0."GENDER" (2 = Female).',
+    );
+  });
+});
+
+/** A one-column dataset whose column holds `pairs` as codes. */
+function _createCodedDataset(
+  id: string,
+  dataType: string,
+  pairs: ReadonlyArray<{ code: string; label: string }>,
+): {
+  dataset: typeof LINE_LIST;
+  profile: OfflineDatasetProfile;
+} {
+  const column = {
+    name: "coded",
+    dataType,
+    codes: {
+      direction: "decode" as const,
+      pairs: pairs.map((pair) => {
+        return { ...pair, acceptedSpellings: [], isMissing: false };
+      }),
+    },
+  };
+  return {
+    dataset: { id, name: `dataset ${id}`, columns: [column] },
+    profile: { datasetId: id, rowCount: 1, columns: [column] },
+  };
+}
+
+describe("offline prompt code-list limits", () => {
+  it("escapes a quote and writes a newline as a space in a code list", () => {
+    const { dataset, profile } = _createCodedDataset(LINE_LIST.id, "varchar", [
+      { code: 'A"1', label: 'Said "yes"\nloudly' },
+    ]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [dataset],
+      profiles: [profile],
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(
+      '- coded varchar, codes: "A\\"1" = "Said \\"yes\\" loudly"',
+    );
+  });
+
+  it("cuts a long label to 60 characters", () => {
+    const { dataset, profile } = _createCodedDataset(LINE_LIST.id, "bigint", [
+      { code: "1", label: "x".repeat(80) },
+    ]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [dataset],
+      profiles: [profile],
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(`codes: 1 = "${"x".repeat(57)}..."`);
+  });
+
+  it("names coded columns past the code-list budget by name and type", () => {
+    const pairs = Array.from({ length: 30 }, (_, index) => {
+      return { code: String(index), label: `Label number ${index}` };
+    });
+    const coded = Array.from({ length: 20 }, (_, index) => {
+      return _createCodedDataset(
+        `dddddddd-${String(index).padStart(4, "0")}-4ddd-8ddd-dddddddddddd`,
+        "bigint",
+        pairs,
+      );
+    });
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: coded.map(({ dataset }) => {
+        return dataset;
+      }),
+      profiles: coded.map(({ profile }) => {
+        return profile;
+      }),
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain("  - coded bigint\n");
+    expect(prompt).toMatch(
+      /\n\(and \d+ more columns with code lists\)\n\nToday/,
+    );
+  });
+
+  it("lists one label's codes on one line and flags it across datasets", () => {
+    const { dataset: first } = _createCodedDataset(LINE_LIST.id, "bigint", []);
+    const { dataset: second } = _createCodedDataset(WORLD.id, "varchar", []);
+
+    const message = buildOfflineQuestionMessage({
+      question: "How many female cases?",
+      matches: [
+        {
+          term: "female",
+          datasetId: first.id,
+          column: "GENDER",
+          storedValue: "2",
+          codeLabel: "Female",
+        },
+        {
+          term: "female",
+          datasetId: second.id,
+          column: "sex_cd",
+          storedValue: "F",
+          codeLabel: "Female",
+        },
+      ],
+      datasets: [first, second],
+    });
+
+    expect(message).toMatch(
+      /- "female" is code 2 in t\d\."GENDER" \(2 = Female\), code F in t\d\."sex_cd" \(F = Female\)\. This name means different things/,
+    );
+  });
+
+  it("caps the columns one label lists", () => {
+    const matches = Array.from({ length: 8 }, (_, index) => {
+      return {
+        term: "yes",
+        datasetId: LINE_LIST.id,
+        column: `flag_${index}`,
+        storedValue: "Y",
+        codeLabel: "Yes",
+      };
+    });
+
+    const message = buildOfflineQuestionMessage({
+      question: "How many said yes?",
+      matches,
+      datasets: [LINE_LIST],
+    });
+
+    expect(message).toContain('t0."flag_4" (Y = Yes), and 3 more columns.');
+    expect(message).not.toContain("flag_5");
   });
 });
 

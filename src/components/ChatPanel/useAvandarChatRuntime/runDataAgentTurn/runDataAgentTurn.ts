@@ -355,6 +355,9 @@ function _buildTurnInputs(
   const { conversation } = options;
   const { gadgetContext } = options.turn;
   const blocks = _buildBlocks(options);
+  if (options.turn.titleMaskRef) {
+    options.turn.titleMaskRef.current = conversation.sqlVault.maskText;
+  }
   // A failed load with a tray repeats last turn's tray. With an empty tray
   // the attached block stays empty, so the model hears it was cleared.
   const isTrayUnknown =

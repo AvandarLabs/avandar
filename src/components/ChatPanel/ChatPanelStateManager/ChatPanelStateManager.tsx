@@ -22,11 +22,6 @@ type ChatPanelState = {
    */
   layout: ChatPanelLayout;
   /**
-   * Incremented to start a fresh Case Manager design session (new thread +
-   * seed turn). ChatPanel resets the thread and appends the seed prompt.
-   */
-  caseDesignSessionNonce: number;
-  /**
    * The clarification the LLM most recently asked for, awaiting a user
    * answer. Set when the chat runtime sees `response.clarification`; cleared
    * once the user submits an answer.
@@ -50,7 +45,6 @@ const initialState: ChatPanelState = {
   isOpen: false,
   isAvailable: true,
   layout: "docked",
-  caseDesignSessionNonce: 0,
   pendingClarification: undefined,
   pendingCaseTypeDraft: undefined,
   contextTray: [],
@@ -74,7 +68,6 @@ export const ChatPanelStateManager = createAppStateManager({
     isOpen: false,
     isAvailable: false,
     layout: "docked",
-    caseDesignSessionNonce: 0,
     pendingClarification: undefined,
     pendingCaseTypeDraft: undefined,
     contextTray: [],
@@ -101,7 +94,6 @@ export const ChatPanelStateManager = createAppStateManager({
         ...state,
         isOpen: true,
         layout: "composer",
-        caseDesignSessionNonce: state.caseDesignSessionNonce + 1,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
       };

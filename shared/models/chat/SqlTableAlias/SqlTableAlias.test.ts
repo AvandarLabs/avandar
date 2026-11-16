@@ -114,6 +114,97 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     expect(block).not.toContain(DATASET_B.id);
   });
 
+  it("lists a coded column's codes beside its name", () => {
+    const aliases = SqlTableAlias.fromDatasets([DATASET_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [
+        {
+          dataset_id: DATASET_B.id,
+          name: "GENDER",
+          data_type: "bigint",
+          codes: {
+            direction: "decode",
+            pairs: [
+              {
+                code: "1",
+                label: "Male",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+              {
+                code: "2",
+                label: "Female",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+            ],
+          },
+        },
+        { dataset_id: DATASET_B.id, name: "county", data_type: "varchar" },
+      ],
+    });
+
+    expect(block).toContain(
+      "- t0: Cholera cases (GENDER [1=Male, 2=Female], county)",
+    );
+  });
+
+  it("quotes a code or label holding a bracket inside a column's list", () => {
+    const aliases = SqlTableAlias.fromDatasets([DATASET_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [
+        {
+          dataset_id: DATASET_B.id,
+          name: "grade",
+          data_type: "varchar",
+          codes: {
+            direction: "decode",
+            pairs: [
+              {
+                code: "[A]",
+                label: "Top] grade",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(block).toContain('(grade ["[A]"="Top] grade"])');
+  });
+
+  it("names columns past the code-list budget without their lists", () => {
+    const pairs = Array.from({ length: 30 }, (_, index) => {
+      return {
+        code: String(index),
+        label: `Label number ${index}`,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+    const aliases = SqlTableAlias.fromDatasets([DATASET_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: Array.from({ length: 20 }, (_, index) => {
+        return {
+          dataset_id: DATASET_B.id,
+          name: `coded_${index}`,
+          data_type: "bigint",
+          codes: { direction: "decode" as const, pairs },
+        };
+      }),
+    });
+
+    expect(block).toContain("coded_0 [0=Label number 0");
+    expect(block).toMatch(/, coded_19\)/);
+    expect(block).toMatch(/\n\(and \d+ more columns with code lists\)$/);
+    expect(block.length).toBeLessThan(5000);
+  });
+
   it("lists concept attribute names without concept UUIDs", () => {
     const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
     const block = SqlTableAlias.formatSchemaBlock({

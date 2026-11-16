@@ -36,7 +36,7 @@ async function sourceList(ctx, showImport = false) {
     await page.getByRole("tabpanel", { name: "Upload", exact: true }).waitFor();
   // The visible count is absent while loading, including when cached requests do not fire.
   const count = page
-    .getByRole("heading", { name: "Datasets", exact: true })
+    .getByRole("heading", { name: "All data", exact: true })
     .locator("..")
     .locator("p");
   await expect(count).toHaveText(/^\d+$/);

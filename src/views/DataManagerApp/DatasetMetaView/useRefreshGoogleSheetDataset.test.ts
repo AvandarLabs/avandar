@@ -41,6 +41,34 @@ vi.mock("@/clients/APIClient", () => {
   return { APIClient: { get: apiGetMock } };
 });
 
+vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
+  return {
+    VirtualDatasetClient: {
+      withCache: () => {
+        return {
+          withEnsureQueryData: () => {
+            return {
+              getAll: async () => {
+                return [];
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/crosswalks/CrosswalkDatasetClient", () => {
+  return {
+    CrosswalkDatasetClient: {
+      getAll: async () => {
+        return [];
+      },
+    },
+  };
+});
+
 vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {

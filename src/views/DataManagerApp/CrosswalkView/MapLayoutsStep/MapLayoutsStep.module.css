@@ -1,0 +1,15 @@
+/*
+ * Step 2's three regions, left to right: the layout stub on the tinted
+ * surface, the mapping table in the lit content column, and the side pane
+ * in the body's rail, widened so its controls and example fit.
+ */
+.mapLayoutsBody {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.mapLayoutsMain {
+  --ava-app-view-rail-width: 22rem;
+}

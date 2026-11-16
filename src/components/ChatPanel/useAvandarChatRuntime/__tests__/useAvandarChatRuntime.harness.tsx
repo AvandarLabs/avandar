@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { act, render, waitFor } from "@testing-library/react";
 import { expect } from "vitest";
+import { parseChatSessionIndex } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import { DataExplorerStandIn } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/DataExplorerStandIn";
 import {
   DATASET_A_ID,
@@ -200,11 +201,21 @@ export async function seedWorkspaceASession(): Promise<TestRouter> {
   return router;
 }
 
-/** The localStorage key the chat thread for `workspace` persists under. */
+/**
+ * The localStorage key the selected chat session's thread for `workspace`
+ * persists under. Reads the workspace's session index for the selected id.
+ */
 export function makeThreadStorageKeyFromWorkspace(
   workspace: Workspace.T,
 ): string {
-  return `ava.chat.thread.${workspace.id}.${USER_ID}`;
+  const rawIndex = window.localStorage.getItem(
+    `ava.chat.sessions.${workspace.id}.${USER_ID}`,
+  );
+  const index = parseChatSessionIndex(JSON.parse(rawIndex ?? "null"));
+  if (!index) {
+    throw new Error(`no chat session index for workspace ${workspace.slug}`);
+  }
+  return `ava.chat.thread.${workspace.id}.${USER_ID}.${index.selectedId}`;
 }
 
 /** Clears every piece of state a previous test left behind. */

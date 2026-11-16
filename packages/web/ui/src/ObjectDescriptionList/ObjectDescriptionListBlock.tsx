@@ -124,6 +124,7 @@ export function ObjectDescriptionListBlock<
                   type="unknown"
                   value={data[key]}
                   rootData={rootData}
+                  parentObject={data}
                   onSubmitChange={onSubmitChange}
                   {...childRenderOptions}
                 />

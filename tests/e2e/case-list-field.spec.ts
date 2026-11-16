@@ -291,11 +291,15 @@ test.describe("Case list fields", () => {
       .toBe(RECORD_COUNT);
 
     // Designing in chat leaves Ask Avandar expanded over the page. Docking it
-    // is what a person does to get back to the case types.
-    await page.getByRole("button", { name: "Dock chat panel" }).click();
+    // is what a person does to get back to the case types. The expanded panel
+    // covers the overlay's center, so a pointer click lands on the panel.
+    // Enter activates the overlay button the way a keyboard user docks it.
+    await page.getByRole("button", { name: "Dock chat panel" }).press("Enter");
     await page.getByRole("link", { name: CASE_TYPE_NAME, exact: true }).click();
+    // A record row's link name also carries its status and assignee.
     await page
-      .getByRole("link", { name: new RegExp(`${RECORD_KEY}$`) })
+      .getByRole("link")
+      .filter({ has: page.getByText(RECORD_KEY, { exact: true }) })
       .click();
 
     // Exact, because the rail also has a "Sources of Daily new cases" list.

@@ -18,6 +18,7 @@ import type {
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { NestedParquetQueryResult } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import type { FetchedOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
@@ -36,9 +37,12 @@ export type DefaultRegistryOptions = {
    * Runs a nested QETL query and returns Parquet bytes. A virtual dataset's
    * defining SQL is itself a QETL query, so this must be bound per query with
    * the caller's `datasetDuckDbLease` closed over, or the nested query races
-   * the outer one on the shared queryable relation cache.
+   * the outer one on the shared queryable relation cache. It returns the
+   * rows and when the datasets they were read from go stale.
    */
-  runParquetQuery: (options: Readonly<{ rawSql: string }>) => Promise<Blob>;
+  runParquetQuery: (
+    options: Readonly<{ rawSql: string }>,
+  ) => Promise<NestedParquetQueryResult>;
 
   /**
    * Resolves a dataset record, shared by the composite and by the wrappers it

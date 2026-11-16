@@ -98,6 +98,7 @@ export const DATA_AGENT_PROMPT_IDS = [
   "data-agent-v2",
   "data-agent-v3",
   "data-agent-v4",
+  "data-agent-v5",
 ] as const;
 
 /** One served prompt version. */
@@ -107,9 +108,10 @@ export type DataAgentPromptId = (typeof DATA_AGENT_PROMPT_IDS)[number];
  * The version of the data agent's prompt this build uses. Only the prompt is
  * versioned: every version shares the same built-in tools. The browser names
  * it in the proxy URL. v2 adds the current page block. v3 adds the attached
- * and mentioned blocks. v4 adds a TOOLS bullet about plugin tools.
+ * and mentioned blocks. v4 adds a TOOLS bullet about plugin tools. v5 adds
+ * the code lists of columns a dictionary is attached to.
  */
-export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v4";
+export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v5";
 
 /**
  * The prompt versions whose TOOLS section describes plugin tools. The proxy
@@ -118,6 +120,7 @@ export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v4";
  */
 export const PLUGIN_TOOL_PROMPT_IDS: readonly DataAgentPromptId[] = [
   "data-agent-v4",
+  "data-agent-v5",
 ];
 
 /** Whether the proxy serves a prompt version. */

@@ -26,6 +26,7 @@ import {
   runEvalPluginAiTool,
 } from "./fitRegressionTooling";
 import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
@@ -440,6 +441,8 @@ export function createPiHarness(
     database: EvalDatabase;
     configName: string;
     model: string;
+    /** The workspace's datasets as the agent sees them. COVID by default. */
+    datasets?: readonly DataAgentDataset[];
   }>,
 ): EvalHarness {
   const models = createModels();
@@ -469,7 +472,7 @@ export function createPiHarness(
         database: options.database,
         createAgent: (host) => {
           return createDataAgent({
-            datasets: COVID_DATASETS,
+            datasets: options.datasets ?? COVID_DATASETS,
             host,
             policy,
             streamFn,

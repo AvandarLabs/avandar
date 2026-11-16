@@ -6,6 +6,7 @@ import { notifications } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -20,6 +21,19 @@ export const Route = createFileRoute(
 });
 
 /**
+ * The New case type card's action: start a case-design session, then open
+ * chat in case design. Without loaded sessions it only opens case design.
+ */
+function useStartCaseDesign(): () => void {
+  const dispatch = ChatPanelStateManager.useDispatch();
+  const sessions = useChatSessions();
+  return () => {
+    sessions?.startCaseDesignSession();
+    dispatch.beginCaseDesign();
+  };
+}
+
+/**
  * Case Manager home: a grid of case types, including first-run with only
  * the create card.
  */
@@ -27,7 +41,7 @@ function OntologyDesignerRoot(): ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const dispatch = ChatPanelStateManager.useDispatch();
+  const startCaseDesign = useStartCaseDesign();
   const [concepts, isLoading] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -88,7 +102,7 @@ function OntologyDesignerRoot(): ReactNode {
   return (
     <CaseTypeHome
       caseTypes={concepts ?? []}
-      onCreate={canCreateCaseType ? dispatch.beginCaseDesign : undefined}
+      onCreate={canCreateCaseType ? startCaseDesign : undefined}
       onDeleteCaseType={canDeleteCaseType ? confirmDeleteCaseType : undefined}
       onOpenCaseType={(caseType) => {
         navigate(

@@ -101,6 +101,12 @@ export function transpileToSqlite(statements: readonly string[]): string[] {
  *   original prefix is a parse error.
  * - `NOT VALID` on ADD CONSTRAINT -> dropped. Postgres-only modifier
  *   meaning "do not validate existing rows"; SQLite always validates.
+ * - `DEFAULT CAST('<literal>' AS <type>)` -> `DEFAULT '<literal>'`. This is
+ *   how sqlglot renders a Postgres `'<literal>'::<type>` default. SQLite
+ *   accepts only a bare literal as an ADD COLUMN default, and dropping it
+ *   would leave a NOT NULL column that SQLite refuses to add to a table
+ *   that already holds rows. An empty array (`'{}'` cast to an array)
+ *   becomes `'[]'`, because the mirror stores arrays as JSON text.
  * - `DEFAULT <fn>(...)` -> dropped. Postgres builtins like
  *   `gen_random_uuid()` and `auth.uid()` survive as `UUID()` /
  *   `auth.uid()` in the transpile, which SQLite cannot evaluate at
@@ -128,6 +134,14 @@ export function stripPostgresIsms(sql: string): string {
   out = out.replace(/"public"\s*\./gi, "");
   out = out.replace(/\bpublic\s*\./gi, "");
   out = out.replace(/\s+NOT\s+VALID\b/gi, "");
+  out = out.replace(
+    /\bDEFAULT\s+CAST\(\s*'\{\}'\s+AS\s+ARRAY\s*<[^>]+>\s*\)/gi,
+    "DEFAULT '[]'",
+  );
+  out = out.replace(
+    /\bDEFAULT\s+CAST\(\s*('(?:[^']|'')*')\s+AS\s+[a-zA-Z_][a-zA-Z0-9_ ]*\)/gi,
+    "DEFAULT $1",
+  );
   out = out.replace(
     /\s+DEFAULT\s+[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)?\s*\([^)]*\)/gi,
     "",

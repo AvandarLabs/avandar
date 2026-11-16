@@ -4,10 +4,19 @@ import { makeHasPermissionFromAppRoles, render } from "@/test-utils";
 import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { ReactNode } from "react";
 
-const { caseTypeHomeMock, hasPermissionMock } = vi.hoisted(() => {
+const {
+  beginCaseDesignMock,
+  caseTypeHomeMock,
+  chatSessions,
+  hasPermissionMock,
+  startCaseDesignSessionMock,
+} = vi.hoisted(() => {
   return {
+    beginCaseDesignMock: vi.fn(),
     caseTypeHomeMock: vi.fn(),
+    chatSessions: { isMounted: true },
     hasPermissionMock: vi.fn<(permissionKey: PermissionKey) => boolean>(),
+    startCaseDesignSessionMock: vi.fn(),
   };
 });
 
@@ -46,12 +55,22 @@ vi.mock(
     return {
       ChatPanelStateManager: {
         useDispatch: () => {
-          return { beginCaseDesign: vi.fn() };
+          return { beginCaseDesign: beginCaseDesignMock };
         },
       },
     };
   },
 );
+
+vi.mock("@/components/ChatPanel/ChatSessionProvider/useChatSessions", () => {
+  return {
+    useChatSessions: () => {
+      return chatSessions.isMounted
+        ? { startCaseDesignSession: startCaseDesignSessionMock }
+        : undefined;
+    },
+  };
+});
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
@@ -77,7 +96,7 @@ vi.mock("@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome", () => {
 const { Route } = await import("./index");
 
 type CaseTypeHomeHandlers = {
-  onCreate?: unknown;
+  onCreate?: () => void;
   onDeleteCaseType?: unknown;
 };
 
@@ -93,8 +112,11 @@ function _renderHomeFor(
 
 describe("/$workspaceSlug/ontology-designer/", () => {
   beforeEach(() => {
+    beginCaseDesignMock.mockReset();
     caseTypeHomeMock.mockReset();
     hasPermissionMock.mockReset();
+    startCaseDesignSessionMock.mockReset();
+    chatSessions.isMounted = true;
   });
 
   it("hands a case_types viewer's home no create action", () => {
@@ -117,5 +139,23 @@ describe("/$workspaceSlug/ontology-designer/", () => {
     expect(_renderHomeFor({ case_types: "admin" }).onDeleteCaseType).toBeTypeOf(
       "function",
     );
+  });
+
+  it("starts a case-design session from the New case type card", () => {
+    _renderHomeFor({ case_types: "editor" }).onCreate?.();
+
+    expect(startCaseDesignSessionMock).toHaveBeenCalledOnce();
+    expect(beginCaseDesignMock).toHaveBeenCalledOnce();
+    expect(startCaseDesignSessionMock.mock.invocationCallOrder[0]).toBeLessThan(
+      beginCaseDesignMock.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("only opens case design when no chat sessions are loaded", () => {
+    chatSessions.isMounted = false;
+    _renderHomeFor({ case_types: "editor" }).onCreate?.();
+
+    expect(startCaseDesignSessionMock).not.toHaveBeenCalled();
+    expect(beginCaseDesignMock).toHaveBeenCalledOnce();
   });
 });

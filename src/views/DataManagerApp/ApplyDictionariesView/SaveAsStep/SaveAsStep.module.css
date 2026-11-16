@@ -1,0 +1,24 @@
+/*
+ * A save target: a radio card on the view's lit surface, Brand Blue only
+ * once chosen.
+ */
+.saveTargetCard {
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  transition: var(--ava-transition-interactive);
+}
+
+.saveTargetCard[data-checked] {
+  background-color: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-5);
+}
+
+.saveTargetCard:disabled {
+  background-color: var(--ava-surface-sunken);
+  cursor: not-allowed;
+}
+
+.saveTargetCard:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}

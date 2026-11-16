@@ -1,3 +1,4 @@
+import type { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
@@ -8,7 +9,10 @@ import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDatase
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type {
+  LogicalDefinition,
+  PrincipalKey,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 import type {
   DatasetDuckDbLease,
@@ -21,14 +25,36 @@ import type {
 } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 
-/** A column whose stored name or type differs from the source data. */
+/**
+ * A column whose stored name, type, or values differ from the source data.
+ */
 export type ColumnReplacement = {
   /** The original name of the column from the source data. */
   originalName: string;
   /** The new name of the column. */
   alias?: string;
-  /** The new data type of the column. */
+  /**
+   * The new data type of the column. For a converted column, the type its
+   * values are cast to before they are converted.
+   */
   dataType?: DuckDbDataType;
+  /** Set for a converted column: its values are translated as it loads. */
+  valueMapping?: ColumnConversion.T;
+  /**
+   * The cast for a converted column's `<column>_original` copy, when the
+   * copy's stored type differs from the type the column loads as.
+   */
+  originalCopyDataType?: DuckDbDataType;
+};
+
+/**
+ * Each of a query's datasets' renames, casts, and conversions, and the key
+ * that names that projection, read from the dataset catalog before the
+ * query loads its relations.
+ */
+export type LoadedColumnReplacements = {
+  replacementsByDatasetId: Record<string, ColumnReplacement[]>;
+  projectionKeyByDatasetId: Record<string, string>;
 };
 
 /** A dataset paired with the source record that says how to fetch it. */
@@ -83,6 +109,11 @@ export type AcquiredRelationBytes = {
    * again; `undefined` for rows that never go stale.
    */
   staleAt: number | undefined;
+  /**
+   * The definition these rows were produced from, stored with them: a
+   * virtual dataset's SQL, or undefined for a dataset with no defining text.
+   */
+  definition?: LogicalDefinition;
 };
 
 /** Per-dataset column sets a query needs, or `"all"` when unknown. */
@@ -161,6 +192,17 @@ export type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
 /** Datasets keyed by their ID. */
 export type DatasetsById = Record<Dataset.Id, Dataset.T | undefined>;
 
+/**
+ * Called at least once for each dataset a query loads, as soon as its
+ * relation is in hand: at once for one DuckDB already serves, after the
+ * storage tier's bytes are read, or after its source returns them. A
+ * virtual dataset's nested query reports its own datasets through the same
+ * callback, so a dataset is reported again from a nested query that reads
+ * the same dataset. A listener that throws is logged and ignored. Lets a
+ * caller show progress across a query that reads many datasets.
+ */
+export type RelationFetchedListener = (datasetId: Dataset.Id) => void;
+
 /** Options for one Qetl query. */
 export type RunQetlQueryOptions = {
   rawSql: string;
@@ -189,6 +231,8 @@ export type RunQetlQueryOptions = {
    * data to the concept planner, never into the SQL.
    */
   conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+  /** Reports each dataset as its relation is in hand. */
+  onRelationFetched?: RelationFetchedListener;
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
@@ -212,4 +256,6 @@ export type RunLeasedQueryOptions = {
   signal?: AbortSignal;
   /** The caller's stated column sets, overriding inference per dataset. */
   neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+  /** The caller's progress callback, passed down to relation loading. */
+  onRelationFetched?: RelationFetchedListener;
 };

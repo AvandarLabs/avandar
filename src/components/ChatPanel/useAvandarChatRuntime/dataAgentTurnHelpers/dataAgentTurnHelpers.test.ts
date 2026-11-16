@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
@@ -14,6 +14,14 @@ import type {
   DataAgentConversation,
   DataAgentTurnOptions,
 } from "./dataAgentConversation.types";
+
+const { loadColumnCodesMock } = vi.hoisted(() => {
+  return { loadColumnCodesMock: vi.fn() };
+});
+
+vi.mock("@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes", () => {
+  return { loadColumnCodes: loadColumnCodesMock };
+});
 
 vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome",
@@ -149,9 +157,52 @@ describe("loadDataAgentDatasets", () => {
     columns: [{ name: "cases", dataType: "bigint" }],
   };
 
+  beforeEach(() => {
+    loadColumnCodesMock.mockResolvedValue(new Map());
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     window.sessionStorage.clear();
+  });
+
+  it("gives a column the code list a dictionary attaches to it", async () => {
+    vi.spyOn(DatasetClient, "getAllDatasetsWithColumns").mockResolvedValue([
+      {
+        id: "dataset-1",
+        name: "line list",
+        columns: [{ id: "col-gender", name: "GENDER", dataType: "bigint" }],
+      },
+    ] as never);
+    loadColumnCodesMock.mockResolvedValue(
+      new Map([
+        [
+          "col-gender",
+          {
+            direction: "decode",
+            pairs: [
+              {
+                code: "2",
+                label: "Female",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+            ],
+            description: "Sex on the report.",
+          },
+        ],
+      ]),
+    );
+
+    const datasets = await loadDataAgentDatasets(WORKSPACE_ID);
+
+    expect(datasets[0]?.columns[0]?.codes).toEqual({
+      direction: "decode",
+      pairs: [
+        { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
+      ],
+      description: "Sex on the report.",
+    });
   });
 
   it("keeps what it loads online for later", async () => {

@@ -1,6 +1,7 @@
 import { where } from "@avandar/utils";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
@@ -11,6 +12,7 @@ import {
   waitForAppliedSqlOutcome,
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { loadColumnCodes } from "@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
@@ -140,15 +142,23 @@ export function createExplorerShowQuery(
 async function _fetchDataAgentDatasets(
   workspaceId: Workspace.Id,
 ): Promise<DataAgentDataset[]> {
-  const datasets = await DatasetClient.getAllDatasetsWithColumns(
-    where("workspace_id", "eq", workspaceId),
-  );
+  const [datasets, codesByColumnId] = await Promise.all([
+    DatasetClient.getAllDatasetsWithColumns(
+      where("workspace_id", "eq", workspaceId),
+    ),
+    loadColumnCodes(workspaceId),
+  ]);
   return datasets.map((dataset) => {
     return {
       id: dataset.id,
       name: dataset.name,
       columns: dataset.columns.map((column) => {
-        return { name: column.name, dataType: String(column.dataType) };
+        const codes = codesByColumnId.get(column.id);
+        return {
+          name: column.name,
+          dataType: String(column.dataType),
+          ...(codes ? { codes: ColumnCodes.toContext(codes) } : {}),
+        };
       }),
     };
   });
@@ -286,6 +296,8 @@ export type AgentTurnInputs = {
 type AskConversationDataAgentOptions = {
   conversations: Map<string, DataAgentConversation>;
   turn: Readonly<DataAgentTurnOptions>;
+  /** Runs after this turn is attached to its conversation, before the ask. */
+  onConversationReady?: (conversation: DataAgentConversation) => void;
   /**
    * The turn's blocks and mention names, built from the conversation it
    * goes to, whose vault hides personal values in every block's SQL.
@@ -347,6 +359,7 @@ export async function askConversationDataAgent(
   conversation.results = results;
   conversation.resultsByTurn.push(results);
   turn.chatPanelDispatch.setPendingClarification(undefined);
+  options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};
   const reply = await _askAgent(

@@ -2,6 +2,7 @@ import { createOfflineDataAgent } from "@/lib/agent/dataAgent/offline/createOffl
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { WebLlmBrowser } from "../../runtime/WebLlmBrowser";
 import { createPiConversation } from "./PiHarness";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { EvalDatabase } from "../../runtime/EvalDatabase";
 import type { EvalHarness } from "../EvalHarness";
 import type { OfflineDataAgentModels } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
@@ -38,6 +39,8 @@ export async function createPiLocalHarness(
     database: EvalDatabase;
     configName: string;
     model: string;
+    /** The workspace's datasets as the agent sees them. COVID by default. */
+    datasets?: readonly DataAgentDataset[];
   }>,
 ): Promise<EvalHarness> {
   const isPlan = options.configName === "plan";
@@ -61,7 +64,7 @@ export async function createPiLocalHarness(
         database: options.database,
         createAgent: (host) => {
           return createOfflineDataAgent({
-            datasets: COVID_DATASETS,
+            datasets: options.datasets ?? COVID_DATASETS,
             host,
             llm: browser,
             models,

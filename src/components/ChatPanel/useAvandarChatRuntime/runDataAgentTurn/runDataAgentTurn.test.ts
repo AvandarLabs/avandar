@@ -440,6 +440,26 @@ describe("runDataAgentTurn", () => {
     expect(_askedTexts()[0]).not.toContain("'Doe'");
   });
 
+  it("exposes the completed turn's title mask", async () => {
+    const titleMaskRef = {
+      current: undefined as ((text: string) => string) | undefined,
+    };
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(`SELECT * FROM t WHERE "last_name" = 'Doe'`),
+    );
+
+    await runDataAgentTurn(
+      {
+        ..._turn("workspace-title-mask", "What is this?"),
+        titleMaskRef,
+      },
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    expect(titleMaskRef.current?.("Visits by Doe")).toBe("Visits by <value 1>");
+  });
+
   it("hides spreadsheet-header filters, alias filters, and titles", async () => {
     getAllDatasetsMock.mockResolvedValue([
       {

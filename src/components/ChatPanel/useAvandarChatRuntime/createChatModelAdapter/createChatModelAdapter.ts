@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
 import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
@@ -39,12 +40,12 @@ import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEdito
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
+import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
@@ -257,6 +258,10 @@ export type CreateChatModelAdapterOptions = {
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
   /** The chat's context tray, read when a turn starts. */
   contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
+  /** The selected session's reply path, read when a turn starts. */
+  sessionKindRef: MutableRefObject<ChatSessionKind>;
+  /** The hosted agent turn's mask, retained until its reply is persisted. */
+  titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
   /**
    * The plugins active in the workspace, from `ActivePluginsContext`. Read
    * each time the agent starts answering, so its plugin AI tools follow
@@ -355,6 +360,10 @@ function _isAbortError(error: unknown): boolean {
   );
 }
 
+function _identityTitleMask(text: string): string {
+  return text;
+}
+
 /**
  * Handles a failed agent turn like `_recoverFromChatFailure`, except for its
  * last step: a failure that would be rethrown becomes a reply instead, so
@@ -404,10 +413,15 @@ export function createChatModelAdapter(
     dashboardEditorDispatch,
     chatPanelDispatch,
     contextTrayRef,
+    sessionKindRef,
+    titleMaskRef,
   } = options;
   const getPluginAiTools = _buildPluginAiToolsGetter(options.activePluginsRef);
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
+      if (titleMaskRef) {
+        titleMaskRef.current = undefined;
+      }
       const generation = chatGenerationRef.current;
       const isGenerationStale = (): boolean => {
         return chatGenerationRef.current !== generation;
@@ -428,8 +442,7 @@ export function createChatModelAdapter(
       const currentDashboardEditorState = dashboardEditorStateRef.current;
       // Only an agent turn reads the tray. Today's chat never sees it.
       const isAgentTurn =
-        currentPageContext.app !== "case-manager" &&
-        DataAgentFeature.isEnabled();
+        sessionKindRef.current === "data" && DataAgentFeature.isEnabled();
       const attachedRefs = isAgentTurn ? contextTrayRef.current : [];
       const turnMessages = await _prepareTurnMessages({
         messages,
@@ -591,6 +604,7 @@ export function createChatModelAdapter(
         workspaceId,
         currentUser,
         chatGeneration: generation,
+        titleMaskRef,
         parseSqlRef,
         dataExplorerDispatch,
         chatPanelDispatch,
@@ -601,6 +615,9 @@ export function createChatModelAdapter(
       // Every answer an offline turn produces is marked, so a hosted
       // request later reads a fixed line in its place.
       const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+        if (titleMaskRef && currentPageContext.app !== "data-explorer") {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const result = await runLocalChatTurn({
           dataAgentTurn: {
             ...dataAgentTurn,
@@ -649,13 +666,22 @@ export function createChatModelAdapter(
           ? buildRetryContext(cachedTurn.response)
           : undefined;
 
+      // A case-design session is today's case-manager chat on every page.
+      const hostedPageContext =
+        sessionKindRef.current === "case-design"
+          ? ChatPageContext.createCaseManagerViewContext()
+          : currentPageContext;
+
       try {
+        if (titleMaskRef) {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },
           body: {
             messages: [...hostedChatMessages],
-            context: currentPageContext,
+            context: hostedPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),
           },

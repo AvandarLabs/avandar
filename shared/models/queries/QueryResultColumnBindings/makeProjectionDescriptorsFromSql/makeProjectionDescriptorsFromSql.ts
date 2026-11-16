@@ -119,6 +119,75 @@ function _getAggregateQueryResultColumnName({
   return matches.length === 1 ? matches[0]!.name : undefined;
 }
 
+/** What DuckDB names a `count(*)` result column that has no alias. */
+const ROW_COUNT_QUERY_RESULT_COLUMN_NAME = "count_star()";
+
+function _getRowCountQueryResultColumnName(
+  columns: readonly QueryResult.Column[],
+): string | undefined {
+  const matches = columns.filter((column) => {
+    return column.name === ROW_COUNT_QUERY_RESULT_COLUMN_NAME;
+  });
+  return matches.length === 1 ? matches[0]!.name : undefined;
+}
+
+// One aggregate of a column, or `count(*)`, which is keyed as a count of
+// the column `*`.
+function _getAggregateProjection({
+  expression,
+  alias,
+  source,
+  columns,
+}: {
+  expression: Readonly<Record<string, unknown>>;
+  alias: string | undefined;
+  source: Readonly<Source>;
+  columns: readonly QueryResult.Column[];
+}): ProjectionDescriptor | undefined {
+  if (
+    expression.type !== "aggr_func" ||
+    expression.over ||
+    expression.filter ||
+    !isPlainObject(expression.args)
+  ) {
+    return undefined;
+  }
+  const args = expression.args;
+  const aggregation =
+    typeof expression.name === "string"
+      ? matchAggregation(expression.name)
+      : undefined;
+  const argument = _getColumn({ node: args.expr, source: source });
+  if (
+    !aggregation ||
+    !argument ||
+    !isPlainObject(args.expr) ||
+    (argument === "*" && aggregation !== "count") ||
+    args.distinct ||
+    args.orderby ||
+    args.separator
+  ) {
+    return undefined;
+  }
+  const queryResultColumnName =
+    alias ??
+    (argument === "*"
+      ? _getRowCountQueryResultColumnName(columns)
+      : _getAggregateQueryResultColumnName({
+          argument: args.expr,
+          aggregation: aggregation,
+          columns: columns,
+        }));
+  return queryResultColumnName === undefined
+    ? undefined
+    : _createDescriptor({
+        source: source,
+        column: argument,
+        queryResultColumnName: queryResultColumnName,
+        aggregation: aggregation,
+      });
+}
+
 function _getProjection({
   item,
   source,
@@ -141,46 +210,12 @@ function _getProjection({
       queryResultColumnName: alias ?? column,
     });
   }
-  if (
-    expression.type !== "aggr_func" ||
-    expression.over ||
-    expression.filter ||
-    !isPlainObject(expression.args)
-  ) {
-    return undefined;
-  }
-  const args = expression.args;
-  const aggregation =
-    typeof expression.name === "string"
-      ? matchAggregation(expression.name)
-      : undefined;
-  const argument = _getColumn({ node: args.expr, source: source });
-  if (
-    !aggregation ||
-    !argument ||
-    !isPlainObject(args.expr) ||
-    argument === "*" ||
-    args.distinct ||
-    args.orderby ||
-    args.separator
-  ) {
-    return undefined;
-  }
-  const queryResultColumnName =
-    alias ??
-    _getAggregateQueryResultColumnName({
-      argument: args.expr,
-      aggregation: aggregation,
-      columns: columns,
-    });
-  return queryResultColumnName === undefined
-    ? undefined
-    : _createDescriptor({
-        source: source,
-        column: argument,
-        queryResultColumnName: queryResultColumnName,
-        aggregation: aggregation,
-      });
+  return _getAggregateProjection({
+    expression: expression,
+    alias: alias,
+    source: source,
+    columns: columns,
+  });
 }
 
 function _hasNestedSelect(node: unknown): boolean {
@@ -237,12 +272,27 @@ function _getSource(
   };
 }
 
+// `GROUP BY 1` groups by the first SELECT item, so read that item instead.
+function _getGroupedNode(
+  node: unknown,
+  selectItems: readonly unknown[],
+): unknown {
+  if (!isPlainObject(node) || node.type !== "number") {
+    return node;
+  }
+  const item =
+    typeof node.value === "number" ? selectItems[node.value - 1] : undefined;
+  return isPlainObject(item) ? item.expr : undefined;
+}
+
 function _hasSupportedGrouping({
   groupby,
   source,
+  selectItems,
 }: {
   groupby: unknown;
   source: Readonly<Source>;
+  selectItems: readonly unknown[];
 }): boolean {
   if (!groupby) {
     return true;
@@ -251,7 +301,10 @@ function _hasSupportedGrouping({
     isPlainObject(groupby) &&
     Array.isArray(groupby.columns) &&
     groupby.columns.every((column: unknown) => {
-      const name = _getColumn({ node: column, source: source });
+      const name = _getColumn({
+        node: _getGroupedNode(column, selectItems),
+        source: source,
+      });
       return name !== undefined && name !== "*";
     })
   );
@@ -260,8 +313,9 @@ function _hasSupportedGrouping({
 /**
  * Reads raw SQL to predict a `ProjectionDescriptor` for each column its
  * `SELECT` outputs, so hand-written SQL keeps stable column IDs across runs.
- * Empty unless every item is a plain column or one aggregate of a column from
- * a single table. Never infers lineage from `QueryResult` column position.
+ * Empty unless every item is a plain column, one aggregate of a column, or
+ * `count(*)`, from a single table, grouped (if at all) by plain columns or
+ * their positions. Never infers lineage from `QueryResult` column position.
  *
  * Use it when a query has no query builder model, for example SQL typed in
  * the editor or the saved SQL of a dashboard chart.
@@ -275,7 +329,11 @@ export function makeProjectionDescriptorsFromSql(
     !ast ||
     !source ||
     !Array.isArray(ast.columns) ||
-    !_hasSupportedGrouping({ groupby: ast.groupby, source: source })
+    !_hasSupportedGrouping({
+      groupby: ast.groupby,
+      source: source,
+      selectItems: ast.columns,
+    })
   ) {
     return [];
   }

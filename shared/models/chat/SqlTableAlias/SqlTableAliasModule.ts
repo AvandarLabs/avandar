@@ -1,4 +1,5 @@
 import { makeBucketMap } from "@avandar/utils";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
@@ -25,6 +26,8 @@ type SchemaColumn = {
   dataset_id: string;
   name: string;
   data_type: string;
+  /** The column's code list, when a dictionary is attached to it. */
+  codes?: ColumnCodes.Context;
 };
 
 function _sortNamedRelations<T extends { id: string }>(
@@ -112,6 +115,43 @@ function _formatAliasLine(
     return `- ${entry.alias}: ${entry.name}`;
   }
   return `- ${entry.alias}: ${entry.name} (${names.join(", ")})`;
+}
+
+/**
+ * The code list the schema block writes after a column's name: ` [1=Male,
+ * 2=Female]` for a column holding codes, ` [values Male, Female]` for one
+ * holding labels, and nothing otherwise.
+ */
+function _formatColumnCodes(column: Readonly<SchemaColumn>): string {
+  const pairsText = column.codes ? ColumnCodes.formatPairs(column.codes) : "";
+  if (pairsText === "") {
+    return "";
+  }
+  return column.codes?.direction === "encode"
+    ? ` [values ${pairsText}]`
+    : ` [${pairsText}]`;
+}
+
+/**
+ * Each dataset column as the schema block names it, such as `GENDER [1=Male,
+ * 2=Female]`, with the note that says how many columns' lists the block's
+ * code-list budget left out. A list stays whole however the block is cut,
+ * because it is part of the column's name.
+ */
+function _formatColumnNames(columns: readonly SchemaColumn[]): {
+  names: Array<{ dataset_id: string; label: string }>;
+  hiddenNote: string | undefined;
+} {
+  const codeTexts = columns.map(_formatColumnCodes);
+  const { isKept, hiddenCount } = ColumnCodes.fitToPromptBudget(codeTexts);
+  const names = columns.map((column, index) => {
+    return {
+      dataset_id: column.dataset_id,
+      label: isKept[index] ? `${column.name}${codeTexts[index]}` : column.name,
+    };
+  });
+  const note = ColumnCodes.formatHiddenCodesNote(hiddenCount);
+  return { names, hiddenNote: note ? `(${note})` : undefined };
 }
 
 /**
@@ -232,9 +272,10 @@ function _formatSchemaBlock(
     conceptStatuses?: readonly SqlTableAliasConceptStatus[];
   }>,
 ): string {
-  const namesByDatasetId = makeBucketMap(args.columns, {
+  const columnNames = _formatColumnNames(args.columns);
+  const namesByDatasetId = makeBucketMap(columnNames.names, {
     key: "dataset_id",
-    valueKey: "name",
+    valueKey: "label",
   });
   const namesByConceptId = _formatConceptAttributeNames(
     args.conceptAttributes ?? [],
@@ -255,6 +296,7 @@ function _formatSchemaBlock(
             ];
       return _formatAliasLine(entry, names);
     })
+    .concat(columnNames.hiddenNote ? [columnNames.hiddenNote] : [])
     .join("\n");
 }
 

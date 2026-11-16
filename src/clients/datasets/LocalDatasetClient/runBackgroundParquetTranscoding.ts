@@ -10,6 +10,7 @@ import {
   notifyWarning,
 } from "@/utils/notifications/notify";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
@@ -22,6 +23,23 @@ import type {
   LocalDatasetCsvParseOptions,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
+
+/**
+ * The columns background transcoding may reconcile, by original name. A
+ * keep-original copy shares its converted column's original name but is not
+ * a column of the file, so it is left out and never shadows the column it
+ * copies.
+ */
+export function getReconcilableColumnsByOriginalName(
+  columns: readonly DatasetColumn.T[],
+): Map<string, DatasetColumn.T> {
+  return makeMap(
+    columns.filter((column) => {
+      return column.dictionaryBindingId === undefined;
+    }),
+    { key: "originalName" },
+  );
+}
 
 /**
  * Reconciles the background parquet transcoding's authoritative column
@@ -71,7 +89,7 @@ async function _reconcileColumns(params: {
     return { changedCount: 0 };
   }
 
-  const byName = makeMap(existingColumns, { key: "originalName" });
+  const byName = getReconcilableColumnsByOriginalName(existingColumns);
 
   let changedCount = 0;
   for (const detected of params.transcodeColumns) {

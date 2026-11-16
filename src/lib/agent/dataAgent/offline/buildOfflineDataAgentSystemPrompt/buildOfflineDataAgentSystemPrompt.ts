@@ -1,5 +1,10 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { OFFLINE_PLAN_INSTRUCTIONS } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/offlinePlanInstructions";
+import {
+  hasListedCodes,
+  isTextColumn,
+} from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { QuestionValueMatch } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import type {
@@ -48,6 +53,16 @@ WITH people AS (SELECT "state", "county", MAX("enrolled") AS enrolled FROM "t9" 
 ASKING
 Call ask_user only when VALUES IN THE QUESTION says a name means different things in different datasets. Then ask which one the user means, with those options.`;
 
+/** Tells the model to ask which of a name's meanings the user means. */
+const AMBIGUOUS_NAME_NOTE =
+  " This name means different things in different datasets: ask the user which one they mean.";
+
+/** The most labels VALUES IN THE QUESTION turns into codes. */
+const MAX_CODE_MATCH_TERMS = 10;
+
+/** The most coded columns one label in the question lists. */
+const MAX_CODE_MATCH_PLACES = 5;
+
 function _quoteValues(values: readonly string[]): string {
   return values
     .map((value) => {
@@ -56,8 +71,42 @@ function _quoteValues(values: readonly string[]): string {
     .join(", ");
 }
 
-function _formatColumn(column: Readonly<OfflineColumnProfile>): string {
+/**
+ * A coded column's list for a small model, written out in full: `1 =
+ * "Male", 2 = "Female", 9 = "Unknown" (missing value)`. Text codes are
+ * quoted, so the model copies the quotes into its filter. Each code and
+ * label is cut to 60 characters, with quotes escaped.
+ */
+function _formatCodes(column: Readonly<OfflineColumnProfile>): string {
+  const pairs = column.codes?.pairs ?? [];
+  const shown = pairs.slice(0, ColumnCodes.MAX_PROMPT_PAIRS).map((pair) => {
+    const codeText = ColumnCodes.toPromptText(pair.code);
+    const code = isTextColumn(column) ? `"${codeText}"` : codeText;
+    const label = ColumnCodes.toPromptText(pair.label);
+    const meaning = label === "" ? "(no label)" : `"${label}"`;
+    return `${code} = ${meaning}${pair.isMissing ? " (missing value)" : ""}`;
+  });
+  const hiddenCount = pairs.length - shown.length;
+  return hiddenCount > 0
+    ? `${shown.join(", ")}, and ${hiddenCount} more`
+    : shown.join(", ");
+}
+
+/**
+ * One column's profile line. `codesText` is its code list when the prompt's
+ * code-list budget kept it; a coded column past the budget gets its name
+ * and type only.
+ */
+function _formatColumn(
+  column: Readonly<OfflineColumnProfile>,
+  codesText: string,
+): string {
   const type = column.dataType.toLowerCase();
+  if (hasListedCodes(column)) {
+    return codesText === ""
+      ? `${column.name} ${type}`
+      : `${column.name} ${type}, codes: ${codesText}`;
+  }
   if (column.range) {
     return `${column.name} ${type}, ${column.range.min} to ${column.range.max}`;
   }
@@ -70,31 +119,57 @@ function _formatColumn(column: Readonly<OfflineColumnProfile>): string {
   return `${column.name} ${type}`;
 }
 
+/**
+ * Each profiled column's code list as the prompt writes it, in prompt
+ * order, blank where the code-list budget left it out or it has none, and
+ * the note that says how many lists were left out.
+ */
+function _fitCodeTexts(columns: readonly OfflineColumnProfile[]): {
+  codeTexts: string[];
+  hiddenNote: string | undefined;
+} {
+  const allTexts = columns.map((column) => {
+    return hasListedCodes(column) ? _formatCodes(column) : "";
+  });
+  const { isKept, hiddenCount } = ColumnCodes.fitToPromptBudget(allTexts);
+  const codeTexts = allTexts.map((text, index) => {
+    return isKept[index] ? text : "";
+  });
+  const note = ColumnCodes.formatHiddenCodesNote(hiddenCount);
+  return { codeTexts, hiddenNote: note ? `(${note})` : undefined };
+}
+
 function _formatDatasets(
   datasets: readonly DataAgentDataset[],
   profiles: readonly OfflineDatasetProfile[],
 ): string {
   const aliases = SqlTableAlias.fromSchema({ datasets });
-  return aliases
-    .flatMap((entry) => {
-      const dataset = datasets.find((candidate) => {
-        return entry.kind === "dataset" && candidate.id === entry.datasetId;
-      });
-      const profile = profiles.find((candidate) => {
-        return candidate.datasetId === dataset?.id;
-      });
-      if (!dataset || !profile) {
-        return [];
-      }
-      const columns = profile.columns.map((column) => {
-        return `  - ${_formatColumn(column)}`;
-      });
-      return [
-        `${entry.alias} = "${dataset.name}" (${profile.rowCount} rows)`,
-        ...columns,
-      ];
-    })
-    .join("\n");
+  const listed = aliases.flatMap((entry) => {
+    const dataset = datasets.find((candidate) => {
+      return entry.kind === "dataset" && candidate.id === entry.datasetId;
+    });
+    const profile = profiles.find((candidate) => {
+      return candidate.datasetId === dataset?.id;
+    });
+    return dataset && profile ? [{ alias: entry.alias, dataset, profile }] : [];
+  });
+  const { codeTexts, hiddenNote } = _fitCodeTexts(
+    listed.flatMap(({ profile }) => {
+      return profile.columns;
+    }),
+  );
+  let offset = 0;
+  const lines = listed.flatMap(({ alias, dataset, profile }) => {
+    const columns = profile.columns.map((column, index) => {
+      return `  - ${_formatColumn(column, codeTexts[offset + index] ?? "")}`;
+    });
+    offset += profile.columns.length;
+    return [
+      `${alias} = "${dataset.name}" (${profile.rowCount} rows)`,
+      ...columns,
+    ];
+  });
+  return [...lines, ...(hiddenNote ? [hiddenNote] : [])].join("\n");
 }
 
 function _normalizeColumnName(name: string): string {
@@ -126,7 +201,77 @@ function _isAmbiguousAcrossDatasets(
   });
 }
 
-/** Lists matched values and flags names that mean different things. */
+/** One line per stored value the question names, with any ambiguity. */
+function _formatStoredValueLines(
+  matches: readonly QuestionValueMatch[],
+  aliasOf: (datasetId: string) => string,
+): string[] {
+  const values = [
+    ...new Set(
+      matches.map((match) => {
+        return match.storedValue;
+      }),
+    ),
+  ];
+  return values.map((value) => {
+    const places = matches.filter((match) => {
+      return match.storedValue === value;
+    });
+    const where = places
+      .map((match) => {
+        return `${aliasOf(match.datasetId)}."${match.column}"`;
+      })
+      .join(", ");
+    const note = _isAmbiguousAcrossDatasets(places) ? AMBIGUOUS_NAME_NOTE : "";
+    return `- "${value}" is stored in ${where}.${note}`;
+  });
+}
+
+/** `code 2 in t0."GENDER" (2 = Female)`, for one coded column. */
+function _formatCodePlace(
+  match: Readonly<QuestionValueMatch>,
+  aliasOf: (datasetId: string) => string,
+): string {
+  const code = ColumnCodes.toPromptText(match.storedValue);
+  const label = ColumnCodes.toPromptText(match.codeLabel ?? "");
+  return `code ${code} in ${aliasOf(match.datasetId)}."${match.column}" (${code} = ${label})`;
+}
+
+/**
+ * One line per label the question names that a code list turns into a
+ * code, listing every coded column it is a label in. Capped at 10 labels
+ * and 5 columns per label, and flagged when the label means different
+ * things in different datasets.
+ */
+function _formatCodeLines(
+  matches: readonly QuestionValueMatch[],
+  aliasOf: (datasetId: string) => string,
+): string[] {
+  const terms = [
+    ...new Set(
+      matches.map((match) => {
+        return match.term;
+      }),
+    ),
+  ].slice(0, MAX_CODE_MATCH_TERMS);
+  return terms.map((term) => {
+    const places = matches.filter((match) => {
+      return match.term === term;
+    });
+    const shown = places.slice(0, MAX_CODE_MATCH_PLACES).map((place) => {
+      return _formatCodePlace(place, aliasOf);
+    });
+    const hiddenCount = places.length - shown.length;
+    const more = hiddenCount > 0 ? `, and ${hiddenCount} more columns` : "";
+    const note = _isAmbiguousAcrossDatasets(places) ? AMBIGUOUS_NAME_NOTE : "";
+    return `- "${term}" is ${shown.join(", ")}${more}.${note}`;
+  });
+}
+
+/**
+ * Lists matched values and flags names that mean different things. A label
+ * found in a column's code list is listed with the code to filter on.
+ */
 export function formatQuestionValues(
   matches: readonly QuestionValueMatch[],
   datasets: readonly DataAgentDataset[],
@@ -139,29 +284,16 @@ export function formatQuestionValues(
       })?.alias ?? datasetId
     );
   };
-  const values = [
-    ...new Set(
-      matches.map((match) => {
-        return match.storedValue;
-      }),
-    ),
-  ];
-  return values
-    .map((value) => {
-      const places = matches.filter((match) => {
-        return match.storedValue === value;
-      });
-      const where = places
-        .map((match) => {
-          return `${aliasOf(match.datasetId)}."${match.column}"`;
-        })
-        .join(", ");
-      const note = _isAmbiguousAcrossDatasets(places)
-        ? " This name means different things in different datasets: ask the user which one they mean."
-        : "";
-      return `- "${value}" is stored in ${where}.${note}`;
-    })
-    .join("\n");
+  const stored = matches.filter((match) => {
+    return match.codeLabel === undefined;
+  });
+  const coded = matches.filter((match) => {
+    return match.codeLabel !== undefined;
+  });
+  return [
+    ..._formatStoredValueLines(stored, aliasOf),
+    ..._formatCodeLines(coded, aliasOf),
+  ].join("\n");
 }
 
 /**

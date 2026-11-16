@@ -13,6 +13,12 @@
     var(--mantine-spacing-sm);
 }
 
+/* Sits close to the title it leads into, like the fact line below it. */
+.appViewHeaderBreadcrumb {
+  font-size: var(--mantine-font-size-xs);
+  margin-block-end: var(--mantine-spacing-xxs);
+}
+
 .appViewHeaderTitleRow {
   min-height: 32px;
 }
