@@ -11,6 +11,21 @@ icon: chart-dots
 permissions:
   - data:context
   - query:addColumns
+  - data:slots
+dataSlots:
+  cases:
+    title: "%slot.cases.title%"
+    description: "%slot.cases.description%"
+    concept: Case
+    required: false
+    attributes:
+      onsetDate:
+        type: date
+        title: "%slot.cases.onsetDate%"
+      district:
+        type: geo.admin2
+        title: "%slot.cases.district%"
+        required: false
 contributes:
   commands:
     - id: regression.linear
@@ -22,6 +37,9 @@ contributes:
     - id: rolling.average
       title: "%rollingAverage.title%"
       icon: chart-line
+    - id: cases.epicurve
+      title: "%cases.epicurve.title%"
+      icon: chart-bar
   menus:
     dataExplorer.toolbar:
       - command: regression.linear
@@ -33,6 +51,7 @@ contributes:
       - command: rolling.average
         when:
           dateColumnCount: { gte: 1 }
+      - command: cases.epicurve
   aiTools:
     - name: fitRegression
       description: >

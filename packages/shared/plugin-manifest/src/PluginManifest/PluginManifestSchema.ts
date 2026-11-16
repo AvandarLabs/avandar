@@ -1,11 +1,17 @@
 import { getIssuesFromVizTypes } from "@plugin-manifest/PluginManifest/getIssuesFromVizTypes.ts";
 import { getIssuesFromWhenCondition } from "@plugin-manifest/PluginManifest/getIssuesFromWhenCondition.ts";
 import {
+  makeComparableAiToolName,
+  RESERVED_AI_TOOL_NAMES,
+} from "@plugin-manifest/PluginManifest/makeComparableAiToolName.ts";
+import {
   COMMAND_ID_MESSAGE,
   COMMAND_ID_PATTERN,
   IconNameSchema,
   LocalizedStringSchema,
 } from "@plugin-manifest/PluginManifest/manifestFieldSchemas.ts";
+import { PluginContentItemSchema } from "@plugin-manifest/PluginManifest/PluginContentSchema.ts";
+import { PluginDataSlotsSchema } from "@plugin-manifest/PluginManifest/PluginDataSlotSchema.ts";
 import { PluginVizTypeSchema } from "@plugin-manifest/PluginManifest/PluginVizTypeSchema.ts";
 import {
   SLOT_IDS,
@@ -46,10 +52,15 @@ const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or 
 /**
  * Permissions a manifest may request in this version of the schema.
  * `data:context` lets a command read the rows of the result it was invoked
- * on, and `query:addColumns` lets a Data Explorer toolbar command add
- * computed columns to that result's query.
+ * on, `query:addColumns` lets a Data Explorer toolbar command add computed
+ * columns to that result's query, and `data:slots` lets a command read the
+ * records an admin bound to the plugin's `dataSlots`.
  */
-export const PLUGIN_PERMISSIONS = ["data:context", "query:addColumns"] as const;
+export const PLUGIN_PERMISSIONS = [
+  "data:context",
+  "query:addColumns",
+  "data:slots",
+] as const;
 
 /**
  * A permission a plugin may request in `permissions`, for typing code that
@@ -188,14 +199,17 @@ const BasePluginManifestSchema = z.strictObject({
     .regex(
       ENTRY_PATTERN,
       "must be a relative path to a .ts or .tsx file inside the plugin folder",
-    ),
+    )
+    .optional(),
   icon: IconNameSchema,
   permissions: z.array(z.enum(PLUGIN_PERMISSIONS)).default([]),
+  dataSlots: PluginDataSlotsSchema.default({}),
   contributes: z.strictObject({
     commands: z.array(CommandSchema).default([]),
     menus: MenusSchema.default({}),
     vizTypes: z.array(PluginVizTypeSchema).default([]),
     aiTools: z.array(AiToolSchema).default([]),
+    content: z.array(PluginContentItemSchema).default([]),
   }),
 });
 
@@ -224,14 +238,28 @@ function _refineAiTools(
 ): void {
   const seenNames = new Set<string>();
   manifest.contributes.aiTools.forEach((tool, index) => {
+    const path = ["contributes", "aiTools", index, "name"];
     if (seenNames.has(tool.name)) {
       context.addIssue({
         code: "custom",
-        path: ["contributes", "aiTools", index, "name"],
+        path,
         message: `duplicate ai tool name "${tool.name}"`,
       });
     }
     seenNames.add(tool.name);
+    const reservedName = RESERVED_AI_TOOL_NAMES.find((candidate) => {
+      return (
+        makeComparableAiToolName(candidate) ===
+        makeComparableAiToolName(tool.name)
+      );
+    });
+    if (reservedName !== undefined) {
+      context.addIssue({
+        code: "custom",
+        path,
+        message: `ai tool name "${tool.name}" is reserved for the built-in "${reservedName}" tool`,
+      });
+    }
   });
 }
 
@@ -288,6 +316,100 @@ function _refineVizTypes(
   });
 }
 
+function _refineDataSlots(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const slotEntries = Object.entries(manifest.dataSlots);
+  const hasPermission = manifest.permissions.includes("data:slots");
+  if (slotEntries.length > 0 && !hasPermission) {
+    context.addIssue({
+      code: "custom",
+      path: ["dataSlots"],
+      message: 'declaring data slots requires the "data:slots" permission',
+    });
+  }
+  if (slotEntries.length === 0 && hasPermission) {
+    context.addIssue({
+      code: "custom",
+      path: ["permissions"],
+      message: '"data:slots" requires at least one entry in dataSlots',
+    });
+  }
+  slotEntries.forEach(([slotId, slot]) => {
+    if (Object.keys(slot.attributes).length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["dataSlots", slotId, "attributes"],
+        message: "must declare at least one attribute",
+      });
+    }
+    _refineAttributeKeyCases(slotId, slot, context);
+  });
+}
+
+/**
+ * Rejects an attribute key that differs from an earlier one in the same slot
+ * only by case. The slot query names its columns by attribute key, and DuckDB
+ * ignores identifier case, so such keys would collide as column names.
+ */
+function _refineAttributeKeyCases(
+  slotId: string,
+  slot: BasePluginManifest["dataSlots"][string],
+  context: z.RefinementCtx,
+): void {
+  const keysByLowerCase = new Map<string, string>();
+  Object.keys(slot.attributes).forEach((attributeKey) => {
+    const lowerCaseKey = attributeKey.toLowerCase();
+    const earlierKey = keysByLowerCase.get(lowerCaseKey);
+    if (earlierKey === undefined) {
+      keysByLowerCase.set(lowerCaseKey, attributeKey);
+      return;
+    }
+    context.addIssue({
+      code: "custom",
+      path: ["dataSlots", slotId, "attributes", attributeKey],
+      message:
+        `attribute key "${attributeKey}" differs from "${earlierKey}" ` +
+        "only by case, and query columns ignore case",
+    });
+  });
+}
+
+function _refineContent(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const seenIds = new Set<string>();
+  manifest.contributes.content.forEach((item, index) => {
+    if (seenIds.has(item.id)) {
+      context.addIssue({
+        code: "custom",
+        path: ["contributes", "content", index, "id"],
+        message: `duplicate content id "${item.id}"`,
+      });
+    }
+    seenIds.add(item.id);
+  });
+}
+
+function _refineEntry(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const { commands, vizTypes, aiTools } = manifest.contributes;
+  const hasCode =
+    commands.length > 0 || vizTypes.length > 0 || aiTools.length > 0;
+  if (hasCode && manifest.entry === undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["entry"],
+      message:
+        "required when the plugin contributes commands, chart types, or AI tools",
+    });
+  }
+}
+
 /**
  * The schema for a compiled `ava.yaml`. Strict: unknown keys fail, so a typo
  * is a build error rather than a silently ignored setting.
@@ -298,6 +420,9 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
     _refineMenus(manifest, context);
     _refineVizTypes(manifest, context);
     _refineAiTools(manifest, context);
+    _refineDataSlots(manifest, context);
+    _refineContent(manifest, context);
+    _refineEntry(manifest, context);
   },
 );
 
@@ -344,3 +469,22 @@ export type PluginVizSettingControl = PluginVizSetting["control"];
  * Schema parameters.
  */
 export type PluginAiTool = PluginManifest["contributes"]["aiTools"][number];
+
+/**
+ * A data slot a plugin declares under `dataSlots`, for example to list it in
+ * the install wizard or to check a binding against its attributes.
+ */
+export type PluginDataSlot = PluginManifest["dataSlots"][string];
+
+/**
+ * One attribute of a data slot, for code that maps it to a workspace field
+ * or reads its value from a bound record.
+ */
+export type PluginDataSlotAttribute = PluginDataSlot["attributes"][string];
+
+/**
+ * A dataset a plugin bundles under `contributes.content`, for example to
+ * offer it in the install wizard or to import it into a workspace.
+ */
+export type PluginContentItem =
+  PluginManifest["contributes"]["content"][number];

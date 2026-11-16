@@ -1367,6 +1367,8 @@ importers:
         specifier: ^7.8.8
         version: 7.12.1
 
+  plugins/mozambique: {}
+
 packages:
 
   '@adobe/css-tools@4.3.3':

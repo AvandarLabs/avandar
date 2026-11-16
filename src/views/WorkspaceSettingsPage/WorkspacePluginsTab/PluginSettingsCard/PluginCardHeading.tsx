@@ -31,8 +31,9 @@ export function PluginCardHeading({
         <PluginIcon size={28} aria-hidden />
       ) : null}
       {/* Order 5 nests the name under the tab's order 4 title. The size stays
-          at h4 so the name keeps its look. */}
-      <Title id={headingId} order={5} size="h4">
+          at h4 so the name keeps its look. It takes focus, with tabIndex -1,
+          when the install wizard closes. */}
+      <Title id={headingId} order={5} size="h4" tabIndex={-1}>
         {pluginName}
       </Title>
       <PluginStatusBadge status={status} />

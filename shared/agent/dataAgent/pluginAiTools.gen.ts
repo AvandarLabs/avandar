@@ -8,7 +8,8 @@ export const PLUGIN_AI_TOOLS: readonly PluginAiToolDeclaration[] = [
     "pluginId": "avandar.epidemiology",
     "permissions": [
       "data:context",
-      "query:addColumns"
+      "query:addColumns",
+      "data:slots"
     ],
     "name": "fitRegression",
     "description": "Fits a straight line of yColumn on xColumn using the result already on screen. Both must be number columns, with at least 10 rows that have a number in both. Returns slope, intercept, rSquared, n (rows used), and isTruncated (true when the result was longer than the first 50,000 rows). rSquared is null when it has no value. You never receive row values. State the slope, intercept, and fit in one or two plain sentences. This call does not end your turn. If the tool says nothing is on screen, say you need a result showing first. Do not call run_query in the same answer to create that result.\n",

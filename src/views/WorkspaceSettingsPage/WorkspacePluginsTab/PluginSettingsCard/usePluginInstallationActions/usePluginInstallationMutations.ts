@@ -3,14 +3,14 @@ import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationCl
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 
 /**
- * The install, update, and uninstall mutations for one plugin, with the
- * success and error notifications the Plugins settings tab shows. Every
- * mutation invalidates all plugin installation `getAll` queries, which are
- * keyed by prefix, so the plugin host's workspace-filtered query refetches
- * and a change shows up in the running app without a reload.
+ * The update and uninstall mutations for one plugin, with the success and
+ * error notifications the Plugins settings tab shows. Every mutation
+ * invalidates all plugin installation `getAll` queries, which are keyed by
+ * prefix, so the plugin host's workspace-filtered query refetches and a
+ * change shows up in the running app without a reload. Installing goes
+ * through the install wizard instead.
  */
 export function usePluginInstallationMutations(pluginName: string): {
-  insertInstallation: ReturnType<typeof PluginInstallationClient.useInsert>[0];
   updateInstallation: ReturnType<typeof PluginInstallationClient.useUpdate>[0];
   deleteInstallation: ReturnType<typeof PluginInstallationClient.useDelete>[0];
   isPending: boolean;
@@ -23,13 +23,6 @@ export function usePluginInstallationMutations(pluginName: string): {
       message: error.message,
     });
   };
-  const [insertInstallation, isInserting] = PluginInstallationClient.useInsert({
-    queriesToInvalidate,
-    onSuccess: () => {
-      notifySuccess(t`${pluginName} installed`);
-    },
-    onError,
-  });
   const [updateInstallation, isUpdating] = PluginInstallationClient.useUpdate({
     queriesToInvalidate,
     onError,
@@ -42,9 +35,8 @@ export function usePluginInstallationMutations(pluginName: string): {
     onError,
   });
   return {
-    insertInstallation,
     updateInstallation,
     deleteInstallation,
-    isPending: isInserting || isUpdating || isDeleting,
+    isPending: isUpdating || isDeleting,
   };
 }

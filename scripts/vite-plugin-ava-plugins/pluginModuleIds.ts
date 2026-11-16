@@ -6,3 +6,6 @@ export const PLUGIN_MANIFEST_MODULE_PREFIX = "virtual:ava-plugin-manifest/";
 
 /** Prefix of the per-plugin locales module: every locale file's messages. */
 export const PLUGIN_LOCALES_MODULE_PREFIX = "virtual:ava-plugin-locales/";
+
+/** Prefix of the per-plugin content module: each content file's URL. */
+export const PLUGIN_CONTENT_MODULE_PREFIX = "virtual:ava-plugin-content/";

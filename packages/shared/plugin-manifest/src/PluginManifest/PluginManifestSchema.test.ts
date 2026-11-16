@@ -734,4 +734,299 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     );
     expect(issues).toEqual([]);
   });
+
+  it.each([
+    ["runQuery", "run_query"],
+    ["runquery", "run_query"],
+    ["lookupValues", "lookup_values"],
+    ["askUser", "ask_user"],
+    ["planQuery", "plan_query"],
+  ])(
+    "rejects the tool name %s, which only differs from %s in case and underscores",
+    (name, reservedName) => {
+      expect(_getIssuesForAiTool({ name })).toEqual([
+        {
+          path: "contributes.aiTools.0.name",
+          message: `ai tool name "${name}" is reserved for the built-in "${reservedName}" tool`,
+        },
+      ]);
+    },
+  );
+
+  it("accepts a tool name that only contains a reserved name", () => {
+    expect(_getIssuesForAiTool({ name: "runQueryTwice" })).toEqual([]);
+  });
+});
+
+function _makeDataSlot(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    title: "%slot.cases.title%",
+    attributes: {
+      onsetDate: { type: "date", title: "%slot.cases.onsetDate%" },
+    },
+    ...overrides,
+  };
+}
+
+function _makeManifestWithDataSlots(
+  dataSlots: Record<string, unknown>,
+  permissions: string[] = ["data:context", "data:slots"],
+): Record<string, unknown> {
+  return { ..._makeValidManifest(), permissions, dataSlots };
+}
+
+describe("PluginManifestSchema dataSlots", () => {
+  it("defaults dataSlots to an empty record when the manifest declares none", () => {
+    const result = PluginManifestSchema.parse(_makeValidManifest());
+    expect(result.dataSlots).toEqual({});
+  });
+
+  it("defaults a slot to optional and its attributes to required", () => {
+    const result = PluginManifestSchema.parse(
+      _makeManifestWithDataSlots({ cases: _makeDataSlot() }),
+    );
+    expect(result.dataSlots.cases?.required).toBe(false);
+    expect(result.dataSlots.cases?.attributes.onsetDate?.required).toBe(true);
+  });
+
+  it.each([
+    ["number"],
+    ["date"],
+    ["text"],
+    ["boolean"],
+    ["geo.admin1"],
+    ["geo.admin2"],
+  ])("accepts a %s attribute", (type) => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: { value: { type, title: "%slot.cases.value%" } },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("rejects data slots declared without the data:slots permission", () => {
+    const manifest = _makeManifestWithDataSlots({ cases: _makeDataSlot() }, [
+      "data:context",
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots",
+        message: 'declaring data slots requires the "data:slots" permission',
+      },
+    ]);
+  });
+
+  it("rejects the data:slots permission when no data slot is declared", () => {
+    const manifest = _makeManifestWithDataSlots({});
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "permissions",
+        message: '"data:slots" requires at least one entry in dataSlots',
+      },
+    ]);
+  });
+
+  it("rejects a data slot with no attributes", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ attributes: {} }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes",
+        message: "must declare at least one attribute",
+      },
+    ]);
+  });
+
+  it("rejects two attribute keys in one slot that differ only by case", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          onsetDate: { type: "date", title: "%slot.cases.onsetDate%" },
+          onsetdate: { type: "date", title: "%slot.cases.onsetdate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onsetdate",
+        message:
+          'attribute key "onsetdate" differs from "onsetDate" only by case, ' +
+          "and query columns ignore case",
+      },
+    ]);
+  });
+
+  it("accepts the same attribute key in two different slots", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot(),
+      deaths: _makeDataSlot(),
+    });
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("rejects a slot id that does not start with a letter", () => {
+    const manifest = _makeManifestWithDataSlots({ "1cases": _makeDataSlot() });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.1cases",
+        message: "must start with a letter and hold only letters and digits",
+      },
+    ]);
+  });
+
+  it("rejects an attribute key that holds a character other than a letter or digit", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          "onset-date": { type: "date", title: "%slot.cases.onsetDate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onset-date",
+        message: "must start with a letter and hold only letters and digits",
+      },
+    ]);
+  });
+
+  it("lists the attribute types when an attribute type is unknown", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          onsetDate: { type: "datetime", title: "%slot.cases.onsetDate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onsetDate.type",
+        message:
+          "must be number, date, text, boolean, geo.admin1, or geo.admin2",
+      },
+    ]);
+  });
+
+  it("rejects a slot title that is not a %key% reference", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ title: "Cases" }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.title",
+        message: "must be a %key% reference to locales/en.json",
+      },
+    ]);
+  });
+
+  it("rejects a concept hint that is only whitespace", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ concept: "  " }),
+    });
+    expect(
+      _getIssues(manifest).map((issue) => {
+        return issue.path;
+      }),
+    ).toEqual(["dataSlots.cases.concept"]);
+  });
+});
+
+function _makeContentItem(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: "provinces",
+    kind: "dataset",
+    title: "%content.provinces.title%",
+    description: "%content.provinces.description%",
+    file: "content/mz-adm1.csv",
+    ...overrides,
+  };
+}
+
+function _makeContentOnlyManifest(content: unknown[]): Record<string, unknown> {
+  const manifest = _makeValidManifest();
+  delete manifest.entry;
+  return {
+    ...manifest,
+    permissions: [],
+    contributes: { content },
+  };
+}
+
+describe("PluginManifestSchema contributes.content", () => {
+  it("defaults content to an empty list", () => {
+    const parsed = PluginManifestSchema.parse(_makeValidManifest());
+    expect(parsed.contributes.content).toEqual([]);
+  });
+
+  it("accepts a manifest with content and no entry", () => {
+    const parsed = PluginManifestSchema.parse(
+      _makeContentOnlyManifest([_makeContentItem()]),
+    );
+    expect(parsed.entry).toBeUndefined();
+    expect(parsed.contributes.content[0]?.file).toBe("content/mz-adm1.csv");
+  });
+
+  it.each([
+    ["commands", { commands: [{ id: "x", title: "%x%", icon: "puzzle" }] }],
+    ["chart types", { vizTypes: [_makeVizType()] }],
+    ["AI tools", { aiTools: [_makeAiTool()] }],
+  ])(
+    "requires an entry when the plugin contributes %s",
+    (_label, contributes) => {
+      const manifest = _makeContentOnlyManifest([]);
+      manifest.contributes = contributes;
+      expect(_getIssues(manifest)).toEqual([
+        {
+          path: "entry",
+          message:
+            "required when the plugin contributes commands, chart types, or AI tools",
+        },
+      ]);
+    },
+  );
+
+  it("rejects duplicate content ids", () => {
+    const manifest = _makeContentOnlyManifest([
+      _makeContentItem(),
+      _makeContentItem({ file: "content/other.csv" }),
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.content.1.id",
+        message: 'duplicate content id "provinces"',
+      },
+    ]);
+  });
+
+  it.each([
+    ["a file that is not a .csv", "content/mz-adm1.json"],
+    ["an absolute path", "/content/mz-adm1.csv"],
+    ["a path that leaves the plugin folder", "../mz-adm1.csv"],
+  ])("rejects %s", (_label, file) => {
+    const manifest = _makeContentOnlyManifest([_makeContentItem({ file })]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.content.0.file",
+        message:
+          "must be a relative path to a .csv file inside the plugin folder",
+      },
+    ]);
+  });
+
+  it("rejects a content kind other than dataset", () => {
+    const manifest = _makeContentOnlyManifest([
+      _makeContentItem({ kind: "map" }),
+    ]);
+    expect(
+      _getIssues(manifest).map((issue) => {
+        return issue.path;
+      }),
+    ).toEqual(["contributes.content.0.kind"]);
+  });
 });

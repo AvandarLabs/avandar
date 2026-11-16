@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 
 /** The translated words of one action: its button and its confirmation. */
 export type PluginActionCopy = Readonly<{
@@ -10,21 +10,20 @@ export type PluginActionCopy = Readonly<{
 }>;
 
 /**
- * The translated button label and confirmation text of every plugin action,
- * naming the plugin the action applies to. A plugin action button reads its
- * own entry before it asks the user to confirm.
+ * The translated button label and confirmation text of every plugin action
+ * that asks before it runs, naming the plugin the action applies to. A
+ * plugin action button reads its own entry before it asks the user to
+ * confirm. For a plugin that bundles datasets, the uninstall confirmation
+ * also says that the datasets it imported stay, because uninstalling removes
+ * the plugin's features but never the data a workspace now owns.
  */
-export function usePluginActionCopy(
-  pluginName: string,
-): Record<PluginActionKind, PluginActionCopy> {
+export function usePluginActionCopy(options: {
+  pluginName: string;
+  hasBundledContent: boolean;
+}): Record<ConfirmedPluginActionKind, PluginActionCopy> {
+  const { pluginName, hasBundledContent } = options;
   const { t } = useLingui();
   return {
-    install: {
-      label: t`Install`,
-      confirmTitle: t`Install ${pluginName}?`,
-      confirmBody: t`${pluginName} will be available to every member of this workspace.`,
-      confirmLabel: t`Install`,
-    },
     review: {
       label: t`Review new permissions`,
       confirmTitle: t`Approve new permissions for ${pluginName}?`,
@@ -46,7 +45,9 @@ export function usePluginActionCopy(
     uninstall: {
       label: t`Uninstall`,
       confirmTitle: t`Uninstall ${pluginName}?`,
-      confirmBody: t`Its features are removed from this workspace.`,
+      confirmBody: hasBundledContent
+        ? t`Its features are removed from this workspace. The datasets it imported stay in Data Sources.`
+        : t`Its features are removed from this workspace.`,
       confirmLabel: t`Uninstall`,
     },
   };

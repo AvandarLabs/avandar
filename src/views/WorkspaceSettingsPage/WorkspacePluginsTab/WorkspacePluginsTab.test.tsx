@@ -1,7 +1,16 @@
+import { ModalsProvider } from "@mantine/modals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
-import { cleanup, fireEvent, render, screen, within } from "@/test-utils";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@/test-utils";
 import { WorkspacePluginsTab } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type {
@@ -57,7 +66,7 @@ vi.mock(
             { isError: mocks.hasInstallationsError },
           ];
         },
-        useInsert: useMutationStub,
+        useInstall: useMutationStub,
         useUpdate: useMutationStub,
         useDelete: useMutationStub,
       },
@@ -76,6 +85,104 @@ vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
     },
   };
 });
+// The install wizard lists the workspace's case types and datasets, and
+// imports content. These stubs keep the dataset clients' DuckDB and storage
+// modules out of the test.
+vi.mock("@/clients/ontology/ConceptClient", () => {
+  return {
+    ConceptClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
+  return {
+    ConceptAttributeClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return {
+    DatasetClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock(
+  "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding",
+  () => {
+    return { checkDataSlotBinding: vi.fn() };
+  },
+);
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem",
+  () => {
+    return { importPluginContentItem: vi.fn() };
+  },
+);
+vi.mock(
+  "@/clients/plugins/PluginContentImportClient/PluginContentImportClient",
+  () => {
+    return {
+      PluginContentImportClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginContentImportClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [[], false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock(
+  "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient",
+  () => {
+    return {
+      PluginDataSlotBindingClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginDataSlotBindingClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [[], false, {}];
+        },
+        useDelete: () => {
+          return [vi.fn(), false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock("@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource", () => {
+  return { loadDataSlotSource: vi.fn() };
+});
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-id" };
+    },
+  };
+});
 vi.mock("@/utils/Logger", () => {
   return { Logger: { error: vi.fn() } };
 });
@@ -89,6 +196,7 @@ let nextEntryNumber = 0;
 function _makeManifestModule(
   pluginId: string,
   icons: Record<string, unknown>,
+  manifestOverrides: Record<string, unknown> = {},
 ): PluginManifestModule {
   return {
     manifest: {
@@ -96,19 +204,26 @@ function _makeManifestModule(
       name: "%name%",
       description: "%description%",
       version: "1.2.0",
+      license: "MIT",
       icon: "chart-dots",
       permissions: ["data:context"],
+      dataSlots: {},
       contributes: {
         commands: [{ id: "run", title: "%run.title%", icon: "chart-dots" }],
         menus: { "dataExplorer.toolbar": [{ command: "run" }] },
         vizTypes: [],
+        aiTools: [],
+        content: [],
       },
+      ...manifestOverrides,
     },
     strings: {
       en: {
         name: "Epidemiology",
         description: "Charts disease spread.",
         "run.title": "Linear regression",
+        "slot.cases.title": "Cases",
+        "content.cases.title": "Sample cases",
       },
     },
     icons,
@@ -116,7 +231,10 @@ function _makeManifestModule(
 }
 
 function _addBundledPlugin(
-  options: { icons?: Record<string, unknown> } = {},
+  options: {
+    icons?: Record<string, unknown>;
+    manifestOverrides?: Record<string, unknown>;
+  } = {},
 ): void {
   nextEntryNumber += 1;
   // A new id each test, because the plugin module cache lives for the session.
@@ -124,7 +242,9 @@ function _addBundledPlugin(
   mocks.entries.push({
     id,
     loadManifest: () => {
-      return Promise.resolve(_makeManifestModule(id, options.icons ?? {}));
+      return Promise.resolve(
+        _makeManifestModule(id, options.icons ?? {}, options.manifestOverrides),
+      );
     },
   });
 }
@@ -140,14 +260,20 @@ function _addInstallation(overrides: Partial<PluginInstallation.T>): void {
   });
 }
 
+// The modals provider sits inside the query client, as in the app, so a
+// modal a card opens can read queries too.
 function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
+        {children}
+      </ModalsProvider>
+    </QueryClientProvider>
   );
 }
 
-function _renderTab(): void {
-  render(<WorkspacePluginsTab />, { wrapper: QueryWrapper });
+function _renderTab(): ReturnType<typeof render> {
+  return render(<WorkspacePluginsTab />, { wrapper: QueryWrapper });
 }
 
 function _getButtonLabelsIn(card: HTMLElement): string[] {
@@ -243,6 +369,134 @@ describe("WorkspacePluginsTab", () => {
     expect(
       await screen.findByText("No plugins are available in this deployment."),
     ).toBeInTheDocument();
+  });
+
+  it("opens the install wizard, titled with the plugin's name, from Install", async () => {
+    _addBundledPlugin();
+    _renderTab();
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+
+    fireEvent.click(within(card).getByRole("button", { name: "Install" }));
+
+    const wizard = await screen.findByRole("dialog", {
+      name: "Install Epidemiology",
+    });
+    expect(
+      within(wizard).getByRole("heading", { name: "About this plugin" }),
+    ).toBeInTheDocument();
+  });
+
+  it("returns focus to the Install button when the wizard is closed without installing", async () => {
+    _addBundledPlugin();
+    _renderTab();
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    const installButton = within(card).getByRole("button", { name: "Install" });
+    installButton.focus();
+    fireEvent.click(installButton);
+    await screen.findByRole("dialog", { name: "Install Epidemiology" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    await waitFor(() => {
+      expect(installButton).toHaveFocus();
+    });
+  });
+
+  it.each(["Close button", "Escape"])(
+    "moves focus to the card heading when the wizard closes with %s after the Install button is gone",
+    async (closeWith) => {
+      _addBundledPlugin();
+      const view = _renderTab();
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      const installButton = within(card).getByRole("button", {
+        name: "Install",
+      });
+      installButton.focus();
+      fireEvent.click(installButton);
+      await screen.findByRole("dialog", { name: "Install Epidemiology" });
+      // The install lands: the card's Install button is replaced.
+      _addInstallation({
+        pluginId: (mocks.entries.at(-1) as PluginIndexEntry).id,
+      });
+      view.rerender(<WorkspacePluginsTab />);
+      await waitFor(() => {
+        expect(installButton).not.toBeInTheDocument();
+      });
+
+      if (closeWith === "Escape") {
+        fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+      } else {
+        fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      }
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Epidemiology" }),
+        ).toHaveFocus();
+      });
+    },
+  );
+
+  describe("an installed plugin with data slots and content", () => {
+    const MANIFEST_OVERRIDES = {
+      permissions: ["data:slots"],
+      dataSlots: {
+        cases: {
+          title: "%slot.cases.title%",
+          required: false,
+          attributes: {
+            onsetDate: { type: "date", title: "%onset%", required: true },
+          },
+        },
+      },
+      contributes: {
+        commands: [],
+        menus: {},
+        vizTypes: [],
+        aiTools: [],
+        content: [
+          {
+            id: "cases",
+            kind: "dataset",
+            title: "%content.cases.title%",
+            description: "%content.cases.title%",
+            file: "content/cases.csv",
+          },
+        ],
+      },
+    };
+
+    it("lists the records it reads and the datasets it includes once installed", async () => {
+      _addBundledPlugin({ manifestOverrides: MANIFEST_OVERRIDES });
+      _addInstallation({
+        pluginId: (mocks.entries[0] as PluginIndexEntry).id,
+        grantedPermissions: ["data:slots"],
+      });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(
+        within(card).getByRole("heading", { name: "Records it reads" }),
+      ).toBeInTheDocument();
+      expect(
+        within(card).getByRole("heading", { name: "Datasets it includes" }),
+      ).toBeInTheDocument();
+    });
+
+    it("leaves both out before the plugin is installed", async () => {
+      _addBundledPlugin({ manifestOverrides: MANIFEST_OVERRIDES });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(
+        within(card).queryByRole("heading", { name: "Records it reads" }),
+      ).not.toBeInTheDocument();
+      expect(
+        within(card).queryByRole("heading", { name: "Datasets it includes" }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("disables the actions for users who cannot manage plugins", async () => {

@@ -1,9 +1,7 @@
-import { Model } from "@avandar/models";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { openPluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard";
 import { usePluginInstallationMutations } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { PluginManifest } from "@avandar/plugin-manifest/runtime";
+import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 
 /**
  * What a settings card can do to one plugin in the current workspace. Each
@@ -13,6 +11,8 @@ import type { PluginManifest } from "@avandar/plugin-manifest/runtime";
 export type PluginInstallationActions = Readonly<{
   /** True while any action is saving, so the card can disable its buttons. */
   isPending: boolean;
+
+  /** Opens the install wizard, which installs the plugin when it finishes. */
   install: () => void;
   setIsEnabled: (isEnabled: boolean) => void;
   approvePermissions: () => void;
@@ -21,43 +21,22 @@ export type PluginInstallationActions = Readonly<{
 
 /** Everything the actions of one plugin read, gathered by the hook. */
 type ActionContext = Readonly<{
-  workspaceId: Workspace.Id;
-  manifest: PluginManifest | undefined;
+  pluginName: string;
+  manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
   mutations: ReturnType<typeof usePluginInstallationMutations>;
 }>;
-
-/**
- * The install row for a manifest, granting every permission it asks for.
- * `installedBy` is left out on purpose: the database fills it from the
- * signed-in user, and its insert policy rejects any other value.
- */
-function _makeInstallationFromManifest(options: {
-  workspaceId: Workspace.Id;
-  manifest: PluginManifest;
-}): PluginInstallation.T<"Insert"> {
-  const { workspaceId, manifest } = options;
-  return Model.make("PluginInstallation", {
-    workspaceId,
-    pluginId: manifest.id,
-    installedVersion: manifest.version,
-    grantedPermissions: [...manifest.permissions],
-  });
-}
 
 /** Builds the actions that add a plugin to the workspace or remove it. */
 function _makeInstallActionsFromContext(
   context: ActionContext,
 ): Pick<PluginInstallationActions, "install" | "uninstall"> {
-  const { workspaceId, manifest, installation, mutations } = context;
+  const { pluginName, manifestModule, installation, mutations } = context;
   return {
     install: () => {
-      if (manifest === undefined) {
-        return;
+      if (manifestModule !== undefined) {
+        openPluginInstallWizard({ pluginName, manifestModule });
       }
-      mutations.insertInstallation({
-        data: _makeInstallationFromManifest({ workspaceId, manifest }),
-      });
     },
     uninstall: () => {
       if (installation !== undefined) {
@@ -71,7 +50,8 @@ function _makeInstallActionsFromContext(
 function _makeUpdateActionsFromContext(
   context: ActionContext,
 ): Pick<PluginInstallationActions, "setIsEnabled" | "approvePermissions"> {
-  const { manifest, installation, mutations } = context;
+  const { installation, mutations } = context;
+  const manifest = context.manifestModule?.manifest;
   return {
     setIsEnabled: (isEnabled) => {
       if (installation !== undefined) {
@@ -113,16 +93,9 @@ function _makeActionsFromContext(
  */
 export function usePluginInstallationActions(options: {
   pluginName: string;
-  manifest: PluginManifest | undefined;
+  manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
 }): PluginInstallationActions {
-  const { pluginName, manifest, installation } = options;
-  const workspace = useCurrentWorkspace();
-  const mutations = usePluginInstallationMutations(pluginName);
-  return _makeActionsFromContext({
-    workspaceId: workspace.id,
-    manifest,
-    installation,
-    mutations,
-  });
+  const mutations = usePluginInstallationMutations(options.pluginName);
+  return _makeActionsFromContext({ ...options, mutations });
 }

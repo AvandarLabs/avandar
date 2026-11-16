@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { AvaPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { PluginVizSettingValue } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfig.types";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
@@ -126,4 +127,72 @@ export function makePluginVizConfigFromSettingValue(
       [setting.key]: _getSettingValueFromControlValue(value),
     },
   };
+}
+
+function _isStoredSettingReadable(options: {
+  setting: PluginVizSetting;
+  config: AvaVizConfig.Plugin;
+  fieldIds: ReadonlySet<string>;
+}): boolean {
+  const { setting, config, fieldIds } = options;
+  if (setting.control.kind === "columnPicker") {
+    const columnId = Object.hasOwn(config.columnSettings, setting.key)
+      ? config.columnSettings[setting.key]
+      : undefined;
+    // While the result's columns load, `fieldIds` is empty and a stored
+    // column cannot be checked yet.
+    return (
+      columnId === undefined || fieldIds.size === 0 || fieldIds.has(columnId)
+    );
+  }
+  // A setting key may be named like an inherited `Object` member, such as
+  // `toString`, so read only a value the config stores under its own key.
+  const value = Object.hasOwn(config.settings, setting.key)
+    ? config.settings[setting.key]
+    : undefined;
+  if (value === undefined) {
+    return true;
+  }
+  return match(setting.control)
+    .with({ kind: "select" }, { kind: "segmented" }, (control) => {
+      return control.options.some((option) => {
+        return option.value === value;
+      });
+    })
+    .with({ kind: "switch" }, () => {
+      return typeof value === "boolean";
+    })
+    .with({ kind: "number" }, () => {
+      return typeof value === "number" && Number.isFinite(value);
+    })
+    .with({ kind: "text" }, { kind: "color" }, () => {
+      return typeof value === "string";
+    })
+    .exhaustive();
+}
+
+/**
+ * Whether a stored plugin chart config can be drawn as the settings form for
+ * `settings`: it parses as an `AvaPluginVizConfig`, every column setting
+ * names one of `fields`, and every other setting holds a value its control
+ * can show. Use it before drawing controls from a config that came from
+ * storage, for example a dashboard saved by an older build or edited by hand.
+ */
+export function isPluginVizConfigReadable(options: {
+  config: unknown;
+  settings: readonly PluginVizSetting[];
+  fields: readonly QueryResult.ColumnWithId[];
+}): boolean {
+  const result = AvaPluginVizConfigSchema.safeParse(options.config);
+  if (!result.success) {
+    return false;
+  }
+  const fieldIds = new Set<string>(
+    options.fields.map((field) => {
+      return field.id;
+    }),
+  );
+  return options.settings.every((setting) => {
+    return _isStoredSettingReadable({ setting, config: result.data, fieldIds });
+  });
 }

@@ -1,9 +1,10 @@
 # How to author a bundled plugin
 
 This guide shows how to add a bundled plugin that puts a command in the Data
-Explorer toolbar or adds a chart type. It assumes a checkout of this repository
-with dependencies installed, and the `ava` CLI on your `PATH` (run
-`pnpm build:ava-cli` if it is not).
+Explorer toolbar, adds a chart type, reads records an admin chooses for it, or
+bundles datasets. It assumes a checkout of this repository with dependencies
+installed, and the `ava` CLI on your `PATH` (run `pnpm build:ava-cli` if it is
+not).
 
 Bundled plugins live in `plugins/<name>/`, are listed in
 `plugins/bundled.yaml`, and are built into the app as lazy chunks. A workspace
@@ -15,8 +16,9 @@ host and one installations request load for every workspace.
 
 Design background:
 `docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md`,
-`docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md`, and
-`docs/superpowers/specs/2026-11-07-plugins-1b-viz-types-design.md`. Package
+`docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md`,
+`docs/superpowers/specs/2026-11-07-plugins-1b-viz-types-design.md`, and
+`docs/superpowers/specs/2026-11-11-plugins-1d-data-slots-design.md`. Package
 exports: the READMEs of `@avandar/plugin-manifest`, `@avandar/plugin-sdk`, and
 `@avandar/plugin-ui` (see `docs/avandar-packages.md`).
 
@@ -196,8 +198,10 @@ contributes:
 | `engines.avandar` | A non-empty version range for the host, such as `"^1"` |
 | `name`, `description`, command `title` | A `%key%` reference to `locales/en.json`, such as `"%plugin.name%"`. The text is plain, with no ICU arguments. A key missing from `en.json` fails |
 | `icon` (plugin and command) | A Tabler icon name in kebab-case, such as `trending-up`. It must be a real icon in `@tabler/icons-react`, matched with exact case |
-| `entry` | A relative `.ts` or `.tsx` path inside the plugin folder. The file must exist |
-| `permissions` | A list of `data:context` and `query:addColumns` (see the API table in section 5) |
+| `entry` | A relative `.ts` or `.tsx` path inside the plugin folder. The file must exist. Required when the plugin contributes commands, chart types, or AI tools. A plugin that only bundles datasets leaves it out (see section 14) |
+| `permissions` | A list of `data:context`, `query:addColumns`, and `data:slots` (see the API table in section 5). `data:slots` and `dataSlots` require each other (see section 13) |
+| `dataSlots` | Optional. The records the plugin reads, keyed by slot id (see section 13) |
+| `contributes.content` | Optional. The datasets the plugin bundles (see section 14) |
 | `contributes.commands[].id` | Lowercase letters, digits, and hyphens in dot-separated words. Unique within the plugin |
 | `contributes.menus.<slot>[].command` | The id of a command declared in the same manifest |
 
@@ -281,18 +285,21 @@ The `avandar` API, from `@avandar/plugin-sdk`:
 | Member | Purpose | Permission |
 | --- | --- | --- |
 | `avandar.context` | What the command was invoked on: `{ slotId: "dataExplorer.toolbar", queryHandle, columns: [{ name, dataType }], rowCount }` | none |
-| `avandar.data.fetchRows(handle, { columns, limit })` | Resolves `{ rows, isTruncated }` for the invoked-on result, with only the requested columns. `limit` defaults to 50,000 and is clamped to at most 200,000. `isTruncated` is true when the result had more rows | `data:context` |
+| `avandar.data.fetchRows(handle, { columns, limit })` | Resolves `{ rows, isTruncated }` for the invoked-on result, or for a data slot `querySlot` read, with only the requested columns. `limit` defaults to 50,000 and is clamped to at most 200,000. `isTruncated` is true when the result had more rows | `data:context` |
+| `avandar.data.querySlot(slotId)` | Reads the records an admin chose for one of the plugin's data slots and resolves `{ queryHandle, columns, rowCount, isTruncated }`. Commands only (see section 13) | `data:slots` |
 | `avandar.ui.openModal({ title, content })` | Opens a modal. `content` is a React tree built from `@avandar/plugin-ui` | none |
 | `avandar.ui.openDrawer({ title, content })` | Opens a drawer with the same options | none |
 | `avandar.ui.notify({ title?, message, color? })` | Shows a notification. `title` defaults to the plugin name. `color` is `blue` (default), `green`, `red`, or `yellow` | none |
 | `avandar.ui.closeModal()` | Closes the modal this invocation opened last. Does nothing when it opened none, or the user already closed it | none |
+| `avandar.ui.openDataSlotBinding(slotId)` | Opens the modal that chooses a data slot's records, and resolves when it closes. Commands only (see section 13) | `data:slots` |
 | `avandar.dataExplorer.addColumns(columns)` | Adds computed columns to the Data Explorer query the command was invoked on, and resolves `{ columnNames }`. `avandar.dataExplorer` is undefined outside a Data Explorer toolbar command (see section 6) | `query:addColumns` |
 | `avandar.i18n.t(key, values?)` | Synchronous. Formats a message from `locales/` for the workspace locale | none |
 | `avandar.workspace` | `{ id, slug, locale }`, read-only | none |
 
-`fetchRows` accepts only the `queryHandle` of the current invocation. Any other
-handle rejects with a `PluginError` coded `PermissionDenied`, and a result that
-is no longer available rejects with `InvalidHandle`. A handler that throws or
+`fetchRows` accepts only the `queryHandle` of the current invocation, or a
+handle `querySlot` returned during the same invocation. Any other handle
+rejects with a `PluginError` coded `PermissionDenied`, and a result that is no
+longer available rejects with `InvalidHandle`. A handler that throws or
 rejects shows a failure notification, and a plugin chunk that fails to load can
 be retried by clicking the button again.
 
@@ -625,7 +632,7 @@ name, as `role="img"` and `title` do above.
 
 | Export | Purpose |
 | --- | --- |
-| `ComposedChart`, `Scatter`, `ErrorBar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`, `ReferenceLine`, `Legend` | Recharts building blocks |
+| `ComposedChart`, `Bar`, `Scatter`, `ErrorBar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`, `ReferenceLine`, `Legend` | Recharts building blocks |
 | `useChartTheme()` | `{ colors, textColor, gridColor }`: Avandar's chart colors, text color, and grid color for the current color scheme, dark mode included |
 
 Recharts already ships in the app, so these exports add no bytes to app
@@ -699,11 +706,12 @@ the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
 
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
 `Divider`, `Group`, `Loader`, `NumberInput`, `SegmentedControl`, `Select`,
-`SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`, and `Title`, and draw
-component charts only from `@avandar/plugin-ui/charts`. Every API call is async
-or fire-and-forget and passes serializable data, with three exceptions: the
-synchronous `i18n.t`, the React `content` of `openModal` and `openDrawer`, and
-chart components, which are React components too.
+`SimpleGrid`, `Stack`, `Switch`, `Table`, `Text`, `TextInput`, and `Title`, and
+draw charts only from `@avandar/plugin-ui/charts`, in a chart component or in
+command UI such as a modal. Every API call is async or fire-and-forget and
+passes serializable data, with three exceptions: the synchronous `i18n.t`, the
+React `content` of `openModal` and `openDrawer`, and chart components, which
+are React components too.
 
 ## 11. Validate
 
@@ -716,13 +724,15 @@ ava plugin validate case-tools
 empty answer means all). For each plugin it runs:
 
 1. The manifest checks: `ava.yaml` against the schema, locale files, the
-   referenced `%key%` strings, the entry file, Tabler icons, and `package.json`
-   dependencies.
+   referenced `%key%` strings, the entry file, each content file (it exists
+   and is at most 1 MiB), Tabler icons, and `package.json` dependencies.
 2. `tsc` on `plugins/<name>/tsconfig.json`.
 3. `eslint` on `plugins/<name>`.
 
-Steps 2 and 3 are skipped when step 1 fails. The command exits nonzero when any
-plugin fails, so CI can use it. The same manifest checks run on every
+Steps 2 and 3 are skipped when step 1 fails, and for a plugin with no `entry`,
+which has no code to check: the command prints
+`No plugin code, skipping tsc and eslint.` instead. The command exits nonzero
+when any plugin fails, so CI can use it. The same manifest checks run on every
 `vite build` and `pnpm dev`, and an invalid manifest fails the build.
 
 Before you open a pull request, also run `pnpm check:plugin-bundle`. It builds
@@ -735,7 +745,10 @@ budget.
 A plugin can give the hosted data agent a tool.
 
 1. Declare it under `contributes.aiTools` in `ava.yaml`. Each tool has a
-   `name`, a plain-text `description` the model sees, and `parameters`.
+   `name`, a plain-text `description` the model sees, and `parameters`. A
+   `name` may not match a built-in tool's name (`run_query`, `lookup_values`,
+   `ask_user`, or `plan_query`) once both are lowercased with underscores
+   removed, so `runQuery` and `askUser` fail validation too.
 2. Export `aiTools.<name>` from the plugin entry. The key matches `name`.
 3. In the handler, read rows with `avandar.data.fetchRows` on
    `avandar.context.queryHandle`. The handler does not receive rows as an
@@ -751,20 +764,264 @@ message must not contain a cell value. Any other throw becomes
 `The tool failed.` for the model.
 
 The tool runs only when the plugin's install status is `installed`, and only on
-the hosted data agent.
+the hosted data agent. A tool handler's `avandar` has no `querySlot` or
+`openDataSlotBinding` (see section 13).
 
 For a working example, see the handler in
 `plugins/epidemiology/src/fitRegression/runFitRegression.ts` and the
 `fitRegression` block in `plugins/epidemiology/ava.yaml`.
+
+## 13. Read records an admin chooses
+
+A command can read workspace records nobody opened for it, such as every case
+of a case type, through a **data slot**. The manifest declares the shape of
+the records the plugin needs, and a settings admin binds the slot to a case
+type or a dataset, attribute by attribute. The binding is the permission
+grant: the plugin reads only the fields the admin chose, under its own
+attribute names.
+
+Declare slots under the top-level `dataSlots` key, and list `data:slots` in
+`permissions`:
+
+```yaml
+permissions:
+  - data:context
+  - data:slots
+dataSlots:
+  cases:
+    title: "%slot.cases.title%"
+    description: "%slot.cases.description%"
+    concept: Case
+    required: false
+    attributes:
+      onsetDate:
+        type: date
+        title: "%slot.cases.onsetDate%"
+      district:
+        type: geo.admin2
+        title: "%slot.cases.district%"
+        required: false
+```
+
+| Key | Rule |
+| --- | --- |
+| Slot id | A letter, then letters and digits, such as `cases`. Unique within the plugin. `querySlot` takes it |
+| `title` | A `%key%` reference |
+| `description` | Optional `%key%` reference, shown above the slot's fields |
+| `concept` | Optional. A case type name the install wizard lists first, compared without case. A hint, not a requirement |
+| `required` | Optional, `false` by default. A required slot must be bound before Install. An optional slot can be skipped and bound later |
+| `attributes` | At least one, keyed by attribute key: a letter, then letters and digits. Each key names a column `querySlot` returns. Two keys in one slot may not differ only by case, because DuckDB ignores identifier case |
+| `attributes.<key>.type` | One of the types below |
+| `attributes.<key>.title` | A `%key%` reference |
+| `attributes.<key>.required` | Optional, `true` by default. A binding must map every required attribute |
+
+| `type` | Binds to fields of type | The admin reads |
+| --- | --- | --- |
+| `number` | whole number (`bigint`) or decimal (`double`) | Number |
+| `date` | `date` or `timestamp` | Date |
+| `text` | text (`varchar`) | Text |
+| `boolean` | `boolean` | Yes / no |
+| `geo.admin1` | text (`varchar`) | Province or region, name or code |
+| `geo.admin2` | text (`varchar`) | District, name or code |
+
+A manifest that declares `dataSlots` must list `data:slots` in `permissions`,
+and one that lists `data:slots` must declare at least one slot. The geo types
+only change the admin's labels: Avandar does not check the values against
+known boundaries.
+
+### Binding a slot
+
+The Install button on a plugin's card in Settings → Plugins opens a wizard
+with the steps its manifest needs: Review, Records (when it declares
+`dataSlots`), Datasets (when it declares `contributes.content`), and Confirm.
+The Records step has one page per slot. On each, the admin picks a case type
+or a dataset, case types whose name matches `concept` first, then a field for
+each attribute. Each attribute lists only the fields whose type fits it. Once
+every required attribute has a field, the wizard checks the records: how many
+there are, how many have a value for each attribute, and the first 5 rows.
+**Next** stays disabled until the slot is bound. An optional slot also has
+**Skip for now**, and a required slot has no way past its page until it is
+bound. The Install button is on the Confirm step, and it saves the
+installation and its bindings together.
+
+After install, the plugin's card lists its slots under "Records it reads",
+each with its status (Bound, Not bound, or Broken) and, once chosen, its
+source, such as "Case type: Measles cases" or "Dataset: Line list". A broken
+slot lists why under it. A binding breaks when its case type or dataset is
+deleted or no longer readable, a chosen field is deleted or changes to a type
+the attribute does not accept, or a required attribute has no field. Workspace
+admins with the plugin-management permission see Choose or Change on each
+slot, and Remove on an optional slot that has a binding, bound or broken.
+Other members see the status only. The database enforces the same rule: it
+refuses a binding write from anyone who is not a settings admin or the
+workspace owner. An admin who approves `data:slots` under "Review new
+permissions" binds the slots from the card. Uninstalling the plugin deletes its bindings.
+
+### Reading a slot
+
+```ts
+const { querySlot } = avandar.data;
+if (querySlot === undefined) {
+  return;
+}
+const slot = await querySlot("cases");
+const { rows } = await avandar.data.fetchRows(slot.queryHandle, {
+  columns: ["onsetDate", "district"],
+  limit: slot.rowCount,
+});
+```
+
+`querySlot(slotId)` resolves:
+
+| Field | Meaning |
+| --- | --- |
+| `queryHandle` | A handle `fetchRows` accepts during this invocation, and in no other. Only the 3 newest handles of an invocation stay readable: `fetchRows` on an older one rejects with `InvalidHandle` |
+| `columns` | One `{ name, dataType }` per attribute, in manifest order, named by attribute key. `dataType` is the bound field's type. An unmapped optional attribute is `null` in every row, and its `dataType` follows its attribute type: `double` for `number`, `date` for `date`, `boolean` for `boolean`, and `varchar` for the rest |
+| `rowCount` | The number of rows `queryHandle` holds. It is the slot's total unless `isTruncated` is true, and then it is the read limit of 200,000 |
+| `isTruncated` | True when the slot holds more than 200,000 records, so `queryHandle` holds only some of them |
+
+Avandar builds the query from the binding and runs it in the browser's DuckDB
+with the current user's access, so nobody reads records they could not already
+read. The plugin sees only its own attribute keys, never the workspace's field
+names. `fetchRows` reads 50,000 rows unless told otherwise, so pass
+`limit: slot.rowCount` to read them all. Several `querySlot` calls in one
+invocation run one at a time, in call order. Every call also checks that the
+plugin is still installed and enabled, so a modal that outlives a Disable
+cannot keep reading.
+
+`querySlot` rejects with a `PluginError`:
+
+| `code` | When |
+| --- | --- |
+| `InvalidSlot` | The manifest declares no data slot with that id |
+| `SlotNotBound` | Nobody has chosen the slot's records yet |
+| `SlotBroken` | The binding no longer fits the slot. The message names attribute keys and the reasons, never a field name, a value, or a source name |
+| `PermissionDenied` | The current user cannot read the bound dataset or case type, or the plugin is not currently installed and enabled, or its permissions are awaiting approval |
+| `InvalidHandle` | The workspace the command started in is no longer open. Run the command again |
+| `CommandFailed` | Any other failure. That includes a case type the user can read whose records come from datasets they cannot reach: it currently reads as `CommandFailed`, not `PermissionDenied`. The message is always "The data slot could not be read." The host logs the details and never sends them to the plugin, because they can name workspace data the plugin was not given |
+
+`avandar.ui.openDataSlotBinding(slotId)` opens a modal titled "Choose records
+for *slot title*", the same one the card's Choose and Change buttons open. An
+admin with the plugin-management permission chooses the records there and
+saves them. Anyone else reads "Ask a workspace admin to choose which records
+this plugin reads." and a Close button, because the modal checks the
+permission itself. It resolves when the modal closes, saved or not, so a
+command can call `querySlot` again then. A slot id the manifest does not
+declare rejects with `InvalidSlot`, and a plugin that is no longer installed
+and enabled with `PermissionDenied`. The epidemiology plugin's Case epicurve
+does both: on `SlotNotBound` or `SlotBroken` it shows an alert with a "Choose
+records" button, then reads the slot again
+(`plugins/epidemiology/src/caseEpicurve/CaseEpicurveModal/useCaseSlotRows.ts`).
+Its `ava.yaml` declares the `cases` slot, with a required `onsetDate` and an
+optional `district`, and the `cases.epicurve` command.
+
+Only commands get data slots. An AI tool handler's and a chart's `avandar`
+have no `querySlot` or `openDataSlotBinding`. A tool that aggregates every
+bound record without anyone looking at it, and returns the result to the
+model, needs its own privacy review. For the same reason, do not keep
+`avandar` or `querySlot` anywhere that outlives the command handler and the
+overlays it opens: a tool handler that captured it could read bound records
+and return them to the model.
+
+Records a slot returns are workspace data the admin shared with the plugin for
+the person running it. Show them to that person, or aggregate them, as the
+Case epicurve does. Never send a value anywhere else: not in a network
+request, not into browser storage or a URL, and not into SQL a command adds to
+a query.
+
+Host code that serves slots follows one split. Logic shared by Settings and
+the command runtime lives in `src/lib/pluginDataSlots/`. Code only commands
+use lives in `src/lib/plugins/dataSlots/` and is reached only through the lazy
+command runner, so it stays out of the plugin host's size budget (see section
+11).
+
+## 14. Bundle datasets
+
+A plugin can bundle CSV files that installing it imports as ordinary
+workspace datasets, such as a country's district boundaries. Such a plugin
+needs no code. The Mozambique pack is a manifest, a `package.json`, a locale
+file, and two CSV files:
+
+```text
+plugins/mozambique/
+  ava.yaml            no entry, no permissions, contributes.content
+  package.json        name, version, private, license, type, and no dependencies
+  locales/en.json
+  content/mz-adm1.csv
+  content/mz-adm2.csv
+  content/README.md   where the data came from, its license, and what changed
+```
+
+A plugin with no commands, chart types, or AI tools leaves out `entry`,
+`src/`, and `tsconfig.json`. Keep its `package.json`, as every plugin has one:
+`ava plugin validate` reads its `dependencies`. Declare each file under
+`contributes.content`:
+
+```yaml
+license: CC-BY-3.0-IGO
+contributes:
+  content:
+    - id: provinces
+      kind: dataset
+      title: "%content.provinces.title%"
+      description: "%content.provinces.description%"
+      file: content/mz-adm1.csv
+```
+
+| Key | Rule |
+| --- | --- |
+| `id` | Lowercase letters, digits, and hyphens in dot-separated words, like a command id. Unique within the plugin. Keep it stable: it is how a workspace remembers what it already imported |
+| `kind` | `dataset`, the only kind |
+| `title`, `description` | `%key%` references. They become the dataset's name and description, in the language of the admin who installs it |
+| `file` | A relative path to a `.csv` file inside the plugin folder, made of letters, digits, `_`, `-`, `.`, and `/`. It must not start with `/` or contain `..`. The file must exist and be at most 1 MiB (1,048,576 bytes) |
+
+A content file goes through the same import as a CSV uploaded in Data
+Manager: DuckDB detects the delimiter, the header row, and each column's type.
+Give it a header row. For map boundaries, add a geometry column as WKT text in
+longitude and latitude (EPSG:4326), as `mz-adm1.csv` does, and GIS detects the
+column when the dataset is added as a map layer. Commit the script that builds
+the files, as `scripts/plugins/buildMozambiqueBoundaries.ts` does for the
+Mozambique pack. It simplifies the shapes until each file fits the size limit.
+
+None of the files downloads until an admin imports it. Installing the plugin
+works like this:
+
+1. The wizard's Datasets step lists each item, every one checked to start
+   with. An item this workspace already imported shows "Already in this
+   workspace" and is not imported again.
+2. The Install button on the Confirm step saves the installation, and then the
+   Confirm step imports the checked items one at a time, each showing Waiting,
+   Importing, Imported, or "Failed: *reason*" with a Retry button. A failure
+   stops that item only, and the install stands. The wizard cannot be closed
+   while an import runs, and Done stays disabled until the imports finish.
+3. Importing creates a dataset, so the admin also needs the right to create
+   datasets in the workspace. Without it, the item fails with the database's
+   reason.
+
+After install, the plugin's card lists its items under "Datasets it includes",
+each linked to its dataset once imported, with Import for an item that is
+missing and Retry for one that failed. Uninstalling the plugin keeps the
+datasets. Deleting an imported dataset lets the item be imported again.
+
+Bundled data needs attribution recorded with it. Credit its source and license
+in the description, because that is where workspace members see where the data
+came from, and set the manifest's `license` and `package.json`'s `license` to
+the data's license. Also keep a `README.md` beside the files that names the
+source, the license, and every change you made to the data, as
+`plugins/mozambique/content/README.md` does. The Mozambique pack's data is the
+geoBoundaries gbHumanitarian release, built from Mozambique INE and UN OCHA
+ROSEA data, under CC BY 3.0 IGO. Its descriptions say so, and its README says
+the shapes were simplified.
 
 ## Rules to keep in mind
 
 - **Permissions are declared, not enforced.** A manifest lists the permissions
   it needs and Settings → Plugins shows them to admins. The host does not
   enforce them: bundled plugins run in-process. Declare `data:context`
-  whenever the plugin calls `fetchRows`, and `query:addColumns` whenever it
-  calls `avandar.dataExplorer.addColumns`, so the manifest states what the
-  plugin does. Adding a permission to a plugin that workspaces already
+  whenever the plugin calls `fetchRows`, `query:addColumns` whenever it
+  calls `avandar.dataExplorer.addColumns`, and `data:slots` whenever it
+  declares `dataSlots` (the manifest fails without it), so the manifest states
+  what the plugin does. Adding a permission to a plugin that workspaces already
   installed hides its contributions there until a settings admin approves
   it under "Review new permissions" in Settings → Plugins.
 - **Never bundle a contract plugin.** This repository is public. A plugin that
@@ -774,3 +1031,12 @@ For a working example, see the handler in
   Explorer links store them. A renamed chart type id shows the missing-plugin
   placeholder wherever the old one was saved, and a renamed setting key loses
   that setting's value.
+- **Keep data slot ids, attribute keys, and content ids stable.** Bindings
+  store the slot id and attribute keys, so renaming one leaves the slot unbound
+  or broken in every workspace. Workspaces remember imports by content id, so
+  a renamed id imports the dataset a second time.
+- **Do not keep `avandar` or `querySlot` past the command.** Use them only in
+  the command handler and in the modals and drawers it opens. Never store them
+  in a module-level variable, a cache, or a global, and never hand them to an
+  AI tool handler. A tool that held on to `querySlot` could return bound
+  records to the model, which data slots must never do (see section 13).

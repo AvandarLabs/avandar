@@ -72,6 +72,26 @@ export type FetchRowsResult = Readonly<{
   isTruncated: boolean;
 }>;
 
+/**
+ * What `avandar.data.querySlot` resolves to: a handle to the records bound to
+ * one of the plugin's data slots, with one column per slot attribute, named
+ * by its attribute key. A command reads the rows by passing `queryHandle` to
+ * `avandar.data.fetchRows`.
+ */
+export type QuerySlotResult = Readonly<{
+  queryHandle: QueryHandle;
+  columns: ReadonlyArray<
+    Readonly<{ name: string; dataType: PluginColumnDataType }>
+  >;
+  /**
+   * The number of rows `queryHandle` holds. It is the slot's total unless
+   * `isTruncated` is true, in which case it is the 200,000 row read limit.
+   */
+  rowCount: number;
+  /** True when the slot holds more records than the host read. */
+  isTruncated: boolean;
+}>;
+
 /** One computed column for `avandar.dataExplorer.addColumns`. */
 export type DerivedColumn = Readonly<{
   /** Lowercase snake case, matching `^[a-z][a-z0-9_]*$`. */
@@ -140,6 +160,23 @@ export type AvandarApi = Readonly<{
       queryHandle: QueryHandle,
       options: FetchRowsOptions,
     ) => Promise<FetchRowsResult>;
+    /**
+     * Reads the records an admin bound to one of the plugin's data slots,
+     * with the current user's access. Present only for commands. Rejects
+     * with a `PluginError`: `InvalidSlot` for a slot id the manifest does
+     * not declare, `SlotNotBound` or `SlotBroken` when the slot cannot be
+     * read, `PermissionDenied` when the user cannot read the bound dataset
+     * or case type or the plugin is no longer installed and enabled,
+     * `InvalidHandle` once the workspace the command started in is no
+     * longer open, and `CommandFailed` for any other failure. That includes
+     * a case type the user can read whose records come from datasets they
+     * cannot reach, which currently reads as `CommandFailed` and not
+     * `PermissionDenied`. A `CommandFailed` message is generic on purpose:
+     * the host keeps the details, which can name workspace data the plugin
+     * was not given. Only the three most recent handles it returns stay
+     * readable by `fetchRows`.
+     */
+    querySlot?: (slotId: string) => Promise<QuerySlotResult>;
   }>;
   ui: Readonly<{
     openModal: (options: PluginOverlayOptions) => void;
@@ -150,6 +187,17 @@ export type AvandarApi = Readonly<{
     closeModal: () => void;
     openDrawer: (options: PluginOverlayOptions) => void;
     notify: (options: PluginNotifyOptions) => void;
+    /**
+     * Lets the user choose the records a data slot reads: a settings admin
+     * gets the binding form for that slot, and anyone else a message to ask
+     * an admin, in the same modal. Resolves once the modal closes. Present
+     * only for commands. Rejects with a `PluginError`: `InvalidSlot` for a
+     * slot id the manifest does not declare, `PermissionDenied` when the
+     * plugin is no longer installed and enabled, `InvalidHandle` once the
+     * workspace the command started in is no longer open, and
+     * `CommandFailed` for any other failure.
+     */
+    openDataSlotBinding?: (slotId: string) => Promise<void>;
   }>;
   i18n: Readonly<{
     t: (key: string, values?: TranslationValues) => string;

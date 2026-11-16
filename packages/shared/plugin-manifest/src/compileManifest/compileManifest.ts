@@ -3,6 +3,7 @@ import { PluginManifestSchema } from "@plugin-manifest/PluginManifest/PluginMani
 import { getMessageKeyFromManifestString } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { parseStrictYaml } from "@plugin-manifest/yaml/parseStrictYaml/parseStrictYaml.ts";
 import type {
+  PluginDataSlot,
   PluginManifest,
   PluginVizSettingControl,
   PluginVizType,
@@ -118,6 +119,16 @@ function _getVizTypeStrings(vizType: PluginVizType): string[] {
   ];
 }
 
+function _getDataSlotStrings(slot: PluginDataSlot): string[] {
+  return [
+    slot.title,
+    ...(slot.description === undefined ? [] : [slot.description]),
+    ...Object.values(slot.attributes).map((attribute) => {
+      return attribute.title;
+    }),
+  ];
+}
+
 /**
  * Gets each distinct message key the manifest's user-facing strings
  * reference, so the compiler can check that the locale files define them.
@@ -131,6 +142,12 @@ export function getMessageKeysFromManifest(manifest: PluginManifest): string[] {
     }),
     ...manifest.contributes.vizTypes.flatMap((vizType) => {
       return _getVizTypeStrings(vizType);
+    }),
+    ...Object.values(manifest.dataSlots).flatMap((slot) => {
+      return _getDataSlotStrings(slot);
+    }),
+    ...manifest.contributes.content.flatMap((item) => {
+      return [item.title, item.description];
     }),
   ];
   const keys = values.flatMap((value) => {

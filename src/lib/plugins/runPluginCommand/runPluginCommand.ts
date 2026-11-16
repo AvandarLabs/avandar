@@ -1,4 +1,5 @@
 import { isPluginDefinition } from "@avandar/plugin-sdk";
+import { makeDataSlotApiForInvocation } from "@/lib/plugins/dataSlots/makeDataSlotApiForInvocation/makeDataSlotApiForInvocation";
 import { makePluginApi } from "@/lib/plugins/makePluginApi/makePluginApi";
 import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
@@ -95,6 +96,7 @@ export async function runPluginCommand(
       workspace,
       messages: codeModule.messages,
       dataExplorerBridge: options.dataExplorerBridge,
+      dataSlotApi: makeDataSlotApiForInvocation({ plugin, pluginName }),
     });
     await handler(api);
     return undefined;

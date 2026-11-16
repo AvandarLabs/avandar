@@ -97,11 +97,15 @@ function _getSettingsFromUiConfig(options: {
   const { vizType, uiConfig } = options;
   return Object.fromEntries(
     vizType.settings.map((setting) => {
+      const stored =
+        setting.control.kind === "columnPicker"
+          ? uiConfig.columnSettings
+          : uiConfig.settings;
+      // A setting key may be named like an inherited `Object` member, such as
+      // `toString`, so read only a value stored under the key itself.
       return [
         setting.key,
-        setting.control.kind === "columnPicker"
-          ? uiConfig.columnSettings[setting.key]
-          : uiConfig.settings[setting.key],
+        Object.hasOwn(stored, setting.key) ? stored[setting.key] : undefined,
       ] as const;
     }),
   );

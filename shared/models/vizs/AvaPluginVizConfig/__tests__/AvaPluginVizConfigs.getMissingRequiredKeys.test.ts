@@ -82,4 +82,23 @@ describe("AvaPluginVizConfigs.getMissingRequiredKeys", () => {
       }),
     ).toEqual(["interval"]);
   });
+
+  it("lists a required setting keyed like an Object member that is unset", () => {
+    const settings: readonly PluginVizSettingShape[] = [
+      { key: "toString", required: true, control: { kind: "text" } },
+      {
+        key: "valueOf",
+        required: true,
+        control: { kind: "columnPicker", dataType: "text" },
+      },
+    ];
+
+    expect(
+      AvaPluginVizConfigs.getMissingRequiredKeys({
+        config: { ...UI_CONFIG, columnSettings: {}, settings: {} },
+        settings,
+        columnNames: undefined,
+      }),
+    ).toEqual(["toString", "valueOf"]);
+  });
 });

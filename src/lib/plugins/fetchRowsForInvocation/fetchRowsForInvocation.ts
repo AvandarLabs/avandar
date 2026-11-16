@@ -18,25 +18,39 @@ function _clampLimit(requestedLimit: number | undefined): number {
 
 /**
  * Implements `avandar.data.fetchRows` under `data:context`: only the handle
- * of the current invocation is readable, and only the requested columns are
- * returned, read from each row's own properties. A limit above
- * `MAX_FETCH_ROWS_LIMIT` is clamped to it, and a NaN limit is treated as not
- * provided.
+ * of the current invocation, or a handle `querySlot` issued during it, is
+ * readable (an issued handle whose rows were evicted is `InvalidHandle`),
+ * and only the requested columns are returned, read from each row's own
+ * properties. A limit above `MAX_FETCH_ROWS_LIMIT` is clamped to
+ * it, and a NaN limit is treated as not provided.
  */
 export function fetchRowsForInvocation(options: {
   invocationHandle: QueryHandle;
   queryHandle: QueryHandle;
   columns: readonly string[];
   limit?: number;
+
+  /** Rows of a handle `querySlot` issued in this invocation, else undefined. */
+  getSlotRows?: (
+    handle: QueryHandle,
+  ) => ReadonlyArray<Readonly<Record<string, unknown>>> | undefined;
+
+  /** Whether `querySlot` issued the handle here, evicted or not. */
+  wasSlotHandleIssued?: (handle: QueryHandle) => boolean;
 }): FetchRowsResult {
   const { invocationHandle, queryHandle, columns } = options;
-  if (queryHandle !== invocationHandle) {
+  const isInvocationHandle = queryHandle === invocationHandle;
+  const isSlotHandle =
+    !isInvocationHandle && options.wasSlotHandleIssued?.(queryHandle) === true;
+  if (!isInvocationHandle && !isSlotHandle) {
     throw new PluginError(
       "PermissionDenied",
-      "fetchRows only accepts the query handle of the current invocation.",
+      "fetchRows only accepts a query handle of the current invocation.",
     );
   }
-  const rows = QueryHandleRegistry.getRows(queryHandle);
+  const rows = isSlotHandle
+    ? options.getSlotRows?.(queryHandle)
+    : QueryHandleRegistry.getRows(queryHandle);
   if (rows === undefined) {
     throw new PluginError(
       "InvalidHandle",

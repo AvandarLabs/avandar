@@ -1,4 +1,4 @@
-import { AvandarProvider } from "@avandar/plugin-sdk";
+import { AvandarProvider, PluginError } from "@avandar/plugin-sdk";
 import { MantineProvider } from "@mantine/core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -25,12 +25,20 @@ function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
       fetchRows: vi.fn(() => {
         return Promise.resolve({ rows: [], isTruncated: false });
       }),
+      querySlot: vi.fn(() => {
+        return Promise.reject(
+          new PluginError("SlotNotBound", "No records are chosen yet."),
+        );
+      }),
     },
     ui: {
       openModal,
       openDrawer: vi.fn(),
       notify: vi.fn(),
       closeModal: vi.fn(),
+      openDataSlotBinding: vi.fn(() => {
+        return Promise.resolve();
+      }),
     },
     dataExplorer: {
       addColumns: vi.fn(() => {
@@ -50,9 +58,10 @@ describe("the epidemiology plugin", () => {
     ["regression.linear", "regression.linear.title", "modal.fit"],
     ["incidence.rate", "incidence.title", "incidence.add"],
     ["rolling.average", "rollingAverage.title", "rollingAverage.add"],
+    ["cases.epicurve", "cases.epicurve.title", "caseEpicurve.chooseRecords"],
   ])(
     "opens the %s modal under its translated title",
-    (commandId, titleKey, buttonKey) => {
+    async (commandId, titleKey, buttonKey) => {
       const openModal = vi.fn();
       const api = _makeApi(openModal);
       void plugin.commands[commandId]?.(api);
@@ -67,7 +76,7 @@ describe("the epidemiology plugin", () => {
         </MantineProvider>,
       );
       expect(
-        screen.getByRole("button", { name: `translated:${buttonKey}` }),
+        await screen.findByRole("button", { name: `translated:${buttonKey}` }),
       ).toBeInTheDocument();
     },
   );

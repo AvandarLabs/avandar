@@ -1,5 +1,6 @@
 import { relative } from "node:path";
 import {
+  PLUGIN_CONTENT_MODULE_PREFIX,
   PLUGIN_INDEX_MODULE_ID,
   PLUGIN_LOCALES_MODULE_PREFIX,
   PLUGIN_MANIFEST_MODULE_PREFIX,
@@ -17,10 +18,14 @@ export type ChunkSummary = Readonly<{
 
 /**
  * Rendered bytes of host code a workspace without plugins may load. Measured
- * at 36,053 bytes with plugin charts drawing in the Data Explorer and on
- * dashboards, rounded up to the next 1,000 bytes, plus 2,000 of headroom.
+ * at 40,580 bytes with two bundled plugins (one with code, one with only
+ * datasets), plugin charts drawing in the Data Explorer, and the Data
+ * Explorer keeping its result for plugin AI tools, rounded up to the next
+ * 1,000 bytes, plus 2,000 of headroom. The chat's plugin AI tool runtime
+ * loads only when the data agent calls a plugin tool, so it is a lazy
+ * runtime and not part of the measurement.
  */
-export const HOST_BUDGET_BYTES = 39_000;
+export const HOST_BUDGET_BYTES = 43_000;
 
 /** Rendered bytes each bundled plugin adds to `HOST_BUDGET_BYTES`. */
 export const PER_PLUGIN_BUDGET_BYTES = 600;
@@ -39,13 +44,16 @@ const HOST_MODULE_MARKERS = [
 
 /**
  * The modules the lazily loaded plugin runtimes are found by: the command
- * runner, which loads when a user picks a command, and the plugin chart
- * runtime, which loads when a plugin chart draws. The app reaches each only
- * through a dynamic `import()`.
+ * runner, which loads when a user picks a command, the plugin chart runtime,
+ * which loads when a plugin chart draws, and the chat's plugin AI tool
+ * runner and handler caller, which load when the data agent calls a plugin
+ * tool. The app reaches each only through a dynamic `import()`.
  */
 const LAZY_RUNTIME_MODULE_MARKERS = [
   "/src/lib/plugins/runPluginCommand/runPluginCommand.ts",
   "/src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.tsx",
+  "/src/lib/plugins/runPluginAiTool/runPluginAiTool.ts",
+  "/src/lib/plugins/invokePluginAiToolHandler/invokePluginAiToolHandler.ts",
 ];
 
 /**
@@ -226,7 +234,8 @@ function _isLazyPluginModule(
   return (
     moduleId.startsWith(`${pluginsDirectory}/`) ||
     moduleId.startsWith(`\0${PLUGIN_MANIFEST_MODULE_PREFIX}`) ||
-    moduleId.startsWith(`\0${PLUGIN_LOCALES_MODULE_PREFIX}`)
+    moduleId.startsWith(`\0${PLUGIN_LOCALES_MODULE_PREFIX}`) ||
+    moduleId.startsWith(`\0${PLUGIN_CONTENT_MODULE_PREFIX}`)
   );
 }
 
@@ -284,11 +293,12 @@ export function makeChunkSummariesFromBundle(
 
 /**
  * Checks that workspaces without plugins pay nothing for them. Every plugin
- * code, manifest, or locale module must sit in a plugin-only chunk: one the
- * app loads only through a plugin loader in `virtual:ava-plugin-index`. The
- * host modules in every other chunk, except those only a lazily loaded
- * runtime (the command runner or the plugin chart runtime) reaches, must
- * stay within the host's byte budget. Returns one message per violation, for
+ * code, manifest, locale, or content module must sit in a plugin-only chunk:
+ * one the app loads only through a plugin loader in
+ * `virtual:ava-plugin-index`. The host modules in every other chunk, except
+ * those only a lazily loaded runtime (the command runner, the plugin chart
+ * runtime, or the chat's plugin AI tool runtime) reaches, must stay within
+ * the host's byte budget. Returns one message per violation, for
  * `vitePluginAvaPlugins` to fail the build.
  *
  * `pluginsDirectory` must be a real, forward-slash absolute path without a

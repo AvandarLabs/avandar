@@ -1,6 +1,6 @@
 import { PluginError } from "@avandar/plugin-sdk";
 import { describe, expect, it } from "vitest";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 
 /**
  * The `PluginError` code `assertSingleSqlExpression` throws for `expression`,

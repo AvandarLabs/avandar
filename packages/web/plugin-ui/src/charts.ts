@@ -5,6 +5,7 @@
  * controls which chart components plugins can render.
  */
 export {
+  Bar,
   CartesianGrid,
   ComposedChart,
   ErrorBar,

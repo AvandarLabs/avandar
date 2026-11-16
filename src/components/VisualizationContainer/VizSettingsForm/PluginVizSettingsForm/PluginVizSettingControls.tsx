@@ -32,6 +32,23 @@ type SettingControlOptions = Readonly<{
 }>;
 
 /**
+ * Reads what the config stores for a setting. A setting key may be named like
+ * an inherited `Object` member, such as `toString`, so it reads only a value
+ * stored under the key itself.
+ */
+function _getStoredValueFromSetting(options: {
+  setting: PluginVizSetting;
+  config: AvaVizConfig.Plugin;
+}): unknown {
+  const { setting, config } = options;
+  const stored =
+    setting.control.kind === "columnPicker"
+      ? config.columnSettings
+      : config.settings;
+  return Object.hasOwn(stored, setting.key) ? stored[setting.key] : undefined;
+}
+
+/**
  * Makes the `Control` for one setting. A segmented control has no visible
  * label of its own, so it gets its localized label as a caption above it.
  */
@@ -44,11 +61,7 @@ function _makeControlElementFromSetting(
     <Control
       label={label}
       spec={makeControlSpecFromPluginVizSetting({ setting, localize })}
-      value={
-        setting.control.kind === "columnPicker"
-          ? config.columnSettings[setting.key]
-          : config.settings[setting.key]
-      }
+      value={_getStoredValueFromSetting({ setting, config })}
       fields={fields}
       onChange={(nextValue) => {
         onConfigChange(

@@ -5,6 +5,10 @@ import {
   openDataExplorerDrawerTab,
 } from "./helpers/dataExplorerFlow";
 import {
+  installPluginThroughWizard,
+  runPluginCommand,
+} from "./helpers/pluginFlow";
+import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
@@ -28,10 +32,6 @@ const BOROUGH_COUNT = 5;
 const RATE_COLUMN = "incidence_per_100k";
 const PLUGIN_ID = "avandar.epidemiology";
 
-function _getPluginCard(page: Page): Locator {
-  return page.getByRole("region", { name: "Epidemiology" });
-}
-
 function _getColumnHeader(
   options: Readonly<{ page: Page; columnName: string }>,
 ): Locator {
@@ -42,43 +42,12 @@ function _getColumnHeader(
 }
 
 /**
- * Installs the plugin from Settings. Calls `onInstallConfirmed` as soon as
- * the install is confirmed, before waiting for "Installed", so a caller can
- * clean up an install whose card never updates.
- */
-async function _installPlugin(
-  options: Readonly<{
-    page: Page;
-    workspaceSlug: string;
-    onInstallConfirmed: () => void;
-  }>,
-): Promise<void> {
-  const { page, workspaceSlug, onInstallConfirmed } = options;
-  await page.goto(`/${workspaceSlug}/settings/plugins`);
-  const card = _getPluginCard(page);
-  await expect(card.getByText("Not installed", { exact: true })).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-  await card.getByRole("button", { name: "Install", exact: true }).click();
-  await page
-    .getByRole("dialog", { name: "Install Epidemiology?" })
-    .getByRole("button", { name: "Install", exact: true })
-    .click();
-  onInstallConfirmed();
-  await expect(card.getByText("Installed", { exact: true })).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-}
-
-/**
  * Runs "Incidence per 100k" from the toolbar with the modal's defaults:
  * `cases` over `population`, per 100,000. Returns the notification that
  * lists the added columns.
  */
 async function _addIncidenceColumns(page: Page): Promise<Locator> {
-  await page
-    .getByRole("button", { name: "Incidence per 100k" })
-    .click({ timeout: MEDIUM_WAIT });
+  await runPluginCommand(page, "Incidence per 100k");
   const dialog = page.getByRole("dialog", { name: "Incidence per 100k" });
   await dialog.getByRole("button", { name: "Add columns" }).click();
   await expect(dialog).toBeHidden({ timeout: SHORT_WAIT });
@@ -143,8 +112,8 @@ test.describe("Epidemiology plugin incidence", () => {
       supabaseAdminClient,
       slug: workspaceSlug,
     });
-    // Set once the Settings install is confirmed, so cleanup never deletes
-    // an install this spec did not make.
+    // Set once Install is clicked in the install wizard, so cleanup never
+    // deletes an install this spec did not make.
     let didInstall = false;
     try {
       await signInWithEmailPassword(page, {
@@ -152,10 +121,10 @@ test.describe("Epidemiology plugin incidence", () => {
         password: primaryUser.password,
         workspaceSlug,
       });
-      await _installPlugin({
-        page,
+      await installPluginThroughWizard(page, {
         workspaceSlug,
-        onInstallConfirmed: () => {
+        pluginName: "Epidemiology",
+        onInstallStarted: () => {
           didInstall = true;
         },
       });

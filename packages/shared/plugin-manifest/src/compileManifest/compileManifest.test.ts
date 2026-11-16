@@ -97,6 +97,50 @@ function _omitVizMessage(key: string): Record<string, string> {
   );
 }
 
+const DATA_SLOT_YAML = VALID_YAML.replace(
+  "contributes:",
+  `permissions:
+  - data:slots
+dataSlots:
+  cases:
+    title: "%slot.cases.title%"
+    description: "%slot.cases.description%"
+    attributes:
+      onsetDate:
+        type: date
+        title: "%slot.cases.onsetDate%"
+contributes:`,
+);
+
+const DATA_SLOT_EN_MESSAGES: Record<string, string> = {
+  ...LOCALES.en,
+  "slot.cases.title": "Cases",
+  "slot.cases.description": "The cases to chart.",
+  "slot.cases.onsetDate": "Onset date",
+};
+
+function _omitDataSlotMessage(key: string): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(DATA_SLOT_EN_MESSAGES).filter(([candidateKey]) => {
+      return candidateKey !== key;
+    }),
+  );
+}
+
+const CONTENT_YAML = `${VALID_YAML}  content:
+    - id: provinces
+      kind: dataset
+      title: "%content.provinces.title%"
+      description: "%content.provinces.description%"
+      file: content/mz-adm1.csv
+`;
+
+const CONTENT_EN_MESSAGES: Record<string, string> = {
+  ...LOCALES.en,
+  "content.provinces.title": "Provinces",
+  "content.provinces.description": "Province boundaries.",
+};
+
 describe("compileManifest", () => {
   it("returns the manifest and only the strings it references", () => {
     const { manifest, strings } = _compile(VALID_YAML);
@@ -309,6 +353,49 @@ describe("compileManifest", () => {
         "viz.windowSize.unit": "days",
         "viz.caption": "Caption",
         "viz.caption.placeholder": "Add a caption",
+      });
+    });
+  });
+
+  describe("content strings", () => {
+    it.each([
+      ["title", "content.provinces.title"],
+      ["description", "content.provinces.description"],
+    ])("requires a content item's %s in locales/en.json", (_label, key) => {
+      const messages = { ...CONTENT_EN_MESSAGES };
+      delete messages[key];
+      expect(
+        _getIssues(() => {
+          return _compile(CONTENT_YAML, { en: messages });
+        }),
+      ).toEqual([`"${key}" is referenced but missing from locales/en.json`]);
+    });
+  });
+
+  describe("data slot strings", () => {
+    it.each([
+      ["title", "slot.cases.title"],
+      ["description", "slot.cases.description"],
+      ["attribute title", "slot.cases.onsetDate"],
+    ])("requires a data slot's %s in locales/en.json", (_label, key) => {
+      expect(
+        _getIssues(() => {
+          return _compile(DATA_SLOT_YAML, { en: _omitDataSlotMessage(key) });
+        }),
+      ).toEqual([`"${key}" is referenced but missing from locales/en.json`]);
+    });
+
+    it("keeps every data slot string in the compiled strings", () => {
+      const { strings } = _compile(DATA_SLOT_YAML, {
+        en: DATA_SLOT_EN_MESSAGES,
+      });
+      expect(strings.en).toEqual({
+        "plugin.name": "Epidemiology",
+        "plugin.description": "Statistical tools.",
+        "regression.linear.title": "Linear regression",
+        "slot.cases.title": "Cases",
+        "slot.cases.description": "The cases to chart.",
+        "slot.cases.onsetDate": "Onset date",
       });
     });
   });

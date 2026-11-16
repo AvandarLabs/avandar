@@ -26,7 +26,6 @@ import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectP
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
-import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -41,14 +40,10 @@ import type {
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { AgentTurnInputs } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import type {
-  PluginAiToolArgs,
-  RunPluginAiTool,
-} from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
+import type { RunPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import type { SqlLiteralDetectors } from "@/lib/agent/dataAgent/pagePrivacy/findSensitiveSqlLiterals";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { ChatModelRunResult } from "@assistant-ui/react";
-import type { AgentToolContext, AvandarApi } from "@avandar/plugin-sdk";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 
 /** The page state the adapter has when a turn starts. */
@@ -116,50 +111,6 @@ function _createProxyStreamFn(workspaceId: Workspace.Id): StreamFn {
 }
 
 /**
- * Loads a bundled plugin's code and calls the handler it declares for the
- * AI tool. Throws when the plugin or the handler is missing, which the
- * runner reports to the model as a failed tool. The plugin code and its
- * API load on first use so they stay out of the agent's chunk.
- */
-async function _invokePluginAiTool(
-  options: Readonly<{
-    declaration: PluginAiToolDeclaration;
-    context: AgentToolContext;
-    args: PluginAiToolArgs;
-    workspace: AvandarApi["workspace"];
-  }>,
-): Promise<unknown> {
-  const [{ isPluginDefinition }, { PluginModuleCache }, indexHelpers, api] =
-    await Promise.all([
-      import("@avandar/plugin-sdk"),
-      import("@/lib/plugins/makePluginModuleCache/makePluginModuleCache"),
-      import("@/lib/plugins/pluginIndexHelpers"),
-      import("@/lib/plugins/makePluginApi/makePluginApi"),
-    ]);
-  const { pluginId, name } = options.declaration;
-  const entry = indexHelpers.getPluginIndexEntry(pluginId);
-  if (entry === undefined) {
-    throw new Error(`Plugin "${pluginId}" is not bundled`);
-  }
-  const codeModule = await PluginModuleCache.loadCode(entry);
-  const { definition } = codeModule;
-  const handler =
-    isPluginDefinition(definition) && Object.hasOwn(definition.aiTools, name)
-      ? definition.aiTools[name]
-      : undefined;
-  if (typeof handler !== "function") {
-    throw new Error(`Plugin "${pluginId}" has no AI tool "${name}"`);
-  }
-  const pluginApi = api.makePluginApi({
-    pluginName: pluginId,
-    context: options.context,
-    workspace: options.workspace,
-    messages: codeModule.messages,
-  });
-  return handler(pluginApi, options.args);
-}
-
-/**
  * Runs a plugin AI tool against what this conversation's turn has on
  * screen: the Data Explorer's result when the user is on it, else the last
  * chat result any turn of this conversation showed.
@@ -181,8 +132,12 @@ async function _runConversationPluginAiTool(
         workspaceId: turn.workspaceId,
       });
     },
-    invoke: (context, args) => {
-      return _invokePluginAiTool({
+    invoke: async (context, args) => {
+      // The handler caller reaches the plugin SDK and `makePluginApi`, so it
+      // loads on first use to keep them out of the agent's chunk.
+      const { invokePluginAiToolHandler } =
+        await import("@/lib/plugins/invokePluginAiToolHandler/invokePluginAiToolHandler");
+      return invokePluginAiToolHandler({
         declaration: request.declaration,
         context,
         args,

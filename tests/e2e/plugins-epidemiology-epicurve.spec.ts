@@ -5,6 +5,7 @@ import {
   openDataExplorerDrawerTab,
 } from "./helpers/dataExplorerFlow";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
+import { installPluginThroughWizard } from "./helpers/pluginFlow";
 import {
   deleteAllDashboardsForOwner,
   deleteDashboardsByIds,
@@ -37,32 +38,9 @@ const ONSET_SQL =
 const EPICURVE_BAR_COUNT = 4;
 const PLUGIN_ID = "avandar.epidemiology";
 
-function _getPluginCard(page: Page): Locator {
-  return page.getByRole("region", { name: "Epidemiology" });
-}
-
 /** The bars a Recharts bar chart draws, on a page or in the editor canvas. */
 function _getBars(scope: Page | FrameLocator): Locator {
   return scope.locator(".recharts-bar-rectangle path");
-}
-
-async function _installPlugin(
-  options: Readonly<{ page: Page; workspaceSlug: string }>,
-): Promise<void> {
-  const { page, workspaceSlug } = options;
-  await page.goto(`/${workspaceSlug}/settings/plugins`);
-  const card = _getPluginCard(page);
-  await expect(card.getByText("Not installed", { exact: true })).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-  await card.getByRole("button", { name: "Install", exact: true }).click();
-  await page
-    .getByRole("dialog", { name: "Install Epidemiology?" })
-    .getByRole("button", { name: "Install", exact: true })
-    .click();
-  await expect(card.getByText("Installed", { exact: true })).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
 }
 
 /** Runs the onset query in the Data Explorer and picks the epicurve. */
@@ -220,7 +198,10 @@ test.describe("Epidemiology plugin epicurve", () => {
         password: primaryUser.password,
         workspaceSlug,
       });
-      await _installPlugin({ page, workspaceSlug });
+      await installPluginThroughWizard(page, {
+        workspaceSlug,
+        pluginName: "Epidemiology",
+      });
       await _pickEpicurve({ page, workspaceSlug });
       await expect(_getBars(page)).toHaveCount(EPICURVE_BAR_COUNT, {
         timeout: MEDIUM_WAIT,

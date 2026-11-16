@@ -11,6 +11,8 @@ const STRINGS: PluginLocaleMessages = {
     "regression.linear.title": "Linear regression",
     "viz.epicurve.title": "Epicurve",
     "viz.ratePlot.title": "Rate plot",
+    "slot.cases.title": "Cases",
+    "slot.deaths.title": "Deaths",
   },
 };
 
@@ -18,11 +20,22 @@ function _makeManifest(options: {
   hasToolbarCommand: boolean;
   hasChartTypes: boolean;
   permissions: string[];
+  dataSlots?: Record<string, unknown>;
+  contentCount?: number;
+  aiToolCount?: number;
 }): PluginManifest {
-  const { hasToolbarCommand, hasChartTypes, permissions } = options;
+  const {
+    hasToolbarCommand,
+    hasChartTypes,
+    permissions,
+    dataSlots = {},
+    contentCount = 0,
+    aiToolCount = 0,
+  } = options;
   return {
     id: "avandar.epidemiology",
     permissions,
+    dataSlots,
     contributes: {
       commands: [
         {
@@ -40,6 +53,12 @@ function _makeManifest(options: {
             { id: "rate-plot", title: "%viz.ratePlot.title%" },
           ]
         : [],
+      content: Array.from({ length: contentCount }, (_value, index) => {
+        return { id: `item-${index}`, kind: "dataset" };
+      }),
+      aiTools: Array.from({ length: aiToolCount }, (_value, index) => {
+        return { name: `tool_${index}` };
+      }),
     },
   } as unknown as PluginManifest;
 }
@@ -48,6 +67,16 @@ const EPIDEMIOLOGY_MANIFEST = _makeManifest({
   hasToolbarCommand: true,
   hasChartTypes: true,
   permissions: ["data:context"],
+});
+
+const DATA_SLOTS_MANIFEST = _makeManifest({
+  hasToolbarCommand: true,
+  hasChartTypes: false,
+  permissions: ["data:slots"],
+  dataSlots: {
+    cases: { title: "%slot.cases.title%", attributes: {} },
+    deaths: { title: "%slot.deaths.title%", attributes: {} },
+  },
 });
 
 const EMPTY_MANIFEST = _makeManifest({
@@ -175,6 +204,64 @@ describe("PluginDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it("describes the data:slots permission in plain language", async () => {
+    await _renderExpandedDetails(DATA_SLOTS_MANIFEST);
+
+    expect(
+      screen.getByText(
+        "The records you choose for it, when someone runs one of its tools",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("lists the records to choose by their localized data slot titles", async () => {
+    await _renderExpandedDetails(DATA_SLOTS_MANIFEST);
+
+    expect(
+      screen.getByText("Records you choose for it: Cases, Deaths"),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ["1 dataset to import", 1],
+    ["2 datasets to import", 2],
+  ])(
+    "lists %s when the plugin bundles that many content items",
+    async (text, contentCount) => {
+      await _renderExpandedDetails(
+        _makeManifest({
+          hasToolbarCommand: false,
+          hasChartTypes: false,
+          permissions: [],
+          contentCount,
+        }),
+      );
+
+      expect(screen.getByText(text)).toBeInTheDocument();
+      expect(screen.queryByText("Nothing yet.")).not.toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    ["1 tool Ask Avandar can use", 1],
+    ["2 tools Ask Avandar can use", 2],
+  ])(
+    "lists %s when the plugin declares that many AI tools",
+    async (text, aiToolCount) => {
+      await _renderExpandedDetails(
+        _makeManifest({
+          hasToolbarCommand: false,
+          hasChartTypes: false,
+          permissions: [],
+          aiToolCount,
+        }),
+      );
+
+      expect(screen.getByText(text)).toBeInTheDocument();
+      expect(screen.queryByText("Nothing yet.")).not.toBeInTheDocument();
+    },
+  );
+
   it("says its charts see only their own rows when the plugin adds chart types", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 
@@ -203,6 +290,11 @@ describe("PluginDetails", () => {
     expect(
       screen.queryByText(/Data Explorer toolbar:/),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Records you choose for it:/),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/to import/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ask Avandar can use/)).not.toBeInTheDocument();
   });
 
   it("says the plugin uses no workspace data when it has no permissions and no chart types", async () => {

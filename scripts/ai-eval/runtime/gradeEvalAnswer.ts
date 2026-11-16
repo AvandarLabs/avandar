@@ -49,6 +49,20 @@ function _gradeNoQuery(answer: EvalAnswer): {
     : { pass: true, detail: "ran no query and said it cannot see it" };
 }
 
+/**
+ * Matches the slope as its own number, or as the coefficient of a variable
+ * in an equation, such as `2x`, `2 x`, `2*x`, or `2·x`. The number must not
+ * be part of a longer one, so `12`, `20`, `2.5`, and `1.2` do not state a
+ * slope of 2.
+ */
+function _buildSlopePattern(slope: number): RegExp {
+  const slopeText = String(slope).replace(".", "\\.");
+  const startsNumber = "(?<![\\w.])";
+  const standalone = `${startsNumber}${slopeText}(?!\\w|\\.\\d)`;
+  const coefficient = `${startsNumber}${slopeText}\\s*[*\u00b7\u00d7\u22c5]?\\s*[a-zA-Z](?![a-zA-Z0-9_])`;
+  return new RegExp(`${standalone}|${coefficient}`);
+}
+
 /** A fitRegression question: the tool ran and the reply has the slope. */
 function _gradeFitRegression(
   slope: number,
@@ -57,8 +71,7 @@ function _gradeFitRegression(
   if (!answer.toolNames.includes("fitRegression")) {
     return { pass: false, detail: "did not call fitRegression" };
   }
-  const slopePattern = new RegExp(`\\b${String(slope).replace(".", "\\.")}\\b`);
-  return slopePattern.test(answer.assistantText)
+  return _buildSlopePattern(slope).test(answer.assistantText)
     ? { pass: true, detail: "called fitRegression and stated the slope" }
     : { pass: false, detail: `reply does not state the slope ${slope}` };
 }

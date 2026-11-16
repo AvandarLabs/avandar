@@ -11,12 +11,13 @@ export {
   Group,
   Loader,
   NumberInput,
-  SegmentedControl,
   Select,
   SimpleGrid,
   Stack,
+  Switch,
   Table,
   Text,
   TextInput,
   Title,
 } from "@mantine/core";
+export { SegmentedControl } from "@plugin-ui/SegmentedControl/SegmentedControl";

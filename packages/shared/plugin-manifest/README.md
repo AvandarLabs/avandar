@@ -23,6 +23,9 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | `PluginManifestSchema` | Schema | main | The strict Zod schema for `ava.yaml` |
 | `PLUGIN_PERMISSIONS` | Constant | main | The permissions a manifest may request |
 | `APPROVED_PLUGIN_DEPENDENCIES` | Constant | main | The npm allowlist for plugins |
+| `RESERVED_AI_TOOL_NAMES` | Constant | main | The built-in data-agent tool names a plugin AI tool may not take, compared with underscores and case ignored |
+| `MAX_CONTENT_FILE_BYTES` | Constant | main | The largest file, in bytes (1 MiB), a bundled content item may hold |
+| `DATA_SLOT_ATTRIBUTE_TYPES` | Constant | main | The kinds of value a data slot attribute holds: `number`, `date`, `text`, `boolean`, `geo.admin1`, `geo.admin2` |
 | `getUnapprovedDependenciesFromPackageJson` | Function | main | Gets the `package.json` dependencies a plugin may not use |
 | `makeTablerComponentNameFromIconName` | Function | main | Makes the Tabler component name for an icon name, such as `trending-up` to `IconTrendingUp` |
 | `readPluginDirectory` | Function | node | Reads and validates one plugin folder |
@@ -37,6 +40,10 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | `PluginVizType` | Type | main, runtime | A chart type declared under `contributes.vizTypes` |
 | `PluginVizSetting` | Type | main, runtime | One setting of a chart type, edited in the chart's settings form |
 | `PluginVizSettingControl` | Type | main, runtime | The control a chart setting uses, such as `columnPicker` or `segmented` |
+| `PluginDataSlot` | Type | main, runtime | A data slot declared under `dataSlots`: the shape of the records a plugin reads, which an admin binds to a case type or dataset |
+| `PluginDataSlotAttribute` | Type | main, runtime | One attribute of a data slot: its value type, title, and whether a binding must map it |
+| `DataSlotAttributeType` | Type | main, runtime | One of the `DATA_SLOT_ATTRIBUTE_TYPES` |
+| `PluginContentItem` | Type | main, runtime | A dataset a plugin bundles under `contributes.content` |
 | `PluginPermission` | Type | main, runtime | A permission a plugin may request |
 | `CompiledPluginManifest` | Type | main, runtime | A validated manifest plus the locale strings it references |
 | `PluginLocaleMessages` | Type | main, runtime | Locale code to message key to text |

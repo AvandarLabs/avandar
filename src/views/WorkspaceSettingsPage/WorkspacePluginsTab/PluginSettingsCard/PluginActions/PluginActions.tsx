@@ -1,5 +1,6 @@
 import { Group } from "@mantine/core";
 import { PluginActionButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton";
+import { PluginInstallButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginInstallButton";
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
 import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
@@ -11,6 +12,9 @@ type Props = Readonly<{
   /** The id of the plugin's card heading, which each action is described by. */
   headingId: string;
   canManage: boolean;
+
+  /** Whether the plugin's manifest bundles datasets that it imports. */
+  hasBundledContent: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -29,25 +33,36 @@ const ACTION_KINDS_BY_STATUS: Record<
 /**
  * The buttons for one plugin's current status, such as Install for a plugin
  * the workspace does not have yet. Users who cannot manage plugins see them
- * disabled, and so does everyone while a change is saving.
+ * disabled, and so does everyone while a change is saving. Install opens the
+ * install wizard; every other action asks the user to confirm first.
  */
 export function PluginActions({
   status,
   pluginName,
   headingId,
   canManage,
+  hasBundledContent,
   actions,
 }: Props): JSX.Element {
+  const isDisabled = !canManage || actions.isPending;
   return (
     <Group gap="xs" wrap="nowrap">
       {ACTION_KINDS_BY_STATUS[status].map((kind) => {
-        return (
+        return kind === "install" ? (
+          <PluginInstallButton
+            key={kind}
+            headingId={headingId}
+            isDisabled={isDisabled}
+            onInstall={actions.install}
+          />
+        ) : (
           <PluginActionButton
             key={kind}
             kind={kind}
             pluginName={pluginName}
             headingId={headingId}
-            isDisabled={!canManage || actions.isPending}
+            isDisabled={isDisabled}
+            hasBundledContent={hasBundledContent}
             actions={actions}
           />
         );

@@ -18,7 +18,7 @@ host renders.
 | `useAvandar` | Hook | Gets the scoped `avandar` API inside plugin UI. Throws a `PluginError` outside an `AvandarProvider`, and inside a plugin chart the error names the chart type |
 | `useT` | Hook | Gets the plugin's translator inside plugin UI or a plugin chart |
 | `PluginError` | Class | A typed error from the plugin API. Branch on its `code` |
-| `PluginErrorCode` | Type | Why a plugin API call failed: `PermissionDenied`, `InvalidHandle`, `LoadFailed`, `CommandFailed`, or `InvalidToolInput` |
+| `PluginErrorCode` | Type | Why a plugin API call failed: `PermissionDenied`, `InvalidHandle`, `LoadFailed`, `CommandFailed`, `InvalidExpression`, `InvalidToolInput`, `SlotNotBound`, `SlotBroken`, or `InvalidSlot` |
 | `AvandarApi` | Type | The API a plugin receives, scoped to one plugin, workspace, user, and invocation |
 | `CommandHandler` | Type | Runs when a user invokes a plugin command |
 | `AiToolHandler` | Type | Runs when the data agent's model calls a plugin AI tool. It gets the model's arguments and returns the result the model reads |
@@ -38,6 +38,7 @@ host renders.
 | `QueryHandle` | Type | An opaque reference to a query result, passed back to `avandar.data.fetchRows` |
 | `FetchRowsOptions` | Type | Options for `avandar.data.fetchRows` |
 | `FetchRowsResult` | Type | Rows returned by `avandar.data.fetchRows` |
+| `QuerySlotResult` | Type | What `avandar.data.querySlot` returns: a handle to a data slot's bound records, its columns, and its row count |
 | `PluginMessages` | Type | Locale code to message key to ICU message, from `locales/<lang>.json` |
 | `TranslationValues` | Type | Values interpolated into an ICU message |
 | `PluginOverlayOptions` | Type | A modal or drawer a plugin opens |

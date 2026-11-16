@@ -24,9 +24,15 @@ function _makeActions(
 function _renderActions(options: {
   status: PluginInstallStatus;
   canManage?: boolean;
+  hasBundledContent?: boolean;
   actions?: PluginInstallationActions;
 }): void {
-  const { status, canManage = true, actions = _makeActions() } = options;
+  const {
+    status,
+    canManage = true,
+    hasBundledContent = false,
+    actions = _makeActions(),
+  } = options;
   render(
     <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
       <h5 id={HEADING_ID}>Epidemiology</h5>
@@ -35,6 +41,7 @@ function _renderActions(options: {
         pluginName="Epidemiology"
         headingId={HEADING_ID}
         canManage={canManage}
+        hasBundledContent={hasBundledContent}
         actions={actions}
       />
     </ModalsProvider>,
@@ -100,6 +107,9 @@ describe("PluginActions", () => {
 
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toHaveTextContent("Uninstall Epidemiology?");
+    expect(dialog).toHaveTextContent(
+      "Its features are removed from this workspace.",
+    );
     expect(actions.uninstall).not.toHaveBeenCalled();
 
     await _confirmInDialog("Uninstall");
@@ -107,14 +117,36 @@ describe("PluginActions", () => {
     expect(actions.uninstall).toHaveBeenCalledTimes(1);
   });
 
-  it("installs after the user confirms", async () => {
+  it("says in the uninstall dialog that the datasets a plugin imported stay", async () => {
+    _renderActions({ status: "installed", hasBundledContent: true });
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      "Its features are removed from this workspace. The datasets it imported stay in Data Sources.",
+    );
+  });
+
+  it("leaves the uninstall dialog text as it was for a plugin with no bundled datasets", async () => {
+    _renderActions({ status: "installed", hasBundledContent: false });
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(
+      "Its features are removed from this workspace.",
+    );
+    expect(dialog).not.toHaveTextContent("Data Sources");
+  });
+
+  it("starts the install without a confirmation, because the install wizard is the confirmation", () => {
     const actions = _makeActions();
     _renderActions({ status: "not_installed", actions });
 
     fireEvent.click(screen.getByRole("button", { name: "Install" }));
-    await _confirmInDialog("Install");
 
     expect(actions.install).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("approves the new permissions after the user confirms", async () => {

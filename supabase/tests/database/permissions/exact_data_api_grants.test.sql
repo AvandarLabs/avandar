@@ -51,6 +51,7 @@ with public_tables as (
       'dataset_columns__dictionary_bindings',
       'datasets__postgres_table',
       'map_jitter_salts',
+      'plugin_content_imports',
       -- Service role only: no `authenticated` grant at all.
       'pipeline_execution_scopes',
       'pipeline_executions',
@@ -149,6 +150,16 @@ with public_tables as (
   -- see its dataset reads, and no signed-in user may change it.
   select
     'datasets__postgres_table',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
+  union all
+  -- No `update`: a plugin content import is written once and only ever
+  -- deleted.
+  select
+    'plugin_content_imports',
     'authenticated',
     privilege_type,
     false

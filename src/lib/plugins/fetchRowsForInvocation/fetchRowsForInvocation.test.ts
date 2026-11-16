@@ -174,6 +174,62 @@ describe("fetchRowsForInvocation", () => {
     expect(code).toBe("PermissionDenied");
   });
 
+  it("reads the rows of a handle the slot rows lookup knows", () => {
+    const slotHandle = "slot-handle" as QueryHandle;
+
+    const result = fetchRowsForInvocation({
+      invocationHandle: QueryHandleRegistry.getOrCreate(ROWS),
+      queryHandle: slotHandle,
+      columns: ["x"],
+      getSlotRows: (handle) => {
+        return handle === slotHandle ? [{ x: 4, y: 8 }] : undefined;
+      },
+      wasSlotHandleIssued: (handle) => {
+        return handle === slotHandle;
+      },
+    });
+
+    expect(result.rows).toEqual([{ x: 4 }]);
+  });
+
+  it("rejects a slot handle whose rows were evicted with InvalidHandle", () => {
+    const slotHandle = "slot-handle" as QueryHandle;
+
+    const code = _getPluginErrorCode(() => {
+      return fetchRowsForInvocation({
+        invocationHandle: QueryHandleRegistry.getOrCreate(ROWS),
+        queryHandle: slotHandle,
+        columns: ["x"],
+        getSlotRows: () => {
+          return undefined;
+        },
+        wasSlotHandleIssued: (handle) => {
+          return handle === slotHandle;
+        },
+      });
+    });
+
+    expect(code).toBe("InvalidHandle");
+  });
+
+  it("rejects a handle neither the invocation nor the slot rows lookup knows", () => {
+    const code = _getPluginErrorCode(() => {
+      return fetchRowsForInvocation({
+        invocationHandle: QueryHandleRegistry.getOrCreate(ROWS),
+        queryHandle: QueryHandleRegistry.getOrCreate([{ x: 9 }]),
+        columns: ["x"],
+        getSlotRows: () => {
+          return undefined;
+        },
+        wasSlotHandleIssued: () => {
+          return false;
+        },
+      });
+    });
+
+    expect(code).toBe("PermissionDenied");
+  });
+
   it("rejects the invocation handle when its rows were evicted", () => {
     const evictedHandle = QueryHandleRegistry.getOrCreate([{ x: 0 }]);
     Array.from({ length: MAX_LIVE_QUERY_HANDLES }, (_unused, rowIndex) => {

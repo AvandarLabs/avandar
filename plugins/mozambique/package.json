@@ -1,0 +1,7 @@
+{
+  "name": "@avandar-plugins/mozambique",
+  "version": "0.1.0",
+  "private": true,
+  "license": "CC-BY-3.0-IGO",
+  "type": "module"
+}

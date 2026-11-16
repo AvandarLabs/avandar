@@ -8,9 +8,12 @@ import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerSt
 import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import { act, cleanup, render, screen, waitFor } from "@/test-utils";
 import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
+import type { DataSlotInvocationApi } from "@/lib/plugins/dataSlots/makeDataSlotApiForInvocation/makeDataSlotApiForInvocation";
 import type {
   AvandarApi,
   DataExplorerToolbarContext,
+  QueryHandle,
+  QuerySlotResult,
 } from "@avandar/plugin-sdk";
 import type { ReactNode } from "react";
 
@@ -22,7 +25,12 @@ const ROWS = [
   { x: 2, y: "b" },
 ];
 
-function _makeApiFromRows(dataExplorerBridge?: DataExplorerBridge): AvandarApi {
+function _makeApiFromRows(
+  options: {
+    dataExplorerBridge?: DataExplorerBridge;
+    dataSlotApi?: DataSlotInvocationApi;
+  } = {},
+): AvandarApi {
   const context: DataExplorerToolbarContext = {
     slotId: "dataExplorer.toolbar",
     queryHandle: QueryHandleRegistry.getOrCreate(ROWS),
@@ -37,8 +45,25 @@ function _makeApiFromRows(dataExplorerBridge?: DataExplorerBridge): AvandarApi {
     context,
     workspace: { id: "w", slug: "w", locale: "es" },
     messages: { en: { greeting: "Hello" }, es: { greeting: "Hola" } },
-    dataExplorerBridge,
+    dataExplorerBridge: options.dataExplorerBridge,
+    dataSlotApi: options.dataSlotApi,
   });
+}
+
+function _makeDataSlotApi(
+  overrides: Partial<DataSlotInvocationApi> = {},
+): DataSlotInvocationApi {
+  return {
+    querySlot: vi.fn(),
+    openDataSlotBinding: vi.fn(),
+    getSlotRows: () => {
+      return undefined;
+    },
+    wasSlotHandleIssued: () => {
+      return false;
+    },
+    ...overrides,
+  };
 }
 
 function _makeBridge(): DataExplorerBridge & {
@@ -88,6 +113,62 @@ describe("makePluginApi", () => {
     await expect(
       api.data.fetchRows(otherHandle, { columns: ["x"] }),
     ).rejects.toMatchObject({ code: "PermissionDenied" });
+  });
+
+  it("reads the rows of a handle the data slot API issued", async () => {
+    const slotHandle = "slot-handle" as QueryHandle;
+    const api = _makeApiFromRows({
+      dataSlotApi: _makeDataSlotApi({
+        getSlotRows: (handle) => {
+          return handle === slotHandle
+            ? [{ onsetDate: "2026-01-05", district: "Ilala" }]
+            : undefined;
+        },
+        wasSlotHandleIssued: (handle) => {
+          return handle === slotHandle;
+        },
+      }),
+    });
+
+    const result = await api.data.fetchRows(slotHandle, {
+      columns: ["onsetDate"],
+    });
+
+    expect(result.rows).toEqual([{ onsetDate: "2026-01-05" }]);
+  });
+
+  it("queries a data slot through the data slot API", async () => {
+    const slotResult: QuerySlotResult = {
+      queryHandle: "slot-handle" as QueryHandle,
+      columns: [{ name: "onsetDate", dataType: "date" }],
+      rowCount: 1,
+      isTruncated: false,
+    };
+    const api = _makeApiFromRows({
+      dataSlotApi: _makeDataSlotApi({
+        querySlot: vi.fn().mockResolvedValue(slotResult),
+      }),
+    });
+
+    await expect(api.data.querySlot?.("cases")).resolves.toBe(slotResult);
+  });
+
+  it("opens a data slot's binding through the data slot API", async () => {
+    const openDataSlotBinding = vi.fn().mockResolvedValue(undefined);
+    const api = _makeApiFromRows({
+      dataSlotApi: _makeDataSlotApi({ openDataSlotBinding }),
+    });
+
+    await api.ui.openDataSlotBinding?.("cases");
+
+    expect(openDataSlotBinding).toHaveBeenCalledWith("cases");
+  });
+
+  it("gives no data slot API to an api made without one", () => {
+    const api = _makeApiFromRows();
+
+    expect(api.data.querySlot).toBeUndefined();
+    expect(api.ui.openDataSlotBinding).toBeUndefined();
   });
 
   it("translates plugin messages in the workspace locale", () => {
@@ -268,7 +349,7 @@ describe("makePluginApi", () => {
 
   it("adds columns through the Data Explorer bridge", async () => {
     const bridge = _makeBridge();
-    const api = _makeApiFromRows(bridge);
+    const api = _makeApiFromRows({ dataExplorerBridge: bridge });
 
     const result = await api.dataExplorer?.addColumns([
       { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
@@ -279,7 +360,7 @@ describe("makePluginApi", () => {
   });
 
   it("rejects addColumns with InvalidExpression for an invalid column", async () => {
-    const api = _makeApiFromRows(_makeBridge());
+    const api = _makeApiFromRows({ dataExplorerBridge: _makeBridge() });
 
     await expect(api.dataExplorer?.addColumns([])).rejects.toMatchObject({
       code: "InvalidExpression",
@@ -289,7 +370,7 @@ describe("makePluginApi", () => {
   it("rejects addColumns with InvalidHandle for an api made before the host unmounted", async () => {
     const previousHost = render(<PluginDrawerHost />);
     const bridge = _makeBridge();
-    const staleApi = _makeApiFromRows(bridge);
+    const staleApi = _makeApiFromRows({ dataExplorerBridge: bridge });
     previousHost.unmount();
 
     await expect(

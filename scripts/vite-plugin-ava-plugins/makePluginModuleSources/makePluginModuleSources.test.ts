@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  makeContentModuleSourceFromPlugin,
   makeIndexModuleSourceFromPlugins,
   makeLocalesModuleSourceFromPlugin,
   makeManifestModuleSourceFromPlugin,
@@ -12,6 +13,7 @@ const PLUGIN = {
   folderName: "epidemiology",
   directory: "/repo/plugins/epidemiology",
   entryPath: "/repo/plugins/epidemiology/src/index.tsx",
+  contentPathsById: {},
   compiled: {
     manifest: {
       id: "avandar.epidemiology",
@@ -28,6 +30,21 @@ const PLUGIN = {
   },
   locales: { en: { t: "Linear regression", "modal.fit": "Fit regression" } },
 } as unknown as PluginDirectory;
+
+/** A copy of `PLUGIN` with no entry, as a plugin with only content has. */
+const PLUGIN_WITHOUT_ENTRY = {
+  ...PLUGIN,
+  entryPath: undefined,
+} as PluginDirectory;
+
+/** A copy of `PLUGIN_WITHOUT_ENTRY` that bundles two content files. */
+const PLUGIN_WITH_CONTENT = {
+  ...PLUGIN_WITHOUT_ENTRY,
+  contentPathsById: {
+    provinces: "/repo/plugins/epidemiology/content/mz-adm1.csv",
+    districts: "/repo/plugins/epidemiology/content/mz-adm2.csv",
+  },
+} as PluginDirectory;
 
 /** A copy of `PLUGIN` whose plugin icon and command icons are replaced. */
 function _makePluginWithIcons(options: {
@@ -103,6 +120,46 @@ describe("makeIndexModuleSourceFromPlugins", () => {
     );
   });
 
+  it("gives a plugin with no entry a loadCode that imports only its locales and returns an empty definition", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITHOUT_ENTRY],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain("/plugins/epidemiology/src/index.tsx");
+    expect(code).toContain(
+      'const locales = await import("virtual:ava-plugin-locales/avandar.epidemiology");',
+    );
+    expect(code).toContain(
+      'definition: { kind: "avandar-plugin", commands: {}, vizTypes: {}, aiTools: {} }',
+    );
+  });
+
+  it("gives a plugin with content a loadContentUrls that imports its content module once", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITH_CONTENT],
+      repoRoot: "/repo",
+    });
+    expect(code).toContain(
+      '    loadContentUrls: () => import("virtual:ava-plugin-content/avandar.epidemiology").then((content) => content.default),',
+    );
+  });
+
+  it("names no content file in the index", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITH_CONTENT],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain(".csv");
+  });
+
+  it("leaves out loadContentUrls for a plugin without content", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain("loadContentUrls");
+  });
+
   it("emits an empty index when nothing is bundled", () => {
     expect(
       makeIndexModuleSourceFromPlugins({ plugins: [], repoRoot: "/repo" }),
@@ -163,6 +220,24 @@ describe("makeManifestModuleSourceFromPlugin icon deduplication", () => {
     expect(_getIconImportBindings(code)).toEqual(["IconNumber1"]);
     expect(code).toContain(
       'export const icons = { "number-1": IconNumber1, "number1": IconNumber1 };',
+    );
+  });
+});
+
+describe("makeContentModuleSourceFromPlugin", () => {
+  it("imports each content file as a URL and exports the URLs keyed by content id", () => {
+    expect(
+      makeContentModuleSourceFromPlugin({
+        plugin: PLUGIN_WITH_CONTENT,
+        repoRoot: "/repo",
+      }),
+    ).toBe(
+      [
+        'import url0 from "/plugins/epidemiology/content/mz-adm1.csv?url";',
+        'import url1 from "/plugins/epidemiology/content/mz-adm2.csv?url";',
+        'export default { "provinces": url0, "districts": url1 };',
+        "",
+      ].join("\n"),
     );
   });
 });

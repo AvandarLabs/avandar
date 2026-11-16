@@ -8,6 +8,10 @@ import {
 import type { ChunkSummary } from "./checkPluginBundle";
 import type { Rollup } from "vite";
 
+const AI_TOOL_HANDLER_MODULE =
+  "/repo/src/lib/plugins/invokePluginAiToolHandler/invokePluginAiToolHandler.ts";
+const AI_TOOL_RUNNER_MODULE =
+  "/repo/src/lib/plugins/runPluginAiTool/runPluginAiTool.ts";
 const PLUGINS_DIRECTORY = "/repo/plugins";
 const PLUGIN_CODE_MODULE = "/repo/plugins/epidemiology/src/index.tsx";
 const PLUGIN_HOST_MODULE = "/repo/src/lib/plugins/PluginHost/PluginHost.tsx";
@@ -229,6 +233,22 @@ describe("checkPluginBundle", () => {
     ]);
 
     expect(violations).toHaveLength(1);
+  });
+
+  it("fails when a plugin content module is statically reachable", () => {
+    const violations = _checkChunks([
+      _chunk({
+        fileName: "index.js",
+        isEntry: true,
+        moduleLengths: {
+          "\0virtual:ava-plugin-content/avandar.mozambique": 120,
+        },
+      }),
+    ]);
+
+    expect(violations).toEqual([
+      expect.stringContaining("virtual:ava-plugin-content/avandar.mozambique"),
+    ]);
   });
 
   it("fails when the plugin host exceeds its budget", () => {
@@ -454,6 +474,83 @@ describe("checkPluginBundle", () => {
     expect(violations).toEqual([
       expect.stringMatching(
         `plugin host adds ${HOST_BUDGET_BYTES + 4_300} bytes`,
+      ),
+    ]);
+  });
+
+  it("leaves the chat's lazily loaded plugin AI tool runner out of the host budget", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "layout.js",
+          imports: ["index.js", "plugin-index.js"],
+          dynamicImports: ["runner.js", "chat-turn.js"],
+          moduleLengths: { [PLUGIN_HOST_MODULE]: 4_000 },
+        }),
+        _chunk({
+          fileName: "chat-turn.js",
+          dynamicImports: ["ai-tool-runner.js"],
+        }),
+        _chunk({
+          fileName: "ai-tool-runner.js",
+          imports: ["sdk.js"],
+          moduleLengths: { [AI_TOOL_RUNNER_MODULE]: HOST_BUDGET_BYTES },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it("leaves the chat's lazily loaded plugin AI tool handler, and the API it builds, out of the host budget", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "layout.js",
+          imports: ["index.js", "plugin-index.js"],
+          dynamicImports: ["runner.js", "chat-turn.js"],
+          moduleLengths: { [PLUGIN_HOST_MODULE]: 4_000 },
+        }),
+        _chunk({
+          fileName: "chat-turn.js",
+          dynamicImports: ["ai-tool-handler.js"],
+        }),
+        _chunk({
+          fileName: "ai-tool-handler.js",
+          imports: ["sdk.js", "plugin-api.js"],
+          moduleLengths: { [AI_TOOL_HANDLER_MODULE]: HOST_BUDGET_BYTES },
+        }),
+        _chunk({
+          fileName: "plugin-api.js",
+          moduleLengths: {
+            "/repo/src/lib/plugins/makePluginApi/makePluginApi.tsx":
+              HOST_BUDGET_BYTES,
+          },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it("counts the chat's plugin AI tool runner when a route imports it statically", () => {
+    const violations = _checkChunks(
+      _makeCorrectChunks([
+        _chunk({
+          fileName: "explorer.js",
+          imports: ["index.js", "ai-tool-runner.js"],
+        }),
+        _chunk({
+          fileName: "ai-tool-runner.js",
+          imports: ["sdk.js"],
+          moduleLengths: { [AI_TOOL_RUNNER_MODULE]: HOST_BUDGET_BYTES },
+        }),
+      ]),
+    );
+
+    expect(violations).toEqual([
+      expect.stringMatching(
+        `plugin host adds ${HOST_BUDGET_BYTES + 5_300} bytes`,
       ),
     ]);
   });

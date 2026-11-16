@@ -211,8 +211,11 @@ export const EXCLUDED_TABLES = [
   // debugging. Nothing the desktop renders.
   "pipeline_executions",
   "pipeline_execution_scopes",
-  // Plugin installs are not mirrored to desktop SQLite yet.
+  // Plugin installs, their data slot bindings, and the content they imported
+  // are not mirrored to desktop SQLite yet.
   "plugin_installations",
+  "plugin_data_slot_bindings",
+  "plugin_content_imports",
   // The open data catalog's unfiltered facet counts, recounted on the server
   // after each pipeline run. Derived from `data_catalog_listings`, which the
   // desktop already mirrors and can count itself.
