@@ -3,7 +3,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
-import { cleanup, fireEvent, render, screen, within } from "@/test-utils";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@/test-utils";
 import { WorkspacePluginsTab } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type {
@@ -158,8 +165,8 @@ function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-function _renderTab(): void {
-  render(<WorkspacePluginsTab />, { wrapper: QueryWrapper });
+function _renderTab(): ReturnType<typeof render> {
+  return render(<WorkspacePluginsTab />, { wrapper: QueryWrapper });
 }
 
 function _getButtonLabelsIn(card: HTMLElement): string[] {
@@ -271,6 +278,57 @@ describe("WorkspacePluginsTab", () => {
       within(wizard).getByRole("heading", { name: "About this plugin" }),
     ).toBeInTheDocument();
   });
+
+  it("returns focus to the Install button when the wizard is closed without installing", async () => {
+    _addBundledPlugin();
+    _renderTab();
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    const installButton = within(card).getByRole("button", { name: "Install" });
+    installButton.focus();
+    fireEvent.click(installButton);
+    await screen.findByRole("dialog", { name: "Install Epidemiology" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    await waitFor(() => {
+      expect(installButton).toHaveFocus();
+    });
+  });
+
+  it.each(["Close button", "Escape"])(
+    "moves focus to the card heading when the wizard closes with %s after the Install button is gone",
+    async (closeWith) => {
+      _addBundledPlugin();
+      const view = _renderTab();
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      const installButton = within(card).getByRole("button", {
+        name: "Install",
+      });
+      installButton.focus();
+      fireEvent.click(installButton);
+      await screen.findByRole("dialog", { name: "Install Epidemiology" });
+      // The install lands: the card's Install button is replaced.
+      _addInstallation({
+        pluginId: (mocks.entries.at(-1) as PluginIndexEntry).id,
+      });
+      view.rerender(<WorkspacePluginsTab />);
+      await waitFor(() => {
+        expect(installButton).not.toBeInTheDocument();
+      });
+
+      if (closeWith === "Escape") {
+        fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+      } else {
+        fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      }
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Epidemiology" }),
+        ).toHaveFocus();
+      });
+    },
+  );
 
   it("disables the actions for users who cannot manage plugins", async () => {
     mocks.canManage = false;
