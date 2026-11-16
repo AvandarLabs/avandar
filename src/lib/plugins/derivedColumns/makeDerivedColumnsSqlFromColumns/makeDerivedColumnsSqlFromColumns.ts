@@ -3,7 +3,7 @@ import {
   normalizeSqlForSubquery,
   quoteSqlIdentifier,
 } from "@avandar/utils/sql";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 import type { DerivedColumn } from "@avandar/plugin-sdk";
 
 /** The names a derived column may take: lowercase snake case. */
