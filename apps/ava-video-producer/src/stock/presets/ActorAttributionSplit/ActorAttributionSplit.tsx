@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { AttributionActors } from "./AttributionActors";
 import { AttributionEvent } from "./AttributionEvent";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
 /** Frame-driven account-attribution scene. */

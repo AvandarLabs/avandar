@@ -1,0 +1,18 @@
+.graduatedClassRow {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+/* Same footprint as an `sm` input, so the swatch lines up with its label. */
+.graduatedClassSwatch {
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  flex: none;
+  height: calc(2.25rem * var(--mantine-scale));
+  width: calc(2.25rem * var(--mantine-scale));
+}
+
+.graduatedClassLabel {
+  flex: 1;
+}

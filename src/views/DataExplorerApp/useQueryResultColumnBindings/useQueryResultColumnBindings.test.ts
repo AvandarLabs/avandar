@@ -35,6 +35,36 @@ function _options({
     initialRegistry: undefined,
   };
 }
+const BASE_SQL = `SELECT "borough", "cases" FROM "nyc"`;
+const WRAPPED_SQL = [
+  "WITH ava_source AS (",
+  "  SELECT *, row_number() OVER () AS __ava_row FROM (",
+  BASE_SQL,
+  "  )",
+  ")",
+  "SELECT * EXCLUDE (__ava_row),",
+  `  ("cases" * 2) AS "double_cases"`,
+  "FROM ava_source",
+  "ORDER BY __ava_row",
+].join("\n");
+
+function _optionsFromSql(
+  sql: string,
+  columnNames: readonly string[],
+): UseQueryResultColumnBindingsOptions {
+  const columns = columnNames.map((name) => {
+    return { name, dataType: "bigint" as const };
+  });
+  return {
+    scopeKey: "owner",
+    sqlKey: sql,
+    resultSqlKey: sql,
+    result: { ...QueryResult.makeEmpty(), columns, data: [], numRows: 0 },
+    projections: makeProjectionDescriptorsFromSql({ sql, columns }),
+    initialRegistry: undefined,
+  };
+}
+
 describe("useQueryResultColumnBindings", () => {
   it("does not create a schema from an absent result", () => {
     const { result } = renderHook(() => {
@@ -103,5 +133,60 @@ describe("useQueryResultColumnBindings", () => {
       { name: "total", dataType: "double" },
     ]);
     expect(options.result?.data).toEqual([{ total: 7 }]);
+  });
+  it("keeps pass-through column IDs when seeded with bindings re-keyed to wrapped SQL", () => {
+    const { result, rerender } = renderHook(useQueryResultColumnBindings, {
+      initialProps: _optionsFromSql(BASE_SQL, ["borough", "cases"]),
+    });
+    const baseRegistry = result.current?.registry;
+    const [boroughId, casesId] = (result.current?.columns ?? []).map(
+      (column) => {
+        return column.id;
+      },
+    );
+
+    rerender({
+      ..._optionsFromSql(WRAPPED_SQL, ["borough", "cases", "double_cases"]),
+      initialRegistry: baseRegistry && { ...baseRegistry, sqlKey: WRAPPED_SQL },
+    });
+
+    const wrappedIds = result.current?.columns.map((column) => {
+      return column.id;
+    });
+    expect(wrappedIds?.slice(0, 2)).toEqual([boroughId, casesId]);
+  });
+
+  it("gives a column the wrapped SQL adds an ID of its own", () => {
+    const { result, rerender } = renderHook(useQueryResultColumnBindings, {
+      initialProps: _optionsFromSql(BASE_SQL, ["borough", "cases"]),
+    });
+    const baseRegistry = result.current?.registry;
+    const baseIds = (result.current?.columns ?? []).map((column) => {
+      return column.id;
+    });
+
+    rerender({
+      ..._optionsFromSql(WRAPPED_SQL, ["borough", "cases", "double_cases"]),
+      initialRegistry: baseRegistry && { ...baseRegistry, sqlKey: WRAPPED_SQL },
+    });
+
+    const addedId = result.current?.columns[2]?.id;
+    expect(addedId).toBeDefined();
+    expect(baseIds).not.toContain(addedId);
+  });
+
+  it("gives wrapped SQL fresh IDs when the seed is keyed to other SQL", () => {
+    const { result, rerender } = renderHook(useQueryResultColumnBindings, {
+      initialProps: _optionsFromSql(BASE_SQL, ["borough", "cases"]),
+    });
+    const baseRegistry = result.current?.registry;
+    const boroughId = result.current?.columns[0]?.id;
+
+    rerender({
+      ..._optionsFromSql(WRAPPED_SQL, ["borough", "cases", "double_cases"]),
+      initialRegistry: baseRegistry,
+    });
+
+    expect(result.current?.columns[0]?.id).not.toBe(boroughId);
   });
 });

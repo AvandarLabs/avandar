@@ -1,6 +1,5 @@
 import { propEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
@@ -8,7 +7,7 @@ import { getPickedValueFromInput } from "./getPickedValueFromInput";
 import { controls } from "./GroupedValuePicker.controls";
 import { PickerCalculation } from "./PickerCalculation";
 import { PickerObservation } from "./PickerObservation";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
@@ -28,7 +27,7 @@ function _getSelectLabel({
   if (!option) {
     throw new Error("Picker select option is missing.");
   }
-  return stockI18n._(option.label);
+  return option.label.message;
 }
 
 /**

@@ -10,6 +10,8 @@ function _createBufferLayer(): MapLayer.T {
       type: "bufferOfLayer",
       layerId: uuid<MapLayer.Id>(),
       distanceMeters: MapLayer.defaultBufferDistanceMeters,
+      distanceUnit: "m",
+      labelColumn: undefined,
       dissolve: false,
     },
   };
@@ -32,6 +34,8 @@ describe("buffer-of-layer updates", () => {
       expect(updatedLayer.geoBinding).toMatchObject({
         type: "bufferOfLayer",
         distanceMeters: expected,
+        distanceUnit: "m",
+        labelColumn: undefined,
       });
     },
   );

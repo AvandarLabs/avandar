@@ -194,7 +194,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: DATASET_NAME,
+        exact: true,
+      });
       await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
         timeout: LONG_WAIT,
       });
@@ -204,6 +207,7 @@ test(
         })
         .click();
       await page.getByRole("menuitem", { name: "Duplicate" }).click();
+      await page.getByRole("button", { name: "Back to layers" }).click();
       await expect(
         page.getByRole("region", { name: "Layers" }).getByRole("listitem"),
       ).toHaveCount(2, { timeout: MEDIUM_WAIT });
@@ -253,10 +257,14 @@ test(
           ),
         })
         .click();
-      await inspector
+      const copyInspector = page.getByRole("region", {
+        name: copyName,
+        exact: true,
+      });
+      await copyInspector
         .getByRole("button", { name: "Filter", exact: true })
         .click();
-      const applyAreaFilter = inspector.getByRole("switch", {
+      const applyAreaFilter = copyInspector.getByRole("switch", {
         name: "Apply area filter",
       });
       await applyAreaFilter.click();

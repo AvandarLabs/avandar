@@ -3,7 +3,7 @@ import { ReadinessCaptions } from "./ReadinessCaptions";
 import { ReadinessGate } from "./ReadinessGate";
 import { ReadinessResult } from "./ReadinessResult";
 import { ReadinessRibbon } from "./ReadinessRibbon";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
 

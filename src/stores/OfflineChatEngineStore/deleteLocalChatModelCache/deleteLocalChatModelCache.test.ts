@@ -14,11 +14,11 @@ describe("deleteLocalChatModelCache", () => {
     deleteModelAllInfoInCacheMock.mockClear();
   });
 
-  it("calls WebLLM cache delete with the catalog MLC model id", async () => {
-    await deleteLocalChatModelCache("qwen-1.5b");
+  it("deletes the WebLLM cache entry for the given model id", async () => {
+    await deleteLocalChatModelCache("Qwen3-4B-q4f16_1-MLC");
 
     expect(deleteModelAllInfoInCacheMock).toHaveBeenCalledWith(
-      "Qwen2.5-1.5B-Instruct-q4f16_1-MLC",
+      "Qwen3-4B-q4f16_1-MLC",
     );
   });
 });

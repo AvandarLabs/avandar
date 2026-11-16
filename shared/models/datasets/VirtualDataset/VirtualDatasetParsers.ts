@@ -18,6 +18,7 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
   raw_sql: z.string(),
+  is_places: z.boolean(),
 });
 
 export const VirtualDatasetParsers =

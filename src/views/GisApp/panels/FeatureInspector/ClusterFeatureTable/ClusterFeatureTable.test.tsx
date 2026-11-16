@@ -236,6 +236,36 @@ describe("ClusterFeatureTable", () => {
     expect(page2Headers).toEqual(["name", "region", ""]);
   });
 
+  it("never shows a hidden column, such as a place's internal id", async () => {
+    const layer = _makeLayerWithColumns(["name", "place_id"]);
+    const getClusterLeaves = vi.fn().mockResolvedValue([
+      {
+        type: "Feature" as const,
+        id: 1,
+        geometry: { type: "Point" as const, coordinates: [0, 0] },
+        properties: { name: "Clinic A", place_id: "place-1" },
+      },
+    ]);
+    const { mapRef } = _makeMapRef(getClusterLeaves);
+
+    render(
+      <ClusterFeatureTable
+        cluster={CLUSTER}
+        layer={layer}
+        mapRef={mapRef}
+        onRowClick={vi.fn()}
+        hiddenColumnNames={["place_id"]}
+      />,
+    );
+    await screen.findByText("Clinic A");
+
+    const headers = screen.getAllByRole("columnheader").map((header) => {
+      return header.textContent;
+    });
+    expect(headers).toEqual(["name", ""]);
+    expect(screen.queryByText("place-1")).not.toBeInTheDocument();
+  });
+
   it("opens the single-feature view for the row that was clicked", async () => {
     const getClusterLeaves = vi
       .fn()

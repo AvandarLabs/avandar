@@ -1,14 +1,12 @@
 import { loopPhase, mix, wave } from "../../motion";
-import {
-  Check,
-  Eyebrow,
-  STOCK,
-  Text,
-  type GraphicProps,
-} from "../graphics-common";
-import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { Check } from "../graphics-common/Check";
+import { Eyebrow } from "../graphics-common/Eyebrow";
+import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
+import { STOCK } from "../stockPalette";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { PacketStreamInput } from "../presets/PacketStream/PacketStream.schema";
 import type { ReactNode } from "react";
 

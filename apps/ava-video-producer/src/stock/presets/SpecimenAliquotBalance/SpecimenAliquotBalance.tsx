@@ -3,7 +3,7 @@ import { AliquotCaption } from "./AliquotCaption";
 import { AliquotEquation } from "./AliquotEquation";
 import { AliquotLedger } from "./AliquotLedger";
 import { AliquotTube } from "./AliquotTube";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
 /** Authored sample volumes and explicit frame. */

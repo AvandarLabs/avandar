@@ -14,6 +14,7 @@ import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { SetOptional } from "type-fest";
@@ -33,6 +34,7 @@ type DatasetWithColumnsAndSource = SetOptional<
     | GoogleSheetsDataset.T
     | OpenDataDataset.T
     | PdfFileDataset.T
+    | PostgresTableDataset.T
     | VirtualDataset.T
     | XlsxFileDataset.T
     | undefined;

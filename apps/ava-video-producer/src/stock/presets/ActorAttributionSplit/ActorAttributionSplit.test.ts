@@ -168,32 +168,3 @@ test("historical accounts retain the actual shared label under reordered actions
     });
   });
 });
-
-import { setupI18n } from "@lingui/core";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId =
-    "motionAtlas.actor-attribution-split.default.copy.historyLimit";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [actorAttributionSplitContract.id]: actorAttributionSplitContract,
-  });
-  assert.equal(messages[messageId], DEFAULT_INPUT.copy.historyLimit);
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: actorAttributionSplitContract,
-    i18n,
-  });
-  assert.equal(resolved.defaultInput.copy.historyLimit, "Texto traducido");
-  assert.notEqual(DEFAULT_INPUT.copy.historyLimit, "Texto traducido");
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.copy.historyLimit}"`,
-    ),
-  );
-});

@@ -38,6 +38,7 @@ export function LayerInspectorFocusedView({
     return (
       <ClassificationEditor
         layer={layer}
+        classifiedValueDomain={viewState?.classifiedValueDomain}
         onLayerChange={onLayerChange}
         onBack={onCloseMatchReport}
       />

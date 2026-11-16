@@ -1,10 +1,10 @@
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { match } from "ts-pattern";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /**
- * Builds the SQL expression for a query column: its quoted base column name,
+ * Builds the SQL expression for a query column: its quoted source column name,
  * wrapped in its aggregation function when it has one. Use it wherever SQL
  * must refer to a column the way the SELECT list does, for example in a
  * HAVING filter on an aggregated column.
@@ -16,7 +16,7 @@ export function makeSqlExpressionFromQueryColumn({
   column: Readonly<QueryColumn.T>;
   aggregation: QueryAggregationType.T | undefined;
 }>): string {
-  const sourceSql = quoteSqlIdentifier(column.baseColumn.name);
+  const sourceSql = quoteSqlIdentifier(QueryColumn.getSourceColumnName(column));
   return match(aggregation)
     .with(undefined, "none", "group_by", () => {
       return sourceSql;

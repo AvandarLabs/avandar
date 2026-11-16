@@ -123,6 +123,10 @@ export type ModelCrudFunctions<M extends CrudModelSpec> = {
   }) => Promise<number | null>;
   getPage: (params: {
     where?: FiltersByColumn<M["DBRead"]>;
+    orderBy?: ReadonlyArray<{
+      column: keyof M["DBRead"] & string;
+      direction: "asc" | "desc";
+    }>;
     pageSize: number;
     pageNum: number;
     logger: ILogger;
@@ -211,6 +215,8 @@ export type BaseModelCrudClient<M extends CrudModelSpec> = {
    * @param params Optional params for the query
    * @param params.where Filters to apply. Get all instances that pass the
    * filters.
+   * @param params.orderBy Columns to order by, applied before the page
+   * window. When omitted the page is unordered.
    * @param params.pageSize The number of instances to return per page.
    * @param params.pageNum The page number to return.
    *
@@ -218,6 +224,10 @@ export type BaseModelCrudClient<M extends CrudModelSpec> = {
    */
   getPage(params: {
     where?: FiltersByColumn<M["DBRead"]>;
+    orderBy?: ReadonlyArray<{
+      column: keyof M["DBRead"] & string;
+      direction: "asc" | "desc";
+    }>;
     pageSize: number;
     pageNum: number;
   }): Promise<ModelCrudPage<M["Read"]>>;

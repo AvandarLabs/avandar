@@ -1,29 +1,27 @@
-import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import type { ChatRuntimeMode } from "$/types/offlineChat.types";
 
-export function resolveChatRuntimeMode(args: {
-  navigatorOnLine: boolean;
-  chatPostFailed?: boolean;
-  /** Active chat model picker id (includes `offline:` ids). */
-  selectedChatModelId?: string;
-}): ChatRuntimeMode {
-  const hasDownloaded = LocalChatModelStore.hasAnyDownloaded();
-  const pickerLocalId = args.selectedChatModelId
-    ? OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
-    : undefined;
-
-  if (pickerLocalId && LocalChatModelStore.isDownloaded(pickerLocalId)) {
-    return { kind: "local", localChatModelId: pickerLocalId };
+/**
+ * Picks where a chat turn runs: on the server, on the offline models, or
+ * (after a failed cloud request) an offer to switch to the offline models.
+ * Called by the chat model adapter before each turn and again when the
+ * cloud request fails.
+ */
+export function resolveChatRuntimeMode(
+  options: Readonly<{
+    navigatorOnLine: boolean;
+    isOfflineModeOn: boolean;
+    isBundleDownloaded: boolean;
+    chatPostFailed?: boolean;
+  }>,
+): ChatRuntimeMode {
+  if (options.isOfflineModeOn) {
+    return { kind: "local" };
   }
-
-  if (!args.navigatorOnLine) {
-    return hasDownloaded ? { kind: "local" } : { kind: "cloud" };
+  if (!options.navigatorOnLine) {
+    return options.isBundleDownloaded ? { kind: "local" } : { kind: "cloud" };
   }
-
-  if (args.chatPostFailed && hasDownloaded) {
+  if (options.chatPostFailed && options.isBundleDownloaded) {
     return { kind: "offer_local_fallback" };
   }
-
   return { kind: "cloud" };
 }

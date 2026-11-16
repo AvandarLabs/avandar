@@ -3,13 +3,13 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fingerprintPlan } from "../scripts/lib/planHelpers/fingerprintPlan";
 import {
-  previewFrames,
-  fingerprintPlan,
-  requireMatchingPreview,
   safeInputFile,
   ensureDirectory,
-} from "../scripts/lib/planHelpers";
+} from "../scripts/lib/planHelpers/planHelpers";
+import { previewFrames } from "../scripts/lib/planHelpers/previewFrames";
+import { requireMatchingPreview } from "../scripts/lib/planHelpers/requireMatchingPreview";
 import { fixture, temporary } from "./pipeline-test-helpers";
 
 test("preview samples the composed film on both sides of its transition", () => {

@@ -1,0 +1,12 @@
+.easing {
+  display: grid;
+  gap: 8px;
+}
+
+.easingBody {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 96px minmax(0, 1fr);
+  padding-inline-start: 12px;
+}

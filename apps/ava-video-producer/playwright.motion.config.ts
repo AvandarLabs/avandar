@@ -1,4 +1,11 @@
+import { register } from "node:module";
 import { defineConfig } from "@playwright/test";
+
+// Specs import stock contracts whose metadata is authored YAML. Hooks
+// registered later run first, so this answers YAML imports before
+// Playwright's own transform tries to parse them as JavaScript. The config
+// loads in the runner and in every worker, so each process registers it.
+register("./scripts/yaml/yamlHooks.ts", import.meta.url);
 
 /**
  * Producer-only headless gallery checks run one spec and one worker at a time.
@@ -9,6 +16,8 @@ export default defineConfig({
     "motion-content.spec.ts",
     "motion-navigation.spec.ts",
     "composition-appearance.spec.ts",
+    "design-tokens.spec.ts",
+    "showcase-smoke.spec.ts",
   ],
   timeout: 45000,
   fullyParallel: false,

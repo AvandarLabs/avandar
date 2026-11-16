@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { Model } from "@avandar/models";
@@ -30,6 +30,7 @@ export function AggregationMeasureSelect({
       label={t`Measure`}
       placeholder={t`Select a numeric column`}
       dataSourceId={dataSourceId}
+      isColumnSelectable={QueryColumn.isNumeric}
       value={
         MapLayerUpdates.getQueryColumnFromLayer({
           layer,

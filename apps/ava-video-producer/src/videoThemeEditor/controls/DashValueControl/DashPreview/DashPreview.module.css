@@ -1,0 +1,10 @@
+.dashPreview {
+  color: var(--ink);
+  height: 8px;
+  width: 160px;
+}
+
+.dashPreview line {
+  stroke: currentcolor;
+  stroke-width: 2;
+}

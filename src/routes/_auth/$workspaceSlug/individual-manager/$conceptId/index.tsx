@@ -1,12 +1,14 @@
 import { Trans } from "@lingui/react/macro";
-import { Button, Center } from "@mantine/core";
+import { Button } from "@mantine/core";
 import {
   createFileRoute,
   getRouteApi,
   useNavigate,
 } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DetailPaneMessage } from "@/views/IndividualManagerApp/DetailPaneMessage/DetailPaneMessage";
 import { IndividualSelectionEmptyState } from "@/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
 import type { ReactNode } from "react";
@@ -28,7 +30,10 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const concept = conceptRoute.useLoaderData();
-  const { allIndividuals, isLoading } = useConceptIndividuals(concept.id);
+  const { allIndividuals, isLoading } = useConceptIndividuals({
+    conceptId: concept.id,
+  });
+  const canViewCaseType = useHasPermission("case_types__can_view_case_type");
   const hasRecords = allIndividuals.length > 0;
 
   if (isLoading) {
@@ -36,12 +41,12 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
   }
 
   return (
-    <Center h="100%" px="md">
+    <DetailPaneMessage>
       <IndividualSelectionEmptyState
         conceptName={concept.name}
         hasRecords={hasRecords}
         action={
-          hasRecords ? undefined : (
+          hasRecords || !canViewCaseType ? undefined : (
             <Button
               size="md"
               variant="light"
@@ -60,6 +65,6 @@ function IndividualManagerWithNoIndividualSelected(): ReactNode {
           )
         }
       />
-    </Center>
+    </DetailPaneMessage>
   );
 }

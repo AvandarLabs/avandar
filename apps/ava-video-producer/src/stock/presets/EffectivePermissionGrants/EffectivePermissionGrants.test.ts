@@ -97,7 +97,7 @@ test("candidates climb their own ranks before gates close and the result rises",
   assert.match(_render({ frame: 150 }), /data-required-notch="editor"/);
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { effectivePermissionGrantsContract } from "./EffectivePermissionGrants.contract";
 import { inputSchema, type Input } from "./EffectivePermissionGrants.schema";
@@ -136,7 +136,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: effectivePermissionGrantsContract,
   expectedTextPaths: [
     ["grants", 0, "label"],

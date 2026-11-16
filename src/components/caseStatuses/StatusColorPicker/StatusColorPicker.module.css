@@ -1,0 +1,25 @@
+.statusColorPickerPalette {
+  display: grid;
+  gap: var(--mantine-spacing-xxs);
+  grid-template-columns: repeat(4, auto);
+}
+
+/* Same footprint as an `xs` input, so the swatch lines up with its row. */
+.statusColorPickerSwatch {
+  align-items: center;
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  height: calc(1.875rem * var(--mantine-scale));
+  justify-content: center;
+  transition: var(--ava-transition-interactive);
+  width: calc(1.875rem * var(--mantine-scale));
+}
+
+.statusColorPickerSwatch:hover {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.statusColorPickerSwatch[aria-pressed="true"] {
+  border-color: var(--ava-border-focus);
+}

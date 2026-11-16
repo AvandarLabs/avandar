@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { BackoffAttempt } from "./BackoffAttempt";
 import { getBackoffStateFromInputAndFrame } from "./getBackoffStateFromInputAndFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
 

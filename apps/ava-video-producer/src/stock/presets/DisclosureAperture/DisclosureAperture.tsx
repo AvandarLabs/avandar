@@ -3,7 +3,7 @@ import { AperturePanel } from "./AperturePanel";
 import { DisclosureCopies } from "./DisclosureCopies";
 import { DisclosureCopy } from "./DisclosureCopy";
 import { DisclosureField } from "./DisclosureField";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
 /** Complete authored disclosure policy and source content. */

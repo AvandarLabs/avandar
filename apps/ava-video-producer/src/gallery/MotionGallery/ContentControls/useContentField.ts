@@ -1,7 +1,5 @@
-import { useLingui } from "@lingui/react";
-import { useLingui as useLinguiMacro } from "@lingui/react/macro";
 import { useId } from "react";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
 import { ContentDraftModule } from "./ContentDraftModule/ContentDraftModule";
 import type { StockJsonValue } from "../../../stock/contracts/StockContract.types";
 import type { Props } from "./ContentField/ContentField";
@@ -28,8 +26,6 @@ export function useContentField({
   state,
   onChange,
 }: Readonly<Props>): UseContentFieldResult {
-  const { i18n } = useLingui();
-  const { t } = useLinguiMacro();
   const id = useId();
   const path = [
     ...parentPath,
@@ -47,13 +43,13 @@ export function useContentField({
     [control.help ? `${id}-help` : "", ...issueIds].filter(Boolean).join(" ") ||
     undefined;
   const label = /^\d+$/.test(control.path)
-    ? t`Cell ${path.join(".")}`
-    : i18n._(control.label);
+    ? `Cell ${path.join(".")}`
+    : control.label.message;
   return {
     path,
     label,
-    value: StockCopyMessages.getValueFromPath({ value: state.draft, path }),
-    help: control.help ? i18n._(control.help) : undefined,
+    value: getStockValueFromPath({ value: state.draft, path }),
+    help: control.help ? control.help.message : undefined,
     update: (replacement: StockJsonValue) =>
       onChange(
         ContentDraftModule.edit({ preset, state, path, value: replacement }),

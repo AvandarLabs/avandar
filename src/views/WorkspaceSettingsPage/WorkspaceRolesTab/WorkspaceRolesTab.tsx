@@ -61,6 +61,8 @@ const INITIAL_EDITOR_STATE: EditorState = {
     data_explorer: undefined,
     dashboards: undefined,
     gis: undefined,
+    case_types: undefined,
+    case_records: undefined,
     settings: undefined,
   },
   builtinPresetType: "custom",

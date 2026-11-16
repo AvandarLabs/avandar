@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
-import { previewFrames } from "../planHelpers";
+import { previewFrames } from "../planHelpers/previewFrames";
 import { productRequirements } from "./productRequirements";
 
 const readFilm = (id: string) =>

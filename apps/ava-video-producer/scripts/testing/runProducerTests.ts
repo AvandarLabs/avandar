@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { requireLicense } from "../require-license.mjs";
+import { requireLicense } from "../requireLicense";
 import { enumerateProducerTests } from "./enumerateProducerTests/enumerateProducerTests";
 
 requireLicense();
@@ -10,7 +10,7 @@ const result: ReturnType<typeof spawnSync> = spawnSync(
     "--import",
     "tsx",
     "--import",
-    "./scripts/yaml/registerYaml.mjs",
+    "./scripts/yaml/registerYaml.ts",
     "--test",
     ...process.argv.slice(2),
     ...files,

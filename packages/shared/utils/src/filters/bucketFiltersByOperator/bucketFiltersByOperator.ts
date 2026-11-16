@@ -34,6 +34,11 @@ export function bucketFiltersByOperator<T extends UnknownObject>(
           filtersByOperator[operator] = [];
         }
 
+        if (operator === "is") {
+          filtersByOperator.is!.push([column, null]);
+          return;
+        }
+
         if (isSingleValueOperator(operator) && !isArray(value)) {
           filtersByOperator[operator].push([column, value]);
         } else if (isArrayValueOperator(operator) && isArray(value)) {

@@ -1,0 +1,138 @@
+/**
+ * One row per Postgres table or view imported as an Avandar dataset - the
+ * satellite half of the `datasets` / `datasets__<type>` split, the same
+ * shape as `datasets__csv_file` or `datasets__google_sheets`. Reached
+ * through `connections__postgres` (`connection_id`), which holds the
+ * saved server connection this table is read through; `schema_name` and
+ * `table_name` together identify the relation within that server.
+ */
+create table public.datasets__postgres_table (
+  -- Primary key
+  id uuid primary key default gen_random_uuid(),
+  -- Dataset this metadata belongs to, constrained below together with
+  -- `workspace_id`.
+  dataset_id uuid not null unique,
+  -- Workspace this dataset belongs to, keyed below to the dataset's own
+  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  -- The saved connection this dataset reads through, constrained below to a
+  -- connection in this dataset's own workspace.
+  connection_id uuid not null,
+  schema_name text not null,
+  table_name text not null,
+  relation_kind public.datasets__postgres_table_relation_kind not null,
+  -- Timestamps
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  -- Both keys below include `workspace_id`, so a dataset can never read
+  -- through another workspace's connection: this row's workspace is its
+  -- dataset's, and its connection's workspace is this row's. A foreign key
+  -- check bypasses RLS, so keys on `dataset_id` and `connection_id` alone
+  -- would accept a client-supplied workspace that matched neither.
+  constraint datasets__postgres_table__dataset_in_workspace_fkey foreign key (dataset_id, workspace_id) references public.datasets (id, workspace_id) on update cascade on delete cascade,
+  -- `restrict`, not `cascade`: deleting a connection with live datasets must
+  -- be an explicit, informed action - the FK must not silently orphan a
+  -- queryable dataset.
+  constraint datasets__postgres_table__connection_in_workspace_fkey foreign key (connection_id, workspace_id) references public.connections (id, workspace_id) on update cascade on delete restrict
+);
+
+-- Enable row level security
+alter table public.datasets__postgres_table enable row level security;
+
+-- Data API privileges. `authenticated` gets no `update`: this row names the
+-- table everyone who can see the dataset reads through the workspace's saved
+-- credential, and nothing in the app changes a row once it exists.
+grant
+select
+,
+  insert,
+  delete on table public.datasets__postgres_table to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__postgres_table to service_role;
+
+-- Policies
+create policy "User can select datasets__postgres_table in their workspace" on public.datasets__postgres_table for
+select
+  to authenticated using (
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__postgres_table.dataset_id,
+      'viewer'
+    )
+  );
+
+-- Inserting also requires `data_sources` editor, the role that can see
+-- connections at all: this row decides which table everyone who can see
+-- the dataset reads through the workspace's saved credential.
+create policy "User can insert datasets__postgres_table in their workspace" on public.datasets__postgres_table for insert to authenticated
+with
+  check (
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__postgres_table.dataset_id,
+      'editor'
+    ) and
+    public.util__auth_user_meets_min_app_role (
+      public.datasets__postgres_table.workspace_id,
+      'data_sources',
+      'editor'
+    )
+  );
+
+create policy "User can delete datasets__postgres_table in their workspace" on public.datasets__postgres_table for delete to authenticated using (
+  public.util__auth_user_can_access_resource (
+    'dataset',
+    public.datasets__postgres_table.dataset_id,
+    'admin'
+  )
+);
+
+create trigger tr_datasets__postgres_table__set_updated_at before
+update on public.datasets__postgres_table for each row
+execute function public.util__set_updated_at ();
+
+/**
+ * Refuses any change to the dataset, connection, schema or table a Postgres
+ * satellite row names, whoever makes it. Everyone who can see the dataset
+ * reads that table through the workspace's saved credential, so moving a row
+ * onto another dataset, or pointing it at another table, must never be a way
+ * to change what a dataset reads.
+ */
+create or replace function public.datasets__postgres_table__prevent_source_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if
+    new.dataset_id is distinct from old.dataset_id or
+    new.connection_id is distinct from old.connection_id or
+    new.schema_name is distinct from old.schema_name or
+    new.table_name is distinct from old.table_name
+  then
+    raise exception 'a Postgres dataset cannot be repointed at another table'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__postgres_table__prevent_source_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__datasets__postgres_table__prevent_source_change before
+update of dataset_id,
+connection_id,
+schema_name,
+table_name on public.datasets__postgres_table for each row
+execute function public.datasets__postgres_table__prevent_source_change ();

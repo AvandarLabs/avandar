@@ -2,7 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { BufferCompass } from "./BufferCompass";
 import { BufferHeadings } from "./BufferHeadings";
 import { BufferLocations } from "./BufferLocations";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 

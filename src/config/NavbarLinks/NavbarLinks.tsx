@@ -7,6 +7,7 @@ import {
   IconMap,
   IconSettings,
   IconTable,
+  IconUser,
 } from "@tabler/icons-react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
@@ -82,6 +83,15 @@ export const NavbarLinks = {
     return {
       link: AppLinks.ontologyDesignerHome(workspaceSlug),
       icon: <IconBlocks size={DEFAULT_ICON_SIZE} stroke={1.5} />,
+      isEnabled: () => {
+        return !isFlagEnabled(FeatureFlag.DisableProfileManager);
+      },
+    };
+  },
+  assignedToMe: (workspaceSlug: string) => {
+    return {
+      link: AppLinks.assignedToMe(workspaceSlug),
+      icon: <IconUser size={DEFAULT_ICON_SIZE} stroke={1.5} />,
       isEnabled: () => {
         return !isFlagEnabled(FeatureFlag.DisableProfileManager);
       },

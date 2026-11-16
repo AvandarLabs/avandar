@@ -4,7 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { FeedbackDraft } from "./FeedbackDraft";
 import { FeedbackNote } from "./FeedbackNote";
 import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 

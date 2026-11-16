@@ -4,7 +4,7 @@ import { EnvelopeFlaps } from "./EnvelopeFlaps";
 import { ExteriorAddress } from "./ExteriorAddress";
 import { HandoffBrief } from "./HandoffBrief";
 import { HandoffCopy } from "./HandoffCopy";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
 /** Complete brief, exterior address and recipient-reveal policy. */

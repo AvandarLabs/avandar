@@ -1,27 +1,21 @@
-import path from "node:path";
 import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { EnvFileLine } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
-import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
-import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
+import { SupabaseCommandOutput } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { promiseMap, prop } from "@avandar/utils";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
+import { isDefined, prop, propEq } from "@avandar/utils";
 import type {
   DevelopmentEnvFile,
-  SupabaseBackupManifest,
   SupabaseEnvironmentDrift,
   SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { SupabaseSwitchSources } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
 
-type MakeStatusReportOptions = {
-  branch: string;
-  configContents: string;
-  manifest: SupabaseBackupManifest | undefined;
+type MakeStatusReportOptions = SupabaseSwitchSources & {
   statusJson: string | undefined;
-  envFiles: readonly DevelopmentEnvFile[];
 };
 
 /** Config port keys worth reporting, in the order they are printed. */
@@ -119,19 +113,54 @@ function _readLocalStatus(
   }
 }
 
+function _makeRemoteEnvironmentValues(
+  envFiles: readonly DevelopmentEnvFile[],
+): SupabaseStatusEntry[] {
+  const assignments = envFiles.flatMap(({ contents }) => {
+    return contents
+      .split("\n")
+      .map(EnvFileLine.getAssignment)
+      .filter(isDefined);
+  });
+  // A hosted project's keys are real credentials, unlike the fixed local
+  // defaults, so the report shows only enough to tell them apart.
+  return SupabaseConfig.getManagedEnvKeys().flatMap((envKey) => {
+    const assignment = assignments.find(propEq("key", envKey));
+    return assignment === undefined
+      ? []
+      : [
+          {
+            label: envKey,
+            value: SupabaseCommandOutput.makeMaskedValueFromEnvValue({
+              envKey,
+              value: EnvFileLine.getUnquotedValue(assignment.value),
+            }),
+          },
+        ];
+  });
+}
+
 function _makeStatusReport(
   options: Readonly<MakeStatusReportOptions>,
 ): SupabaseStatusReport {
-  const { branch, configContents, manifest, statusJson, envFiles } = options;
-  const config = SupabaseConfig.makeStateFromContents(configContents);
+  const { statusJson, envFiles } = options;
+  const { config, ...summary } = SupabaseSwitchState.fromSources(options);
+  if (summary.switchKind === "remote") {
+    return {
+      ...summary,
+      isSwitched: true,
+      isRunning: false,
+      ports: [],
+      environmentValues: _makeRemoteEnvironmentValues(envFiles),
+      endpoints: [],
+      environmentDrift: [],
+    };
+  }
   const status = _readLocalStatus(statusJson);
-  const isSwitched = manifest?.temporaryProjectId === config.projectId;
   return {
-    isSwitched,
-    isExpectedForBranch: isSwitched !== (branch === SHARED_STACK_BRANCH),
+    ...summary,
+    isSwitched: summary.switchKind === "local",
     isRunning: status !== undefined,
-    branch,
-    projectId: config.projectId,
     ports: _makePorts({
       ports: config.ports,
       devServerPort: DevServerPort.fromEnvFiles(envFiles.map(prop("contents"))),
@@ -147,29 +176,6 @@ function _makeStatusReport(
   };
 }
 
-/** Reads this branch's backup manifest, if a switch left one behind. */
-async function _readManifest(
-  options: Readonly<{
-    io: SupabaseLocalEnvironmentIo;
-    branch: string;
-    worktreePath: string;
-  }>,
-): Promise<SupabaseBackupManifest | undefined> {
-  const backupDirectory = SupabaseBackupPaths.backupDirectory({
-    projectRoot: options.io.projectRoot,
-    branch: options.branch,
-    worktreePath: options.worktreePath,
-  });
-  try {
-    return await SupabaseBackupStore.readManifest({
-      io: options.io,
-      backupDirectory,
-    });
-  } catch {
-    return undefined;
-  }
-}
-
 async function _readStatusJson(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string | undefined> {
@@ -180,27 +186,14 @@ async function _readStatusJson(
 async function _readStatusReport(
   io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseStatusReport> {
-  const [branch, worktreePath, configContents, envFilePaths, statusJson] =
-    await Promise.all([
-      io.readBranch(),
-      io.readWorktreePath(),
-      io.readTextFile(path.join(io.projectRoot, "supabase", "config.toml")),
-      io.findDevelopmentEnvFiles(),
-      _readStatusJson(io),
-    ]);
-  const [manifest, envFiles] = await Promise.all([
-    _readManifest({ io, branch, worktreePath }),
-    promiseMap(envFilePaths, async (filePath) => {
-      return { filePath, contents: await io.readTextFile(filePath) };
-    }),
-  ]);
-  return _makeStatusReport({
-    branch,
-    configContents,
-    manifest,
-    statusJson,
-    envFiles,
-  });
+  const sources = await SupabaseSwitchState.readSources(io);
+  // A hosted project has no local stack to ask, and the shared stack's
+  // status would describe a database this worktree does not use.
+  const statusJson =
+    SupabaseSwitchState.fromSources(sources).switchKind === "remote"
+      ? undefined
+      : await _readStatusJson(io);
+  return _makeStatusReport({ ...sources, statusJson });
 }
 
 /** Summarizes which local Supabase a worktree is pointed at. */

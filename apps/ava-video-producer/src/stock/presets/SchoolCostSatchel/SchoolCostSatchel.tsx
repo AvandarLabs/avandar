@@ -4,7 +4,7 @@ import { SatchelHeading } from "./SatchelHeading";
 import { SatchelSetting } from "./SatchelSetting";
 import { SatchelTotal } from "./SatchelTotal";
 import { SceneText } from "./SceneText";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
 

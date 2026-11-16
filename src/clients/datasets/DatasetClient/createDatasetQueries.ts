@@ -4,6 +4,7 @@ import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFile
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
+import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/PostgresTableDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -50,6 +51,11 @@ function _makeGetSourceDataset(config: Readonly<DatasetQueryConfig>): (
       },
       pdf_file: () => {
         return PdfFileDatasetClient.getOne(
+          where("dataset_id", "eq", datasetId),
+        );
+      },
+      postgres_table: () => {
+        return PostgresTableDatasetClient.getOne(
           where("dataset_id", "eq", datasetId),
         );
       },

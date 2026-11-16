@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MutableRefObject, RefObject } from "react";
 
@@ -90,15 +90,26 @@ export function useMapViewSync({
     undefined,
   );
 
+  // Read through an effect event so a new callback identity never
+  // resubscribes. Resubscribing leaves a gap between the old listener's
+  // removal and the new one's registration, and an instant camera fit made in
+  // the same commit lands its moveend in that gap, so the view never saves.
+  const publishViewChange = useEffectEvent(
+    (changedView: AvaMapConfig.ViewState) => {
+      onViewChange(changedView);
+    },
+  );
   useEffect(
     function publishMapCameraChanges() {
       return _subscribeToMapCameraChanges({
         mapInstance,
         pendingConfigViewRef,
-        onViewChange,
+        onViewChange: publishViewChange,
       });
     },
-    [mapInstance, onViewChange],
+    // useEffectEvent callbacks must not be listed in effect deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mapInstance],
   );
 
   useEffect(

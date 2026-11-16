@@ -7,7 +7,7 @@
 # before changing one.
 set -e
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 
 ID="${1:-demo}"
 # A poster is the first painted pixel of the <video> on a page, and it sits
@@ -30,6 +30,10 @@ DELIVER="${DELIVER:-1536:960}"
 # only means something for a clip that repeats in a page.
 GATE_FLAGS=""
 [ "${STANDALONE:-0}" = "1" ] && GATE_FLAGS="--standalone"
+# DECLARED_CUTS=602,1022 lists the first frames of shots a storyboard declares
+# as hard cuts (`transition: {kind: "cut"}`). `npm run video -- render` sets it
+# from the plan; fixed compositions leave it unset and get the ordinary gate.
+[ -n "${DECLARED_CUTS:-}" ] && GATE_FLAGS="$GATE_FLAGS --declared-cuts $DECLARED_CUTS"
 
 OUT="${RENDER_OUT_DIR:-out}"
 OUTPUT_ID="${RENDER_OUTPUT_ID:-$ID}"
@@ -64,7 +68,7 @@ rm -rf "$FRAMES"
 # The renderer API accepts output directories under .videos without treating
 # the hidden parent's name as a file extension. It uses concurrency: 1 and the
 # same JPEG format/quality as the CLI sequence path.
-node scripts/render-sequence.mjs "$ID" "$FRAMES"
+node --import tsx scripts/renderSequence.ts "$ID" "$FRAMES"
 
 # 1536x960 is the same 8:5 as the 1600x1000 canvas and is 16-aligned, so no
 # partial macroblock row. -bf 0 is here only so frame-stepping in a scrubber
@@ -104,7 +108,7 @@ ls -lh "$OUT"
 # already in it: the step that decides whether the encoder is innocent. Clean
 # the frames up before the gate runs and that instruction cannot be followed,
 # which throws away the only reason to render through stills at all.
-if node scripts/check-frames.mjs "$OUT/$OUTPUT_ID.mp4" $GATE_FLAGS; then
+if node --import tsx scripts/checkFrames.ts "$OUT/$OUTPUT_ID.mp4" $GATE_FLAGS; then
   if [ "${KEEP_RENDER_FRAMES:-0}" != "1" ]; then
     rm -rf "$FRAMES"
   fi

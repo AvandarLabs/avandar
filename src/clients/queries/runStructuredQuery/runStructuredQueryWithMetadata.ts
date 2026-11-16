@@ -1,17 +1,12 @@
-import { Model } from "@avandar/models";
-import { prop, sortObjList } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { match } from "ts-pattern";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { PublicQuerySession } from "@/clients/qetl/PublicQuerySession/PublicQuerySession";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
 import { makeExecutableQueryFromManualQuery } from "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
-import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
@@ -20,11 +15,6 @@ import type {
   RunStructuredQueryResult,
   StructuredQueryAuth,
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-
-/** A structured query's columns, in the stable order execution expects. */
-type SortedQueryColumns = ReadonlyArray<
-  StructuredQuery.Partial["queryColumns"][number]
->;
 
 /**
  * Resolves the SQL that should actually run: caller-supplied raw SQL takes
@@ -131,86 +121,44 @@ function _getWorkspaceAuthFromStructuredQuery(
     .exhaustive();
 }
 
-/** Runs a structured query against its data source. */
+/**
+ * Runs a structured query against its data source, and returns the SQL it
+ * ran. A dataset and a case type both compile to SQL: a case type's SQL
+ * names its `concept_<id>` view, which QETL builds inside the query's lease.
+ * Nothing runs, and no SQL is returned, without a data source or a column.
+ */
 async function _runSourceQuery({
   workspaceId,
   dataSource,
   executionQuery,
-  sortedQueryColumns,
+  queryColumnCount,
 }: {
   workspaceId: Workspace.Id;
   dataSource: QueryDataSource.T | undefined;
   executionQuery: StructuredQuery.Partial;
-  sortedQueryColumns: SortedQueryColumns;
-}): Promise<QueryResult.T<UnknownRow>> {
-  if (!dataSource || sortedQueryColumns.length === 0) {
-    return QueryResult.makeEmpty();
+  queryColumnCount: number;
+}): Promise<Pick<RunStructuredQueryResult, "result" | "executedSql">> {
+  if (!dataSource || queryColumnCount === 0) {
+    return { result: QueryResult.makeEmpty(), executedSql: undefined };
   }
 
-  const executionQueryWithSource = {
+  const rawSql = StructuredQuery.toRawDuckDbQuery({
     ...executionQuery,
     dataSource,
-  } as StructuredQuery.T;
-
-  return await Model.match(dataSource, {
-    Dataset: async (): Promise<QueryResult.T<UnknownRow>> => {
-      return await WorkspaceQuerySession.runQuery({
-        rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
-        workspaceId,
-      });
-    },
-
-    // Individual sources resolve through AttributeAssertionClient, which may in
-    // turn query many datasets.
-    Concept: async (concept): Promise<QueryResult.T<UnknownRow>> => {
-      return await _runConceptQuery({
-        concept,
-        sortedQueryColumns,
-        workspaceId,
-      });
-    },
-  });
-}
-
-/**
- * Runs an individual-source query.
- *
- * @returns The requested attributes' values, keyed by attribute name.
- */
-async function _runConceptQuery({
-  concept,
-  sortedQueryColumns,
-  workspaceId,
-}: {
-  concept: Concept.T;
-  sortedQueryColumns: SortedQueryColumns;
-  workspaceId: Workspace.Id;
-}): Promise<QueryResult.T<UnknownRow>> {
-  // TODO(jpsyx): optimize this by using a progressive
-  // table-materialization approach
-  const attributes = sortedQueryColumns
-    .map(prop("baseColumn"))
-    .filter(Model.valIsOfModelType("ConceptAttribute"));
-
-  // TODO(jpsyx): we still need to apply group bys, aggregations,
-  // and sorting. Right now its just returning all values for the
-  // requested attributes.
-  const rows = await AttributeAssertionClient.getConceptExtension({
-    conceptId: concept.id,
-    conceptAttributes: attributes,
-    workspaceId,
-  });
-
-  return buildConceptQueryResult(attributes, rows);
+  } as StructuredQuery.T);
+  return {
+    result: await WorkspaceQuerySession.runQuery({ rawSql, workspaceId }),
+    executedSql: rawSql,
+  };
 }
 
 /**
  * Runs a structured query (or caller-supplied raw SQL) against the right QETL
- * client, resolving dataset and individual sources.
+ * client. Every data source, case types included, is compiled to SQL and run
+ * through the workspace query session.
  *
  * This is the single execution path shared by the Data Explorer and the GIS
- * app. Callers wrap it in their own caching hook rather than duplicating the
- * source-resolution branches.
+ * app. Callers wrap it in their own caching hook.
  */
 export async function runStructuredQueryWithMetadata(
   params: RunStructuredQueryParams,
@@ -221,7 +169,6 @@ export async function runStructuredQueryWithMetadata(
 
   const { query } = params;
   const { dataSource, queryColumns } = query;
-  const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
 
   const { sqlToRun, executionQuery, didAutoLimit } =
     await _selectSqlForExecution(params);
@@ -234,14 +181,11 @@ export async function runStructuredQueryWithMetadata(
     };
   }
 
-  return {
-    result: await _runSourceQuery({
-      workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
-      dataSource,
-      executionQuery,
-      sortedQueryColumns,
-    }),
-    didAutoLimit,
-    executedSql: sqlToRun,
-  };
+  const sourceRun = await _runSourceQuery({
+    workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
+    dataSource,
+    executionQuery,
+    queryColumnCount: queryColumns.length,
+  });
+  return { ...sourceRun, didAutoLimit };
 }

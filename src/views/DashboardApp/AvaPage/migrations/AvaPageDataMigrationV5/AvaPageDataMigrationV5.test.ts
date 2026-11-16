@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import type { V5_AvaPageData } from "./AvaPageDataMigrationV5.types";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+
+/**
+ * Narrows an upgraded document to the version 5 shape `downgrade` takes. The
+ * current DataViz `vizType` also allows `"plugin"`, which version 5 keeps out
+ * of its frozen version 4 list. These documents hold only built-in charts.
+ */
+function _asV5Data(data: AvaPageData): V5_AvaPageData {
+  return data as V5_AvaPageData;
+}
 
 /**
  * Registered migrations preserve legacy targets without allocating bindings.
@@ -95,7 +106,7 @@ it("unwraps version-zero charts exactly and rejects missing persisted bound targ
     ],
   };
   const upgraded = upgradeAvaPageData(legacy);
-  expect(AvaPageDataMigrationV5.downgrade(upgraded)).toEqual(legacy);
+  expect(AvaPageDataMigrationV5.downgrade(_asV5Data(upgraded))).toEqual(legacy);
   const bound = {
     ...upgraded,
     content: [
@@ -122,7 +133,9 @@ it("unwraps version-zero charts exactly and rejects missing persisted bound targ
     ],
   };
   expect(() => {
-    return AvaPageDataMigrationV5.downgrade(bound as typeof upgraded);
+    return AvaPageDataMigrationV5.downgrade(
+      _asV5Data(bound as typeof upgraded),
+    );
   }).toThrow(/global filter.*persisted binding/i);
 });
 
@@ -187,7 +200,7 @@ it("downgrades bound chart and local targets using only persisted names", async 
       },
     ],
   });
-  const downgraded = AvaPageDataMigrationV5.downgrade(bound);
+  const downgraded = AvaPageDataMigrationV5.downgrade(_asV5Data(bound));
   expect(downgraded.content[0]?.props).toMatchObject({
     vizConfig: {
       xAxisKey: "region",
@@ -260,7 +273,7 @@ it.each([["territory"], ["region", "territory"]])(
     });
     const original = JSON.stringify(document);
     expect(() => {
-      return AvaPageDataMigrationV5.downgrade(document);
+      return AvaPageDataMigrationV5.downgrade(_asV5Data(document));
     }).toThrow(/global filter.*cannot be represented.*v4/i);
     expect(JSON.stringify(document)).toBe(original);
   },

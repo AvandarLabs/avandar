@@ -3,7 +3,7 @@ import { EvolutionCaptions } from "./EvolutionCaptions";
 import { EvolutionHeader } from "./EvolutionHeader";
 import { EvolutionRow } from "./EvolutionRow";
 import { LaterEvolutionRow } from "./LaterEvolutionRow";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
 /** Frame-driven complete authored schema extension. */

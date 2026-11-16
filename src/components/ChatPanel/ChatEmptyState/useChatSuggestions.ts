@@ -41,7 +41,41 @@ function _buildDashboardSuggestions(
   ];
 }
 
-function _buildDataExplorerSuggestions(
+/**
+ * Suggestions for a dataset that counts something over time, such as "Show
+ * total daily_new_deaths by month in long-us-deaths.csv". Undefined when the
+ * dataset has no measure column or no date column.
+ */
+function _buildMeasureSuggestions(
+  parameters: Readonly<{
+    cachedSummaries: ReadonlyMap<string, ColumnSummary>;
+    columns: readonly DatasetColumn.T[];
+    datasetName: string;
+    i18n: I18n;
+  }>,
+): string[] | undefined {
+  const { cachedSummaries, columns, datasetName, i18n } = parameters;
+  const groupByColumn = ChatSuggestionColumnPicker.pickGroupByColumn(
+    columns,
+    cachedSummaries,
+  );
+  const measureColumn = ChatSuggestionColumnPicker.pickMeasureColumn(columns);
+  const dateColumn = ChatSuggestionColumnPicker.pickDateColumn(columns);
+  if (!measureColumn || !dateColumn) {
+    return undefined;
+  }
+  return [
+    i18n._(msg`Show total ${measureColumn} by month in ${datasetName}`),
+    groupByColumn
+      ? i18n._(
+          msg`Which ${groupByColumn} has the highest total ${measureColumn}?`,
+        )
+      : undefined,
+    i18n._(msg`Show the first 20 rows of ${datasetName}`),
+  ].filter(isDefined);
+}
+
+function _buildFallbackDataExplorerSuggestions(
   parameters: Readonly<{
     cachedSummaries: ReadonlyMap<string, ColumnSummary>;
     columns: readonly DatasetColumn.T[];
@@ -77,6 +111,19 @@ function _buildDataExplorerSuggestions(
             )
           : undefined,
   ].filter(isDefined);
+}
+
+/**
+ * Data Explorer starter prompts: questions about the dataset's measure over
+ * time when it has one, otherwise row counts and breakdowns.
+ */
+function _buildDataExplorerSuggestions(
+  parameters: Parameters<typeof _buildMeasureSuggestions>[0],
+): string[] {
+  return (
+    _buildMeasureSuggestions(parameters) ??
+    _buildFallbackDataExplorerSuggestions(parameters)
+  );
 }
 
 /** Builds starter prompts for the active chat application and dataset. */

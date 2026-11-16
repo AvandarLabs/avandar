@@ -4,7 +4,6 @@ import {
   METADATA,
   controls,
   DEFAULT_TEXT_PATHS,
-  DEFAULT_SPAN_BINDINGS,
   bindingExamples,
 } from "./ProseMeasurementLedger.metadata";
 import {
@@ -28,6 +27,5 @@ export const proseMeasurementLedgerContract = {
   metadata: METADATA,
   controls,
   defaultTextPaths: DEFAULT_TEXT_PATHS,
-  defaultSpanBindings: DEFAULT_SPAN_BINDINGS,
   bindingExamples,
 } satisfies StockContract<Input>;

@@ -46,6 +46,12 @@
         "files": ["apps/ava-video-producer/showcase/motion.css"],
         "createdAt": "2026-10-19T19:47:03.578Z",
         "reason": "Codex: existing Motion Atlas typography shown in the user reference. The user requested matching the existing shared design theme; replacing its font is outside this styling regression fix."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "font",
+        "createdAt": "2026-11-13T18:17:04.393Z",
+        "reason": "agent: false positive, L174 is the editor control name string 'font' in TOKEN_CONTROLS, not a CSS font"
       }
     ]
   }

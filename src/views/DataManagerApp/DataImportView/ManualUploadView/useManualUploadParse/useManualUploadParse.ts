@@ -56,6 +56,7 @@ export type ManualUploadParse = {
   isReparsePending: boolean;
   onFileSubmit: (file: File | undefined) => void;
   onRequestDataReparse: (parseOptions: FileParseOptions) => Promise<void>;
+  clearParsedFile: () => void;
 };
 
 function _fileMimeTypeToSourceType(
@@ -222,6 +223,10 @@ export function useManualUploadParse(
         requestFileParse,
         setIsReparsePending,
       });
+    },
+    clearParsedFile: () => {
+      setUploadedFile(undefined);
+      manualFileLoad.clearLoadedFile();
     },
   };
 }

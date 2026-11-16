@@ -1,10 +1,11 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { DEFAULT_INPUT } from "./CommunityCoordinationTable.fixtures";
 import { CoordinationActors } from "./CoordinationActors";
 import { CoordinationLabels } from "./CoordinationLabels";
 import { CoordinationMarker } from "./CoordinationMarker";
 import { CoordinationPlaceConnections } from "./CoordinationPlaceConnections";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
 

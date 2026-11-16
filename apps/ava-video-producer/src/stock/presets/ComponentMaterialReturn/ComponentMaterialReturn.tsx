@@ -5,7 +5,7 @@ import { MaterialOperator } from "./MaterialOperator";
 import { MaterialParts } from "./MaterialParts";
 import { MaterialQuantities } from "./MaterialQuantities";
 import { SceneLabel } from "./SceneLabel";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
 /** Explicit content joins the shared stock frame contract. */

@@ -1,5 +1,8 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheColumn } from "./CacheColumn";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
@@ -21,6 +24,8 @@ export function CachedRelation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const style = useGraphicProps("QueryColumnCacheGrowth", {});
+  const { color } = useGraphicTokens();
   const columns = frame < 106 ? scene.original : scene.union;
   return (
     <g>
@@ -30,10 +35,10 @@ export function CachedRelation({
         y={260}
         width={scene.width}
         height={74 + scene.rowCount * 44}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+        rx={style.tableRadius}
+        fill={color.surface}
+        stroke={color.line}
+        strokeWidth={style.tableStrokeWidth}
       />
       {Array.from({ length: scene.rowCount }, (_, rowIndex) => (
         <StockRect
@@ -44,7 +49,8 @@ export function CachedRelation({
           width={scene.width}
           height={44}
           fill="none"
-          stroke={STOCK.line}
+          stroke={color.line}
+          strokeWidth={style.gridStrokeWidth}
         />
       ))}
       {columns.map((column, index) => (

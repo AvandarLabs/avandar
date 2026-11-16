@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "id": "fly-through",
+  "title": "Fly-through into colour",
+  "description": "The mark's columns fly toward the camera and spread until they cover the frame in the accent colour, then a hard cut lands on a shot painted on that same colour.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "The window shows a curated fictional Avandar screenshot from public/avandar/screens."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "lockup",
+      "scene": "brand-lockup",
+      "durationInFrames": 100,
+      "transitionInFrames": 0,
+      "props": {
+        "logo": {
+          "src": "avandar/logo.png",
+          "aspectRatio": 1
+        },
+        "wordmark": "Avandar",
+        "build": {
+          "atFrame": 5,
+          "columns": 8,
+          "staggerFrames": 1.5
+        },
+        "exit": {
+          "kind": "fly-through",
+          "atFrame": 70,
+          "durationInFrames": 18,
+          "color": "brand"
+        }
+      }
+    },
+    {
+      "id": "accent-window",
+      "scene": "tilted-window",
+      "durationInFrames": 120,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "var(--brand)",
+        "foreground": "#0b0f17",
+        "muted-foreground": "#1e293b",
+        "background": "#0b0f17",
+        "card": "#1e293b",
+        "border": "#334155"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 4,
+            "lines": ["Every source,", "one map"],
+            "subtitle": "Maps"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/map-map-cases.png"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    }
+  ]
+}

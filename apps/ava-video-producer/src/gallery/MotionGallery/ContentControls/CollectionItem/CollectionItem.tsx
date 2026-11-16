@@ -1,4 +1,3 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { ContentDraftModule } from "../ContentDraftModule/ContentDraftModule";
 import { ContentField } from "../ContentField/ContentField";
 import styles from "./CollectionItem.module.css";
@@ -23,7 +22,6 @@ export function CollectionItem({
   itemPath: providedItemPath,
   ...remainingProps
 }: Props): ReactNode {
-  const { t } = useLingui();
   const path = [...context.path, index];
   const itemPath =
     item && typeof item === "object" && !Array.isArray(item)
@@ -32,11 +30,9 @@ export function CollectionItem({
   return (
     <div className={styles.collectionItemRow}>
       <div className={styles.collectionItemRowHeader}>
-        <span>
-          <Trans>Item {index + 1}</Trans>
-        </span>
+        <span>Item {index + 1}</span>
         <button
-          aria-label={t`Remove ${context.label} item ${index + 1}`}
+          aria-label={`Remove ${context.label} item ${index + 1}`}
           disabled={count <= control.minItems}
           onClick={() =>
             onChange(
@@ -49,7 +45,7 @@ export function CollectionItem({
             )
           }
         >
-          <Trans>Remove</Trans>
+          Remove
         </button>
       </div>
       {control.itemControls.map((child) => (

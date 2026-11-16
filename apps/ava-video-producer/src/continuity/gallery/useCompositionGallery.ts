@@ -1,66 +1,77 @@
 import { useCallback, useReducer } from "react";
+import { ALL_ATLAS_CATEGORIES } from "../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { CONTINUITY_CATALOG } from "../continuityCatalog";
-import { buildCompositionSearchTextFromEntry } from "../search/buildCompositionSearchTextFromEntry/buildCompositionSearchTextFromEntry";
-import { gallerySelectionReducer } from "./gallerySelectionReducer/gallerySelectionReducer";
+import {
+  countCompositionCategories,
+  filterCompositionEntries,
+  gallerySelectionReducer,
+} from "./gallerySelectionReducer/gallerySelectionReducer";
 import type { ContinuityFamily } from "../continuityCatalog";
 import type { GallerySelection } from "./gallerySelectionReducer/gallerySelectionReducer";
 
-function _createInitialSelection(): GallerySelection {
-  const requested = new URLSearchParams(location.search).get("film");
-  const entry =
-    CONTINUITY_CATALOG.find((candidate) => candidate.id === requested) ??
-    CONTINUITY_CATALOG.find(
-      (candidate) =>
-        candidate.family ===
-        (new URLSearchParams(location.search).get("section") === "compositions"
-          ? "vocabulary"
-          : "films"),
-    )!;
+/** The Atlas section that browses a catalog family. */
+function _toSection(family: ContinuityFamily): "films" | "compositions" {
+  return family === "films" ? "films" : "compositions";
+}
+
+/**
+ * The selection a deep link names, for example
+ * `?section=compositions&category=transitions&film=whip-exit`. An entry from
+ * this family opens its preview; unknown values fall back to every category
+ * and no open preview.
+ */
+function _createInitialSelection(family: ContinuityFamily): GallerySelection {
+  const parameters = new URLSearchParams(location.search);
+  const entry = CONTINUITY_CATALOG.find(
+    (candidate) =>
+      candidate.id === parameters.get("film") && candidate.family === family,
+  );
+  const category = parameters.get("category");
+  const isKnownCategory = countCompositionCategories(family).some(
+    (item) => item.id === category,
+  );
   return {
-    selectedId: entry.id,
-    family: entry.family,
+    family,
+    category: isKnownCategory ? category! : ALL_ATLAS_CATEGORIES,
     query: "",
+    openId: entry?.id,
     captions: undefined,
   };
 }
 
-/** Gallery selection and filters, with caption state scoped to the active iframe. */
-export function useCompositionGallery() {
+/** Keeps the deep link in step with the open preview and category filter. */
+function _replaceUrl(
+  selection: Pick<GallerySelection, "family" | "category" | "openId">,
+) {
+  const parameters = new URLSearchParams({
+    section: _toSection(selection.family),
+  });
+  if (selection.category !== ALL_ATLAS_CATEGORIES) {
+    parameters.set("category", selection.category);
+  }
+  if (selection.openId) {
+    parameters.set("film", selection.openId);
+  }
+  history.replaceState(null, "", `?${parameters.toString()}`);
+}
+
+/**
+ * One family's gallery: category filter, search, the open preview and its
+ * neighbours, with caption state scoped to the open live player.
+ */
+export function useCompositionGallery(family: ContinuityFamily) {
   const [selection, dispatch] = useReducer(
     gallerySelectionReducer,
-    undefined,
+    family,
     _createInitialSelection,
   );
-  const selected = CONTINUITY_CATALOG.find(
-    (entry) => entry.id === selection.selectedId,
-  )!;
-  const entries = CONTINUITY_CATALOG.filter(
-    (entry) =>
-      entry.family === selection.family &&
-      (entry.family === "vocabulary"
-        ? `${entry.category} ${buildCompositionSearchTextFromEntry(entry)}`
-        : `${entry.title} ${entry.description} ${entry.category}`
-      )
-        .toLowerCase()
-        .includes(selection.query.toLowerCase()),
+  const entries = filterCompositionEntries(selection);
+  const open = CONTINUITY_CATALOG.find(
+    (entry) => entry.id === selection.openId,
   );
-  const select = (id: string) => {
-    dispatch({ type: "select", id });
-    history.replaceState(
-      null,
-      "",
-      `?section=${selected.family === "films" ? "films" : "compositions"}&film=${encodeURIComponent(id)}`,
-    );
-  };
-  const chooseFamily = (family: ContinuityFamily) => {
-    dispatch({ type: "family", family });
-    const entry = CONTINUITY_CATALOG.find(
-      (candidate) => candidate.family === family,
-    );
-    if (family !== selection.family && entry) {
-      history.replaceState(null, "", `?film=${encodeURIComponent(entry.id)}`);
-    }
-  };
+  // Browsing a deep-linked entry outside the current filter still works.
+  const browsable = open && !entries.includes(open) ? [open] : entries;
+  const index = open ? browsable.indexOf(open) : -1;
   const receiveOptions = useCallback(
     (options: { id: string; captions: boolean }) => {
       dispatch({ type: "captions", ...options });
@@ -69,11 +80,23 @@ export function useCompositionGallery() {
   );
   return {
     selection,
-    selected,
     entries,
-    select,
-    chooseFamily,
-    receiveOptions,
+    open,
+    previous: index > 0 ? browsable[index - 1] : undefined,
+    next: index >= 0 ? browsable[index + 1] : undefined,
+    openEntry: (id: string) => {
+      dispatch({ type: "open", id });
+      _replaceUrl({ ...selection, openId: id });
+    },
+    close: () => {
+      dispatch({ type: "close" });
+      _replaceUrl({ ...selection, openId: undefined });
+    },
+    chooseCategory: (category: string) => {
+      dispatch({ type: "category", category });
+      _replaceUrl({ ...selection, category });
+    },
     setQuery: (query: string) => dispatch({ type: "query", query }),
+    receiveOptions,
   };
 }

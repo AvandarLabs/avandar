@@ -1,8 +1,9 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { STOCK } from "../../stockPalette";
 import { PaymentLegend } from "./PaymentLegend";
 import { PaymentRow } from "./PaymentRow";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
 

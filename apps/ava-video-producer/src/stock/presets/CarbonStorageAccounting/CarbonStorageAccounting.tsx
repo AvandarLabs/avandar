@@ -1,8 +1,8 @@
-import { type GraphicProps } from "../../graphics-common";
 import { FitText } from "../../primitives/FitText/FitText";
 import { CarbonAccounting } from "./CarbonAccounting";
 import { CarbonPhysical } from "./CarbonPhysical";
 import { DEFAULT_INPUT } from "./CarbonStorageAccounting.fixtures";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 

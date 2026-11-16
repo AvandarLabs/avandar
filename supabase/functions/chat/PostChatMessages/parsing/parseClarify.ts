@@ -1,4 +1,7 @@
-import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
+import {
+  makeDiscoveryCandidateGroupsFromModelOutput,
+  makeDiscoveryCandidateValuesFromModelOutput,
+} from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { match } from "ts-pattern";
 import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
@@ -17,6 +20,7 @@ type RawClarifyArgs = {
     query?: unknown;
     column?: unknown;
     candidateValues?: unknown;
+    candidateGroups?: unknown;
   };
 };
 
@@ -32,6 +36,27 @@ export function countClarificationsInHistory(
       message.role === "user" && CLARIFICATION_MARKER_RE.test(message.content)
     );
   }).length;
+}
+
+/**
+ * Options the clarification card always adds on its own ("Something else…",
+ * "None of the above"), or a model's synonym for them. Offering them again
+ * shows the same choice twice.
+ */
+const CARD_BUILT_IN_OPTIONS = new Set([
+  "something else",
+  "none of the above",
+  "none of these",
+  "other",
+]);
+
+function _isCardBuiltInOption(option: string): boolean {
+  const normalized = option
+    .trim()
+    .toLowerCase()
+    .replace(/[.…!?:]+$/u, "")
+    .trim();
+  return CARD_BUILT_IN_OPTIONS.has(normalized);
 }
 
 /** Parses and bounds a model-generated clarification request. */
@@ -88,7 +113,7 @@ export function parseClarify(
       }
       const options = shape.options
         .filter((option): option is string => {
-          return typeof option === "string";
+          return typeof option === "string" && !_isCardBuiltInOption(option);
         })
         .slice(0, 8);
       if (options.length < 2) {
@@ -114,6 +139,9 @@ export function parseClarify(
       if (!isReadOnlyDiscoveryQuery(query) || column.length === 0) {
         return undefined;
       }
+      const candidateGroups = makeDiscoveryCandidateGroupsFromModelOutput(
+        shape.candidateGroups,
+      );
       return {
         question,
         rationale,
@@ -125,6 +153,7 @@ export function parseClarify(
           candidateValues: makeDiscoveryCandidateValuesFromModelOutput(
             shape.candidateValues,
           ),
+          ...(candidateGroups.length > 0 ? { candidateGroups } : {}),
         },
         turnNumber,
       };

@@ -63,7 +63,6 @@
     "**/.videos/**",
     "apps/ava-video-producer/out/**",
     "apps/ava-video-producer/src/avandar/generated/**",
-    "apps/ava-video-producer/showcase/motion-gallery.js",
     "apps/desktop/bundle/**",
     "apps/desktop/.electrobun-cache/**",
     "playwright-report/**",
@@ -275,6 +274,12 @@
       }
     },
     {
+      "files": ["eslint/**/*.js"],
+      "rules": {
+        "import-js/extensions": ["error", "ignorePackages", { "js": "always" }]
+      }
+    },
+    {
       "files": ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
       "rules": {
         "import-js/extensions": [
@@ -453,15 +458,6 @@
       ],
       "rules": {
         "typescript/no-explicit-any": "off"
-      }
-    },
-    {
-      "files": [
-        "apps/ava-video-producer/capture-flows/**/*.mjs",
-        "apps/ava-video-producer/scripts/measure-avandar.mjs"
-      ],
-      "rules": {
-        "import/named": "off"
       }
     }
   ]

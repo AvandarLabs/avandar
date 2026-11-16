@@ -1,5 +1,5 @@
 import { EASE, mix, ramp } from "../../../motion";
-import { cubicPoint } from "../../graphics-common";
+import { cubicPoint } from "../../graphics-common/cubicPoint";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Props } from "./ExceptionDetour";
 import type { ReactNode } from "react";

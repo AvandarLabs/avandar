@@ -8,8 +8,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { readLicense } from "../scripts/lib/readLicense.mjs";
-import { requireLicense } from "../scripts/require-license.mjs";
+import { getRemotionLicenseFromAppRoot } from "../scripts/lib/getRemotionLicenseFromAppRoot";
+import { requireLicense } from "../scripts/requireLicense";
 import {
   buildLicenseFixture,
   LICENSE_FIXTURE,
@@ -17,6 +17,76 @@ import {
 } from "./license-fixture";
 
 const APP_ROOT = fileURLToPath(new URL("../", import.meta.url));
+
+/**
+ * Every direct script entry point the license guard must stop, as the program
+ * and arguments that start it.
+ */
+const ENTRY_POINT_COMMANDS = [
+  [
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "--import",
+      "./scripts/yaml/registerYaml.ts",
+      "scripts/showcase/server/server.ts",
+    ],
+  ],
+  [
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "--import",
+      "./scripts/yaml/registerYaml.ts",
+      "scripts/motion/motion.ts",
+      "list",
+    ],
+  ],
+  [
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "--import",
+      "./scripts/yaml/registerYaml.ts",
+      "scripts/showcase/buildShowcaseCli.ts",
+    ],
+  ],
+  ...[
+    "buildProduct/buildProduct",
+    "reviewAvandar",
+    "renderSequence",
+    "measureAvandar/measureAvandar",
+    "deliverAvandar",
+    "newVideo",
+    "adoptTheme/adoptTheme",
+    "checkFrames",
+    "curateCapture/curateCapture",
+    "captureAvandar/captureAvandar",
+  ].map((name) => [
+    process.execPath,
+    ["--import", "tsx", `scripts/${name}.ts`],
+  ]),
+  [
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "--import",
+      "./scripts/yaml/registerYaml.ts",
+      "scripts/readTheme.ts",
+    ],
+  ],
+  ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
+    (name) => ["sh", [`scripts/${name}.sh`]],
+  ),
+  ...["generate", "validate"].map((name) => [
+    "python3",
+    [`demo-data/${name}.py`],
+  ]),
+] as Array<[string, string[]]>;
 
 test("the direct video command refuses to start without license keys", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "producer-license-"));
@@ -27,8 +97,8 @@ test("the direct video command refuses to start without license keys", async () 
         "--import",
         "tsx",
         "--import",
-        "./scripts/yaml/registerYaml.mjs",
-        "scripts/video.ts",
+        "./scripts/yaml/registerYaml.ts",
+        "scripts/video/video.ts",
         "--help",
       ],
       {
@@ -40,7 +110,8 @@ test("the direct video command refuses to start without license keys", async () 
     );
     assert.equal(result.status, 1, result.stderr);
     assert.match(result.stderr, /Remotion license keys are required/);
-    assert.match(result.stderr, /apps\/ava-video-producer\/\.env\.local/);
+    assert.match(result.stderr, /\.env\.video-producer\.local/);
+    assert.match(result.stderr, /\.env\.video-producer\.example/);
     assert.equal(result.stdout, "");
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -71,7 +142,7 @@ test("dotenv loading returns only the key pair without changing process.env", as
     const environmentBefore = createHash("sha256")
       .update(JSON.stringify(process.env))
       .digest("hex");
-    assert.deepEqual(readLicense(directory, {}), {
+    assert.deepEqual(getRemotionLicenseFromAppRoot(directory, {}), {
       publicKey: LICENSE_FIXTURE.publicKey,
       privateKey: LICENSE_FIXTURE.privateKey,
     });
@@ -149,7 +220,7 @@ test("direct exports with missing keys create no output directory", async () => 
         "--import",
         "tsx",
         "--import",
-        "./scripts/yaml/registerYaml.mjs",
+        "./scripts/yaml/registerYaml.ts",
         "--input-type=module",
         "-e",
         `
@@ -179,7 +250,7 @@ test("process keys override the key file without changing it", async () => {
   try {
     await writeFile(filename, buildLicenseFixture());
     assert.deepEqual(
-      readLicense(directory, {
+      getRemotionLicenseFromAppRoot(directory, {
         REMOTION_PUBLIC_KEY: "rm_pub_ciFixture",
         REMOTION_PRIVATE_KEY: "rm_priv_ciFixture",
       }),
@@ -217,7 +288,7 @@ test("missing, blank, swapped, and free-license keys fail without disclosing val
     ];
     invalidPairs.forEach((environment) => {
       assert.throws(
-        () => readLicense(directory, environment),
+        () => getRemotionLicenseFromAppRoot(directory, environment),
         (error: unknown) => {
           assert.ok(error instanceof Error);
           assert.match(error.message, /Remotion license keys are required/);
@@ -240,9 +311,12 @@ test("an explicit key file works outside the app without loading unrelated varia
     const result = spawnSync(
       process.execPath,
       [
+        // The command runs outside the app, so load tsx by its resolved URL.
+        "--import",
+        import.meta.resolve("tsx"),
         "--input-type=module",
         "-e",
-        `await import(${JSON.stringify(new URL("../scripts/require-license.mjs", import.meta.url).href)}).then(({ requireLicense }) => {
+        `await import(${JSON.stringify(new URL("../scripts/requireLicense.ts", import.meta.url).href)}).then(({ requireLicense }) => {
         requireLicense();
         if (process.env.REMOTION_PRIVATE_KEY || process.env.PRODUCER_UNRELATED_SECRET) process.exit(2);
         console.log("licensed");
@@ -291,62 +365,9 @@ test("every package command fails before starting without license keys", async (
 });
 
 test("direct script entry points reject missing keys before doing work", async (context) => {
-  const commands = [
-    [
-      process.execPath,
-      [
-        "--import",
-        "tsx",
-        "--import",
-        "./scripts/yaml/registerYaml.mjs",
-        "scripts/showcase/server.ts",
-      ],
-    ],
-    [
-      process.execPath,
-      [
-        "--import",
-        "tsx",
-        "--import",
-        "./scripts/yaml/registerYaml.mjs",
-        "scripts/motion.ts",
-        "list",
-      ],
-    ],
-    ...[
-      "build-avandar",
-      "build-motion-gallery",
-      "review-avandar",
-      "render-sequence",
-      "measure-avandar",
-      "deliver-avandar",
-      "new-video",
-      "adopt-theme",
-      "check-frames",
-      "curate-capture",
-      "capture-avandar/capture-avandar",
-    ].map((name) => [process.execPath, [`scripts/${name}.mjs`]]),
-    [
-      process.execPath,
-      [
-        "--import",
-        "tsx",
-        "--import",
-        "./scripts/yaml/registerYaml.mjs",
-        "scripts/read-theme.mjs",
-      ],
-    ],
-    ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
-      (name) => ["sh", [`scripts/${name}.sh`]],
-    ),
-    ...["generate", "validate"].map((name) => [
-      "python3",
-      [`demo-data/${name}.py`],
-    ]),
-  ] as Array<[string, string[]]>;
   const directory = await mkdtemp(path.join(tmpdir(), "producer-license-"));
   try {
-    for (const [program, args] of commands) {
+    for (const [program, args] of ENTRY_POINT_COMMANDS) {
       await context.test(args.join(" "), () => {
         const result = spawnSync(program, args, {
           cwd: APP_ROOT,

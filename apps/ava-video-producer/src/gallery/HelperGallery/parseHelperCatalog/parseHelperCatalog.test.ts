@@ -1,0 +1,113 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { parseHelperCatalog } from "./parseHelperCatalog";
+
+const CATEGORY = {
+  id: "curves",
+  title: "Curves and durations",
+  description: "How fast a value moves.",
+};
+const MODULE = { path: "src/motion.ts", excluded: [] };
+const HELPER = {
+  id: "ease-out",
+  title: "Ease out",
+  category: "curves",
+  description: "The default arrival curve.",
+  source: "src/motion.ts",
+  exports: ["EASE.out"],
+  signature: "EASE.out: (t: number) => number",
+  defaults: [{ name: "definition", value: "bezier(0.16, 1, 0.3, 1)" }],
+  usage: "ramp(frame, 12, DUR.panel, EASE.out);",
+  goodFor: "Entrances.",
+  avoid: "Departures.",
+  usedBy: ["src/scenes/GraphScene.tsx"],
+  demo: { id: "curve-out", frames: 75 },
+};
+
+function createCatalog(overrides: Record<string, unknown> = {}) {
+  return {
+    categories: [CATEGORY],
+    modules: [MODULE],
+    helpers: [HELPER],
+    ...overrides,
+  };
+}
+
+test("preserves authored helper metadata in catalog order", () => {
+  const catalog = parseHelperCatalog(createCatalog());
+  assert.deepEqual(catalog.helpers, [HELPER]);
+  assert.deepEqual(catalog.categories, [CATEGORY]);
+  assert.deepEqual(catalog.modules, [{ ...MODULE, exhaustiveMembers: [] }]);
+});
+
+test("rejects unknown fields instead of dropping authored copy", () => {
+  assert.throws(() =>
+    parseHelperCatalog(
+      createCatalog({ helpers: [{ ...HELPER, goodfor: "Typo" }] }),
+    ),
+  );
+});
+
+test("rejects duplicate helper ids", () => {
+  assert.throws(
+    () => parseHelperCatalog(createCatalog({ helpers: [HELPER, HELPER] })),
+    /Duplicate helper id: ease-out/,
+  );
+});
+
+test("rejects a helper whose category is not declared", () => {
+  assert.throws(
+    () =>
+      parseHelperCatalog(
+        createCatalog({ helpers: [{ ...HELPER, category: "missing" }] }),
+      ),
+    /Unknown category "missing" for "ease-out"/,
+  );
+});
+
+test("rejects a helper whose source module is not listed for drift checks", () => {
+  assert.throws(
+    () =>
+      parseHelperCatalog(
+        createCatalog({ helpers: [{ ...HELPER, source: "src/other.ts" }] }),
+      ),
+    /Unlisted source module "src\/other.ts" for "ease-out"/,
+  );
+});
+
+test("rejects a declared category with no helpers", () => {
+  assert.throws(
+    () =>
+      parseHelperCatalog(
+        createCatalog({
+          categories: [CATEGORY, { ...CATEGORY, id: "empty" }],
+        }),
+      ),
+    /Category "empty" has no helpers/,
+  );
+});
+
+test("rejects non-integer preview lengths and empty export lists", () => {
+  assert.throws(() =>
+    parseHelperCatalog(
+      createCatalog({
+        helpers: [{ ...HELPER, demo: { id: "curve-out", frames: 7.5 } }],
+      }),
+    ),
+  );
+  assert.throws(() =>
+    parseHelperCatalog(
+      createCatalog({ helpers: [{ ...HELPER, exports: [] }] }),
+    ),
+  );
+});
+
+test("rejects an exclusion without a reason", () => {
+  assert.throws(() =>
+    parseHelperCatalog(
+      createCatalog({
+        modules: [{ ...MODULE, excluded: [{ name: "span" }] }],
+      }),
+    ),
+  );
+});

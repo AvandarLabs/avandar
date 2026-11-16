@@ -1,8 +1,8 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LocalCountSheet } from "./LocalCountSheet";
 import { PublicCountMap } from "./PublicCountMap";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
 

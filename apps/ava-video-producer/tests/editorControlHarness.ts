@@ -3,8 +3,8 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { isPlainObject } from "@avandar/utils";
-import { transformAsync } from "@babel/core";
 import { build } from "esbuild";
+import { yamlPlugin } from "../scripts/yaml/yamlPlugin";
 import type {
   StockMessageDescriptor,
   StockControl,
@@ -57,7 +57,7 @@ await fs.mkdir(directory, {
   recursive: true,
 });
 
-const entry: string = `import {createElement,useState} from "react"; import {I18nProvider} from "@lingui/react"; import {stockI18n} from "${path.resolve("src/stock/i18n/stockI18n/stockI18n.ts")}"; import {ContentField} from "${path.resolve("src/gallery/MotionGallery/ContentControls/ContentField/ContentField.tsx")}"; import {ContentDraftModule} from "${path.resolve("src/gallery/MotionGallery/ContentControls/ContentDraftModule/ContentDraftModule.ts")}"; export function Harness({controls,draft}) { const [state,setState]=useState(() => ContentDraftModule.edit({preset:"decision-fork",state:ContentDraftModule.fromPreset("decision-fork"),path:[],value:draft}));return createElement(I18nProvider,{i18n:stockI18n},controls.map(control => createElement(ContentField,{key:control.path,control,parentPath:[],itemPath:[],preset:"decision-fork",state,onChange:setState})),createElement("output",{"data-testid":"authored-input"},JSON.stringify(state.draft))); }`;
+const entry: string = `import {createElement,Fragment,useState} from "react"; import {ContentField} from "${path.resolve("src/gallery/MotionGallery/ContentControls/ContentField/ContentField.tsx")}"; import {ContentDraftModule} from "${path.resolve("src/gallery/MotionGallery/ContentControls/ContentDraftModule/ContentDraftModule.ts")}"; export function Harness({controls,draft}) { const [state,setState]=useState(() => ContentDraftModule.edit({preset:"decision-fork",state:ContentDraftModule.fromPreset("decision-fork"),path:[],value:draft}));return createElement(Fragment,null,controls.map(control => createElement(ContentField,{key:control.path,control,parentPath:[],itemPath:[],preset:"decision-fork",state,onChange:setState})),createElement("output",{"data-testid":"authored-input"},JSON.stringify(state.draft))); }`;
 
 await build({
   stdin: {
@@ -73,33 +73,11 @@ await build({
   jsx: "automatic",
   logLevel: "silent",
   plugins: [
+    // Stock presets import their authored metadata from YAML.
+    yamlPlugin,
     {
-      name: "editor-macros",
+      name: "editor-css-stub",
       setup(builder) {
-        builder.onLoad(
-          {
-            filter: /\.tsx?$/,
-          },
-          async ({ path: filename }) => {
-            if (!filename.includes("/src/gallery/")) {
-              return undefined;
-            }
-            const result = await transformAsync(
-              await fs.readFile(filename, "utf8"),
-              {
-                filename,
-                babelrc: false,
-                configFile: false,
-                presets: ["@babel/preset-typescript"],
-                plugins: ["@lingui/babel-plugin-lingui-macro"],
-              },
-            );
-            return {
-              contents: result!.code!,
-              loader: "tsx",
-            };
-          },
-        );
         builder.onLoad(
           {
             filter: /\.css$/,

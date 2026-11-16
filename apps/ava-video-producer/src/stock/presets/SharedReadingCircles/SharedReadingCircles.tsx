@@ -4,7 +4,7 @@ import { ReadingBook } from "./ReadingBook";
 import { ReadingHeadings } from "./ReadingHeadings";
 import { ReadingLearner } from "./ReadingLearner";
 import { SceneText } from "./SceneText";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
 

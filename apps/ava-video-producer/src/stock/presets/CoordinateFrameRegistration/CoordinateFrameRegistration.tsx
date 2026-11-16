@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { RegistrationGrids } from "./RegistrationGrids";
 import { RegistrationLedger } from "./RegistrationLedger";
 import { RegistrationPoints } from "./RegistrationPoints";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
 

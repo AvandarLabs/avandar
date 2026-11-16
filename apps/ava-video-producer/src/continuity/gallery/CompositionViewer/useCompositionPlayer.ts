@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { afterDownloads } from "../../../../showcase/download.js";
-import { watchFilms } from "../../../../showcase/watch-films.js";
+import { FilmDownloads } from "../../../../showcase/FilmDownloads/FilmDownloads";
+import { watchFilms } from "../../../../showcase/watchFilms/watchFilms";
 import type { RefObject } from "react";
 
 function _isOptionsMessage(data: unknown): data is {
@@ -37,7 +37,7 @@ export function useCompositionPlayer(options: {
     let cancelRefresh: (() => void) | undefined;
     const stopWatching = watchFilms([player.current], () => {
       cancelRefresh?.();
-      cancelRefresh = afterDownloads(() => location.reload());
+      cancelRefresh = FilmDownloads.afterDownloads(() => location.reload());
     });
     return () => {
       stopWatching();

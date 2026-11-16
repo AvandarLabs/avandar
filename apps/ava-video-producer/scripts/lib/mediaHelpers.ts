@@ -8,7 +8,7 @@ import {
   durationInFrames,
   type Storyboard,
 } from "../../src/storyboard/schema/schema";
-import { publicAsset } from "./planHelpers";
+import { publicAsset } from "./planHelpers/planHelpers";
 
 export const ffmpeg =
   process.env.FFMPEG_BIN ||

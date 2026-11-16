@@ -1,0 +1,156 @@
+import { expect, test } from "./fixtures/e2e.fixture";
+import { signInWithEmailPassword } from "./helpers/auth";
+import { PostgresConnectionSeed } from "./helpers/liveConnectors/PostgresConnectionSeed";
+import { pickPostgresRelation } from "./helpers/pickPostgresRelation";
+import { saveCloudOnlyDataset } from "./helpers/saveCloudOnlyDataset";
+import {
+  createSupabaseAdminClient,
+  deleteAllDatasetsInWorkspaceForE2E,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
+import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import type { SeededPostgresConnection } from "./helpers/liveConnectors/PostgresConnectionSeed";
+import type { Page, Route } from "@playwright/test";
+
+/**
+ * The Postgres connector, end to end: a saved connection, the schema-grouped
+ * table picker, the preview, and the import form the rows land in.
+ *
+ * Only the two `connectors` HTTP calls that would otherwise open a
+ * real TCP connection to an external Postgres server are stubbed
+ * (`relations`, `preview`) - mirroring exactly why
+ * `google-sheets-import.spec.ts` stubs the Google API boundary and nothing
+ * else. Unlike Sheets, where the
+ * browser talks to the third party directly and Playwright's `page.route()`
+ * can intercept it, this connector's actual database round trip happens
+ * server-side, inside the edge function - Playwright cannot intercept a raw
+ * Postgres wire-protocol connection the way it intercepts a `fetch`. Loosening
+ * the edge function's SSRF guard (`validateHostNotPrivate.ts`) so this test
+ * could dial a loopback/Docker-internal address was considered and rejected:
+ * that guard is security-critical, already has its own dedicated unit-test
+ * matrix (`validateHostNotPrivate.test.ts`), and a standing bypass mechanism
+ * is a bigger permanent risk than the marginal coverage gained by this one
+ * e2e spec also exercising it. So the HTTP boundary between the browser and
+ * our own edge function is stubbed instead - the same boundary choice the
+ * Sheets test makes, just one layer further down this feature's own stack.
+ *
+ * The connection-creation form itself (host/port/username/password/SSL mode)
+ * is therefore not exercised here - it is plain Mantine form state with no
+ * network call this test can observe without also stubbing test-and-save,
+ * and is covered instead by `PostgresConnectorImportView.test.tsx`'s
+ * component test. This spec starts from an already-saved connection (seeded
+ * directly, the same "pre-test setup purely to save time" exception the
+ * Sheets test's own token seeding relies on) and covers the parts genuinely
+ * specific to this connector: the saved-connection auto-select, the
+ * schema-grouped relation picker, the preview, and a real dataset save.
+ */
+
+const SEEDED_RELATION = {
+  relationId: "public.e2e_customers",
+  label: "public.e2e_customers",
+  kind: "table",
+};
+
+const PREVIEW_COLUMNS = [
+  { columnName: "id", sourceType: "integer", dataType: "bigint" },
+  { columnName: "full_name", sourceType: "text", dataType: "varchar" },
+];
+
+const PREVIEW_ROWS = [
+  { id: 1, full_name: "Ada Lovelace" },
+  { id: 2, full_name: "Grace Hopper" },
+];
+
+/**
+ * Answers the two `connectors` routes this view calls for an
+ * already-saved connection, out of the fixture above. `test-and-save` is
+ * deliberately not stubbed here - see the file docstring for why the
+ * connection-creation path is out of scope for this spec.
+ */
+async function _stubConnectorRoutes(page: Page): Promise<void> {
+  await page.route(
+    "**/functions/v1/connectors/postgres/connections/*/relations",
+    async (route: Route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ relations: [SEEDED_RELATION] }),
+      });
+    },
+  );
+
+  await page.route(
+    "**/functions/v1/connectors/postgres/connections/*/relations/*/preview",
+    async (route: Route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          columns: PREVIEW_COLUMNS,
+          previewRows: PREVIEW_ROWS,
+        }),
+      });
+    },
+  );
+}
+
+test.describe("Postgres connector", () => {
+  test("imports a table from a saved connection", async ({
+    page,
+    e2eWorkerDb,
+  }) => {
+    const admin = createSupabaseAdminClient();
+    const workspaceId = await getWorkspaceIdBySlug({
+      supabaseAdminClient: admin,
+      slug: e2eWorkerDb.workspaceSlug,
+    });
+
+    let connection: SeededPostgresConnection | undefined;
+    try {
+      connection = await PostgresConnectionSeed.create({
+        supabaseAdminClient: admin,
+        workspaceId,
+      });
+
+      await _stubConnectorRoutes(page);
+
+      await signInWithEmailPassword(page, {
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+
+      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-manager/data-import`);
+      await page.getByRole("tab", { name: "Connectors" }).click();
+
+      await pickPostgresRelation({
+        page,
+        relationLabel: SEEDED_RELATION.label,
+      });
+
+      await expect(
+        page.getByRole("heading", { name: "Data preview" }),
+      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect(
+        page.getByRole("columnheader", { name: "full_name" }),
+      ).toBeVisible({ timeout: SHORT_WAIT });
+
+      await saveCloudOnlyDataset({
+        page,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+    } finally {
+      await deleteAllDatasetsInWorkspaceForE2E({
+        supabaseAdminClient: admin,
+        workspaceId,
+      });
+      if (connection) {
+        await PostgresConnectionSeed.remove({
+          supabaseAdminClient: admin,
+          workspaceId,
+          connection,
+        });
+      }
+    }
+  });
+});

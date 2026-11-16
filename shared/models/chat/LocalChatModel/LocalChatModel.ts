@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
-  LocalChatModelCopy,
+  LocalChatModelBundle,
   LocalChatModelId,
   LocalChatModelRamGb,
   LocalChatModelT,
@@ -12,5 +12,5 @@ export namespace LocalChatModel {
   export type T = LocalChatModelT;
   export type Id = LocalChatModelId;
   export type RamGb = LocalChatModelRamGb;
-  export type Copy = LocalChatModelCopy;
+  export type Bundle = LocalChatModelBundle;
 }

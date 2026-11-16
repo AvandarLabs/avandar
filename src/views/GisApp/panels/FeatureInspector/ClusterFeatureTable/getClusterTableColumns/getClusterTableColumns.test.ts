@@ -114,4 +114,39 @@ describe("getClusterTableColumns", () => {
       getClusterTableColumnsFromLeaves(leaves),
     );
   });
+
+  it("leaves out hidden columns the layer's popup would otherwise show", () => {
+    const layer = _makeLayer({
+      columnNames: ["name", "place_id"],
+      popup: { columnIds: "all", action: undefined },
+    });
+
+    const columns = getClusterTableColumns({
+      layer,
+      leaves: [_makeFeature({ name: "Clinic", place_id: "p1" })],
+      hiddenColumnNames: ["place_id"],
+    });
+
+    expect(columns).toEqual({ source: "properties", keys: ["name"] });
+  });
+
+  it("leaves out hidden columns the leaves carry when no layer is known", () => {
+    const columns = getClusterTableColumns({
+      layer: undefined,
+      leaves: [_makeFeature({ name: "Clinic", place_id: "p1" })],
+      hiddenColumnNames: ["place_id"],
+    });
+
+    expect(columns).toEqual({ source: "properties", keys: ["name"] });
+  });
+
+  it("falls back to the feature id when every column is hidden", () => {
+    const columns = getClusterTableColumns({
+      layer: undefined,
+      leaves: [_makeFeature({ place_id: "p1" })],
+      hiddenColumnNames: ["place_id"],
+    });
+
+    expect(columns).toEqual({ source: "id", keys: ["id"] });
+  });
 });

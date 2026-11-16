@@ -44,6 +44,7 @@ function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
     pdf_file: t`PDF`,
     google_sheets: t`Google Sheets`,
     open_data: t`Open data`,
+    postgres_table: t`Database`,
     virtual: t`Derived`,
   };
 }
@@ -157,6 +158,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         "pdf_file",
         "google_sheets",
         "open_data",
+        "postgres_table",
         () => {
           openAsRawPreview(selectedDataset);
         },

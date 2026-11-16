@@ -3,8 +3,10 @@ import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createLayer,
+  createTextColumn,
   createXyBoundLayer,
   fixtures,
+  geometrySampleQuery,
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
@@ -98,6 +100,67 @@ describe("DataSection coordinates", () => {
     render(<DataSection layer={layer} onLayerChange={onLayerChange} />);
 
     expect(onLayerChange).not.toHaveBeenCalled();
+  });
+
+  it("binds a location column of point WKT as point geometry", async () => {
+    const location = createTextColumn("location");
+    fixtures.sourceColumns = [fixtures.nameColumn, location];
+    geometrySampleQuery.mockResolvedValue({
+      id: "geometry-sample",
+      columns: [],
+      data: [
+        { location: "POINT (-73.98 40.75)" },
+        { location: "POINT (-73.99 40.76)" },
+        { location: "POINT (-74.00 40.77)" },
+      ],
+      numRows: 3,
+    });
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+
+    render(<DataSection layer={createLayer()} onLayerChange={onLayerChange} />);
+
+    await waitFor(() => {
+      expect(onLayerChange).toHaveBeenCalled();
+    });
+    const update = onLayerChange.mock.calls.at(-1)![0];
+    const updatedLayer = update(createLayer());
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "geometryColumn",
+      column: location.id,
+      encoding: "wkt",
+      family: "point",
+    });
+  });
+
+  it("binds a GeoJSON polygon column as polygon GeoJSON", async () => {
+    const boundary = createTextColumn("the_geom");
+    fixtures.sourceColumns = [boundary];
+    geometrySampleQuery.mockResolvedValue({
+      id: "geometry-sample",
+      columns: [],
+      data: [
+        {
+          the_geom:
+            '{"type":"Polygon","coordinates":[[[0,0],[1,0],[1,1],[0,0]]]}',
+        },
+      ],
+      numRows: 1,
+    });
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+
+    render(<DataSection layer={createLayer()} onLayerChange={onLayerChange} />);
+
+    await waitFor(() => {
+      expect(onLayerChange).toHaveBeenCalled();
+    });
+    const update = onLayerChange.mock.calls.at(-1)![0];
+    const updatedLayer = update(createLayer());
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "geometryColumn",
+      column: boundary.id,
+      encoding: "geojson",
+      family: "polygon",
+    });
   });
 
   it("offers a manual pick when no column name reads as a coordinate", () => {

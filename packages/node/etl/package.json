@@ -23,12 +23,14 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
+    "test:supabase": "vitest run -c vitest.supabase.config.ts",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@avandar/modules": "workspace:*",
-    "@avandar/utils": "workspace:*"
+    "@avandar/utils": "workspace:*",
+    "yaml": "2.9.0",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@supabase/supabase-js": "catalog:",

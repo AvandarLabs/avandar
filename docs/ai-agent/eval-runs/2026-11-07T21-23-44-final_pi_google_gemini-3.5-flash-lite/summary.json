@@ -1,0 +1,31 @@
+{
+  "label": "final:pi:google/gemini-3.5-flash-lite",
+  "questionCount": 45,
+  "passCount": 32,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 80,
+  "promptTokens": 133706,
+  "cachedPromptTokens": 0,
+  "completionTokens": 12322,
+  "totalCost": 0.0709168,
+  "costPerQuestion": 0.001575928888888889,
+  "latencyMedianMs": 1537.4938329999986,
+  "latencyP90Ms": 3962.4912909999985,
+  "failedIds": [
+    "B01",
+    "B04",
+    "B09",
+    "H01",
+    "H05",
+    "H08",
+    "I01",
+    "I04",
+    "I07",
+    "N02",
+    "N05",
+    "N09",
+    "N11"
+  ]
+}

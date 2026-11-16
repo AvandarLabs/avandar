@@ -11,6 +11,12 @@ type ContinuityCatalogBase = {
   description: string;
   frames: number;
   path: string;
+  /**
+   * Omitted for continuity entries. `scene` marks a plan of plain storyboard
+   * scenes and shot transitions at 1920 by 1080, whose controls name shot
+   * fields (`props`, `transition`, `theme`) instead of continuity beats.
+   */
+  kind?: "scene";
 };
 
 /** An authored input that can be adjusted when reusing a study. */
@@ -38,5 +44,12 @@ export type ContinuityVocabularyEntry = ContinuityCatalogBase & {
 export type ContinuityCatalogEntry =
   | ContinuityFilmEntry
   | ContinuityVocabularyEntry;
+/** Whether an entry plays plain storyboard scenes rather than continuity. */
+export function isSceneEntry(
+  entry: Readonly<Pick<ContinuityCatalogBase, "kind">>,
+): boolean {
+  return entry.kind === "scene";
+}
+
 /** A single allowlist for the gallery, live players and downloadable pictures. */
 export const CONTINUITY_CATALOG = parseContinuityCatalog(films, studies);

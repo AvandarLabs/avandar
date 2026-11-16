@@ -35,13 +35,14 @@ export function LayerInspectorSections({
 }: Props): ReactNode {
   return (
     <>
-      <div className={css.layerInspectorBodyLead}>
-        <h3 className={css.layerInspectorBodyLeadName}>{layer.name}</h3>
-        <LayerLeadStatus
-          viewState={viewState}
-          onOpenMatchReport={onOpenMatchReport}
-        />
-      </div>
+      {viewState ? (
+        <div className={css.layerInspectorBodyLead}>
+          <LayerLeadStatus
+            viewState={viewState}
+            onOpenMatchReport={onOpenMatchReport}
+          />
+        </div>
+      ) : null}
       <DataSection
         layer={layer}
         layers={layers}
@@ -55,6 +56,7 @@ export function LayerInspectorSections({
       <SensitivitySection layer={layer} onLayerChange={onLayerChange} />
       <FilterSection
         layer={layer}
+        layers={layers}
         onLayerChange={onLayerChange}
         focusRequest={filterFocusRequest}
         showApplyAoiFilterSwitch={layer.geoBinding?.type !== "bufferOfLayer"}

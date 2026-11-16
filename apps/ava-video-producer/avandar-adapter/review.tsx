@@ -3,12 +3,9 @@ import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { useCurrentFrame } from "remotion";
-import {
-  AvandarStage,
-  FEATURE_BEATS,
-} from "../src/avandar/generated/product.js";
+import { AvandarStage, FEATURE_BEATS } from "../src/avandar/generated/product";
 import "../src/avandar/generated/product.css";
-import type { ProductFeature } from "../src/avandar/generated/product.js";
+import type { ProductFeature } from "../src/avandar/generated/product";
 
 declare global {
   interface Window {

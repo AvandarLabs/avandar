@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { GOOGLE_SHEET_FRESHNESS_CACHE } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
+import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ const {
   apiGetMock,
   dropLocalDatasetMock,
   startCsvImportMock,
-  getStoredGoogleSheetTabCsvMock,
+  fetchSheetCsvMock,
   evictRelationCacheMock,
   notifySuccessMock,
   notifyErrorMock,
@@ -30,7 +30,7 @@ const {
     apiGetMock: vi.fn(),
     dropLocalDatasetMock: vi.fn(),
     startCsvImportMock: vi.fn(),
-    getStoredGoogleSheetTabCsvMock: vi.fn(),
+    fetchSheetCsvMock: vi.fn(),
     evictRelationCacheMock: vi.fn(),
     notifySuccessMock: vi.fn(),
     notifyErrorMock: vi.fn(),
@@ -50,9 +50,12 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/google/GoogleDriveClient/GoogleDriveClient", () => {
-  return { getStoredGoogleSheetTabCsv: getStoredGoogleSheetTabCsvMock };
-});
+vi.mock(
+  "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy",
+  () => {
+    return { GoogleSheetDatasetProxy: { fetchCsv: fetchSheetCsvMock } };
+  },
+);
 
 vi.mock(
   "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache",
@@ -83,49 +86,40 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-function _wrapper({ children }: { children: ReactNode }): JSX.Element {
-  const queryClient = new QueryClient({
+function _makeQueryClient(): QueryClient {
+  return new QueryClient({
     defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
   });
-  // `TestProviders` supplies the Lingui provider the hook's `useLingui` needs.
-  return createElement(
-    TestProviders,
-    null,
-    createElement(QueryClientProvider, { client: queryClient }, children),
-  );
 }
 
-function _sourceDataset(
-  sheetName: string | null,
-): Pick<
-  GoogleSheetsDataset.T,
-  "googleDocumentId" | "googleAccountId" | "sheetName"
-> {
-  return {
-    googleDocumentId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
-    // A Google `sub`, which is what `tokens__google.google_account_id` stores.
-    googleAccountId: "108374652910384756291",
-    sheetName,
+function _makeWrapper(
+  queryClient: QueryClient,
+): (props: { children: ReactNode }) => JSX.Element {
+  return ({ children }) => {
+    // `TestProviders` supplies the Lingui provider the hook's `useLingui`
+    // needs.
+    return createElement(
+      TestProviders,
+      null,
+      createElement(QueryClientProvider, { client: queryClient }, children),
+    );
   };
 }
 
-async function _refresh(sheetName: string | null = "Kenya"): Promise<void> {
+async function _refresh(
+  queryClient: QueryClient = _makeQueryClient(),
+): Promise<void> {
   const { result } = renderHook(
     () => {
       return useRefreshGoogleSheetDataset();
     },
-    { wrapper: _wrapper },
+    { wrapper: _makeWrapper(queryClient) },
   );
 
   await act(async () => {
-    await result.current[0]
-      .async({
-        datasetId: DATASET_ID,
-        sourceDataset: _sourceDataset(sheetName),
-      })
-      .catch(() => {
-        // Failure paths are asserted through the notification mocks.
-      });
+    await result.current[0].async({ datasetId: DATASET_ID }).catch(() => {
+      // Failure paths are asserted through the notification mocks.
+    });
   });
 }
 
@@ -135,9 +129,6 @@ describe("useRefreshGoogleSheetDataset", () => {
     GOOGLE_SHEET_FRESHNESS_CACHE.clear();
 
     apiGetMock.mockReset();
-    apiGetMock.mockResolvedValue({
-      tokens: [{ access_token: "ya29.refresh-test-token" }],
-    });
 
     evictRelationCacheMock.mockReset();
     evictRelationCacheMock.mockImplementation(async () => {
@@ -149,14 +140,10 @@ describe("useRefreshGoogleSheetDataset", () => {
       callOrder.push("drop");
     });
 
-    getStoredGoogleSheetTabCsvMock.mockReset();
-    getStoredGoogleSheetTabCsvMock.mockImplementation(async () => {
+    fetchSheetCsvMock.mockReset();
+    fetchSheetCsvMock.mockImplementation(async () => {
       callOrder.push("download");
-      return {
-        csvText: "county\r\nNairobi\r\n",
-        sourceVersion: "99",
-        tab: { sheetId: 988142735, title: "Kenya", index: 1 },
-      };
+      return { csvText: "county\r\nNairobi\r\n", sourceVersion: "99" };
     });
 
     startCsvImportMock.mockReset();
@@ -204,35 +191,54 @@ describe("useRefreshGoogleSheetDataset", () => {
     );
   });
 
-  it("asks for the dataset's stored tab by name", async () => {
-    // Resolving the name to a tab is `getStoredGoogleSheetTabCsv`'s job, and it
-    // is shared with import and query-time acquisition so all three read a
-    // dataset's rows the same way.
-    await _refresh("Kenya");
-
-    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
-      expect.objectContaining({ sheetName: "Kenya" }),
-    );
-  });
-
-  it("passes a null stored tab through, which means the first tab", async () => {
-    // Positive control for the test above, and the legacy-row contract: `null`
-    // means the workbook's first tab, which is what those rows already read.
-    await _refresh(null);
-
-    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
-      expect.objectContaining({ sheetName: null }),
-    );
-  });
-
-  it("reads the dataset's own document with the refreshed token", async () => {
+  it("downloads the rows through the dataset's edge route, so any viewer of the dataset can refresh it", async () => {
     await _refresh();
 
-    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
-        accessToken: "ya29.refresh-test-token",
-      }),
+    expect(fetchSheetCsvMock).toHaveBeenCalledWith({ datasetId: DATASET_ID });
+    // No Google token of the refresher's own is ever asked for: the edge
+    // function reads the sheet with the grant of the account that added it.
+    expect(apiGetMock).not.toHaveBeenCalled();
+  });
+
+  it("marks the dataset page's queries and open data queries stale once the sheet is re-imported", async () => {
+    const queryClient = _makeQueryClient();
+    const previewQueryKey = [
+      "DatasetQueryClient",
+      "getPreviewData",
+      { datasetId: DATASET_ID },
+    ];
+    const dataQueryKey = [
+      { auth: "workspace", workspaceId: WORKSPACE_ID },
+      undefined,
+      RAW_SQL_KEY_MARKER,
+      "select 1",
+    ];
+    const unrelatedQueryKey = ["datasets", "getAll"];
+    queryClient.setQueryData(previewQueryKey, []);
+    queryClient.setQueryData(dataQueryKey, { rows: [] });
+    queryClient.setQueryData(unrelatedQueryKey, []);
+    startCsvImportMock.mockImplementation(async () => {
+      // Nothing may be marked stale before the new rows are imported, or
+      // the page would re-run its queries against the old ones.
+      expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(
+        false,
+      );
+      return {
+        columns: [{ column_name: "county", column_type: "VARCHAR" }],
+        previewRows: [{ county: "Nairobi" }],
+        csvSniff: {},
+      };
+    });
+
+    await _refresh(queryClient);
+
+    expect(notifyErrorMock).not.toHaveBeenCalled();
+    expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(
+      true,
+    );
+    expect(queryClient.getQueryState(dataQueryKey)?.isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(unrelatedQueryKey)?.isInvalidated).toBe(
+      false,
     );
   });
 
@@ -246,9 +252,7 @@ describe("useRefreshGoogleSheetDataset", () => {
   });
 
   it("reports a failure instead of announcing success", async () => {
-    getStoredGoogleSheetTabCsvMock.mockRejectedValue(
-      new Error("Drive is down"),
-    );
+    fetchSheetCsvMock.mockRejectedValue(new Error("Drive is down"));
 
     await _refresh();
 
@@ -258,16 +262,5 @@ describe("useRefreshGoogleSheetDataset", () => {
     expect(notifySuccessMock).not.toHaveBeenCalled();
     // The workbook never arrived, so nothing may have been re-imported.
     expect(startCsvImportMock).not.toHaveBeenCalled();
-  });
-
-  it("fails when the user has no Google token", async () => {
-    apiGetMock.mockResolvedValue({ tokens: [] });
-
-    await _refresh();
-
-    await waitFor(() => {
-      expect(notifyErrorMock).toHaveBeenCalled();
-    });
-    expect(getStoredGoogleSheetTabCsvMock).not.toHaveBeenCalled();
   });
 });

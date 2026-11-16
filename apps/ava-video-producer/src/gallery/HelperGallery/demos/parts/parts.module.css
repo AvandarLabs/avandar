@@ -1,0 +1,153 @@
+.card {
+  background: var(--demo-panel);
+  border: 1px solid var(--demo-line);
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 96px;
+  padding: 16px 18px;
+  width: 240px;
+}
+
+.cardTitle {
+  color: var(--demo-text);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cardBar {
+  background: var(--demo-line);
+  border-radius: 4px;
+  height: 10px;
+}
+
+.cardBarShort {
+  /* The composed name is a class reference, not a CSS keyword, so its case must match. */
+  /* stylelint-disable-next-line value-keyword-case */
+  composes: cardBar;
+  width: 60%;
+}
+
+.window {
+  background: var(--demo-panel);
+  border: 1px solid var(--demo-line);
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.titlebar {
+  align-items: center;
+  background: var(--demo-ground);
+  display: flex;
+  flex: none;
+  gap: 6px;
+  height: 22px;
+  padding: 0 10px;
+}
+
+.titlebarDot {
+  background: var(--demo-line);
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.windowBody {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  gap: 8%;
+  padding: 10% 10% 12%;
+  position: relative;
+}
+
+.windowLabel {
+  color: var(--demo-text);
+  font-size: 20px;
+  font-weight: 600;
+  left: 10%;
+  position: absolute;
+  top: 10%;
+}
+
+.windowBar {
+  border-radius: 4px 4px 0 0;
+  flex: 1;
+}
+
+.plot {
+  overflow: visible;
+}
+
+.plotAxis {
+  fill: none;
+  stroke: var(--demo-line);
+  stroke-width: 1.5;
+}
+
+.plotGuide {
+  fill: none;
+  stroke: var(--demo-line);
+  stroke-dasharray: 4 6;
+  stroke-width: 1;
+}
+
+.plotCurve {
+  fill: none;
+  stroke: var(--demo-accent);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.plotTrail {
+  fill: none;
+  stroke: var(--demo-brand);
+  stroke-linecap: round;
+  stroke-width: 5;
+}
+
+.plotDot {
+  fill: var(--demo-highlight);
+}
+
+.plotHandle {
+  fill: none;
+  stroke: var(--demo-muted);
+  stroke-width: 1.5;
+}
+
+.plotHandlePoint {
+  fill: var(--demo-muted);
+}
+
+.plotText {
+  fill: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: 13px;
+}
+
+.canvas {
+  background: var(--demo-ground);
+  border: 1px dashed var(--demo-line);
+  height: 400px;
+  left: calc(50% - 320px);
+  overflow: hidden;
+  position: absolute;
+  top: calc(50% - 200px);
+  width: 640px;
+}
+
+.tilted {
+  position: absolute;
+}
+
+.tiltedContent {
+  height: 100%;
+}

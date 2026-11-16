@@ -2,16 +2,26 @@ import { Composition, registerRoot } from "remotion";
 import "./theme.css";
 import importPlan from "../storyboards/import.json";
 import { AvandarScene } from "./avandar/AvandarScene";
+import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import {
   storyboardSchema,
   durationInFrames,
   type Storyboard,
 } from "./storyboard/schema/schema";
-import { StoryFilm } from "./storyboard/StoryFilm/StoryFilm";
+import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
+import type { VideoThemeSnapshot } from "./videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 
 const defaults = storyboardSchema.parse(importPlan);
-function ProductFilm({ plan }: { plan: Storyboard }) {
-  return <StoryFilm plan={plan} productScene={AvandarScene} />;
+function ProductFilm({
+  plan,
+  theme,
+}: {
+  plan: Storyboard;
+  theme?: VideoThemeSnapshot;
+}) {
+  return (
+    <ThemedStoryFilm plan={plan} theme={theme} productScene={AvandarScene} />
+  );
 }
 function Root() {
   return (
@@ -22,8 +32,12 @@ function Root() {
       calculateMetadata={({ props }) => {
         const plan = storyboardSchema.parse(props.plan);
         return {
-          props: { plan },
-          durationInFrames: durationInFrames(plan),
+          props: { plan, theme: props.theme },
+          durationInFrames: durationInFrames(
+            createContinuityPlanFromVideoThemeSnapshot(plan, props.theme, [
+              plan.id,
+            ]),
+          ),
           fps: plan.fps,
           width: plan.width,
           height: plan.height,

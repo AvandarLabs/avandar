@@ -14,7 +14,12 @@ export {
   flowNodes,
   nodeHighlight,
   edgeHighlight,
+  offsetEdgeEndpoints,
+  getPacketPositions,
+  GRAPH_ITEM_GAP,
+  GRAPH_ITEM_PITCH,
 } from "./graphLayout";
+export type { GraphPacket } from "./graphLayout";
 export {
   formatMetric,
   textUnits,

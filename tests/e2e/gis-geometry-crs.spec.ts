@@ -103,7 +103,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: DATASET_NAME,
+        exact: true,
+      });
       await _selectOption(page, inspector, "Geometry", "Geometry column");
       await _selectOption(page, inspector, "Geometry column", "mercator_wkt");
       await _selectOption(page, inspector, "Expected geometry", "Point");
@@ -135,6 +138,14 @@ test(
       // restore as `fresh` while stale, and nothing inside a test recovers from
       // that (see `docs/rules/e2e-testing.md`). Both are proven above.
       await page.reload();
+      await page
+        .getByRole("region", { name: "Layers" })
+        .getByRole("button", {
+          name: new RegExp(
+            `^${DATASET_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\s|$)`,
+          ),
+        })
+        .click();
       await expect(
         inspector.getByRole("combobox", { name: "Source CRS" }),
       ).toHaveValue("3857 - Web Mercator", { timeout: LONG_WAIT });

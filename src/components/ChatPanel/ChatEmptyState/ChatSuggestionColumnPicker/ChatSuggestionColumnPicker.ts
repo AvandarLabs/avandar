@@ -54,6 +54,19 @@ const NON_AVERAGEABLE_NAME_SUBSTRINGS = [
   "fiscal_year",
 ] as const;
 
+/** Coordinate column names, after trailing underscores are dropped. */
+const COORDINATE_EXACT_NAMES = new Set([
+  "lat",
+  "long",
+  "lng",
+  "lon",
+  "latitude",
+  "longitude",
+]);
+
+/** Numbered code columns such as `code3`, and FIPS codes. */
+const CODE_NAME_REGEX = /^(?:code\d*|fips)$/;
+
 /** Column names that are rarely useful as GROUP BY dimensions. */
 const NON_GROUPABLE_EXACT_NAMES = new Set([
   ...IDENTIFIER_EXACT_NAMES,
@@ -110,6 +123,8 @@ function _isNonAverageableColumnName(columnName: string): boolean {
   return (
     _isIdentifierColumnName(columnName) ||
     NON_AVERAGEABLE_EXACT_NAMES.has(normalized) ||
+    COORDINATE_EXACT_NAMES.has(normalized.replace(/_+$/, "")) ||
+    CODE_NAME_REGEX.test(normalized) ||
     normalized.endsWith("_year") ||
     normalized.endsWith("_code") ||
     NON_AVERAGEABLE_NAME_SUBSTRINGS.some((fragment) => {
@@ -206,8 +221,35 @@ function _pickAverageColumn(
   return numericColumns[0]?.name;
 }
 
+/**
+ * Picks the column a dataset most likely measures, for suggestions such as
+ * "Show total daily_new_deaths by month": the last numeric column that is not
+ * an id, code, or coordinate, since a table usually lists what it describes
+ * before what it counts.
+ */
+function _pickMeasureColumn(
+  columns: readonly ColumnMeta[],
+): string | undefined {
+  const numericColumns = _sortByColumnIdx(columns).filter((column) => {
+    return (
+      AvaDataTypeModule.isNumeric(column.dataType) &&
+      !_isNonAverageableColumnName(column.name)
+    );
+  });
+  return numericColumns.at(-1)?.name;
+}
+
+/** Picks the first date or timestamp column, for "by month" suggestions. */
+function _pickDateColumn(columns: readonly ColumnMeta[]): string | undefined {
+  return _sortByColumnIdx(columns).find((column) => {
+    return column.dataType === "date" || column.dataType === "timestamp";
+  })?.name;
+}
+
 /** Selects columns suitable for generated chat suggestions. */
 export const ChatSuggestionColumnPicker = {
+  pickDateColumn: _pickDateColumn,
+  pickMeasureColumn: _pickMeasureColumn,
   isIdentifierColumnName: _isIdentifierColumnName,
   isNonAverageableColumnName: _isNonAverageableColumnName,
   isNonGroupableColumnName: _isNonGroupableColumnName,

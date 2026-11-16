@@ -154,44 +154,6 @@ test("one basis point remains an exact minor unit with no prior remainder carrie
   assert.ok(_render({ frame: 150, input: input }).includes(">0.01</text>"));
 });
 
-import { setupI18n } from "@lingui/core";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId =
-    "motionAtlas.term-limited-revenue-share.default.arrangement.termBoundaryLabel";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [termLimitedRevenueShareContract.id]: termLimitedRevenueShareContract,
-  });
-  assert.equal(
-    messages[messageId],
-    DEFAULT_INPUT.arrangement.termBoundaryLabel,
-  );
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: termLimitedRevenueShareContract,
-    i18n,
-  });
-  assert.equal(
-    resolved.defaultInput.arrangement.termBoundaryLabel,
-    "Texto traducido",
-  );
-  assert.notEqual(
-    DEFAULT_INPUT.arrangement.termBoundaryLabel,
-    "Texto traducido",
-  );
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.arrangement.termBoundaryLabel}"`,
-    ),
-  );
-});
-
 test("maximum labels and extreme arithmetic render in both arrangements", () => {
   ["side-by-side", "stacked"].forEach((arrangementLayout) => {
     [true, false].forEach((showAmounts) => {

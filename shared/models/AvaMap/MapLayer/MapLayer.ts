@@ -9,6 +9,7 @@ import type {
   AreaAggregation as AreaAggregationType,
   AreaGeoBinding as AreaGeoBindingType,
   BoundarySourceRef as BoundarySourceRefType,
+  BufferDistanceUnit as BufferDistanceUnitType,
   BufferOfLayerBinding as BufferOfLayerBindingType,
   GeoBindingColumnNames as GeoBindingColumnNamesType,
   GeoBinding as GeoBindingType,
@@ -39,6 +40,7 @@ import type {
   AggregateOnlyMapLayerRead,
   MapLayerId,
   MapLayerRead,
+  MapLayerSpatialFilter,
   PopupConfig,
   PopupLinkAction,
   StandardMapLayerRead,
@@ -48,6 +50,7 @@ import type {
 } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 
 export {
+  BUFFER_DISTANCE_UNITS,
   GEOMETRY_ENCODINGS,
   GEOMETRY_FAMILIES,
   isGeometryEncoding,
@@ -104,4 +107,8 @@ export namespace MapLayer {
   export type DisputedStatusValues = DisputedStatusValuesType;
   /** How one feature's boundary line is drawn. */
   export type DisputedStatus = DisputedStatusType;
+  /** Another layer whose polygons this layer's features must intersect. */
+  export type SpatialFilter = MapLayerSpatialFilter;
+  /** A unit a buffer distance is typed and shown in. */
+  export type BufferDistanceUnit = BufferDistanceUnitType;
 }

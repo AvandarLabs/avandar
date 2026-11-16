@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ComparisonTags } from "./ComparisonTags";
 import {
@@ -19,7 +18,7 @@ export function ContentComparison({
   const headerMatch = input.saved.header === input.current.header,
     fingerprintMatch = input.saved.fingerprint === input.current.fingerprint;
   const matched = headerMatch && fingerprintMatch;
-  const ordinalCaption = `${stockI18n._(ordinalMessage)}: ${input.current.detectorOrdinal}`;
+  const ordinalCaption = `${ordinalMessage.message}: ${input.current.detectorOrdinal}`;
   return (
     <g
       data-header-match={headerMatch}
@@ -35,14 +34,7 @@ export function ContentComparison({
       />
       <LabelSlots
         labels={[
-          [
-            `${stockI18n._(pageMessage)}: ${input.saved.page}`,
-            52,
-            360,
-            280,
-            12,
-            1,
-          ],
+          [`${pageMessage.message}: ${input.saved.page}`, 52, 360, 280, 12, 1],
         ]}
       />
       {input.showDetectorOrdinal ? (

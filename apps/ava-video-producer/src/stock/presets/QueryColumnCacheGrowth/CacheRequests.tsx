@@ -1,5 +1,6 @@
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheRequestCards } from "./CacheRequestCards";
-import { CacheRequestRoutes } from "./CacheRequestRoutes";
+import { CacheRequestRoutes } from "./CacheRequestRoutes/CacheRequestRoutes";
 import { MissingCacheColumns } from "./MissingCacheColumns";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
@@ -20,6 +21,7 @@ export function CacheRequests({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { text } = useGraphicTokens();
   return (
     <g>
       <CacheRequestCards input={input} frame={frame} accent={accent} />
@@ -38,7 +40,9 @@ export function CacheRequests({
           x={60}
           y={32}
           fill={accent}
-          fontSize={18}
+          fontSize={text.graphic.label.fontSize}
+          fontFamily={text.graphic.label.fontFamily}
+          fontWeight={text.graphic.label.fontWeight}
         >
           {frame < 61 ? "R₁ ⊆ C" : frame < 106 ? "R₂ ∖ C" : "C ∪ R₂"}
         </text>

@@ -16,6 +16,7 @@ test("discovery includes colocated producer tests and excludes unrelated or gene
     "tests/stock.test.ts",
     "tests/helpers/check/check.test.ts",
     "showcase/player.test.mjs",
+    "showcase/watchFilms/watchFilms.test.ts",
   ];
   const excluded = [
     "out/result.test.ts",

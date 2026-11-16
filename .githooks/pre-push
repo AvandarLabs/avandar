@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Pre-push (pre-PR) hook. Three stages:
-#   1. Local Supabase configuration: rejects a pushed tree whose local project
-#      id or protected ports differ from the standard avandar configuration.
+#   1. Local Supabase configuration: rejects a pushed tree that changes the
+#      project_id or ports in supabase/config.toml. Nobody changes them.
 #   2. i18n translation pipeline: keep the Lingui catalogs in sync with the
 #      source before pushing. The script no-ops fast when extract produces no
 #      catalog changes; otherwise it runs the LLM translation step and
@@ -46,13 +46,13 @@ while read -r _local_ref local_sha _remote_ref remote_sha; do
     fi
 
     if ! git cat-file -e "$local_sha:supabase/config.toml" 2>/dev/null; then
-      echo "pre-push hook: pushed tree is missing supabase/config.toml." >&2
-      echo "${YELLOW}Run 'ava supabase restore', stage the restored files, and retry.${RESET}" >&2
+      echo "❌ pre-push hook: pushed tree is missing supabase/config.toml." >&2
+      echo "${YELLOW}  ⚠️ Restore it from develop, commit it, and retry.${RESET}" >&2
       exit 1
     fi
 
     if ! git show "$local_sha:supabase/config.toml" \
-      | "$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"; then
+      | "$REPO_ROOT/scripts/supabase/validate-standard-local-config/validate-standard-local-config.sh"; then
       exit 1
     fi
   fi

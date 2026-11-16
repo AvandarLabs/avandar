@@ -4,7 +4,7 @@ import { ClinicLedger } from "./ClinicLedger";
 import { ClinicMap } from "./ClinicMap";
 import { ClinicPeople } from "./ClinicPeople";
 import { ClinicSlots } from "./ClinicSlots";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 /** Supplied sites, finite slots and explicit nullable assignments. */

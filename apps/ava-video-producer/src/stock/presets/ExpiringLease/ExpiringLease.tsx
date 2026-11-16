@@ -4,7 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
 import { LeaseSocket } from "./LeaseSocket";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpiringLease.schema";
 import type { ComponentProps, ReactNode } from "react";
 

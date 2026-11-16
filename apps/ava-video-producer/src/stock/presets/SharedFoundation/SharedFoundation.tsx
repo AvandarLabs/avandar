@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { FoundationApproach } from "./FoundationApproach";
 import { FoundationBase } from "./FoundationBase";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
 /** Two authored approaches and their single shared principle. */

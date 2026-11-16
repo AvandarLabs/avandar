@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { CategoryTallies } from "./CategoryTallies";
 import { RetainedRecordStrip } from "./RetainedRecordStrip";
 import { UtilitySocket } from "./UtilitySocket";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 /** A complete authored utility-installation study. */

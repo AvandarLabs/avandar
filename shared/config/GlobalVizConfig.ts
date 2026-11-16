@@ -1,4 +1,4 @@
-import type { VizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
+import type { BuiltInVizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 
 /**
  * Per-visualization caps on how many rows can be passed to the underlying
@@ -26,6 +26,6 @@ export const VIZ_RENDER_LIMITS = {
   pie: { max: 50, noun: "slices" },
   funnel: { max: 50, noun: "steps" },
   radar: { max: 50, noun: "axes" },
-} as const satisfies Record<VizType, VizRenderLimit | undefined>;
+} as const satisfies Record<BuiltInVizType, VizRenderLimit | undefined>;
 
 export type VizRenderLimitKey = keyof typeof VIZ_RENDER_LIMITS;

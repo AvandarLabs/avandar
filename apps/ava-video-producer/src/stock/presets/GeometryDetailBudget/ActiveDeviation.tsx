@@ -1,4 +1,4 @@
-import { DrawPath } from "../../graphics-common";
+import { DrawPath } from "../../graphics-common/DrawPath";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";

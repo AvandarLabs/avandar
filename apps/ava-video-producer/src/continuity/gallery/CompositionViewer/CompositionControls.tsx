@@ -1,54 +1,45 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import "@mantine/core/styles.layer.css";
-import { MantineProvider, Checkbox } from "@mantine/core";
+import { Checkbox } from "@mantine/core";
+import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromeProvider";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
-import { PaletteControls } from "../../../gallery/MotionGallery/PaletteControls";
-import { CameraPresetControl } from "./CameraPresetControl";
 import css from "./CompositionControls.module.css";
-import { CompositionRoughnessControls } from "./CompositionRoughnessControls";
 import type { useCompositionAppearance } from "./useCompositionAppearance";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };
-/** Shared Atlas palette and transport controls for the active composition. */
-export function CompositionControls({ appearance }: Props) {
+type ControlsProps = Props & {
+  /** A scene study plays plain storyboard scenes with its authored theme. */
+  isScene: boolean;
+};
+
+/**
+ * Transport and render toggles for the active composition. Colours, sketch
+ * levels, and camera presets are design tokens, edited in the Design tokens
+ * tab. Scene studies keep only playback.
+ */
+export function CompositionControls({ appearance, isScene }: ControlsProps) {
   return (
-    <MantineProvider
-      theme={{ fontFamily: "Inter, Helvetica Neue, Arial, sans-serif" }}
-    >
+    <AtlasChromeProvider>
       <div className={css.controls}>
-        <PaletteControls
-          accent={appearance.draft.accent}
-          background={appearance.draft.background}
-          setAccent={(accent) => appearance.update({ accent })}
-          setBackground={(background) => appearance.update({ background })}
-        />
-        <p className={css.help}>
-          <Trans>
-            Colors affect editorial graphics. Product components retain their
-            native theme.
-          </Trans>
-        </p>
-        <TransportControls appearance={appearance} />
+        {isScene ? (
+          <p className={css.help}>
+            Storyboard scenes play with their authored theme and per-shot field
+            colors. Design tokens, camera motion, motion blur, and annotation
+            settings apply to continuity compositions only.
+          </p>
+        ) : null}
+        <TransportControls appearance={appearance} isScene={isScene} />
       </div>
-    </MantineProvider>
+    </AtlasChromeProvider>
   );
 }
 
-function TransportControls({ appearance }: Props) {
-  const { t } = useLingui();
+function TransportControls({ appearance, isScene }: ControlsProps) {
   return (
     <div className={css.transport}>
-      <button onClick={() => appearance.send("play")}>
-        <Trans>Play</Trans>
-      </button>
-      <button onClick={() => appearance.send("pause")}>
-        <Trans>Pause</Trans>
-      </button>
-      <button onClick={() => appearance.send("replay")}>
-        <Trans>Replay</Trans>
-      </button>
+      <button onClick={() => appearance.send("play")}>Play</button>
+      <button onClick={() => appearance.send("pause")}>Pause</button>
+      <button onClick={() => appearance.send("replay")}>Replay</button>
       <AtlasSelect
-        label={t`Speed`}
+        label="Speed"
         value={String(appearance.transport.speed)}
         data={[0.5, 1, 1.5, 2].map((speed) => ({
           value: String(speed),
@@ -63,27 +54,24 @@ function TransportControls({ appearance }: Props) {
       />
       <Checkbox
         size="xs"
-        label={t`Loop`}
+        label="Loop"
         checked={appearance.transport.loop}
         onChange={(event) => {
           const loop = event.currentTarget.checked;
           appearance.setTransport((current) => ({ ...current, loop }));
         }}
       />
-      <AppearanceToggles appearance={appearance} />
-      <CameraPresetControl appearance={appearance} />
-      <CompositionRoughnessControls appearance={appearance} />
+      {isScene ? null : <AppearanceToggles appearance={appearance} />}
     </div>
   );
 }
 
 function AppearanceToggles({ appearance }: Props) {
-  const { t } = useLingui();
   const labels = {
-    cameraMotion: t`Camera motion`,
-    motionBlur: t`Motion blur`,
-    annotations: t`Annotations`,
-    captions: t`Captions`,
+    cameraMotion: "Camera motion",
+    motionBlur: "Motion blur",
+    annotations: "Annotations",
+    captions: "Captions",
   };
   return (
     <>

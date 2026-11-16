@@ -2,7 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { QuarantinedRows } from "./QuarantinedRows";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InvalidTableQuarantine.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

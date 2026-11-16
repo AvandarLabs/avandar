@@ -3,7 +3,7 @@ import { STOCK } from "../../stockPalette";
 import { BoundaryRequest } from "./BoundaryRequest";
 import { BoundaryWorker } from "./BoundaryWorker";
 import { ProtectedSlot } from "./ProtectedSlot";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
 /** Frame-driven finite schedule and authored request disposition. */

@@ -3,7 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
 import { ReferralLane } from "./ReferralLane";
 import { ReferralLedger } from "./ReferralLedger";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
 /** Explicit referral facts and local frame. */

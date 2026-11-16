@@ -3,7 +3,7 @@ import "./generated/product.css";
 import { cursorOnTarget, type CursorKind } from "../cursor-motion";
 import { measuredPath } from "./choreography";
 import targets from "./cursor-targets.json";
-import { AvandarStage } from "./generated/product.js";
+import { AvandarStage } from "./generated/product";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/StoryFilm";
 
 // End-of-typing holds from the adapters' typed() intervals, in full feature frames.

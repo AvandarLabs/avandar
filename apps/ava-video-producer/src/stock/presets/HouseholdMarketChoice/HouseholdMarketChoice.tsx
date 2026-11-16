@@ -4,7 +4,7 @@ import { MarketCheckout } from "./MarketCheckout";
 import { MarketLabels } from "./MarketLabels";
 import { MarketProduct } from "./MarketProduct";
 import { MarketShopper } from "./MarketShopper";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 /** Complete authored purchase and shared frame parameters. */

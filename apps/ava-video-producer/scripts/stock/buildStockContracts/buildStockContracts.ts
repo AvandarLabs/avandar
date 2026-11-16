@@ -3,9 +3,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
-import { ensureDirectory } from "../../lib/planHelpers";
-import { yamlPlugin } from "../../yaml/yamlPlugin/yamlPlugin";
-import { buildStockMessages } from "../buildStockMessages/buildStockMessages";
+import { ensureDirectory } from "../../lib/planHelpers/planHelpers";
+import { yamlPlugin } from "../../yaml/yamlPlugin";
 import { StockFingerprintModule } from "../StockFingerprintModule/StockFingerprintModule";
 
 type Contracts = Pick<
@@ -140,6 +139,12 @@ async function _loadGeneration(
   return entry.generation;
 }
 
+/**
+ * Directories a stock contract may import from. Content colour fields read
+ * the semantic colour roles from the video theme's token catalog.
+ */
+const CONTRACT_SOURCE_DIRECTORIES = ["src/stock", "src/videoTheme"] as const;
+
 async function _dependencyHash(
   options: Readonly<{
     root: string;
@@ -155,12 +160,13 @@ async function _dependencyHash(
     .reduce(async (previous, file) => {
       await previous;
       const filename = await fs.realpath(path.resolve(root, file));
-      if (
-        !filename.startsWith(`${path.resolve(root, "src/stock")}${path.sep}`) ||
-        /\.tsx$/.test(filename)
-      ) {
+      const isInsideContractSources = CONTRACT_SOURCE_DIRECTORIES.some(
+        (directory) =>
+          filename.startsWith(`${path.resolve(root, directory)}${path.sep}`),
+      );
+      if (!isInsideContractSources || filename.endsWith(".tsx")) {
         throw new Error(
-          "Stock contract dependencies must be renderer-free files inside src/stock",
+          "Stock contract dependencies must be renderer-free files inside src/stock or src/videoTheme",
         );
       }
       const bytes = await fs.readFile(filename);
@@ -172,7 +178,6 @@ async function _dependencyHash(
 async function _buildGeneration(
   root: string,
 ): Promise<StockContractGeneration> {
-  await buildStockMessages(root);
   const sourceHash = await StockFingerprintModule.getSourceHashFromRoot(root);
   const result = await build({
     absWorkingDir: root,

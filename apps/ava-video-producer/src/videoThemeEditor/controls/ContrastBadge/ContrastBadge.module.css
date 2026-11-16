@@ -1,0 +1,13 @@
+/*
+ * The badge keeps Mantine's tinted fill, but its text is the ink colour (or
+ * a deeper red.9 when failing) at 10px, so it reads at 4.5:1 or better on
+ * that fill. Plain red.9 on the red fill is only 4.5:1, with no margin.
+ */
+.contrastBadge {
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.contrastBadgeFail {
+  color: color-mix(in srgb, var(--mantine-color-red-9) 70%, var(--ink));
+}

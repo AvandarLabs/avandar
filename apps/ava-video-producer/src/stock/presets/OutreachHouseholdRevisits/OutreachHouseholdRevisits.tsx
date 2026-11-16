@@ -4,7 +4,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { HouseholdMap } from "./HouseholdMap";
 import { OutreachLedger } from "./OutreachLedger";
 import { OutreachWorker } from "./OutreachWorker";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 /** Fixed household universe and an ordered authored visit sequence. */

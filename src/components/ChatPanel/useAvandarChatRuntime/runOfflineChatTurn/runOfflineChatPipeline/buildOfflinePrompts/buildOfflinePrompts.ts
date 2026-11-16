@@ -50,6 +50,7 @@ function formatSchema(schema: OfflineChatSchema): string {
     aliases: aliasesFromSchema(schema),
     columns: schema.columns,
     conceptAttributes: schema.conceptAttributes ?? [],
+    conceptStatuses: schema.conceptStatuses ?? [],
   });
   return `Available datasets and concepts (SQL FROM must use the alias, never a label):\n${block}`;
 }
@@ -88,7 +89,13 @@ function formatOpenDatasetHint(
   return `User has this dataset open. Default FROM table name: "${alias}" (label: ${openDataset.name}).\n\n`;
 }
 
-function formatOfflineSqlSchemaNotes(): string {
+function formatOfflineSqlSchemaNotes(schema: OfflineChatSchema): string {
+  const listFieldNote = SqlTableAlias.formatListFieldNote(
+    schema.conceptAttributes ?? [],
+  );
+  const bucketedFieldNote = SqlTableAlias.formatBucketedFieldNote(
+    schema.conceptAttributes ?? [],
+  );
   return `Rules:
 - SQL FROM / JOIN targets must be the quoted aliases above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "t0" or FROM "c0").
 - Do not invent datasets or system tables (pg_database, information_schema).
@@ -96,7 +103,7 @@ function formatOfflineSqlSchemaNotes(): string {
 - Do not invent WHERE literal values unless the user named them.
 - DuckDB uses LIMIT, not SELECT TOP.
 - Wrap every table alias and column name in double quotes.
-- One read-only SELECT or WITH. No semicolons.`;
+- One read-only SELECT or WITH. No semicolons.${listFieldNote ? `\n${listFieldNote}` : ""}${bucketedFieldNote ? `\n${bucketedFieldNote}` : ""}`;
 }
 
 function formatSqlTurnContext(args: {
@@ -173,7 +180,7 @@ ${args.analysisSummary}
 
 ${formatSchema(args.schema)}
 
-${formatOfflineSqlSchemaNotes()}
+${formatOfflineSqlSchemaNotes(args.schema)}
 
 User question:
 ${args.lastUserPrompt}${formatSqlTurnContext({
@@ -203,7 +210,7 @@ ${formatAllowedTablesList(args.schema)}
 
 Forbidden: pg_database, information_schema, invented names, dataset labels as tables.
 
-${resolvedBlock}${formatOfflineSqlSchemaNotes()}
+${resolvedBlock}${formatOfflineSqlSchemaNotes(args.schema)}
 
 User question: ${args.lastUserPrompt}
 

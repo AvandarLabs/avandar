@@ -12,7 +12,6 @@ import {
 } from ".././ProseMeasurementLedger.fixtures";
 import { inputSchema, type Input } from ".././ProseMeasurementLedger.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
-import type { StockDefaultSpanBinding } from "../../../contracts/StockContract.types";
 
 const render = ({
   frame,
@@ -87,44 +86,6 @@ function _assertReadablePaint(markup: string): void {
   });
 }
 
-const EXPECTED_SPAN_BINDINGS: StockDefaultSpanBinding[] = [
-  {
-    textPath: ["fragments", 0, "text"],
-    startPath: ["fragments", 0, "contentStart"],
-    endPath: ["fragments", 0, "contentEnd"],
-    template: "<content>West site</content> reported ",
-  },
-  {
-    textPath: ["fragments", 1, "text"],
-    startPath: ["fragments", 1, "contentStart"],
-    endPath: ["fragments", 1, "contentEnd"],
-    template: "<content>about</content> ",
-  },
-  {
-    textPath: ["fragments", 2, "text"],
-    startPath: ["fragments", 2, "contentStart"],
-    endPath: ["fragments", 2, "contentEnd"],
-    template: "<content>12</content> ",
-  },
-  {
-    textPath: ["fragments", 3, "text"],
-    startPath: ["fragments", 3, "contentStart"],
-    endPath: ["fragments", 3, "contentEnd"],
-    template: "<content>crates</content> ",
-  },
-  {
-    textPath: ["fragments", 4, "text"],
-    startPath: ["fragments", 4, "contentStart"],
-    endPath: ["fragments", 4, "contentEnd"],
-    template: "<content>received</content> ",
-  },
-  {
-    textPath: ["fragments", 5, "text"],
-    startPath: ["fragments", 5, "contentStart"],
-    endPath: ["fragments", 5, "contentEnd"],
-    template: "in <content>week 2</content>.",
-  },
-];
 export {
   render,
   _marker,
@@ -132,5 +93,4 @@ export {
   getVisibleTexts,
   options,
   _assertReadablePaint,
-  EXPECTED_SPAN_BINDINGS as expectedSpanBindings,
 };

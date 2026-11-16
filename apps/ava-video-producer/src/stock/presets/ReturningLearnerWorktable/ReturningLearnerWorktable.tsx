@@ -6,7 +6,7 @@ import { ReturnActivity } from "./ReturnActivity";
 import { ReturningTeacher } from "./ReturningTeacher";
 import { ReturnWorktables } from "./ReturnWorktables";
 import { SceneText } from "./SceneText";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
 

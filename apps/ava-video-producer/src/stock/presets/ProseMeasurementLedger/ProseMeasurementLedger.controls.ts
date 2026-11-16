@@ -63,7 +63,7 @@ function _number({
   };
 }
 
-/** Localized semantic slot headings also serve the role selector. */
+/** Semantic slot headings also serve the role selector. */
 export const roleMessages: Record<
   | "subject"
   | "metric"

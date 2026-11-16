@@ -244,38 +244,72 @@ re-writes all rows (no incremental sync).
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
-**Current state:** `Individual.status` is a free `string` defaulted to `active`;
-status options are hard-coded in a stub UI. Nothing configurable.
+**Current state:** Status sets ship (P5b.1): each case type has its own
+statuses in `concept_statuses`, and every record points at one through
+`individuals.status_id`. Enumerations and relations are not configurable yet.
 
-- P5b.1 `[NEW]` Configurable **status sets** per TBox (e.g. Suspected →
+- P5b.1 `[DONE]` Configurable **status sets** per TBox (e.g. Suspected →
   Probable → Confirmed → Recovered/Deceased for a case; org can define their
-  own).
+  own). Each status has a name, a description, a palette color, an order, and
+  one default per case type, edited in the create form, the chat draft card,
+  and the case type page. Spec:
+  `docs/superpowers/specs/2026-10-25-case-statuses-design.md`.
 - P5b.2 `[NEW]` Configurable enumerations / controlled vocabularies for fields.
 - P5b.3 `[NEW]` Configurable relations (from P5.2) exposed in the designer.
 - P5b.4 `[NEW]` LLM-assisted TBox authoring (see P5c.1).
 - `[Depends on: P5]`
 
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
-**Current state:** Case-management UI is **stubs with no backend**:
-`ActivityBlock` (comments) calls `notifyNotImplemented`; `StatusPill` is a
-hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
-no writer/UI. Greenfield.
+**Current state:** Status workflow and the records list's status filter ship
+(P5c.4, and P5c.6 except the assignee filter), and comments shipped in P5c.2.
+Assignment is still a **stub with no backend**: `Individual.assignedTo` exists
+with no writer or UI.
 
 - P5c.1 `[NEW]` **LLM-configurable case types**: describe a domain in natural
   language ("cholera outbreak investigation") → generate a TBox (fields,
   statuses, relations) the org can edit. Domain-agnostic.
-- P5c.2 `[NEW]` **Comments / activity feed** on an ABox (model, table, client,
-  wire the existing Tiptap editor). Includes @mentions.
-- P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
-  persist `assignedTo`; "assigned to me" views.
-- P5c.4 `[NEW]` **Status workflow**: set/track status from the configurable set
-  (P5b.1); status change history.
-- P5c.5 `[NEW]` **Activity/audit log** (status changes, assignments, edits).
-- P5c.6 `[NEW]` ABox **list/grid view** with filtering by status/assignee
-  (today there's only a virtualized navbar + single-individual detail).
+- P5c.2 **Comments / activity feed** on an ABox: built. Rich text, markdown,
+  @mentions, reactions, edit and delete, on an append-only activity log. See
+  [case-activity-architecture.md](measles-demo/case-activity-architecture.md).
+  - **Gadget references:** built. A comment links or embeds a dashboard,
+    dashboard tile, dataset, map, case type, or case from the `@` menu, as a
+    chip or a card of key facts, without ever storing or leaking a name the
+    reader cannot see. See [gadgets.md](measles-demo/gadgets.md).
+    Follow-ups: live embed bodies (a running tile, a dataset preview, a map);
+    paste an Avandar URL to convert it; a `/` block menu; backlinks from
+    `comment_gadget_refs`; notifications when a gadget you own is
+    referenced; faster search (split blank and non-blank queries, trigram
+    indexes); a case Status fact once status sets exist (P5c.4); comments,
+    saved queries, and catalog listings as gadgets.
+- P5c.3 `[NEW]` **Assignment**: one workspace member per record, or
+  unassigned. A Case Records editor sets it from the record header. "Assigned
+  to me" is a sidebar queue across case types, and a case type's record list
+  filters by assignee. Spec:
+  `docs/superpowers/specs/2026-11-08-individual-assignment-design.md`.
+  User groups stay out of this slice.
+- P5c.4 `[DONE, except history]` **Status workflow**: set/track status from the
+  configurable set (P5b.1). A record's status changes from the record page,
+  with each status's description on hover; status is a column in the Data
+  Explorer and in chat's schema, and chat proposes a status set when it drafts a
+  case type. Status change history moved to P5c.9.
+- P5c.5 `[NEW]` **Activity/audit log** for every change to a case: status
+  changes, assignment, manual field values, and case creation, plus history
+  pulled from a connected third-party service. Each is a new `activity_events`
+  kind written by a trigger; the feed and table already exist (P5c.2).
+- P5c.6 `[PARTIAL]` ABox **list/grid view** with filtering by status/assignee.
+  Done: the records list filters by status and counts the matching records.
+  The assignee filter ships with assignment (P5c.3), not as a later pass.
 - P5c.7 `[NEW]` Manual case creation + edit (uses P5.4 manual_entry).
-- P5c.8 `[NEW]` Notifications for assignment/mention/status change (reuse email
-  client / in-app).
+- P5c.8 `[NEW]` **Notifications and email.** Out of the assignment demo
+  on purpose. After a record is assigned, a person is mentioned, or a status
+  changes, notify the people involved in the app and by email, reusing the
+  existing email client. Mention notifications read `comment_mentions`.
+  Assignment (P5c.3) persists the assignee and shows it. It does not send
+  anything.
+- P5c.9 `[NEW]` **Case change history**: record who changed what on a case and
+  when, across status, assignment, and edits, and show it on the record page.
+  Covers the status change history left out of P5c.4 and feeds P5c.5. Kept out
+  of the status sets work on purpose (case statuses spec, follow-up 1).
 - `[Depends on: P5, P5b, P3 (assignee = permission principal)]`
 
 ---
@@ -304,6 +338,106 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   boundaries, health facilities, population) as time allows.
 - P6.5 `[REFACTOR]` Open-data catalog Beta → production (search, provenance,
   refresh cadence surfacing).
+- P6.6 `[REFACTOR]` **Infer catalog column types on the server** (AVA-394): pipelines
+  ingest API listings' columns as text, and the browser verifies their real
+  types today. After a listing stays open for 3 seconds, the `open-data` edge
+  function sends a sample to the browser, DuckDB-WASM infers the types, and
+  the edge function writes them back if the column names match a signed copy
+  of the sample's header. Once edge functions move to a long-running server,
+  read the sample and run DuckDB there instead. That removes the round trip
+  and the need to trust types from a user's browser, which can still
+  mislabel a type.
+- P6.7 `[FIX]` **One column type verification at a time per listing** (AVA-395): add a
+  lock, such as a claimed-at timestamp on the listing, so several people
+  opening the same unverified listing don't each fetch a sample and verify it.
+  Today each browser tries a listing at most once per page load, and
+  concurrent verifications write the same result, so the cost is duplicate
+  work, not wrong data.
+- P6.8 `[NEW]` **Ask about an Open Data Catalog (ODC) listing before adding
+  it**: let a user ask Ava questions about an ODC dataset straight from the
+  ODC page, without first adding it to the workspace. The ODC page already
+  reads a listing's first 200 rows for its data preview without adding it
+  (`fetchCatalogListingPreview`), so the open questions are how chat
+  addresses a relation that is not a workspace dataset (an ODC listing is a
+  relation, not a dataset: `docs/measles-demo/connector-nomenclature.md`),
+  how much of it a query may read, and what a chat session that cites it
+  keeps once the listing is never added. Needs P10's app-wide chat.
+- P6.9 `[NEW]` **Cached Parquet copies of API-backed ODC listings**: the
+  pipeline server streams a listing's source into a Parquet copy in the
+  public `opendata` bucket the first time a workspace adds it, and rebuilds
+  it when the source changes. Workspaces read the copy straight from
+  Storage, which removes the 25 MB ceiling of the edge function relay, so an
+  ODC listing is limited only by the Storage upload limit manual uploads
+  already have. Starts by dropping the policies that let any signed-in user
+  write to `opendata`. Spec: `docs/measles-demo/odc-parquet-cache-spec.md`.
+  In progress.
+- P6.10 `[NEW]` **Retest ODC listings marked unreachable**: a file host that
+  does not answer marks a listing `unreachable_dataset`, even when the
+  outage is temporary, and the mark only clears when the pipeline sees the
+  source change or a sample is later verified. Add (a) a scheduled job that
+  re-reads each `unreachable_dataset` listing's sample with backoff (daily
+  at first, weekly after repeated failures) and clears the mark on success,
+  and (b) a "Try again" button on the ODC listing's invalid notice that
+  re-reads the sample at once. Other invalid reasons (`dataset_not_found`,
+  `unsupported_format`, `external_host`) are not temporary and are not
+  retried on a schedule, though "Try again" works for all of them.
+- P6.11 `[NEW]` **Handle ODC source drift**: an ODC listing added to a
+  workspace copies the listing's columns at that moment, while its data is
+  read from the listing's current Parquet copy. When the source changes,
+  the workspace's columns, its data, and the catalog can disagree, and a
+  dashboard or analysis built on the dataset can break with no explanation.
+  Today nothing reconciles them. Cover every case:
+  - (a) **Source changes after a listing is added**: the source's columns
+    or rows change after a workspace added the listing.
+  - (b) **Detect outdated Parquet copies**: notice that a copy's source
+    changed (its freshness token moved) and rebuild it, rather than only on
+    the next load.
+  - (c) **Move workspaces to the new copy**: point every workspace dataset
+    that reads a listing's copy at the rebuilt one.
+  - (d) **Update a workspace's columns**: when the listing's columns change,
+    update the columns of every workspace dataset added from it.
+  - (e) **Track drift and column history in the ODC**: record each change to
+    a listing's columns and data, so the app can show a user why their
+    dashboards or analyses may have broken because the source changed.
+  - (f) **Let users freeze a dataset**: a frozen dataset does not sync with
+    its source, so a changed source never breaks it. This means keeping each
+    copy a frozen dataset reads, and tracking those copies as distinct from
+    the listing's current one, so a rebuild never deletes a copy a frozen
+    dataset still uses.
+  Depends on P6.9.
+- P6.12 `[NEW]` **WHO GHO pipeline, recommended listings, and copy
+  freshness**: a `gho` pipeline lists each of GHO's 3,091 indicators, and
+  each dimension's value list, as an API-backed listing copied from OData
+  JSON. Listings can name recommended listings to add with them (an
+  indicator recommends the country list its `SpatialDim` codes come from).
+  API-backed copies get a 15-minute max age in the browser. Today a copy
+  that was current when it loaded is never re-checked, for Socrata and HDX
+  too. Freshness checks are throttled per listing and described by the
+  listing rather than hardcoded per API. Spec:
+  `docs/measles-demo/gho-pipeline-spec.md`. Follow-ups listed in that spec's
+  section 9: paged JSON downloads, recommendations across drives, passing
+  join pairs to chat, a Refresh action for open data datasets, and moving
+  CKAN and Socrata freshness onto listing probes. Depends on P6.9.
+- P6.13 `[NEW]` `[DEFERRED]` **Partitioned live connections**: one listing
+  for a whole API (all of GHO as one table) instead of one per resource.
+  QETL would pull the query's equality, `IN` and range filters on the
+  partition keys the API declares (GHO: `IndicatorCode`, optionally
+  `SpatialDim` and `TimeDim`), send only those to the API (GHO: OData
+  `$filter`), and apply the full `WHERE` in DuckDB, so a result is correct
+  whenever the fetched partitions cover the query. Each partition is cached
+  on its own, and a cache hit is set containment over partition ids, as
+  exact and cheap as the column check, rather than predicate containment.
+  Needs: a SQL syntax tree in the analyzer (DuckDB's `json_serialize_sql`)
+  to extract filters, failing closed when a restriction cannot be proven;
+  more than one live cache entry per relation in both tiers, with the DuckDB
+  table becoming a view over the loaded partitions; per-partition copies in
+  Storage with single-flight builds; a fast route that returns a small
+  partition at once; and small reference relations (indicator and dimension
+  lists) still read whole, so `SELECT DISTINCT IndicatorCode` works.
+  Deferred because every relation so far can be copied whole (GHO's largest
+  indicator is 268,128 rows). It becomes necessary for a source too big to
+  copy, or a paid API where copying whole costs too much. Overlaps P0.2.
+  Background: `docs/measles-demo/gho-pipeline-spec.md` section 9.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 
@@ -547,9 +681,11 @@ even if later, deeper items are still stabilizing on demo day. Land these first:
    on already-built `resource_shares`; finish the UX and "shared with me".
 3. **Guests, minimal (P4.1–P4.4)** - view-only guest to a single dashboard.
    High demo value ("invite a field partner to just this dashboard").
-4. **Case management thin slice (P5c.1 lite, P5c.2, P5c.3, P5c.4 with P5b.1)** -
-   comments + assignment + configurable statuses on individuals, LLM-generated
-   case type for the cholera example. Backend-wire the existing stubs.
+4. **Case management thin slice (P5c.1 lite, P5c.2, P5c.4 with P5b.1, then
+   P5c.3)** - comments and configurable statuses are in. Assignment is next:
+   one workspace member per record, an Assigned to me queue, and an assignee
+   filter. Notifications and email stay P5c.8 and are not required for the
+   demo. LLM-generated case type for the cholera example remains P5c.1.
 5. **GIS points, cleaned up (P7.1) + plot cases/dataset on a map** - drop
    choropleth/multi-layer for the demo; a clean point map of cases is enough.
 6. **Google Sheets re-enabled (P6.1)** - live field-data intake story; code is

@@ -1,6 +1,10 @@
-import { DUR, ramp } from "../../../motion";
-import { STOCK } from "../../graphics-common";
+import { ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
@@ -9,6 +13,9 @@ type Props = Pick<
   BranchProps,
   "branch" | "x" | "frame" | "accent" | "isSelected" | "showUnchosenOutcomes"
 >;
+
+const SELECTION_CUE = 46;
+const HOLD_CUE = 114;
 
 /**
  * The chosen outcome opens into the hold while alternatives may stay subdued.
@@ -21,8 +28,11 @@ export function DecisionOutcome({
   isSelected,
   showUnchosenOutcomes,
 }: Readonly<Props>): ReactNode {
-  const selected = isSelected ? ramp(frame, 46, DUR.sheet) : 0;
-  const opacity = isSelected ? ramp(frame, 114, DUR.chip) : 1;
+  const style = useGraphicProps("DecisionFork", {});
+  const { color } = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const selected = isSelected ? ramp(frame, SELECTION_CUE, motion.sheet) : 0;
+  const opacity = isSelected ? ramp(frame, HOLD_CUE, motion.chip) : 1;
   if (!isSelected && !showUnchosenOutcomes) {
     return null;
   }
@@ -33,27 +43,23 @@ export function DecisionOutcome({
         y={424}
         width={208}
         height={94}
-        rx={14}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={style.outcomeRadius}
+        fill={color.surface}
+        stroke={color.line}
+        strokeWidth={style.outcomeStrokeWidth}
       />
       <StockRect
         x={x - 104}
         y={424}
         width={208}
         height={94}
-        rx={14}
+        rx={style.outcomeRadius}
         fill="none"
         stroke={accent}
         strokeOpacity={selected}
+        strokeWidth={style.outcomeStrokeWidth}
       />
-      <ForkLabel
-        text={branch.outcome}
-        x={x}
-        y={449}
-        width={184}
-        fill={STOCK.text}
-      />
+      <ForkLabel text={branch.outcome} x={x} y={449} width={184} />
     </g>
   );
 }

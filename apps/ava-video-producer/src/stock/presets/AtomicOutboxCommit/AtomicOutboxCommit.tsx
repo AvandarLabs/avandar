@@ -4,7 +4,7 @@ import { OutboxCommitMarks } from "./OutboxCommitMarks";
 import { OutboxDurableState } from "./OutboxDurableState";
 import { OutboxOutcome } from "./OutboxOutcome";
 import { OutboxProposal } from "./OutboxProposal";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { loopEnvelope, loopPhase, wave } from "../src/motion";
+import {
+  DUR,
+  EASE,
+  STAGGER,
+  STAGGER_COLUMN,
+  loopEnvelope,
+  loopPhase,
+  wave,
+} from "../src/motion";
 
 test("loop motion is bounded, periodic, and deterministic under out-of-order seeks", () => {
   const frames = [-361, -180, -1, 0, 1, 45, 90, 179, 180, 361];
@@ -68,4 +76,24 @@ test("loop helpers reject invalid timing before it reaches SVG geometry", () => 
   ]) {
     assert.throws(() => loopEnvelope(30, duration, fade));
   }
+});
+
+test("EASE.in departs slowly and reaches full speed at the end", () => {
+  assert.equal(EASE.in(0), 0);
+  assert.equal(EASE.in(1), 1);
+  assert.ok(EASE.in(0.25) < 0.1, "a departure barely moves at first");
+  assert.ok(EASE.in(0.9) - EASE.in(0.8) > EASE.in(0.2) - EASE.in(0.1));
+});
+
+test("EASE.surge holds at both ends and spends its travel in the middle", () => {
+  assert.ok(EASE.surge(0.2) < 0.08, "the surge starts slower than inOut");
+  assert.ok(EASE.surge(0.2) < EASE.inOut(0.2));
+  assert.ok(EASE.surge(0.8) > 0.9, "the surge lands early and settles");
+});
+
+test("whip and column-stagger tokens are faster than the beats they replace", () => {
+  assert.ok(DUR.whip < DUR.panel);
+  assert.ok(DUR.whip > DUR.chip);
+  assert.ok(STAGGER_COLUMN > 0 && STAGGER_COLUMN < 1);
+  assert.ok(STAGGER_COLUMN < STAGGER);
 });

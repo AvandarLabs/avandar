@@ -1,7 +1,7 @@
 import { STOCK } from "../../stockPalette";
 import { LunchLabels } from "./LunchLabels";
 import { LunchTray } from "./LunchTray";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 /** Inputs for SchoolLunchTrayComposition. */

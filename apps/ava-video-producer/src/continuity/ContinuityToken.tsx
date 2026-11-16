@@ -1,10 +1,11 @@
 import { ramp } from "../motion";
 import { getMotionProgress } from "../motion-components/motionSettings";
 import { SharedElement } from "../motion-components/SharedElement";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ContinuityPlan } from "./continuitySchema";
 
 /** A single persistent object carries identity across a scene boundary. */
@@ -15,7 +16,10 @@ export function ContinuityToken({
   plan: ContinuityPlan;
   frame: number;
 }) {
-  const translate = useContinuityCopy();
+  const tokens = useVideoTokens();
+  const sharedObject = useVideoProps("SharedObject", {});
+  const motion = useVideoMotion();
+  const isSketched = tokens.sketch.box.roughness > 0;
   const timing = getContinuityTimeline(plan.beats);
   const index = Math.max(
     0,
@@ -46,15 +50,19 @@ export function ContinuityToken({
       motion={beat.transition.motion}
       className={css.continuityToken}
       style={{
-        color: plan.accent,
-        borderColor: plan.boxRoughness > 0 ? "transparent" : undefined,
-        borderRadius: plan.boxRoughness > 0 ? 0 : undefined,
+        borderColor: isSketched ? "transparent" : undefined,
+        borderRadius: isSketched ? 0 : undefined,
         background:
           beat.token.appearance === "outline" ? "transparent" : undefined,
         opacity:
-          ramp(frame, 12, 18) *
+          ramp(frame, 12, motion.scale(sharedObject.fadeIn)) *
           (beat.token.appearance === "outline"
-            ? 1 - ramp(frame, timing[index].start + 60, 20)
+            ? 1 -
+              ramp(
+                frame,
+                timing[index].start + 60,
+                motion.scale(sharedObject.outlineFade),
+              )
             : 1),
       }}
     >
@@ -64,7 +72,7 @@ export function ContinuityToken({
           opacity: beat.token.appearance === "outline" ? 1 - progress : 1,
         }}
       >
-        {translate(beat.token.label)}
+        {beat.token.label}
       </span>
     </SharedElement>
   );

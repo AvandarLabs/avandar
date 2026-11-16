@@ -5,9 +5,9 @@
 .transport {
   align-items: center;
   background: var(--paper, #fff);
-  border: 1px solid var(--line, #d6d9d4);
+  border: 1px solid var(--line);
   border-radius: 7px;
-  color: var(--ink, #18251f);
+  color: var(--ink);
   display: flex;
   flex-wrap: wrap;
   font-size: 12px;
@@ -17,7 +17,7 @@
 
 .transport > button {
   background: transparent;
-  border: 1px solid var(--line, #d6d9d4);
+  border: 1px solid var(--line);
   border-radius: 5px;
   color: inherit;
   cursor: pointer;
@@ -26,7 +26,7 @@
 }
 
 .transport > button:hover {
-  background: var(--ava-neutral-1, #eef1ee);
+  background: var(--ava-neutral-1);
 }
 
 .transport label {
@@ -36,16 +36,16 @@
 }
 
 .transport input {
-  accent-color: var(--ava-primary-6, #2983ff);
+  accent-color: var(--ava-primary-6);
 }
 
 .transport :focus-visible {
-  outline: 2px solid var(--ava-primary-7, #1563fe);
+  outline: 2px solid var(--ava-primary-7);
   outline-offset: 3px;
 }
 
 .help {
-  color: var(--muted, #68746c);
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
   margin: -10px 0 18px;
@@ -59,15 +59,6 @@
   .transport label {
     flex: 1 1 130px;
   }
-}
-
-.roughness {
-  border-top: 1px solid var(--line, #d6d9d4);
-  display: flex;
-  flex-basis: 100%;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  padding-top: 12px;
 }
 
 :global(dialog:modal) .transport {
@@ -84,11 +75,6 @@
   margin: 0 0 10px;
 }
 
-:global(dialog:modal) .roughness {
-  gap: 8px;
-  padding-top: 8px;
-}
-
 @media (width <= 800px) {
   :global(dialog:modal) .transport {
     gap: 6px 10px;
@@ -101,10 +87,6 @@
   :global(dialog:modal) .help {
     display: none;
   }
-}
-
-.roughness > div {
-  flex-basis: 100%;
 }
 
 .transport :global(.mantine-Checkbox-label) {

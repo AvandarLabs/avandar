@@ -1,16 +1,20 @@
+/* Mantine's layer comes after the showcase resets, so it wins over them. */
+@layer showcase-reset, mantine;
+
 :root {
   background: var(--paper);
   color: var(--ink);
   color-scheme: light;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--ava-font);
   -webkit-font-smoothing: antialiased;
   font-synthesis: none;
 
-  --paper: #eeede7;
-  --white: #f8f7f1;
+  /* Brand-derived surfaces: a cool paper tinted toward Avandar blue. */
+  --paper: color-mix(in oklab, var(--ava-primary-0) 45%, var(--ava-neutral-0));
+  --white: #fff;
   --ink: var(--ava-neutral-9);
   --muted: var(--ava-neutral-6);
-  --line: #cecec4;
+  --line: color-mix(in oklab, var(--ava-primary-1) 35%, var(--ava-neutral-1));
   --accent-soft: var(--ava-primary-2);
   --accent: var(--ava-primary-7);
   --dark: var(--ava-neutral-9);
@@ -29,46 +33,52 @@ body {
   margin: 0;
 }
 
-button,
-input,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
+/*
+ * Element resets sit in a layer below Mantine's, so a Mantine Button or
+ * input inside the Atlas modals keeps its own styles. Unlayered rules always
+ * beat layered ones, so unlayered resets would strip every Mantine control.
+ * Gallery class rules stay unlayered and still override these.
+ */
+@layer showcase-reset {
+  button,
+  input,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-button,
-input {
-  font: inherit;
-}
+  button,
+  input {
+    font: inherit;
+  }
 
-button,
-a {
-  touch-action: manipulation;
-}
+  button,
+  a {
+    touch-action: manipulation;
+  }
 
-button {
-  color: inherit;
-  cursor: pointer;
-}
+  button {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
 
-button {
-  background: none;
-  border: 0;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 4px;
+  }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 4px;
-}
-
-button:disabled {
-  cursor: default;
+  button:disabled {
+    cursor: default;
+  }
 }
 
 svg {
@@ -80,10 +90,6 @@ h2,
 h3,
 p {
   margin: 0;
-}
-
-button {
-  padding: 0;
 }
 
 ::selection {
@@ -166,36 +172,13 @@ button {
   letter-spacing: -0.2px;
 }
 
+/* The logo PNG carries its own padding, so the box runs a little large. */
 .brand-mark {
-  display: inline-block;
-  height: 28px;
-  position: relative;
-  transform: rotate(-24deg);
-  width: 27px;
-}
-
-.brand-mark i {
-  border: 1.6px solid var(--ink);
-  border-radius: 50%;
-  height: 12px;
-  position: absolute;
-  width: 12px;
-}
-
-.brand-mark i:nth-child(1) {
-  left: 0;
-  top: 0;
-}
-
-.brand-mark i:nth-child(2) {
-  right: 0;
-  top: 8px;
-}
-
-.brand-mark i:nth-child(3) {
-  background: var(--ink);
-  bottom: 0;
-  left: 0;
+  display: block;
+  flex-shrink: 0;
+  height: 40px;
+  margin: -6px -6px -6px -8px;
+  width: 40px;
 }
 
 .site-header nav {
@@ -1125,48 +1108,6 @@ button {
   letter-spacing: 0.7px;
 }
 
-.palette-row {
-  align-items: center;
-  color: var(--ava-neutral-6);
-  display: flex;
-  font-size: 10px;
-  gap: 15px;
-  margin-top: 22px;
-}
-
-.swatches {
-  display: flex;
-  gap: 8px;
-}
-
-.swatch {
-  align-items: center;
-  background: var(--swatch);
-  border: 3px solid var(--paper);
-  border-radius: 50%;
-  color: var(--ava-primary-7);
-  display: flex;
-  height: 22px;
-  justify-content: center;
-  outline: 1px solid var(--ava-primary-1);
-  width: 22px;
-}
-
-.swatch.is-selected {
-  outline: 1px solid var(--ava-primary-7);
-}
-
-.swatch:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 3px;
-}
-
-.palette-note {
-  color: var(--ava-neutral-6);
-  font: 7px var(--mono);
-  margin-left: auto;
-}
-
 .dialog-details {
   min-width: 0;
   padding: 27px 26px 21px;
@@ -1528,14 +1469,6 @@ button {
     font-size: 11px;
   }
 
-  .palette-row {
-    gap: 12px;
-  }
-
-  .palette-note {
-    display: none;
-  }
-
   .frame-rate {
     display: none;
   }
@@ -1803,14 +1736,6 @@ button {
 
   .dialog-details h2 {
     font-size: 30px;
-  }
-
-  .palette-row {
-    margin-top: 17px;
-  }
-
-  .palette-note {
-    display: block;
   }
 
   .dialog-description {
@@ -2085,14 +2010,6 @@ button {
     max-height: none;
   }
 
-  .palette-note {
-    font-size: 6px;
-  }
-
-  .palette-row {
-    font-size: 9px;
-  }
-
   .dialog-description {
     font-size: 11px;
   }
@@ -2170,95 +2087,6 @@ button {
   .card-preview:focus-visible .preview-open {
     opacity: 1;
   }
-}
-
-.palette-controls {
-  align-items: center;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  color: var(--ink);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin: 18px 0 24px;
-  padding: 14px;
-}
-
-.color-control {
-  align-items: center;
-  display: flex;
-  font-size: 11px;
-  gap: 8px;
-}
-
-.color-control code {
-  font: 10px var(--mono);
-}
-
-.color-control input[type="color"] {
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  cursor: pointer;
-  height: 32px;
-  padding: 2px;
-  width: 32px;
-}
-
-.palette-reset {
-  font-size: 11px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.palette-help {
-  color: var(--ava-neutral-6);
-  flex-basis: 100%;
-  font-size: 10px;
-  line-height: 1.6;
-}
-
-.palette-controls input:focus-visible,
-.palette-reset:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 3px;
-}
-
-.palette-group {
-  display: flex;
-  flex: 1 1 310px;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.palette-controls .swatches {
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.palette-controls .swatch {
-  height: 26px;
-  width: 26px;
-}
-
-.palette-controls .swatch > svg {
-  color: #fff;
-  filter: drop-shadow(0 1px 1px var(--ava-neutral-9))
-    drop-shadow(0 0 1px var(--ava-neutral-9));
-}
-
-.palette-controls .color-control > span {
-  min-width: 68px;
-}
-
-.palette-controls .palette-reset {
-  align-self: center;
-}
-
-.palette-controls .palette-help {
-  margin: 0;
 }
 
 /* The animation owns the viewport. Reference material scrolls in its own rail. */
@@ -2428,56 +2256,6 @@ button {
   margin: 0;
 }
 
-.dialog-details .palette-controls {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  border-radius: 0;
-  border-top: 1px solid var(--line);
-  gap: 18px;
-  margin: 22px 0;
-  padding: 20px 0;
-}
-
-.dialog-details .palette-group {
-  flex-basis: 100%;
-  gap: 10px;
-}
-
-.dialog-details .color-control {
-  font-size: 12px;
-  gap: 6px;
-  justify-content: space-between;
-}
-
-.dialog-details .color-control code {
-  color: var(--muted);
-  font-size: 10px;
-}
-
-.dialog-details .color-control > span {
-  margin-right: auto;
-  min-width: 0;
-}
-
-.dialog-details .swatches {
-  gap: 9px;
-}
-
-.dialog-details .swatch {
-  height: 28px;
-  width: 28px;
-}
-
-.dialog-details .palette-help {
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.palette-reset {
-  color: var(--ava-primary-7);
-}
-
 .detail-section {
   margin-top: 22px;
 }
@@ -2560,7 +2338,8 @@ button {
   min-height: 0;
 }
 
-.preview-dialog button:disabled {
+/* Mantine buttons keep their own disabled styling. */
+.preview-dialog button:disabled:not(.mantine-UnstyledButton-root) {
   cursor: wait;
   opacity: 0.6;
 }
@@ -2657,17 +2436,6 @@ button {
     padding: 24px;
   }
 
-  .dialog-details .palette-controls {
-    display: grid;
-    gap: 18px 24px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dialog-details .palette-reset,
-  .dialog-details .palette-help {
-    grid-column: 1/-1;
-  }
-
   .dialog-actions {
     flex-direction: row;
   }
@@ -2678,10 +2446,6 @@ button {
 }
 
 @media (width <= 520px) {
-  .dialog-details .palette-controls {
-    grid-template-columns: 1fr;
-  }
-
   .dialog-actions {
     flex-direction: column;
   }
@@ -2712,5 +2476,64 @@ button {
   .collection-filter {
     width: 100%;
     max-width: none;
+  }
+}
+
+/*
+ * The Design tokens tab widens the modal's right column, without squeezing
+ * the player on narrower screens.
+ */
+@media (width > 800px) {
+  .dialog-layout.is-token-panel {
+    grid-template-columns: minmax(0, 1fr) min(420px, 45vw);
+  }
+}
+
+/*
+ * While the Design tokens tab is open on a phone, the player stays pinned
+ * under the dialog header as a small strip, so an edit stays in view. The
+ * strip, the header, and the tab list together cover about a third of the
+ * viewport. The panel tab list and the token editor's pinned block stick
+ * below the strip through --atlas-pin-offset. The scrubber and its labels
+ * are hidden while pinned. Play, pause, and restart stay.
+ */
+@media (width <= 760px) {
+  :root {
+    --atlas-header-height: 64px;
+    --atlas-strip-height: calc(14dvh + 48px);
+  }
+
+  .dialog-layout.is-token-panel {
+    --atlas-pin-offset: calc(
+      var(--atlas-header-height) + var(--atlas-strip-height)
+    );
+  }
+
+  .is-token-panel .dialog-player {
+    height: var(--atlas-strip-height);
+    inset-block-start: var(--atlas-header-height);
+    position: sticky;
+    z-index: 4;
+  }
+
+  .is-token-panel .dialog-stage {
+    padding: 0;
+  }
+
+  .is-token-panel .dialog-canvas {
+    aspect-ratio: 8 / 5;
+    height: 100%;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .is-token-panel .player-controls {
+    padding: 6px 16px;
+  }
+
+  .is-token-panel .frame-scrubber,
+  .is-token-panel .scrubber-labels,
+  .is-token-panel .frame-rate {
+    display: none;
   }
 }

@@ -1,6 +1,6 @@
 # Continuity compositions
 
-The Composition Atlas at `/compositions.html` contains ten long explainers and thirteen reusable studies. It is linked from the Motion Atlas and Productions. Every preview uses the live React composition. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
+The Motion Atlas **Compositions** and **Sample films** sections (`/motion.html?section=compositions` and `?section=films`; the legacy `/compositions.html` link redirects there) contain ten long explainers, thirteen reusable continuity studies, and the [shot vocabulary](../storyboards/shot-vocabulary.json) sample film with twelve storyboard-scene studies drawn from it. Terms such as composition, transition, compositing and reenactment follow [the video producer nomenclature](../../../docs/video-producer-nomenclature.md). Each section shows a category sidebar with counts and a card per entry; a card's thumbnail is a tracked poster (`showcase/assets/atlas/<themeId>/<id>.jpg`, rendered by `pnpm atlas:posters --theme <themeId>`; a theme without one falls back to the `classic` poster with a badge), and opening it plays the live React composition in the Atlas preview modal. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
 
 ## Editorial choices
 
@@ -9,9 +9,9 @@ Professional continuity gives the viewer a reason to follow an object, a directi
 | Relationship | Useful treatment | What to preserve | Avoid |
 | --- | --- | --- | --- |
 | Motion to motion | Cut, short dissolve, spatial continuation, aperture, shared-object handoff | Object identity, direction, reading order, color meaning | Dissolving several layers of text together; unrelated shapes morphing without a reason |
-| Motion to product | Conceptual frame opens onto a measured product region | The question or model being demonstrated; readable native text | Scaling the entire UI, invented controls, beginning an action during the reveal |
-| Product to motion | Hold the result, then reveal its data or relationship model | The result's meaning and source context | Implying that the diagram is actual backend telemetry |
-| Product and motion | Full native product with anchored floating artwork, a source spotlight, and timed notation | The action, its observed consequence, and one focal point | A connector that asserts an unverified data flow; tiny complete diagrams squeezed into a rail |
+| Motion to reenactment | Conceptual frame opens onto a measured product region | The question or model being demonstrated; readable native text | Scaling the entire UI, invented controls, beginning an action during the reveal |
+| Reenactment to motion | Hold the result, then reveal its data or relationship model | The result's meaning and source context | Implying that the diagram is actual backend telemetry |
+| Motion over reenactment | Full native product with anchored floating artwork, a source spotlight, and timed notation | The action, its observed consequence, and one focal point | A connector that asserts an unverified data flow; tiny complete diagrams squeezed into a rail |
 
 The authored transitions generally take 18–30 frames at 30 fps. That is a vocabulary default, not a universal rule. Native product beats stay mounted; diagrams hold their resolved pose before their stock loop reset. Diagram details depart from a measured UI source, settle in free space, and return attention to their origin. Fast diagram camera moves use temporal shutter samples; readable holds remain sharp. Captions retain a separate 160-pixel band.
 
@@ -22,15 +22,16 @@ A graphic match cut depends on matching the actual source and destination images
 | Film | Composition and product sequence |
 | --- | --- |
 | `qetl-motion` | QETL: motion to motion |
-| `qetl-to-product` | QETL: motion to product, Explorer query |
-| `product-to-qetl` | QETL: product to motion, Import |
+| `qetl-to-product` | QETL: motion to reenactment, Explorer query |
+| `product-to-qetl` | QETL: reenactment to motion, Import |
 | `qetl-composite` | QETL: composite, Dashboard result |
 | `ontology-motion` | Customizability: motion to motion |
-| `ontology-to-product` | Customizability: motion to product, Concept metadata |
-| `product-to-ontology` | Customizability: product to motion, Case record |
+| `ontology-to-product` | Customizability: motion to reenactment, Concept metadata |
+| `product-to-ontology` | Customizability: reenactment to motion, Case record |
 | `ontology-composite` | Customizability: composite, Field mapping |
 | `plugin-ecosystem` | Future plugins: motion to motion |
 | `right-sized-data` | Small and medium workloads: motion to motion |
+| `shot-vocabulary` | Storyboard scenes: the launch-film shot vocabulary (`kind: scene`, see below) |
 
 The ten films run approximately 51–66 seconds each. They use different stock presets and six distinct product sequences. QETL's composite traces a static dashboard result to its illustrative dependency and reuse path; it does not depict configuring or saving the dashboard. Ontology's composite shows a rule selection and manual-field configuration. The causal-signal study isolates the rule action and its explanatory consequence.
 
@@ -45,8 +46,43 @@ Actual product leaves come from this worktree's source and CSS. Fixture controll
 | Transitions | Shared-object handoff; frame-to-interface morph; aperture into detail; spatial continuation; occlusion wipe; aligned-layout dissolve |
 | Compositing | Action, signal, consequence; bracket a field group; focus without a connector; restrained teaching underline |
 | Composition recipes | Model to workspace; record to relationships; controls and their meaning |
+| Transitions (scenes) | Stepped column wipe; field-colour cut; fly-through into colour; whip exit |
+| Composition recipes (scenes) | Tilted product window; racing pair; brand lockup and call to action; bar comparison |
+| Entrances and reveals | Window entrances; typography line reveals; heading wipe; graph packets |
 
 Each study exposes guidance, real schema paths, and its source-film link. Inputs are authored as validated storyboards, not changed through a live form editor. The gallery search and family buttons select films or studies; the existing Motion Atlas input editor continues to own individual stock-preset inputs.
+
+### Storyboard-scene studies
+
+The catalog also hosts studies of plain storyboard scenes and shot transitions
+(`tilted-window`, `brand-lockup`, `bar-comparison`, typography, graph and metric
+headings, `stepped-column-wipe`, field-colour cuts). An entry with `kind: scene`
+is a scene study; an entry without `kind` is a continuity study, and its
+validation is unchanged.
+
+| | Continuity study | Scene study (`kind: scene`) |
+| --- | --- | --- |
+| Plan | `storyboards/explainers/`, one `continuity` shot at 1600 by 840 | `storyboards/vocabulary/` (the parser enforces it), plain scenes at 1920 by 1080, plan `id` equal to the catalog `id` |
+| Control paths | Continuity beat fields such as `beats[].transition.kind` | Shot fields rooted at `props`, `transition`, `transitionInFrames` or `theme`, such as `props.windows[].swap` or `transition.outgoingDrift` |
+| Path check | `gallerySelectionReducer.test.ts`: every path is a beat schema field present in the study's first shot | `sceneStudies.test.ts`: every path is set on at least one shot of the plan, `frames` equals the plan duration, and the studies together cover every piece of shot vocabulary |
+| `sourceFilm` | A continuity film | The `shot-vocabulary` sample film, itself registered with `kind: scene` |
+| Atlas controls | Palette, camera preset, motion blur, annotations, roughness and captions | Playback only. Plain scenes keep their authored plan and per-shot `theme`, and the live player ignores appearance messages for them, so the viewer hides those controls and says so. Downloads send only the caption choice. Transcript and caption links are hidden because the plans carry no narration |
+
+Scene studies sit in the `transitions` and `compositions` categories next to the
+continuity studies, plus an `entrances-and-reveals` category ("Entrances and
+reveals"). The sidebar filters by category and shows each category's count;
+each card labels its entry "Continuity" or "Storyboard scenes" with its
+duration. Add a poster for a new entry with `pnpm atlas:posters <id>`;
+`atlasPosters.test.ts` fails until every catalog entry has one. Keep one category's
+entries adjacent in `studyCatalog.yaml`; a test checks it.
+
+To add one, write a short focused plan in `storyboards/vocabulary/`, run
+`pnpm video validate` and `pnpm video preview` on it and read the contact sheet,
+then add its catalog entry with real `goodFor`, `creativeDirection`, `avoid`,
+three or more distinct `tags`, and `controls` that name the shot fields a reuser
+would change. Keep **Fictional demonstration data** visible under product stills
+(tilted-window `footnote`) and figures (bar-comparison `footnote`). Scene-plan
+copy is not extracted into the continuity catalog; only the catalog metadata is.
 
 ## Authoring contract
 
@@ -54,12 +90,13 @@ Each study exposes guidance, real schema paths, and its source-film link. Inputs
 
 `src/continuity/vocabulary/studyCatalog.yaml` is the source of reusable composition
 metadata. Each entry includes `title`, `description`, `goodFor`, `tags`,
-`creativeDirection`, and `avoid`. Tags provide keyword phrases. Creative direction
+`creativeDirection`, and `avoid`, plus `kind: scene` for a storyboard-scene
+study. Tags provide keyword phrases. Creative direction
 describes the visual treatment, attention sequence, and intended feel of the
 authored study. The Atlas searches these semantic fields and displays the guidance
 and tags in the reuse guide.
 
-Edit this YAML directly. The Atlas, CLI, translation collector, and renderer load
+Edit this YAML directly. The Atlas, CLI, and renderer load
 the same source and validate its structure. Sample-film metadata lives alongside
 it in `src/continuity/films/filmCatalog.yaml`. There is no catalog export step or
 generated JSON copy to synchronize. Normal showcase rebuilds consume YAML edits.
@@ -101,11 +138,11 @@ Narration uses `shotId`, optional `beatId`, and start/end frames. With `beatId`,
 
 Product features include Import, Explorer, Dashboards, Cases, Map, Ontology, and Attribute Mapping. Existing native `avandar` scenes keep their original feature set; the two new adapters are exposed through continuity. Product scenes require a 1600 × 840 stage, typically a 1600 × 1000 film with single-line captions. The CLI detects product and map requirements inside continuity scenes and includes the product build in preview fingerprints.
 
-Use `pnpm video validate <plan>` and `pnpm video preview <plan>` from the producer app. Preview frames include nested boundaries and resolved poses. Inspect the frames and playback after editing. `pnpm showcase` regenerates localized copy and watches source changes. A successful rebuild refreshes the gallery and live player while preserving the selected film and the player's saved state.
+Use `pnpm video validate <plan>` and `pnpm video preview <plan>` from the producer app. Preview frames include nested boundaries and resolved poses. Inspect the frames and playback after editing. `pnpm showcase` watches source changes. A successful rebuild refreshes the gallery and live player while preserving the selected film and the player's saved state.
 
-## Localized copy
+## Copy
 
-`pnpm continuity:messages` generates extractable descriptors from the authored films, studies and gallery copy, then extracts and compiles the Lingui catalog. The existing stock-message lifecycle invokes it for tests, showcase startup and video commands. Add translations under `src/continuity/i18n/locales/`; regional locales fall back to their base language and then English. Existing providers keep their locale and product translator. Standalone continuity scenes receive an English provider when their caller has none.
+Film, study and gallery copy is plain English authored in the catalog YAML and the plan JSON. Components render it as written. There are no message catalogs, locale folders or translation providers for it.
 
 ## Remotion implementation
 
@@ -119,7 +156,7 @@ Dependencies are pinned to the producer's existing Remotion version, 4.0.516. Do
 
 ## Appearance and camera direction
 
-The Composition Atlas reuses Motion Atlas swatches and color pickers. Camera motion, motion blur, annotations and captions can be toggled independently without seeking the playhead. Speed and loop are synchronized to the active player. Downloads use its acknowledged appearance snapshot. Palette changes affect editorial graphics; actual product components keep their native theme.
+The Compositions section reuses Motion Atlas swatches and color pickers. Camera motion, motion blur, annotations and captions can be toggled independently without seeking the playhead. Speed and loop are synchronized to the active player. Downloads use its acknowledged appearance snapshot. Palette changes affect editorial graphics; actual product components keep their native theme.
 
 Camera paths establish a wide diagram, push into one relevant detail, travel quickly to the next, and reopen the context. Align the travel with the caption or spoken change of subject. Stock objects can depart independently through an authored mask. Use these moves to direct attention, and leave the explanation still long enough to read. The product stage stays at 1600 by 840; a dedicated stacking context keeps native application layers underneath explanatory overlays.
 
@@ -127,7 +164,7 @@ Camera paths establish a wide diagram, push into one relevant detail, travel qui
 ## Independent sketch controls
 
 Annotation roughness and Box roughness each offer Smooth (0), Subtle (0.5),
-Sketch (1.5), and Rough (3) in the Composition Atlas. Storyboard continuity
+Sketch (1.5), and Rough (3) in the Atlas Compositions section. Storyboard continuity
 props and appearance/export options also accept intermediate numeric levels,
 for example `{ "annotationRoughness": 0.5, "boxRoughness": 2 }`. Settings persist
 between films and reloads. Exports receive the active player's acknowledged

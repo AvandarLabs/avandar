@@ -1,0 +1,89 @@
+.videoThemePanel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding-block: 16px 20px;
+  padding-inline: 20px;
+
+  /*
+   * One focus ring for every control in the panel, matching the gallery's own
+   * focus style: 2px of --ava-primary-7. It overrides Mantine's stock blue.
+   */
+  :focus-visible {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 2px;
+  }
+
+  /* A switch and a segmented control hide their input, so the ring goes on what is drawn. */
+  :global(.mantine-Switch-input):focus-visible
+    + :global(.mantine-Switch-track) {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 2px;
+  }
+
+  :global(.mantine-SegmentedControl-input):focus-visible
+    + :global(.mantine-SegmentedControl-label) {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 0;
+  }
+
+  /*
+   * Labels use the ink colour. Mantine paints these in pure black or its stock
+   * gray.7, and DESIGN.md allows neither, so the panel states its own.
+   */
+  :global(.mantine-Button-root[data-variant="default"]),
+  :global(.mantine-SegmentedControl-label),
+  :global(.mantine-Accordion-label) {
+    color: var(--ink);
+  }
+
+  /* A disabled button's label is the neutral ramp, not stock gray.5. */
+  :global(.mantine-Button-root:disabled) {
+    color: var(--ava-neutral-4);
+  }
+
+  /* Text fields and selects also recolour their border, but never over an error. */
+  :global(.mantine-Input-input):focus:not([data-error]) {
+    border-color: var(--ava-primary-7);
+  }
+}
+
+/*
+ * On a phone every control gets at least a 32px hit area, past the 24px
+ * WCAG 2.2 minimum. A Mantine control sets its own height, so these floors
+ * go on the library's stable class names.
+ */
+@media (width <= 760px) {
+  .videoThemePanel {
+    padding: 12px;
+
+    :global(.mantine-Button-root),
+    :global(.mantine-Input-input) {
+      min-height: 32px;
+    }
+
+    :global(.mantine-ActionIcon-root) {
+      min-height: 32px;
+      min-width: 32px;
+    }
+
+    :global(.mantine-Switch-body) {
+      align-items: center;
+      min-height: 32px;
+    }
+
+    :global(.mantine-SegmentedControl-label) {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      min-height: 32px;
+    }
+
+    :global(.mantine-ColorInput-swatch) {
+      flex: 0 0 32px;
+      height: 0;
+      padding-bottom: 32px;
+      width: 32px;
+    }
+  }
+}

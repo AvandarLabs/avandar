@@ -2,20 +2,17 @@ import { TransitionSeries } from "@remotion/transitions";
 import { Fragment } from "react";
 import { Sequence, useCurrentFrame } from "remotion";
 import { createSceneTransition } from "../motion-components/SceneTransition";
-import {
-  ContinuityAppearanceContext,
-  getEditorialInk,
-} from "./ContinuityAppearanceContext";
+import { buildColorWithAlpha } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
+import { ContinuityAppearanceContext } from "./ContinuityAppearanceContext";
 import { ContinuityBeatView } from "./ContinuityBeatView";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
 import { ContinuityToken } from "./ContinuityToken";
-import { useContinuityCopy } from "./useContinuityCopy";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityPlan } from "./continuitySchema";
-import type { CSSProperties } from "react";
 
-/** Overlap-aware sequence of motions, product demonstrations and explanatory composites. */
+/** Overlap-aware sequence of motions, product demonstrations and explanatory composites, drawn in the surrounding video theme. */
 export function ContinuityScene({
   plan,
   frame,
@@ -26,20 +23,15 @@ export function ContinuityScene({
   productScene?: ProductSceneRenderer;
 }) {
   const parentFrame = useCurrentFrame();
-  const translate = useContinuityCopy();
+  const { color } = useVideoTokens();
+  const bar = useVideoProps("ProgressBar", {});
+  const morph = useVideoProps("Morph", {});
+  const aperture = useVideoProps("Aperture", {});
   const timing = getContinuityTimeline(plan.beats);
   const duration = timing[timing.length - 1].end;
   return (
     <ContinuityAppearanceContext.Provider value={plan}>
-      <div
-        className={css.continuityStage}
-        style={
-          {
-            "--continuity-ground": plan.background,
-            "--continuity-ink": getEditorialInk(plan.background),
-          } as CSSProperties
-        }
-      >
+      <div className={css.continuityStage}>
         <Sequence from={parentFrame - frame}>
           <TransitionSeries>
             {plan.beats.map((beat, index) => (
@@ -54,6 +46,8 @@ export function ContinuityScene({
                       anchor: plan.beats[index - 1]?.token?.anchor,
                       cameraMotion: plan.cameraMotion,
                       motionBlur: plan.motionBlur,
+                      morphRadius: morph.startRadius,
+                      apertureOverscan: aperture.overscan,
                     })}
                   />
                 )}
@@ -63,7 +57,7 @@ export function ContinuityScene({
                 >
                   <ContinuityBeatView
                     beat={beat}
-                    accent={plan.accent}
+                    accent={color.accent}
                     productScene={productScene}
                   />
                 </TransitionSeries.Sequence>
@@ -73,14 +67,15 @@ export function ContinuityScene({
         </Sequence>
         <ContinuityToken plan={plan} frame={frame} />
         <div className={css.continuityEvidence}>
-          <span>{translate(plan.evidence)}</span>
-          <span>{translate(plan.title)}</span>
+          <span>{plan.evidence}</span>
+          <span>{plan.title}</span>
         </div>
         <div
           className={css.continuityProgress}
           style={{
             width: `${Math.min(1, frame / (duration - 1)) * 100}%`,
-            background: plan.accent,
+            height: bar.height,
+            background: buildColorWithAlpha(bar.paint.color, bar.paint.alpha),
           }}
         />
       </div>

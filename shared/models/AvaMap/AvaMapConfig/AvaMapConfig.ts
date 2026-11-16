@@ -15,6 +15,8 @@ import type {
   TimeRange as TimeRangeType,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type {
+  ExportFeatureList as ExportFeatureListType,
+  ExportFeatureListSort as ExportFeatureListSortType,
   ExportHeaderLine as ExportHeaderLineType,
   ExportLayout as ExportLayoutType,
   ExportOrientation as ExportOrientationType,
@@ -62,4 +64,8 @@ export namespace AvaMapConfig {
   export type ExportOrientation = ExportOrientationType;
   /** One optional header line: whether it prints, and the author's text. */
   export type ExportHeaderLine = ExportHeaderLineType;
+  /** One layer's features, printed as a table after the map. */
+  export type ExportFeatureList = ExportFeatureListType;
+  /** The column and direction a printed feature list sorts by. */
+  export type ExportFeatureListSort = ExportFeatureListSortType;
 }

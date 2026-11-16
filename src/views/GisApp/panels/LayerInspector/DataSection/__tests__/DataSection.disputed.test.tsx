@@ -12,6 +12,7 @@ import {
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DisputedStatusControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
@@ -44,6 +45,27 @@ function _column(
       columnIdx: 0,
     }),
   );
+}
+
+/** A text field that keeps every value, which a query reads as a list. */
+function _textListColumn(name: string): QueryColumn.T {
+  return QueryColumnModel.makeFromConceptAttributes([
+    Model.make("ConceptAttribute", {
+      id: uuid<ConceptAttribute.Id>(),
+      conceptId: uuid(),
+      workspaceId: uuid(),
+      createdAt: "2026-11-06T00:00:00Z",
+      updatedAt: "2026-11-06T00:00:00Z",
+      name,
+      description: undefined,
+      dataType: "varchar",
+      mappingType: "dataset_column",
+      isLabel: false,
+      isIdentifier: false,
+      allowManualEdit: false,
+      isArray: true,
+    }) as ConceptAttribute.T,
+  ])[0]!;
 }
 
 function _statusColumn(): QueryColumn.T {
@@ -155,6 +177,24 @@ describe("DisputedStatusControls", () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("option", { name: "population", hidden: true }),
+    ).toBeNull();
+  });
+
+  it("does not offer a text list field", () => {
+    fixtures.sourceColumns = [
+      _column("status", "varchar"),
+      _textListColumn("statuses"),
+    ];
+    _render({ layer: _polygonFillLayer() });
+    fireEvent.click(
+      screen.getByRole("combobox", { name: "Disputed status column" }),
+    );
+
+    expect(
+      screen.getByRole("option", { name: "status", hidden: true }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "statuses", hidden: true }),
     ).toBeNull();
   });
 

@@ -20,9 +20,20 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   sqlQueryFailed: string;
   /** The SQL was applied but no query outcome was observed. */
   sqlQueryApplied: string;
+  /**
+   * The model offered a block, such as a heading, that only a dashboard can
+   * hold, while the user is in the Data Explorer.
+   */
+  dashboardOnlyBlock: string;
   fallbackTitle: string;
   fallbackMessage: string;
+  /** The button that answers the failed message offline. */
+  fallbackAction: string;
   contextWindowExceeded: string;
+  /** The agent's reply when the proxy refuses the user's role. */
+  agentAccessDenied: string;
+  /** The agent's reply when a turn fails and cannot be answered offline. */
+  agentUnavailable: string;
 };
 
 /**

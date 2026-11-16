@@ -4,25 +4,35 @@ import {
   delayRender,
   staticFile,
 } from "remotion";
+import {
+  listBundledVideoFonts,
+  VIDEO_FONT_REGISTRY,
+} from "./videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 
-/** Locally bundled Geist keeps previews and exports independent of font CDNs. */
-export const FACE = "Geist";
-// Register once per document and hold rendering until the shared face is ready.
+// Register every bundled face once per document and hold rendering until each
+// one is ready, so previews and exports never depend on a font CDN.
 if (typeof document !== "undefined") {
-  const handle = delayRender("Load local Geist font");
-  const face = new FontFace(
-    FACE,
-    `url(${staticFile("fonts/geist-latin.woff2")})`,
-    { weight: "100 900", style: "normal" },
-  );
-  void face
-    .load()
-    .then((loaded) => {
-      document.fonts.add(loaded);
-      continueRender(handle);
-    })
-    .catch(cancelRender);
+  listBundledVideoFonts().forEach((font) => {
+    const handle = delayRender(`Load local ${font.label} font`);
+    const face = new FontFace(font.face, `url(${staticFile(font.file)})`, {
+      weight: font.weight,
+      style: "normal",
+    });
+    void face
+      .load()
+      .then((loaded) => {
+        document.fonts.add(loaded);
+        continueRender(handle);
+      })
+      .catch(cancelRender);
+  });
 }
 
+/** Avandar's brand typeface name, for code that names the face directly. */
+export const FACE = "Figtree";
+
 /** Shared composition typography. Product scenes retain their own source font. */
-export const TYPE = `${FACE}, Inter, ui-sans-serif, system-ui, sans-serif`;
+export const TYPE = VIDEO_FONT_REGISTRY.figtree.stack;
+
+/** Monospace stack for commands, code and terminal text drawn by scenes. */
+export const MONO = VIDEO_FONT_REGISTRY.systemMono.stack;

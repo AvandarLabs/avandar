@@ -3,7 +3,7 @@ import { SeedCaptions } from "./SeedCaptions";
 import { SeedContainers } from "./SeedContainers";
 import { SeedCultivator } from "./SeedCultivator";
 import { SeedMaterial } from "./SeedMaterial";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 import type { ReactNode } from "react";
 

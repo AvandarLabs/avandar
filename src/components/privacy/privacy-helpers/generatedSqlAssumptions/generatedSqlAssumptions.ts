@@ -43,7 +43,10 @@ export function collectApprovedClarificationValues(
     if (message.role !== "user") {
       continue;
     }
-    const match = message.content.match(/^\[Clarification answer: (.+)\]$/s);
+    // An automatically matched answer carries a note on a second line.
+    const match = message.content.match(
+      /^\[Clarification answer: (.+?)\](?:\n[^\n]*)?$/s,
+    );
     if (!match) {
       continue;
     }

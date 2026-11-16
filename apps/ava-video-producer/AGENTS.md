@@ -5,6 +5,37 @@ governs how they are shot. Compositions are React; output is mp4. The local
 pipeline adds real Avandar capture, validated storyboards, reusable scenes,
 narration/captions, and reproducible fictional demo data.
 
+## No translation
+
+This app is an internal tool. It has no Lingui catalogs and no translation
+hooks. Write displayable text as plain English strings and JSX.
+
+The repo-wide rule that all displayable frontend text must be translated
+through Lingui does **not** apply anywhere under `apps/ava-video-producer`, and
+this file overrides it. Do not add `<Trans>`, `t`, `msg`, `useLingui` for copy,
+message extraction, compiled catalogs, `.po` files or locale folders here.
+Stock, continuity, helper and token copy is read straight from its YAML
+catalog, token catalog or source literal.
+
+The one exception is `avandar-adapter/`. Its product components bring their
+own translations, so the adapter keeps only the minimum needed to host them:
+
+- `avandar-adapter/index.tsx` creates an English `i18n` instance
+  (`@lingui/core`, `@lingui/message-utils`) and wraps the stage in
+  `I18nProvider` (`@lingui/react`) because product components call the
+  product's own `useLingui` and `<Trans>`.
+- `avandar-adapter/DashboardScreen/DashboardScreen.tsx` reads that `i18n`
+  instance with `useLingui` from `@lingui/react` to hand it to the product's
+  dashboard config hook.
+- `scripts/buildProduct/compileProductSource.ts` runs `@lingui/babel-plugin-lingui-macro` over the
+  product source it compiles, so the product's macros expand.
+
+That is why `@lingui/core`, `@lingui/message-utils`, `@lingui/react`,
+`@lingui/babel-plugin-lingui-macro` and `@babel/core` stay in `package.json`.
+Strings the adapter itself owns (fixture names, labels it passes to product
+components) are plain English like everything else. Never import Lingui from
+`src/`. A test fails if you do.
+
 ## Read the skill first
 
 **`.claude/skills/product-demo/SKILL.md` before writing or editing any
@@ -16,6 +47,8 @@ Not on Claude Code? The file is plain markdown; read it directly.
 
 ## Read and maintain the inventories
 
+- Use the terms in [the video producer nomenclature](../../docs/video-producer-nomenclature.md): animation, motion, composition, transition, compositing, layout, camera movement, film, helper, and reenactment. "Atlas" and "catalog" mean the same thing. Keep "scene" for storyboard scenes, and call programmatically performed product UI a reenactment, never a recording.
+- Read [docs/video-theme.md](docs/video-theme.md) before changing a colour, font, stroke, corner, shadow, glow, sketch, layout, timing, or camera value in a renderer. Every such value comes from the video theme: add or reuse a token, never a literal. The design-token terms are in the nomenclature above.
 - Read [docs/motion-vocabulary.md](docs/motion-vocabulary.md) before adding or changing animation behavior. Reuse the shared curves, durations, and helpers; update the inventory when their APIs or behavior change.
 - Read [docs/shared-scene-library.md](docs/shared-scene-library.md) before adding or changing a scene or visual component. Reuse existing components and update the inventory when their interfaces or availability change.
 - Use [docs/stock-motion-library.md](docs/stock-motion-library.md) and `showcase/motion.html` when choosing graphic references. Refer to stable preset IDs in briefs. Keep the gallery and Remotion on the same `StockGraphic` renderer; rebuild the browser bundle after edits. Stock labels, relationships, code, and values are illustrative, not product evidence. Add new presets to the typed catalog, renderer, documentation, and inspected preview/render outputs together.
@@ -36,7 +69,7 @@ npm run studio                          # preview at localhost:3000, scrub the t
 sh scripts/preview.sh <id>              # stills on every beat + a contact sheet
 sh scripts/render.sh <id> [poster-frame] # render → deliver → gate
 bash scripts/add-sfx.sh <id>            # sound pass over the finished mp4
-node scripts/check-frames.mjs <file>    # the gate on its own
+node --import tsx scripts/checkFrames.ts <file>    # the gate on its own
 npm run typecheck                      # source and tool/test types
 npm test                               # schema, scene, capture, and pipeline checks
 npm run data:validate                  # verify fictional fixtures independently
@@ -48,9 +81,10 @@ npm run video -- validate storyboards/library.json
 npm run video -- plan storyboards/library.json
 npm run video -- preview storyboards/library.json
 npm run video -- render storyboards/library.json
-npm run motion:build                  # build the live Motion Atlas gallery
+npm run motion:build                  # build every showcase page with Vite
 npm run motion -- preview all          # inspect each preset's contact sheet
 npm run motion -- render all           # matching previews, serial render and loop gate
+npm run atlas:posters [id...]          # Compositions and Sample films card posters
 ```
 
 `STANDALONE=1` on a clip that plays once skips the loop-seam check, which
@@ -73,8 +107,15 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 - **`src/motion.ts` has no runtime imports.** Its React `CSSProperties` import
   is type-only. Keep the helpers independent of the renderer so they remain portable.
 - **The gate is not optional.** `render.sh` exits non-zero on its failure. Do
-  not loosen the thresholds in `check-frames.mjs` to make a render pass. It
-  keeps the frame sequence on a failure so the flagged JPEG can be opened.
+  not loosen the thresholds in `checkFrames.ts` or `scripts/lib/frameGateHelpers.ts`
+  to make a render pass. It keeps the frame sequence on a failure so the
+  flagged JPEG can be opened. The one sanctioned exception is a storyboard's
+  declared cut (`transition: {kind: "cut"}`): `video render` passes its first
+  frame as `--declared-cuts`, and the gate accepts a jump of any size there
+  only if the luma does not swing back by more than 25 within 10 frames,
+  because a jump and its reversal is a flash. It lists every declared cut and
+  its verdict. Declare a cut only where the film means one; never declare one
+  to silence a strobe.
 - **Nothing on screen may be invented.** Not a row, a card, a label, a count
   or a colour. Lists live in a constants module, not in the page; grep a
   visible string back to its definition and use the whole list in its order.
@@ -111,7 +152,7 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 `storyboards/` reviewed film inputs · `capture-flows/` real UI actions ·
 `avandar-adapter/` frame-controlled product adapters · the enclosing Avandar `src/`, `shared/`, and `packages/` supply product source ·
 `src/avandar/` generated bridge and measured pointer choreography ·
-`demo-data/` fictional inputs and validators · `scripts/video.ts` assembly ·
+`demo-data/` fictional inputs and validators · `scripts/video/video.ts` assembly ·
 `scripts/beats/<id>.txt` legacy sound scores · `.claude/skills/product-demo/` the skill.
 
 ## Clips shot against a real product
@@ -134,9 +175,9 @@ rules for committing, pushing, merging, or publication.
 
 ## Avandar workspace additions
 
-- Never open, print, commit, or copy `.env.local`. It contains credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it.
+- Never open, print, commit, or copy `.env.local` or the workspace root's `.env.video-producer.local`. They contain credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it. The root file is the source; the license guard (`scripts/lib/copyRootEnvFile.ts`) copies it to `.env.local`, so never edit the copy by hand. Add new producer keys to the root `.env.video-producer.example`.
 - Keep `Config.setDotEnvLocation("remotion.env")`. Never pass `.env.local` to Remotion: environment-file values are exposed to browser code.
-- Every executable producer entry point must call the shared license guard before doing work. `scripts/lib/readLicense.mjs` reads only the public/private pair without populating `process.env`. Keep raw Remotion CLI configuration guarded too. Never add a skip-license environment variable. Tests use inert keys in temporary files and must never submit render telemetry with them.
+- Every executable producer entry point must call the shared license guard before doing work. `scripts/lib/getRemotionLicenseFromAppRoot.ts` reads only the public/private pair without populating `process.env`. Keep raw Remotion CLI configuration guarded too. Never add a skip-license environment variable. Tests use inert keys in temporary files and must never submit render telemetry with them.
 - The starter showcase is intentionally generic. Preserve the original demo and palette when demonstrating upstream behavior; label new studies as additions.
 - `pnpm showcase` serves the gallery, generated browser players, approved plan
   media, and completed downloads through bounded local routes. Never serve the
@@ -154,8 +195,9 @@ rules for committing, pushing, merging, or publication.
   deliveries use `out/motion/deliveries/`. Do not copy generated MP4s into gallery
   assets or rewrite page revision strings.
 - Production player caption choices must match their exports. Motion Atlas
-  downloads must preserve the selected accent and background. Do not imply that
-  product films offer arbitrary brand or background controls.
+  downloads must render with the video theme the preview shows, unsaved edits
+  included. Do not imply that product films offer arbitrary brand or
+  background controls.
 - `TitleStudy`, `MotionLab`, and the library storyboard are examples of the kit itself, not claims about Avandar's UI or features. Label editorial diagrams and synthetic data clearly.
 - Harborfield fixtures are deliberately fictional, authorized demo inputs. Keep **Fictional demonstration data** visible in product footage and exported examples. Preserve blank/missing values and dataset grain; do not turn fixture fields into claims about unimplemented product workflows.
 - Component films render the actual worktree source closure with deterministic fixture state. Do not describe adapter typing, query results, save responses or navigation as a new live product test. Keep source hashes, fixture provenance and remaining product limitations explicit.

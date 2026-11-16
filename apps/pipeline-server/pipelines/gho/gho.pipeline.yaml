@@ -1,0 +1,27 @@
+# The GHO pipeline's one drive, WHO's Global Health Observatory OData API,
+# and the catalog metadata every GHO listing shares. Read once per run by
+# `run.ts`. See socrata.pipeline.yaml for the mapping kinds, and
+# docs/measles-demo/gho-pipeline-spec.md.
+#
+# Each indicator is one listing, and each dimension's value list is another.
+# GHO's records carry only a code and a name, which the pipeline maps in
+# code, so the fields here are constants.
+
+organizationLabels:
+  1: Organization
+  2: Collection
+
+fields:
+  organization1_name: { value: World Health Organization }
+  organization2_name: { value: Global Health Observatory }
+
+# How the pipeline server downloads one listing for its Parquet copy. GHO
+# answers a whole indicator in one JSON response, so it does not page.
+download:
+  paging: false
+  script: ./download/ghoListingDownload.ts
+
+# GHO is one OData service, so this lists one drive. An empty list switches
+# the pipeline off.
+drives:
+  - baseUrl: https://ghoapi.azureedge.net/api

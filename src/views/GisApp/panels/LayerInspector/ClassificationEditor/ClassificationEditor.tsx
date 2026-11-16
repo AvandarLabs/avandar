@@ -11,6 +11,8 @@ import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
+  /** Lowest and highest classified value, from the layer's view state. */
+  classifiedValueDomain?: readonly [number, number];
   onLayerChange: LayerChangeHandler;
   onBack: () => void;
 };
@@ -31,6 +33,7 @@ function _getManualBreaks(layer: MapLayer.T, color: MapLayer.Color): number[] {
 /** Focused editor for polygon color classification and normalization. */
 export function ClassificationEditor({
   layer,
+  classifiedValueDomain,
   onLayerChange,
   onBack,
 }: Props): ReactNode {
@@ -52,6 +55,7 @@ export function ClassificationEditor({
           layer={layer}
           color={color}
           manualBreaks={_getManualBreaks(layer, color)}
+          classifiedValueDomain={classifiedValueDomain}
           onLayerChange={onLayerChange}
         />
       ) : color.type === "categorical" ? (

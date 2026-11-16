@@ -1,5 +1,5 @@
 import { ramp, mix, EASE } from "../../../motion";
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { STOCK } from "../../stockPalette";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import { ObservationCell } from "./ObservationCell";

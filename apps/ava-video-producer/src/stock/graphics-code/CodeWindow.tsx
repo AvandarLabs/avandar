@@ -1,5 +1,13 @@
-import { Panel, STOCK, Text } from "../graphics-common";
+import { Panel } from "../graphics-common/Panel";
+import { Text } from "../graphics-common/Text";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+const DOT_COUNT = 3;
+const DOT_SPACING = 20;
 
 /** Shared terminal/editor frame. Exclusive to this directory's preset components. */
 export function CodeWindow({
@@ -9,20 +17,26 @@ export function CodeWindow({
   title: string;
   children: ReactNode;
 }) {
+  const style = useGraphicProps("CodeWindow", {});
+  const { color } = useGraphicTokens();
   return (
-    <Panel x={70} y={111} width={820} height={411} radius={19}>
-      <path d="M70 164 H890" stroke={STOCK.line} />
-      {[0, 1, 2].map((i) => (
+    <Panel x={70} y={111} width={820} height={411} radius={style.radius}>
+      <path
+        d="M70 164 H890"
+        stroke={color.line}
+        strokeWidth={style.dividerWidth}
+      />
+      {Array.from({ length: DOT_COUNT }, (_, i) => (
         <circle
           key={i}
-          cx={95 + i * 20}
+          cx={95 + i * DOT_SPACING}
           cy={138}
-          r={4.5}
-          fill={STOCK.muted}
-          fillOpacity={0.45}
+          r={style.dotRadius}
+          fill={color.inactive}
+          fillOpacity={style.dotAlpha}
         />
       ))}
-      <Text x={480} y={144} size={14} mono fill={STOCK.muted} anchor="middle">
+      <Text role="footnote" x={480} y={144} anchor="middle">
         {title}
       </Text>
       {children}

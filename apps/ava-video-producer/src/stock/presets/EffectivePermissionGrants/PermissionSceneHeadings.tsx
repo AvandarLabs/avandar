@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import {
   controls,
@@ -16,12 +15,12 @@ export function PermissionSceneHeadings({ input }: Readonly<Props>): ReactNode {
       <LabelSlots
         labels={[
           [input.labels.resource, 55, 55, 820, 20, 2],
-          [stockI18n._(controls[2].label), 700, 115, 205, 12, 2],
+          [controls[2].label.message, 700, 115, 205, 12, 2],
         ]}
       />
       {input.restricted ? (
         <LabelSlots
-          labels={[[stockI18n._(RESTRICTION_MESSAGE), 55, 112, 620, 14, 2]]}
+          labels={[[RESTRICTION_MESSAGE.message, 55, 112, 620, 14, 2]]}
         />
       ) : undefined}
     </g>

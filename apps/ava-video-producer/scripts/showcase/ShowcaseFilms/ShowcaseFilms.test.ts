@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { DECISION_FORK_DENSE_INPUT } from "../../../src/stock/presets/DecisionFork/DecisionFork.fixtures";
+import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
+import { makeResolvedVideoThemeFromSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 
 test("unknown IDs and unsafe render options cannot become render inputs", async () => {
@@ -38,6 +41,22 @@ test("homepage captions can be hidden without changing product stage geometry", 
   assert.equal(film.source, "apps/ava-video-producer/storyboards/home.json");
 });
 
+/**
+ * Copies the app sources the film catalog imports, so tests can edit the
+ * copy without touching this worktree.
+ */
+async function _copyCatalogSources(root: string): Promise<void> {
+  await Promise.all(
+    ["scripts", "src", "themes"].map((directory) =>
+      fs.cp(path.join(appRoot, directory), path.join(root, directory), {
+        recursive: true,
+        // Skips generated product bundles, which the catalog never imports.
+        filter: (source) => !source.includes(`${path.sep}generated${path.sep}`),
+      }),
+    ),
+  );
+}
+
 async function _withCatalogCopy(
   action: (
     root: string,
@@ -48,54 +67,7 @@ async function _withCatalogCopy(
 ) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-catalog-"));
   try {
-    const files = [
-      "scripts/showcase/ShowcaseFilms/ShowcaseFilms.ts",
-      "scripts/stock/buildStockContracts/buildStockContracts.ts",
-      "scripts/stock/buildStockMessages/buildStockMessages.ts",
-      "scripts/require-license.mjs",
-      "scripts/lib/readLicense.mjs",
-      "scripts/stock/StockFingerprintModule/StockFingerprintModule.ts",
-      "scripts/lib/planHelpers.ts",
-      "scripts/lib/productRequirements/productRequirements.ts",
-      "scripts/lib/product-source.mjs",
-      "src/avandar/cursor-targets.json",
-      "src/storyboard/schema/schema.ts",
-      "src/storyboard/schema/primitives.ts",
-      "src/storyboard/schema/shotSchema.ts",
-      "src/storyboard/schema/storyboardSchema.ts",
-      "src/storyboard/schema/timeline.ts",
-      "src/storyboard/schema/getCueWindowFromShot.ts",
-      "src/scenes/layout/layout.ts",
-      "src/scenes/layout/geometry.ts",
-      "src/scenes/layout/graphLayout.ts",
-      "src/scenes/layout/textLayout.ts",
-      "src/scenes/layout/captionLayout.ts",
-      "src/motion.ts",
-      "src/gallery/palette.ts",
-      "src/gallery/theme-colors.json",
-      "src/stock/catalog.ts",
-    ];
-    await Promise.all(
-      files.map(async (file) => {
-        await fs.mkdir(path.dirname(path.join(root, file)), {
-          recursive: true,
-        });
-        await fs.copyFile(path.join(appRoot, file), path.join(root, file));
-      }),
-    );
-    await fs.cp(
-      path.join(appRoot, "src/continuity"),
-      path.join(root, "src/continuity"),
-      { recursive: true },
-    );
-    await fs.cp(
-      path.join(appRoot, "src/motion-components"),
-      path.join(root, "src/motion-components"),
-      { recursive: true },
-    );
-    await fs.cp(path.join(appRoot, "src/stock"), path.join(root, "src/stock"), {
-      recursive: true,
-    });
+    await _copyCatalogSources(root);
     await fs.writeFile(
       path.join(root, "package.json"),
       JSON.stringify({ type: "module" }),
@@ -253,15 +225,6 @@ test("nested default and schema edits refresh together while frozen films retain
     await assert.rejects(fingerprint(original), /changed during/);
     const current = await load("stock-decision-fork");
     await fingerprint(current);
-    const englishCatalog = await fs.readFile(
-      path.join(root, "src/stock/i18n/messages.en.generated.ts"),
-      "utf8",
-    );
-    assert.match(englishCatalog, /An edited complete fictional default/);
-    assert.doesNotMatch(
-      englishCatalog,
-      /Where does the fictional sketch belong\?/,
-    );
     assert.equal(
       (await fs.readdir(path.join(root, "out/showcase/contracts"))).length,
       2,
@@ -300,26 +263,25 @@ test("explainer caption selection preserves the overlap-aware film duration", as
 test("continuity appearance options preserve the timeline", async () => {
   const original = await ShowcaseFilms.load("qetl-motion");
   const film = await ShowcaseFilms.load("qetl-motion", {
-    accent: "#ff0000",
-    background: "#ffffff",
+    theme: {
+      id: "classic",
+      patch: {
+        other: { video: { atomic: { swatch: { ground: "#ffffff" } } } },
+      },
+    },
     cameraMotion: false,
     motionBlur: false,
     annotations: false,
-    annotationRoughness: 0,
-    boxRoughness: 2.5,
   });
   assert.equal(film.frames, original.frames);
   assert.deepEqual(film.plan?.narration, original.plan?.narration);
   const shot = film.plan?.shots.find(
     (candidate) => candidate.scene === "continuity",
   );
-  assert.equal(shot?.scene === "continuity" && shot.props.accent, "#ff0000");
+  assert.equal(shot?.scene === "continuity" && "accent" in shot.props, false);
   assert.equal(shot?.scene === "continuity" && shot.props.cameraMotion, false);
-  assert.equal(
-    shot?.scene === "continuity" && shot.props.annotationRoughness,
-    0,
-  );
-  assert.equal(shot?.scene === "continuity" && shot.props.boxRoughness, 2.5);
+  const theme = makeResolvedVideoThemeFromSnapshot(film.theme, [film.id]);
+  assert.equal(theme.semantic.color.ground, "#ffffff");
   await assert.rejects(
     ShowcaseFilms.load("avandar-home", { cameraMotion: false }),
   );
@@ -328,24 +290,96 @@ test("continuity appearance options preserve the timeline", async () => {
 test("camera preset exports include the complete extended timeline", async () => {
   const original = await ShowcaseFilms.load("shared-object-handoff");
   const adjusted = await ShowcaseFilms.load("shared-object-handoff", {
-    cameraPreset: "deliberate",
+    theme: {
+      id: "classic",
+      patch: {
+        other: { video: { semantic: { camera: { preset: "deliberate" } } } },
+      },
+    },
   });
   assert.ok(adjusted.frames > original.frames);
+  const drawn = createContinuityPlanFromVideoThemeSnapshot(
+    adjusted.plan!,
+    adjusted.theme,
+    [adjusted.id],
+  );
   assert.equal(
     adjusted.frames,
-    adjusted.plan!.shots.reduce(
-      (total, shot) => total + shot.durationInFrames,
-      0,
-    ),
+    drawn.shots.reduce((total, shot) => total + shot.durationInFrames, 0),
   );
-  const shot = adjusted.plan!.shots[0];
+  const shot = drawn.shots[0];
   assert.equal(
     shot.scene === "continuity" &&
       shot.props.beats[0].content.kind === "stock" &&
-      shot.props.beats[0].content.cameraOptions?.preset,
-    "deliberate",
+      shot.props.beats[0].content.cameraOptions?.speed,
+    0.25,
   );
   await assert.rejects(
-    ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "fast" }),
+    ShowcaseFilms.load("shared-object-handoff", {
+      theme: {
+        id: "classic",
+        patch: {
+          other: { video: { semantic: { camera: { preset: "fast" } } } },
+        },
+      },
+    }),
   );
+});
+
+test("continuity films refuse colour options; colours come from the theme", async () => {
+  await assert.rejects(
+    ShowcaseFilms.load("shared-object-handoff", { accent: "#ff0000" }),
+    /theme/,
+  );
+});
+
+test("a film without a theme option carries the classic snapshot", async () => {
+  const film = await ShowcaseFilms.load("occlusion-wipe");
+  assert.deepEqual(film.theme, {
+    themeId: "classic",
+    documents: [],
+    patches: [],
+  });
+});
+
+test("a draft on a built-in theme renders as the unsaved theme that extends it", async () => {
+  const patch = {
+    other: { video: { atomic: { swatch: { ground: "#201510" } } } },
+  };
+  const film = await ShowcaseFilms.load("stock-network-graph", {
+    theme: { id: "avandar", patch },
+  });
+  assert.equal(film.theme?.themeId, DRAFT_THEME_ID);
+  assert.deepEqual(
+    film.theme?.documents.map((document) => document.extends),
+    ["avandar"],
+  );
+  assert.deepEqual(film.theme?.patches, [patch]);
+});
+
+test("a stock film keeps its theme out of the stock request", async () => {
+  const film = await ShowcaseFilms.load("stock-network-graph", {
+    theme: { id: "avandar" },
+  });
+  assert.equal(film.kind === "stock" && film.preset, "network-graph");
+});
+
+test("an unknown theme is refused", async () => {
+  await assert.rejects(
+    ShowcaseFilms.load("occlusion-wipe", { theme: { id: "missing" } }),
+  );
+});
+
+test("a continuity film keeps its theme out of the appearance options", async () => {
+  const film = await ShowcaseFilms.load("qetl-motion", {
+    theme: { id: "avandar" },
+  });
+  assert.equal(film.theme?.themeId, "avandar");
+});
+
+test("an empty draft patch on a built-in theme still renders as the unsaved theme", async () => {
+  const film = await ShowcaseFilms.load("stock-network-graph", {
+    theme: { id: "avandar", patch: {} },
+  });
+  assert.equal(film.theme?.themeId, DRAFT_THEME_ID);
 });

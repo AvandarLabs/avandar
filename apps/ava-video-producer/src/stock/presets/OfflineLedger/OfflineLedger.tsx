@@ -3,7 +3,7 @@ import { LedgerCasing } from "./LedgerCasing";
 import { LedgerConnection } from "./LedgerConnection";
 import { LedgerCopy } from "./LedgerCopy";
 import { LedgerEntry } from "./LedgerEntry";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 /** Complete notebook rendering input. */

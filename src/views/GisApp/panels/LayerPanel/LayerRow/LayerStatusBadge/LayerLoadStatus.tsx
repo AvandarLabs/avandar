@@ -3,6 +3,7 @@ import { Badge, Group, Loader } from "@mantine/core";
 import { IconCircleX } from "@tabler/icons-react";
 import { match } from "ts-pattern";
 import { ReadyOperationalStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
@@ -12,12 +13,14 @@ type OperationalState = ReturnType<typeof getMapLayerOperationalState>;
 type Props = {
   viewState: MapLayerViewState;
   operationalState: OperationalState;
+  geoBinding: MapLayer.GeoBinding | undefined;
 };
 
 /** Reports load, empty, error, and ready counts for a layer row. */
 export function LayerLoadStatus({
   viewState,
   operationalState,
+  geoBinding,
 }: Props): ReactNode {
   const { t } = useLingui();
   const { droppedRowCount, featureCount, status } = viewState;
@@ -58,6 +61,7 @@ export function LayerLoadStatus({
           droppedRowCount={droppedRowCount}
           featureCount={featureCount}
           operationalState={operationalState}
+          geoBinding={geoBinding}
         />
       );
     })

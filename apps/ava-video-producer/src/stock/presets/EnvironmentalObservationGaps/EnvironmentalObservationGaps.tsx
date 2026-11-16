@@ -2,7 +2,7 @@ import { ObservationCaptions } from "./ObservationCaptions";
 import { ObservationContext } from "./ObservationContext";
 import { ObservationFieldTeam } from "./ObservationFieldTeam";
 import { ObservationTile } from "./ObservationTile";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for EnvironmentalObservationGaps. */

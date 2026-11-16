@@ -1,6 +1,26 @@
 import fs from "node:fs/promises";
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 import { stockRequestSchema } from "../../src/stock/contracts/stockRequestSchema/stockRequestSchema";
+
+/** Fetches every stylesheet the Atlas page links and expects CSS back. */
+async function _expectAtlasStylesheetsServed(
+  request: APIRequestContext,
+): Promise<void> {
+  const atlasPage = await request.get("/motion.html");
+  const stylesheets = [
+    ...(await atlasPage.text()).matchAll(
+      /<link rel="stylesheet"[^>]*href="([^"]+)"/g,
+    ),
+  ].map((match) => match[1]);
+  expect(stylesheets.length).toBeGreaterThan(0);
+  await Promise.all(
+    stylesheets.map(async (href) => {
+      const stylesheet = await request.get(href);
+      expect(stylesheet.ok()).toBe(true);
+      expect(stylesheet.headers()["content-type"]).toContain("text/css");
+    }),
+  );
+}
 
 test("authored whitespace stays exact in native copied JSON and export input", async ({
   page,
@@ -76,10 +96,11 @@ test("authored whitespace stays exact in native copied JSON and export input", a
     .toEqual({
       id: "stock-tradeoff-pivot",
       options: {
-        accent: copied.accent,
-        background: copied.background,
         schemaVersion: copied.schemaVersion,
         input: copied.input,
+        // The export renders with the gallery's saved video theme, not the
+        // copied request's accent and background.
+        theme: { id: "classic" },
       },
     });
   await content
@@ -140,9 +161,7 @@ test("edited branches keep preview, JSON and download content identical", async 
       },
     });
   });
-  const stylesheet = await request.get("/motion-gallery.css");
-  expect(stylesheet.ok()).toBe(true);
-  expect(stylesheet.headers()["content-type"]).toContain("text/css");
+  await _expectAtlasStylesheetsServed(request);
   let downloadPayload: unknown;
   let contentTransportUrl = "";
   await page.route("**/api/exports", async (route) => {
@@ -314,10 +333,9 @@ test("edited branches keep preview, JSON and download content identical", async 
   expect(downloadPayload).toEqual({
     id: "stock-decision-fork",
     options: {
-      accent: copied.accent,
-      background: copied.background,
       schemaVersion: copied.schemaVersion,
       input: copied.input,
+      theme: { id: "classic" },
     },
   });
   await content

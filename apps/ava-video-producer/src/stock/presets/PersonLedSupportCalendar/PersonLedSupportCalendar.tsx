@@ -4,7 +4,7 @@ import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerAppointments } from "./PlannerAppointments";
 import { PlannerGrid } from "./PlannerGrid";
 import { PlannerPeople } from "./PlannerPeople";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
 /** Explicit authored scene props. */

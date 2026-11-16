@@ -1,9 +1,9 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GridCells } from "./GridCells";
 import { GridTokens } from "./GridTokens";
 import { ZeroCountLegend } from "./ZeroCountLegend";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
 

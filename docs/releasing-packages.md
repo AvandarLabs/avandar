@@ -147,9 +147,9 @@ resolution.
   Use `catalog:` in `dependencies`/`devDependencies` only.
 - **Provenance needs the `repository` field**, including `directory` for a
   monorepo. Every package has one; removing it breaks `--provenance`.
-- **Only `packages/**` is ever published.** Everything under `apps/**` is
-  internal, including `@avandar/ava-cli`, and every one of them is
-  `private: true`. That flag, not the Changesets `ignore` list, is what stops
-  `pnpm publish` reaching the registry. `pnpm verify:packages` asserts it and
-  fails if a root or `apps/**` package becomes publishable, so a newly added
-  app cannot quietly slip into a release.
+- **Only `packages/**` is ever published.** Everything under `apps/**` and
+  `plugins/**` is internal, including `@avandar/ava-cli`, and every one of them
+  is `private: true`. That flag, not the Changesets `ignore` list, is what
+  stops `pnpm publish` reaching the registry. `pnpm verify:packages` asserts it
+  and fails if a root, `apps/**`, or `plugins/**` package becomes publishable,
+  so a newly added app or plugin cannot quietly slip into a release.

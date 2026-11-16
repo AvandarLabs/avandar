@@ -1,5 +1,5 @@
 import { parseStockInput } from "../../../../stock/contracts/parseStockInput/parseStockInput";
-import { StockCopyMessages } from "../../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
 import { stockContracts } from "../../../../stock/registry/stockContracts";
 import type {
   StockInputByPreset,
@@ -212,7 +212,7 @@ function _addDraftItem({
   path,
   schema,
 }: Readonly<AddDraftItemOptions>): ContentDraft {
-  const items = StockCopyMessages.getValueFromPath({
+  const items = getStockValueFromPath({
     value: state.draft,
     path,
   });
@@ -274,7 +274,7 @@ function _removeDraftItem({
   path,
   index,
 }: Readonly<RemoveDraftItemOptions>): ContentDraft {
-  const items = StockCopyMessages.getValueFromPath({
+  const items = getStockValueFromPath({
     value: state.draft,
     path,
   });

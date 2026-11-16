@@ -244,6 +244,17 @@ export const AppLinks = {
   },
 
   // Individual Manager links
+  assignedToMe: (workspaceSlug: string) => {
+    return {
+      key: "assigned-to-me",
+      to: "/$workspaceSlug/individual-manager/assigned",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`Assigned to me`;
+      },
+      isAvailableOffline: false,
+    };
+  },
   individualManagerHome: ({
     workspaceSlug,
     conceptId,

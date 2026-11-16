@@ -53,6 +53,21 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
 /**
+ * Seven patient visits with a date and a temperature, for a per-month case
+ * type field. See the README beside it.
+ */
+export const CASE_BUCKETED_VISITS_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/case-bucketed-visits/case-bucketed-visits.csv",
+);
+
+/**
+ * Row count reported after DuckDB parses
+ * {@link CASE_BUCKETED_VISITS_CSV_PATH}.
+ */
+export const CASE_BUCKETED_VISITS_CSV_EXPECTED_ROW_COUNT = 7;
+
+/**
  * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
  * provenance and licence). Well under the 50-page import cap, so its page
  * geometry sniff finishes quickly.
@@ -176,6 +191,34 @@ export const GIS_DATED_POINTS_ROW_COUNT = 9;
 /** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
 export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
 
+/** Two lower-Manhattan exposure sites as latitude and longitude. */
+export const GIS_NYC_EXPOSURE_SITES_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.csv",
+);
+
+/** Parsed row count of {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}. */
+export const GIS_NYC_EXPOSURE_SITES_ROW_COUNT = 2;
+
+/**
+ * The same two sites as {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, as Parquet,
+ * so a spec can seed them as a catalog listing instead of uploading the CSV.
+ */
+export const GIS_NYC_EXPOSURE_SITES_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.parquet",
+);
+
+/**
+ * 35 NYC school points (WKT `the_geom`, name in `loc_name`) around
+ * {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, with none near the edge of a
+ * half-mile ring around either site.
+ */
+export const GIS_NYC_SCHOOL_POINTS_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-school-points-near-sites.parquet",
+);
+
 /** Directory of the export and disputed-boundary GIS fixtures. */
 const GIS_WAVE_E_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-e");
 
@@ -190,6 +233,31 @@ export const GIS_DISPUTED_BOUNDARIES_CSV_PATH = path.join(
 
 /** Parsed row count of {@link GIS_DISPUTED_BOUNDARIES_CSV_PATH}. */
 export const GIS_DISPUTED_BOUNDARIES_ROW_COUNT = 4;
+
+/** Directory of the Parquet copies the threshold-colors spec seeds. */
+const GIS_THRESHOLD_COLORS_DATA_DIR = path.join(
+  process.cwd(),
+  "tests/data/gis-threshold-colors",
+);
+
+/**
+ * 25 Manhattan rows of NYC's Modified ZIP Code Tabulation Areas (MODZCTA):
+ * `modzcta` keys and WKT `the_geom` multipolygons.
+ */
+export const GIS_MODZCTA_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "modzcta-manhattan.parquet",
+);
+
+/**
+ * The 2024-2025 New York State School Immunization Survey rows inside
+ * {@link GIS_MODZCTA_MANHATTAN_PARQUET_PATH}: WKT `location` points and
+ * `percent_immunized_measles` stored as a fraction (0.95, not 95).
+ */
+export const GIS_SCHOOL_IMMUNIZATION_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "school-immunization-manhattan.parquet",
+);
 
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(

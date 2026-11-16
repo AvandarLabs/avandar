@@ -1,55 +1,96 @@
+import { ALL_ATLAS_CATEGORIES } from "../../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { CONTINUITY_CATALOG } from "../../continuityCatalog";
-import type { ContinuityFamily } from "../../continuityCatalog";
+import { buildCompositionSearchTextFromEntry } from "../../search/buildCompositionSearchTextFromEntry/buildCompositionSearchTextFromEntry";
+import type {
+  ContinuityCatalogEntry,
+  ContinuityFamily,
+} from "../../continuityCatalog";
 
-/** Current screening and the caption options acknowledged by its live player. */
+/**
+ * One section's filters and its open preview. `family` is fixed by the
+ * section: Compositions browse studies, Sample films browse films.
+ */
 export type GallerySelection = {
-  selectedId: string;
   family: ContinuityFamily;
+  /** A catalog category id, or `ALL_ATLAS_CATEGORIES`. */
+  category: string;
   query: string;
+  /** The entry whose preview modal is open, if any. */
+  openId: string | undefined;
+  /** Caption choice acknowledged by the open entry's live player. */
   captions: boolean | undefined;
 };
 
-/** User selection, filtering and scoped live-player option events. */
+/** User filtering, preview, and scoped live-player option events. */
 export type GallerySelectionAction =
-  | { type: "select"; id: string }
-  | { type: "family"; family: ContinuityFamily }
+  | { type: "open"; id: string }
+  | { type: "close" }
+  | { type: "category"; category: string }
   | { type: "query"; query: string }
   | { type: "captions"; id: string; captions: boolean };
 
-function _selectEntry(state: GallerySelection, id: string): GallerySelection {
-  const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
-  if (!entry || entry.id === state.selectedId) {
-    return state;
-  }
-  return {
-    selectedId: entry.id,
-    family: entry.family,
-    query: entry.family === state.family ? state.query : "",
-    captions: undefined,
-  };
-}
-
-/** Keeps the active preview in its selected family and ignores stale options. */
+/** Opens previews only within the section and ignores stale player options. */
 export function gallerySelectionReducer(
   state: GallerySelection,
   action: GallerySelectionAction,
 ): GallerySelection {
   switch (action.type) {
-    case "select":
-      return _selectEntry(state, action.id);
-    case "family": {
+    case "open": {
       const entry = CONTINUITY_CATALOG.find(
-        (candidate) => candidate.family === action.family,
+        (candidate) => candidate.id === action.id,
       );
-      return action.family === state.family || !entry
-        ? state
-        : { ..._selectEntry(state, entry.id), query: "" };
+      if (!entry || entry.family !== state.family || entry.id === state.openId)
+        return state;
+      return { ...state, openId: entry.id, captions: undefined };
     }
+    case "close":
+      return { ...state, openId: undefined, captions: undefined };
+    case "category":
+      return { ...state, category: action.category };
     case "query":
       return { ...state, query: action.query };
     case "captions":
-      return action.id === state.selectedId
+      return action.id === state.openId
         ? { ...state, captions: action.captions }
         : state;
   }
+}
+
+/** Everything an entry can be searched by, lowercased. */
+function _buildSearchText(entry: ContinuityCatalogEntry): string {
+  return (
+    entry.family === "vocabulary"
+      ? `${entry.category} ${buildCompositionSearchTextFromEntry(entry)}`
+      : `${entry.title} ${entry.description} ${entry.category}`
+  ).toLowerCase();
+}
+
+/**
+ * The section's entries in the chosen category whose copy contains the
+ * search, case-insensitively, in catalog order.
+ */
+export function filterCompositionEntries(
+  selection: Pick<GallerySelection, "family" | "category" | "query">,
+): ContinuityCatalogEntry[] {
+  const query = selection.query.trim().toLowerCase();
+  return CONTINUITY_CATALOG.filter(
+    (entry) =>
+      entry.family === selection.family &&
+      (selection.category === ALL_ATLAS_CATEGORIES ||
+        entry.category === selection.category) &&
+      (!query || _buildSearchText(entry).includes(query)),
+  );
+}
+
+/** Each of the family's categories, in catalog order, with its entry count. */
+export function countCompositionCategories(
+  family: ContinuityFamily,
+): Array<{ id: string; count: number }> {
+  const counts = new Map<string, number>();
+  CONTINUITY_CATALOG.forEach((entry) => {
+    if (entry.family === family) {
+      counts.set(entry.category, (counts.get(entry.category) ?? 0) + 1);
+    }
+  });
+  return Array.from(counts, ([id, count]) => ({ id, count }));
 }

@@ -1,7 +1,7 @@
 import { ParcelCopy } from "./ParcelCopy";
 import { ParcelGeometry } from "./ParcelGeometry";
 import { ParcelLedger } from "./ParcelLedger";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
 /** Inputs for ParcelSetbackInset. */

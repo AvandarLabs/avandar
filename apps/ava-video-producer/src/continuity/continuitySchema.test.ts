@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
 import test from "node:test";
 import productFilm from "../../storyboards/explainers/film-ontology-to-product.json";
 import film from "../../storyboards/explainers/film-qetl-motion.json";
@@ -123,4 +124,20 @@ test("unordered camera keys return validation errors instead of throwing", () =>
   assert.ok(content.kind === "stock" && content.camera);
   content.camera[2].at = 1;
   assert.equal(continuitySchema.safeParse(plan).success, false);
+});
+
+test("a plan that still authors an accent is pointed at the theme", async () => {
+  const plan = JSON.parse(
+    await fs.readFile(
+      new URL(
+        "../../storyboards/explainers/study-occlusion-wipe.json",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
+  const props = { ...plan.shots[0].props, accent: "#f0ba83" };
+  const result = continuitySchema.safeParse(props);
+  assert.equal(result.success, false);
+  assert.match(result.error?.issues[0]?.message ?? "", /theme/);
 });

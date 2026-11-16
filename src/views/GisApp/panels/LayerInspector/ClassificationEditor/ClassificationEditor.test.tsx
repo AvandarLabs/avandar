@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
+import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import { ClassificationEditor } from "./ClassificationEditor";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -52,6 +53,7 @@ function _createLayer(): MapLayer.T {
         type: "graduated",
         value: { type: "queryColumn", column: column.id },
         ramp: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+        classLabels: [undefined, undefined, undefined, undefined, undefined],
         classification: { method: "quantile", classCount: 5 },
         normalization: undefined,
         noData: { color: "#ced4da", label: "" },
@@ -71,7 +73,151 @@ function _createLayer(): MapLayer.T {
   };
 }
 
+type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;
+
+function _createColumn(
+  name: string,
+  dataType: "double" | "varchar",
+): QueryColumn.T {
+  const now = new Date().toISOString();
+  return QueryColumn.makeFromDatasetColumn(
+    Model.make("DatasetColumn", {
+      id: uuid<DatasetColumn.Id>(),
+      datasetId: uuid<Dataset.Id>(),
+      workspaceId: uuid<Workspace.Id>(),
+      createdAt: now,
+      updatedAt: now,
+      name,
+      originalName: name,
+      originalDataType: dataType === "double" ? "DOUBLE" : "VARCHAR",
+      dataType,
+      detectedDataType: dataType === "double" ? "DOUBLE" : "VARCHAR",
+      description: undefined,
+      columnIdx: 0,
+    }),
+  );
+}
+
+function _withSourceColumns(options: {
+  queryColumns: QueryColumn.T[];
+  sourceColumns: QueryColumn.T[];
+}): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Schools");
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      queryColumns: options.queryColumns,
+      sourceColumns: options.sourceColumns,
+    },
+  };
+}
+
+function _withGraduatedColor(
+  layer: MapLayer.T,
+  overrides: Partial<GraduatedColor>,
+): MapLayer.T {
+  if (
+    layer.symbology.type !== "fill" ||
+    layer.symbology.color.type !== "graduated"
+  ) {
+    throw new Error("Expected a graduated fill layer");
+  }
+  return {
+    ...layer,
+    symbology: {
+      ...layer.symbology,
+      color: { ...layer.symbology.color, ...overrides },
+    },
+  };
+}
+
 describe("ClassificationEditor", () => {
+  it("names a reversed preset in the color ramp select", () => {
+    boundarySourceState.options = [];
+    const layer = _withGraduatedColor(_createLayer(), {
+      ramp: ["#08306b", "#2171b5", "#6baed6", "#bdd7e7", "#eff3ff"],
+    });
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Color ramp" })).toHaveValue(
+      "Blue",
+    );
+  });
+
+  it("shows custom colors when the ramp matches no preset", () => {
+    boundarySourceState.options = [];
+    const layer = _withGraduatedColor(_createLayer(), {
+      ramp: ["#d7301f", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+    });
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    const rampSelect = screen.getByRole("combobox", { name: "Color ramp" });
+    expect(rampSelect).toHaveValue("");
+    expect(rampSelect).toHaveAttribute("placeholder", "Custom colors");
+  });
+
+  it("fills every class from the picked red preset", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Color ramp" }));
+    fireEvent.click(screen.getByRole("option", { name: "Red", hidden: true }));
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#fee5d9",
+      "#fcae91",
+      "#fb6a4a",
+      "#de2d26",
+      "#a50f15",
+    ]);
+  });
+
+  it("reverses the class colors from the Reverse colors button", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Reverse colors" }));
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#08306b",
+      "#2171b5",
+      "#6baed6",
+      "#bdd7e7",
+      "#eff3ff",
+    ]);
+  });
+
   it("uses the grid aggregation output when enabling graduated color", () => {
     const layer = _createLayer();
     const outputValueId = uuid<MapLayer.AreaAggregationOutputId>();
@@ -171,12 +317,13 @@ describe("ClassificationEditor", () => {
     );
 
     fireEvent.click(screen.getByRole("combobox", { name: "Normalize by" }));
+    const dropdown = getMantineSelectDropdown("Normalize by");
 
     expect(
-      screen.getByRole("option", { name: "Cases", hidden: true }),
+      within(dropdown).getByRole("option", { name: "Cases", hidden: true }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("option", {
+      within(dropdown).queryByRole("option", {
         name: "Population (boundary)",
         hidden: true,
       }),
@@ -298,5 +445,248 @@ describe("ClassificationEditor", () => {
     expect(updated.symbology.color).toMatchObject({
       classification: { method: "manual", breaks: [11] },
     });
+  });
+
+  it("shows one label input per class", () => {
+    boundarySourceState.options = [];
+    render(
+      <ClassificationEditor
+        layer={_createLayer()}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getAllByRole("textbox", { name: /^Class \d label$/ }),
+    ).toHaveLength(5);
+  });
+
+  it("shows the generated interval as a class label placeholder", () => {
+    boundarySourceState.options = [];
+    render(
+      <ClassificationEditor
+        layer={_createLayer()}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: "Class 1 label" }),
+    ).toHaveAttribute("placeholder", "< 10");
+  });
+
+  it("writes a typed label to its class", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Class 2 label" }), {
+      target: { value: "95% or above" },
+    });
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.classLabels).toEqual([
+      undefined,
+      "95% or above",
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("writes a picked swatch color to its class", async () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Class 1 color" }));
+    fireEvent.click(await screen.findByRole("button", { name: "#d7301f" }));
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#d7301f",
+      "#bdd7e7",
+      "#6baed6",
+      "#2171b5",
+      "#08306b",
+    ]);
+  });
+
+  it("stores a typed percent as a fraction when every value is a fraction", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[0.62, 1]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "95" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      classification: { method: "manual", breaks: [0.95] },
+      ramp: ["#d7301f", "#d9d9d9"],
+      classLabels: ["Below 95%", "95% or above"],
+    });
+  });
+
+  it("stores a typed percent without float drift", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[0.1, 1]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "33.3" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color.classification.breaks).toEqual([0.333]);
+  });
+
+  it("stores the typed number as is when values are not fractions", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[3, 410]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "100" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      classification: { method: "manual", breaks: [100] },
+      classLabels: ["Below 100", "100 or above"],
+    });
+  });
+
+  it("enables graduated color from a numeric source column that is not queried yet", () => {
+    const geometry = _createColumn("coordinates", "varchar");
+    const measles = _createColumn("percentimmunizedmeasles", "double");
+    const layer = _withSourceColumns({
+      queryColumns: [geometry],
+      sourceColumns: [geometry, measles],
+    });
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Color mode" }));
+    fireEvent.click(
+      screen.getByRole("option", { name: "Graduated", hidden: true }),
+    );
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      type: "graduated",
+      value: { type: "queryColumn", column: measles.id },
+    });
+    expect(
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
+        return column.id;
+      }),
+    ).toContain(measles.id);
+  });
+
+  it("changes the graduated measure to another numeric source column", () => {
+    const geometry = _createColumn("coordinates", "varchar");
+    const exemptions = _createColumn("percentmedicalexemptions", "double");
+    const measles = _createColumn("percentimmunizedmeasles", "double");
+    const schools = _withSourceColumns({
+      queryColumns: [geometry],
+      sourceColumns: [geometry, exemptions, measles],
+    });
+    if (schools.symbology.type !== "circle") {
+      throw new Error("Expected a circle layer");
+    }
+    const layer: MapLayer.T = {
+      ...schools,
+      sensitivity: { mode: "exact" },
+      symbology: {
+        ...schools.symbology,
+        color: {
+          type: "graduated",
+          value: { type: "queryColumn", column: exemptions.id },
+          ramp: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+          classLabels: [undefined, undefined, undefined, undefined, undefined],
+          classification: { method: "quantile", classCount: 5 },
+          normalization: undefined,
+          noData: { color: "#ced4da", label: "" },
+        },
+      },
+    };
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Measure" }));
+    fireEvent.click(
+      screen.getByRole("option", {
+        name: "percentimmunizedmeasles",
+        hidden: true,
+      }),
+    );
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.value).toEqual({
+      type: "queryColumn",
+      column: measles.id,
+    });
+    expect(
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
+        return column.id;
+      }),
+    ).toContain(measles.id);
   });
 });

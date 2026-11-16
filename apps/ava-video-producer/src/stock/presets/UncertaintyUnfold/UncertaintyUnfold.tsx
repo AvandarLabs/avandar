@@ -5,7 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { UncertaintyAxis } from "./UncertaintyAxis";
 import { UncertaintyReference } from "./UncertaintyReference";
 import { UncertaintyValues } from "./UncertaintyValues";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 

@@ -23,6 +23,11 @@ export function OntologyDesignerApp(): JSX.Element {
     matchRoute({ to: "/$workspaceSlug/ontology-designer/$conceptId" }),
   );
   const showMasterDetail = isCreatorRoute || isConceptRoute;
+  // `$conceptId` also matches the creator's path segment, so the creator is
+  // excluded by name. The case type page is an `AppView`, which scrolls its
+  // own body so its header band stays put; the creator form still scrolls
+  // as a whole.
+  const isCaseTypeRoute = isConceptRoute && !isCreatorRoute;
   const [concepts, isLoading] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -35,7 +40,7 @@ export function OntologyDesignerApp(): JSX.Element {
       containerProps={showMasterDetail ? undefined : { p: "md" }}
     >
       {showMasterDetail ? (
-        <Flex align="stretch" h="100%">
+        <Flex align="stretch" h="100%" mih={0}>
           {caseTypes.length > 0 || isLoading ? (
             <ConceptNavbar
               miw={240}
@@ -43,9 +48,15 @@ export function OntologyDesignerApp(): JSX.Element {
               isLoading={isLoading}
             />
           ) : null}
-          <ScrollArea h="100%" w="100%">
-            <Outlet />
-          </ScrollArea>
+          {isCaseTypeRoute ? (
+            <Flex direction="column" flex={1} miw={0} mih={0}>
+              <Outlet />
+            </Flex>
+          ) : (
+            <ScrollArea h="100%" w="100%">
+              <Outlet />
+            </ScrollArea>
+          )}
         </Flex>
       ) : (
         <Outlet />

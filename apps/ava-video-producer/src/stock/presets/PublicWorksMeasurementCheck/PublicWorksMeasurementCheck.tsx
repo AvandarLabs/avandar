@@ -2,7 +2,7 @@ import { EASE, ramp } from "../../../motion";
 import { MeasuredStructure } from "./MeasuredStructure";
 import { MeasurementCaptions } from "./MeasurementCaptions";
 import { TapeObservers } from "./TapeObservers";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 

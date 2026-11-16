@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { downloadFilm } from "../../../../../showcase/download.js";
-import type { ContinuityAppearance } from "../../../continuityAppearance";
+import { FilmDownloads } from "../../../../../showcase/FilmDownloads/FilmDownloads";
+import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
+import type { CompositionExportOptions } from "../compositionExportOptions";
 
-/** On-demand rendering, with progress scoped to the selected film. */
+/** On-demand rendering with the acknowledged options and theme, with progress scoped to the selected film. */
 export function useCompositionDownload(options: {
   id: string;
-  options: ContinuityAppearance | undefined;
+  options: CompositionExportOptions | undefined;
   captions: boolean | undefined;
+  theme: ExportTheme | undefined;
 }) {
-  const { id, options: appearance } = options;
+  const { id, options: appearance, theme } = options;
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState({ id: "", message: "" });
   async function start() {
@@ -17,9 +19,9 @@ export function useCompositionDownload(options: {
     }
     setBusy(true);
     try {
-      await downloadFilm({
+      await FilmDownloads.downloadFilm({
         id,
-        options: appearance,
+        options: theme ? { ...appearance, theme } : appearance,
         onStatus: (job) => setProgress({ id, message: job.message }),
       });
     } catch {

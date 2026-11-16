@@ -16,9 +16,18 @@ type GoogleSheetsImportAnalyticsSource = {
   };
 };
 
+type PostgresTableImportAnalyticsSource = {
+  sourceType: "postgres_table";
+  datasetLoadResult: {
+    numRows: number;
+    columns: readonly unknown[];
+  };
+};
+
 type DatasetImportAnalyticsSource =
   | FileImportAnalyticsSource
-  | GoogleSheetsImportAnalyticsSource;
+  | GoogleSheetsImportAnalyticsSource
+  | PostgresTableImportAnalyticsSource;
 
 /** Derives privacy-safe analytics dimensions from a successful dataset save. */
 export function makeDatasetImportedPayloadFromSaveResult(

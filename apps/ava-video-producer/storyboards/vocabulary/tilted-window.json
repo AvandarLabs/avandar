@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "id": "tilted-window",
+  "title": "Tilted product window",
+  "description": "A headline column beside a 3D tilted window that scrolls a still, slides and cuts through a carousel, pushes in with a window-only camera, and later rests in the tall box with a secondary window beside it.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "carousel",
+      "scene": "tilted-window",
+      "durationInFrames": 230,
+      "transitionInFrames": 0,
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": ["Import a", "spreadsheet"],
+            "subtitle": "Import"
+          },
+          {
+            "atFrame": 110,
+            "lines": ["See where", "it lands"],
+            "subtitle": "Maps"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/import-import-preview.png",
+            "scrollSteps": [
+              {
+                "atFrame": 40,
+                "offset": 0.05
+              },
+              {
+                "atFrame": 70,
+                "offset": 0.1
+              }
+            ]
+          },
+          {
+            "kind": "image",
+            "src": "avandar/screens/map-map-cases.png",
+            "atFrame": 105,
+            "swap": "slide"
+          },
+          {
+            "kind": "image",
+            "src": "avandar/screens/map-map-facilities.png",
+            "atFrame": 160,
+            "swap": "cut"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "camera": [
+          {
+            "at": 0,
+            "x": 0.9,
+            "y": 0.5,
+            "zoom": 1
+          },
+          {
+            "at": 172,
+            "x": 0.9,
+            "y": 0.5,
+            "zoom": 1
+          },
+          {
+            "at": 190,
+            "x": 0.9,
+            "y": 0.5,
+            "zoom": 1.2,
+            "ease": "push"
+          }
+        ],
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "tall-box",
+      "scene": "tilted-window",
+      "durationInFrames": 160,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": ["Open the", "record"],
+            "subtitle": "Cases"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/cases-cases-records.png"
+          }
+        ],
+        "windowBox": "tall",
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "secondary": {
+          "kind": "image",
+          "src": "avandar/screens/cases-cases-record-detail.png",
+          "fit": "cover",
+          "box": {
+            "x": 0.74,
+            "y": 0.46,
+            "width": 0.2,
+            "height": 0.4
+          },
+          "atFrame": 50
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    }
+  ]
+}

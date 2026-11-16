@@ -3,6 +3,17 @@ import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerTo
 import { describe, expect, it } from "vitest";
 
 describe("buildDataExplorerToolDefinitions", () => {
+  it("keeps column comparisons out of the query tool", () => {
+    const generateSql = buildDataExplorerToolDefinitions().find((tool) => {
+      return tool.function.name === "generateSql";
+    });
+
+    expect(generateSql?.function.description).toContain("compare columns");
+    expect(generateSql?.function.description).not.toContain(
+      "whenever the user asks about their data",
+    );
+  });
+
   it("offers SQL generation and clarification", () => {
     expect(
       buildDataExplorerToolDefinitions().map((tool) => {

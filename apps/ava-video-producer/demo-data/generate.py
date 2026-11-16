@@ -199,5 +199,5 @@ def main():
 
 if __name__ == "__main__":
     import subprocess
-    subprocess.run(["node", str(Path(__file__).resolve().parent.parent / "scripts/require-license.mjs")], check=True)
+    subprocess.run(["node", "--import", "tsx", str(Path(__file__).resolve().parent.parent / "scripts/requireLicense.ts")], check=True)
     main()

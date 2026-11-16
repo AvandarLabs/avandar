@@ -19,6 +19,8 @@ export function makeBufferLayersFromSource({
         type: "bufferOfLayer",
         layerId: buffers[index - 1]?.id ?? sourceId,
         distanceMeters: 100,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
     };

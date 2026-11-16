@@ -1,0 +1,35 @@
+.themeExportNoticeError {
+  align-items: flex-start;
+  color: var(--mantine-color-red-9);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 6px;
+  line-height: 1.5;
+  margin: 12px 0 0;
+}
+
+.themeExportNoticeErrorIcon {
+  color: var(--mantine-color-red-6);
+  flex: none;
+  margin-top: 2px;
+}
+
+.themeExportNoticeError > span {
+  flex: 1 1 200px;
+}
+
+.themeExportNoticeRetry {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ava-primary-7);
+  cursor: pointer;
+  font: inherit;
+  padding: 4px 10px;
+}
+
+.themeExportNoticeRetry:focus-visible {
+  outline: 2px solid var(--ava-primary-7);
+  outline-offset: 3px;
+}

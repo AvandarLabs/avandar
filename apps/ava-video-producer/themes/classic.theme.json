@@ -1,0 +1,1160 @@
+{
+  "schemaVersion": 1,
+  "id": "classic",
+  "label": "Classic",
+  "colors": {
+    "primary": [
+      "#edf6ff",
+      "#d8ebff",
+      "#b9dcff",
+      "#89c7ff",
+      "#51a7ff",
+      "#2983ff",
+      "#1563fe",
+      "#0b4aea",
+      "#103dbd",
+      "#143894"
+    ],
+    "neutral": [
+      "#f8fafc",
+      "#d9e0e7",
+      "#bac6d2",
+      "#9cadbd",
+      "#8094a9",
+      "#637c95",
+      "#486581",
+      "#334e68",
+      "#243b53",
+      "#102a43"
+    ],
+    "secondary": [
+      "#fffbea",
+      "#fff3c4",
+      "#fce588",
+      "#fadb5f",
+      "#f7c948",
+      "#f0b429",
+      "#de911d",
+      "#cb6e17",
+      "#b44d12",
+      "#8d2b0b"
+    ],
+    "success": [
+      "#eafcef",
+      "#d9f6df",
+      "#b1ebbe",
+      "#86e09a",
+      "#63d77c",
+      "#4dd269",
+      "#40cf5e",
+      "#31b74e",
+      "#27a343",
+      "#168d36"
+    ],
+    "warning": [
+      "#fffae2",
+      "#fdf4ce",
+      "#fae8a0",
+      "#f6db6d",
+      "#f4d043",
+      "#f2c928",
+      "#f1c617",
+      "#d7ae06",
+      "#bf9b00",
+      "#a58500"
+    ],
+    "danger": [
+      "#ffebe8",
+      "#ffd6d2",
+      "#f6ada5",
+      "#ef8075",
+      "#e95a4c",
+      "#e64231",
+      "#e53523",
+      "#cb2717",
+      "#b61f13",
+      "#a0140c"
+    ],
+    "info": [
+      "#e6fcff",
+      "#d5f5fa",
+      "#abe9f3",
+      "#7edcec",
+      "#5dd2e6",
+      "#49cce2",
+      "#3bc9e1",
+      "#2bb1c8",
+      "#169eb3",
+      "#00899d"
+    ]
+  },
+  "white": "#ffffff",
+  "black": "#000000",
+  "primaryColor": "primary",
+  "primaryShade": { "light": 7, "dark": 4 },
+  "defaultGradient": { "from": "#0b1219", "to": "#142632", "deg": 180 },
+  "fontFamily": "Figtree, ui-sans-serif, system-ui, sans-serif",
+  "fontFamilyMonospace": "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace",
+  "headings": {
+    "fontFamily": "Figtree, ui-sans-serif, system-ui, sans-serif",
+    "fontWeight": "600",
+    "sizes": {
+      "h1": { "fontSize": "63px", "fontWeight": "500", "lineHeight": "1.12" },
+      "h2": { "fontSize": "48px", "fontWeight": "600", "lineHeight": "1.12" }
+    }
+  },
+  "fontSizes": {
+    "3xs": "12px",
+    "2xs": "13px",
+    "xs": "14px",
+    "sm": "15px",
+    "md": "16px",
+    "lg": "17px",
+    "xl": "18px",
+    "2xl": "20px",
+    "3xl": "21px",
+    "4xl": "22px",
+    "5xl": "23px",
+    "6xl": "24px",
+    "7xl": "25px",
+    "8xl": "30px",
+    "9xl": "32px"
+  },
+  "lineHeights": { "xs": "1.12", "sm": "1.25", "md": "1.3", "lg": "1.35" },
+  "radius": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "10px",
+    "lg": "12px",
+    "xl": "18px",
+    "full": "9999px"
+  },
+  "spacing": {
+    "2xs": "16px",
+    "xs": "20px",
+    "sm": "32px",
+    "md": "49px",
+    "lg": "60px",
+    "xl": "64px",
+    "2xl": "70px",
+    "3xl": "96px",
+    "4xl": "192px"
+  },
+  "autoContrast": false,
+  "luminanceThreshold": 0.3,
+  "fontSmoothing": true,
+  "other": {
+    "video": {
+      "atomic": {
+        "swatch": {
+          "mint": "#9fefca",
+          "cyan": "#82c8f2",
+          "orange": "#f0ba83",
+          "ground": "#0b1219",
+          "surface": "#101e28",
+          "elevated": "#142632",
+          "line": "#2a404e",
+          "muted": "#728794",
+          "text": "#edf7f4",
+          "textDark": "#182d27",
+          "productBackdrop": "#eaeef2",
+          "scrim": "#061019a8",
+          "shadow": "#06101455"
+        },
+        "fontFamily": {
+          "figtree": "figtree",
+          "arial": "arial",
+          "courier": "courier",
+          "systemMono": "systemMono"
+        },
+        "fontWeight": {
+          "regular": 400,
+          "medium": 500,
+          "semibold": 600,
+          "bold": 700
+        },
+        "letterSpacing": {
+          "tight": -0.025,
+          "none": 0,
+          "wide": 0.17142857142857143
+        },
+        "size": {},
+        "strokeWidth": {
+          "3xs": 1,
+          "2xs": 1.1,
+          "xs": 1.5,
+          "sm": 2,
+          "md": 2.5,
+          "lg": 3,
+          "xl": 3.5
+        },
+        "opacity": {
+          "3": 0.03,
+          "6": 0.06,
+          "8": 0.08,
+          "9": 0.09,
+          "10": 0.1,
+          "24": 0.24,
+          "25": 0.25,
+          "28": 0.28,
+          "30": 0.3,
+          "32": 0.32,
+          "34": 0.34,
+          "40": 0.4,
+          "65": 0.65,
+          "70": 0.7,
+          "100": 1
+        },
+        "shadow": {
+          "none": { "layers": [] },
+          "lg": {
+            "layers": [
+              {
+                "offsetX": 0,
+                "offsetY": 16,
+                "blur": 22,
+                "spread": 0,
+                "alpha": 1
+              }
+            ]
+          }
+        },
+        "glow": { "halo": { "spread": 5, "blur": 0, "opacity": 0.09 } },
+        "textShadow": {},
+        "blur": { "md": 12 },
+        "roughness": { "none": 0, "subtle": 0.5, "sketch": 1.5, "rough": 3 },
+        "bowing": { "md": 1 },
+        "seed": { "sm": 4, "md": 17 },
+        "randomness": { "md": 3 },
+        "dash": {
+          "none": [],
+          "fine": [0.015, 0.02],
+          "orbit": [3, 9],
+          "connector": [5, 9]
+        },
+        "curveTension": { "md": 0.45 },
+        "duration": {
+          "2xs": 4,
+          "xs": 6,
+          "sm": 8,
+          "md": 9,
+          "lg": 13,
+          "xl": 15,
+          "2xl": 18
+        },
+        "easing": {
+          "out": [0.16, 1, 0.3, 1],
+          "outBack": [0.34, 1.56, 0.64, 1],
+          "inOut": [0.45, 0, 0.55, 1],
+          "inOutCubic": { "powerInOut": 3 },
+          "word": [0.22, 1, 0.36, 1],
+          "in": [0.55, 0, 1, 0.45],
+          "surge": [0.7, 0, 0.2, 1]
+        },
+        "spring": { "pop": { "damping": 14, "stiffness": 120, "mass": 0.8 } },
+        "stagger": { "xs": 0.5, "sm": 2 },
+        "period": { "sm": 75, "md": 90, "lg": 120 },
+        "distance": { "sm": 8, "md": 12 },
+        "typingRate": { "md": 28 },
+        "tempo": { "md": 1 },
+        "cameraSpeed": {
+          "deliberate": 0.25,
+          "gentle": 0.5,
+          "balanced": 0.75,
+          "brisk": 1,
+          "whip": 1.5
+        },
+        "shutter": {
+          "deliberate": 45,
+          "gentle": 90,
+          "balanced": 120,
+          "brisk": 180,
+          "whip": 240
+        },
+        "samples": { "md": 10 },
+        "zoom": { "min": 1, "max": 3 },
+        "velocityBlur": { "factor": 0.09, "max": 3 }
+      },
+      "semantic": {
+        "color": {
+          "ground": "$atomic.swatch.ground",
+          "groundFill": "$color.ground",
+          "surface": "$atomic.swatch.surface",
+          "elevated": "$atomic.swatch.elevated",
+          "line": "$atomic.swatch.line",
+          "text": {
+            "onDark": "$atomic.swatch.text",
+            "onLight": "$atomic.swatch.textDark"
+          },
+          "textMuted": {
+            "onDark": "$atomic.swatch.muted",
+            "onLight": "$colors.neutral.6"
+          },
+          "inactive": "$atomic.swatch.muted",
+          "accent": "$primary",
+          "accentAlt": "$atomic.swatch.cyan",
+          "highlight": "$atomic.swatch.orange",
+          "scrim": "$atomic.swatch.scrim",
+          "productBackdrop": "$atomic.swatch.productBackdrop",
+          "shadowColor": "$atomic.swatch.shadow"
+        },
+        "text": {
+          "graphic": {
+            "eyebrow": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "letterSpacing": "$atomic.letterSpacing.wide",
+              "color": "$color.textMuted"
+            },
+            "heading": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.4xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "body": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.2xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "label": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "detail": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.3xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "caption": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.lg",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "pill": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.2xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "display": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.9xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.text"
+            },
+            "title": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.7xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.text"
+            },
+            "panelTitle": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.5xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.text"
+            },
+            "cardTitle": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.4xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.text"
+            },
+            "itemLabel": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.3xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "choice": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.lg",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "question": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "secondary": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.md",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "note": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.sm",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "meta": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.sm",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "footnote": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "field": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.lg",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "lineNumber": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.lg",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "code": {
+              "family": "$atomic.fontFamily.courier",
+              "size": "$fontSizes.3xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "data": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.3xs",
+              "weight": "$atomic.fontWeight.regular",
+              "lineHeight": "$lineHeights.md",
+              "color": "$color.text"
+            }
+          },
+          "stage": {
+            "heading": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$headings.sizes.h2.fontSize",
+              "weight": "$headings.sizes.h2.fontWeight",
+              "lineHeight": "$headings.sizes.h2.lineHeight",
+              "letterSpacing": "$atomic.letterSpacing.tight",
+              "color": "$color.text"
+            },
+            "subtitle": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.7xl",
+              "weight": "$atomic.fontWeight.regular",
+              "lineHeight": "$lineHeights.lg",
+              "color": "$color.text"
+            },
+            "evidence": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.lg",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "sharedObject": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.7xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.accent"
+            },
+            "thesis": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$headings.sizes.h1.fontSize",
+              "weight": "$headings.sizes.h1.fontWeight",
+              "lineHeight": "$headings.sizes.h1.lineHeight",
+              "letterSpacing": "$atomic.letterSpacing.tight",
+              "color": "$color.text"
+            },
+            "thesisEmphasis": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.8xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "floatingLabel": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.5xl",
+              "weight": "$atomic.fontWeight.regular",
+              "lineHeight": "$lineHeights.sm",
+              "color": "$color.text"
+            }
+          }
+        },
+        "stroke": {
+          "guide": "$atomic.strokeWidth.xs",
+          "hairline": "$atomic.strokeWidth.3xs",
+          "outline": "$atomic.strokeWidth.xs",
+          "default": "$atomic.strokeWidth.sm",
+          "annotation": "$atomic.strokeWidth.lg",
+          "route": "$atomic.strokeWidth.xl"
+        },
+        "corner": {
+          "panel": "$radius.xl",
+          "pill": "$radius.full",
+          "card": "$radius.lg",
+          "chip": "$radius.xs",
+          "sharedObject": "$radius.sm",
+          "spotlight": "$radius.lg",
+          "label": "$radius.md"
+        },
+        "elevation": {
+          "flat": {
+            "shadow": "$atomic.shadow.none",
+            "color": "$color.shadowColor"
+          },
+          "floating": {
+            "shadow": "$atomic.shadow.lg",
+            "color": "$color.shadowColor"
+          }
+        },
+        "effect": { "halo": "$atomic.glow.halo" },
+        "sketch": {
+          "profile": {
+            "smooth": {
+              "roughness": "$atomic.roughness.none",
+              "bowing": "$atomic.bowing.md",
+              "seed": "$atomic.seed.md",
+              "randomness": "$atomic.randomness.md"
+            },
+            "subtle": {
+              "roughness": "$atomic.roughness.subtle",
+              "bowing": "$atomic.bowing.md",
+              "seed": "$atomic.seed.md",
+              "randomness": "$atomic.randomness.md"
+            },
+            "sketch": {
+              "roughness": "$atomic.roughness.sketch",
+              "bowing": "$atomic.bowing.md",
+              "seed": "$atomic.seed.md",
+              "randomness": "$atomic.randomness.md"
+            },
+            "rough": {
+              "roughness": "$atomic.roughness.rough",
+              "bowing": "$atomic.bowing.md",
+              "seed": "$atomic.seed.md",
+              "randomness": "$atomic.randomness.md"
+            }
+          },
+          "box": "$sketch.profile.smooth",
+          "annotation": "$sketch.profile.sketch",
+          "shape": "$sketch.profile.smooth"
+        },
+        "layout": {
+          "graphic": {
+            "margin": "$spacing.xl",
+            "eyebrowOrigin": { "x": "$spacing.xl", "y": "$spacing.xl" },
+            "captionBaseline": "$spacing.md"
+          },
+          "stage": {
+            "headingInset": { "x": "$spacing.3xl", "top": "$spacing.xl" },
+            "graphicInset": {
+              "x": "$spacing.lg",
+              "top": "$spacing.4xl",
+              "bottom": "$spacing.2xl"
+            },
+            "evidenceRow": {
+              "x": "$spacing.sm",
+              "bottom": "$spacing.2xs",
+              "gap": "$spacing.xs"
+            }
+          }
+        },
+        "motion": {
+          "tempo": "$atomic.tempo.md",
+          "press": "$atomic.duration.2xs",
+          "chip": "$atomic.duration.xs",
+          "whip": "$atomic.duration.sm",
+          "panel": "$atomic.duration.md",
+          "sheet": "$atomic.duration.lg",
+          "word": "$atomic.duration.xl",
+          "hero": "$atomic.duration.2xl",
+          "entrance": {
+            "duration": "$motion.panel",
+            "easing": "$atomic.easing.out",
+            "distance": "$atomic.distance.md"
+          },
+          "exit": {
+            "duration": "$motion.chip",
+            "easing": "$atomic.easing.out",
+            "distance": "$atomic.distance.md"
+          },
+          "emphasis": {
+            "duration": "$motion.sheet",
+            "spring": "$atomic.spring.pop"
+          },
+          "drawOn": {
+            "duration": "$motion.hero",
+            "easing": "$atomic.easing.inOut"
+          },
+          "travel": { "easing": "$atomic.easing.inOut" },
+          "pulse": { "period": "$atomic.period.md" },
+          "drift": { "distance": "$atomic.distance.md" },
+          "packetFlow": { "period": "$atomic.period.sm" },
+          "typing": { "rate": "$atomic.typingRate.md" },
+          "stagger": {
+            "list": "$atomic.stagger.sm",
+            "edge": "$atomic.stagger.sm",
+            "column": "$atomic.stagger.xs"
+          }
+        },
+        "camera": {
+          "preset": "authored",
+          "presets": {
+            "deliberate": {
+              "speed": "$atomic.cameraSpeed.deliberate",
+              "shutter": "$atomic.shutter.deliberate",
+              "easing": "$atomic.easing.inOut"
+            },
+            "gentle": {
+              "speed": "$atomic.cameraSpeed.gentle",
+              "shutter": "$atomic.shutter.gentle",
+              "easing": "$atomic.easing.inOut"
+            },
+            "balanced": {
+              "speed": "$atomic.cameraSpeed.balanced",
+              "shutter": "$atomic.shutter.balanced",
+              "easing": "$atomic.easing.inOut"
+            },
+            "brisk": {
+              "speed": "$atomic.cameraSpeed.brisk",
+              "shutter": "$atomic.shutter.brisk",
+              "easing": "$atomic.easing.inOutCubic"
+            },
+            "whip": {
+              "speed": "$atomic.cameraSpeed.whip",
+              "shutter": "$atomic.shutter.whip",
+              "easing": "$atomic.easing.inOutCubic"
+            }
+          },
+          "easing": {
+            "push": "$atomic.easing.out",
+            "whip": "$atomic.easing.inOutCubic",
+            "glide": "$atomic.easing.inOut"
+          },
+          "zoom": { "min": "$atomic.zoom.min", "max": "$atomic.zoom.max" }
+        },
+        "motionBlur": {
+          "shutter": "$atomic.shutter.brisk",
+          "samples": "$atomic.samples.md",
+          "velocityFactor": "$atomic.velocityBlur.factor",
+          "velocityMax": "$atomic.velocityBlur.max",
+          "transitionBlur": "$atomic.blur.md"
+        }
+      }
+    }
+  },
+  "components": {
+    "Node": {
+      "defaultProps": {
+        "radiusXs": 22,
+        "radiusSm": 25,
+        "radiusMd": 26,
+        "radiusLg": 29,
+        "radiusXl": 37,
+        "fill": "$color.surface",
+        "stroke": "$color.line",
+        "strokeWidth": "$stroke.outline",
+        "ringSpread": 9,
+        "ringAlpha": "$atomic.opacity.25",
+        "tintAlpha": "$atomic.opacity.9",
+        "outlineAlpha": "$atomic.opacity.28",
+        "coreRadius": 5,
+        "coreGrowth": 2,
+        "labelOffset": 30,
+        "detailOffset": 51,
+        "sketch": "$sketch.shape"
+      }
+    },
+    "Edge": {
+      "defaultProps": {
+        "color": "$color.line",
+        "strokeWidth": "$stroke.default",
+        "cap": "round",
+        "dash": "$atomic.dash.fine",
+        "drawDuration": "$motion.drawOn.duration",
+        "drawEasing": "$motion.drawOn.easing",
+        "curveTension": "$atomic.curveTension.md",
+        "sketch": "$sketch.shape"
+      }
+    },
+    "Route": {
+      "defaultProps": {
+        "strokeWidth": "$stroke.route",
+        "cap": "round",
+        "fadeIn": "$motion.chip"
+      }
+    },
+    "Packet": {
+      "defaultProps": {
+        "radius": 4,
+        "radiusSm": 2.5,
+        "period": "$motion.packetFlow.period",
+        "curveTension": "$atomic.curveTension.md",
+        "fadeIn": "$motion.sheet"
+      }
+    },
+    "Halo": { "defaultProps": { "glow": "$effect.halo" } },
+    "Particle": {
+      "defaultProps": {
+        "radius": 2.7,
+        "radiusLg": 4.5,
+        "haloRadius": 14,
+        "haloAlpha": "$atomic.opacity.6",
+        "twinklePeriod": "$motion.pulse.period",
+        "twinkleFloor": 0.45
+      }
+    },
+    "Guide": {
+      "defaultProps": {
+        "color": "$color.line",
+        "alpha": "$atomic.opacity.65",
+        "strokeWidth": "$atomic.strokeWidth.3xs",
+        "dash": "$atomic.dash.orbit",
+        "sketch": "$sketch.shape"
+      }
+    },
+    "Panel": {
+      "defaultProps": {
+        "fill": "$color.surface",
+        "stroke": "$color.line",
+        "radius": "$corner.panel",
+        "strokeWidth": "$stroke.outline",
+        "elevation": "$elevation.flat"
+      }
+    },
+    "Card": {
+      "defaultProps": {
+        "radius": "$corner.card",
+        "fillAlpha": "$atomic.opacity.8",
+        "strokeAlpha": "$atomic.opacity.32",
+        "padding": 16,
+        "textBaseline": 21,
+        "baseHeight": 24
+      }
+    },
+    "Pill": {
+      "defaultProps": {
+        "height": 30,
+        "radius": "$corner.pill",
+        "fillAlpha": "$atomic.opacity.8",
+        "strokeAlpha": "$atomic.opacity.32",
+        "textBaseline": 20
+      }
+    },
+    "Check": {
+      "defaultProps": {
+        "strokeWidth": "$atomic.strokeWidth.md",
+        "cap": "round",
+        "join": "round"
+      }
+    },
+    "Rule": {
+      "defaultProps": {
+        "color": "$color.line",
+        "strokeWidth": "$atomic.strokeWidth.3xs"
+      }
+    },
+    "Glyph": { "defaultProps": { "strokeWidth": "$stroke.default" } },
+    "NetworkGraph": {
+      "defaultProps": {
+        "highlightEdgeAlpha": "$atomic.opacity.34",
+        "edgeAlpha": "$atomic.opacity.65",
+        "hubPulsePeriod": "$motion.pulse.period",
+        "hubPulseFloor": 0.65,
+        "hubPulseSwing": 0.3,
+        "nodePulsePeriod": "$atomic.period.lg",
+        "nodePulseSwing": 0.5
+      }
+    },
+    "RadialNetwork": {
+      "defaultProps": {
+        "spokeAlpha": "$atomic.opacity.30",
+        "spokePulsePeriod": "$motion.pulse.period",
+        "spokePulseSwing": 0.6,
+        "hubRadius": 70,
+        "hubStrokeAlpha": "$atomic.opacity.40",
+        "hubStrokeWidth": "$stroke.hairline",
+        "hubGlowRadius": 59,
+        "hubGlowAlpha": "$atomic.opacity.3",
+        "hubLabelOffset": -2,
+        "hubDetailOffset": 22
+      }
+    },
+    "PlexusField": {
+      "defaultProps": {
+        "linkDistance": 148,
+        "linkAlpha": 0.62,
+        "linkWidth": "$atomic.strokeWidth.2xs"
+      }
+    },
+    "OrbitalSystem": {
+      "defaultProps": {
+        "orbitAlpha": "$atomic.opacity.24",
+        "orbitWidth": "$stroke.guide",
+        "bodyRadius": 17,
+        "bodyCoreRadius": 7,
+        "bodyAlpha": "$atomic.opacity.24",
+        "bodyStrokeWidth": "$stroke.hairline",
+        "bodyLabelOffset": 27,
+        "coreRadius": 49,
+        "coreStrokeAlpha": "$atomic.opacity.70",
+        "coreStrokeWidth": "$stroke.hairline",
+        "pulsePeriod": "$motion.pulse.period",
+        "pulseRadius": 71,
+        "pulseSwing": 5,
+        "pulseAlpha": "$atomic.opacity.3",
+        "pulseStrokeAlpha": "$atomic.opacity.10",
+        "pulseStrokeWidth": "$stroke.hairline"
+      }
+    },
+    "DataPipeline": {
+      "defaultProps": {
+        "activeTintAlpha": 0.04,
+        "activeStrokeAlpha": 0.6,
+        "activeStrokeWidth": "$stroke.hairline",
+        "iconRadius": 25,
+        "iconFillAlpha": "$atomic.opacity.8",
+        "iconStrokeAlpha": 0.35,
+        "iconStrokeWidth": "$stroke.hairline",
+        "checkSize": 19,
+        "dotRadius": 5,
+        "trackHeight": 3,
+        "packetPeriod": 64
+      }
+    },
+    "PredicatePushdownBoundary": {
+      "defaultProps": {
+        "boundaryWidth": "$stroke.default",
+        "boundaryDash": [5, 7],
+        "predicateRadius": 10,
+        "predicateStrokeWidth": "$stroke.hairline",
+        "rowRadius": 5,
+        "rowStrokeWidth": "$stroke.hairline",
+        "gateWidth": "$atomic.strokeWidth.lg"
+      }
+    },
+    "CodeWindow": {
+      "defaultProps": {
+        "radius": 19,
+        "dividerWidth": "$stroke.hairline",
+        "dotRadius": 4.5,
+        "dotAlpha": 0.45
+      }
+    },
+    "CodeFocus": {
+      "defaultProps": {
+        "highlightRadius": 7,
+        "highlightAlpha": 0.065,
+        "markerWidth": 3,
+        "dividerWidth": "$stroke.hairline",
+        "footerDotRadius": 3.5
+      }
+    },
+    "SchemaMapping": {
+      "defaultProps": {
+        "fieldRadius": 8,
+        "dividerWidth": "$stroke.hairline",
+        "dotRadius": 5,
+        "edgeAlpha": "$atomic.opacity.70",
+        "ringRadius": 13,
+        "ringAlpha": 0.6,
+        "ringStrokeWidth": "$stroke.hairline",
+        "checkSize": 10
+      }
+    },
+    "QueryColumnCacheGrowth": {
+      "defaultProps": {
+        "tableRadius": 5,
+        "tableStrokeWidth": "$stroke.default",
+        "gridStrokeWidth": "$stroke.hairline",
+        "missingDash": [5, 3],
+        "missingStrokeWidth": "$stroke.hairline",
+        "cardRadius": 10,
+        "cardStrokeWidth": "$stroke.hairline",
+        "checkWidth": "$atomic.strokeWidth.lg",
+        "routeStrokeWidth": "$stroke.hairline",
+        "portRadius": 5
+      }
+    },
+    "SourceMerge": {
+      "defaultProps": {
+        "edgeAlpha": 0.42,
+        "chipRadius": 10,
+        "chipFillAlpha": 0.07,
+        "chipStrokeAlpha": "$atomic.opacity.30",
+        "chipStrokeWidth": "$stroke.hairline",
+        "outEdgeAlpha": 0.5,
+        "outEdgeWidth": "$atomic.strokeWidth.lg",
+        "outPacketPeriod": 60,
+        "mergeRadius": 39,
+        "mergeStrokeAlpha": "$atomic.opacity.65",
+        "mergeStrokeWidth": "$stroke.hairline",
+        "glyphWidth": "$atomic.strokeWidth.md",
+        "barHeight": 6,
+        "barAlpha": 0.8,
+        "slotRadius": 5,
+        "slotFillAlpha": 0.12,
+        "slotStrokeAlpha": 0.6,
+        "slotStrokeWidth": "$stroke.default"
+      }
+    },
+    "DecisionFork": {
+      "defaultProps": {
+        "selectedWidth": "$atomic.strokeWidth.lg",
+        "conditionRadius": 10,
+        "conditionStrokeWidth": "$stroke.hairline",
+        "outcomeRadius": 14,
+        "outcomeStrokeWidth": "$stroke.hairline",
+        "gateWidth": "$stroke.default",
+        "gateSpread": 9,
+        "markerRadius": 13,
+        "markerAlpha": 0.12,
+        "markerCoreRadius": 5,
+        "lineGap": 4
+      }
+    },
+    "Heading": {
+      "defaultProps": {
+        "entranceDuration": "$motion.hero",
+        "entranceEasing": "$atomic.easing.out",
+        "entranceDistance": "$atomic.distance.sm"
+      }
+    },
+    "Subtitle": { "defaultProps": { "gap": 18 } },
+    "SharedObject": {
+      "defaultProps": {
+        "borderWidth": "$stroke.default",
+        "fill": "$color.surface",
+        "fadeIn": "$motion.hero",
+        "outlineFade": 20
+      }
+    },
+    "EvidenceChip": { "defaultProps": { "padding": { "x": 12, "y": 7 } } },
+    "ProductFrame": {
+      "defaultProps": { "backdrop": "$color.productBackdrop" }
+    },
+    "Thesis": {
+      "defaultProps": {
+        "gap": 26,
+        "inset": { "top": 235, "x": 110, "bottom": 80 },
+        "emphasisGap": 20,
+        "lineStagger": 24,
+        "lineDuration": 24,
+        "lineEasing": "$atomic.easing.out",
+        "lineDistance": 16
+      }
+    },
+    "Underline": {
+      "defaultProps": {
+        "strokeWidth": "$stroke.annotation",
+        "seed": "$atomic.seed.sm",
+        "drawIn": 28
+      }
+    },
+    "Annotation": {
+      "defaultProps": {
+        "strokeWidth": "$stroke.annotation",
+        "highlightAlpha": "$atomic.opacity.40",
+        "drawIn": "$motion.hero"
+      }
+    },
+    "Spotlight": { "defaultProps": { "padding": 10, "scrimSpread": 1800 } },
+    "Connector": {
+      "defaultProps": {
+        "strokeWidth": "$stroke.default",
+        "dash": "$atomic.dash.connector",
+        "bend": 30,
+        "drop": 60,
+        "drawIn": 30,
+        "easing": "$atomic.easing.inOut"
+      }
+    },
+    "FloatingLabel": {
+      "defaultProps": {
+        "padding": { "x": 18, "y": 12 },
+        "offset": 12,
+        "borderWidth": "$stroke.hairline"
+      }
+    },
+    "FloatingDiagram": {
+      "defaultProps": { "elevation": "$elevation.floating" }
+    },
+    "Morph": { "defaultProps": { "startRadius": 12 } },
+    "Aperture": { "defaultProps": { "overscan": 1.05 } },
+    "ProgressBar": {
+      "defaultProps": {
+        "height": 3,
+        "paint": { "color": "$color.accent", "alpha": "$atomic.opacity.100" }
+      }
+    }
+  },
+  "overrides": {
+    "qetl-motion": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "qetl-to-product": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "product-to-qetl": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.orange" } }
+        }
+      }
+    },
+    "qetl-composite": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "ontology-motion": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "ontology-to-product": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.orange" } }
+        }
+      }
+    },
+    "product-to-ontology": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "ontology-composite": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "plugin-ecosystem": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.orange" } }
+        }
+      }
+    },
+    "right-sized-data": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "shared-object-handoff": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "frame-to-interface": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "aperture-detail": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "spatial-continuation": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "occlusion-wipe": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.orange" } }
+        }
+      }
+    },
+    "graphic-match": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "causal-signal": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "field-grouping": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "focus-handoff": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "teaching-underline": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "model-to-workspace": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.orange" } }
+        }
+      }
+    },
+    "record-to-relationships": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.mint" } }
+        }
+      }
+    },
+    "controls-and-meaning": {
+      "other": {
+        "video": {
+          "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    }
+  }
+}

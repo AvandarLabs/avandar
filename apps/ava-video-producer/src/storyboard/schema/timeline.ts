@@ -15,6 +15,17 @@ export function timeline(plan: Storyboard) {
   });
 }
 
+/**
+ * The absolute first frames of the shots that declare a hard cut with
+ * `transition: {kind: "cut"}`, in film order. The storyboard render passes
+ * these to the frame gate. An undeclared hard cut is never included.
+ */
+export function declaredCutFrames(plan: Storyboard): number[] {
+  return timeline(plan)
+    .filter((shot) => shot.transition?.kind === "cut")
+    .map((shot) => shot.startFrame);
+}
+
 export function durationInFrames(plan: Storyboard): number {
   return plan.shots.reduce((sum, shot) => sum + shot.durationInFrames, 0);
 }

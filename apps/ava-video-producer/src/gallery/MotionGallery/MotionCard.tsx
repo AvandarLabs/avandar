@@ -1,6 +1,6 @@
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { memo } from "react";
-import { StockGraphic } from "../../stock/StockGraphic";
+import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
+import { GalleryItemTheme } from "../GalleryVideoTheme/GalleryItemTheme";
 import { Icon } from "./Icon";
 import { useFrames, useVisible } from "./useGalleryClock";
 import type { StockPresetId } from "../../stock/catalog";
@@ -14,12 +14,8 @@ export const MotionCard = memo(function MotionCard({
   saved,
   onOpen,
   onSave,
-  accent,
-  background,
   contentState,
 }: {
-  accent: string;
-  background: string;
   contentState?: ContentDraft;
   preset: Preset;
   index: number;
@@ -28,7 +24,6 @@ export const MotionCard = memo(function MotionCard({
   onOpen: (preset: Preset) => void;
   onSave: (id: StockPresetId) => void;
 }) {
-  const { t } = useGalleryLingui();
   const [element, visible] = useVisible();
   const [frame] = useFrames(
     playing && visible,
@@ -41,18 +36,18 @@ export const MotionCard = memo(function MotionCard({
         ref={element}
         className="card-preview"
         onClick={() => onOpen(preset)}
-        aria-label={t`Explore ${preset.name}`}
+        aria-label={`Explore ${preset.name}`}
       >
         {visible ? (
-          <StockGraphic
-            {...({
-              preset: preset.id,
-              input: contentState?.resolvedInput,
-            } as import("../../stock/contracts/StockContract.types").StockRequest)}
-            frame={frame}
-            accent={accent}
-            background={background}
-          />
+          <GalleryItemTheme itemId={preset.id}>
+            <StockGraphic
+              {...({
+                preset: preset.id,
+                input: contentState?.resolvedInput,
+              } as import("../../stock/contracts/StockContract.types").StockRequest)}
+              frame={frame}
+            />
+          </GalleryItemTheme>
         ) : (
           <span className="card-still" aria-hidden="true">
             <Icon name="pause" size={24} />
@@ -69,7 +64,7 @@ export const MotionCard = memo(function MotionCard({
             className={`card-state ${playing && visible ? "is-playing" : ""}`}
           >
             <i />
-            {playing && visible ? t`LIVE` : t`PAUSED`}
+            {playing && visible ? "LIVE" : "PAUSED"}
           </span>
         </div>
         <div className="card-heading">
@@ -81,8 +76,8 @@ export const MotionCard = memo(function MotionCard({
             onClick={() => onSave(preset.id)}
             aria-label={
               saved
-                ? t`Remove ${preset.name} from references`
-                : t`Save ${preset.name} to references`
+                ? `Remove ${preset.name} from references`
+                : `Save ${preset.name} to references`
             }
             aria-pressed={saved}
           >
@@ -92,17 +87,13 @@ export const MotionCard = memo(function MotionCard({
         <p>{preset.description}</p>
         <div className="card-foot">
           <code>
-            {String(index + 1).padStart(2, "0")}
-            <Trans>/</Trans>
-            {preset.id}
+            {String(index + 1).padStart(2, "0")}/{preset.id}
           </code>
           <button
             onClick={() => onOpen(preset)}
-            aria-label={t`View ${preset.name} details`}
+            aria-label={`View ${preset.name} details`}
           >
-            <span>
-              <Trans>Explore</Trans>
-            </span>
+            <span>Explore</span>
             <Icon name="arrow" size={15} />
           </button>
         </div>

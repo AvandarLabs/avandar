@@ -1,6 +1,7 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { type TextBounds, wrapTextToLines } from "./wrapTextToLines";
 import type { ReactNode } from "react";
+
 /** Data for Props. */
 type PropsResult = {
   x: number;
@@ -11,7 +12,11 @@ type PropsResult = {
 
 type Props = TextBounds & PropsResult;
 
-/** Renders every authored word at one fixed size or fails before drawing. */
+/**
+ * Renders every authored word at one fixed size or fails before drawing.
+ * The size is content, validated against measured widths; the family,
+ * colour, and line spacing come from the `text.graphic.data` role.
+ */
 export function FitText({
   text,
   width,
@@ -21,9 +26,11 @@ export function FitText({
   normalizeWhitespace = false,
   x,
   y,
-  color = STOCK.text,
+  color,
   anchor = "start",
 }: Readonly<Props>): ReactNode {
+  const data = useGraphicTokens().text.graphic.data;
+  const lineHeight = data.lineHeight ?? 1.3;
   const lines = wrapTextToLines({
     text,
     width,
@@ -37,13 +44,13 @@ export function FitText({
       aria-label={normalizeWhitespace ? text : undefined}
       x={x}
       y={y}
-      fill={color}
+      fill={color ?? data.color}
       fontSize={fontSize}
-      fontFamily="Arial, sans-serif"
+      fontFamily={data.fontFamily}
       textAnchor={anchor}
     >
       {lines.map((line, index) => (
-        <tspan key={index} x={x} dy={index ? fontSize * 1.3 : 0}>
+        <tspan key={index} x={x} dy={index ? fontSize * lineHeight : 0}>
           {line}
         </tspan>
       ))}

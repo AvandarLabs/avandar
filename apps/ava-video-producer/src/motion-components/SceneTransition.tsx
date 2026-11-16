@@ -29,6 +29,10 @@ export type SceneTransitionProps = {
   cameraMotion?: boolean;
   motionBlur?: boolean;
   motion?: MotionOptions;
+  /** Corner radius a morph starts from, in stage pixels. 12 when unthemed. */
+  morphRadius?: number;
+  /** How far past the frame's diagonal an aperture opens. 1.05 when unthemed. */
+  apertureOverscan?: number;
 };
 
 /** Scene geometry is independent of playback history and uses one native UI instance per scene. */
@@ -42,6 +46,8 @@ export function getSceneTransitionStyle(
     height = 840,
     cameraMotion = true,
     motionBlur = true,
+    morphRadius = 12,
+    apertureOverscan = 1.05,
   } = props;
   const kind = cameraMotion ? props.kind : "dissolve";
   const origin = props.origin ?? { x: width / 2, y: height / 2 };
@@ -55,9 +61,9 @@ export function getSceneTransitionStyle(
   const clipPath = !entering
     ? undefined
     : kind === "aperture"
-      ? `circle(${progress * Math.hypot(width, height) * 1.05}px at ${origin.x}px ${origin.y}px)`
+      ? `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`
       : kind === "morph"
-        ? `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${12 * (1 - progress)}px)`
+        ? `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${morphRadius * (1 - progress)}px)`
         : kind === "wipe" || kind === "handoff"
           ? `inset(0 ${(1 - progress) * 100}% 0 0)`
           : undefined;
@@ -70,7 +76,7 @@ export function getSceneTransitionStyle(
         : undefined,
     filter:
       kind === "spatial" && motionBlur
-        ? `blur(${(Math.sin(progress * Math.PI) * 12 * settings.blurStrength * settings.shutterAngle) / 180}px)`
+        ? `blur(${(Math.sin(progress * Math.PI) * settings.transitionBlur * settings.blurStrength * settings.shutterAngle) / 180}px)`
         : undefined,
   };
 }

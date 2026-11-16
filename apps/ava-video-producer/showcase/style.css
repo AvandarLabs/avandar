@@ -1,20 +1,16 @@
 :root {
-  --paper: #eeede7;
+  /* Brand-derived surfaces: a cool paper tinted toward Avandar blue. */
+  --paper: color-mix(in oklab, var(--ava-primary-0) 45%, var(--ava-neutral-0));
   --ink: var(--ava-neutral-9);
   --muted: var(--ava-neutral-6);
-  --line: #cecec4;
-  --accent: #c4492c;
+  --line: color-mix(in oklab, var(--ava-primary-1) 35%, var(--ava-neutral-1));
+  --accent: var(--ava-primary-6);
   --dark: var(--ava-neutral-9);
-  --cream: #f8f7f1;
+  --cream: #fff;
 
   background: var(--paper);
   color: var(--ink);
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--ava-font);
   font-synthesis: none;
 }
 
@@ -73,22 +69,23 @@ input:focus-visible {
 .brand {
   align-items: center;
   display: flex;
-  font-size: 13px;
+  font-size: 19px;
   font-weight: 650;
-  gap: 17px;
-  letter-spacing: 1.5px;
+  gap: 12px;
+  letter-spacing: -0.3px;
   text-decoration: none;
 }
 
+/* The logo PNG carries its own padding, so the box runs a little large. */
 .brand-mark {
-  font-family: Georgia, serif;
-  font-size: 33px;
-  letter-spacing: -3px;
-  margin-right: 2px;
+  display: block;
+  height: 34px;
+  margin: -4px -4px -4px -6px;
+  width: 34px;
 }
 
 .brand-divider {
-  color: #b6b8ae;
+  color: var(--ava-neutral-3);
   font-size: 21px;
   font-weight: 300;
 }
@@ -303,7 +300,7 @@ button:disabled {
 }
 
 .export-status[data-state="failed"] {
-  color: #ffd1bc;
+  color: var(--ava-primary-2);
 }
 
 .export-status[hidden] {
@@ -476,7 +473,11 @@ h2 {
 }
 
 .chapters button:hover {
-  background: #e1e1d8;
+  background: color-mix(
+    in oklab,
+    var(--ava-primary-1) 40%,
+    var(--ava-neutral-1)
+  );
 }
 
 .chapters time {
@@ -551,7 +552,11 @@ h2 {
 }
 
 .file-tag {
-  background: #e2e3da;
+  background: color-mix(
+    in oklab,
+    var(--ava-primary-1) 40%,
+    var(--ava-neutral-1)
+  );
   border-radius: 3px;
   color: var(--ava-neutral-7);
   font:
@@ -645,7 +650,11 @@ h2 {
 }
 
 .closing code {
-  background: #e1e2d8;
+  background: color-mix(
+    in oklab,
+    var(--ava-primary-1) 40%,
+    var(--ava-neutral-1)
+  );
   border-radius: 3px;
   color: var(--ink);
   font-size: 11px;
@@ -684,7 +693,7 @@ footer a {
 }
 
 .video-error {
-  color: #ffd1bc;
+  color: var(--ava-primary-2);
   font-size: 12px;
   padding: 20px;
 }
@@ -748,13 +757,13 @@ footer a {
   }
 
   .brand {
-    font-size: 10px;
-    gap: 9px;
-    letter-spacing: 1px;
+    font-size: 15px;
+    gap: 8px;
   }
 
   .brand-mark {
-    font-size: 27px;
+    height: 28px;
+    width: 28px;
   }
 
   .room {

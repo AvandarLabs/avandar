@@ -13,6 +13,9 @@ type Props = {
   totalPages: number;
   onPageChange: (page: number) => void;
   onRowClick: (feature: GeoJSON.Feature) => void;
+
+  /** Columns never shown, even when the layer's popup would show them. */
+  hiddenColumnNames?: readonly string[];
 };
 
 /** Reads one cell's display value from either a leaf's properties or id. */
@@ -42,9 +45,10 @@ export function ClusterFeatureTableBody({
   totalPages,
   onPageChange,
   onRowClick,
+  hiddenColumnNames,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const columns = getClusterTableColumns({ layer, leaves });
+  const columns = getClusterTableColumns({ layer, leaves, hiddenColumnNames });
 
   return (
     <>

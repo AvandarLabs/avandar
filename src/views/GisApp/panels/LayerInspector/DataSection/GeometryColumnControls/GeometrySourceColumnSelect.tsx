@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
@@ -13,7 +14,12 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
-/** Selects the encoded geometry column for a direct geometry binding. */
+/**
+ * Selects the encoded geometry column for a direct geometry binding. When
+ * the popup is still set to all fields, picking a column also replaces that
+ * setting with the default list of fields, the same way binding latitude and
+ * longitude does.
+ */
 export function GeometrySourceColumnSelect({
   layer,
   columnId,
@@ -23,6 +29,7 @@ export function GeometrySourceColumnSelect({
   const dataSourceId = layer.source.dataSource
     ? Model.getTypedId(layer.source.dataSource)
     : undefined;
+  const sourceColumns = useLayerSourceColumns(dataSourceId);
   return (
     <QueryColumnSingleSelect
       label={t`Geometry column`}
@@ -36,10 +43,17 @@ export function GeometrySourceColumnSelect({
           return;
         }
         onLayerChange((current) => {
-          return MapLayerUpdates.withGeometryColumn({
+          const withColumn = MapLayerUpdates.withGeometryColumn({
             layer: current,
             column,
           });
+          // Until the source's columns load, keep "all" rather than none.
+          return sourceColumns.length === 0
+            ? withColumn
+            : MapLayerUpdates.withDefaultPopupColumns({
+                layer: withColumn,
+                availableColumns: sourceColumns,
+              });
         });
       }}
     />

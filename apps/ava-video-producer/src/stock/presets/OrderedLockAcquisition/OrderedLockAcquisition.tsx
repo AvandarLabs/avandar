@@ -4,7 +4,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { STOCK } from "../../stockPalette";
 import { getLockStateFromFrame } from "./getLockStateFromFrame";
 import { LockOperation } from "./LockOperation";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

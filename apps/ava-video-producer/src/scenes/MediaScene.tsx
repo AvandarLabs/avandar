@@ -1,14 +1,13 @@
-import { Freeze, Img, OffthreadVideo, staticFile } from "remotion";
 import { DUR, enter, ramp } from "../motion";
 import {
   assertFrame,
   assertRect,
   assertUnit,
   fitTextLines,
-  safePublicPath,
   sceneBounds,
   textUnits,
 } from "./layout/layout";
+import { MediaPlane } from "./MediaPlane";
 import { positioned, SceneShell } from "./SceneShell";
 import type { MediaSceneProps } from "./scenes.types";
 import type { CSSProperties } from "react";
@@ -36,7 +35,6 @@ export function MediaScene({
     throw new Error("Media kind must be image or video");
   if (fit !== "contain" && fit !== "cover")
     throw new Error("Media fit must be contain or cover");
-  const asset = staticFile(safePublicPath(src));
   sceneBounds(width, height); // Apply the shared minimum-size checks.
   const top = title || kicker ? 92 : 24;
   const bounds = {
@@ -142,22 +140,14 @@ export function MediaScene({
             transform: `translate(${(-crop.x / crop.width) * bounds.width}px, ${(-crop.y / crop.height) * bounds.height}px) scale(${1 / crop.width}, ${1 / crop.height})`,
           }}
         >
-          {kind === "image" ? (
-            <Img
-              src={asset}
-              alt={title ?? "Captured product screen"}
-              style={mediaStyle}
-            />
-          ) : (
-            <Freeze frame={Math.max(0, Math.floor(frame))}>
-              <OffthreadVideo
-                src={asset}
-                trimBefore={trimBefore}
-                muted
-                style={mediaStyle}
-              />
-            </Freeze>
-          )}
+          <MediaPlane
+            frame={frame}
+            kind={kind}
+            src={src}
+            trimBefore={trimBefore}
+            alt={title ?? "Captured product screen"}
+            style={mediaStyle}
+          />
         </div>
         {callouts.map((callout) => {
           if (frame < callout.startFrame || frame >= callout.endFrame)

@@ -210,6 +210,10 @@ export function useDataExplorerUrlSync({
             colNames: urlState.colNames,
             datasetColumns,
             conceptAttributes,
+            conceptId:
+              restoredDataSource?.__type === "Concept"
+                ? restoredDataSource.id
+                : undefined,
           });
 
           if (restoredCols.length > 0) {

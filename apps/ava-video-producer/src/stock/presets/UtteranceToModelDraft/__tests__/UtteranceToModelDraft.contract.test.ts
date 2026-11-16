@@ -4,12 +4,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { setupI18n } from "@lingui/core";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { makeLocalizedStockDataFromContract } from "../../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../../i18n/StockCopyMessages";
 import { utteranceToModelDraftContract } from ".././UtteranceToModelDraft.contract";
 import {
   DEFAULT_INPUT,
@@ -184,30 +181,6 @@ test("maximum phrase labels remain exact through whitespace and grapheme mapping
         _render({ frame: 150, input: input }).includes(`aria-label="${text}"`),
       );
     },
-  );
-});
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId = "motionAtlas.utterance-to-model-draft.default.review.note";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [utteranceToModelDraftContract.id]: utteranceToModelDraftContract,
-  });
-  assert.equal(messages[messageId], DEFAULT_INPUT.review.note);
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: utteranceToModelDraftContract,
-    i18n,
-  });
-  assert.equal(resolved.defaultInput.review.note, "Texto traducido");
-  assert.notEqual(DEFAULT_INPUT.review.note, "Texto traducido");
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.review.note}"`,
-    ),
   );
 });
 

@@ -1,7 +1,7 @@
 import { ClassroomFurniture } from "./ClassroomFurniture";
 import { ClassroomLabels } from "./ClassroomLabels";
 import { ClassroomLearner } from "./ClassroomLearner";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomAccessRearrangement. */

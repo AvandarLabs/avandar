@@ -169,35 +169,6 @@ test("hinging retains its upper edge while the projected sheet opens", () => {
   );
 });
 
-import { setupI18n } from "@lingui/core";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId =
-    "motionAtlas.expectation-overlay-check.default.tests.0.expected";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [expectationOverlayCheckContract.id]: expectationOverlayCheckContract,
-  });
-  assert.equal(messages[messageId], DEFAULT_INPUT.tests[0].expected);
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: expectationOverlayCheckContract,
-    i18n,
-  });
-  assert.equal(resolved.defaultInput.tests[0].expected, "Texto traducido");
-  assert.notEqual(DEFAULT_INPUT.tests[0].expected, "Texto traducido");
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.tests[0].expected}"`,
-    ),
-  );
-});
-
 test("three-line case captions clear the input caption below them", () => {
   const label = `界 ${"界".repeat(13)} ${"界".repeat(8)}`;
   const input = {

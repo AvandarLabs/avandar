@@ -25,19 +25,25 @@ export type DbAnalyticsEventName = (typeof DB_ANALYTICS_EVENT_NAMES)[number];
 /** Every analytics event name accepted by the platform. */
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
 
-/** Which surface executed a query. Recorded on failures from every surface. */
+/**
+ * Which surface executed a query. Recorded on failures from every surface.
+ * `chat_result`: an agent result re-run in the chat.
+ */
 export type QueryAnalyticsSurface =
   | "data_explorer"
   | "dashboard_block"
-  | "viz_config";
+  | "viz_config"
+  | "chat_result";
 
 /**
  * What caused a query to run.
  *
  * `dataset_opened` covers opening a saved dataset from the Data Explorer
- * drawer. `block_render` is what dashboard blocks and viz-config previews
- * report, since neither has a user-initiated trigger: they run whenever their
- * SQL changes.
+ * drawer. `plugin_command` covers a plugin command changing the Data
+ * Explorer's SQL, such as one that adds computed columns, and the Undo that
+ * puts the earlier SQL back. `block_render` is what dashboard blocks and
+ * viz-config previews report, since neither has a user-initiated trigger:
+ * they run whenever their SQL changes.
  */
 export type QueryAnalyticsTrigger =
   | "sql_submit"
@@ -45,6 +51,7 @@ export type QueryAnalyticsTrigger =
   | "chat_generated"
   | "url_hydration"
   | "dataset_opened"
+  | "plugin_command"
   | "block_render";
 
 /**
@@ -121,6 +128,10 @@ type ChatMessageSentPayload = {
   modelId?: string;
   runtimeMode: "cloud" | "local";
   hasOpenDataset: boolean;
+  /** Gadgets the message mentions. */
+  mentionCount?: number;
+  /** Gadgets attached to the chat when the message was sent. */
+  attachedCount?: number;
 };
 
 /**

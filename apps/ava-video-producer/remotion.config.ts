@@ -1,9 +1,9 @@
 import { Config } from "@remotion/cli/config";
-import { readLicense } from "./scripts/lib/readLicense.mjs";
-import { withWorkspaceAliases } from "./scripts/lib/withWorkspaceAliases.mjs";
+import { getRemotionLicenseFromAppRoot } from "./scripts/lib/getRemotionLicenseFromAppRoot";
+import { makeWorkspaceWebpackConfigFromConfig } from "./scripts/lib/makeWorkspaceWebpackConfigFromConfig";
 
 // Remotion evaluates bundled configuration from the app root.
-const { publicKey } = readLicense(process.cwd());
+const { publicKey } = getRemotionLicenseFromAppRoot(process.cwd());
 
 // Preserve inherited credentials for reloads under a server-only prefix.
 // The CLI forwards REMOTION_* variables to browser code, including key paths.
@@ -19,7 +19,7 @@ Object.keys(process.env)
     delete process.env[name];
   });
 
-Config.overrideWebpackConfig(withWorkspaceAliases);
+Config.overrideWebpackConfig(makeWorkspaceWebpackConfigFromConfig);
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
 

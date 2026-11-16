@@ -2,7 +2,7 @@ import { EASE, mix, ramp } from "../../../motion";
 import { GlobeCopy } from "./GlobeCopy";
 import { GlobeIncident } from "./GlobeIncident";
 import { GlobeSurface } from "./GlobeSurface";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
 /** Hypothetical surface locations and an authored shortest longitude sweep. */

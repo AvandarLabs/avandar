@@ -5,7 +5,7 @@
 Do **not** start with the encoder, B-frames, GOP, or "the preview is lying."
 That diagnosis is wrong, and it is wrong in a way that costs a day.
 
-1. Run `check-frames.mjs` on the shipped mp4.
+1. Run `checkFrames.ts` on the shipped mp4.
 2. **If it flags tiles:** extract that frame from the JPEG sequence
    (`out/<id>-frames/element-NNN.jpeg`). If the JPEG is already a grid, the
    encoder is innocent. Re-render that exact frame with `remotion still`
@@ -16,7 +16,7 @@ That diagnosis is wrong, and it is wrong in a way that costs a day.
    onto empty white.
 4. Only after both are clean, look at encode.
 
-A grid seen **only** in an editor's media widget, while `check-frames.mjs`
+A grid seen **only** in an editor's media widget, while `checkFrames.ts`
 passes and a `remotion still` of the same frame matches the mp4 (~33 dB), can
 be the previewer. Prove it with the detector first.
 
@@ -32,7 +32,7 @@ empty Chrome log is almost never a Remotion problem.
   `npx remotion browser ensure` and let Remotion manage its own Headless
   Shell — it is isolated from your desktop browser and cannot hit the above.
 
-## What check-frames.mjs detects
+## What checkFrames.ts detects
 
 - **Tiled frames** — compares each frame's left half to its right half and
   flags frames matching far better than their neighbours do, only on frames

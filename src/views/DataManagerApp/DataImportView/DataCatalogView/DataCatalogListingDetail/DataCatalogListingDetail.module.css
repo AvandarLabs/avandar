@@ -1,0 +1,167 @@
+/*
+ * The body scrolls and the foot does not, so "Add to workspace" never
+ * scrolls away under a long column list.
+ */
+.dataCatalogListingDetail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dataCatalogListingDetailBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  scrollbar-width: thin;
+}
+
+/*
+ * The body is a height-bound flex column, so without this its children
+ * would shrink to fit instead of overflowing into the scroll.
+ */
+.dataCatalogListingDetailBody > * {
+  flex-shrink: 0;
+}
+
+.dataCatalogListingDetailIdle {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  padding: var(--mantine-spacing-xl);
+}
+
+.dataCatalogListingDetailFoot {
+  align-items: flex-end;
+  border-top: 1px solid var(--ava-border-default);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
+  text-align: end;
+}
+
+.dataCatalogListingDetailAdd {
+  flex-shrink: 0;
+}
+
+/*
+ * Only where the detail replaces the results does it need a way back to
+ * them; beside the list it would be a button to somewhere already visible.
+ */
+.dataCatalogListingDetailBack {
+  align-self: flex-start;
+  display: none;
+  margin-inline-start: calc(var(--mantine-spacing-xs) * -1);
+}
+
+@container data-catalog (width < 40rem) {
+  .dataCatalogListingDetailBack {
+    display: inline-flex;
+  }
+}
+
+/* The arrow points back along the reading direction. */
+[dir="rtl"] .dataCatalogListingDetailBackIcon {
+  transform: scaleX(-1);
+}
+
+/* Keep the paragraph breaks the source's HTML had. */
+.dataCatalogListingDetailDescription {
+  white-space: pre-line;
+}
+
+/*
+ * Neutral rather than blue: revealing the rest of a paragraph is reading,
+ * not an intent on the listing.
+ */
+.dataCatalogListingDetailSpoilerControl {
+  color: var(--mantine-color-neutral-7);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  margin-top: var(--mantine-spacing-xxs);
+}
+
+.dataCatalogListingDetailSpoilerControl:hover {
+  color: var(--mantine-color-neutral-9);
+}
+
+.dataCatalogListingDetailSourceRecord {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+  margin: 0;
+}
+
+.dataCatalogListingDetailSourceRecordLabel {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.45;
+}
+
+.dataCatalogListingDetailRawMetadata {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  font-family: var(--mantine-font-family-monospace);
+  margin: 0;
+  max-height: 16rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: var(--mantine-spacing-xs);
+  white-space: pre-wrap;
+}
+
+.dataCatalogListingDetailChevronClosed,
+.dataCatalogListingDetailChevronOpen {
+  transition: transform var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+}
+
+.dataCatalogListingDetailChevronOpen {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dataCatalogListingDetailChevronClosed,
+  .dataCatalogListingDetailChevronOpen {
+    transition: none;
+  }
+}
+
+/*
+ * In the pane the content is one column. In full screen the facts move into
+ * a rail beside the content, split from it by a hairline as a workspace
+ * dataset's rail is, so the description, columns, and preview get the width.
+ */
+.dataCatalogListingDetailLayoutIsExpanded {
+  display: grid;
+  gap: var(--mantine-spacing-xl);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+}
+
+.dataCatalogListingDetailMain > * {
+  flex-shrink: 0;
+}
+
+.dataCatalogListingDetailRail {
+  align-self: start;
+  border-inline-start: 1px solid var(--ava-border-default);
+  padding-inline-start: var(--mantine-spacing-lg);
+}
+
+@media (width < 62em) {
+  .dataCatalogListingDetailLayoutIsExpanded {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dataCatalogListingDetailRail {
+    border-inline-start: none;
+    border-top: 1px solid var(--ava-border-default);
+    padding-inline-start: 0;
+    padding-top: var(--mantine-spacing-lg);
+  }
+}

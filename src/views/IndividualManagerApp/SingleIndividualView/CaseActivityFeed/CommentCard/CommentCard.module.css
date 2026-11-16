@@ -1,0 +1,91 @@
+.card {
+  border-radius: var(--mantine-radius-sm);
+  column-gap: var(--mantine-spacing-sm);
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  padding-block: var(--mantine-spacing-sm);
+
+  /* Keeps a card scrolled into view clear of the docked composer. */
+  scroll-margin-block-end: var(--ava-sticky-action-bar-inset, 160px);
+  transition: var(--ava-transition-colors);
+}
+
+.card:focus {
+  outline: none;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+.card + .card {
+  border-block-start: 1px solid var(--ava-border-default);
+}
+
+.highlighted {
+  animation: highlight-fade 2.4s ease-in forwards;
+  background-color: var(--mantine-color-primary-0);
+}
+
+/* Holds the linked-comment tint, then fades it before the class is dropped. */
+@keyframes highlight-fade {
+  0%,
+  60% {
+    background-color: var(--mantine-color-primary-0);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.avatar {
+  background-color: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  border-radius: 50%;
+  display: grid;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  height: 32px;
+  place-items: center;
+  width: 32px;
+}
+
+.header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.actions {
+  margin-inline-start: auto;
+  opacity: 0;
+  transition: var(--ava-transition-opacity);
+}
+
+.card:hover .actions,
+.card:focus-within .actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+  }
+}
+
+.deleted {
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .actions {
+    transition: none;
+  }
+
+  .highlighted {
+    animation: none;
+  }
+}

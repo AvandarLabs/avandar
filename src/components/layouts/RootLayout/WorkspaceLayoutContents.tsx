@@ -8,6 +8,7 @@ import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { PluginHost } from "@/lib/plugins/PluginHost/PluginHost";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -36,27 +37,29 @@ export function WorkspaceLayoutContents({
 
   return (
     <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
-      <DataExplorerStateManager.Provider>
-        <DashboardEditorStateManager.Provider>
-          <ChatPanelProvider>
-            <NuxStateManager.Provider>
-              <AppDropzone>
-                <AppShell
-                  title={workspace.name}
-                  currentWorkspace={workspace}
-                  profileLink={profileLink}
-                  navbarLinks={mainNavBarLinks}
-                  utilityLinks={utilityNavBarLinks}
-                  spotlightActions={spotlightActions}
-                >
-                  {children}
-                </AppShell>
-                <NuxRoot />
-              </AppDropzone>
-            </NuxStateManager.Provider>
-          </ChatPanelProvider>
-        </DashboardEditorStateManager.Provider>
-      </DataExplorerStateManager.Provider>
+      <PluginHost>
+        <DataExplorerStateManager.Provider>
+          <DashboardEditorStateManager.Provider>
+            <ChatPanelProvider>
+              <NuxStateManager.Provider>
+                <AppDropzone>
+                  <AppShell
+                    title={workspace.name}
+                    currentWorkspace={workspace}
+                    profileLink={profileLink}
+                    navbarLinks={mainNavBarLinks}
+                    utilityLinks={utilityNavBarLinks}
+                    spotlightActions={spotlightActions}
+                  >
+                    {children}
+                  </AppShell>
+                  <NuxRoot />
+                </AppDropzone>
+              </NuxStateManager.Provider>
+            </ChatPanelProvider>
+          </DashboardEditorStateManager.Provider>
+        </DataExplorerStateManager.Provider>
+      </PluginHost>
     </ModalsProvider>
   );
 }

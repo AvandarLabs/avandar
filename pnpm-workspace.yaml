@@ -3,6 +3,7 @@ packages:
   - "packages/shared/*"
   - "packages/web/*"
   - "packages/node/*"
+  - "plugins/*"
 
 # Singleton runtime dependencies. These must resolve to exactly one copy across
 # the whole workspace: they carry React context or module-level identity, so a
@@ -60,6 +61,7 @@ catalog:
   ts-pattern: ^5.7.0
   typescript: ~5.9.3
   tsup: ^8.5.0
+  vite: ^7.0.4
   vitest: ^3.2.4
 
 # Supply-chain cooldown: refuse to resolve any version published less than

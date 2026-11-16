@@ -87,7 +87,7 @@ test("every literal displayed row is replaced before the shutter first opens", (
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { invalidTableQuarantineContract } from "./InvalidTableQuarantine.contract";
 import { inputSchema } from "./InvalidTableQuarantine.schema";
@@ -130,7 +130,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
     ["labels", "readable"],
