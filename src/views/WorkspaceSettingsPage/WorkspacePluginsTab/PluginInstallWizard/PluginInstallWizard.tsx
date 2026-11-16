@@ -1,10 +1,12 @@
 import { Stack } from "@mantine/core";
+import { useDataSlotDraftStatus } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotDraftStatus";
 import { InstallWizardFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter";
 import { InstallWizardPageContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardPageContent";
 import { InstallWizardStepper } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper";
 import { useInstallPlugin } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin";
 import { useInstallWizardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardState";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
+import type { InstallWizardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardState";
 
 type Props = Readonly<{
   pluginName: string;
@@ -13,6 +15,22 @@ type Props = Readonly<{
   /** Closes the modal the wizard is in. */
   onClose: () => void;
 }>;
+
+/**
+ * Whether the wizard's current page lets the admin go on: a data slot's page
+ * does once its binding is complete, and every other page always does.
+ */
+function useCanGoNext(wizard: InstallWizardState): boolean {
+  const slotPage = wizard.page.step === "dataSlots" ? wizard.page : undefined;
+  const { status } = useDataSlotDraftStatus({
+    slot: slotPage?.slot,
+    draft:
+      slotPage === undefined
+        ? undefined
+        : wizard.draftsBySlotId[slotPage.slotId],
+  });
+  return slotPage === undefined || status?.kind === "bound";
+}
 
 /**
  * The plugin install wizard: Review, then the steps the manifest needs, then
@@ -29,6 +47,7 @@ export function PluginInstallWizard({
     pluginName,
     manifest: manifestModule.manifest,
   });
+  const canGoNext = useCanGoNext(wizard);
   return (
     <Stack gap="lg">
       <InstallWizardStepper steps={wizard.steps} activeStep={wizard.page.step}>
@@ -44,8 +63,9 @@ export function PluginInstallWizard({
       <InstallWizardFooter
         wizard={wizard}
         installer={installer}
+        canGoNext={canGoNext}
         onInstall={() => {
-          installer.install([]);
+          installer.install(wizard.bindings);
         }}
         onClose={onClose}
       />

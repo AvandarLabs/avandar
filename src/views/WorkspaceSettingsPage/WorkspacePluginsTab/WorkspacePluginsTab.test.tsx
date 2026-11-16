@@ -85,6 +85,50 @@ vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
     },
   };
 });
+// The install wizard lists the workspace's case types and datasets. These
+// stubs keep the dataset client's DuckDB and storage modules out of the test.
+vi.mock("@/clients/ontology/ConceptClient", () => {
+  return {
+    ConceptClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
+  return {
+    ConceptAttributeClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return {
+    DatasetClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
+vi.mock(
+  "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding",
+  () => {
+    return { checkDataSlotBinding: vi.fn() };
+  },
+);
 vi.mock("@/utils/Logger", () => {
   return { Logger: { error: vi.fn() } };
 });

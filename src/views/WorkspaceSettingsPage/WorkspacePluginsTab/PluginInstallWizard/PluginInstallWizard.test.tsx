@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@/test-utils";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
+import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 import type { ReactNode } from "react";
 
@@ -44,6 +45,62 @@ vi.mock(
     };
   },
 );
+// The panel has its own tests. This stand-in binds its slot in one click.
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotPanel",
+  () => {
+    return {
+      DataSlotPanel: (props: {
+        slotId: string;
+        slotTitle: string;
+        onDraftChange: (draft: PluginDataSlotBinding.Draft) => void;
+      }) => {
+        return (
+          <button
+            type="button"
+            onClick={() => {
+              props.onDraftChange(_makeDraft(props.slotId));
+            }}
+          >
+            {`Bind ${props.slotTitle}`}
+          </button>
+        );
+      },
+    };
+  },
+);
+// A draft counts as complete as soon as there is one.
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotDraftStatus",
+  () => {
+    return {
+      useDataSlotDraftStatus: (options: { draft: unknown }) => {
+        return {
+          source: undefined,
+          isLoadingSource: false,
+          status:
+            options.draft === undefined
+              ? undefined
+              : { kind: "bound", fieldsByAttributeKey: {} },
+        };
+      },
+    };
+  },
+);
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceOptions",
+  () => {
+    return {
+      useDataSlotSourceOptions: () => {
+        return {
+          concepts: [{ id: "concept-deaths", name: "Measles deaths" }],
+          datasets: [],
+          isLoading: false,
+        };
+      },
+    };
+  },
+);
 vi.mock("@/utils/notifications/notify", () => {
   return {
     notifySuccess: mocks.notifySuccess,
@@ -56,7 +113,35 @@ const INSTALLATION = {
   pluginId: "avandar.epidemiology",
 };
 
+const DATA_SLOTS = {
+  cases: {
+    title: "%slot.cases.title%",
+    description: "%slot.cases.description%",
+    required: false,
+    attributes: {
+      onsetDate: { type: "date", title: "%onset%", required: true },
+    },
+  },
+  deaths: {
+    title: "%slot.deaths.title%",
+    required: true,
+    attributes: {
+      deathDate: { type: "date", title: "%death%", required: true },
+    },
+  },
+};
+
 let queryClient: QueryClient;
+
+function _makeDraft(slotId: string): PluginDataSlotBinding.Draft {
+  return {
+    slotId,
+    sourceType: "concept",
+    conceptId: `concept-${slotId}` as PluginDataSlotBinding.Draft["conceptId"],
+    datasetId: undefined,
+    attributeMap: { date: `attribute-${slotId}` },
+  };
+}
 let onClose: ReturnType<typeof vi.fn>;
 
 function _makeManifestModule(
@@ -86,6 +171,9 @@ function _makeManifestModule(
         name: "Epidemiology",
         description: "Charts disease spread.",
         "run.title": "Linear regression",
+        "slot.cases.title": "Cases",
+        "slot.cases.description": "The case records the epicurve counts.",
+        "slot.deaths.title": "Deaths",
       },
     },
     icons: {},
@@ -247,5 +335,88 @@ describe("PluginInstallWizard", () => {
       message: "permission denied",
     });
     expect(screen.getByRole("button", { name: "Install" })).toBeEnabled();
+  });
+
+  describe("data slots", () => {
+    function _renderWizardWithDataSlots(): void {
+      _renderWizard(
+        _makeManifestModule({
+          permissions: ["data:slots"],
+          dataSlots: DATA_SLOTS,
+        }),
+      );
+    }
+
+    it("gives each data slot its own page, titled and described by the slot", () => {
+      _renderWizardWithDataSlots();
+
+      _clickButton("Next");
+
+      expect(screen.getByRole("heading", { name: "Cases" })).toHaveFocus();
+      expect(
+        screen.getByText("The case records the epicurve counts."),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Records")).toBeInTheDocument();
+    });
+
+    it("offers Skip for now on an optional data slot and keeps Next off until it is bound", () => {
+      _renderWizardWithDataSlots();
+      _clickButton("Next");
+
+      expect(
+        screen.getByRole("button", { name: "Skip for now" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+      _clickButton("Bind Cases");
+
+      expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+    });
+
+    it("blocks Next on a required data slot until it is bound, with no Skip", () => {
+      _renderWizardWithDataSlots();
+      _clickButton("Next");
+      _clickButton("Skip for now");
+
+      expect(screen.getByRole("heading", { name: "Deaths" })).toHaveFocus();
+      expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+      expect(
+        screen.queryByRole("button", { name: "Skip for now" }),
+      ).not.toBeInTheDocument();
+      _clickButton("Bind Deaths");
+
+      expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+    });
+
+    it("installs with the bindings chosen and none for a skipped slot", () => {
+      _renderWizardWithDataSlots();
+      _clickButton("Next");
+      _clickButton("Bind Cases");
+      _clickButton("Skip for now");
+      _clickButton("Bind Deaths");
+      _clickButton("Next");
+
+      _clickButton("Install");
+
+      expect(mocks.install).toHaveBeenCalledWith(
+        expect.objectContaining({
+          grantedPermissions: ["data:slots"],
+          bindings: [_makeDraft("deaths")],
+        }),
+      );
+    });
+
+    it("lists the records each data slot reads on the Confirm step", () => {
+      _renderWizardWithDataSlots();
+      _clickButton("Next");
+      _clickButton("Skip for now");
+      _clickButton("Bind Deaths");
+
+      _clickButton("Next");
+
+      expect(screen.getByText("Cases: not chosen yet")).toBeInTheDocument();
+      expect(
+        screen.getByText("Deaths: Case type: Measles deaths"),
+      ).toBeInTheDocument();
+    });
   });
 });

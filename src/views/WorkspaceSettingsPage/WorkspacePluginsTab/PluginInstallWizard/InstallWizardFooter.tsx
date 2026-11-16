@@ -6,6 +6,9 @@ import type { InstallWizardState } from "@/views/WorkspaceSettingsPage/Workspace
 type Props = Readonly<{
   wizard: InstallWizardState;
   installer: PluginInstaller;
+
+  /** False while the current page needs a choice before the next one. */
+  canGoNext: boolean;
   onInstall: () => void;
   onClose: () => void;
 }>;
@@ -13,12 +16,17 @@ type Props = Readonly<{
 function PrimaryButton({
   wizard,
   installer,
+  canGoNext,
   onInstall,
   onClose,
 }: Props): JSX.Element {
   const { t } = useLingui();
   if (wizard.page.step !== "confirm") {
-    return <Button onClick={wizard.goToNextPage}>{t`Next`}</Button>;
+    return (
+      <Button disabled={!canGoNext} onClick={wizard.goToNextPage}>
+        {t`Next`}
+      </Button>
+    );
   }
   if (installer.installation !== undefined) {
     return <Button onClick={onClose}>{t`Done`}</Button>;
@@ -32,8 +40,9 @@ function PrimaryButton({
 
 /**
  * The install wizard's buttons: Back, then Next on every page but the last,
- * Install on the last, and Done once installed. Back goes away once the
- * install starts, because the choices it would return to are already saved.
+ * Install on the last, and Done once installed. An optional data slot's page
+ * also offers Skip for now. Back goes away once the install starts, because
+ * the choices it would return to are already saved.
  */
 export function InstallWizardFooter(props: Props): JSX.Element {
   const { t } = useLingui();
@@ -47,6 +56,11 @@ export function InstallWizardFooter(props: Props): JSX.Element {
           {t`Back`}
         </Button>
       )}
+      {wizard.page.step === "dataSlots" && !wizard.page.slot.required ? (
+        <Button variant="default" onClick={wizard.skipDataSlot}>
+          {t`Skip for now`}
+        </Button>
+      ) : null}
       <PrimaryButton {...props} />
     </Group>
   );
