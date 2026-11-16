@@ -153,6 +153,29 @@ vi.mock(
     };
   },
 );
+vi.mock(
+  "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient",
+  () => {
+    return {
+      PluginDataSlotBindingClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginDataSlotBindingClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [[], false, {}];
+        },
+        useDelete: () => {
+          return [vi.fn(), false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock("@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource", () => {
+  return { loadDataSlotSource: vi.fn() };
+});
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return {
     useCurrentUser: () => {
@@ -173,6 +196,7 @@ let nextEntryNumber = 0;
 function _makeManifestModule(
   pluginId: string,
   icons: Record<string, unknown>,
+  manifestOverrides: Record<string, unknown> = {},
 ): PluginManifestModule {
   return {
     manifest: {
@@ -191,12 +215,15 @@ function _makeManifestModule(
         aiTools: [],
         content: [],
       },
+      ...manifestOverrides,
     },
     strings: {
       en: {
         name: "Epidemiology",
         description: "Charts disease spread.",
         "run.title": "Linear regression",
+        "slot.cases.title": "Cases",
+        "content.cases.title": "Sample cases",
       },
     },
     icons,
@@ -204,7 +231,10 @@ function _makeManifestModule(
 }
 
 function _addBundledPlugin(
-  options: { icons?: Record<string, unknown> } = {},
+  options: {
+    icons?: Record<string, unknown>;
+    manifestOverrides?: Record<string, unknown>;
+  } = {},
 ): void {
   nextEntryNumber += 1;
   // A new id each test, because the plugin module cache lives for the session.
@@ -212,7 +242,9 @@ function _addBundledPlugin(
   mocks.entries.push({
     id,
     loadManifest: () => {
-      return Promise.resolve(_makeManifestModule(id, options.icons ?? {}));
+      return Promise.resolve(
+        _makeManifestModule(id, options.icons ?? {}, options.manifestOverrides),
+      );
     },
   });
 }
@@ -404,6 +436,68 @@ describe("WorkspacePluginsTab", () => {
       });
     },
   );
+
+  describe("an installed plugin with data slots and content", () => {
+    const MANIFEST_OVERRIDES = {
+      permissions: ["data:slots"],
+      dataSlots: {
+        cases: {
+          title: "%slot.cases.title%",
+          required: false,
+          attributes: {
+            onsetDate: { type: "date", title: "%onset%", required: true },
+          },
+        },
+      },
+      contributes: {
+        commands: [],
+        menus: {},
+        vizTypes: [],
+        aiTools: [],
+        content: [
+          {
+            id: "cases",
+            kind: "dataset",
+            title: "%content.cases.title%",
+            description: "%content.cases.title%",
+            file: "content/cases.csv",
+          },
+        ],
+      },
+    };
+
+    it("lists the records it reads and the datasets it includes once installed", async () => {
+      _addBundledPlugin({ manifestOverrides: MANIFEST_OVERRIDES });
+      _addInstallation({
+        pluginId: (mocks.entries[0] as PluginIndexEntry).id,
+        grantedPermissions: ["data:slots"],
+      });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(
+        within(card).getByRole("heading", { name: "Records it reads" }),
+      ).toBeInTheDocument();
+      expect(
+        within(card).getByRole("heading", { name: "Datasets it includes" }),
+      ).toBeInTheDocument();
+    });
+
+    it("leaves both out before the plugin is installed", async () => {
+      _addBundledPlugin({ manifestOverrides: MANIFEST_OVERRIDES });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(
+        within(card).queryByRole("heading", { name: "Records it reads" }),
+      ).not.toBeInTheDocument();
+      expect(
+        within(card).queryByRole("heading", { name: "Datasets it includes" }),
+      ).not.toBeInTheDocument();
+    });
+  });
 
   it("disables the actions for users who cannot manage plugins", async () => {
     mocks.canManage = false;
