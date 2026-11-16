@@ -113,6 +113,22 @@ export const CASE_BUCKETED_VISITS_CSV_PATH = path.join(
 export const CASE_BUCKETED_VISITS_CSV_EXPECTED_ROW_COUNT = 7;
 
 /**
+ * Thirty cases, `C001` to `C030`, each with an onset date and a district,
+ * for the epidemiology plugin's cases data slot. The onset dates fall in four
+ * MMWR weeks, starting 2023-12-31 (6 cases), 2024-01-07 (10), 2024-01-14 (9),
+ * and 2024-01-21 (5). The districts are Ilala (14 cases), Kinondoni (10), and
+ * Temeke (6), and every week has a case in each, so the epicurve stacked by
+ * district draws 12 bars.
+ */
+export const CASE_LINE_LIST_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/case-line-list/case-line-list.csv",
+);
+
+/** Row count reported after DuckDB parses {@link CASE_LINE_LIST_CSV_PATH}. */
+export const CASE_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 30;
+
+/**
  * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
  * provenance and licence). Well under the 50-page import cap, so its page
  * geometry sniff finishes quickly.
