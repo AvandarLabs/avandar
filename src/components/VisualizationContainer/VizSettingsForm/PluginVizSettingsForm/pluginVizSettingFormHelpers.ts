@@ -136,14 +136,20 @@ function _isStoredSettingReadable(options: {
 }): boolean {
   const { setting, config, fieldIds } = options;
   if (setting.control.kind === "columnPicker") {
-    const columnId = config.columnSettings[setting.key];
+    const columnId = Object.hasOwn(config.columnSettings, setting.key)
+      ? config.columnSettings[setting.key]
+      : undefined;
     // While the result's columns load, `fieldIds` is empty and a stored
     // column cannot be checked yet.
     return (
       columnId === undefined || fieldIds.size === 0 || fieldIds.has(columnId)
     );
   }
-  const value = config.settings[setting.key];
+  // A setting key may be named like an inherited `Object` member, such as
+  // `toString`, so read only a value the config stores under its own key.
+  const value = Object.hasOwn(config.settings, setting.key)
+    ? config.settings[setting.key]
+    : undefined;
   if (value === undefined) {
     return true;
   }
