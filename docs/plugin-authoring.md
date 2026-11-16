@@ -747,8 +747,8 @@ A plugin can give the hosted data agent a tool.
 1. Declare it under `contributes.aiTools` in `ava.yaml`. Each tool has a
    `name`, a plain-text `description` the model sees, and `parameters`. A
    `name` may not match a built-in tool's name (`run_query`, `lookup_values`,
-   or `ask_user`) once both are lowercased with underscores removed, so
-   `runQuery` and `askUser` fail validation too.
+   `ask_user`, or `plan_query`) once both are lowercased with underscores
+   removed, so `runQuery` and `askUser` fail validation too.
 2. Export `aiTools.<name>` from the plugin entry. The key matches `name`.
 3. In the handler, read rows with `avandar.data.fetchRows` on
    `avandar.context.queryHandle`. The handler does not receive rows as an

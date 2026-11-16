@@ -1,5 +1,7 @@
+import { RESERVED_AI_TOOL_NAMES } from "@avandar/plugin-manifest";
 import { describe, expect, it, vi } from "vitest";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
@@ -401,6 +403,28 @@ describe("plan_query", () => {
       expect.objectContaining({
         sql: expect.stringContaining(`FROM "${DATASET_ID}"`),
       }),
+    );
+  });
+});
+
+describe("built-in tool names", () => {
+  it("are all reserved, so no plugin AI tool can take the name of a tool either agent offers", () => {
+    const state = createDataAgentRunState();
+    const host = _createHost();
+    const queryContext = { host, aliases: ALIASES, state };
+    const builtInTools = [
+      createRunQueryTool(queryContext),
+      createPlanQueryTool(queryContext, []),
+      createLookupValuesTool({ host, aliases: ALIASES, datasets: [], state }),
+      createAskUserTool({ host, state }),
+    ];
+
+    expect(RESERVED_AI_TOOL_NAMES).toEqual(
+      expect.arrayContaining(
+        builtInTools.map((tool) => {
+          return tool.name;
+        }),
+      ),
     );
   });
 });

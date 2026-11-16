@@ -740,6 +740,7 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     ["runquery", "run_query"],
     ["lookupValues", "lookup_values"],
     ["askUser", "ask_user"],
+    ["planQuery", "plan_query"],
   ])(
     "rejects the tool name %s, which only differs from %s in case and underscores",
     (name, reservedName) => {
