@@ -1,6 +1,7 @@
 import { relative, sep } from "node:path";
 import { makeTablerComponentNameFromIconName } from "@avandar/plugin-manifest";
 import {
+  PLUGIN_CONTENT_MODULE_PREFIX,
   PLUGIN_LOCALES_MODULE_PREFIX,
   PLUGIN_MANIFEST_MODULE_PREFIX,
 } from "../pluginModuleIds";
@@ -47,31 +48,18 @@ function _makeLoadCodeSourceLinesFromPlugin(options: {
   ];
 }
 
-function _makeLoadContentUrlsSourceLinesFromPlugin(options: {
-  plugin: PluginDirectory;
-  repoRoot: string;
-}): string[] {
-  const { plugin, repoRoot } = options;
-  const contentEntries = Object.entries(plugin.contentPathsById);
-  if (contentEntries.length === 0) {
+// One import of the plugin's content module, however many files it has,
+// keeps the entry short, since the index loads at startup. `.then` rather
+// than `(await import(...)).default`, which Vite rewrites into longer code.
+function _makeLoadContentUrlsSourceLinesFromPlugin(
+  plugin: PluginDirectory,
+): string[] {
+  if (Object.keys(plugin.contentPathsById).length === 0) {
     return [];
   }
-  // `?url` makes Vite emit each file as an asset and import only its URL, so
-  // no content bytes reach a JavaScript chunk.
-  const importLines = contentEntries.map(([, path]) => {
-    const rootRelativePath = _makeRootRelativePathFromPath({ path, repoRoot });
-    return `        import(${JSON.stringify(`${rootRelativePath}?url`)}),`;
-  });
-  const urlProperties = contentEntries.map(([contentId], index) => {
-    return `${JSON.stringify(contentId)}: urls[${index}].default`;
-  });
+  const contentModuleId = `${PLUGIN_CONTENT_MODULE_PREFIX}${plugin.compiled.manifest.id}`;
   return [
-    "    loadContentUrls: async () => {",
-    "      const urls = await Promise.all([",
-    ...importLines,
-    "      ]);",
-    `      return { ${urlProperties.join(", ")} };`,
-    "    },",
+    `    loadContentUrls: () => import(${JSON.stringify(contentModuleId)}).then((content) => content.default),`,
   ];
 }
 
@@ -86,7 +74,7 @@ function _makeIndexEntrySourceFromPlugin(options: {
     `    id: ${JSON.stringify(pluginId)},`,
     `    loadManifest: () => import(${JSON.stringify(manifestModuleId)}),`,
     ..._makeLoadCodeSourceLinesFromPlugin(options),
-    ..._makeLoadContentUrlsSourceLinesFromPlugin(options),
+    ..._makeLoadContentUrlsSourceLinesFromPlugin(options.plugin),
     "  },",
   ].join("\n");
 }
@@ -121,9 +109,9 @@ function _getIconBindingsFromPlugin(plugin: PluginDirectory): IconBinding[] {
  * Source for `virtual:ava-plugin-index`: one entry per bundled plugin with
  * lazy `loadManifest` and `loadCode` loaders. A plugin with no entry gets a
  * `loadCode` that loads only its locales and returns a definition with no
- * handlers, and a plugin with content gets a `loadContentUrls` that resolves
- * each content id to its file's URL. It must contain no static imports, so
- * the main bundle carries only these few bytes per plugin.
+ * handlers, and a plugin with content gets a `loadContentUrls` that loads
+ * its `virtual:ava-plugin-content/<id>` module. It must contain no static
+ * imports, so the main bundle carries only these few bytes per plugin.
  * `vitePluginAvaPlugins`'s `load` hook calls it.
  */
 export function makeIndexModuleSourceFromPlugins(options: {
@@ -164,6 +152,33 @@ export function makeManifestModuleSourceFromPlugin(
     `export const manifest = ${JSON.stringify(manifest)};`,
     `export const strings = ${JSON.stringify(strings)};`,
     `export const icons = { ${iconEntries.join(", ")} };`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * Source for `virtual:ava-plugin-content/<id>`: each content file's URL,
+ * keyed by content id. `?url` makes Vite emit each file as an asset and
+ * import only its URL (a file under Vite's asset inline limit becomes a data
+ * URL here instead), so no file downloads until an import fetches it.
+ * `vitePluginAvaPlugins`'s `load` hook calls it.
+ */
+export function makeContentModuleSourceFromPlugin(options: {
+  plugin: PluginDirectory;
+  repoRoot: string;
+}): string {
+  const { plugin, repoRoot } = options;
+  const contentEntries = Object.entries(plugin.contentPathsById);
+  const importLines = contentEntries.map(([, path], index) => {
+    const rootRelativePath = _makeRootRelativePathFromPath({ path, repoRoot });
+    return `import url${index} from ${JSON.stringify(`${rootRelativePath}?url`)};`;
+  });
+  const urlProperties = contentEntries.map(([contentId], index) => {
+    return `${JSON.stringify(contentId)}: url${index}`;
+  });
+  return [
+    ...importLines,
+    `export default { ${urlProperties.join(", ")} };`,
     "",
   ].join("\n");
 }

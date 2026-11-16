@@ -8,11 +8,13 @@ import {
 } from "./checkPluginBundle/checkPluginBundle";
 import { makeOptimizeDepsEntriesFromPlugins } from "./makeOptimizeDepsEntriesFromPlugins/makeOptimizeDepsEntriesFromPlugins";
 import {
+  makeContentModuleSourceFromPlugin,
   makeIndexModuleSourceFromPlugins,
   makeLocalesModuleSourceFromPlugin,
   makeManifestModuleSourceFromPlugin,
 } from "./makePluginModuleSources/makePluginModuleSources";
 import {
+  PLUGIN_CONTENT_MODULE_PREFIX,
   PLUGIN_INDEX_MODULE_ID,
   PLUGIN_LOCALES_MODULE_PREFIX,
   PLUGIN_MANIFEST_MODULE_PREFIX,
@@ -27,7 +29,8 @@ function _isPluginVirtualId(id: string): boolean {
   return (
     id === PLUGIN_INDEX_MODULE_ID ||
     id.startsWith(PLUGIN_MANIFEST_MODULE_PREFIX) ||
-    id.startsWith(PLUGIN_LOCALES_MODULE_PREFIX)
+    id.startsWith(PLUGIN_LOCALES_MODULE_PREFIX) ||
+    id.startsWith(PLUGIN_CONTENT_MODULE_PREFIX)
   );
 }
 
@@ -126,6 +129,13 @@ function _loadVirtualModule(options: {
     return makeLocalesModuleSourceFromPlugin(
       _findPluginOrFail({ pluginId, plugins, context }),
     );
+  }
+  if (id.startsWith(PLUGIN_CONTENT_MODULE_PREFIX)) {
+    const pluginId = id.slice(PLUGIN_CONTENT_MODULE_PREFIX.length);
+    return makeContentModuleSourceFromPlugin({
+      plugin: _findPluginOrFail({ pluginId, plugins, context }),
+      repoRoot,
+    });
   }
   return null;
 }

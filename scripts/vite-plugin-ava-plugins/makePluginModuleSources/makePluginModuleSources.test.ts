@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  makeContentModuleSourceFromPlugin,
   makeIndexModuleSourceFromPlugins,
   makeLocalesModuleSourceFromPlugin,
   makeManifestModuleSourceFromPlugin,
@@ -133,20 +134,22 @@ describe("makeIndexModuleSourceFromPlugins", () => {
     );
   });
 
-  it("gives a plugin with content a loadContentUrls that imports each file as a URL and keys it by content id", () => {
+  it("gives a plugin with content a loadContentUrls that imports its content module once", () => {
     const code = makeIndexModuleSourceFromPlugins({
       plugins: [PLUGIN_WITH_CONTENT],
       repoRoot: "/repo",
     });
     expect(code).toContain(
-      'import("/plugins/epidemiology/content/mz-adm1.csv?url"),',
+      '    loadContentUrls: () => import("virtual:ava-plugin-content/avandar.epidemiology").then((content) => content.default),',
     );
-    expect(code).toContain(
-      'import("/plugins/epidemiology/content/mz-adm2.csv?url"),',
-    );
-    expect(code).toContain(
-      'return { "provinces": urls[0].default, "districts": urls[1].default };',
-    );
+  });
+
+  it("names no content file in the index", () => {
+    const code = makeIndexModuleSourceFromPlugins({
+      plugins: [PLUGIN_WITH_CONTENT],
+      repoRoot: "/repo",
+    });
+    expect(code).not.toContain(".csv");
   });
 
   it("leaves out loadContentUrls for a plugin without content", () => {
@@ -217,6 +220,24 @@ describe("makeManifestModuleSourceFromPlugin icon deduplication", () => {
     expect(_getIconImportBindings(code)).toEqual(["IconNumber1"]);
     expect(code).toContain(
       'export const icons = { "number-1": IconNumber1, "number1": IconNumber1 };',
+    );
+  });
+});
+
+describe("makeContentModuleSourceFromPlugin", () => {
+  it("imports each content file as a URL and exports the URLs keyed by content id", () => {
+    expect(
+      makeContentModuleSourceFromPlugin({
+        plugin: PLUGIN_WITH_CONTENT,
+        repoRoot: "/repo",
+      }),
+    ).toBe(
+      [
+        'import url0 from "/plugins/epidemiology/content/mz-adm1.csv?url";',
+        'import url1 from "/plugins/epidemiology/content/mz-adm2.csv?url";',
+        'export default { "provinces": url0, "districts": url1 };',
+        "",
+      ].join("\n"),
     );
   });
 });
