@@ -38,7 +38,7 @@ export function PluginSettingsCard({
   });
   const actions = usePluginInstallationActions({
     pluginName,
-    manifest,
+    manifestModule,
     installation,
   });
   return (

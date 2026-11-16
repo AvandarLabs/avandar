@@ -2,12 +2,12 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { usePluginActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
-import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 import type { ButtonProps } from "@mantine/core";
 
 type Props = Readonly<{
-  kind: PluginActionKind;
+  kind: ConfirmedPluginActionKind;
   pluginName: string;
 
   /** The id of the plugin's card heading, which describes this button. */
@@ -18,10 +18,9 @@ type Props = Readonly<{
 
 /** How each kind of action looks. Uninstall is the only destructive one. */
 const STYLE_BY_KIND: Record<
-  PluginActionKind,
+  ConfirmedPluginActionKind,
   Pick<ButtonProps, "variant" | "color">
 > = {
-  install: {},
   review: {},
   enable: { variant: "outline" },
   disable: { variant: "outline", color: "neutral" },
@@ -30,9 +29,8 @@ const STYLE_BY_KIND: Record<
 
 function _makeOnConfirmByKind(
   actions: PluginInstallationActions,
-): Record<PluginActionKind, () => void> {
+): Record<ConfirmedPluginActionKind, () => void> {
   return {
-    install: actions.install,
     review: actions.approvePermissions,
     enable: () => {
       actions.setIsEnabled(true);

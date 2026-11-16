@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 
 /** The translated words of one action: its button and its confirmation. */
 export type PluginActionCopy = Readonly<{
@@ -10,21 +10,16 @@ export type PluginActionCopy = Readonly<{
 }>;
 
 /**
- * The translated button label and confirmation text of every plugin action,
- * naming the plugin the action applies to. A plugin action button reads its
- * own entry before it asks the user to confirm.
+ * The translated button label and confirmation text of every plugin action
+ * that asks before it runs, naming the plugin the action applies to. A
+ * plugin action button reads its own entry before it asks the user to
+ * confirm.
  */
 export function usePluginActionCopy(
   pluginName: string,
-): Record<PluginActionKind, PluginActionCopy> {
+): Record<ConfirmedPluginActionKind, PluginActionCopy> {
   const { t } = useLingui();
   return {
-    install: {
-      label: t`Install`,
-      confirmTitle: t`Install ${pluginName}?`,
-      confirmBody: t`${pluginName} will be available to every member of this workspace.`,
-      confirmLabel: t`Install`,
-    },
     review: {
       label: t`Review new permissions`,
       confirmTitle: t`Approve new permissions for ${pluginName}?`,

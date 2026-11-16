@@ -1,6 +1,8 @@
+import { ModalsProvider } from "@mantine/modals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { cleanup, fireEvent, render, screen, within } from "@/test-utils";
 import { WorkspacePluginsTab } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -57,7 +59,7 @@ vi.mock(
             { isError: mocks.hasInstallationsError },
           ];
         },
-        useInsert: useMutationStub,
+        useInstall: useMutationStub,
         useUpdate: useMutationStub,
         useDelete: useMutationStub,
       },
@@ -96,6 +98,7 @@ function _makeManifestModule(
       name: "%name%",
       description: "%description%",
       version: "1.2.0",
+      license: "MIT",
       icon: "chart-dots",
       permissions: ["data:context"],
       dataSlots: {},
@@ -103,6 +106,7 @@ function _makeManifestModule(
         commands: [{ id: "run", title: "%run.title%", icon: "chart-dots" }],
         menus: { "dataExplorer.toolbar": [{ command: "run" }] },
         vizTypes: [],
+        aiTools: [],
         content: [],
       },
     },
@@ -142,9 +146,15 @@ function _addInstallation(overrides: Partial<PluginInstallation.T>): void {
   });
 }
 
+// The modals provider sits inside the query client, as in the app, so a
+// modal a card opens can read queries too.
 function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
+        {children}
+      </ModalsProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -244,6 +254,21 @@ describe("WorkspacePluginsTab", () => {
 
     expect(
       await screen.findByText("No plugins are available in this deployment."),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the install wizard, titled with the plugin's name, from Install", async () => {
+    _addBundledPlugin();
+    _renderTab();
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+
+    fireEvent.click(within(card).getByRole("button", { name: "Install" }));
+
+    const wizard = await screen.findByRole("dialog", {
+      name: "Install Epidemiology",
+    });
+    expect(
+      within(wizard).getByRole("heading", { name: "About this plugin" }),
     ).toBeInTheDocument();
   });
 

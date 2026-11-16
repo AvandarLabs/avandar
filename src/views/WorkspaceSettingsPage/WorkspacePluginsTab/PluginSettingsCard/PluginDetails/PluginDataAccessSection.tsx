@@ -3,12 +3,16 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { List, Text } from "@mantine/core";
 import { PluginDetailsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsSection";
 import type { PluginPermission } from "@avandar/plugin-manifest/runtime";
+import type { TitleOrder } from "@mantine/core";
 
 type Props = Readonly<{
   permissions: readonly PluginPermission[];
 
   /** Whether the plugin adds chart types, which read their own rows. */
   hasChartTypes: boolean;
+
+  /** The section heading's level. See `PluginDetailsSection`. */
+  headingOrder?: TitleOrder;
 }>;
 
 /**
@@ -19,6 +23,7 @@ type Props = Readonly<{
 export function PluginDataAccessSection({
   permissions,
   hasChartTypes,
+  headingOrder,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const permissionLines = permissions.map((permission) => {
@@ -41,7 +46,10 @@ export function PluginDataAccessSection({
       ]
     : permissionLines;
   return (
-    <PluginDetailsSection title={<Trans>Data it can read</Trans>}>
+    <PluginDetailsSection
+      title={<Trans>Data it can read</Trans>}
+      headingOrder={headingOrder}
+    >
       {lines.length === 0 ? (
         <Text size="sm" c="dimmed">
           <Trans>Uses no workspace data.</Trans>

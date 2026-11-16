@@ -1,9 +1,8 @@
-import { getLocalizedTextFromManifestStrings } from "@avandar/plugin-manifest/runtime";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Collapse, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useId } from "react";
-import { getContributionsFromManifest } from "@/lib/plugins/getContributionsFromManifest/getContributionsFromManifest";
+import { getLocalizedContributionTitlesFromManifest } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/getLocalizedContributionTitlesFromManifest";
 import { PluginAdditionsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection";
 import { PluginDataAccessSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection";
 import { PluginDetailsToggle } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle";
@@ -22,34 +21,6 @@ type Props = Readonly<{
   headingId: string;
 }>;
 
-function _getLocalizedContributionTitles(options: {
-  manifest: PluginManifest;
-  strings: PluginLocaleMessages;
-  locale: string;
-}): {
-  toolbarCommandTitles: string[];
-  chartTypeTitles: string[];
-  dataSlotTitles: string[];
-} {
-  const { manifest, strings, locale } = options;
-  const { dataExplorerToolbarCommands, chartTypes } =
-    getContributionsFromManifest(manifest);
-  const getTitles = (contributions: ReadonlyArray<{ title: string }>) => {
-    return contributions.map((contribution) => {
-      return getLocalizedTextFromManifestStrings({
-        strings,
-        locale,
-        value: contribution.title,
-      });
-    });
-  };
-  return {
-    toolbarCommandTitles: getTitles(dataExplorerToolbarCommands),
-    chartTypeTitles: getTitles(chartTypes),
-    dataSlotTitles: getTitles(Object.values(manifest.dataSlots)),
-  };
-}
-
 /**
  * What a plugin adds and which data it can read, in plain language, behind a
  * "See more" toggle so a plugin's settings card stays short until an admin
@@ -63,12 +34,11 @@ export function PluginDetails({
   const { i18n } = useLingui();
   const [isExpanded, { toggle }] = useDisclosure(false);
   const regionId = useId();
-  const { toolbarCommandTitles, chartTypeTitles, dataSlotTitles } =
-    _getLocalizedContributionTitles({
-      manifest,
-      strings,
-      locale: i18n.locale,
-    });
+  const titles = getLocalizedContributionTitlesFromManifest({
+    manifest,
+    strings,
+    locale: i18n.locale,
+  });
   return (
     <>
       <PluginDetailsToggle
@@ -84,14 +54,13 @@ export function PluginDetails({
         <Collapse expanded={isExpanded}>
           <Stack gap="sm" pt="xxs">
             <PluginAdditionsSection
-              toolbarCommandTitles={toolbarCommandTitles}
-              chartTypeTitles={chartTypeTitles}
-              dataSlotTitles={dataSlotTitles}
+              {...titles}
               contentCount={manifest.contributes.content.length}
+              aiToolCount={manifest.contributes.aiTools.length}
             />
             <PluginDataAccessSection
               permissions={manifest.permissions}
-              hasChartTypes={chartTypeTitles.length > 0}
+              hasChartTypes={titles.chartTypeTitles.length > 0}
             />
           </Stack>
         </Collapse>

@@ -107,14 +107,14 @@ describe("PluginActions", () => {
     expect(actions.uninstall).toHaveBeenCalledTimes(1);
   });
 
-  it("installs after the user confirms", async () => {
+  it("starts the install without a confirmation, because the install wizard is the confirmation", () => {
     const actions = _makeActions();
     _renderActions({ status: "not_installed", actions });
 
     fireEvent.click(screen.getByRole("button", { name: "Install" }));
-    await _confirmInDialog("Install");
 
     expect(actions.install).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("approves the new permissions after the user confirms", async () => {

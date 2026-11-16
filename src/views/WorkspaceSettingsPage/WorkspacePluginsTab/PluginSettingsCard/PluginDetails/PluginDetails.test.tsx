@@ -22,6 +22,7 @@ function _makeManifest(options: {
   permissions: string[];
   dataSlots?: Record<string, unknown>;
   contentCount?: number;
+  aiToolCount?: number;
 }): PluginManifest {
   const {
     hasToolbarCommand,
@@ -29,6 +30,7 @@ function _makeManifest(options: {
     permissions,
     dataSlots = {},
     contentCount = 0,
+    aiToolCount = 0,
   } = options;
   return {
     id: "avandar.epidemiology",
@@ -53,6 +55,9 @@ function _makeManifest(options: {
         : [],
       content: Array.from({ length: contentCount }, (_value, index) => {
         return { id: `item-${index}`, kind: "dataset" };
+      }),
+      aiTools: Array.from({ length: aiToolCount }, (_value, index) => {
+        return { name: `tool_${index}` };
       }),
     },
   } as unknown as PluginManifest;
@@ -237,6 +242,26 @@ describe("PluginDetails", () => {
     },
   );
 
+  it.each([
+    ["1 tool Ask Avandar can use", 1],
+    ["2 tools Ask Avandar can use", 2],
+  ])(
+    "lists %s when the plugin declares that many AI tools",
+    async (text, aiToolCount) => {
+      await _renderExpandedDetails(
+        _makeManifest({
+          hasToolbarCommand: false,
+          hasChartTypes: false,
+          permissions: [],
+          aiToolCount,
+        }),
+      );
+
+      expect(screen.getByText(text)).toBeInTheDocument();
+      expect(screen.queryByText("Nothing yet.")).not.toBeInTheDocument();
+    },
+  );
+
   it("says its charts see only their own rows when the plugin adds chart types", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 
@@ -269,6 +294,7 @@ describe("PluginDetails", () => {
       screen.queryByText(/Records you choose for it:/),
     ).not.toBeInTheDocument();
     expect(screen.queryByText(/to import/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ask Avandar can use/)).not.toBeInTheDocument();
   });
 
   it("says the plugin uses no workspace data when it has no permissions and no chart types", async () => {

@@ -8,3 +8,9 @@ export type PluginActionKind =
   | "enable"
   | "disable"
   | "uninstall";
+
+/**
+ * An action that asks the user to confirm before it runs. Install is left
+ * out because it opens the install wizard, which is its own confirmation.
+ */
+export type ConfirmedPluginActionKind = Exclude<PluginActionKind, "install">;
