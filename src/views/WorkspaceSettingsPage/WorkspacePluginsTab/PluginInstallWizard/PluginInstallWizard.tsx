@@ -5,6 +5,7 @@ import { InstallWizardFooter } from "@/views/WorkspaceSettingsPage/WorkspacePlug
 import { InstallWizardPageContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardPageContent";
 import { InstallWizardStepper } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper";
 import { useInstallPlugin } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin";
+import { useInstallWizardContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardContent";
 import { useInstallWizardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardState";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 import type { InstallWizardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardState";
@@ -35,8 +36,9 @@ function useCanGoNext(wizard: InstallWizardState): boolean {
 
 /**
  * The plugin install wizard: Review, then the steps the manifest needs, then
- * Confirm, which installs the plugin. Opened in a modal by
- * `openPluginInstallWizard` from a plugin's settings card.
+ * Confirm, which installs the plugin and then imports the chosen content.
+ * Opened in a modal by `openPluginInstallWizard` from a plugin's settings
+ * card.
  */
 export function PluginInstallWizard({
   pluginName,
@@ -44,9 +46,16 @@ export function PluginInstallWizard({
   onClose,
 }: Props): JSX.Element {
   const wizard = useInstallWizardState(manifestModule.manifest);
+  const content = useInstallWizardContent({
+    manifestModule,
+    chosenContentIds: wizard.chosenContentIds,
+  });
   const installer = useInstallPlugin({
     pluginName,
     manifest: manifestModule.manifest,
+    onInstalled: () => {
+      void content.contentImports.importItems(content.itemsToImport);
+    },
   });
   const canGoNext = useCanGoNext(wizard);
   return (
@@ -58,6 +67,7 @@ export function PluginInstallWizard({
             manifestModule={manifestModule}
             wizard={wizard}
             installer={installer}
+            content={content}
           />
         </Stack>
       </InstallWizardStepper>
@@ -65,6 +75,7 @@ export function PluginInstallWizard({
         wizard={wizard}
         installer={installer}
         canGoNext={canGoNext}
+        isImportingContent={content.contentImports.isImporting}
         onInstall={() => {
           installer.install(wizard.bindings);
         }}

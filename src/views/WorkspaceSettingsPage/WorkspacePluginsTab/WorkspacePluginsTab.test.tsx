@@ -85,8 +85,9 @@ vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
     },
   };
 });
-// The install wizard lists the workspace's case types and datasets. These
-// stubs keep the dataset client's DuckDB and storage modules out of the test.
+// The install wizard lists the workspace's case types and datasets, and
+// imports content. These stubs keep the dataset clients' DuckDB and storage
+// modules out of the test.
 vi.mock("@/clients/ontology/ConceptClient", () => {
   return {
     ConceptClient: {
@@ -129,6 +130,36 @@ vi.mock(
     return { checkDataSlotBinding: vi.fn() };
   },
 );
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem",
+  () => {
+    return { importPluginContentItem: vi.fn() };
+  },
+);
+vi.mock(
+  "@/clients/plugins/PluginContentImportClient/PluginContentImportClient",
+  () => {
+    return {
+      PluginContentImportClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginContentImportClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [[], false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-id" };
+    },
+  };
+});
 vi.mock("@/utils/Logger", () => {
   return { Logger: { error: vi.fn() } };
 });

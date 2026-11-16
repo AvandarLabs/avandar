@@ -66,6 +66,42 @@ vi.mock(
     };
   },
 );
+// The wizard's content hooks read the current user and the workspace's
+// imported content. These stubs keep the router and the dataset import
+// modules out of the test. These manifests bundle no content.
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-id" };
+    },
+  };
+});
+vi.mock(
+  "@/clients/plugins/PluginContentImportClient/PluginContentImportClient",
+  () => {
+    return {
+      PluginContentImportClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginContentImportClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [[], false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem",
+  () => {
+    return { importPluginContentItem: vi.fn() };
+  },
+);
+vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
+  return { getPluginIndexEntry: vi.fn() };
+});
 vi.mock("@/utils/notifications/notify", () => {
   return { notifySuccess: vi.fn(), notifyError: vi.fn() };
 });

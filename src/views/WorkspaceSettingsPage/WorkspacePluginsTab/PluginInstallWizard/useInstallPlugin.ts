@@ -22,12 +22,15 @@ export type PluginInstaller = Readonly<{
  * bindings an admin chose, from the install wizard's Confirm step. It shows
  * the same success and error notifications as the other plugin actions, and
  * refreshes every plugin installs query so the plugin turns on right away.
+ * `onInstalled` runs once the install is saved, for example to import the
+ * plugin's content.
  */
 export function useInstallPlugin(options: {
   pluginName: string;
   manifest: PluginManifest;
+  onInstalled?: (installation: PluginInstallation.T) => void;
 }): PluginInstaller {
-  const { pluginName, manifest } = options;
+  const { pluginName, manifest, onInstalled } = options;
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [installation, setInstallation] = useState<PluginInstallation.T>();
@@ -36,6 +39,7 @@ export function useInstallPlugin(options: {
     onSuccess: (newInstallation) => {
       notifySuccess(t`${pluginName} installed`);
       setInstallation(newInstallation);
+      onInstalled?.(newInstallation);
     },
     onError: (error) => {
       notifyError({

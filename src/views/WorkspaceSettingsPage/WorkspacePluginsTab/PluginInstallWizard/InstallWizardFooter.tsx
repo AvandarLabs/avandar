@@ -9,6 +9,9 @@ type Props = Readonly<{
 
   /** False while the current page needs a choice before the next one. */
   canGoNext: boolean;
+
+  /** True while content imports run, which Done waits for. */
+  isImportingContent: boolean;
   onInstall: () => void;
   onClose: () => void;
 }>;
@@ -17,6 +20,7 @@ function PrimaryButton({
   wizard,
   installer,
   canGoNext,
+  isImportingContent,
   onInstall,
   onClose,
 }: Props): JSX.Element {
@@ -29,7 +33,11 @@ function PrimaryButton({
     );
   }
   if (installer.installation !== undefined) {
-    return <Button onClick={onClose}>{t`Done`}</Button>;
+    return (
+      <Button disabled={isImportingContent} onClick={onClose}>
+        {t`Done`}
+      </Button>
+    );
   }
   return (
     <Button loading={installer.isInstalling} onClick={onInstall}>

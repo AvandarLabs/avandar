@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@/test-utils";
+import { cleanup, fireEvent, render, screen, waitFor } from "@/test-utils";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
 import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -17,6 +17,8 @@ const mocks = vi.hoisted(() => {
     installOptions: undefined as InstallOptions | undefined,
     notifySuccess: vi.fn(),
     notifyError: vi.fn(),
+    contentImports: [] as unknown[],
+    importPluginContentItem: vi.fn(),
   };
 });
 
@@ -24,6 +26,50 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
       return { id: "workspace-id", slug: "workspace-slug" };
+    },
+  };
+});
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-id" };
+    },
+  };
+});
+vi.mock(
+  "@/clients/plugins/PluginContentImportClient/PluginContentImportClient",
+  () => {
+    return {
+      PluginContentImportClient: {
+        QueryKeys: {
+          getAll: () => {
+            return ["PluginContentImportClient", "getAll"];
+          },
+        },
+        useGetAll: () => {
+          return [mocks.contentImports, false, {}];
+        },
+      },
+    };
+  },
+);
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/importPluginContentItem/importPluginContentItem",
+  () => {
+    return { importPluginContentItem: mocks.importPluginContentItem };
+  },
+);
+vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
+  return {
+    getPluginIndexEntry: () => {
+      return {
+        loadContentUrls: () => {
+          return Promise.resolve({
+            provinces: "/assets/mz-adm1.csv",
+            districts: "/assets/mz-adm2.csv",
+          });
+        },
+      };
     },
   };
 });
@@ -131,6 +177,23 @@ const DATA_SLOTS = {
   },
 };
 
+const CONTENT = [
+  {
+    id: "provinces",
+    kind: "dataset",
+    title: "%content.provinces.title%",
+    description: "%content.provinces.description%",
+    file: "content/mz-adm1.csv",
+  },
+  {
+    id: "districts",
+    kind: "dataset",
+    title: "%content.districts.title%",
+    description: "%content.districts.description%",
+    file: "content/mz-adm2.csv",
+  },
+];
+
 let queryClient: QueryClient;
 
 function _makeDraft(slotId: string): PluginDataSlotBinding.Draft {
@@ -174,6 +237,10 @@ function _makeManifestModule(
         "slot.cases.title": "Cases",
         "slot.cases.description": "The case records the epicurve counts.",
         "slot.deaths.title": "Deaths",
+        "content.provinces.title": "Mozambique provinces",
+        "content.provinces.description": "Province boundaries.",
+        "content.districts.title": "Mozambique districts",
+        "content.districts.description": "District boundaries.",
       },
     },
     icons: {},
@@ -212,6 +279,8 @@ describe("PluginInstallWizard", () => {
     cleanup();
     vi.clearAllMocks();
     mocks.install.mockReset();
+    mocks.importPluginContentItem.mockReset();
+    mocks.contentImports = [];
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
@@ -417,6 +486,137 @@ describe("PluginInstallWizard", () => {
       expect(
         screen.getByText("Deaths: Case type: Measles deaths"),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("content", () => {
+    function _renderWizardWithContent(): void {
+      _renderWizard(
+        _makeManifestModule({
+          permissions: [],
+          contributes: {
+            commands: [],
+            menus: {},
+            vizTypes: [],
+            aiTools: [],
+            content: CONTENT,
+          },
+        }),
+      );
+    }
+
+    function _installFromContentStep(): void {
+      _succeedInstall();
+      _clickButton("Next");
+      _clickButton("Install");
+    }
+
+    it("lists every bundled dataset on the Content step, each checked to start with", () => {
+      _renderWizardWithContent();
+
+      _clickButton("Next");
+
+      expect(
+        screen.getByRole("heading", { name: "Datasets to import" }),
+      ).toHaveFocus();
+      expect(
+        screen.getByRole("checkbox", { name: "Mozambique provinces" }),
+      ).toBeChecked();
+      expect(
+        screen.getByRole("checkbox", { name: "Mozambique districts" }),
+      ).toBeChecked();
+    });
+
+    it("disables a dataset the workspace already imported and says so", () => {
+      mocks.contentImports = [{ contentId: "provinces", datasetId: "d-1" }];
+      _renderWizardWithContent();
+
+      _clickButton("Next");
+
+      expect(
+        screen.getByRole("checkbox", { name: "Mozambique provinces" }),
+      ).toBeDisabled();
+      expect(screen.getByText("Already in this workspace")).toBeInTheDocument();
+    });
+
+    it("imports only chosen datasets the workspace lacks, once installed", async () => {
+      mocks.contentImports = [{ contentId: "provinces", datasetId: "d-1" }];
+      mocks.importPluginContentItem.mockResolvedValue("d-2");
+      _renderWizardWithContent();
+      _clickButton("Next");
+
+      _installFromContentStep();
+
+      expect(await screen.findByText("Imported")).toBeInTheDocument();
+      expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(1);
+      expect(mocks.importPluginContentItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          item: CONTENT[1],
+          datasetName: "Mozambique districts",
+          url: "/assets/mz-adm2.csv",
+        }),
+      );
+    });
+
+    it("imports nothing when every dataset is unchecked", () => {
+      _renderWizardWithContent();
+      _clickButton("Next");
+      fireEvent.click(
+        screen.getByRole("checkbox", { name: "Mozambique provinces" }),
+      );
+      fireEvent.click(
+        screen.getByRole("checkbox", { name: "Mozambique districts" }),
+      );
+
+      _installFromContentStep();
+
+      expect(screen.getByText("None")).toBeInTheDocument();
+      expect(mocks.importPluginContentItem).not.toHaveBeenCalled();
+    });
+
+    it("shows why a dataset failed and imports it again with Retry", async () => {
+      mocks.importPluginContentItem
+        .mockRejectedValueOnce(new Error("permission denied"))
+        .mockResolvedValue("d-2");
+      _renderWizardWithContent();
+      _clickButton("Next");
+      _installFromContentStep();
+      expect(
+        await screen.findByText("Failed: permission denied"),
+      ).toBeInTheDocument();
+
+      _clickButton("Retry Mozambique provinces");
+
+      await waitFor(() => {
+        expect(screen.getAllByText("Imported")).toHaveLength(2);
+      });
+      expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(3);
+    });
+
+    it("keeps Done disabled until the imports finish", async () => {
+      let finishImport: (datasetId: string) => void = () => {};
+      mocks.importPluginContentItem.mockImplementation(() => {
+        return new Promise((resolve) => {
+          finishImport = resolve;
+        });
+      });
+      _renderWizardWithContent();
+      _clickButton("Next");
+      _installFromContentStep();
+      await waitFor(() => {
+        expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(1);
+      });
+      expect(screen.getByRole("button", { name: "Done" })).toBeDisabled();
+
+      finishImport("d-1");
+      await waitFor(() => {
+        expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(2);
+      });
+      finishImport("d-2");
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Done" })).toBeEnabled();
+      });
     });
   });
 });

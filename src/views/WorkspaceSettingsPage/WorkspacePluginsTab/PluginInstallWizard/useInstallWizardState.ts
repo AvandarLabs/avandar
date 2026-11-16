@@ -49,6 +49,10 @@ export type InstallWizardState = Readonly<{
 
   /** Every data slot binding chosen, to install with the plugin. */
   bindings: readonly PluginDataSlotBinding.Draft[];
+
+  /** The content items to import, by id. Every item to start with. */
+  chosenContentIds: readonly string[];
+  setIsContentChosen: (contentId: string, isChosen: boolean) => void;
 }>;
 
 function _makePagesFromManifest(manifest: PluginManifest): InstallWizardPage[] {
@@ -64,16 +68,42 @@ function _makePagesFromManifest(manifest: PluginManifest): InstallWizardPage[] {
   );
 }
 
+/** The content items an admin left checked, all of them to start with. */
+function useChosenContentIds(
+  manifest: PluginManifest,
+): Pick<InstallWizardState, "chosenContentIds" | "setIsContentChosen"> {
+  const [chosenContentIds, setChosenContentIds] = useState<readonly string[]>(
+    () => {
+      return manifest.contributes.content.map((item) => {
+        return item.id;
+      });
+    },
+  );
+  return {
+    chosenContentIds,
+    setIsContentChosen: (contentId, isChosen) => {
+      const otherContentIds = chosenContentIds.filter((chosenContentId) => {
+        return chosenContentId !== contentId;
+      });
+      setChosenContentIds(
+        isChosen ? [...otherContentIds, contentId] : otherContentIds,
+      );
+    },
+  };
+}
+
 /**
  * Tracks the install wizard for one plugin's manifest: the current page, the
- * steps the manifest needs, and the data slot bindings chosen so far. Moving
- * past the last page or before the first does nothing.
+ * steps the manifest needs, the data slot bindings chosen so far, and the
+ * content items to import. Moving past the last page or before the first
+ * does nothing.
  */
 export function useInstallWizardState(
   manifest: PluginManifest,
 ): InstallWizardState {
   const [pageIndex, setPageIndex] = useState(0);
   const [draftsBySlotId, setDraftsBySlotId] = useState<DraftsBySlotId>({});
+  const chosenContent = useChosenContentIds(manifest);
   const pages = _makePagesFromManifest(manifest);
   const page = pages[pageIndex]!;
   const setSlotDraft: InstallWizardState["setSlotDraft"] = (slotId, draft) => {
@@ -99,5 +129,6 @@ export function useInstallWizardState(
       goToNextPage();
     },
     bindings: Object.values(draftsBySlotId).filter(isDefined),
+    ...chosenContent,
   };
 }
