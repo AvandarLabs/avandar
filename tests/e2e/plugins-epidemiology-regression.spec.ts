@@ -2,6 +2,11 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import {
+  getPluginCard,
+  installPluginThroughWizard,
+  runPluginCommand,
+} from "./helpers/pluginFlow";
+import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
@@ -11,16 +16,13 @@ import type { Locator, Page } from "@playwright/test";
 /** Twenty points on the exact line y = 2x + 1, so every statistic is known. */
 const REGRESSION_SQL = "SELECT x, 2 * x + 1 AS y FROM range(1, 21) t(x)";
 const PLUGIN_ID = "avandar.epidemiology";
+const PLUGIN_NAME = "Epidemiology";
 
 async function _confirmDialog(page: Page, buttonName: string): Promise<void> {
   await page
     .getByRole("dialog")
     .getByRole("button", { name: buttonName })
     .click();
-}
-
-function _getPluginCard(page: Page): Locator {
-  return page.getByRole("region", { name: "Epidemiology" });
 }
 
 /**
@@ -56,15 +58,9 @@ test.describe("Epidemiology plugin", () => {
         workspaceSlug,
       });
 
-      await page.goto(`/${workspaceSlug}/settings/plugins`);
-      const card = _getPluginCard(page);
-      await expect(
-        card.getByText("Not installed", { exact: true }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-      await card.getByRole("button", { name: "Install" }).click();
-      await _confirmDialog(page, "Install");
-      await expect(card.getByText("Installed", { exact: true })).toBeVisible({
-        timeout: MEDIUM_WAIT,
+      await installPluginThroughWizard(page, {
+        workspaceSlug,
+        pluginName: PLUGIN_NAME,
       });
 
       await page.goto(
@@ -75,9 +71,7 @@ test.describe("Epidemiology plugin", () => {
         page.getByRole("columnheader", { name: /^y$/i }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-      await page
-        .getByRole("button", { name: "Linear regression" })
-        .click({ timeout: MEDIUM_WAIT });
+      await runPluginCommand(page, "Linear regression");
       const dialog = page.getByRole("dialog", { name: "Linear regression" });
       await dialog.getByRole("button", { name: "Fit regression" }).click();
       await _expectStatistic({ dialog, label: "Slope", value: "2" });
@@ -87,12 +81,11 @@ test.describe("Epidemiology plugin", () => {
       await page.keyboard.press("Escape");
 
       await page.goto(`/${workspaceSlug}/settings/plugins`);
-      await _getPluginCard(page)
-        .getByRole("button", { name: "Uninstall" })
-        .click();
+      const card = getPluginCard(page, PLUGIN_NAME);
+      await card.getByRole("button", { name: "Uninstall" }).click();
       await _confirmDialog(page, "Uninstall");
       await expect(
-        _getPluginCard(page).getByText("Not installed", { exact: true }),
+        card.getByText("Not installed", { exact: true }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
     } finally {
       // Safety net if the test failed before its own UI uninstall. Removes
