@@ -785,6 +785,7 @@ Declare slots under the top-level `dataSlots` key, and list `data:slots` in
 
 ```yaml
 permissions:
+  - data:context
   - data:slots
 dataSlots:
   cases:
@@ -850,8 +851,9 @@ slot lists why under it. A binding breaks when its case type or dataset is
 deleted or no longer readable, a chosen field is deleted or changes to a type
 the attribute does not accept, or a required attribute has no field. Workspace
 admins with the plugin-management permission see Choose or Change on each
-slot, and Remove on an optional slot that is bound. Other members see the
-status only. The database enforces the same rule: it refuses a binding write
+slot, and Remove on an optional slot that has a binding, bound or broken.
+Other members see the status only. The database enforces the same rule: it
+refuses a binding write
 from anyone who is not a settings admin or the workspace owner. An admin who
 approves `data:slots` under "Review new permissions" binds the slots from the
 card. Uninstalling the plugin deletes its bindings.
@@ -895,7 +897,7 @@ cannot keep reading.
 | `InvalidSlot` | The manifest declares no data slot with that id |
 | `SlotNotBound` | Nobody has chosen the slot's records yet |
 | `SlotBroken` | The binding no longer fits the slot. The message names attribute keys and the reasons, never a field name, a value, or a source name |
-| `PermissionDenied` | The current user cannot read the bound case type or dataset, or the plugin is no longer installed and enabled in this workspace |
+| `PermissionDenied` | The current user cannot read the bound case type or dataset, or the plugin is not currently installed and enabled, or its permissions are awaiting approval |
 | `InvalidHandle` | The workspace the command started in is no longer open. Run the command again |
 | `CommandFailed` | Any other failure. The message is always "The data slot could not be read." The host logs the details and never sends them to the plugin, because they can name workspace data the plugin was not given |
 
@@ -952,8 +954,9 @@ plugins/mozambique/
 ```
 
 A plugin with no commands, chart types, or AI tools leaves out `entry`,
-`src/`, and `tsconfig.json`. Its `package.json` is still required. Declare
-each file under `contributes.content`:
+`src/`, and `tsconfig.json`. Keep its `package.json`, as every plugin has one:
+`ava plugin validate` reads its `dependencies`. Declare each file under
+`contributes.content`:
 
 ```yaml
 license: CC-BY-3.0-IGO
