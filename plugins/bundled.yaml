@@ -3,3 +3,4 @@
 # happens in Settings → Plugins.
 plugins:
   - epidemiology
+  - mozambique
