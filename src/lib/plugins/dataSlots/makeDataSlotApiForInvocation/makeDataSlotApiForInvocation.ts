@@ -10,6 +10,11 @@ import {
   QUERY_SLOT_MAX_ROWS,
 } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
 import { runDataSlotQuery } from "@/lib/pluginDataSlots/runDataSlotQuery/runDataSlotQuery";
+import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
+import {
+  makeQueryHandleRegistry,
+  MAX_LIVE_QUERY_HANDLES,
+} from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
 import type {
   DataSlotSource,
@@ -43,14 +48,40 @@ export type DataSlotInvocationApi = Readonly<{
   querySlot: (slotId: string) => Promise<QuerySlotResult>;
   openDataSlotBinding: (slotId: string) => Promise<void>;
 
-  /** Rows of a handle querySlot issued in this invocation, else undefined. */
+  /**
+   * Rows of a handle querySlot issued in this invocation, else undefined.
+   * Only the `MAX_LIVE_QUERY_HANDLES` newest handles keep their rows.
+   */
   getSlotRows: (handle: QueryHandle) => readonly SlotRow[] | undefined;
+
+  /** Whether querySlot issued the handle in this invocation, evicted or not. */
+  wasSlotHandleIssued: (handle: QueryHandle) => boolean;
 }>;
 
 type InvocationOptions = {
   plugin: ActivePlugin;
   pluginName: string;
 };
+
+/**
+ * The workspace view a command started in. Its host is gone once the drawer
+ * host generation changes, and from then on the command may read nothing.
+ */
+type InvocationHost = Readonly<{
+  /** Throws `InvalidHandle` once the host is gone, and aborts `signal`. */
+  assertFromCurrentHost: () => void;
+
+  /** Aborts when the host is found gone. */
+  signal: AbortSignal;
+
+  /** Runs `run`, and aborts `signal` if the host goes while it runs. */
+  runWhileHostLasts: <Result>(run: () => Promise<Result>) => Promise<Result>;
+}>;
+
+type SlotRowsStore = Readonly<{
+  registry: ReturnType<typeof makeQueryHandleRegistry>;
+  issuedHandles: Set<QueryHandle>;
+}>;
 
 /**
  * The type of a slot column whose attribute is unmapped, which is the type
@@ -69,6 +100,42 @@ const UNMAPPED_DATA_TYPE_BY_ATTRIBUTE_TYPE: Readonly<
 
 const PERMISSION_DENIED_MESSAGE =
   "You cannot read the records this data slot is bound to.";
+
+// Generic on purpose. A host or DuckDB error can name a table, a workspace
+// field, or a cell value, none of which the plugin was given.
+const QUERY_FAILED_MESSAGE = "The data slot could not be read.";
+
+const HOST_CLOSED_MESSAGE =
+  "The workspace this command ran in is no longer open. Run the command again.";
+
+function _makeHostFromCurrentGeneration(): InvocationHost {
+  const hostGeneration = PluginDrawerStore.getGeneration();
+  const abortController = new AbortController();
+  const isFromCurrentHost = (): boolean => {
+    return PluginDrawerStore.getGeneration() === hostGeneration;
+  };
+  return {
+    signal: abortController.signal,
+    assertFromCurrentHost: () => {
+      if (!isFromCurrentHost()) {
+        abortController.abort();
+        throw new PluginError("InvalidHandle", HOST_CLOSED_MESSAGE);
+      }
+    },
+    runWhileHostLasts: async (run) => {
+      const stopListening = PluginDrawerStore.subscribe(() => {
+        if (!isFromCurrentHost()) {
+          abortController.abort();
+        }
+      });
+      try {
+        return await run();
+      } finally {
+        stopListening();
+      }
+    },
+  };
+}
 
 function _getSlotFromPlugin(
   options: Readonly<{ plugin: ActivePlugin; slotId: string }>,
@@ -168,16 +235,18 @@ async function _runSlotQuery(
     slot: PluginDataSlot;
     source: DataSlotSource;
     fieldsByAttributeKey: FieldsByAttributeKey;
+    host: InvocationHost;
   }>,
 ): Promise<SlotRow[]> {
-  const { plugin, slot, source, fieldsByAttributeKey } = options;
+  const { plugin, slot, source, fieldsByAttributeKey, host } = options;
   const boundFields = Object.values(fieldsByAttributeKey).filter(isDefined);
-  try {
-    const result = await runDataSlotQuery({
+  const result = await host.runWhileHostLasts(async () => {
+    return await runDataSlotQuery({
       workspaceId: plugin.installation.workspaceId,
       source,
       // With no field bound, the dataset loads every column.
       fields: boundFields.length > 0 ? boundFields : undefined,
+      signal: host.signal,
       sql: makeDataSlotSqlFromBinding({
         slot,
         source,
@@ -185,13 +254,8 @@ async function _runSlotQuery(
         limit: QUERY_SLOT_MAX_ROWS + 1,
       }),
     });
-    return result.data;
-  } catch (error) {
-    if (error instanceof WorkspaceRelationsDenied) {
-      throw new PluginError("PermissionDenied", PERMISSION_DENIED_MESSAGE);
-    }
-    throw error;
-  }
+  });
+  return result.data;
 }
 
 function _getColumnsFromSlot(
@@ -216,10 +280,12 @@ async function _querySlot(
   options: Readonly<{
     plugin: ActivePlugin;
     slotId: string;
-    rowsByHandle: Map<QueryHandle, readonly SlotRow[]>;
+    host: InvocationHost;
+    rowsStore: SlotRowsStore;
   }>,
 ): Promise<QuerySlotResult> {
-  const { plugin, slotId, rowsByHandle } = options;
+  const { plugin, slotId, host, rowsStore } = options;
+  host.assertFromCurrentHost();
   const slot = _getSlotFromPlugin({ plugin, slotId });
   const { source, fieldsByAttributeKey } = await _loadBoundFields({
     plugin,
@@ -231,10 +297,15 @@ async function _querySlot(
     slot,
     source,
     fieldsByAttributeKey,
+    host,
   });
-  const keptRows = rows.slice(0, QUERY_SLOT_MAX_ROWS);
-  const queryHandle = crypto.randomUUID() as QueryHandle;
-  rowsByHandle.set(queryHandle, keptRows);
+  host.assertFromCurrentHost();
+  const keptRows =
+    rows.length > QUERY_SLOT_MAX_ROWS
+      ? rows.slice(0, QUERY_SLOT_MAX_ROWS)
+      : rows;
+  const queryHandle = rowsStore.registry.getOrCreate(keptRows);
+  rowsStore.issuedHandles.add(queryHandle);
   return {
     queryHandle,
     columns: _getColumnsFromSlot({ slot, fieldsByAttributeKey }),
@@ -243,13 +314,52 @@ async function _querySlot(
   };
 }
 
+/**
+ * What a plugin may learn from a failed read. A `PluginError` is already
+ * written for the plugin. A denied relation is a permission failure. Anything
+ * else is logged for the host and reported generically, since the original
+ * message can name a table, a workspace field, or a value. A failure after
+ * the host is gone reads as the host being gone.
+ */
+function _getPluginErrorFromFailure(
+  options: Readonly<{ error: unknown; host: InvocationHost }>,
+): PluginError {
+  const { error, host } = options;
+  if (error instanceof PluginError) {
+    return error;
+  }
+  try {
+    host.assertFromCurrentHost();
+  } catch (hostError) {
+    return hostError as PluginError;
+  }
+  if (error instanceof WorkspaceRelationsDenied) {
+    return new PluginError("PermissionDenied", PERMISSION_DENIED_MESSAGE);
+  }
+  console.error("A plugin's data slot could not be read.", error);
+  return new PluginError("CommandFailed", QUERY_FAILED_MESSAGE);
+}
+
+async function _querySlotWithoutLeaks(
+  options: Parameters<typeof _querySlot>[0],
+): Promise<QuerySlotResult> {
+  try {
+    return await _querySlot(options);
+  } catch (error) {
+    throw _getPluginErrorFromFailure({ error, host: options.host });
+  }
+}
+
 // The binding modal checks whether the user may bind slots, because it
 // renders inside the router where the user's roles are readable. It is
 // Settings UI, so it loads only when a command opens it.
 async function _openDataSlotBinding(
-  options: Readonly<InvocationOptions & { slotId: string }>,
+  options: Readonly<
+    InvocationOptions & { slotId: string; host: InvocationHost }
+  >,
 ): Promise<void> {
-  const { plugin, pluginName, slotId } = options;
+  const { plugin, pluginName, slotId, host } = options;
+  host.assertFromCurrentHost();
   _getSlotFromPlugin({ plugin, slotId });
   const { openDataSlotBindingModal } =
     await import("@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal");
@@ -267,8 +377,13 @@ async function _openDataSlotBinding(
  * access, and `openDataSlotBinding` opens the slot's binding modal, which
  * lets a settings admin choose them and tells anyone else to ask one. The
  * handles `querySlot` issues are readable through `getSlotRows` for this
- * invocation only, and are never registered in the app-wide
- * `QueryHandleRegistry`.
+ * invocation only, the newest `MAX_LIVE_QUERY_HANDLES` of them, and are never
+ * registered in the app-wide `QueryHandleRegistry`.
+ *
+ * Nothing a plugin receives from a failed read comes from the host or
+ * DuckDB: a failure is a `PluginError` written for the plugin. Once the
+ * drawer host generation the invocation started in changes, both members
+ * reject with `InvalidHandle` and a running query is aborted.
  *
  * `runPluginCommand` calls it once per invocation. It reaches the binding
  * client and the slot query, so import it only from the lazy command
@@ -277,18 +392,32 @@ async function _openDataSlotBinding(
 export function makeDataSlotApiForInvocation(
   options: Readonly<InvocationOptions>,
 ): DataSlotInvocationApi {
-  const rowsByHandle = new Map<QueryHandle, readonly SlotRow[]>();
+  const host = _makeHostFromCurrentGeneration();
+  const rowsStore: SlotRowsStore = {
+    registry: makeQueryHandleRegistry({
+      maxLiveHandles: MAX_LIVE_QUERY_HANDLES,
+    }),
+    issuedHandles: new Set(),
+  };
   return {
     // `async` turns a thrown `PluginError` into a rejected promise, which is
     // how a plugin receives it.
     querySlot: async (slotId) => {
-      return _querySlot({ plugin: options.plugin, slotId, rowsByHandle });
+      return _querySlotWithoutLeaks({
+        plugin: options.plugin,
+        slotId,
+        host,
+        rowsStore,
+      });
     },
     openDataSlotBinding: async (slotId) => {
-      return _openDataSlotBinding({ ...options, slotId });
+      return _openDataSlotBinding({ ...options, slotId, host });
     },
     getSlotRows: (handle) => {
-      return rowsByHandle.get(handle);
+      return rowsStore.registry.getRows(handle);
+    },
+    wasSlotHandleIssued: (handle) => {
+      return rowsStore.issuedHandles.has(handle);
     },
   };
 }

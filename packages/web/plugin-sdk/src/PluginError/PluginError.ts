@@ -7,7 +7,8 @@
  *   or the Data Explorer no longer shows the result the command was invoked
  *   on.
  * - `LoadFailed`: the plugin's code or data could not be loaded.
- * - `CommandFailed`: a command handler, or SDK code it called, threw.
+ * - `CommandFailed`: a command handler, or SDK code it called, threw, or
+ *   the host could not read a data slot for a reason it does not share.
  * - `InvalidExpression`: `avandar.dataExplorer.addColumns` got a column it
  *   cannot add: a bad name, a placeholder with no input, an input naming a
  *   column the result does not have, an expression that is not exactly one

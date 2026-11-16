@@ -2,6 +2,8 @@ import { PluginError } from "@avandar/plugin-sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { QUERY_SLOT_MAX_ROWS } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
+import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
+import { MAX_LIVE_QUERY_HANDLES } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
@@ -16,16 +18,30 @@ import type {
   PluginManifest,
 } from "@avandar/plugin-manifest/runtime";
 import type { QueryHandle } from "@avandar/plugin-sdk";
+import type { MockInstance } from "vitest";
 
-const { getBindingsMock, loadSourceMock, openModalMock, runQueryMock } =
-  vi.hoisted(() => {
-    return {
-      getBindingsMock: vi.fn(),
-      loadSourceMock: vi.fn(),
-      openModalMock: vi.fn(),
-      runQueryMock: vi.fn(),
-    };
-  });
+const {
+  getBindingsMock,
+  loadSourceMock,
+  openModalMock,
+  runQueryMock,
+  statusMock,
+} = vi.hoisted(() => {
+  return {
+    getBindingsMock: vi.fn(),
+    loadSourceMock: vi.fn(),
+    openModalMock: vi.fn(),
+    runQueryMock: vi.fn(),
+    statusMock: vi.fn(),
+  };
+});
+
+vi.mock(
+  "@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus",
+  () => {
+    return { getDataSlotBindingStatus: statusMock };
+  },
+);
 
 vi.mock(
   "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient",
@@ -48,6 +64,10 @@ vi.mock(
     return { openDataSlotBindingModal: openModalMock };
   },
 );
+
+const { getDataSlotBindingStatus: actualGetStatus } = await vi.importActual<
+  typeof import("@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus")
+>("@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus");
 
 const { makeDataSlotApiForInvocation } =
   await import("@/lib/plugins/dataSlots/makeDataSlotApiForInvocation/makeDataSlotApiForInvocation");
@@ -144,8 +164,14 @@ async function _getQuerySlotError(slotId: string): Promise<PluginError> {
   return error as PluginError;
 }
 
+let consoleErrorSpy: MockInstance;
+
 describe("makeDataSlotApiForInvocation", () => {
   beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {
+      return undefined;
+    });
+    statusMock.mockImplementation(actualGetStatus);
     getBindingsMock.mockResolvedValue([_makeBinding()]);
     loadSourceMock.mockResolvedValue(SOURCE);
     runQueryMock.mockResolvedValue({ data: _makeRows(2) });
@@ -248,11 +274,59 @@ describe("makeDataSlotApiForInvocation", () => {
       expect(error.code).toBe("PermissionDenied");
     });
 
-    it("passes any other query failure through unchanged", async () => {
+    it("reports any other query failure generically and keeps its text from the plugin", async () => {
+      const queryError = new Error(
+        'Binder Error: column "Onset date" of concept_0b6f4f0e has value "Maria Lopez"',
+      );
+      runQueryMock.mockRejectedValue(queryError);
+
+      const error = await _getQuerySlotError("cases");
+
+      expect(error.code).toBe("CommandFailed");
+      expect(error.message).toBe("The data slot could not be read.");
+      expect(error.message).not.toMatch(/concept_|Onset date|Maria/);
+    });
+
+    it("logs the original query failure on the host", async () => {
       const queryError = new Error("DuckDB is not ready");
       runQueryMock.mockRejectedValue(queryError);
 
-      await expect(_makeApi().querySlot("cases")).rejects.toBe(queryError);
+      await _getQuerySlotError("cases");
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.any(String),
+        queryError,
+      );
+    });
+
+    it.each([
+      [
+        "loading the source",
+        () => {
+          return loadSourceMock;
+        },
+      ],
+      [
+        "fetching the bindings",
+        () => {
+          return getBindingsMock;
+        },
+      ],
+      [
+        "computing the binding status",
+        () => {
+          return statusMock;
+        },
+      ],
+    ])("reports a failure %s generically", async (_step, getMock) => {
+      getMock().mockImplementation(() => {
+        throw new Error('relation "bindings" row 77');
+      });
+
+      const error = await _getQuerySlotError("cases");
+
+      expect(error.code).toBe("CommandFailed");
+      expect(error.message).toBe("The data slot could not be read.");
     });
 
     it("queries one row more than it keeps, in the install's workspace", async () => {
@@ -299,7 +373,97 @@ describe("makeDataSlotApiForInvocation", () => {
     });
   });
 
+  describe("after the host the command started in is gone", () => {
+    it("rejects querySlot with InvalidHandle and reads nothing", async () => {
+      const api = _makeApi();
+      PluginDrawerStore.clear();
+
+      await expect(api.querySlot("cases")).rejects.toMatchObject({
+        code: "InvalidHandle",
+      });
+      expect(getBindingsMock).not.toHaveBeenCalled();
+      expect(runQueryMock).not.toHaveBeenCalled();
+    });
+
+    it("rejects openDataSlotBinding with InvalidHandle and opens no modal", async () => {
+      const api = _makeApi();
+      PluginDrawerStore.clear();
+
+      await expect(api.openDataSlotBinding("cases")).rejects.toMatchObject({
+        code: "InvalidHandle",
+      });
+      expect(openModalMock).not.toHaveBeenCalled();
+    });
+
+    it("aborts the running query and rejects with InvalidHandle", async () => {
+      const queryStarted = Promise.withResolvers<AbortSignal>();
+      runQueryMock.mockImplementation((options: { signal: AbortSignal }) => {
+        queryStarted.resolve(options.signal);
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            reject(new Error("The operation was aborted"));
+          });
+        });
+      });
+      const querying = _makeApi()
+        .querySlot("cases")
+        .catch((rejection: unknown) => {
+          return rejection;
+        });
+      const signal = await queryStarted.promise;
+
+      PluginDrawerStore.clear();
+
+      expect(signal.aborted).toBe(true);
+      expect(await querying).toMatchObject({ code: "InvalidHandle" });
+    });
+
+    it("hands no rows to a query that finished after the host went", async () => {
+      runQueryMock.mockImplementation(async () => {
+        PluginDrawerStore.clear();
+        return { data: _makeRows(2) };
+      });
+
+      const error = await _getQuerySlotError("cases");
+
+      expect(error.code).toBe("InvalidHandle");
+    });
+
+    it("passes a signal that is not aborted while the host lasts", async () => {
+      await _makeApi().querySlot("cases");
+
+      expect(runQueryMock.mock.calls[0]![0].signal.aborted).toBe(false);
+    });
+  });
+
   describe("getSlotRows", () => {
+    it("keeps only the newest handles readable and still knows the evicted ones", async () => {
+      runQueryMock.mockImplementation(async () => {
+        return { data: _makeRows(2) };
+      });
+      const api = _makeApi();
+      const handles: QueryHandle[] = [];
+      for (
+        let callIndex = 0;
+        callIndex <= MAX_LIVE_QUERY_HANDLES;
+        callIndex++
+      ) {
+        handles.push((await api.querySlot("cases")).queryHandle);
+      }
+
+      const [oldestHandle, newestHandle] = [handles[0]!, handles.at(-1)!];
+
+      expect(api.getSlotRows(oldestHandle)).toBeUndefined();
+      expect(api.wasSlotHandleIssued(oldestHandle)).toBe(true);
+      expect(api.getSlotRows(newestHandle)).toHaveLength(2);
+    });
+
+    it("does not know a handle querySlot never issued", () => {
+      expect(
+        _makeApi().wasSlotHandleIssued("handle-never-issued" as QueryHandle),
+      ).toBe(false);
+    });
+
     it("returns the rows of a handle querySlot issued in the invocation", async () => {
       const api = _makeApi();
 

@@ -70,6 +70,19 @@ describe("runDataSlotQuery", () => {
     );
   });
 
+  it("passes the abort signal to the workspace query session", async () => {
+    const { signal } = new AbortController();
+
+    await runDataSlotQuery({
+      workspaceId: WORKSPACE_ID,
+      source: DATASET_SOURCE,
+      sql: SQL,
+      signal,
+    });
+
+    expect(runQueryMock.mock.calls[0]![0].signal).toBe(signal);
+  });
+
   it("loads only the given fields' columns of a dataset", async () => {
     await runDataSlotQuery({
       workspaceId: WORKSPACE_ID,

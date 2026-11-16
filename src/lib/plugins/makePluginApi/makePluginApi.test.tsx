@@ -59,6 +59,9 @@ function _makeDataSlotApi(
     getSlotRows: () => {
       return undefined;
     },
+    wasSlotHandleIssued: () => {
+      return false;
+    },
     ...overrides,
   };
 }
@@ -120,6 +123,9 @@ describe("makePluginApi", () => {
           return handle === slotHandle
             ? [{ onsetDate: "2026-01-05", district: "Ilala" }]
             : undefined;
+        },
+        wasSlotHandleIssued: (handle) => {
+          return handle === slotHandle;
         },
       }),
     });

@@ -47,6 +47,7 @@ function _makeDataApi(
         columns: fetchOptions.columns,
         limit: fetchOptions.limit,
         getSlotRows: dataSlotApi?.getSlotRows,
+        wasSlotHandleIssued: dataSlotApi?.wasSlotHandleIssued,
       });
     },
     querySlot: dataSlotApi?.querySlot,

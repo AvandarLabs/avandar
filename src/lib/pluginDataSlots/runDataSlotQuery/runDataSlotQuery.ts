@@ -13,6 +13,9 @@ import type {
  * engine does not have to infer them from the SQL, each column once even when
  * several slot attributes map to it. A case type's view plans its own columns.
  *
+ * Pass a `signal` to cancel the query, for example when the screen that
+ * asked for it closes.
+ *
  * Use it for SQL made by `makeDataSlotSqlFromBinding`, or SQL that wraps it,
  * for example a count over a slot's rows.
  */
@@ -22,12 +25,14 @@ export async function runDataSlotQuery(
     source: DataSlotSource;
     sql: string;
     fields?: readonly DataSlotSourceField[];
+    signal?: AbortSignal;
   }>,
 ): Promise<QueryResult.T> {
-  const { workspaceId, source, sql, fields = source.fields } = options;
+  const { workspaceId, source, sql, signal, fields = source.fields } = options;
   return await WorkspaceQuerySession.runQuery({
     rawSql: sql,
     workspaceId,
+    signal,
     neededColumnsByDatasetId:
       source.kind === "dataset"
         ? {

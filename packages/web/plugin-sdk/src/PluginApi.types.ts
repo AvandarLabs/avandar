@@ -84,9 +84,8 @@ export type QuerySlotResult = Readonly<{
     Readonly<{ name: string; dataType: PluginColumnDataType }>
   >;
   /**
-   * The number of rows `queryHandle` holds, which is the number of records
-   * the host read. It is never the slot's total: when `isTruncated` is true,
-   * `rowCount` is the read limit (200,000) and the slot holds more.
+   * The number of rows `queryHandle` holds. It is the slot's total unless
+   * `isTruncated` is true, in which case it is the 200,000 row read limit.
    */
   rowCount: number;
   /** True when the slot holds more records than the host read. */
@@ -166,7 +165,12 @@ export type AvandarApi = Readonly<{
      * with the current user's access. Present only for commands. Rejects
      * with a `PluginError`: `InvalidSlot` for a slot id the manifest does
      * not declare, `SlotNotBound` or `SlotBroken` when the slot cannot be
-     * read, and `PermissionDenied` when the user cannot read its records.
+     * read, `PermissionDenied` when the user cannot read its records,
+     * `InvalidHandle` once the workspace the command started in is no
+     * longer open, and `CommandFailed` for any other failure. A
+     * `CommandFailed` message is generic on purpose: the host keeps the
+     * details, which can name workspace data the plugin was not given. Only
+     * the three most recent handles it returns stay readable by `fetchRows`.
      */
     querySlot?: (slotId: string) => Promise<QuerySlotResult>;
   }>;
@@ -184,7 +188,9 @@ export type AvandarApi = Readonly<{
      * gets the binding form for that slot, and anyone else a message to ask
      * an admin, in the same modal. Resolves once the modal closes. Present
      * only for commands. Rejects with `PluginError("InvalidSlot")` for a
-     * slot id the manifest does not declare.
+     * slot id the manifest does not declare, and with
+     * `PluginError("InvalidHandle")` once the workspace the command started
+     * in is no longer open.
      */
     openDataSlotBinding?: (slotId: string) => Promise<void>;
   }>;
