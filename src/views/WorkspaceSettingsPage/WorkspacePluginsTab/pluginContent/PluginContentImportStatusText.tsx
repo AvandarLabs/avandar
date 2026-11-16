@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Group, Loader, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { match } from "ts-pattern";
+import { UntranslatedDetail } from "@/components/UntranslatedDetail/UntranslatedDetail";
 import type { PluginContentImportStatus } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports";
 
 type Props = Readonly<{ status: PluginContentImportStatus }>;
@@ -38,7 +39,14 @@ export function PluginContentImportStatusText({ status }: Props): JSX.Element {
       );
     })
     .with({ kind: "failed" }, ({ reason }) => {
-      return <Text size="sm" c="danger">{t`Failed: ${reason}`}</Text>;
+      return (
+        <div>
+          <Text size="sm" c="danger">
+            {t`Failed`}
+          </Text>
+          <UntranslatedDetail detail={reason} />
+        </div>
+      );
     })
     .exhaustive();
 }

@@ -159,10 +159,16 @@ describe("DataSlotCheckPreview", () => {
     render(_makePreview(ONSET_FIELD), { wrapper: QueryWrapper });
 
     expect(
-      await screen.findByText(
-        "Could not read these records. Catalog Error: Table does not exist",
-      ),
+      await screen.findByText("Could not read these records."),
     ).toBeInTheDocument();
+    // The app's error toast repeats the message, so find the inline detail
+    // by its language mark.
+    const detail = screen
+      .getAllByText("Catalog Error: Table does not exist")
+      .find((element) => {
+        return element.getAttribute("lang") === "en";
+      });
+    expect(detail).toBeDefined();
   });
 
   it("checks again when a mapped field changes", async () => {

@@ -592,8 +592,9 @@ describe("PluginInstallWizard", () => {
       _clickButton("Next");
       _installFromContentStep();
       expect(
-        await screen.findByText("Failed: permission denied"),
-      ).toBeInTheDocument();
+        await screen.findByText("permission denied"),
+      ).toHaveAttribute("lang", "en");
+      expect(screen.getByText("Failed")).toBeInTheDocument();
 
       _clickButton("Retry Mozambique provinces");
 

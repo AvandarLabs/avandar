@@ -2,6 +2,7 @@ import { useQuery } from "@avandar/query-hooks";
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Group, Loader, Text } from "@mantine/core";
+import { UntranslatedDetail } from "@/components/UntranslatedDetail/UntranslatedDetail";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { checkDataSlotBinding } from "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding";
 import { DataSlotCheckSummary } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSummary";
@@ -78,10 +79,9 @@ export function DataSlotCheckPreview(props: Props): JSX.Element {
   if (result === undefined) {
     const reason = query.error?.message ?? "";
     return (
-      <Callout
-        messageSize="sm"
-        message={t`Could not read these records. ${reason}`}
-      />
+      <Callout messageSize="sm" message={t`Could not read these records.`}>
+        <UntranslatedDetail detail={reason} />
+      </Callout>
     );
   }
   return <DataSlotCheckSummary {...props} result={result} />;
