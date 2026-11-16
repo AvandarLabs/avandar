@@ -840,6 +840,33 @@ describe("PluginManifestSchema dataSlots", () => {
     ]);
   });
 
+  it("rejects two attribute keys in one slot that differ only by case", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          onsetDate: { type: "date", title: "%slot.cases.onsetDate%" },
+          onsetdate: { type: "date", title: "%slot.cases.onsetdate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onsetdate",
+        message:
+          'attribute key "onsetdate" differs from "onsetDate" only by case, ' +
+          "and query columns ignore case",
+      },
+    ]);
+  });
+
+  it("accepts the same attribute key in two different slots", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot(),
+      deaths: _makeDataSlot(),
+    });
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
   it("rejects a slot id that does not start with a letter", () => {
     const manifest = _makeManifestWithDataSlots({ "1cases": _makeDataSlot() });
     expect(_getIssues(manifest)).toEqual([

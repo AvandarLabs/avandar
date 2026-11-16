@@ -344,6 +344,35 @@ function _refineDataSlots(
         message: "must declare at least one attribute",
       });
     }
+    _refineAttributeKeyCases(slotId, slot, context);
+  });
+}
+
+/**
+ * Rejects an attribute key that differs from an earlier one in the same slot
+ * only by case. The slot query names its columns by attribute key, and DuckDB
+ * ignores identifier case, so such keys would collide as column names.
+ */
+function _refineAttributeKeyCases(
+  slotId: string,
+  slot: BasePluginManifest["dataSlots"][string],
+  context: z.RefinementCtx,
+): void {
+  const keysByLowerCase = new Map<string, string>();
+  Object.keys(slot.attributes).forEach((attributeKey) => {
+    const lowerCaseKey = attributeKey.toLowerCase();
+    const earlierKey = keysByLowerCase.get(lowerCaseKey);
+    if (earlierKey === undefined) {
+      keysByLowerCase.set(lowerCaseKey, attributeKey);
+      return;
+    }
+    context.addIssue({
+      code: "custom",
+      path: ["dataSlots", slotId, "attributes", attributeKey],
+      message:
+        `attribute key "${attributeKey}" differs from "${earlierKey}" ` +
+        "only by case, and query columns ignore case",
+    });
   });
 }
 
