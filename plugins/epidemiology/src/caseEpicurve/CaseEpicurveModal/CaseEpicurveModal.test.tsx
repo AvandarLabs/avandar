@@ -5,13 +5,14 @@ import {
 } from "@avandar/plugin-sdk";
 import { MantineProvider } from "@mantine/core";
 import {
+  act,
   fireEvent,
   render,
   screen,
   waitFor,
   within,
 } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import englishMessages from "../../../locales/en.json";
 import { CaseEpicurveModal } from "./CaseEpicurveModal";
 import type {
@@ -150,7 +151,72 @@ function _getTableCells(table: HTMLElement): string[][] {
     });
 }
 
+type ResizeCallback = (
+  entries: Array<{ contentRect: { width: number } }>,
+) => void;
+
+/**
+ * Replaces `ResizeObserver` with one that records its callbacks, so a test
+ * can say how wide the chart's container is: jsdom does no layout.
+ */
+function _stubResizeObserver(): (width: number) => void {
+  const callbacks: ResizeCallback[] = [];
+  class FakeResizeObserver {
+    constructor(callback: ResizeCallback) {
+      callbacks.push(callback);
+    }
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  }
+  vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+  return (width) => {
+    act(() => {
+      callbacks.forEach((callback) => {
+        callback([{ contentRect: { width } }]);
+      });
+    });
+  };
+}
+
+function _getChartWidth(): number {
+  const surface = document.querySelector("svg.recharts-surface");
+  return Number(surface?.getAttribute("width"));
+}
+
 describe("CaseEpicurveModal", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("draws the chart as wide as the space it is given", async () => {
+    const setContainerWidth = _stubResizeObserver();
+    _renderModal();
+    await screen.findByRole("img", { name: "Case epicurve" });
+
+    setContainerWidth(430);
+
+    await waitFor(() => {
+      expect(_getChartWidth()).toBe(430);
+    });
+  });
+
+  it("never draws the chart narrower than a readable minimum or wider than the modal", async () => {
+    const setContainerWidth = _stubResizeObserver();
+    _renderModal();
+    await screen.findByRole("img", { name: "Case epicurve" });
+
+    setContainerWidth(40);
+    await waitFor(() => {
+      expect(_getChartWidth()).toBe(280);
+    });
+
+    setContainerWidth(5000);
+    await waitFor(() => {
+      expect(_getChartWidth()).toBe(720);
+    });
+  });
+
   it("says it is reading the case records until they arrive", () => {
     _renderModal({
       querySlot: () => {
