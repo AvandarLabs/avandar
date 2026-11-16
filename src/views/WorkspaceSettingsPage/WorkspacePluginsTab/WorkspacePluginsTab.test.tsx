@@ -98,6 +98,7 @@ function _makeManifestModule(
       version: "1.2.0",
       icon: "chart-dots",
       permissions: ["data:context"],
+      dataSlots: {},
       contributes: {
         commands: [{ id: "run", title: "%run.title%", icon: "chart-dots" }],
         menus: { "dataExplorer.toolbar": [{ command: "run" }] },

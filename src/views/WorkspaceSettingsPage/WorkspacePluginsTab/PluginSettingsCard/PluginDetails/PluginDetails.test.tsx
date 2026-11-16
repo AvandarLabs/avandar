@@ -11,6 +11,8 @@ const STRINGS: PluginLocaleMessages = {
     "regression.linear.title": "Linear regression",
     "viz.epicurve.title": "Epicurve",
     "viz.ratePlot.title": "Rate plot",
+    "slot.cases.title": "Cases",
+    "slot.deaths.title": "Deaths",
   },
 };
 
@@ -18,11 +20,18 @@ function _makeManifest(options: {
   hasToolbarCommand: boolean;
   hasChartTypes: boolean;
   permissions: string[];
+  dataSlots?: Record<string, unknown>;
 }): PluginManifest {
-  const { hasToolbarCommand, hasChartTypes, permissions } = options;
+  const {
+    hasToolbarCommand,
+    hasChartTypes,
+    permissions,
+    dataSlots = {},
+  } = options;
   return {
     id: "avandar.epidemiology",
     permissions,
+    dataSlots,
     contributes: {
       commands: [
         {
@@ -48,6 +57,16 @@ const EPIDEMIOLOGY_MANIFEST = _makeManifest({
   hasToolbarCommand: true,
   hasChartTypes: true,
   permissions: ["data:context"],
+});
+
+const DATA_SLOTS_MANIFEST = _makeManifest({
+  hasToolbarCommand: true,
+  hasChartTypes: false,
+  permissions: ["data:slots"],
+  dataSlots: {
+    cases: { title: "%slot.cases.title%", attributes: {} },
+    deaths: { title: "%slot.deaths.title%", attributes: {} },
+  },
 });
 
 const EMPTY_MANIFEST = _makeManifest({
@@ -175,6 +194,24 @@ describe("PluginDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it("describes the data:slots permission in plain language", async () => {
+    await _renderExpandedDetails(DATA_SLOTS_MANIFEST);
+
+    expect(
+      screen.getByText(
+        "The records you choose for it, when someone runs one of its tools",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("lists the records to choose by their localized data slot titles", async () => {
+    await _renderExpandedDetails(DATA_SLOTS_MANIFEST);
+
+    expect(
+      screen.getByText("Records you choose for it: Cases, Deaths"),
+    ).toBeInTheDocument();
+  });
+
   it("says its charts see only their own rows when the plugin adds chart types", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 
@@ -202,6 +239,9 @@ describe("PluginDetails", () => {
     expect(screen.getByText("Nothing yet.")).toBeInTheDocument();
     expect(
       screen.queryByText(/Data Explorer toolbar:/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Records you choose for it:/),
     ).not.toBeInTheDocument();
   });
 

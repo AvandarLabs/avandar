@@ -735,3 +735,153 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     expect(issues).toEqual([]);
   });
 });
+
+function _makeDataSlot(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    title: "%slot.cases.title%",
+    attributes: {
+      onsetDate: { type: "date", title: "%slot.cases.onsetDate%" },
+    },
+    ...overrides,
+  };
+}
+
+function _makeManifestWithDataSlots(
+  dataSlots: Record<string, unknown>,
+  permissions: string[] = ["data:context", "data:slots"],
+): Record<string, unknown> {
+  return { ..._makeValidManifest(), permissions, dataSlots };
+}
+
+describe("PluginManifestSchema dataSlots", () => {
+  it("defaults dataSlots to an empty record when the manifest declares none", () => {
+    const result = PluginManifestSchema.parse(_makeValidManifest());
+    expect(result.dataSlots).toEqual({});
+  });
+
+  it("defaults a slot to optional and its attributes to required", () => {
+    const result = PluginManifestSchema.parse(
+      _makeManifestWithDataSlots({ cases: _makeDataSlot() }),
+    );
+    expect(result.dataSlots.cases?.required).toBe(false);
+    expect(result.dataSlots.cases?.attributes.onsetDate?.required).toBe(true);
+  });
+
+  it.each([
+    ["number"],
+    ["date"],
+    ["text"],
+    ["boolean"],
+    ["geo.admin1"],
+    ["geo.admin2"],
+  ])("accepts a %s attribute", (type) => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: { value: { type, title: "%slot.cases.value%" } },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("rejects data slots declared without the data:slots permission", () => {
+    const manifest = _makeManifestWithDataSlots({ cases: _makeDataSlot() }, [
+      "data:context",
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots",
+        message: 'declaring data slots requires the "data:slots" permission',
+      },
+    ]);
+  });
+
+  it("rejects the data:slots permission when no data slot is declared", () => {
+    const manifest = _makeManifestWithDataSlots({});
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "permissions",
+        message: '"data:slots" requires at least one entry in dataSlots',
+      },
+    ]);
+  });
+
+  it("rejects a data slot with no attributes", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ attributes: {} }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes",
+        message: "must declare at least one attribute",
+      },
+    ]);
+  });
+
+  it("rejects a slot id that does not start with a letter", () => {
+    const manifest = _makeManifestWithDataSlots({ "1cases": _makeDataSlot() });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.1cases",
+        message: "must start with a letter and hold only letters and digits",
+      },
+    ]);
+  });
+
+  it("rejects an attribute key that holds a character other than a letter or digit", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          "onset-date": { type: "date", title: "%slot.cases.onsetDate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onset-date",
+        message: "must start with a letter and hold only letters and digits",
+      },
+    ]);
+  });
+
+  it("lists the attribute types when an attribute type is unknown", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({
+        attributes: {
+          onsetDate: { type: "datetime", title: "%slot.cases.onsetDate%" },
+        },
+      }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.attributes.onsetDate.type",
+        message:
+          "must be number, date, text, boolean, geo.admin1, or geo.admin2",
+      },
+    ]);
+  });
+
+  it("rejects a slot title that is not a %key% reference", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ title: "Cases" }),
+    });
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "dataSlots.cases.title",
+        message: "must be a %key% reference to locales/en.json",
+      },
+    ]);
+  });
+
+  it("rejects a concept hint that is only whitespace", () => {
+    const manifest = _makeManifestWithDataSlots({
+      cases: _makeDataSlot({ concept: "  " }),
+    });
+    expect(
+      _getIssues(manifest).map((issue) => {
+        return issue.path;
+      }),
+    ).toEqual(["dataSlots.cases.concept"]);
+  });
+});

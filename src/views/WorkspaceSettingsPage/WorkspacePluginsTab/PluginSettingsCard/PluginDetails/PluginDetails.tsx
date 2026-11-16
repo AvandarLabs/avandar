@@ -7,7 +7,6 @@ import { getContributionsFromManifest } from "@/lib/plugins/getContributionsFrom
 import { PluginAdditionsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection";
 import { PluginDataAccessSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection";
 import { PluginDetailsToggle } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle";
-import type { PluginContribution } from "@/lib/plugins/getContributionsFromManifest/getContributionsFromManifest";
 import type {
   PluginLocaleMessages,
   PluginManifest,
@@ -27,11 +26,15 @@ function _getLocalizedContributionTitles(options: {
   manifest: PluginManifest;
   strings: PluginLocaleMessages;
   locale: string;
-}): { toolbarCommandTitles: string[]; chartTypeTitles: string[] } {
+}): {
+  toolbarCommandTitles: string[];
+  chartTypeTitles: string[];
+  dataSlotTitles: string[];
+} {
   const { manifest, strings, locale } = options;
   const { dataExplorerToolbarCommands, chartTypes } =
     getContributionsFromManifest(manifest);
-  const getTitles = (contributions: readonly PluginContribution[]) => {
+  const getTitles = (contributions: ReadonlyArray<{ title: string }>) => {
     return contributions.map((contribution) => {
       return getLocalizedTextFromManifestStrings({
         strings,
@@ -43,6 +46,7 @@ function _getLocalizedContributionTitles(options: {
   return {
     toolbarCommandTitles: getTitles(dataExplorerToolbarCommands),
     chartTypeTitles: getTitles(chartTypes),
+    dataSlotTitles: getTitles(Object.values(manifest.dataSlots)),
   };
 }
 
@@ -59,7 +63,7 @@ export function PluginDetails({
   const { i18n } = useLingui();
   const [isExpanded, { toggle }] = useDisclosure(false);
   const regionId = useId();
-  const { toolbarCommandTitles, chartTypeTitles } =
+  const { toolbarCommandTitles, chartTypeTitles, dataSlotTitles } =
     _getLocalizedContributionTitles({
       manifest,
       strings,
@@ -82,6 +86,7 @@ export function PluginDetails({
             <PluginAdditionsSection
               toolbarCommandTitles={toolbarCommandTitles}
               chartTypeTitles={chartTypeTitles}
+              dataSlotTitles={dataSlotTitles}
             />
             <PluginDataAccessSection
               permissions={manifest.permissions}

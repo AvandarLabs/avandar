@@ -30,6 +30,7 @@ const MANIFEST: PluginManifest = {
   entry: "src/index.tsx",
   icon: "virus",
   permissions: [],
+  dataSlots: {},
   contributes: { commands: [], menus: {}, vizTypes: [EPICURVE], aiTools: [] },
 };
 

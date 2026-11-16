@@ -6,6 +6,7 @@ import {
   IconNameSchema,
   LocalizedStringSchema,
 } from "@plugin-manifest/PluginManifest/manifestFieldSchemas.ts";
+import { PluginDataSlotsSchema } from "@plugin-manifest/PluginManifest/PluginDataSlotSchema.ts";
 import { PluginVizTypeSchema } from "@plugin-manifest/PluginManifest/PluginVizTypeSchema.ts";
 import {
   SLOT_IDS,
@@ -46,10 +47,15 @@ const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or 
 /**
  * Permissions a manifest may request in this version of the schema.
  * `data:context` lets a command read the rows of the result it was invoked
- * on, and `query:addColumns` lets a Data Explorer toolbar command add
- * computed columns to that result's query.
+ * on, `query:addColumns` lets a Data Explorer toolbar command add computed
+ * columns to that result's query, and `data:slots` lets a command read the
+ * records an admin bound to the plugin's `dataSlots`.
  */
-export const PLUGIN_PERMISSIONS = ["data:context", "query:addColumns"] as const;
+export const PLUGIN_PERMISSIONS = [
+  "data:context",
+  "query:addColumns",
+  "data:slots",
+] as const;
 
 /**
  * A permission a plugin may request in `permissions`, for typing code that
@@ -191,6 +197,7 @@ const BasePluginManifestSchema = z.strictObject({
     ),
   icon: IconNameSchema,
   permissions: z.array(z.enum(PLUGIN_PERMISSIONS)).default([]),
+  dataSlots: PluginDataSlotsSchema.default({}),
   contributes: z.strictObject({
     commands: z.array(CommandSchema).default([]),
     menus: MenusSchema.default({}),
@@ -288,6 +295,37 @@ function _refineVizTypes(
   });
 }
 
+function _refineDataSlots(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const slotEntries = Object.entries(manifest.dataSlots);
+  const hasPermission = manifest.permissions.includes("data:slots");
+  if (slotEntries.length > 0 && !hasPermission) {
+    context.addIssue({
+      code: "custom",
+      path: ["dataSlots"],
+      message: 'declaring data slots requires the "data:slots" permission',
+    });
+  }
+  if (slotEntries.length === 0 && hasPermission) {
+    context.addIssue({
+      code: "custom",
+      path: ["permissions"],
+      message: '"data:slots" requires at least one entry in dataSlots',
+    });
+  }
+  slotEntries.forEach(([slotId, slot]) => {
+    if (Object.keys(slot.attributes).length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["dataSlots", slotId, "attributes"],
+        message: "must declare at least one attribute",
+      });
+    }
+  });
+}
+
 /**
  * The schema for a compiled `ava.yaml`. Strict: unknown keys fail, so a typo
  * is a build error rather than a silently ignored setting.
@@ -298,6 +336,7 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
     _refineMenus(manifest, context);
     _refineVizTypes(manifest, context);
     _refineAiTools(manifest, context);
+    _refineDataSlots(manifest, context);
   },
 );
 
@@ -344,3 +383,15 @@ export type PluginVizSettingControl = PluginVizSetting["control"];
  * Schema parameters.
  */
 export type PluginAiTool = PluginManifest["contributes"]["aiTools"][number];
+
+/**
+ * A data slot a plugin declares under `dataSlots`, for example to list it in
+ * the install wizard or to check a binding against its attributes.
+ */
+export type PluginDataSlot = PluginManifest["dataSlots"][string];
+
+/**
+ * One attribute of a data slot, for code that maps it to a workspace field
+ * or reads its value from a bound record.
+ */
+export type PluginDataSlotAttribute = PluginDataSlot["attributes"][string];
