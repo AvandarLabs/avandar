@@ -66,5 +66,21 @@
   "rollingAverage.add": "Add column",
   "rollingAverage.missingColumns": "This command needs a date column.",
   "rollingAverage.unavailable": "Columns can be added only to a query result in the Data Explorer. Run a query there, then try again.",
-  "rollingAverage.failed": "Could not add the column: {message}"
+  "rollingAverage.failed": "Could not add the column: {message}",
+  "slot.cases.title": "Cases",
+  "slot.cases.description": "One record per case, with the date its symptoms began. The Case epicurve command charts them over time.",
+  "slot.cases.onsetDate": "Onset date",
+  "slot.cases.district": "District",
+  "cases.epicurve.title": "Case epicurve",
+  "caseEpicurve.loading": "Reading the case records…",
+  "caseEpicurve.notBound": "No case records are chosen for this plugin yet. Choose the case type or dataset it reads.",
+  "caseEpicurve.broken": "The case records chosen for this plugin have changed and can no longer be read. Choose them again.",
+  "caseEpicurve.chooseRecords": "Choose records",
+  "caseEpicurve.unavailable": "This version of Avandar cannot read case records for plugins.",
+  "caseEpicurve.failed": "Could not read the case records: {message}",
+  "caseEpicurve.stackByDistrict": "Stack by district",
+  "caseEpicurve.noDistrict": "None of these cases has a district.",
+  "caseEpicurve.empty": "None of these cases has an onset date to chart.",
+  "caseEpicurve.truncated": "Drawn from the first {count, plural, one {# case} other {# cases}}.",
+  "caseEpicurve.seriesCount": "{series}: {count, number}"
 }

@@ -1,4 +1,5 @@
 import { definePlugin } from "@avandar/plugin-sdk";
+import { CaseEpicurveModal } from "./caseEpicurve/CaseEpicurveModal/CaseEpicurveModal";
 import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
 import { runFitRegressionTool } from "./fitRegression/runFitRegression";
 import { IncidenceModal } from "./incidence/IncidenceModal/IncidenceModal";
@@ -27,6 +28,12 @@ export default definePlugin({
       avandar.ui.openModal({
         title: avandar.i18n.t("rollingAverage.title"),
         content: <RollingAverageModal />,
+      });
+    },
+    "cases.epicurve": (avandar) => {
+      avandar.ui.openModal({
+        title: avandar.i18n.t("cases.epicurve.title"),
+        content: <CaseEpicurveModal />,
       });
     },
   },
