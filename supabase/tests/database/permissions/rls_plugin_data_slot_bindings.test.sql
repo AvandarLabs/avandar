@@ -109,7 +109,7 @@ values (
   '{"onsetDate": "d1507001-0000-4000-8000-000000000001"}'::jsonb
 );
 
-select plan (35);
+select plan (39);
 
 -- 1. A plain member reads their workspace's binding.
 select lives_ok (
@@ -277,7 +277,8 @@ select lives_ok (
 );
 
 -- 11. A settings admin of both workspaces cannot move a binding between
--- them. RLS alone would allow it, so the trigger is what stops it.
+-- them. RLS alone would allow it. Column grants alone stop it: UPDATE is not
+-- granted on `workspace_id`.
 select throws_ok (
   $t11$
   set local role authenticated;
@@ -286,7 +287,7 @@ select throws_ok (
   set workspace_id = 'd1501002-0000-4000-8000-000000000002'::uuid
   where id = 'd150b001-0000-4000-8000-000000000001'::uuid;
   $t11$,
-  '23514',
+  '42501',
   null,
   'a settings admin of both workspaces cannot move a binding between them'
 );
@@ -299,7 +300,7 @@ select throws_ok (
   insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type, concept_id)
   values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a001-0000-4000-8000-000000000001'::uuid, 'otherCases', 'concept', 'd1504002-0000-4000-8000-000000000002'::uuid);
   $t12$,
-  '23514',
+  '23503',
   null,
   'a data slot binding cannot read a case type of another workspace'
 );
@@ -312,7 +313,7 @@ select throws_ok (
   insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type, dataset_id)
   values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a001-0000-4000-8000-000000000001'::uuid, 'otherDeaths', 'dataset', 'd1506002-0000-4000-8000-000000000002'::uuid);
   $t13$,
-  '23514',
+  '23503',
   null,
   'a data slot binding cannot read a dataset of another workspace'
 );
@@ -325,7 +326,7 @@ select throws_ok (
   insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type, concept_id)
   values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a002-0000-4000-8000-000000000002'::uuid, 'cases', 'concept', 'd1504001-0000-4000-8000-000000000001'::uuid);
   $t14$,
-  '23514',
+  '23503',
   null,
   'a data slot binding cannot belong to an install of another workspace'
 );
@@ -831,6 +832,45 @@ select lives_ok (
   $t35$,
   'deleting the user who bound a slot keeps the binding with no binder'
 );
+
+-- 36. A non-member's insert is refused by RLS before any key is looked up,
+-- so it cannot learn whether a guessed case type id exists.
+select throws_ok (
+  $t36$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  insert into public.plugin_data_slot_bindings (workspace_id, installation_id, slot_id, source_type, concept_id)
+  values ('d1501001-0000-4000-8000-000000000001'::uuid, 'd150a001-0000-4000-8000-000000000001'::uuid, 'probe', 'concept', gen_random_uuid());
+  $t36$,
+  '42501',
+  null,
+  'a non-member cannot probe for case type ids'
+);
+
+reset role;
+select set_config('request.jwt.claims', '', true);
+
+-- 37. Moving a binding to another install is refused by the column grants.
+select throws_ok (
+  $t37$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  update public.plugin_data_slot_bindings
+  set installation_id = gen_random_uuid()
+  where id = 'd150b001-0000-4000-8000-000000000001'::uuid;
+  $t37$,
+  '42501',
+  null,
+  'a settings admin cannot move a binding to another install'
+);
+
+reset role;
+select set_config('request.jwt.claims', '', true);
+
+-- 38. The indexes that serve the foreign key cascades exist.
+select has_index ('public', 'plugin_data_slot_bindings', 'idx_plugin_data_slot_bindings__concept_id', 'concept_id is indexed');
+
+select has_index ('public', 'plugin_data_slot_bindings', 'idx_plugin_data_slot_bindings__dataset_id', 'dataset_id is indexed');
 
 select * from finish ();
 

@@ -2866,25 +2866,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "plugin_data_slot_bindings_concept_id_fkey"
-            columns: ["concept_id"]
+            foreignKeyName: "plugin_data_slot_bindings__concept_in_workspace_fkey"
+            columns: ["concept_id", "workspace_id"]
             isOneToOne: false
             referencedRelation: "concepts"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "workspace_id"]
           },
           {
-            foreignKeyName: "plugin_data_slot_bindings_dataset_id_fkey"
-            columns: ["dataset_id"]
+            foreignKeyName: "plugin_data_slot_bindings__dataset_in_workspace_fkey"
+            columns: ["dataset_id", "workspace_id"]
             isOneToOne: false
             referencedRelation: "datasets"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "workspace_id"]
           },
           {
-            foreignKeyName: "plugin_data_slot_bindings_installation_id_fkey"
-            columns: ["installation_id"]
+            foreignKeyName: "plugin_data_slot_bindings__installation_in_workspace_fkey"
+            columns: ["installation_id", "workspace_id"]
             isOneToOne: false
             referencedRelation: "plugin_installations"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "workspace_id"]
           },
           {
             foreignKeyName: "plugin_data_slot_bindings_workspace_id_fkey"

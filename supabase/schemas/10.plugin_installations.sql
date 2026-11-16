@@ -22,7 +22,10 @@ create table public.plugin_installations (
   created_at timestamptz not null default now(),
   -- Timestamp of the last change to this install.
   updated_at timestamptz not null default now(),
-  constraint plugin_installations__workspace_plugin_unique unique (workspace_id, plugin_id)
+  constraint plugin_installations__workspace_plugin_unique unique (workspace_id, plugin_id),
+  -- The target of a `(installation_id, workspace_id)` foreign key, which
+  -- keeps that row's workspace equal to its install's.
+  constraint plugin_installations__id_workspace_id_key unique (id, workspace_id)
 );
 
 alter table public.plugin_installations enable row level security;

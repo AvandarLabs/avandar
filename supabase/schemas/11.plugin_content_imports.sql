@@ -47,6 +47,10 @@ select
 update,
 delete on table public.plugin_content_imports to service_role;
 
+-- Serves the foreign key's delete cascade from `datasets`, which looks up
+-- imports by dataset.
+create index idx_plugin_content_imports__dataset_id on public.plugin_content_imports (dataset_id);
+
 -- Policies
 create policy "Members can SELECT plugin content imports" on public.plugin_content_imports for
 select

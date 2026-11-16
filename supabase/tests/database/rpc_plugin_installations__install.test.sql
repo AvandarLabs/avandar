@@ -95,7 +95,7 @@ select throws_ok (
     '[{"slot_id": "cases", "source_type": "concept", "concept_id": "d1704002-0000-4000-8000-000000000002", "dataset_id": null, "attribute_map": {}}]'::jsonb
   );
   $t2$,
-  '23514',
+  '23503',
   null,
   'an install whose binding reads another workspace case type fails'
 );
@@ -119,7 +119,7 @@ select lives_ok (
         array['data:slots'],
         '[{"slot_id": "cases", "source_type": "concept", "concept_id": "d1704002-0000-4000-8000-000000000002", "dataset_id": null, "attribute_map": {}}]'::jsonb
       );
-    exception when sqlstate '23514' then
+    exception when sqlstate '23503' then
       v_failed := true;
     end;
     if not v_failed then

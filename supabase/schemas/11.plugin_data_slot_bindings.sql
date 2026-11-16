@@ -4,6 +4,11 @@
  * install wizard and the plugin card in Settings write it. A plugin command
  * reads through it with `avandar.data.querySlot`.
  *
+ * A binding stays inside one workspace: its install, and the case type or
+ * dataset it reads, must be in the binding's own workspace. Composite foreign
+ * keys enforce that, so row level security refuses a non-member before any id
+ * is looked up.
+ *
  * Uninstalling deletes the install row and with it every binding. Deleting
  * the bound case type or dataset sets its id to null, which the client reads
  * as a broken binding.
@@ -11,21 +16,22 @@
 create table public.plugin_data_slot_bindings (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
-  -- Workspace of the binding. Always the install's workspace, which
-  -- `tr__plugin_data_slot_bindings__check_workspace` enforces.
+  -- Workspace of the binding. Always the install's workspace, and the
+  -- workspace of the case type or dataset it reads: the composite foreign
+  -- keys below enforce both.
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- The plugin install this binding belongs to.
-  installation_id uuid not null references public.plugin_installations (id) on update cascade on delete cascade,
+  installation_id uuid not null,
   -- The manifest's data slot id, e.g. `cases`.
   slot_id text not null constraint plugin_data_slot_bindings__slot_id_format check (slot_id ~ '^[a-zA-Z][a-zA-Z0-9]*$'),
   -- Whether the slot reads a case type or a dataset.
   source_type public.plugin_data_slot_bindings__source_type not null,
   -- The case type the slot reads. Null unless `source_type` is `concept`,
   -- and null again once that case type is deleted.
-  concept_id uuid references public.concepts (id) on update cascade on delete set null,
+  concept_id uuid,
   -- The dataset the slot reads. Null unless `source_type` is `dataset`, and
   -- null again once that dataset is deleted.
-  dataset_id uuid references public.datasets (id) on update cascade on delete set null,
+  dataset_id uuid,
   -- Slot attribute key to the case type attribute id or the dataset column
   -- id that fills it, e.g. `{ "onsetDate": "<attribute id>" }`.
   attribute_map jsonb not null default '{}'::jsonb constraint plugin_data_slot_bindings__attribute_map_object check (jsonb_typeof(attribute_map) = 'object'),
@@ -47,6 +53,16 @@ create table public.plugin_data_slot_bindings (
       concept_id is null
     )
   ),
+  -- Keeps the install in the binding's workspace, and deletes the binding
+  -- with the install.
+  constraint plugin_data_slot_bindings__installation_in_workspace_fkey foreign key (installation_id, workspace_id) references public.plugin_installations (id, workspace_id) on update cascade on delete cascade,
+  -- Keeps the case type in the binding's workspace. Deleting it clears only
+  -- `concept_id`, which the client reads as a broken binding. A null
+  -- `concept_id` skips the key.
+  constraint plugin_data_slot_bindings__concept_in_workspace_fkey foreign key (concept_id, workspace_id) references public.concepts (id, workspace_id) on update cascade on delete set null (concept_id),
+  -- Keeps the dataset in the binding's workspace. Deleting it clears only
+  -- `dataset_id`.
+  constraint plugin_data_slot_bindings__dataset_in_workspace_fkey foreign key (dataset_id, workspace_id) references public.datasets (id, workspace_id) on update cascade on delete set null (dataset_id),
   -- One binding per slot of an install. Its index also serves every lookup
   -- of an install's bindings.
   constraint plugin_data_slot_bindings__installation_slot_unique unique (installation_id, slot_id)
@@ -54,99 +70,39 @@ create table public.plugin_data_slot_bindings (
 
 alter table public.plugin_data_slot_bindings enable row level security;
 
--- Data API privileges. `anon` is intentionally omitted.
+-- Data API privileges. `anon` is intentionally omitted. `authenticated` may
+-- update only what a rebind changes, so a binding can never move to another
+-- workspace or install. `bound_by` is listed because the save rpc writes it,
+-- though the stamp trigger always overwrites it.
+grant
+select
+,
+  insert,
+  delete on table public.plugin_data_slot_bindings to authenticated;
+
+grant
+update (
+  source_type,
+  concept_id,
+  dataset_id,
+  attribute_map,
+  bound_by
+) on table public.plugin_data_slot_bindings to authenticated;
+
 grant
 select
 ,
   insert,
 update,
-delete on table public.plugin_data_slot_bindings to authenticated,
-service_role;
+delete on table public.plugin_data_slot_bindings to service_role;
 
-/**
- * Keeps a data slot binding inside one workspace: its install, and the case
- * type or dataset it reads, must all be in the binding's own workspace.
- * Without it a settings admin of two workspaces could point one workspace's
- * plugin at another workspace's records.
- *
- * SECURITY DEFINER so the check reads the install, the case type, and the
- * dataset whatever the caller's RLS allows: it validates the binding's
- * shape, not the caller's access to the records, which `querySlot` checks
- * when it reads them. A BEFORE trigger runs ahead of the RLS `with check`,
- * so every lookup is scoped to the binding's own workspace and each error
- * names only an id the caller supplied. A record in another workspace reads
- * as missing.
- */
-create or replace function public.plugin_data_slot_bindings__check_workspace () returns trigger language plpgsql security definer
-set
-  search_path = '' as $$
-begin
-  if not exists (
-    select 1
-    from public.plugin_installations installation
-    where
-      installation.id = new.installation_id
-      and installation.workspace_id = new.workspace_id
-  ) then
-    raise exception 'A data slot binding must be in its plugin install''s workspace'
-      using
-        errcode = '23514',
-        hint = 'installation_not_in_workspace',
-        detail = format('installation_id %s', new.installation_id);
-  end if;
+-- Serve the foreign key checks and delete cascades. The unique index on
+-- `(installation_id, slot_id)` already covers `installation_id`.
+create index idx_plugin_data_slot_bindings__workspace_id on public.plugin_data_slot_bindings (workspace_id);
 
-  if new.concept_id is not null and not exists (
-    select 1
-    from public.concepts concept
-    where
-      concept.id = new.concept_id
-      and concept.workspace_id = new.workspace_id
-  ) then
-    raise exception 'A data slot binding can only read a case type of its own workspace'
-      using
-        errcode = '23514',
-        hint = 'concept_not_in_workspace',
-        detail = format('concept_id %s', new.concept_id);
-  end if;
+create index idx_plugin_data_slot_bindings__concept_id on public.plugin_data_slot_bindings (concept_id);
 
-  if new.dataset_id is not null and not exists (
-    select 1
-    from public.datasets dataset
-    where
-      dataset.id = new.dataset_id
-      and dataset.workspace_id = new.workspace_id
-  ) then
-    raise exception 'A data slot binding can only read a dataset of its own workspace'
-      using
-        errcode = '23514',
-        hint = 'dataset_not_in_workspace',
-        detail = format('dataset_id %s', new.dataset_id);
-  end if;
-
-  return new;
-end;
-$$;
-
--- Trigger-only. The trigger machinery does not consult EXECUTE, so no Data
--- API role needs a grant for the trigger to fire.
-revoke
-execute on function public.plugin_data_slot_bindings__check_workspace ()
-from
-  public,
-  anon,
-  authenticated,
-  service_role;
-
--- `before`, so a refused binding never reaches the foreign key checks and
--- the error names the real problem. Deleting a bound case type or dataset
--- fires it too, through `on delete set null`, and passes, because a null id
--- is not checked.
-create trigger tr__plugin_data_slot_bindings__check_workspace before insert or
-update of workspace_id,
-installation_id,
-concept_id,
-dataset_id on public.plugin_data_slot_bindings for each row
-execute function public.plugin_data_slot_bindings__check_workspace ();
+create index idx_plugin_data_slot_bindings__dataset_id on public.plugin_data_slot_bindings (dataset_id);
 
 /**
  * Refuses a binding that is broken from the start: one whose `source_type`
