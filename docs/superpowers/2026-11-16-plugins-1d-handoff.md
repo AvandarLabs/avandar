@@ -22,6 +22,8 @@ Ask Pablo what to pick up. The unfinished part of 1d is below. The next slice (1
 
 Slice 1d is implemented on this branch only. It is not on `origin/demo/measles` and it has not been deployed. The branch has 63 commits that measles does not have and is 0 commits behind it. The diff is 234 files, about 43,000 added lines. The plan file alone is about 21,500 of those.
 
+The 1d leftovers are on `fix/plugins-leftovers`, not merged, and they add a migration (`supabase/migrations/20261116222442_harden_plugin_data_slot_bindings.sql`).
+
 | Work | State | Docs |
 | --- | --- | --- |
 | Slice 1a, plugin core and toolbar commands | On `demo/measles` | `docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md` |
@@ -71,12 +73,12 @@ Facts a new session will not guess:
 Do these before treating the slice as finished. None of them are a new slice.
 
 1. **Verification, last full run (2026-11-16).** `pnpm test:frontend` ran 1,432 files that pass and 1 that fails (the maplibre file in item 2, pre-existing). Plugin package tests: manifest 217, sdk 50, ui 11. `pnpm test:executed` 37, `pnpm test:ava-cli` 712, `pnpm test:db` 124 files and 1,834 tests. These all exit 0: `tsc -b`, `pnpm type-check:deno`, `eslint .`, `pnpm check:plugin-bundle` (host budget 43,000 bytes), `pnpm verify:packages`, `pnpm desktop:sqlite:check-migrations`, `ava plugin validate`. Plugin E2E specs `plugins-mozambique-install`, `plugins-epidemiology-case-slot`, `-regression`, `-incidence` and `-epicurve` passed. The first three were re-run last, after the final schema change.
-2. **One frontend test file fails at import, and it is not ours.** `src/routes/_auth/$workspaceSlug/dashboards/edit/-$dashboardId.test.tsx` fails with `TypeError: window.URL.createObjectURL is not a function` from maplibre-gl at module load in jsdom. It fails identically on a clean checkout of `origin/demo/measles` (`c3bb19d8c`), so this branch did not cause it. See open follow-up 10.
+2. **One frontend test file fails at import, and it is not ours.** `src/routes/_auth/$workspaceSlug/dashboards/edit/-$dashboardId.test.tsx` fails with `TypeError: window.URL.createObjectURL is not a function` from maplibre-gl at module load in jsdom. It fails identically on a clean checkout of `origin/demo/measles` (`c3bb19d8c`), so this branch did not cause it. Closed after the handoff was first written (see below).
 3. **Live AI eval, 2026-11-16,** with `pi` and `anthropic/claude-haiku-5.5`, the default 45 questions. It scored 42/45, the same as 1c. The full run failed H06, N04, and N09. On reruns H06 and N09 passed 3 of 3 and N04 failed 2 of 3 (it also failed in 1c). N02, a 1c failure, passed. R01 failed once because the model wrote "2x" and the old grader pattern (`\b2\b`) wanted a standalone 2. It then passed 3 of 3. `d2f76e218` changed the grader to accept a slope written as a coefficient such as "2x" and to reject 2.5 and 12x. That is stricter than before, because the old regex also matched the 2 in 2.5. R01 is expected to pass after the grader change, but it was NOT re-run. The pi harness calls the epidemiology `fitRegression` handler directly and never installs the plugin, so it does not exercise slots. No harness change was needed.
 4. **Manual headless check of the done-when,** with screenshots in the gitignored `.temp/feat-plugins-slots/`. The Mozambique install imports both datasets. They appear in Data Sources and in the Maps boundary picker (the picker lists every workspace dataset, not only these). The Epidemiology `cases` slot binds, and the Case epicurve renders bars, stacking, and "Show as table". It found epoch milliseconds shown for dates in the check preview, which `7db64748b` fixed.
 5. **Deviations from the plan,** all in the code now:
    - The Task 10 schema gained the `bound_by` trigger (`76076ed4f`).
-   - `assertSingleSqlExpression` moved to `src/lib/sql/` (`16b1df138`). The docs under `docs/measles-demo` and two 1b docs still name the old path. See open follow-up 9.
+   - `assertSingleSqlExpression` moved to `src/lib/sql/` (`16b1df138`). The docs under `docs/measles-demo` and two 1b docs still named the old path when this was written. Closed after the handoff was first written (see below).
    - The manifest rejects slot attribute keys that differ only by case, because DuckDB identifiers are case-insensitive (`754207c6c`).
    - `plan_query` joined the reserved AI tool names (`7bcce710d`).
    - After a security review of the runtime: errors the plugin sees are generic (`CommandFailed`), calls run one at a time per invocation, at most 3 slot handles stay readable per invocation, the host and install status are re-checked on every call, and a host change aborts (`29450f90d`, `76fb6664f`).
@@ -110,24 +112,24 @@ The other 1c follow-ups (2 to 7) and 1b follow-ups (1 to 7 and 9) are untouched.
 | The Case epicurve chart was clipped at 1280 wide | `84bc04847`. The chart now fits its container |
 | The R01 grader accepted only a standalone "2" | `d2f76e218`. It now accepts a slope written as a coefficient such as "2x" and rejects 2.5 and 12x. It is stricter than before: the old regex also matched the 2 in 2.5 |
 | Lingui catalogs were stale | Extracted and compiled twice, in `ac8b31f80` and `53b0b4259`. Non-English locales still have untranslated `msgid`s that the pre-push hook translates |
+| Grants and probe ordering on `plugin_data_slot_bindings` (follow-up 1) | `46b4e1cbc`. The workspace check trigger is gone, so RLS refuses a non-member before any id is looked up. UPDATE is granted only on the columns a rebind changes |
+| Composite foreign keys instead of the workspace trigger (follow-up 2) | `46b4e1cbc`. The installation, concept and dataset links are composite foreign keys that include `workspace_id` |
+| Missing indexes on the binding and content import tables (follow-up 3) | `46b4e1cbc`. Indexes on `workspace_id`, `concept_id` and `dataset_id` in `plugin_data_slot_bindings`, and on `dataset_id` in `plugin_content_imports` |
+| Permission errors on a case type are not `PermissionDenied` (follow-up 4, first half) | `f0f83c78d`. An unreadable case type now reports `PermissionDenied`. The second half, that `querySlot` does not check `case_records__can_view_record`, stays as the owner chose |
+| Dataset-ready toasts show the file name (follow-up 6) | `661e1aefc`. The toast names the dataset, not the bundled file |
+| A struct cell in the check preview renders `[object Object]` (follow-up 7) | `6ece22172` shows struct cells as JSON. `54c295a2d` keeps typed arrays as lists. The check preview and the Data Explorer grid share `makeDataGridColumnDefs`, so both change |
+| Dead exports (follow-up 8) | `2ede7b5b9`. `PluginDataSlotAttributeSchema` and `DATA_SLOT_ACCEPTED_DATA_TYPES` are now module-private. `DATA_SLOT_ATTRIBUTE_TYPES` stays exported because it is documented as public API |
+| Docs name the old `assertSingleSqlExpression` path (follow-up 9) | `2ede7b5b9` and `c4a4a848c`. The docs point at `src/lib/sql/assertSingleSqlExpression/` |
+| The maplibre `createObjectURL` test failure (follow-up 10) | `471d12005`. The dashboard editor route test mocks maplibre-gl. The file passes in the `pnpm test:frontend` run on 2026-11-16 |
+| The host error text is English inside translated sentences (follow-up 12) | `0e287f8cc`. Raw error details are kept apart from translated sentences. The detail text is still English, because it comes from DuckDB, Supabase or the network |
 
 ### Still open
 
 None of these block 1e. Ask Pablo before picking one up.
 
-1. **Grants and probe ordering on `plugin_data_slot_bindings`** (from the Task 10 frontier review, minor). It has column-level UPDATE grants. The workspace check trigger runs before RLS, so a non-member could probe for guessed ids. File: `supabase/schemas/11.plugin_data_slot_bindings.sql`.
-2. **Composite foreign keys instead of the workspace trigger** for the dataset and case type workspace checks. Concepts would need a unique `(id, workspace_id)`. File: `supabase/schemas/11.plugin_data_slot_bindings.sql`.
-3. **Missing indexes** on `plugin_data_slot_bindings` (`workspace_id`, `concept_id`, `dataset_id`) and on `plugin_content_imports(dataset_id)`. Files: `supabase/schemas/11.plugin_data_slot_bindings.sql`, `supabase/schemas/11.plugin_content_imports.sql`.
-4. **Permission errors on a case type are not `PermissionDenied`.** A case type whose underlying data the current user cannot read surfaces as `CommandFailed`, because `_assertContributorsAllowed` in the concept relation plans code throws a plain Error. The docs describe this real behavior. Separately, `querySlot` does not check `case_records__can_view_record`, which matches the Data Explorer. The owner chose to keep that.
-5. **A command can retain the `avandar` object and call `querySlot` from an AI tool handler.** `docs/plugin-authoring.md` section 13 documents this as forbidden. It is not enforced and cannot be while plugins run in the host's JS context.
-6. **Dataset-ready toasts show the file name,** for example `"mz-adm1.csv" finished processing`, not the dataset name. The message is built in `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts` from the source file name.
-7. **A struct cell in the check preview renders `[object Object]`.** It matches the Data Explorer grid (`makeDataGridColumnDefs` uses `String(value)`). Decide whether to fix both.
-8. **Dead exports.** `DATA_SLOT_ATTRIBUTE_TYPES` is exported from the manifest package's main entry but only used inside that package. `PluginDataSlotAttributeSchema` (same package, `PluginDataSlotSchema.ts`) is exported and only used in its own file. `DATA_SLOT_ACCEPTED_DATA_TYPES` in `src/lib/pluginDataSlots/isDataTypeAcceptedBySlotAttribute/isDataTypeAcceptedBySlotAttribute.ts` is exported and only used in its own file.
-9. **Docs name the old `assertSingleSqlExpression` path** (`src/lib/plugins/derivedColumns/assertSingleSqlExpression`): `docs/measles-demo/data-dictionaries-5-crosswalks-plan.md`, `docs/measles-demo/pr-feature-log.md`, `docs/superpowers/2026-11-09-plugins-1b-handoff.md`, and `docs/superpowers/plans/2026-11-09-plugins-1b-part-b-derived-columns.md`. The module is now `src/lib/sql/assertSingleSqlExpression/`.
-10. **The maplibre `createObjectURL` test failure is pre-existing, not ours.** It fails identically on a clean `origin/demo/measles` (`c3bb19d8c`). Whoever fixes the jsdom setup or the test can pick it up. File: `src/routes/_auth/$workspaceSlug/dashboards/edit/-$dashboardId.test.tsx`.
-11. **Local state, now moot:** the `avandar-labs` workspace had a Free subscription row from manual verification. The database was re-seeded, so the row is gone.
-12. **The host error text is English inside translated sentences.** Where a message shown to the user embeds text from the host, that embedded part is not translated.
-13. **Header count changes in two older generated desktop migrations.** The desktop `.gen.sql` reformat touches `apps/desktop/migrations/20261109134745_gadgets_search_stored_prompt.gen.sql` and `apps/desktop/migrations/20261109155144_catalog_loadable_search.gen.sql` (one line each).
+- **5.** **A command can retain the `avandar` object and call `querySlot` from an AI tool handler.** `docs/plugin-authoring.md` section 13 documents this as forbidden. It is not enforced and cannot be while plugins run in the host's JS context.
+- **11.** **Local state, now moot:** the `avandar-labs` workspace had a Free subscription row from manual verification. The database was re-seeded, so the row is gone.
+- **13.** **Header count changes in two older generated desktop migrations.** The desktop `.gen.sql` reformat touches `apps/desktop/migrations/20261109134745_gadgets_search_stored_prompt.gen.sql` and `apps/desktop/migrations/20261109155144_catalog_loadable_search.gen.sql` (one line each).
 
 ## What comes next in the plugin project
 
