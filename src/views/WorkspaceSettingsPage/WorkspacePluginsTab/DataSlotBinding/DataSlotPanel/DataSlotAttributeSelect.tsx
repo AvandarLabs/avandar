@@ -46,6 +46,7 @@ export function DataSlotAttributeSelect({
       description={typeLabels[attribute.type]}
       required={attribute.required}
       clearable={!attribute.required}
+      allowDeselect={!attribute.required}
       disabled={options.length === 0}
       placeholder={
         options.length === 0 ? t`No fields of this type` : t`Select a field`

@@ -73,6 +73,7 @@ export function DataSlotSourceSelect(props: Props): JSX.Element {
       label={t`Case type or dataset`}
       placeholder={t`Choose where the records come from`}
       searchable
+      allowDeselect={false}
       disabled={sourceOptions.isLoading}
       nothingFoundMessage={t`No case types or datasets match`}
       data={groups.filter((group) => {

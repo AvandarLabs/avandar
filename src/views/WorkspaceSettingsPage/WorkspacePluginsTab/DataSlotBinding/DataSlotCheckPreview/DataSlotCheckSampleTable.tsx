@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Table } from "@mantine/core";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import type { DataSlotCheckResult } from "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding";
 import type { PluginDataSlot } from "@avandar/plugin-manifest/runtime";
 
@@ -57,7 +58,10 @@ export function DataSlotCheckSampleTable({
                 {attributeKeys.map((attributeKey) => {
                   return (
                     <Table.Td key={attributeKey}>
-                      {_getTextFromCellValue(row[attributeKey], i18n.locale)}
+                      {_getTextFromCellValue(
+                        getOwnValue(row, attributeKey),
+                        i18n.locale,
+                      )}
                     </Table.Td>
                   );
                 })}

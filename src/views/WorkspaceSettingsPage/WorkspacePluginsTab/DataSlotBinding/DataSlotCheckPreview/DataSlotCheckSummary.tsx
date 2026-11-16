@@ -1,6 +1,7 @@
 import { Plural, useLingui } from "@lingui/react/macro";
 import { List, Stack, Text } from "@mantine/core";
 import { DataSlotCheckSampleTable } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckSampleTable";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import type { DataSlotCheckResult } from "@/lib/pluginDataSlots/checkDataSlotBinding/checkDataSlotBinding";
 import type { PluginDataSlot } from "@avandar/plugin-manifest/runtime";
 
@@ -33,7 +34,7 @@ export function DataSlotCheckSummary({
         {Object.entries(slot.attributes).map(([attributeKey, attribute]) => {
           const title = localize(attribute.title);
           const filledCount = i18n.number(
-            result.filledCountsByAttributeKey[attributeKey] ?? 0,
+            getOwnValue(result.filledCountsByAttributeKey, attributeKey) ?? 0,
           );
           return (
             <List.Item key={attributeKey}>

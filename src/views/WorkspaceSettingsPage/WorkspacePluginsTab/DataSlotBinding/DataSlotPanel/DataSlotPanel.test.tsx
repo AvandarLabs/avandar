@@ -170,12 +170,12 @@ function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-function Harness(): JSX.Element {
+function Harness({ slot = SLOT }: { slot?: PluginDataSlot }): JSX.Element {
   const [draft, setDraft] = useState<PluginDataSlotBinding.Draft>();
   return (
     <DataSlotPanel
       slotId="cases"
-      slot={SLOT}
+      slot={slot}
       slotTitle="Cases"
       localize={(value) => {
         return TITLES[value] ?? value;
@@ -189,8 +189,8 @@ function Harness(): JSX.Element {
   );
 }
 
-function _renderPanel(): void {
-  render(<Harness />, { wrapper: QueryWrapper });
+function _renderPanel(slot?: PluginDataSlot): void {
+  render(<Harness slot={slot} />, { wrapper: QueryWrapper });
 }
 
 function _getOptionLabels(comboboxName: string): string[] {
@@ -324,6 +324,53 @@ describe("DataSlotPanel", () => {
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "Checking these records",
+    );
+  });
+
+  it("keeps the source when the chosen source is clicked again", () => {
+    _renderPanel();
+    pickMantineSelectOption("Case type or dataset", "line_list.csv");
+
+    pickMantineSelectOption("Case type or dataset", "line_list.csv");
+
+    expect(onDraftChange).not.toHaveBeenCalledWith(undefined);
+    expect(
+      screen.getByRole("combobox", { name: "Case type or dataset" }),
+    ).toHaveValue("line_list.csv");
+  });
+
+  it("keeps the field when the chosen field of a required attribute is clicked again", () => {
+    _renderPanel();
+    pickMantineSelectOption("Case type or dataset", "line_list.csv");
+    pickMantineSelectOption("Onset date", "onset");
+
+    pickMantineSelectOption("Onset date", "onset");
+
+    expect(screen.getByRole("combobox", { name: "Onset date" })).toHaveValue(
+      "onset",
+    );
+  });
+
+  it("maps an attribute whose key is named like a prototype member", () => {
+    _renderPanel({
+      ...SLOT,
+      attributes: Object.fromEntries([
+        ["constructor", { type: "date", title: "%onset%", required: false }],
+      ]) as PluginDataSlot["attributes"],
+    });
+    pickMantineSelectOption("Case type or dataset", "line_list.csv");
+
+    expect(screen.getByRole("combobox", { name: "Onset date" })).toHaveValue(
+      "",
+    );
+    // An optional field shows a clear button once something is chosen.
+    expect(
+      screen.queryByRole("button", { hidden: true }),
+    ).not.toBeInTheDocument();
+    pickMantineSelectOption("Onset date", "onset");
+
+    expect(onDraftChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ attributeMap: { constructor: "onset" } }),
     );
   });
 });

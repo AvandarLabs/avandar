@@ -3,6 +3,7 @@ import { List } from "@mantine/core";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useDataSlotSourceLabels } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceLabels";
 import { useDataSlotSourceOptions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotSourceOptions";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import { PluginDetailsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsSection";
 import { useLocalizePluginText } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useLocalizePluginText";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -33,7 +34,7 @@ export function ConfirmDataSlotsSummary({
     return null;
   }
   const getSourceLabel = (slotId: string): string => {
-    const draft = draftsBySlotId[slotId];
+    const draft = getOwnValue(draftsBySlotId, slotId);
     if (draft === undefined) {
       return t`not chosen yet`;
     }
@@ -42,7 +43,7 @@ export function ConfirmDataSlotsSummary({
     const name = sources.find((source) => {
       return source.id === sourceId;
     })?.name;
-    return sourceLabels[draft.sourceType](name ?? "");
+    return sourceLabels[draft.sourceType](name ?? t`unavailable`);
   };
   return (
     <PluginDetailsSection title={t`Records it reads`} headingOrder={4}>

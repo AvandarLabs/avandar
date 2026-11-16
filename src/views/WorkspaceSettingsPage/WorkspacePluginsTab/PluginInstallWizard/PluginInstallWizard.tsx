@@ -1,5 +1,6 @@
 import { Stack } from "@mantine/core";
 import { useDataSlotDraftStatus } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotDraftStatus";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import { InstallWizardFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter";
 import { InstallWizardPageContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardPageContent";
 import { InstallWizardStepper } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper";
@@ -27,7 +28,7 @@ function useCanGoNext(wizard: InstallWizardState): boolean {
     draft:
       slotPage === undefined
         ? undefined
-        : wizard.draftsBySlotId[slotPage.slotId],
+        : getOwnValue(wizard.draftsBySlotId, slotPage.slotId),
   });
   return slotPage === undefined || status?.kind === "bound";
 }

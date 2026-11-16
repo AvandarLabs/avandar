@@ -51,6 +51,9 @@ function useDataSlotCheck(
     },
     // The sample holds workspace records, so it is never written to disk.
     meta: { persist: false },
+    // Always run again for a repeat mapping, and drop the records soon.
+    staleTime: 0,
+    gcTime: 60_000,
     retry: false,
   });
 }

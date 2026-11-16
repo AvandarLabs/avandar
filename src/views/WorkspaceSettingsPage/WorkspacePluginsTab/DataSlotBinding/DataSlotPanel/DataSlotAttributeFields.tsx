@@ -2,6 +2,7 @@ import { omit } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { DataSlotAttributeSelect } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotAttributeSelect";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
 import type { DataSlotSource } from "@/lib/pluginDataSlots/DataSlotSource.types";
 import type { PluginDataSlot } from "@avandar/plugin-manifest/runtime";
@@ -38,7 +39,7 @@ export function DataSlotAttributeFields({
             attribute={attribute}
             attributeTitle={localize(attribute.title)}
             source={source}
-            fieldId={draft.attributeMap[attributeKey]}
+            fieldId={getOwnValue(draft.attributeMap, attributeKey)}
             onFieldIdChange={(fieldId) => {
               onDraftChange({
                 ...draft,

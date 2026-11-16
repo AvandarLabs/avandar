@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import { ConfirmStep } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmStep";
 import { DataSlotsStep } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep";
 import { ReviewStep } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep";
@@ -32,7 +33,7 @@ export function InstallWizardPageContent({
           manifestModule={manifestModule}
           slotId={slotId}
           slot={slot}
-          draft={wizard.draftsBySlotId[slotId]}
+          draft={getOwnValue(wizard.draftsBySlotId, slotId)}
           onDraftChange={(draft) => {
             wizard.setSlotDraft(slotId, draft);
           }}
