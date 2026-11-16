@@ -21,7 +21,10 @@ async function _fetchContentFile(options: {
 }): Promise<File> {
   const { url, item } = options;
   const response = await fetch(url);
-  if (!response.ok) {
+  // A host that answers a missing asset with its app page and a 200 must not
+  // become a dataset, so an HTML response counts as a failed download.
+  const isHtml = response.headers.get("content-type")?.startsWith("text/html");
+  if (!response.ok || isHtml === true) {
     const { status } = response;
     const filePath = item.file;
     throw new Error(t`Could not download ${filePath} (HTTP ${status}).`);

@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { PluginContentImportClient } from "@/clients/plugins/PluginContentImportClient/PluginContentImportClient";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { usePluginContentImports } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports";
@@ -12,6 +13,7 @@ const mocks = vi.hoisted(() => {
   return {
     importPluginContentItem: vi.fn(),
     contentUrls: {} as Record<string, string>,
+    loadContentUrls: vi.fn(),
   };
 });
 
@@ -33,9 +35,7 @@ vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
   return {
     getPluginIndexEntry: () => {
       return {
-        loadContentUrls: () => {
-          return Promise.resolve(mocks.contentUrls);
-        },
+        loadContentUrls: mocks.loadContentUrls,
       };
     },
   };
@@ -103,6 +103,10 @@ function _renderImports(): {
 describe("usePluginContentImports", () => {
   beforeEach(() => {
     mocks.importPluginContentItem.mockReset();
+    mocks.loadContentUrls.mockReset();
+    mocks.loadContentUrls.mockImplementation(() => {
+      return Promise.resolve(mocks.contentUrls);
+    });
     mocks.contentUrls = {
       provinces: "/assets/mz-adm1.csv",
       districts: "/assets/mz-adm2.csv",
@@ -251,7 +255,7 @@ describe("usePluginContentImports", () => {
     });
   });
 
-  it("refreshes the workspace's dataset lists after an item is imported", async () => {
+  it("refreshes the workspace's dataset and column lists after an item is imported", async () => {
     mocks.importPluginContentItem.mockResolvedValue("provinces-dataset");
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
     const { result } = _renderImports();
@@ -263,5 +267,34 @@ describe("usePluginContentImports", () => {
     expect(invalidateQueries).toHaveBeenCalledWith({
       queryKey: DatasetClient.QueryKeys.getAll(),
     });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: DatasetColumnClient.QueryKeys.getAll(),
+    });
+  });
+
+  it("fails each item with the reason when the bundled file URLs cannot be loaded", async () => {
+    mocks.loadContentUrls.mockRejectedValue(new Error("chunk failed to load"));
+    const { result } = _renderImports();
+
+    await act(async () => {
+      await result.current.importItems([PROVINCES, DISTRICTS]);
+    });
+
+    expect(result.current.statusesByContentId).toEqual({
+      provinces: { kind: "failed", reason: "chunk failed to load" },
+      districts: { kind: "failed", reason: "chunk failed to load" },
+    });
+    expect(mocks.importPluginContentItem).not.toHaveBeenCalled();
+  });
+
+  it("does nothing, not even loading the file URLs, when there are no items", async () => {
+    const { result } = _renderImports();
+
+    await act(async () => {
+      await result.current.importItems([]);
+    });
+
+    expect(mocks.loadContentUrls).not.toHaveBeenCalled();
+    expect(result.current.statusesByContentId).toEqual({});
   });
 });

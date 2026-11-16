@@ -1,4 +1,6 @@
 import { Stack } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { useEffect } from "react";
 import { useDataSlotDraftStatus } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotDraftStatus";
 import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import { InstallWizardFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter";
@@ -16,7 +18,30 @@ type Props = Readonly<{
 
   /** Closes the modal the wizard is in. */
   onClose: () => void;
+
+  /**
+   * The id of the modal the wizard is in. While content imports run, the
+   * wizard turns off that modal's Escape key and close button, so the
+   * outcome of an import is never lost to a closed wizard.
+   */
+  modalId?: string;
 }>;
+
+/** Keeps the wizard's modal open while content imports run. */
+function useKeepModalOpenWhile(
+  isImporting: boolean,
+  modalId: string | undefined,
+): void {
+  useEffect(() => {
+    if (modalId !== undefined) {
+      modals.updateModal({
+        modalId,
+        closeOnEscape: !isImporting,
+        withCloseButton: !isImporting,
+      });
+    }
+  }, [isImporting, modalId]);
+}
 
 /**
  * Whether the wizard's current page lets the admin go on: a data slot's page
@@ -44,6 +69,7 @@ export function PluginInstallWizard({
   pluginName,
   manifestModule,
   onClose,
+  modalId,
 }: Props): JSX.Element {
   const wizard = useInstallWizardState(manifestModule.manifest);
   const content = useInstallWizardContent({
@@ -57,6 +83,7 @@ export function PluginInstallWizard({
       void content.contentImports.importItems(content.itemsToImport);
     },
   });
+  useKeepModalOpenWhile(content.contentImports.isImporting, modalId);
   const canGoNext = useCanGoNext(wizard);
   return (
     <Stack gap="lg">

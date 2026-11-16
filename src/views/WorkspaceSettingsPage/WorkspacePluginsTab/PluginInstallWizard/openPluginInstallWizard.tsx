@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import { randomId } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -28,7 +29,7 @@ function _returnFocusFromOpener(
  * Opens the install wizard for one plugin in a large modal titled
  * "Install <plugin name>". A plugin's settings card calls it from its Install
  * button. A click outside does not close it, so a half-made choice is not
- * lost; the close button and Escape still do.
+ * lost; the close button and Escape still do, except while content imports run.
  */
 export function openPluginInstallWizard(options: {
   pluginName: string;
@@ -37,7 +38,9 @@ export function openPluginInstallWizard(options: {
   const { pluginName, manifestModule } = options;
   const opener = document.activeElement;
   const headingId = opener?.getAttribute("aria-describedby") ?? null;
-  const modalId = modals.open({
+  const modalId = randomId();
+  modals.open({
+    modalId,
     title: t`Install ${pluginName}`,
     size: "xl",
     closeOnClickOutside: false,
@@ -55,6 +58,7 @@ export function openPluginInstallWizard(options: {
       <PluginInstallWizard
         pluginName={pluginName}
         manifestModule={manifestModule}
+        modalId={modalId}
         onClose={() => {
           modals.close(modalId);
         }}

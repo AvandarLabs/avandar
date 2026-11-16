@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { PluginContentImportClient } from "@/clients/plugins/PluginContentImportClient/PluginContentImportClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -81,6 +82,9 @@ function useImportContentItem(
       void queryClient.invalidateQueries({
         queryKey: DatasetClient.QueryKeys.getAll(),
       });
+      void queryClient.invalidateQueries({
+        queryKey: DatasetColumnClient.QueryKeys.getAll(),
+      });
     } catch (error) {
       setStatuses({
         [item.id]: { kind: "failed", reason: _getReasonFromError(error) },
@@ -113,6 +117,9 @@ export function usePluginContentImports(
       return status.kind === "pending" || status.kind === "importing";
     }),
     importItems: async (items) => {
+      if (items.length === 0) {
+        return;
+      }
       setStatuses(
         Object.fromEntries(
           items.map((item) => {

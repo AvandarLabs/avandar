@@ -232,4 +232,20 @@ describe("importPluginContentItem", () => {
     expect(mocks.startCsvImport).not.toHaveBeenCalled();
     expect(mocks.insertCsvFileDataset).not.toHaveBeenCalled();
   });
+
+  it("creates nothing when the host answers a missing file with an HTML page", async () => {
+    mocks.fetch.mockResolvedValue(
+      new Response("<!doctype html>", {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      }),
+    );
+
+    await expect(_importProvinces()).rejects.toThrow(
+      "Could not download content/mz-adm1.csv (HTTP 200).",
+    );
+
+    expect(mocks.startCsvImport).not.toHaveBeenCalled();
+    expect(mocks.insertCsvFileDataset).not.toHaveBeenCalled();
+  });
 });

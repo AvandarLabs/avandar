@@ -1,6 +1,8 @@
+import { ModalsProvider } from "@mantine/modals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@/test-utils";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@/test-utils";
+import { openPluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
 import type { PluginDataSlotBinding } from "$/models/PluginDataSlotBinding/PluginDataSlotBinding";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -250,6 +252,14 @@ function _makeManifestModule(
 function QueryWrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
+
+function ModalsWrapper({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <QueryWrapper>
+      <ModalsProvider>{children}</ModalsProvider>
+    </QueryWrapper>
   );
 }
 
@@ -616,6 +626,79 @@ describe("PluginInstallWizard", () => {
 
       await waitFor(() => {
         expect(screen.getByRole("button", { name: "Done" })).toBeEnabled();
+      });
+    });
+  });
+
+  describe("opened in a modal", () => {
+    const CLOSE_NAME = "Close";
+
+    async function _openWizardAndStartImport(): Promise<
+      (datasetId: string) => void
+    > {
+      let finishImport: (datasetId: string) => void = () => {};
+      mocks.importPluginContentItem.mockImplementation(() => {
+        return new Promise((resolve) => {
+          finishImport = resolve;
+        });
+      });
+      _succeedInstall();
+      render(<div />, { wrapper: ModalsWrapper });
+      act(() => {
+        openPluginInstallWizard({
+          pluginName: "Mozambique",
+          manifestModule: _makeManifestModule({
+            permissions: [],
+            contributes: {
+              commands: [],
+              menus: {},
+              vizTypes: [],
+              aiTools: [],
+              content: CONTENT,
+            },
+          }),
+        });
+      });
+      fireEvent.click(await screen.findByRole("button", { name: "Next" }));
+      _clickButton("Next");
+      _clickButton("Install");
+      await waitFor(() => {
+        expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(1);
+      });
+      return (datasetId) => {
+        finishImport(datasetId);
+      };
+    }
+
+    function _pressEscape(): void {
+      fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    }
+
+    it("cannot be closed while content imports run, and can be once they finish", async () => {
+      const finishImport = await _openWizardAndStartImport();
+
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("button", { name: CLOSE_NAME }),
+        ).not.toBeInTheDocument();
+      });
+      _pressEscape();
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      finishImport("d-1");
+      await waitFor(() => {
+        expect(mocks.importPluginContentItem).toHaveBeenCalledTimes(2);
+      });
+      finishImport("d-2");
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: CLOSE_NAME }),
+        ).toBeInTheDocument();
+      });
+      _pressEscape();
+      await waitFor(() => {
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       });
     });
   });
