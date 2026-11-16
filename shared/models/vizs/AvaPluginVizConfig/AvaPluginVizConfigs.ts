@@ -35,10 +35,17 @@ function _isRequiredSettingMissing(
   }>,
 ): boolean {
   const { setting, config, columnNames } = options;
+  // A setting key may be named like an inherited `Object` member, such as
+  // `toString`, so read only a value stored under the key itself.
   if (!_isColumnSetting(setting)) {
-    return config.settings[setting.key] === undefined;
+    return (
+      !Object.hasOwn(config.settings, setting.key) ||
+      config.settings[setting.key] === undefined
+    );
   }
-  const column = config.columnSettings[setting.key];
+  const column = Object.hasOwn(config.columnSettings, setting.key)
+    ? config.columnSettings[setting.key]
+    : undefined;
   return (
     column === undefined ||
     (columnNames !== undefined && !columnNames.includes(column))

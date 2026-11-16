@@ -177,6 +177,29 @@ const CASE_RINGS_VIZ_TYPE = {
   ],
 };
 
+/**
+ * A transform chart type whose optional settings are keyed like `Object`
+ * members, which the setting key pattern allows.
+ */
+const CASE_NOTES_VIZ_TYPE = {
+  id: "case-notes",
+  title: "%viz.caseNotes.title%",
+  icon: "chart-bar",
+  render: "transform",
+  settings: [
+    {
+      key: "toString",
+      label: "%viz.labelColumn%",
+      control: { kind: "text" },
+    },
+    {
+      key: "valueOf",
+      label: "%viz.labelColumn%",
+      control: { kind: "columnPicker", dataType: "text" },
+    },
+  ],
+};
+
 function _makeManifestModule(pluginId: string): PluginManifestModule {
   return {
     manifest: {
@@ -206,6 +229,7 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
             settings: [],
           },
           CASE_RINGS_VIZ_TYPE,
+          CASE_NOTES_VIZ_TYPE,
         ],
       },
     },
@@ -372,6 +396,26 @@ describe("PluginVizRenderer", () => {
       expect.objectContaining({ settings: { labelColumn: "region" } }),
       expect.anything(),
     );
+  });
+
+  it("passes no value for a setting keyed like an Object member that is unset", async () => {
+    const transform = vi.fn(_makeCaseBarsFromRows);
+    const pluginId = _addBundledPlugin({
+      definition: definePlugin({ vizTypes: { "case-notes": { transform } } }),
+    });
+
+    _renderChart({
+      vizConfig: _makeConfig({
+        pluginId,
+        pluginVizId: "case-notes",
+        columnSettings: {},
+      }),
+    });
+    await screen.findByTestId("bar-chart");
+
+    const [input] = transform.mock.calls[0] ?? [];
+    expect(input?.settings.toString).toBeUndefined();
+    expect(input?.settings.valueOf).toBeUndefined();
   });
 
   it("draws a component chart at the measured size", async () => {
