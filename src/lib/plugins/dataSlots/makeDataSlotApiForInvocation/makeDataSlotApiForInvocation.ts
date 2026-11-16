@@ -3,6 +3,7 @@ import { isDefined } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { getDataSlotBindingStatus } from "@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus";
 import { loadDataSlotSource } from "@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource";
@@ -341,10 +342,10 @@ async function _querySlot(
 
 /**
  * What a plugin may learn from a failed read. A `PluginError` is already
- * written for the plugin. A denied relation is a permission failure. Anything
- * else is logged for the host and reported generically, since the original
- * message can name a table, a workspace field, or a value. A failure after
- * the host is gone reads as the host being gone.
+ * written for the plugin. A denied relation or case type is a permission
+ * failure. Anything else is logged for the host and reported generically,
+ * since the original message can name a table, a workspace field, or a value.
+ * A failure after the host is gone reads as the host being gone.
  */
 function _getPluginErrorFromFailure(
   options: Readonly<{ error: unknown; host: InvocationHost }>,
@@ -358,7 +359,10 @@ function _getPluginErrorFromFailure(
   } catch (hostError) {
     return hostError as PluginError;
   }
-  if (error instanceof WorkspaceRelationsDenied) {
+  if (
+    error instanceof WorkspaceRelationsDenied ||
+    error instanceof ConceptRelationDenied
+  ) {
     return new PluginError("PermissionDenied", PERMISSION_DENIED_MESSAGE);
   }
   console.error("A plugin's data slot could not be read.", error);

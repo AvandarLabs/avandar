@@ -9,6 +9,7 @@
  * query names.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
@@ -252,6 +253,12 @@ describe("getConceptRelationPlansFromSql", () => {
         allowlist: _permissiveAllowlist(),
       }),
     ).rejects.toThrow(/does not belong to this workspace/);
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${OTHER_CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+      }),
+    ).rejects.toBeInstanceOf(ConceptRelationDenied);
     expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
   });
 
@@ -275,6 +282,19 @@ describe("getConceptRelationPlansFromSql", () => {
         },
       }),
     ).rejects.toThrow(/not reachable from this workspace/);
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: {
+          getAllowedConceptIds: async () => {
+            return [CONCEPT_ID];
+          },
+          getAllowedDatasetIds: async () => {
+            return [];
+          },
+        },
+      }),
+    ).rejects.toBeInstanceOf(ConceptRelationDenied);
     // The individuals are never read either: the refusal comes before the
     // spine.
     expect(individualGetAllMock).not.toHaveBeenCalled();
