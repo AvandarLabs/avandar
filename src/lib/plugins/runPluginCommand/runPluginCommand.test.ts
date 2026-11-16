@@ -1,16 +1,53 @@
 import { definePlugin } from "@avandar/plugin-sdk";
 import { describe, expect, it, vi } from "vitest";
 import { runPluginCommand } from "@/lib/plugins/runPluginCommand/runPluginCommand";
+import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
-import type { PluginCodeModule } from "@/lib/plugins/PluginIndex.types";
+import type {
+  PluginCodeModule,
+  PluginManifestModule,
+} from "@/lib/plugins/PluginIndex.types";
 import type { PluginCommandFailure } from "@/lib/plugins/runPluginCommand/runPluginCommand";
+import type { PluginManifest } from "@avandar/plugin-manifest/runtime";
 import type {
   CommandHandler,
   DataExplorerToolbarContext,
   QueryHandle,
 } from "@avandar/plugin-sdk";
 
-const PLUGIN = { entry: { id: "avandar.test" } } as ActivePlugin;
+const { openBindingModalMock } = vi.hoisted(() => {
+  return { openBindingModalMock: vi.fn() };
+});
+
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal",
+  () => {
+    return { openDataSlotBindingModal: openBindingModalMock };
+  },
+);
+
+const DATA_SLOTS: PluginManifest["dataSlots"] = {
+  cases: {
+    title: "%slot.cases.title%",
+    required: false,
+    attributes: {
+      onsetDate: {
+        type: "date",
+        title: "%slot.cases.onsetDate%",
+        required: true,
+      },
+    },
+  },
+};
+
+const PLUGIN = {
+  entry: { id: "avandar.test" },
+  installation: { id: "installation_1" } as PluginInstallation.T,
+  manifestModule: {
+    manifest: { dataSlots: DATA_SLOTS },
+  } as PluginManifestModule,
+} as ActivePlugin;
+
 const CONTEXT: DataExplorerToolbarContext = {
   slotId: "dataExplorer.toolbar",
   queryHandle: "handle" as QueryHandle,
@@ -78,6 +115,42 @@ describe("runPluginCommand", () => {
     });
 
     expect(applyDerivedColumnsSql).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives the handler a querySlot that rejects a slot the manifest does not declare", async () => {
+    let querySlotError: unknown;
+    await _runCommandFromLoader({
+      loadCode: async () => {
+        return _makeCodeModuleFromCommands({
+          hello: async (avandar) => {
+            querySlotError = await avandar.data
+              .querySlot?.("deaths")
+              .catch((error: unknown) => {
+                return error;
+              });
+          },
+        });
+      },
+    });
+
+    expect(querySlotError).toMatchObject({ code: "InvalidSlot" });
+  });
+
+  it("opens the slot's binding modal from openDataSlotBinding", async () => {
+    openBindingModalMock.mockResolvedValue(undefined);
+    await _runCommandFromLoader({
+      loadCode: async () => {
+        return _makeCodeModuleFromCommands({
+          hello: async (avandar) => {
+            await avandar.ui.openDataSlotBinding?.("cases");
+          },
+        });
+      },
+    });
+
+    expect(openBindingModalMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pluginName: "Test", slotId: "cases" }),
+    );
   });
 
   it("reports no failure when the handler completes", async () => {

@@ -83,6 +83,11 @@ export type QuerySlotResult = Readonly<{
   columns: ReadonlyArray<
     Readonly<{ name: string; dataType: PluginColumnDataType }>
   >;
+  /**
+   * The number of rows `queryHandle` holds, which is the number of records
+   * the host read. It is never the slot's total: when `isTruncated` is true,
+   * `rowCount` is the read limit (200,000) and the slot holds more.
+   */
   rowCount: number;
   /** True when the slot holds more records than the host read. */
   isTruncated: boolean;

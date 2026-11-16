@@ -11,6 +11,7 @@ import { fetchRowsForInvocation } from "@/lib/plugins/fetchRowsForInvocation/fet
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { PluginErrorBoundary } from "@/lib/plugins/PluginErrorBoundary/PluginErrorBoundary";
 import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
+import type { DataSlotInvocationApi } from "@/lib/plugins/dataSlots/makeDataSlotApiForInvocation/makeDataSlotApiForInvocation";
 import type {
   AvandarApi,
   PluginInvocationContext,
@@ -29,7 +30,13 @@ function _makeIsFromCurrentHost(hostGeneration: number): () => boolean {
   };
 }
 
-function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
+function _makeDataApi(
+  options: Readonly<{
+    context: PluginInvocationContext;
+    dataSlotApi: DataSlotInvocationApi | undefined;
+  }>,
+): AvandarApi["data"] {
+  const { context, dataSlotApi } = options;
   return {
     // `async` turns a thrown `PluginError` into a rejected promise, which is
     // how a plugin receives it.
@@ -39,8 +46,10 @@ function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
         queryHandle,
         columns: fetchOptions.columns,
         limit: fetchOptions.limit,
+        getSlotRows: dataSlotApi?.getSlotRows,
       });
     },
+    querySlot: dataSlotApi?.querySlot,
   };
 }
 
@@ -141,7 +150,10 @@ function _makeUiApi(
  * switch cannot open a modal or a drawer in the next workspace. Its
  * `dataExplorer` is set only for a Data Explorer toolbar invocation that came
  * with a `dataExplorerBridge`, and its `addColumns` rejects with
- * `PluginError("InvalidHandle")` once the drawer host has unmounted.
+ * `PluginError("InvalidHandle")` once the drawer host has unmounted. Its
+ * `data.querySlot` and `ui.openDataSlotBinding` are set only when a
+ * `dataSlotApi` is given, as `runPluginCommand` does, so an AI tool or chart
+ * never gets them.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
@@ -153,10 +165,17 @@ export function makePluginApi(
     workspace: AvandarApi["workspace"];
     messages: PluginMessages;
     dataExplorerBridge?: DataExplorerBridge;
+    dataSlotApi?: DataSlotInvocationApi;
   }>,
 ): AvandarApi {
-  const { pluginName, context, workspace, messages, dataExplorerBridge } =
-    options;
+  const {
+    pluginName,
+    context,
+    workspace,
+    messages,
+    dataExplorerBridge,
+    dataSlotApi,
+  } = options;
   // Overlay content renders after this function returns, so it can read
   // `api` through the closure to give plugin UI its own scoped API.
   const wrapContent = (content: ReactNode): ReactNode => {
@@ -172,8 +191,11 @@ export function makePluginApi(
   const api: AvandarApi = {
     context,
     workspace,
-    data: _makeDataApi(context),
-    ui: _makeUiApi({ pluginName, wrapContent, isFromCurrentHost }),
+    data: _makeDataApi({ context, dataSlotApi }),
+    ui: {
+      ..._makeUiApi({ pluginName, wrapContent, isFromCurrentHost }),
+      openDataSlotBinding: dataSlotApi?.openDataSlotBinding,
+    },
     i18n: {
       t: makePluginTranslator({ locale: workspace.locale, messages }),
     },

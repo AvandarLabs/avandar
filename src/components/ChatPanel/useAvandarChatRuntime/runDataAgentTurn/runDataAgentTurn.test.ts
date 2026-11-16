@@ -361,6 +361,22 @@ describe("runDataAgentTurn", () => {
     expect(args).toEqual({ xColumn: "x", yColumn: "y" });
   });
 
+  it("gives a plugin tool no way to read or bind a data slot", async () => {
+    const fitRegression = vi.fn().mockResolvedValue({ slope: 2 });
+    bundledPluginMocks.definition = definePlugin({
+      aiTools: { fitRegression },
+    });
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn(_turn("workspace-tool-no-slots", "Fit a line."));
+    const request = await _runPluginAiToolFromAgent();
+
+    await request.invoke(PLUGIN_TOOL_CONTEXT, { xColumn: "x", yColumn: "y" });
+
+    const [pluginApi] = fitRegression.mock.calls[0]!;
+    expect(pluginApi.data.querySlot).toBeUndefined();
+    expect(pluginApi.ui.openDataSlotBinding).toBeUndefined();
+  });
+
   it("fails a tool whose bundled plugin has no handler for it", async () => {
     bundledPluginMocks.definition = definePlugin({});
     getAllDatasetsMock.mockResolvedValue([DATASET_A]);
