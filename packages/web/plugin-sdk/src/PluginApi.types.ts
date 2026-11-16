@@ -165,12 +165,16 @@ export type AvandarApi = Readonly<{
      * with the current user's access. Present only for commands. Rejects
      * with a `PluginError`: `InvalidSlot` for a slot id the manifest does
      * not declare, `SlotNotBound` or `SlotBroken` when the slot cannot be
-     * read, `PermissionDenied` when the user cannot read its records,
+     * read, `PermissionDenied` when the user cannot read the bound dataset
+     * or case type or the plugin is no longer installed and enabled,
      * `InvalidHandle` once the workspace the command started in is no
-     * longer open, and `CommandFailed` for any other failure. A
-     * `CommandFailed` message is generic on purpose: the host keeps the
-     * details, which can name workspace data the plugin was not given. Only
-     * the three most recent handles it returns stay readable by `fetchRows`.
+     * longer open, and `CommandFailed` for any other failure. That includes
+     * a case type the user can read whose records come from datasets they
+     * cannot reach, which currently reads as `CommandFailed` and not
+     * `PermissionDenied`. A `CommandFailed` message is generic on purpose:
+     * the host keeps the details, which can name workspace data the plugin
+     * was not given. Only the three most recent handles it returns stay
+     * readable by `fetchRows`.
      */
     querySlot?: (slotId: string) => Promise<QuerySlotResult>;
   }>;

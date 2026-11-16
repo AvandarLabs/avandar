@@ -896,9 +896,9 @@ cannot keep reading.
 | `InvalidSlot` | The manifest declares no data slot with that id |
 | `SlotNotBound` | Nobody has chosen the slot's records yet |
 | `SlotBroken` | The binding no longer fits the slot. The message names attribute keys and the reasons, never a field name, a value, or a source name |
-| `PermissionDenied` | The current user cannot read the bound case type or dataset, or the plugin is not currently installed and enabled, or its permissions are awaiting approval |
+| `PermissionDenied` | The current user cannot read the bound dataset or case type, or the plugin is not currently installed and enabled, or its permissions are awaiting approval |
 | `InvalidHandle` | The workspace the command started in is no longer open. Run the command again |
-| `CommandFailed` | Any other failure. The message is always "The data slot could not be read." The host logs the details and never sends them to the plugin, because they can name workspace data the plugin was not given |
+| `CommandFailed` | Any other failure. That includes a case type the user can read whose records come from datasets they cannot reach: it currently reads as `CommandFailed`, not `PermissionDenied`. The message is always "The data slot could not be read." The host logs the details and never sends them to the plugin, because they can name workspace data the plugin was not given |
 
 `avandar.ui.openDataSlotBinding(slotId)` opens a modal titled "Choose records
 for *slot title*", the same one the card's Choose and Change buttons open. An
