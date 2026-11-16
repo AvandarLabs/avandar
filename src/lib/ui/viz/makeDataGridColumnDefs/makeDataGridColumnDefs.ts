@@ -95,7 +95,7 @@ function _formatStructValue(value: object): string {
  * The text of one non-date cell. A list, such as a case type field that
  * keeps every value, shows its values separated by semicolons, which never
  * collide with a number's thousands separator. An empty list is blank. A
- * struct shows as JSON.
+ * struct shows as JSON, while a typed array keeps its comma-separated values.
  */
 function _formatCellValue(value: unknown, columnName: string): string {
   if (Array.isArray(value)) {
@@ -104,7 +104,12 @@ function _formatCellValue(value: unknown, columnName: string): string {
   if (typeof value === "number") {
     return _formatGridNumber(value, columnName);
   }
-  if (typeof value === "object" && value !== null && !(value instanceof Date)) {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    !(value instanceof Date) &&
+    !ArrayBuffer.isView(value)
+  ) {
     return _formatStructValue(value);
   }
   return value == null ? "" : String(value);

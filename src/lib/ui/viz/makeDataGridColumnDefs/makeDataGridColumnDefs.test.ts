@@ -305,6 +305,11 @@ describe("struct cells", () => {
     expect(_formatPlainCell("place", structRow)).toBe('{"district":"Maputo"}');
   });
 
+  it("keeps a typed array as its comma-separated values", () => {
+    expect(_formatPlainCell("bytes", new Uint8Array([1, 2]))).toBe("1,2");
+    expect(_formatPlainCell("ids", new Int32Array([1, 2]))).toBe("1,2");
+  });
+
   it("shows a list of structs separated by semicolons", () => {
     expect(_formatPlainCell("places", [{ id: 1 }, { id: 2 }])).toBe(
       '{"id":1}; {"id":2}',
