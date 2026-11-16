@@ -266,6 +266,9 @@ select lives_ok (
   reset role;
   do $chk$
   begin
+    if (select count(*)::int from public.plugin_installations where id = 'd160a001-0000-4000-8000-000000000001'::uuid) <> 0 then
+      raise exception 'the owner could not uninstall the plugin';
+    end if;
     if (select count(*)::int from public.plugin_content_imports where id = 'd160c001-0000-4000-8000-000000000001'::uuid) <> 1 then
       raise exception 'uninstalling deleted a content import';
     end if;

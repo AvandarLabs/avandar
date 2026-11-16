@@ -6,8 +6,11 @@
  * unbind a slot. Other workspaces see nothing. A binding stays inside its
  * install's workspace: it cannot move to another workspace, attach to
  * another workspace's install, or read another workspace's case type or
- * dataset. The binder is always the signed-in user. Deleting the case type
- * keeps the binding with a null source, and uninstalling deletes it.
+ * dataset. The binder is always the signed-in user. Deleting the case type or
+ * the dataset keeps the binding with a null source, and uninstalling deletes
+ * it. Later cases rely on rows the earlier ones leave: the `forged` binding
+ * is unbound in 19, the case type and dataset are deleted in 20 and 21, and
+ * 22 uninstalls what is left.
  */
 begin;
 
@@ -99,7 +102,7 @@ values (
   '{"onsetDate": "d1507001-0000-4000-8000-000000000001"}'::jsonb
 );
 
-select plan (20);
+select plan (22);
 
 -- 1. A plain member reads their workspace's binding.
 select lives_ok (
@@ -424,9 +427,36 @@ select lives_ok (
   'an update that changes nothing material keeps the existing binder'
 );
 
--- 19. Deleting the bound case type keeps the binding, with no source.
+-- 19. A settings admin unbinds a slot, and the row is really gone. Unlike the
+-- uninstall cascade below, this runs through the DELETE policy.
 select lives_ok (
   $t19$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1500004-0000-4000-8000-000000000004","role":"authenticated"}', true);
+  delete from public.plugin_data_slot_bindings
+  where
+    installation_id = 'd150a001-0000-4000-8000-000000000001'::uuid and
+    slot_id = 'forged';
+  reset role;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_data_slot_bindings
+      where
+        installation_id = 'd150a001-0000-4000-8000-000000000001'::uuid and
+        slot_id = 'forged'
+    ) <> 0 then
+      raise exception 'a settings admin could not unbind a data slot';
+    end if;
+  end $chk$;
+  $t19$,
+  'a settings admin unbinds a data slot'
+);
+
+-- 20. Deleting the bound case type keeps the binding, with no source.
+select lives_ok (
+  $t20$
   reset role;
   delete from public.concepts where id = 'd1504001-0000-4000-8000-000000000001'::uuid;
   do $chk$
@@ -441,13 +471,37 @@ select lives_ok (
       raise exception 'deleting the case type did not leave the binding with a null concept_id';
     end if;
   end $chk$;
-  $t19$,
+  $t20$,
   'deleting the bound case type keeps the binding with a null concept_id'
 );
 
--- 20. Uninstalling deletes the install's bindings.
+-- 21. Deleting the bound dataset keeps the binding, with no source. Runs
+-- after the case type deletion, and before the uninstall that removes it.
 select lives_ok (
-  $t20$
+  $t21$
+  reset role;
+  delete from public.datasets where id = 'd1506001-0000-4000-8000-000000000001'::uuid;
+  do $chk$
+  begin
+    if (
+      select count(*)::int
+      from public.plugin_data_slot_bindings
+      where
+        installation_id = 'd150a001-0000-4000-8000-000000000001'::uuid and
+        slot_id = 'deaths' and
+        source_type = 'dataset' and
+        dataset_id is null
+    ) <> 1 then
+      raise exception 'deleting the dataset did not leave the binding with a null dataset_id';
+    end if;
+  end $chk$;
+  $t21$,
+  'deleting the bound dataset keeps the binding with a null dataset_id'
+);
+
+-- 22. Uninstalling deletes the install's bindings.
+select lives_ok (
+  $t22$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"d1500001-0000-4000-8000-000000000001","role":"authenticated"}', true);
   delete from public.plugin_installations where id = 'd150a001-0000-4000-8000-000000000001'::uuid;
@@ -458,7 +512,7 @@ select lives_ok (
       raise exception 'uninstalling left data slot bindings behind';
     end if;
   end $chk$;
-  $t20$,
+  $t22$,
   'uninstalling a plugin deletes its data slot bindings'
 );
 

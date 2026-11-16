@@ -76,7 +76,7 @@ values (
   array['data:slots']
 );
 
-select plan (5);
+select plan (8);
 
 -- 1. The owner binds a slot that had no binding.
 select lives_ok (
@@ -202,6 +202,24 @@ select throws_ok (
   '23514',
   null,
   'a data slot cannot be bound to a case type of another workspace'
+);
+
+reset role;
+
+-- Function privileges: `authenticated` only, the one role that calls it.
+select ok (
+  has_function_privilege('authenticated', 'public.rpc_plugin_data_slot_bindings__save(uuid, text, public.plugin_data_slot_bindings__source_type, uuid, uuid, jsonb)', 'execute'),
+  'a signed-in user may call the save rpc'
+);
+
+select ok (
+  not has_function_privilege('anon', 'public.rpc_plugin_data_slot_bindings__save(uuid, text, public.plugin_data_slot_bindings__source_type, uuid, uuid, jsonb)', 'execute'),
+  'an anonymous visitor may not call the save rpc'
+);
+
+select ok (
+  not has_function_privilege('service_role', 'public.rpc_plugin_data_slot_bindings__save(uuid, text, public.plugin_data_slot_bindings__source_type, uuid, uuid, jsonb)', 'execute'),
+  'the service role may not call the save rpc'
 );
 
 select * from finish ();

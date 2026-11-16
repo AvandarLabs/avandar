@@ -42,7 +42,7 @@ values
   ('d1705001-0000-4000-8000-000000000001'::uuid, 'd1701001-0000-4000-8000-000000000001'::uuid, 'd1704001-0000-4000-8000-000000000001'::uuid, 'Active', '#40c057', 0),
   ('d1705002-0000-4000-8000-000000000002'::uuid, 'd1701002-0000-4000-8000-000000000002'::uuid, 'd1704002-0000-4000-8000-000000000002'::uuid, 'Active', '#40c057', 0);
 
-select plan (6);
+select plan (9);
 
 -- 1. The owner installs with a case type binding. The binding takes the new
 -- install's id and workspace, and both rows are attributed to the owner.
@@ -100,18 +100,42 @@ select throws_ok (
   'an install whose binding reads another workspace case type fails'
 );
 
-reset role;
-
--- 3. That failure left no install behind.
-select is (
-  (
-    select count(*)::int
-    from public.plugin_installations
-    where
-      workspace_id = 'd1701001-0000-4000-8000-000000000001'::uuid and
-      plugin_id = 'avandar.other'
-  ),
-  0,
+-- 3. A failing binding rolls its install back. The rpc runs inside a block
+-- that catches its failure, then the same transaction counts the installs it
+-- left behind.
+select lives_ok (
+  $t3$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"d1700001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_failed boolean := false;
+  begin
+    begin
+      perform public.rpc_plugin_installations__install(
+        'd1701001-0000-4000-8000-000000000001'::uuid,
+        'avandar.atomic',
+        '0.1.0',
+        array['data:slots'],
+        '[{"slot_id": "cases", "source_type": "concept", "concept_id": "d1704002-0000-4000-8000-000000000002", "dataset_id": null, "attribute_map": {}}]'::jsonb
+      );
+    exception when sqlstate '23514' then
+      v_failed := true;
+    end;
+    if not v_failed then
+      raise exception 'the install with a failing binding did not fail';
+    end if;
+    if (
+      select count(*)::int
+      from public.plugin_installations
+      where
+        workspace_id = 'd1701001-0000-4000-8000-000000000001'::uuid and
+        plugin_id = 'avandar.atomic'
+    ) <> 0 then
+      raise exception 'a failing binding left its install behind';
+    end if;
+  end $chk$;
+  $t3$,
   'a failing binding rolls back its install'
 );
 
@@ -173,6 +197,24 @@ select throws_ok (
   '42501',
   null,
   'an outsider cannot install into another workspace through the rpc'
+);
+
+reset role;
+
+-- Function privileges: `authenticated` only, the one role that calls it.
+select ok (
+  has_function_privilege('authenticated', 'public.rpc_plugin_installations__install(uuid, text, text, text[], jsonb)', 'execute'),
+  'a signed-in user may call the install rpc'
+);
+
+select ok (
+  not has_function_privilege('anon', 'public.rpc_plugin_installations__install(uuid, text, text, text[], jsonb)', 'execute'),
+  'an anonymous visitor may not call the install rpc'
+);
+
+select ok (
+  not has_function_privilege('service_role', 'public.rpc_plugin_installations__install(uuid, text, text, text[], jsonb)', 'execute'),
+  'the service role may not call the install rpc'
 );
 
 select * from finish ();
