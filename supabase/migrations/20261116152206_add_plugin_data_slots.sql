@@ -155,6 +155,34 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.plugin_data_slot_bindings__stamp_bound_by()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+begin
+  if auth.uid () is null then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    new.bound_by := auth.uid ();
+  elsif
+    new.source_type is distinct from old.source_type or
+    new.concept_id is distinct from old.concept_id or
+    new.dataset_id is distinct from old.dataset_id or
+    new.attribute_map is distinct from old.attribute_map
+  then
+    new.bound_by := auth.uid ();
+  else
+    new.bound_by := old.bound_by;
+  end if;
+
+  return new;
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.rpc_plugin_data_slot_bindings__save(p_installation_id uuid, p_slot_id text, p_source_type public.plugin_data_slot_bindings__source_type, p_concept_id uuid DEFAULT NULL::uuid, p_dataset_id uuid DEFAULT NULL::uuid, p_attribute_map jsonb DEFAULT '{}'::jsonb)
  RETURNS public.plugin_data_slot_bindings
  LANGUAGE plpgsql
@@ -357,12 +385,15 @@ CREATE TRIGGER tr__plugin_data_slot_bindings__check_workspace BEFORE INSERT OR U
 
 CREATE TRIGGER tr__plugin_data_slot_bindings__set_updated_at BEFORE UPDATE ON public.plugin_data_slot_bindings FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
+CREATE TRIGGER tr__plugin_data_slot_bindings__stamp_bound_by BEFORE INSERT OR UPDATE ON public.plugin_data_slot_bindings FOR EACH ROW EXECUTE FUNCTION public.plugin_data_slot_bindings__stamp_bound_by();
+
 
 
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
 revoke all privileges on function public.plugin_data_slot_bindings__check_workspace() from public, anon, authenticated, service_role;
+revoke all privileges on function public.plugin_data_slot_bindings__stamp_bound_by() from public, anon, authenticated, service_role;
 revoke all privileges on function public.rpc_plugin_data_slot_bindings__save(p_installation_id uuid, p_slot_id text, p_source_type plugin_data_slot_bindings__source_type, p_concept_id uuid, p_dataset_id uuid, p_attribute_map jsonb) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.rpc_plugin_data_slot_bindings__save(p_installation_id uuid, p_slot_id text, p_source_type plugin_data_slot_bindings__source_type, p_concept_id uuid, p_dataset_id uuid, p_attribute_map jsonb) to "authenticated";
 revoke all privileges on function public.rpc_plugin_installations__install(p_workspace_id uuid, p_plugin_id text, p_installed_version text, p_granted_permissions text[], p_bindings jsonb) from public, anon, authenticated, service_role;

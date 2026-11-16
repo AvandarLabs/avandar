@@ -148,6 +148,54 @@ concept_id,
 dataset_id on public.plugin_data_slot_bindings for each row
 execute function public.plugin_data_slot_bindings__check_workspace ();
 
+/**
+ * Stamps `bound_by` from the signed-in user, so a caller can neither name
+ * another user as the binder nor leave the previous binder on a binding they
+ * changed. An insert always takes the caller. An update takes the caller only
+ * when it changes what the slot reads (`source_type`, `concept_id`,
+ * `dataset_id`, or `attribute_map`), and otherwise keeps the existing binder.
+ * With no signed-in user (the service role, tests), the value is left alone.
+ *
+ * SECURITY INVOKER: it only reads `auth.uid()` and the row being written.
+ */
+create or replace function public.plugin_data_slot_bindings__stamp_bound_by () returns trigger language plpgsql
+set
+  search_path = '' as $$
+begin
+  if auth.uid () is null then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    new.bound_by := auth.uid ();
+  elsif
+    new.source_type is distinct from old.source_type or
+    new.concept_id is distinct from old.concept_id or
+    new.dataset_id is distinct from old.dataset_id or
+    new.attribute_map is distinct from old.attribute_map
+  then
+    new.bound_by := auth.uid ();
+  else
+    new.bound_by := old.bound_by;
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE.
+revoke
+execute on function public.plugin_data_slot_bindings__stamp_bound_by ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__plugin_data_slot_bindings__stamp_bound_by before insert or
+update on public.plugin_data_slot_bindings for each row
+execute function public.plugin_data_slot_bindings__stamp_bound_by ();
+
 create trigger tr__plugin_data_slot_bindings__set_updated_at before
 update on public.plugin_data_slot_bindings for each row
 execute function public.util__set_updated_at ();
