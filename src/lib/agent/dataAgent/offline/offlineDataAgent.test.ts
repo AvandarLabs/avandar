@@ -3,7 +3,10 @@ import {
   buildOfflineDataAgentSystemPrompt,
   buildOfflineQuestionMessage,
 } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt";
-import { routeOfflineMessageByRules } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
+import {
+  classifyOfflineMessage,
+  routeOfflineMessageByRules,
+} from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
 import { createOfflineDataAgent } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
 import {
   extractQuestionTerms,
@@ -16,6 +19,35 @@ import type {
   LocalLlm,
   LocalLlmRequest,
 } from "@/lib/agent/localModels/LocalLlm";
+
+// Wrap the router and value matcher so a test can read what they were given.
+// Each still runs its real implementation.
+vi.mock(
+  "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage")
+      >();
+    return {
+      ...actual,
+      classifyOfflineMessage: vi.fn(actual.classifyOfflineMessage),
+    };
+  },
+);
+vi.mock(
+  "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues")
+      >();
+    return {
+      ...actual,
+      findQuestionValues: vi.fn(actual.findQuestionValues),
+    };
+  },
+);
 
 const US = {
   id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
@@ -535,5 +567,83 @@ describe("routeOfflineMessageByRules", () => {
     ["covid in georgia", undefined],
   ])("routes %j as %s", (message, route) => {
     expect(routeOfflineMessageByRules(message, ["us.csv"])).toBe(route);
+  });
+});
+
+/**
+ * Asks the offline agent one turn and reports the message the router was
+ * given, the question the value matcher read, and the text the answer
+ * model read as the user's turn.
+ */
+async function _askOffline(turnText: string): Promise<{
+  routerMessage: string | undefined;
+  matchedQuestion: string | undefined;
+  modelText: string;
+}> {
+  const { llm, requests } = _createLlm([
+    '{"action":"run_query","args":{"sql":"SELECT 1 FROM \\"t0\\"","summary":"Deaths."}}',
+    '{"action":"reply","text":"Done."}',
+  ]);
+  vi.mocked(classifyOfflineMessage).mockClear();
+  vi.mocked(findQuestionValues).mockClear();
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm,
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+
+  await agent.ask(turnText);
+
+  const userMessage = requests[0]?.messages.find((message) => {
+    return message.role === "user";
+  });
+  return {
+    routerMessage: vi.mocked(classifyOfflineMessage).mock.calls[0]?.[1].message,
+    matchedQuestion: vi.mocked(findQuestionValues).mock.calls[0]?.[1].question,
+    modelText: userMessage?.content ?? "",
+  };
+}
+
+describe("offline dashboard requests", () => {
+  it("routes an add-to-dashboard request to data by rules", () => {
+    expect(
+      routeOfflineMessageByRules("Add a heading to the Budget dashboard", []),
+    ).toBe("data");
+    expect(routeOfflineMessageByRules("how do I make a dashboard?", [])).toBe(
+      "chat",
+    );
+  });
+
+  it("tells the offline model about blocks and the dashboard tool", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+    });
+
+    expect(prompt).toContain("add_dashboard_block");
+    expect(prompt).toContain("<current_page>");
+    expect(planPrompt).toContain("add_dashboard_block");
+    expect(planPrompt).toContain("<current_page>");
+  });
+
+  it("routes and matches values on the message, keeping the blocks", async () => {
+    const asked = await _askOffline(
+      "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+    );
+
+    expect(asked.routerMessage).toBe("how many deaths in total?");
+    expect(asked.matchedQuestion).toBe("how many deaths in total?");
+    expect(asked.modelText.startsWith("<current_page>")).toBe(true);
+    expect(asked.modelText).toContain("how many deaths in total?");
   });
 });

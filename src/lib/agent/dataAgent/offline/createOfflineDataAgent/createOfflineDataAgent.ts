@@ -1,3 +1,4 @@
+import { splitAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import {
   buildOfflineDataAgentSystemPrompt,
@@ -82,29 +83,45 @@ type OfflineSession = {
   previousMessage?: string;
 };
 
-/**
- * Routes the question, profiles the datasets once per conversation, and
- * finds the question's stored values. Returns the conversation's system
- * prompt (the same for every question, so it stays cached) and the message
- * the model reads for this question.
- */
-async function _prepareQuestion(
+/** Puts the turn's leading blocks back in front of the model's text. */
+function _withBlocks(blocks: string, text: string): string {
+  return blocks ? `${blocks}\n\n${text}` : text;
+}
+
+/** Sorts the user's message into data or chat, and remembers it. */
+async function _routeQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
   session: OfflineSession,
-  message: string,
-): Promise<{ systemPrompt: string; messageText: string }> {
-  session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
+  question: string,
+): Promise<void> {
   session.route.current = options.models.router
     ? await classifyOfflineMessage(options.llm, {
         modelId: options.models.router,
-        message,
+        message: question,
         previousMessage: session.previousMessage,
         datasetNames: options.datasets.map((dataset) => {
           return dataset.name;
         }),
       })
     : "data";
-  session.previousMessage = message;
+  session.previousMessage = question;
+}
+
+/**
+ * Routes the question, profiles the datasets once per conversation, and
+ * finds the question's stored values. Returns the conversation's system
+ * prompt (the same for every question, so it stays cached) and the message
+ * the model reads for this question. Routing and value matching read only
+ * the user's message; the blocks before it go to the model unchanged.
+ */
+async function _prepareQuestion(
+  options: Readonly<CreateOfflineDataAgentOptions>,
+  session: OfflineSession,
+  message: string,
+): Promise<{ systemPrompt: string; messageText: string }> {
+  const { blocks, message: question } = splitAgentTurnText(message);
+  session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
+  await _routeQuestion(options, session, question);
   const profiles = await session.profiles;
   const systemPrompt = buildOfflineDataAgentSystemPrompt({
     datasets: options.datasets,
@@ -113,21 +130,19 @@ async function _prepareQuestion(
     queryStyle: options.queryStyle,
   });
   if (session.route.current === "chat") {
-    return { systemPrompt, messageText: message };
+    return { systemPrompt, messageText: _withBlocks(blocks, question) };
   }
   const matches = await findQuestionValues(options.host, {
     datasets: options.datasets,
     profiles,
-    question: message,
+    question,
   });
-  return {
-    systemPrompt,
-    messageText: buildOfflineQuestionMessage({
-      question: message,
-      matches,
-      datasets: options.datasets,
-    }),
-  };
+  const questionMessage = buildOfflineQuestionMessage({
+    question,
+    matches,
+    datasets: options.datasets,
+  });
+  return { systemPrompt, messageText: _withBlocks(blocks, questionMessage) };
 }
 
 function _createLocalChoice(modelId: string, contextWindow: number) {
