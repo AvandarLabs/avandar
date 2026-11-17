@@ -143,6 +143,8 @@ unless stated otherwise.
 | `useUninstallContentRows.ts` | Builds the rows. See Data flow |
 | `useDatasetDependents.ts` | For one dataset id, the linked datasets that read it and the other installs' data slot bindings on it |
 | `uninstallPluginAndDeleteDatasets.ts` | Plain async function, no React. Uninstalls, then deletes each chosen dataset. Returns the ids it deleted and the ids it could not delete |
+| `UninstallPluginError.ts` | The error `uninstallPluginAndDeleteDatasets` throws when it cannot show the install is gone. Its `reason` is `still_installed` or `not_confirmed`, and its message is for logs |
+| `useRunUninstall.ts` | Runs an uninstall from the modal. Logs a failure, refreshes the plugin and dataset lists, says how it went (the translated copy for each `UninstallPluginError` reason, a generic sentence for any other error), and calls `onDone` once the lists have refreshed |
 
 Changes to existing files:
 
@@ -264,7 +266,8 @@ No schema change, so no pgTAP tests and no Supabase switch.
 | Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there (`still_installed`) or could not be read back (`not_confirmed`). A failed delete does not stop the others and is returned. A dataset `fullDelete` refuses with `not_allowed` is returned as failed without an error log. A dataset whose row survives is returned as failed. A dataset whose row is gone after `fullDelete` threw counts as deleted. A dataset that is already gone is not failed and never reaches `fullDelete`. A duplicate id is deleted once |
 | Unit | `useUninstallContentRows.test.ts` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name |
 | Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
-| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. The notification matches the outcome, and an `UninstallPluginError` shows translated copy by reason |
+| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running |
+| Unit | `useRunUninstall/useRunUninstall.test.tsx` | The notification matches the outcome, and counts only the datasets this run deleted. An `UninstallPluginError` shows translated copy by reason, and any other error shows the generic sentence. A failure is logged with the install id. The lists refresh when the uninstall fails. A refresh that rejects is logged, and neither hides the result nor blocks `onDone`. `onDone` waits for the refresh |
 | Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/pluginFlow.ts` |
 
