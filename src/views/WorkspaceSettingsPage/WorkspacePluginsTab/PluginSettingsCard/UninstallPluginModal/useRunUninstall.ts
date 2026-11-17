@@ -62,12 +62,13 @@ async function _uninstallAndRefresh(
 ): Promise<UninstallSummary> {
   const { datasetIds, rows } = options;
   try {
-    const { failedDatasetIds } = await uninstallPluginAndDeleteDatasets({
-      installationId: options.installationId,
-      datasetIds,
-    });
+    const { deletedDatasetIds, failedDatasetIds } =
+      await uninstallPluginAndDeleteDatasets({
+        installationId: options.installationId,
+        datasetIds,
+      });
     return {
-      deletedCount: datasetIds.length - failedDatasetIds.length,
+      deletedCount: deletedDatasetIds.length,
       failedNames: rows
         .filter((row) => {
           return failedDatasetIds.includes(row.datasetId);

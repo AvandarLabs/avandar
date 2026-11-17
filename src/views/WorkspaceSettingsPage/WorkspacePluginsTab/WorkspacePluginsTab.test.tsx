@@ -204,7 +204,10 @@ vi.mock(
   () => {
     return {
       uninstallPluginAndDeleteDatasets: vi.fn(() => {
-        return Promise.resolve({ failedDatasetIds: [] });
+        return Promise.resolve({
+          deletedDatasetIds: [],
+          failedDatasetIds: [],
+        });
       }),
     };
   },

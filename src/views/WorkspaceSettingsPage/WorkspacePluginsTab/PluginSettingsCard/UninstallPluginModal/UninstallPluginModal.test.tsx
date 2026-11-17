@@ -69,6 +69,11 @@ vi.mock("@/utils/notifications/notify", () => {
   };
 });
 
+type UninstallOutcomeStub = {
+  deletedDatasetIds: string[];
+  failedDatasetIds: string[];
+};
+
 function _renderModal(): QueryClient {
   const queryClient = new QueryClient();
   render(
@@ -119,7 +124,11 @@ describe("UninstallPluginModal", () => {
     mocks.hiddenCount = 0;
     mocks.isLoading = false;
     mocks.hasDependents = true;
-    mocks.uninstall.mockResolvedValue({ failedDatasetIds: [] });
+    mocks.uninstall.mockImplementation(
+      async ({ datasetIds }: { datasetIds: string[] }) => {
+        return { deletedDatasetIds: datasetIds, failedDatasetIds: [] };
+      },
+    );
   });
 
   it("starts with every dataset kept", () => {
@@ -344,7 +353,7 @@ describe("UninstallPluginModal", () => {
   });
 
   describe("while the uninstall runs", () => {
-    let finish: (value: { failedDatasetIds: string[] }) => void = () => {};
+    let finish: (value: UninstallOutcomeStub) => void = () => {};
 
     beforeEach(() => {
       mocks.uninstall.mockReturnValue(
@@ -355,7 +364,7 @@ describe("UninstallPluginModal", () => {
     });
 
     afterEach(async () => {
-      finish({ failedDatasetIds: [] });
+      finish({ deletedDatasetIds: [], failedDatasetIds: [] });
       await waitFor(() => {
         expect(mocks.onClose).toHaveBeenCalled();
       });
@@ -415,6 +424,7 @@ describe("UninstallPluginModal", () => {
 
   it("warns with the names of the datasets it could not delete", async () => {
     mocks.uninstall.mockResolvedValue({
+      deletedDatasetIds: [],
       failedDatasetIds: ["dataset-districts"],
     });
     _renderModal();
@@ -497,6 +507,23 @@ describe("UninstallPluginModal", () => {
       expect(mocks.notifyError).toHaveBeenCalled();
     });
     expect(mocks.onClose).not.toHaveBeenCalled();
+  });
+
+  it("does not count a checked dataset that was already gone as deleted", async () => {
+    mocks.uninstall.mockResolvedValue({
+      deletedDatasetIds: [],
+      failedDatasetIds: [],
+    });
+    _renderModal();
+    _checkDataset("Mozambique districts");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.notifySuccess).toHaveBeenCalledWith("Mozambique uninstalled");
+    });
   });
 
   it("says only that the plugin was uninstalled when nothing was deleted", async () => {
