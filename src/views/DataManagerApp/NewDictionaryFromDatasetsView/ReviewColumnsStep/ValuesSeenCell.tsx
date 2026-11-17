@@ -73,9 +73,11 @@ export function ValuesSeenCell({
 
   return (
     <>
-      <Text size="sm" lineClamp={1} className={css.reviewEntryText}>
-        {summary}
-      </Text>
+      <div className={css.reviewEntryLine}>
+        <Text size="sm" lineClamp={1} className={css.reviewEntryText}>
+          {summary}
+        </Text>
+      </div>
       {entry.suggestionReason === "other_codes" ? (
         <Text size="xs" c="dimmed">
           <Trans>

@@ -6,3 +6,22 @@
 .reviewEntryRow[data-included="false"] .reviewEntryText {
   color: var(--mantine-color-dimmed);
 }
+
+/*
+ * Cells hug the top of the row, so a name error or a note under a value
+ * grows the row downward without moving any control off the row's line.
+ */
+.reviewEntryRow > td {
+  vertical-align: top;
+}
+
+/*
+ * The first line of every cell. It is as tall as a small input and centers
+ * its content, so inputs, selects, checkboxes, and plain text all sit on the
+ * same center line.
+ */
+.reviewEntryLine {
+  align-items: center;
+  display: flex;
+  min-height: var(--input-height-xs);
+}

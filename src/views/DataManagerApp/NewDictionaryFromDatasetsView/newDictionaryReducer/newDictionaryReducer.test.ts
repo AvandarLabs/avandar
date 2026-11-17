@@ -176,6 +176,28 @@ describe("newDictionaryReducer", () => {
     ).toBe("Male");
   });
 
+  it("includes or leaves out every entry at once", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const leftOut = newDictionaryReducer(read, {
+      type: "set_all_entries_included",
+      isIncluded: false,
+    });
+    expect(
+      leftOut.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([false, false]);
+    const included = newDictionaryReducer(leftOut, {
+      type: "set_all_entries_included",
+      isIncluded: true,
+    });
+    expect(
+      included.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([true, true]);
+  });
+
   it("remembers the answer to the first online suggestion", () => {
     const start = makeInitialNewDictionaryState(undefined);
     expect(start.suggestionConsent).toBe("not_asked");

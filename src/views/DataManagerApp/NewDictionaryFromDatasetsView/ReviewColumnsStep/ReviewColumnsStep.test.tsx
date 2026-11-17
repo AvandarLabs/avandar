@@ -46,23 +46,40 @@ const TWO_DATASETS = DictionaryProposal.fromColumnProfiles([
   _column("sex", ["M", "F", "U"], ERIE_ID),
 ]);
 
-function _renderStep(
-  options: {
-    proposal?: DictionaryProposal.T;
-    originDatasetName?: string;
-    meaningMatchStatus?: MeaningMatchStatus;
-  } = {},
-) {
+type StepOptions = {
+  proposal?: DictionaryProposal.T;
+  originDatasetName?: string;
+  meaningMatchStatus?: MeaningMatchStatus;
+};
+
+function _renderStep(options: StepOptions = {}) {
   const dispatch = vi.fn();
-  render(
-    <ReviewColumnsStep
-      proposal={options.proposal ?? TWO_DATASETS}
-      originDatasetName={options.originDatasetName}
-      meaningMatchStatus={options.meaningMatchStatus ?? "done"}
-      dispatch={dispatch}
-    />,
-  );
-  return { dispatch };
+  const buildStep = (stepOptions: StepOptions) => {
+    return (
+      <ReviewColumnsStep
+        proposal={stepOptions.proposal ?? TWO_DATASETS}
+        originDatasetName={stepOptions.originDatasetName}
+        meaningMatchStatus={stepOptions.meaningMatchStatus ?? "done"}
+        dispatch={dispatch}
+      />
+    );
+  };
+  const { rerender } = render(buildStep(options));
+  return {
+    dispatch,
+    rerenderWith: (nextOptions: StepOptions) => {
+      rerender(buildStep(nextOptions));
+    },
+  };
+}
+
+/** The entry names typed into the table's name inputs, top to bottom. */
+function _entryNamesInOrder(): string[] {
+  return screen
+    .getAllByRole("textbox", { name: /^Name of the entry from / })
+    .map((input) => {
+      return (input as HTMLInputElement).value;
+    });
 }
 
 function _keyOf(proposal: DictionaryProposal.T, name: string): string {
@@ -74,18 +91,54 @@ function _keyOf(proposal: DictionaryProposal.T, name: string): string {
 }
 
 describe("ReviewColumnsStep", () => {
-  it("sorts entries into coded, ordered, and description-only sections", () => {
+  it("lists every entry in one table, in the proposal's order", () => {
+    _renderStep();
+    expect(screen.getAllByRole("table")).toHaveLength(1);
+    expect(_entryNamesInOrder()).toEqual(
+      TWO_DATASETS.entries.map((entry) => {
+        return entry.name;
+      }),
+    );
+  });
+
+  it("keeps a row in the same place when its kind changes", () => {
+    const { rerenderWith } = _renderStep();
+    const orderBefore = _entryNamesInOrder();
+    for (const kind of ["ordered", "text", "number", "categorical"] as const) {
+      rerenderWith({
+        proposal: DictionaryProposal.setEntryKind(TWO_DATASETS, {
+          entryKey: _keyOf(TWO_DATASETS, "hosp_yn"),
+          kind,
+        }),
+      });
+      expect(_entryNamesInOrder()).toEqual(orderBefore);
+    }
+  });
+
+  it("shows the columns an entry came from in their own column", () => {
     _renderStep();
     expect(
-      screen.getByRole("heading", { name: "Coded columns" }),
+      screen.getByRole("columnheader", { name: /^Entry name/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Ordered scales" }),
+      screen.getByRole("columnheader", { name: "Column source" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Descriptions only" }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("GENDER (Bronx), sex (Erie)")).toBeInTheDocument();
+    const genderRow = screen.getByRole("row", { name: /GENDER \(Bronx\)/ });
+    const cells = within(genderRow).getAllByRole("cell");
+    expect(within(cells[1] as HTMLElement).getByRole("textbox")).toHaveValue(
+      "gender",
+    );
+    expect(cells[2]).toHaveTextContent("GENDER (Bronx), sex (Erie)");
+  });
+
+  it("explains the entry name on a focusable info icon", async () => {
+    _renderStep();
+    const explanation =
+      "The name this entry is shown under in the dictionary. Changing it doesn't rename any column in your data.";
+    const info = screen.getByRole("button", { name: "About entry names" });
+    expect(info).toHaveAccessibleDescription(explanation);
+    fireEvent.focus(info);
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(explanation);
   });
 
   it("leaves an entry out when it is unchecked", () => {
@@ -165,6 +218,52 @@ describe("ReviewColumnsStep", () => {
     expect(within(hospRow).getByText("Needs labels")).toBeInTheDocument();
     const idRow = screen.getByRole("row", { name: /case_id/ });
     expect(within(idRow).getByText("Description")).toBeInTheDocument();
+  });
+
+  it("offers to deselect all when every entry is included", () => {
+    const { dispatch } = _renderStep();
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Deselect all columns",
+    });
+    expect(selectAll).toBeChecked();
+    fireEvent.click(selectAll);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "set_all_entries_included",
+      isIncluded: false,
+    });
+  });
+
+  it("shows the select-all box as indeterminate when only some are included", () => {
+    const some = DictionaryProposal.setEntryIncluded(TWO_DATASETS, {
+      entryKey: _keyOf(TWO_DATASETS, "hosp_yn"),
+      isIncluded: false,
+    });
+    const { dispatch } = _renderStep({ proposal: some });
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Select all columns",
+    });
+    expect(selectAll).not.toBeChecked();
+    expect(selectAll).toHaveProperty("indeterminate", true);
+    fireEvent.click(selectAll);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "set_all_entries_included",
+      isIncluded: true,
+    });
+  });
+
+  it("shows the select-all box unchecked when none are included", () => {
+    const none = TWO_DATASETS.entries.reduce((current, entry) => {
+      return DictionaryProposal.setEntryIncluded(current, {
+        entryKey: entry.key,
+        isIncluded: false,
+      });
+    }, TWO_DATASETS);
+    _renderStep({ proposal: none });
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Select all columns",
+    });
+    expect(selectAll).not.toBeChecked();
+    expect(selectAll).toHaveProperty("indeterminate", false);
   });
 
   it("holds Next and says why when every entry is left out", () => {

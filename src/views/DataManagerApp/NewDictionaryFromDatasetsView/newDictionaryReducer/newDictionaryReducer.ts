@@ -72,6 +72,8 @@ export type NewDictionaryAction =
   | { type: "rename_entry"; entryKey: string; name: string }
   | { type: "set_entry_kind"; entryKey: string; kind: DataDictionaryEntry.Kind }
   | { type: "set_entry_included"; entryKey: string; isIncluded: boolean }
+  /** Includes or leaves out every entry, for the select-all checkbox. */
+  | { type: "set_all_entries_included"; isIncluded: boolean }
   | { type: "keep_apart"; entryKey: string }
   | { type: "set_entry_description"; entryKey: string; description: string }
   | {
@@ -305,6 +307,16 @@ const HANDLERS: Handlers = {
   set_entry_included: (state, action) => {
     return _editProposal(state, (proposal) => {
       return DictionaryProposal.setEntryIncluded(proposal, action);
+    });
+  },
+  set_all_entries_included: (state, action) => {
+    return _editProposal(state, (proposal) => {
+      return proposal.entries.reduce((current, entry) => {
+        return DictionaryProposal.setEntryIncluded(current, {
+          entryKey: entry.key,
+          isIncluded: action.isIncluded,
+        });
+      }, proposal);
     });
   },
   keep_apart: (state, action) => {
