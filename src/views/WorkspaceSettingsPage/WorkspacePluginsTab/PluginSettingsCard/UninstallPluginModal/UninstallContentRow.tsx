@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Stack, Text } from "@mantine/core";
-import { UninstallDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents";
+import { UninstallDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { UninstallContentRow as Row } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 

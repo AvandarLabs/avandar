@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
-import { UninstallDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents";
+import { UninstallDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
@@ -65,7 +65,7 @@ describe("UninstallDatasetDependents", () => {
     ).toBeInTheDocument();
   });
 
-  it("names each thing that reads the dataset and how it reads it", () => {
+  it("labels each dependent with the way it reads the dataset", () => {
     mocks.result = {
       dependents: [
         { key: "a", kind: "linkedDataset", label: "Districts joined" },
@@ -96,9 +96,9 @@ describe("UninstallDatasetDependents", () => {
 
     _renderDependents();
 
-    expect(
-      screen.getByText("We could not check what reads this dataset."),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "We could not check what reads this dataset.",
+    );
   });
 
   it("warns beside the linked datasets it did find when a lookup failed", () => {

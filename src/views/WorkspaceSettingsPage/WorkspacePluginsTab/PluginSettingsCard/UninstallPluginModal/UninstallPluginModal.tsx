@@ -1,8 +1,8 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { Loader, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { useState } from "react";
-import { UninstallContentList } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentList";
+import { UninstallContentSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection";
 import { UninstallModalFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallModalFooter";
 import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall";
 import { useUninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
@@ -21,7 +21,7 @@ type Props = Readonly<{
 }>;
 
 /** The confirm button's text: plain, or naming how many datasets go too. */
-function _getConfirmLabel(
+function _buildConfirmLabel(
   checkedCount: number,
   uninstallLabel: string,
 ): string {
@@ -47,19 +47,29 @@ function _listCheckedIdsInRowOrder(
     });
 }
 
-/** Checked dataset ids, with one id checked or unchecked. */
-function _toggleCheckedId(
-  checkedIds: ReadonlySet<Dataset.Id>,
-  datasetId: Dataset.Id,
-  isChecked: boolean,
-): ReadonlySet<Dataset.Id> {
-  const updatedIds = new Set(checkedIds);
-  if (isChecked) {
-    updatedIds.add(datasetId);
-  } else {
-    updatedIds.delete(datasetId);
-  }
-  return updatedIds;
+/**
+ * The ids of the datasets checked for deletion, none at first, and a setter
+ * that checks or unchecks one.
+ */
+function useCheckedDatasetIds(): {
+  checkedIds: ReadonlySet<Dataset.Id>;
+  setIsChecked: (datasetId: Dataset.Id, isChecked: boolean) => void;
+} {
+  const [checkedIds, setCheckedIds] = useState<ReadonlySet<Dataset.Id>>(
+    new Set(),
+  );
+  const setIsChecked = (datasetId: Dataset.Id, isChecked: boolean): void => {
+    setCheckedIds((previousIds) => {
+      const updatedIds = new Set(previousIds);
+      if (isChecked) {
+        updatedIds.add(datasetId);
+      } else {
+        updatedIds.delete(datasetId);
+      }
+      return updatedIds;
+    });
+  };
+  return { checkedIds, setIsChecked };
 }
 
 /**
@@ -71,9 +81,7 @@ function _toggleCheckedId(
 export function UninstallPluginModal(props: Props): JSX.Element {
   const { t } = useLingui();
   const content = useUninstallContentRows(props.pluginId);
-  const [checkedIds, setCheckedIds] = useState<ReadonlySet<Dataset.Id>>(
-    new Set(),
-  );
+  const { checkedIds, setIsChecked } = useCheckedDatasetIds();
   const uninstaller = useRunUninstall({
     pluginName: props.pluginName,
     installationId: props.installationId,
@@ -81,37 +89,30 @@ export function UninstallPluginModal(props: Props): JSX.Element {
     onDone: props.onClose,
   });
   useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
+  const datasetIdsToDelete = _listCheckedIdsInRowOrder(
+    content.rows,
+    checkedIds,
+  );
   return (
     <Stack gap="md">
       <Text size="sm">{t`Its features are removed from this workspace.`}</Text>
-      {/* Order 3 nests this under the modal's order 2 title. */}
-      <Title order={3} size="h6">{t`Datasets it imported`}</Title>
-      {content.isLoading ? (
-        <Loader size="sm" role="status" aria-label={t`Loading datasets`} />
-      ) : (
-        <UninstallContentList
-          rows={content.rows}
-          hiddenCount={content.hiddenCount}
-          installationId={props.installationId}
-          checkedIds={checkedIds}
-          isDisabled={uninstaller.isRunning}
-          onIsCheckedChange={(datasetId, isChecked) => {
-            setCheckedIds((previousIds) => {
-              return _toggleCheckedId(previousIds, datasetId, isChecked);
-            });
-          }}
-        />
-      )}
-      <Text size="sm" c="dimmed">{t`Unchecked datasets stay in Data Sources.`}</Text>
+      <UninstallContentSection
+        content={content}
+        installationId={props.installationId}
+        checkedIds={checkedIds}
+        isDisabled={uninstaller.isRunning}
+        onIsCheckedChange={setIsChecked}
+      />
       <UninstallModalFooter
-        confirmLabel={_getConfirmLabel(checkedIds.size, t`Uninstall`)}
+        confirmLabel={_buildConfirmLabel(
+          datasetIdsToDelete.length,
+          t`Uninstall`,
+        )}
         isRunning={uninstaller.isRunning}
         isLoading={content.isLoading}
         onCancel={props.onClose}
         onConfirm={() => {
-          void uninstaller.run(
-            _listCheckedIdsInRowOrder(content.rows, checkedIds),
-          );
+          void uninstaller.run(datasetIdsToDelete);
         }}
       />
     </Stack>

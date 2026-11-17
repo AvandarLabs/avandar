@@ -1,5 +1,4 @@
 import { plural } from "@lingui/core/macro";
-import { useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { UninstallContentRow } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentRow";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -15,12 +14,15 @@ type Props = Readonly<{
   checkedIds: ReadonlySet<Dataset.Id>;
   isDisabled: boolean;
   onIsCheckedChange: (datasetId: Dataset.Id, isChecked: boolean) => void;
+
+  /** The id of the heading that names this group. */
+  labelId: string;
 }>;
 
 /**
  * The datasets a plugin imported, in the uninstall modal, one row each and
  * then a count of the ones the user cannot see. It is the group that holds
- * the "Delete <name>" checkboxes.
+ * the "Delete <name>" checkboxes, named by the heading `labelId` points at.
  */
 export function UninstallContentList({
   rows,
@@ -29,10 +31,10 @@ export function UninstallContentList({
   checkedIds,
   isDisabled,
   onIsCheckedChange,
+  labelId,
 }: Props): JSX.Element {
-  const { t } = useLingui();
   return (
-    <Stack gap="sm" role="group" aria-label={t`Datasets it imported`}>
+    <Stack gap="sm" role="group" aria-labelledby={labelId}>
       {rows.map((row) => {
         return (
           <UninstallContentRow

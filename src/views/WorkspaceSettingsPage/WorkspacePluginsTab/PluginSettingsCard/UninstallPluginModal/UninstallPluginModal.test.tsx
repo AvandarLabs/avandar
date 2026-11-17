@@ -1,5 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { PluginContentImportClient } from "@/clients/plugins/PluginContentImportClient/PluginContentImportClient";
+import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
+import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { UninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -9,6 +13,7 @@ const mocks = vi.hoisted(() => {
   return {
     rows: [] as Array<{ datasetId: string; name: string; canDelete: boolean }>,
     hiddenCount: 0,
+    isLoading: false,
     uninstall: vi.fn(),
     keepOpen: vi.fn(),
     notifySuccess: vi.fn(),
@@ -26,14 +31,14 @@ vi.mock(
         return {
           rows: mocks.rows,
           hiddenCount: mocks.hiddenCount,
-          isLoading: false,
+          isLoading: mocks.isLoading,
         };
       },
     };
   },
 );
 vi.mock(
-  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents",
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents",
   () => {
     return {
       UninstallDatasetDependents: ({ datasetId }: { datasetId: string }) => {
@@ -62,7 +67,7 @@ vi.mock("@/utils/notifications/notify", () => {
   };
 });
 
-function _renderModal(): void {
+function _renderModal(): QueryClient {
   const queryClient = new QueryClient();
   render(
     <UninstallPluginModal
@@ -82,17 +87,35 @@ function _renderModal(): void {
       },
     },
   );
+  return queryClient;
+}
+
+function _checkDataset(name: string): void {
+  fireEvent.click(screen.getByRole("checkbox", { name: `Delete ${name}` }));
 }
 
 describe("UninstallPluginModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.rows = [
-      { datasetId: "dataset-districts", name: "Mozambique districts", canDelete: true },
-      { datasetId: "dataset-provinces", name: "Mozambique provinces", canDelete: true },
-      { datasetId: "dataset-facilities", name: "Health facilities", canDelete: false },
+      {
+        datasetId: "dataset-districts",
+        name: "Mozambique districts",
+        canDelete: true,
+      },
+      {
+        datasetId: "dataset-provinces",
+        name: "Mozambique provinces",
+        canDelete: true,
+      },
+      {
+        datasetId: "dataset-facilities",
+        name: "Health facilities",
+        canDelete: false,
+      },
     ];
     mocks.hiddenCount = 0;
+    mocks.isLoading = false;
     mocks.uninstall.mockResolvedValue({ failedDatasetIds: [] });
   });
 
@@ -105,14 +128,27 @@ describe("UninstallPluginModal", () => {
     expect(screen.getByRole("button", { name: "Uninstall" })).toBeEnabled();
   });
 
-  it("gives a dataset the user cannot delete no checkbox and says why", () => {
+  it("gives a dataset the user cannot delete no checkbox", () => {
     _renderModal();
 
     expect(
       screen.queryByRole("checkbox", { name: "Delete Health facilities" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("says why a dataset the user cannot delete is kept", () => {
+    _renderModal();
+
     expect(
       screen.getByText("Kept. Only a dataset admin can delete it."),
+    ).toBeInTheDocument();
+  });
+
+  it("names the list of datasets by the heading above it", () => {
+    _renderModal();
+
+    expect(
+      screen.getByRole("group", { name: "Datasets it imported" }),
     ).toBeInTheDocument();
   });
 
@@ -126,68 +162,204 @@ describe("UninstallPluginModal", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows what reads a dataset only once it is checked, and names the count on the button", () => {
+  it("shows a loader and no list while the datasets load", () => {
+    mocks.isLoading = true;
+
     _renderModal();
+
+    expect(
+      screen.getByRole("status", { name: "Loading datasets" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  });
+
+  it("disables the confirm button while the datasets load", () => {
+    mocks.isLoading = true;
+
+    _renderModal();
+
+    expect(screen.getByRole("button", { name: "Uninstall" })).toBeDisabled();
+  });
+
+  it("leaves out the list when the plugin imported no datasets", () => {
+    mocks.rows = [];
+
+    _renderModal();
+
+    expect(screen.queryByRole("group")).not.toBeInTheDocument();
+  });
+
+  it("says unchecked datasets stay when one can be deleted", () => {
+    _renderModal();
+
+    expect(
+      screen.getByText("Unchecked datasets stay in Data Sources."),
+    ).toBeInTheDocument();
+  });
+
+  it("leaves out the note that unchecked datasets stay when none can be deleted", () => {
+    mocks.rows = [
+      {
+        datasetId: "dataset-facilities",
+        name: "Health facilities",
+        canDelete: false,
+      },
+    ];
+
+    _renderModal();
+
+    expect(
+      screen.queryByText("Unchecked datasets stay in Data Sources."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides what reads a dataset until it is checked", () => {
+    _renderModal();
+
     expect(
       screen.queryByText("dependents of dataset-districts"),
     ).not.toBeInTheDocument();
+  });
 
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "Delete Mozambique districts" }),
-    );
+  it("shows what reads a dataset once it is checked", () => {
+    _renderModal();
+
+    _checkDataset("Mozambique districts");
 
     expect(
       screen.getByText("dependents of dataset-districts"),
     ).toBeInTheDocument();
+  });
+
+  it("names the number of checked datasets on the confirm button", () => {
+    _renderModal();
+
+    _checkDataset("Mozambique districts");
+
     expect(
       screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
     ).toBeInTheDocument();
   });
 
-  it("uninstalls and deletes the checked datasets in the order shown, then closes", async () => {
+  it("calls onClose when Cancel is pressed", () => {
     _renderModal();
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "Delete Mozambique provinces" }),
-    );
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "Delete Mozambique districts" }),
-    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(mocks.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("deletes the checked datasets in the order shown", async () => {
+    _renderModal();
+    _checkDataset("Mozambique provinces");
+    _checkDataset("Mozambique districts");
 
     fireEvent.click(
       screen.getByRole("button", { name: "Uninstall and delete 2 datasets" }),
     );
 
     await waitFor(() => {
-      expect(mocks.onClose).toHaveBeenCalledTimes(1);
-    });
-    expect(mocks.uninstall).toHaveBeenCalledWith({
-      installationId: "installation-1",
-      datasetIds: ["dataset-districts", "dataset-provinces"],
-    });
-    expect(mocks.notifySuccess).toHaveBeenCalledWith({
-      title: "Mozambique uninstalled",
-      message: "2 datasets deleted.",
+      expect(mocks.uninstall).toHaveBeenCalledWith({
+        installationId: "installation-1",
+        datasetIds: ["dataset-districts", "dataset-provinces"],
+      });
     });
   });
 
-  it("keeps the modal open and the buttons disabled while it runs", async () => {
-    let finish: (value: { failedDatasetIds: string[] }) => void = () => {};
-    mocks.uninstall.mockReturnValue(
-      new Promise((resolve) => {
-        finish = resolve;
-      }),
-    );
+  it("closes the modal once the uninstall finishes", async () => {
     _renderModal();
 
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
 
     await waitFor(() => {
-      expect(mocks.keepOpen).toHaveBeenLastCalledWith(true, "modal-1");
+      expect(mocks.onClose).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
-    finish({ failedDatasetIds: [] });
+  });
+
+  it("reports how many datasets were deleted", async () => {
+    _renderModal();
+    _checkDataset("Mozambique provinces");
+    _checkDataset("Mozambique districts");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Uninstall and delete 2 datasets" }),
+    );
+
     await waitFor(() => {
-      expect(mocks.onClose).toHaveBeenCalled();
+      expect(mocks.notifySuccess).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: "2 datasets deleted.",
+      });
+    });
+  });
+
+  describe("while the uninstall runs", () => {
+    let finish: (value: { failedDatasetIds: string[] }) => void = () => {};
+
+    beforeEach(() => {
+      mocks.uninstall.mockReturnValue(
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+      );
+    });
+
+    afterEach(async () => {
+      finish({ failedDatasetIds: [] });
+      await waitFor(() => {
+        expect(mocks.onClose).toHaveBeenCalled();
+      });
+    });
+
+    it("keeps the modal open", async () => {
+      _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(mocks.keepOpen).toHaveBeenLastCalledWith(true, "modal-1");
+      });
+    });
+
+    it("disables Cancel", async () => {
+      _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+      });
+    });
+
+    it("shows the confirm button loading and disabled", async () => {
+      _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: "Uninstall" }),
+        ).toBeDisabled();
+      });
+      expect(screen.getByRole("button", { name: "Uninstall" })).toHaveAttribute(
+        "data-loading",
+        "true",
+      );
+    });
+
+    it("disables the dataset checkboxes", async () => {
+      _renderModal();
+      _checkDataset("Mozambique districts");
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("checkbox", { name: "Delete Mozambique provinces" }),
+        ).toBeDisabled();
+      });
     });
   });
 
@@ -196,9 +368,7 @@ describe("UninstallPluginModal", () => {
       failedDatasetIds: ["dataset-districts"],
     });
     _renderModal();
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "Delete Mozambique districts" }),
-    );
+    _checkDataset("Mozambique districts");
 
     fireEvent.click(
       screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
@@ -213,7 +383,7 @@ describe("UninstallPluginModal", () => {
     });
   });
 
-  it("stays open and reports the error when the uninstall fails", async () => {
+  it("reports the error when the uninstall fails", async () => {
     mocks.uninstall.mockRejectedValue(new Error("not allowed"));
     _renderModal();
 
@@ -224,6 +394,17 @@ describe("UninstallPluginModal", () => {
         title: "Could not update Mozambique",
         message: "not allowed",
       });
+    });
+  });
+
+  it("stays open when the uninstall fails", async () => {
+    mocks.uninstall.mockRejectedValue(new Error("not allowed"));
+    _renderModal();
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    await waitFor(() => {
+      expect(mocks.notifyError).toHaveBeenCalled();
     });
     expect(mocks.onClose).not.toHaveBeenCalled();
   });
@@ -237,6 +418,44 @@ describe("UninstallPluginModal", () => {
       expect(mocks.notifySuccess).toHaveBeenCalledWith(
         "Mozambique uninstalled",
       );
+    });
+  });
+
+  describe("refreshing the lists an uninstall changes", () => {
+    const expectedQueryKeys = [
+      PluginInstallationClient.QueryKeys.getAll(),
+      PluginContentImportClient.QueryKeys.getAll(),
+      PluginDataSlotBindingClient.QueryKeys.getAll(),
+      DatasetClient.QueryKeys.getAll(),
+    ];
+
+    it("invalidates the plugin and dataset lists after a successful run", async () => {
+      const queryClient = _renderModal();
+      const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(mocks.onClose).toHaveBeenCalled();
+      });
+      expectedQueryKeys.forEach((queryKey) => {
+        expect(invalidate).toHaveBeenCalledWith({ queryKey });
+      });
+    });
+
+    it("invalidates them when the uninstall fails, so a deleted install is not shown", async () => {
+      mocks.uninstall.mockRejectedValue(new Error("could not verify"));
+      const queryClient = _renderModal();
+      const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(mocks.notifyError).toHaveBeenCalled();
+      });
+      expectedQueryKeys.forEach((queryKey) => {
+        expect(invalidate).toHaveBeenCalledWith({ queryKey });
+      });
     });
   });
 });

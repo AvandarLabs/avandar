@@ -39,7 +39,8 @@ function _invalidateUninstallQueries(queryClient: QueryClient): void {
 
 /**
  * Uninstalls the plugin, deletes the chosen datasets, and refreshes the lists
- * that showed them. Throws when the uninstall itself fails.
+ * that showed them, whether or not the uninstall succeeded. Throws when the
+ * uninstall itself fails.
  */
 async function _uninstallAndRefresh(
   options: Readonly<{
@@ -50,21 +51,26 @@ async function _uninstallAndRefresh(
   }>,
 ): Promise<UninstallSummary> {
   const { datasetIds, rows } = options;
-  const { failedDatasetIds } = await uninstallPluginAndDeleteDatasets({
-    installationId: options.installationId,
-    datasetIds,
-  });
-  _invalidateUninstallQueries(options.queryClient);
-  return {
-    deletedCount: datasetIds.length - failedDatasetIds.length,
-    failedNames: rows
-      .filter((row) => {
-        return failedDatasetIds.includes(row.datasetId);
-      })
-      .map((row) => {
-        return row.name;
-      }),
-  };
+  try {
+    const { failedDatasetIds } = await uninstallPluginAndDeleteDatasets({
+      installationId: options.installationId,
+      datasetIds,
+    });
+    return {
+      deletedCount: datasetIds.length - failedDatasetIds.length,
+      failedNames: rows
+        .filter((row) => {
+          return failedDatasetIds.includes(row.datasetId);
+        })
+        .map((row) => {
+          return row.name;
+        }),
+    };
+  } finally {
+    // Also after a failure: the install row may be gone even when the check
+    // that proves it throws, so the lists must not keep showing it.
+    _invalidateUninstallQueries(options.queryClient);
+  }
 }
 
 /** Says how the uninstall went, naming any dataset it could not delete. */
@@ -126,23 +132,25 @@ export function useRunUninstall(
   const [isRunning, setIsRunning] = useState(false);
   const run = async (datasetIds: readonly Dataset.Id[]): Promise<void> => {
     setIsRunning(true);
+    let summary: UninstallSummary;
     try {
-      const summary = await _uninstallAndRefresh({
+      summary = await _uninstallAndRefresh({
         installationId: options.installationId,
         datasetIds,
         rows: options.rows,
         queryClient,
       });
-      notifyOutcome(summary);
-      options.onDone();
     } catch (error) {
       notifyError({
         title: t`Could not update ${pluginName}`,
         message: error instanceof Error ? error.message : String(error),
       });
+      return;
     } finally {
       setIsRunning(false);
     }
+    notifyOutcome(summary);
+    options.onDone();
   };
   return { run, isRunning };
 }

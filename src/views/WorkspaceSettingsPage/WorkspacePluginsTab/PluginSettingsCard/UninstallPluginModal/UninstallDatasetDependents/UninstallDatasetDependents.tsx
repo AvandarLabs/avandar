@@ -3,6 +3,7 @@ import { List, Loader, Stack, Text } from "@mantine/core";
 import { useDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
+import type { DatasetDependent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents";
 
 type Props = Readonly<{
   datasetId: Dataset.Id;
@@ -10,6 +11,34 @@ type Props = Readonly<{
   /** The install being uninstalled, whose own bindings are left out. */
   installationId: PluginInstallation.Id;
 }>;
+
+/**
+ * The things that read a dataset, each labelled with how it reads it. Used
+ * by `UninstallDatasetDependents` once it has at least one to show.
+ */
+function DependentsList({
+  dependents,
+}: Readonly<{ dependents: readonly DatasetDependent[] }>): JSX.Element {
+  const { t } = useLingui();
+  return (
+    <>
+      <Text size="sm">
+        <Trans>These read it and stop working once it is deleted:</Trans>
+      </Text>
+      <List size="sm">
+        {dependents.map(({ key, kind, label }) => {
+          return (
+            <List.Item key={key}>
+              {kind === "linkedDataset"
+                ? t`${label} (linked dataset)`
+                : t`${label} (data slot)`}
+            </List.Item>
+          );
+        })}
+      </List>
+    </>
+  );
+}
 
 /**
  * Under a dataset marked for deletion in the uninstall modal, what reads it
@@ -41,25 +70,10 @@ export function UninstallDatasetDependents({
   return (
     <Stack gap="xxs">
       {dependents.length > 0 ? (
-        <>
-          <Text size="sm">
-            <Trans>These read it and stop working once it is deleted:</Trans>
-          </Text>
-          <List size="sm">
-            {dependents.map(({ key, kind, label }) => {
-              return (
-                <List.Item key={key}>
-                  {kind === "linkedDataset"
-                    ? t`${label} (linked dataset)`
-                    : t`${label} (data slot)`}
-                </List.Item>
-              );
-            })}
-          </List>
-        </>
+        <DependentsList dependents={dependents} />
       ) : null}
       {hasFailed ? (
-        <Text size="sm" c="warning.8">
+        <Text size="sm" c="warning.8" role="status">
           <Trans>We could not check what reads this dataset.</Trans>
         </Text>
       ) : null}
