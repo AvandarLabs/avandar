@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { buildAgentTurnInputs } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/buildAgentTurnInputs";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
@@ -110,5 +111,154 @@ describe("buildAgentTurnInputs", () => {
     first.onReplied?.();
 
     expect(buildAgentTurnInputs(options).dashboardCardLines).toEqual([]);
+  });
+
+  describe("names that hold a personal value", () => {
+    const JANE_CARD = {
+      status: "confirmed",
+      dashboardId: "d-1",
+      dashboardName: "Jane Doe visits",
+      isUnsaved: false,
+      isReported: false,
+    } as const;
+    const JANE_REF = {
+      gadgetType: "dataset",
+      gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+      subId: null,
+    } as const;
+
+    function _janeTurn(): DataAgentTurnOptions {
+      return {
+        ..._turn(),
+        titleMaskRef: { current: undefined },
+        gadgetContext: {
+          attachedRefs: [],
+          contexts: new Map([
+            [
+              ChatMentionToken.buildRefKey(JANE_REF),
+              { kind: "dataset", ref: JANE_REF, name: "Jane Doe visits" },
+            ],
+          ]),
+        },
+      } as unknown as DataAgentTurnOptions;
+    }
+
+    function _build(
+      privacy: "hosted" | "device",
+      conversation: DataAgentConversation = _conversation(),
+    ) {
+      AgentDashboardCardStore.setStatus(IDENTITY, "card-1", JANE_CARD);
+      const turn = _janeTurn();
+      return {
+        turn,
+        inputs: buildAgentTurnInputs({
+          conversation,
+          datasets: DATASETS,
+          pageContext: PAGE,
+          turn,
+          privacy,
+        }),
+      };
+    }
+
+    it("masks the dashboard name in a hosted card line", () => {
+      const { inputs } = _build("hosted");
+
+      expect(inputs.dashboardCardLines).toEqual([
+        '<dashboard_card>Confirmed: added to "<value 1> visits".</dashboard_card>',
+      ]);
+    });
+
+    it("keeps the dashboard name in a device card line", () => {
+      const { inputs } = _build("device");
+
+      expect(inputs.dashboardCardLines).toEqual([
+        '<dashboard_card>Confirmed: added to "Jane Doe visits".</dashboard_card>',
+      ]);
+    });
+
+    it("keeps real names even when the vault holds the value", () => {
+      const conversation = _conversation();
+      buildAgentTurnInputs({
+        conversation,
+        datasets: DATASETS,
+        pageContext: PAGE,
+        turn: _turn(),
+        privacy: "hosted",
+      });
+
+      const { inputs } = _build("device", conversation);
+
+      expect(inputs.dashboardCardLines?.[0]).toContain("Jane Doe visits");
+      expect(inputs.maskAssistantText("Jane Doe had 2")).toBe("Jane Doe had 2");
+    });
+
+    it("names a personal-looking chart title only on a device turn", () => {
+      const tileRef = {
+        ...JANE_REF,
+        gadgetType: "dashboard_tile",
+        subId: "t1",
+      } as const;
+      const email = "jane.doe@example.com";
+      const turn = {
+        ..._turn(),
+        gadgetContext: {
+          attachedRefs: [],
+          contexts: new Map([
+            [
+              ChatMentionToken.buildRefKey(tileRef),
+              {
+                kind: "dashboard_tile",
+                ref: tileRef,
+                dashboardName: "Visits",
+                tile: { title: email, chartType: "bar", sql: "" },
+              },
+            ],
+          ]),
+        },
+      } as unknown as DataAgentTurnOptions;
+      const options = {
+        conversation: _conversation(),
+        datasets: DATASETS,
+        pageContext: undefined,
+        turn,
+      };
+
+      const hosted = buildAgentTurnInputs({ ...options, privacy: "hosted" });
+      const device = buildAgentTurnInputs({ ...options, privacy: "device" });
+
+      expect(hosted.nameOf(tileRef)).not.toContain(email);
+      expect(device.nameOf(tileRef)).toContain(email);
+    });
+
+    it("gives a hosted turn's title the vault's mask", () => {
+      const { turn } = _build("hosted");
+
+      expect(turn.titleMaskRef?.current?.("Jane Doe visits")).toBe(
+        "<value 1> visits",
+      );
+    });
+
+    it("leaves a device turn's title mask unset", () => {
+      const { turn } = _build("device");
+
+      expect(turn.titleMaskRef?.current).toBeUndefined();
+    });
+
+    it("masks a mention's name and an earlier reply on a hosted turn", () => {
+      const { inputs } = _build("hosted");
+
+      expect(inputs.nameOf(JANE_REF)).toBe("<value 1> visits");
+      expect(inputs.maskAssistantText("Jane Doe had 2")).toBe(
+        "<value 1> had 2",
+      );
+    });
+
+    it("keeps a mention's name and an earlier reply real on a device turn", () => {
+      const { inputs } = _build("device");
+
+      expect(inputs.nameOf(JANE_REF)).toBe("Jane Doe visits");
+      expect(inputs.maskAssistantText("Jane Doe had 2")).toBe("Jane Doe had 2");
+    });
   });
 });
