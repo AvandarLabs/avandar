@@ -22,13 +22,17 @@ export type DatasetDependent = Readonly<{
 
 /** What reads one dataset, as `useDatasetDependents` returns it. */
 export type DatasetDependents = Readonly<{
-  /** Empty until the data slot lookups settle, and when one fails. */
+  /**
+   * Empty of data slots until their lookups settle, and when the bindings or
+   * installs lookup fails. Linked datasets are listed regardless.
+   */
   dependents: readonly DatasetDependent[];
   isLoading: boolean;
 
   /**
-   * Whether the data slots that read the dataset could not be loaded, so the
-   * list may be missing some. Linked datasets are listed regardless.
+   * Whether the bindings or the installs could not be loaded, so the data
+   * slots in the list may be missing or unnamed. Linked datasets are listed
+   * regardless.
    */
   hasFailed: boolean;
 }>;
@@ -99,12 +103,8 @@ function _listOtherInstallSlotNames(
 }
 
 /**
- * Other installs' data slots that read the dataset, labelled. The bindings
- * and installs are read again on every mount, since the persisted cache can
- * restore a list from before a slot was bound. Nothing is listed while they
- * refetch, and nothing is listed when the bindings fail to load.
- *
- * Called only by `useDatasetDependents`, which adds the linked datasets.
+ * Other installs' data slots that read the dataset, labelled "<plugin>:
+ * <slot>". Nothing is listed while the lookups load or after one fails.
  */
 function useDataSlotDependents(
   options: Readonly<{
@@ -114,6 +114,8 @@ function useDataSlotDependents(
 ): DatasetDependents {
   const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
+  // Both lists are read again on every mount, since the persisted cache can
+  // restore one from before a slot was bound or a plugin was installed.
   const [bindings, , bindingsQuery] = PluginDataSlotBindingClient.useGetAll({
     ...where("dataset_id", "eq", options.datasetId),
     useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
@@ -128,7 +130,7 @@ function useDataSlotDependents(
     bindingsQuery.isFetching ||
     installationsQuery.isFetching ||
     isLoadingManifests;
-  const hasFailed = bindingsQuery.isError;
+  const hasFailed = bindingsQuery.isError || installationsQuery.isError;
   if (isLoading || hasFailed) {
     return { dependents: [], isLoading, hasFailed };
   }
@@ -151,9 +153,14 @@ function useDataSlotDependents(
 
 /**
  * What reads one dataset and stops working once it is deleted: the linked
- * datasets that read it, and other plugins' data slots bound to it. The
- * install being uninstalled is left out, since its bindings go with it.
- * The uninstall modal shows these under each dataset marked for deletion.
+ * datasets that read it, then other plugins' data slots bound to it. The
+ * install being uninstalled is left out, since its bindings go with it. It
+ * tells an admin what would break before they choose to delete the dataset.
+ *
+ * The data slot side is read fresh on every mount and is untrusted while it
+ * loads or after it fails. Linked datasets come from `useLinkedDatasets`,
+ * which does not expose fetching or error state, so that side is not gated
+ * the same way.
  */
 export function useDatasetDependents(
   options: Readonly<{
@@ -161,20 +168,20 @@ export function useDatasetDependents(
     installationId: PluginInstallation.Id;
   }>,
 ): DatasetDependents {
-  const linked = useLinkedDatasets(options.datasetId);
-  const slots = useDataSlotDependents(options);
+  const linkedDatasetsResult = useLinkedDatasets(options.datasetId);
+  const dataSlotsResult = useDataSlotDependents(options);
   return {
     dependents: [
-      ...linked.linkedDatasets.map((linkedDataset) => {
+      ...linkedDatasetsResult.linkedDatasets.map((linkedDataset) => {
         return {
           key: linkedDataset.id,
           kind: "linkedDataset" as const,
           label: linkedDataset.name,
         };
       }),
-      ...slots.dependents,
+      ...dataSlotsResult.dependents,
     ],
-    isLoading: linked.isLoading || slots.isLoading,
-    hasFailed: slots.hasFailed,
+    isLoading: linkedDatasetsResult.isLoading || dataSlotsResult.isLoading,
+    hasFailed: dataSlotsResult.hasFailed,
   };
 }

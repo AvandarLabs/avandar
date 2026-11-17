@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n/i18n";
 import { renderHook, TestProviders } from "@/test-utils";
 import { useDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -9,6 +10,8 @@ type QueryFlags = { isFetching: boolean; isError: boolean };
 const mocks = vi.hoisted(() => {
   return {
     linkedDatasets: [] as Array<{ id: string; name: string }>,
+    isLoadingLinked: false,
+    isLoadingManifests: false,
     bindings: [] as Array<{
       id: string;
       installationId: string;
@@ -25,7 +28,10 @@ const mocks = vi.hoisted(() => {
 vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
   return {
     useLinkedDatasets: () => {
-      return { linkedDatasets: mocks.linkedDatasets, isLoading: false };
+      return {
+        linkedDatasets: mocks.linkedDatasets,
+        isLoading: mocks.isLoadingLinked,
+      };
     },
   };
 });
@@ -82,11 +88,15 @@ vi.mock(
                     "plugin.name": "Epidemiology",
                     "slot.cases.title": "Cases",
                   },
+                  pt: {
+                    "plugin.name": "Epidemiologia",
+                    "slot.cases.title": "Casos",
+                  },
                 },
               },
             ],
           },
-          false,
+          mocks.isLoadingManifests,
         ];
       },
     };
@@ -110,6 +120,8 @@ function _renderDependents() {
 describe("useDatasetDependents", () => {
   beforeEach(() => {
     mocks.linkedDatasets = [];
+    mocks.isLoadingLinked = false;
+    mocks.isLoadingManifests = false;
     mocks.bindings = [];
     mocks.installations = [
       { id: "installation-epi", pluginId: "avandar.epidemiology" },
@@ -120,6 +132,10 @@ describe("useDatasetDependents", () => {
     mocks.installationsFlags = { isFetching: false, isError: false };
     mocks.bindingsArgs = undefined;
     mocks.installationsArgs = undefined;
+  });
+
+  afterEach(() => {
+    i18n.loadAndActivate({ locale: "en", messages: {} });
   });
 
   it("lists the linked datasets that read the dataset", () => {
@@ -209,7 +225,7 @@ describe("useDatasetDependents", () => {
     });
   });
 
-  it("lists no data slot and reports loading while the bindings refetch", () => {
+  it("lists no data slot while the bindings refetch", () => {
     mocks.bindings = [
       { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
     ];
@@ -218,6 +234,13 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([]);
+  });
+
+  it("reports loading while the bindings refetch", () => {
+    mocks.bindingsFlags = { isFetching: true, isError: false };
+
+    const { result } = _renderDependents();
+
     expect(result.current.isLoading).toBe(true);
   });
 
@@ -229,7 +252,31 @@ describe("useDatasetDependents", () => {
     expect(result.current.isLoading).toBe(true);
   });
 
-  it("reports a failure and lists no data slot when the bindings refetch fails", () => {
+  it("reports loading while the bundled manifests load", () => {
+    mocks.isLoadingManifests = true;
+
+    const { result } = _renderDependents();
+
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it("reports loading while the linked datasets load", () => {
+    mocks.isLoadingLinked = true;
+
+    const { result } = _renderDependents();
+
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it("reports a failure when the bindings fail to load", () => {
+    mocks.bindingsFlags = { isFetching: false, isError: true };
+
+    const { result } = _renderDependents();
+
+    expect(result.current.hasFailed).toBe(true);
+  });
+
+  it("lists no data slot when the bindings fail to load", () => {
     mocks.bindings = [
       { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
     ];
@@ -237,14 +284,72 @@ describe("useDatasetDependents", () => {
 
     const { result } = _renderDependents();
 
-    expect(result.current.hasFailed).toBe(true);
     expect(result.current.dependents).toEqual([]);
   });
 
-  it("is settled and has not failed once everything loads", () => {
+  it("reports a failure when the installs fail to load", () => {
+    mocks.installationsFlags = { isFetching: false, isError: true };
+
     const { result } = _renderDependents();
 
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.hasFailed).toBe(false);
+    expect(result.current.hasFailed).toBe(true);
+  });
+
+  it("lists no data slot when the installs fail to load", () => {
+    mocks.bindings = [
+      { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
+    ];
+    mocks.installationsFlags = { isFetching: false, isError: true };
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([]);
+  });
+
+  it("keeps the linked datasets when the data slot lookups fail", () => {
+    mocks.linkedDatasets = [{ id: "linked-1", name: "Districts linked" }];
+    mocks.bindingsFlags = { isFetching: false, isError: true };
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([
+      { key: "linked-1", kind: "linkedDataset", label: "Districts linked" },
+    ]);
+  });
+
+  it("lists the linked datasets before the data slots", () => {
+    mocks.linkedDatasets = [{ id: "linked-1", name: "Districts linked" }];
+    mocks.bindings = [
+      { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
+    ];
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([
+      { key: "linked-1", kind: "linkedDataset", label: "Districts linked" },
+      { key: "binding-1", kind: "dataSlot", label: "Epidemiology: Cases" },
+    ]);
+  });
+
+  it("names the plugin and slot in the active locale", () => {
+    i18n.loadAndActivate({ locale: "pt", messages: {} });
+    mocks.bindings = [
+      { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
+    ];
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([
+      { key: "binding-1", kind: "dataSlot", label: "Epidemiologia: Casos" },
+    ]);
+  });
+
+  it("reports neither loading nor failure once everything loads", () => {
+    const { result } = _renderDependents();
+
+    expect(result.current).toMatchObject({
+      isLoading: false,
+      hasFailed: false,
+    });
   });
 });
