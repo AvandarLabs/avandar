@@ -69,7 +69,7 @@ afterEach(() => {
 });
 
 describe("validatePluginCommand", () => {
-  it("runs tsc and eslint on the named plugin and reports it valid", () => {
+  it("runs tsc and oxlint on the named plugin and reports it valid", () => {
     _writeValidPlugin("case-tools");
     const runCommand = _makePassingRunCommand();
     validatePluginCommand({ name: "case-tools", repoRoot, runCommand });
@@ -80,7 +80,7 @@ describe("validatePluginCommand", () => {
     );
     expect(runCommand).toHaveBeenCalledWith(
       "pnpm",
-      ["exec", "eslint", "plugins/case-tools"],
+      ["exec", "oxlint", "plugins/case-tools"],
       repoRoot,
     );
     expect(_getLoggedLines().join("\n")).toContain(
@@ -94,14 +94,14 @@ describe("validatePluginCommand", () => {
     _writeBundledList(["case-tools", "lab-tools"]);
     const runCommand = _makePassingRunCommand();
     validatePluginCommand({ repoRoot, runCommand });
-    const eslintTargets = runCommand.mock.calls
+    const oxlintTargets = runCommand.mock.calls
       .filter(([, args]) => {
-        return args[1] === "eslint";
+        return args[1] === "oxlint";
       })
       .map(([, args]) => {
         return args[2];
       });
-    expect(eslintTargets).toEqual(["plugins/case-tools", "plugins/lab-tools"]);
+    expect(oxlintTargets).toEqual(["plugins/case-tools", "plugins/lab-tools"]);
   });
 
   it("warns and passes when no plugin is bundled", () => {
@@ -130,6 +130,27 @@ describe("validatePluginCommand", () => {
     expect(output).toContain("error TS2322");
   });
 
+  it("throws and prints the tool output when oxlint fails", () => {
+    _writeValidPlugin("case-tools");
+    const runCommand = vi.fn().mockImplementation((_command, args) => {
+      return args[1] === "oxlint"
+        ? {
+            isOk: false,
+            output: "plugin-restrictions(no-unapproved-imports): disallowed",
+          }
+        : { isOk: true, output: "" };
+    });
+    expect(() => {
+      return validatePluginCommand({
+        name: "case-tools",
+        repoRoot,
+        runCommand,
+      });
+    }).toThrow(/1 plugin failed validation/);
+    const output = _getLoggedLines().join("\n");
+    expect(output).toContain("oxlint:\nplugin-restrictions");
+  });
+
   it("counts every failing plugin when several fail", () => {
     _writeValidPlugin("case-tools");
     _writeValidPlugin("lab-tools");
@@ -140,7 +161,7 @@ describe("validatePluginCommand", () => {
     }).toThrow(/2 plugins failed validation/);
   });
 
-  it("lists the manifest problems and skips tsc and eslint when the manifest is invalid", () => {
+  it("lists the manifest problems and skips tsc and oxlint when the manifest is invalid", () => {
     _writeBundledList(["case-tools"]);
     const runCommand = _makePassingRunCommand();
     expect(() => {
@@ -182,14 +203,14 @@ describe("runValidatePluginCli", () => {
     vi.spyOn(Acclimate, "requestInput").mockResolvedValueOnce("lab-tools");
     const runCommand = _makePassingRunCommand();
     await runValidatePluginCli({ isInteractive: true, repoRoot, runCommand });
-    const eslintTargets = runCommand.mock.calls
+    const oxlintTargets = runCommand.mock.calls
       .filter(([, args]) => {
-        return args[1] === "eslint";
+        return args[1] === "oxlint";
       })
       .map(([, args]) => {
         return args[2];
       });
-    expect(eslintTargets).toEqual(["plugins/lab-tools"]);
+    expect(oxlintTargets).toEqual(["plugins/lab-tools"]);
   });
 
   it("validates every bundled plugin when the prompt is left empty", async () => {

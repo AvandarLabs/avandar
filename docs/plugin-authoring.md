@@ -689,13 +689,13 @@ Plugin code may import only:
 - the approved npm packages: `simple-statistics`, `d3-array`, and `date-fns`
   (including its subpaths)
 
-ESLint enforces this for `plugins/**` (`eslint/plugin-restrictions.js`). Test
+`oxlint` enforces this for `plugins/**` (`eslint/plugin-restrictions.js`). Test
 files are exempt from the package list, since they import the test runner, but
 no plugin file, test or not, may import a file outside its own plugin folder:
 not app code through a relative path, and not another plugin.
 `ava plugin validate` also fails when `package.json` lists a dependency outside
 the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
-`@avandar/plugin-manifest`, and the ESLint patterns must stay in step with it.
+`@avandar/plugin-manifest`, and the `oxlint` patterns must stay in step with it.
 
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
 `Divider`, `Group`, `Loader`, `NumberInput`, `SegmentedControl`, `Select`,
@@ -719,7 +719,7 @@ empty answer means all). For each plugin it runs:
    referenced `%key%` strings, the entry file, Tabler icons, and `package.json`
    dependencies.
 2. `tsc` on `plugins/<name>/tsconfig.json`.
-3. `eslint` on `plugins/<name>`.
+3. `oxlint` on `plugins/<name>`.
 
 Steps 2 and 3 are skipped when step 1 fails. The command exits nonzero when any
 plugin fails, so CI can use it. The same manifest checks run on every

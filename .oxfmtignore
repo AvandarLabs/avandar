@@ -28,7 +28,7 @@ shared/types/database.types.ts
 *.gen.*
 *.generated.*
 
-# Trees ESLint already excludes, kept in sync so the formatter and the linter
+# Trees oxlint already excludes, kept in sync so the formatter and the linter
 # agree on what is "our" code. Most are gitignored too, but not all:
 # `agent-skills/` is vendored third-party skill content that we do not restyle,
 # and two of its files (the `dif` web shell's `shell.js` / `boot.js`) are
