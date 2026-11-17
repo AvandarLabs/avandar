@@ -7,9 +7,9 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /** What an uninstall left behind: the chosen datasets it could not delete. */
-export type UninstallOutcome = Readonly<{
-  failedDatasetIds: readonly Dataset.Id[];
-}>;
+export type UninstallOutcome = {
+  failedDatasetIds: Dataset.Id[];
+};
 
 /**
  * Deletes the install and proves it is gone. The CRUD client's delete does
@@ -32,14 +32,15 @@ async function _deleteInstallationOrThrow(
 
 /**
  * Deletes one dataset if the user may still delete it, and says whether it
- * was deleted. The access check comes first because `fullDelete` removes
- * the dataset's files before its row: a row that RLS refuses to delete
- * would be left with no data.
+ * was deleted. A dataset that cannot be deleted, or whose delete throws, is
+ * reported as not deleted instead of throwing.
  */
 async function _deleteDatasetIfAllowed(
   datasetId: Dataset.Id,
 ): Promise<boolean> {
   try {
+    // Check access first: `fullDelete` removes the dataset's files before its
+    // row, so a row that RLS refuses to delete would be left with no data.
     const canDelete = await UserClient.canAccessResource({
       resourceType: "dataset",
       resourceId: datasetId,
