@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { uninstallPluginAndDeleteDatasets } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
+import type { UninstallOutcome } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
@@ -43,7 +44,9 @@ const INSTALLATION_ID = "installation-1" as PluginInstallation.Id;
 const PROVINCES_DATASET_ID = "dataset-provinces" as Dataset.Id;
 const DISTRICTS_DATASET_ID = "dataset-districts" as Dataset.Id;
 
-function _run(datasetIds: readonly Dataset.Id[]) {
+function _run(
+  datasetIds: readonly Dataset.Id[],
+): Promise<UninstallOutcome> {
   return uninstallPluginAndDeleteDatasets({
     installationId: INSTALLATION_ID,
     datasetIds,
@@ -114,7 +117,8 @@ describe("uninstallPluginAndDeleteDatasets", () => {
   });
 
   it("throws a not_confirmed error and deletes nothing when reading the install back fails", async () => {
-    mocks.getInstallationById.mockRejectedValue(new Error("network down"));
+    const readError = new Error("network down");
+    mocks.getInstallationById.mockRejectedValue(readError);
 
     const error = await _runAndCatch([PROVINCES_DATASET_ID]);
 
@@ -126,21 +130,45 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     expect(mocks.fullDelete).not.toHaveBeenCalled();
   });
 
-  it("goes on after a failed delete and returns it", async () => {
-    mocks.fullDelete.mockImplementation(async ({ id }: { id: string }) => {
-      if (id === PROVINCES_DATASET_ID) {
-        throw new Error("storage down");
-      }
+  it("keeps the read error as the cause of a not_confirmed error", async () => {
+    const readError = new Error("network down");
+    mocks.getInstallationById.mockRejectedValue(readError);
+
+    const error = await _runAndCatch([PROVINCES_DATASET_ID]);
+
+    expect(error).toHaveProperty("cause", readError);
+  });
+
+  describe("when one delete throws", () => {
+    beforeEach(() => {
+      mocks.fullDelete.mockImplementation(async ({ id }: { id: string }) => {
+        if (id === PROVINCES_DATASET_ID) {
+          throw new Error("storage down");
+        }
+        mocks.calls.push(`delete ${id}`);
+      });
     });
 
-    const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
+    it("still deletes the datasets after it", async () => {
+      await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
 
-    expect(mocks.fullDelete).toHaveBeenCalledWith({ id: DISTRICTS_DATASET_ID });
-    expect(outcome).toEqual({
-      deletedDatasetIds: [DISTRICTS_DATASET_ID],
-      failedDatasetIds: [PROVINCES_DATASET_ID],
+      expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
     });
-    expect(mocks.loggerError).toHaveBeenCalledTimes(1);
+
+    it("returns that dataset as failed and the others as deleted", async () => {
+      const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
+
+      expect(outcome).toEqual({
+        deletedDatasetIds: [DISTRICTS_DATASET_ID],
+        failedDatasetIds: [PROVINCES_DATASET_ID],
+      });
+    });
+
+    it("logs the error once", async () => {
+      await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
+
+      expect(mocks.loggerError).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("a dataset the user may not delete", () => {
@@ -176,19 +204,34 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     });
   });
 
-  it("returns a dataset as failed when its row survives the delete", async () => {
-    mocks.fullDelete.mockRejectedValue(
-      new DatasetDeleteError({
-        datasetId: PROVINCES_DATASET_ID,
-        reason: "still_present",
-      }),
-    );
+  describe("when fullDelete reports that the row is still present", () => {
+    beforeEach(() => {
+      mocks.fullDelete.mockRejectedValue(
+        new DatasetDeleteError({
+          datasetId: PROVINCES_DATASET_ID,
+          reason: "still_present",
+        }),
+      );
+      // A re-read would find nothing, so only the error's own reason can
+      // make the dataset count as failed.
+      mocks.getDatasetById
+        .mockResolvedValueOnce({ id: PROVINCES_DATASET_ID })
+        .mockResolvedValue(undefined);
+    });
 
-    const outcome = await _run([PROVINCES_DATASET_ID]);
+    it("returns the dataset as failed", async () => {
+      const outcome = await _run([PROVINCES_DATASET_ID]);
 
-    expect(outcome).toEqual({
-      deletedDatasetIds: [],
-      failedDatasetIds: [PROVINCES_DATASET_ID],
+      expect(outcome).toEqual({
+        deletedDatasetIds: [],
+        failedDatasetIds: [PROVINCES_DATASET_ID],
+      });
+    });
+
+    it("does not read the dataset again", async () => {
+      await _run([PROVINCES_DATASET_ID]);
+
+      expect(mocks.getDatasetById).toHaveBeenCalledTimes(1);
     });
   });
 

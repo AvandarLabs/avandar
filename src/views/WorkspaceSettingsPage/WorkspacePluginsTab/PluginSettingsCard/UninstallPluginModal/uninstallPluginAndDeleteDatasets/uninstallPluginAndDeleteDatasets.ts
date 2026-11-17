@@ -23,31 +23,11 @@ export type UninstallOutcome = {
 type DatasetResult = "deleted" | "already_gone" | "failed";
 
 /**
- * Reads the install back after its delete, and says whether it is still
- * there. The CRUD client's delete does not report how many rows it removed,
- * so a delete that RLS refuses would otherwise look like a success. A read
- * that throws is reported as `not_confirmed`, since the install may be gone.
- */
-async function _isInstallationStillThere(
-  installationId: PluginInstallation.Id,
-): Promise<boolean> {
-  try {
-    const remaining = await PluginInstallationClient.getById({
-      id: installationId,
-    });
-    return remaining !== undefined;
-  } catch (cause) {
-    throw new UninstallPluginError({
-      installationId,
-      reason: "not_confirmed",
-      cause,
-    });
-  }
-}
-
-/**
  * Deletes the install and proves it is gone, or throws an
- * `UninstallPluginError`.
+ * `UninstallPluginError`. The CRUD client's delete does not report how many
+ * rows it removed, so a delete that RLS refuses would otherwise look like a
+ * success, and the install is read back. A read that throws is `not_confirmed`
+ * since the install may be gone. An install still there is `still_installed`.
  *
  * On the web the read-back runs against Supabase under the user's own access,
  * so it shows whether the server removed the row. On desktop it does not
@@ -61,7 +41,17 @@ async function _deleteInstallationOrThrow(
   installationId: PluginInstallation.Id,
 ): Promise<void> {
   await PluginInstallationClient.delete({ id: installationId });
-  if (await _isInstallationStillThere(installationId)) {
+  let remaining: PluginInstallation.T | undefined;
+  try {
+    remaining = await PluginInstallationClient.getById({ id: installationId });
+  } catch (cause) {
+    throw new UninstallPluginError({
+      installationId,
+      reason: "not_confirmed",
+      cause,
+    });
+  }
+  if (remaining !== undefined) {
     throw new UninstallPluginError({
       installationId,
       reason: "still_installed",
@@ -72,9 +62,10 @@ async function _deleteInstallationOrThrow(
 /**
  * Decides how a dataset ended after `fullDelete` threw. A refusal for lack of
  * admin access is a normal outcome and is not logged. Any other error is
- * logged, and the dataset is read again: `fullDelete` can throw after it has
- * deleted the row, for example while it cleans up local copies, and then the
- * dataset is gone.
+ * logged. A `still_present` error already shows the row survived, so the
+ * dataset failed. For any other error the dataset is read again, since
+ * `fullDelete` can throw after it has deleted the row, for example while it
+ * cleans up local copies, and then the dataset is gone.
  */
 async function _settleAfterFailedDelete(
   options: Readonly<{ datasetId: Dataset.Id; error: unknown }>,
@@ -87,6 +78,9 @@ async function _settleAfterFailedDelete(
     datasetId,
     error,
   });
+  if (error instanceof DatasetDeleteError && error.reason === "still_present") {
+    return "failed";
+  }
   try {
     const remaining = await DatasetClient.getById({ id: datasetId });
     return remaining === undefined ? "deleted" : "failed";
@@ -126,6 +120,22 @@ async function _deleteDataset(datasetId: Dataset.Id): Promise<DatasetResult> {
   }
 }
 
+/** Lists the ids whose result is `wanted`, in the order they were deleted. */
+function _selectIdsByResult(
+  options: Readonly<{
+    results: ReadonlyArray<{ datasetId: Dataset.Id; result: DatasetResult }>;
+    wanted: DatasetResult;
+  }>,
+): Dataset.Id[] {
+  return options.results
+    .filter(({ result }) => {
+      return result === options.wanted;
+    })
+    .map(({ datasetId }) => {
+      return datasetId;
+    });
+}
+
 /**
  * Uninstalls a plugin, then deletes the datasets the admin chose, one at a
  * time in the order given and each at most once. Use it where an admin
@@ -152,17 +162,8 @@ export async function uninstallPluginAndDeleteDatasets(
       return { datasetId, result: await _deleteDataset(datasetId) };
     },
   );
-  const idsWithResult = (wanted: DatasetResult): Dataset.Id[] => {
-    return results
-      .filter(({ result }) => {
-        return result === wanted;
-      })
-      .map(({ datasetId }) => {
-        return datasetId;
-      });
-  };
   return {
-    deletedDatasetIds: idsWithResult("deleted"),
-    failedDatasetIds: idsWithResult("failed"),
+    deletedDatasetIds: _selectIdsByResult({ results, wanted: "deleted" }),
+    failedDatasetIds: _selectIdsByResult({ results, wanted: "failed" }),
   };
 }
