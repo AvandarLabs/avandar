@@ -39,7 +39,7 @@ export function PluginContentRow({
   return (
     <Group justify="space-between" wrap="nowrap">
       <Text size="sm">{title}</Text>
-      <Group gap="xs" wrap="nowrap">
+      <Group gap="xs" wrap="nowrap" miw={0}>
         {status === undefined ? (
           <Text size="sm" c="dimmed">{t`Not imported`}</Text>
         ) : (
@@ -48,6 +48,7 @@ export function PluginContentRow({
         {canManage && !isRunning ? (
           <Button
             size="compact-sm"
+            flex="none"
             variant="default"
             aria-label={isFailed ? t`Retry ${title}` : t`Import ${title}`}
             onClick={onImport}

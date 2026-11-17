@@ -611,7 +611,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `plugins/bundled.yaml` | F97, F101 | F97: `plugins: []`. F101: `- epidemiology`. |
 | `plugins/epidemiology/{ava.yaml,locales/en.json,src/index.tsx,src/index.test.tsx}` | F101, F108, F110, F111 | F101: regression. F108: the two `vizTypes`, their strings, and `bdb15ff8b`'s description. F110: `closeModal` in the test's mocked API. F111: the two commands, `query:addColumns`, their strings, and `f6fecb818`'s line-list wording. |
 | `plugins/epidemiology/src/RegressionModal/RegressionModal.test.tsx` | F101, F110 | F110: `closeModal` in the mocked API (`3b2e41020`). |
-| `src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts` | F110, F111 | F111: the row-count window case from `f6fecb818`. |
+| `src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts` | F110, F111 | F111: the row-count window case from `f6fecb818`. |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F81 to F85, F110 | F110: the `plugin_command` query trigger. F81 to F85 `b3b7dacd4`, `63d934d75` own the rest. |
 | `package.json` | F96, F97, others | F96: the three `@avandar/plugin-*` `workspace:*` dependencies. F97: the `check:plugin-bundle` script. |
 | `vite.config.ts` | F96, F97 | F96: the three plugin package aliases. F97: `runnerImport` of the Vite plugin, the async config, the plugin registration, and the `virtual:ava-plugin-index` Vitest alias. |
@@ -9319,7 +9319,7 @@ draws the incidence columns as a rate plot with whiskers).
   `src/derivedColumns/**` (all new).
 - The F111 hunks of `plugins/epidemiology/{ava.yaml,locales/en.json,src/index.tsx,src/index.test.tsx}`
   (final state at `34798387c`).
-- `src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`
+- `src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`
   (one case).
 - `tests/e2e/plugins-epidemiology-incidence.spec.ts` (new).
 

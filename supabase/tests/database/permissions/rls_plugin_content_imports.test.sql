@@ -69,7 +69,7 @@ values (
   'd1600001-0000-4000-8000-000000000001'::uuid
 );
 
-select plan (15);
+select plan (16);
 
 -- 1. A plain member reads their workspace's import.
 select lives_ok (
@@ -318,6 +318,9 @@ select lives_ok (
   $t15$,
   'the workspace owner deletes a content import'
 );
+
+-- 16. The index that serves the dataset foreign key cascade exists.
+select has_index ('public', 'plugin_content_imports', 'idx_plugin_content_imports__dataset_id', 'dataset_id is indexed');
 
 select * from finish ();
 

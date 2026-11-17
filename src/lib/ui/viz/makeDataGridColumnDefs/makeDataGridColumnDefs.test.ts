@@ -28,6 +28,16 @@ function _formatCell(
   return columnDef!.valueFormatter({ value: options.value });
 }
 
+function _formatPlainCell(field: string, value: unknown): string {
+  const [columnDef] = makeDataGridColumnDefs({
+    columnNames: [field],
+    data: [{ [field]: value }],
+    dateColumns: undefined,
+    dateFormat: "YYYY-MM-DD",
+  });
+  return columnDef!.valueFormatter({ value });
+}
+
 describe("makeDataGridColumnDefs", () => {
   const originalTimezone = process.env.TZ;
 
@@ -270,5 +280,71 @@ describe("makeDataGridColumnDefs", () => {
         _formatPeriods({ value: ["Fever", "Cough"], bucketGrain: "month" }),
       ).toBe("Fever; Cough");
     });
+  });
+});
+
+describe("struct cells", () => {
+  it("shows a struct as its fields, not [object Object]", () => {
+    expect(_formatPlainCell("location", { lat: 1.5, lng: -2 })).toBe(
+      '{"lat":1.5,"lng":-2}',
+    );
+  });
+
+  it("shows a struct holding a bigint", () => {
+    expect(_formatPlainCell("location", { count: 12n })).toBe(
+      '{"count":"12"}',
+    );
+  });
+
+  it("uses a value's own toJSON, as an Arrow struct row has", () => {
+    const structRow = {
+      toJSON: () => {
+        return { district: "Maputo" };
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe('{"district":"Maputo"}');
+  });
+
+  it("shows text when a value's toJSON returns undefined", () => {
+    const structRow = {
+      toJSON: () => {
+        return undefined;
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe("[object Object]");
+  });
+
+  it("shows text when a struct refers back to itself", () => {
+    const circular: Record<string, unknown> = { id: 1 };
+    circular.self = circular;
+    expect(_formatPlainCell("place", circular)).toBe("[object Object]");
+  });
+
+  it("shows text when a value's toJSON throws", () => {
+    const structRow = {
+      toJSON: () => {
+        throw new Error("cannot serialize");
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe("[object Object]");
+  });
+
+  it("shows a placeholder when a value cannot be turned into text", () => {
+    const bareObject = Object.create(null) as Record<string, unknown>;
+    bareObject.toJSON = () => {
+      return undefined;
+    };
+    expect(_formatPlainCell("place", bareObject)).toBe("[object]");
+  });
+
+  it("keeps a typed array as its comma-separated values", () => {
+    expect(_formatPlainCell("bytes", new Uint8Array([1, 2]))).toBe("1,2");
+    expect(_formatPlainCell("ids", new Int32Array([1, 2]))).toBe("1,2");
+  });
+
+  it("shows a list of structs separated by semicolons", () => {
+    expect(_formatPlainCell("places", [{ id: 1 }, { id: 2 }])).toBe(
+      '{"id":1}; {"id":2}',
+    );
   });
 });

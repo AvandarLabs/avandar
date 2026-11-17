@@ -41,7 +41,7 @@ function _getKeyIssueMessage(issue: { code?: string }): string | undefined {
  * each bound record, such as a case's onset date. Required by default, so a
  * binding must map it to a workspace field.
  */
-export const PluginDataSlotAttributeSchema = z.strictObject({
+const PluginDataSlotAttributeSchema = z.strictObject({
   type: z.enum(DATA_SLOT_ATTRIBUTE_TYPES, { error: ATTRIBUTE_TYPE_MESSAGE }),
   title: LocalizedStringSchema,
   required: z.boolean().default(true),

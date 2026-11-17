@@ -643,19 +643,19 @@ EOF
 ### Task 4: `assertSingleSqlExpression`
 
 **Files:**
-- Create: `src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.ts`
-- Test: `src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`
+- Create: `src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.ts`
+- Test: `src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`
 
 **Context:** A plugin's expression is spliced into the Data Explorer's SQL, so the host must prove it can only add a column. The function rejects `;`, `--`, and `/*` before parsing (they could end the expression or hide text from the parser), then parses `SELECT <expression>` with `node-sql-parser`. It tries the `postgresql` dialect first and falls back to `snowflake`, because `postgresql` rejects `RANGE BETWEEN INTERVAL 6 DAY PRECEDING`, which the rolling average needs. It accepts only one `select` statement with one column that is not `*` and has no alias, no clause (`FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `WITH`, `LIMIT`, a set operation), and no nested `select` anywhere in the column. `groupby` is typed as an object with `columns` but is `null` at runtime, and `limit` can be `null` in some dialects, so both are read null-safely. It lives under `src/lib/plugins/derivedColumns/`, which only the lazily loaded runner reaches.
 
 - [ ] **Step 1: Write the failing test**
 
-`src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`:
+`src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts`:
 
 ```ts
 import { PluginError } from "@avandar/plugin-sdk";
 import { describe, expect, it } from "vitest";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 
 /**
  * The `PluginError` code `assertSingleSqlExpression` throws for `expression`,
@@ -727,12 +727,12 @@ describe("assertSingleSqlExpression", () => {
 
 - [ ] **Step 2: Run it and confirm it fails**
 
-Run: `pnpm vitest run src/lib/plugins/derivedColumns/assertSingleSqlExpression`
-Expected: FAIL, `Error: Failed to resolve import "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression"`.
+Run: `pnpm vitest run src/lib/sql/assertSingleSqlExpression`
+Expected: FAIL, `Error: Failed to resolve import "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression"`.
 
 - [ ] **Step 3: Implement it**
 
-`src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.ts`:
+`src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.ts`:
 
 ```ts
 import { PluginError } from "@avandar/plugin-sdk";
@@ -855,19 +855,19 @@ export function assertSingleSqlExpression(expression: string): void {
 
 - [ ] **Step 4: Run it and confirm it passes**
 
-Run: `pnpm vitest run src/lib/plugins/derivedColumns/assertSingleSqlExpression`
+Run: `pnpm vitest run src/lib/sql/assertSingleSqlExpression`
 Expected: PASS, `Tests  21 passed (21)`.
 
 - [ ] **Step 5: Format, lint, and type-check**
 
-Run: `pnpm exec oxfmt --ignore-path .oxfmtignore src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.ts src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts && pnpm exec eslint src/lib/plugins/derivedColumns/assertSingleSqlExpression && pnpm exec tsc -b --noEmit 2>&1 | grep "error TS"`
+Run: `pnpm exec oxfmt --ignore-path .oxfmtignore src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.ts src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts && pnpm exec eslint src/lib/sql/assertSingleSqlExpression && pnpm exec tsc -b --noEmit 2>&1 | grep "error TS"`
 Expected: `Finished in ...ms on 2 files`, no ESLint output, and no type errors.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.ts \
-  src/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression.test.ts
+git add src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.ts \
+  src/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression.test.ts
 git commit -m "$(cat <<'EOF'
 feat(plugins): check that a derived column is one SQL expression
 
@@ -1065,7 +1065,7 @@ import {
   normalizeSqlForSubquery,
   quoteSqlIdentifier,
 } from "@avandar/utils/sql";
-import { assertSingleSqlExpression } from "@/lib/plugins/derivedColumns/assertSingleSqlExpression/assertSingleSqlExpression";
+import { assertSingleSqlExpression } from "@/lib/sql/assertSingleSqlExpression/assertSingleSqlExpression";
 import type { DerivedColumn } from "@avandar/plugin-sdk";
 
 /** The names a derived column may take: lowercase snake case. */

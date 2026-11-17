@@ -135,6 +135,7 @@ export async function importPluginContentItem(
     workspaceId: options.workspaceId,
     userId: options.userId,
     file,
+    displayName: options.datasetName,
     parseOptions: {},
   });
   try {

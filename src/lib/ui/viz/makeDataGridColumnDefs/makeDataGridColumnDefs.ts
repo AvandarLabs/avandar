@@ -81,9 +81,37 @@ function _listItemTexts(
 }
 
 /**
+ * A struct cell as JSON, so its fields read as `{"lat":1.5}` rather than
+ * `[object Object]`. A bigint becomes its digits. A value with its own
+ * `toJSON`, such as an Arrow struct row, is read through it. A value JSON
+ * cannot represent, such as a circular object or one whose `toJSON` throws,
+ * falls back to its plain text, so a cell never throws or renders undefined.
+ */
+function _formatStructValue(value: object): string {
+  try {
+    // TypeScript types `JSON.stringify` as returning a string, but it
+    // returns undefined when a value's `toJSON` returns undefined.
+    const json = JSON.stringify(value, (_key, fieldValue: unknown) => {
+      return typeof fieldValue === "bigint" ? String(fieldValue) : fieldValue;
+    }) as string | undefined;
+    if (json !== undefined) {
+      return json;
+    }
+  } catch {
+    // Fall through to the plain text below.
+  }
+  try {
+    return String(value);
+  } catch {
+    return "[object]";
+  }
+}
+
+/**
  * The text of one non-date cell. A list, such as a case type field that
  * keeps every value, shows its values separated by semicolons, which never
- * collide with a number's thousands separator. An empty list is blank.
+ * collide with a number's thousands separator. An empty list is blank. A
+ * struct shows as JSON, while a typed array keeps its comma-separated values.
  */
 function _formatCellValue(value: unknown, columnName: string): string {
   if (Array.isArray(value)) {
@@ -91,6 +119,14 @@ function _formatCellValue(value: unknown, columnName: string): string {
   }
   if (typeof value === "number") {
     return _formatGridNumber(value, columnName);
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    !(value instanceof Date) &&
+    !ArrayBuffer.isView(value)
+  ) {
+    return _formatStructValue(value);
   }
   return value == null ? "" : String(value);
 }

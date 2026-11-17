@@ -200,7 +200,7 @@ select throws_ok (
     '{}'::jsonb
   );
   $t5$,
-  '23514',
+  '23503',
   null,
   'a data slot cannot be bound to a case type of another workspace'
 );

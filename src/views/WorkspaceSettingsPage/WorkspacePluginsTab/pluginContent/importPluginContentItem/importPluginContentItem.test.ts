@@ -133,6 +133,14 @@ describe("importPluginContentItem", () => {
     expect(parseOptions).toEqual({});
   });
 
+  it("names the import after the dataset, not the bundled file", async () => {
+    await _importProvinces();
+
+    expect(mocks.startCsvImport).toHaveBeenCalledWith(
+      expect.objectContaining({ displayName: "Mozambique provinces" }),
+    );
+  });
+
   it("saves a CSV dataset named and described by the item, with the sniffed dialect", async () => {
     await _importProvinces();
 

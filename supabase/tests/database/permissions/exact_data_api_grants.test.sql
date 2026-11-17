@@ -52,6 +52,7 @@ with public_tables as (
       'datasets__postgres_table',
       'map_jitter_salts',
       'plugin_content_imports',
+      'plugin_data_slot_bindings',
       -- Service role only: no `authenticated` grant at all.
       'pipeline_execution_scopes',
       'pipeline_executions',
@@ -166,6 +167,16 @@ with public_tables as (
   from
     unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
+  -- `update` is granted per column, below: a binding never moves to another
+  -- workspace or install.
+  select
+    'plugin_data_slot_bindings',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
+  union all
   select
     'dashboards',
     'anon',
@@ -240,6 +251,23 @@ with expected_column_privileges as (
         'deleted_at'
       ]
     ) as columns (column_name)
+  union all
+  select
+    'plugin_data_slot_bindings'::text as table_name,
+    column_name,
+    'authenticated'::text as grantee,
+    'UPDATE'::text as privilege_type,
+    false as is_grantable
+  from
+    unnest(
+      array[
+        'attribute_map',
+        'bound_by',
+        'concept_id',
+        'dataset_id',
+        'source_type'
+      ]
+    ) as columns (column_name)
 ), actual_column_privileges as (
   select
     c.relname::text as table_name,
@@ -283,7 +311,7 @@ select is(
     ),
     '[]'::jsonb
   ),
-  'explicit column privileges exactly match the analytics event insert contract'
+  'explicit column privileges exactly match the column grant contract'
 );
 
 with analytics_views as (

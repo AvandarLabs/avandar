@@ -188,8 +188,9 @@ describe("PluginContentSection", () => {
     );
 
     expect(
-      await screen.findByText("Failed: permission denied"),
-    ).toBeInTheDocument();
+      await screen.findByText("permission denied"),
+    ).toHaveAttribute("lang", "en");
+    expect(screen.getByText("Failed")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Retry Mozambique districts" }),
     ).toBeInTheDocument();

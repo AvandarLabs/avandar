@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { SessionExpiredError } from "$/ServerApiClient";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111" as Workspace.Id;
@@ -62,6 +64,16 @@ describe("AvaQueryClient retry policy", () => {
       ).toBe(false);
     },
   );
+
+  it("does not retry a concept the caller may not query", () => {
+    // Like the workspace refusals, this is a decision: the same query would
+    // name the same concept and be refused again.
+    const retry = _getRetryPredicate();
+    const denial = new ConceptRelationDenied({
+      conceptId: "22222222-2222-4222-8222-222222222222" as Concept.Id,
+    });
+    expect(retry(0, denial)).toBe(false);
+  });
 
   it("still does not retry an expired session", () => {
     // Pins the pre-existing branch, so adding the denial case above cannot

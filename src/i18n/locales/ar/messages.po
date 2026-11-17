@@ -734,13 +734,6 @@ msgstr "جارٍ التحقق من هذه السجلات"
 msgid "NYS measles case report"
 msgstr "تقرير حالة حصبة NYS"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
-"differed from the import preview and have been overwritten with the "
-"actual values."
-msgstr "أنواع الأعمدة المكتشفة لـ {changedCount} عمود في \"{sourceFileName}\" "
-"تختلف عن المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "الهندسة"
@@ -1458,6 +1451,10 @@ msgstr "مخطط فقاعي"
 msgid "Restart tutorial"
 msgstr "إعادة تشغيل البرنامج التعليمي"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" finished processing and is ready to use."
+msgstr "\"{displayName}\" انتهى من المعالجة وهو جاهز للاستخدام."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "{publisher} · version {version} · {license} license"
 msgstr "{publisher} · الإصدار {version} · ترخيص {license}"
@@ -1524,6 +1521,12 @@ msgstr "صمِّم أنواع الحالات في الدردشة"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Choose a default status."
 msgstr "اختر حالة افتراضية."
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{displayName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr "أنواع الأعمدة المكتشفة لعمود واحد في \"{displayName}\" تختلف عن "
+"المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1717,6 +1720,10 @@ msgstr "لا توجد طبقات بعد."
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Label {rowNumber}"
 msgstr "تسمية {rowNumber}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
+msgid "Could not read these records."
+msgstr "تعذّرت قراءة هذه السجلات."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -2309,6 +2316,10 @@ msgstr "{fieldName} لكل شهر"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "الإحداثي هو 0، 0"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
+msgid "Failed"
+msgstr "فشل"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
@@ -3721,12 +3732,6 @@ msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
 msgstr "{applied, plural, one {تم تطبيق # عامل تصفية} other {تم تطبيق # عوامل "
 "تصفية}}"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
-"the import preview and have been overwritten with the actual values."
-msgstr "أنواع الأعمدة المكتشفة لعمود واحد في \"{sourceFileName}\" تختلف عن "
-"المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
-
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاجه بدلاً من ذلك."
@@ -3908,10 +3913,6 @@ msgstr "{0} من مفاتيح الحدود المكررة"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
 msgstr "أصلح عنوان URL المخصص قبل النشر."
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr "\"{sourceFileName}\" انتهى من المعالجة وهو جاهز للاستخدام."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{attachedCount, plural, one {# attached as reference} other {# attached "
@@ -6118,6 +6119,13 @@ msgstr "جارٍ إعداد النماذج غير المتصلة"
 msgid "URL template"
 msgstr "قالب URL"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{displayName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr "أنواع الأعمدة المكتشفة لـ {changedCount} عمود في \"{displayName}\" "
+"تختلف عن المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google is rate limiting this request"
 msgstr "يُقيّد Google معدل هذا الطلب"
@@ -6322,10 +6330,6 @@ msgstr "لا توجد سجلات {conceptName} حتى الآن"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "المزيد من إجراءات مجموعة البيانات"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/PluginContentImportStatusText.tsx
-msgid "Failed: {reason}"
-msgstr "فشل: {reason}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -6571,6 +6575,10 @@ msgstr "طي"
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Labels"
 msgstr "التسميات"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed."
+msgstr "\"{displayName}\" لم يتمكن من التحليل."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "code {code}"
@@ -9782,10 +9790,6 @@ msgstr "الصفوف من هذا المخطط"
 msgid "member"
 msgstr "عضو"
 
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr "\"{sourceFileName}\" لم يتمكن من التحليل: {message}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
 msgstr "الطباعة"
@@ -10919,8 +10923,9 @@ msgstr "يمكن للمالك فقط جعل هذا {resource} خاصًا."
 #. placeholder {0}: props.contentCount
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "{0, plural, one {# dataset to import} other {# datasets to import}}"
-msgstr "{0, plural, one {مجموعة بيانات واحدة للاستيراد} other {# مجموعات بيانات "
-"للاستيراد}}"
+msgstr "{0, plural, one {مجموعة بيانات واحدة للاستيراد} two {مجموعتا بيانات "
+"للاستيراد} few {# مجموعات بيانات للاستيراد} many {# مجموعة بيانات "
+"للاستيراد} other {# مجموعة بيانات للاستيراد}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Updates"
@@ -11237,7 +11242,7 @@ msgstr "لا يمكنني إضافة ذلك إلا إلى لوحة معلوما�
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "لا تسمح خطتك بمشاركة المزيد من لوحات المعلومات."
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "تحذير"
@@ -11995,7 +12000,7 @@ msgstr "{threshold} أو أكثر"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ReviewStep.tsx
 msgid "About this plugin"
-msgstr "حول هذه الإضافة"
+msgstr "حول هذا المكوّن الإضافي"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
@@ -12010,7 +12015,7 @@ msgstr "فشل تحميل مجموعة البيانات"
 msgid "Decimal"
 msgstr "عشري"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Error"
 msgstr "خطأ"
 
@@ -12734,7 +12739,7 @@ msgstr "افتحه على {serviceName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/DataSlotsStep.tsx
 msgid "Optional. You can choose these records later on the plugin's card."
-msgstr "اختياري. يمكنك اختيار هذه السجلات لاحقًا من بطاقة الإضافة."
+msgstr "اختياري. يمكنك اختيار هذه السجلات لاحقًا من بطاقة المكوّن الإضافي."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -13078,10 +13083,6 @@ msgstr "تعذّر تحميل حقول هذا السجل"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "{percentLabel}% of the datasets read"
 msgstr "تمت قراءة {percentLabel}% من مجموعات البيانات"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotCheckPreview/DataSlotCheckPreview.tsx
-msgid "Could not read these records. {reason}"
-msgstr "تعذّرت قراءة هذه السجلات. {reason}"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
@@ -13472,7 +13473,7 @@ msgstr "لا يمكن لهذا المتصفح تشغيل النماذج غير �
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
 msgid "Datasets it includes"
-msgstr "مجموعات البيانات التي تتضمنها"
+msgstr "مجموعات البيانات التي يتضمنها"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -14044,6 +14045,10 @@ msgstr "معاينة لوحة المعلومات هذه"
 msgid "Show as link"
 msgstr "عرض كرابط"
 
+#: src/components/UntranslatedDetail/UntranslatedDetail.tsx
+msgid "Details:"
+msgstr "التفاصيل:"
+
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
@@ -14118,8 +14123,8 @@ msgstr "تحميل مجموعة بيانات"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace. The datasets it imported "
 "stay in Data Sources."
-msgstr "تمت إزالة ميزاتها من مساحة العمل هذه. وتبقى مجموعات البيانات التي "
-"استوردتها في مصادر البيانات."
+msgstr "تمت إزالة ميزاته من مساحة العمل هذه. وتبقى مجموعات البيانات التي "
+"استوردها في مصادر البيانات."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -15681,7 +15686,7 @@ msgstr "المسافة ({unitLabel})"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/usePluginContentImports/usePluginContentImports.ts
 msgid "This plugin no longer includes {filePath}."
-msgstr "لم تعد هذه الإضافة تتضمن {filePath}."
+msgstr "لم يعد هذا المكوّن الإضافي يتضمن {filePath}."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
@@ -15723,7 +15728,7 @@ msgstr "اختر القيمة الدنيا"
 msgid "Mode"
 msgstr "وضع"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Success"
 msgstr "نجاح"
 
