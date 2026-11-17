@@ -12,7 +12,10 @@ import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsT
 import { useUninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useKeepModalOpenWhile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
+import type {
+  UninstallContentRow,
+  UninstallContentRows,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /**
@@ -99,6 +102,26 @@ function useCheckedDatasetIds(): {
   return { checkedIds, setIsChecked };
 }
 
+/**
+ * Runs the uninstall for the modal and keeps the modal open while it runs.
+ * It closes the modal as uninstalled when the run finishes.
+ */
+function useModalUninstaller(
+  props: Props,
+  rows: readonly UninstallContentRow[],
+): ReturnType<typeof useRunUninstall> {
+  const uninstaller = useRunUninstall({
+    pluginName: props.pluginName,
+    installationId: props.installationId,
+    rows,
+    onDone: () => {
+      props.onClose("uninstalled");
+    },
+  });
+  useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
+  return uninstaller;
+}
+
 /** The rows, the buttons and the running state of the uninstall dialog. */
 function UninstallModalBody(
   props: Props & Readonly<{ isWaitingForDependents: boolean }>,
@@ -106,15 +129,7 @@ function UninstallModalBody(
   const { t } = useLingui();
   const content = useUninstallContentRows(props.pluginId);
   const { checkedIds, setIsChecked } = useCheckedDatasetIds();
-  const uninstaller = useRunUninstall({
-    pluginName: props.pluginName,
-    installationId: props.installationId,
-    rows: content.rows,
-    onDone: () => {
-      props.onClose("uninstalled");
-    },
-  });
-  useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
+  const uninstaller = useModalUninstaller(props, content.rows);
   const datasetIdsToDelete = _listCheckedIdsInRowOrder(
     content,
     checkedIds,

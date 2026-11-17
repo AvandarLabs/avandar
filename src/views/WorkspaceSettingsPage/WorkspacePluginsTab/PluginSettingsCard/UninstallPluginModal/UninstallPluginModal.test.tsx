@@ -559,6 +559,26 @@ describe("UninstallPluginModal", () => {
     });
   });
 
+  describe("when the uninstall fails and the modal stays open", () => {
+    beforeEach(() => {
+      mocks.uninstall.mockRejectedValue(new Error("rpc failed"));
+    });
+
+    it("returns focus to the confirm button, which was disabled while running", async () => {
+      _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+      await waitFor(() => {
+        expect(mocks.notifyError).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Uninstall" })).toHaveFocus();
+      });
+      expect(mocks.onClose).not.toHaveBeenCalled();
+    });
+  });
+
   describe("while the uninstall runs", () => {
     let finish: (value: UninstallOutcomeStub) => void = () => {};
 
