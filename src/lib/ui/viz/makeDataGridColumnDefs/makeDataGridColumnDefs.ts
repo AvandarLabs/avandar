@@ -83,12 +83,26 @@ function _listItemTexts(
 /**
  * A struct cell as JSON, so its fields read as `{"lat":1.5}` rather than
  * `[object Object]`. A bigint becomes its digits. A value with its own
- * `toJSON`, such as an Arrow struct row, is read through it.
+ * `toJSON`, such as an Arrow struct row, is read through it. A value JSON
+ * cannot represent, such as a circular object or one whose `toJSON` throws,
+ * falls back to its plain text, so a cell never throws or renders undefined.
  */
 function _formatStructValue(value: object): string {
-  return JSON.stringify(value, (_key, fieldValue: unknown) => {
-    return typeof fieldValue === "bigint" ? String(fieldValue) : fieldValue;
-  });
+  try {
+    const json = JSON.stringify(value, (_key, fieldValue: unknown) => {
+      return typeof fieldValue === "bigint" ? String(fieldValue) : fieldValue;
+    }) as string | undefined;
+    if (json !== undefined) {
+      return json;
+    }
+  } catch {
+    // Fall through to the plain text below.
+  }
+  try {
+    return String(value);
+  } catch {
+    return "[object]";
+  }
 }
 
 /**

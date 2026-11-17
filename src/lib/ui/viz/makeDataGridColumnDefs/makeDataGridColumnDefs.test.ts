@@ -305,6 +305,38 @@ describe("struct cells", () => {
     expect(_formatPlainCell("place", structRow)).toBe('{"district":"Maputo"}');
   });
 
+  it("shows text when a value's toJSON returns undefined", () => {
+    const structRow = {
+      toJSON: () => {
+        return undefined;
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe("[object Object]");
+  });
+
+  it("shows text when a struct refers back to itself", () => {
+    const circular: Record<string, unknown> = { id: 1 };
+    circular.self = circular;
+    expect(_formatPlainCell("place", circular)).toBe("[object Object]");
+  });
+
+  it("shows text when a value's toJSON throws", () => {
+    const structRow = {
+      toJSON: () => {
+        throw new Error("cannot serialize");
+      },
+    };
+    expect(_formatPlainCell("place", structRow)).toBe("[object Object]");
+  });
+
+  it("shows a placeholder when a value cannot be turned into text", () => {
+    const bareObject = Object.create(null) as Record<string, unknown>;
+    bareObject.toJSON = () => {
+      return undefined;
+    };
+    expect(_formatPlainCell("place", bareObject)).toBe("[object]");
+  });
+
   it("keeps a typed array as its comma-separated values", () => {
     expect(_formatPlainCell("bytes", new Uint8Array([1, 2]))).toBe("1,2");
     expect(_formatPlainCell("ids", new Int32Array([1, 2]))).toBe("1,2");
