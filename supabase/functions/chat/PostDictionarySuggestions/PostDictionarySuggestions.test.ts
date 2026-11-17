@@ -131,6 +131,50 @@ describe("PostDictionarySuggestions", () => {
     expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
   });
 
+  describe("describe requests", () => {
+    const DESCRIBE_REQUEST: DictionarySuggestionsRequest = {
+      task: "describe",
+      locale: "en",
+      column: {
+        name: "clinic_notes",
+        otherNames: [],
+        kind: "text",
+        values: [],
+      },
+      datasetNames: ["Kings"],
+      description: "Free text from intake",
+    };
+
+    it("answers a description request under v2, holding the model to the description schema", async () => {
+      sendOpenRouterRequestMock.mockResolvedValue({
+        text: '{"description":"Nurse notes."}',
+      });
+      await expect(
+        _callRoute("dictionary-suggestions-v2", DESCRIBE_REQUEST),
+      ).resolves.toEqual({ reply: '{"description":"Nurse notes."}' });
+      expect(sendOpenRouterRequestMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          requestBody: expect.objectContaining({
+            response_format: expect.objectContaining({
+              json_schema: expect.objectContaining({
+                name: "dictionary_describe",
+                schema: getDictionarySuggestionsJsonSchema("describe"),
+              }),
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("refuses a description request under the frozen v1 prompt before calling the model", async () => {
+      await expect(
+        _callRoute("dictionary-suggestions-v1", DESCRIBE_REQUEST),
+      ).rejects.toMatchObject({ httpCode: 400 });
+      expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
+      expect(verifyAckTokenMock).not.toHaveBeenCalled();
+    });
+  });
+
   it("refuses an unknown prompt version before calling the model", async () => {
     await expect(_callRoute("dictionary-suggestions-v0")).rejects.toMatchObject(
       {

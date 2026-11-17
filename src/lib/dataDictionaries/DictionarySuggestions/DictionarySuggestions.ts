@@ -2,6 +2,8 @@ import { prop } from "@avandar/utils";
 import {
   buildDictionarySuggestionsMessages,
   DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN,
+  DICTIONARY_SUGGESTIONS_MAX_DATASET_NAMES,
+  DICTIONARY_SUGGESTIONS_MAX_EXISTING_DESCRIPTION_LENGTH,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
   DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH,
@@ -119,13 +121,13 @@ async function approveRequest(
   const { request } = options;
   const text = stringifyDictionarySuggestionsRequest(request);
   const columns =
-    request.task === "labels" ? [request.column] : request.columns;
+    request.task === "matches" ? request.columns : [request.column];
   const consent = await decideIfDataCanCrossBoundary({
     text,
     values: columns.flatMap((column) => {
       return column.values;
     }),
-    sourceColumn: request.task === "labels" ? request.column.name : undefined,
+    sourceColumn: request.task === "matches" ? undefined : request.column.name,
     context: "dictionary_suggestions",
     workspaceId: options.workspaceId,
     userId: options.userId,
@@ -302,6 +304,58 @@ function getLabelsBlockReason(
 ): LabelsBlockReason | undefined {
   const check = _checkLabelsRequestFromCodeList(options);
   return check.type === "blocked" ? check.reason : undefined;
+}
+
+/**
+ * The names of the datasets an entry's columns come from, each once, cut to
+ * what the route takes.
+ */
+function _getDatasetNames(entry: Readonly<DictionaryProposal.Entry>): string[] {
+  const names = DictionaryProposal.getColumns(entry).map((column) => {
+    return column.datasetName.slice(0, DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH);
+  });
+  return [...new Set(names)].slice(0, DICTIONARY_SUGGESTIONS_MAX_DATASET_NAMES);
+}
+
+/**
+ * What the user wrote in an entry's description, cut to what the route
+ * takes. A description that is an earlier suggestion is left out, so a new
+ * suggestion builds on the user's words and not on the model's own.
+ */
+function _getWrittenDescription(
+  entry: Readonly<DictionaryProposal.Entry>,
+): string {
+  return entry.isDescriptionSuggested
+    ? ""
+    : entry.description
+        .trim()
+        .slice(0, DICTIONARY_SUGGESTIONS_MAX_EXISTING_DESCRIPTION_LENGTH);
+}
+
+function makeDescribeRequestFromEntry(
+  options: Readonly<{
+    entry: DictionaryProposal.Entry;
+    locale: string;
+  }>,
+): DictionarySuggestionsRequest {
+  const { entry } = options;
+  const allNames = [entry.name, ...DictionaryProposal.getColumnNames(entry)];
+  const values = DictionaryProposal.getValuesSeen(entry)
+    .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES)
+    .map(prop("value"));
+  // Only the codes of a coded column not named after a person are sent, and
+  // never a cut one. Every cap here keeps the request well inside the
+  // offline model's window and the route's limit, so unlike labels there is
+  // no list that is too long to ask about.
+  const canSendValues =
+    _canSendValues([entry], allNames) && _areValuesShortEnough(values);
+  return {
+    task: "describe",
+    locale: options.locale,
+    column: _makeColumn(entry, canSendValues ? values : []),
+    datasetNames: _getDatasetNames(entry),
+    description: _getWrittenDescription(entry),
+  };
 }
 
 function makeMatchesRequestFromProposal(
@@ -488,8 +542,8 @@ function _fitMatchesRequest(
  * offline alike. Only column names, kinds, and the codes of short coded
  * columns are sent, never rows, and never the values of a column named
  * after a person or a contact detail. Online sends go through the chat's
- * consent gate first. Used by the create flow's Review and Label values
- * steps, and by a crosswalk's Suggest matches.
+ * consent gate first. Used by the create flow's Review, Label values, and
+ * Describe columns steps, and by a crosswalk's Suggest matches.
  */
 export const DictionarySuggestions = {
   /** Which model answers, the same way chat decides where a turn runs. */
@@ -523,6 +577,14 @@ export const DictionarySuggestions = {
    * can. Lets the Label values step say which of the three it is.
    */
   getLabelsBlockReason,
+
+  /**
+   * The request for a description of one entry, with what the user already
+   * wrote so the model improves on it. It names the entry's columns, kind,
+   * and datasets, and sends its codes only for a coded column not named
+   * after a person. It works for an entry with no value list.
+   */
+  makeDescribeRequestFromEntry,
 
   /**
    * The request for meaning matches across a proposal's entries. Undefined

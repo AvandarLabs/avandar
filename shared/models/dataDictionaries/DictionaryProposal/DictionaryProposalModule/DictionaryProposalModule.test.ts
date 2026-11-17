@@ -160,6 +160,23 @@ describe("DictionaryProposal edits", () => {
     expect(suggested.entries[0]?.isDescriptionSuggested).toBe(false);
   });
 
+  it("lets a suggested description replace a typed one only when told it may", () => {
+    const entryKey = VACCINATION.entries[0]?.key ?? "";
+    const typed = DictionaryProposal.setEntryDescription(VACCINATION, {
+      entryKey,
+      description: "MMR doses received",
+    });
+    const rewritten = DictionaryProposal.suggestEntryDescription(typed, {
+      entryKey,
+      description: "Doses of the MMR vaccine received",
+      isRewriteAllowed: true,
+    });
+    expect(rewritten.entries[0]?.description).toBe(
+      "Doses of the MMR vaccine received",
+    );
+    expect(rewritten.entries[0]?.isDescriptionSuggested).toBe(true);
+  });
+
   it("lists each column name once with the datasets it comes from", () => {
     const proposal = DictionaryProposal.fromColumnProfiles([
       _coded(BRONX, "GENDER", ["1", "2", "9"]),

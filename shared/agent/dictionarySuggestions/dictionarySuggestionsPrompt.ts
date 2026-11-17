@@ -2,18 +2,23 @@ import { z } from "zod";
 import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal.ts";
 
-/** Prompt versions the `chat` edge function serves. A shipped one is frozen. */
+/**
+ * Prompt versions the `chat` edge function serves. A shipped one is frozen:
+ * v1 serves labels and matches only, v2 adds descriptions.
+ */
 export const DICTIONARY_SUGGESTIONS_PROMPT_IDS = [
   "dictionary-suggestions-v1",
+  "dictionary-suggestions-v2",
 ] as const;
 
 /** The prompt version the browser asks for. */
-export const DICTIONARY_SUGGESTIONS_PROMPT_ID = "dictionary-suggestions-v1";
+export const DICTIONARY_SUGGESTIONS_PROMPT_ID = "dictionary-suggestions-v2";
 
 const MATCHES_MAX_TOKENS = 800;
 const LABELS_BASE_TOKENS = 300;
 const LABELS_TOKENS_PER_VALUE = 25;
 const LABELS_MAX_TOKENS = 3000;
+const DESCRIBE_MAX_TOKENS = 300;
 
 /**
  * A pessimistic count of characters per token, for sizing a prompt against
@@ -35,6 +40,15 @@ export const DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH = 200;
 
 /** The most other names one column may carry in a request. */
 export const DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES = 50;
+
+/** The most dataset names one describe request may carry. */
+export const DICTIONARY_SUGGESTIONS_MAX_DATASET_NAMES = 20;
+
+/**
+ * The longest an existing description may be in a describe request. The
+ * browser cuts a longer one, since it is only context for the model.
+ */
+export const DICTIONARY_SUGGESTIONS_MAX_EXISTING_DESCRIPTION_LENGTH = 2000;
 
 /** The most columns one matches request may carry. */
 export const DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS = 300;
@@ -151,7 +165,8 @@ const SuggestionColumnSchema = _makeColumnSchema(
 
 /**
  * What the browser asks the suggestion model for: labels for one coded
- * column, or which columns record the same thing. The `chat` edge route
+ * column, a description of one column, or which columns record the same
+ * thing. The `chat` edge route
  * validates request bodies with it, and tells a request too long to consent
  * to from an invalid one with `isDictionarySuggestionsRequestTooLarge`.
  */
@@ -161,6 +176,18 @@ export const DictionarySuggestionsRequestSchema = z
       task: z.literal("labels"),
       locale: LocaleSchema,
       column: SuggestionColumnSchema,
+    }),
+    z.object({
+      task: z.literal("describe"),
+      locale: LocaleSchema,
+      column: SuggestionColumnSchema,
+      datasetNames: z
+        .array(NameSchema)
+        .max(DICTIONARY_SUGGESTIONS_MAX_DATASET_NAMES),
+      /** What the user already wrote, or an empty string. */
+      description: z
+        .string()
+        .max(DICTIONARY_SUGGESTIONS_MAX_EXISTING_DESCRIPTION_LENGTH),
     }),
     z.object({
       task: z.literal("matches"),
@@ -221,6 +248,14 @@ const LABELS_SYSTEM_PROMPT = [
   'Reply with JSON only: {"labels":[{"value":"1","label":"Male","isMissing":false}],"description":"..."}',
 ].join(" ");
 
+const DESCRIBE_SYSTEM_PROMPT = [
+  "You describe one column of a dataset, for a data dictionary, in the requested locale.",
+  "Write one or two plain sentences saying what the column records, for someone who has never seen the data.",
+  "If an existing description is given, it is what the dictionary's author wrote: keep its facts and wording where they are right, and improve on it rather than starting over.",
+  "Use only the names, kind, values, and dataset names given. Do not invent units, codes, or facts you cannot tell from them.",
+  'Reply with JSON only: {"description":"..."}',
+].join(" ");
+
 const MATCHES_SYSTEM_PROMPT = [
   "You find columns that record the same thing under different names, for a data dictionary.",
   "Each column comes from a dataset, and coded columns list some of their values.",
@@ -248,6 +283,13 @@ const LABELS_JSON_SCHEMA = {
     description: { type: "string" },
   },
   required: ["labels", "description"],
+  additionalProperties: false,
+};
+
+const DESCRIBE_JSON_SCHEMA = {
+  type: "object",
+  properties: { description: { type: "string" } },
+  required: ["description"],
   additionalProperties: false,
 };
 
@@ -281,6 +323,10 @@ const LabelsReplySchema = z.object({
   description: z.string().catch(""),
 });
 
+const DescriptionReplySchema = z.object({
+  description: z.string().catch(""),
+});
+
 const MatchesReplySchema = z.object({
   matches: z
     .array(z.object({ name: z.string(), sameAs: z.string() }))
@@ -306,28 +352,41 @@ function _toColumnText(
 export function stringifyDictionarySuggestionsRequest(
   request: Readonly<DictionarySuggestionsRequest>,
 ): string {
-  return request.task === "labels"
-    ? JSON.stringify({
-        task: "labels",
-        locale: request.locale,
-        column: _toColumnText(request.column),
-      })
-    : JSON.stringify({
-        task: "matches",
-        locale: request.locale,
-        columns: request.columns.map(_toColumnText),
-      });
+  if (request.task === "labels") {
+    return JSON.stringify({
+      task: "labels",
+      locale: request.locale,
+      column: _toColumnText(request.column),
+    });
+  }
+  if (request.task === "describe") {
+    return JSON.stringify({
+      task: "describe",
+      locale: request.locale,
+      column: _toColumnText(request.column),
+      datasetNames: [...request.datasetNames],
+      description: request.description,
+    });
+  }
+  return JSON.stringify({
+    task: "matches",
+    locale: request.locale,
+    columns: request.columns.map(_toColumnText),
+  });
 }
 
 /**
  * The most tokens a model may use to reply to one request, online or
  * offline. A labels reply grows with the codes it labels and their length,
- * so its budget does too, up to a cap. A matches reply is a short list of
- * pairs.
+ * so its budget does too, up to a cap. A description is a sentence or two,
+ * and a matches reply is a short list of pairs.
  */
 export function getDictionarySuggestionsMaxTokens(
   request: Readonly<DictionarySuggestionsRequest>,
 ): number {
+  if (request.task === "describe") {
+    return DESCRIBE_MAX_TOKENS;
+  }
   if (request.task !== "labels") {
     return MATCHES_MAX_TOKENS;
   }
@@ -350,22 +409,51 @@ export function isDictionarySuggestionsPromptId(value: string): boolean {
   );
 }
 
+/**
+ * Whether a prompt version serves a task. v1 is frozen to labels and
+ * matches, so a describe request sent under it is refused.
+ */
+export function isDictionarySuggestionsTaskServed(
+  promptId: string,
+  task: DictionarySuggestionsRequest["task"],
+): boolean {
+  return promptId === "dictionary-suggestions-v1"
+    ? task === "labels" || task === "matches"
+    : isDictionarySuggestionsPromptId(promptId);
+}
+
+function _getPromptInput(
+  request: Readonly<DictionarySuggestionsRequest>,
+): object {
+  if (request.task === "labels") {
+    return { column: request.column };
+  }
+  if (request.task === "describe") {
+    return {
+      column: request.column,
+      datasetNames: request.datasetNames,
+      description: request.description,
+    };
+  }
+  return { columns: request.columns };
+}
+
+function _getSystemPrompt(task: DictionarySuggestionsRequest["task"]): string {
+  if (task === "labels") {
+    return LABELS_SYSTEM_PROMPT;
+  }
+  return task === "describe" ? DESCRIBE_SYSTEM_PROMPT : MATCHES_SYSTEM_PROMPT;
+}
+
 /** The messages that ask either model for one request's suggestions. */
 export function buildDictionarySuggestionsMessages(
   request: Readonly<DictionarySuggestionsRequest>,
 ): DictionarySuggestionsMessage[] {
-  const isLabels = request.task === "labels";
-  const input = isLabels
-    ? { column: request.column }
-    : { columns: request.columns };
   return [
-    {
-      role: "system",
-      content: isLabels ? LABELS_SYSTEM_PROMPT : MATCHES_SYSTEM_PROMPT,
-    },
+    { role: "system", content: _getSystemPrompt(request.task) },
     {
       role: "user",
-      content: `Locale: ${request.locale}\n${JSON.stringify(input)}`,
+      content: `Locale: ${request.locale}\n${JSON.stringify(_getPromptInput(request))}`,
     },
   ];
 }
@@ -377,7 +465,10 @@ export function buildDictionarySuggestionsMessages(
 export function getDictionarySuggestionsJsonSchema(
   task: DictionarySuggestionsRequest["task"],
 ): object {
-  return task === "labels" ? LABELS_JSON_SCHEMA : MATCHES_JSON_SCHEMA;
+  if (task === "labels") {
+    return LABELS_JSON_SCHEMA;
+  }
+  return task === "describe" ? DESCRIBE_JSON_SCHEMA : MATCHES_JSON_SCHEMA;
 }
 
 function _readJsonObject(reply: string): unknown {
@@ -429,6 +520,23 @@ export function parseDictionaryLabelSuggestions(
     .trim()
     .slice(0, MAX_DESCRIPTION_LENGTH);
   return { labels, description };
+}
+
+/**
+ * The description in a model's reply, trimmed and cut to the cap. Undefined
+ * when the reply holds no readable JSON or the description is blank.
+ */
+export function parseDictionaryDescriptionSuggestion(
+  reply: string,
+): string | undefined {
+  const parsed = DescriptionReplySchema.safeParse(_readJsonObject(reply));
+  if (!parsed.success) {
+    return undefined;
+  }
+  const description = parsed.data.description
+    .trim()
+    .slice(0, MAX_DESCRIPTION_LENGTH);
+  return description === "" ? undefined : description;
 }
 
 /**
