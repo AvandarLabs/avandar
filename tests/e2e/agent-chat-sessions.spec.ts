@@ -25,7 +25,11 @@ function _replyStream(): string {
     { type: "text_end", contentIndex: 0, contentSignature: "" },
     { type: "done", reason: "stop", usage },
   ];
-  return events.map((event) => {return `data: ${JSON.stringify(event)}\n\n`}).join("");
+  return events
+    .map((event) => {
+      return `data: ${JSON.stringify(event)}\n\n`;
+    })
+    .join("");
 }
 
 /** The chat tabs inside the panel, excluding similarly named archive rows. */
