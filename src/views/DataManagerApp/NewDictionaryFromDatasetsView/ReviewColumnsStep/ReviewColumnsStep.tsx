@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { ReviewColumnsFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter";
-import { ReviewSections } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections";
+import { ReviewEntriesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable";
 import { ReviewSummary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
@@ -47,7 +47,7 @@ export function ReviewColumnsStep({
               dispatch({ type: "learn_from_more" });
             }}
           />
-          <ReviewSections
+          <ReviewEntriesTable
             proposal={proposal}
             nameIssues={nameIssues}
             dispatch={dispatch}

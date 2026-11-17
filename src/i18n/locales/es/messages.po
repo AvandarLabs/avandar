@@ -411,8 +411,8 @@ msgid "Skip this step"
 msgstr "Omitir este paso"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · you'll label their values next"
-msgstr "{count} · a continuación etiquetará sus valores"
+#~ msgid "{count} · you'll label their values next"
+#~ msgstr "{count} · a continuación etiquetará sus valores"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -2461,6 +2461,11 @@ msgstr "El restablecimiento de contraseña falló"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Nuevo grupo de roles"
+
+#. placeholder {0}: entries.length
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
+msgid "{0, plural, one {# entry} other {# entries}}"
+msgstr ""
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -4682,6 +4687,10 @@ msgstr "La cláusula HAVING usa un lado izquierdo que el formulario no puede "
 msgid "has no value"
 msgstr "no tiene valor"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Select all columns"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -4969,8 +4978,8 @@ msgstr "Vuelva a iniciar sesión para continuar. Si no puede iniciar sesión, "
 "inténtelo una vez más."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Descriptions only"
-msgstr "Solo descripciones"
+#~ msgid "Descriptions only"
+#~ msgstr "Solo descripciones"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
@@ -5389,6 +5398,7 @@ msgid "Publish"
 msgstr "Publicar"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "Entries"
 msgstr "Entradas"
@@ -5799,6 +5809,10 @@ msgstr "Confirmar acción"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "No hay dashboards para mostrar"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Column source"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -6272,6 +6286,10 @@ msgstr "Comienza tu viaje con nosotros"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Fields that keep every value cannot be filtered on."
 msgstr "No se puede filtrar por campos que conservan todos los valores."
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "About entry names"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
@@ -7318,6 +7336,11 @@ msgstr "Aviso"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Which {groupByColumn} has the highest total {measureColumn}?"
 msgstr "¿Qué {groupByColumn} tiene el total más alto de {measureColumn}?"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "The name this entry is shown under in the dictionary. Changing it "
+"doesn't rename any column in your data."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
@@ -10111,8 +10134,8 @@ msgid "It may have been deleted. Open another one from Data Sources."
 msgstr "Es posible que se haya eliminado. Abra otro desde Fuentes de datos."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Coded columns"
-msgstr "Columnas codificadas"
+#~ msgid "Coded columns"
+#~ msgstr "Columnas codificadas"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open case"
@@ -10343,8 +10366,8 @@ msgid "Unmatched values"
 msgstr "Valores sin coincidencia"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · order is kept when charted"
-msgstr "{count} · se conserva el orden al crear gráficos"
+#~ msgid "{count} · order is kept when charted"
+#~ msgstr "{count} · se conserva el orden al crear gráficos"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
 msgid "Assigned to: {label}"
@@ -11366,8 +11389,8 @@ msgid "Status not changed"
 msgstr "El estado no cambió"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · no codes to label"
-msgstr "{count} · no hay códigos que etiquetar"
+#~ msgid "{count} · no codes to label"
+#~ msgstr "{count} · no hay códigos que etiquetar"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -12389,8 +12412,8 @@ msgid "Suggested rewrite:"
 msgstr "Reescritura sugerida:"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Ordered scales"
-msgstr "Escalas ordenadas"
+#~ msgid "Ordered scales"
+#~ msgstr "Escalas ordenadas"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
@@ -12891,8 +12914,8 @@ msgid "Freehand"
 msgstr "A mano alzada"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-msgid "Include"
-msgstr "Incluir"
+#~ msgid "Include"
+#~ msgstr "Incluir"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
@@ -13427,8 +13450,8 @@ msgid "No boundary layer on this map to look up a P-code."
 msgstr "No hay una capa de límites en este mapa para consultar un código P."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-msgid "Entry name and the columns it came from"
-msgstr "Nombre de la entrada y las columnas de las que proviene"
+#~ msgid "Entry name and the columns it came from"
+#~ msgstr "Nombre de la entrada y las columnas de las que proviene"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Order"
@@ -13750,7 +13773,6 @@ msgstr "Avandar no puede conectarse a una dirección de loopback, link-local o "
 "privada. Use un host y puerto accesibles públicamente."
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useReviewHeadline.ts
 msgid "{entryCount, plural, one {# entry} other {# entries}}"
 msgstr "{entryCount, plural, one {# entrada} other {# entradas}}"
@@ -14982,6 +15004,10 @@ msgstr "Seleccionado de los datos: estos valores son etiquetas."
 msgid "Used by"
 msgstr "Usado por"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Entry name"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "¿Sincronizar en línea?"
@@ -15684,6 +15710,10 @@ msgstr "O"
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to results"
 msgstr "Volver a los resultados"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Deselect all columns"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"

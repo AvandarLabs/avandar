@@ -385,8 +385,8 @@ msgid "Skip this step"
 msgstr "跳过此步骤"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · you'll label their values next"
-msgstr "{count} · 接下来您将为其值添加标签"
+#~ msgid "{count} · you'll label their values next"
+#~ msgstr "{count} · 接下来您将为其值添加标签"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -2344,6 +2344,11 @@ msgstr "密码重置失败"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "新角色组"
+
+#. placeholder {0}: entries.length
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
+msgid "{0, plural, one {# entry} other {# entries}}"
+msgstr ""
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -4471,6 +4476,10 @@ msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
 msgid "has no value"
 msgstr "没有值"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Select all columns"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -4745,8 +4754,8 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 msgstr "请重新登录以继续。如果无法登录，请重置应用以清除缓存数据，然后再试一次。"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Descriptions only"
-msgstr "仅描述"
+#~ msgid "Descriptions only"
+#~ msgstr "仅描述"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
@@ -5139,6 +5148,7 @@ msgid "Publish"
 msgstr "发布"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "Entries"
 msgstr "条目"
@@ -5532,6 +5542,10 @@ msgstr "确认操作"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "没有可显示的仪表板"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Column source"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -5982,6 +5996,10 @@ msgstr "与我们一起开始您的旅程"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Fields that keep every value cannot be filtered on."
 msgstr "无法按保留所有值的字段进行筛选。"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "About entry names"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
@@ -6987,6 +7005,11 @@ msgstr "免责声明"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Which {groupByColumn} has the highest total {measureColumn}?"
 msgstr "哪个 {groupByColumn} 的 {measureColumn} 总计最高？"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "The name this entry is shown under in the dictionary. Changing it "
+"doesn't rename any column in your data."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
@@ -9665,8 +9688,8 @@ msgid "It may have been deleted. Open another one from Data Sources."
 msgstr "它可能已被删除。请从“数据源”中打开另一个字典。"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Coded columns"
-msgstr "编码列"
+#~ msgid "Coded columns"
+#~ msgstr "编码列"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open case"
@@ -9889,8 +9912,8 @@ msgid "Unmatched values"
 msgstr "未匹配的值"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · order is kept when charted"
-msgstr "{count} · 制作图表时保持顺序"
+#~ msgid "{count} · order is kept when charted"
+#~ msgstr "{count} · 制作图表时保持顺序"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
 msgid "Assigned to: {label}"
@@ -10868,8 +10891,8 @@ msgid "Status not changed"
 msgstr "状态未更改"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "{count} · no codes to label"
-msgstr "{count} · 没有要标记的代码"
+#~ msgid "{count} · no codes to label"
+#~ msgstr "{count} · 没有要标记的代码"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -11835,8 +11858,8 @@ msgid "Suggested rewrite:"
 msgstr "建议重写："
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-msgid "Ordered scales"
-msgstr "有序量表"
+#~ msgid "Ordered scales"
+#~ msgstr "有序量表"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
@@ -12313,8 +12336,8 @@ msgid "Freehand"
 msgstr "手绘"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-msgid "Include"
-msgstr "包括"
+#~ msgid "Include"
+#~ msgstr "包括"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
@@ -12827,8 +12850,8 @@ msgid "No boundary layer on this map to look up a P-code."
 msgstr "此地图上没有可用于查询 P-code 的边界图层。"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-msgid "Entry name and the columns it came from"
-msgstr "条目名称及其来源列"
+#~ msgid "Entry name and the columns it came from"
+#~ msgstr "条目名称及其来源列"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Order"
@@ -13133,7 +13156,6 @@ msgid "Avandar can't connect to a loopback, link-local, or private address. Use 
 msgstr "Avandar 无法连接到回环、本地链路或私有地址。请使用可公开访问的主机和端口。"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useReviewHeadline.ts
 msgid "{entryCount, plural, one {# entry} other {# entries}}"
 msgstr "{entryCount, plural, one {# 个条目} other {# 个条目}}"
@@ -14302,6 +14324,10 @@ msgstr "从数据中选择：这些值是标签。"
 msgid "Used by"
 msgstr "使用者"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Entry name"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "在线同步？"
@@ -14975,6 +15001,10 @@ msgstr "或"
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to results"
 msgstr "返回结果"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
+msgid "Deselect all columns"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"

@@ -1,8 +1,40 @@
 /*
+ * Text that wraps keeps its first line on the shared center line instead of
+ * centering the whole block, which would push the first line down.
+ */
+.reviewEntryText {
+  margin-block: calc((var(--review-entry-line-height) - 1lh) / 2);
+}
+
+/*
  * An entry left out reads as set aside: only the text about where it came
  * from and what it holds dims. Its checkbox, name, kind, and buttons stay at
  * full strength so it can be put back.
  */
 .reviewEntryRow[data-included="false"] .reviewEntryText {
   color: var(--mantine-color-dimmed);
+}
+
+/*
+ * Cells hug the top of the row, so a name error or a note under a value
+ * grows the row downward without moving any control off the row's line.
+ */
+.reviewEntryRow > td {
+  vertical-align: top;
+}
+
+/*
+ * The height of a size xs input (Mantine only defines its variable inside
+ * the input). Every cell's first line is as tall as this, and centers its
+ * content, so inputs, selects, checkboxes, and plain text all sit on the
+ * same center line.
+ */
+.reviewEntryRow {
+  --review-entry-line-height: calc(1.875rem * var(--mantine-scale));
+}
+
+.reviewEntryLine {
+  align-items: center;
+  display: flex;
+  min-height: var(--review-entry-line-height);
 }

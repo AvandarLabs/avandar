@@ -80,9 +80,9 @@ async function _openCreateFromDataset(page: Page): Promise<void> {
   await page
     .getByRole("menuitem", { name: /Create a dictionary from this dataset/ })
     .click();
-  await expect(
-    page.getByRole("heading", { name: "Coded columns" }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  await expect(page.getByRole("heading", { name: "Entries" })).toBeVisible({
+    timeout: LONG_WAIT,
+  });
 }
 
 async function _suggestGenderLabels(
