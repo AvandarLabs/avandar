@@ -13,6 +13,9 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       canEditDataset: true,
       hasBindings: false,
       hasBindingsError: false,
+      hasDictionaries: true,
+      isLoadingDictionaries: false,
+      hasDictionariesError: false,
       isLoadingLinkedDatasets: false,
       combiningCrosswalk: undefined as unknown,
       isLoadingCombiningCrosswalk: false,
@@ -63,6 +66,18 @@ vi.mock("@/hooks/dataDictionaries/useDatasetHasBindings", () => {
         hasBindings: permissionState.hasBindings,
         isLoading: false,
         isError: permissionState.hasBindingsError,
+      };
+    },
+  };
+});
+
+vi.mock("@/hooks/dataDictionaries/useWorkspaceHasDictionaries", () => {
+  return {
+    useWorkspaceHasDictionaries: () => {
+      return {
+        hasDictionaries: permissionState.hasDictionaries,
+        isLoading: permissionState.isLoadingDictionaries,
+        isError: permissionState.hasDictionariesError,
       };
     },
   };
@@ -150,6 +165,9 @@ describe("DatasetActionsMenu", () => {
     permissionState.canEditDataset = true;
     permissionState.hasBindings = false;
     permissionState.hasBindingsError = false;
+    permissionState.hasDictionaries = true;
+    permissionState.isLoadingDictionaries = false;
+    permissionState.hasDictionariesError = false;
     permissionState.isLoadingLinkedDatasets = false;
     permissionState.combiningCrosswalk = undefined;
     permissionState.isLoadingCombiningCrosswalk = false;
@@ -228,6 +246,80 @@ describe("DatasetActionsMenu", () => {
     expect(
       screen.queryByRole("menuitem", { name: /Apply a dictionary/ }),
     ).toBeNull();
+  });
+
+  it("does not offer Apply when the workspace has no dictionaries", async () => {
+    permissionState.hasDictionaries = false;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", {
+        name: /Delete Dataset/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", {
+        name: /Apply a dictionary/,
+        hidden: true,
+      }),
+    ).toBeNull();
+  });
+
+  it("still offers learning a dictionary when the workspace has none", async () => {
+    permissionState.hasDictionaries = false;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", {
+        name: /Create a dictionary from this dataset/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("holds Apply back while it looks up the workspace's dictionaries", async () => {
+    permissionState.isLoadingDictionaries = true;
+    permissionState.hasDictionaries = false;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", {
+        name: /Delete Dataset/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", {
+        name: /Apply a dictionary/,
+        hidden: true,
+      }),
+    ).toBeNull();
+  });
+
+  it("still offers Apply when the dictionaries cannot be read", async () => {
+    permissionState.hasDictionaries = false;
+    permissionState.hasDictionariesError = true;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", {
+        name: /Apply a dictionary/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
   });
 
   it("stops offering to learn a dictionary once one is attached", async () => {
