@@ -22,9 +22,11 @@ export type UninstallOutcome = {
   refusedDatasetIds: Dataset.Id[];
 
   /**
-   * The datasets whose delete failed after it could have started. Their files
-   * may already be gone and their row may be gone too, so none of them can be
-   * assumed to be intact in Data Sources.
+   * The datasets whose state is unknown after a failure. Most failed after
+   * the delete could have started, so their files and their row may already
+   * be gone. One that could not even be read first was not touched. None of
+   * them can be assumed to be intact in Data Sources, so the admin should
+   * check each one.
    */
   incompleteDatasetIds: Dataset.Id[];
 };

@@ -322,9 +322,10 @@ push to `demo/**` deploys.
   may already be gone.
 - **Known limit.** A dataset that becomes unreadable to the user between the
   uninstall's first read and `fullDelete`'s own read makes `fullDelete` skip
-  the Storage cleanup and return normally after a delete that removed no row.
-  The uninstall then counts it as deleted. No data is lost in that case, since
-  nothing was removed.
+  the Storage cleanup and return normally after a delete that may remove no
+  row. A user who may delete a row but not read it can also end with the row
+  deleted and the parquet left behind. The uninstall still counts such a
+  dataset as deleted. No data is lost that the admin did not ask to delete.
 
 ## Done when
 
