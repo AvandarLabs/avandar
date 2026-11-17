@@ -1,12 +1,2 @@
-/**
- * Strip markdown fencing and stray prefixes that LLMs sometimes wrap around
- * generated SQL.
- */
-export function cleanLlmGeneratedSql(raw: string): string {
-  return raw
-    .replace(/^\n?/i, "")
-    .replace(/^```\n?/i, "")
-    .replace(/\n?```$/i, "")
-    .trim()
-    .replace(/^sql\s+/i, "");
-}
+/** Kept so the edge function's callers import it from here as before. */
+export { cleanLlmGeneratedSql } from "$/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
