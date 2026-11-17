@@ -151,7 +151,9 @@ msgstr "comienza con"
 #: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
 msgid "{count, plural, one {# value in the data has no target value.} other {# "
 "values in the data have no target value.}}"
-msgstr ""
+msgstr "{count, plural, one {# valor de los datos no tiene un valor de "
+"destino.} other {# valores de los datos no tienen un valor de "
+"destino.}}"
 
 #. placeholder {0}: counts.attachedCount
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
@@ -160,7 +162,12 @@ msgid "{0, plural, one {Nothing in your data changes. # column keeps its "
 "dictionaries show up here right away.} other {Nothing in your data "
 "changes. # columns keep their values, with the dictionaries attached as "
 "reference. Edits to the dictionaries show up here right away.}}"
-msgstr ""
+msgstr "{0, plural, one {Nada de tus datos cambia. La columna # conserva sus "
+"valores, con los diccionarios adjuntos como referencia. Las ediciones "
+"en los diccionarios aparecen aquí de inmediato.} other {Nada de tus "
+"datos cambia. Las # columnas conservan sus valores, con los "
+"diccionarios adjuntos como referencia. Las ediciones en los "
+"diccionarios aparecen aquí de inmediato.}}"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Open link in the same tab"
@@ -188,11 +195,6 @@ msgstr "Palabras clave"
 msgid "This query isn't written correctly, so it couldn't be read."
 msgstr "Esta consulta no está escrita correctamente, por lo que no se pudo "
 "leer."
-
-#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
-#~ msgid "Codes"
-#~ msgstr "Códigos"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
 msgid "Its conversions follow the dictionaries, so later edits to them show up "
@@ -242,7 +244,7 @@ msgstr "Esta consulta usa una función, {functionName}, que el motor de "
 
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "What these values cover and where they come from"
-msgstr ""
+msgstr "Qué abarcan estos valores y de dónde provienen"
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Change to the values"
@@ -326,7 +328,8 @@ msgstr "Verifique su correo electrónico para un enlace de restablecimiento de "
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
 msgid "Your data will change. The dictionary stays attached too, so the column "
 "is still explained."
-msgstr ""
+msgstr "Tus datos cambiarán. El diccionario también permanece adjunto, por lo "
+"que la columna sigue estando explicada."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Equal interval"
@@ -433,10 +436,6 @@ msgstr "Arrastre para reordenar o mantenga presionada la tecla Alt y presione "
 msgid "Skip this step"
 msgstr "Omitir este paso"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "{count} · you'll label their values next"
-#~ msgstr "{count} · a continuación etiquetará sus valores"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
 "old link will no longer be able to reach this dashboard."
@@ -473,7 +472,7 @@ msgstr "Preguntar a Avandar"
 
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 msgid "What is a source value?"
-msgstr ""
+msgstr "¿Qué es un valor de origen?"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
@@ -940,10 +939,6 @@ msgstr "Las ubicaciones individuales se dibujarán en el mapa y las áreas "
 msgid "Aggregations"
 msgstr "Agregaciones"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "Label for {value}"
-#~ msgstr "Etiqueta para {value}"
-
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "What happens"
@@ -972,7 +967,7 @@ msgstr "Tipos de caso"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these are source values."
-msgstr ""
+msgstr "Seleccionados de los datos: estos son valores de origen."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1036,7 +1031,8 @@ msgstr "actualizaciones cuando cambia este diccionario"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel.tsx
 msgid "None of the entries you kept has values to map. Go on to save, or go "
 "back and change an entry's kind."
-msgstr ""
+msgstr "Ninguna de las entradas que conservaste tiene valores para asignar. "
+"Continúa para guardar o regresa y cambia el tipo de una entrada."
 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText}. Download the full list as CSV from "
@@ -1133,11 +1129,6 @@ msgstr "Subir archivo"
 msgid "Privacy log cleared."
 msgstr "Registro de privacidad borrado."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
-#~ msgid "Suggestions did not come back. Labeling still works without them."
-#~ msgstr "No se recibieron sugerencias. El etiquetado sigue funcionando sin "
-#~ "ellas."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Exportar CSV"
@@ -1150,15 +1141,14 @@ msgstr "¿Quieres importar \"{fileName}\" como un nuevo conjunto de datos?"
 msgid "Classes"
 msgstr "Clases"
 
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
-#~ msgid "How codes work"
-#~ msgstr "Cómo funcionan los códigos"
-
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
 msgid "Changes the values in every column that matches a dictionary, replacing "
 "each source value with its target value. Charts, filters, and downloads "
 "show the target values from then on."
-msgstr ""
+msgstr "Cambia los valores de cada columna que coincida con un diccionario, "
+"reemplazando cada valor de origen por su valor de destino. A partir de "
+"ese momento, los gráficos, filtros y descargas muestran los valores de "
+"destino."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter and show list"
@@ -1181,19 +1171,11 @@ msgstr "registro"
 msgid "Click \"Save to dashboard\"."
 msgstr "Haga clic en «Guardar en el panel»."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "Label to use for {value}"
-#~ msgstr "Etiqueta que se usará para {value}"
-
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
 "track key metrics and insights."
 msgstr "Aún no se ha creado ni compartido nada con usted. Cree un dashboard "
 "para dar seguimiento a métricas e insights clave."
-
-#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
-#~ msgid "Needs a label. You can save without one and add it later."
-#~ msgstr "Necesita una etiqueta. Puede guardarlo sin una y agregarla después."
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
@@ -1277,7 +1259,7 @@ msgstr "Filtrar por responsable"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Leave unmapped"
-msgstr ""
+msgstr "Dejar sin asignar"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -1327,7 +1309,8 @@ msgstr "Ingrese un nombre para el conjunto de datos combinado."
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A value you added to a code list is missing its source value or target "
 "value."
-msgstr ""
+msgstr "A un valor que agregaste a una lista de códigos le falta el valor de "
+"origen o el valor de destino."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotRow.tsx
 msgid "Broken"
@@ -1354,7 +1337,7 @@ msgstr "Cargando conjuntos de datos"
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Target value"
-msgstr ""
+msgstr "Valor de destino"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -1406,7 +1389,7 @@ msgstr "Eliminando modelos sin conexión"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Source value for {value}"
-msgstr ""
+msgstr "Valor de origen para {value}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 msgid "{otherCount, plural, one {# other match} other {# other matches}}"
@@ -1455,10 +1438,6 @@ msgstr "Otro color"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
 msgstr "Permita que sus colegas abran lo que acaba de crear."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListPaneHeader.tsx
-#~ msgid "Suggest labels"
-#~ msgstr "Sugerir etiquetas"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -1543,7 +1522,7 @@ msgstr "En este conjunto de datos"
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
 msgid "Columns with a dictionary come out as"
-msgstr ""
+msgstr "Las columnas con un diccionario aparecen como"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Bubble Chart"
@@ -1569,12 +1548,6 @@ msgstr "Este panel es <0>público</0>. Cualquiera que tenga el enlace puede "
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid " records"
 msgstr " registros"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
-#~ msgid "This list is too long to suggest labels for in one request. Labeling "
-#~ "still works."
-#~ msgstr "Esta lista es demasiado larga para sugerir etiquetas en una sola "
-#~ "solicitud. El etiquetado sigue funcionando."
 
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
@@ -1656,14 +1629,6 @@ msgstr "Cobertura"
 msgid "{shareClause} will lose access."
 msgstr "{shareClause} perderá el acceso."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Changes the values in this column using the dictionary. For example, "
-#~ "every 1 becomes Male, and charts, filters, and downloads show Male from "
-#~ "then on."
-#~ msgstr "Cambia los valores de esta columna mediante el diccionario. Por "
-#~ "ejemplo, cada 1 se convierte en Masculino, y a partir de entonces los "
-#~ "gráficos, filtros y descargas muestran Masculino."
-
 #: src/components/caseStatuses/useStatusColorLabels.ts
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
@@ -1697,7 +1662,7 @@ msgstr "El chat está habilitado en el Explorador de Datos y Tableros. <0>Abrir 
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
 msgid "Attach as reference only"
-msgstr ""
+msgstr "Adjuntar solo como referencia"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group updated"
@@ -1816,17 +1781,9 @@ msgstr "Se quitaron los diccionarios de {datasetName}. Los datos no cambiaron."
 msgid "No layers yet."
 msgstr "Aún no hay capas."
 
-#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
-#~ msgid "Label {rowNumber}"
-#~ msgstr "Etiquetar {rowNumber}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
 msgstr "Estrecho"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "{count} · you'll map their values next"
-#~ msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
 msgid "Nothing is applied to this column. Pick a match in the table to apply "
@@ -1849,7 +1806,7 @@ msgstr "Elija cuánto de cada conjunto de datos publicar. La opción "
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 msgid "No target value yet"
-msgstr ""
+msgstr "Aún no hay un valor de destino"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset.tsx
 msgid "The stages a record moves through. New records start in the default "
@@ -2004,7 +1961,7 @@ msgstr "No instalado"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
 msgid "Describe columns"
-msgstr ""
+msgstr "Describir columnas"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
 msgid "Add value"
@@ -2209,7 +2166,8 @@ msgstr "Escriba una pregunta y generaré el SQL y lo ejecutaré por usted."
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeSuggestionsNote.tsx
 msgid "Suggestions need a connection or the offline model. You can still write "
 "the descriptions yourself."
-msgstr ""
+msgstr "Las sugerencias requieren una conexión o el modelo sin conexión. Aún "
+"puedes escribir las descripciones manualmente."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
@@ -2370,12 +2328,6 @@ msgstr "Nombre"
 msgid "Datasets to learn from"
 msgstr "Conjuntos de datos de referencia"
 
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
-#~ msgid "From {dictionaryName} › {entryName}. The values were converted to these "
-#~ "codes."
-#~ msgstr "De {dictionaryName} › {entryName}. Los valores se convirtieron en estos "
-#~ "códigos."
-
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Tu pregunta contiene lenguaje que puede sesgar la respuesta de la IA."
@@ -2517,7 +2469,7 @@ msgstr "Cargando planes..."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Use an existing target value"
-msgstr ""
+msgstr "Usar un valor de destino existente"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -2533,10 +2485,6 @@ msgstr "Acciones"
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
 msgstr "La asignación no cambió"
-
-#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
-#~ msgid "Translate codes"
-#~ msgstr "Traducir códigos"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
@@ -2558,7 +2506,7 @@ msgstr "Nuevo grupo de roles"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
 msgid "{0, plural, one {# entry} other {# entries}}"
-msgstr ""
+msgstr "{0, plural, one {# entrada} other {# entradas}}"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -2567,7 +2515,7 @@ msgstr "Panel"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel.tsx
 msgid "Nothing to map"
-msgstr ""
+msgstr "Nada para asignar"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
@@ -2686,7 +2634,7 @@ msgstr "Ocultar lista"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "{mappedText} of {valueText}"
-msgstr ""
+msgstr "{mappedText} de {valueText}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "You are offline, so nothing can be sent. Kept the rule-based results."
@@ -2742,7 +2690,7 @@ msgstr "Reasignar recursos privados"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "No target value yet, kept as is"
-msgstr ""
+msgstr "Aún no hay un valor de destino; se conserva tal como está"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "A coordinate cannot be mapped when either latitude or longitude is "
@@ -2834,7 +2782,11 @@ msgid "Turn on for values that mean no answer was recorded, such as \"Unknown\" 
 "or 99. Your data isn't changed. The value is marked as missing wherever "
 "the dictionary is shown, and Avandar's AI is told it is missing, so it "
 "won't treat it as a real answer."
-msgstr ""
+msgstr "Actívalo para los valores que significan que no se registró una "
+"respuesta, como \"Desconocido\" o 99. Tus datos no cambian. El valor se "
+"marca como faltante dondequiera que se muestre el diccionario y se "
+"informa a la IA de Avandar que falta, para que no lo trate como una "
+"respuesta real."
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
@@ -3050,10 +3002,6 @@ msgstr "Radio de calor"
 msgid "Detected:"
 msgstr "Detectado:"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "Leave unlabeled"
-#~ msgstr "Dejar sin etiquetar"
-
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "El registro conserva su estado anterior. Inténtelo de nuevo en un "
@@ -3075,7 +3023,7 @@ msgstr "Columna 3"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
 msgid "About missing values"
-msgstr ""
+msgstr "Acerca de los valores faltantes"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
@@ -3206,7 +3154,9 @@ msgstr "Permisos guardados"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
 msgid "You chose not to send values to the AI provider, so suggestions are off "
 "for this dictionary. You can still map values yourself."
-msgstr ""
+msgstr "Elegiste no enviar valores al proveedor de IA, por lo que las "
+"sugerencias están desactivadas para este diccionario. Aún puedes "
+"asignar los valores manualmente."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
@@ -3215,15 +3165,11 @@ msgstr "Subtítulo"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
 msgid "Map values"
-msgstr ""
+msgstr "Asignar valores"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset updated successfully!"
 msgstr "¡Conjunto de datos actualizado con éxito!"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
-#~ msgid "{labeledText} of {valueText}"
-#~ msgstr "{labeledText} de {valueText}"
 
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Excel file"
@@ -3311,7 +3257,7 @@ msgstr "Ahorras {discount}% en comparación con la facturación mensual"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Source values"
-msgstr ""
+msgstr "Valores de origen"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
@@ -3499,18 +3445,12 @@ msgstr "Algo salió mal al ejecutar esta consulta."
 
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 msgid "What are source and target values?"
-msgstr ""
+msgstr "¿Qué son los valores de origen y de destino?"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Unit"
 msgstr "Unidad"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/AddedCodeConflictCallout.tsx
-#~ msgid "The code {code} is added twice to {listName}. Change one of them on "
-#~ "Unmatched values."
-#~ msgstr "El código {code} se agregó dos veces a {listName}. Cambie uno de ellos "
-#~ "en Valores no coincidentes."
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -3587,7 +3527,9 @@ msgstr "Tu perfil de usuario aún no está cargado. Por favor, intenta de nuevo.
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
 msgid "Apply it to a dataset to explain its values and describe its columns. "
 "The datasets it is applied to are listed here."
-msgstr ""
+msgstr "Aplícalo a un conjunto de datos para explicar sus valores y describir "
+"sus columnas. Aquí se muestran los conjuntos de datos a los que se "
+"aplica."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -3729,7 +3671,7 @@ msgstr "T{quarter} {year}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/ValueLabelInput.tsx
 msgid "Target value for {code}"
-msgstr ""
+msgstr "Valor de destino para {code}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3803,7 +3745,7 @@ msgstr "Guardar URL"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (target values)"
-msgstr ""
+msgstr "{datasetName} (valores de destino)"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Map deleted"
@@ -3811,7 +3753,8 @@ msgstr "Mapa eliminado"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Another value in this list already uses this target value or spelling."
-msgstr ""
+msgstr "Otro valor de esta lista ya usa este valor de destino o esta "
+"ortografía."
 
 #: src/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
@@ -3857,7 +3800,7 @@ msgstr "Sobrescribir SQL con cambios del formulario"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these are target values."
-msgstr ""
+msgstr "Seleccionados de los datos: estos son valores de destino."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset did not match the expected schema"
@@ -3892,10 +3835,6 @@ msgstr "Compartió su primer panel con su espacio de trabajo. Cualquier persona 
 #: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 msgid "You can no longer read {dictionaryName}, so it was not re-applied."
 msgstr "Ya no puede leer {dictionaryName}, por lo que no se volvió a aplicar."
-
-#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
-#~ msgid "Coded columns come out as"
-#~ msgstr "Las columnas codificadas se muestran como"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
@@ -4000,7 +3939,7 @@ msgstr "Conjunto de datos sin título"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A target value you added is already used in its code list."
-msgstr ""
+msgstr "El valor de destino que agregaste ya se usa en su lista de códigos."
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Remove {displayName}"
@@ -4304,7 +4243,8 @@ msgstr "No se pudo guardar el nombre. Inténtelo de nuevo o comuníquese con "
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
 msgid "Same name, different values. Kept as separate code lists under one "
 "entry."
-msgstr ""
+msgstr "Mismo nombre, distintos valores. Se conservaron como listas de códigos "
+"separadas dentro de una sola entrada."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -4339,7 +4279,7 @@ msgstr "Avandar no pudo leer las columnas de este conjunto de datos para hacer "
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
 msgid "Suggested {doneCount} of {totalCount}"
-msgstr ""
+msgstr "Sugeridos {doneCount} de {totalCount}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -4354,12 +4294,6 @@ msgstr "Elige un conjunto de datos guardado o importa nuevos datos a tu espacio 
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
 msgid "Cannot sync this case type"
 msgstr "No se puede sincronizar este tipo de caso"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
-#~ msgid "Columns with a set of values get mapped next. The rest become entries "
-#~ "with a description, so the dictionary documents them too. Uncheck "
-#~ "anything you don't want, or change its kind."
-#~ msgstr ""
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "Recent"
@@ -4830,10 +4764,6 @@ msgstr "Los datos de {sourceName} aún no se pueden cambiar desde Avandar, por "
 "lo que por ahora la única opción es usar un conjunto de datos "
 "vinculado."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
-#~ msgid "Labels become codes"
-#~ msgstr "Las etiquetas se convierten en códigos"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Published by"
 msgstr "Publicado por"
@@ -4849,7 +4779,7 @@ msgstr "no tiene valor"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "Select all columns"
-msgstr ""
+msgstr "Seleccionar todas las columnas"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -5074,7 +5004,7 @@ msgstr "Comprobando su acceso"
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Translate target values"
-msgstr ""
+msgstr "Traducir valores de destino"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 msgid "More dictionary actions"
@@ -5106,15 +5036,11 @@ msgstr "MapLibre, colaboradores de OpenStreetMap"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
 msgid "Target → Source"
-msgstr ""
+msgstr "Destino → Origen"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "No columns from this dataset."
 msgstr "No hay columnas en este conjunto de datos."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/ValueLabelInput.tsx
-#~ msgid "Label for {code}"
-#~ msgstr "Etiqueta para {code}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Only point, line, or polygon layers with exact locations can be listed."
@@ -5146,10 +5072,6 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 msgstr "Vuelva a iniciar sesión para continuar. Si no puede iniciar sesión, "
 "restablezca la aplicación para borrar los datos almacenados en caché e "
 "inténtelo una vez más."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "Descriptions only"
-#~ msgstr "Solo descripciones"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
@@ -5258,7 +5180,7 @@ msgstr "\"{0}\" se está preparando. Los conjuntos de datos grandes pueden "
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListsToLabelNav.tsx
 msgid "Code lists to map"
-msgstr ""
+msgstr "Listas de códigos para asignar"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 msgid "Saved the records for {slotTitle}"
@@ -5372,10 +5294,6 @@ msgstr "Deshabilitado"
 msgid "is at most"
 msgstr "es como máximo"
 
-#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
-#~ msgid "Translate labels"
-#~ msgstr "Traducir etiquetas"
-
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Per year"
 msgstr "Por año"
@@ -5399,10 +5317,6 @@ msgstr "No se reconoció ninguna columna de {0} como coordenada por su nombre. "
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
 msgid "Assignee unavailable"
 msgstr "El responsable no está disponible"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge.tsx
-#~ msgid "Labeled"
-#~ msgstr "Etiquetado"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -5523,12 +5437,6 @@ msgstr "Enlace copiado"
 msgid "Add dictionary"
 msgstr "Agregar diccionario"
 
-#: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
-#~ msgid "{count, plural, one {# value in the data has no label.} other {# values "
-#~ "in the data have no label.}}"
-#~ msgstr "{count, plural, one {# valor de los datos no tiene etiqueta.} other {# "
-#~ "valores de los datos no tienen etiqueta.}}"
-
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Version"
 msgstr "Versión"
@@ -5552,7 +5460,8 @@ msgstr "¿Qué archivo debe importar Avandar?"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
 msgid "Avandar learns the values your datasets use and what their columns mean."
-msgstr ""
+msgstr "Avandar aprende los valores que usan sus conjuntos de datos y lo que "
+"significan sus columnas."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
@@ -5655,7 +5564,7 @@ msgstr "Desde"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
 msgid "Descriptions"
-msgstr ""
+msgstr "Descripciones"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "N"
@@ -5991,7 +5900,7 @@ msgstr "No hay dashboards para mostrar"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "Column source"
-msgstr ""
+msgstr "Origen de la columna"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
@@ -6068,10 +5977,6 @@ msgstr "Ninguna entrada coincide con “{filter}”. Las entradas coinciden por 
 "propio nombre y por cada nombre de columna con el que también "
 "coinciden."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "Code for {value}"
-#~ msgstr "Código para {value}"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to find its columns."
 msgstr "Estamos leyendo una muestra de este conjunto de datos para encontrar "
@@ -6140,10 +6045,6 @@ msgstr "Sin descripción"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Back to the original values"
 msgstr "Volver a los valores originales"
-
-#: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
-#~ msgid "Label them in {dictionaryName}"
-#~ msgstr "Etiquetarlos en {dictionaryName}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
@@ -6307,7 +6208,7 @@ msgstr "Elegido de los datos"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Target value {rowNumber}"
-msgstr ""
+msgstr "Valor de destino {rowNumber}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -6384,11 +6285,6 @@ msgstr "Agrega un bloque de Filtro al panel para habilitar el filtrado global "
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
 msgstr "Recomendado con este conjunto de datos"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
-#~ msgid "Labels become codes in the linked dataset"
-#~ msgstr "Las etiquetas se convierten en códigos en el conjunto de datos "
-#~ "vinculado"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -6472,7 +6368,7 @@ msgstr "No se puede filtrar por campos que conservan todos los valores."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "About entry names"
-msgstr ""
+msgstr "Acerca de los nombres de las entradas"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
@@ -6558,12 +6454,6 @@ msgstr "La capa {0} está configurada como Desplazar, una opción que solo "
 msgid "Failed to save to dashboard: {0}"
 msgstr "Error al guardar en el panel: {0}"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel.tsx
-#~ msgid "None of the entries you kept has codes. Go on to save, or go back and "
-#~ "change an entry's kind."
-#~ msgstr "Ninguna de las entradas que conservó tiene códigos. Continúe para "
-#~ "guardar o regrese y cambie el tipo de una entrada."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
@@ -6608,7 +6498,8 @@ msgstr "Escriba el nombre del espacio de trabajo para confirmar"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "This entry has no values, so only its description is attached."
-msgstr ""
+msgstr "Esta entrada no tiene valores, por lo que solo se adjunta su "
+"descripción."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -6647,7 +6538,7 @@ msgstr "Obtenga una respuesta a partir de los datos que acaba de agregar."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "source value {code}"
-msgstr ""
+msgstr "valor de origen {code}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -6898,7 +6789,9 @@ msgstr "Informe de validación de coordenadas"
 msgid "Converting {datasetName} creates a linked dataset, and your plan's "
 "dataset limit is reached. You can still attach the dictionary as "
 "reference only."
-msgstr ""
+msgstr "Convertir {datasetName} crea un conjunto de datos vinculado, y se "
+"alcanzó el límite de conjuntos de datos de su plan. Aún puede adjuntar "
+"el diccionario solo como referencia."
 
 #: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
 msgid "Re-apply {dictionaryName}?"
@@ -6916,32 +6809,9 @@ msgstr "Aplicar cada filtro global en el panel."
 msgid "Collapse"
 msgstr "Colapsar"
 
-#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
-#~ msgid "Labels"
-#~ msgstr "Etiquetas"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
-#~ msgid "code {code}"
-#~ msgstr "código {code}"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Límite alcanzado"
-
-#. placeholder {0}: counts.attachedCount
-#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
-#~ msgid "{0, plural, one {Nothing in your data changes. # column keeps its "
-#~ "values, with labels attached as reference. Edits to the dictionaries "
-#~ "show up here right away.} other {Nothing in your data changes. # columns "
-#~ "keep their values, with labels attached as reference. Edits to the "
-#~ "dictionaries show up here right away.}}"
-#~ msgstr "{0, plural, one {No cambia nada en sus datos. La columna # conserva sus "
-#~ "valores, con etiquetas adjuntas como referencia. Las ediciones a los "
-#~ "diccionarios aparecen aquí de inmediato.} other {No cambia nada en sus "
-#~ "datos. Las # columnas conservan sus valores, con etiquetas adjuntas "
-#~ "como referencia. Las ediciones a los diccionarios aparecen aquí de "
-#~ "inmediato.}}"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Unavailable layer"
@@ -7085,7 +6955,9 @@ msgstr "Todos los datos"
 msgid "Converting {datasetName} creates a linked dataset, and only workspace "
 "admins can add datasets. You can still attach the dictionary as "
 "reference only."
-msgstr ""
+msgstr "Convertir {datasetName} crea un conjunto de datos vinculado, y solo los "
+"administradores del espacio de trabajo pueden agregar conjuntos de "
+"datos. Aún puede adjuntar el diccionario solo como referencia."
 
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Loading result"
@@ -7127,7 +6999,7 @@ msgstr "Agregar a la lista"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Next: map values"
-msgstr ""
+msgstr "Siguiente: asignar valores"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -7371,7 +7243,7 @@ msgstr "Número: una medida o un conteo"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
 msgid "Nothing to describe"
-msgstr ""
+msgstr "Nada que describir"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
@@ -7412,7 +7284,7 @@ msgstr "A4"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 msgid "The suggestion uses what you wrote and may rewrite it."
-msgstr ""
+msgstr "La sugerencia usa lo que escribió y puede reformularlo."
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
@@ -7421,17 +7293,6 @@ msgstr "Fin del intervalo de tiempo: {endLabel}"
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
 msgstr "Inicio"
-
-#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.tsx
-#~ msgid "Pairs work both ways. Applying this list to a column of codes turns them "
-#~ "into labels, and applying it to a column of labels turns them into "
-#~ "codes. Matching ignores capitalization and extra spaces, and also "
-#~ "accepts the other spellings listed beside each label."
-#~ msgstr "Los pares funcionan en ambos sentidos. Aplicar esta lista a una columna "
-#~ "de códigos los convierte en etiquetas, y aplicarla a una columna de "
-#~ "etiquetas los convierte en códigos. La coincidencia ignora las "
-#~ "mayúsculas y los espacios adicionales, y también acepta las otras "
-#~ "formas de escritura que aparecen junto a cada etiqueta."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -7472,10 +7333,6 @@ msgstr "Avandar (predeterminado)"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Add your first dataset"
 msgstr "Agregue su primer conjunto de datos"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
-#~ msgid "Turn codes into labels and add column descriptions"
-#~ msgstr "Convertir códigos en etiquetas y agregar descripciones de columnas"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -7526,12 +7383,6 @@ msgid "Checking this dataset's columns first. It will be added to your "
 msgstr "Primero estamos verificando las columnas de este conjunto de datos. Se "
 "agregará a su espacio de trabajo en cuanto termine el proceso."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "{value} is already in the list, without a label. Label it on the "
-#~ "dictionary."
-#~ msgstr "{value} ya está en la lista, sin una etiqueta. Asígnele una etiqueta en "
-#~ "el diccionario."
-
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "Hacer privado"
@@ -7555,7 +7406,8 @@ msgstr "¿Qué {groupByColumn} tiene el total más alto de {measureColumn}?"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "The name this entry is shown under in the dictionary. Changing it "
 "doesn't rename any column in your data."
-msgstr ""
+msgstr "El nombre con el que se muestra esta entrada en el diccionario. "
+"Cambiarlo no cambia el nombre de ninguna columna de sus datos."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingModalContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/PluginDataSlotsSection.tsx
@@ -7772,7 +7624,8 @@ msgstr "Licencia"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Needs a target value. You can save without one and add it later."
-msgstr ""
+msgstr "Necesita un valor de destino. Puede guardarlo sin uno y agregarlo más "
+"tarde."
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Describe your answer…"
@@ -7798,10 +7651,6 @@ msgstr "Suelta para importar"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Rango de fechas"
-
-#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
-#~ msgid "What these codes cover and where they come from"
-#~ msgstr "Qué abarcan estos códigos y de dónde provienen"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
@@ -7861,7 +7710,7 @@ msgstr "Ir al inicio"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "Values mapped"
-msgstr ""
+msgstr "Valores asignados"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -7932,15 +7781,11 @@ msgstr "[La búsqueda de descubrimiento local falló. Prueba con otra columna o 
 msgid "Export mapping"
 msgstr "Exportar asignación"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
-#~ msgid "Suggested labels filled in. Check them before saving."
-#~ msgstr "Se completaron las etiquetas sugeridas. Revise antes de guardar."
-
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHeading.tsx
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Source value"
-msgstr ""
+msgstr "Valor de origen"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 msgid "For example, years"
@@ -8016,7 +7861,8 @@ msgstr "{usedSeats} de {maxSeats} asientos utilizados · {remainingSeats} "
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 msgid "One per line, with the source value first: 1 = Male, 1: Male, or 1, "
 "Male."
-msgstr ""
+msgstr "Uno por línea, con el valor de origen primero: 1 = Male, 1: Male o 1, "
+"Male."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Generate Query"
@@ -8034,12 +7880,6 @@ msgstr "No pudimos verificar las columnas de este conjunto de datos. Intente "
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "Agregaremos esta visualización a tu nuevo panel."
-
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
-#~ msgid "Data holding 1 becomes Male, and data holding Male becomes 1, from the "
-#~ "same pair."
-#~ msgstr "Los datos que contienen 1 se convierten en Masculino, y los datos que "
-#~ "contienen Masculino se convierten en 1, a partir del mismo par."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "All statuses"
@@ -8098,10 +7938,6 @@ msgstr "Brillante"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Canonical"
 msgstr "Canónico"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListsToLabelNav.tsx
-#~ msgid "Code lists to label"
-#~ msgstr "Listas de códigos para etiquetar"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
 msgid "Converted this dataset · version {appliedText}"
@@ -8210,7 +8046,9 @@ msgstr "Suposiciones de SQL generadas"
 msgid "You chose not to send column details to the AI provider, so suggestions "
 "are off for this dictionary. You can still write the descriptions "
 "yourself."
-msgstr ""
+msgstr "Decidió no enviar los detalles de las columnas al proveedor de IA, por "
+"lo que las sugerencias están desactivadas para este diccionario. Aún "
+"puede escribir las descripciones usted mismo."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -8253,10 +8091,6 @@ msgstr "No se pudo ejecutar esta consulta"
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "Ver"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
-#~ msgid "Codes → labels"
-#~ msgstr "Códigos → etiquetas"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "This condition does not apply to {typeName} columns."
@@ -8359,7 +8193,10 @@ msgstr "{datasetName} no se puede cambiar directamente, por lo que no se guardó
 msgid "Data holding a source value becomes its target value, and data holding a "
 "target value becomes its source value, from the same pair. For example, "
 "1 becomes Male, and Male becomes 1."
-msgstr ""
+msgstr "Los datos que contienen un valor de origen se convierten en su valor de "
+"destino, y los datos que contienen un valor de destino se convierten en "
+"su valor de origen, a partir del mismo par. Por ejemplo, 1 se convierte "
+"en Male y Male se convierte en 1."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -8422,7 +8259,8 @@ msgstr "¿Hacer que el conjunto de datos sea solo para uso offline?"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint.ts
 msgid "{names} hold the same values, so they share this one list. Map it once."
-msgstr ""
+msgstr "{names} contienen los mismos valores, por lo que comparten esta lista. "
+"Asígnelos una sola vez."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 msgid "Don't apply"
@@ -8619,7 +8457,7 @@ msgstr "{0, plural, one {# valor encontrado} other {# valores encontrados}}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
 msgid "{datasetName} (source values)"
-msgstr ""
+msgstr "{datasetName} (valores de origen)"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
@@ -8774,10 +8612,6 @@ msgid "Unable to open the billing portal. Please try again later."
 msgstr "No se pudo abrir el portal de facturación. Inténtelo de nuevo más "
 "tarde."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
-#~ msgid "Attach labels only as reference"
-#~ msgstr "Adjuntar etiquetas solo como referencia"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 msgid "Time column"
 msgstr "Columna de tiempo"
@@ -8817,7 +8651,7 @@ msgstr "<0>Enter</0> enlazar"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Target value to use for {value}"
-msgstr ""
+msgstr "Valor de destino que se usará para {value}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
@@ -8896,13 +8730,6 @@ msgstr "CSV, Excel o PDF. Un archivo a la vez."
 msgid "Delete workspace"
 msgstr "Eliminar espacio de trabajo"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsSectionBody.tsx
-#~ msgid "Pick datasets that use the same codes. Avandar reads each column, finds "
-#~ "the coded ones, and merges columns that mean the same thing."
-#~ msgstr "Seleccione conjuntos de datos que usen los mismos códigos. Avandar lee "
-#~ "cada columna, identifica las codificadas y combina las columnas que "
-#~ "significan lo mismo."
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I applied the query in the Data Explorer."
 msgstr "Apliqué la consulta en el Explorador de datos."
@@ -8917,10 +8744,6 @@ msgstr " Aún no se ha publicado."
 msgid "{datasetCount, plural, one {# dataset} other {# datasets}}"
 msgstr "{datasetCount, plural, one {# conjunto de datos} other {# conjuntos de "
 "datos}}"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
-#~ msgid "Needs labels"
-#~ msgstr "Necesita etiquetas"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Cancel URL change"
@@ -8949,7 +8772,7 @@ msgstr "Creado manualmente"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 msgid "Suggest"
-msgstr ""
+msgstr "Sugerir"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "This isn't a single SQL expression. Check its brackets, quotes, and "
@@ -9006,7 +8829,8 @@ msgstr "Elija un conjunto de datos para combinar"
 #: src/views/DataManagerApp/ApplyDictionariesView/AddedCodeConflictCallout.tsx
 msgid "The source value {code} is added twice to {listName}. Change one of them "
 "on Unmatched values."
-msgstr ""
+msgstr "El valor de origen {code} se agregó dos veces a {listName}. Cambie uno "
+"de ellos en Valores no coincidentes."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -9224,12 +9048,6 @@ msgstr "Conjunto de datos cargado con éxito"
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Every status needs a name."
 msgstr "Cada estado necesita un nombre."
-
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
-#~ msgid "From {dictionaryName} › {entryName}. The values were converted to these "
-#~ "labels."
-#~ msgstr "De {dictionaryName} › {entryName}. Los valores se convirtieron en estas "
-#~ "etiquetas."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
@@ -9460,7 +9278,7 @@ msgstr "Su plan actual solo le permite compartir o publicar {maxAllowed, "
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "The source value {conflictCode} is added twice to this list."
-msgstr ""
+msgstr "El valor de origen {conflictCode} se agregó dos veces a esta lista."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file was downloaded, but Avandar couldn't read it as a table."
@@ -9491,15 +9309,6 @@ msgstr "¡Panel eliminado con éxito!"
 msgid "Reference layout"
 msgstr "Diseño de referencia"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
-#~ msgid "Chosen from the data: these values are codes."
-#~ msgstr "Seleccionados de los datos: estos valores son códigos."
-
-#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
-#~ msgid "A value you added to a code list is missing its label or code."
-#~ msgstr "A un valor que agregó a una lista de códigos le falta la etiqueta o el "
-#~ "código."
-
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin's chart code didn't load."
 msgstr "No se cargó el código del gráfico del plugin {pluginId}."
@@ -9519,7 +9328,8 @@ msgstr "Morado"
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "{value} is already in the list, with no target value. Add one on the "
 "dictionary."
-msgstr ""
+msgstr "{value} ya está en la lista, sin valor de destino. Agregue uno en el "
+"diccionario."
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
 msgid "More crosswalk actions"
@@ -9563,13 +9373,6 @@ msgid "You are not connected to the internet, so chat runs on this computer "
 msgstr "No tienes conexión a Internet, por lo que el chat se ejecuta en esta "
 "computadora con los modelos sin conexión."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Your data stays the same, which is what you want for models and exports "
-#~ "that need the original values. Hover the column to see the labels."
-#~ msgstr "Sus datos permanecen sin cambios, lo que necesita para los modelos y "
-#~ "las exportaciones que requieren los valores originales. Pase el cursor "
-#~ "sobre la columna para ver las etiquetas."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
 msgstr "¿Qué representa este tipo de caso?"
@@ -9605,10 +9408,6 @@ msgstr "Extensión izquierda"
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "{filterCount} filters"
 msgstr "{filterCount} filtros"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
-#~ msgid "Label values"
-#~ msgstr "Valores de etiqueta"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
@@ -9696,12 +9495,6 @@ msgstr "El asistente está escribiendo"
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
 msgstr "¡Conjunto de datos guardado exitosamente!"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint.ts
-#~ msgid "{names} hold the same values, so they share this one list. Label it "
-#~ "once."
-#~ msgstr "{names} contienen los mismos valores, por lo que comparten esta lista. "
-#~ "Etiquétela una sola vez."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Attributes"
@@ -9802,9 +9595,10 @@ msgid "Either way, the code lists and descriptions are attached to "
 msgstr "De cualquier forma, las listas de códigos y las descripciones se "
 "adjuntan a {datasetName} como referencia."
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Next: describe columns"
-msgstr ""
+msgstr "Siguiente: describir columnas"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -9890,10 +9684,6 @@ msgstr "Vacío"
 msgid "All"
 msgstr "Todo"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
-#~ msgid "Codes become labels"
-#~ msgstr "Los códigos se convierten en etiquetas"
-
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models downloaded"
 msgstr "Modelos sin conexión descargados"
@@ -9926,11 +9716,11 @@ msgid "{valueCount, plural, one {# value in {listNames} has no target value "
 "finish it on the dictionary.} other {# values in {listNames} have no "
 "target value yet. They are saved without one and marked as needing one, "
 "so you can finish them on the dictionary.}}"
-msgstr ""
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
-#~ msgid "Values labeled"
-#~ msgstr "Valores etiquetados"
+msgstr "{valueCount, plural, one {# valor en {listNames} aún no tiene un valor "
+"de destino. Se guarda sin uno y se marca como pendiente, para que pueda "
+"completarlo en el diccionario.} other {# valores en {listNames} aún no "
+"tienen un valor de destino. Se guardan sin uno y se marcan como "
+"pendientes, para que pueda completarlos en el diccionario.}}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "We couldn't read a sample of this dataset, so its columns and their "
@@ -9971,7 +9761,7 @@ msgstr "Clase {0}: {1} valores"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Translate values with"
-msgstr ""
+msgstr "Traducir valores con"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -10161,13 +9951,6 @@ msgstr "Derecha"
 msgid "Show total {measureColumn} by month in {datasetName}"
 msgstr "Mostrar el total de {measureColumn} por mes en {datasetName}"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
-#~ msgid "You chose not to send values to the AI provider, so suggestions are off "
-#~ "for this dictionary. Labeling still works."
-#~ msgstr "Decidió no enviar valores al proveedor de IA, por lo que las "
-#~ "sugerencias están desactivadas para este diccionario. El etiquetado "
-#~ "sigue funcionando."
-
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/KeepApartButton.tsx
 msgid "Keep apart"
 msgstr "Mantener separados"
@@ -10221,7 +10004,7 @@ msgstr "Cada serie es una columna numérica trazada en el eje Y. Elige el eje X 
 
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 msgid "What is a target value?"
-msgstr ""
+msgstr "¿Qué es un valor de destino?"
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename layer"
@@ -10314,7 +10097,7 @@ msgstr "Registros que elija para esto: {dataSlots}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
 msgid "Describe"
-msgstr ""
+msgstr "Describir"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
@@ -10328,12 +10111,6 @@ msgstr "Permitir sincronización"
 msgid "Unique per row"
 msgstr "Único por fila"
 
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
-#~ msgid "The values were converted to these codes. The dictionary entry they came "
-#~ "from was deleted."
-#~ msgstr "Los valores se convirtieron en estos códigos. La entrada del "
-#~ "diccionario de la que provenían se eliminó."
-
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Ascending"
@@ -10346,15 +10123,13 @@ msgstr "Ascendente"
 msgid "Suggested"
 msgstr "Sugerido"
 
-#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
-#~ msgid "Another value in this list already uses this label or spelling."
-#~ msgstr "Otro valor de esta lista ya usa esta etiqueta o forma de escritura."
-
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsSectionBody.tsx
 msgid "Pick datasets that use the same values. Avandar reads each column, finds "
 "the ones with a set of values, and merges columns that mean the same "
 "thing."
-msgstr ""
+msgstr "Elija conjuntos de datos que usen los mismos valores. Avandar lee cada "
+"columna, encuentra las que contienen un conjunto de valores y combina "
+"las columnas que significan lo mismo."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Ask about your data"
@@ -10440,10 +10215,6 @@ msgstr "No se pudieron cargar los diccionarios"
 msgid "It may have been deleted. Open another one from Data Sources."
 msgstr "Es posible que se haya eliminado. Abra otro desde Fuentes de datos."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "Coded columns"
-#~ msgstr "Columnas codificadas"
-
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open case"
 msgstr "Abrir caso"
@@ -10455,7 +10226,7 @@ msgstr "Filtrar"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "How values map"
-msgstr ""
+msgstr "Cómo se asignan los valores"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "This cannot be undone."
@@ -10467,7 +10238,7 @@ msgstr "{count, plural, one {# entidad} other {# entidades}}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 msgid "Suggest a description for {entryName}"
-msgstr ""
+msgstr "Sugerir una descripción para {entryName}"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "{usedByCount, plural, one {Used by # dataset} other {Used by # "
@@ -10485,7 +10256,7 @@ msgstr "Días a años"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
 msgid "Convert values and add column descriptions"
-msgstr ""
+msgstr "Convertir valores y agregar descripciones de columnas"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
@@ -10684,10 +10455,6 @@ msgstr "Subir"
 msgid "Unmatched values"
 msgstr "Valores sin coincidencia"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "{count} · order is kept when charted"
-#~ msgstr "{count} · se conserva el orden al crear gráficos"
-
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
 msgid "Assigned to: {label}"
 msgstr "Asignado a: {label}"
@@ -10776,12 +10543,7 @@ msgstr "La fuente no tiene filas."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Target values become source values"
-msgstr ""
-
-#: src/views/DataManagerApp/DataManagerToolbarActions/NewDictionaryMenu.tsx
-#~ msgid "Learns the codes and column meanings your datasets use"
-#~ msgstr "Aprende los códigos y significados de columna que usan sus conjuntos de "
-#~ "datos"
+msgstr "Los valores de destino se convierten en valores de origen"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Unmapped rows are still counted in this layer's totals. They are "
@@ -10921,20 +10683,9 @@ msgstr "Editar consulta"
 msgid "Data Explorer"
 msgstr "Explorador de datos"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Converting {datasetName} creates a linked dataset, and only workspace "
-#~ "admins can add datasets. You can still attach labels as reference."
-#~ msgstr "Convertir {datasetName} crea un conjunto de datos vinculado, y solo los "
-#~ "administradores del espacio de trabajo pueden agregar conjuntos de "
-#~ "datos. Aún puede adjuntar etiquetas como referencia."
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "No basemap"
 msgstr "Sin mapa base"
-
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
-#~ msgid "Translate codes with"
-#~ msgstr "Traducir códigos con"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
 msgid "Suggestions need a connection or the offline model. Mapping still works."
@@ -10947,7 +10698,7 @@ msgstr "Categórica: grupos con nombre, como sexo o resultado"
 
 #: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
 msgid "Add them in {dictionaryName}"
-msgstr ""
+msgstr "Agréguelos en {dictionaryName}"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
@@ -10960,10 +10711,6 @@ msgstr "Habilitar"
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
 msgstr "El primer valor no puede ser mayor que el segundo."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "{count} · no values to map"
-#~ msgstr ""
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
@@ -11082,7 +10829,8 @@ msgstr "no coincide con la expresión regular"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
 msgid "Suggestions need a connection or the offline model. You can still map "
 "values yourself."
-msgstr ""
+msgstr "Las sugerencias necesitan una conexión o el modelo sin conexión. Aún "
+"puede asignar los valores manualmente."
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical"
@@ -11119,10 +10867,6 @@ msgstr "No se pudo crear el panel: {0}"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
 msgstr "¿Mostrar ubicaciones exactas?"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel.tsx
-#~ msgid "Nothing to label"
-#~ msgstr "Nada que etiquetar"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Just ask"
@@ -11184,7 +10928,7 @@ msgstr "{crosswalkName} se eliminó."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
 msgid "Source → Target"
-msgstr ""
+msgstr "Origen → Destino"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
@@ -11288,7 +11032,8 @@ msgstr "No se pudieron cargar los plugins de este espacio de trabajo. Vuelva a "
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
 msgid "The suggestion did not come back. Try again or write it yourself."
-msgstr ""
+msgstr "La sugerencia no se recibió. Inténtelo de nuevo o escríbala usted "
+"mismo."
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper.tsx
@@ -11297,7 +11042,7 @@ msgstr "Registros"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestDescriptions.ts
 msgid "Suggested descriptions filled in. Check them before saving."
-msgstr ""
+msgstr "Se completaron las descripciones sugeridas. Revísalas antes de guardar."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "Created {linkedName}. The code lists are attached to {datasetName} for "
@@ -11353,11 +11098,6 @@ msgstr "Fecha de producción (Siempre incluida)"
 msgid "Italic"
 msgstr "Cursiva"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
-#~ msgid "Same name, different codes. Kept as separate code lists under one entry."
-#~ msgstr "Mismo nombre, códigos diferentes. Se conservaron como listas de códigos "
-#~ "separadas dentro de una entrada."
-
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{recordCount, plural, one {# record} other {# records}}"
 msgstr "{recordCount, plural, one {# registro} other {# registros}}"
@@ -11375,13 +11115,8 @@ msgstr "Presione la barra espaciadora o Enter para seleccionar este estado, "
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
 msgid "From {dictionaryName} › {entryName}. The values were converted to these "
 "source values."
-msgstr ""
-
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
-#~ msgid "No label yet"
-#~ msgstr "Aún no hay etiqueta"
+msgstr "De {dictionaryName} › {entryName}. Los valores se convirtieron en estos "
+"valores de origen."
 
 #: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
 msgid "Update now"
@@ -11399,7 +11134,8 @@ msgstr "Actualizar contraseña"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
 msgid "{unlabeledCount, plural, one {# value needs a target value} other {# "
 "values need a target value}}"
-msgstr ""
+msgstr "{unlabeledCount, plural, one {# valor necesita un valor de destino} "
+"other {# valores necesitan un valor de destino}}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
@@ -11416,7 +11152,8 @@ msgstr "Intervalos naturales"
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "This source value is already in the list. Source values are matched "
 "ignoring capitalization."
-msgstr ""
+msgstr "Este valor de origen ya está en la lista. Los valores de origen se "
+"comparan sin distinguir entre mayúsculas y minúsculas."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
@@ -11663,7 +11400,7 @@ msgstr "Editar {entryName}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
 msgid "Suggest all"
-msgstr ""
+msgstr "Sugerir todos"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
@@ -11675,7 +11412,12 @@ msgid "Pairs work both ways. Applying this list to a column of source values "
 "values turns them into source values. Matching ignores capitalization "
 "and extra spaces, and also accepts the other spellings listed beside "
 "each target value."
-msgstr ""
+msgstr "Los pares funcionan en ambos sentidos. Al aplicar esta lista a una "
+"columna de valores de origen, estos se convierten en valores de "
+"destino; al aplicarla a una columna de valores de destino, se "
+"convierten en valores de origen. La comparación ignora mayúsculas, "
+"minúsculas y espacios adicionales, y también acepta las otras formas de "
+"escritura indicadas junto a cada valor de destino."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
@@ -11726,7 +11468,7 @@ msgstr "{typeLabel} · {distinctText} valores diferentes"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow.ts
 msgid "{firstName} values"
-msgstr ""
+msgstr "Valores de {firstName}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Threshold"
@@ -11745,7 +11487,7 @@ msgstr "Elija un estado"
 
 #: src/components/dataDictionaries/ValueSideHint/ValueSideHint.tsx
 msgid "A value as it appears in the data, such as 1 or \"M\"."
-msgstr ""
+msgstr "Un valor tal como aparece en los datos, por ejemplo, 1 o \"M\"."
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 msgid "Values being converted"
@@ -11771,10 +11513,6 @@ msgstr "Intervalo de tiempo"
 msgid "Status not changed"
 msgstr "El estado no cambió"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "{count} · no codes to label"
-#~ msgstr "{count} · no hay códigos que etiquetar"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
@@ -11792,10 +11530,6 @@ msgstr "Amarillo"
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 msgid "You can't edit any dataset in this workspace"
 msgstr "No puede editar ningún conjunto de datos en este espacio de trabajo"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
-#~ msgid "A label you added is already used in its code list."
-#~ msgstr "Una etiqueta que agregó ya se utiliza en su lista de códigos."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
@@ -11823,7 +11557,7 @@ msgstr "Facturación"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Source value {rowNumber}"
-msgstr ""
+msgstr "Valor de origen {rowNumber}"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
@@ -12224,7 +11958,8 @@ msgstr "Avandar no pudo combinar estos conjuntos de datos en este dispositivo. "
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
 msgid "The values were converted to these target values. The dictionary entry "
 "they came from was deleted."
-msgstr ""
+msgstr "Los valores se convirtieron en estos valores de destino. La entrada del "
+"diccionario de la que provenían se eliminó."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -12264,19 +11999,11 @@ msgstr "No está en la lista; se conserva sin cambios"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Source values become target values"
-msgstr ""
+msgstr "Los valores de origen se convierten en valores de destino"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Every value needs a source value."
-msgstr ""
-
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Changes the values in every column that has codes, using the labels from "
-#~ "your dictionaries. Charts, filters, and downloads show the labels from "
-#~ "then on."
-#~ msgstr "Cambia los valores de cada columna que contiene códigos, usando las "
-#~ "etiquetas de sus diccionarios. A partir de ese momento, los gráficos, "
-#~ "filtros y descargas muestran las etiquetas."
+msgstr "Cada valor necesita un valor de origen."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
@@ -12317,7 +12044,7 @@ msgstr "Versión aplicada {appliedVersion}, versión actual {nowVersion}"
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Target values"
-msgstr ""
+msgstr "Valores de destino"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -12400,7 +12127,7 @@ msgstr "Acceso denegado"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Target value for {value}"
-msgstr ""
+msgstr "Valor de destino para {value}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 msgid "Pick a layer"
@@ -12437,7 +12164,11 @@ msgid "Every checked column becomes a dictionary entry. Columns with a fixed "
 "set of values also get their values mapped next. Text, number, and date "
 "columns aren't mapped, but they still join the dictionary with a "
 "description, so anyone using it knows what the column holds."
-msgstr ""
+msgstr "Cada columna seleccionada se convierte en una entrada del diccionario. "
+"Las columnas con un conjunto fijo de valores también asignan sus "
+"valores a continuación. Las columnas de texto, número y fecha no se "
+"asignan, pero aun así se incorporan al diccionario con una descripción "
+"para que quienes lo usen sepan qué contiene la columna."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically last"
@@ -12532,7 +12263,8 @@ msgstr "Convertir {displayName} en predeterminado"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
 msgid "A value in this list is too long to send for suggestions. You can still "
 "map values yourself."
-msgstr ""
+msgstr "Uno de los valores de esta lista es demasiado largo para enviarlo a "
+"sugerencias. Aún puedes asignar los valores manualmente."
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
@@ -12731,10 +12463,6 @@ msgstr "Aplicar calibración"
 msgid "Could not generate QR code"
 msgstr "No se pudo generar el código QR"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "Use an existing label"
-#~ msgstr "Usar una etiqueta existente"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove condition"
 msgstr "Eliminar condición"
@@ -12747,11 +12475,6 @@ msgstr "Tipos de caso"
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
 msgstr "Abrir tipo de caso"
-
-#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
-#~ msgid "One per line, with the code first: 1 = Male, 1: Male, or 1, Male."
-#~ msgstr "Una por línea, con el código primero: 1 = Hombre, 1: Hombre o 1, "
-#~ "Hombre."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Percent"
@@ -12814,16 +12537,10 @@ msgid "For data that writes the same values another way, such as M and F "
 msgstr "Para datos que escriben los mismos valores de otra manera, como M y F "
 "en lugar de 1 y 2."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
-#~ msgid "Suggestions need a connection or the offline model. Labeling still "
-#~ "works."
-#~ msgstr "Las sugerencias necesitan una conexión o el modelo sin conexión. El "
-#~ "etiquetado sigue funcionando."
-
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 msgid "Suggest and rewrite"
-msgstr ""
+msgstr "Sugerir y reescribir"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
@@ -12837,10 +12554,6 @@ msgstr "Cambiar los valores"
 msgid "Suggested rewrite:"
 msgstr "Reescritura sugerida:"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "Ordered scales"
-#~ msgstr "Escalas ordenadas"
-
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
 msgstr "No se pudieron cargar los modelos sin conexión."
@@ -12848,7 +12561,9 @@ msgstr "No se pudieron cargar los modelos sin conexión."
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
 msgid "Some columns already have a description. Checked ones may be rewritten, "
 "using what you wrote. Uncheck any you want to keep as they are."
-msgstr ""
+msgstr "Algunas columnas ya tienen una descripción. Las seleccionadas pueden "
+"reescribirse usando lo que escribiste. Desmarca las que quieras "
+"conservar tal como están."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
@@ -12890,7 +12605,7 @@ msgstr "Sin columnas numéricas"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
 msgid "Suggested from the column. Edit it or keep it."
-msgstr ""
+msgstr "Sugerido a partir de la columna. Edítalo o consérvalo."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "Insert column"
@@ -13039,10 +12754,6 @@ msgstr "consultado"
 msgid "They referenced columns this data source does not have."
 msgstr "Hicieron referencia a columnas que esta fuente de datos no tiene."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
-#~ msgid "Values without a label"
-#~ msgstr "Valores sin etiqueta"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
 msgstr "Campos de {conceptName}"
@@ -13050,10 +12761,6 @@ msgstr "Campos de {conceptName}"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Collapse the legend"
 msgstr "Contraer la leyenda"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
-#~ msgid "Needs mapping"
-#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -13095,7 +12802,8 @@ msgstr "Siguiente: valores sin coincidencia"
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
 msgid "From {dictionaryName} › {entryName}. The values were converted to these "
 "target values."
-msgstr ""
+msgstr "De {dictionaryName} › {entryName}. Los valores se convirtieron en estos "
+"valores de destino."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
@@ -13146,12 +12854,6 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
 msgstr "La capa obtiene exactamente estos campos, por lo que agregar uno "
 "también lo hace disponible para filtrar."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint.ts
-#~ msgid "Give each value the label people should see. Suggestions are only a "
-#~ "starting point."
-#~ msgstr "Asigna a cada valor la etiqueta que las personas deberían ver. Las "
-#~ "sugerencias son solo un punto de partida."
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
 msgid "Your plan's dataset limit is reached, so a new dataset can't be added."
@@ -13265,7 +12967,8 @@ msgstr "es al menos"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
 msgid "Suggested target values filled in. Check them before saving."
-msgstr ""
+msgstr "Se completaron los valores de destino sugeridos. Revísalos antes de "
+"guardar."
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
@@ -13319,10 +13022,6 @@ msgstr "Polígono"
 msgid "Resuming dataset processing…"
 msgstr "Reanudando el procesamiento del conjunto de datos…"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
-#~ msgid "Columns to map"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Tab not found"
 msgstr "No se encontró la pestaña"
@@ -13348,7 +13047,7 @@ msgstr "URL personalizada (opcional)"
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Translate source values"
-msgstr ""
+msgstr "Traducir valores de origen"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "The workspace name was saved successfully."
@@ -13369,10 +13068,6 @@ msgstr "Inicie sesión con otra cuenta"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
 msgstr "A mano alzada"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-#~ msgid "Include"
-#~ msgstr "Incluir"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
@@ -13404,15 +13099,6 @@ msgstr "Texto alternativo"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Please try again in a moment."
 msgstr "Inténtelo de nuevo en un momento."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
-#~ msgid "Coded columns get labeled next. The rest become entries with a "
-#~ "description, so the dictionary documents them too. Uncheck anything you "
-#~ "don't want, or change its kind."
-#~ msgstr "A continuación, se etiquetarán las columnas codificadas. El resto se "
-#~ "convertirá en entradas con una descripción, para que el diccionario "
-#~ "también las documente. Desmarca lo que no quieras incluir o cambia su "
-#~ "tipo."
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Could not delete the place."
@@ -13579,12 +13265,6 @@ msgstr "Columna 2"
 msgid "Data not ready"
 msgstr "Datos no disponibles"
 
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
-#~ msgid "The values were converted to these labels. The dictionary entry they "
-#~ "came from was deleted."
-#~ msgstr "Los valores se convirtieron en estas etiquetas. La entrada del "
-#~ "diccionario de la que provenían se eliminó."
-
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
 msgstr "La vista guardada del mapa"
@@ -13708,7 +13388,8 @@ msgstr "Ninguna de las anteriores"
 
 #: src/views/DataManagerApp/DataManagerToolbarActions/NewDictionaryMenu.tsx
 msgid "Learns the values and column meanings your datasets use"
-msgstr ""
+msgstr "Aprende los valores y significados de columna que usan tus conjuntos de "
+"datos"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "Isochrone from a point"
@@ -13751,7 +13432,7 @@ msgstr "Configurar cómo unir conjuntos de datos"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
 msgid "Map values + describe"
-msgstr ""
+msgstr "Asignar valores + describir"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Add an area layer, such as a buffer, to filter by it."
@@ -13780,12 +13461,6 @@ msgstr "{rowCount, plural, one {Creado a partir de la primera fila del "
 "resultado.} other {Creado a partir de las primeras # filas del "
 "resultado.}}"
 
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
-#~ msgid "{unlabeledCount, plural, one {# value needs a label} other {# values "
-#~ "need a label}}"
-#~ msgstr "{unlabeledCount, plural, one {# valor necesita una etiqueta} other {# "
-#~ "valores necesitan una etiqueta}}"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
@@ -13812,7 +13487,8 @@ msgstr "Preparando sus datos"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint.ts
 msgid "Give each source value its target value. Suggestions are only a starting "
 "point."
-msgstr ""
+msgstr "Asigna a cada valor de origen su valor de destino. Las sugerencias son "
+"solo un punto de partida."
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -13848,7 +13524,9 @@ msgstr "No se pudo crear el PDF: {detail}"
 msgid "Your data stays the same, which is what you want for models and exports "
 "that need the original values. Hover the column to see the target "
 "values."
-msgstr ""
+msgstr "Tus datos permanecen sin cambios, que es lo que necesitas para los "
+"modelos y las exportaciones que requieren los valores originales. Pasa "
+"el cursor sobre la columna para ver los valores de destino."
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Used by {usedByText}."
@@ -13881,12 +13559,6 @@ msgstr "Este conjunto de datos será solo offline"
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y / Size series"
 msgstr "Agrega al menos una serie de X / Y / Tamaño"
-
-#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
-#~ msgid "This code is already in the list. Codes are matched ignoring "
-#~ "capitalization."
-#~ msgstr "Este código ya está en la lista. Los códigos coinciden sin distinguir "
-#~ "mayúsculas de minúsculas."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar"
@@ -13924,10 +13596,6 @@ msgstr "Acerca de"
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "No hay una capa de límites en este mapa para consultar un código P."
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
-#~ msgid "Entry name and the columns it came from"
-#~ msgstr "Nombre de la entrada y las columnas de las que proviene"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Order"
@@ -14169,12 +13837,6 @@ msgstr "Conjunto de datos listo"
 msgid "H2"
 msgstr "H2"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Your data will change. The labels stay attached too, so the column is "
-#~ "still explained."
-#~ msgstr "Sus datos cambiarán. Las etiquetas también permanecerán asociadas, por "
-#~ "lo que la columna seguirá explicada."
-
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
 msgid "In the combined dataset"
 msgstr "En el conjunto de datos combinado"
@@ -14355,10 +14017,6 @@ msgstr "Actualizar y republicar"
 msgid "Center"
 msgstr "Centro"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
-#~ msgid "Next: label values"
-#~ msgstr "Siguiente: etiquetar valores"
-
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValueRow.tsx
 msgid "Missing"
@@ -14433,19 +14091,6 @@ msgstr "Idioma"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "Cerrar panel (⌘/)"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveWarnings.tsx
-#~ msgid "{valueCount, plural, one {# value in {listNames} has no label yet. It is "
-#~ "saved without one and marked as needing a label, so you can finish it on "
-#~ "the dictionary.} other {# values in {listNames} have no label yet. They "
-#~ "are saved without one and marked as needing a label, so you can finish "
-#~ "them on the dictionary.}}"
-#~ msgstr "{valueCount, plural, one {# valor en {listNames} aún no tiene una "
-#~ "etiqueta. Se guardará sin ella y se marcará como pendiente de "
-#~ "etiquetado para que pueda completarlo en el diccionario.} other {# "
-#~ "valores en {listNames} aún no tienen una etiqueta. Se guardarán sin "
-#~ "ella y se marcarán como pendientes de etiquetado para que pueda "
-#~ "completarlos en el diccionario.}}"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
@@ -14579,12 +14224,6 @@ msgstr "entero"
 msgid "Custom clarification answer"
 msgstr "Respuesta de aclaración personalizada"
 
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
-#~ msgid "Apply it to a dataset to explain its codes and describe its columns. The "
-#~ "datasets it is applied to are listed here."
-#~ msgstr "Aplíquelo a un conjunto de datos para explicar sus códigos y describir "
-#~ "sus columnas. Los conjuntos de datos a los que se aplica aparecen aquí."
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/CreateDictionaryMenuItem.tsx
 msgid "Saved to Dictionaries, so other datasets can use it too"
 msgstr "Guardado en Diccionarios, para que otros conjuntos de datos también "
@@ -14640,7 +14279,7 @@ msgstr "Estás en el plan Gratuito"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
 msgid "Suggestions did not come back. You can still map values without them."
-msgstr ""
+msgstr "No se recibieron sugerencias. Aún puedes asignar los valores sin ellas."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "{slotTitle}: {sourceLabel}"
@@ -14680,11 +14319,6 @@ msgstr "Avandar aún está en beta. Algunas funciones pueden no funcionar como s
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Exposure starts"
 msgstr "Comienza la exposición"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
-#~ msgid "This entry has no codes, so only its description is attached."
-#~ msgstr "Esta entrada no tiene códigos, por lo que solo se adjunta su "
-#~ "descripción."
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
@@ -14887,7 +14521,9 @@ msgstr "Ejecuté la consulta. Sus resultados están listos."
 msgid "Replaces each source value in this column with its target value. For "
 "example, every 1 becomes Male, and charts, filters, and downloads show "
 "Male from then on."
-msgstr ""
+msgstr "Reemplaza cada valor de origen de esta columna por su valor de destino. "
+"Por ejemplo, cada 1 se convierte en Masculino, y desde ese momento los "
+"gráficos, filtros y descargas muestran Masculino."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."
@@ -14897,7 +14533,9 @@ msgstr "Actualmente estás suscrito a este plan."
 msgid "What the source value is converted to when the dictionary is applied. It "
 "can be a readable label, such as \"Male\", or a value in another coding "
 "system."
-msgstr ""
+msgstr "En qué se convierte el valor de origen cuando se aplica el diccionario. "
+"Puede ser una etiqueta fácil de leer, como \"Masculino\", o un valor de "
+"otro sistema de codificación."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
@@ -14942,7 +14580,8 @@ msgstr "Condición"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
 msgid "This list is too long to suggest target values for in one request. You "
 "can still map values yourself."
-msgstr ""
+msgstr "Esta lista es demasiado larga para sugerir valores de destino en una "
+"sola solicitud. Aún puedes asignar los valores manualmente."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 msgid "Give this dictionary a name."
@@ -14960,12 +14599,6 @@ msgid "{0, plural, one {# saved database available} other {# saved databases "
 "available}}"
 msgstr "{0, plural, one {# base de datos guardada disponible} other {# bases de "
 "datos guardadas disponibles}}"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
-#~ msgid "A value in this list is too long to send for suggestions. Labeling still "
-#~ "works."
-#~ msgstr "Un valor de esta lista es demasiado largo para enviarlo como "
-#~ "sugerencia. El etiquetado sigue funcionando."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field from {datasetName}"
@@ -14996,10 +14629,6 @@ msgstr "Agrega una serie para elegir qué columna numérica impulsa el gráfico.
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "Columna de geometría"
-
-#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
-#~ msgid "Code {rowNumber}"
-#~ msgstr "Código {rowNumber}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Last run"
@@ -15114,16 +14743,10 @@ msgstr "Dejar de usar {name}"
 msgid "You can't go to this step until you create a new dashboard."
 msgstr "No puede avanzar a este paso hasta crear un dashboard nuevo."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
-#~ msgid "Converting {datasetName} creates a linked dataset, and your plan's "
-#~ "dataset limit is reached. You can still attach labels as reference."
-#~ msgstr "Convertir {datasetName} crea un conjunto de datos vinculado y se "
-#~ "alcanzó el límite de conjuntos de datos de su plan. Aún puede adjuntar "
-#~ "etiquetas como referencia."
-
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Source values become target values in the linked dataset"
-msgstr ""
+msgstr "Los valores de origen se convierten en valores de destino en el "
+"conjunto de datos vinculado"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
@@ -15152,7 +14775,8 @@ msgstr "Actualizado recientemente"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Target values become source values in the linked dataset"
-msgstr ""
+msgstr "Los valores de destino se convierten en valores de origen en el "
+"conjunto de datos vinculado"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this case type. Teammates on this case without "
@@ -15199,7 +14823,8 @@ msgstr "Solo como referencia"
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
 msgid "No columns are checked, so the dictionary would be empty. Go back and "
 "check the columns it should hold."
-msgstr ""
+msgstr "No hay columnas seleccionadas, por lo que el diccionario estaría vacío. "
+"Regresa y selecciona las columnas que debe contener."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
@@ -15324,10 +14949,6 @@ msgstr "En esta página"
 msgid "Not imported"
 msgstr "No importado"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
-#~ msgid "{datasetName} (coded)"
-#~ msgstr "{datasetName} (con códigos)"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -15367,7 +14988,6 @@ msgstr "(Mensaje no enviado.)"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsFooter.tsx
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 msgid "Next: save"
 msgstr "Siguiente: guardar"
 
@@ -15401,15 +15021,11 @@ msgstr "Ahí está su respuesta"
 msgid "Expand the legend"
 msgstr "Expandir la leyenda"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
-#~ msgid "Codes become labels in the linked dataset"
-#~ msgstr "Los códigos se convierten en etiquetas en el conjunto de datos "
-#~ "vinculado"
-
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
 msgid "The values were converted to these source values. The dictionary entry "
 "they came from was deleted."
-msgstr ""
+msgstr "Los valores se convirtieron en estos valores de origen. La entrada del "
+"diccionario de la que provenían se eliminó."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -15417,10 +15033,6 @@ msgid "Every workspace member who can open the {app} app gets this role on this 
 msgstr "Cada miembro del espacio de trabajo que pueda abrir la aplicación {app} "
 "obtiene este rol en este {resource}, además de lo que aparezca a "
 "continuación."
-
-#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
-#~ msgid "The code {conflictCode} is added twice to this list."
-#~ msgstr "El código {conflictCode} se agregó dos veces a esta lista."
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "{title} couldn't render"
@@ -15512,17 +15124,13 @@ msgstr "Es momento de crear su primer espacio de trabajo. ¡No lo piense "
 msgid "Re-apply"
 msgstr "Volver a aplicar"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
-#~ msgid "Chosen from the data: these values are labels."
-#~ msgstr "Seleccionado de los datos: estos valores son etiquetas."
-
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
 msgid "Used by"
 msgstr "Usado por"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "Entry name"
-msgstr ""
+msgstr "Nombre de la entrada"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -15532,18 +15140,9 @@ msgstr "¿Sincronizar en línea?"
 msgid "Neutral failure"
 msgstr "Fallo neutral"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
-#~ msgid "No label yet, kept as is"
-#~ msgstr "Aún no tiene etiqueta, se mantiene tal como está"
-
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "No fields yet"
 msgstr "Aún no hay campos"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField.tsx
-#~ msgid "Suggested from the column name and values. Edit it or keep it."
-#~ msgstr "Sugerida a partir del nombre y los valores de la columna. Edítela o "
-#~ "consérvela."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
@@ -15561,11 +15160,6 @@ msgstr "{0, plural, one {Agregar # valor} other {Agregar # valores}}"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "Acceso general"
-
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
-#~ msgid "Avandar learns the codes your datasets use and what their columns mean."
-#~ msgstr "Avandar aprende los códigos que usan sus conjuntos de datos y el "
-#~ "significado de sus columnas."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "All topics"
@@ -15668,10 +15262,6 @@ msgid "You need Case Records editor access to assign a record."
 msgstr "Necesitas acceso de editor de Registros de casos para asignar un "
 "registro."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow.ts
-#~ msgid "{firstName} codes"
-#~ msgstr "Códigos de {firstName}"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
 msgstr "Haga su primera pregunta"
@@ -15727,10 +15317,6 @@ msgstr "Error al actualizar el correo electrónico"
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
 msgid "Skip this dataset"
 msgstr "Omitir este conjunto de datos"
-
-#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
-#~ msgid "Every value needs a code."
-#~ msgstr "Cada valor necesita un código."
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "A dictionary this crosswalk uses changed. Reload the page and try again."
@@ -15897,10 +15483,6 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Los valores que seleccionaste pueden contener información personal. El "
 "proveedor de IA los recibirá y puede registrar la solicitud."
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
-#~ msgid "Labels → codes"
-#~ msgstr "Etiquetas → códigos"
-
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
 msgstr "Nada que deshacer"
@@ -15944,7 +15526,7 @@ msgstr "km"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 msgid "Values with no target value"
-msgstr ""
+msgstr "Valores sin valor de destino"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
@@ -15985,7 +15567,7 @@ msgstr "Categoría {0}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListPaneHeader.tsx
 msgid "Suggest target values"
-msgstr ""
+msgstr "Sugerir valores de destino"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -16237,7 +15819,7 @@ msgstr "Volver a los resultados"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead.tsx
 msgid "Deselect all columns"
-msgstr ""
+msgstr "Deseleccionar todas las columnas"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
@@ -16329,10 +15911,6 @@ msgstr "Valores, separados por comas"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Heading"
 msgstr "Encabezado"
-
-#: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
-#~ msgid "{datasetName} (labeled)"
-#~ msgstr "{datasetName} (etiquetado)"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
