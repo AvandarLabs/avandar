@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { uninstallPluginAndDeleteDatasets } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -46,6 +47,15 @@ function _run(datasetIds: readonly Dataset.Id[]) {
   });
 }
 
+/** Runs an uninstall that is expected to throw and returns what it threw. */
+async function _runAndCatch(
+  datasetIds: readonly Dataset.Id[],
+): Promise<unknown> {
+  return await _run(datasetIds).catch((caught: unknown) => {
+    return caught;
+  });
+}
+
 describe("uninstallPluginAndDeleteDatasets", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -81,7 +91,13 @@ describe("uninstallPluginAndDeleteDatasets", () => {
   it("deletes nothing when the install is still there after a delete that did not throw", async () => {
     mocks.getInstallationById.mockResolvedValue({ id: INSTALLATION_ID });
 
-    await expect(_run([PROVINCES_DATASET_ID])).rejects.toThrow(/was not uninstalled/);
+    const error = await _runAndCatch([PROVINCES_DATASET_ID]);
+
+    expect(error).toBeInstanceOf(UninstallPluginError);
+    expect(error).toMatchObject({
+      reason: "still_installed",
+      installationId: INSTALLATION_ID,
+    });
     expect(mocks.fullDelete).not.toHaveBeenCalled();
   });
 

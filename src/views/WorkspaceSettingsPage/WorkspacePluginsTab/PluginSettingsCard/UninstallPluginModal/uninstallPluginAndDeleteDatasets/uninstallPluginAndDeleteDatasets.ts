@@ -3,6 +3,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { UserClient } from "@/clients/UserClient";
 import { Logger } from "@/utils/Logger";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
@@ -24,9 +25,10 @@ async function _deleteInstallationOrThrow(
     id: installationId,
   });
   if (remaining !== undefined) {
-    throw new Error(
-      `Plugin install ${installationId} was not uninstalled. The current user may not be allowed to uninstall plugins.`,
-    );
+    throw new UninstallPluginError({
+      installationId,
+      reason: "still_installed",
+    });
   }
 }
 

@@ -5,6 +5,7 @@ import { PluginContentImportClient } from "@/clients/plugins/PluginContentImport
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { UninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { ReactNode } from "react";
@@ -442,6 +443,46 @@ describe("UninstallPluginModal", () => {
       expect(mocks.notifyError).toHaveBeenCalledWith({
         title: "Could not update Mozambique",
         message: "not allowed",
+      });
+    });
+  });
+
+  it("explains in plain words that the plugin is still installed, not the log message", async () => {
+    mocks.uninstall.mockRejectedValue(
+      new UninstallPluginError({
+        installationId: "installation-1" as PluginInstallation.Id,
+        reason: "still_installed",
+      }),
+    );
+    _renderModal();
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    await waitFor(() => {
+      expect(mocks.notifyError).toHaveBeenCalledWith({
+        title: "Could not update Mozambique",
+        message:
+          "Mozambique is still installed. You may not have permission to uninstall it.",
+      });
+    });
+  });
+
+  it("asks the admin to check the plugin list when the uninstall could not be confirmed", async () => {
+    mocks.uninstall.mockRejectedValue(
+      new UninstallPluginError({
+        installationId: "installation-1" as PluginInstallation.Id,
+        reason: "not_confirmed",
+      }),
+    );
+    _renderModal();
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    await waitFor(() => {
+      expect(mocks.notifyError).toHaveBeenCalledWith({
+        title: "Could not update Mozambique",
+        message:
+          "We could not confirm the uninstall. Check the plugin list, then try again.",
       });
     });
   });

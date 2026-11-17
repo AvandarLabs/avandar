@@ -11,6 +11,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/utils/notifications/notify";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { uninstallPluginAndDeleteDatasets } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
@@ -113,6 +114,25 @@ function useNotifyUninstallOutcome(
   };
 }
 
+/**
+ * Returns a function that turns an uninstall failure into the message the
+ * admin reads. An `UninstallPluginError` gets copy chosen by its `reason`.
+ * Any other error keeps its own message.
+ */
+function useBuildUninstallErrorMessage(
+  pluginName: string,
+): (error: unknown) => string {
+  const { t } = useLingui();
+  return (error) => {
+    if (error instanceof UninstallPluginError) {
+      return error.reason === "still_installed"
+        ? t`${pluginName} is still installed. You may not have permission to uninstall it.`
+        : t`We could not confirm the uninstall. Check the plugin list, then try again.`;
+    }
+    return error instanceof Error ? error.message : String(error);
+  };
+}
+
 /** What `useRunUninstall` gives the uninstall modal. */
 type RunUninstall = {
   /** Uninstalls the plugin and deletes the datasets with these ids. */
@@ -138,6 +158,7 @@ export function useRunUninstall(
   const { pluginName } = options;
   const queryClient = useQueryClient();
   const notifyOutcome = useNotifyUninstallOutcome(pluginName);
+  const buildErrorMessage = useBuildUninstallErrorMessage(pluginName);
   const [isRunning, setIsRunning] = useState(false);
   const run = async (datasetIds: readonly Dataset.Id[]): Promise<void> => {
     setIsRunning(true);
@@ -152,7 +173,7 @@ export function useRunUninstall(
     } catch (error) {
       notifyError({
         title: t`Could not update ${pluginName}`,
-        message: error instanceof Error ? error.message : String(error),
+        message: buildErrorMessage(error),
       });
       return;
     } finally {
