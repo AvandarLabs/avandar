@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => {
     rows: [] as Array<{ datasetId: string; name: string; canDelete: boolean }>,
     hiddenCount: 0,
     isLoading: false,
+    hasDependents: true,
     uninstall: vi.fn(),
     keepOpen: vi.fn(),
     notifySuccess: vi.fn(),
@@ -42,7 +43,7 @@ vi.mock(
   () => {
     return {
       UninstallDatasetDependents: ({ datasetId }: { datasetId: string }) => {
-        return <p>{`dependents of ${datasetId}`}</p>;
+        return mocks.hasDependents ? <p>{`dependents of ${datasetId}`}</p> : null;
       },
     };
   },
@@ -116,6 +117,7 @@ describe("UninstallPluginModal", () => {
     ];
     mocks.hiddenCount = 0;
     mocks.isLoading = false;
+    mocks.hasDependents = true;
     mocks.uninstall.mockResolvedValue({ failedDatasetIds: [] });
   });
 
@@ -229,6 +231,18 @@ describe("UninstallPluginModal", () => {
     expect(
       screen.getByText("dependents of dataset-districts"),
     ).toBeInTheDocument();
+  });
+
+  it("adds no empty element under a checked dataset that nothing reads", () => {
+    mocks.hasDependents = false;
+    _renderModal();
+
+    _checkDataset("Mozambique districts");
+
+    const checkboxRoot = screen
+      .getByRole("checkbox", { name: "Delete Mozambique districts" })
+      .closest(".mantine-Checkbox-root");
+    expect(checkboxRoot?.parentElement?.children).toHaveLength(1);
   });
 
   it("names the number of checked datasets on the confirm button", () => {

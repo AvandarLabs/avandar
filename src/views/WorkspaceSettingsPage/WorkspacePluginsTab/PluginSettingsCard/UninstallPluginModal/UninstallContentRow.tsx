@@ -47,12 +47,10 @@ export function UninstallContentRow({
         }}
       />
       {isChecked ? (
-        <Stack pl="xl">
-          <UninstallDatasetDependents
-            datasetId={row.datasetId}
-            installationId={installationId}
-          />
-        </Stack>
+        <UninstallDatasetDependents
+          datasetId={row.datasetId}
+          installationId={installationId}
+        />
       ) : null}
     </Stack>
   );

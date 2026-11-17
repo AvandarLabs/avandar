@@ -44,7 +44,9 @@ function DependentsList({
  * Under a dataset marked for deletion in the uninstall modal, what reads it
  * and stops working once it is deleted. Renders nothing when nothing does and
  * every lookup succeeded. When a lookup failed, it says so instead of
- * reading the missing answer as "nothing reads this".
+ * reading the missing answer as "nothing reads this". It indents what it
+ * renders under the dataset's checkbox, so its caller needs no wrapper that
+ * could be left empty.
  */
 export function UninstallDatasetDependents({
   datasetId,
@@ -59,6 +61,7 @@ export function UninstallDatasetDependents({
     return (
       <Loader
         size="xs"
+        ml="xl"
         role="status"
         aria-label={t`Checking what reads this dataset`}
       />
@@ -68,7 +71,7 @@ export function UninstallDatasetDependents({
     return null;
   }
   return (
-    <Stack gap="xxs">
+    <Stack gap="xxs" pl="xl">
       {dependents.length > 0 ? (
         <DependentsList dependents={dependents} />
       ) : null}
