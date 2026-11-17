@@ -1,11 +1,10 @@
 import { Stack } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { useEffect } from "react";
 import { useDataSlotDraftStatus } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotDraftStatus";
 import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/getOwnValue/getOwnValue";
 import { InstallWizardFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardFooter";
 import { InstallWizardPageContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardPageContent";
 import { InstallWizardStepper } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper";
+import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useKeepModalOpenWhile";
 import { useInstallPlugin } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallPlugin";
 import { useInstallWizardContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardContent";
 import { useInstallWizardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/useInstallWizardState";
@@ -26,22 +25,6 @@ type Props = Readonly<{
    */
   modalId?: string;
 }>;
-
-/** Keeps the wizard's modal open while content imports run. */
-function useKeepModalOpenWhile(
-  isImporting: boolean,
-  modalId: string | undefined,
-): void {
-  useEffect(() => {
-    if (modalId !== undefined) {
-      modals.updateModal({
-        modalId,
-        closeOnEscape: !isImporting,
-        withCloseButton: !isImporting,
-      });
-    }
-  }, [isImporting, modalId]);
-}
 
 /**
  * Whether the wizard's current page lets the admin go on: a data slot's page

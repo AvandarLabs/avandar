@@ -1,29 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { randomId } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
+import { returnFocusFromOpener } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
-
-/**
- * Puts focus back where the admin was before the wizard opened. A successful
- * install turns the card's Install button into other buttons, so the button
- * that opened the wizard may be gone by now. Then focus goes to the card's
- * heading, which the Install button points to with `aria-describedby`.
- */
-function _returnFocusFromOpener(
-  opener: Element | null,
-  headingId: string | null,
-): void {
-  const target =
-    opener?.isConnected === true
-      ? opener
-      : headingId === null
-        ? null
-        : document.getElementById(headingId);
-  if (target instanceof HTMLElement) {
-    target.focus({ preventScroll: true });
-  }
-}
 
 /**
  * Opens the install wizard for one plugin in a large modal titled
@@ -51,7 +31,7 @@ export function openPluginInstallWizard(options: {
     returnFocus: false,
     onClose: () => {
       window.setTimeout(() => {
-        _returnFocusFromOpener(opener, headingId);
+        returnFocusFromOpener(opener, headingId);
       }, 0);
     },
     children: (
