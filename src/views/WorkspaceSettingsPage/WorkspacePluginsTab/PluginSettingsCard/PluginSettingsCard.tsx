@@ -20,13 +20,16 @@ type Props = Readonly<{
 
 /**
  * Whether the plugin imported datasets into this workspace, and whether that
- * is still loading. It reads the import rows, not the manifest, so a plugin
- * that is installed but no longer bundled is covered too.
+ * is not yet known. It reads the import rows, not the manifest, so a plugin
+ * that is installed but no longer bundled is covered too. The answer is
+ * unknown until the lookup is fresh and succeeded: a restored cache or a
+ * failed refetch may hide an import, and Uninstall must then not fall back
+ * to a confirm that keeps no dataset.
  */
 function usePluginImportState(options: {
   installation: PluginInstallation.T | undefined;
   manifestModule: PluginManifestModule | undefined;
-}): { hasImportedDatasets: boolean; isLoadingImportedDatasets: boolean } {
+}): { hasImportedDatasets: boolean; isLookingUpImportedDatasets: boolean } {
   const { installation, manifestModule } = options;
   // A card always has an install or a manifest, so one of the ids is set.
   const importedContent = useImportedPluginContent(
@@ -35,7 +38,10 @@ function usePluginImportState(options: {
   return {
     hasImportedDatasets:
       Object.keys(importedContent.importsByContentId).length > 0,
-    isLoadingImportedDatasets: importedContent.isLoading,
+    isLookingUpImportedDatasets:
+      importedContent.isLoading ||
+      importedContent.isFetching ||
+      importedContent.isError,
   };
 }
 

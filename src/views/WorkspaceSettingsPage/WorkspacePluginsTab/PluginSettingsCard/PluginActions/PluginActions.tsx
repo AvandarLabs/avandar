@@ -16,8 +16,11 @@ type Props = Readonly<{
   /** Whether the plugin imported datasets into this workspace. */
   hasImportedDatasets: boolean;
 
-  /** True until the card knows whether the plugin imported datasets. */
-  isLoadingImportedDatasets: boolean;
+  /**
+   * True until the card knows, from a fresh lookup that succeeded, whether
+   * the plugin imported datasets. Uninstall stays disabled until then.
+   */
+  isLookingUpImportedDatasets: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -46,7 +49,7 @@ export function PluginActions({
   headingId,
   canManage,
   hasImportedDatasets,
-  isLoadingImportedDatasets,
+  isLookingUpImportedDatasets,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -68,7 +71,7 @@ export function PluginActions({
             headingId={headingId}
             isDisabled={isDisabled}
             hasImportedDatasets={hasImportedDatasets}
-            isLoadingImportedDatasets={isLoadingImportedDatasets}
+            isLookingUpImportedDatasets={isLookingUpImportedDatasets}
             actions={actions}
           />
         );

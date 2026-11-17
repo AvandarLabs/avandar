@@ -26,14 +26,14 @@ function _renderActions(options: {
   status: PluginInstallStatus;
   canManage?: boolean;
   hasImportedDatasets?: boolean;
-  isLoadingImportedDatasets?: boolean;
+  isLookingUpImportedDatasets?: boolean;
   actions?: PluginInstallationActions;
 }): void {
   const {
     status,
     canManage = true,
     hasImportedDatasets = false,
-    isLoadingImportedDatasets = false,
+    isLookingUpImportedDatasets = false,
     actions = _makeActions(),
   } = options;
   render(
@@ -45,7 +45,7 @@ function _renderActions(options: {
         headingId={HEADING_ID}
         canManage={canManage}
         hasImportedDatasets={hasImportedDatasets}
-        isLoadingImportedDatasets={isLoadingImportedDatasets}
+        isLookingUpImportedDatasets={isLookingUpImportedDatasets}
         actions={actions}
       />
     </ModalsProvider>,
@@ -158,7 +158,7 @@ describe("PluginActions", () => {
   });
 
   it("waits for the imported datasets to load before Uninstall can be clicked", () => {
-    _renderActions({ status: "installed", isLoadingImportedDatasets: true });
+    _renderActions({ status: "installed", isLookingUpImportedDatasets: true });
 
     expect(screen.getByRole("button", { name: "Uninstall" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Disable" })).toBeEnabled();

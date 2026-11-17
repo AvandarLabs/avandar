@@ -29,6 +29,9 @@ const mocks = vi.hoisted(() => {
     hasInstallationsError: false,
     hasInstallationsData: true,
     contentImports: [] as unknown[],
+    isLoadingContentImports: false,
+    isFetchingContentImports: false,
+    hasContentImportsError: false,
   };
 });
 
@@ -148,7 +151,14 @@ vi.mock(
           },
         },
         useGetAll: () => {
-          return [mocks.contentImports, false, {}];
+          return [
+            mocks.contentImports,
+            mocks.isLoadingContentImports,
+            {
+              isFetching: mocks.isFetchingContentImports,
+              isError: mocks.hasContentImportsError,
+            },
+          ];
         },
       },
     };
@@ -299,6 +309,9 @@ describe("WorkspacePluginsTab", () => {
     mocks.hasInstallationsError = false;
     mocks.hasInstallationsData = true;
     mocks.contentImports = [];
+    mocks.isLoadingContentImports = false;
+    mocks.isFetchingContentImports = false;
+    mocks.hasContentImportsError = false;
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -385,6 +398,37 @@ describe("WorkspacePluginsTab", () => {
     expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
     expect(dialog).toHaveTextContent("Datasets it imported");
     expect(dialog).toHaveTextContent("1 more dataset you can't see stays.");
+  });
+
+  it.each([
+    ["while the imports load", { isLoadingContentImports: true }],
+    ["while the imports refetch", { isFetchingContentImports: true }],
+    ["when the imports fail to load", { hasContentImportsError: true }],
+  ] as const)(
+    "keeps Uninstall disabled and opens no confirm %s",
+    async (_label, state) => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      Object.assign(mocks, state);
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      const button = within(card).getByRole("button", { name: "Uninstall" });
+      expect(button).toBeDisabled();
+      fireEvent.click(button);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    },
+  );
+
+  it("enables Uninstall once the imports lookup is settled", async () => {
+    _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
+    expect(within(card).getByRole("button", { name: "Uninstall" })).toBeEnabled();
   });
 
   it("says so when this deployment bundles no plugins", async () => {

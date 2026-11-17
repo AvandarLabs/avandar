@@ -7,9 +7,9 @@ import type { PluginInstallation } from "$/models/PluginInstallation/PluginInsta
 
 /**
  * Opens the uninstall dialog of a plugin that imported datasets, titled
- * "Uninstall <plugin name>?". A plugin's settings card calls it from its
- * Uninstall button. A click outside never closes it, and while the uninstall
- * runs neither do Escape and the close button.
+ * "Uninstall <plugin name>?". The `usePluginInstallationActions` hook calls
+ * it for a settings card's Uninstall button. A click outside never closes
+ * it, and while the uninstall runs neither do Escape and the close button.
  */
 export function openUninstallPluginModal(
   options: Readonly<{

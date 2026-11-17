@@ -17,8 +17,11 @@ type Props = Readonly<{
   /** Whether the plugin imported datasets into this workspace. */
   hasImportedDatasets: boolean;
 
-  /** True until the card knows whether the plugin imported datasets. */
-  isLoadingImportedDatasets: boolean;
+  /**
+   * True until the card knows, from a fresh lookup that succeeded, whether
+   * the plugin imported datasets. Uninstall stays disabled until then.
+   */
+  isLookingUpImportedDatasets: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -61,21 +64,20 @@ export function PluginActionButton({
   headingId,
   isDisabled,
   hasImportedDatasets,
-  isLoadingImportedDatasets,
+  isLookingUpImportedDatasets,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const copy = usePluginActionCopy({ pluginName })[kind];
-  const isUninstallWithDatasets = kind === "uninstall" && hasImportedDatasets;
+  const isUninstall = kind === "uninstall";
+  const isUninstallWithDatasets = isUninstall && hasImportedDatasets;
   const style = STYLE_BY_KIND[kind];
   return (
     <Button
       size="compact-sm"
       {...style}
       aria-describedby={headingId}
-      disabled={
-        isDisabled || (kind === "uninstall" && isLoadingImportedDatasets)
-      }
+      disabled={isDisabled || (isUninstall && isLookingUpImportedDatasets)}
       onClick={() => {
         if (isUninstallWithDatasets) {
           actions.uninstallWithImportedDatasets();
