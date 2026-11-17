@@ -260,10 +260,10 @@ push to `demo/**` deploys.
   A user whose dataset admin access was revoked after the page loaded could
   end up with a dataset that has no data, and see a success. `fullDelete` now
   checks admin access before it touches Storage and reads the row back after
-  the delete, and throws a `DatasetDeleteError` if either check fails. A
-  permission revoked between the access check and the row delete can still
-  leave a dataset without its files for that moment, but the read-back now
-  reports it as an error instead of a silent success. This path's own
+  the delete, and throws a `DatasetDeleteError` if either check fails. If
+  access is revoked between the access check and the row delete, the files
+  are already gone permanently, but the read-back now reports it as an error
+  instead of a silent success. This path's own
   re-check in `uninstallPluginAndDeleteDatasets` stays, so a dataset the user
   may no longer delete is recorded as failed without a throw.
 
