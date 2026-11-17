@@ -142,7 +142,7 @@ unless stated otherwise.
 | `UninstallContentRow.tsx` | One dataset row, with its checkbox or its "Kept" reason, and its dependents while checked |
 | `useUninstallContentRows.ts` | Builds the rows. See Data flow |
 | `useDatasetDependents.ts` | For one dataset id, the linked datasets that read it and the other installs' data slot bindings on it |
-| `uninstallPluginAndDeleteDatasets.ts` | Plain async function, no React. Uninstalls, then deletes each chosen dataset. Returns the ids it could not delete |
+| `uninstallPluginAndDeleteDatasets.ts` | Plain async function, no React. Uninstalls, then deletes each chosen dataset. Returns the ids it deleted and the ids it could not delete |
 
 Changes to existing files:
 
@@ -184,33 +184,62 @@ checked row:
 `uninstallPluginAndDeleteDatasets({ installationId, datasetIds })`:
 
 1. Deletes the install with `PluginInstallationClient.delete`, then reads it
-   back with `PluginInstallationClient.getById`. If the delete throws, or the
-   install is still there, it throws and deletes nothing. The read-back is
-   needed because the Supabase CRUD client's `delete` does not check how many
-   rows it deleted, so a delete that RLS refuses succeeds silently with zero
-   rows.
-2. For each dataset id, in the order shown:
-   1. Re-checks `canAccessResource(dataset, admin)`. If it is false, the id is
-      recorded as failed and `fullDelete` is not called. `fullDelete` checks
-      the same access first and throws a `DatasetDeleteError`, so this check
-      is kept only so that a refused dataset is recorded as failed without an
-      error.
-   2. Calls `DatasetClient.fullDelete({ id })`. A throw records the id as
-      failed, and the loop continues.
-3. Returns `{ failedDatasetIds }`.
+   back with `PluginInstallationClient.getById`. It throws an
+   `UninstallPluginError` and deletes nothing in two cases:
+   - `still_installed`: the install is still there after a delete that did not
+     throw. The read-back is needed because the Supabase CRUD client's
+     `delete` does not check how many rows it deleted, so a delete that RLS
+     refuses succeeds silently with zero rows.
+   - `not_confirmed`: the read-back itself threw, so it is unknown whether the
+     install is gone.
+
+   If the delete itself throws, that error propagates unchanged and nothing is
+   deleted. On desktop the read-back proves nothing about the server:
+   `plugin_installations` is not mirrored to the desktop SQLite database, so
+   the CRUD client targets a local table that does not exist and its delete
+   throws before any dataset is touched.
+2. Removes duplicate ids, keeping the order of first appearance. Then, for each
+   id in that order:
+   1. Reads the dataset with `DatasetClient.getById`. A row that is already
+      missing, such as one deleted by someone else after the dialog loaded, is
+      nothing to do. It is neither deleted nor failed, and `fullDelete` is not
+      called. A read that throws records the id as failed.
+   2. Calls `DatasetClient.fullDelete({ id })`. It does not check admin access
+      itself, because `fullDelete` checks it before it touches Storage (through
+      the platform server API, since the desktop webview has no Supabase
+      session) and throws a `DatasetDeleteError` with reason `not_allowed`.
+      That error records the id as failed and is not logged as unexpected.
+   3. Any other throw is logged, and the dataset is read again. `fullDelete`
+      can throw after it deleted the row, for example while it cleans up local
+      copies or reads the row back. A dataset whose row is gone counts as
+      deleted. A dataset whose row is still there, or whose re-read throws,
+      counts as failed. A failure never stops the loop.
+3. Returns `{ deletedDatasetIds, failedDatasetIds }`. A dataset that was
+   already gone is in neither list.
 
 The modal then:
 
+- Translates an `UninstallPluginError` by its `reason` into plain copy, never
+  showing the error's own message, which is for logs. Any other error keeps
+  its message.
 - Invalidates the plugin installation, plugin content import, plugin data
   slot binding, and dataset queries, so Data Sources and the cards update
-  without a reload.
+  without a reload. This also runs when the uninstall throws, so a card does
+  not keep showing an install that is gone.
 - Notifies:
-  - Nothing checked: "Mozambique uninstalled" (today's message).
-  - Everything deleted: "Mozambique uninstalled. 2 datasets deleted."
+  - Nothing checked, or nothing deleted by this run: "Mozambique
+    uninstalled" (today's message).
+  - Everything deleted: "Mozambique uninstalled. 2 datasets deleted." The
+    count is the datasets this run deleted.
   - Some failed: a warning, "Mozambique uninstalled. These datasets could not
     be deleted and are still in Data Sources:" followed by their names.
-  - Uninstall failed: today's error notification. The modal stays open and
-    the admin can retry or cancel.
+  - Uninstall failed with `still_installed`: "Could not update Mozambique.
+    Mozambique is still installed. You may not have permission to uninstall
+    it."
+  - Uninstall failed with `not_confirmed`: "Could not update Mozambique. We
+    could not confirm the uninstall. Check the plugin list, then try again."
+  - Any other uninstall failure: today's error notification. The modal stays
+    open and the admin can retry or cancel.
 
 What deleting a dataset already does, unchanged by this spec:
 
@@ -226,10 +255,10 @@ No schema change, so no pgTAP tests and no Supabase switch.
 
 | Level | File | Proves |
 | --- | --- | --- |
-| Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there after a delete that did not throw. A failed delete does not stop the others and is returned. A dataset that fails the admin re-check is returned and `fullDelete` is never called for it |
+| Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there (`still_installed`) or could not be read back (`not_confirmed`). A failed delete does not stop the others and is returned. A dataset `fullDelete` refuses with `not_allowed` is returned as failed without an error log. A dataset whose row survives is returned as failed. A dataset whose row is gone after `fullDelete` threw counts as deleted. A dataset that is already gone is not failed and never reaches `fullDelete`. A duplicate id is deleted once |
 | Unit | `useUninstallContentRows.test.ts` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name |
 | Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
-| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. The notification matches the outcome |
+| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. The notification matches the outcome, and an `UninstallPluginError` shows translated copy by reason |
 | Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/pluginFlow.ts` |
 
@@ -263,9 +292,9 @@ push to `demo/**` deploys.
   the delete, and throws a `DatasetDeleteError` if either check fails. If
   access is revoked between the access check and the row delete, the files
   are already gone permanently, but the read-back now reports it as an error
-  instead of a silent success. This path's own
-  re-check in `uninstallPluginAndDeleteDatasets` stays, so a dataset the user
-  may no longer delete is recorded as failed without a throw.
+  instead of a silent success. Because of that
+  check, `uninstallPluginAndDeleteDatasets` has no access check of its own: it
+  records a `not_allowed` refusal from `fullDelete` as a failed dataset.
 
 ## Done when
 
