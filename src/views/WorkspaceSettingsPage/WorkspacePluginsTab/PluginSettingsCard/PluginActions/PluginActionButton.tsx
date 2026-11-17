@@ -14,8 +14,11 @@ type Props = Readonly<{
   headingId: string;
   isDisabled: boolean;
 
-  /** Whether the plugin's manifest bundles datasets that it imports. */
-  hasBundledContent: boolean;
+  /** Whether the plugin imported datasets into this workspace. */
+  hasImportedDatasets: boolean;
+
+  /** True until the card knows whether the plugin imported datasets. */
+  isLoadingImportedDatasets: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -49,25 +52,35 @@ function _makeOnConfirmByKind(
  * One action button on a plugin's settings card. Clicking it opens a
  * confirmation, and the action runs only once the user confirms, because
  * every action changes the plugin for every member of the workspace.
+ * Uninstall of a plugin that imported datasets opens the uninstall modal
+ * instead, which is its own confirmation.
  */
 export function PluginActionButton({
   kind,
   pluginName,
   headingId,
   isDisabled,
-  hasBundledContent,
+  hasImportedDatasets,
+  isLoadingImportedDatasets,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const copy = usePluginActionCopy({ pluginName, hasBundledContent })[kind];
+  const copy = usePluginActionCopy({ pluginName })[kind];
+  const isUninstallWithDatasets = kind === "uninstall" && hasImportedDatasets;
   const style = STYLE_BY_KIND[kind];
   return (
     <Button
       size="compact-sm"
       {...style}
       aria-describedby={headingId}
-      disabled={isDisabled}
+      disabled={
+        isDisabled || (kind === "uninstall" && isLoadingImportedDatasets)
+      }
       onClick={() => {
+        if (isUninstallWithDatasets) {
+          actions.uninstallWithImportedDatasets();
+          return;
+        }
         modals.openConfirmModal({
           title: copy.confirmTitle,
           children: <Text size="sm">{copy.confirmBody}</Text>,

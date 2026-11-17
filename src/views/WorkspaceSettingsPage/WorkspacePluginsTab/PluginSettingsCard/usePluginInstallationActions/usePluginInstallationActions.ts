@@ -1,4 +1,5 @@
 import { openPluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard";
+import { openUninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal";
 import { usePluginInstallationMutations } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -17,6 +18,13 @@ export type PluginInstallationActions = Readonly<{
   setIsEnabled: (isEnabled: boolean) => void;
   approvePermissions: () => void;
   uninstall: () => void;
+
+  /**
+   * Opens the uninstall dialog that lets an admin delete the datasets the
+   * plugin imported. The card uses it instead of `uninstall` when the plugin
+   * imported datasets into this workspace.
+   */
+  uninstallWithImportedDatasets: () => void;
 }>;
 
 /** Everything the actions of one plugin read, gathered by the hook. */
@@ -30,7 +38,10 @@ type ActionContext = Readonly<{
 /** Builds the actions that add a plugin to the workspace or remove it. */
 function _makeInstallActionsFromContext(
   context: ActionContext,
-): Pick<PluginInstallationActions, "install" | "uninstall"> {
+): Pick<
+  PluginInstallationActions,
+  "install" | "uninstall" | "uninstallWithImportedDatasets"
+> {
   const { pluginName, manifestModule, installation, mutations } = context;
   return {
     install: () => {
@@ -41,6 +52,15 @@ function _makeInstallActionsFromContext(
     uninstall: () => {
       if (installation !== undefined) {
         mutations.deleteInstallation({ id: installation.id });
+      }
+    },
+    uninstallWithImportedDatasets: () => {
+      if (installation !== undefined) {
+        openUninstallPluginModal({
+          pluginName,
+          pluginId: installation.pluginId,
+          installationId: installation.id,
+        });
       }
     },
   };

@@ -8,6 +8,7 @@ import { PluginInstalledSections } from "@/views/WorkspaceSettingsPage/Workspace
 import { PluginManifestSummary } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary";
 import { usePluginDisplayText } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginDisplayText";
 import { usePluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
+import { useImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 
@@ -16,6 +17,27 @@ type Props = Readonly<{
   installation: PluginInstallation.T | undefined;
   canManage: boolean;
 }>;
+
+/**
+ * Whether the plugin imported datasets into this workspace, and whether that
+ * is still loading. It reads the import rows, not the manifest, so a plugin
+ * that is installed but no longer bundled is covered too.
+ */
+function usePluginImportState(options: {
+  installation: PluginInstallation.T | undefined;
+  manifestModule: PluginManifestModule | undefined;
+}): { hasImportedDatasets: boolean; isLoadingImportedDatasets: boolean } {
+  const { installation, manifestModule } = options;
+  // A card always has an install or a manifest, so one of the ids is set.
+  const importedContent = useImportedPluginContent(
+    installation?.pluginId ?? manifestModule?.manifest.id ?? "",
+  );
+  return {
+    hasImportedDatasets:
+      Object.keys(importedContent.importsByContentId).length > 0,
+    isLoadingImportedDatasets: importedContent.isLoading,
+  };
+}
 
 /**
  * One plugin on the Plugins settings tab. Without a manifest module, the
@@ -42,6 +64,7 @@ export function PluginSettingsCard({
     manifestModule,
     installation,
   });
+  const importState = usePluginImportState({ installation, manifestModule });
   return (
     <Card component="section" aria-labelledby={headingId} padding="lg">
       <Group justify="space-between" align="flex-start" wrap="nowrap">
@@ -76,7 +99,7 @@ export function PluginSettingsCard({
           pluginName={pluginName}
           headingId={headingId}
           canManage={canManage}
-          hasBundledContent={(manifest?.contributes.content.length ?? 0) > 0}
+          {...importState}
           actions={actions}
         />
       </Group>

@@ -28,6 +28,7 @@ const mocks = vi.hoisted(() => {
     isLoadingInstallations: false,
     hasInstallationsError: false,
     hasInstallationsData: true,
+    contentImports: [] as unknown[],
   };
 });
 
@@ -147,7 +148,7 @@ vi.mock(
           },
         },
         useGetAll: () => {
-          return [[], false, {}];
+          return [mocks.contentImports, false, {}];
         },
       },
     };
@@ -297,6 +298,7 @@ describe("WorkspacePluginsTab", () => {
     mocks.isLoadingInstallations = false;
     mocks.hasInstallationsError = false;
     mocks.hasInstallationsData = true;
+    mocks.contentImports = [];
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -361,6 +363,28 @@ describe("WorkspacePluginsTab", () => {
     const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
     expect(within(card).getByText("Unavailable")).toBeInTheDocument();
     expect(_getButtonLabelsIn(card)).toEqual(["Uninstall"]);
+  });
+
+  it("opens the uninstall modal, not a confirm, for an unavailable plugin that imported datasets", async () => {
+    _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+    mocks.contentImports = [
+      { contentId: "cases", pluginId: REMOVED_PLUGIN_ID, datasetId: "gone" },
+    ];
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
+    await waitFor(() => {
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
+    });
+    fireEvent.click(within(card).getByRole("button", { name: "Uninstall" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
+    expect(dialog).toHaveTextContent("Datasets it imported");
+    expect(dialog).toHaveTextContent("1 more dataset you can't see stays.");
   });
 
   it("says so when this deployment bundles no plugins", async () => {

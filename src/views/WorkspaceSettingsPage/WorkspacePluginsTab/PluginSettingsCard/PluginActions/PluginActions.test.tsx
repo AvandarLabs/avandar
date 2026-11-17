@@ -17,6 +17,7 @@ function _makeActions(
     setIsEnabled: vi.fn(),
     approvePermissions: vi.fn(),
     uninstall: vi.fn(),
+    uninstallWithImportedDatasets: vi.fn(),
     ...overrides,
   };
 }
@@ -24,13 +25,15 @@ function _makeActions(
 function _renderActions(options: {
   status: PluginInstallStatus;
   canManage?: boolean;
-  hasBundledContent?: boolean;
+  hasImportedDatasets?: boolean;
+  isLoadingImportedDatasets?: boolean;
   actions?: PluginInstallationActions;
 }): void {
   const {
     status,
     canManage = true,
-    hasBundledContent = false,
+    hasImportedDatasets = false,
+    isLoadingImportedDatasets = false,
     actions = _makeActions(),
   } = options;
   render(
@@ -41,7 +44,8 @@ function _renderActions(options: {
         pluginName="Epidemiology"
         headingId={HEADING_ID}
         canManage={canManage}
-        hasBundledContent={hasBundledContent}
+        hasImportedDatasets={hasImportedDatasets}
+        isLoadingImportedDatasets={isLoadingImportedDatasets}
         actions={actions}
       />
     </ModalsProvider>,
@@ -117,18 +121,8 @@ describe("PluginActions", () => {
     expect(actions.uninstall).toHaveBeenCalledTimes(1);
   });
 
-  it("says in the uninstall dialog that the datasets a plugin imported stay", async () => {
-    _renderActions({ status: "installed", hasBundledContent: true });
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    expect(await screen.findByRole("dialog")).toHaveTextContent(
-      "Its features are removed from this workspace. The datasets it imported stay in Data Sources.",
-    );
-  });
-
-  it("leaves the uninstall dialog text as it was for a plugin with no bundled datasets", async () => {
-    _renderActions({ status: "installed", hasBundledContent: false });
+  it("keeps the one-line uninstall confirm for a plugin with no imported datasets", async () => {
+    _renderActions({ status: "installed", hasImportedDatasets: false });
 
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
 
@@ -137,6 +131,37 @@ describe("PluginActions", () => {
       "Its features are removed from this workspace.",
     );
     expect(dialog).not.toHaveTextContent("Data Sources");
+  });
+
+  it("opens the uninstall modal without a confirm first when the plugin imported datasets", () => {
+    const actions = _makeActions();
+    _renderActions({ status: "installed", hasImportedDatasets: true, actions });
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    expect(actions.uninstallWithImportedDatasets).toHaveBeenCalledTimes(1);
+    expect(actions.uninstall).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("opens the uninstall modal for an unavailable plugin that imported datasets", () => {
+    const actions = _makeActions();
+    _renderActions({
+      status: "unavailable",
+      hasImportedDatasets: true,
+      actions,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    expect(actions.uninstallWithImportedDatasets).toHaveBeenCalledTimes(1);
+  });
+
+  it("waits for the imported datasets to load before Uninstall can be clicked", () => {
+    _renderActions({ status: "installed", isLoadingImportedDatasets: true });
+
+    expect(screen.getByRole("button", { name: "Uninstall" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Disable" })).toBeEnabled();
   });
 
   it("starts the install without a confirmation, because the install wizard is the confirmation", () => {

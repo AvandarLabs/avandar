@@ -13,8 +13,11 @@ type Props = Readonly<{
   headingId: string;
   canManage: boolean;
 
-  /** Whether the plugin's manifest bundles datasets that it imports. */
-  hasBundledContent: boolean;
+  /** Whether the plugin imported datasets into this workspace. */
+  hasImportedDatasets: boolean;
+
+  /** True until the card knows whether the plugin imported datasets. */
+  isLoadingImportedDatasets: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -34,14 +37,16 @@ const ACTION_KINDS_BY_STATUS: Record<
  * The buttons for one plugin's current status, such as Install for a plugin
  * the workspace does not have yet. Users who cannot manage plugins see them
  * disabled, and so does everyone while a change is saving. Install opens the
- * install wizard; every other action asks the user to confirm first.
+ * install wizard; every other action asks the user to confirm first, except
+ * Uninstall of a plugin that imported datasets, which opens its own modal.
  */
 export function PluginActions({
   status,
   pluginName,
   headingId,
   canManage,
-  hasBundledContent,
+  hasImportedDatasets,
+  isLoadingImportedDatasets,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -62,7 +67,8 @@ export function PluginActions({
             pluginName={pluginName}
             headingId={headingId}
             isDisabled={isDisabled}
-            hasBundledContent={hasBundledContent}
+            hasImportedDatasets={hasImportedDatasets}
+            isLoadingImportedDatasets={isLoadingImportedDatasets}
             actions={actions}
           />
         );
