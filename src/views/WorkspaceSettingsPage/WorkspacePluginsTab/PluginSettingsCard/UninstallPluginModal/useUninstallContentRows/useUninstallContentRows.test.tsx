@@ -10,6 +10,10 @@ const mocks = vi.hoisted(() => {
     datasets: [] as Array<{ id: string; name: string }>,
     isFetchingDatasets: false,
     isErrorDatasets: false,
+    isFetchingImports: false,
+    isErrorImports: false,
+    refetchImports: vi.fn(),
+    refetchDatasets: vi.fn(),
     datasetsArgs: undefined as unknown,
     canAccessResource: vi.fn(),
   };
@@ -23,6 +27,9 @@ vi.mock(
         return {
           importsByContentId: mocks.importsByContentId,
           isLoading: false,
+          isFetching: mocks.isFetchingImports,
+          isError: mocks.isErrorImports,
+          refetch: mocks.refetchImports,
         };
       },
     };
@@ -39,6 +46,7 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
           {
             isFetching: mocks.isFetchingDatasets,
             isError: mocks.isErrorDatasets,
+            refetch: mocks.refetchDatasets,
           },
         ];
       },
@@ -92,6 +100,10 @@ describe("useUninstallContentRows", () => {
     ];
     mocks.isFetchingDatasets = false;
     mocks.isErrorDatasets = false;
+    mocks.isFetchingImports = false;
+    mocks.isErrorImports = false;
+    mocks.refetchImports.mockReset();
+    mocks.refetchDatasets.mockReset();
     mocks.datasetsArgs = undefined;
     mocks.canAccessResource.mockReset();
     mocks.canAccessResource.mockResolvedValue(true);
@@ -157,19 +169,33 @@ describe("useUninstallContentRows", () => {
     expect(result.current.hiddenCount).toBe(1);
   });
 
-  it("treats a failed access check as not deletable", async () => {
-    mocks.canAccessResource.mockRejectedValue(new Error("rpc failed"));
-
+  it("is not failed when every lookup succeeded", async () => {
     const { result } = _renderRows();
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(
-      result.current.rows.every((row) => {
-        return !row.canDelete;
-      }),
-    ).toBe(true);
+    expect(result.current.hasFailed).toBe(false);
+  });
+
+  it("has failed when an access check fails, listing no row from the other answers", async () => {
+    mocks.canAccessResource.mockImplementation(
+      async ({ resourceId }: { resourceId: string }) => {
+        if (resourceId === "dataset-provinces") {
+          throw new Error("rpc failed");
+        }
+        return true;
+      },
+    );
+
+    const { result } = _renderRows();
+
+    await waitFor(() => {
+      expect(result.current.hasFailed).toBe(true);
+    });
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.hiddenCount).toBe(0);
   });
 
   it("stays loading until every access check has answered", () => {
@@ -210,16 +236,115 @@ describe("useUninstallContentRows", () => {
     expect(mocks.canAccessResource).toHaveBeenCalledTimes(2);
   });
 
-  it("does not list or check the restored datasets when the refetch fails", async () => {
+  it("has failed, listing nothing and counting nothing as unseen, when the dataset lookup fails", async () => {
     mocks.isErrorDatasets = true;
 
     const { result } = _renderRows();
     await _flush();
 
+    expect(result.current.hasFailed).toBe(true);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.rows).toEqual([]);
-    expect(result.current.hiddenCount).toBe(2);
+    expect(result.current.hiddenCount).toBe(0);
     expect(mocks.canAccessResource).not.toHaveBeenCalled();
+  });
+
+  it("has failed, listing nothing, when the imports lookup fails", async () => {
+    mocks.isErrorImports = true;
+
+    const { result } = _renderRows();
+    await _flush();
+
+    expect(result.current.hasFailed).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.hiddenCount).toBe(0);
+    expect(mocks.canAccessResource).not.toHaveBeenCalled();
+  });
+
+  it("asks for no datasets when the imports lookup failed, since its list is stale", () => {
+    mocks.isErrorImports = true;
+
+    _renderRows();
+
+    expect(mocks.datasetsArgs).toMatchObject({
+      useQueryOptions: { enabled: false },
+    });
+  });
+
+  it.each([
+    ["imports", { isErrorImports: true, isFetchingImports: true }],
+    ["datasets", { isErrorDatasets: true, isFetchingDatasets: true }],
+  ] as const)(
+    "is loading, not failed, while a failed %s lookup is retried",
+    async (_label, state) => {
+      Object.assign(mocks, state);
+
+      const { result } = _renderRows();
+      await _flush();
+
+      expect(result.current.hasFailed).toBe(false);
+      expect(result.current.isLoading).toBe(true);
+    },
+  );
+
+  it("retries only the dataset lookup when that is what failed", async () => {
+    mocks.isErrorDatasets = true;
+    const { result } = _renderRows();
+    await _flush();
+
+    act(() => {
+      result.current.retry();
+    });
+
+    expect(mocks.refetchDatasets).toHaveBeenCalledTimes(1);
+    expect(mocks.refetchImports).not.toHaveBeenCalled();
+  });
+
+  it("retries only the imports lookup when that is what failed", async () => {
+    mocks.isErrorImports = true;
+    const { result } = _renderRows();
+    await _flush();
+
+    act(() => {
+      result.current.retry();
+    });
+
+    expect(mocks.refetchImports).toHaveBeenCalledTimes(1);
+    expect(mocks.refetchDatasets).not.toHaveBeenCalled();
+  });
+
+  it("retries only the access checks that failed, and then lists the rows", async () => {
+    let hasProvincesFailed = true;
+    mocks.canAccessResource.mockImplementation(
+      async ({ resourceId }: { resourceId: string }) => {
+        if (resourceId === "dataset-provinces" && hasProvincesFailed) {
+          throw new Error("rpc failed");
+        }
+        return true;
+      },
+    );
+    const { result } = _renderRows();
+    await waitFor(() => {
+      expect(result.current.hasFailed).toBe(true);
+    });
+    mocks.canAccessResource.mockClear();
+    hasProvincesFailed = false;
+
+    act(() => {
+      result.current.retry();
+    });
+
+    await waitFor(() => {
+      expect(result.current.rows).toHaveLength(2);
+    });
+    expect(result.current.hasFailed).toBe(false);
+    expect(mocks.canAccessResource).toHaveBeenCalledTimes(1);
+    expect(mocks.canAccessResource).toHaveBeenCalledWith(
+      expect.objectContaining({ resourceId: "dataset-provinces" }),
+    );
+    expect(mocks.refetchImports).not.toHaveBeenCalled();
+    expect(mocks.refetchDatasets).not.toHaveBeenCalled();
   });
 
   it("asks for the imported datasets and always refetches them on mount", () => {

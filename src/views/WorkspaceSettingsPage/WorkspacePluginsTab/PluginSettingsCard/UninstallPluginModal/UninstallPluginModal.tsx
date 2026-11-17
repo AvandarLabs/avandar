@@ -26,11 +26,20 @@ type Props = Readonly<{
   onClose: (reason: UninstallModalCloseReason) => void;
 }>;
 
-/** The confirm button's text: plain, or naming how many datasets go too. */
-function _buildConfirmLabel(
-  checkedCount: number,
-  uninstallLabel: string,
-): string {
+/**
+ * The confirm button's text: plain, naming how many datasets go too, or
+ * saying every dataset is kept when the datasets could not be loaded.
+ */
+function _buildConfirmLabel(options: {
+  checkedCount: number;
+  hasFailed: boolean;
+  uninstallLabel: string;
+  keepAllLabel: string;
+}): string {
+  const { checkedCount, hasFailed, uninstallLabel, keepAllLabel } = options;
+  if (hasFailed) {
+    return keepAllLabel;
+  }
   return checkedCount === 0
     ? uninstallLabel
     : plural(checkedCount, {
@@ -87,6 +96,8 @@ function useCheckedDatasetIds(): {
  * the workspace. It lists them, every one kept unless the admin checks it for
  * deletion, then uninstalls and deletes the checked ones. It keeps the modal
  * it is rendered in open while the uninstall runs, and closes it when done.
+ * When the datasets could not be loaded, it says so with a Retry and still
+ * offers an uninstall that keeps every dataset.
  */
 export function UninstallPluginModal(props: Props): JSX.Element {
   const { t } = useLingui();
@@ -101,10 +112,10 @@ export function UninstallPluginModal(props: Props): JSX.Element {
     },
   });
   useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
-  const datasetIdsToDelete = _listCheckedIdsInRowOrder(
-    content.rows,
-    checkedIds,
-  );
+  // Nothing loaded can be trusted after a failure, so nothing is deleted.
+  const datasetIdsToDelete = content.hasFailed
+    ? []
+    : _listCheckedIdsInRowOrder(content.rows, checkedIds);
   return (
     <Stack gap="md">
       <Text size="sm">{t`Its features are removed from this workspace.`}</Text>
@@ -116,10 +127,12 @@ export function UninstallPluginModal(props: Props): JSX.Element {
         onIsCheckedChange={setIsChecked}
       />
       <UninstallModalFooter
-        confirmLabel={_buildConfirmLabel(
-          datasetIdsToDelete.length,
-          t`Uninstall`,
-        )}
+        confirmLabel={_buildConfirmLabel({
+          checkedCount: datasetIdsToDelete.length,
+          hasFailed: content.hasFailed,
+          uninstallLabel: t`Uninstall`,
+          keepAllLabel: t`Uninstall and keep all datasets`,
+        })}
         isRunning={uninstaller.isRunning}
         isLoading={content.isLoading}
         onCancel={() => {

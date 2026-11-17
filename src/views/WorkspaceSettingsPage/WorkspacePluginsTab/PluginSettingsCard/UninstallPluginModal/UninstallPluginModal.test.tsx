@@ -10,6 +10,8 @@ const mocks = vi.hoisted(() => {
     rows: [] as Array<{ datasetId: string; name: string; canDelete: boolean }>,
     hiddenCount: 0,
     isLoading: false,
+    hasFailed: false,
+    retry: vi.fn(),
     hasDependents: true,
     uninstall: vi.fn(),
     keepOpen: vi.fn(),
@@ -29,6 +31,8 @@ vi.mock(
           rows: mocks.rows,
           hiddenCount: mocks.hiddenCount,
           isLoading: mocks.isLoading,
+          hasFailed: mocks.hasFailed,
+          retry: mocks.retry,
         };
       },
     };
@@ -70,27 +74,34 @@ type UninstallOutcomeStub = {
   incompleteDatasetIds: string[];
 };
 
-function _renderModal(): QueryClient {
-  const queryClient = new QueryClient();
-  render(
+function _buildModal(): JSX.Element {
+  return (
     <UninstallPluginModal
       pluginName="Mozambique"
       pluginId="avandar.mozambique"
       installationId={"installation-1" as PluginInstallation.Id}
       modalId="modal-1"
       onClose={mocks.onClose}
-    />,
-    {
-      wrapper: ({ children }: { children: ReactNode }) => {
-        return (
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        );
-      },
-    },
+    />
   );
-  return queryClient;
+}
+
+function _renderModal(): { rerenderModal: () => void } {
+  const queryClient = new QueryClient();
+  const { rerender } = render(_buildModal(), {
+    wrapper: ({ children }: { children: ReactNode }) => {
+      return (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      );
+    },
+  });
+  return {
+    rerenderModal: () => {
+      rerender(_buildModal());
+    },
+  };
 }
 
 function _checkDataset(name: string): void {
@@ -119,6 +130,7 @@ describe("UninstallPluginModal", () => {
     ];
     mocks.hiddenCount = 0;
     mocks.isLoading = false;
+    mocks.hasFailed = false;
     mocks.hasDependents = true;
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: string[] }) => {
@@ -339,6 +351,109 @@ describe("UninstallPluginModal", () => {
 
     await waitFor(() => {
       expect(mocks.onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when a lookup of the datasets failed", () => {
+    beforeEach(() => {
+      mocks.hasFailed = true;
+      mocks.rows = [];
+    });
+
+    it("says the datasets could not be loaded, in an alert", () => {
+      _renderModal();
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "We could not load the datasets this plugin imported.",
+      );
+    });
+
+    it("asks to look the datasets up again when Retry is pressed", () => {
+      _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+
+      expect(mocks.retry).toHaveBeenCalledTimes(1);
+    });
+
+    it("claims neither unseen datasets nor datasets only an admin can delete", () => {
+      mocks.hiddenCount = 2;
+      mocks.rows = [
+        {
+          datasetId: "dataset-facilities",
+          name: "Health facilities",
+          canDelete: false,
+        },
+      ];
+
+      _renderModal();
+
+      expect(screen.queryByText(/you can't see/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Only a dataset admin/)).not.toBeInTheDocument();
+      expect(screen.queryByRole("group")).not.toBeInTheDocument();
+    });
+
+    it("offers an uninstall that keeps every dataset", () => {
+      _renderModal();
+
+      expect(
+        screen.getByRole("button", { name: "Uninstall and keep all datasets" }),
+      ).toBeEnabled();
+      expect(
+        screen.getByText("Every dataset it imported stays in Data Sources."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("Unchecked datasets stay in Data Sources."),
+      ).not.toBeInTheDocument();
+    });
+
+    it("deletes no dataset on confirm, even for one that was checked before the failure", async () => {
+      mocks.hasFailed = false;
+      mocks.rows = [
+        {
+          datasetId: "dataset-districts",
+          name: "Mozambique districts",
+          canDelete: true,
+        },
+      ];
+      const { rerenderModal } = _renderModal();
+      _checkDataset("Mozambique districts");
+      mocks.hasFailed = true;
+      rerenderModal();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Uninstall and keep all datasets" }),
+      );
+
+      await waitFor(() => {
+        expect(mocks.uninstall).toHaveBeenCalledWith({
+          installationId: "installation-1",
+          datasetIds: [],
+        });
+      });
+    });
+
+    it("shows the list again once a retry succeeds", () => {
+      mocks.retry.mockImplementation(() => {
+        mocks.hasFailed = false;
+        mocks.rows = [
+          {
+            datasetId: "dataset-districts",
+            name: "Mozambique districts",
+            canDelete: true,
+          },
+        ];
+      });
+      const { rerenderModal } = _renderModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+      rerenderModal();
+
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("checkbox", { name: "Delete Mozambique districts" }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Uninstall" })).toBeEnabled();
     });
   });
 

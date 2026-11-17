@@ -23,17 +23,31 @@ export type UninstallContentRows = {
   /** Imports whose dataset the current user cannot read. */
   hiddenCount: number;
   isLoading: boolean;
+
+  /**
+   * True when a lookup behind the list failed: the imports, the datasets, or
+   * an access check. `rows` is then empty and `hiddenCount` is 0, since
+   * nothing loaded can be trusted. The caller says so and keeps every
+   * dataset instead of listing any.
+   */
+  hasFailed: boolean;
+
+  /** Asks again for whatever failed. `isLoading` is true until it settles. */
+  retry: () => void;
 };
 
 /**
  * Whether the user may delete each dataset, by the same rule as the
- * `datasets` DELETE policy. A failed check reads as not allowed.
+ * `datasets` DELETE policy. A check that failed is not read as "not allowed":
+ * it is reported through `hasFailed`, and `retry` asks the failed ones again.
  *
  * Called only by `useUninstallContentRows`, which lists the result.
  */
 function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
   canDeleteById: ReadonlyMap<Dataset.Id, boolean>;
   isLoading: boolean;
+  hasFailed: boolean;
+  retry: () => void;
 } {
   const results = useQueries({
     queries: datasetIds.map((datasetId) => {
@@ -55,6 +69,9 @@ function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
       };
     }),
   });
+  const failedResults = results.filter((result) => {
+    return result.isError && !result.isFetching;
+  });
   return {
     canDeleteById: new Map(
       datasetIds.map((datasetId, index) => {
@@ -62,15 +79,76 @@ function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
       }),
     ),
     isLoading: results.some((result) => {
-      return result.isLoading;
+      return result.isLoading || (result.isError && result.isFetching);
     }),
+    hasFailed: failedResults.length > 0,
+    retry: () => {
+      failedResults.forEach((result) => {
+        void result.refetch();
+      });
+    },
+  };
+}
+
+/** The rows for the readable datasets, sorted by name. */
+function _createRowsFromDatasets(
+  datasets: ReadonlyArray<{ id: Dataset.Id; name: string }>,
+  canDeleteById: ReadonlyMap<Dataset.Id, boolean>,
+): UninstallContentRow[] {
+  return datasets
+    .map((dataset) => {
+      return {
+        datasetId: dataset.id,
+        name: dataset.name,
+        canDelete: canDeleteById.get(dataset.id) === true,
+      };
+    })
+    .sort((left, right) => {
+      return left.name.localeCompare(right.name);
+    });
+}
+
+/**
+ * The imported datasets the user can read, loaded by id. It lists nothing
+ * while the lookup is in flight or after it failed, since a restored cache
+ * can hold a list that names a deleted dataset or hides a new one.
+ *
+ * Called only by `useUninstallContentRows`.
+ */
+function useReadableDatasets(importedIds: readonly Dataset.Id[]): {
+  readable: ReadonlyArray<{ id: Dataset.Id; name: string }>;
+  isFetching: boolean;
+  hasFailed: boolean;
+  retry: () => void;
+} {
+  const hasImports = importedIds.length > 0;
+  const [datasets, , query] = DatasetClient.useGetAll({
+    where: { id: { in: [...importedIds] } },
+    useQueryOptions: {
+      ...ALWAYS_REFETCH_ON_MOUNT,
+      enabled: hasImports,
+    },
+  });
+  const isFetching = hasImports && query.isFetching;
+  const hasFailed = hasImports && query.isError && !query.isFetching;
+  return {
+    readable: hasImports && !isFetching && !hasFailed ? (datasets ?? []) : [],
+    isFetching,
+    hasFailed,
+    retry: () => {
+      if (hasFailed) {
+        void query.refetch();
+      }
+    },
   };
 }
 
 /**
  * The datasets a plugin imported into the current workspace, named as they
  * are now, with whether the current user may delete each one. Imports whose
- * dataset the user cannot read are only counted.
+ * dataset the user cannot read are only counted. When a lookup fails, it
+ * reports `hasFailed` and lists nothing, so a failure is never shown as a
+ * dataset the user cannot see.
  *
  * `UninstallPluginModal` uses it to list the imported datasets an admin can
  * choose to keep or delete.
@@ -79,45 +157,42 @@ export function useUninstallContentRows(
   pluginId: string,
 ): UninstallContentRows {
   const imported = useImportedPluginContent(pluginId);
-  const importedIds = Object.values(imported.importsByContentId).map(
-    (contentImport) => {
-      return contentImport.datasetId;
-    },
-  );
-  const hasImports = importedIds.length > 0;
-  const [datasets, , datasetsQuery] = DatasetClient.useGetAll({
-    where: { id: { in: importedIds } },
-    useQueryOptions: {
-      ...ALWAYS_REFETCH_ON_MOUNT,
-      enabled: hasImports,
-    },
-  });
-  // A restored cache renders with `isLoading` false while the refetch is in
-  // flight, so gate on `isFetching`. Until it settles, list nothing and
-  // check no access, since the restored list may name a deleted dataset.
-  // A failed refetch keeps the restored list as its data, so it is not
-  // trusted either: every import is then counted as one the user cannot see.
-  const isFetchingDatasets = hasImports && datasetsQuery.isFetching;
-  const canTrustDatasets = !isFetchingDatasets && !datasetsQuery.isError;
-  const readable = canTrustDatasets ? (datasets ?? []) : [];
+  // After a failed lookup the imports are a restored list that may be stale,
+  // so none of them is asked about.
+  const importedIds = imported.isError
+    ? []
+    : Object.values(imported.importsByContentId).map((contentImport) => {
+        return contentImport.datasetId;
+      });
+  const datasets = useReadableDatasets(importedIds);
   const access = useCanDeleteByDatasetId(
-    readable.map((dataset) => {
+    datasets.readable.map((dataset) => {
       return dataset.id;
     }),
   );
+  const hasFailedImports = imported.isError && !imported.isFetching;
+  const hasFailed =
+    hasFailedImports || datasets.hasFailed || access.hasFailed;
   return {
-    rows: readable
-      .map((dataset) => {
-        return {
-          datasetId: dataset.id,
-          name: dataset.name,
-          canDelete: access.canDeleteById.get(dataset.id) === true,
-        };
-      })
-      .sort((left, right) => {
-        return left.name.localeCompare(right.name);
-      }),
-    hiddenCount: isFetchingDatasets ? 0 : importedIds.length - readable.length,
-    isLoading: imported.isLoading || isFetchingDatasets || access.isLoading,
+    rows: hasFailed
+      ? []
+      : _createRowsFromDatasets(datasets.readable, access.canDeleteById),
+    hiddenCount:
+      hasFailed || datasets.isFetching
+        ? 0
+        : importedIds.length - datasets.readable.length,
+    isLoading:
+      imported.isLoading ||
+      (imported.isError && imported.isFetching) ||
+      datasets.isFetching ||
+      access.isLoading,
+    hasFailed,
+    retry: () => {
+      if (hasFailedImports) {
+        imported.refetch();
+      }
+      datasets.retry();
+      access.retry();
+    },
   };
 }
