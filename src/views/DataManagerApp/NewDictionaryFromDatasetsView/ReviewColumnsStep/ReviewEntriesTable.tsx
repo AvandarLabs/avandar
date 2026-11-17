@@ -22,7 +22,7 @@ const NO_SHARED_NAMES: readonly string[] = [];
 /**
  * Every proposed entry in one table, in the order the datasets were read.
  * An entry stays in its row when its kind changes, so it never seems to
- * disappear into another group.
+ * disappear into another group. Nothing is shown when there are no entries.
  */
 export function ReviewEntriesTable({
   proposal,
@@ -40,6 +40,9 @@ export function ReviewEntriesTable({
     return entry.isIncluded;
   }).length;
 
+  if (entries.length === 0) {
+    return null;
+  }
   return (
     <AppViewSection
       title={t`Entries`}

@@ -101,6 +101,11 @@ describe("ReviewColumnsStep", () => {
     );
   });
 
+  it("shows no table when no entries were proposed", () => {
+    _renderStep({ proposal: DictionaryProposal.fromColumnProfiles([]) });
+    expect(screen.queryByRole("table")).toBeNull();
+  });
+
   it("keeps a row in the same place when its kind changes", () => {
     const { rerenderWith } = _renderStep();
     const orderBefore = _entryNamesInOrder();
