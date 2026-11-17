@@ -7,7 +7,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
-import { AgentDashboardBlockPart } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart";
+import { AgentDashboardBlockPartLazy } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPartLazy";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { AgentQueryResultPartLazy } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPartLazy";
 import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
@@ -16,17 +16,16 @@ import css from "./AssistantMessage.module.css";
 
 /**
  * How `MessagePrimitive.Parts` draws each part of an assistant message:
- * text as Markdown, the agent's query results as result cards or chips,
- * whose chart code loads on first use, and its dashboard proposals as
- * confirm cards. Kept at module level so it is not
- * rebuilt on every render.
+ * text as Markdown, and the agent's query results and dashboard proposals
+ * as cards, whose chart code loads on first use. Kept at module level so it
+ * is not rebuilt on every render.
  */
 const MESSAGE_PART_COMPONENTS = {
   Text: MarkdownTextPart,
   data: {
     by_name: {
       [AgentQueryResult.PART_NAME]: AgentQueryResultPartLazy,
-      [AgentDashboardBlock.PART_NAME]: AgentDashboardBlockPart,
+      [AgentDashboardBlock.PART_NAME]: AgentDashboardBlockPartLazy,
     },
   },
 };

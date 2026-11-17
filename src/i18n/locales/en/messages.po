@@ -2223,6 +2223,10 @@ msgstr "{datasetName} is built from other data, so a linked dataset is the only 
 msgid "Regular expression"
 msgstr "Regular expression"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "edited {editedDate}"
+msgstr "edited {editedDate}"
+
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
 msgstr "Skip"
@@ -7224,6 +7228,7 @@ msgstr "A file you drop stays on this device until you save. A link is "
 "downloaded by Avandar first, then read here the same way."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPartLazy.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
@@ -13044,8 +13049,8 @@ msgstr "Another number"
 
 #. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-msgid "edited {0}"
-msgstr "edited {0}"
+#~ msgid "edited {0}"
+#~ msgstr "edited {0}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx

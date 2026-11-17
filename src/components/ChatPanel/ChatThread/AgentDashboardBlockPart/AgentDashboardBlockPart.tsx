@@ -4,7 +4,7 @@ import { Button, Group, Radio, Stack, Text } from "@mantine/core";
 import { IconArrowRight, IconLayoutDashboard } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import clsx from "clsx";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   AgentDashboardCardStore,
   useAgentDashboardCardStatus,
@@ -122,7 +122,7 @@ function TextPreview({
   const { i18n } = useLingui();
   const text = _blockPreviewText(block);
   return (
-    <Stack gap={2}>
+    <Stack gap="xxxs">
       <Text size="xs" c="dimmed">
         {i18n._(BLOCK_KIND_LABELS[block.kind])}
       </Text>
@@ -153,13 +153,15 @@ function CandidateOption({
   const { t, i18n } = useLingui();
   const { chartCount, updatedAt } = candidate;
   const updatedDate = updatedAt ? new Date(updatedAt) : undefined;
+  const editedDate =
+    updatedDate === undefined || Number.isNaN(updatedDate.getTime())
+      ? undefined
+      : i18n.date(updatedDate, { dateStyle: "medium" });
   const facts = [
     chartCount === undefined
       ? undefined
       : plural(chartCount, { one: "# chart", other: "# charts" }),
-    updatedDate === undefined || Number.isNaN(updatedDate.getTime())
-      ? undefined
-      : t`edited ${i18n.date(updatedDate, { dateStyle: "medium" })}`,
+    editedDate === undefined ? undefined : t`edited ${editedDate}`,
   ].filter((fact) => {
     return fact !== undefined;
   });
@@ -198,28 +200,82 @@ function DashboardPicker({
   );
 }
 
-/** The message a failed card shows, and whether trying again can help. */
-function useFailureCopy(
-  reason: Extract<AgentDashboardCardStatus, { status: "failed" }>["reason"],
-): { message: string; canRetry: boolean } {
+/** The message a card shows once the user has acted on it. */
+function StatusMessage({
+  status,
+}: {
+  status: AgentDashboardCardStatus;
+}): ReactNode {
+  const { t } = useLingui();
+  switch (status.status) {
+    case "cancelled":
+      return <Text size="sm">{t`Nothing was added.`}</Text>;
+    case "confirmed":
+      return (
+        <Text size="sm">
+          {status.isUnsaved
+            ? t`It is in the open editor. Save the dashboard to keep it.`
+            : t`Added to the dashboard.`}
+        </Text>
+      );
+    case "failed":
+      return <FailedMessage reason={status.reason} />;
+  }
+}
+
+/** Why a card could not save. */
+function FailedMessage({
+  reason,
+}: {
+  reason: Extract<AgentDashboardCardStatus, { status: "failed" }>["reason"];
+}): ReactNode {
   const { t } = useLingui();
   switch (reason) {
     case "network":
-      return {
-        message: t`Couldn't save. Check your connection and try again.`,
-        canRetry: true,
-      };
+      return (
+        <Text size="sm">{t`Couldn't save. Check your connection and try again.`}</Text>
+      );
     case "stale":
-      return {
-        message: t`The dashboard changed while saving. Try again.`,
-        canRetry: true,
-      };
+      return (
+        <Text size="sm">{t`The dashboard changed while saving. Try again.`}</Text>
+      );
     case "unavailable":
-      return {
-        message: t`This dashboard is no longer available.`,
-        canRetry: false,
-      };
+      return <Text size="sm">{t`This dashboard is no longer available.`}</Text>;
   }
+}
+
+/**
+ * Where a card's outcome is announced. It holds only the message, so a
+ * screen reader does not read the link or Retry. When the user's control
+ * has just unmounted, focus moves here so keyboard users keep their place.
+ */
+function StatusRegion({
+  status,
+}: {
+  status: AgentDashboardCardStatus | undefined;
+}): ReactNode {
+  const regionRef = useRef<HTMLDivElement>(null);
+  const outcome = status?.status;
+  const shownOutcome = useRef(outcome);
+  useEffect(() => {
+    if (shownOutcome.current === outcome) {
+      return;
+    }
+    shownOutcome.current = outcome;
+    const region = regionRef.current;
+    const focused = document.activeElement;
+    if (
+      region &&
+      (focused === document.body || region.parentElement?.contains(focused))
+    ) {
+      region.focus();
+    }
+  }, [outcome]);
+  return (
+    <div ref={regionRef} role="status" tabIndex={-1} className={classes.status}>
+      {status ? <StatusMessage status={status} /> : null}
+    </div>
+  );
 }
 
 /** The link to a dashboard a card added its block to. */
@@ -244,30 +300,8 @@ function OpenDashboardLink({
   );
 }
 
-/** A failed card: why, and Retry when trying again can help. */
-function FailedStatus({
-  reason,
-  onRetry,
-}: {
-  reason: Extract<AgentDashboardCardStatus, { status: "failed" }>["reason"];
-  onRetry: () => void;
-}): ReactNode {
-  const { t } = useLingui();
-  const { message, canRetry } = useFailureCopy(reason);
-  return (
-    <Group gap="xs">
-      <Text size="sm">{message}</Text>
-      {canRetry ? (
-        <Button variant="default" size="xs" onClick={onRetry}>
-          {t`Retry`}
-        </Button>
-      ) : null}
-    </Group>
-  );
-}
-
-/** What happened to the card: added with a link, cancelled, or failed. */
-function CardStatusView({
+/** What the user can do next: open the dashboard, or retry a failed save. */
+function StatusActions({
   status,
   onRetry,
 }: {
@@ -275,25 +309,24 @@ function CardStatusView({
   onRetry: () => void;
 }): ReactNode {
   const { t } = useLingui();
-  if (status.status === "cancelled") {
-    return <Text size="sm">{t`Nothing was added.`}</Text>;
-  }
-  if (status.status === "failed") {
-    return <FailedStatus reason={status.reason} onRetry={onRetry} />;
-  }
-  return (
-    <Group gap="xs">
-      <Text size="sm">
-        {status.isUnsaved
-          ? t`It is in the open editor. Save the dashboard to keep it.`
-          : t`Added to the dashboard.`}
-      </Text>
+  if (status.status === "confirmed") {
+    return (
       <OpenDashboardLink
         dashboardId={status.dashboardId}
         dashboardName={status.dashboardName}
       />
-    </Group>
-  );
+    );
+  }
+  if (status.status === "failed" && status.reason !== "unavailable") {
+    return (
+      <Group>
+        <Button variant="default" size="xs" onClick={onRetry}>
+          {t`Retry`}
+        </Button>
+      </Group>
+    );
+  }
+  return null;
 }
 
 /**
@@ -356,6 +389,36 @@ function DashboardChoice({
   );
 }
 
+/** Confirm, held until a dashboard is picked, and Cancel. */
+function PendingButtons({
+  canConfirm,
+  isBusy,
+  onConfirm,
+  onCancel,
+}: {
+  canConfirm: boolean;
+  isBusy: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}): ReactNode {
+  const { t } = useLingui();
+  return (
+    <Group gap="xs">
+      <Button
+        size="xs"
+        onClick={onConfirm}
+        disabled={!canConfirm}
+        loading={isBusy}
+      >
+        {t`Confirm`}
+      </Button>
+      <Button variant="subtle" size="xs" onClick={onCancel} disabled={isBusy}>
+        {t`Cancel`}
+      </Button>
+    </Group>
+  );
+}
+
 /** The target dashboard or a picker, then Confirm and Cancel. */
 function PendingActions({
   card,
@@ -364,7 +427,6 @@ function PendingActions({
   card: AgentDashboardBlockData;
   identity: AgentDashboardCardIdentity;
 }): ReactNode {
-  const { t } = useLingui();
   const [pickedId, setPickedId] = useState<string | undefined>(
     card.candidates.length === 1 ? card.candidates[0]!.id : undefined,
   );
@@ -385,21 +447,14 @@ function PendingActions({
         pickedId={pickedId}
         onPick={setPickedId}
       />
-      <Group gap="xs">
-        <Button
-          size="xs"
-          onClick={() => {
-            void confirm();
-          }}
-          disabled={dashboard === undefined}
-          loading={isBusy}
-        >
-          {t`Confirm`}
-        </Button>
-        <Button variant="subtle" size="xs" onClick={cancel} disabled={isBusy}>
-          {t`Cancel`}
-        </Button>
-      </Group>
+      <PendingButtons
+        canConfirm={dashboard !== undefined}
+        isBusy={isBusy}
+        onConfirm={() => {
+          void confirm();
+        }}
+        onCancel={cancel}
+      />
     </Stack>
   );
 }
@@ -444,11 +499,8 @@ export function AgentDashboardBlockPart({
       </div>
       <Stack gap="sm" className={classes.body}>
         <BlockPreview card={card} />
-        <div role="status">
-          {status === undefined ? null : (
-            <CardStatusView status={status} onRetry={retry} />
-          )}
-        </div>
+        <StatusRegion status={status} />
+        {status ? <StatusActions status={status} onRetry={retry} /> : null}
         {status === undefined && identity ? (
           <PendingActions card={card} identity={identity} />
         ) : null}

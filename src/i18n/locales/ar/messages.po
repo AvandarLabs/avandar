@@ -2217,6 +2217,10 @@ msgstr "تم إنشاء {datasetName} من بيانات أخرى، لذا فإن
 msgid "Regular expression"
 msgstr "تعبير نمطي"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "edited {editedDate}"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
 msgstr "تخطٍّ"
@@ -7214,6 +7218,7 @@ msgstr "يبقى الملف الذي تُسقطه على هذا الجهاز ح�
 "Avandar أولًا ثم يقرأه هنا بالطريقة نفسها."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPartLazy.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
@@ -13015,8 +13020,8 @@ msgstr "رقم آخر"
 
 #. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-msgid "edited {0}"
-msgstr ""
+#~ msgid "edited {0}"
+#~ msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx

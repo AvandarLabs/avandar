@@ -2283,6 +2283,10 @@ msgstr "{datasetName} est créé à partir d’autres données, donc un jeu de "
 msgid "Regular expression"
 msgstr "Expression régulière"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "edited {editedDate}"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
 msgstr "Passer"
@@ -7410,6 +7414,7 @@ msgstr "Un fichier que vous déposez reste sur cet appareil jusqu’à ce que vo
 "de la même manière."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPartLazy.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
@@ -13364,8 +13369,8 @@ msgstr "Un autre nombre"
 
 #. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-msgid "edited {0}"
-msgstr ""
+#~ msgid "edited {0}"
+#~ msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx

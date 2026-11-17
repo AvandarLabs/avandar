@@ -175,6 +175,9 @@ describe("AgentDashboardBlockPart pending card", () => {
     });
     render(<AgentDashboardBlockPart {..._props(card)} />);
 
+    expect(
+      screen.getByRole("radiogroup", { name: "Which dashboard?" }),
+    ).toBeVisible();
     expect(screen.getByText(/12 charts/)).toBeVisible();
     expect(screen.getByText(/1 chart$/)).toBeVisible();
     expect(screen.getByText(/edited/)).toBeVisible();
@@ -259,6 +262,7 @@ describe("AgentDashboardBlockPart resolved card", () => {
     expect(
       screen.getByRole("link", { name: "Open COVID 2022" }),
     ).toHaveAttribute("href", "/acme/dashboards/edit/d-1");
+    expect(screen.getByText("Added to the dashboard.")).toBeVisible();
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByText(/Save the dashboard/)).toBeNull();
   });
@@ -294,6 +298,60 @@ describe("AgentDashboardBlockPart resolved card", () => {
       AgentDashboardCardStore.readStatus(IDENTITY, HEADING_CARD.cardId),
     ).toBeUndefined();
     expect(screen.getByRole("button", { name: "Confirm" })).toBeEnabled();
+  });
+
+  it("offers Retry after a stale save", () => {
+    _withStatus({ status: "failed", reason: "stale" });
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(
+      screen.getByText("The dashboard changed while saving. Try again."),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+  });
+
+  it("announces only the message, not the Retry button or the link", () => {
+    _withStatus({ status: "failed", reason: "network" });
+    const { unmount } = render(
+      <AgentDashboardBlockPart {..._props(HEADING_CARD)} />,
+    );
+
+    const failedRegion = screen.getByRole("status");
+    expect(failedRegion).toHaveTextContent(
+      "Couldn't save. Check your connection and try again.",
+    );
+    expect(failedRegion).not.toContainElement(
+      screen.getByRole("button", { name: "Retry" }),
+    );
+    unmount();
+
+    _withStatus({
+      status: "confirmed",
+      dashboardId: "d-1",
+      dashboardName: "COVID 2022",
+      isUnsaved: false,
+      isReported: false,
+    });
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(screen.getByRole("status")).not.toContainElement(
+      screen.getByRole("link", { name: "Open COVID 2022" }),
+    );
+  });
+
+  it("moves focus to the status once Cancel removes the buttons", () => {
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.getByRole("status")).toHaveFocus();
+  });
+
+  it("leaves focus alone while a card is first drawn", () => {
+    _withStatus({ status: "cancelled", isReported: false });
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(screen.getByRole("status")).not.toHaveFocus();
   });
 
   it("offers no Retry when the dashboard is gone", () => {

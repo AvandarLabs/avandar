@@ -2149,6 +2149,10 @@ msgstr "{datasetName} 基于其他数据构建，因此只能选择关联数据�
 msgid "Regular expression"
 msgstr "正则表达式"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "edited {editedDate}"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
 msgstr "跳过"
@@ -7010,6 +7014,7 @@ msgid "A file you drop stays on this device until you save. A link is "
 msgstr "拖放的文件会一直保留在此设备上，直到你保存。链接会先由 Avandar 下载，然后以相同方式在此处读取。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPartLazy.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
@@ -12657,8 +12662,8 @@ msgstr "另一个数字"
 
 #. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-msgid "edited {0}"
-msgstr ""
+#~ msgid "edited {0}"
+#~ msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx

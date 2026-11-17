@@ -13,3 +13,17 @@
 .preview {
   block-size: calc(220px * var(--mantine-scale));
 }
+
+/*
+ * Where the card's outcome is announced. Focus moves here when a control
+ * unmounts. Empty, it cancels the gap it would add to the card's body.
+ */
+.status:focus-visible {
+  border-radius: var(--mantine-radius-xs);
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+.status:empty {
+  margin-block-start: calc(-1 * var(--mantine-spacing-sm));
+}
