@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
+import { DASHBOARD_QUESTIONS } from "../../covid/covidDashboardQuestions";
 import { MENTION_QUESTIONS } from "../../covid/covidMentionQuestions";
 import { PAGE_QUESTIONS } from "../../covid/covidPageQuestions";
 import { createPiConversation } from "./PiHarness";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase } from "../../runtime/EvalDatabase";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
@@ -508,5 +510,117 @@ describe("createPiConversation store isolation", () => {
     await conversation.ask(QUESTION);
 
     expect(seenDuringAsk).toEqual([undefined]);
+  });
+});
+
+describe("createPiConversation with dashboard questions", () => {
+  const questionOf = (id: string): EvalQuestion => {
+    return DASHBOARD_QUESTIONS.find((question) => {
+      return question.id === id;
+    })!;
+  };
+
+  /** A fake agent that adds `block` to `dashboard` once. */
+  function _createAddingAgent(
+    host: DataAgentHost,
+    request: { dashboard: string; block: ChatGeneratedDashboardBlock },
+  ): DataAgent {
+    return {
+      agent: { state: { messages: [] } },
+      ask: async () => {
+        await host.addDashboardBlock!({ ...request, summary: "Added." });
+        return {
+          text: "Added.",
+          state: { questions: [], valuesSentToModel: [] },
+          usage: {},
+        };
+      },
+    } as unknown as DataAgent;
+  }
+
+  it("records an editor write for the open dashboard", async () => {
+    const question = questionOf("D02");
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "current",
+          block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(question);
+
+    expect(answer.dashboardWrites).toEqual([
+      {
+        dashboardId: question.openEditorDashboardId,
+        via: "editor",
+        block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+      },
+    ]);
+  });
+
+  it("picks the scripted dashboard on the card and runs the chart", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "value", type: "bigint" }], rows: [[1]] },
+    });
+    const question = questionOf("D09");
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "COVID",
+          block: {
+            kind: "DataViz",
+            prompt: "Deaths",
+            sql: "SELECT 1",
+            vizType: "line",
+          },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(question);
+
+    expect(answer.dashboardWrites).toEqual([
+      expect.objectContaining({
+        dashboardId: question.card?.pickDashboardId,
+        via: "card",
+        result: { columns: [{ name: "value", type: "bigint" }], rows: [[1]] },
+      }),
+    ]);
+  });
+
+  it("writes nothing for a name no dashboard has", async () => {
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "Budget",
+          block: { kind: "HeadingBlock", text: "Spending" },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(questionOf("D08"));
+
+    expect(answer.dashboardWrites).toEqual([]);
+  });
+
+  it("names a mention by its real name on a device conversation", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(questionOf("D06"));
+
+    expect(asked[0]).toContain('@"COVID 2022"');
   });
 });

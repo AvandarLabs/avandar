@@ -62,6 +62,7 @@ export async function createPiLocalHarness(
     startConversation: () => {
       return createPiConversation({
         database: options.database,
+        privacy: "device",
         createAgent: (host) => {
           return createOfflineDataAgent({
             datasets: options.datasets ?? COVID_DATASETS,
