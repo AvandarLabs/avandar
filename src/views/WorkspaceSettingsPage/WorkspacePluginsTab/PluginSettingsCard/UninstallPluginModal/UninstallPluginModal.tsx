@@ -4,6 +4,10 @@ import { Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { UninstallContentSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection";
 import { UninstallModalFooter } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallModalFooter";
+import {
+  DependentsLoadingContext,
+  useDependentsLoadingTracker,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading";
 import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall";
 import { useUninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useKeepModalOpenWhile";
@@ -95,15 +99,10 @@ function useCheckedDatasetIds(): {
   return { checkedIds, setIsChecked };
 }
 
-/**
- * The body of the uninstall dialog of a plugin that imported datasets into
- * the workspace. It lists them, every one kept unless the admin checks it for
- * deletion, then uninstalls and deletes the checked ones. It keeps the modal
- * it is rendered in open while the uninstall runs, and closes it when done.
- * When the datasets could not be loaded, it says so with a Retry and still
- * offers an uninstall that keeps every dataset.
- */
-export function UninstallPluginModal(props: Props): JSX.Element {
+/** The rows, the buttons and the running state of the uninstall dialog. */
+function UninstallModalBody(
+  props: Props & Readonly<{ isWaitingForDependents: boolean }>,
+): JSX.Element {
   const { t } = useLingui();
   const content = useUninstallContentRows(props.pluginId);
   const { checkedIds, setIsChecked } = useCheckedDatasetIds();
@@ -137,7 +136,7 @@ export function UninstallPluginModal(props: Props): JSX.Element {
       <UninstallModalFooter
         confirmLabel={confirmLabel}
         isRunning={uninstaller.isRunning}
-        isLoading={content.isLoading}
+        isLoading={content.isLoading || props.isWaitingForDependents}
         onCancel={() => {
           props.onClose("cancelled");
         }}
@@ -146,5 +145,27 @@ export function UninstallPluginModal(props: Props): JSX.Element {
         }}
       />
     </Stack>
+  );
+}
+
+/**
+ * The body of the uninstall dialog of a plugin that imported datasets into
+ * the workspace. It lists them, every one kept unless the admin checks it for
+ * deletion, then uninstalls and deletes the checked ones. It keeps the modal
+ * it is rendered in open while the uninstall runs, and closes it when done.
+ * The confirm button waits until what reads each checked dataset has loaded,
+ * so an admin never deletes a dataset before seeing what stops working.
+ * When the datasets could not be loaded, it says so with a Retry and still
+ * offers an uninstall that keeps every dataset.
+ */
+export function UninstallPluginModal(props: Props): JSX.Element {
+  const dependents = useDependentsLoadingTracker();
+  return (
+    <DependentsLoadingContext.Provider value={dependents.report}>
+      <UninstallModalBody
+        {...props}
+        isWaitingForDependents={dependents.isAnyLoading}
+      />
+    </DependentsLoadingContext.Provider>
   );
 }

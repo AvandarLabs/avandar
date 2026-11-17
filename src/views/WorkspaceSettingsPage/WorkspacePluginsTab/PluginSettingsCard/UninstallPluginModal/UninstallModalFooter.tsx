@@ -6,7 +6,10 @@ type Props = Readonly<{
   confirmLabel: string;
   isRunning: boolean;
 
-  /** Whether the datasets are still loading, so the choice is not final. */
+  /**
+   * Whether the datasets, or what reads a checked one, are still loading, so
+   * the choice is not final.
+   */
   isLoading: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -15,7 +18,8 @@ type Props = Readonly<{
 /**
  * The Cancel and confirm buttons of the uninstall modal. Both stay disabled
  * while the uninstall runs, and the confirm button also waits for the dataset
- * list so an admin never confirms before seeing what is kept.
+ * list and for what reads each checked dataset, so an admin never confirms
+ * before seeing what is kept and what stops working.
  */
 export function UninstallModalFooter({
   confirmLabel,

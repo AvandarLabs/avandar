@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Stack, Text } from "@mantine/core";
 import { DependentsList } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList";
 import { useDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents";
+import { useReportDependentsLoading } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
@@ -18,7 +19,8 @@ type Props = Readonly<{
  * every lookup succeeded. When a lookup failed, it says so instead of
  * reading the missing answer as "nothing reads this". It indents what it
  * renders under the dataset's checkbox, so its caller needs no wrapper that
- * could be left empty.
+ * could be left empty. While it loads, it tells the uninstall modal, which
+ * keeps its confirm button disabled until the admin can see the list.
  */
 export function UninstallDatasetDependents({
   datasetId,
@@ -29,6 +31,7 @@ export function UninstallDatasetDependents({
     datasetId,
     installationId,
   });
+  useReportDependentsLoading({ datasetId, isLoading });
   if (isLoading) {
     return (
       <Loader

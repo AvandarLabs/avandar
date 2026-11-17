@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import { UninstallDatasetDependents } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents";
+import {
+  DependentsLoadingContext,
+  type ReportDependentsLoading,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
@@ -43,12 +47,16 @@ const PLUGIN = {
 
 const LOAD_FAILURE = "We could not load what reads this dataset.";
 
-function _renderDependents(): void {
+function _renderDependents(
+  report: ReportDependentsLoading = vi.fn(),
+): void {
   render(
-    <UninstallDatasetDependents
-      datasetId={"dataset-1" as Dataset.Id}
-      installationId={"installation-1" as PluginInstallation.Id}
-    />,
+    <DependentsLoadingContext.Provider value={report}>
+      <UninstallDatasetDependents
+        datasetId={"dataset-1" as Dataset.Id}
+        installationId={"installation-1" as PluginInstallation.Id}
+      />
+    </DependentsLoadingContext.Provider>,
   );
 }
 
@@ -184,5 +192,31 @@ describe("UninstallDatasetDependents", () => {
     _renderDependents();
 
     expect(screen.getByRole("alert")).toHaveTextContent(LOAD_FAILURE);
+  });
+
+  it("tells the modal it is loading while the lookups load", () => {
+    _setResult({ dependents: [], isLoading: true });
+    const report = vi.fn();
+
+    _renderDependents(report);
+
+    expect(report).toHaveBeenLastCalledWith("dataset-1", true);
+  });
+
+  it("tells the modal it has loaded once the lookups settle", () => {
+    const report = vi.fn();
+
+    _renderDependents(report);
+
+    expect(report).toHaveBeenLastCalledWith("dataset-1", false);
+  });
+
+  it("does not keep the modal waiting when a lookup failed", () => {
+    _setResult({ dependents: [], hasFailed: true });
+    const report = vi.fn();
+
+    _renderDependents(report);
+
+    expect(report).toHaveBeenLastCalledWith("dataset-1", false);
   });
 });

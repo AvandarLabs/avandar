@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => {
     isRetrying: false,
     retry: vi.fn(),
     hasDependents: true,
+    isLoadingDependents: false,
     uninstall: vi.fn(),
     keepOpen: vi.fn(),
     notifySuccess: vi.fn(),
@@ -40,11 +41,19 @@ vi.mock(
     };
   },
 );
+// The stand-in reports through the real context, as the real row does.
 vi.mock(
   "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents",
-  () => {
+  async () => {
+    const { useReportDependentsLoading } = await import(
+      "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading"
+    );
     return {
       UninstallDatasetDependents: ({ datasetId }: { datasetId: string }) => {
+        useReportDependentsLoading({
+          datasetId: datasetId as never,
+          isLoading: mocks.isLoadingDependents,
+        });
         return mocks.hasDependents ? <p>{`dependents of ${datasetId}`}</p> : null;
       },
     };
@@ -135,6 +144,7 @@ describe("UninstallPluginModal", () => {
     mocks.hasFailed = false;
     mocks.isRetrying = false;
     mocks.hasDependents = true;
+    mocks.isLoadingDependents = false;
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: string[] }) => {
         return {
@@ -354,6 +364,49 @@ describe("UninstallPluginModal", () => {
 
     await waitFor(() => {
       expect(mocks.onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("while what reads a checked dataset loads", () => {
+    beforeEach(() => {
+      mocks.isLoadingDependents = true;
+    });
+
+    it("keeps the confirm button disabled", () => {
+      _renderModal();
+
+      _checkDataset("Mozambique districts");
+
+      expect(
+        screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
+      ).toBeDisabled();
+    });
+
+    it("enables the confirm button once it has loaded", () => {
+      const { rerenderModal } = _renderModal();
+      _checkDataset("Mozambique districts");
+
+      mocks.isLoadingDependents = false;
+      rerenderModal();
+
+      expect(
+        screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
+      ).toBeEnabled();
+    });
+
+    it("enables the confirm button when the dataset is unchecked", () => {
+      _renderModal();
+      _checkDataset("Mozambique districts");
+
+      _checkDataset("Mozambique districts");
+
+      expect(screen.getByRole("button", { name: "Uninstall" })).toBeEnabled();
+    });
+
+    it("does not wait for a dataset that is not checked", () => {
+      _renderModal();
+
+      expect(screen.getByRole("button", { name: "Uninstall" })).toBeEnabled();
     });
   });
 
