@@ -315,6 +315,37 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     });
   });
 
+  it("does not start the next delete until the one before it settles", async () => {
+    let finishFirstDelete: () => void = () => {};
+    mocks.fullDelete.mockImplementation(async ({ id }: { id: string }) => {
+      mocks.calls.push(`delete ${id}`);
+      if (id === PROVINCES_DATASET_ID) {
+        await new Promise<void>((resolve) => {
+          finishFirstDelete = resolve;
+        });
+      }
+    });
+
+    const running = _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
+    await vi.waitFor(() => {
+      expect(mocks.fullDelete).toHaveBeenCalledTimes(1);
+    });
+    // Give a delete that wrongly started early time to show up.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20);
+    });
+    expect(mocks.fullDelete).toHaveBeenCalledTimes(1);
+
+    finishFirstDelete();
+    await running;
+
+    expect(mocks.calls).toEqual([
+      "uninstall",
+      `delete ${PROVINCES_DATASET_ID}`,
+      `delete ${DISTRICTS_DATASET_ID}`,
+    ]);
+  });
+
   it("deletes a dataset listed twice once, keeping the order of first appearance", async () => {
     const outcome = await _run([
       PROVINCES_DATASET_ID,
