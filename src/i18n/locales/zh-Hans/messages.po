@@ -1911,6 +1911,10 @@ msgstr "但是，我们目前不允许新的注册。"
 msgid "Not installed"
 msgstr "未安装"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
+msgid "Describe columns"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
 msgid "Add value"
 msgstr "添加值"
@@ -2099,6 +2103,11 @@ msgstr "{issueCount, plural, one {保存前需要修复 # 个问题} other {保�
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "输入问题，我会为您生成 SQL 并执行。"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeSuggestionsNote.tsx
+msgid "Suggestions need a connection or the offline model. You can still write "
+"the descriptions yourself."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
@@ -2429,6 +2438,7 @@ msgid "New role group"
 msgstr "新角色组"
 
 #. placeholder {0}: entries.length
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
 msgid "{0, plural, one {# entry} other {# entries}}"
 msgstr ""
@@ -3002,7 +3012,7 @@ msgstr "边界免责声明（始终包含）"
 msgid "Undo"
 msgstr "撤销"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{distinctCount, plural, one {# different value} other {# different "
 "values}}"
 msgstr "{distinctCount, plural, one {# 个不同的值} other {# 个不同的值}}"
@@ -4137,6 +4147,10 @@ msgid "Avandar could not read this dataset's columns to match them. Please try "
 "again later or reach out to support."
 msgstr "Avandar 无法读取此数据集的列以进行匹配。请稍后重试，或联系支持团队。"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
+msgid "Suggested {doneCount} of {totalCount}"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
@@ -4151,10 +4165,10 @@ msgid "Cannot sync this case type"
 msgstr "无法同步此案例类型"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
-msgid "Columns with a set of values get mapped next. The rest become entries "
-"with a description, so the dictionary documents them too. Uncheck "
-"anything you don't want, or change its kind."
-msgstr ""
+#~ msgid "Columns with a set of values get mapped next. The rest become entries "
+#~ "with a description, so the dictionary documents them too. Uncheck "
+#~ "anything you don't want, or change its kind."
+#~ msgstr ""
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "Recent"
@@ -4756,6 +4770,8 @@ msgstr "几何功能正在下载。在网络较慢时可能需要稍等。"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
@@ -5339,7 +5355,7 @@ msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to 
 "generate SQL."
 msgstr "尚无 SQL。请向 Avandar 提问或在手动选项卡中构建查询以生成 SQL。"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{moreCount, plural, one {{shown} and # more} other {{shown} and # more}}"
 msgstr "{moreCount, plural, one {{shown} 和另外 # 个} other {{shown} 和另外 # 个}}"
 
@@ -5384,6 +5400,10 @@ msgstr "建议匹配"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
 msgstr "来源"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
+msgid "Descriptions"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "N"
@@ -7029,6 +7049,10 @@ msgstr "每个数字一行"
 msgid "Number: a measurement or a count"
 msgstr "数字：测量值或计数"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
+msgid "Nothing to describe"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsFooter.tsx
@@ -7064,6 +7088,10 @@ msgstr "此地点已被删除。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
 msgstr "A4"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "The suggestion uses what you wrote and may rewrite it."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
@@ -7243,6 +7271,7 @@ msgstr "线性"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineFooter.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -7471,7 +7500,7 @@ msgstr "大多数唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 msgid "Boundary display name"
 msgstr "边界显示名称"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
 msgid "Description of {entryName}"
 msgstr "{entryName} 的描述"
 
@@ -7813,6 +7842,12 @@ msgstr "发送"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Generated SQL assumptions"
 msgstr "生成的 SQL 假设"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeSuggestionsNote.tsx
+msgid "You chose not to send column details to the AI provider, so suggestions "
+"are off for this dictionary. You can still write the descriptions "
+"yourself."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -8517,6 +8552,11 @@ msgstr "输入您的答案..."
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Built by hand"
 msgstr "手动创建"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest"
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "This isn't a single SQL expression. Check its brackets, quotes, and "
@@ -9335,6 +9375,10 @@ msgid "Either way, the code lists and descriptions are attached to "
 "{datasetName} for reference."
 msgstr "无论选择哪种方式，代码列表和描述都会附加到 {datasetName}，以供参考。"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
+msgid "Next: describe columns"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
 msgstr "最近"
@@ -9769,7 +9813,6 @@ msgstr "低"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
@@ -9826,6 +9869,10 @@ msgstr "英里"
 msgid "Records you choose for it: {dataSlots}"
 msgstr "为其选择的记录：{dataSlots}"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
+msgid "Describe"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
 msgstr "选择记录来源"
@@ -9834,7 +9881,7 @@ msgstr "选择记录来源"
 msgid "Allow syncing"
 msgstr "允许同步"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "Unique per row"
 msgstr "每行唯一"
 
@@ -9971,6 +10018,10 @@ msgstr "此操作无法撤销。"
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
 msgstr "{count, plural, one {# 个要素} other {# 个要素}}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest a description for {entryName}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "{usedByCount, plural, one {Used by # dataset} other {Used by # "
@@ -10759,10 +10810,18 @@ msgstr "深色"
 msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr "无法加载此工作区的插件。请重新加载后重试。"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
+msgid "The suggestion did not come back. Try again or write it yourself."
+msgstr ""
+
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper.tsx
 msgid "Records"
 msgstr "记录"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestDescriptions.ts
+msgid "Suggested descriptions filled in. Check them before saving."
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "Created {linkedName}. The code lists are attached to {datasetName} for "
@@ -11104,6 +11163,10 @@ msgstr "移除列"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
 msgid "Edit {entryName}"
 msgstr "编辑{entryName}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+msgid "Suggest all"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
@@ -11829,6 +11892,13 @@ msgstr "乘以 {factor}"
 msgid "{0} boundaries without data"
 msgstr "{0} 个边界没有数据"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
+msgid "Every checked column becomes a dictionary entry. Columns with a fixed "
+"set of values also get their values mapped next. Text, number, and date "
+"columns aren't mapped, but they still join the dictionary with a "
+"description, so anyone using it knows what the column holds."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically last"
 msgstr "按字母顺序最后"
@@ -12196,6 +12266,11 @@ msgstr "适用于以其他方式写入相同值的数据，例如用 M 和 F 代
 #~ "works."
 #~ msgstr "建议需要网络连接或离线模型。标注仍可正常进行。"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest and rewrite"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
 msgstr "选择要读取的内容"
@@ -12215,6 +12290,11 @@ msgstr "建议重写："
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
 msgstr "无法加载离线模型。"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+msgid "Some columns already have a description. Checked ones may be rewritten, "
+"using what you wrote. Uncheck any you want to keep as they are."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
@@ -12252,6 +12332,10 @@ msgstr "1 个数据集"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "没有数值列"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
+msgid "Suggested from the column. Edit it or keep it."
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "Insert column"
@@ -12405,8 +12489,8 @@ msgid "Collapse the legend"
 msgstr "收起图例"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
-msgid "Needs mapping"
-msgstr ""
+#~ msgid "Needs mapping"
+#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -12895,7 +12979,7 @@ msgstr "{trimmedName} 已经是合并数据集中的一列。"
 msgid "billing portal."
 msgstr "账单门户。"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "Dates"
 msgstr "日期"
 
@@ -13069,6 +13153,10 @@ msgstr "琥珀色"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "配置如何连接数据集"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
+msgid "Map values + describe"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Add an area layer, such as a buffer, to filter by it."
@@ -14447,6 +14535,11 @@ msgstr "选择一个工作区预设或按应用自定义。用户组控制数据
 msgid "Reference only"
 msgstr "仅供参考"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
+msgid "No columns are checked, so the dictionary would be empty. Go back and "
+"check the columns it should hold."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "划分为网格"
@@ -14603,6 +14696,7 @@ msgid "(Message not sent.)"
 msgstr "（消息未发送。）"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 msgid "Next: save"
 msgstr "下一步：保存"
@@ -14767,8 +14861,8 @@ msgid "No fields yet"
 msgstr "暂无字段"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField.tsx
-msgid "Suggested from the column name and values. Edit it or keep it."
-msgstr "根据列名和值建议。您可以编辑，也可以保留。"
+#~ msgid "Suggested from the column name and values. Edit it or keep it."
+#~ msgstr "根据列名和值建议。您可以编辑，也可以保留。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
@@ -15090,7 +15184,7 @@ msgstr "选择数据源以添加筛选条件。"
 msgid "Annual"
 msgstr "年度"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{lowest} to {highest}"
 msgstr "{lowest} 至 {highest}"
 
