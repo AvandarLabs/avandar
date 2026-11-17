@@ -158,4 +158,21 @@ describe("useLinkedDatasets", () => {
 
     expect(result.current.hasFailed).toBe(false);
   });
+
+  it.each([
+    ["datasets", "datasetsFlags"],
+    ["dictionary bindings", "bindingsFlags"],
+  ] as const)(
+    "ignores a stale fetching flag on the %s when nothing reads the dataset",
+    (_name, flagsKey) => {
+      mocks.virtualDatasets = [];
+      mocks[flagsKey] = { isFetching: true, isError: false };
+
+      const { result } = renderHook(() => {
+        return useLinkedDatasets(SOURCE_ID);
+      });
+
+      expect(result.current.isFetching).toBe(false);
+    },
+  );
 });

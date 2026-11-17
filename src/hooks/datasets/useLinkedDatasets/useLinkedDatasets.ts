@@ -68,8 +68,12 @@ function _toLinkedDatasets(
 /**
  * The linked datasets that read one dataset, that the user can see, each
  * with the dictionaries it converts with. A linked dataset created a
- * moment ago is listed, since the virtual datasets refetch on mount. Used
- * by the dataset's rail and its delete confirmation.
+ * moment ago is listed, since the virtual datasets refetch on mount.
+ *
+ * Use it wherever something needs to know what would break if a dataset
+ * went away, for example a dataset's rail or a delete confirmation.
+ * `isFetching` and `hasFailed` cover every lookup behind the list, so a
+ * caller that cannot show a stale or partial list can gate on them.
  */
 export function useLinkedDatasets(
   datasetId: Dataset.Id | undefined,
@@ -100,6 +104,9 @@ export function useLinkedDatasets(
       ? _toLinkedDatasets(datasets ?? [], bindings ?? [])
       : NO_LINKED_DATASETS;
   }, [hasLinked, datasets, bindings]);
+  // The dictionary bindings feed each linked dataset's `dictionaryIds`, so
+  // the flags below include that lookup: a failure there leaves the list
+  // incomplete.
   return {
     linkedDatasets,
     isLoading:
