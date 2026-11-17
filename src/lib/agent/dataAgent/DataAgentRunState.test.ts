@@ -21,4 +21,16 @@ describe("beginDataAgentRun", () => {
     expect(next.needsEscalation).toBe(false);
     expect(next.lastQuery).toBeUndefined();
   });
+
+  it("clears the dashboard block the previous answer added", () => {
+    const previous = createDataAgentRunState();
+    previous.dashboardBlock = {
+      summary: "Added a heading to COVID 2022.",
+      outcome: "added_to_editor",
+    };
+
+    const merged = { ...previous, ...beginDataAgentRun(previous, "Again") };
+
+    expect(merged.dashboardBlock).toBeUndefined();
+  });
 });

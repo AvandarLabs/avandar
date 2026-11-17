@@ -469,3 +469,111 @@ describe("getDataAgentReplyText", () => {
     );
   });
 });
+
+type ScriptedToolCall = { name: string; arguments: JsonObject };
+
+/** A stream function whose n-th model call is the n-th scripted tool call. */
+function _createToolCallingStreamFn(
+  script: readonly ScriptedToolCall[],
+): StreamFn {
+  let callCount = 0;
+  return () => {
+    const scripted = script[callCount];
+    if (!scripted) {
+      throw new Error("The model was called more often than scripted.");
+    }
+    callCount += 1;
+    const toolCall = {
+      type: "toolCall" as const,
+      id: `call-${callCount}`,
+      ...scripted,
+    };
+    const message: AssistantMessage = {
+      role: "assistant",
+      content: [toolCall],
+      api: MODEL.api,
+      provider: MODEL.provider,
+      model: MODEL.id,
+      usage: {
+        input: 0,
+        output: 0,
+        cacheRead: 0,
+        cacheWrite: 0,
+        totalTokens: 0,
+        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+      },
+      stopReason: "toolUse",
+      timestamp: 0,
+    };
+    const stream = createAssistantMessageEventStream();
+    queueMicrotask(() => {
+      stream.push({ type: "start", partial: message });
+      stream.push({ type: "done", reason: "toolUse", message });
+    });
+    return stream;
+  };
+}
+
+function _addHeading(summary: string): ScriptedToolCall {
+  return {
+    name: "add_dashboard_block",
+    arguments: {
+      dashboard: "COVID 2022",
+      block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+      summary,
+    },
+  };
+}
+
+describe("createDataAgent across several asks", () => {
+  function _createDashboardAgent(script: readonly ScriptedToolCall[]) {
+    const host: DataAgentHost = {
+      ...HOST,
+      approveValuesForModel: vi.fn().mockResolvedValue(true),
+      showQuery: vi
+        .fn()
+        .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      checkQuery: vi
+        .fn()
+        .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      addDashboardBlock: vi.fn().mockResolvedValue({ kind: "added_to_editor" }),
+    };
+    const dataAgent = createDataAgent({
+      datasets: [],
+      host,
+      policy: { primary: { model: MODEL, thinkingLevel: "off" } },
+      streamFn: _createToolCallingStreamFn(script),
+      today: "2026-11-08",
+      promptId: "data-agent-v6",
+    });
+    return { dataAgent, host };
+  }
+
+  it("adds a block on a later ask after one was added", async () => {
+    const { dataAgent, host } = _createDashboardAgent([
+      _addHeading("Added the first heading."),
+      _addHeading("Added the second heading."),
+    ]);
+
+    await dataAgent.ask("Add a heading");
+    const second = await dataAgent.ask("Add another heading");
+
+    expect(host.addDashboardBlock).toHaveBeenCalledTimes(2);
+    expect(second.text).toBe("Added the second heading.");
+  });
+
+  it("does not reply with an earlier answer's block summary", async () => {
+    const { dataAgent } = _createDashboardAgent([
+      _addHeading("Added the first heading."),
+      {
+        name: "run_query",
+        arguments: { sql: "SELECT 1", summary: "One row of numbers." },
+      },
+    ]);
+
+    await dataAgent.ask("Add a heading");
+    const second = await dataAgent.ask("How many deaths?");
+
+    expect(second.text).toBe("One row of numbers.");
+  });
+});
