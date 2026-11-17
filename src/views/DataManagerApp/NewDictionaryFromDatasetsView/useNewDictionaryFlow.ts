@@ -10,6 +10,7 @@ import { useCreateDictionary } from "@/views/DataManagerApp/NewDictionaryFromDat
 import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import { useMeaningMatches } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import { useReadDatasets } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
+import { useSuggestDescriptions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestDescriptions";
 import { useSuggestLabels } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserProfile } from "$/models/User/UserProfile";
@@ -25,6 +26,7 @@ import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFro
 import type { NewDictionarySources } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources";
 import type { ApplyTarget } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
 import type { ReadableDataset } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
+import type { SuggestDescriptions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestDescriptions";
 import type { Dispatch, RefObject } from "react";
 
 /** What the create flow's steps can do beyond changing its state. */
@@ -38,6 +40,8 @@ export type NewDictionaryFlow = {
     codeList: DictionaryProposal.CodeList,
   ) => LabelsBlockReason | undefined;
   suggestingCodeListKey: string | undefined;
+  /** Asks for entry descriptions, for the Describe columns step. */
+  descriptions: SuggestDescriptions;
   createDictionary: () => void;
   isCreating: boolean;
   /**
@@ -286,7 +290,8 @@ function useReadPicked(
 
 /**
  * Connects the create flow's state to everything outside it: reading the
- * picked datasets, meaning matches, label suggestions, and saving.
+ * picked datasets, meaning matches, label and description suggestions, and
+ * saving.
  * `NewDictionaryFromDatasetsView` calls it once and hands the result to its
  * steps.
  */
@@ -310,6 +315,12 @@ export function useNewDictionaryFlow(
     requestReply: suggestions.requestReply,
     dispatch,
   });
+  const descriptions = useSuggestDescriptions({
+    proposal: state.proposal,
+    readId: state.readId,
+    requestReply: suggestions.requestReply,
+    dispatch,
+  });
   const readPicked = useReadPicked({ state, sources, read: reading.read });
   const [create, isCreating] = useCreateDictionary();
   const applyTargets = _getApplyTargets(state, sources);
@@ -327,6 +338,7 @@ export function useNewDictionaryFlow(
     suggestLabels: labels.suggestLabels,
     getLabelsBlockReason: labels.getLabelsBlockReason,
     suggestingCodeListKey: labels.suggestingCodeListKey,
+    descriptions,
     createDictionary: _makeCreateDictionary({
       state,
       userProfile,

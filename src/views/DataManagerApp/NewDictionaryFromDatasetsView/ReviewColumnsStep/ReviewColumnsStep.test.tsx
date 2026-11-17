@@ -217,12 +217,14 @@ describe("ReviewColumnsStep", () => {
     ).toBeDisabled();
   });
 
-  it("says in each row whether the entry needs labels or a description", () => {
+  it("says in each row whether the entry gets its values mapped and a description, or only a description", () => {
     _renderStep();
     const hospRow = screen.getByRole("row", { name: /hosp_yn/ });
-    expect(within(hospRow).getByText("Needs mapping")).toBeInTheDocument();
+    expect(
+      within(hospRow).getByText("Map values + describe"),
+    ).toBeInTheDocument();
     const idRow = screen.getByRole("row", { name: /case_id/ });
-    expect(within(idRow).getByText("Description")).toBeInTheDocument();
+    expect(within(idRow).getByText("Describe")).toBeInTheDocument();
   });
 
   it("offers to deselect all when every entry is included", () => {
@@ -283,8 +285,44 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Include at least one entry to go on."),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Next: map values" }),
+      screen.getByRole("button", { name: "Next: describe columns" }),
     ).toBeDisabled();
+  });
+
+  it("explains that every checked column joins the dictionary and which also get mapped", () => {
+    _renderStep();
+    expect(
+      screen.getByText(
+        "Every checked column becomes a dictionary entry. Columns with a fixed set of values also get their values mapped next. Text, number, and date columns aren't mapped, but they still join the dictionary with a description, so anyone using it knows what the column holds.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("goes on to Map values when an included entry has values to map", () => {
+    const { dispatch } = _renderStep();
+    fireEvent.click(screen.getByRole("button", { name: "Next: map values" }));
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "go_to_step",
+      step: "label",
+    });
+  });
+
+  it("skips Map values and goes on to Describe when no included entry has values to map", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("case_id", undefined),
+      _column("clinic_notes", undefined),
+    ]);
+    const { dispatch } = _renderStep({ proposal });
+    expect(
+      screen.queryByRole("button", { name: "Next: map values" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next: describe columns" }),
+    );
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "go_to_step",
+      step: "describe",
+    });
   });
 
   it("changes an entry's kind", () => {

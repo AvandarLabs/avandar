@@ -2018,6 +2018,10 @@ msgstr "Cependant, nous ne permettons pas de nouvelles inscriptions pour le "
 msgid "Not installed"
 msgstr "Non installé"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
+msgid "Describe columns"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
 msgid "Add value"
 msgstr "Ajouter une valeur"
@@ -2221,6 +2225,11 @@ msgstr "{issueCount, plural, one {# élément à corriger avant l’enregistreme
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Saisissez une question et je générerai le SQL, puis l’exécuterai pour "
 "vous."
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeSuggestionsNote.tsx
+msgid "Suggestions need a connection or the offline model. You can still write "
+"the descriptions yourself."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
@@ -2567,6 +2576,7 @@ msgid "New role group"
 msgstr "Nouveau groupe de rôles"
 
 #. placeholder {0}: entries.length
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable.tsx
 msgid "{0, plural, one {# entry} other {# entries}}"
 msgstr ""
@@ -3167,7 +3177,7 @@ msgstr "Clause de non-responsabilité concernant les limites (Toujours incluse)"
 msgid "Undo"
 msgstr "Annuler"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{distinctCount, plural, one {# different value} other {# different "
 "values}}"
 msgstr "{distinctCount, plural, one {# valeur différente} other {# valeurs "
@@ -4365,6 +4375,10 @@ msgstr "Avandar n’a pas pu lire les colonnes de ce jeu de données pour les "
 "mettre en correspondance. Veuillez réessayer plus tard ou contacter "
 "l’assistance."
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
+msgid "Suggested {doneCount} of {totalCount}"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
@@ -4380,10 +4394,10 @@ msgid "Cannot sync this case type"
 msgstr "Impossible de synchroniser ce type de dossier"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
-msgid "Columns with a set of values get mapped next. The rest become entries "
-"with a description, so the dictionary documents them too. Uncheck "
-"anything you don't want, or change its kind."
-msgstr ""
+#~ msgid "Columns with a set of values get mapped next. The rest become entries "
+#~ "with a description, so the dictionary documents them too. Uncheck "
+#~ "anything you don't want, or change its kind."
+#~ msgstr ""
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "Recent"
@@ -5016,6 +5030,8 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
@@ -5636,7 +5652,7 @@ msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to 
 msgstr "Pas encore de SQL. Posez une question à Avandar ou construisez une "
 "requête dans l'onglet Manuel pour générer du SQL."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{moreCount, plural, one {{shown} and # more} other {{shown} and # more}}"
 msgstr "{moreCount, plural, one {{shown} et # autre} other {{shown} et # "
 "autres}}"
@@ -5683,6 +5699,10 @@ msgstr "Suggérer des correspondances"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
 msgstr "Depuis"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep.tsx
+msgid "Descriptions"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "N"
@@ -7408,6 +7428,10 @@ msgstr "Une ligne par nombre"
 msgid "Number: a measurement or a count"
 msgstr "Nombre : une mesure ou un décompte"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
+msgid "Nothing to describe"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsFooter.tsx
@@ -7444,6 +7468,10 @@ msgstr "Ce lieu a déjà été supprimé."
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
 msgstr "A4"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "The suggestion uses what you wrote and may rewrite it."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
@@ -7634,6 +7662,7 @@ msgstr "Linéaire"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineFooter.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -7874,7 +7903,7 @@ msgstr "Principalement unique : <0>{0}</0> valeurs distinctes sur <1>{1}</1 "
 msgid "Boundary display name"
 msgstr "Nom d’affichage de la limite"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
 msgid "Description of {entryName}"
 msgstr "Description de {entryName}"
 
@@ -8240,6 +8269,12 @@ msgstr "Envoyer"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Generated SQL assumptions"
 msgstr "Hypothèses SQL générées"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeSuggestionsNote.tsx
+msgid "You chose not to send column details to the AI provider, so suggestions "
+"are off for this dictionary. You can still write the descriptions "
+"yourself."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -8979,6 +9014,11 @@ msgstr "Tapez votre réponse..."
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Built by hand"
 msgstr "Créé manuellement"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest"
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "This isn't a single SQL expression. Check its brackets, quotes, and "
@@ -9838,6 +9878,10 @@ msgid "Either way, the code lists and descriptions are attached to "
 msgstr "Dans tous les cas, les listes de codes et les descriptions sont "
 "associées à {datasetName} à titre de référence."
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
+msgid "Next: describe columns"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
 msgstr "récemment"
@@ -10289,7 +10333,6 @@ msgstr "Faible"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
@@ -10349,6 +10392,10 @@ msgstr "mi"
 msgid "Records you choose for it: {dataSlots}"
 msgstr "Enregistrements que vous sélectionnez pour celui-ci : {dataSlots}"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
+msgid "Describe"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotPanel/DataSlotSourceSelect.tsx
 msgid "Choose where the records come from"
 msgstr "Choisissez la source des enregistrements"
@@ -10357,7 +10404,7 @@ msgstr "Choisissez la source des enregistrements"
 msgid "Allow syncing"
 msgstr "Autoriser la synchronisation"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "Unique per row"
 msgstr "Unique par ligne"
 
@@ -10499,6 +10546,10 @@ msgstr "Cela ne peut pas être annulé."
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
 msgstr "{count, plural, one {# entité} other {# entités}}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest a description for {entryName}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "{usedByCount, plural, one {Used by # dataset} other {Used by # "
@@ -11323,10 +11374,18 @@ msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr "Impossible de charger les plugins de cet espace de travail. Rechargez "
 "la page pour réessayer."
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
+msgid "The suggestion did not come back. Try again or write it yourself."
+msgstr ""
+
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepper.tsx
 msgid "Records"
 msgstr "Enregistrements"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestDescriptions.ts
+msgid "Suggested descriptions filled in. Check them before saving."
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "Created {linkedName}. The code lists are attached to {datasetName} for "
@@ -11690,6 +11749,10 @@ msgstr "Supprimer la colonne"
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
 msgid "Edit {entryName}"
 msgstr "Modifier {entryName}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+msgid "Suggest all"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
@@ -12462,6 +12525,13 @@ msgstr "Multiplier par {factor}"
 msgid "{0} boundaries without data"
 msgstr "{0} limites sans données"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary.tsx
+msgid "Every checked column becomes a dictionary entry. Columns with a fixed "
+"set of values also get their values mapped next. Text, number, and date "
+"columns aren't mapped, but they still join the dictionary with a "
+"description, so anyone using it knows what the column holds."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically last"
 msgstr "Dernier par ordre alphabétique"
@@ -12845,6 +12915,11 @@ msgstr "Pour les données qui écrivent les mêmes valeurs d’une autre manièr
 #~ msgstr "Les suggestions nécessitent une connexion ou le modèle hors ligne. "
 #~ "L’étiquetage fonctionne toujours."
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestEntryButton.tsx
+msgid "Suggest and rewrite"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
 msgstr "Choisissez les éléments à lire"
@@ -12864,6 +12939,11 @@ msgstr "Réécriture suggérée :"
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
 msgstr "Les modèles hors ligne n’ont pas pu être chargés."
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/SuggestAllButton.tsx
+msgid "Some columns already have a description. Checked ones may be rewritten, "
+"using what you wrote. Uncheck any you want to keep as they are."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
@@ -12902,6 +12982,10 @@ msgstr "1 jeu de données"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "Aucune colonne numérique"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeEntryBlock.tsx
+msgid "Suggested from the column. Edit it or keep it."
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
 msgid "Insert column"
@@ -13064,8 +13148,8 @@ msgid "Collapse the legend"
 msgstr "Réduire la légende"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
-msgid "Needs mapping"
-msgstr ""
+#~ msgid "Needs mapping"
+#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -13579,7 +13663,7 @@ msgstr "{trimmedName} est déjà une colonne du jeu de données combiné."
 msgid "billing portal."
 msgstr "portail de facturation."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "Dates"
 msgstr "Dates"
 
@@ -13760,6 +13844,10 @@ msgstr "Ambre"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "Configurer comment rejoindre les ensembles de données"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow.tsx
+msgid "Map values + describe"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Add an area layer, such as a buffer, to filter by it."
@@ -15215,6 +15303,11 @@ msgstr "Choisissez un préréglage d'espace de travail ou personnalisez par "
 msgid "Reference only"
 msgstr "Référence uniquement"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/NothingToDescribe.tsx
+msgid "No columns are checked, so the dictionary would be empty. Go back and "
+"check the columns it should hold."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "Regrouper dans une grille"
@@ -15379,6 +15472,7 @@ msgid "(Message not sent.)"
 msgstr "(Message non envoyé.)"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 msgid "Next: save"
 msgstr "Suivant : enregistrer"
@@ -15553,9 +15647,9 @@ msgid "No fields yet"
 msgstr "Aucun champ pour le moment"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField.tsx
-msgid "Suggested from the column name and values. Edit it or keep it."
-msgstr "Suggestion basée sur le nom et les valeurs de la colonne. Modifiez-la "
-"ou conservez-la."
+#~ msgid "Suggested from the column name and values. Edit it or keep it."
+#~ msgstr "Suggestion basée sur le nom et les valeurs de la colonne. Modifiez-la "
+#~ "ou conservez-la."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
@@ -15894,7 +15988,7 @@ msgstr "Sélectionnez une source de données pour ajouter des filtres."
 msgid "Annual"
 msgstr "Annuel"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useValuesSeenSummary.ts
 msgid "{lowest} to {highest}"
 msgstr "De {lowest} à {highest}"
 

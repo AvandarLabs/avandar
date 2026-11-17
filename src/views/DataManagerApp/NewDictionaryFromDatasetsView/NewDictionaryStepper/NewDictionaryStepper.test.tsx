@@ -23,6 +23,26 @@ const READ_STATE = newDictionaryReducer(
   },
 );
 
+const CODED_STATE = {
+  ...READ_STATE,
+  proposal: DictionaryProposal.fromColumnProfiles([
+    {
+      datasetId: DATASET_ID,
+      datasetName: "Kings",
+      columnName: "GENDER",
+      dataType: "varchar",
+      rowCount: 300,
+      nonNullCount: 300,
+      distinctCount: 3,
+      values: ["1", "2", "9"].map((value) => {
+        return { value, rowCount: 100 };
+      }),
+      dateShare: undefined,
+      numberRange: undefined,
+    },
+  ]),
+};
+
 describe("NewDictionaryStepper", () => {
   it("has no Pick datasets step when the flow opened from a dataset", () => {
     render(
@@ -52,11 +72,39 @@ describe("NewDictionaryStepper", () => {
     ).toBeInTheDocument();
   });
 
+  it("lists Map values and Describe columns before Save when there are values to map", () => {
+    render(
+      <NewDictionaryStepper
+        state={{ ...CODED_STATE, step: "review" }}
+        dispatch={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getAllByRole("button").map((step) => {
+        // Each step button leads with its number.
+        return step.textContent?.replace(/^\d/, "");
+      }),
+    ).toEqual(["Review columns", "Map values", "Describe columns", "Save"]);
+  });
+
+  it("leaves out Map values but never Describe columns when nothing has values to map", () => {
+    render(
+      <NewDictionaryStepper
+        state={{ ...READ_STATE, step: "review" }}
+        dispatch={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Map values/ })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /Describe columns/ }),
+    ).toBeInTheDocument();
+  });
+
   it("goes back to an earlier step", () => {
     const dispatch = vi.fn();
     render(
       <NewDictionaryStepper
-        state={{ ...READ_STATE, step: "label" }}
+        state={{ ...CODED_STATE, step: "label" }}
         dispatch={dispatch}
       />,
     );

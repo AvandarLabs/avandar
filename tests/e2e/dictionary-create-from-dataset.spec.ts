@@ -25,7 +25,7 @@ import type { Page, Route } from "@playwright/test";
 
 const DICTIONARY_NAME = "E2E line list codes";
 const SUGGESTIONS_ROUTE =
-  "**/functions/v1/chat/*/dictionary-suggestions/dictionary-suggestions-v1";
+  "**/functions/v1/chat/*/dictionary-suggestions/dictionary-suggestions-v2";
 const SESSION_SECRET_ROUTE = "**/functions/v1/chat/*/session-secret";
 const LABELS_REPLY = JSON.stringify({
   labels: [
@@ -35,13 +35,19 @@ const LABELS_REPLY = JSON.stringify({
   ],
   description: "Sex recorded at intake.",
 });
+const DESCRIBE_REPLY = JSON.stringify({
+  description: "Where the person was seen.",
+});
 
 async function _replyToSuggestions(route: Route): Promise<void> {
   const body = route.request().postDataJSON() as {
     request?: { task?: string };
   };
-  const reply =
-    body.request?.task === "labels" ? LABELS_REPLY : '{"matches":[]}';
+  const replies: Record<string, string> = {
+    labels: LABELS_REPLY,
+    describe: DESCRIBE_REPLY,
+  };
+  const reply = replies[body.request?.task ?? ""] ?? '{"matches":[]}';
   await route.fulfill({
     contentType: "application/json",
     body: JSON.stringify({ reply }),
@@ -132,6 +138,12 @@ test.describe("learning a dictionary from a dataset", () => {
       ).toHaveValue("gender");
       await _suggestGenderLabels(page, { isOnline: true });
       await page.getByRole("button", { name: "Accept and next list" }).click();
+      await page
+        .getByRole("button", { name: "Next: describe columns" })
+        .click();
+      await expect(
+        page.getByRole("textbox", { name: "Description of gender" }),
+      ).toHaveValue("Sex recorded at intake.");
       await page.getByRole("button", { name: "Next: save" }).click();
       await expect(page.getByText(/have no target value yet/)).toBeVisible();
       await page
@@ -186,6 +198,55 @@ test.describe("learning a dictionary from a dataset", () => {
     }
   });
 
+  test("a column with no value list is described with a suggestion on the Describe columns step", async ({
+    page,
+    e2eWorkerDb,
+  }) => {
+    const admin = createSupabaseAdminClient();
+    const workspaceId = await getWorkspaceIdBySlug({
+      supabaseAdminClient: admin,
+      slug: e2eWorkerDb.workspaceSlug,
+    });
+    let datasetId: string | undefined;
+    await page.route(SESSION_SECRET_ROUTE, _replyWithSessionSecret);
+    await page.route(SUGGESTIONS_ROUTE, _replyToSuggestions);
+    try {
+      await signInWithEmailPassword(page, {
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      datasetId = await importDatasetViaUi({
+        page,
+        filePath: MEASLES_LINE_LIST_CSV_PATH,
+        expectedRowCount: MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+
+      await _openCreateFromDataset(page);
+      await page.getByRole("button", { name: "Next: map values" }).click();
+      await page
+        .getByRole("button", { name: "Next: describe columns" })
+        .click();
+      const onsetDescription = page.getByRole("textbox", {
+        name: "Description of onset_dt",
+      });
+      await expect(onsetDescription).toHaveValue("");
+      await page
+        .getByRole("button", { name: "Suggest a description for onset_dt" })
+        .click();
+      await _agreeToSend(page);
+      await expect(onsetDescription).toHaveValue("Where the person was seen.", {
+        timeout: MEDIUM_WAIT,
+      });
+      await page.getByRole("button", { name: "Cancel" }).click();
+    } finally {
+      if (datasetId) {
+        await deleteDatasetFixture({ admin, datasetId, workspaceId });
+      }
+    }
+  });
+
   test("labels are suggested by the offline model when offline mode is on", async ({
     page,
     e2eWorkerDb,
@@ -202,7 +263,7 @@ test.describe("learning a dictionary from a dataset", () => {
       await route.abort();
     });
     await page.addInitScript(
-      ({ labelsReply }) => {
+      ({ labelsReply, describeReply }) => {
         window.localStorage.setItem(
           "avandar.offlineChat.isOfflineModeOn",
           "on",
@@ -214,11 +275,12 @@ test.describe("learning a dictionary from a dataset", () => {
         Object.assign(window, {
           __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__: [
             { match: "You label the coded values", response: labelsReply },
+            { match: "You describe one column", response: describeReply },
             { match: "You find columns", response: '{"matches":[]}' },
           ],
         });
       },
-      { labelsReply: LABELS_REPLY },
+      { labelsReply: LABELS_REPLY, describeReply: DESCRIBE_REPLY },
     );
     try {
       await signInWithEmailPassword(page, {

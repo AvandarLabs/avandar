@@ -180,7 +180,7 @@ describe("DictionarySuggestions.requestReply", () => {
       route: "chat/:workspaceId/dictionary-suggestions/:promptId",
       pathParams: {
         workspaceId: "workspace-id",
-        promptId: "dictionary-suggestions-v1",
+        promptId: "dictionary-suggestions-v2",
       },
       body: { request: REQUEST, ackToken: "ack-1" },
     });
@@ -852,5 +852,117 @@ describe("DictionarySuggestions.makeMatchesRequestFromColumns", () => {
         model: "online",
       }),
     ).toBeUndefined();
+  });
+});
+
+describe("DictionarySuggestions.makeDescribeRequestFromEntry", () => {
+  function _entryOf(
+    columnName: string,
+    codes: readonly string[] | undefined,
+    description = "",
+  ): DictionaryProposal.Entry {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column(columnName, codes),
+    ]);
+    const [entry] = proposal.entries;
+    if (!entry) {
+      throw new Error("The proposal has no entries.");
+    }
+    return DictionaryProposal.setEntryDescription(
+      { entries: [entry] },
+      { entryKey: entry.key, description },
+    ).entries[0]!;
+  }
+
+  it("asks about an entry with no value list from its name, kind, and dataset", () => {
+    const entry = {
+      ..._entryOf("clinic_notes", undefined),
+      kind: "text" as const,
+    };
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "es",
+    });
+    expect(request).toEqual({
+      task: "describe",
+      locale: "es",
+      column: {
+        name: "clinic_notes",
+        otherNames: [],
+        kind: "text",
+        values: [],
+      },
+      datasetNames: ["Bronx"],
+      description: "",
+    });
+    expect(DictionarySuggestionsRequestSchema.safeParse(request).success).toBe(
+      true,
+    );
+  });
+
+  it("sends what the user wrote as the existing description", () => {
+    const entry = _entryOf("clinic_notes", undefined, "Nurse notes at intake");
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "en",
+    });
+    expect(request.task === "describe" && request.description).toBe(
+      "Nurse notes at intake",
+    );
+  });
+
+  it("sends no existing description when the text is an earlier suggestion", () => {
+    const entry = DictionaryProposal.suggestEntryDescription(
+      { entries: [_entryOf("clinic_notes", undefined)] },
+      {
+        entryKey: _entryOf("clinic_notes", undefined).key,
+        description: "An earlier suggestion",
+      },
+    ).entries[0]!;
+    expect(entry.isDescriptionSuggested).toBe(true);
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "en",
+    });
+    expect(request.task === "describe" && request.description).toBe("");
+  });
+
+  it("cuts a very long existing description to what the route takes", () => {
+    const entry = _entryOf("clinic_notes", undefined, "n".repeat(5000));
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "en",
+    });
+    expect(request.task === "describe" && request.description).toHaveLength(
+      2000,
+    );
+    expect(DictionarySuggestionsRequestSchema.safeParse(request).success).toBe(
+      true,
+    );
+  });
+
+  it("sends a coded entry's first values, so the model sees what it holds", () => {
+    const entry = _entryOf("GENDER", ["1", "2", "9"]);
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "en",
+    });
+    expect(request.task === "describe" && request.column.values).toEqual([
+      "1",
+      "2",
+      "9",
+    ]);
+  });
+
+  it("withholds the values of an entry named after a person but still asks", () => {
+    const entry = _entryOf("first_name", ["Ana", "Luis"]);
+    const request = DictionarySuggestions.makeDescribeRequestFromEntry({
+      entry,
+      locale: "en",
+    });
+    expect(request.task === "describe" && request.column.values).toEqual([]);
+    expect(request.task === "describe" && request.column.name).toBe(
+      "first_name",
+    );
   });
 });

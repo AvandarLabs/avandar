@@ -7,11 +7,15 @@ import {
   DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
   DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
+  DICTIONARY_SUGGESTIONS_PROMPT_IDS,
   DictionarySuggestionsRequestSchema,
+  getDictionarySuggestionsJsonSchema,
   getDictionarySuggestionsMaxTokens,
   isDictionarySuggestionsPromptId,
   isDictionarySuggestionsRequestTooLarge,
+  isDictionarySuggestionsTaskServed,
   isIdentifyingColumnName,
+  parseDictionaryDescriptionSuggestion,
   parseDictionaryLabelSuggestions,
   parseDictionaryMeaningMatches,
   stringifyDictionarySuggestionsRequest,
@@ -45,11 +49,46 @@ function _makeCodes(count: number): string[] {
 }
 
 describe("dictionarySuggestionsPrompt", () => {
-  it("serves dictionary-suggestions-v1 and refuses any other id", () => {
+  it("serves dictionary-suggestions-v1 and v2 and refuses any other id", () => {
+    expect(DICTIONARY_SUGGESTIONS_PROMPT_IDS).toEqual([
+      "dictionary-suggestions-v1",
+      "dictionary-suggestions-v2",
+    ]);
+    expect(isDictionarySuggestionsPromptId("dictionary-suggestions-v1")).toBe(
+      true,
+    );
     expect(
       isDictionarySuggestionsPromptId(DICTIONARY_SUGGESTIONS_PROMPT_ID),
     ).toBe(true);
     expect(isDictionarySuggestionsPromptId("chat-title-v1")).toBe(false);
+  });
+
+  it("asks the browser for v2, which serves descriptions as well as labels and matches", () => {
+    expect(DICTIONARY_SUGGESTIONS_PROMPT_ID).toBe("dictionary-suggestions-v2");
+    expect(
+      isDictionarySuggestionsTaskServed(
+        "dictionary-suggestions-v2",
+        "describe",
+      ),
+    ).toBe(true);
+    expect(
+      isDictionarySuggestionsTaskServed("dictionary-suggestions-v2", "labels"),
+    ).toBe(true);
+  });
+
+  it("keeps v1 frozen to labels and matches, refusing descriptions", () => {
+    expect(
+      isDictionarySuggestionsTaskServed("dictionary-suggestions-v1", "labels"),
+    ).toBe(true);
+    expect(
+      isDictionarySuggestionsTaskServed("dictionary-suggestions-v1", "matches"),
+    ).toBe(true);
+    expect(
+      isDictionarySuggestionsTaskServed(
+        "dictionary-suggestions-v1",
+        "describe",
+      ),
+    ).toBe(false);
   });
 
   it("asks for labels in the locale, with the column's names and codes", () => {
@@ -322,5 +361,88 @@ describe("dictionarySuggestionsPrompt", () => {
       return "x".repeat(200);
     });
     expect(budgetFor(longCodes)).toBe(3000);
+  });
+
+  describe("describe task", () => {
+    const NOTES: DictionarySuggestionColumn = {
+      name: "clinic_notes",
+      otherNames: [],
+      kind: "text",
+      values: [],
+    };
+    const DESCRIBE: DictionarySuggestionsRequest = {
+      task: "describe",
+      locale: "es",
+      column: NOTES,
+      datasetNames: ["Kings line list"],
+      description: "Free text the nurse wrote at intake",
+    };
+
+    it("puts the existing description in the prompt so the model builds on it", () => {
+      const [system, user] = buildDictionarySuggestionsMessages(DESCRIBE);
+      expect(system?.content).toContain("describe one column");
+      expect(system?.content).toContain("existing description");
+      expect(user?.content).toContain("Locale: es");
+      expect(user?.content).toContain("Free text the nurse wrote at intake");
+      expect(user?.content).toContain("clinic_notes");
+      expect(user?.content).toContain("Kings line list");
+    });
+
+    it("sends an empty existing description when the box is empty", () => {
+      const [, user] = buildDictionarySuggestionsMessages({
+        ...DESCRIBE,
+        description: "",
+      });
+      expect(user?.content).toContain('"description":""');
+    });
+
+    it("writes the text a consent covers in one key order", () => {
+      expect(stringifyDictionarySuggestionsRequest(DESCRIBE)).toBe(
+        '{"task":"describe","locale":"es","column":{"name":"clinic_notes","otherNames":[],"kind":"text","values":[]},"datasetNames":["Kings line list"],"description":"Free text the nurse wrote at intake"}',
+      );
+    });
+
+    it("accepts a described column of any kind that sends no values", () => {
+      expect(
+        DictionarySuggestionsRequestSchema.safeParse(DESCRIBE).success,
+      ).toBe(true);
+    });
+
+    it("refuses the values of a described column that is not coded", () => {
+      const parsed = DictionarySuggestionsRequestSchema.safeParse({
+        ...DESCRIBE,
+        column: { ...NOTES, values: ["secret"] },
+      });
+      expect(parsed.success).toBe(false);
+    });
+
+    it("refuses an existing description over the cap", () => {
+      const parsed = DictionarySuggestionsRequestSchema.safeParse({
+        ...DESCRIBE,
+        description: "d".repeat(2001),
+      });
+      expect(parsed.success).toBe(false);
+    });
+
+    it("constrains the reply to a description and gives it a small budget", () => {
+      expect(getDictionarySuggestionsJsonSchema("describe")).toMatchObject({
+        required: ["description"],
+      });
+      expect(getDictionarySuggestionsMaxTokens(DESCRIBE)).toBe(300);
+    });
+
+    it("reads a description from a reply wrapped in prose, cut to the cap", () => {
+      const reply = `Sure: {"description":"  Nurse notes at intake. ${"x".repeat(400)}"}`;
+      const description = parseDictionaryDescriptionSuggestion(reply);
+      expect(description?.startsWith("Nurse notes at intake.")).toBe(true);
+      expect(description).toHaveLength(300);
+    });
+
+    it("returns nothing for a reply without JSON or with a blank description", () => {
+      expect(parseDictionaryDescriptionSuggestion("No idea.")).toBeUndefined();
+      expect(
+        parseDictionaryDescriptionSuggestion('{"description":"  "}'),
+      ).toBeUndefined();
+    });
   });
 });

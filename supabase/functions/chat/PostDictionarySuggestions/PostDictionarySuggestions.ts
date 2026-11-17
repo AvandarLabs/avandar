@@ -18,6 +18,7 @@ import {
   getDictionarySuggestionsMaxTokens,
   isDictionarySuggestionsPromptId,
   isDictionarySuggestionsRequestTooLarge,
+  isDictionarySuggestionsTaskServed,
   stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
@@ -125,8 +126,10 @@ async function _askModel(
 }
 
 /**
- * Suggests labels for one coded column, or the columns that record the same
- * thing, for a Data Sources editor learning a dictionary from datasets. The
+ * Suggests labels for one coded column, a description of one column, or the
+ * columns that record the same thing, for a Data Sources editor learning a
+ * dictionary from datasets. The frozen v1 prompt serves labels and matches
+ * only, so a description request under it is refused. The
  * browser sends column names, kinds, and the codes of short coded columns,
  * with proof the user agreed to send them; rows never reach this route. It
  * answers with the data agent's primary model, held to the task's JSON
@@ -160,6 +163,12 @@ export const PostDictionarySuggestions = POST({
       minRole: "editor",
     });
     const request = _parseRequest(body.request);
+    if (!isDictionarySuggestionsTaskServed(pathParams.promptId, request.task)) {
+      throw new AvaHTTPError(
+        `Prompt "${pathParams.promptId}" does not serve ${request.task} suggestions. Reload the page.`,
+        BAD_REQUEST,
+      );
+    }
     await _assertConsented({
       ackToken: body.ackToken,
       request,

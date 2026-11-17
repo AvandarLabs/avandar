@@ -13,8 +13,9 @@ type Props = {
 };
 
 /**
- * Back and Create dictionary under the Save step. Creating needs a
- * connection, so the button is gated like the app's other saves.
+ * Back, to Describe columns, and Create dictionary under the Save step.
+ * Creating needs a connection, so the button is gated like the app's other
+ * saves.
  */
 export function SaveFooter({
   canCreate,
@@ -28,7 +29,7 @@ export function SaveFooter({
         <Button
           variant="default"
           onClick={() => {
-            dispatch({ type: "go_to_step", step: "label" });
+            dispatch({ type: "go_to_step", step: "describe" });
           }}
         >
           <Trans>Back</Trans>
