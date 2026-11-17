@@ -30,9 +30,9 @@ export type DatasetDependents = Readonly<{
   isLoading: boolean;
 
   /**
-   * Whether the bindings or the installs could not be loaded, so the data
-   * slots in the list may be missing or unnamed. Linked datasets are listed
-   * regardless.
+   * Whether the linked datasets, the bindings, or the installs could not be
+   * loaded, so the list may be missing items or leave a data slot unnamed.
+   * What was found is listed regardless.
    */
   hasFailed: boolean;
 }>;
@@ -157,10 +157,10 @@ function useDataSlotDependents(
  * install being uninstalled is left out, since its bindings go with it. It
  * tells an admin what would break before they choose to delete the dataset.
  *
- * The data slot side is read fresh on every mount and is untrusted while it
- * loads or after it fails. Linked datasets come from `useLinkedDatasets`,
- * which does not expose fetching or error state, so that side is not gated
- * the same way.
+ * Both sides are read fresh on every mount, so the result reports loading
+ * while either refetches, and a failure when either lookup failed. The data
+ * slot side lists nothing while it loads or after it fails. The linked
+ * datasets side lists whatever it found.
  */
 export function useDatasetDependents(
   options: Readonly<{
@@ -181,7 +181,10 @@ export function useDatasetDependents(
       }),
       ...dataSlotsResult.dependents,
     ],
-    isLoading: linkedDatasetsResult.isLoading || dataSlotsResult.isLoading,
-    hasFailed: dataSlotsResult.hasFailed,
+    isLoading:
+      linkedDatasetsResult.isLoading ||
+      linkedDatasetsResult.isFetching ||
+      dataSlotsResult.isLoading,
+    hasFailed: linkedDatasetsResult.hasFailed || dataSlotsResult.hasFailed,
   };
 }

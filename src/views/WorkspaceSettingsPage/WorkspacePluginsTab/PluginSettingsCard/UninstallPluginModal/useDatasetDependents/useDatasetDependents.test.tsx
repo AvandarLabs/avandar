@@ -11,6 +11,8 @@ const mocks = vi.hoisted(() => {
   return {
     linkedDatasets: [] as Array<{ id: string; name: string }>,
     isLoadingLinked: false,
+    isFetchingLinked: false,
+    hasFailedLinked: false,
     isLoadingManifests: false,
     bindings: [] as Array<{
       id: string;
@@ -31,6 +33,8 @@ vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
       return {
         linkedDatasets: mocks.linkedDatasets,
         isLoading: mocks.isLoadingLinked,
+        isFetching: mocks.isFetchingLinked,
+        hasFailed: mocks.hasFailedLinked,
       };
     },
   };
@@ -121,6 +125,8 @@ describe("useDatasetDependents", () => {
   beforeEach(() => {
     mocks.linkedDatasets = [];
     mocks.isLoadingLinked = false;
+    mocks.isFetchingLinked = false;
+    mocks.hasFailedLinked = false;
     mocks.isLoadingManifests = false;
     mocks.bindings = [];
     mocks.installations = [
@@ -314,6 +320,35 @@ describe("useDatasetDependents", () => {
 
     expect(result.current.dependents).toEqual([
       { key: "linked-1", kind: "linkedDataset", label: "Districts linked" },
+    ]);
+  });
+
+  it("reports loading while the linked datasets refetch", () => {
+    mocks.isFetchingLinked = true;
+
+    const { result } = _renderDependents();
+
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it("reports a failure when the linked datasets could not be loaded", () => {
+    mocks.hasFailedLinked = true;
+
+    const { result } = _renderDependents();
+
+    expect(result.current.hasFailed).toBe(true);
+  });
+
+  it("still lists the data slots it found when the linked lookup failed", () => {
+    mocks.hasFailedLinked = true;
+    mocks.bindings = [
+      { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
+    ];
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([
+      { key: "binding-1", kind: "dataSlot", label: "Epidemiology: Cases" },
     ]);
   });
 

@@ -49,7 +49,7 @@ describe("UninstallDatasetDependents", () => {
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(
-      screen.queryByText("We could not check what reads this dataset."),
+      screen.queryByText("We could not load what reads this dataset."),
     ).not.toBeInTheDocument();
   });
 
@@ -87,7 +87,7 @@ describe("UninstallDatasetDependents", () => {
       screen.getByText("Mozambique: Districts (data slot)"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("We could not check what reads this dataset."),
+      screen.queryByText("We could not load what reads this dataset."),
     ).not.toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("UninstallDatasetDependents", () => {
     _renderDependents();
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      "We could not check what reads this dataset.",
+      "We could not load what reads this dataset.",
     );
   });
 
@@ -116,7 +116,7 @@ describe("UninstallDatasetDependents", () => {
       screen.getByText("Districts joined (linked dataset)"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("We could not check what reads this dataset."),
+      screen.getByText("We could not load what reads this dataset."),
     ).toBeInTheDocument();
   });
 });

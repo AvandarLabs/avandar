@@ -74,7 +74,7 @@ export function UninstallDatasetDependents({
       ) : null}
       {hasFailed ? (
         <Text size="sm" c="warning.8" role="status">
-          <Trans>We could not check what reads this dataset.</Trans>
+          <Trans>We could not load what reads this dataset.</Trans>
         </Text>
       ) : null}
     </Stack>
