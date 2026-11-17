@@ -81,14 +81,19 @@ export function useUninstallContentRows(
       return contentImport.datasetId;
     },
   );
-  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
+  const hasImports = importedIds.length > 0;
+  const [datasets, , datasetsQuery] = DatasetClient.useGetAll({
     where: { id: { in: importedIds } },
     useQueryOptions: {
       ...ALWAYS_REFETCH_ON_MOUNT,
-      enabled: importedIds.length > 0,
+      enabled: hasImports,
     },
   });
-  const readable = datasets ?? [];
+  // A restored cache renders with `isLoading` false while the refetch is in
+  // flight, so gate on `isFetching`. Until it settles, list nothing and
+  // check no access, since the restored list may name a deleted dataset.
+  const isFetchingDatasets = hasImports && datasetsQuery.isFetching;
+  const readable = isFetchingDatasets ? [] : (datasets ?? []);
   const access = useCanDeleteByDatasetId(
     readable.map((dataset) => {
       return dataset.id;
@@ -107,6 +112,6 @@ export function useUninstallContentRows(
         return left.name.localeCompare(right.name);
       }),
     hiddenCount: importedIds.length - readable.length,
-    isLoading: imported.isLoading || isLoadingDatasets || access.isLoading,
+    isLoading: imported.isLoading || isFetchingDatasets || access.isLoading,
   };
 }

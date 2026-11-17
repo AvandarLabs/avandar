@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
   return {
     importsByContentId: {} as Record<string, { datasetId: string }>,
     datasets: [] as Array<{ id: string; name: string }>,
+    isFetchingDatasets: false,
     canAccessResource: vi.fn(),
   };
 });
@@ -29,7 +30,11 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       useGetAll: () => {
-        return [mocks.datasets, false];
+        return [
+          mocks.datasets,
+          false,
+          { isFetching: mocks.isFetchingDatasets },
+        ];
       },
     },
   };
@@ -70,6 +75,7 @@ describe("useUninstallContentRows", () => {
       { id: "dataset-provinces", name: "Provinces (renamed)" },
       { id: "dataset-districts", name: "Districts" },
     ];
+    mocks.isFetchingDatasets = false;
     mocks.canAccessResource.mockReset();
     mocks.canAccessResource.mockResolvedValue(true);
   });
@@ -144,6 +150,16 @@ describe("useUninstallContentRows", () => {
     const { result } = _renderRows();
 
     expect(result.current.isLoading).toBe(true);
+  });
+
+  it("stays loading and checks no access while the dataset refetch is in flight", async () => {
+    mocks.isFetchingDatasets = true;
+
+    const { result } = _renderRows();
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.rows).toEqual([]);
+    expect(mocks.canAccessResource).not.toHaveBeenCalled();
   });
 
   it("lists nothing and is not loading when the plugin imported nothing", async () => {
