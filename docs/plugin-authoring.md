@@ -1008,7 +1008,8 @@ When an admin uninstalls a plugin that imported datasets, the uninstall dialog
 lists each one with an unchecked "Delete" box, so every dataset is kept unless
 the admin chooses otherwise. Only datasets the admin could delete from Data
 Sources can be deleted there. A checked dataset lists the linked datasets and
-other plugins' data slots that read it.
+the other plugins that use it, each as "<slot title> in the <plugin name>
+plugin".
 
 Bundled data needs attribution recorded with it. Credit its source and license
 in the description, because that is where workspace members see where the data

@@ -17,6 +17,11 @@ import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 export type DatasetDependent = Readonly<{
   key: string;
   kind: "linkedDataset" | "dataSlot";
+
+  /**
+   * A linked dataset's name, or a full sentence for a data slot, such as
+   * "Cases in the Epidemiology plugin". Show a data slot's label as it is.
+   */
   label: string;
 }>;
 
@@ -103,8 +108,9 @@ function _listOtherInstallSlotNames(
 }
 
 /**
- * Other installs' data slots that read the dataset, labelled "<plugin>:
- * <slot>". Nothing is listed while the lookups load or after one fails.
+ * Other installs' data slots that read the dataset, each described as the
+ * slot title in the plugin name. Nothing is listed while the lookups load
+ * or after one fails.
  */
 function useDataSlotDependents(
   options: Readonly<{
@@ -145,7 +151,7 @@ function useDataSlotDependents(
     return {
       key,
       kind: "dataSlot" as const,
-      label: t`${pluginName}: ${slotTitle}`,
+      label: t`${slotTitle} in the ${pluginName} plugin`,
     };
   });
   return { dependents, isLoading, hasFailed };

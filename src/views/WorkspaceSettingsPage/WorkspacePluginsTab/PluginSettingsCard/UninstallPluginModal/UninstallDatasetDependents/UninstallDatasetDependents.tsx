@@ -31,7 +31,7 @@ function DependentsList({
             <List.Item key={key}>
               {kind === "linkedDataset"
                 ? t`${label} (linked dataset)`
-                : t`${label} (data slot)`}
+                : label}
             </List.Item>
           );
         })}

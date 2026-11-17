@@ -69,7 +69,11 @@ describe("UninstallDatasetDependents", () => {
     mocks.result = {
       dependents: [
         { key: "a", kind: "linkedDataset", label: "Districts joined" },
-        { key: "b", kind: "dataSlot", label: "Mozambique: Districts" },
+        {
+          key: "b",
+          kind: "dataSlot",
+          label: "Districts in the Mozambique plugin",
+        },
       ],
       isLoading: false,
       hasFailed: false,
@@ -84,8 +88,9 @@ describe("UninstallDatasetDependents", () => {
       screen.getByText("Districts joined (linked dataset)"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Mozambique: Districts (data slot)"),
+      screen.getByText("Districts in the Mozambique plugin"),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/data slot/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText("We could not load what reads this dataset."),
     ).not.toBeInTheDocument();

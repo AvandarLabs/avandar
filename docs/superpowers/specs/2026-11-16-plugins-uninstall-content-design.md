@@ -93,7 +93,7 @@ Datasets it imported
   [x] Delete  Mozambique districts
         These read it and stop working once it is deleted:
         • Districts with population (linked dataset)
-        • Epidemiology: Cases (data slot)
+        • Cases in the Epidemiology plugin
   [–] Mozambique health facilities
         Kept. Only a dataset admin can delete it.
   1 more dataset you can't see stays.
@@ -121,7 +121,13 @@ Unchecked datasets stay in Data Sources.
   gets the same modal. Every value it shows comes from the import rows and
   the dataset rows, not the manifest.
 
-All copy goes through Lingui. The copy says "dataset", never "content import".
+- A linked dataset reads "<name> (linked dataset)". Another plugin's use of the
+  dataset reads "<slot title> in the <plugin name> plugin", one translatable
+  message with named placeholders. Without a manifest for that plugin in this
+  build, it uses the plugin id and the slot id in the same sentence.
+
+All copy goes through Lingui. The copy says "dataset", never "content import",
+and never "data slot", which is the manifest's term and not the admin's.
 
 ## Parts
 
@@ -222,7 +228,7 @@ No schema change, so no pgTAP tests and no Supabase switch.
 | --- | --- | --- |
 | Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there after a delete that did not throw. A failed delete does not stop the others and is returned. A dataset that fails the admin re-check is returned and `fullDelete` is never called for it |
 | Unit | `useUninstallContentRows.test.ts` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name |
-| Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Lists other installs' bindings with "<plugin>: <slot>" labels. Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
+| Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
 | Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. The notification matches the outcome |
 | Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/pluginFlow.ts` |
