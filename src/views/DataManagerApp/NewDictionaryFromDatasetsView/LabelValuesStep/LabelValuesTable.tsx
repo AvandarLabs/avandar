@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { Table } from "@mantine/core";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { LabelValueRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValueRow";
+import { MissingValueHeader } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
 
@@ -31,8 +32,8 @@ export function LabelValuesTable({
           <Table.Th>
             <Trans>Label</Trans>
           </Table.Th>
-          <Table.Th w={130}>
-            <Trans>Missing value</Trans>
+          <Table.Th w={150}>
+            <MissingValueHeader />
           </Table.Th>
         </Table.Tr>
       </Table.Thead>
