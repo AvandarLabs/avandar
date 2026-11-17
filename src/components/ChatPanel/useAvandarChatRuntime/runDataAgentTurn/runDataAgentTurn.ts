@@ -164,6 +164,7 @@ export async function runDataAgentTurn(
         datasets,
         pageContext,
         turn: options,
+        privacy: "hosted",
       });
     },
     createConversation: async (turnRef) => {

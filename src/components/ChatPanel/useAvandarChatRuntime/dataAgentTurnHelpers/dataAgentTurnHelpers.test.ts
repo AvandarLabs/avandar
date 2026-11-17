@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
@@ -260,6 +261,7 @@ describe("askConversationDataAgent", () => {
       turnRef: { current: _createTurnOptions() },
       results: [],
       resultsByTurn: [],
+      dashboardCards: [],
       datasets: [],
       dataAgent: {
         agent: { abort: vi.fn() },
@@ -381,6 +383,80 @@ describe("askConversationDataAgent", () => {
         AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
       ),
     ]);
+  });
+
+  it("starts with card lines, then marks them heard after the reply", async () => {
+    const cardLine =
+      "<dashboard_card>Cancelled: nothing was added.</dashboard_card>";
+    const card = AgentDashboardBlock.create({
+      block: { kind: "heading", text: "Visits" },
+      summary: "Added a heading.",
+      candidates: [{ id: "d-1", name: "Clinic visits" }],
+    } as never);
+    const onReplied = vi.fn();
+    const conversation = _fakeConversation(async () => {
+      expect(onReplied).not.toHaveBeenCalled();
+      conversation.dashboardCards.push(card);
+      return { text: "Done." };
+    });
+
+    const reply = await askConversationDataAgent({
+      conversations: new Map([["workspace-1:0", conversation]]),
+      turn: _turn("Add a heading"),
+      buildTurnInputs: () => {
+        return {
+          blocks: {},
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+          dashboardCardLines: [cardLine],
+          onReplied,
+        };
+      },
+      createConversation: vi.fn(),
+    });
+
+    expect(conversation.asked[0]).toBe(`${cardLine}\n\nAdd a heading`);
+    expect(onReplied).toHaveBeenCalledTimes(1);
+    expect(reply.content).toEqual([
+      { type: "text", text: "Done." },
+      AgentDashboardBlock.toDataPart(card),
+    ]);
+  });
+
+  it("keeps card lines unheard when the agent fails to reply", async () => {
+    const onReplied = vi.fn();
+    const conversation = _fakeConversation(async () => {
+      throw new Error("model down");
+    });
+
+    await expect(
+      askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", conversation]]),
+        turn: _turn("Add a heading"),
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            dashboardCardLines: ["<dashboard_card>x</dashboard_card>"],
+            onReplied,
+          };
+        },
+        createConversation: vi.fn(),
+      }),
+    ).rejects.toThrow("model down");
+
+    expect(onReplied).not.toHaveBeenCalled();
+  });
+
+  it("gives each turn its own list of dashboard cards", async () => {
+    const conversation = _fakeConversation();
+    const staleCards = conversation.dashboardCards;
+
+    await _ask(new Map([["workspace-1:0", conversation]]), _turn("How many?"));
+
+    expect(conversation.dashboardCards).not.toBe(staleCards);
+    expect(conversation.dashboardCards).toEqual([]);
   });
 
   it("asks the conversation it creates on the first turn", async () => {

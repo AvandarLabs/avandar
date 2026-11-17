@@ -1,14 +1,18 @@
+import { formatDashboardCardLine } from "$/agent/dashboardBlocks/dashboardCardLine";
+import { getAgentGadgetName } from "$/agent/mentions/AgentGadgetContext";
 import {
   buildAgentContextBlocks,
   buildAgentGadgetModelName,
 } from "$/agent/mentions/buildAgentContextBlocks";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
 import { createAgentPageContext } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
 import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { OFFLINE_SQL_TILE_BUDGET } from "@/lib/agent/dataAgent/offline/offlineContextBudget";
 import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
@@ -17,6 +21,7 @@ import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AgentDashboardCardIdentity } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import type {
   AgentTurnGadgetContext,
   DataAgentConversation,
@@ -94,6 +99,12 @@ type TurnInputsOptions = {
   datasets: readonly DataAgentDataset[];
   pageContext: AgentPageContext | undefined;
   turn: Readonly<DataAgentTurnOptions>;
+  /**
+   * `hosted` redacts SQL and masks names through the conversation's vault
+   * for a model off the device. `device` sends real values and names, as an
+   * offline model may read them, with SQL for at most three charts.
+   */
+  privacy: "hosted" | "device";
 };
 
 /** The SQL a gadget's charts filter with, empty strings left out. */
@@ -153,6 +164,7 @@ function _buildBlocks(
 ): AgentContextBlocks {
   const { gadgetContext } = options.turn;
   const { sqlVault } = options.conversation;
+  const isHosted = options.privacy === "hosted";
   const detectors = _createPageSqlDetectors(options.datasets);
   const isLoaded = gadgetContext?.contexts !== undefined;
   // The raw question, which still holds the ref tokens.
@@ -164,7 +176,9 @@ function _buildBlocks(
     return sqlVault.redact(sql, detectors);
   };
   // Every redaction happens before `buildAgentContextBlocks` masks a name.
-  _redactEarlierMentionSql(options.turn, question, redactSql);
+  if (isHosted) {
+    _redactEarlierMentionSql(options.turn, question, redactSql);
+  }
   return buildAgentContextBlocks({
     page: options.pageContext,
     attached: isLoaded ? gadgetContext.attachedRefs.map(toContext) : [],
@@ -173,15 +187,69 @@ function _buildBlocks(
       : [],
     aliases: SqlTableAlias.fromSchema({ datasets: options.datasets }),
     isSensitive: isPersonalDataText,
-    redactSql,
-    maskText: sqlVault.maskText,
+    redactSql: isHosted ? redactSql : undefined,
+    maskText: isHosted ? sqlVault.maskText : undefined,
+    maxSqlTiles: isHosted ? undefined : OFFLINE_SQL_TILE_BUDGET,
   });
 }
 
+/** The session the turn's dashboard cards belong to, when it is known. */
+function _cardIdentityOf(
+  turn: Readonly<DataAgentTurnOptions>,
+): AgentDashboardCardIdentity | undefined {
+  const userId = turn.currentUser?.id;
+  return userId && turn.sessionId
+    ? { workspaceId: turn.workspaceId, userId, sessionId: turn.sessionId }
+    : undefined;
+}
+
 /**
- * The turn's blocks, and the mention names masked with the same vault
- * after every block's SQL is redacted. When the gadgets failed to load,
- * a non-empty tray's attached block repeats last turn's, so the model reads
+ * One line per card the user resolved since the agent last heard, and a
+ * callback that marks them heard once the agent has replied.
+ */
+function _dashboardCardInputs(
+  turn: Readonly<DataAgentTurnOptions>,
+  mask: (text: string) => string,
+): Pick<AgentTurnInputs, "dashboardCardLines" | "onReplied"> {
+  const identity = _cardIdentityOf(turn);
+  if (!identity) {
+    return { dashboardCardLines: [] };
+  }
+  const unreported = AgentDashboardCardStore.listUnreported(identity);
+  return {
+    dashboardCardLines: unreported.map(({ status }) => {
+      return formatDashboardCardLine(
+        status.status === "confirmed"
+          ? {
+              kind: "confirmed",
+              dashboardName: status.dashboardName,
+              isUnsaved: status.isUnsaved,
+            }
+          : { kind: "cancelled" },
+        mask,
+      );
+    }),
+    onReplied: () => {
+      AgentDashboardCardStore.markReported(
+        identity,
+        unreported.map(({ cardId }) => {
+          return cardId;
+        }),
+      );
+    },
+  };
+}
+
+function _keepText(text: string): string {
+  return text;
+}
+
+/**
+ * The turn's blocks, the mention names, and the lines about dashboard cards
+ * the user resolved since the agent last heard. A `hosted` turn masks every
+ * name with the conversation's vault after every block's SQL is redacted. A
+ * `device` turn keeps real names. When the gadgets failed to load, a
+ * non-empty tray's attached block repeats last turn's, so the model reads
  * "unchanged", and every mention is named as unavailable.
  */
 export function buildAgentTurnInputs(
@@ -189,9 +257,11 @@ export function buildAgentTurnInputs(
 ): AgentTurnInputs {
   const { conversation } = options;
   const { gadgetContext } = options.turn;
+  const isHosted = options.privacy === "hosted";
+  const mask = isHosted ? conversation.sqlVault.maskText : _keepText;
   const blocks = _buildBlocks(options);
-  if (options.turn.titleMaskRef) {
-    options.turn.titleMaskRef.current = conversation.sqlVault.maskText;
+  if (isHosted && options.turn.titleMaskRef) {
+    options.turn.titleMaskRef.current = mask;
   }
   // A failed load with a tray repeats last turn's tray. With an empty tray
   // the attached block stays empty, so the model hears it was cleared.
@@ -204,13 +274,19 @@ export function buildAgentTurnInputs(
       ? { ...blocks, attachedBlock: conversation.lastAttachedBlock }
       : blocks,
     nameOf: (ref) => {
-      return buildAgentGadgetModelName(_contextOf(gadgetContext, ref), {
-        isSensitive: isPersonalDataText,
-        mask: conversation.sqlVault.maskText,
-      });
+      const context = _contextOf(gadgetContext, ref);
+      return isHosted
+        ? buildAgentGadgetModelName(context, {
+            isSensitive: isPersonalDataText,
+            mask,
+          })
+        : getAgentGadgetName(context);
     },
     // Called only once the blocks above have redacted every piece of the
     // turn's SQL, so the vault holds every value to mask.
-    maskAssistantText: conversation.sqlVault.maskText,
+    maskAssistantText: mask,
+    // Built after the blocks, so the vault holds every value a name could
+    // match.
+    ..._dashboardCardInputs(options.turn, mask),
   };
 }

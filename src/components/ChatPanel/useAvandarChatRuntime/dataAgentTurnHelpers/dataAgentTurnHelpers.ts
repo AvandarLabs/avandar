@@ -3,6 +3,7 @@ import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
@@ -19,6 +20,7 @@ import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClie
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatDashboardVizType } from "$/types/chat.types";
+import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type {
   AgentConversationState,
@@ -291,6 +293,10 @@ export type AgentTurnInputs = {
    * a fixed line.
    */
   maskAssistantText: (text: string) => string;
+  /** Lines about dashboard cards the user resolved, sent first. */
+  dashboardCardLines?: readonly string[];
+  /** Runs after the agent replied, to mark those cards heard. */
+  onReplied?: () => void;
 };
 
 type AskConversationDataAgentOptions = {
@@ -355,9 +361,11 @@ export async function askConversationDataAgent(
   }
   // A fresh list per turn: a stopped run's late results land in its own.
   const results: AgentQueryResultData[] = [];
+  const dashboardCards: AgentDashboardBlockData[] = [];
   conversation.turnRef.current = turn;
   conversation.results = results;
   conversation.resultsByTurn.push(results);
+  conversation.dashboardCards = dashboardCards;
   turn.chatPanelDispatch.setPendingClarification(undefined);
   options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
@@ -371,14 +379,17 @@ export async function askConversationDataAgent(
       attachedBlock: blocks.attachedBlock,
       previousAttachedBlock: conversation.lastAttachedBlock,
       mentionedBlock: blocks.mentionedBlock,
+      dashboardCardLines: inputs?.dashboardCardLines,
     }),
   );
+  inputs?.onReplied?.();
   conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
   conversation.lastAttachedBlock = blocks.attachedBlock;
   return {
     content: [
       { type: "text", text: reply.text },
       ...results.map(AgentQueryResult.toDataPart),
+      ...dashboardCards.map(AgentDashboardBlock.toDataPart),
     ],
   };
 }
