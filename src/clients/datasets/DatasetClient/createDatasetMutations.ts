@@ -7,7 +7,6 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { UserClient } from "@/clients/UserClient";
 import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ILogger } from "@avandar/logger";
@@ -231,16 +230,24 @@ function _makeInsertOpenDataDataset(
  * Throws unless the current user may delete the dataset. This is the same
  * rule as the `datasets` DELETE policy, so a delete that passes it cannot be
  * silently refused by row level security.
+ *
+ * The check goes through the platform-aware `serverApi`, never the webview's
+ * own Supabase client. On desktop that client holds no session (only the
+ * main process carries the access token), so its RPC would run as `anon`,
+ * which may not execute this function.
  */
 async function _assertCanDeleteDataset(
   options: Readonly<{ datasetId: Dataset.Id }>,
 ): Promise<void> {
   const { datasetId } = options;
-  const canDelete = await UserClient.canAccessResource({
-    resourceType: "dataset",
-    resourceId: datasetId,
-    minRole: "admin",
-  });
+  const canDelete = await serverApi.rpc<boolean | null>(
+    "util__auth_user_can_access_resource",
+    {
+      p_resource_type: "dataset",
+      p_resource_id: datasetId,
+      p_min_role: "admin",
+    },
+  );
   if (!canDelete) {
     throw new DatasetDeleteError({ datasetId, reason: "not_allowed" });
   }
@@ -249,7 +256,9 @@ async function _assertCanDeleteDataset(
 /**
  * Throws if the dataset row can still be read. The CRUD client's delete does
  * not report how many rows it removed, so a delete that row level security
- * refuses looks like a success until the row is read back.
+ * refuses looks like a success until the row is read back. On desktop the
+ * CRUD client reads and deletes the local SQLite mirror, which has no row
+ * level security, so there this read-back confirms only the local delete.
  */
 async function _assertDatasetRowGone(
   options: Readonly<{
@@ -303,6 +312,9 @@ function _makeFullDelete(
   return async (params) => {
     const logger = options.logger.appendName("fullDelete");
     logger.log("Deleting dataset", params);
+    // A row the user cannot read comes back undefined and skips Storage, so
+    // a user who may delete but not read it leaves the parquet behind. That
+    // is the long-standing behavior and loses no data.
     const dataset = await options.client.getById(params);
     if (dataset) {
       // Check access before touching Storage: the files go first, so a row
