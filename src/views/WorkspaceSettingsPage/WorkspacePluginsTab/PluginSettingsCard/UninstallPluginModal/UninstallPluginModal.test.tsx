@@ -66,7 +66,8 @@ vi.mock("@/utils/notifications/notify", () => {
 
 type UninstallOutcomeStub = {
   deletedDatasetIds: string[];
-  failedDatasetIds: string[];
+  refusedDatasetIds: string[];
+  incompleteDatasetIds: string[];
 };
 
 function _renderModal(): QueryClient {
@@ -121,7 +122,11 @@ describe("UninstallPluginModal", () => {
     mocks.hasDependents = true;
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: string[] }) => {
-        return { deletedDatasetIds: datasetIds, failedDatasetIds: [] };
+        return {
+          deletedDatasetIds: datasetIds,
+          refusedDatasetIds: [],
+          incompleteDatasetIds: [],
+        };
       },
     );
   });
@@ -349,7 +354,11 @@ describe("UninstallPluginModal", () => {
     });
 
     afterEach(async () => {
-      finish({ deletedDatasetIds: [], failedDatasetIds: [] });
+      finish({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [],
+      });
       await waitFor(() => {
         expect(mocks.onClose).toHaveBeenCalled();
       });

@@ -92,7 +92,8 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     ]);
     expect(outcome).toEqual({
       deletedDatasetIds: [PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID],
-      failedDatasetIds: [],
+      refusedDatasetIds: [],
+      incompleteDatasetIds: [],
     });
   });
 
@@ -155,12 +156,13 @@ describe("uninstallPluginAndDeleteDatasets", () => {
       expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
     });
 
-    it("returns that dataset as failed and the others as deleted", async () => {
+    it("returns that dataset as incomplete and the others as deleted", async () => {
       const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
 
       expect(outcome).toEqual({
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
-        failedDatasetIds: [PROVINCES_DATASET_ID],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [PROVINCES_DATASET_ID],
       });
     });
 
@@ -181,12 +183,13 @@ describe("uninstallPluginAndDeleteDatasets", () => {
       });
     });
 
-    it("is returned as failed while the others are still deleted", async () => {
+    it("is returned as refused while the others are still deleted", async () => {
       const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
 
       expect(outcome).toEqual({
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
-        failedDatasetIds: [PROVINCES_DATASET_ID],
+        refusedDatasetIds: [PROVINCES_DATASET_ID],
+        incompleteDatasetIds: [],
       });
       expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
     });
@@ -213,19 +216,26 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         }),
       );
       // A re-read would find nothing, so only the error's own reason can
-      // make the dataset count as failed.
+      // make the dataset count as incomplete.
       mocks.getDatasetById
         .mockResolvedValueOnce({ id: PROVINCES_DATASET_ID })
         .mockResolvedValue(undefined);
     });
 
-    it("returns the dataset as failed", async () => {
+    it("returns the dataset as incomplete, since its files may be gone", async () => {
       const outcome = await _run([PROVINCES_DATASET_ID]);
 
       expect(outcome).toEqual({
         deletedDatasetIds: [],
-        failedDatasetIds: [PROVINCES_DATASET_ID],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [PROVINCES_DATASET_ID],
       });
+    });
+
+    it("logs the error", async () => {
+      await _run([PROVINCES_DATASET_ID]);
+
+      expect(mocks.loggerError).toHaveBeenCalledTimes(1);
     });
 
     it("does not read the dataset again", async () => {
@@ -249,7 +259,8 @@ describe("uninstallPluginAndDeleteDatasets", () => {
 
       expect(outcome).toEqual({
         deletedDatasetIds: [PROVINCES_DATASET_ID],
-        failedDatasetIds: [],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [],
       });
     });
 
@@ -263,7 +274,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
       expect(mocks.loggerError).toHaveBeenCalledTimes(1);
     });
 
-    it("counts the dataset as failed when reading it back throws", async () => {
+    it("counts the dataset as incomplete when reading it back throws, since it may be gone", async () => {
       mocks.getDatasetById
         .mockResolvedValueOnce({ id: PROVINCES_DATASET_ID })
         .mockRejectedValueOnce(new Error("network down"));
@@ -272,7 +283,8 @@ describe("uninstallPluginAndDeleteDatasets", () => {
 
       expect(outcome).toEqual({
         deletedDatasetIds: [],
-        failedDatasetIds: [PROVINCES_DATASET_ID],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [PROVINCES_DATASET_ID],
       });
     });
   });
@@ -286,12 +298,13 @@ describe("uninstallPluginAndDeleteDatasets", () => {
       );
     });
 
-    it("is neither deleted nor reported as failed", async () => {
+    it("is left out of every list of the outcome", async () => {
       const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
 
       expect(outcome).toEqual({
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
-        failedDatasetIds: [],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [],
       });
     });
 
@@ -320,7 +333,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     ]);
   });
 
-  it("returns a dataset as failed without deleting it when reading it first throws", async () => {
+  it("returns a dataset as incomplete without deleting it when reading it first throws", async () => {
     mocks.getDatasetById.mockRejectedValueOnce(new Error("network down"));
 
     const outcome = await _run([PROVINCES_DATASET_ID]);
@@ -328,7 +341,8 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     expect(mocks.fullDelete).not.toHaveBeenCalled();
     expect(outcome).toEqual({
       deletedDatasetIds: [],
-      failedDatasetIds: [PROVINCES_DATASET_ID],
+      refusedDatasetIds: [],
+      incompleteDatasetIds: [PROVINCES_DATASET_ID],
     });
     expect(mocks.loggerError).toHaveBeenCalledTimes(1);
   });

@@ -95,7 +95,11 @@ describe("useRunUninstall", () => {
     loggerError.mockImplementation(() => {});
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: Dataset.Id[] }) => {
-        return { deletedDatasetIds: datasetIds, failedDatasetIds: [] };
+        return {
+          deletedDatasetIds: datasetIds,
+          refusedDatasetIds: [],
+          incompleteDatasetIds: [],
+        };
       },
     );
   });
@@ -111,26 +115,81 @@ describe("useRunUninstall", () => {
     });
   });
 
-  it("warns with the names of the datasets it could not delete", async () => {
-    mocks.uninstall.mockResolvedValue({
-      deletedDatasetIds: [],
-      failedDatasetIds: [DISTRICTS_ID],
+  describe("when some datasets were not deleted", () => {
+    const REFUSED_SENTENCE =
+      "These datasets were not deleted because you can't delete them, and they are still in Data Sources: Mozambique districts";
+    const INCOMPLETE_SENTENCE =
+      "These datasets could not be fully deleted. Their data may already be gone. Check them in Data Sources and delete them again: Mozambique provinces";
+
+    it("names a dataset the user may not delete and says it is still in Data Sources", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [DISTRICTS_ID],
+        incompleteDatasetIds: [],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([DISTRICTS_ID]);
+
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: REFUSED_SENTENCE,
+      });
     });
-    const { run } = _renderRunUninstall();
 
-    await run([DISTRICTS_ID]);
+    it("names a dataset whose delete did not finish and says its data may be gone", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [PROVINCES_ID],
+      });
+      const { run } = _renderRunUninstall();
 
-    expect(mocks.notifyWarning).toHaveBeenCalledWith({
-      title: "Mozambique uninstalled",
-      message:
-        "These datasets could not be deleted and are still in Data Sources: Mozambique districts",
+      await run([PROVINCES_ID]);
+
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: INCOMPLETE_SENTENCE,
+      });
+    });
+
+    it("shows both sentences in one warning when both kinds are present", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [DISTRICTS_ID],
+        incompleteDatasetIds: [PROVINCES_ID],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([DISTRICTS_ID, PROVINCES_ID]);
+
+      expect(mocks.notifyWarning).toHaveBeenCalledTimes(1);
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: `${INCOMPLETE_SENTENCE} ${REFUSED_SENTENCE}`,
+      });
+    });
+
+    it("warns instead of reporting success when other datasets were deleted", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [DISTRICTS_ID],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [PROVINCES_ID],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([DISTRICTS_ID, PROVINCES_ID]);
+
+      expect(mocks.notifySuccess).not.toHaveBeenCalled();
+      expect(mocks.notifyWarning).toHaveBeenCalledTimes(1);
     });
   });
 
   it("does not count a checked dataset that was already gone as deleted", async () => {
     mocks.uninstall.mockResolvedValue({
       deletedDatasetIds: [],
-      failedDatasetIds: [],
+      refusedDatasetIds: [],
+      incompleteDatasetIds: [],
     });
     const { run } = _renderRunUninstall();
 

@@ -23,9 +23,28 @@ import type { QueryClient } from "@tanstack/react-query";
 type UninstallSummary = {
   deletedCount: number;
 
-  /** The names of the chosen datasets that could not be deleted. */
-  failedNames: string[];
+  /** The names of the chosen datasets the user may not delete. */
+  refusedNames: string[];
+
+  /** The names of the chosen datasets whose delete did not finish. */
+  incompleteNames: string[];
 };
+
+/** Lists the names of the rows whose dataset id is in `datasetIds`. */
+function _listRowNames(
+  options: Readonly<{
+    rows: readonly UninstallContentRow[];
+    datasetIds: readonly Dataset.Id[];
+  }>,
+): string[] {
+  return options.rows
+    .filter((row) => {
+      return options.datasetIds.includes(row.datasetId);
+    })
+    .map((row) => {
+      return row.name;
+    });
+}
 
 /**
  * Refreshes every list an uninstall can change, such as Data Sources, and
@@ -75,20 +94,20 @@ async function _uninstallAndRefresh(
 ): Promise<UninstallSummary> {
   const { datasetIds, rows } = options;
   try {
-    const { deletedDatasetIds, failedDatasetIds } =
-      await uninstallPluginAndDeleteDatasets({
-        installationId: options.installationId,
-        datasetIds,
-      });
+    const outcome = await uninstallPluginAndDeleteDatasets({
+      installationId: options.installationId,
+      datasetIds,
+    });
     return {
-      deletedCount: deletedDatasetIds.length,
-      failedNames: rows
-        .filter((row) => {
-          return failedDatasetIds.includes(row.datasetId);
-        })
-        .map((row) => {
-          return row.name;
-        }),
+      deletedCount: outcome.deletedDatasetIds.length,
+      refusedNames: _listRowNames({
+        rows,
+        datasetIds: outcome.refusedDatasetIds,
+      }),
+      incompleteNames: _listRowNames({
+        rows,
+        datasetIds: outcome.incompleteDatasetIds,
+      }),
     };
   } finally {
     // Also after a failure: the install row may be gone even when the check
@@ -97,21 +116,35 @@ async function _uninstallAndRefresh(
   }
 }
 
-/** Says how the uninstall went, naming any dataset it could not delete. */
+/**
+ * Says how the uninstall went. A dataset the user may not delete and a
+ * dataset whose delete did not finish each get their own sentence, and both
+ * go in one warning when both happen, so no failure hides behind a success.
+ */
 function useNotifyUninstallOutcome(
   pluginName: string,
 ): (summary: UninstallSummary) => void {
   const { t, i18n } = useLingui();
-  return ({ deletedCount, failedNames }) => {
+  return ({ deletedCount, refusedNames, incompleteNames }) => {
     const title = t`${pluginName} uninstalled`;
-    if (failedNames.length > 0) {
-      const names = new Intl.ListFormat(i18n.locale, {
-        type: "conjunction",
-      }).format(failedNames);
-      notifyWarning({
-        title,
-        message: t`These datasets could not be deleted and are still in Data Sources: ${names}`,
-      });
+    const listFormat = new Intl.ListFormat(i18n.locale, {
+      type: "conjunction",
+    });
+    const warnings: string[] = [];
+    if (incompleteNames.length > 0) {
+      const incompleteList = listFormat.format(incompleteNames);
+      warnings.push(
+        t`These datasets could not be fully deleted. Their data may already be gone. Check them in Data Sources and delete them again: ${incompleteList}`,
+      );
+    }
+    if (refusedNames.length > 0) {
+      const refusedList = listFormat.format(refusedNames);
+      warnings.push(
+        t`These datasets were not deleted because you can't delete them, and they are still in Data Sources: ${refusedList}`,
+      );
+    }
+    if (warnings.length > 0) {
+      notifyWarning({ title, message: warnings.join(" ") });
       return;
     }
     if (deletedCount === 0) {
