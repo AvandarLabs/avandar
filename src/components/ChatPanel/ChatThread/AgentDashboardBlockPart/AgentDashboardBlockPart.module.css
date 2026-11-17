@@ -1,0 +1,15 @@
+/* Sits under the reply like a result card. */
+.root {
+  margin-block-start: var(--mantine-spacing-sm);
+}
+
+/* Preview, choices, and actions. */
+.body {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm)
+    var(--mantine-spacing-sm);
+}
+
+/* The chart preview's fixed height, as the result card uses. */
+.preview {
+  block-size: calc(220px * var(--mantine-scale));
+}
