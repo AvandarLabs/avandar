@@ -24,6 +24,12 @@ export type ImportedPluginContent = Readonly<{
   isError: boolean;
 
   /**
+   * True when the last request failed and no retry is in flight, so the
+   * failure can be shown as final. It is false again while `refetch` runs.
+   */
+  hasFailed: boolean;
+
+  /**
    * Asks for the imports again, for example from a Retry button after
    * `isError`. `isFetching` is true until the request settles.
    */
@@ -60,6 +66,7 @@ export function useImportedPluginContent(
     isLoading,
     isFetching: query.isFetching,
     isError: query.isError,
+    hasFailed: query.isError && !query.isFetching,
     refetch: () => {
       void query.refetch();
     },

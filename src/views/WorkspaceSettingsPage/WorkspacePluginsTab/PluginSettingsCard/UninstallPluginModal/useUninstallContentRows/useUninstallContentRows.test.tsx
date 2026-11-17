@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => {
 });
 
 vi.mock(
-  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent",
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent/useImportedPluginContent",
   () => {
     return {
       useImportedPluginContent: () => {
@@ -29,6 +29,7 @@ vi.mock(
           isLoading: false,
           isFetching: mocks.isFetchingImports,
           isError: mocks.isErrorImports,
+          hasFailed: mocks.isErrorImports && !mocks.isFetchingImports,
           refetch: mocks.refetchImports,
         };
       },
@@ -176,6 +177,7 @@ describe("useUninstallContentRows", () => {
       expect(result.current.isLoading).toBe(false);
     });
     expect(result.current.hasFailed).toBe(false);
+    expect(result.current.isRetrying).toBe(false);
   });
 
   it("has failed when an access check fails, listing no row from the other answers", async () => {
@@ -273,20 +275,86 @@ describe("useUninstallContentRows", () => {
   });
 
   it.each([
-    ["imports", { isErrorImports: true, isFetchingImports: true }],
-    ["datasets", { isErrorDatasets: true, isFetchingDatasets: true }],
+    ["imports", "isErrorImports", "isFetchingImports"],
+    ["datasets", "isErrorDatasets", "isFetchingDatasets"],
   ] as const)(
     "is loading, not failed, while a failed %s lookup is retried",
-    async (_label, state) => {
-      Object.assign(mocks, state);
-
-      const { result } = _renderRows();
+    async (_label, errorFlag, fetchingFlag) => {
+      mocks[errorFlag] = true;
+      const { result, rerender } = _renderRows();
       await _flush();
+      expect(result.current.hasFailed).toBe(true);
+
+      // A query with no data drops its error as soon as the retry starts.
+      mocks[errorFlag] = false;
+      mocks[fetchingFlag] = true;
+      rerender();
 
       expect(result.current.hasFailed).toBe(false);
+      expect(result.current.isRetrying).toBe(true);
       expect(result.current.isLoading).toBe(true);
+      expect(result.current.rows).toEqual([]);
     },
   );
+
+  it("keeps the failure retrying, not failed, when a retried query keeps its error", async () => {
+    mocks.isErrorDatasets = true;
+    const { result, rerender } = _renderRows();
+    await _flush();
+
+    mocks.isFetchingDatasets = true;
+    rerender();
+
+    expect(result.current.hasFailed).toBe(false);
+    expect(result.current.isRetrying).toBe(true);
+  });
+
+  it("is not retrying while a first load is in flight", async () => {
+    mocks.isFetchingDatasets = true;
+
+    const { result } = _renderRows();
+    await _flush();
+
+    expect(result.current.isRetrying).toBe(false);
+  });
+
+  it("is loading, not failed, while a failed access check is retried", async () => {
+    mocks.canAccessResource.mockRejectedValue(new Error("rpc failed"));
+    const { result } = _renderRows();
+    await waitFor(() => {
+      expect(result.current.hasFailed).toBe(true);
+    });
+    mocks.canAccessResource.mockImplementation(() => {
+      return new Promise(() => {});
+    });
+
+    act(() => {
+      result.current.retry();
+    });
+
+    await waitFor(() => {
+      expect(result.current.isRetrying).toBe(true);
+    });
+    expect(result.current.hasFailed).toBe(false);
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.rows).toEqual([]);
+  });
+
+  it("lists nothing and asks for no datasets while a restored imports list refetches", async () => {
+    mocks.isFetchingImports = true;
+
+    const { result } = _renderRows();
+    await _flush();
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isRetrying).toBe(false);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.hiddenCount).toBe(0);
+    expect(mocks.datasetsArgs).toMatchObject({
+      useQueryOptions: { enabled: false },
+    });
+    expect(mocks.canAccessResource).not.toHaveBeenCalled();
+  });
 
   it("retries only the dataset lookup when that is what failed", async () => {
     mocks.isErrorDatasets = true;

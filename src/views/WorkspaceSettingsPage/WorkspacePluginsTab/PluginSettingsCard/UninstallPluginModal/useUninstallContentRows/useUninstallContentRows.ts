@@ -2,7 +2,8 @@ import { useQueries } from "@tanstack/react-query";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { UserClient } from "@/clients/UserClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
-import { useImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent";
+import { useImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent/useImportedPluginContent";
+import { useLookupState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/useLookupState/useLookupState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /** One imported dataset as the uninstall modal lists it. */
@@ -32,9 +33,37 @@ export type UninstallContentRows = {
    */
   hasFailed: boolean;
 
+  /**
+   * True while a retry of a failed lookup is in flight. `hasFailed` is false
+   * then, `rows` is still empty, and `isLoading` is true.
+   */
+  isRetrying: boolean;
+
   /** Asks again for whatever failed. `isLoading` is true until it settles. */
   retry: () => void;
 };
+
+/**
+ * The query that asks whether the user may delete one dataset. The answer is
+ * asked again each time the modal opens: `persist: false` keeps it out of
+ * the IndexedDB cache, and a zero `gcTime` drops it from memory once the
+ * modal closes.
+ */
+function _createAccessQuery(datasetId: Dataset.Id) {
+  return {
+    queryKey: ["plugins", "uninstall", "canDeleteDataset", datasetId],
+    queryFn: () => {
+      return UserClient.canAccessResource({
+        resourceType: "dataset",
+        resourceId: datasetId,
+        minRole: "admin",
+      });
+    },
+    staleTime: 0,
+    gcTime: 0,
+    meta: { persist: false },
+  };
+}
 
 /**
  * Whether the user may delete each dataset, by the same rule as the
@@ -49,26 +78,7 @@ function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
   hasFailed: boolean;
   retry: () => void;
 } {
-  const results = useQueries({
-    queries: datasetIds.map((datasetId) => {
-      return {
-        queryKey: ["plugins", "uninstall", "canDeleteDataset", datasetId],
-        queryFn: () => {
-          return UserClient.canAccessResource({
-            resourceType: "dataset",
-            resourceId: datasetId,
-            minRole: "admin",
-          });
-        },
-        // An access answer must be asked again each time the modal opens.
-        // `persist: false` keeps it out of the IndexedDB cache, and a zero
-        // `gcTime` drops it from memory once the modal closes.
-        staleTime: 0,
-        gcTime: 0,
-        meta: { persist: false },
-      };
-    }),
-  });
+  const results = useQueries({ queries: datasetIds.map(_createAccessQuery) });
   const failedResults = results.filter((result) => {
     return result.isError && !result.isFetching;
   });
@@ -124,10 +134,7 @@ function useReadableDatasets(importedIds: readonly Dataset.Id[]): {
   const hasImports = importedIds.length > 0;
   const [datasets, , query] = DatasetClient.useGetAll({
     where: { id: { in: [...importedIds] } },
-    useQueryOptions: {
-      ...ALWAYS_REFETCH_ON_MOUNT,
-      enabled: hasImports,
-    },
+    useQueryOptions: { ...ALWAYS_REFETCH_ON_MOUNT, enabled: hasImports },
   });
   const isFetching = hasImports && query.isFetching;
   const hasFailed = hasImports && query.isError && !query.isFetching;
@@ -146,9 +153,9 @@ function useReadableDatasets(importedIds: readonly Dataset.Id[]): {
 /**
  * The datasets a plugin imported into the current workspace, named as they
  * are now, with whether the current user may delete each one. Imports whose
- * dataset the user cannot read are only counted. When a lookup fails, it
- * reports `hasFailed` and lists nothing, so a failure is never shown as a
- * dataset the user cannot see.
+ * dataset the user cannot read are only counted. While any lookup is in
+ * flight it lists nothing. When one fails, it reports `hasFailed` and lists
+ * nothing, so a failure is never shown as a dataset the user cannot see.
  *
  * `UninstallPluginModal` uses it to list the imported datasets an admin can
  * choose to keep or delete.
@@ -157,38 +164,43 @@ export function useUninstallContentRows(
   pluginId: string,
 ): UninstallContentRows {
   const imported = useImportedPluginContent(pluginId);
-  // After a failed lookup the imports are a restored list that may be stale,
-  // so none of them is asked about.
-  const importedIds = imported.isError
-    ? []
-    : Object.values(imported.importsByContentId).map((contentImport) => {
-        return contentImport.datasetId;
-      });
+  // A restored imports list may be stale while it refetches, and after a
+  // failed lookup it cannot be trusted, so none of it is asked about.
+  const importedIds =
+    imported.isFetching || imported.isError
+      ? []
+      : Object.values(imported.importsByContentId).map((contentImport) => {
+          return contentImport.datasetId;
+        });
   const datasets = useReadableDatasets(importedIds);
   const access = useCanDeleteByDatasetId(
     datasets.readable.map((dataset) => {
       return dataset.id;
     }),
   );
-  const hasFailedImports = imported.isError && !imported.isFetching;
   const hasFailed =
-    hasFailedImports || datasets.hasFailed || access.hasFailed;
+    imported.hasFailed || datasets.hasFailed || access.hasFailed;
+  const isLoading =
+    imported.isLoading ||
+    imported.isFetching ||
+    datasets.isFetching ||
+    access.isLoading;
+  // A failure shown to the admin must stay until its retry settles.
+  const lookupState = useLookupState({ hasFailed, isLoading });
+  const canList = lookupState === "ok";
   return {
-    rows: hasFailed
-      ? []
-      : _createRowsFromDatasets(datasets.readable, access.canDeleteById),
+    rows: canList
+      ? _createRowsFromDatasets(datasets.readable, access.canDeleteById)
+      : [],
     hiddenCount:
-      hasFailed || datasets.isFetching
-        ? 0
-        : importedIds.length - datasets.readable.length,
-    isLoading:
-      imported.isLoading ||
-      (imported.isError && imported.isFetching) ||
-      datasets.isFetching ||
-      access.isLoading,
+      canList && !datasets.isFetching
+        ? importedIds.length - datasets.readable.length
+        : 0,
+    isLoading,
     hasFailed,
+    isRetrying: lookupState === "retrying",
     retry: () => {
-      if (hasFailedImports) {
+      if (imported.hasFailed) {
         imported.refetch();
       }
       datasets.retry();
