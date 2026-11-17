@@ -1011,6 +1011,12 @@ Sources can be deleted there. A checked dataset lists the linked datasets and
 the other plugins that use it, each as "<slot title> in the <plugin name>
 plugin".
 
+When the card cannot check whether the plugin imported datasets, it says so
+with a Retry button, and Uninstall confirms an uninstall that keeps every
+dataset. When the dialog cannot load the datasets, it shows the same kind of
+error with Retry, and its confirm button reads "Uninstall and keep all
+datasets".
+
 Bundled data needs attribution recorded with it. Credit its source and license
 in the description, because that is where workspace members see where the data
 came from, and set the manifest's `license` and `package.json`'s `license` to
