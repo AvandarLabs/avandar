@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { Loader, Stack, Text, Title } from "@mantine/core";
+import { Loader, Stack, Title } from "@mantine/core";
 import { useId } from "react";
-import { PluginLookupErrorCallout } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginLookupErrorCallout";
-import { UninstallContentList } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentList";
+import { UninstallContentChoices } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentChoices";
+import { UninstallContentFailure } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure";
+import type { LookupState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/useLookupState/useLookupState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { UninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
@@ -15,12 +16,19 @@ type Props = Readonly<{
   onIsCheckedChange: (datasetId: Dataset.Id, isChecked: boolean) => void;
 }>;
 
+/** Where the dataset lookups stand, as the failure alert needs it. */
+function _buildLookupState(content: UninstallContentRows): LookupState {
+  if (content.hasFailed) {
+    return "failed";
+  }
+  return content.isRetrying ? "retrying" : "ok";
+}
+
 /**
  * The "Datasets it imported" part of the uninstall modal: a heading, then a
- * loader while the datasets load or the list of them. The list and the note
- * that unchecked datasets stay are left out when there is nothing to choose.
- * When the datasets could not be loaded, an alert with a Retry replaces the
- * list, and the note says every dataset stays.
+ * loader while the datasets load, or the list of them. When the datasets
+ * could not be loaded, an alert with a Retry replaces the list, and a note
+ * says every dataset stays.
  */
 export function UninstallContentSection({
   content,
@@ -31,46 +39,24 @@ export function UninstallContentSection({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const headingId = useId();
-  const { rows, hiddenCount, isLoading, hasFailed, retry } = content;
-  const hasListedContent = rows.length > 0 || hiddenCount > 0;
-  const canDeleteAny = rows.some((row) => {
-    return row.canDelete;
-  });
+  const lookupState = _buildLookupState(content);
+  const isShowingChoices = !content.isLoading && lookupState === "ok";
   return (
     <Stack gap="md">
       {/* Order 3 nests this under the modal's order 2 title. */}
       <Title id={headingId} order={3} size="h6">
         {t`Datasets it imported`}
       </Title>
-      {isLoading ? (
+      <UninstallContentFailure state={lookupState} onRetry={content.retry} />
+      {content.isLoading && lookupState === "ok" ? (
         <Loader size="sm" role="status" aria-label={t`Loading datasets`} />
       ) : null}
-      {!isLoading && hasFailed ? (
-        <>
-          <PluginLookupErrorCallout
-            message={t`We could not load the datasets this plugin imported.`}
-            onRetry={retry}
-          />
-          <Text size="sm" c="dimmed">
-            {t`Every dataset it imported stays in Data Sources.`}
-          </Text>
-        </>
-      ) : null}
-      {!isLoading && !hasFailed && hasListedContent ? (
-        <UninstallContentList
-          rows={rows}
-          hiddenCount={hiddenCount}
-          installationId={installationId}
-          checkedIds={checkedIds}
-          isDisabled={isDisabled}
+      {isShowingChoices ? (
+        <UninstallContentChoices
+          {...{ content, installationId, checkedIds, isDisabled }}
           onIsCheckedChange={onIsCheckedChange}
           labelId={headingId}
         />
-      ) : null}
-      {!isLoading && !hasFailed && canDeleteAny ? (
-        <Text size="sm" c="dimmed">
-          {t`Unchecked datasets stay in Data Sources.`}
-        </Text>
       ) : null}
     </Stack>
   );

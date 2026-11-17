@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { PluginActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions";
+import type { ImportedDatasetsState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 
@@ -25,17 +26,13 @@ function _makeActions(
 function _renderActions(options: {
   status: PluginInstallStatus;
   canManage?: boolean;
-  hasImportedDatasets?: boolean;
-  isLookingUpImportedDatasets?: boolean;
-  hasFailedImportedDatasetsLookup?: boolean;
+  importedDatasets?: ImportedDatasetsState;
   actions?: PluginInstallationActions;
 }): void {
   const {
     status,
     canManage = true,
-    hasImportedDatasets = false,
-    isLookingUpImportedDatasets = false,
-    hasFailedImportedDatasetsLookup = false,
+    importedDatasets = "none",
     actions = _makeActions(),
   } = options;
   render(
@@ -46,9 +43,7 @@ function _renderActions(options: {
         pluginName="Epidemiology"
         headingId={HEADING_ID}
         canManage={canManage}
-        hasImportedDatasets={hasImportedDatasets}
-        isLookingUpImportedDatasets={isLookingUpImportedDatasets}
-        hasFailedImportedDatasetsLookup={hasFailedImportedDatasetsLookup}
+        importedDatasets={importedDatasets}
         actions={actions}
       />
     </ModalsProvider>,
@@ -125,7 +120,7 @@ describe("PluginActions", () => {
   });
 
   it("keeps the one-line uninstall confirm for a plugin with no imported datasets", async () => {
-    _renderActions({ status: "installed", hasImportedDatasets: false });
+    _renderActions({ status: "installed", importedDatasets: "none" });
 
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
 
@@ -138,7 +133,7 @@ describe("PluginActions", () => {
 
   it("opens the uninstall modal without a confirm first when the plugin imported datasets", () => {
     const actions = _makeActions();
-    _renderActions({ status: "installed", hasImportedDatasets: true, actions });
+    _renderActions({ status: "installed", importedDatasets: "some", actions });
 
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
 
@@ -151,7 +146,7 @@ describe("PluginActions", () => {
     const actions = _makeActions();
     _renderActions({
       status: "unavailable",
-      hasImportedDatasets: true,
+      importedDatasets: "some",
       actions,
     });
 
@@ -161,7 +156,7 @@ describe("PluginActions", () => {
   });
 
   it("waits for the imported datasets to load before Uninstall can be clicked", () => {
-    _renderActions({ status: "installed", isLookingUpImportedDatasets: true });
+    _renderActions({ status: "installed", importedDatasets: "loading" });
 
     expect(screen.getByRole("button", { name: "Uninstall" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Disable" })).toBeEnabled();
@@ -171,8 +166,7 @@ describe("PluginActions", () => {
     const actions = _makeActions();
     _renderActions({
       status: "installed",
-      hasImportedDatasets: true,
-      hasFailedImportedDatasetsLookup: true,
+      importedDatasets: "failed",
       actions,
     });
 
@@ -183,7 +177,10 @@ describe("PluginActions", () => {
       "Its features are removed from this workspace.",
     );
     expect(dialog).toHaveTextContent(
-      "We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.",
+      "We could not check for datasets this plugin imported.",
+    );
+    expect(dialog).toHaveTextContent(
+      "If you uninstall it now, every dataset it imported is kept.",
     );
     expect(actions.uninstallWithImportedDatasets).not.toHaveBeenCalled();
     await _confirmInDialog("Uninstall");
@@ -193,7 +190,7 @@ describe("PluginActions", () => {
   it("adds no kept-datasets sentence to the confirm of another action when the lookup failed", async () => {
     _renderActions({
       status: "installed",
-      hasFailedImportedDatasetsLookup: true,
+      importedDatasets: "failed",
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Disable" }));

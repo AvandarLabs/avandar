@@ -2,7 +2,11 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { usePluginActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
-import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type {
+  ConfirmedPluginActionKind,
+  ImportedDatasetsState,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type { UninstallActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 import type { ButtonProps } from "@mantine/core";
 
@@ -14,20 +18,12 @@ type Props = Readonly<{
   headingId: string;
   isDisabled: boolean;
 
-  /** Whether the plugin imported datasets into this workspace. */
-  hasImportedDatasets: boolean;
-
   /**
-   * True while the card loads or refetches whether the plugin imported
-   * datasets. Uninstall stays disabled until the lookup settles.
+   * What the card knows about the datasets the plugin imported. Uninstall is
+   * disabled while it loads, opens the uninstall modal when there are some,
+   * and confirms an uninstall that keeps every dataset when the lookup failed.
    */
-  isLookingUpImportedDatasets: boolean;
-
-  /**
-   * True when that lookup failed. Uninstall then asks for a plain confirm
-   * that says every dataset is kept, whatever `hasImportedDatasets` says.
-   */
-  hasFailedImportedDatasetsLookup: boolean;
+  importedDatasets: ImportedDatasetsState;
   actions: PluginInstallationActions;
 }>;
 
@@ -57,6 +53,28 @@ function _makeOnConfirmByKind(
   };
 }
 
+/** The sentences Uninstall adds when the datasets could not be looked up. */
+function _listLookupFailedNotes(copy: UninstallActionCopy): string[] {
+  return [copy.lookupFailedProblem, copy.lookupFailedOutcome];
+}
+
+/** The paragraphs of a confirmation: its body, then any extra notes. */
+function ConfirmParagraphs({
+  paragraphs,
+}: Readonly<{ paragraphs: readonly string[] }>): JSX.Element {
+  return (
+    <Stack gap="xs">
+      {paragraphs.map((paragraph) => {
+        return (
+          <Text key={paragraph} size="sm">
+            {paragraph}
+          </Text>
+        );
+      })}
+    </Stack>
+  );
+}
+
 /**
  * One action button on a plugin's settings card. Clicking it opens a
  * confirmation, and the action runs only once the user confirms, because
@@ -70,39 +88,32 @@ export function PluginActionButton({
   pluginName,
   headingId,
   isDisabled,
-  hasImportedDatasets,
-  isLookingUpImportedDatasets,
-  hasFailedImportedDatasetsLookup,
+  importedDatasets,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const copy = usePluginActionCopy({ pluginName })[kind];
+  const copies = usePluginActionCopy({ pluginName });
+  const copy = copies[kind];
   const isUninstall = kind === "uninstall";
-  const isUninstallWithDatasets =
-    isUninstall && hasImportedDatasets && !hasFailedImportedDatasetsLookup;
-  const shouldNoteKeptDatasets = isUninstall && hasFailedImportedDatasetsLookup;
   const style = STYLE_BY_KIND[kind];
+  const paragraphs =
+    isUninstall && importedDatasets === "failed"
+      ? [copy.confirmBody, ..._listLookupFailedNotes(copies.uninstall)]
+      : [copy.confirmBody];
   return (
     <Button
       size="compact-sm"
       {...style}
       aria-describedby={headingId}
-      disabled={isDisabled || (isUninstall && isLookingUpImportedDatasets)}
+      disabled={isDisabled || (isUninstall && importedDatasets === "loading")}
       onClick={() => {
-        if (isUninstallWithDatasets) {
+        if (isUninstall && importedDatasets === "some") {
           actions.uninstallWithImportedDatasets();
           return;
         }
         modals.openConfirmModal({
           title: copy.confirmTitle,
-          children: (
-            <Stack gap="xs">
-              <Text size="sm">{copy.confirmBody}</Text>
-              {shouldNoteKeptDatasets ? (
-                <Text size="sm">{copy.datasetLookupFailedNote}</Text>
-              ) : null}
-            </Stack>
-          ),
+          children: <ConfirmParagraphs paragraphs={paragraphs} />,
           labels: { confirm: copy.confirmLabel, cancel: t`Cancel` },
           confirmProps: { color: style.color },
           onConfirm: _makeOnConfirmByKind(actions)[kind],

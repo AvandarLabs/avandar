@@ -7,13 +7,18 @@ export type PluginActionCopy = Readonly<{
   confirmTitle: string;
   confirmBody: string;
   confirmLabel: string;
-
-  /**
-   * A second paragraph for the confirmation, for an uninstall that cannot
-   * tell whether the plugin imported datasets. Only Uninstall has one.
-   */
-  datasetLookupFailedNote?: string;
 }>;
+
+/**
+ * The words of Uninstall. When the lookup of the datasets the plugin imported
+ * failed, its confirmation adds these two sentences, one per paragraph: what
+ * could not be checked, and that every dataset is kept.
+ */
+export type UninstallActionCopy = PluginActionCopy &
+  Readonly<{
+    lookupFailedProblem: string;
+    lookupFailedOutcome: string;
+  }>;
 
 /**
  * The translated button label and confirmation text of every plugin action
@@ -24,7 +29,8 @@ export type PluginActionCopy = Readonly<{
  */
 export function usePluginActionCopy(options: {
   pluginName: string;
-}): Record<ConfirmedPluginActionKind, PluginActionCopy> {
+}): Record<Exclude<ConfirmedPluginActionKind, "uninstall">, PluginActionCopy> &
+  Record<"uninstall", UninstallActionCopy> {
   const { pluginName } = options;
   const { t } = useLingui();
   return {
@@ -51,7 +57,8 @@ export function usePluginActionCopy(options: {
       confirmTitle: t`Uninstall ${pluginName}?`,
       confirmBody: t`Its features are removed from this workspace.`,
       confirmLabel: t`Uninstall`,
-      datasetLookupFailedNote: t`We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.`,
+      lookupFailedProblem: t`We could not check for datasets this plugin imported.`,
+      lookupFailedOutcome: t`If you uninstall it now, every dataset it imported is kept.`,
     },
   };
 }

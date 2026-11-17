@@ -264,16 +264,6 @@ describe("useUninstallContentRows", () => {
     expect(mocks.canAccessResource).not.toHaveBeenCalled();
   });
 
-  it("asks for no datasets when the imports lookup failed, since its list is stale", () => {
-    mocks.isErrorImports = true;
-
-    _renderRows();
-
-    expect(mocks.datasetsArgs).toMatchObject({
-      useQueryOptions: { enabled: false },
-    });
-  });
-
   it.each([
     ["imports", "isErrorImports", "isFetchingImports"],
     ["datasets", "isErrorDatasets", "isFetchingDatasets"],
@@ -340,7 +330,7 @@ describe("useUninstallContentRows", () => {
     expect(result.current.rows).toEqual([]);
   });
 
-  it("lists nothing and asks for no datasets while a restored imports list refetches", async () => {
+  it("lists nothing and checks no access while a restored imports list refetches", async () => {
     mocks.isFetchingImports = true;
 
     const { result } = _renderRows();
@@ -350,9 +340,6 @@ describe("useUninstallContentRows", () => {
     expect(result.current.isRetrying).toBe(false);
     expect(result.current.rows).toEqual([]);
     expect(result.current.hiddenCount).toBe(0);
-    expect(mocks.datasetsArgs).toMatchObject({
-      useQueryOptions: { enabled: false },
-    });
     expect(mocks.canAccessResource).not.toHaveBeenCalled();
   });
 

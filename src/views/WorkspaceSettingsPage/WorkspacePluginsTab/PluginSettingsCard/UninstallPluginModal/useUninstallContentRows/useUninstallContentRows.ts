@@ -4,6 +4,7 @@ import { UserClient } from "@/clients/UserClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent/useImportedPluginContent";
 import { useLookupState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/useLookupState/useLookupState";
+import type { ImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent/useImportedPluginContent";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /** One imported dataset as the uninstall modal lists it. */
@@ -119,6 +120,20 @@ function _createRowsFromDatasets(
 }
 
 /**
+ * The ids of the datasets the plugin imported. A restored imports list may be
+ * stale while it refetches, and after a failed lookup it cannot be trusted,
+ * so none of it is asked about then.
+ */
+function _listTrustedDatasetIds(imported: ImportedPluginContent): Dataset.Id[] {
+  if (imported.isFetching || imported.isError) {
+    return [];
+  }
+  return Object.values(imported.importsByContentId).map((contentImport) => {
+    return contentImport.datasetId;
+  });
+}
+
+/**
  * The imported datasets the user can read, loaded by id. It lists nothing
  * while the lookup is in flight or after it failed, since a restored cache
  * can hold a list that names a deleted dataset or hides a new one.
@@ -164,14 +179,7 @@ export function useUninstallContentRows(
   pluginId: string,
 ): UninstallContentRows {
   const imported = useImportedPluginContent(pluginId);
-  // A restored imports list may be stale while it refetches, and after a
-  // failed lookup it cannot be trusted, so none of it is asked about.
-  const importedIds =
-    imported.isFetching || imported.isError
-      ? []
-      : Object.values(imported.importsByContentId).map((contentImport) => {
-          return contentImport.datasetId;
-        });
+  const importedIds = _listTrustedDatasetIds(imported);
   const datasets = useReadableDatasets(importedIds);
   const access = useCanDeleteByDatasetId(
     datasets.readable.map((dataset) => {
@@ -187,15 +195,12 @@ export function useUninstallContentRows(
     access.isLoading;
   // A failure shown to the admin must stay until its retry settles.
   const lookupState = useLookupState({ hasFailed, isLoading });
-  const canList = lookupState === "ok";
+  const canList = lookupState === "ok" && !datasets.isFetching;
   return {
     rows: canList
       ? _createRowsFromDatasets(datasets.readable, access.canDeleteById)
       : [],
-    hiddenCount:
-      canList && !datasets.isFetching
-        ? importedIds.length - datasets.readable.length
-        : 0,
+    hiddenCount: canList ? importedIds.length - datasets.readable.length : 0,
     isLoading,
     hasFailed,
     isRetrying: lookupState === "retrying",

@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => {
     hiddenCount: 0,
     isLoading: false,
     hasFailed: false,
+    isRetrying: false,
     retry: vi.fn(),
     hasDependents: true,
     uninstall: vi.fn(),
@@ -32,6 +33,7 @@ vi.mock(
           hiddenCount: mocks.hiddenCount,
           isLoading: mocks.isLoading,
           hasFailed: mocks.hasFailed,
+          isRetrying: mocks.isRetrying,
           retry: mocks.retry,
         };
       },
@@ -131,6 +133,7 @@ describe("UninstallPluginModal", () => {
     mocks.hiddenCount = 0;
     mocks.isLoading = false;
     mocks.hasFailed = false;
+    mocks.isRetrying = false;
     mocks.hasDependents = true;
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: string[] }) => {
@@ -393,15 +396,25 @@ describe("UninstallPluginModal", () => {
       expect(screen.queryByRole("group")).not.toBeInTheDocument();
     });
 
-    it("offers an uninstall that keeps every dataset", () => {
+    it("offers an enabled uninstall that keeps every dataset", () => {
       _renderModal();
 
       expect(
         screen.getByRole("button", { name: "Uninstall and keep all datasets" }),
       ).toBeEnabled();
+    });
+
+    it("says every dataset stays in Data Sources", () => {
+      _renderModal();
+
       expect(
         screen.getByText("Every dataset it imported stays in Data Sources."),
       ).toBeInTheDocument();
+    });
+
+    it("leaves out the note about unchecked datasets", () => {
+      _renderModal();
+
       expect(
         screen.queryByText("Unchecked datasets stay in Data Sources."),
       ).not.toBeInTheDocument();
@@ -433,20 +446,53 @@ describe("UninstallPluginModal", () => {
       });
     });
 
-    it("shows the list again once a retry succeeds", () => {
-      mocks.retry.mockImplementation(() => {
-        mocks.hasFailed = false;
-        mocks.rows = [
-          {
-            datasetId: "dataset-districts",
-            name: "Mozambique districts",
-            canDelete: true,
-          },
-        ];
-      });
-      const { rerenderModal } = _renderModal();
+    it("keeps the alert, a loading Retry and the keep-all confirm, disabled, while the retry runs", () => {
+      mocks.isRetrying = true;
+      mocks.hasFailed = false;
+      mocks.isLoading = true;
+
+      _renderModal();
+
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Retry" })).toHaveAttribute(
+        "data-loading",
+        "true",
+      );
+      expect(
+        screen.getByRole("button", { name: "Uninstall and keep all datasets" }),
+      ).toBeDisabled();
+      expect(
+        screen.queryByRole("status", { name: "Loading datasets" }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Loading the datasets this plugin imported.",
+      );
+    });
+
+    it("moves focus to the status when Retry is pressed, since the button is replaced", () => {
+      _renderModal();
 
       fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+
+      expect(screen.getByRole("status")).toHaveFocus();
+    });
+
+    it("shows the list again and announces it once the retry succeeds", () => {
+      const { rerenderModal } = _renderModal();
+      mocks.hasFailed = false;
+      mocks.isRetrying = true;
+      mocks.isLoading = true;
+      rerenderModal();
+
+      mocks.isRetrying = false;
+      mocks.isLoading = false;
+      mocks.rows = [
+        {
+          datasetId: "dataset-districts",
+          name: "Mozambique districts",
+          canDelete: true,
+        },
+      ];
       rerenderModal();
 
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -454,6 +500,9 @@ describe("UninstallPluginModal", () => {
         screen.getByRole("checkbox", { name: "Delete Mozambique districts" }),
       ).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Uninstall" })).toBeEnabled();
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "The datasets this plugin imported are loaded.",
+      );
     });
   });
 

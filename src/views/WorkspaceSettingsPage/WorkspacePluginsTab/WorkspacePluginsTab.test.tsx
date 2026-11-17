@@ -514,7 +514,10 @@ describe("WorkspacePluginsTab", () => {
       const dialog = await screen.findByRole("dialog");
       expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
       expect(dialog).toHaveTextContent(
-        "We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.",
+        "We could not check for datasets this plugin imported.",
+      );
+      expect(dialog).toHaveTextContent(
+        "If you uninstall it now, every dataset it imported is kept.",
       );
       expect(dialog).not.toHaveTextContent("Datasets it imported");
     });
@@ -540,8 +543,7 @@ describe("WorkspacePluginsTab", () => {
       expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
     });
 
-    it("shows no alert while the retry is in flight", async () => {
-      mocks.isFetchingContentImports = true;
+    it("ties Retry to the plugin it belongs to", async () => {
       _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
 
       _renderTab();
@@ -549,7 +551,67 @@ describe("WorkspacePluginsTab", () => {
       const card = await screen.findByRole("region", {
         name: REMOVED_PLUGIN_ID,
       });
+      expect(
+        within(card).getByRole("button", { name: "Retry" }),
+      ).toHaveAccessibleDescription(REMOVED_PLUGIN_ID);
+    });
+
+    it("keeps the alert, Retry loading and Uninstall disabled while the retry runs", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      const { rerender } = _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      // A query with no data drops its error as soon as the retry starts.
+      mocks.hasContentImportsError = false;
+      mocks.isFetchingContentImports = true;
+      rerender(<WorkspacePluginsTab />);
+
+      expect(within(card).getByRole("alert")).toHaveTextContent(LOOKUP_ERROR);
+      expect(
+        within(card).getByRole("button", { name: "Retry" }),
+      ).toHaveAttribute("data-loading", "true");
+      expect(within(card).getByRole("status")).toHaveTextContent(
+        "Checking for datasets this plugin imported.",
+      );
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeDisabled();
+    });
+
+    it("moves focus to the status when Retry is pressed", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Retry" }));
+
+      expect(within(card).getByRole("status")).toHaveFocus();
+    });
+
+    it("drops the alert and announces the recovery once the retry succeeds", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      const { rerender } = _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      mocks.hasContentImportsError = false;
+      mocks.isFetchingContentImports = true;
+      rerender(<WorkspacePluginsTab />);
+
+      mocks.isFetchingContentImports = false;
+      rerender(<WorkspacePluginsTab />);
+
       expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+      expect(within(card).getByRole("status")).toHaveTextContent(
+        "We checked for datasets this plugin imported.",
+      );
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
     });
   });
 

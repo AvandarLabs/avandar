@@ -8,6 +8,7 @@ import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsT
 import { useUninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useKeepModalOpenWhile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /**
@@ -30,18 +31,17 @@ type Props = Readonly<{
  * The confirm button's text: plain, naming how many datasets go too, or
  * saying every dataset is kept when the datasets could not be loaded.
  */
-function _buildConfirmLabel(options: {
+function useConfirmLabel(options: {
   checkedCount: number;
-  hasFailed: boolean;
-  uninstallLabel: string;
-  keepAllLabel: string;
+  isKeepingAll: boolean;
 }): string {
-  const { checkedCount, hasFailed, uninstallLabel, keepAllLabel } = options;
-  if (hasFailed) {
-    return keepAllLabel;
+  const { checkedCount, isKeepingAll } = options;
+  const { t } = useLingui();
+  if (isKeepingAll) {
+    return t`Uninstall and keep all datasets`;
   }
   return checkedCount === 0
-    ? uninstallLabel
+    ? t`Uninstall`
     : plural(checkedCount, {
         one: "Uninstall and delete # dataset",
         other: "Uninstall and delete # datasets",
@@ -51,13 +51,17 @@ function _buildConfirmLabel(options: {
 /**
  * The ids in `checkedIds`, in the order the rows are listed. A row the admin
  * may no longer delete has no checkbox, so its id is left out even when it
- * was checked earlier.
+ * was checked earlier. After a failed lookup nothing loaded can be trusted,
+ * so no id is returned.
  */
 function _listCheckedIdsInRowOrder(
-  rows: ReadonlyArray<{ datasetId: Dataset.Id; canDelete: boolean }>,
+  content: UninstallContentRows,
   checkedIds: ReadonlySet<Dataset.Id>,
 ): Dataset.Id[] {
-  return rows
+  if (content.hasFailed || content.isRetrying) {
+    return [];
+  }
+  return content.rows
     .filter((row) => {
       return row.canDelete && checkedIds.has(row.datasetId);
     })
@@ -112,10 +116,14 @@ export function UninstallPluginModal(props: Props): JSX.Element {
     },
   });
   useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
-  // Nothing loaded can be trusted after a failure, so nothing is deleted.
-  const datasetIdsToDelete = content.hasFailed
-    ? []
-    : _listCheckedIdsInRowOrder(content.rows, checkedIds);
+  const datasetIdsToDelete = _listCheckedIdsInRowOrder(
+    content,
+    checkedIds,
+  );
+  const confirmLabel = useConfirmLabel({
+    checkedCount: datasetIdsToDelete.length,
+    isKeepingAll: content.hasFailed || content.isRetrying,
+  });
   return (
     <Stack gap="md">
       <Text size="sm">{t`Its features are removed from this workspace.`}</Text>
@@ -127,12 +135,7 @@ export function UninstallPluginModal(props: Props): JSX.Element {
         onIsCheckedChange={setIsChecked}
       />
       <UninstallModalFooter
-        confirmLabel={_buildConfirmLabel({
-          checkedCount: datasetIdsToDelete.length,
-          hasFailed: content.hasFailed,
-          uninstallLabel: t`Uninstall`,
-          keepAllLabel: t`Uninstall and keep all datasets`,
-        })}
+        confirmLabel={confirmLabel}
         isRunning={uninstaller.isRunning}
         isLoading={content.isLoading}
         onCancel={() => {

@@ -2,7 +2,10 @@ import { Group } from "@mantine/core";
 import { PluginActionButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton";
 import { PluginInstallButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginInstallButton";
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
-import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type {
+  ImportedDatasetsState,
+  PluginActionKind,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 
 type Props = Readonly<{
@@ -13,20 +16,12 @@ type Props = Readonly<{
   headingId: string;
   canManage: boolean;
 
-  /** Whether the plugin imported datasets into this workspace. */
-  hasImportedDatasets: boolean;
-
   /**
-   * True while the card loads or refetches whether the plugin imported
-   * datasets. Uninstall stays disabled until the lookup settles.
+   * What the card knows about the datasets the plugin imported. Uninstall is
+   * disabled while it loads, opens the uninstall modal when there are some,
+   * and confirms an uninstall that keeps every dataset when the lookup failed.
    */
-  isLookingUpImportedDatasets: boolean;
-
-  /**
-   * True when that lookup failed. Uninstall then asks for a plain confirm
-   * that says every dataset is kept, whatever `hasImportedDatasets` says.
-   */
-  hasFailedImportedDatasetsLookup: boolean;
+  importedDatasets: ImportedDatasetsState;
   actions: PluginInstallationActions;
 }>;
 
@@ -56,9 +51,7 @@ export function PluginActions({
   pluginName,
   headingId,
   canManage,
-  hasImportedDatasets,
-  isLookingUpImportedDatasets,
-  hasFailedImportedDatasetsLookup,
+  importedDatasets,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -79,9 +72,7 @@ export function PluginActions({
             pluginName={pluginName}
             headingId={headingId}
             isDisabled={isDisabled}
-            hasImportedDatasets={hasImportedDatasets}
-            isLookingUpImportedDatasets={isLookingUpImportedDatasets}
-            hasFailedImportedDatasetsLookup={hasFailedImportedDatasetsLookup}
+            importedDatasets={importedDatasets}
             actions={actions}
           />
         );
