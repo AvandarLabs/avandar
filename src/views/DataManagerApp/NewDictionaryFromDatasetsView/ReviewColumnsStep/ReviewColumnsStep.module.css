@@ -38,3 +38,12 @@
   display: flex;
   min-height: var(--review-entry-line-height);
 }
+
+/*
+ * A compact button pads its label inward, which pushes the label off the
+ * start edge the status text above it sits on. Pulling the button back by
+ * its own padding lines the two labels up, in either text direction.
+ */
+.keepApartButton {
+  margin-inline-start: calc(var(--button-padding-x) * -1);
+}
