@@ -11,8 +11,8 @@ export type DatasetDeleteErrorReason = "not_allowed" | "still_present";
 
 /**
  * Thrown by `DatasetClient.fullDelete` when a dataset was not deleted. A
- * caller that wants its own copy checks `instanceof` and reads `reason`. The
- * message is for logs and for the generic error toast.
+ * caller that shows the failure checks `instanceof` and translates `reason`
+ * into copy; the message is for logs only.
  */
 export class DatasetDeleteError extends Error {
   readonly reason: DatasetDeleteErrorReason;
@@ -27,8 +27,8 @@ export class DatasetDeleteError extends Error {
   ) {
     super(
       options.reason === "not_allowed"
-        ? `You need admin access to delete dataset ${options.datasetId}.`
-        : `Dataset ${options.datasetId} was not deleted. You may not have permission to delete it.`,
+        ? `Dataset '${options.datasetId}' cannot be deleted by the current user.`
+        : `Dataset '${options.datasetId}' is still present after its delete.`,
     );
     this.name = "DatasetDeleteError";
     this.reason = options.reason;

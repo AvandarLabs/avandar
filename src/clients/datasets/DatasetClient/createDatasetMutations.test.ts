@@ -160,24 +160,41 @@ describe("fullDelete", () => {
   let getByIdMock: ReturnType<typeof vi.fn>;
   let deleteRowMock: ReturnType<typeof vi.fn>;
 
-  function _fullDelete(): Promise<void> {
+  const _fullDelete = (): Promise<void> => {
     const config = {
       ...CONFIG,
       client: { getById: getByIdMock, delete: deleteRowMock, getAll: vi.fn() },
     } as unknown as DatasetMutationConfig;
     return createDatasetMutations(config).fullDelete({ id: datasetId });
-  }
+  };
 
-  function _recordCall(
+  const _recordCall = (
     name: string,
     mock: ReturnType<typeof vi.fn>,
     result: unknown,
-  ): void {
+  ): void => {
     mock.mockImplementation(async () => {
       callOrder.push(name);
       return result;
     });
-  }
+  };
+
+  /** Makes the row readable before the delete and, by default, gone after. */
+  const _stubRowReads = (
+    options: Readonly<{ sourceType: string; isRowStillThere?: boolean }>,
+  ): void => {
+    const row = { id: datasetId, workspaceId, sourceType: options.sourceType };
+    getByIdMock.mockReset();
+    getByIdMock
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRow");
+        return row;
+      })
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRowBack");
+        return options.isRowStillThere ? row : undefined;
+      });
+  };
 
   beforeEach(() => {
     callOrder = [];
@@ -193,19 +210,10 @@ describe("fullDelete", () => {
     _recordCall("deleteLocal", mocks.deleteLocalDatasetMock, undefined);
     _recordCall("dropDuckDb", mocks.dropDuckDbTableMock, undefined);
     mocks.getLocalDatasetMock.mockResolvedValue(undefined);
-    // The row is there before the delete and gone after it.
-    getByIdMock
-      .mockImplementationOnce(async () => {
-        callOrder.push("readRow");
-        return { id: datasetId, workspaceId, sourceType: "csv_file" };
-      })
-      .mockImplementationOnce(async () => {
-        callOrder.push("readRowBack");
-        return undefined;
-      });
+    _stubRowReads({ sourceType: "csv_file" });
   });
 
-  it("deletes the files, then the row, after checking admin access", async () => {
+  it("checks admin access before the files, then deletes the row and reads it back", async () => {
     await _fullDelete();
 
     expect(callOrder).toEqual([
@@ -228,6 +236,9 @@ describe("fullDelete", () => {
   });
 
   it("leaves Storage and the row alone when the user is not a dataset admin", async () => {
+    // A pdf dataset, so the retained original is in play and a check moved
+    // after its deletion would turn this red.
+    _stubRowReads({ sourceType: "pdf_file" });
     _recordCall("canAccess", mocks.canAccessResourceMock, false);
 
     await expect(_fullDelete()).rejects.toMatchObject({
@@ -235,21 +246,25 @@ describe("fullDelete", () => {
       reason: "not_allowed",
     });
 
-    expect(mocks.deleteParquetMock).not.toHaveBeenCalled();
-    expect(mocks.deleteOriginalFileMock).not.toHaveBeenCalled();
-    expect(deleteRowMock).not.toHaveBeenCalled();
-    expect(mocks.deleteLocalDatasetMock).not.toHaveBeenCalled();
+    expect(callOrder).toEqual(["readRow", "canAccess"]);
+  });
+
+  it("leaves Storage and the row alone when the access check itself fails", async () => {
+    _stubRowReads({ sourceType: "pdf_file" });
+    mocks.canAccessResourceMock.mockImplementation(async () => {
+      callOrder.push("canAccess");
+      throw new Error("rpc unavailable");
+    });
+
+    await expect(_fullDelete()).rejects.toThrow("rpc unavailable");
+
+    expect(callOrder).toEqual(["readRow", "canAccess"]);
   });
 
   it("throws when the row is still there after the delete", async () => {
     // A delete that RLS refuses succeeds with zero rows, so only reading the
     // row back proves it was removed.
-    getByIdMock.mockReset();
-    getByIdMock.mockResolvedValue({
-      id: datasetId,
-      workspaceId,
-      sourceType: "csv_file",
-    });
+    _stubRowReads({ sourceType: "csv_file", isRowStillThere: true });
 
     const error = await _fullDelete().catch((caught: unknown) => {
       return caught;
@@ -260,12 +275,7 @@ describe("fullDelete", () => {
   });
 
   it("keeps the local copy when the row is still there after the delete", async () => {
-    getByIdMock.mockReset();
-    getByIdMock.mockResolvedValue({
-      id: datasetId,
-      workspaceId,
-      sourceType: "csv_file",
-    });
+    _stubRowReads({ sourceType: "csv_file", isRowStillThere: true });
     mocks.getLocalDatasetMock.mockResolvedValue({ datasetId });
 
     await _fullDelete().catch(() => {
@@ -294,17 +304,8 @@ describe("fullDelete", () => {
     expect(mocks.deleteOriginalFileMock).not.toHaveBeenCalled();
   });
 
-  it("removes the retained original of a pdf dataset before the row", async () => {
-    getByIdMock.mockReset();
-    getByIdMock
-      .mockImplementationOnce(async () => {
-        callOrder.push("readRow");
-        return { id: datasetId, workspaceId, sourceType: "pdf_file" };
-      })
-      .mockImplementationOnce(async () => {
-        callOrder.push("readRowBack");
-        return undefined;
-      });
+  it("removes the retained original of a pdf dataset", async () => {
+    _stubRowReads({ sourceType: "pdf_file" });
 
     await _fullDelete();
 
@@ -313,6 +314,13 @@ describe("fullDelete", () => {
       datasetId,
       fileExtension: "pdf",
     });
+  });
+
+  it("removes the retained original after the parquet and before the row", async () => {
+    _stubRowReads({ sourceType: "pdf_file" });
+
+    await _fullDelete();
+
     expect(callOrder).toEqual([
       "readRow",
       "canAccess",
@@ -324,14 +332,7 @@ describe("fullDelete", () => {
   });
 
   it("still deletes the row when the retained original cannot be removed", async () => {
-    getByIdMock.mockReset();
-    getByIdMock
-      .mockResolvedValueOnce({
-        id: datasetId,
-        workspaceId,
-        sourceType: "pdf_file",
-      })
-      .mockResolvedValueOnce(undefined);
+    _stubRowReads({ sourceType: "pdf_file" });
     mocks.deleteOriginalFileMock.mockRejectedValue(new Error("storage down"));
 
     await _fullDelete();

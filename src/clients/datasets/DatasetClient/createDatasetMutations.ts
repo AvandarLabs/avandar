@@ -10,6 +10,7 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { UserClient } from "@/clients/UserClient";
 import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ILogger } from "@avandar/logger";
 import type { CompositeTypes } from "$/types/database.types";
 import type {
   DatasetColumnInput,
@@ -231,7 +232,10 @@ function _makeInsertOpenDataDataset(
  * rule as the `datasets` DELETE policy, so a delete that passes it cannot be
  * silently refused by row level security.
  */
-async function _assertCanDeleteDataset(datasetId: Dataset.Id): Promise<void> {
+async function _assertCanDeleteDataset(
+  options: Readonly<{ datasetId: Dataset.Id }>,
+): Promise<void> {
+  const { datasetId } = options;
   const canDelete = await UserClient.canAccessResource({
     resourceType: "dataset",
     resourceId: datasetId,
@@ -248,20 +252,26 @@ async function _assertCanDeleteDataset(datasetId: Dataset.Id): Promise<void> {
  * refuses looks like a success until the row is read back.
  */
 async function _assertDatasetRowGone(
-  options: Readonly<DatasetMutationConfig>,
-  datasetId: Dataset.Id,
+  options: Readonly<{
+    client: DatasetMutationConfig["client"];
+    datasetId: Dataset.Id;
+  }>,
 ): Promise<void> {
-  const remaining = await options.client.getById({ id: datasetId });
+  const { client, datasetId } = options;
+  const remaining = await client.getById({ id: datasetId });
   if (remaining) {
     throw new DatasetDeleteError({ datasetId, reason: "still_present" });
   }
 }
 
+/**
+ * Removes the dataset's parquet and, for a source that keeps one, its retained
+ * original from Storage.
+ */
 async function _deleteDatasetFiles(
-  options: Readonly<DatasetMutationConfig>,
-  dataset: Dataset.T,
+  options: Readonly<{ dataset: Dataset.T; logger: ILogger }>,
 ): Promise<void> {
-  const logger = options.logger.appendName("fullDelete");
+  const { dataset, logger } = options;
   await DatasetParquetStorageClient.deleteDataset({
     workspaceId: dataset.workspaceId,
     datasetId: dataset.id,
@@ -297,12 +307,18 @@ function _makeFullDelete(
     if (dataset) {
       // Check access before touching Storage: the files go first, so a row
       // that row level security would refuse to delete must be caught here.
-      await _assertCanDeleteDataset(params.id);
-      await _deleteDatasetFiles(options, dataset);
+      await _assertCanDeleteDataset({ datasetId: params.id });
+      await _deleteDatasetFiles({ dataset, logger });
     }
     await options.client.delete(params);
     if (dataset) {
-      await _assertDatasetRowGone(options, params.id);
+      // If this read-back throws (for example a network blip after the row
+      // was deleted), the local cleanup below is skipped and the stale local
+      // copy is left for a later cleanup.
+      await _assertDatasetRowGone({
+        client: options.client,
+        datasetId: params.id,
+      });
     }
     const localDataset = await LocalDatasetClient.getById(params);
     if (!localDataset) {
