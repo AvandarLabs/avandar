@@ -8,7 +8,9 @@ import { notifyError } from "@/utils/notifications/notify";
  * behind a Delete Dataset menu item. A `DatasetDeleteError` becomes a
  * translated notification chosen by its `reason`. Any other error goes to
  * `onOtherError` when given, and otherwise to the app's error reporter with
- * the generic message, which is what a mutation does when it has no `onError`.
+ * the generic message. Pass it as `onError`: a mutation without one reports
+ * that generic message only in production builds, and shows the error's raw
+ * message in development builds, which is developer text for a refused delete.
  */
 export function useNotifyDatasetDeleteError(
   options: Readonly<{ onOtherError?: (error: Error) => void }> = {},
@@ -24,7 +26,7 @@ export function useNotifyDatasetDeleteError(
         message:
           error.reason === "not_allowed"
             ? t`You don't have permission to delete this dataset.`
-            : t`The dataset could not be deleted. Try again.`,
+            : t`The dataset could not be fully deleted. Its data may already be gone. Check it in Data Sources and delete it again.`,
       });
       return;
     }

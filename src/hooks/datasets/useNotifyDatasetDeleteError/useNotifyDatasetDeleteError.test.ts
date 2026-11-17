@@ -65,7 +65,7 @@ describe("useNotifyDatasetDeleteError", () => {
     });
   });
 
-  it("tells the user to try again when the dataset is still there", () => {
+  it("tells the user the data may be gone when the dataset row is still there", () => {
     const notify = _renderNotifier();
 
     notify(
@@ -74,7 +74,8 @@ describe("useNotifyDatasetDeleteError", () => {
 
     expect(mocks.notifyErrorMock).toHaveBeenCalledWith({
       title: "Dataset not deleted",
-      message: "The dataset could not be deleted. Try again.",
+      message:
+        "The dataset could not be fully deleted. Its data may already be gone. Check it in Data Sources and delete it again.",
     });
   });
 
