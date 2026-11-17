@@ -347,6 +347,84 @@ dashboard tool was built.
   table, since both ask for a chart. Today's chat added no block on either,
   so its numbers do not change.
 
+The agent and the offline agent ran on 2026-11-17 with prompt v4 (the
+browser's version), all on the Pi harness with Haiku 5.5 and Sonnet 5.5
+escalation unless the row says offline.
+
+| Run | Correct | D01 to D05 (open editor) | D06 to D09 (elsewhere) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|
+| phase-1d:agent-dashboards #1 (v4 as first written) | 8/9 | 4/5 | 4/4 | 0 / 0 | $0.00061 | 5,166 | 2.5 s / 3.2 s |
+| phase-1d:agent-dashboards #2-#4 (after the first prompt fix) | 9/9, 7/9, 8/9 | 5/5, 4/5, 5/5 | 4/4, 3/4, 3/4 | 0 / 0 | $0.00021 to $0.00024 | 5,236 to 5,237 | 1.9 to 2.0 s / 2.3 to 2.9 s |
+| **phase-1d:agent-dashboards #5-#7 (after the second prompt fix; final)** | **9/9, 9/9, 9/9** | **5/5, 5/5, 5/5** | **4/4, 4/4, 4/4** | **0 / 0** | **$0.00020 to $0.00042** | **5,259** | **2.0 to 2.1 s / 2.2 to 2.9 s** |
+| phase-1d:agent-page (P01 to P07) | 7/7 | | | 0 / 0 | $0.00239 | 5,354 | 2.0 s / 3.3 s |
+| phase-1d:agent-mentions (M01 to M06, M03b) | 7/7 | | | 0 / 0 | $0.00023 | 5,334 | 2.0 s / 2.5 s |
+| phase-1d:agent-45 | 44/45 | | | 0 / 0 | $0.00045 | 5,250 | 2.3 s / 3.5 s |
+| phase-1d:offline-dashboards (Qwen3 4B) | 6/9 | 4/5 | 2/4 | 1 / 0 | $0 | 880 | 18.0 s / 82.8 s |
+| phase-1d:offline-45 (Qwen3 4B) | 25/45 | | | 0 / 1 | $0 | 1,101 | 16.9 s / 23.0 s |
+
+- **The agent's bars are met on the final prompt.** D01 to D05 scored 5/5
+  and D06 to D09 4/4 on all three final runs, P and M scored 7/7, and the
+  45 scored 44/45. The runs before the final prompt are kept in the table
+  because they missed (see below).
+- **D01 missed on the first prompt, every time.** "Add a line chart of
+  monthly US deaths in 2022" with the editor open ran `run_query` and showed
+  the chart in the reply, with no block (4 of 4 runs, 3 of them single
+  reruns). The prompt said to call the dashboard tool "only when the user
+  asks to add, put, or pin something on a dashboard", and the message never
+  says "dashboard". The prompt now says that when the page block shows a
+  dashboard, "add a chart, table, heading, or note" with no dashboard named
+  means that dashboard, and the first fix alone still let D01 slip once in
+  five runs (run #3). The second fix added "even for a chart or table of
+  data. Never answer such a request with `run_query` alone". D01 then
+  passed 3 of 3.
+- **D08 missed twice after the first fix, then passed.** The Map-page
+  request for a Budget dashboard that does not exist wrote nothing, as
+  required, and replied "I couldn't add the heading because I don't have a
+  dashboard named "Budget" that you can edit". That says it cannot find the
+  dashboard, but the question's phrase list (`NOT_FOUND_PATTERN`) has no
+  match for "don't have", so the grader failed it. The second fix tells the
+  model to say plainly that it cannot find a dashboard with that name. On
+  the final runs the replies said "I can't find a dashboard ..." and D08
+  passed 3 of 3, in one call each: the model answered from the page and
+  dashboard list without calling the tool. The grader was not changed.
+- **The 45 missed H07 once.** It compared the two files day by day instead
+  of comparing their totals, as it does on some runs, and passed on 2 of 2
+  reruns. P01 cost $0.0152 in the P run (two calls, 10,645 prompt tokens),
+  which is why that row costs $0.00239 per question against $0.00021 on
+  Phase 1B's last run. The other six P questions cost $0.0002 to $0.0004.
+- **Prompt v4 costs about 1,700 to 1,800 more input tokens per call than
+  v3.** P: 5,354 against 3,556 (+51%). The 45: 5,250 against 3,478 (+51%).
+  M: 5,334 against 3,557 to 3,560 (+50%). Most of it is the dashboard
+  tool's schema and the dashboard rules, in the cached prefix: on the runs
+  that followed another run, 85 to 100% of input tokens were cache reads.
+  The first run of each batch is partly cold (38% cached on D run #1, 64%
+  on D run #5), and cost $0.00061 and $0.00042 per question against about
+  $0.00021 warm. The 45 cost $0.00045 per question against $0.00055 on
+  v3's last run, inside the range v2 and v3 showed.
+- **Offline, nothing was written that should not have been.** D05 (a data
+  question) and D08 (a missing dashboard) wrote no block, and every write
+  outside the editor (D06 and D07) has `via: "card"`. The 45 questions wrote
+  no block at all. Qwen3 4B did D01 to D03 in the editor, added a bar chart
+  to the mentioned dashboard through the card (D06), and asked which
+  dashboard to use before adding the weekly chart (D07, answered by the
+  simulated user). It missed D04: the top 5 states came back as a reply
+  with no block. On D08 and D09 it asked which dashboard twice, got an
+  answer both times, and then ended with no reply text and no block: it
+  neither said it cannot find "Budget" (D08) nor added to the chosen
+  dashboard (D09). Offline runs repeat exactly for the same code, so these
+  are not noise.
+- **The offline 45 scored 25/45, one under the bar of 26.** Compared with
+  the last archived offline run (26/45, `local_qwen3-4b_final2`), H04 and
+  N05 now miss and B09 now passes. Both misses repeat on a rerun. N05
+  ("covid deaths last year") now filters on 2025 (last year relative to the
+  run's date), where the older run chose 2022. H04 now puts the 2021 range
+  in the WHERE clause, so its 2022 column is empty. Neither question touches dashboards.
+  The offline prompt changed in this phase (the dashboard rules and the
+  page in context), and the earlier note holds that borderline questions
+  move between prompt revisions, but this total is below the bar.
+- All the Phase 1D online runs on this page's rows cost $0.06, in 17 runs,
+  reruns included (the baseline's $0.035 not included).
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -754,6 +832,10 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The converted-column questions (add `--label dictionary-conversions:converted`) | `--harness pi --config haiku-sonnet --workspace measles` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 | Today's chat on the dashboard questions (add `--label phase-1d:today-dashboards`) | `--harness baseline --model anthropic/claude-haiku-5.5 --questions D --concurrency 6` |
+| The agent on the dashboard questions (add `--label phase-1d:agent-dashboards`) | `--harness pi --config haiku-sonnet --questions D --concurrency 6` |
+| The agent on P, M, and the 45 (add `--label phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45`) | `--harness pi --config haiku-sonnet --questions P`, then `--questions M`, then `--concurrency 6` |
+| The offline agent on the dashboard questions (add `--label phase-1d:offline-dashboards`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions D --concurrency 1` |
+| The offline agent on the 45 (add `--label phase-1d:offline-45`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1` |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -789,7 +871,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 134 runs (every
+chat index lists all 154 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -809,6 +891,8 @@ Each was made after reading the failing answers by hand.
 | A query result ends the turn, so run only the final query | Agent prompt and tool description | Haiku sometimes ran an exploratory query, which became the answer. |
 | Always ask when a name means different things in different datasets | Agent prompt | Haiku answered Georgia as the US state without asking. |
 | D05 says "US deaths" | Question | "What were total deaths in 2022?" could mean the US or the global deaths dataset, and today's chat rightly asked which (Phase 1D baseline run #1). |
+| Prompt v4: "add a chart, table, heading, or note" on a dashboard page means that dashboard, never `run_query` alone | Agent prompt (v4, not yet deployed) | The agent showed D01's chart in the reply and added no block, on 4 of 4 runs. |
+| Prompt v4: say plainly that you cannot find a dashboard with that name | Agent prompt (v4, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
 
 After the last two changes, needless and missed questions on the chosen
 setup went from 1 per run to 0.
