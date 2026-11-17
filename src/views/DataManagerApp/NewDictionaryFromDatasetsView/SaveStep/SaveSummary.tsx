@@ -31,12 +31,12 @@ export function SaveSummary({
     labels,
     codeLists,
   ).valueCount;
-  const labeledText = i18n.number(valueCount - unlabeledCount);
+  const mappedText = i18n.number(valueCount - unlabeledCount);
   const valueText = i18n.number(valueCount);
   const facts = [
     { label: t`Entries`, value: i18n.number(draft.entries.length) },
     { label: t`Code lists`, value: i18n.number(draft.codeLists.length) },
-    { label: t`Values labeled`, value: t`${labeledText} of ${valueText}` },
+    { label: t`Values mapped`, value: t`${mappedText} of ${valueText}` },
     {
       label: t`Learned from`,
       value: new Intl.ListFormat(i18n.locale, { type: "conjunction" }).format(

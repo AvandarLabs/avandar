@@ -15,10 +15,10 @@ type Props = {
 };
 
 /**
- * "3 values in the data have no label." for a converted column, with a
- * link to label them on the dictionary. Mounted only while the popover is
+ * "3 values in the data have no target value." for a converted column, with a
+ * link to add them on the dictionary. Mounted only while the popover is
  * open, so the count is read only when someone looks. Renders nothing
- * while it reads, and when every value has a label.
+ * while it reads, and when every value has a target value.
  */
 export function UnlabeledValuesNote({
   datasetId,
@@ -40,12 +40,12 @@ export function UnlabeledValuesNote({
     <Text size="xs">
       <Plural
         value={count}
-        one="# value in the data has no label."
-        other="# values in the data have no label."
+        one="# value in the data has no target value."
+        other="# values in the data have no target value."
       />{" "}
       {codes.isSourceDeleted ? null : (
         <Link to={link.to} params={link.params} size="xs">
-          <Trans>Label them in {dictionaryName}</Trans>
+          <Trans>Add them in {dictionaryName}</Trans>
         </Link>
       )}
     </Text>

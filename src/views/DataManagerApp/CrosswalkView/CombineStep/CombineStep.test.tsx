@@ -151,7 +151,7 @@ describe("CombineStep", () => {
   it("changes how coded columns come out", () => {
     const flow = _render();
 
-    fireEvent.click(screen.getByRole("radio", { name: "Codes" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Source values" }));
 
     expect(flow.dispatch).toHaveBeenCalledWith({
       type: "settings_changed",

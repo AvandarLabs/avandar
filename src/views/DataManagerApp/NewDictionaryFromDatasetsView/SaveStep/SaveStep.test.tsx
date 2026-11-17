@@ -94,7 +94,7 @@ describe("SaveStep", () => {
       screen.getByRole("row", { name: "Code lists 1" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("row", { name: "Values labeled 0 of 3" }),
+      screen.getByRole("row", { name: "Values mapped 0 of 3" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("row", { name: "Learned from Kings line list" }),
@@ -105,7 +105,7 @@ describe("SaveStep", () => {
     const { onCreate } = _renderStep();
     expect(
       screen.getByText(
-        "3 values in gender (1/2/9) have no label yet. They are saved without one and marked as needing a label, so you can finish them on the dictionary.",
+        "3 values in gender (1/2/9) have no target value yet. They are saved without one and marked as needing one, so you can finish them on the dictionary.",
       ),
     ).toBeInTheDocument();
     expect(
@@ -119,7 +119,7 @@ describe("SaveStep", () => {
     _renderStep({ labels: _labelValues(["1", "2"]) });
     expect(
       screen.getByText(
-        "1 value in gender (1/2/9) has no label yet. It is saved without one and marked as needing a label, so you can finish it on the dictionary.",
+        "1 value in gender (1/2/9) has no target value yet. It is saved without one and marked as needing one, so you can finish it on the dictionary.",
       ),
     ).toBeInTheDocument();
   });

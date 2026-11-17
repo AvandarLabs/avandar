@@ -19,8 +19,10 @@ function _nameFor(directions: ReadonlyArray<"decode" | "encode">): string {
 
 describe("useDefaultLinkedName", () => {
   it("names the linked dataset by what its conversions do", () => {
-    expect(_nameFor(["decode", "decode"])).toBe("Bronx line list (labeled)");
-    expect(_nameFor(["encode"])).toBe("Bronx line list (coded)");
+    expect(_nameFor(["decode", "decode"])).toBe(
+      "Bronx line list (target values)",
+    );
+    expect(_nameFor(["encode"])).toBe("Bronx line list (source values)");
     expect(_nameFor(["decode", "encode"])).toBe("Bronx line list (converted)");
   });
 });

@@ -26,12 +26,12 @@ function useConversionText(
   const { t } = useLingui();
   if (happens.kind === "decode") {
     return isLinkedTarget
-      ? t`Codes become labels in the linked dataset`
-      : t`Codes become labels`;
+      ? t`Source values become target values in the linked dataset`
+      : t`Source values become target values`;
   }
   return isLinkedTarget
-    ? t`Labels become codes in the linked dataset`
-    : t`Labels become codes`;
+    ? t`Target values become source values in the linked dataset`
+    : t`Target values become source values`;
 }
 
 function ConversionCell(

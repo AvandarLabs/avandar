@@ -10,7 +10,7 @@ type Props = {
   rows: readonly DataDictionary.EntryDraft[];
   selectedId: DataDictionaryEntry.Id | undefined;
   listNames: ReadonlyMap<DataDictionaryCodeList.Id, string>;
-  /** Values that still need a label, by code list. */
+  /** Values that still need a target value, by code list. */
   unlabeledCounts: ReadonlyMap<DataDictionaryCodeList.Id, number>;
   kindShortLabels: Record<DataDictionaryEntry.Kind, string>;
   onSelect: (entryId: DataDictionaryEntry.Id) => void;
@@ -20,7 +20,7 @@ type RowProps = {
   entry: DataDictionary.EntryDraft;
   isSelected: boolean;
   listNames: Props["listNames"];
-  /** Values that still need a label, by code list. */
+  /** Values that still need a target value, by code list. */
   unlabeledCounts: Props["unlabeledCounts"];
   kindShortLabels: Props["kindShortLabels"];
   onSelect: Props["onSelect"];
@@ -82,8 +82,8 @@ function DictionaryEntryRow({
           <Text size="xs" c="dimmed">
             <Plural
               value={unlabeledCount}
-              one="# value needs a label"
-              other="# values need a label"
+              one="# value needs a target value"
+              other="# values need a target value"
             />
           </Text>
         ) : null}

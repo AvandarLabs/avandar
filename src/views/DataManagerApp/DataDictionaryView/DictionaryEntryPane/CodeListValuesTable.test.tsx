@@ -18,6 +18,6 @@ describe("CodeListValuesTable", () => {
   it("shows a dimmed placeholder for a value without a label", () => {
     render(<CodeListValuesTable codeList={CODE_LIST} />);
     expect(screen.getByText("Male")).toBeInTheDocument();
-    expect(screen.getAllByText("No label yet")).toHaveLength(1);
+    expect(screen.getAllByText("No target value yet")).toHaveLength(1);
   });
 });

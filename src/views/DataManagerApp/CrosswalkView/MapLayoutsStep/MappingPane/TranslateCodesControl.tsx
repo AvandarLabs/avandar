@@ -36,8 +36,8 @@ function HoldsControl(
         aria-labelledby={labelId}
         value={props.holdsLabels ? "labels" : "codes"}
         data={[
-          { value: "codes", label: t`Codes` },
-          { value: "labels", label: t`Labels` },
+          { value: "codes", label: t`Source values` },
+          { value: "labels", label: t`Target values` },
         ]}
         onChange={(value) => {
           props.onChange({
@@ -69,7 +69,7 @@ export function TranslateCodesControl(props: Readonly<Props>): ReactNode {
     <Stack gap="xs">
       <Select
         size="xs"
-        label={t`Translate codes with`}
+        label={t`Translate values with`}
         allowDeselect={false}
         value={isMissing ? null : (codeListId ?? NO_TRANSLATION)}
         error={

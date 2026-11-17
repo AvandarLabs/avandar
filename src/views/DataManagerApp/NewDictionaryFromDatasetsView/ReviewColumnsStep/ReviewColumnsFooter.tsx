@@ -54,7 +54,7 @@ export function ReviewColumnsFooter({
           dispatch({ type: "go_to_step", step: "label" });
         }}
       >
-        <Trans>Next: label values</Trans>
+        <Trans>Next: map values</Trans>
       </Button>
     </NewDictionaryFooter>
   );

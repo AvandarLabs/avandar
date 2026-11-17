@@ -130,7 +130,7 @@ test.describe("data dictionaries", () => {
         [3, "Unknown"],
       ] as const) {
         await expect(
-          savedCodeListsPanel.getByLabel(`Label ${rowNumber}`),
+          savedCodeListsPanel.getByLabel(`Target value ${rowNumber}`),
         ).toHaveValue(label);
       }
     } finally {

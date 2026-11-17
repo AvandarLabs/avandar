@@ -76,7 +76,7 @@ function MeaningCell(
   if (props.direction === "encode") {
     return (
       <>
-        {props.mode === "convert" ? code : <Trans>code {code}</Trans>}
+        {props.mode === "convert" ? code : <Trans>source value {code}</Trans>}
         {isAcceptedSpelling ? (
           <Text span size="xs" c="dimmed">
             {" "}
@@ -89,9 +89,9 @@ function MeaningCell(
   return pair.label.trim() === "" ? (
     <Text size="sm" c="dimmed" fs="italic">
       {props.mode === "convert" ? (
-        <Trans>No label yet, kept as is</Trans>
+        <Trans>No target value yet, kept as is</Trans>
       ) : (
-        <Trans>No label yet</Trans>
+        <Trans>No target value yet</Trans>
       )}
     </Text>
   ) : (
@@ -100,7 +100,7 @@ function MeaningCell(
 }
 
 /**
- * Each value in a column, its rows, and what the code list says it means,
+ * Each value in a column, its rows, and what the code list says it maps to,
  * or, when the column converts, what it becomes. Accepted spellings are
  * marked, and a value the list does not hold says it is kept as is.
  */

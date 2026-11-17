@@ -48,7 +48,7 @@ describe("NewDictionaryStepper", () => {
       screen.getByRole("button", { name: /Pick datasets/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Label values/ }),
+      screen.getByRole("button", { name: /Map values/ }),
     ).toBeInTheDocument();
   });
 

@@ -54,9 +54,9 @@ function DirectionNote({
   return (
     <Text size="xs" c="dimmed">
       {direction === "decode" ? (
-        <Trans>Chosen from the data: these values are codes.</Trans>
+        <Trans>Chosen from the data: these are source values.</Trans>
       ) : (
-        <Trans>Chosen from the data: these values are labels.</Trans>
+        <Trans>Chosen from the data: these are target values.</Trans>
       )}
     </Text>
   );
@@ -73,7 +73,7 @@ function DescriptionOnly({
       <Text size="sm">{description || <Trans>No description yet</Trans>}</Text>
       <Text size="xs" c="dimmed">
         <Trans>
-          This entry has no codes, so only its description is attached.
+          This entry has no values, so only its description is attached.
         </Trans>
       </Text>
     </Stack>

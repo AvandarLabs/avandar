@@ -44,7 +44,7 @@ function ModeButton(
 
 /**
  * How to apply the dictionary to the selected column: Apply conversions or
- * Attach labels only as reference, each with its tooltip, then what the
+ * Attach as reference only, each with its tooltip, then what the
  * choice does to the data.
  */
 export function ModeSwitch({
@@ -70,7 +70,7 @@ export function ModeSwitch({
           }}
         />
         <ModeButton
-          label={t`Attach labels only as reference`}
+          label={t`Attach as reference only`}
           tooltip={copy.referenceTooltip}
           isSelected={mode === "reference"}
           isLocked={false}

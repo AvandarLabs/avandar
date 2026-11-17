@@ -79,15 +79,15 @@ function CodesOutputControl({
   return (
     <Stack gap={6} align="flex-start">
       <Text id={labelId} size="sm" fw={500}>
-        <Trans>Coded columns come out as</Trans>
+        <Trans>Columns with a dictionary come out as</Trans>
       </Text>
       <SegmentedControl
         size="xs"
         aria-labelledby={labelId}
         value={draft.codesOutputAs}
         data={[
-          { value: "labels", label: t`Labels` },
-          { value: "codes", label: t`Codes` },
+          { value: "labels", label: t`Target values` },
+          { value: "codes", label: t`Source values` },
         ]}
         onChange={(value) => {
           const codesOutputAs = value === "codes" ? "codes" : "labels";
@@ -104,9 +104,9 @@ function CodesOutputControl({
 
 /**
  * The combined dataset's own settings: its name, whether it gets a
- * source_dataset column, and, when a column is governed, whether coded
- * columns come out as labels or codes. The two settings change the draft.
- * The name is saved with the dataset.
+ * source_dataset column, and, when a column is governed, whether columns
+ * with a dictionary come out as target values or source values. The two
+ * settings change the draft. The name is saved with the dataset.
  */
 export function CombineSettings(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();

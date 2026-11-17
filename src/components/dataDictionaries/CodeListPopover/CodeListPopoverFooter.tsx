@@ -15,25 +15,25 @@ function ConvertedSentence({ codes }: Readonly<Props>): ReactNode {
   if (codes.isSourceDeleted) {
     return holdsLabels ? (
       <Trans>
-        The values were converted to these labels. The dictionary entry they
-        came from was deleted.
+        The values were converted to these target values. The dictionary entry
+        they came from was deleted.
       </Trans>
     ) : (
       <Trans>
-        The values were converted to these codes. The dictionary entry they came
-        from was deleted.
+        The values were converted to these source values. The dictionary entry
+        they came from was deleted.
       </Trans>
     );
   }
   return holdsLabels ? (
     <Trans>
       From {dictionaryName} › {entryName}. The values were converted to these
-      labels.
+      target values.
     </Trans>
   ) : (
     <Trans>
       From {dictionaryName} › {entryName}. The values were converted to these
-      codes.
+      source values.
     </Trans>
   );
 }

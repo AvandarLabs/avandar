@@ -89,7 +89,7 @@ async function _relabelFemale(page: Page): Promise<void> {
   await codeLists.getByText("Sex (1/2/9)", { exact: true }).click();
   // The editor names each label input by its row, and row 2 of the seeded
   // list is code 2, Female.
-  await codeLists.getByLabel("Label 2").fill("Woman");
+  await codeLists.getByLabel("Target value 2").fill("Woman");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByText("Dictionary saved")).toBeVisible({
     timeout: MEDIUM_WAIT,

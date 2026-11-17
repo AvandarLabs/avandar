@@ -1,7 +1,9 @@
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useLingui } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
 import { useState } from "react";
+import { ValueSideHeading } from "@/components/dataDictionaries/ValueSideHint/ValueSideHeading";
 import css from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.module.css";
 import { CodePairRow } from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
@@ -133,6 +135,30 @@ function useReorderTracking(): {
   };
 }
 
+/**
+ * The column headings above the rows. They share the rows' grid, so each
+ * heading sits over its input, and each side's info icon defines it.
+ */
+function CodePairHeader({
+  hasHandle,
+}: Readonly<{ hasHandle: boolean }>): ReactNode {
+  return (
+    <Text
+      component="div"
+      size="xs"
+      fw={600}
+      c="dimmed"
+      className={css.codeListEditorHeader}
+      data-has-handle={hasHandle}
+    >
+      {hasHandle ? <span /> : null}
+      <ValueSideHeading side="source" />
+      <span />
+      <ValueSideHeading side="target" />
+    </Text>
+  );
+}
+
 function CodePairRows({
   list,
   canEdit,
@@ -196,6 +222,7 @@ export function CodePairList({
         actions.reorderPairs(pairs, movedToIndex);
       }}
     >
+      <CodePairHeader hasHandle={list.isOrdered && canEdit} />
       <ul
         key={orderVersion}
         className={css.codeListEditorList}

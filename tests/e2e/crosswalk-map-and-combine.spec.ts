@@ -218,9 +218,9 @@ async function _translateQueensSex(page: Page): Promise<void> {
     page.getByRole("radio", { name: "A column", exact: true }),
   ).toBeChecked();
   await _chooseOption(page, "Column", "sex");
-  await _chooseOption(page, "Translate codes with", "Sex (M/F/U)");
+  await _chooseOption(page, "Translate values with", "Sex (M/F/U)");
   await expect(
-    page.getByRole("radio", { name: "Codes", exact: true }),
+    page.getByRole("radio", { name: "Source values", exact: true }),
   ).toBeChecked();
   await expect(_exampleTable(page)).toContainText("Male", {
     timeout: MEDIUM_WAIT,
@@ -235,7 +235,7 @@ async function _expectReferenceTranslates(
   await _selectLayout(page, kingsLayoutName);
   await _selectColumn(page, "GENDER");
   await expect(
-    page.getByRole("combobox", { name: "Translate codes with", exact: true }),
+    page.getByRole("combobox", { name: "Translate values with", exact: true }),
   ).toHaveValue("Sex (1/2/9)", { timeout: MEDIUM_WAIT });
 }
 

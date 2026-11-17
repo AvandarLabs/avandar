@@ -202,7 +202,7 @@ function useReadWithMatches(options: ReadOptions): {
               return dataset.id;
             }),
           ),
-        defaultName: t`${firstName} codes`,
+        defaultName: t`${firstName} values`,
         findMatches: matches.findMatches,
       });
     },

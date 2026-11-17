@@ -12,7 +12,7 @@ type Props = {
   onAccepted: () => void;
 };
 
-/** Back, Accept and next list, and Next: save, under the Label values step. */
+/** Back, Accept and next list, and Next: save, under the Map values step. */
 export function LabelValuesFooter({
   selectedKey,
   dispatch,

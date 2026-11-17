@@ -75,7 +75,7 @@ export function ReviewEntryRow({
       <Table.Td>
         <div className={css.reviewEntryLine}>
           <Text size="xs" c="dimmed">
-            {isCoded ? t`Needs labels` : t`Description`}
+            {isCoded ? t`Needs mapping` : t`Description`}
           </Text>
         </div>
         <KeepApartButton

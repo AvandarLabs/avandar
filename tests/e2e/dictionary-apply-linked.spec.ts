@@ -60,7 +60,7 @@ async function _openApply(page: Page): Promise<void> {
   await page.getByRole("button", { name: "More dataset actions" }).click();
   const applyItem = page.getByRole("menuitem", { name: /Apply a dictionary/ });
   await expect(applyItem).toContainText(
-    "Turn codes into labels and add column descriptions",
+    "Convert values and add column descriptions",
   );
   await applyItem.click();
 }
@@ -88,7 +88,9 @@ async function _labelUnmatchedNine(page: Page): Promise<void> {
     .filter({ has: page.getByRole("cell", { name: "9", exact: true }) });
   await expect(nineRow).toContainText("3", { timeout: MEDIUM_WAIT });
   await nineRow.getByText("Add to list", { exact: true }).click();
-  await nineRow.getByRole("textbox", { name: "Label for 9" }).fill("Unknown");
+  await nineRow
+    .getByRole("textbox", { name: "Target value for 9" })
+    .fill("Unknown");
 }
 
 /** Opens the preview, sees a label, and closes it from the keyboard. */
@@ -173,7 +175,7 @@ async function _relabelFemaleThenOpenLinked(
   await codeLists.getByText("Sex (1/2)", { exact: true }).click();
   // The editor names each label input by its row, and row 2 of the seeded
   // list is code 2, Female.
-  await codeLists.getByLabel("Label 2").fill("Woman");
+  await codeLists.getByLabel("Target value 2").fill("Woman");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByText("Dictionary saved")).toBeVisible({
     timeout: MEDIUM_WAIT,

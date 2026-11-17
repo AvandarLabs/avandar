@@ -13,7 +13,7 @@ type Props = {
   onSuggest: () => void;
 };
 
-/** The selected list's title and its Suggest labels button. */
+/** The selected list's title and its Suggest target values button. */
 export function CodeListPaneHeader({
   title,
   titleRef,
@@ -34,7 +34,7 @@ export function CodeListPaneHeader({
         disabled={isSuggestOff}
         onClick={onSuggest}
       >
-        <Trans>Suggest labels</Trans>
+        <Trans>Suggest target values</Trans>
       </Button>
     </Group>
   );

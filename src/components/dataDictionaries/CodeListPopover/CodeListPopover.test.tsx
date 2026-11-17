@@ -89,7 +89,7 @@ async function _focusDropdownLink(): Promise<{
   });
   const dialog = await screen.findByRole("dialog");
   const link = within(dialog).getByRole("link", {
-    name: "Label them in NYS codes",
+    name: "Add them in NYS codes",
     hidden: true,
   });
   fireEvent.keyDown(tag, { key: "Tab" });
@@ -133,7 +133,7 @@ describe("CodeListPopover", () => {
       screen.getByRole("button", { name: "Code list for GENDER" }),
     );
 
-    expect(await screen.findByText("No label yet")).toBeInTheDocument();
+    expect(await screen.findByText("No target value yet")).toBeInTheDocument();
   });
 
   it("closes on Escape while the tag has focus", async () => {
@@ -191,7 +191,7 @@ describe("CodeListPopover", () => {
 
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toHaveTextContent(
-      "From NYS codes › sex. The values were converted to these labels.",
+      "From NYS codes › sex. The values were converted to these target values.",
     );
     expect(dialog).toHaveTextContent(
       "Converted with version 2 of the dictionary. The dictionary is now at version 3.",
@@ -201,7 +201,7 @@ describe("CodeListPopover", () => {
     );
   });
 
-  it("says codes when labels were converted to codes", async () => {
+  it("says source values when target values were converted to source values", async () => {
     render(
       <CodeListPopover
         columnName="GENDER"
@@ -213,7 +213,7 @@ describe("CodeListPopover", () => {
     );
 
     expect(await screen.findByRole("dialog")).toHaveTextContent(
-      "The values were converted to these codes.",
+      "The values were converted to these source values.",
     );
   });
 
@@ -239,7 +239,7 @@ describe("CodeListPopover", () => {
     );
 
     expect(await screen.findByRole("dialog")).toHaveTextContent(
-      "The values were converted to these labels. The dictionary entry they came from was deleted.",
+      "The values were converted to these target values. The dictionary entry they came from was deleted.",
     );
   });
 
@@ -257,12 +257,14 @@ describe("CodeListPopover", () => {
     );
 
     const dialog = await screen.findByRole("dialog");
-    expect(dialog).toHaveTextContent("3 values in the data have no label.");
+    expect(dialog).toHaveTextContent(
+      "3 values in the data have no target value.",
+    );
     // jsdom never finishes the dropdown's enter transition, so the dialog
     // keeps an inline `display: none` and its link counts as hidden.
     expect(
       within(dialog).getByRole("link", {
-        name: "Label them in NYS codes",
+        name: "Add them in NYS codes",
         hidden: true,
       }),
     ).toBeInTheDocument();
@@ -285,7 +287,7 @@ describe("CodeListPopover", () => {
       });
       const dialog = await screen.findByRole("dialog");
       const link = within(dialog).getByRole("link", {
-        name: "Label them in NYS codes",
+        name: "Add them in NYS codes",
         hidden: true,
       });
 

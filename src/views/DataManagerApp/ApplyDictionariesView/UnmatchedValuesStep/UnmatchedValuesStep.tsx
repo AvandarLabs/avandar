@@ -131,7 +131,7 @@ function ReadyBody(props: Readonly<BodyProps>): ReactNode {
       />
       <ValuesSection
         {...shared}
-        title={<Trans>Values without a label</Trans>}
+        title={<Trans>Values with no target value</Trans>}
         rows={rows.reference}
       />
     </Stack>

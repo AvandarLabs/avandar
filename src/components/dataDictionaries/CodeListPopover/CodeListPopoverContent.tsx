@@ -21,7 +21,7 @@ function PairLabel({ pair }: Readonly<{ pair: ColumnCodes.Pair }>): ReactNode {
     <>
       {label === "" ? (
         <Text span c="dimmed" fs="italic" size="sm">
-          <Trans>No label yet</Trans>
+          <Trans>No target value yet</Trans>
         </Text>
       ) : (
         label

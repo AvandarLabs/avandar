@@ -100,7 +100,7 @@ export function NewDataDictionaryModal({
           />
           <Textarea
             label={t`Description`}
-            placeholder={t`What these codes cover and where they come from`}
+            placeholder={t`What these values cover and where they come from`}
             value={description}
             onChange={(event) => {
               setDescription(event.currentTarget.value);

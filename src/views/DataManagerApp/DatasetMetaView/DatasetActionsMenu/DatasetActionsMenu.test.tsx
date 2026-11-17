@@ -231,7 +231,7 @@ describe("DatasetActionsMenu", () => {
     );
     expect(
       await screen.findByRole("menuitem", { name: /Apply a dictionary/ }),
-    ).toHaveTextContent("Turn codes into labels and add column descriptions");
+    ).toHaveTextContent("Convert values and add column descriptions");
   });
 
   it("does not offer Apply to someone who cannot edit the dataset", async () => {

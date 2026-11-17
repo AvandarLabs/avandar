@@ -135,7 +135,7 @@ describe("AttachStep", () => {
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "The code 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
+      "The source value 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
     );
     expect(
       screen.getByRole("button", { name: "Attach to Kings line list" }),

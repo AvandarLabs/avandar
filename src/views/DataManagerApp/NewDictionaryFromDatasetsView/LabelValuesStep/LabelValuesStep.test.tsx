@@ -106,9 +106,25 @@ describe("LabelValuesStep", () => {
   it("heads the code list flank and counts how many are done", () => {
     _renderStep();
     expect(
-      screen.getByRole("heading", { name: "Code lists to label" }),
+      screen.getByRole("heading", { name: "Code lists to map" }),
     ).toBeInTheDocument();
     expect(screen.getByText("1 of 2 done")).toBeInTheDocument();
+  });
+
+  it("heads the values table with source and target values and an info icon for each", () => {
+    _renderStep();
+    expect(
+      screen.getByRole("columnheader", { name: /Source value/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: /Target value/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "What is a source value?" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "What is a target value?" }),
+    ).toBeInTheDocument();
   });
 
   it("titles the selected list with a second level heading", () => {
@@ -144,31 +160,34 @@ describe("LabelValuesStep", () => {
       />,
     );
     expect(
-      screen.getByRole("textbox", { name: "Label for 1" }),
+      screen.getByRole("textbox", { name: "Target value for 1" }),
     ).toHaveAccessibleDescription("Suggested from the column name and values");
     expect(
-      screen.getByRole("textbox", { name: "Label for 2" }),
+      screen.getByRole("textbox", { name: "Target value for 2" }),
     ).not.toHaveAccessibleDescription();
   });
 
   it("lists each code list with how far along it is", () => {
     _renderStep();
-    const nav = screen.getByRole("navigation", { name: "Code lists to label" });
+    const nav = screen.getByRole("navigation", { name: "Code lists to map" });
     expect(
       within(nav).getByRole("button", { name: /gender \(1\/2\/9\).*To do/ }),
     ).toBeInTheDocument();
     expect(
       within(nav).getByRole("button", {
-        name: /county \(Bronx\/Kings\).*Labeled/,
+        name: /county \(Bronx\/Kings\).*Mapped/,
       }),
     ).toBeInTheDocument();
   });
 
   it("types a label for a value", () => {
     const { dispatch } = _renderStep();
-    fireEvent.change(screen.getByRole("textbox", { name: "Label for 1" }), {
-      target: { value: "Male" },
-    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Target value for 1" }),
+      {
+        target: { value: "Male" },
+      },
+    );
     expect(dispatch).toHaveBeenCalledWith({
       type: "set_value_label",
       codeListKey: GENDER_LIST?.key,
@@ -208,14 +227,16 @@ describe("LabelValuesStep", () => {
 
   it("asks for suggestions for the selected list", () => {
     const { onSuggest } = _renderStep();
-    fireEvent.click(screen.getByRole("button", { name: "Suggest labels" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Suggest target values" }),
+    );
     expect(onSuggest).toHaveBeenCalledWith(GENDER_LIST);
   });
 
-  it("turns Suggest labels off while another list's suggestion is pending", () => {
+  it("turns Suggest target values off while another list's suggestion is pending", () => {
     _renderStep("online", undefined, CODE_LISTS[1]?.key);
     expect(
-      screen.getByRole("button", { name: "Suggest labels" }),
+      screen.getByRole("button", { name: "Suggest target values" }),
     ).toBeDisabled();
   });
 
@@ -263,11 +284,11 @@ describe("LabelValuesStep", () => {
   it("explains that suggestions are off when no model is available", () => {
     _renderStep("unavailable");
     expect(
-      screen.getByRole("button", { name: "Suggest labels" }),
+      screen.getByRole("button", { name: "Suggest target values" }),
     ).toBeDisabled();
     expect(
       screen.getByText(
-        "Suggestions need a connection or the offline model. Labeling still works.",
+        "Suggestions need a connection or the offline model. You can still map values yourself.",
       ),
     ).toBeInTheDocument();
   });
@@ -275,11 +296,11 @@ describe("LabelValuesStep", () => {
   it("explains that suggestions are off when the user declined to send them", () => {
     _renderStep("declined");
     expect(
-      screen.getByRole("button", { name: "Suggest labels" }),
+      screen.getByRole("button", { name: "Suggest target values" }),
     ).toBeDisabled();
     expect(
       screen.getByText(
-        "You chose not to send values to the AI provider, so suggestions are off for this dictionary. Labeling still works.",
+        "You chose not to send values to the AI provider, so suggestions are off for this dictionary. You can still map values yourself.",
       ),
     ).toBeInTheDocument();
   });
@@ -291,18 +312,18 @@ describe("LabelValuesStep", () => {
     ],
     [
       "code_too_long",
-      "A value in this list is too long to send for suggestions. Labeling still works.",
+      "A value in this list is too long to send for suggestions. You can still map values yourself.",
     ],
     [
       "too_large_for_model",
-      "This list is too long to suggest labels for in one request. Labeling still works.",
+      "This list is too long to suggest target values for in one request. You can still map values yourself.",
     ],
   ] as const)(
     "explains why a list that cannot be sent for %s is not",
     (reason, message) => {
       _renderStep("online", reason);
       expect(
-        screen.getByRole("button", { name: "Suggest labels" }),
+        screen.getByRole("button", { name: "Suggest target values" }),
       ).toBeDisabled();
       expect(screen.getByText(message)).toBeInTheDocument();
     },

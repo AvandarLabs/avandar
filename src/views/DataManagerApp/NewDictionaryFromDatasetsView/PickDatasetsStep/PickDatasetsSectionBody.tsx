@@ -25,8 +25,9 @@ export function PickDatasetsSectionBody({
     <>
       <Text size="sm" c="dimmed" mb="sm">
         <Trans>
-          Pick datasets that use the same codes. Avandar reads each column,
-          finds the coded ones, and merges columns that mean the same thing.
+          Pick datasets that use the same values. Avandar reads each column,
+          finds the ones with a set of values, and merges columns that mean the
+          same thing.
         </Trans>
       </Text>
       {isLoading ? (

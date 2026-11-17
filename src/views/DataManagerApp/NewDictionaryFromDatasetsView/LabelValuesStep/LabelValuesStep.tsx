@@ -25,8 +25,8 @@ type Props = {
 };
 
 /**
- * The third step of learning a dictionary: label every code list's values,
- * by hand or with suggestions. Labels can be left unfinished and finished
+ * The third step of learning a dictionary: map every code list's values,
+ * by hand or with suggestions. Values can be left unfinished and finished
  * on the dictionary later. After Accept and next list, focus moves to the
  * title of the list that comes next.
  */

@@ -24,7 +24,7 @@ type Props = {
 };
 
 /**
- * The Label values step's two regions: the flank of code lists to label and
+ * The Map values step's two regions: the flank of code lists to map and
  * the column holding the selected list's values.
  */
 export function LabelValuesColumns(props: Readonly<Props>): ReactNode {
