@@ -72,8 +72,8 @@ function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
  * are now, with whether the current user may delete each one. Imports whose
  * dataset the user cannot read are only counted.
  *
- * The uninstall modal on a plugin's card uses it to list the imported
- * datasets an admin can choose to keep or delete.
+ * `UninstallPluginModal` uses it to list the imported datasets an admin can
+ * choose to keep or delete.
  */
 export function useUninstallContentRows(
   pluginId: string,
