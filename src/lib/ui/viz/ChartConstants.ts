@@ -29,10 +29,7 @@ export const CHART_COLOR_SWATCHES = [
 
 /**
  * Fixed color cycle used for pie, donut, funnel, and radar chart slices.
- * Expressed as Mantine color strings (e.g. `"blue.6"`). Plugin charts read
- * the same cycle from `SERIES_COLOR_NAMES` in
- * `packages/web/plugin-ui/src/useChartTheme/useChartTheme.ts`, so keep the
- * two in step.
+ * Expressed as Mantine color strings (e.g. `"blue.6"`).
  */
 export const CHART_COLORS = [
   "blue.6",

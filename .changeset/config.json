@@ -23,10 +23,5 @@
   "access": "public",
   "baseBranch": "develop",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@avandar/ava-cli",
-    "@avandar/plugin-manifest",
-    "@avandar/plugin-sdk",
-    "@avandar/plugin-ui"
-  ]
+  "ignore": ["@avandar/ava-cli"]
 }

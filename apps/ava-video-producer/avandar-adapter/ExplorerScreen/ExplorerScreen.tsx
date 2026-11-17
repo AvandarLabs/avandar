@@ -317,8 +317,7 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
                 isCollapsed={stage.drawerProgress === 0}
                 regionId="demo-explorer-drawer"
                 queryEditorMode={stage.isSql ? "sql" : "manual"}
-                vizConfig={stage.isChart ? barConfig : { vizType: "table" }}
-                columns={aggregateColumns}
+                vizType={stage.isChart ? "bar" : "table"}
                 isStructuredQueryInSync
                 onQueryEditorModeChange={_noop}
                 onVizTypeChange={_noop}

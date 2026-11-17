@@ -27,8 +27,7 @@ function _renderRail({
         isCollapsed={isCollapsed}
         regionId="drawer-region"
         queryEditorMode="manual"
-        vizConfig={{ vizType: "table" }}
-        columns={[]}
+        vizType="bar"
         isStructuredQueryInSync={isStructuredQueryInSync}
         onQueryEditorModeChange={vi.fn()}
         onVizTypeChange={vi.fn()}

@@ -15,11 +15,7 @@
       "specifier": "eslint-plugin-react-refresh"
     },
     "@tanstack/eslint-plugin-query",
-    "@tanstack/eslint-plugin-router",
-    {
-      "name": "plugin-restrictions",
-      "specifier": "./eslint/plugin-restrictions.js"
-    }
+    "@tanstack/eslint-plugin-router"
   ],
   "categories": {
     "correctness": "off"
@@ -257,12 +253,6 @@
       }
     },
     {
-      "files": ["eslint/**/*.js"],
-      "rules": {
-        "import/extensions": ["error", "ignorePackages", { "js": "always" }]
-      }
-    },
-    {
       "files": ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
       "rules": {
         "import/extensions": [
@@ -441,19 +431,6 @@
       ],
       "rules": {
         "typescript/no-explicit-any": "off"
-      }
-    },
-    {
-      "files": ["plugins/**/*.{js,jsx,ts,tsx}"],
-      "excludeFiles": ["plugins/**/*.test.{js,jsx,ts,tsx}"],
-      "rules": {
-        "plugin-restrictions/no-unapproved-imports": "error"
-      }
-    },
-    {
-      "files": ["plugins/**/*.{js,jsx,ts,tsx}"],
-      "rules": {
-        "plugin-restrictions/no-restricted-paths": "error"
       }
     }
   ]

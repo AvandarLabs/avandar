@@ -19,7 +19,7 @@ import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizCon
 import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfig.types.ts";
 import type {
   AvaVizConfigType,
-  BuiltInVizType,
+  VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 import type {
@@ -151,14 +151,14 @@ export const AvaAreaChartVizConfigs = {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "area");
   },
 
-  convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
+  convertVizConfig: <K extends VizType = VizType>(
     vizConfig: AvaAreaChartVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K> => {
     const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
-    return match<BuiltInVizType>(newVizType)
+    return match<VizType>(newVizType)
       .with("table", (vizType): AvaTableVizConfig => {
         return { vizType };
       })

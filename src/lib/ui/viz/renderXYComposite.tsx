@@ -18,9 +18,6 @@ type Props = {
   styleProps: ReturnType<typeof applyChartStyle>;
   valueFormatter?: (value: number) => string;
   chartStyle?: ChartStyle;
-
-  /** `"none"` draws neighboring bar categories touching. */
-  barGap?: "default" | "none";
 };
 
 /**
@@ -40,7 +37,6 @@ export function renderXYComposite({
   styleProps,
   valueFormatter,
   chartStyle,
-  barGap,
 }: Props): JSX.Element {
   const compositeSeries: CompositeChartSeries[] = series.map((s) => {
     return { name: s.key, label: s.label, color: s.color, type: s.renderAs };
@@ -118,7 +114,6 @@ export function renderXYComposite({
           left: hasYLabel ? 10 : undefined,
           right: hasYLabel ? 5 : undefined,
         },
-        ...(barGap === "none" ? { barCategoryGap: 0 } : {}),
       }}
       xAxisProps={{
         ...xAxisProps,

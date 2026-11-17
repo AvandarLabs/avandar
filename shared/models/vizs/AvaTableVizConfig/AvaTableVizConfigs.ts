@@ -12,7 +12,7 @@ import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizCon
 import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfig.types.ts";
 import type {
   AvaVizConfigType,
-  BuiltInVizType,
+  VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 
@@ -36,11 +36,11 @@ export const AvaTableVizConfigs = {
     return vizConfig;
   },
 
-  convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
+  convertVizConfig: <K extends VizType = VizType>(
     vizConfig: AvaTableVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K> => {
-    return match<BuiltInVizType>(newVizType)
+    return match<VizType>(newVizType)
       .with("table", (): AvaTableVizConfig => {
         return vizConfig;
       })

@@ -199,7 +199,8 @@ export const EXCLUDED_TABLES = [
   // debugging. Nothing the desktop renders.
   "pipeline_executions",
   "pipeline_execution_scopes",
-  // Plugin installs are not mirrored to desktop SQLite yet.
+  // Dropped by 20261117210525 ("drop_plugin_installations"). Retained because
+  // 20261109035052 still contains its DDL.
   "plugin_installations",
   // The open data catalog's unfiltered facet counts, recounted on the server
   // after each pipeline run. Derived from `data_catalog_listings`, which the

@@ -39,11 +39,9 @@ export type QueryAnalyticsSurface =
  * What caused a query to run.
  *
  * `dataset_opened` covers opening a saved dataset from the Data Explorer
- * drawer. `plugin_command` covers a plugin command changing the Data
- * Explorer's SQL, such as one that adds computed columns, and the Undo that
- * puts the earlier SQL back. `block_render` is what dashboard blocks and
- * viz-config previews report, since neither has a user-initiated trigger:
- * they run whenever their SQL changes.
+ * drawer. `block_render` is what dashboard blocks and viz-config previews
+ * report, since neither has a user-initiated trigger: they run whenever their
+ * SQL changes.
  */
 export type QueryAnalyticsTrigger =
   | "sql_submit"
@@ -51,7 +49,6 @@ export type QueryAnalyticsTrigger =
   | "chat_generated"
   | "url_hydration"
   | "dataset_opened"
-  | "plugin_command"
   | "block_render";
 
 /**
