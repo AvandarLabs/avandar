@@ -594,6 +594,7 @@ msgid "Enter your question or instructions in natural language to generate a "
 msgstr "Ingiza swali lako au maelekezo kwa lugha ya kawaida ili kuunda swali la "
 "SQL"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
 msgstr "Imeshindikana kusasisha {pluginName}"
@@ -1291,6 +1292,7 @@ msgstr "Ondoa rekodi za {slotTitle}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
 msgid "Loading datasets"
 msgstr "Inapakia seti za data"
 
@@ -2307,6 +2309,10 @@ msgstr "Ramani hii inajumuisha {0}, safu iliyowekwa kuwa Jumlisha pekee. "
 "Uhamishaji hutumia uzuiaji uleule kama skrini: maeneo yenye rekodi "
 "zisizozidi {threshold} yanaonyeshwa kuwa yamezuiwa, kamwe si sifuri."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
+msgid "{pluginName}: {slotTitle}"
+msgstr "{pluginName}: {slotTitle}"
+
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
@@ -2449,6 +2455,10 @@ msgstr "Kurekebisha nenosiri kumeshindikana"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Kundi jipya la jukumu"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "We could not check what reads this dataset."
+msgstr "Hatukuweza kuangalia kinachosoma seti hii ya data."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -4015,6 +4025,12 @@ msgid "By default we use a direct UUID-based link."
 msgstr "Kwa chaguomsingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 "UUID."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+msgid "These datasets could not be deleted and are still in Data Sources: "
+"{names}"
+msgstr "Seti hizi za data hazikuweza kufutwa na bado ziko katika Vyanzo vya "
+"Data: {names}"
+
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Import {0}"
@@ -4062,6 +4078,7 @@ msgid "Two statuses have the same name. Give each one its own name."
 msgstr "Hali mbili zina jina sawa. Zipe kila moja jina lake."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
 msgid "Its features are removed from this workspace."
 msgstr "Vipengele vyake vimeondolewa kwenye workspace hii."
 
@@ -4115,6 +4132,7 @@ msgstr "Kwa maeneo ya umma pekee. Utafutaji huenda kwenye huduma ya nje, kwa "
 "hivyo usiwahi kuandika anwani ya nyumbani ya mtu."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal.tsx
 msgid "Uninstall {pluginName}?"
 msgstr "Uondoe {pluginName}?"
 
@@ -4697,6 +4715,7 @@ msgstr "{usedSeats} kati ya {maxSeats} viti vilitumika · {remainingSeats} "
 msgid "Statuses"
 msgstr "Hali"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
 msgstr "{pluginName} imeondolewa"
@@ -4808,6 +4827,7 @@ msgstr "Usaidizi wa jiometri bado unapakuliwa. Hii inaweza kuchukua muda kwa "
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallModalFooter.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -5936,6 +5956,7 @@ msgid "Fix the fields above, then save."
 msgstr "Rekebisha sehemu zilizo hapo juu, kisha uhifadhi."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
 msgid "Uninstall"
 msgstr "Ondoa"
 
@@ -6611,6 +6632,10 @@ msgstr "m"
 msgid "Keeps the original values in {originalName}"
 msgstr "Huhifadhi thamani asili katika {originalName}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "These read it and stop working once it is deleted:"
+msgstr "Hivi vinaisoma na kuacha kufanya kazi pindi inapofutwa:"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
 msgstr "haianzi na"
@@ -6866,6 +6891,10 @@ msgstr "Unda mkusanyiko wa data wa maeneo"
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Add to list"
 msgstr "Ongeza kwenye orodha"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+msgid "Datasets it imported"
+msgstr "Seti za data ilizoziingiza"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -7360,6 +7389,12 @@ msgstr "Ondoa {name} kwenye muktadha"
 msgid "Continue to your workspace"
 msgstr "Endelea kwenye ofisi yako"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentList.tsx
+msgid "{hiddenCount, plural, one {# more dataset you can't see stays.} other {# "
+"more datasets you can't see stay.}}"
+msgstr "{hiddenCount, plural, one {Seti # nyingine ya data usiyoweza kuiona "
+"inabaki.} other {Seti # nyingine za data usizoweza kuziona zinabaki.}}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has a value"
 msgstr "ina thamani"
@@ -7566,6 +7601,10 @@ msgstr "Maelezo ya {entryName}"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Safu ya Y"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "{label} (linked dataset)"
+msgstr "{label} (seti ya data iliyounganishwa)"
 
 #. placeholder {0}: facets.numUnloadable
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
@@ -9204,6 +9243,12 @@ msgstr "{threshold}% au zaidi"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# kipengele} other {# vipengele}}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
+"deleted.}}"
+msgstr "{deletedCount, plural, one {Seti # ya data imefutwa.} other {Seti # za "
+"data zimefutwa.}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -12523,6 +12568,10 @@ msgstr "Sehemu za {conceptName}"
 msgid "Collapse the legend"
 msgstr "Kunja maelezo ya ramani"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "Checking what reads this dataset"
+msgstr "Inakagua kinachosoma seti hii ya data"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Ujumbe wa gumzo"
@@ -12761,6 +12810,10 @@ msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "Kila series ni wingu moja la (X, Y) la alama. Ongeza zaidi ili "
 "kulinganisha jozi nyingi za metriki kwenye chati moja."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentRow.tsx
+msgid "Kept. Only a dataset admin can delete it."
+msgstr "Imehifadhiwa. Ni msimamizi wa seti za data pekee anayeweza kuifuta."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# feature} other {# features}}"
@@ -14237,6 +14290,12 @@ msgstr "Onyesha kama kiungo"
 msgid "No value"
 msgstr "Hakuna thamani"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
+msgid "{checkedCount, plural, one {Uninstall and delete # dataset} other "
+"{Uninstall and delete # datasets}}"
+msgstr "{checkedCount, plural, one {Ondoa na ufute seti # ya data} other {Ondoa "
+"na ufute seti # za data}}"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "Umbo"
@@ -14248,6 +14307,10 @@ msgstr "Maoni haya yalifutwa."
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesToolbar.tsx
 msgid "Filter entries or column names"
 msgstr "Chuja maingizo au majina ya safu"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+msgid "Unchecked datasets stay in Data Sources."
+msgstr "Seti za data ambazo hazijachaguliwa zinabaki katika Vyanzo vya Data."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "The column holds"
@@ -14301,12 +14364,6 @@ msgstr "Kwa sasa umejiandikisha kwa mpango huu."
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "Pakia seti ya data"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Its features are removed from this workspace. The datasets it imported "
-"stay in Data Sources."
-msgstr "Vipengele vyake vimeondolewa kwenye nafasi hii ya kazi. Seti za data "
-"ilizoleta zimesalia katika Vyanzo vya Data."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -15030,6 +15087,10 @@ msgstr "Google inaweza kuhamisha hadi MB 10 za lahajedwali kwa wakati mmoja. "
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "Ni uwanja gani unapaswa kutumika kama jina la {singularConceptName}?"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentRow.tsx
+msgid "Delete {name}"
+msgstr "Futa {name}"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "You need Case Records editor access to assign a record."
 msgstr "Unahitaji ufikiaji wa kuhariri Case Records ili kukabidhi rekodi."
@@ -15319,6 +15380,10 @@ msgstr "Kwa robo mwaka"
 msgid "{0} (boundary)"
 msgstr "{0} (mpaka)"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "{label} (data slot)"
+msgstr "{label} (nafasi ya data)"
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
@@ -15470,6 +15535,7 @@ msgstr "ni kubwa kuliko"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal.tsx
 msgid "Close"
 msgstr "Funga"
 

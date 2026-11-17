@@ -596,6 +596,7 @@ msgid "Enter your question or instructions in natural language to generate a "
 msgstr "Digite sua pergunta ou instruções em linguagem natural para gerar uma "
 "consulta SQL"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
 msgstr "Não foi possível atualizar {pluginName}"
@@ -1295,6 +1296,7 @@ msgstr "Remover os registros de {slotTitle}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ContentStep.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
 msgid "Loading datasets"
 msgstr "Carregando conjuntos de dados"
 
@@ -2315,6 +2317,10 @@ msgstr "Este mapa inclui {0}, uma camada definida como somente agregada. A "
 "exportação aplica a mesma supressão da tela: áreas com menos de "
 "{threshold} registros são mostradas como suprimidas, nunca como zero."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
+msgid "{pluginName}: {slotTitle}"
+msgstr "{pluginName}: {slotTitle}"
+
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
@@ -2458,6 +2464,10 @@ msgstr "Falha na redefinição da senha"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Novo grupo de funções"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "We could not check what reads this dataset."
+msgstr "Não foi possível verificar o que lê este conjunto de dados."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -4023,6 +4033,12 @@ msgstr "O ID do workspace não pode estar vazio"
 msgid "By default we use a direct UUID-based link."
 msgstr "Por padrão, usamos um link direto baseado em UUID."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+msgid "These datasets could not be deleted and are still in Data Sources: "
+"{names}"
+msgstr "Não foi possível excluir estes conjuntos de dados, e eles continuam em "
+"Fontes de Dados: {names}"
+
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Import {0}"
@@ -4070,6 +4086,7 @@ msgid "Two statuses have the same name. Give each one its own name."
 msgstr "Dois status têm o mesmo nome. Dê a cada um seu próprio nome."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
 msgid "Its features are removed from this workspace."
 msgstr "Os recursos dele foram removidos deste workspace."
 
@@ -4123,6 +4140,7 @@ msgstr "Somente para locais públicos. A pesquisa é direcionada a um serviço "
 "externo; portanto, nunca digite o endereço residencial de uma pessoa."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal.tsx
 msgid "Uninstall {pluginName}?"
 msgstr "Desinstalar {pluginName}?"
 
@@ -4705,6 +4723,7 @@ msgstr "{usedSeats} de {maxSeats} assentos utilizados · {remainingSeats} "
 msgid "Statuses"
 msgstr "Status"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
 msgstr "{pluginName} desinstalado"
@@ -4817,6 +4836,7 @@ msgstr "O suporte de geometria ainda está sendo baixado. Isso pode levar um "
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDataSlotsSection/RemoveDataSlotBindingButton.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallModalFooter.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -5948,6 +5968,7 @@ msgid "Fix the fields above, then save."
 msgstr "Corrija os campos acima e salve."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
 msgid "Uninstall"
 msgstr "Desinstalar"
 
@@ -6622,6 +6643,10 @@ msgstr "m"
 msgid "Keeps the original values in {originalName}"
 msgstr "Mantém os valores originais em {originalName}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "These read it and stop working once it is deleted:"
+msgstr "Estes itens o leem e deixam de funcionar quando ele é excluído:"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
 msgstr "não começa com"
@@ -6876,6 +6901,10 @@ msgstr "Criar conjunto de dados de locais"
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 msgid "Add to list"
 msgstr "Adicionar à lista"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+msgid "Datasets it imported"
+msgstr "Conjuntos de dados que ele importou"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -7371,6 +7400,13 @@ msgstr "Remover {name} do contexto"
 msgid "Continue to your workspace"
 msgstr "Continue para seu workspace"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentList.tsx
+msgid "{hiddenCount, plural, one {# more dataset you can't see stays.} other {# "
+"more datasets you can't see stay.}}"
+msgstr "{hiddenCount, plural, one {Mais # conjunto de dados que você não pode "
+"ver é mantido.} other {Mais # conjuntos de dados que você não pode ver "
+"são mantidos.}}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has a value"
 msgstr "tem um valor"
@@ -7578,6 +7614,10 @@ msgstr "Descrição de {entryName}"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Coluna Y"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "{label} (linked dataset)"
+msgstr "{label} (conjunto de dados vinculado)"
 
 #. placeholder {0}: facets.numUnloadable
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
@@ -9221,6 +9261,12 @@ msgstr "{threshold}% ou mais"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# recurso} other {# recursos}}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
+"deleted.}}"
+msgstr "{deletedCount, plural, one {# conjunto de dados excluído.} other {# "
+"conjuntos de dados excluídos.}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -12550,6 +12596,10 @@ msgstr "Campos de {conceptName}"
 msgid "Collapse the legend"
 msgstr "Recolher a legenda"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "Checking what reads this dataset"
+msgstr "Verificando o que lê este conjunto de dados"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Mensagem de chat"
@@ -12791,6 +12841,10 @@ msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "Cada série é uma nuvem de pontos (X, Y). Adicione mais para comparar "
 "múltiplos pares de métricas no mesmo gráfico."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentRow.tsx
+msgid "Kept. Only a dataset admin can delete it."
+msgstr "Mantido. Somente um administrador de conjuntos de dados pode excluí-lo."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# feature} other {# features}}"
@@ -14275,6 +14329,12 @@ msgstr "Exibir como link"
 msgid "No value"
 msgstr "Nenhum valor"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
+msgid "{checkedCount, plural, one {Uninstall and delete # dataset} other "
+"{Uninstall and delete # datasets}}"
+msgstr "{checkedCount, plural, one {Desinstalar e excluir # conjunto de dados} "
+"other {Desinstalar e excluir # conjuntos de dados}}"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "Forma"
@@ -14286,6 +14346,10 @@ msgstr "Este comentário foi excluído."
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesToolbar.tsx
 msgid "Filter entries or column names"
 msgstr "Filtrar entradas ou nomes de colunas"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+msgid "Unchecked datasets stay in Data Sources."
+msgstr "Os conjuntos de dados desmarcados permanecem em Fontes de Dados."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "The column holds"
@@ -14339,12 +14403,6 @@ msgstr "Você está atualmente inscrito neste plano."
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "Carregar um conjunto de dados"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Its features are removed from this workspace. The datasets it imported "
-"stay in Data Sources."
-msgstr "Os recursos dele foram removidos deste workspace. Os conjuntos de dados "
-"importados permanecem em Fontes de dados."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
@@ -15067,6 +15125,10 @@ msgstr "O Google pode exportar no máximo 10 MB de uma planilha por vez. Divida 
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "Qual campo deve ser usado como nome de um {singularConceptName}?"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentRow.tsx
+msgid "Delete {name}"
+msgstr "Excluir {name}"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "You need Case Records editor access to assign a record."
 msgstr "Você precisa ter acesso de editor aos registros de casos para atribuir "
@@ -15361,6 +15423,10 @@ msgstr "Por trimestre"
 msgid "{0} (boundary)"
 msgstr "{0} (limite)"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "{label} (data slot)"
+msgstr "{label} (espaço de dados)"
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
@@ -15514,6 +15580,7 @@ msgstr "é maior que"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/DataSlotBindingForm/DataSlotBindingAdminGate.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/openDataSlotBindingModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal.tsx
 msgid "Close"
 msgstr "Fechar"
 
