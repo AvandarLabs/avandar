@@ -158,6 +158,7 @@ function _createAdapter(
     chatPanelDispatch: { setPendingClarification: vi.fn() },
     contextTrayRef: ref([]),
     sessionKindRef: ref("data"),
+    activeSessionIdRef: ref(undefined),
     ...overrides,
   } as unknown as CreateChatModelAdapterOptions);
 }
@@ -364,6 +365,24 @@ describe("createChatModelAdapter with the agent on", () => {
       expect(apiPostMock).not.toHaveBeenCalled();
     },
   );
+
+  it("gives the agent the open editor and the session", async () => {
+    const queuePendingBlock = vi.fn();
+    await _ask(
+      _createAdapter("dashboards", {
+        dashboardEditorStateRef: { current: { activeDashboardId: "d-open" } },
+        dashboardEditorDispatch: { queuePendingBlock },
+        activeSessionIdRef: { current: "s-1" },
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(turn.dashboardEditor.activeDashboardId).toBe("d-open");
+    expect(turn.dashboardEditor.dispatch.queuePendingBlock).toBe(
+      queuePendingBlock,
+    );
+    expect(turn.sessionId).toBe("s-1");
+  });
 
   it("keeps a stored case id out of the agent's messages", async () => {
     await _askAfterStoredCaseView(_createAdapter("dashboards"));

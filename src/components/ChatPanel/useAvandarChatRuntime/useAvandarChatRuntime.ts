@@ -358,6 +358,7 @@ export function useAvandarChatRuntime(): {
       chatPanelDispatch,
       contextTrayRef,
       sessionKindRef,
+      activeSessionIdRef,
       titleMaskRef,
       activePluginsRef,
     });

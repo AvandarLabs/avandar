@@ -260,6 +260,8 @@ export type CreateChatModelAdapterOptions = {
   contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
   /** The selected session's reply path, read when a turn starts. */
   sessionKindRef: MutableRefObject<ChatSessionKind>;
+  /** The selected chat session, for the dashboard cards a turn reports. */
+  activeSessionIdRef: MutableRefObject<string | undefined>;
   /** The hosted agent turn's mask, retained until its reply is persisted. */
   titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
   /**
@@ -414,6 +416,7 @@ export function createChatModelAdapter(
     chatPanelDispatch,
     contextTrayRef,
     sessionKindRef,
+    activeSessionIdRef,
     titleMaskRef,
   } = options;
   const getPluginAiTools = _buildPluginAiToolsGetter(options.activePluginsRef);
@@ -610,6 +613,11 @@ export function createChatModelAdapter(
         chatPanelDispatch,
         getPluginAiTools,
         workspaceSlug: workspaceRef.current.slug,
+        dashboardEditor: {
+          activeDashboardId: currentDashboardEditorState.activeDashboardId,
+          dispatch: dashboardEditorDispatch,
+        },
+        sessionId: activeSessionIdRef.current,
       };
 
       // Every answer an offline turn produces is marked, so a hosted
