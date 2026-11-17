@@ -344,3 +344,32 @@ describe("createSqlPlaceholderVault lookups", () => {
     expect(vault.isHeldPlaceholder("<value 02>")).toBe(false);
   });
 });
+
+describe("unmaskText", () => {
+  const detectors = {
+    isSensitiveColumn: (column: string) => {
+      return column === "Admin2";
+    },
+    isSensitiveValue: () => {
+      return false;
+    },
+    knownColumnNames: new Set(["admin2"]),
+  };
+
+  it("swaps each held placeholder back for its value", () => {
+    const vault = createSqlPlaceholderVault();
+    vault.redact(`SELECT 1 FROM t WHERE "Admin2" = 'Kings'`, detectors);
+
+    expect(vault.unmaskText("Deaths in <value 1> by week")).toBe(
+      "Deaths in Kings by week",
+    );
+  });
+
+  it("leaves an unknown placeholder and plain text as written", () => {
+    const vault = createSqlPlaceholderVault();
+
+    expect(vault.unmaskText("<value 3> and COVID 2022")).toBe(
+      "<value 3> and COVID 2022",
+    );
+  });
+});
