@@ -89,6 +89,8 @@ function _listItemTexts(
  */
 function _formatStructValue(value: object): string {
   try {
+    // TypeScript types `JSON.stringify` as returning a string, but it
+    // returns undefined when a value's `toJSON` returns undefined.
     const json = JSON.stringify(value, (_key, fieldValue: unknown) => {
       return typeof fieldValue === "bigint" ? String(fieldValue) : fieldValue;
     }) as string | undefined;
