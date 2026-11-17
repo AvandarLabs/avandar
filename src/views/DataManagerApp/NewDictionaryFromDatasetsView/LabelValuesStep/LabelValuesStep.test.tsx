@@ -225,6 +225,24 @@ describe("LabelValuesStep", () => {
     );
   });
 
+  it("goes on to Describe columns, not straight to Save", () => {
+    const { dispatch } = _renderStep();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next: describe columns" }),
+    );
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "go_to_step",
+      step: "describe",
+    });
+  });
+
+  it("no longer asks for a description beside the values", () => {
+    _renderStep();
+    expect(
+      screen.queryByRole("textbox", { name: /Description of/ }),
+    ).not.toBeInTheDocument();
+  });
+
   it("asks for suggestions for the selected list", () => {
     const { onSuggest } = _renderStep();
     fireEvent.click(

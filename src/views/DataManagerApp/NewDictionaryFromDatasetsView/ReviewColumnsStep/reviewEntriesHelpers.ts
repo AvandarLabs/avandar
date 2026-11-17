@@ -29,3 +29,20 @@ export function getSharedNamesByEntryKey(
     });
   return shared;
 }
+
+/**
+ * The columns an entry came from, comma separated. Datasets are named after
+ * each column only when more than one was read.
+ */
+export function buildEntrySourcesText(
+  entry: DictionaryProposal.Entry,
+  isSingleDataset: boolean,
+): string {
+  return DictionaryProposal.getColumnSources(entry)
+    .map(({ columnName, datasetNames }) => {
+      return isSingleDataset
+        ? columnName
+        : `${columnName} (${datasetNames.join(", ")})`;
+    })
+    .join(", ");
+}

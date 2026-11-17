@@ -1,0 +1,33 @@
+/*
+ * Entries are one list on the content column's surface, told apart by a
+ * hairline and the air around it. A box per entry would nest cards inside
+ * the slate, and a 50-entry list would read as 50 boxes.
+ */
+.describeEntryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.describeEntry {
+  border-top: 1px solid var(--ava-border-default);
+  padding-block: var(--mantine-spacing-md);
+}
+
+.describeEntry:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/*
+ * The confirm note's width, so its sentence wraps at a readable measure
+ * instead of the width of the button it opens from.
+ */
+.describeConfirm {
+  max-width: calc(20rem * var(--mantine-scale));
+}
+
+.describeConfirmEntries {
+  max-height: calc(12rem * var(--mantine-scale));
+  overflow-y: auto;
+}

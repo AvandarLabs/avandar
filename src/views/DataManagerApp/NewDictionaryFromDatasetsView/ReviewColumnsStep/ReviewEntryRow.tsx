@@ -24,7 +24,8 @@ type Props = {
 /**
  * One proposed entry on the Review step: include it or not, rename it, see
  * where it came from, change its kind, and undo a guessed merge. The last
- * cell says what comes next for it, labels or only a description. Every
+ * cell says what comes next for it, mapping values and a description, or
+ * only a description. Every
  * cell puts its first line on the row's shared center line.
  */
 export function ReviewEntryRow({
@@ -75,7 +76,7 @@ export function ReviewEntryRow({
       <Table.Td>
         <div className={css.reviewEntryLine}>
           <Text size="xs" c="dimmed">
-            {isCoded ? t`Needs mapping` : t`Description`}
+            {isCoded ? t`Map values + describe` : t`Describe`}
           </Text>
         </div>
         <KeepApartButton

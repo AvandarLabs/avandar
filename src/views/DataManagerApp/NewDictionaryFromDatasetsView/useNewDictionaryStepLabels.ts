@@ -14,6 +14,7 @@ export function useNewDictionaryStepLabels(): Record<
     pick: t`Pick datasets`,
     review: t`Review columns`,
     label: t`Map values`,
+    describe: t`Describe columns`,
     save: t`Save`,
   };
 }
