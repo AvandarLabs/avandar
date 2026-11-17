@@ -513,6 +513,24 @@ describe("createPiConversation store isolation", () => {
   });
 });
 
+describe("createPiConversation on a device conversation", () => {
+  it("M06 keeps the county's real value instead of a placeholder", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(_questionById("M06"));
+
+    expect(asked[0]).toContain("Kings");
+    expect(asked[0]).not.toContain("<value 1>");
+  });
+});
+
 describe("createPiConversation with dashboard questions", () => {
   const questionOf = (id: string): EvalQuestion => {
     return DASHBOARD_QUESTIONS.find((question) => {
@@ -607,20 +625,5 @@ describe("createPiConversation with dashboard questions", () => {
     const answer = await conversation.ask(questionOf("D08"));
 
     expect(answer.dashboardWrites).toEqual([]);
-  });
-
-  it("names a mention by its real name on a device conversation", async () => {
-    const asked: string[] = [];
-    const conversation = createPiConversation({
-      database: {} as EvalDatabase,
-      privacy: "device",
-      createAgent: () => {
-        return _createRecordingAgent(asked);
-      },
-    });
-
-    await conversation.ask(questionOf("D06"));
-
-    expect(asked[0]).toContain('@"COVID 2022"');
   });
 });

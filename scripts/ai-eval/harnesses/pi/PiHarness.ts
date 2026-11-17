@@ -457,7 +457,8 @@ function _createContextLookup(
  * context for is unavailable. Unlike the browser, it does not redact the SQL
  * of gadgets only earlier messages mention: no eval follow-up mentions a
  * gadget its parent did not also have in scope, so the vault never lacks a
- * value a later name needs.
+ * value a later name needs. With `device` privacy it skips redaction and
+ * masking: SQL and names stay real, and SQL is capped at three charts.
  */
 function _buildTurnInputs(
   question: EvalQuestion,
