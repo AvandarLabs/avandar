@@ -30,10 +30,11 @@ Three facts shape the design:
    owned by whoever imported it.
 2. An imported dataset may now be read by other things: linked datasets
    (dictionary conversions) and other plugins' data slot bindings.
-3. `DatasetClient.fullDelete` removes the dataset's parquet (and retained
-   original) from Storage, then deletes the `datasets` row. Storage cleanup
-   happens in the browser, so no server transaction can make an uninstall and
-   its deletes atomic.
+3. `DatasetClient.fullDelete` checks the user's admin access to the dataset,
+   removes its parquet (and retained original) from Storage, deletes the
+   `datasets` row, and confirms the row is gone. Storage cleanup happens in
+   the browser, so no server transaction can make an uninstall and its
+   deletes atomic.
 
 ## Goals
 
@@ -59,7 +60,6 @@ Three facts shape the design:
   Sources already does that.
 - Plugin storage, secrets, and the 30-day retention from the ecosystem spec's
   uninstall table. None of them exist yet.
-- Fixing the half-delete risk in `fullDelete` for Data Sources. See Follow-ups.
 
 ## Decisions
 
@@ -245,15 +245,17 @@ It shares no source files with `fix/plugins-leftovers`, only the `.po`
 catalogs. Merge into `demo/measles` only with Pablo's explicit approval. A
 push to `demo/**` deploys.
 
-## Follow-ups
+## Fixed
 
-- **`fullDelete` can half-delete a dataset.** It deletes the parquet from
+- **`fullDelete` could half-delete a dataset.** It deleted the parquet from
   Storage before the `datasets` row, and a row that RLS hides from DELETE is
   deleted silently with zero rows affected. A user whose dataset admin access
   was revoked after the page loaded could end up with a dataset that has no
-  data. This spec guards its own path with a re-check. Data Sources' Delete
-  Dataset does not. Fix it in `createDatasetMutations.ts` (delete the row
-  first and check it was deleted, or check access first) in its own change.
+  data. `fullDelete` now checks admin access before it touches Storage and
+  reads the row back after the delete, and throws a `DatasetDeleteError` if
+  either check fails. This path's own re-check in
+  `uninstallPluginAndDeleteDatasets` stays, so a dataset the user may no
+  longer delete is recorded as failed without a throw.
 
 ## Done when
 
