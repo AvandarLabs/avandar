@@ -1,7 +1,8 @@
 /*
  * The code lists flank beside the selected list's values. The flank paints
  * the body surface edge to edge with a single hairline against the lit
- * column, and sits outside the content column's gutter.
+ * column, and sits outside the content column's gutter. Its corners take
+ * the design system's default panel radius.
  */
 .labelValuesStep {
   display: flex;
@@ -13,6 +14,7 @@
 .labelValuesStepNav {
   background-color: var(--ava-surface-body);
   border-inline-end: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
   display: flex;
   flex: none;
   flex-direction: column;

@@ -190,6 +190,22 @@ describe("LabelValuesStep", () => {
     });
   });
 
+  it("explains the Missing value column to someone who focuses its info icon", async () => {
+    _renderStep();
+    const infoButton = screen.getByRole("button", {
+      name: "About missing values",
+    });
+    expect(
+      within(
+        screen.getByRole("columnheader", { name: /Missing value/ }),
+      ).getByRole("button", { name: "About missing values" }),
+    ).toBe(infoButton);
+    fireEvent.focus(infoButton);
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(
+      "Your data isn't changed.",
+    );
+  });
+
   it("asks for suggestions for the selected list", () => {
     const { onSuggest } = _renderStep();
     fireEvent.click(screen.getByRole("button", { name: "Suggest labels" }));
