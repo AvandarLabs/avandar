@@ -38,11 +38,11 @@ function _attachedText(
 }
 
 /**
- * The text of one agent turn: the page block, the attached block, the
- * mentioned block, then the user's message. A page or attached block
- * identical to the previous turn's becomes one short line, so a long
- * conversation does not resend the same charts every turn. An attached
- * block that disappeared becomes one "nothing attached" line. The
+ * The text of one agent turn: the dashboard card lines, the page block, the
+ * attached block, the mentioned block, then the user's message. A page or
+ * attached block identical to the previous turn's becomes one short line,
+ * so a long conversation does not resend the same charts every turn. An
+ * attached block that disappeared becomes one "nothing attached" line. The
  * `previous*` options are the full blocks built for the previous turn, not
  * the text that was sent for it.
  */
@@ -54,9 +54,15 @@ export function buildAgentTurnText(
     attachedBlock?: string;
     previousAttachedBlock?: string;
     mentionedBlock?: string;
+    /**
+     * Lines about cards the user resolved since the agent last heard, sent
+     * first.
+     */
+    dashboardCardLines?: readonly string[];
   }>,
 ): string {
   const blocks = [
+    ...(options.dashboardCardLines ?? []),
     _pageText(options.pageBlock, options.previousPageBlock),
     _attachedText(options.attachedBlock, options.previousAttachedBlock),
     options.mentionedBlock,
@@ -64,4 +70,31 @@ export function buildAgentTurnText(
     return block !== undefined;
   });
   return [...blocks, options.message].join("\n\n");
+}
+
+/** A block at the start of a turn's text, with the blank line after it. */
+const LEADING_TURN_BLOCK =
+  /^<(dashboard_card|current_page|attached|mentioned)>[\s\S]*?<\/\1>(?:\n\n|$)/;
+
+/**
+ * A turn's text split into the blocks `buildAgentTurnText` put first and
+ * the message after them. The offline router and value matcher read only
+ * the message. Tag starts inside a block are escaped when it is built, so
+ * a block's closing tag is always its own.
+ */
+export function splitAgentTurnText(text: string): {
+  blocks: string;
+  message: string;
+} {
+  const blocks: string[] = [];
+  let rest = text;
+  for (
+    let match = LEADING_TURN_BLOCK.exec(rest);
+    match;
+    match = LEADING_TURN_BLOCK.exec(rest)
+  ) {
+    blocks.push(match[0].trimEnd());
+    rest = rest.slice(match[0].length);
+  }
+  return { blocks: blocks.join("\n\n"), message: rest };
 }
