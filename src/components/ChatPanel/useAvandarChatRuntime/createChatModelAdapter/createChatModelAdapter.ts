@@ -139,6 +139,11 @@ type TurnMessages = {
    */
   localMessages: readonly ChatClientMessage.T[];
   /**
+   * The thread with ref tokens kept and offline answers readable. Only
+   * offline agent turns read it; they name each token on the device.
+   */
+  localTokenMessages: readonly ChatClientMessage.T[];
+  /**
    * The thread as today's hosted chat receives it, each mention named by
    * its type only (`@"a chart"`), and offline answers hidden. Its consent
    * check runs on this text, so a consent ack matches the message it is
@@ -217,13 +222,14 @@ async function _prepareTurnMessages(
     attachedRefs: options.attachedRefs,
     workspaceId: options.workspaceId,
   });
+  // Offline answers stay readable on the device.
+  const localTokenMessages = _toApiMessages(options.messages, {
+    hideOfflineAnswers: false,
+  });
   return {
     apiMessages,
-    // Offline answers stay readable on the device.
-    localMessages: toLocalModelMessages(
-      _toApiMessages(options.messages, { hideOfflineAnswers: false }),
-      gadgetContext,
-    ),
+    localMessages: toLocalModelMessages(localTokenMessages, gadgetContext),
+    localTokenMessages,
     hostedChatMessages: toHostedChatMessages(apiMessages),
     gadgetContext,
     mentionCount: options.isAgentTurn
@@ -629,9 +635,15 @@ export function createChatModelAdapter(
         const result = await runLocalChatTurn({
           dataAgentTurn: {
             ...dataAgentTurn,
-            apiMessages: localMessages,
-            gadgetContext: undefined,
+            apiMessages: turnMessages.localTokenMessages,
             questionLabel: turnMessages.questionLabel,
+          },
+          pipelineMessages: localMessages,
+          isCaseDesign: sessionKindRef.current === "case-design",
+          page: {
+            pathname: currentPathname,
+            chatPageContext: currentPageContext,
+            dashboardEditorState: currentDashboardEditorState,
           },
           workspace: workspaceRef.current,
           pageContext: currentPageContext,

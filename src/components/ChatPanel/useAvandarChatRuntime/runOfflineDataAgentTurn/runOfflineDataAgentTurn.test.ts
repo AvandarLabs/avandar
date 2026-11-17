@@ -1,19 +1,26 @@
+import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { runOfflineDataAgentTurn } from "./runOfflineDataAgentTurn";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type { AgentPageInputs } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/buildAgentTurnInputs";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { CreateOfflineDataAgentOptions } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
 
 const {
+  askMock,
   createOfflineDataAgentMock,
   decideMock,
   explorerShowQueryMock,
+  readAgentPageContextMock,
   showQueryInChatMock,
 } = vi.hoisted(() => {
   return {
+    askMock: vi.fn(),
     createOfflineDataAgentMock: vi.fn(),
     decideMock: vi.fn(),
+    readAgentPageContextMock: vi.fn(),
     explorerShowQueryMock: vi
       .fn()
       .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
@@ -38,6 +45,14 @@ vi.mock(
         return explorerShowQueryMock;
       },
     };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/buildAgentTurnInputs",
+  async (importOriginal) => {
+    const original = await importOriginal<object>();
+    return { ...original, readAgentPageContext: readAgentPageContextMock };
   },
 );
 
@@ -84,17 +99,34 @@ function _createTurnOptions(
   } as unknown as DataAgentTurnOptions;
 }
 
+function _page(): AgentPageInputs {
+  return {
+    pathname: "/acme/page",
+    chatPageContext: Model.make("ChatPageContext", { app: "other" }),
+    dashboardEditorState: {} as never,
+  };
+}
+
+/** Makes the page read return `pageContext` for the next turn. */
+function _onPage(pageContext: AgentPageContext): AgentPageInputs {
+  readAgentPageContextMock.mockResolvedValue(pageContext);
+  return _page();
+}
+
 function _lastAgentOptions(): CreateOfflineDataAgentOptions {
   return createOfflineDataAgentMock.mock.calls.at(-1)![0];
 }
 
 describe("runOfflineDataAgentTurn", () => {
   beforeEach(() => {
+    askMock.mockReset().mockResolvedValue({ text: "42" });
+    readAgentPageContextMock.mockReset();
+    explorerShowQueryMock.mockClear();
+    showQueryInChatMock
+      .mockReset()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 });
     createOfflineDataAgentMock.mockReset().mockImplementation(() => {
-      return {
-        agent: { abort: vi.fn() },
-        ask: vi.fn().mockResolvedValue({ text: "42" }),
-      };
+      return { agent: { abort: vi.fn() }, ask: askMock };
     });
     decideMock.mockReset();
   });
@@ -151,12 +183,44 @@ describe("runOfflineDataAgentTurn", () => {
     expect(createOfflineDataAgentMock).toHaveBeenCalledTimes(1);
   });
 
-  it("shows results in the Data Explorer", async () => {
-    await runOfflineDataAgentTurn(_createTurnOptions({ chatGeneration: 5 }));
+  it("shows results in the Data Explorer on that page", async () => {
+    await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 5 }),
+      _onPage({ app: "data-explorer" }),
+    );
 
     await _lastAgentOptions().host.showQuery({ sql: "SELECT 1", summary: "s" });
 
     expect(explorerShowQueryMock).toHaveBeenCalled();
     expect(showQueryInChatMock).not.toHaveBeenCalled();
+  });
+
+  it("shows results in the chat on a dashboard page", async () => {
+    await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 7 }),
+      _onPage({
+        app: "dashboard",
+        dashboard: { id: "d-1", name: "COVID 2022", tiles: [] },
+      }),
+    );
+
+    await _lastAgentOptions().host.showQuery({ sql: "SELECT 1", summary: "s" });
+
+    expect(showQueryInChatMock).toHaveBeenCalled();
+    expect(explorerShowQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("builds device blocks for the offline agent", async () => {
+    await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 8 }),
+      _onPage({
+        app: "dashboard",
+        dashboard: { id: "d-1", name: "COVID 2022", tiles: [] },
+      }),
+    );
+
+    const askedText: string = askMock.mock.calls[0]![0];
+    expect(askedText.startsWith("<current_page>")).toBe(true);
+    expect(askedText).toContain("COVID 2022");
   });
 });

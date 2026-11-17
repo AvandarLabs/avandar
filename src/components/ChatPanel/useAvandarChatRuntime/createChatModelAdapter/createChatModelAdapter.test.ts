@@ -291,18 +291,37 @@ describe("createChatModelAdapter", () => {
     expect(apiPostMock).not.toHaveBeenCalled();
   });
 
-  it("runs the offline pipeline outside the Data Explorer with offline mode on", async () => {
+  it("runs the offline agent outside the Data Explorer with offline mode on", async () => {
     OfflineModeStore.setOn(true);
 
     const result = await _ask(_createAdapter("dashboards"));
 
     expect(result).toEqual(
       OfflineAnswerMessage.mark({
+        content: [{ type: "text", text: "offline agent reply" }],
+      }),
+    );
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(runOfflineChatTurnMock).not.toHaveBeenCalled();
+    expect(apiPostMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps the offline pipeline for a case-design session", async () => {
+    OfflineModeStore.setOn(true);
+
+    const result = await _ask(
+      _createAdapter("dashboards", {
+        sessionKindRef: { current: "case-design" },
+      } as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(result).toEqual(
+      OfflineAnswerMessage.mark({
         content: [{ type: "text", text: "offline pipeline reply" }],
       }),
     );
+    expect(runOfflineChatTurnMock).toHaveBeenCalledTimes(1);
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
-    expect(apiPostMock).not.toHaveBeenCalled();
   });
 
   it("runs offline when the browser is offline and the bundle is downloaded", async () => {
@@ -835,23 +854,27 @@ describe("createChatModelAdapter with mentions", () => {
     expect(apiPostMock).not.toHaveBeenCalled();
   });
 
-  it("sends the offline data agent names, never tokens", async () => {
+  it("sends the offline data agent tokens and the loaded gadgets", async () => {
     isAgentEnabledMock.mockReturnValue(true);
     OfflineModeStore.setOn(true);
 
     await _askWithMention("data-explorer", [DASHBOARD_REF]);
 
     const turn = runOfflineDataAgentTurnMock.mock.calls[0]![0];
-    expect(turn.apiMessages.at(-1).content).toBe('Show @"US deaths"');
-    expect(JSON.stringify(turn.apiMessages)).not.toContain("@{");
-    expect(turn.gadgetContext).toBeUndefined();
+    expect(turn.apiMessages.at(-1).content).toBe(`Show ${DATASET_TOKEN}`);
+    expect(turn.gadgetContext).toEqual({
+      attachedRefs: [DASHBOARD_REF],
+      contexts: LOADED_CONTEXTS,
+    });
     expect(runDataAgentTurnMock).not.toHaveBeenCalled();
   });
 
   it("sends the offline pipeline names, never tokens", async () => {
     OfflineModeStore.setOn(true);
 
-    await _askWithMention("dashboards");
+    await _askWithMention("dashboards", [], {
+      sessionKindRef: { current: "case-design" },
+    } as Partial<CreateChatModelAdapterOptions>);
 
     const { messages } = runOfflineChatTurnMock.mock.calls[0]![0];
     expect(messages.at(-1).content).toBe('Show @"US deaths"');
@@ -1019,6 +1042,7 @@ describe("createChatModelAdapter with mentions", () => {
 
     expect(runOfflineDataAgentTurnMock).toHaveBeenCalledWith(
       expect.objectContaining({ questionLabel: "Show @US deaths" }),
+      expect.anything(),
     );
   });
 
@@ -1351,6 +1375,9 @@ describe("createChatModelAdapter offline answers in hosted requests", () => {
     runDataAgentTurnMock.mockReset().mockResolvedValue({
       content: [{ type: "text", text: "agent reply" }],
     });
+    runOfflineDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
     runOfflineChatTurnMock
       .mockReset()
       .mockResolvedValue({ assistantText: "Jane Doe had two visits." });
@@ -1442,7 +1469,9 @@ describe("createChatModelAdapter offline answers in hosted requests", () => {
     isAgentEnabledMock.mockReturnValue(false);
     OfflineModeStore.setOn(true);
 
-    await _createAdapter("dashboards").run(
+    await _createAdapter("dashboards", {
+      sessionKindRef: { current: "case-design" },
+    } as Partial<CreateChatModelAdapterOptions>).run(
       _threadWithReply({ custom: { isOfflineAnswer: true } }),
     );
 
