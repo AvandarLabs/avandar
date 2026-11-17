@@ -2658,7 +2658,7 @@ msgstr "Inabadilishwa inapopakiwa · inafuata kamusi"
 msgid "The offline models did not download"
 msgstr "Modeli za nje ya mtandao hazikupakuliwa"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
 msgid "Missing value"
 msgstr "Thamani inayokosekana"
 
@@ -2708,6 +2708,13 @@ msgstr "Jifunze kutoka kwenye seti zaidi za data"
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {Hamisha rekodi # hadi} other {Hamisha rekodi "
 "# hadi}}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "Turn on for values that mean no answer was recorded, such as \"Unknown\" "
+"or 99. Your data isn't changed. The value is marked as missing wherever "
+"the dictionary is shown, and Avandar's AI is told it is missing, so it "
+"won't treat it as a real answer."
+msgstr ""
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
@@ -2944,6 +2951,10 @@ msgstr "Kuunda kamusi kunahitaji ruhusa ya kuhariri Vyanzo vya Data. Muulize "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "Safu wima ya 3"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "About missing values"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx

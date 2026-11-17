@@ -2668,7 +2668,7 @@ msgstr "Convertido durante o carregamento · segue o dicionário"
 msgid "The offline models did not download"
 msgstr "Os modelos offline não foram baixados"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
 msgid "Missing value"
 msgstr "Valor ausente"
 
@@ -2717,6 +2717,13 @@ msgstr "Aprender com mais conjuntos de dados"
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {Mover # registro para} other {Mover # "
 "registros para}}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "Turn on for values that mean no answer was recorded, such as \"Unknown\" "
+"or 99. Your data isn't changed. The value is marked as missing wherever "
+"the dictionary is shown, and Avandar's AI is told it is missing, so it "
+"won't treat it as a real answer."
+msgstr ""
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
@@ -2951,6 +2958,10 @@ msgstr "A criação de um dicionário requer acesso de edição a Data Sources. 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "Coluna 3"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "About missing values"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx

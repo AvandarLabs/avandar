@@ -2547,7 +2547,7 @@ msgstr "載入時轉換 · 遵循字典"
 msgid "The offline models did not download"
 msgstr "離線模型未下載"
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
 msgid "Missing value"
 msgstr "缺少值"
 
@@ -2593,6 +2593,13 @@ msgstr "從更多資料集中學習"
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {將 # 筆記錄移至} other {將 # 筆記錄移至}}"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "Turn on for values that mean no answer was recorded, such as \"Unknown\" "
+"or 99. Your data isn't changed. The value is marked as missing wherever "
+"the dictionary is shown, and Avandar's AI is told it is missing, so it "
+"won't treat it as a real answer."
+msgstr ""
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
@@ -2818,6 +2825,10 @@ msgstr "建立字典需要具備 Data Sources 的編輯存取權限。請向工�
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "第 3 欄"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader.tsx
+msgid "About missing values"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
