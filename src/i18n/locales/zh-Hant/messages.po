@@ -14065,7 +14065,7 @@ msgstr "轉換 {datasetName} 會建立連結資料集，而您的方案已達資
 
 #: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
 msgid "Please contact support for assistance."
-msgstr "請聯繫支援團隊以取得協助。"
+msgstr "請聯絡支援團隊以取得協助。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."

@@ -11803,11 +11803,11 @@ msgstr "المهام"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList.tsx
 msgid "{dependentCount, plural, one {This reads it and stops working once it is "
 "deleted:} other {These read it and stop working once it is deleted:}}"
-msgstr "{dependentCount, plural, zero {لا يقرؤه أي عنصر:} one {هذا العنصر يقرؤه "
-"ويتوقف عن العمل بعد حذفه:} two {هذان العنصران يقرآنه ويتوقفان عن العمل "
-"بعد حذفه:} few {هذه العناصر تقرؤه وتتوقف عن العمل بعد حذفه:} many {هذه "
-"العناصر تقرؤه وتتوقف عن العمل بعد حذفه:} other {هذه العناصر تقرؤه "
-"وتتوقف عن العمل بعد حذفه:}}"
+msgstr "{dependentCount, plural, zero {لا يقرؤها أي عنصر:} one {هذا العنصر "
+"يقرؤها ويتوقف عن العمل بعد حذفها:} two {هذان العنصران يقرآنها ويتوقفان "
+"عن العمل بعد حذفها:} few {هذه العناصر تقرؤها وتتوقف عن العمل بعد "
+"حذفها:} many {هذه العناصر تقرؤها وتتوقف عن العمل بعد حذفها:} other {هذه "
+"العناصر تقرؤها وتتوقف عن العمل بعد حذفها:}}"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
