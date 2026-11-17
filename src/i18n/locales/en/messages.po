@@ -419,6 +419,10 @@ msgstr "most recent"
 msgid "PII detected:"
 msgstr "PII detected:"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "Something went wrong while uninstalling. Try again."
+msgstr "Something went wrong while uninstalling. Try again."
+
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Nearest {sourceName}"
 msgstr "Nearest {sourceName}"
@@ -584,7 +588,7 @@ msgid "Enter your question or instructions in natural language to generate a "
 msgstr "Enter your question or instructions in natural language to generate a "
 "SQL query"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
 msgstr "Could not update {pluginName}"
@@ -1830,6 +1834,10 @@ msgstr "Assign to"
 msgid "Share “{resourceName}”"
 msgstr "Share “{resourceName}”"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "The datasets this plugin imported are loaded."
+msgstr "The datasets this plugin imported are loaded."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
 msgstr "Checking what each map publishes"
@@ -2066,6 +2074,7 @@ msgstr "Metadata"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentItemRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginLookupFeedback.tsx
 msgid "Retry"
 msgstr "Retry"
 
@@ -2086,6 +2095,10 @@ msgstr "{issueCount, plural, one {# thing to fix before saving} other {# things 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Type a question and I will generate the SQL and run it for you."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "We checked for datasets this plugin imported."
+msgstr "We checked for datasets this plugin imported."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
@@ -2278,10 +2291,6 @@ msgstr "This map includes {0}, a layer set to Aggregate only. The export "
 "applies the same suppression as the screen: areas with fewer than "
 "{threshold} records are shown as suppressed, never as zero."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
-msgid "{pluginName}: {slotTitle}"
-msgstr "{pluginName}: {slotTitle}"
-
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
@@ -2423,10 +2432,6 @@ msgstr "Password reset failed"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "New role group"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "We could not check what reads this dataset."
-msgstr "We could not check what reads this dataset."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -2820,6 +2825,13 @@ msgstr "For example: {example}"
 msgid "Remove member"
 msgstr "Remove member"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets could not be fully deleted. Their data may already be "
+"gone. Check them in Data Sources and delete them again: {incompleteList}"
+msgstr "These datasets could not be fully deleted. Their data may already be "
+"gone. Check them in Data Sources and delete them again: "
+"{incompleteList}"
+
 #. placeholder {0}: _formatProducedAt(producedAt)
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
@@ -2986,6 +2998,10 @@ msgstr "Positron"
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Boundary disclaimer (Always included)"
 msgstr "Boundary disclaimer (Always included)"
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "The dataset could not be deleted. Try again."
+msgstr "The dataset could not be deleted. Try again."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
@@ -3300,6 +3316,10 @@ msgstr "Radius"
 msgid "Week of {day}"
 msgstr "Week of {day}"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset."
+msgstr "You don't have permission to delete this dataset."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Sort & limit"
@@ -3533,6 +3553,12 @@ msgstr "The default order lists the nearest first when a buffer filters the "
 #: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
 msgid "Q{quarter} {year}"
 msgstr "Q{quarter} {year}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "We could not confirm the uninstall. Check the plugin list, then try "
+"again."
+msgstr "We could not confirm the uninstall. Check the plugin list, then try "
+"again."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -3967,12 +3993,6 @@ msgstr "The workspace ID cannot be empty"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "By default we use a direct UUID-based link."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
-msgid "These datasets could not be deleted and are still in Data Sources: "
-"{names}"
-msgstr "These datasets could not be deleted and are still in Data Sources: "
-"{names}"
 
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
@@ -4649,7 +4669,7 @@ msgstr "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgid "Statuses"
 msgstr "Statuses"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
 msgstr "{pluginName} uninstalled"
@@ -4707,6 +4727,10 @@ msgstr "your dataset"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "Single color"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "If you uninstall it now, every dataset it imported is kept."
+msgstr "If you uninstall it now, every dataset it imported is kept."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry support is still downloading. This can take a moment on a slow "
@@ -4891,6 +4915,12 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 "app to clear cached data and try once more."
 msgstr "Please sign in again to continue. If signing in does not work, reset "
 "the app to clear cached data and try once more."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because you can't delete them, and they "
+"are still in Data Sources: {refusedList}"
+msgstr "These datasets were not deleted because you can't delete them, and they "
+"are still in Data Sources: {refusedList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "Descriptions only"
@@ -6328,6 +6358,10 @@ msgstr "Forgot your password?"
 msgid "Reopen chat"
 msgstr "Reopen chat"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "Checking for datasets this plugin imported."
+msgstr "Checking for datasets this plugin imported."
+
 #. placeholder {0}: pageIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "PDF page {0}"
@@ -6503,6 +6537,10 @@ msgstr "Choose the language used across this workspace. Right-to-left languages 
 msgid "No plans available."
 msgstr "No plans available."
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "Dataset not deleted"
+msgstr "Dataset not deleted"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or after"
 msgstr "is on or after"
@@ -6544,10 +6582,6 @@ msgstr "m"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Keeps the original values in {originalName}"
 msgstr "Keeps the original values in {originalName}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "These read it and stop working once it is deleted:"
-msgstr "These read it and stop working once it is deleted:"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
@@ -6788,6 +6822,10 @@ msgstr "New chat"
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "Unavailable result"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "We could not check whether this plugin imported datasets."
+msgstr "We could not check whether this plugin imported datasets."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
 msgid "Reject the suggestion for {columnName}"
@@ -7507,7 +7545,7 @@ msgstr "Description of {entryName}"
 msgid "Y column"
 msgstr "Y column"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList.tsx
 msgid "{label} (linked dataset)"
 msgstr "{label} (linked dataset)"
 
@@ -8885,6 +8923,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "An unexpected error occurred"
+msgstr "An unexpected error occurred"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
 msgid "Assigned to"
 msgstr "Assigned to"
@@ -8893,6 +8935,10 @@ msgstr "Assigned to"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
 msgstr "Added {0} rows from the assistant. Check them before saving."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
+msgid "Uninstall and keep all datasets"
+msgstr "Uninstall and keep all datasets"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
@@ -9130,7 +9176,7 @@ msgstr "{threshold}% or above"
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# feature} other {# features}}"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
 "deleted.}}"
 msgstr "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
@@ -10872,6 +10918,12 @@ msgstr "Update now"
 msgid "Mean"
 msgstr "Mean"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{pluginName} is still installed. You may not have permission to "
+"uninstall it."
+msgstr "{pluginName} is still installed. You may not have permission to "
+"uninstall it."
+
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
@@ -11390,6 +11442,10 @@ msgstr "Add entry"
 msgid "Global filters"
 msgstr "Global filters"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "We could not load the datasets this plugin imported."
+msgstr "We could not load the datasets this plugin imported."
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
@@ -11760,6 +11816,13 @@ msgstr "There was an error while trying to authenticate with Google Sheets."
 msgid "To do"
 msgstr "To do"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList.tsx
+msgid "{dependentCount, plural, one {This reads it and stops working once it is "
+"deleted:} other {These read it and stop working once it is deleted:}}"
+msgstr "{dependentCount, plural, one {This reads it and stops working once it "
+"is deleted:} other {These read it and stop working once it is "
+"deleted:}}"
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
 "settings."
@@ -11982,6 +12045,10 @@ msgstr "All decisions"
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
 msgstr "series.cases"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "Every dataset it imported stays in Data Sources."
+msgstr "Every dataset it imported stays in Data Sources."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
 msgid "Loading count"
@@ -12603,6 +12670,10 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "We could not load what reads this dataset."
+msgstr "We could not load what reads this dataset."
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
@@ -13685,6 +13756,10 @@ msgstr "Back to layers"
 msgid "Cancelled"
 msgstr "Cancelled"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "Loading the datasets this plugin imported."
+msgstr "Loading the datasets this plugin imported."
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
@@ -14145,7 +14220,7 @@ msgstr "This comment was deleted."
 msgid "Filter entries or column names"
 msgstr "Filter entries or column names"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentChoices.tsx
 msgid "Unchecked datasets stay in Data Sources."
 msgstr "Unchecked datasets stay in Data Sources."
 
@@ -14391,6 +14466,10 @@ msgstr "Invalid value column selected"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Row {rowNum} / Col {colNum}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "We could not check for datasets this plugin imported."
+msgstr "We could not check for datasets this plugin imported."
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DictionaryChips.tsx
 msgid "Stop using {name}"
 msgstr "Stop using {name}"
@@ -14404,6 +14483,10 @@ msgid "Converting {datasetName} creates a linked dataset, and your plan's "
 "dataset limit is reached. You can still attach labels as reference."
 msgstr "Converting {datasetName} creates a linked dataset, and your plan's "
 "dataset limit is reached. You can still attach labels as reference."
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "Please contact support for assistance."
+msgstr "Please contact support for assistance."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
@@ -14724,7 +14807,7 @@ msgstr "Explore your data"
 msgid "Mention a teammate"
 msgstr "Mention a teammate"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginCardSummary.tsx
 msgid "No longer included in this deployment. Uninstall to remove it from this "
 "workspace."
 msgstr "No longer included in this deployment. Uninstall to remove it from this "
@@ -15203,10 +15286,6 @@ msgstr "Per quarter"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
 msgstr "{0} (boundary)"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "{label} (data slot)"
-msgstr "{label} (data slot)"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
@@ -15788,6 +15867,10 @@ msgstr "Add at least one X / Y series"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Show QR code"
 msgstr "Show QR code"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
+msgid "{slotTitle} in the {pluginName} plugin"
+msgstr "{slotTitle} in the {pluginName} plugin"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"

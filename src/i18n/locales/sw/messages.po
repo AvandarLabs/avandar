@@ -425,6 +425,10 @@ msgstr "ya hivi karibuni zaidi"
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "Something went wrong while uninstalling. Try again."
+msgstr "Hitilafu imetokea wakati wa kuondoa. Jaribu tena."
+
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Nearest {sourceName}"
 msgstr "Iliyo karibu zaidi na {sourceName}"
@@ -594,7 +598,7 @@ msgid "Enter your question or instructions in natural language to generate a "
 msgstr "Ingiza swali lako au maelekezo kwa lugha ya kawaida ili kuunda swali la "
 "SQL"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
 msgstr "Imeshindikana kusasisha {pluginName}"
@@ -1854,6 +1858,10 @@ msgstr "Kabidhi kwa"
 msgid "Share “{resourceName}”"
 msgstr "Shiriki “{resourceName}”"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "The datasets this plugin imported are loaded."
+msgstr "Seti za data ambazo plugin hii iliziingiza zimepakiwa."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
 msgstr "Inakagua kile ambacho kila ramani huchapisha"
@@ -2095,6 +2103,7 @@ msgstr "Metadata"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentItemRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginContentSection/PluginContentRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginLookupFeedback.tsx
 msgid "Retry"
 msgstr "Jaribu tena"
 
@@ -2116,6 +2125,10 @@ msgstr "{issueCount, plural, one {# jambo la kurekebisha kabla ya kuhifadhi} "
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Andika swali, nami nitaunda SQL na kuiendesha kwa ajili yako."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "We checked for datasets this plugin imported."
+msgstr "Tumeangalia seti za data ambazo plugin hii iliziingiza."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
@@ -2309,10 +2322,6 @@ msgstr "Ramani hii inajumuisha {0}, safu iliyowekwa kuwa Jumlisha pekee. "
 "Uhamishaji hutumia uzuiaji uleule kama skrini: maeneo yenye rekodi "
 "zisizozidi {threshold} yanaonyeshwa kuwa yamezuiwa, kamwe si sifuri."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
-msgid "{pluginName}: {slotTitle}"
-msgstr "{pluginName}: {slotTitle}"
-
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
@@ -2455,10 +2464,6 @@ msgstr "Kurekebisha nenosiri kumeshindikana"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Kundi jipya la jukumu"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "We could not check what reads this dataset."
-msgstr "Hatukuweza kuangalia kinachosoma seti hii ya data."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -2858,6 +2863,13 @@ msgstr "Kwa mfano: {example}"
 msgid "Remove member"
 msgstr "Ondoa mwanachama"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets could not be fully deleted. Their data may already be "
+"gone. Check them in Data Sources and delete them again: {incompleteList}"
+msgstr "Seti hizi za data hazikuweza kufutwa kikamilifu. Data yake huenda "
+"tayari imeondoka. Zikague katika Vyanzo vya Data na uzifute tena: "
+"{incompleteList}"
+
 #. placeholder {0}: _formatProducedAt(producedAt)
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
@@ -3027,6 +3039,10 @@ msgstr "Positron"
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Boundary disclaimer (Always included)"
 msgstr "Kanusho la mpaka (Hujumuishwa kila wakati)"
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "The dataset could not be deleted. Try again."
+msgstr "Seti ya data haikuweza kufutwa. Jaribu tena."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
@@ -3345,6 +3361,10 @@ msgstr "Radius"
 msgid "Week of {day}"
 msgstr "Wiki ya {day}"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset."
+msgstr "Huna ruhusa ya kufuta seti hii ya data."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Panga na punguza"
@@ -3580,6 +3600,12 @@ msgstr "Mpangilio chaguomsingi huorodhesha vilivyo karibu zaidi kwanza wakati "
 #: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
 msgid "Q{quarter} {year}"
 msgstr "Robo {quarter} {year}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "We could not confirm the uninstall. Check the plugin list, then try "
+"again."
+msgstr "Hatukuweza kuthibitisha uondoaji. Angalia orodha ya plugin, kisha "
+"ujaribu tena."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
@@ -4024,12 +4050,6 @@ msgstr "Kitambulisho cha workspace hakiwezi kuwa tupu"
 msgid "By default we use a direct UUID-based link."
 msgstr "Kwa chaguomsingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 "UUID."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
-msgid "These datasets could not be deleted and are still in Data Sources: "
-"{names}"
-msgstr "Seti hizi za data hazikuweza kufutwa na bado ziko katika Vyanzo vya "
-"Data: {names}"
 
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
@@ -4715,7 +4735,7 @@ msgstr "{usedSeats} kati ya {maxSeats} viti vilitumika · {remainingSeats} "
 msgid "Statuses"
 msgstr "Hali"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
 msgstr "{pluginName} imeondolewa"
@@ -4773,6 +4793,10 @@ msgstr "seti yako ya data"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "Rangi moja"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "If you uninstall it now, every dataset it imported is kept."
+msgstr "Ukiiondoa sasa, seti zote za data ilizoziingiza zitabaki."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry support is still downloading. This can take a moment on a slow "
@@ -4961,6 +4985,12 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 msgstr "Tafadhali ingia tena ili uendelee. Ikiwa kuingia hakufanyi kazi, weka "
 "upya programu ili kufuta data iliyohifadhiwa kwenye akiba kisha ujaribu "
 "tena."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because you can't delete them, and they "
+"are still in Data Sources: {refusedList}"
+msgstr "Seti hizi za data hazikufutwa kwa sababu huna ruhusa ya kuzifuta, na "
+"bado ziko katika Vyanzo vya Data: {refusedList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "Descriptions only"
@@ -6412,6 +6442,10 @@ msgstr "Umesahau nenosiri lako?"
 msgid "Reopen chat"
 msgstr "Fungua tena soga"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "Checking for datasets this plugin imported."
+msgstr "Inaangalia seti za data ambazo plugin hii iliziingiza."
+
 #. placeholder {0}: pageIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "PDF page {0}"
@@ -6590,6 +6624,10 @@ msgstr "Chagua lugha inayotumika katika eneo hili la kazi. Lugha za kulia "
 msgid "No plans available."
 msgstr "Hakuna mipango inapatikana."
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "Dataset not deleted"
+msgstr "Seti ya data haijafutwa"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or after"
 msgstr "ni baada ya au tarehe hiyo"
@@ -6631,10 +6669,6 @@ msgstr "m"
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Keeps the original values in {originalName}"
 msgstr "Huhifadhi thamani asili katika {originalName}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "These read it and stop working once it is deleted:"
-msgstr "Hivi vinaisoma na kuacha kufanya kazi pindi inapofutwa:"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
@@ -6879,6 +6913,10 @@ msgstr "Mazungumzo mapya"
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "Matokeo hayapatikani"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback.tsx
+msgid "We could not check whether this plugin imported datasets."
+msgstr "Hatukuweza kuangalia kama plugin hii iliingiza seti za data."
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
 msgid "Reject the suggestion for {columnName}"
@@ -7602,7 +7640,7 @@ msgstr "Maelezo ya {entryName}"
 msgid "Y column"
 msgstr "Safu ya Y"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList.tsx
 msgid "{label} (linked dataset)"
 msgstr "{label} (seti ya data iliyounganishwa)"
 
@@ -8998,6 +9036,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "Hakuna mwelekeo bado. Kumbukumbu inajaza kadri mazungumzo yanavyouliza "
 "maswali ya ufafanuzi."
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "An unexpected error occurred"
+msgstr "Hitilafu isiyotarajiwa imetokea"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
 msgid "Assigned to"
 msgstr "Imekabidhiwa kwa"
@@ -9006,6 +9048,10 @@ msgstr "Imekabidhiwa kwa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
 msgstr "Imeongeza mistari {0} kutoka kwa msaidizi. Ikague kabla ya kuhifadhi."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal.tsx
+msgid "Uninstall and keep all datasets"
+msgstr "Ondoa na uhifadhi seti zote za data"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
@@ -9244,7 +9290,7 @@ msgstr "{threshold}% au zaidi"
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# kipengele} other {# vipengele}}"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall.ts
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
 msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
 "deleted.}}"
 msgstr "{deletedCount, plural, one {Seti # ya data imefutwa.} other {Seti # za "
@@ -11002,6 +11048,11 @@ msgstr "Sasisha sasa"
 msgid "Mean"
 msgstr "Kati"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{pluginName} is still installed. You may not have permission to "
+"uninstall it."
+msgstr "{pluginName} bado imesakinishwa. Huenda huna ruhusa ya kuiondoa."
+
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
@@ -11528,6 +11579,10 @@ msgstr "Ongeza ingizo"
 msgid "Global filters"
 msgstr "Vichujio vya kimataifa"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "We could not load the datasets this plugin imported."
+msgstr "Hatukuweza kupakia seti za data ambazo plugin hii iliziingiza."
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
@@ -11902,6 +11957,13 @@ msgstr "Kulikuwa na hitilafu wakati wa kujaribu kuthibitisha na Google Sheets."
 msgid "To do"
 msgstr "Cha kufanya"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/DependentsList.tsx
+msgid "{dependentCount, plural, one {This reads it and stops working once it is "
+"deleted:} other {These read it and stop working once it is deleted:}}"
+msgstr "{dependentCount, plural, one {Kipengele hiki kinaisoma na kitaacha "
+"kufanya kazi ikishafutwa:} other {Vipengele hivi vinaisoma na vitaacha "
+"kufanya kazi ikishafutwa:}}"
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
 "settings."
@@ -12128,6 +12190,10 @@ msgstr "Maamuzi yote"
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
 msgstr "mfululizo.kesi"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "Every dataset it imported stays in Data Sources."
+msgstr "Kila seti ya data iliyoingizwa nayo inabaki katika Vyanzo vya Data."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
 msgid "Loading count"
@@ -12753,6 +12819,10 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "Workspace hii haipo tena au umeondolewa kwenye ufikiaji wake. Ikiwa "
 "unafikiri hili ni kosa, wasiliana na mmiliki wa workspace."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
+msgid "We could not load what reads this dataset."
+msgstr "Hatukuweza kupakia kinachosoma seti hii ya data."
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
@@ -13846,6 +13916,10 @@ msgstr "Rudi kwenye tabaka"
 msgid "Cancelled"
 msgstr "Imesitishwa"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentFailure.tsx
+msgid "Loading the datasets this plugin imported."
+msgstr "Inapakia seti za data ambazo plugin hii iliziingiza."
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
@@ -14308,7 +14382,7 @@ msgstr "Maoni haya yalifutwa."
 msgid "Filter entries or column names"
 msgstr "Chuja maingizo au majina ya safu"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallContentChoices.tsx
 msgid "Unchecked datasets stay in Data Sources."
 msgstr "Seti za data ambazo hazijachaguliwa zinabaki katika Vyanzo vya Data."
 
@@ -14557,6 +14631,10 @@ msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Safu {rowNum} / Safu wima {colNum}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
+msgid "We could not check for datasets this plugin imported."
+msgstr "Hatukuweza kuangalia seti za data ambazo plugin hii iliziingiza."
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DictionaryChips.tsx
 msgid "Stop using {name}"
 msgstr "Acha kutumia {name}"
@@ -14571,6 +14649,10 @@ msgid "Converting {datasetName} creates a linked dataset, and your plan's "
 msgstr "Kubadilisha {datasetName} huunda seti ya data iliyounganishwa, na "
 "kikomo cha seti za data cha mpango wako kimefikiwa. Bado unaweza "
 "kuambatisha lebo kama marejeo."
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "Please contact support for assistance."
+msgstr "Tafadhali wasiliana na timu ya usaidizi ili upate msaada."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
@@ -14893,7 +14975,7 @@ msgstr "Chunguza data yako"
 msgid "Mention a teammate"
 msgstr "Mtaje mshiriki wa timu"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginCardSummary.tsx
 msgid "No longer included in this deployment. Uninstall to remove it from this "
 "workspace."
 msgstr "Haijajumuishwa tena katika deployment hii. Ondoa usakinishaji ili "
@@ -15379,10 +15461,6 @@ msgstr "Kwa robo mwaka"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
 msgstr "{0} (mpaka)"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents.tsx
-msgid "{label} (data slot)"
-msgstr "{label} (nafasi ya data)"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
@@ -15968,6 +16046,10 @@ msgstr "Ongeza angalau mfululizo mmoja wa X / Y"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Show QR code"
 msgstr "Onyesha QR code"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDatasetDependents/useDatasetDependents.ts
+msgid "{slotTitle} in the {pluginName} plugin"
+msgstr "{slotTitle} katika plugin ya {pluginName}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
