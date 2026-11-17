@@ -35,9 +35,9 @@ export type DatasetDependents = Readonly<{
   isLoading: boolean;
 
   /**
-   * Whether the linked datasets, the bindings, or the installs could not be
-   * loaded, so the list may be missing items or leave a data slot unnamed.
-   * What was found is listed regardless.
+   * Whether the linked datasets, the bindings, the installs, or a bundled
+   * plugin manifest could not be loaded, so the list may be missing items or
+   * name a data slot by its ids. What was found is listed regardless.
    */
   hasFailed: boolean;
 }>;
@@ -107,10 +107,62 @@ function _listOtherInstallSlotNames(
     });
 }
 
+type DataSlotLookups = Readonly<{
+  bindings: readonly PluginDataSlotBinding.T[];
+  installations: readonly PluginInstallation.T[];
+  manifestModules: readonly PluginManifestModule[];
+  isLoading: boolean;
+
+  /** The bindings or the installs could not be read, so none are trusted. */
+  hasLookupFailed: boolean;
+
+  /** Any lookup failed, including a bundled plugin manifest. */
+  hasFailed: boolean;
+}>;
+
+/**
+ * Reads what `useDataSlotDependents` needs: the dataset's slot bindings, the
+ * workspace's installs, and the bundled plugin manifests, with how far each
+ * can be trusted.
+ */
+function useDataSlotLookups(datasetId: Dataset.Id): DataSlotLookups {
+  const workspace = useCurrentWorkspace();
+  // Both lists are read again on every mount, since the persisted cache can
+  // restore one from before a slot was bound or a plugin was installed.
+  const [bindings, , bindingsQuery] = PluginDataSlotBindingClient.useGetAll({
+    ...where("dataset_id", "eq", datasetId),
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
+  const [installations, , installationsQuery] =
+    PluginInstallationClient.useGetAll({
+      ...where("workspace_id", "eq", workspace.id),
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
+  const [loadedManifests, isLoadingManifests, manifestsQuery] =
+    useBundledPluginManifests();
+  const hasLookupFailed = bindingsQuery.isError || installationsQuery.isError;
+  return {
+    bindings: bindings ?? [],
+    installations: installations ?? [],
+    manifestModules: loadedManifests?.manifestModules ?? [],
+    isLoading:
+      bindingsQuery.isFetching ||
+      installationsQuery.isFetching ||
+      isLoadingManifests,
+    hasLookupFailed,
+    // A manifest that failed to load only leaves a slot named by its ids, so
+    // it counts as a failure without making the found slots untrusted.
+    hasFailed:
+      hasLookupFailed ||
+      manifestsQuery.isError ||
+      loadedManifests?.hasFailures === true,
+  };
+}
+
 /**
  * Other installs' data slots that read the dataset, each described as the
  * slot title in the plugin name. Nothing is listed while the lookups load
- * or after one fails.
+ * or after the bindings or installs lookup fails.
  */
 function useDataSlotDependents(
   options: Readonly<{
@@ -119,31 +171,15 @@ function useDataSlotDependents(
   }>,
 ): DatasetDependents {
   const { t, i18n } = useLingui();
-  const workspace = useCurrentWorkspace();
-  // Both lists are read again on every mount, since the persisted cache can
-  // restore one from before a slot was bound or a plugin was installed.
-  const [bindings, , bindingsQuery] = PluginDataSlotBindingClient.useGetAll({
-    ...where("dataset_id", "eq", options.datasetId),
-    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-  });
-  const [installations, , installationsQuery] =
-    PluginInstallationClient.useGetAll({
-      ...where("workspace_id", "eq", workspace.id),
-      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-    });
-  const [loadedManifests, isLoadingManifests] = useBundledPluginManifests();
-  const isLoading =
-    bindingsQuery.isFetching ||
-    installationsQuery.isFetching ||
-    isLoadingManifests;
-  const hasFailed = bindingsQuery.isError || installationsQuery.isError;
-  if (isLoading || hasFailed) {
+  const lookups = useDataSlotLookups(options.datasetId);
+  const { isLoading, hasFailed } = lookups;
+  if (isLoading || lookups.hasLookupFailed) {
     return { dependents: [], isLoading, hasFailed };
   }
   const dependents = _listOtherInstallSlotNames({
-    bindings: bindings ?? [],
-    installations: installations ?? [],
-    manifestModules: loadedManifests?.manifestModules ?? [],
+    bindings: lookups.bindings,
+    installations: lookups.installations,
+    manifestModules: lookups.manifestModules,
     installationId: options.installationId,
     locale: i18n.locale,
   }).map(({ key, names }) => {
@@ -187,10 +223,7 @@ export function useDatasetDependents(
       }),
       ...dataSlotsResult.dependents,
     ],
-    isLoading:
-      linkedDatasetsResult.isLoading ||
-      linkedDatasetsResult.isFetching ||
-      dataSlotsResult.isLoading,
+    isLoading: linkedDatasetsResult.isFetching || dataSlotsResult.isLoading,
     hasFailed: linkedDatasetsResult.hasFailed || dataSlotsResult.hasFailed,
   };
 }

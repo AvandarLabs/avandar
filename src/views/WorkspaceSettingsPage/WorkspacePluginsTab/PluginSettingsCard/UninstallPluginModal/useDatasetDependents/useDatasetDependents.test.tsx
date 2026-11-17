@@ -10,10 +10,11 @@ type QueryFlags = { isFetching: boolean; isError: boolean };
 const mocks = vi.hoisted(() => {
   return {
     linkedDatasets: [] as Array<{ id: string; name: string }>,
-    isLoadingLinked: false,
     isFetchingLinked: false,
     hasFailedLinked: false,
     isLoadingManifests: false,
+    manifestsHaveFailures: false,
+    manifestsQueryFailed: false,
     bindings: [] as Array<{
       id: string;
       installationId: string;
@@ -32,7 +33,6 @@ vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
     useLinkedDatasets: () => {
       return {
         linkedDatasets: mocks.linkedDatasets,
-        isLoading: mocks.isLoadingLinked,
         isFetching: mocks.isFetchingLinked,
         hasFailed: mocks.hasFailedLinked,
       };
@@ -79,7 +79,7 @@ vi.mock(
       useBundledPluginManifests: () => {
         return [
           {
-            hasFailures: false,
+            hasFailures: mocks.manifestsHaveFailures,
             manifestModules: [
               {
                 manifest: {
@@ -101,6 +101,7 @@ vi.mock(
             ],
           },
           mocks.isLoadingManifests,
+          { isError: mocks.manifestsQueryFailed },
         ];
       },
     };
@@ -124,10 +125,11 @@ function _renderDependents() {
 describe("useDatasetDependents", () => {
   beforeEach(() => {
     mocks.linkedDatasets = [];
-    mocks.isLoadingLinked = false;
     mocks.isFetchingLinked = false;
     mocks.hasFailedLinked = false;
     mocks.isLoadingManifests = false;
+    mocks.manifestsHaveFailures = false;
+    mocks.manifestsQueryFailed = false;
     mocks.bindings = [];
     mocks.installations = [
       { id: "installation-epi", pluginId: "avandar.epidemiology" },
@@ -266,12 +268,33 @@ describe("useDatasetDependents", () => {
     expect(result.current.isLoading).toBe(true);
   });
 
-  it("reports loading while the linked datasets load", () => {
-    mocks.isLoadingLinked = true;
+  it("reports a failure when a bundled manifest failed to load", () => {
+    mocks.manifestsHaveFailures = true;
 
     const { result } = _renderDependents();
 
-    expect(result.current.isLoading).toBe(true);
+    expect(result.current.hasFailed).toBe(true);
+  });
+
+  it("reports a failure when the bundled manifests query failed", () => {
+    mocks.manifestsQueryFailed = true;
+
+    const { result } = _renderDependents();
+
+    expect(result.current.hasFailed).toBe(true);
+  });
+
+  it("still lists the data slots it found when a bundled manifest failed to load", () => {
+    mocks.manifestsHaveFailures = true;
+    mocks.bindings = [
+      { id: "binding-1", installationId: "installation-epi", slotId: "cases" },
+    ];
+
+    const { result } = _renderDependents();
+
+    expect(result.current.dependents).toEqual([
+      { key: "binding-1", kind: "dataSlot", label: "Cases in the Epidemiology plugin" },
+    ]);
   });
 
   it("reports a failure when the bindings fail to load", () => {
