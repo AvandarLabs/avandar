@@ -1,12 +1,20 @@
 import { Agent } from "@earendil-works/pi-agent-core";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
-import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
+import {
+  ADD_DASHBOARD_BLOCK_TOOL,
+  DATA_AGENT_PROMPT_ID,
+  DATA_AGENT_TOOLS_BY_PROMPT_ID,
+} from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { createAddDashboardBlockTool } from "@/lib/agent/dataAgent/createDataAgentTools/addDashboardBlockTool";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
-import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
+import {
+  createRunQueryTool,
+  MAX_QUERY_RUNS_PER_ANSWER,
+} from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import {
   beginDataAgentRun,
   createDataAgentRunState,
@@ -120,19 +128,44 @@ function _throwIfModelCallFailed(messages: Agent["state"]["messages"]): void {
   }
 }
 
+/** The reply when a chart's query kept failing until the query cap. */
+const CHART_NOT_BUILT_REPLY =
+  "I couldn't build that chart. Its query kept failing.";
+
+/** Whether the answer ended on a chart whose query cap ran out. */
+function _endedOnFailedChart(
+  lastToolNames: readonly string[],
+  state: DataAgentRunState,
+): boolean {
+  return (
+    lastToolNames.includes(ADD_DASHBOARD_BLOCK_TOOL.name) &&
+    !state.dashboardBlock &&
+    state.queryRuns >= MAX_QUERY_RUNS_PER_ANSWER
+  );
+}
+
 /**
  * The reply to show. When the turn ended on a query, the query's summary is
  * the answer; any text the model wrote beside the tool call is narration
- * ("let me run that") written before the query ran.
+ * ("let me run that") written before the query ran. When it ended on a
+ * dashboard block, that tool's summary is the reply, or a note that the
+ * chart could not be built if its query ran out of attempts.
  */
-function _getReplyText(
+export function getDataAgentReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
 ): string {
   const lastAssistant = _findLastAssistant(messages);
-  const endedOnToolCall = (lastAssistant?.content ?? []).some((block) => {
-    return block.type === "toolCall";
+  const lastToolNames = (lastAssistant?.content ?? []).flatMap((block) => {
+    return block.type === "toolCall" ? [block.name] : [];
   });
+  const endedOnToolCall = lastToolNames.length > 0;
+  if (endedOnToolCall && state.dashboardBlock) {
+    return state.dashboardBlock.summary;
+  }
+  if (_endedOnFailedChart(lastToolNames, state)) {
+    return CHART_NOT_BUILT_REPLY;
+  }
   if (endedOnToolCall && state.lastQuery?.outcome.kind === "rows") {
     return state.lastQuery.summary;
   }
@@ -149,13 +182,30 @@ function _getNoPluginAiTools(): readonly PluginAiToolDeclaration[] {
   return [];
 }
 
+/** One tool of an agent built with these options. */
 type DataAgentTool =
   | ReturnType<typeof createRunQueryTool>
   | ReturnType<typeof createPlanQueryTool>
   | ReturnType<typeof createLookupValuesTool>
   | ReturnType<typeof createAskUserTool>
+  | ReturnType<typeof createAddDashboardBlockTool>
   | ReturnType<typeof createPluginAiTool>;
 
+/** Whether the agent's prompt version serves the dashboard tool. */
+function _servesDashboardTool(
+  options: Readonly<CreateDataAgentOptions>,
+): boolean {
+  const promptId = options.promptId ?? DATA_AGENT_PROMPT_ID;
+  return DATA_AGENT_TOOLS_BY_PROMPT_ID[promptId].some((tool) => {
+    return tool.name === ADD_DASHBOARD_BLOCK_TOOL.name;
+  });
+}
+
+/**
+ * The built-in tools: the query tools for the query style, `ask_user`, and
+ * `add_dashboard_block` when the prompt version serves it, so the browser
+ * never offers a tool the proxy would refuse.
+ */
 function _createBuiltInTools(
   options: Readonly<CreateDataAgentOptions>,
   aliases: readonly SqlTableAlias.T[],
@@ -168,31 +218,33 @@ function _createBuiltInTools(
     previewRowCount: options.previewRowCount,
   };
   const askUser = createAskUserTool({ host: options.host, state });
-  if (options.queryTools === "plan") {
-    return [
-      createPlanQueryTool(queryContext, options.datasets),
-      createRunQueryTool(queryContext),
-      askUser,
-    ];
-  }
-  return [
-    createRunQueryTool(queryContext),
-    createLookupValuesTool({
-      host: options.host,
-      aliases,
-      datasets: options.datasets,
-      state,
-    }),
-    askUser,
-  ];
+  const dashboardTools = _servesDashboardTool(options)
+    ? [createAddDashboardBlockTool(queryContext)]
+    : [];
+  const queryTools =
+    options.queryTools === "plan"
+      ? [
+          createPlanQueryTool(queryContext, options.datasets),
+          createRunQueryTool(queryContext),
+        ]
+      : [
+          createRunQueryTool(queryContext),
+          createLookupValuesTool({
+            host: options.host,
+            aliases,
+            datasets: options.datasets,
+            state,
+          }),
+        ];
+  return [...queryTools, askUser, ...dashboardTools];
 }
 
 /**
- * The built-in tools, then one tool per installed plugin AI tool. The
- * offline agent (`plan`) gets no plugin tools, and neither does an agent
- * with no way to run them.
+ * The agent's tools: the built-in tools, then one tool per installed plugin
+ * AI tool, in the order the proxy lists them. The offline agent (`plan`)
+ * gets no plugin tools, and neither does an agent with no way to run them.
  */
-function _createTools(
+export function createDataAgentToolList(
   options: Readonly<CreateDataAgentOptions>,
   aliases: readonly SqlTableAlias.T[],
   state: DataAgentRunState,
@@ -224,7 +276,7 @@ function _createAgent(
       }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
-      tools: _createTools(options, aliases, state),
+      tools: createDataAgentToolList(options, aliases, state),
     },
     streamFn: options.streamFn,
     sessionId: options.sessionId,
@@ -281,8 +333,9 @@ export type CreateDataAgentOptions = {
 
 /**
  * Creates the Pi-based data agent for one conversation: three tools (run a
- * query, look up stored values, ask the user) plus the installed plugin AI
- * tools, rebuilt on every `ask`, a cache-friendly system prompt, and a
+ * query, look up stored values, ask the user), `add_dashboard_block` when
+ * its prompt version serves it, and the installed plugin AI tools, rebuilt
+ * on every `ask`, a cache-friendly system prompt, and a
  * model policy that escalates to a stronger model only when a
  * query fails or comes back empty. `ask` rejects when a model call fails,
  * so callers can show the error or offer another way to answer.
@@ -299,7 +352,7 @@ export function createDataAgent(
     ask: async (message) => {
       Object.assign(state, beginDataAgentRun(state, message));
       turnCounter.turns = 0;
-      agent.state.tools = _createTools(options, aliases, state);
+      agent.state.tools = createDataAgentToolList(options, aliases, state);
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
       let usage: DataAgentUsage = EMPTY_USAGE;
@@ -320,7 +373,7 @@ export function createDataAgent(
       }
       _throwIfModelCallFailed(agent.state.messages);
       return {
-        text: _getReplyText(agent.state.messages, state),
+        text: getDataAgentReplyText(agent.state.messages, state),
         state,
         usage,
         modelIds,
