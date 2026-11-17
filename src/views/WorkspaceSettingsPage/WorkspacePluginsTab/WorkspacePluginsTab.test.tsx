@@ -113,6 +113,11 @@ vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetClient", "getAll"];
+        },
+      },
       useGetAll: () => {
         return [[], false, {}];
       },
@@ -192,6 +197,23 @@ vi.mock("@/hooks/users/useCurrentUser", () => {
     useCurrentUser: () => {
       return { id: "user-id" };
     },
+  };
+});
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets",
+  () => {
+    return {
+      uninstallPluginAndDeleteDatasets: vi.fn(() => {
+        return Promise.resolve({ failedDatasetIds: [] });
+      }),
+    };
+  },
+);
+vi.mock("@/utils/notifications/notify", () => {
+  return {
+    notifySuccess: vi.fn(),
+    notifyWarning: vi.fn(),
+    notifyError: vi.fn(),
   };
 });
 vi.mock("@/utils/Logger", () => {
@@ -429,6 +451,52 @@ describe("WorkspacePluginsTab", () => {
 
     const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
     expect(within(card).getByRole("button", { name: "Uninstall" })).toBeEnabled();
+  });
+
+  describe("the uninstall modal of a plugin that imported datasets", () => {
+    async function _openUninstallModal(): Promise<HTMLElement> {
+      _addBundledPlugin();
+      _addInstallation({ pluginId: (mocks.entries[0] as PluginIndexEntry).id });
+      mocks.contentImports = [
+        { contentId: "cases", pluginId: "any", datasetId: "gone" },
+      ];
+      _renderTab();
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      const uninstallButton = within(card).getByRole("button", {
+        name: "Uninstall",
+      });
+      uninstallButton.focus();
+      fireEvent.click(uninstallButton);
+      await screen.findByRole("dialog");
+      return uninstallButton;
+    }
+
+    it("returns focus to the Uninstall button on Cancel", async () => {
+      const uninstallButton = await _openUninstallModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      await waitFor(() => {
+        expect(uninstallButton).toHaveFocus();
+      });
+    });
+
+    it("moves focus to the card heading after the plugin is uninstalled", async () => {
+      const uninstallButton = await _openUninstallModal();
+
+      fireEvent.click(
+        within(screen.getByRole("dialog")).getByRole("button", {
+          name: "Uninstall",
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Epidemiology" }),
+        ).toHaveFocus();
+      });
+      expect(uninstallButton).not.toHaveFocus();
+    });
   });
 
   it("says so when this deployment bundles no plugins", async () => {

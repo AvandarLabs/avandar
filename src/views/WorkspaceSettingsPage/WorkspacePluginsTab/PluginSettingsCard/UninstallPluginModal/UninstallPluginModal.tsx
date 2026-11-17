@@ -10,6 +10,12 @@ import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePl
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
+/**
+ * Why the modal is closing: the admin backed out, or the plugin was
+ * uninstalled. The opener uses it to decide where focus goes next.
+ */
+export type UninstallModalCloseReason = "cancelled" | "uninstalled";
+
 type Props = Readonly<{
   pluginName: string;
   pluginId: string;
@@ -17,7 +23,7 @@ type Props = Readonly<{
 
   /** The modal this is in, kept open while the uninstall runs. */
   modalId: string;
-  onClose: () => void;
+  onClose: (reason: UninstallModalCloseReason) => void;
 }>;
 
 /** The confirm button's text: plain, or naming how many datasets go too. */
@@ -33,14 +39,18 @@ function _buildConfirmLabel(
       });
 }
 
-/** The ids in `checkedIds`, in the order the rows are listed. */
+/**
+ * The ids in `checkedIds`, in the order the rows are listed. A row the admin
+ * may no longer delete has no checkbox, so its id is left out even when it
+ * was checked earlier.
+ */
 function _listCheckedIdsInRowOrder(
-  rows: ReadonlyArray<{ datasetId: Dataset.Id }>,
+  rows: ReadonlyArray<{ datasetId: Dataset.Id; canDelete: boolean }>,
   checkedIds: ReadonlySet<Dataset.Id>,
 ): Dataset.Id[] {
   return rows
     .filter((row) => {
-      return checkedIds.has(row.datasetId);
+      return row.canDelete && checkedIds.has(row.datasetId);
     })
     .map((row) => {
       return row.datasetId;
@@ -86,7 +96,9 @@ export function UninstallPluginModal(props: Props): JSX.Element {
     pluginName: props.pluginName,
     installationId: props.installationId,
     rows: content.rows,
-    onDone: props.onClose,
+    onDone: () => {
+      props.onClose("uninstalled");
+    },
   });
   useKeepModalOpenWhile(uninstaller.isRunning, props.modalId);
   const datasetIdsToDelete = _listCheckedIdsInRowOrder(
@@ -110,7 +122,9 @@ export function UninstallPluginModal(props: Props): JSX.Element {
         )}
         isRunning={uninstaller.isRunning}
         isLoading={content.isLoading}
-        onCancel={props.onClose}
+        onCancel={() => {
+          props.onClose("cancelled");
+        }}
         onConfirm={() => {
           void uninstaller.run(datasetIdsToDelete);
         }}

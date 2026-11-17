@@ -2,7 +2,11 @@ import { t } from "@lingui/core/macro";
 import { randomId } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { UninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
-import { returnFocusFromOpener } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
+import {
+  returnFocusFromOpener,
+  returnFocusToCardHeading,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
+import type { UninstallModalCloseReason } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /**
@@ -22,25 +26,31 @@ export function openUninstallPluginModal(
   const opener = document.activeElement;
   const headingId = opener?.getAttribute("aria-describedby") ?? null;
   const modalId = randomId();
+  let closeReason: UninstallModalCloseReason = "cancelled";
   modals.open({
     modalId,
     title: t`Uninstall ${pluginName}?`,
     closeOnClickOutside: false,
     closeButtonProps: { "aria-label": t`Close` },
     // A finished uninstall removes the Uninstall button, so focus goes to the
-    // card heading then. `onClose` runs for Cancel, Escape, the close button,
-    // and a finished uninstall alike.
+    // card heading then, and back to the opener otherwise. `onClose` runs for
+    // Cancel, Escape, the close button, and a finished uninstall alike.
     returnFocus: false,
     onClose: () => {
       window.setTimeout(() => {
-        returnFocusFromOpener(opener, headingId);
+        if (closeReason === "uninstalled") {
+          returnFocusToCardHeading(opener, headingId);
+        } else {
+          returnFocusFromOpener(opener, headingId);
+        }
       }, 0);
     },
     children: (
       <UninstallPluginModal
         {...options}
         modalId={modalId}
-        onClose={() => {
+        onClose={(reason) => {
+          closeReason = reason;
           modals.close(modalId);
         }}
       />

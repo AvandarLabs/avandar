@@ -25,16 +25,25 @@ type UninstallSummary = {
   failedNames: string[];
 };
 
-/** Refreshes every list an uninstall can change, such as Data Sources. */
-function _invalidateUninstallQueries(queryClient: QueryClient): void {
-  [
-    PluginInstallationClient.QueryKeys.getAll(),
-    PluginContentImportClient.QueryKeys.getAll(),
-    PluginDataSlotBindingClient.QueryKeys.getAll(),
-    DatasetClient.QueryKeys.getAll(),
-  ].forEach((queryKey) => {
-    void queryClient.invalidateQueries({ queryKey });
-  });
+/**
+ * Refreshes every list an uninstall can change, such as Data Sources, and
+ * resolves once the lists on screen have reloaded. The modal closes after
+ * that, so the plugin's card has already lost its Uninstall button when
+ * focus moves back to it.
+ */
+async function _invalidateUninstallQueries(
+  queryClient: QueryClient,
+): Promise<void> {
+  await Promise.all(
+    [
+      PluginInstallationClient.QueryKeys.getAll(),
+      PluginContentImportClient.QueryKeys.getAll(),
+      PluginDataSlotBindingClient.QueryKeys.getAll(),
+      DatasetClient.QueryKeys.getAll(),
+    ].map((queryKey) => {
+      return queryClient.invalidateQueries({ queryKey });
+    }),
+  );
 }
 
 /**
@@ -69,7 +78,7 @@ async function _uninstallAndRefresh(
   } finally {
     // Also after a failure: the install row may be gone even when the check
     // that proves it throws, so the lists must not keep showing it.
-    _invalidateUninstallQueries(options.queryClient);
+    await _invalidateUninstallQueries(options.queryClient);
   }
 }
 

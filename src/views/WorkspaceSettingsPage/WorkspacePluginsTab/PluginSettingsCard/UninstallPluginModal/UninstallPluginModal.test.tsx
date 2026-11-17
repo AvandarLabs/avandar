@@ -266,6 +266,41 @@ describe("UninstallPluginModal", () => {
     });
   });
 
+  it("leaves out a dataset that was checked and then can no longer be deleted", async () => {
+    _renderModal();
+    _checkDataset("Mozambique districts");
+    // The admin loses the right to delete it. The next render reads the row.
+    mocks.rows = mocks.rows.map((row) => {
+      return row.datasetId === "dataset-districts"
+        ? { ...row, canDelete: false }
+        : row;
+    });
+    _checkDataset("Mozambique provinces");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.uninstall).toHaveBeenCalledWith({
+        installationId: "installation-1",
+        datasetIds: ["dataset-provinces"],
+      });
+    });
+  });
+
+  it("closes as uninstalled once the uninstall finishes, and as cancelled on Cancel", async () => {
+    _renderModal();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(mocks.onClose).toHaveBeenLastCalledWith("cancelled");
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    await waitFor(() => {
+      expect(mocks.onClose).toHaveBeenLastCalledWith("uninstalled");
+    });
+  });
+
   it("closes the modal once the uninstall finishes", async () => {
     _renderModal();
 

@@ -18,3 +18,23 @@ export function returnFocusFromOpener(
     target.focus({ preventScroll: true });
   }
 }
+
+/**
+ * Puts focus on a plugin card's heading once the plugin is uninstalled,
+ * because the Uninstall button that opened the dialog is gone or about to
+ * go. When the card is gone too, such as that of a plugin no longer bundled,
+ * focus goes back to the opener if it is still on the page, and otherwise
+ * stays where the browser left it.
+ */
+export function returnFocusToCardHeading(
+  opener: Element | null,
+  headingId: string | null,
+): void {
+  const heading =
+    headingId === null ? null : document.getElementById(headingId);
+  if (heading instanceof HTMLElement) {
+    heading.focus({ preventScroll: true });
+    return;
+  }
+  returnFocusFromOpener(opener, null);
+}
