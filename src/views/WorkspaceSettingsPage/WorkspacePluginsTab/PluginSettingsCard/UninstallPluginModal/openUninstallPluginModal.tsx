@@ -9,6 +9,18 @@ import {
 import type { UninstallModalCloseReason } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
+type OpenUninstallPluginModalOptions = Readonly<{
+  pluginName: string;
+  pluginId: string;
+  installationId: PluginInstallation.Id;
+
+  /** The button that opened the dialog, where focus returns on Cancel. */
+  opener: HTMLElement;
+
+  /** The id of the card's heading, where focus goes once uninstalled. */
+  headingId: string;
+}>;
+
 /**
  * Opens the uninstall dialog of a plugin that imported datasets, titled
  * "Uninstall <plugin name>?". The `usePluginInstallationActions` hook calls
@@ -16,19 +28,10 @@ import type { PluginInstallation } from "$/models/PluginInstallation/PluginInsta
  * it, and while the uninstall runs neither do Escape and the close button.
  */
 export function openUninstallPluginModal(
-  options: Readonly<{
-    pluginName: string;
-    pluginId: string;
-    installationId: PluginInstallation.Id;
-
-    /** The button that opened the dialog, where focus returns on Cancel. */
-    opener: HTMLElement;
-
-    /** The id of the card's heading, where focus goes once uninstalled. */
-    headingId: string;
-  }>,
+  options: OpenUninstallPluginModalOptions,
 ): void {
-  const { pluginName, opener, headingId } = options;
+  const { opener, headingId, ...modalProps } = options;
+  const { pluginName } = modalProps;
   const modalId = randomId();
   let closeReason: UninstallModalCloseReason = "cancelled";
   modals.open({
@@ -51,9 +54,7 @@ export function openUninstallPluginModal(
     },
     children: (
       <UninstallPluginModal
-        pluginName={pluginName}
-        pluginId={options.pluginId}
-        installationId={options.installationId}
+        {...modalProps}
         modalId={modalId}
         onClose={(reason) => {
           closeReason = reason;

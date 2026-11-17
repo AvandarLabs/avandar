@@ -109,6 +109,24 @@ function useUploadControlConfig(
 }
 
 /**
+ * The delete mutation of a dataset that needs a resync. A refused delete shows
+ * one translated message, and any other failure shows a generic one.
+ */
+function useDeleteDataset(): ReturnType<typeof DatasetClient.useFullDelete> {
+  const { t } = useLingui();
+  const notifyDeleteError = useNotifyDatasetDeleteError({
+    onOtherError: (error) => {
+      Logger.error("Failed to delete dataset", error);
+      notifyError(t`Failed to delete dataset`);
+    },
+  });
+  return DatasetClient.useFullDelete({
+    queryToRefetch: DatasetClient.QueryKeys.getAll(),
+    onError: notifyDeleteError,
+  });
+}
+
+/**
  * A card component for displaying a single dataset that needs to be re-synced
  * because its local data is missing.
  *
@@ -121,16 +139,7 @@ function useUploadControlConfig(
 export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
   const user = useCurrentUser();
-  const notifyDeleteError = useNotifyDatasetDeleteError({
-    onOtherError: (error) => {
-      Logger.error("Failed to delete dataset", error);
-      notifyError(t`Failed to delete dataset`);
-    },
-  });
-  const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
-    queryToRefetch: DatasetClient.QueryKeys.getAll(),
-    onError: notifyDeleteError,
-  });
+  const [deleteDataset, isDeletingDataset] = useDeleteDataset();
   const [deleteDatasetLocally] = useMutation({
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (datasetId: Dataset.Id) => {
