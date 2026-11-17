@@ -1001,7 +1001,8 @@ works like this:
 After install, the plugin's card lists its items under "Datasets it includes",
 each linked to its dataset once imported, with Import for an item that is
 missing and Retry for one that failed. Uninstalling the plugin keeps the
-datasets. Deleting an imported dataset lets the item be imported again.
+datasets unless the admin chooses to delete them, as described below. Deleting
+an imported dataset lets the item be imported again.
 
 When an admin uninstalls a plugin that imported datasets, the uninstall dialog
 lists each one with an unchecked "Delete" box, so every dataset is kept unless
