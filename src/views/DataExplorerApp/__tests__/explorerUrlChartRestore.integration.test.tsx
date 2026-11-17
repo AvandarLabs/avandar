@@ -156,15 +156,6 @@ vi.mock("@/lib/ui/viz/LineChart/LineChart", () => {
     },
   };
 });
-vi.mock("@/lib/plugins/vizs/PluginVizRenderer/PluginVizRenderer", () => {
-  return {
-    PluginVizRenderer: ({ vizConfig }: { vizConfig: unknown }) => {
-      return (
-        <output data-testid="plugin-viz">{JSON.stringify(vizConfig)}</output>
-      );
-    },
-  };
-});
 vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
   return {
     AppSlate: ({ children }: { children: ReactNode }) => {
@@ -216,30 +207,6 @@ const _STYLED_CHART_URL: DataExplorerUrlSearch = {
     withLegend: true,
     xAxisKey: "quarter",
     series: [{ key: "revenue", ..._STYLED_REVENUE_SERIES }],
-  }),
-};
-
-/** A link to an epicurve, keyed by `QueryResult` column name. */
-const _PLUGIN_CHART_URL: DataExplorerUrlSearch = {
-  sql: 'select "quarter", "revenue" from "sales"',
-  vc: JSON.stringify({
-    vizType: "plugin",
-    pluginId: "avandar.epidemiology",
-    pluginVizId: "epicurve",
-    columnSettings: { dateColumn: "quarter" },
-    settings: { interval: "epiWeek" },
-  }),
-};
-
-/** A link whose plugin chart config names no plugin. */
-const _INVALID_PLUGIN_CHART_URL: DataExplorerUrlSearch = {
-  sql: 'select "quarter", "revenue" from "sales"',
-  vc: JSON.stringify({
-    vizType: "plugin",
-    pluginId: "",
-    pluginVizId: "epicurve",
-    columnSettings: {},
-    settings: {},
   }),
 };
 
@@ -302,10 +269,6 @@ function _renderExplorerSession({
 async function _getRenderedBarChart(): Promise<BarChartProps> {
   const chart = await screen.findByTestId("bar-chart");
   return JSON.parse(chart.textContent ?? "{}") as BarChartProps;
-}
-
-function _getRenderedPluginVizConfig(): unknown {
-  return JSON.parse(screen.getByTestId("plugin-viz").textContent ?? "{}");
 }
 
 beforeEach(() => {
@@ -403,41 +366,4 @@ it("keeps a chart type chosen before the reopened query returns", async () => {
   session.rerender();
 
   expect(await screen.findByTestId("line-chart")).toBeInTheDocument();
-});
-
-it("binds a plugin chart restored from the URL to the reopened result's columns", async () => {
-  const session = _renderExplorerSession({
-    urlSearch: _PLUGIN_CHART_URL,
-    onNavigate: () => {},
-  });
-
-  await waitFor(() => {
-    const quarterColumn = session.result.current[0].lastResultColumns?.find(
-      (column) => {
-        return column.name === "quarter";
-      },
-    );
-    expect(_getRenderedPluginVizConfig()).toEqual({
-      vizType: "plugin",
-      pluginId: "avandar.epidemiology",
-      pluginVizId: "epicurve",
-      columnSettings: { dateColumn: quarterColumn?.id },
-      settings: { interval: "epiWeek" },
-    });
-  });
-});
-
-it("falls back to the table view when the URL's plugin chart config is invalid", async () => {
-  const session = _renderExplorerSession({
-    urlSearch: _INVALID_PLUGIN_CHART_URL,
-    onNavigate: () => {},
-  });
-  await waitFor(() => {
-    expect(session.result.current[0].rawSql).toBe(
-      _INVALID_PLUGIN_CHART_URL.sql,
-    );
-  });
-  await act(async () => {});
-
-  expect(session.result.current[0].vizConfig).toEqual({ vizType: "table" });
 });

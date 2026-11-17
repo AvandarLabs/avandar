@@ -1,7 +1,8 @@
 import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
-import { doesDataTypeMatchColumnPicker } from "$/models/vizs/doesDataTypeMatchColumnPicker/doesDataTypeMatchColumnPicker";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { ReactNode } from "react";
 
@@ -35,12 +36,16 @@ export function ColumnPickerControl({
 }: Props): ReactNode {
   const { t } = useLingui();
   const filtered = useMemo(() => {
-    return fields.filter((field) => {
-      return doesDataTypeMatchColumnPicker({
-        dataType: field.dataType,
-        pickerDataType: dataType,
-      });
-    });
+    if (dataType === undefined || dataType === "any") {
+      return fields;
+    }
+    if (dataType === "numeric") {
+      return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
+    }
+    if (dataType === "temporal") {
+      return fields.filter(propPasses("dataType", AvaDataType.isTemporal));
+    }
+    return fields.filter(propPasses("dataType", AvaDataType.isText));
   }, [fields, dataType]);
 
   const options = useMemo(() => {

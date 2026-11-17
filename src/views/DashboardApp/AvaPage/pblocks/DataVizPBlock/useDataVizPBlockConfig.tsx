@@ -1,8 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
+import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import {
+  AvaVizConfigs,
+  VizTypes,
+} from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
@@ -10,7 +14,6 @@ import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/Av
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
-import { useVizTypePFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizTypePField/useVizTypePFieldConfig";
 import { DashboardColumnBindingPreparation } from "../../utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
@@ -45,7 +48,7 @@ type DataVizPBlockConfigOptions = {
   vizConfigField: Field<DataVizPBlockProps["vizConfig"]>;
   globalFilterField: Field<DataVizPBlockProps["globalFilterSubscription"]>;
   localFiltersField: Field<DataVizPBlockProps["localFilters"]>;
-  vizTypeField: Field<DataVizPBlockProps["vizType"]>;
+  vizTypeLabel: string;
 
   /** Stores per-block viz config memory across Puck data callbacks. */
   vizConfigMemoryRef: RefObject<DataVizConfigMemory>;
@@ -65,7 +68,16 @@ function _getDataVizPBlockConfig(
     label: options.label,
     fields: {
       nlQuery: options.nlQueryField,
-      vizType: options.vizTypeField,
+      vizType: {
+        label: options.vizTypeLabel,
+        type: "select",
+        options: VizTypes.map((vizType) => {
+          return {
+            label: vizTypeLabel(vizType),
+            value: vizType,
+          };
+        }),
+      },
       vizConfig: options.vizConfigField,
       globalFilterSubscription: options.globalFilterField,
       localFilters: options.localFiltersField,
@@ -133,7 +145,6 @@ export function useDataVizPBlockConfig(
     dashboardId: options.dashboardId,
     snapshotRevision: options.snapshotRevision,
   });
-  const vizTypeFieldConfig = useVizTypePFieldConfig(auth);
   const globalFilterSubscriptionFieldConfig =
     useGlobalFilterSubscriptionPFieldConfig();
   const localFiltersFieldConfig = useLocalFiltersPFieldConfig(auth);
@@ -153,7 +164,7 @@ export function useDataVizPBlockConfig(
       vizConfigField: vizConfigFieldConfig,
       globalFilterField: globalFilterSubscriptionFieldConfig,
       localFiltersField: localFiltersFieldConfig,
-      vizTypeField: vizTypeFieldConfig,
+      vizTypeLabel: t`Visualization Type`,
       vizConfigMemoryRef,
     });
   }, [
@@ -162,7 +173,6 @@ export function useDataVizPBlockConfig(
     queryClient,
     nlQueryFieldConfig,
     vizConfigFieldConfig,
-    vizTypeFieldConfig,
     globalFilterSubscriptionFieldConfig,
     localFiltersFieldConfig,
   ]);

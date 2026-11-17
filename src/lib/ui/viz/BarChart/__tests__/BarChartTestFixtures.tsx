@@ -54,7 +54,6 @@ function renderBar(config: UiVizConfigBar): void {
         xAxisKey={config.xAxisKey ?? "x"}
         series={config.series}
         layout={config.layout}
-        barGap={config.barGap}
         withLegend={config.withLegend}
         chartStyle={config.chartStyle}
       />

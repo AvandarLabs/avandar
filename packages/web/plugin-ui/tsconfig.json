@@ -1,9 +1,0 @@
-{
-  "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "typeRoots": ["./node_modules/@types"]
-  },
-  "include": ["src", "../../../shared/types", "../../../tests/vitest.setup.ts"]
-}

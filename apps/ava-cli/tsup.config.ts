@@ -30,11 +30,6 @@ export default defineConfig({
   // `ava` command died on its internal `@utils/*` aliases. They have to be
   // bundled. `@avandar/acclimate` is a real published package with a real dist,
   // so it stays external.
-  noExternal: [
-    "@avandar/utils",
-    "@avandar/models",
-    "@avandar/clients",
-    "@avandar/plugin-manifest",
-  ],
+  noExternal: ["@avandar/utils", "@avandar/models", "@avandar/clients"],
   external: ["oxfmt", "prettier", "readline/promises"],
 });

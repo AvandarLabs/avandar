@@ -1,0 +1,13 @@
+/*
+ * Static layout styles for the visualization container. Extracted from
+ * the inline `style`/size props repeated on every chart wrapper so the
+ * markup stays declarative and the values live in one place.
+ */
+
+/* Wrapper around each chart. Fills its parent and clips overflow so the
+ * chart never spills outside its allotted area. */
+.chartWrapper {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
