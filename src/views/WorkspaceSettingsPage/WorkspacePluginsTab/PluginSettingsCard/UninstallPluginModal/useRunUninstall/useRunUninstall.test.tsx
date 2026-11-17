@@ -7,6 +7,7 @@ import { PluginContentImportClient } from "@/clients/plugins/PluginContentImport
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { act, renderHook } from "@/test-utils";
+import { Logger } from "@/utils/Logger";
 import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -37,6 +38,10 @@ vi.mock("@/utils/notifications/notify", () => {
     notifyError: mocks.notifyError,
   };
 });
+
+// The real logger stays in place, since other modules build child loggers
+// from it when they load.
+const loggerError = vi.spyOn(Logger, "error");
 
 const INSTALLATION_ID = "installation-1" as PluginInstallation.Id;
 const DISTRICTS_ID = "dataset-districts" as Dataset.Id;
@@ -87,6 +92,7 @@ function _renderRunUninstall(): Rendered {
 describe("useRunUninstall", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    loggerError.mockImplementation(() => {});
     mocks.uninstall.mockImplementation(
       async ({ datasetIds }: { datasetIds: Dataset.Id[] }) => {
         return { deletedDatasetIds: datasetIds, failedDatasetIds: [] };
@@ -177,16 +183,40 @@ describe("useRunUninstall", () => {
     });
   });
 
-  it("reports the error when the uninstall fails", async () => {
-    mocks.uninstall.mockRejectedValue(new Error("not allowed"));
+  it("shows a translated sentence, not the raw message, when the uninstall fails for another reason", async () => {
+    mocks.uninstall.mockRejectedValue(new Error("PGRST301 JWT expired"));
     const { run } = _renderRunUninstall();
 
     await run();
 
     expect(mocks.notifyError).toHaveBeenCalledWith({
       title: "Could not update Mozambique",
-      message: "not allowed",
+      message: "Something went wrong while uninstalling. Try again.",
     });
+  });
+
+  it("logs the uninstall error with its install, so the detail is not lost", async () => {
+    const cause = new UninstallPluginError({
+      installationId: INSTALLATION_ID,
+      reason: "not_confirmed",
+    });
+    mocks.uninstall.mockRejectedValue(cause);
+    const { run } = _renderRunUninstall();
+
+    await run();
+
+    expect(loggerError).toHaveBeenCalledWith(
+      "Could not uninstall a plugin",
+      { installationId: INSTALLATION_ID, error: cause },
+    );
+  });
+
+  it("logs nothing when the uninstall succeeds", async () => {
+    const { run } = _renderRunUninstall();
+
+    await run();
+
+    expect(loggerError).not.toHaveBeenCalled();
   });
 
   it("does not call onDone when the uninstall fails", async () => {
@@ -215,6 +245,68 @@ describe("useRunUninstall", () => {
       expectedQueryKeys.forEach((queryKey) => {
         expect(invalidate).toHaveBeenCalledWith({ queryKey });
       });
+    });
+
+    it("finishes the uninstall when refreshing the lists rejects", async () => {
+      const { queryClient, run } = _renderRunUninstall();
+      vi.spyOn(queryClient, "invalidateQueries").mockRejectedValue(
+        new Error("refetch failed"),
+      );
+
+      await run();
+
+      expect(mocks.onDone).toHaveBeenCalledTimes(1);
+    });
+
+    it("logs a refresh that rejects", async () => {
+      const { queryClient, run } = _renderRunUninstall();
+      const refreshError = new Error("refetch failed");
+      vi.spyOn(queryClient, "invalidateQueries").mockRejectedValue(
+        refreshError,
+      );
+
+      await run();
+
+      expect(loggerError).toHaveBeenCalledWith(
+        "Could not refresh the lists after an uninstall",
+        { error: refreshError },
+      );
+    });
+
+    it("still reports the uninstall error when refreshing the lists also rejects", async () => {
+      mocks.uninstall.mockRejectedValue(new Error("network down"));
+      const { queryClient, run } = _renderRunUninstall();
+      vi.spyOn(queryClient, "invalidateQueries").mockRejectedValue(
+        new Error("refetch failed"),
+      );
+
+      await run();
+
+      expect(mocks.notifyError).toHaveBeenCalledWith({
+        title: "Could not update Mozambique",
+        message: "Something went wrong while uninstalling. Try again.",
+      });
+    });
+
+    it("waits for the refreshed lists before it calls onDone", async () => {
+      const { queryClient, run } = _renderRunUninstall();
+      let finishRefresh: () => void = () => {};
+      vi.spyOn(queryClient, "invalidateQueries").mockReturnValue(
+        new Promise<void>((resolve) => {
+          finishRefresh = resolve;
+        }),
+      );
+
+      const running = run();
+      await vi.waitFor(() => {
+        expect(queryClient.invalidateQueries).toHaveBeenCalled();
+      });
+      expect(mocks.onDone).not.toHaveBeenCalled();
+
+      finishRefresh();
+      await running;
+
+      expect(mocks.onDone).toHaveBeenCalledTimes(1);
     });
 
     it("invalidates them when the uninstall fails, so a deleted install is not shown", async () => {

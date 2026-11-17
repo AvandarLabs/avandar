@@ -6,6 +6,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { PluginContentImportClient } from "@/clients/plugins/PluginContentImportClient/PluginContentImportClient";
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
+import { Logger } from "@/utils/Logger";
 import {
   notifyError,
   notifySuccess,
@@ -48,6 +49,18 @@ async function _invalidateUninstallQueries(
 }
 
 /**
+ * Refreshes the lists an uninstall changes, and logs instead of throwing when
+ * a refresh fails, so a failed refresh cannot hide how the uninstall went.
+ */
+async function _refreshQueriesOrLog(queryClient: QueryClient): Promise<void> {
+  try {
+    await _invalidateUninstallQueries(queryClient);
+  } catch (error) {
+    Logger.error("Could not refresh the lists after an uninstall", { error });
+  }
+}
+
+/**
  * Uninstalls the plugin, deletes the chosen datasets, and refreshes the lists
  * that showed them, whether or not the uninstall succeeded. Throws when the
  * uninstall itself fails.
@@ -80,7 +93,7 @@ async function _uninstallAndRefresh(
   } finally {
     // Also after a failure: the install row may be gone even when the check
     // that proves it throws, so the lists must not keep showing it.
-    await _invalidateUninstallQueries(options.queryClient);
+    await _refreshQueriesOrLog(options.queryClient);
   }
 }
 
@@ -118,7 +131,8 @@ function useNotifyUninstallOutcome(
 /**
  * Returns a function that turns an uninstall failure into the message the
  * admin reads. An `UninstallPluginError` gets copy chosen by its `reason`.
- * Any other error keeps its own message.
+ * Any other error gets a generic sentence, since its own message is developer
+ * text and is only logged.
  */
 function useBuildUninstallErrorMessage(
   pluginName: string,
@@ -130,7 +144,7 @@ function useBuildUninstallErrorMessage(
         ? t`${pluginName} is still installed. You may not have permission to uninstall it.`
         : t`We could not confirm the uninstall. Check the plugin list, then try again.`;
     }
-    return error instanceof Error ? error.message : String(error);
+    return t`Something went wrong while uninstalling. Try again.`;
   };
 }
 
@@ -172,6 +186,10 @@ export function useRunUninstall(
         queryClient,
       });
     } catch (error) {
+      Logger.error("Could not uninstall a plugin", {
+        installationId: options.installationId,
+        error,
+      });
       notifyError({
         title: t`Could not update ${pluginName}`,
         message: buildErrorMessage(error),
