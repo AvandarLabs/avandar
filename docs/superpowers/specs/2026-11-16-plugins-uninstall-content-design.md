@@ -143,13 +143,19 @@ installed plugin:
 We could not check whether this plugin imported datasets.   [Retry]
 ```
 
-- Retry asks for the imports again. While the lookup loads or retries,
-  Uninstall is disabled and the alert is hidden, as before.
+- Retry asks for the imports again. It is described by the card's heading, so
+  a screen reader says which plugin it applies to. While the retry runs, the
+  alert stays, Retry shows a loader, and Uninstall is disabled again, as it is
+  while the lookup first loads. The alert goes only once a retry succeeds.
+- A status region that is always mounted announces "Checking for datasets this
+  plugin imported." while the retry runs and "We checked for datasets this
+  plugin imported." once it succeeds. Pressing Retry moves focus to that
+  region, since the button is disabled during the retry and gone after it.
 - Uninstall stays enabled. It opens the one-line confirm, never the dataset
-  modal, even when a restored cache still lists imports. The confirm adds a
-  second paragraph: "We could not check for datasets this plugin imported. If
-  you uninstall it now, every dataset it imported is kept." Confirming runs
-  today's plain delete, which touches no dataset.
+  modal, even when a restored cache still lists imports. The confirm adds two
+  paragraphs, each one sentence: "We could not check for datasets this plugin
+  imported." and "If you uninstall it now, every dataset it imported is kept."
+  Confirming runs today's plain delete, which touches no dataset.
 
 **In the modal**, when the imports lookup, the dataset lookup, or any access
 check failed (and no retry is in flight), an alert replaces the list:
@@ -168,9 +174,13 @@ Every dataset it imported stays in Data Sources.
 - There is no "can't see" count and no "Kept. Only a dataset admin can delete
   it." line, since neither is known. Nothing can be checked for deletion, and
   the confirm passes an empty delete list.
-- Retry asks again for whatever failed. While it runs, the modal shows the
-  loader and the confirm button is disabled. A successful retry returns to the
-  normal list. A retry that fails shows the error again.
+- Retry asks again for whatever failed. While it runs, the alert stays with a
+  loading Retry, the confirm button keeps its "keep all datasets" label and is
+  disabled, and no list or loader replaces the alert. A status region that is
+  always mounted announces "Loading the datasets this plugin imported." and
+  then "The datasets this plugin imported are loaded.", and takes focus when
+  Retry is pressed. A successful retry returns to the normal list. A retry that
+  fails shows the error again.
 - An import whose dataset the user genuinely cannot read (RLS hides the row)
   is unchanged: when the lookup succeeded, it still counts toward "N more
   datasets you can't see stay".
@@ -204,11 +214,16 @@ Changes to existing files:
   modal instead of the confirm. The card must not show the confirm and then
   the modal. When the imports lookup failed, the confirm gains the paragraph
   that says every dataset is kept.
-- `PluginSettingsCard.tsx`: shows the lookup alert with Retry, and tells
-  `PluginActions` whether the lookup is loading or has failed.
-- `useImportedPluginContent.ts`: exposes `refetch`.
-- `PluginLookupErrorCallout.tsx` (new, in `PluginSettingsCard/`): the alert
-  with a Retry button, shared by the card and the modal.
+- `PluginSettingsCard.tsx`: shows the lookup alert with Retry. It reads its
+  state from `usePluginCardState.ts`, which tells `PluginActions` one value,
+  `importedDatasets`: `loading`, `failed`, `none`, or `some`.
+- `useImportedPluginContent.ts`: exposes `refetch` and `hasFailed` (a failure
+  with no retry in flight).
+- `useLookupState.ts` (new, in `PluginSettingsCard/`): says whether a lookup
+  is `ok`, `failed`, or `retrying`. A query with no data drops its error the
+  moment a retry starts, so the error flag alone cannot keep the alert up.
+- `PluginLookupFeedback.tsx` (new, in `PluginSettingsCard/`): the alert, the
+  loading Retry, and the status region, shared by the card and the modal.
 
 ## Data flow
 
@@ -227,11 +242,13 @@ Changes to existing files:
    `hiddenCount`, `isLoading`, `hasFailed`, and `retry`.
 
 `hasFailed` is true when the imports lookup failed, the dataset lookup failed,
-or any access check failed, and none of them is being retried. A failure is
+or any access check failed, and none of them is being retried. `isRetrying` is
+true while a retry of one of them runs, and `isLoading` is true too. A failure is
 never read as an answer: a failed dataset lookup does not count the imports
 as "can't see", and a failed access check does not mean "not deletable". In
-that state `rows` is empty and `hiddenCount` is 0. After a failed imports
-lookup the restored list is not used to ask for datasets. `retry` refetches
+that state `rows` is empty and `hiddenCount` is 0. While the imports
+refetch, and after a failed imports lookup, the restored list is not used to
+ask for datasets, so `isLoading` is true and nothing is listed or checked. `retry` refetches
 only what failed, and `isLoading` stays true until the retry settles.
 
 `useDatasetDependents({ datasetId, installationId })`, called only for a
@@ -341,13 +358,15 @@ No schema change, so no pgTAP tests and no Supabase switch.
 | Level | File | Proves |
 | --- | --- | --- |
 | Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there (`still_installed`) or could not be read back (`not_confirmed`). Deletes run one at a time, and a delete does not start before the one before it settles. A failed delete does not stop the others and is returned as incomplete. A dataset `fullDelete` refuses with `not_allowed` is returned as refused without an error log. A dataset whose row survives (`still_present`) is returned as incomplete and its error is logged. A dataset that cannot be read first, or whose re-read also throws, is incomplete. A dataset whose row is gone after `fullDelete` threw counts as deleted. A dataset that is already gone is not failed and never reaches `fullDelete`. A duplicate id is deleted once |
-| Unit | `useImportedPluginContent.test.tsx` | `refetch` asks the imports lookup again |
-| Unit | `useUninstallContentRows.test.tsx` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name. `hasFailed` is true for each failure source (imports, datasets, an access check), with no rows and no `hiddenCount`, and false while a failed lookup is retried. `retry` refetches only what failed, and the rows return when it succeeds |
+| Unit | `useImportedPluginContent.test.tsx` | `refetch` asks the imports lookup again. `hasFailed` is true for a failure, and false while a retry runs or when the lookup succeeded |
+| Unit | `useLookupState.test.tsx` | A first load is `ok`. A failure is `failed`. A load after a failure is `retrying`. A failed retry is `failed` again, and a successful one is `ok` |
+| Component | `PluginLookupFeedback.test.tsx` | The alert and Retry show on failure and are described by the owner. During a retry the alert stays and Retry is loading. Retry calls `onRetry` and moves focus to the status region. The retry and the recovery are announced, and nothing is announced without an error |
+| Unit | `useUninstallContentRows.test.tsx` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name. `hasFailed` is true for each failure source (imports, datasets, an access check), with no rows and no `hiddenCount`. While a failed lookup is retried, `hasFailed` is false, `isRetrying` and `isLoading` are true, and nothing is listed. Nothing is listed or checked while a restored imports list refetches. `retry` refetches only what failed, and the rows return when it succeeds |
 | Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
-| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. When a lookup failed it shows the alert and Retry, no "can't see" count and no "Kept" line, reads "Uninstall and keep all datasets" with "Every dataset it imported stays in Data Sources.", deletes nothing on confirm, and returns to the list after a successful retry |
+| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. When a lookup failed it shows the alert and Retry, no "can't see" count and no "Kept" line, reads "Uninstall and keep all datasets" with "Every dataset it imported stays in Data Sources.", and deletes nothing on confirm. During a retry it keeps the alert, a loading Retry and the disabled keep-all button, and announces the retry. Retry moves focus to the status region. After a successful retry it shows the list and announces it |
 | Unit | `useRunUninstall/useRunUninstall.test.tsx` | The notification matches the outcome, and counts only the datasets this run deleted. A refused dataset, an incomplete dataset, and both together each get their own warning text, and a warning is never replaced by a success when other datasets were deleted. An `UninstallPluginError` shows translated copy by reason, and any other error shows the generic sentence. A failure is logged with the install id. The lists refresh when the uninstall fails. A refresh that rejects is logged, and neither hides the result nor blocks `onDone`. `onDone` waits for the refresh |
-| Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first. When the imports lookup failed, Uninstall gets the plain confirm with the kept-datasets paragraph and never opens the modal |
-| Component | `WorkspacePluginsTab.test.tsx` (existing) | Uninstall is disabled while the imports load or retry. When the lookup failed, the card shows the alert with Retry (only to an admin of an installed plugin), Retry refetches, Uninstall is enabled, and its confirm carries the kept-datasets paragraph |
+| Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first. When the imports lookup failed, Uninstall gets the plain confirm with the two kept-datasets paragraphs and never opens the modal |
+| Component | `WorkspacePluginsTab.test.tsx` (existing) | Uninstall is disabled while the imports load or retry. When the lookup failed, the card shows the alert with Retry (only to an admin of an installed plugin), Retry is described by the plugin, Retry refetches and moves focus to the status region, Uninstall is enabled, and its confirm carries the kept-datasets paragraphs. During a retry the alert stays with a loading Retry and Uninstall is disabled. After it succeeds the alert goes, the recovery is announced and Uninstall is enabled |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/mozambiquePackFlow.ts` |
 
 The E2E runs under the 45-second local limit, using the existing Mozambique
