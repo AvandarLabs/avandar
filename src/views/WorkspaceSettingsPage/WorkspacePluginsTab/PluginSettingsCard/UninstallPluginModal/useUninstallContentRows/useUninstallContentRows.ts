@@ -28,6 +28,8 @@ export type UninstallContentRows = {
 /**
  * Whether the user may delete each dataset, by the same rule as the
  * `datasets` DELETE policy. A failed check reads as not allowed.
+ *
+ * Called only by `useUninstallContentRows`, which lists the result.
  */
 function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
   canDeleteById: ReadonlyMap<Dataset.Id, boolean>;
@@ -68,9 +70,10 @@ function useCanDeleteByDatasetId(datasetIds: readonly Dataset.Id[]): {
 /**
  * The datasets a plugin imported into the current workspace, named as they
  * are now, with whether the current user may delete each one. Imports whose
- * dataset the user cannot read are only counted. Use it where a plugin's
- * imported content is listed for an admin to keep or delete, such as an
- * uninstall dialog.
+ * dataset the user cannot read are only counted.
+ *
+ * The uninstall modal on a plugin's card uses it to list the imported
+ * datasets an admin can choose to keep or delete.
  */
 export function useUninstallContentRows(
   pluginId: string,
@@ -92,8 +95,11 @@ export function useUninstallContentRows(
   // A restored cache renders with `isLoading` false while the refetch is in
   // flight, so gate on `isFetching`. Until it settles, list nothing and
   // check no access, since the restored list may name a deleted dataset.
+  // A failed refetch keeps the restored list as its data, so it is not
+  // trusted either: every import is then counted as one the user cannot see.
   const isFetchingDatasets = hasImports && datasetsQuery.isFetching;
-  const readable = isFetchingDatasets ? [] : (datasets ?? []);
+  const canTrustDatasets = !isFetchingDatasets && !datasetsQuery.isError;
+  const readable = canTrustDatasets ? (datasets ?? []) : [];
   const access = useCanDeleteByDatasetId(
     readable.map((dataset) => {
       return dataset.id;
@@ -111,7 +117,7 @@ export function useUninstallContentRows(
       .sort((left, right) => {
         return left.name.localeCompare(right.name);
       }),
-    hiddenCount: importedIds.length - readable.length,
+    hiddenCount: isFetchingDatasets ? 0 : importedIds.length - readable.length,
     isLoading: imported.isLoading || isFetchingDatasets || access.isLoading,
   };
 }
