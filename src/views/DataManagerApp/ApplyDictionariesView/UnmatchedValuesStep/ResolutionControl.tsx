@@ -27,8 +27,8 @@ const REFERENCE_ACTIONS: readonly Action[] = ["keep", "add"];
 function useActionLabels(isConverting: boolean): Record<Action, string> {
   const { t } = useLingui();
   return {
-    keep: isConverting ? t`Keep as is` : t`Leave unlabeled`,
-    map: t`Use an existing label`,
+    keep: isConverting ? t`Keep as is` : t`Leave unmapped`,
+    map: t`Use an existing target value`,
     add: t`Add to list`,
     empty: t`Leave empty`,
   };
@@ -45,7 +45,7 @@ function useBlockers(
   if (!canEditDictionaries) {
     addBlocker = t`Adding a value changes the dictionary, so it needs edit access to dictionaries.`;
   } else if (row.isInListWithoutLabel) {
-    addBlocker = t`${value} is already in the list, without a label. Label it on the dictionary.`;
+    addBlocker = t`${value} is already in the list, with no target value. Add one on the dictionary.`;
   }
   const keepBlocker = row.cannotStayAsText
     ? t`This column becomes whole numbers, so this value can't stay as text.`
@@ -99,8 +99,8 @@ function ActionRadio(
 }
 
 /**
- * The Select or input a chosen action needs: an existing label, or the text
- * to add.
+ * The Select or input a chosen action needs: an existing target value, or
+ * the text to add.
  */
 function ResolutionDetail(
   props: Readonly<{
@@ -125,7 +125,7 @@ function ResolutionDetail(
       <Select
         size="xs"
         maw={280}
-        aria-label={t`Label to use for ${value}`}
+        aria-label={t`Target value to use for ${value}`}
         data={options}
         value={resolution.code}
         allowDeselect={false}
@@ -136,19 +136,23 @@ function ResolutionDetail(
     );
   }
   if (resolution?.action === "add") {
-    const isLabel = row.pick.direction === "decode";
+    const isTargetValue = row.pick.direction === "decode";
     const conflictCode = conflict?.code;
     return (
       <TextInput
         error={
           conflictCode === undefined
             ? undefined
-            : t`The code ${conflictCode} is added twice to this list.`
+            : t`The source value ${conflictCode} is added twice to this list.`
         }
         size="xs"
         maw={280}
-        aria-label={isLabel ? t`Label for ${value}` : t`Code for ${value}`}
-        placeholder={isLabel ? t`Label` : t`Code`}
+        aria-label={
+          isTargetValue
+            ? t`Target value for ${value}`
+            : t`Source value for ${value}`
+        }
+        placeholder={isTargetValue ? t`Target value` : t`Source value`}
         value={resolution.text}
         onChange={(event) => {
           props.onResolve({ action: "add", text: event.currentTarget.value });
@@ -161,8 +165,8 @@ function ResolutionDetail(
 
 /**
  * How one unmatched value is resolved: a radio group named by the value,
- * and, for Use an existing label or Add to list, the Select or input that
- * completes it. Nothing chosen means the default: Keep as is, or Leave
+ * and, for Use an existing target value or Add to list, the Select or input
+ * that completes it. Nothing chosen means the default: Keep as is, or Leave
  * empty for a value a whole-number column cannot keep.
  */
 export function ResolutionControl(props: Readonly<Props>): ReactNode {

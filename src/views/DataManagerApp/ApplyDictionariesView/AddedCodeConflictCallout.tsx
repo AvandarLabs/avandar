@@ -31,7 +31,7 @@ export function AddedCodeConflictCallout({
       maw={560}
       icon={<IconAlertCircle size={18} />}
       messageSize="sm"
-      message={t`The code ${code} is added twice to ${listName}. Change one of them on Unmatched values.`}
+      message={t`The source value ${code} is added twice to ${listName}. Change one of them on Unmatched values.`}
     />
   );
 }

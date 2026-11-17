@@ -107,7 +107,9 @@ describe("DictionaryEntriesTab", () => {
 
   it("says how many of an entry's values still need a label", () => {
     _renderTab({ draft: UNLABELED_DRAFT });
-    expect(screen.getByText("1 value needs a label")).toBeInTheDocument();
+    expect(
+      screen.getByText("1 value needs a target value"),
+    ).toBeInTheDocument();
   });
 
   it("edits the selected entry's description through the pane", () => {

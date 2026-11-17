@@ -185,7 +185,7 @@ describe("useNewDictionaryFlow", () => {
       proposal: PROPOSAL,
       datasetIds: [DATASET_ID],
       readId: expect.any(String),
-      defaultName: "Kings line list codes",
+      defaultName: "Kings line list values",
     });
     // The matches are asked for under the id of the read they belong to.
     const readId = dispatch.mock.calls[0]?.[0].readId;

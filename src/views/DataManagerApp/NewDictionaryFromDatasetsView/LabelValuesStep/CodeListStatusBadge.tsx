@@ -8,12 +8,12 @@ type Props = {
   status: DictionaryProposal.CodeListStatus;
 };
 
-/** Labeled, Suggested, or To do, beside a code list waiting for labels. */
+/** Mapped, Suggested, or To do, beside a code list waiting to be mapped. */
 export function CodeListStatusBadge({ status }: Readonly<Props>): ReactNode {
   if (status === "labeled") {
     return (
       <Badge size="sm" variant="light" color="success" tt="none">
-        <Trans>Labeled</Trans>
+        <Trans>Mapped</Trans>
       </Badge>
     );
   }

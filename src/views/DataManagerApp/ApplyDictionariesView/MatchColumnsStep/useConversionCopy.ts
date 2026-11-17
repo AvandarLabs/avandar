@@ -23,8 +23,8 @@ function useConvertUnavailable(
     return undefined;
   }
   return targets.linked.reason === "dataset_limit"
-    ? t`Converting ${datasetName} creates a linked dataset, and your plan's dataset limit is reached. You can still attach labels as reference.`
-    : t`Converting ${datasetName} creates a linked dataset, and only workspace admins can add datasets. You can still attach labels as reference.`;
+    ? t`Converting ${datasetName} creates a linked dataset, and your plan's dataset limit is reached. You can still attach the dictionary as reference only.`
+    : t`Converting ${datasetName} creates a linked dataset, and only workspace admins can add datasets. You can still attach the dictionary as reference only.`;
 }
 
 /**
@@ -39,12 +39,12 @@ export function useConversionCopy(
 ): ConversionCopy {
   const { t } = useLingui();
   return {
-    convertAllTooltip: t`Changes the values in every column that has codes, using the labels from your dictionaries. Charts, filters, and downloads show the labels from then on.`,
+    convertAllTooltip: t`Changes the values in every column that matches a dictionary, replacing each source value with its target value. Charts, filters, and downloads show the target values from then on.`,
     referenceAllTooltip: t`Leaves every column exactly as it is. Your dictionaries are attached alongside the data, so anyone can hover a column to see what its values mean, and Ask Avandar can use them to answer questions.`,
-    convertTooltip: t`Changes the values in this column using the dictionary. For example, every 1 becomes Male, and charts, filters, and downloads show Male from then on.`,
+    convertTooltip: t`Replaces each source value in this column with its target value. For example, every 1 becomes Male, and charts, filters, and downloads show Male from then on.`,
     referenceTooltip: t`Leaves this column exactly as it is. The dictionary is attached alongside it, so anyone can hover the column to see what each value means, and Ask Avandar can use it to answer questions.`,
-    convertExplanation: t`Your data will change. The labels stay attached too, so the column is still explained.`,
-    referenceExplanation: t`Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the labels.`,
+    convertExplanation: t`Your data will change. The dictionary stays attached too, so the column is still explained.`,
+    referenceExplanation: t`Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the target values.`,
     convertUnavailable: useConvertUnavailable(
       options.datasetName,
       options.targets,

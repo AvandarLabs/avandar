@@ -19,9 +19,9 @@ export function AttachSummaryText({
   const attached =
     counts.attachedCount > 0
       ? plural(counts.attachedCount, {
-          one: "Nothing in your data changes. # column keeps its values, with labels attached as reference. Edits to the dictionaries show up here right away.",
+          one: "Nothing in your data changes. # column keeps its values, with the dictionaries attached as reference. Edits to the dictionaries show up here right away.",
           other:
-            "Nothing in your data changes. # columns keep their values, with labels attached as reference. Edits to the dictionaries show up here right away.",
+            "Nothing in your data changes. # columns keep their values, with the dictionaries attached as reference. Edits to the dictionaries show up here right away.",
         })
       : t`Nothing in your data changes. Edits to the dictionaries show up here right away.`;
   const described = plural(counts.describedCount, {

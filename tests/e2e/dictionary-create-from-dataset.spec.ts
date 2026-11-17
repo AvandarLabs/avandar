@@ -81,7 +81,7 @@ async function _openCreateFromDataset(page: Page): Promise<void> {
     .getByRole("menuitem", { name: /Create a dictionary from this dataset/ })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Coded columns" }),
+    page.getByRole("heading", { name: "Columns to map" }),
   ).toBeVisible({ timeout: LONG_WAIT });
 }
 
@@ -89,16 +89,15 @@ async function _suggestGenderLabels(
   page: Page,
   options: Readonly<{ isOnline: boolean }>,
 ): Promise<void> {
-  await page.getByRole("button", { name: "Next: label values" }).click();
+  await page.getByRole("button", { name: "Next: map values" }).click();
   await page.getByRole("button", { name: /gender \(1\/2\/9\)/ }).click();
-  await page.getByRole("button", { name: "Suggest labels" }).click();
+  await page.getByRole("button", { name: "Suggest target values" }).click();
   if (options.isOnline) {
     await _agreeToSend(page);
   }
-  await expect(page.getByRole("textbox", { name: "Label for 1" })).toHaveValue(
-    "Male",
-    { timeout: MEDIUM_WAIT },
-  );
+  await expect(
+    page.getByRole("textbox", { name: "Target value for 1" }),
+  ).toHaveValue("Male", { timeout: MEDIUM_WAIT });
 }
 
 test.describe("learning a dictionary from a dataset", () => {
@@ -134,7 +133,7 @@ test.describe("learning a dictionary from a dataset", () => {
       await _suggestGenderLabels(page, { isOnline: true });
       await page.getByRole("button", { name: "Accept and next list" }).click();
       await page.getByRole("button", { name: "Next: save" }).click();
-      await expect(page.getByText(/have no label yet/)).toBeVisible();
+      await expect(page.getByText(/have no target value yet/)).toBeVisible();
       await page
         .getByRole("textbox", { name: "Dictionary name" })
         .fill(DICTIONARY_NAME);

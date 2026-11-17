@@ -230,8 +230,8 @@ describe("MappingPane", () => {
     expect(
       screen.queryByRole("combobox", { name: "Change the values" }),
     ).toBeNull();
-    pickMantineSelectOption("Translate codes with", "Sex (M/F/U)");
-    fireEvent.click(screen.getByRole("radio", { name: "Labels" }));
+    pickMantineSelectOption("Translate values with", "Sex (M/F/U)");
+    fireEvent.click(screen.getByRole("radio", { name: "Target values" }));
 
     _expectFill(dispatch, SEX_COLUMN.id, {
       ...GENDER_FILL,

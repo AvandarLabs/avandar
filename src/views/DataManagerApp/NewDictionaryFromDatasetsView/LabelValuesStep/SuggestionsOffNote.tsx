@@ -19,8 +19,8 @@ function _getNote(options: Readonly<Props>): ReactNode {
   if (availability === "unavailable") {
     return (
       <Trans>
-        Suggestions need a connection or the offline model. Labeling still
-        works.
+        Suggestions need a connection or the offline model. You can still map
+        values yourself.
       </Trans>
     );
   }
@@ -28,7 +28,7 @@ function _getNote(options: Readonly<Props>): ReactNode {
     return (
       <Trans>
         You chose not to send values to the AI provider, so suggestions are off
-        for this dictionary. Labeling still works.
+        for this dictionary. You can still map values yourself.
       </Trans>
     );
   }
@@ -43,16 +43,16 @@ function _getNote(options: Readonly<Props>): ReactNode {
   if (blockReason === "code_too_long") {
     return (
       <Trans>
-        A value in this list is too long to send for suggestions. Labeling still
-        works.
+        A value in this list is too long to send for suggestions. You can still
+        map values yourself.
       </Trans>
     );
   }
   if (blockReason === "too_large_for_model") {
     return (
       <Trans>
-        This list is too long to suggest labels for in one request. Labeling
-        still works.
+        This list is too long to suggest target values for in one request. You
+        can still map values yourself.
       </Trans>
     );
   }

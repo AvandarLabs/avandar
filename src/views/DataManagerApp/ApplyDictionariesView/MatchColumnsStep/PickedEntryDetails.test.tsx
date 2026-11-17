@@ -56,10 +56,19 @@ describe("PickedEntryDetails", () => {
     expect(screen.getByText("Your data will change.")).toBeInTheDocument();
   });
 
+  it("offers an info icon that defines the two sides beside the direction switch", () => {
+    _render();
+    expect(
+      screen.getByRole("button", {
+        name: "What are source and target values?",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("switches direction and keeps the original values", () => {
     const dispatch = _render();
 
-    fireEvent.click(screen.getByRole("button", { name: "Labels → codes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Target → Source" }));
     fireEvent.click(
       screen.getByRole("checkbox", {
         name: "Also keep the original values in a new column, GENDER_original",
@@ -84,7 +93,9 @@ describe("PickedEntryDetails", () => {
     expect(
       screen.getByRole("columnheader", { name: "Means" }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Labels → codes" })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Target → Source" }),
+    ).toBeNull();
     expect(screen.queryByRole("checkbox")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Apply conversions" }));
     expect(dispatch).toHaveBeenCalledWith({

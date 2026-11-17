@@ -27,7 +27,7 @@ type Props = {
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
 };
 
-/** The selected code list: its values to label and Suggest labels. */
+/** The selected code list: its values to map and Suggest target values. */
 export function CodeListLabelsPane({
   codeList,
   entries,

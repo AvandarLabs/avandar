@@ -69,7 +69,7 @@ export function NewDictionaryHeader({
       description={
         isFromDataset
           ? t`Saved to Dictionaries, so any dataset can use it.`
-          : t`Avandar learns the codes your datasets use and what their columns mean.`
+          : t`Avandar learns the values your datasets use and what their columns mean.`
       }
       actions={
         <Button variant="default" onClick={onCancel}>

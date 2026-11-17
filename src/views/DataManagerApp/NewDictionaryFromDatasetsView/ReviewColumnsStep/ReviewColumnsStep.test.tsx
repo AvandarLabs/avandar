@@ -77,7 +77,7 @@ describe("ReviewColumnsStep", () => {
   it("sorts entries into coded, ordered, and description-only sections", () => {
     _renderStep();
     expect(
-      screen.getByRole("heading", { name: "Coded columns" }),
+      screen.getByRole("heading", { name: "Columns to map" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Ordered scales" }),
@@ -102,7 +102,7 @@ describe("ReviewColumnsStep", () => {
     const { dispatch } = _renderStep();
     expect(
       screen.getByText(
-        "Same name, different codes. Kept as separate code lists under one entry.",
+        "Same name, different values. Kept as separate code lists under one entry.",
       ),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Keep apart: gender" }));
@@ -155,14 +155,14 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Fix the entry names marked above to go on."),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Next: label values" }),
+      screen.getByRole("button", { name: "Next: map values" }),
     ).toBeDisabled();
   });
 
   it("says in each row whether the entry needs labels or a description", () => {
     _renderStep();
     const hospRow = screen.getByRole("row", { name: /hosp_yn/ });
-    expect(within(hospRow).getByText("Needs labels")).toBeInTheDocument();
+    expect(within(hospRow).getByText("Needs mapping")).toBeInTheDocument();
     const idRow = screen.getByRole("row", { name: /case_id/ });
     expect(within(idRow).getByText("Description")).toBeInTheDocument();
   });
@@ -179,7 +179,7 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Include at least one entry to go on."),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Next: label values" }),
+      screen.getByRole("button", { name: "Next: map values" }),
     ).toBeDisabled();
   });
 

@@ -13,7 +13,7 @@ import type { ReactNode, Ref } from "react";
 export type CodePairIssue = {
   type: DataDictionary.DraftIssue["type"] | DataDictionary.DraftWarning["type"];
   message: string;
-  /** An error blocks saving. A warning, such as a missing label, does not. */
+  /** An error blocks saving. A warning, like a missing target, does not. */
   severity: "error" | "warning";
 };
 
@@ -150,7 +150,7 @@ function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
   return (
     <>
       <TextInput
-        aria-label={t`Code ${rowNumber}`}
+        aria-label={t`Source value ${rowNumber}`}
         {..._buildIssueProps({ issue, input: "code" })}
         value={pair.code}
         disabled={!canEdit}
@@ -165,7 +165,7 @@ function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
         className={css.codeListEditorArrow}
       />
       <TextInput
-        aria-label={t`Label ${rowNumber}`}
+        aria-label={t`Target value ${rowNumber}`}
         {..._buildIssueProps({ issue, input: "label" })}
         value={pair.label}
         disabled={!canEdit}

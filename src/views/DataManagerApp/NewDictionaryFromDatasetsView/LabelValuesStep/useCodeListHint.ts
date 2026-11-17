@@ -19,9 +19,9 @@ export function useCodeListHint(
         return entry.name;
       }),
     );
-    return t`${names} hold the same values, so they share this one list. Label it once.`;
+    return t`${names} hold the same values, so they share this one list. Map it once.`;
   }
   return codeList.isOrdered
     ? t`This list is ordered, lowest level first. Reorder it on the dictionary after saving if the order is wrong.`
-    : t`Give each value the label people should see. Suggestions are only a starting point.`;
+    : t`Give each source value its target value. Suggestions are only a starting point.`;
 }

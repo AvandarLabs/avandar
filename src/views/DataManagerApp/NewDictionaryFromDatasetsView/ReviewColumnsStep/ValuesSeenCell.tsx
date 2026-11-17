@@ -79,7 +79,7 @@ export function ValuesSeenCell({
       {entry.suggestionReason === "other_codes" ? (
         <Text size="xs" c="dimmed">
           <Trans>
-            Same name, different codes. Kept as separate code lists under one
+            Same name, different values. Kept as separate code lists under one
             entry.
           </Trans>
         </Text>

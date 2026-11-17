@@ -49,7 +49,7 @@ export function NewDictionaryMenu({
         >
           <Text size="sm">{t`From datasets`}</Text>
           <Text size="xs" c="dimmed">
-            {t`Learns the codes and column meanings your datasets use`}
+            {t`Learns the values and column meanings your datasets use`}
           </Text>
         </Menu.Item>
         <Menu.Item

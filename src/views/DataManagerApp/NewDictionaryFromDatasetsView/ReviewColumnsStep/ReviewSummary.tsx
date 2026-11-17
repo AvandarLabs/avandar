@@ -35,9 +35,9 @@ export function ReviewSummary({
         </Text>
         <Text size="sm" c="dimmed">
           <Trans>
-            Coded columns get labeled next. The rest become entries with a
-            description, so the dictionary documents them too. Uncheck anything
-            you don't want, or change its kind.
+            Columns with a set of values get mapped next. The rest become
+            entries with a description, so the dictionary documents them too.
+            Uncheck anything you don't want, or change its kind.
           </Trans>
         </Text>
         <MeaningMatchStatusLine status={meaningMatchStatus} />

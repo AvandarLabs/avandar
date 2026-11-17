@@ -45,8 +45,8 @@ export function DictionaryUsedByTab({ usage }: Readonly<Props>): ReactNode {
         title={t`No datasets use this dictionary yet`}
         message={
           <Trans>
-            Apply it to a dataset to explain its codes and describe its columns.
-            The datasets it is applied to are listed here.
+            Apply it to a dataset to explain its values and describe its
+            columns. The datasets it is applied to are listed here.
           </Trans>
         }
       />

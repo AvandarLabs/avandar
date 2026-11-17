@@ -22,9 +22,9 @@ export function useApplyErrorMessage(
     convert_needs_code_list: t`A column set to convert has no code list. Attach it as reference only, or pick an entry with a code list.`,
     dataset_has_linked_datasets: t`A linked dataset reads ${datasetName}, so it can't be changed in place. Convert in the linked dataset instead.`,
     dictionary_editor_required: t`Adding values to a code list needs edit access to dictionaries, so nothing was saved. Choose another way to handle those values.`,
-    code_pair_incomplete: t`A value you added to a code list is missing its label or code.`,
+    code_pair_incomplete: t`A value you added to a code list is missing its source value or target value.`,
     codes_not_unique: t`A value you added is already in its code list, perhaps with different capitalization.`,
-    labels_not_unique: t`A label you added is already used in its code list.`,
+    labels_not_unique: t`A target value you added is already used in its code list.`,
     dataset_creator_required: t`Only workspace admins can add datasets, so the linked dataset was not created.`,
     nothing_to_reapply: t`${datasetName} is already up to date.`,
   };

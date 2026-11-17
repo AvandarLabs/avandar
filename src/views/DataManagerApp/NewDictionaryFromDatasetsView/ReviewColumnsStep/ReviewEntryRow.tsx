@@ -68,7 +68,7 @@ export function ReviewEntryRow({
       </Table.Td>
       <Table.Td>
         <Text size="xs" c="dimmed">
-          {isCoded ? t`Needs labels` : t`Description`}
+          {isCoded ? t`Needs mapping` : t`Description`}
         </Text>
         <KeepApartButton
           entry={entry}

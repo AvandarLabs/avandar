@@ -33,8 +33,8 @@ function useSectionTextsGetter(): (
     switch (section) {
       case "coded":
         return {
-          title: t`Coded columns`,
-          meta: t`${count} · you'll label their values next`,
+          title: t`Columns to map`,
+          meta: t`${count} · you'll map their values next`,
         };
       case "ordered":
         return {
@@ -44,7 +44,7 @@ function useSectionTextsGetter(): (
       case "description":
         return {
           title: t`Descriptions only`,
-          meta: t`${count} · no codes to label`,
+          meta: t`${count} · no values to map`,
         };
     }
   };
