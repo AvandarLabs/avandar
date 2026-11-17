@@ -209,7 +209,9 @@ checked row:
       the platform server API, since the desktop webview has no Supabase
       session) and throws a `DatasetDeleteError` with reason `not_allowed`.
       That error records the id as failed and is not logged as unexpected.
-   3. Any other throw is logged, and the dataset is read again. `fullDelete`
+   3. Any other throw is logged. A `DatasetDeleteError` with reason
+      `still_present` already shows the row survived, so the dataset counts as
+      failed. For any other error the dataset is read again. `fullDelete`
       can throw after it deleted the row, for example while it cleans up local
       copies or reads the row back. A dataset whose row is gone counts as
       deleted. A dataset whose row is still there, or whose re-read throws,
@@ -219,13 +221,16 @@ checked row:
 
 The modal then:
 
-- Translates an `UninstallPluginError` by its `reason` into plain copy, never
-  showing the error's own message, which is for logs. Any other error keeps
-  its message.
+- Logs the uninstall error with the install id, and translates an
+  `UninstallPluginError` by its `reason` into plain copy. It never shows an
+  error's own message, which is for logs. Any other error gets a generic
+  translated sentence.
 - Invalidates the plugin installation, plugin content import, plugin data
   slot binding, and dataset queries, so Data Sources and the cards update
   without a reload. This also runs when the uninstall throws, so a card does
-  not keep showing an install that is gone.
+  not keep showing an install that is gone. A refresh that rejects is logged
+  and does not change how the uninstall is reported. The modal closes only
+  after the refresh has finished.
 - Notifies:
   - Nothing checked, or nothing deleted by this run: "Mozambique
     uninstalled" (today's message).
@@ -238,8 +243,9 @@ The modal then:
     it."
   - Uninstall failed with `not_confirmed`: "Could not update Mozambique. We
     could not confirm the uninstall. Check the plugin list, then try again."
-  - Any other uninstall failure: today's error notification. The modal stays
-    open and the admin can retry or cancel.
+  - Any other uninstall failure: "Could not update Mozambique. Something went
+    wrong while uninstalling. Try again." The modal stays open and the admin
+    can retry or cancel.
 
 What deleting a dataset already does, unchanged by this spec:
 
