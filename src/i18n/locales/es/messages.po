@@ -3054,10 +3054,6 @@ msgstr "Positron"
 msgid "Boundary disclaimer (Always included)"
 msgstr "Aviso sobre los límites (Siempre incluido)"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "The dataset could not be deleted. Try again."
-msgstr "No se pudo eliminar el conjunto de datos. Inténtelo de nuevo."
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
@@ -13526,6 +13522,13 @@ msgstr "Fecha de publicación"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Level {levelNumber}"
 msgstr "Nivel {levelNumber}"
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "The dataset could not be fully deleted. Its data may already be gone. "
+"Check it in Data Sources and delete it again."
+msgstr "No se pudo eliminar por completo el conjunto de datos. Es posible que "
+"sus datos ya no existan. Revíselo en Fuentes de datos y elimínelo de "
+"nuevo."
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"

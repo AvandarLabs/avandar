@@ -2909,10 +2909,6 @@ msgstr "Positron"
 msgid "Boundary disclaimer (Always included)"
 msgstr "邊界免責聲明（一定包含）"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "The dataset could not be deleted. Try again."
-msgstr "無法刪除該資料集。請再試一次。"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
@@ -12914,6 +12910,11 @@ msgstr "發布日期"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Level {levelNumber}"
 msgstr "第 {levelNumber} 級"
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "The dataset could not be fully deleted. Its data may already be gone. "
+"Check it in Data Sources and delete it again."
+msgstr "資料集未能完全刪除。它的資料可能已經不存在。請在資料來源中檢查並再次刪除。"
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"

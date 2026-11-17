@@ -3040,10 +3040,6 @@ msgstr "Positron"
 msgid "Boundary disclaimer (Always included)"
 msgstr "Kanusho la mpaka (Hujumuishwa kila wakati)"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "The dataset could not be deleted. Try again."
-msgstr "Seti ya data haikuweza kufutwa. Jaribu tena."
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
@@ -13455,6 +13451,12 @@ msgstr "Tarehe ya kuchapishwa"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Level {levelNumber}"
 msgstr "Kiwango cha {levelNumber}"
+
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "The dataset could not be fully deleted. Its data may already be gone. "
+"Check it in Data Sources and delete it again."
+msgstr "Seti ya data haikuweza kufutwa kikamilifu. Data yake huenda tayari "
+"imeondoka. Iangalie katika Vyanzo vya Data na uifute tena."
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
