@@ -238,4 +238,18 @@ describe("runBackgroundParquetTranscoding toasts", () => {
       }),
     );
   });
+
+  it("keeps the raw parse error out of the translated message", async () => {
+    mocks.loadCsv.mockRejectedValue(new Error("Invalid Input Error: row 4"));
+
+    await expect(_runWithDisplayName("Mozambique provinces")).rejects.toThrow(
+      "Invalid Input Error: row 4",
+    );
+
+    expect(mocks.notifyError).toHaveBeenCalledWith({
+      title: "Dataset failed to process",
+      message: '"Mozambique provinces" could not be parsed.',
+      detail: "Invalid Input Error: row 4",
+    });
+  });
 });

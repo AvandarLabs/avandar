@@ -6756,6 +6756,10 @@ msgstr "Réduire"
 msgid "Labels"
 msgstr "Libellés"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed."
+msgstr "\"{displayName}\" n'a pas pu être analysé."
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "code {code}"
 msgstr "code {code}"
@@ -11533,7 +11537,7 @@ msgstr "Je peux uniquement ajouter cela à un tableau de bord. Ouvrez un tableau
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "Votre forfait ne permet pas de partager davantage de tableaux de bord."
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "Avertissement"
@@ -12324,7 +12328,7 @@ msgstr "Échec du chargement de l'ensemble de données"
 msgid "Decimal"
 msgstr "Décimal"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Error"
 msgstr "Erreur"
 
@@ -12458,10 +12462,6 @@ msgid "Suggestions need a connection or the offline model. Labeling still "
 "works."
 msgstr "Les suggestions nécessitent une connexion ou le modèle hors ligne. "
 "L’étiquetage fonctionne toujours."
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{displayName}\" could not be parsed: {message}"
-msgstr "\"{displayName}\" n'a pas pu être analysé : {message}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
@@ -16137,7 +16137,7 @@ msgstr "Choisissez la valeur minimale"
 msgid "Mode"
 msgstr "Mode"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Success"
 msgstr "Succès"
 

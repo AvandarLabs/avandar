@@ -254,7 +254,8 @@ export async function runBackgroundParquetTranscoding(params: {
     ImportJobsManager.markFailed(datasetId, message);
     notifyError({
       title: i18n._(msg`Dataset failed to process`),
-      message: i18n._(msg`"${displayName}" could not be parsed: ${message}`),
+      message: i18n._(msg`"${displayName}" could not be parsed.`),
+      detail: message,
     });
     setTimeout(() => {
       ImportJobsManager.clearJob(datasetId);

@@ -6392,6 +6392,10 @@ msgstr "折叠"
 msgid "Labels"
 msgstr "标签"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{displayName}\" could not be parsed."
+msgstr "\"{displayName}\" 无法解析。"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "code {code}"
 msgstr "代码 {code}"
@@ -10940,7 +10944,7 @@ msgstr "我只能将其添加到仪表板。请打开一个仪表板，然后在
 msgid "Your plan does not allow sharing more dashboards."
 msgstr "您的套餐不允许再分享更多仪表板。"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "警告"
@@ -11681,7 +11685,7 @@ msgstr "数据集加载失败"
 msgid "Decimal"
 msgstr "小数"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Error"
 msgstr "错误"
 
@@ -11810,10 +11814,6 @@ msgstr "适用于以其他方式写入相同值的数据，例如用 M 和 F 代
 msgid "Suggestions need a connection or the offline model. Labeling still "
 "works."
 msgstr "建议需要网络连接或离线模型。标注仍可正常进行。"
-
-#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
-msgid "\"{displayName}\" could not be parsed: {message}"
-msgstr "\"{displayName}\" 无法解析：{message}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
@@ -15303,7 +15303,7 @@ msgstr "选择最小值"
 msgid "Mode"
 msgstr "模式"
 
-#: src/utils/notifications/notify.ts
+#: src/utils/notifications/notify.tsx
 msgid "Success"
 msgstr "成功"
 
