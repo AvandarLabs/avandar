@@ -1,11 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { PluginContentImportClient } from "@/clients/plugins/PluginContentImportClient/PluginContentImportClient";
-import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
-import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
-import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { UninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { ReactNode } from "react";
@@ -313,10 +308,16 @@ describe("UninstallPluginModal", () => {
     });
   });
 
-  it("closes as uninstalled once the uninstall finishes, and as cancelled on Cancel", async () => {
+  it("closes as cancelled on Cancel", () => {
     _renderModal();
+
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
     expect(mocks.onClose).toHaveBeenLastCalledWith("cancelled");
+  });
+
+  it("closes as uninstalled once the uninstall finishes", async () => {
+    _renderModal();
 
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
 
@@ -325,6 +326,7 @@ describe("UninstallPluginModal", () => {
     });
   });
 
+
   it("closes the modal once the uninstall finishes", async () => {
     _renderModal();
 
@@ -332,23 +334,6 @@ describe("UninstallPluginModal", () => {
 
     await waitFor(() => {
       expect(mocks.onClose).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it("reports how many datasets were deleted", async () => {
-    _renderModal();
-    _checkDataset("Mozambique provinces");
-    _checkDataset("Mozambique districts");
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Uninstall and delete 2 datasets" }),
-    );
-
-    await waitFor(() => {
-      expect(mocks.notifySuccess).toHaveBeenCalledWith({
-        title: "Mozambique uninstalled",
-        message: "2 datasets deleted.",
-      });
     });
   });
 
@@ -422,157 +407,4 @@ describe("UninstallPluginModal", () => {
     });
   });
 
-  it("warns with the names of the datasets it could not delete", async () => {
-    mocks.uninstall.mockResolvedValue({
-      deletedDatasetIds: [],
-      failedDatasetIds: ["dataset-districts"],
-    });
-    _renderModal();
-    _checkDataset("Mozambique districts");
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
-    );
-
-    await waitFor(() => {
-      expect(mocks.notifyWarning).toHaveBeenCalledWith({
-        title: "Mozambique uninstalled",
-        message:
-          "These datasets could not be deleted and are still in Data Sources: Mozambique districts",
-      });
-    });
-  });
-
-  it("reports the error when the uninstall fails", async () => {
-    mocks.uninstall.mockRejectedValue(new Error("not allowed"));
-    _renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    await waitFor(() => {
-      expect(mocks.notifyError).toHaveBeenCalledWith({
-        title: "Could not update Mozambique",
-        message: "not allowed",
-      });
-    });
-  });
-
-  it("explains in plain words that the plugin is still installed, not the log message", async () => {
-    mocks.uninstall.mockRejectedValue(
-      new UninstallPluginError({
-        installationId: "installation-1" as PluginInstallation.Id,
-        reason: "still_installed",
-      }),
-    );
-    _renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    await waitFor(() => {
-      expect(mocks.notifyError).toHaveBeenCalledWith({
-        title: "Could not update Mozambique",
-        message:
-          "Mozambique is still installed. You may not have permission to uninstall it.",
-      });
-    });
-  });
-
-  it("asks the admin to check the plugin list when the uninstall could not be confirmed", async () => {
-    mocks.uninstall.mockRejectedValue(
-      new UninstallPluginError({
-        installationId: "installation-1" as PluginInstallation.Id,
-        reason: "not_confirmed",
-      }),
-    );
-    _renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    await waitFor(() => {
-      expect(mocks.notifyError).toHaveBeenCalledWith({
-        title: "Could not update Mozambique",
-        message:
-          "We could not confirm the uninstall. Check the plugin list, then try again.",
-      });
-    });
-  });
-
-  it("stays open when the uninstall fails", async () => {
-    mocks.uninstall.mockRejectedValue(new Error("not allowed"));
-    _renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    await waitFor(() => {
-      expect(mocks.notifyError).toHaveBeenCalled();
-    });
-    expect(mocks.onClose).not.toHaveBeenCalled();
-  });
-
-  it("does not count a checked dataset that was already gone as deleted", async () => {
-    mocks.uninstall.mockResolvedValue({
-      deletedDatasetIds: [],
-      failedDatasetIds: [],
-    });
-    _renderModal();
-    _checkDataset("Mozambique districts");
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Uninstall and delete 1 dataset" }),
-    );
-
-    await waitFor(() => {
-      expect(mocks.notifySuccess).toHaveBeenCalledWith("Mozambique uninstalled");
-    });
-  });
-
-  it("says only that the plugin was uninstalled when nothing was deleted", async () => {
-    _renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-    await waitFor(() => {
-      expect(mocks.notifySuccess).toHaveBeenCalledWith(
-        "Mozambique uninstalled",
-      );
-    });
-  });
-
-  describe("refreshing the lists an uninstall changes", () => {
-    const expectedQueryKeys = [
-      PluginInstallationClient.QueryKeys.getAll(),
-      PluginContentImportClient.QueryKeys.getAll(),
-      PluginDataSlotBindingClient.QueryKeys.getAll(),
-      DatasetClient.QueryKeys.getAll(),
-    ];
-
-    it("invalidates the plugin and dataset lists after a successful run", async () => {
-      const queryClient = _renderModal();
-      const invalidate = vi.spyOn(queryClient, "invalidateQueries");
-
-      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-      await waitFor(() => {
-        expect(mocks.onClose).toHaveBeenCalled();
-      });
-      expectedQueryKeys.forEach((queryKey) => {
-        expect(invalidate).toHaveBeenCalledWith({ queryKey });
-      });
-    });
-
-    it("invalidates them when the uninstall fails, so a deleted install is not shown", async () => {
-      mocks.uninstall.mockRejectedValue(new Error("could not verify"));
-      const queryClient = _renderModal();
-      const invalidate = vi.spyOn(queryClient, "invalidateQueries");
-
-      fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
-
-      await waitFor(() => {
-        expect(mocks.notifyError).toHaveBeenCalled();
-      });
-      expectedQueryKeys.forEach((queryKey) => {
-        expect(invalidate).toHaveBeenCalledWith({ queryKey });
-      });
-    });
-  });
 });
