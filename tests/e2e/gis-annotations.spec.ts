@@ -15,7 +15,7 @@ const ANNOTATION_TEXT = "E2E note";
 type AnnotationSnapshot = {
   featureCount: number;
   kinds: string[];
-  fillVisibility: string | undefined;
+  fillVisibility: unknown;
 };
 
 /** Clicks a canvas fraction so annotation tools miss the empty-map overlay. */

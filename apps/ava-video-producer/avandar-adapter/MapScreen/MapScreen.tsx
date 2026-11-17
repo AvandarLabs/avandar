@@ -32,7 +32,9 @@ import {
 } from "./mapFixtures";
 import css from "./MapScreen.module.css";
 import { PointInspector } from "./PointInspector";
+import "./setUpMapLibreWorker";
 import { PointMapTools } from "./PointMapTools";
+import type { ErrorEvent as MapLibreErrorEvent } from "maplibre-gl";
 
 export { MAP_BEATS, MAP_DURATION };
 
@@ -122,8 +124,10 @@ export function MapScreen({
       }
       continueRender(frameHandle);
     };
-    const onError = (event: { error?: Error }) =>
-      cancelRender(event.error ?? new Error("Native map failed to render"));
+    const onError = (event: MapLibreErrorEvent) =>
+      cancelRender(
+        new Error(event.error.message || "Native map failed to render"),
+      );
     map.once("idle", complete);
     map.on("error", onError);
     map.resize();

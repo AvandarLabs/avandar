@@ -15,9 +15,7 @@ import type { RefObject } from "react";
 // top-level code reaches for `window.URL.createObjectURL`, unavailable in
 // jsdom. Nothing here constructs a real map, so a stub is enough.
 vi.mock("maplibre-gl", () => {
-  return {
-    default: { Map: vi.fn(), NavigationControl: vi.fn() },
-  };
+  return { Map: vi.fn(), NavigationControl: vi.fn() };
 });
 
 const { ClusterFeatureTable } =

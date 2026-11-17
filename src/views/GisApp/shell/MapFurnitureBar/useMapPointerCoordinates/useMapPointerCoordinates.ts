@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type maplibregl from "maplibre-gl";
+import type { MapMouseEvent } from "maplibre-gl";
 import type { RefObject } from "react";
 
 /** Geographic coordinates under the pointer, in degrees. */
@@ -9,11 +9,11 @@ export type MapPointerCoordinates = { longitude: number; latitude: number };
 export type MapPointerEventSource = {
   on: (
     eventName: "mousemove" | "mouseout",
-    listener: (event: maplibregl.MapMouseEvent) => void,
+    listener: (event: MapMouseEvent) => void,
   ) => unknown;
   off: (
     eventName: "mousemove" | "mouseout",
-    listener: (event: maplibregl.MapMouseEvent) => void,
+    listener: (event: MapMouseEvent) => void,
   ) => unknown;
 };
 
@@ -40,7 +40,7 @@ export function useMapPointerCoordinates(
         return undefined;
       }
 
-      const onMouseMove = (event: maplibregl.MapMouseEvent): void => {
+      const onMouseMove = (event: MapMouseEvent): void => {
         setCoordinates({
           longitude: event.lngLat.lng,
           latitude: event.lngLat.lat,

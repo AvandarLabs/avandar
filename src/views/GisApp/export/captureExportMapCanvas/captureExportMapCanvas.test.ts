@@ -66,9 +66,7 @@ const {
 });
 
 vi.mock("maplibre-gl", () => {
-  return {
-    default: { Map: mapConstructorMock },
-  };
+  return { Map: mapConstructorMock };
 });
 
 vi.mock("@/views/GisApp/MapCanvas/syncMap/syncMap", () => {

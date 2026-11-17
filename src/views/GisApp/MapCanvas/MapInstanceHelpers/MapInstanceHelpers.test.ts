@@ -35,10 +35,8 @@ const { eventHandlers, mapConstructorMock, mapLibreMapMock } = vi.hoisted(
 
 vi.mock("maplibre-gl", () => {
   return {
-    default: {
-      Map: mapConstructorMock,
-      NavigationControl: vi.fn(),
-    },
+    Map: mapConstructorMock,
+    NavigationControl: vi.fn(),
   };
 });
 
