@@ -13,19 +13,25 @@ import type {
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
-const { showQueryInChatMock, explorerShowQueryMock, runQueryMock } = vi.hoisted(
-  () => {
-    return {
-      runQueryMock: vi.fn(),
-      showQueryInChatMock: vi
-        .fn()
-        .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
-      explorerShowQueryMock: vi
-        .fn()
-        .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
-    };
-  },
-);
+const {
+  showQueryInChatMock,
+  explorerShowQueryMock,
+  runQueryMock,
+  checkQueryOnDeviceMock,
+  addAgentDashboardBlockMock,
+} = vi.hoisted(() => {
+  return {
+    runQueryMock: vi.fn(),
+    checkQueryOnDeviceMock: vi.fn(),
+    addAgentDashboardBlockMock: vi.fn(),
+    showQueryInChatMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+    explorerShowQueryMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+  };
+});
 
 vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
   return { WorkspaceQuerySession: { runQuery: runQueryMock } };
@@ -34,7 +40,17 @@ vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
 vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat",
   () => {
-    return { showQueryInChat: showQueryInChatMock };
+    return {
+      showQueryInChat: showQueryInChatMock,
+      checkQueryOnDevice: checkQueryOnDeviceMock,
+    };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock",
+  () => {
+    return { addAgentDashboardBlock: addAgentDashboardBlockMock };
   },
 );
 
@@ -78,6 +94,7 @@ function _state(turn: DataAgentTurnOptions): AgentConversationState {
     results: [],
     resultsByTurn: [],
     sqlVault: createSqlPlaceholderVault(),
+    dashboardCards: [],
   };
 }
 
@@ -176,12 +193,42 @@ describe("createConversationAgentHost", () => {
     expect(explorerShowQueryMock).not.toHaveBeenCalled();
   });
 
-  it("shows an offline turn's results in the explorer", async () => {
+  it("shows an offline turn with no page in the explorer", async () => {
     const turn = _turn(undefined, { isOffline: true });
     await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
 
     expect(explorerShowQueryMock).toHaveBeenCalledWith(REQUEST);
     expect(showQueryInChatMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an offline turn on a dashboard in the chat", async () => {
+    const turn = _turn("dashboard", { isOffline: true });
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(showQueryInChatMock).toHaveBeenCalled();
+    expect(explorerShowQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("checks a dashboard chart's SQL on the current turn's workspace", async () => {
+    checkQueryOnDeviceMock.mockResolvedValue({
+      kind: "rows",
+      columns: [],
+      rowCount: 3,
+    });
+    const state = _state(_turn("dashboard"));
+    const host = createConversationAgentHost(state);
+    const laterWorkspaceId =
+      "workspace-2" as DataAgentTurnOptions["workspaceId"];
+    state.turnRef.current = _turn("dashboard", {
+      workspaceId: laterWorkspaceId,
+    });
+
+    await host.checkQuery!("SELECT 1");
+
+    expect(checkQueryOnDeviceMock).toHaveBeenCalledWith({
+      workspaceId: laterWorkspaceId,
+      sql: "SELECT 1",
+    });
   });
 });
 
@@ -265,5 +312,29 @@ describe("createAgentConversation", () => {
     expect(showQueryInChatMock).toHaveBeenCalledWith(
       expect.objectContaining({ results: conversation.results }),
     );
+  });
+
+  it("adds dashboard cards to the conversation's list", async () => {
+    addAgentDashboardBlockMock.mockImplementation(async ({ cards }) => {
+      cards.push({ cardId: "card-1" });
+      return { kind: "card_shown" };
+    });
+    let agentHost: DataAgentHost | undefined;
+    const conversation = createAgentConversation({
+      turnRef: { current: _turn("dashboard") },
+      datasets: [],
+      createDataAgent: (host) => {
+        agentHost = host;
+        return { ask: vi.fn() } as unknown as DataAgent;
+      },
+    });
+
+    await agentHost!.addDashboardBlock!({
+      dashboard: "Mortality",
+      block: { kind: "HeadingBlock", text: "Deaths" },
+      summary: "s",
+    });
+
+    expect(conversation.dashboardCards).toEqual([{ cardId: "card-1" }]);
   });
 });

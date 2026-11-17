@@ -13,6 +13,10 @@ export type BrowserDataAgentHostOptions = {
    * the caller decides.
    */
   showQuery: DataAgentHost["showQuery"];
+  /** Checks a dashboard chart's SQL on this device. */
+  checkQuery?: DataAgentHost["checkQuery"];
+  /** Places a dashboard block in the open editor or on a card. */
+  addDashboardBlock?: DataAgentHost["addDashboardBlock"];
   /** Shows a question card in the chat panel. */
   showQuestionCard: (clarification: ChatClarifyRequest) => void;
 };
@@ -49,6 +53,8 @@ export function createBrowserDataAgentHost(
 ): DataAgentHost {
   return {
     showQuery: options.showQuery,
+    checkQuery: options.checkQuery,
+    addDashboardBlock: options.addDashboardBlock,
     readColumnValues: (sql) => {
       return _readColumnValues(options.workspaceId, sql);
     },

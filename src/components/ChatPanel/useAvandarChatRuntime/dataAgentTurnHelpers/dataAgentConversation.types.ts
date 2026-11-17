@@ -7,9 +7,11 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
+import type { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
@@ -50,8 +52,9 @@ export type DataAgentTurnOptions = {
    */
   pageContext?: AgentPageContext;
   /**
-   * True for a turn answered by the offline models. Offline turns run only
-   * in the Data Explorer, so their results always go there.
+   * True for a turn answered by the offline models. Its answer is marked as
+   * offline. Its results go where an online turn's do once it carries a page
+   * context.
    */
   isOffline?: boolean;
   /**
@@ -73,6 +76,16 @@ export type DataAgentTurnOptions = {
   getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
   /** The workspace's slug, for the API a plugin AI tool receives. */
   workspaceSlug?: string;
+  /**
+   * The dashboard editor when the turn started: the dashboard it shows, and
+   * how to add a block to it unsaved. Absent where no editor is known.
+   */
+  dashboardEditor?: {
+    activeDashboardId: string | undefined;
+    dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+  };
+  /** The chat session the turn belongs to, for its dashboard cards. */
+  sessionId?: string;
 };
 
 /**
@@ -92,10 +105,12 @@ export type AgentConversationState = {
   resultsByTurn: AgentQueryResultData[][];
   /**
    * Created with the conversation. Page blocks hide values with it, and the
-   * host restores them before SQL runs. An offline conversation sends no
-   * page block, so its vault stays empty and restoring changes nothing.
+   * host restores them before SQL runs. An offline conversation never
+   * redacts, so its vault stays empty and restoring changes nothing.
    */
   sqlVault: SqlPlaceholderVault;
+  /** Dashboard cards this turn added to the chat. Reset every turn. */
+  dashboardCards: AgentDashboardBlockData[];
 };
 
 /** One conversation's agent, the turn it is answering, and its results. */
