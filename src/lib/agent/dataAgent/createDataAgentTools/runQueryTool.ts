@@ -10,8 +10,11 @@ import type {
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
 
-/** After this many runs in one answer, the last result stands. */
-const MAX_QUERY_RUNS_PER_ANSWER = 3;
+/**
+ * Queries one answer may run, counting dashboard chart checks. After this
+ * many, the last result stands.
+ */
+export const MAX_QUERY_RUNS_PER_ANSWER = 3;
 
 function _describeShape(
   columns: ReadonlyArray<{ name: string }>,
