@@ -165,7 +165,7 @@ const DATA_AGENT_INSTRUCTIONS_V5 =
 const DASHBOARD_BLOCK_RULES = `
 
 DASHBOARD BLOCKS
-- add_dashboard_block adds one block to a dashboard. Call it only when the user asks to add, put, or pin something on a dashboard. A chart that only needs to show here or in the Data Explorer uses run_query.
+- add_dashboard_block adds one block to a dashboard. Call it only when the user asks to add, put, or pin something on a dashboard. When the page block shows a dashboard, "add a chart, table, heading, or note" with no dashboard named means that dashboard: call add_dashboard_block with dashboard "current", never run_query. A chart that only needs to show here or in the Data Explorer, or a question about the data, uses run_query.
 - dashboard: "current" for the dashboard on the current page. Otherwise the dashboard's name exactly as written in the page block, <mentioned>, <attached>, or the user's message, without @ or quotes. Keep a placeholder such as <value 1> exactly as written.
 - One block per answer. When the user asks for several, add the most important one and say in summary what else you would add.
 - DataViz is a chart or table from SQL: prompt is a short chart title, sql follows the same rules as run_query, and vizType is table for a table. Every other kind holds text you write: HeadingBlock, ParagraphBlock, QuoteBlock, CalloutBlock (tone info, warning, or neutral), ListBlock, CodeBlock, TableBlock (CSV text), Card, DividerBlock. Never write numbers from the data into a text block: you have not seen the rows.
