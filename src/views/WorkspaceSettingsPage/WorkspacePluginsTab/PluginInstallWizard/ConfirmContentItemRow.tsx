@@ -26,13 +26,14 @@ export function ConfirmContentItemRow({
   return (
     <Group justify="space-between" wrap="nowrap">
       <Text size="sm">{title}</Text>
-      <Group gap="xs" wrap="nowrap">
+      <Group gap="xs" wrap="nowrap" miw={0}>
         {status === undefined ? null : (
           <PluginContentImportStatusText status={status} />
         )}
         {status?.kind === "failed" ? (
           <Button
             size="compact-sm"
+            flex="none"
             variant="default"
             aria-label={t`Retry ${title}`}
             onClick={onRetry}
