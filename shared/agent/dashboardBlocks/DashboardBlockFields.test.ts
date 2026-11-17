@@ -79,20 +79,64 @@ describe("parseDashboardBlockFields", () => {
     });
   });
 
-  it("reads every text kind", () => {
-    const kinds = [
-      { kind: "ParagraphBlock", text: "a" },
-      { kind: "QuoteBlock", quote: "a", cite: "b" },
-      { kind: "DividerBlock" },
-      { kind: "ListBlock", items: ["a", " b "], listType: "ordered" },
-      { kind: "CodeBlock", code: "x", language: "sql" },
-      { kind: "TableBlock", data: "a,b", delimiter: "comma", hasHeader: true },
-      { kind: "Card", title: "a" },
-    ].map((raw) => {
-      return parseDashboardBlockFields(raw).kind;
-    });
+  it.each([[null], [7]])(
+    "reads a chart whose kind is %j as a DataViz",
+    (kind) => {
+      expect(
+        parseDashboardBlockFields({
+          kind,
+          prompt: "Deaths",
+          sql: "SELECT 1",
+          vizType: "bar",
+        }),
+      ).toEqual({
+        kind: "valid",
+        block: {
+          kind: "DataViz",
+          prompt: "Deaths",
+          sql: "SELECT 1",
+          vizType: "bar",
+        },
+      });
+    },
+  );
 
-    expect(kinds).toEqual(Array(7).fill("valid"));
+  it("rejects a non-string kind when there is no prompt and sql", () => {
+    const parsed = parseDashboardBlockFields({ kind: null, text: "a" });
+
+    expect(parsed.kind === "invalid" && parsed.reason).toMatch(
+      /kind must be one of/,
+    );
+  });
+
+  it.each([
+    [
+      { kind: "ParagraphBlock", text: "a" },
+      { kind: "ParagraphBlock", text: "a" },
+    ],
+    [
+      { kind: "QuoteBlock", quote: "a", cite: "b" },
+      { kind: "QuoteBlock", quote: "a", cite: "b" },
+    ],
+    [{ kind: "DividerBlock" }, { kind: "DividerBlock" }],
+    [
+      { kind: "ListBlock", items: ["a", " b "], listType: "ordered" },
+      { kind: "ListBlock", items: ["a", "b"], listType: "ordered" },
+    ],
+    [
+      { kind: "CodeBlock", code: "x", language: "sql" },
+      { kind: "CodeBlock", code: "x", language: "sql" },
+    ],
+    [
+      { kind: "TableBlock", data: "a,b", delimiter: "comma", hasHeader: false },
+      { kind: "TableBlock", data: "a,b", delimiter: "comma", hasHeader: false },
+    ],
+    [
+      { kind: "Card", title: "a" },
+      { kind: "Card", title: "a" },
+    ],
+  ])("keeps the fields of each block kind: %j", (raw, block) => {
+    expect(parseDashboardBlockFields(raw)).toEqual({ kind: "valid", block });
   });
 });
 

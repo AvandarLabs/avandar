@@ -204,9 +204,9 @@ const PARSERS: Readonly<
 
 /**
  * Checks a dashboard block's fields as a model sent them, keeping only
- * allowed optional values. A block with no `kind` but a `prompt` and `sql`
- * is a chart, as today's chat has always read it. An invalid block comes
- * back with a reason written for the model.
+ * allowed optional values. A block with no `kind` (or a non-string `kind`)
+ * but a `prompt` and `sql` is read as a chart. An invalid block comes back
+ * with a reason written for the model.
  *
  * Use it wherever a model's tool call adds a block to a dashboard, such as
  * the chat edge function or the browser agent.
@@ -217,7 +217,7 @@ export function parseDashboardBlockFields(raw: unknown): DashboardBlockParse {
   }
   const fields = raw as BlockFields;
   const isUntypedChart =
-    fields.kind === undefined &&
+    typeof fields.kind !== "string" &&
     typeof fields.sql === "string" &&
     typeof fields.prompt === "string";
   const kind =
