@@ -185,9 +185,10 @@ checked row:
    rows.
 2. For each dataset id, in the order shown:
    1. Re-checks `canAccessResource(dataset, admin)`. If it is false, the id is
-      recorded as failed and `fullDelete` is not called. This matters because
-      `fullDelete` deletes Storage objects before the row: a row that RLS
-      silently refuses to delete would be left with no data.
+      recorded as failed and `fullDelete` is not called. `fullDelete` checks
+      the same access first and throws a `DatasetDeleteError`, so this check
+      is kept only so that a refused dataset is recorded as failed without an
+      error.
    2. Calls `DatasetClient.fullDelete({ id })`. A throw records the id as
       failed, and the loop continues.
 3. Returns `{ failedDatasetIds }`.
@@ -247,15 +248,18 @@ push to `demo/**` deploys.
 
 ## Fixed
 
-- **`fullDelete` could half-delete a dataset.** It deleted the parquet from
-  Storage before the `datasets` row, and a row that RLS hides from DELETE is
-  deleted silently with zero rows affected. A user whose dataset admin access
-  was revoked after the page loaded could end up with a dataset that has no
-  data. `fullDelete` now checks admin access before it touches Storage and
-  reads the row back after the delete, and throws a `DatasetDeleteError` if
-  either check fails. This path's own re-check in
-  `uninstallPluginAndDeleteDatasets` stays, so a dataset the user may no
-  longer delete is recorded as failed without a throw.
+- **`fullDelete` deleted a dataset's files before it knew the row would
+  go.** It deleted the parquet from Storage before the `datasets` row, and a
+  row that RLS hides from DELETE is deleted silently with zero rows affected.
+  A user whose dataset admin access was revoked after the page loaded could
+  end up with a dataset that has no data, and see a success. `fullDelete` now
+  checks admin access before it touches Storage and reads the row back after
+  the delete, and throws a `DatasetDeleteError` if either check fails. A
+  permission revoked between the access check and the row delete can still
+  leave a dataset without its files for that moment, but the read-back now
+  reports it as an error instead of a silent success. This path's own
+  re-check in `uninstallPluginAndDeleteDatasets` stays, so a dataset the user
+  may no longer delete is recorded as failed without a throw.
 
 ## Done when
 
