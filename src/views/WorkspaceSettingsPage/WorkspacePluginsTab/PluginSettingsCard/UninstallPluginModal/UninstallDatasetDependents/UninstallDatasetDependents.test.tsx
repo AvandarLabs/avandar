@@ -52,72 +52,87 @@ function _renderDependents(): void {
   );
 }
 
+function _setResult(
+  result: Partial<typeof mocks.result> & {
+    dependents: typeof mocks.result.dependents;
+  },
+): void {
+  mocks.result = { isLoading: false, hasFailed: false, ...result };
+}
+
 describe("UninstallDatasetDependents", () => {
   beforeEach(() => {
-    mocks.result = { dependents: [], isLoading: false, hasFailed: false };
+    _setResult({ dependents: [] });
   });
 
-  it("renders nothing when nothing reads the dataset", () => {
+  it("renders no list or message when nothing reads the dataset", () => {
     _renderDependents();
 
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
-    expect(screen.queryByText(LOAD_FAILURE)).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("shows a status indicator while the lookups load", () => {
-    mocks.result = { dependents: [], isLoading: true, hasFailed: false };
+    _setResult({ dependents: [], isLoading: true });
 
     _renderDependents();
 
     expect(
       screen.getByRole("status", { name: "Checking what reads this dataset" }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
   it("hides the dependents it has found while a lookup is still loading", () => {
-    mocks.result = { dependents: [LINKED], isLoading: true, hasFailed: false };
+    _setResult({ dependents: [LINKED], isLoading: true });
 
     _renderDependents();
 
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
-    expect(screen.queryByText(/Districts joined/)).not.toBeInTheDocument();
   });
 
-  it("lists a linked dataset as a linked dataset", () => {
-    mocks.result = { dependents: [LINKED], isLoading: false, hasFailed: false };
+  it("introduces a single dependent in the singular", () => {
+    _setResult({ dependents: [LINKED] });
+
+    _renderDependents();
+
+    expect(
+      screen.getByText("This reads it and stops working once it is deleted:"),
+    ).toBeInTheDocument();
+  });
+
+  it("introduces several dependents in the plural", () => {
+    _setResult({ dependents: [LINKED, PLUGIN] });
 
     _renderDependents();
 
     expect(
       screen.getByText("These read it and stop working once it is deleted:"),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("listitem")).toHaveLength(1);
-    expect(
-      screen.getByText("Districts joined (linked dataset)"),
-    ).toBeInTheDocument();
   });
 
-  it("lists another plugin's use of the dataset in plain words", () => {
-    mocks.result = { dependents: [PLUGIN], isLoading: false, hasFailed: false };
+  it("marks a linked dataset with the linked dataset suffix", () => {
+    _setResult({ dependents: [LINKED] });
 
     _renderDependents();
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(
-      screen.getByText("Districts in the Mozambique plugin"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/data slot/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/linked dataset/i)).not.toBeInTheDocument();
+      screen.getByRole("listitem"),
+    ).toHaveTextContent("Districts joined (linked dataset)");
   });
 
-  it("lists linked datasets and plugin dependents together in the order given", () => {
-    mocks.result = {
-      dependents: [LINKED, PLUGIN],
-      isLoading: false,
-      hasFailed: false,
-    };
+  it("shows a plugin dependent's label without the linked dataset suffix", () => {
+    _setResult({ dependents: [PLUGIN] });
+
+    _renderDependents();
+
+    expect(screen.getByRole("listitem").textContent).toBe(
+      "Districts in the Mozambique plugin",
+    );
+  });
+
+  it("lists linked datasets and plugin dependents in the order given", () => {
+    _setResult({ dependents: [LINKED, PLUGIN] });
 
     _renderDependents();
 
@@ -129,28 +144,45 @@ describe("UninstallDatasetDependents", () => {
       "Districts joined (linked dataset)",
       "Districts in the Mozambique plugin",
     ]);
-    expect(screen.queryByText(LOAD_FAILURE)).not.toBeInTheDocument();
   });
 
-  it("says the list could not be loaded instead of showing an empty list", () => {
-    mocks.result = { dependents: [], isLoading: false, hasFailed: true };
+  it("shows no load failure message when every lookup succeeded", () => {
+    _setResult({ dependents: [LINKED, PLUGIN] });
 
     _renderDependents();
 
-    expect(screen.getByRole("status")).toHaveTextContent(LOAD_FAILURE);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("says the list could not be loaded when a lookup failed", () => {
+    _setResult({ dependents: [], hasFailed: true });
+
+    _renderDependents();
+
+    expect(screen.getByRole("alert")).toHaveTextContent(LOAD_FAILURE);
+  });
+
+  it("shows no empty list when a lookup failed and nothing was found", () => {
+    _setResult({ dependents: [], hasFailed: true });
+
+    _renderDependents();
+
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
-  it("says the list could not be loaded beside the dependents it did find", () => {
-    mocks.result = {
-      dependents: [LINKED, PLUGIN],
-      isLoading: false,
-      hasFailed: true,
-    };
+  it("keeps the dependents it did find when a lookup failed", () => {
+    _setResult({ dependents: [LINKED, PLUGIN], hasFailed: true });
 
     _renderDependents();
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
-    expect(screen.getByRole("status")).toHaveTextContent(LOAD_FAILURE);
+  });
+
+  it("says the list could not be loaded beside the dependents it did find", () => {
+    _setResult({ dependents: [LINKED, PLUGIN], hasFailed: true });
+
+    _renderDependents();
+
+    expect(screen.getByRole("alert")).toHaveTextContent(LOAD_FAILURE);
   });
 });
