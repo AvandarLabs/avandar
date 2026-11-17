@@ -674,7 +674,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
 
-### Data dictionaries (F129 to F137)
+### Data dictionaries (F129 to F138)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
@@ -11820,6 +11820,91 @@ Results at the commit that adds this entry:
 - Timings from the measurement (medians of three, in
   `docs/measles-demo/crosswalks-materialization.md`): cold throttled 67.7 s,
   cold unthrottled 2.1 s, warm storage tier 1.3 s, hot 0.2 s.
+
+---
+
+## F138: Data dictionary QA fixes and the Describe columns step
+
+Status: merged into `demo/measles` on 2026-11-17 (merges `c924b731a`,
+`52c4b9bc1`, `b55c4c8a1`, `1841f8f7b`). No PR is open.
+
+**Purpose:** Fixes from a QA pass over the new-dictionary flow. The Review
+step is one table whose rows never move when their kind changes, with a
+select-all checkbox and separate Entry name and Column source columns. The
+UI says "Source value" and "Target value" instead of "code" and "label",
+since a dictionary can map labels to codes or one code system to another.
+A new Describe columns step lets every entry, including text, number, and
+date columns, get a description, with per-entry Suggest and Suggest all that
+never rewrites a user's text without asking. Smaller fixes: rounded corners
+on the Map values sidebar, Apply a dictionary hidden when the workspace has
+no dictionaries, and an info tooltip on Missing value.
+
+**Value:** Changing a kind no longer looks like the column vanished,
+description-only columns clearly belong to the dictionary, and the copy no
+longer assumes which side of a mapping is human-readable.
+
+**Design:** `docs/measles-demo/data-dictionaries-describe-step-design.md`, and
+`docs/measles-demo/data-dictionaries-design.md` sections 4, 13, and 17 (new
+roadmap item: display-only target values).
+
+**PR title:** `feat(data-dictionaries): describe every entry, and say source and target values`
+
+**Depends on:** F130, F131, F133, F136 (the copy touches the apply flow,
+popovers, and crosswalk surfaces).
+
+**Files, by area:**
+
+- Apply a dictionary hidden with no dictionaries (`c0c167cdb`): new
+  `src/hooks/dataDictionaries/useWorkspaceHasDictionaries.ts`,
+  `DatasetActionsMenu/DictionaryMenuItems.tsx`, `DatasetActionsMenu.test.tsx`.
+- Sidebar radius and Missing value tooltip (`b7a5ecd23`, `a85653a71`):
+  `LabelValuesStep/LabelValuesStep.module.css`, new
+  `LabelValuesStep/MissingValueHeader.tsx`, `LabelValuesTable.tsx`,
+  `LabelValuesStep.test.tsx`.
+- One Review table (`4b3fbdbc9`, `5efefef4d`): `ReviewColumnsStep/`
+  (`ReviewSections.tsx` deleted, `ReviewEntriesSection.tsx` renamed to
+  `ReviewEntriesTable.tsx`, `reviewSectionHelpers.ts` renamed to
+  `reviewEntriesHelpers.ts`, `ReviewEntriesTableHead.tsx`, `ReviewEntryRow.tsx`,
+  `EntryNameCell.tsx`, the CSS module, tests), `newDictionaryReducer/`
+  (`set_all_entries_included`), and the heading the
+  `dictionary-create-from-dataset` e2e spec waits on.
+- Source and target value copy (`a9bc5a112`, `a15fcbf2a`): new
+  `src/components/dataDictionaries/ValueSideHint/`, copy-only edits across
+  `NewDictionaryFromDatasetsView/`, `DataDictionaryView/`,
+  `ApplyDictionariesView/`, `CrosswalkView/`, `src/components/dataDictionaries/`,
+  and e2e assertions. Internal names (`code`, `label`, `decode`/`encode`) are
+  unchanged. The merge `b55c4c8a1` resolves its conflicts with the Review
+  table: take the merge's versions of `ReviewEntryRow.tsx`,
+  `ReviewColumnsStep.test.tsx`, and the e2e spec.
+- Describe columns step (`1f85358db`, `c22c998ff`, `c59f4d38f`, `f1228986f`):
+  new `NewDictionaryFromDatasetsView/DescribeColumnsStep/`, step wiring in
+  `NewDictionaryStepper.tsx`, `useNewDictionaryFlow.ts`,
+  `useNewDictionaryStepLabels.ts`, `ProposalStepBody.tsx`, `SaveFooter.tsx`,
+  `LabelValuesFooter.tsx`, `EntryDescriptionField.tsx` deleted; the describe
+  task and prompt `dictionary-suggestions-v2` in
+  `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts`;
+  `isRewriteAllowed` in `DictionaryProposalModule.ts`;
+  `makeDescribeRequestFromEntry` in
+  `src/lib/dataDictionaries/DictionarySuggestions/`; v1 refusing describe in
+  `supabase/functions/chat/PostDictionarySuggestions/`; the Review intro and
+  last-cell copy; the "Keep apart" alignment.
+- Translations (`0f03b42d5`, `7012e9ba1`, `ec290523a`) and this log.
+
+**Schema:** none.
+
+**Deploy:** the `chat` edge function (new prompt version), then the frontend.
+
+**Known gaps:** no e2e spec was run and the UI was only screenshotted in
+preview harnesses, because the shared local stack lacked this branch's
+dictionary schema. Run `dictionary-create-from-dataset.spec.ts` on a switched
+stack before building the PR. Charts still show the target side of a
+reference-attached column (see the roadmap item).
+
+**Verification:** `pnpm exec tsc -b --force`, `deno check`, eslint and
+stylelint on changed files, and vitest over `src/views/DataManagerApp`,
+`src/components/dataDictionaries`, and the shared dictionary prompt and model.
+
+---
 
 ## Open decisions
 
