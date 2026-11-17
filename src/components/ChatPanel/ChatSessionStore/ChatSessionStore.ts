@@ -1,3 +1,4 @@
+import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import {
   addChatSession,
@@ -58,6 +59,7 @@ function _clearSession(
 ): void {
   ChatThreadStore.clear({ ...identity, sessionId });
   ChatContextTrayStore.clear({ ...identity, sessionId });
+  AgentDashboardCardStore.clear({ ...identity, sessionId });
 }
 
 function _migrateLegacyChat(
@@ -123,8 +125,9 @@ export function loadChatSessions(
 }
 
 /**
- * Archives a session, persists its replacement index, and removes any
- * archived session evicted by the cap after that write succeeds.
+ * Archives a session, persists its replacement index, and removes the
+ * thread, tray, and dashboard card statuses of any archived session evicted
+ * by the cap after that write succeeds.
  */
 export function archiveStoredChatSession(
   identity: Readonly<ChatSessionIdentity>,
@@ -152,8 +155,9 @@ export function commitChatSessionIndex(
 }
 
 /**
- * Deletes an archived session from the index and clears its stored thread
- * and tray only after the updated index is persisted.
+ * Deletes an archived session from the index and clears its stored thread,
+ * tray, and dashboard card statuses only after the updated index is
+ * persisted.
  */
 export function deleteStoredChatSession(
   identity: Readonly<ChatSessionIdentity>,

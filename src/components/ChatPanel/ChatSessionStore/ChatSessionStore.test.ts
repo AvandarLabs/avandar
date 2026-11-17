@@ -1,9 +1,14 @@
 /** Behavioral tests for persisted chat session loading and archiving. */
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ARCHIVE_LIMIT } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
-import { archiveStoredChatSession, loadChatSessions } from "./ChatSessionStore";
+import {
+  archiveStoredChatSession,
+  deleteStoredChatSession,
+  loadChatSessions,
+} from "./ChatSessionStore";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 
 const IDENTITY = { workspaceId: "ws-1", userId: "user-1" };
@@ -203,5 +208,33 @@ describe("archiveStoredChatSession", () => {
     expect(
       ChatContextTrayStore.read({ ...IDENTITY, sessionId: oldest }),
     ).toEqual([]);
+  });
+});
+
+describe("deleteStoredChatSession", () => {
+  it("deletes the session's dashboard card statuses", () => {
+    const index = loadChatSessions(IDENTITY);
+    const closedId = "closed-session";
+    const withArchived = {
+      ...index,
+      archivedIds: [closedId, ...index.archivedIds],
+      sessions: {
+        ...index.sessions,
+        [closedId]: {
+          id: closedId,
+          kind: "data" as const,
+          titleIsPlaceholder: true,
+        },
+      },
+    };
+    const cardIdentity = { ...IDENTITY, sessionId: closedId };
+    AgentDashboardCardStore.setStatus(cardIdentity, "card-1", {
+      status: "cancelled",
+      isReported: true,
+    });
+
+    deleteStoredChatSession(IDENTITY, withArchived, closedId);
+
+    expect(AgentDashboardCardStore.read(cardIdentity)).toEqual({});
   });
 });
