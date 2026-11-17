@@ -1003,6 +1003,12 @@ each linked to its dataset once imported, with Import for an item that is
 missing and Retry for one that failed. Uninstalling the plugin keeps the
 datasets. Deleting an imported dataset lets the item be imported again.
 
+When an admin uninstalls a plugin that imported datasets, the uninstall dialog
+lists each one with an unchecked "Delete" box, so every dataset is kept unless
+the admin chooses otherwise. Only datasets the admin could delete from Data
+Sources can be deleted there. A checked dataset lists the linked datasets and
+other plugins' data slots that read it.
+
 Bundled data needs attribution recorded with it. Credit its source and license
 in the description, because that is where workspace members see where the data
 came from, and set the manifest's `license` and `package.json`'s `license` to
