@@ -74,8 +74,11 @@ export type PluginCardState = Readonly<{
 export function usePluginCardState(options: {
   manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
+
+  /** The id of the card's heading, where focus returns after an uninstall. */
+  headingId: string;
 }): PluginCardState {
-  const { manifestModule, installation } = options;
+  const { manifestModule, installation, headingId } = options;
   const { pluginName, description } = usePluginDisplayText(options);
   const status = getPluginInstallStatusFromInstallation({
     installation,
@@ -85,6 +88,7 @@ export function usePluginCardState(options: {
     pluginName,
     manifestModule,
     installation,
+    headingId,
   });
   const imports = usePluginImportState(options);
   return { pluginName, description, status, actions, ...imports };

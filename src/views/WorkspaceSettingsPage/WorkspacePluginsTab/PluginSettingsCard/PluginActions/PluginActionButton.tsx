@@ -106,9 +106,9 @@ export function PluginActionButton({
       {...style}
       aria-describedby={headingId}
       disabled={isDisabled || (isUninstall && importedDatasets === "loading")}
-      onClick={() => {
+      onClick={(event) => {
         if (isUninstall && importedDatasets === "some") {
-          actions.uninstallWithImportedDatasets();
+          actions.uninstallWithImportedDatasets(event.currentTarget);
           return;
         }
         modals.openConfirmModal({

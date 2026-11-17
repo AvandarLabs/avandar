@@ -28,7 +28,11 @@ export function PluginSettingsCard({
   canManage,
 }: Props): JSX.Element {
   const headingId = useId();
-  const state = usePluginCardState({ manifestModule, installation });
+  const state = usePluginCardState({
+    manifestModule,
+    installation,
+    headingId,
+  });
   const { pluginName } = state;
   return (
     <Card component="section" aria-labelledby={headingId} padding="lg">

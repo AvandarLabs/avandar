@@ -636,7 +636,7 @@ describe("WorkspacePluginsTab", () => {
       const uninstallButton = within(card).getByRole("button", {
         name: "Uninstall",
       });
-      uninstallButton.focus();
+      // Safari and Firefox on macOS do not focus a button on click.
       fireEvent.click(uninstallButton);
       await screen.findByRole("dialog");
       return uninstallButton;

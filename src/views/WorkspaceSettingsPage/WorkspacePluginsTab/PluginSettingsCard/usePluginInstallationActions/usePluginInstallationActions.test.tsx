@@ -152,6 +152,7 @@ function Harness(): ReactNode {
     pluginName: "Epidemiology",
     manifestModule: MANIFEST_MODULE,
     installation,
+    headingId: "card-heading",
   });
   return (
     <div>
@@ -175,7 +176,12 @@ function Harness(): ReactNode {
       <button type="button" onClick={actions.uninstall}>
         uninstall
       </button>
-      <button type="button" onClick={actions.uninstallWithImportedDatasets}>
+      <button
+        type="button"
+        onClick={(event) => {
+          actions.uninstallWithImportedDatasets(event.currentTarget);
+        }}
+      >
         uninstall with datasets
       </button>
     </div>
@@ -234,7 +240,7 @@ describe("usePluginInstallationActions", () => {
     expect(await screen.findByText("no installation")).toBeInTheDocument();
   });
 
-  it("opens the uninstall modal with the install's plugin id and id, and deletes nothing", async () => {
+  it("opens the uninstall modal with the install's ids, the button that opened it and the card heading, and deletes nothing", async () => {
     _seedInstallation({});
     await _renderAfterFirstLoad();
 
@@ -244,6 +250,8 @@ describe("usePluginInstallationActions", () => {
       pluginName: "Epidemiology",
       pluginId: MANIFEST.id,
       installationId: "00000000-0000-4000-8000-000000000101",
+      opener: screen.getByText("uninstall with datasets"),
+      headingId: "card-heading",
     });
     expect(fakeDatabase.rows).toHaveLength(1);
   });

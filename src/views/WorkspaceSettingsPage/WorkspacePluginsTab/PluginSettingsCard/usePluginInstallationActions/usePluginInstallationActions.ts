@@ -22,9 +22,11 @@ export type PluginInstallationActions = Readonly<{
   /**
    * Opens the uninstall dialog that lets an admin delete the datasets the
    * plugin imported. The card uses it instead of `uninstall` when the plugin
-   * imported datasets into this workspace.
+   * imported datasets into this workspace. Pass the button that opened it,
+   * since a click does not focus a button in every browser, so focus can go
+   * back to it afterwards.
    */
-  uninstallWithImportedDatasets: () => void;
+  uninstallWithImportedDatasets: (opener: HTMLElement) => void;
 }>;
 
 /** Everything the actions of one plugin read, gathered by the hook. */
@@ -32,6 +34,9 @@ type ActionContext = Readonly<{
   pluginName: string;
   manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
+
+  /** The id of the card's heading, where focus goes if the opener is gone. */
+  headingId: string;
   mutations: ReturnType<typeof usePluginInstallationMutations>;
 }>;
 
@@ -43,6 +48,7 @@ function _makeInstallActionsFromContext(
   "install" | "uninstall" | "uninstallWithImportedDatasets"
 > {
   const { pluginName, manifestModule, installation, mutations } = context;
+  const { headingId } = context;
   return {
     install: () => {
       if (manifestModule !== undefined) {
@@ -54,12 +60,14 @@ function _makeInstallActionsFromContext(
         mutations.deleteInstallation({ id: installation.id });
       }
     },
-    uninstallWithImportedDatasets: () => {
+    uninstallWithImportedDatasets: (opener) => {
       if (installation !== undefined) {
         openUninstallPluginModal({
           pluginName,
           pluginId: installation.pluginId,
           installationId: installation.id,
+          opener,
+          headingId,
         });
       }
     },
@@ -115,6 +123,7 @@ export function usePluginInstallationActions(options: {
   pluginName: string;
   manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
+  headingId: string;
 }): PluginInstallationActions {
   const mutations = usePluginInstallationMutations(options.pluginName);
   return _makeActionsFromContext({ ...options, mutations });

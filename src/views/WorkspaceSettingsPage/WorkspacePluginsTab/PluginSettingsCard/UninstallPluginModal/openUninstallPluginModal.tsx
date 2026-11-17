@@ -20,11 +20,15 @@ export function openUninstallPluginModal(
     pluginName: string;
     pluginId: string;
     installationId: PluginInstallation.Id;
+
+    /** The button that opened the dialog, where focus returns on Cancel. */
+    opener: HTMLElement;
+
+    /** The id of the card's heading, where focus goes once uninstalled. */
+    headingId: string;
   }>,
 ): void {
-  const { pluginName } = options;
-  const opener = document.activeElement;
-  const headingId = opener?.getAttribute("aria-describedby") ?? null;
+  const { pluginName, opener, headingId } = options;
   const modalId = randomId();
   let closeReason: UninstallModalCloseReason = "cancelled";
   modals.open({
@@ -47,7 +51,9 @@ export function openUninstallPluginModal(
     },
     children: (
       <UninstallPluginModal
-        {...options}
+        pluginName={pluginName}
+        pluginId={options.pluginId}
+        installationId={options.installationId}
         modalId={modalId}
         onClose={(reason) => {
           closeReason = reason;
