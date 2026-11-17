@@ -1,3 +1,4 @@
+import { mapDashboardBlockText } from "$/agent/dashboardBlocks/DashboardBlockFields";
 import type {
   DataAgentHost,
   DataAgentQueryOutcome,
@@ -31,6 +32,41 @@ function _maskOutcome(
   };
 }
 
+/** The host's chart check, with placeholders restored and the result masked. */
+function _restoringCheckQuery(
+  checkQuery: NonNullable<DataAgentHost["checkQuery"]>,
+  vault: SqlPlaceholderVault,
+): NonNullable<DataAgentHost["checkQuery"]> {
+  return async (sql) => {
+    const problem = vault.getPlaceholderError(sql);
+    if (problem !== undefined) {
+      return { kind: "failed", error: problem };
+    }
+    return _maskOutcome(await checkQuery(vault.restore(sql)), vault);
+  };
+}
+
+/**
+ * The host's dashboard add, with the dashboard name and every string the
+ * block shows restored, and its SQL restored, so the user sees and saves
+ * real values. Nothing restored here goes back to the model.
+ */
+function _restoringAddDashboardBlock(
+  addDashboardBlock: NonNullable<DataAgentHost["addDashboardBlock"]>,
+  vault: SqlPlaceholderVault,
+): NonNullable<DataAgentHost["addDashboardBlock"]> {
+  return (request) => {
+    return addDashboardBlock({
+      ...request,
+      dashboard: vault.unmaskText(request.dashboard),
+      block: mapDashboardBlockText(request.block, {
+        mapSql: vault.restore,
+        mapText: vault.unmaskText,
+      }),
+    });
+  };
+}
+
 /**
  * Wraps a data agent host so SQL the model writes with page placeholders
  * (`'<value 1>'`) runs with the values the vault holds. `showQuery` and
@@ -38,6 +74,9 @@ function _maskOutcome(
  * result card, and DuckDB all get the real SQL. SQL with an unknown
  * placeholder, or one inside a longer string, fails without running, with
  * the reason for the model.
+ *
+ * A dashboard chart's check is restored and masked like a query. A
+ * dashboard block is restored before the host shows or saves it.
  *
  * Nothing the model reads back carries a restored value: a query's column
  * names, preview cells, and error are masked, and a lookup that ran with
@@ -80,5 +119,11 @@ export function createPlaceholderRestoringHost(
           });
     },
     isHeldPlaceholder: vault.isHeldPlaceholder,
+    checkQuery: host.checkQuery
+      ? _restoringCheckQuery(host.checkQuery, vault)
+      : undefined,
+    addDashboardBlock: host.addDashboardBlock
+      ? _restoringAddDashboardBlock(host.addDashboardBlock, vault)
+      : undefined,
   };
 }

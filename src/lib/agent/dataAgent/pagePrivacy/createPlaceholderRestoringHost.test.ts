@@ -211,4 +211,79 @@ describe("createPlaceholderRestoringHost", () => {
     );
     expect(JSON.stringify(result)).not.toContain("Kings");
   });
+
+  it("restores a chart check's SQL and masks what comes back", async () => {
+    const checkQuery = vi.fn().mockResolvedValue({
+      kind: "failed",
+      error: "Conversion Error: Kings is not a number",
+    });
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ checkQuery }),
+      _createVault(),
+    );
+
+    const outcome = await host.checkQuery!(MODEL_SQL);
+
+    expect(checkQuery).toHaveBeenCalledWith(RESTORED_SQL);
+    expect(outcome).toEqual({
+      kind: "failed",
+      error: "Conversion Error: <value 1> is not a number",
+    });
+  });
+
+  it("refuses a chart check with an unknown placeholder", async () => {
+    const checkQuery = vi.fn();
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ checkQuery }),
+      _createVault(),
+    );
+
+    const outcome = await host.checkQuery!(`SELECT 1 WHERE x = '<value 4>'`);
+
+    expect(checkQuery).not.toHaveBeenCalled();
+    expect(outcome).toEqual({
+      kind: "failed",
+      error: expect.stringContaining("unknown"),
+    });
+  });
+
+  it("restores the dashboard name and the block before adding it", async () => {
+    const addDashboardBlock = vi.fn().mockResolvedValue({ kind: "card_shown" });
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ addDashboardBlock }),
+      _createVault(),
+    );
+
+    await host.addDashboardBlock!({
+      dashboard: "<value 1> deaths",
+      block: {
+        kind: "DataViz",
+        prompt: "Deaths in <value 1>",
+        sql: MODEL_SQL,
+        vizType: "line",
+      },
+      summary: "Added it.",
+    });
+
+    expect(addDashboardBlock).toHaveBeenCalledWith({
+      dashboard: "Kings deaths",
+      block: {
+        kind: "DataViz",
+        prompt: "Deaths in Kings",
+        sql: RESTORED_SQL,
+        vizType: "line",
+      },
+      summary: "Added it.",
+    });
+  });
+
+  it("leaves dashboard members out when the host has none", () => {
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({}),
+      createSqlPlaceholderVault(),
+    );
+
+    expect(host.checkQuery).toBeUndefined();
+    expect(host.addDashboardBlock).toBeUndefined();
+  });
 });
