@@ -32,6 +32,7 @@ const mocks = vi.hoisted(() => {
     isLoadingContentImports: false,
     isFetchingContentImports: false,
     hasContentImportsError: false,
+    refetchContentImports: vi.fn(),
   };
 });
 
@@ -162,6 +163,7 @@ vi.mock(
             {
               isFetching: mocks.isFetchingContentImports,
               isError: mocks.hasContentImportsError,
+              refetch: mocks.refetchContentImports,
             },
           ];
         },
@@ -338,6 +340,7 @@ describe("WorkspacePluginsTab", () => {
     mocks.isLoadingContentImports = false;
     mocks.isFetchingContentImports = false;
     mocks.hasContentImportsError = false;
+    mocks.refetchContentImports.mockReset();
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -429,7 +432,10 @@ describe("WorkspacePluginsTab", () => {
   it.each([
     ["while the imports load", { isLoadingContentImports: true }],
     ["while the imports refetch", { isFetchingContentImports: true }],
-    ["when the imports fail to load", { hasContentImportsError: true }],
+    [
+      "while the imports refetch after a failure",
+      { isFetchingContentImports: true, hasContentImportsError: true },
+    ],
   ] as const)(
     "keeps Uninstall disabled and opens no confirm %s",
     async (_label, state) => {
@@ -447,6 +453,105 @@ describe("WorkspacePluginsTab", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     },
   );
+
+  describe("when the imports fail to load", () => {
+    const LOOKUP_ERROR =
+      "We could not check whether this plugin imported datasets.";
+
+    beforeEach(() => {
+      mocks.hasContentImportsError = true;
+    });
+
+    it("says the lookup failed, in an alert on the card", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(within(card).getByRole("alert")).toHaveTextContent(LOOKUP_ERROR);
+    });
+
+    it("asks for the imports again when Retry is pressed", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Retry" }));
+
+      expect(mocks.refetchContentImports).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps Uninstall enabled", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
+    });
+
+    it("confirms an uninstall that keeps every dataset, never opening the dataset modal", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      // A restored cache may still list imports after a failed refetch.
+      mocks.contentImports = [
+        { contentId: "cases", pluginId: REMOVED_PLUGIN_ID, datasetId: "d1" },
+      ];
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Uninstall" }));
+
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
+      expect(dialog).toHaveTextContent(
+        "We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.",
+      );
+      expect(dialog).not.toHaveTextContent("Datasets it imported");
+    });
+
+    it("shows no alert to a user who cannot manage plugins", async () => {
+      mocks.canManage = false;
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("shows no alert on a plugin that is not installed", async () => {
+      _addBundledPlugin();
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("shows no alert while the retry is in flight", async () => {
+      mocks.isFetchingContentImports = true;
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+    });
+  });
 
   it("enables Uninstall once the imports lookup is settled", async () => {
     _addInstallation({ pluginId: REMOVED_PLUGIN_ID });

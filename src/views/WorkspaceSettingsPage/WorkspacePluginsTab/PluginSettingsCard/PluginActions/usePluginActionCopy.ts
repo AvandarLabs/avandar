@@ -7,6 +7,12 @@ export type PluginActionCopy = Readonly<{
   confirmTitle: string;
   confirmBody: string;
   confirmLabel: string;
+
+  /**
+   * A second paragraph for the confirmation, for an uninstall that cannot
+   * tell whether the plugin imported datasets. Only Uninstall has one.
+   */
+  datasetLookupFailedNote?: string;
 }>;
 
 /**
@@ -45,6 +51,7 @@ export function usePluginActionCopy(options: {
       confirmTitle: t`Uninstall ${pluginName}?`,
       confirmBody: t`Its features are removed from this workspace.`,
       confirmLabel: t`Uninstall`,
+      datasetLookupFailedNote: t`We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.`,
     },
   };
 }

@@ -17,10 +17,16 @@ type Props = Readonly<{
   hasImportedDatasets: boolean;
 
   /**
-   * True until the card knows, from a fresh lookup that succeeded, whether
-   * the plugin imported datasets. Uninstall stays disabled until then.
+   * True while the card loads or refetches whether the plugin imported
+   * datasets. Uninstall stays disabled until the lookup settles.
    */
   isLookingUpImportedDatasets: boolean;
+
+  /**
+   * True when that lookup failed. Uninstall then asks for a plain confirm
+   * that says every dataset is kept, whatever `hasImportedDatasets` says.
+   */
+  hasFailedImportedDatasetsLookup: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -42,6 +48,8 @@ const ACTION_KINDS_BY_STATUS: Record<
  * disabled, and so does everyone while a change is saving. Install opens the
  * install wizard; every other action asks the user to confirm first, except
  * Uninstall of a plugin that imported datasets, which opens its own modal.
+ * When the imported datasets could not be looked up, Uninstall confirms an
+ * uninstall that keeps every dataset.
  */
 export function PluginActions({
   status,
@@ -50,6 +58,7 @@ export function PluginActions({
   canManage,
   hasImportedDatasets,
   isLookingUpImportedDatasets,
+  hasFailedImportedDatasetsLookup,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -72,6 +81,7 @@ export function PluginActions({
             isDisabled={isDisabled}
             hasImportedDatasets={hasImportedDatasets}
             isLookingUpImportedDatasets={isLookingUpImportedDatasets}
+            hasFailedImportedDatasetsLookup={hasFailedImportedDatasetsLookup}
             actions={actions}
           />
         );

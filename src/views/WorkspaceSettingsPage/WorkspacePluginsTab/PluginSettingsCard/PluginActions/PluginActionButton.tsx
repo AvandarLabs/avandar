@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { Button, Text } from "@mantine/core";
+import { Button, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { usePluginActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
 import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
@@ -18,10 +18,16 @@ type Props = Readonly<{
   hasImportedDatasets: boolean;
 
   /**
-   * True until the card knows, from a fresh lookup that succeeded, whether
-   * the plugin imported datasets. Uninstall stays disabled until then.
+   * True while the card loads or refetches whether the plugin imported
+   * datasets. Uninstall stays disabled until the lookup settles.
    */
   isLookingUpImportedDatasets: boolean;
+
+  /**
+   * True when that lookup failed. Uninstall then asks for a plain confirm
+   * that says every dataset is kept, whatever `hasImportedDatasets` says.
+   */
+  hasFailedImportedDatasetsLookup: boolean;
   actions: PluginInstallationActions;
 }>;
 
@@ -56,7 +62,8 @@ function _makeOnConfirmByKind(
  * confirmation, and the action runs only once the user confirms, because
  * every action changes the plugin for every member of the workspace.
  * Uninstall of a plugin that imported datasets opens the uninstall modal
- * instead, which is its own confirmation.
+ * instead, which is its own confirmation. When the lookup of imported
+ * datasets failed, Uninstall confirms an uninstall that keeps every dataset.
  */
 export function PluginActionButton({
   kind,
@@ -65,12 +72,15 @@ export function PluginActionButton({
   isDisabled,
   hasImportedDatasets,
   isLookingUpImportedDatasets,
+  hasFailedImportedDatasetsLookup,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const copy = usePluginActionCopy({ pluginName })[kind];
   const isUninstall = kind === "uninstall";
-  const isUninstallWithDatasets = isUninstall && hasImportedDatasets;
+  const isUninstallWithDatasets =
+    isUninstall && hasImportedDatasets && !hasFailedImportedDatasetsLookup;
+  const shouldNoteKeptDatasets = isUninstall && hasFailedImportedDatasetsLookup;
   const style = STYLE_BY_KIND[kind];
   return (
     <Button
@@ -85,7 +95,14 @@ export function PluginActionButton({
         }
         modals.openConfirmModal({
           title: copy.confirmTitle,
-          children: <Text size="sm">{copy.confirmBody}</Text>,
+          children: (
+            <Stack gap="xs">
+              <Text size="sm">{copy.confirmBody}</Text>
+              {shouldNoteKeptDatasets ? (
+                <Text size="sm">{copy.datasetLookupFailedNote}</Text>
+              ) : null}
+            </Stack>
+          ),
           labels: { confirm: copy.confirmLabel, cancel: t`Cancel` },
           confirmProps: { color: style.color },
           onConfirm: _makeOnConfirmByKind(actions)[kind],

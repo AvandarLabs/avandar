@@ -22,6 +22,12 @@ export type ImportedPluginContent = Readonly<{
    * be trusted.
    */
   isError: boolean;
+
+  /**
+   * Asks for the imports again, for example from a Retry button after
+   * `isError`. `isFetching` is true until the request settles.
+   */
+  refetch: () => void;
 }>;
 
 /**
@@ -54,5 +60,8 @@ export function useImportedPluginContent(
     isLoading,
     isFetching: query.isFetching,
     isError: query.isError,
+    refetch: () => {
+      void query.refetch();
+    },
   };
 }

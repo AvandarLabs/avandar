@@ -27,6 +27,7 @@ function _renderActions(options: {
   canManage?: boolean;
   hasImportedDatasets?: boolean;
   isLookingUpImportedDatasets?: boolean;
+  hasFailedImportedDatasetsLookup?: boolean;
   actions?: PluginInstallationActions;
 }): void {
   const {
@@ -34,6 +35,7 @@ function _renderActions(options: {
     canManage = true,
     hasImportedDatasets = false,
     isLookingUpImportedDatasets = false,
+    hasFailedImportedDatasetsLookup = false,
     actions = _makeActions(),
   } = options;
   render(
@@ -46,6 +48,7 @@ function _renderActions(options: {
         canManage={canManage}
         hasImportedDatasets={hasImportedDatasets}
         isLookingUpImportedDatasets={isLookingUpImportedDatasets}
+        hasFailedImportedDatasetsLookup={hasFailedImportedDatasetsLookup}
         actions={actions}
       />
     </ModalsProvider>,
@@ -162,6 +165,41 @@ describe("PluginActions", () => {
 
     expect(screen.getByRole("button", { name: "Uninstall" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Disable" })).toBeEnabled();
+  });
+
+  it("confirms an uninstall that keeps every dataset when the imports lookup failed", async () => {
+    const actions = _makeActions();
+    _renderActions({
+      status: "installed",
+      hasImportedDatasets: true,
+      hasFailedImportedDatasetsLookup: true,
+      actions,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(
+      "Its features are removed from this workspace.",
+    );
+    expect(dialog).toHaveTextContent(
+      "We could not check for datasets this plugin imported. If you uninstall it now, every dataset it imported is kept.",
+    );
+    expect(actions.uninstallWithImportedDatasets).not.toHaveBeenCalled();
+    await _confirmInDialog("Uninstall");
+    expect(actions.uninstall).toHaveBeenCalledTimes(1);
+  });
+
+  it("adds no kept-datasets sentence to the confirm of another action when the lookup failed", async () => {
+    _renderActions({
+      status: "installed",
+      hasFailedImportedDatasetsLookup: true,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Disable" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).not.toHaveTextContent("every dataset it imported is kept");
   });
 
   it("starts the install without a confirmation, because the install wizard is the confirmation", () => {
