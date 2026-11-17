@@ -2,27 +2,35 @@ import { HexColorInput } from "../HexColorInput";
 import css from "./PaletteValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
 
+function _buildShadeEntries(shades: readonly string[]) {
+  return shades.map((shade, shadeSlot) => ({
+    key: `shade-${shadeSlot}`,
+    shadeSlot,
+    shade,
+  }));
+}
+
 /** A ten-shade palette, one colour field per shade. */
 export function PaletteValueControl({
   label,
   value,
   onChange,
 }: ValueControlProps) {
-  const shades = Array.isArray(value) ? value : [];
+  const shades: string[] = Array.isArray(value) ? value : [];
   return (
     <div className={css.paletteValueGrid} role="group" aria-label={label}>
-      {shades.map((shade, index) => (
+      {_buildShadeEntries(shades).map(({ key, shadeSlot, shade }) => (
         <HexColorInput
-          // A shade's position is its identity: the palette always has ten.
-          key={`shade-${String(index)}`}
+          // A shade's slot (0..9) is its Mantine palette identity.
+          key={key}
           size="xs"
-          aria-label={`${label}, shade ${index}`}
+          aria-label={`${label}, shade ${shadeSlot}`}
           value={shade}
           allowAlpha={false}
           onChange={(color) =>
             onChange(
               shades.map((current, position) =>
-                position === index ? color : current,
+                position === shadeSlot ? color : current,
               ),
             )
           }

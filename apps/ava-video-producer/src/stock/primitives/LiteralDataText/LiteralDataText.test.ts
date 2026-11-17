@@ -49,10 +49,11 @@ test("whitespace marks use the theme's highlight colour", () => {
     other: { video: { atomic: { swatch: { orange: "#00ff00" } } } },
   };
   const markup = renderToStaticMarkup(
-    createElement(VideoThemeScope, {
-      patches: [patch],
-      children: createElement(LiteralDataText, { value: "a b", x: 0, y: 0 }),
-    }),
+    createElement(
+      VideoThemeScope,
+      { patches: [patch] },
+      createElement(LiteralDataText, { value: "a b", x: 0, y: 0 }),
+    ),
   );
   assert.match(markup, /fill="#00ff00"/);
 });

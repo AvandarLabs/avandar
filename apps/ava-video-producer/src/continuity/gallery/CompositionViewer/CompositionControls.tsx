@@ -66,13 +66,14 @@ function TransportControls({ appearance, isScene }: ControlsProps) {
   );
 }
 
+const APPEARANCE_LABELS = {
+  cameraMotion: "Camera motion",
+  motionBlur: "Motion blur",
+  annotations: "Annotations",
+  captions: "Captions",
+} as const;
+
 function AppearanceToggles({ appearance }: Props) {
-  const labels = {
-    cameraMotion: "Camera motion",
-    motionBlur: "Motion blur",
-    annotations: "Annotations",
-    captions: "Captions",
-  };
   return (
     <>
       {(["cameraMotion", "motionBlur", "annotations", "captions"] as const).map(
@@ -80,7 +81,7 @@ function AppearanceToggles({ appearance }: Props) {
           <Checkbox
             key={key}
             size="xs"
-            label={labels[key]}
+            label={APPEARANCE_LABELS[key]}
             checked={appearance.draft[key]}
             onChange={(event) =>
               appearance.update({ [key]: event.currentTarget.checked })

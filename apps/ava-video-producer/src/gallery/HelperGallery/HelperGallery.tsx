@@ -22,6 +22,10 @@ const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => ({
   ).length,
 }));
 
+function _getCategoryLabelFromId(id: string): string {
+  return HELPER_CATEGORIES.find((category) => category.id === id)?.label ?? id;
+}
+
 /**
  * The Helpers section of the Motion Atlas: the shared helpers motions and
  * compositions are built from, as live thumbnail cards by category, each
@@ -31,8 +35,6 @@ export function HelperGallery() {
   const gallery = useHelperGallery();
   const [playing, setPlaying] = useState(() => !isReducedMotionPreferred());
   const { selection, open, previous, next } = gallery;
-  const labelOf = (id: string) =>
-    HELPER_CATEGORIES.find((category) => category.id === id)?.label ?? id;
   return (
     <>
       <a className="skip-link" href="#library">
@@ -93,7 +95,7 @@ export function HelperGallery() {
             <HelperCard
               key={helper.id}
               helper={helper}
-              category={labelOf(helper.category)}
+              category={_getCategoryLabelFromId(helper.category)}
               playing={playing && !open}
               onOpen={gallery.openHelper}
             />
@@ -103,7 +105,7 @@ export function HelperGallery() {
       {open ? (
         <AtlasDialog
           title={open.title}
-          subtitle={labelOf(open.category)}
+          subtitle={_getCategoryLabelFromId(open.category)}
           previousLabel="Previous helper"
           nextLabel="Next helper"
           onClose={gallery.close}

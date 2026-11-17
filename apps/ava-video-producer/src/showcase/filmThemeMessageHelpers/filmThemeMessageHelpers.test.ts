@@ -59,7 +59,7 @@ function _playerHash(input: Case, filmId: string = ITEM_ID): string {
   const snapshot = createSnapshotFromDraft({ ...input, itemId: ITEM_ID });
   const { message } = createFilmThemeAcknowledgement({
     id: filmId,
-    value: JSON.parse(JSON.stringify(snapshot)),
+    value: structuredClone(snapshot),
   });
   assert.equal(message.type, "film-theme");
   return message.type === "film-theme" ? message.hash : "";

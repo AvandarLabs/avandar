@@ -21,13 +21,11 @@ export async function runCasesFlow(ctx: FlowContext): Promise<void> {
     cases: await ensureFixtureDataset(ctx, "cases"),
     visits: await ensureFixtureDataset(ctx, "visits"),
   };
-  const [expectedRows, expectedVisits] = await Promise.all([
+  const [expectedRows, expectedVisits, isNew] = await Promise.all([
     readFixtureRows(ctx, "cases"),
     readFixtureRows(ctx, "visits"),
+    ctx.step("cases-create-type", () => openOrCreateCaseType(ctx, sources)),
   ]);
-  const isNew = await ctx.step("cases-create-type", () =>
-    openOrCreateCaseType(ctx, sources),
-  );
   await ctx.checkpoint("cases-type");
   await ctx.step("cases-sync-records", () => openCaseRecords(ctx, isNew));
   await ctx.step("cases-verify-240-records", () =>

@@ -50,6 +50,7 @@ export function TokenSections({
   emptyGroups: readonly string[];
 }>) {
   const [openGroups, setOpenGroups] = useState<string[]>([]);
+  const openGroupSet = useMemo(() => new Set(openGroups), [openGroups]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
     return <p className={css.tokenSectionsEmpty}>{"No settings match."}</p>;
@@ -72,7 +73,7 @@ export function TokenSections({
             <span className={css.tokenSectionCount}>{grouped.length}</span>
           </Accordion.Control>
           <Accordion.Panel>
-            {openGroups.includes(group) ? (
+            {openGroupSet.has(group) ? (
               <SectionRows group={group} rows={grouped} allRows={allRows} />
             ) : null}
           </Accordion.Panel>

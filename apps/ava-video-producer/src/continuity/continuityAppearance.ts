@@ -6,14 +6,12 @@ import type { Storyboard } from "../storyboard/schema/schema";
  * previews and exports. Colours, sketch levels, and camera presets are
  * design tokens edited in the theme, not options.
  */
-export const continuityAppearanceSchema = z
-  .object({
-    captions: z.boolean().default(true),
-    cameraMotion: z.boolean().default(true),
-    motionBlur: z.boolean().default(true),
-    annotations: z.boolean().default(true),
-  })
-  .strict();
+export const continuityAppearanceSchema = z.strictObject({
+  captions: z.boolean().default(true),
+  cameraMotion: z.boolean().default(true),
+  motionBlur: z.boolean().default(true),
+  annotations: z.boolean().default(true),
+});
 
 /** Complete render options acknowledged by the active player. */
 export type ContinuityAppearance = z.infer<typeof continuityAppearanceSchema>;
@@ -28,13 +26,12 @@ export function createContinuityPlanFromOptions(
 ): Storyboard {
   const shape = continuityAppearanceSchema.shape;
   const { captions: _captions, ...appearance } = z
-    .object({
+    .strictObject({
       captions: shape.captions.unwrap().optional(),
       cameraMotion: shape.cameraMotion.unwrap().optional(),
       motionBlur: shape.motionBlur.unwrap().optional(),
       annotations: shape.annotations.unwrap().optional(),
     })
-    .strict()
     .parse(raw);
   return {
     ...plan,

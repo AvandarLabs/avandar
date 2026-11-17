@@ -25,21 +25,19 @@ export const MOTION_PRESETS = {
  * preset and fills the shutter, samples, and blur fields from the video
  * theme; a value the storyboard authors overrides the theme for that cue.
  */
-export const motionOptionsSchema = z
-  .object({
-    preset: z
-      .enum(["deliberate", "gentle", "balanced", "brisk", "whip"])
-      .optional(),
-    speed: z.number().min(0.1).max(4).optional(),
-    easing: motionEasingSchema.optional(),
-    shutterAngle: z.number().min(0).max(360).optional(),
-    samples: z.number().int().min(2).max(16).optional(),
-    blurStrength: z.number().min(0).max(2).optional(),
-    velocityBlurFactor: z.number().min(0).max(1).optional(),
-    velocityBlurLimit: z.number().min(0).max(20).optional(),
-    transitionBlur: z.number().min(0).max(48).optional(),
-  })
-  .strict();
+export const motionOptionsSchema = z.strictObject({
+  preset: z
+    .enum(["deliberate", "gentle", "balanced", "brisk", "whip"])
+    .optional(),
+  speed: z.number().min(0.1).max(4).optional(),
+  easing: motionEasingSchema.optional(),
+  shutterAngle: z.number().min(0).max(360).optional(),
+  samples: z.number().int().min(2).max(16).optional(),
+  blurStrength: z.number().min(0).max(2).optional(),
+  velocityBlurFactor: z.number().min(0).max(1).optional(),
+  velocityBlurLimit: z.number().min(0).max(20).optional(),
+  transitionBlur: z.number().min(0).max(48).optional(),
+});
 /** Numeric overrides take precedence over the selected semantic preset. */
 export type MotionOptions = z.infer<typeof motionOptionsSchema>;
 

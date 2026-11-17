@@ -360,12 +360,9 @@ export function buildThemeIdFromLabel(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "theme";
+  const taken = new Set(takenIds);
   let id = base;
-  for (
-    let suffix = 2;
-    takenIds.includes(id) || id === DRAFT_THEME_ID;
-    suffix += 1
-  ) {
+  for (let suffix = 2; taken.has(id) || id === DRAFT_THEME_ID; suffix += 1) {
     id = `${base}-${suffix}`;
   }
   return id;

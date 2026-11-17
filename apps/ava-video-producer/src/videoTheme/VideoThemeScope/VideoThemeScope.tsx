@@ -8,7 +8,7 @@ import type { VideoThemePatch } from "../videoTheme.types";
 type Props = Readonly<{
   overrideIds?: readonly string[];
   patches?: readonly VideoThemePatch[];
-  children: ReactNode;
+  children?: ReactNode;
   element?: "div" | "none";
 }>;
 

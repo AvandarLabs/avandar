@@ -1,4 +1,5 @@
 import { Button, Group } from "@mantine/core";
+import { useState } from "react";
 import { elevationToBoxShadow } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useTokenEditor } from "../../TokenEditorContext";
 import { DEFAULT_SHADOW_LAYER } from "../effectControls.constants";
@@ -19,16 +20,31 @@ export function ShadowValueControl({
   onChange,
 }: ValueControlProps) {
   const { theme } = useTokenEditor();
+  const [layerIds, setLayerIds] = useState<readonly string[]>(() =>
+    Array.from({ length: MAX_SHADOW_LAYERS }, () => crypto.randomUUID()),
+  );
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
   const setLayers = (nextLayers: readonly ShadowLayer[]) =>
     onChange({ layers: nextLayers });
+  const removeLayer = (index: number) => {
+    setLayerIds((current) => [
+      ...current.filter((_, position) => position !== index),
+      crypto.randomUUID(),
+    ]);
+    setLayers(layers.filter((_, position) => position !== index));
+  };
   const boxShadow = elevationToBoxShadow({
     layers,
     color: theme.semantic.color.shadowColor,
   });
   return (
     <div className={css.shadowLayers} role="group" aria-label={label}>
-      <ShadowLayers layers={layers} onChange={setLayers} />
+      <ShadowLayers
+        layers={layers}
+        layerIds={layerIds}
+        onChange={setLayers}
+        onRemove={removeLayer}
+      />
       <Group gap="xs">
         <Button
           size="compact-xs"

@@ -32,6 +32,7 @@ export function PushdownRows({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const matches = _matchingRows(input);
+  const matchedRows = new Set(matches);
   const travel = ramp(
     frame,
     TRAVEL_CUE,
@@ -63,7 +64,7 @@ export function PushdownRows({
           frame={frame}
           row={row}
           index={index}
-          isRejected={!matches.includes(row)}
+          isRejected={!matchedRows.has(row)}
           accent={accent}
         />
       ))}

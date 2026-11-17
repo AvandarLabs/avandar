@@ -44,12 +44,12 @@ async function _request<Body>(
     ...init,
     headers: { "Content-Type": "application/json", ...init.headers },
   });
-  const body: unknown = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const { message, issues } = _errorBody(body);
+    const errorBody: unknown = await response.json().catch(() => ({}));
+    const { message, issues } = _errorBody(errorBody);
     throw new ThemeApiError(response.status, message, issues);
   }
-  return body as Body;
+  return (await response.json().catch(() => ({}))) as Body;
 }
 
 async function _read(id: string): Promise<StoredTheme> {

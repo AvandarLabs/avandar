@@ -134,6 +134,18 @@ function _Mark({
   const meanFlight = flights.reduce((sum, value) => sum + value, 0) / columns;
   const tilt = FLIGHT_TILT_DEGREES * Math.sin(Math.PI * meanFlight);
   const cover = getFlightProgress(frame, exit).cover;
+  const columnSlices = rise.map((columnRise, index) => ({
+    id: `mark-column-${index}-of-${columns}`,
+    index,
+    columnRise,
+    rect: getFlightColumnRect(
+      index,
+      columns,
+      mark,
+      { width, height },
+      flights[index],
+    ),
+  }));
   return (
     <div
       style={{
@@ -149,45 +161,36 @@ function _Mark({
           transform: `rotateY(${tilt.toFixed(2)}deg)`,
         }}
       >
-        {rise.map((columnRise, index) => {
-          const rect = getFlightColumnRect(
-            index,
-            columns,
-            mark,
-            { width, height },
-            flights[index],
-          );
-          return (
-            <div
-              key={`mark-column-${index}`}
+        {columnSlices.map(({ id, index, columnRise, rect }) => (
+          <div
+            key={id}
+            style={{
+              ...positioned(rect),
+              overflow: "hidden",
+              clipPath: `inset(${((1 - columnRise) * 100).toFixed(2)}% 0 0 0)`,
+            }}
+          >
+            <Img
+              src={src}
+              alt=""
               style={{
-                ...positioned(rect),
-                overflow: "hidden",
-                clipPath: `inset(${((1 - columnRise) * 100).toFixed(2)}% 0 0 0)`,
+                position: "absolute",
+                left: -index * rect.width,
+                top: 0,
+                width: rect.width * columns,
+                height: rect.height,
               }}
-            >
-              <Img
-                src={src}
-                alt=""
-                style={{
-                  position: "absolute",
-                  left: -index * rect.width,
-                  top: 0,
-                  width: rect.width * columns,
-                  height: rect.height,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: `var(--${exit?.color ?? "brand"})`,
-                  opacity: cover,
-                }}
-              />
-            </div>
-          );
-        })}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `var(--${exit?.color ?? "brand"})`,
+                opacity: cover,
+              }}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

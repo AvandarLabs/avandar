@@ -75,14 +75,6 @@ export function useCompositionAppearance(
     return () => window.removeEventListener("message", receive);
   }, [id, player, draft, transport, send, isScene]);
   useEffect(() => {
-    if (!isScene) send("appearance", draft);
-    try {
-      localStorage.setItem("composition-appearance:v2", JSON.stringify(draft));
-    } catch {
-      /* Preferences remain usable when storage is unavailable. */
-    }
-  }, [draft, send, isScene]);
-  useEffect(() => {
     send("speed", transport.speed);
     send("loop", transport.loop);
     try {
@@ -103,8 +95,21 @@ export function useCompositionAppearance(
     setTransport,
     options,
     send,
-    update: (patch: Partial<ContinuityAppearance>) =>
-      setDraft((current) => ({ ...current, ...patch })),
+    update: (patch: Partial<ContinuityAppearance>) => {
+      const nextDraft = { ...draft, ...patch };
+      setDraft(nextDraft);
+      if (!isScene) {
+        send("appearance", nextDraft);
+      }
+      try {
+        localStorage.setItem(
+          "composition-appearance:v2",
+          JSON.stringify(nextDraft),
+        );
+      } catch {
+        /* Preferences remain usable when storage is unavailable. */
+      }
+    },
     loaded: () => {
       if (!isScene) send("appearance", draft);
     },

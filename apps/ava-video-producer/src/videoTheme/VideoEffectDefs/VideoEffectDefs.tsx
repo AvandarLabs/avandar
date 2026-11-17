@@ -11,13 +11,39 @@ type Props = Readonly<{
   filters: readonly VideoEffectFilter[];
 }>;
 
-function _primitive(primitive: EffectPrimitive, index: number): ReactNode {
-  const input = index === 0 ? "SourceGraphic" : `fx${index - 1}`;
-  const result = `fx${index}`;
+type KeyedPrimitive = Readonly<{
+  key: string;
+  primitive: EffectPrimitive;
+  input: string;
+  result: string;
+}>;
+
+function _buildKeyedPrimitives(
+  primitives: readonly EffectPrimitive[],
+): KeyedPrimitive[] {
+  const counts = new Map<string, number>();
+  return primitives.map((primitive, stepOffset) => {
+    const occurrence = counts.get(primitive.kind) ?? 0;
+    counts.set(primitive.kind, occurrence + 1);
+    return {
+      key: `${primitive.kind}-${occurrence}`,
+      primitive,
+      input: stepOffset === 0 ? "SourceGraphic" : `fx${stepOffset - 1}`,
+      result: `fx${stepOffset}`,
+    };
+  });
+}
+
+function _primitive({
+  key,
+  primitive,
+  input,
+  result,
+}: KeyedPrimitive): ReactNode {
   if (primitive.kind === "dropShadow") {
     return (
       <feDropShadow
-        key={result}
+        key={key}
         dx={primitive.dx}
         dy={primitive.dy}
         stdDeviation={primitive.stdDeviation}
@@ -31,7 +57,7 @@ function _primitive(primitive: EffectPrimitive, index: number): ReactNode {
   if (primitive.kind === "blur") {
     return (
       <feGaussianBlur
-        key={result}
+        key={key}
         in={input}
         stdDeviation={primitive.stdDeviation}
         result={result}
@@ -39,12 +65,7 @@ function _primitive(primitive: EffectPrimitive, index: number): ReactNode {
     );
   }
   return (
-    <GlowEffect
-      key={result}
-      primitive={primitive}
-      input={input}
-      result={result}
-    />
+    <GlowEffect key={key} primitive={primitive} input={input} result={result} />
   );
 }
 
@@ -70,7 +91,7 @@ export function VideoEffectDefs({ graphicId, filters }: Props) {
             height="200%"
             colorInterpolationFilters="sRGB"
           >
-            {filter.primitives.map(_primitive)}
+            {_buildKeyedPrimitives(filter.primitives).map(_primitive)}
           </filter>
         );
       })}

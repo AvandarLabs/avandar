@@ -13,7 +13,7 @@ import { VideoTokenUsageContext } from "../videoTheme/tokenUsageHelpers/tokenUsa
 import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
 import { CaptionToggle } from "./CaptionToggle";
 import { LiveFilm } from "./LiveFilm";
-import { useFilmControl } from "./useFilmControl";
+import { postToParentGallery, useFilmControl } from "./useFilmControl";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
 import "../theme.css";
@@ -60,12 +60,12 @@ window.addEventListener("message", (event) => {
   } catch {
     /* Storage can be unavailable in a restricted browser. */
   }
-  _send({ type: "film-reloading", requestId: event.data.requestId });
+  postToParentGallery({
+    type: "film-reloading",
+    requestId: event.data.requestId,
+  });
   location.reload();
 });
-function _send(message: object) {
-  window.parent.postMessage(message, location.origin);
-}
 
 function _findContinuityShot(film: Film): ContinuityShot | undefined {
   const shot = film.plan?.shots.find(
@@ -118,7 +118,7 @@ function useSavedPlayback(
   useEffect(
     function registerPlayEventListener() {
       const current = player.current;
-      const play = () => _send({ type: "film-playing", id });
+      const play = () => postToParentGallery({ type: "film-playing", id });
       current?.addEventListener("play", play);
       return () => {
         current?.removeEventListener("play", play);
@@ -211,7 +211,6 @@ function useLiveFilmControl(options: LiveFilmControlOptions) {
     loop: state.loop,
     previewFrames: options.previewFrames,
     usedTokens: options.usedTokens,
-    send: _send,
     onAppearance: (nextAppearance) => {
       state.setAppearance(nextAppearance);
       state.setCaptions(nextAppearance.captions);

@@ -1,3 +1,4 @@
+import { promiseMapSequential } from "@avandar/utils";
 import { expect, type Page } from "@playwright/test";
 import { closeChat } from "../../closeChat";
 import { getRecordIdFromPageUrl } from "../../getRecordIdFromPageUrl";
@@ -48,12 +49,15 @@ async function _chooseCaseFieldRules(
   });
   // Each source's join field is chosen on the one recording page, so they run
   // in order.
-  for (const source of [sources.cases, sources.visits]) {
-    await selectOption(page, {
-      input: page.getByRole("combobox", { name: source.name, exact: true }),
-      value: "case_id",
-    });
-  }
+  await promiseMapSequential(
+    [sources.cases, sources.visits],
+    async (source) => {
+      await selectOption(page, {
+        input: page.getByRole("combobox", { name: source.name, exact: true }),
+        value: "case_id",
+      });
+    },
+  );
   await selectOption(page, {
     input: page.getByRole("combobox", {
       name: /What field should be used as a .*'s name\?/,
@@ -74,9 +78,12 @@ async function _configureCaseFields(
     })
     .check();
   // Fields are added through the page one at a time.
-  for (const column of ["case_label", "district_name", "referral_status"]) {
-    await _addCaseField(page, { source: sources.cases, column });
-  }
+  await promiseMapSequential(
+    ["case_label", "district_name", "referral_status"],
+    async (column) => {
+      await _addCaseField(page, { source: sources.cases, column });
+    },
+  );
   await _addCaseField(page, {
     source: sources.visits,
     column: "supply_kits_delivered",

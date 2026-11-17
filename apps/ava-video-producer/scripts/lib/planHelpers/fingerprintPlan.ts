@@ -131,9 +131,10 @@ async function _hashFiles(
   const hash = createHash("sha256");
   // One file at a time: the list includes full-length videos, and the hash
   // must absorb them in path order.
-  for (const file of [...files].sort()) {
-    hash.update(`${file}\0${await getSha256FromFile(path.join(root, file))}\n`);
-  }
+  await promiseMapSequential([...files].sort(), async (file) => {
+    const fileSha256 = await getSha256FromFile(path.join(root, file));
+    hash.update(`${file}\0${fileSha256}\n`);
+  });
   return hash.digest("hex");
 }
 

@@ -159,7 +159,7 @@ test("a draft unchanged since the save started is cleared", () => {
 });
 
 test("an equal copy of the saved draft is cleared too", () => {
-  const copy: ThemeDraft = JSON.parse(JSON.stringify(ACCENT_DRAFT));
+  const copy: ThemeDraft = structuredClone(ACCENT_DRAFT);
   assert.deepEqual(_settle(ACCENT_DRAFT, copy), EMPTY_THEME_DRAFT);
 });
 
@@ -229,7 +229,7 @@ test("a newer draft that lacks a saved token keeps only its own edits", () => {
 });
 
 test("drafts are unchanged only when every edit matches", () => {
-  const copy: ThemeDraft = JSON.parse(JSON.stringify(ACCENT_DRAFT));
+  const copy: ThemeDraft = structuredClone(ACCENT_DRAFT);
   assert.equal(
     isDraftUnchanged({ savedDraft: ACCENT_DRAFT, currentDraft: copy }),
     true,

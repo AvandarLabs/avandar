@@ -25,6 +25,10 @@ export function CompositionStage({
         isTokenPanel && css.compositionStageIsTokenPanel,
       )}
     >
+      {/* Do not add `sandbox` without `allow-same-origin`: `/live.html` is a
+          first-party player that reads `sessionStorage`, loads product stores,
+          and verifies `event.origin === location.origin` on `postMessage`. */}
+      {/* react-doctor-disable-next-line react-doctor/iframe-missing-sandbox */}
       <iframe
         key={selected.id}
         className={css.compositionStagePlayer}

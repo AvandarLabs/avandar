@@ -54,9 +54,7 @@ function _buildSearchText(helper: HelperEntry): string {
     helper.goodFor,
     helper.avoid,
     ...helper.exports,
-  ]
-    .join(" ")
-    .toLowerCase();
+  ].join(" ");
 }
 
 /**
@@ -75,6 +73,6 @@ export function filterHelpers(
     (helper) =>
       (options.category === ALL_ATLAS_CATEGORIES ||
         helper.category === options.category) &&
-      (!query || _buildSearchText(helper).includes(query)),
+      (!query || _buildSearchText(helper).toLowerCase().includes(query)),
   );
 }

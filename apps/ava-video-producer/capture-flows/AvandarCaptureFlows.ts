@@ -1,4 +1,4 @@
-import { objectValuesMap } from "@avandar/utils";
+import { objectValuesMap, promiseMapSequential } from "@avandar/utils";
 import { expect, type Page } from "@playwright/test";
 import { closeChat } from "./closeChat";
 import { ensureDataset } from "./ensureDataset";
@@ -107,14 +107,17 @@ async function _aggregateDistricts(
     .getByRole("columnheader", { name: "recorded_cases", exact: true })
     .waitFor({ timeout: 20000 });
   // Each row check reads the one recording page, so they run in order.
-  for (const [district, numCases] of DISTRICT_CASE_COUNTS) {
-    await expect(
-      page.getByRole("row", {
-        name: `${district} ${numCases.toFixed(2)}`,
-        exact: true,
-      }),
-    ).toBeVisible();
-  }
+  await promiseMapSequential(
+    DISTRICT_CASE_COUNTS,
+    async ([district, numCases]) => {
+      await expect(
+        page.getByRole("row", {
+          name: `${district} ${numCases.toFixed(2)}`,
+          exact: true,
+        }),
+      ).toBeVisible();
+    },
+  );
 }
 
 async function _showBarChart(page: Page): Promise<void> {

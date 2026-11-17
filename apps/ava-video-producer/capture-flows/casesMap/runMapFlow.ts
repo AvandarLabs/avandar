@@ -1,3 +1,4 @@
+import { promiseMapSequential } from "@avandar/utils";
 import { expect, type Locator, type Page } from "@playwright/test";
 import { closeChat } from "../closeChat";
 import { ensureFixtureDataset } from "../ensureFixtureDataset";
@@ -244,22 +245,25 @@ async function _verifyMapPersistence(
     ctx.page.getByRole("textbox", { name: "Map name", exact: true }),
   ).toHaveValue(ctx.state.map?.name ?? "", { timeout: WAIT });
   // Each check reads the one recording page, so they run in order.
-  for (const source of Object.values(sources)) {
+  await promiseMapSequential(Object.values(sources), async (source) => {
     await _layerRow(ctx.page, source.name).waitFor({ timeout: WAIT });
-  }
+  });
   await ctx.page.locator(".maplibregl-canvas").waitFor();
   // Each layer is opened on the one recording page, so they run in order.
-  for (const [key, expectedRowCount] of [
-    ["cases", 240],
-    ["facilities", 12],
-  ] as const) {
-    const inspector = await _openLayer(ctx, sources[key]);
-    await inspector
-      .getByText(`${expectedRowCount} of ${expectedRowCount} rows mapped`, {
-        exact: true,
-      })
-      .waitFor({ timeout: WAIT });
-  }
+  await promiseMapSequential(
+    [
+      ["cases", 240],
+      ["facilities", 12],
+    ] as const,
+    async ([key, expectedRowCount]) => {
+      const inspector = await _openLayer(ctx, sources[key]);
+      await inspector
+        .getByText(`${expectedRowCount} of ${expectedRowCount} rows mapped`, {
+          exact: true,
+        })
+        .waitFor({ timeout: WAIT });
+    },
+  );
   await _zoomToLayer(ctx.page, sources.cases.name);
   await _mapSaved(ctx.page);
 }

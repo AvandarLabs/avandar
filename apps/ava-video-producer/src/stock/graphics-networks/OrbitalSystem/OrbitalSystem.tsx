@@ -19,6 +19,16 @@ type Props = GraphicProps & { input: OrbitalSystemInput };
 const CUBE_GLYPH =
   "M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311";
 
+function _buildKeyedBodies(bodies: OrbitalSystemInput["bodies"]) {
+  const counts = new Map<string, number>();
+  return bodies.map((orbit) => {
+    const signature = `${orbit.label}:${orbit.rx}:${orbit.ry}:${orbit.angle}:${orbit.phase}`;
+    const occurrence = counts.get(signature) ?? 0;
+    counts.set(signature, occurrence + 1);
+    return { key: `${signature}#${occurrence}`, orbit };
+  });
+}
+
 /** Draws the bounded authored orbital-system study at an explicit frame. */
 export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
   const style = useGraphicProps("OrbitalSystem", {});
@@ -30,9 +40,9 @@ export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
           descriptor: LEGACY_DISPLAY_COPY["orbital-system"].orbitalSystem,
         })}
       </Eyebrow>
-      {input.bodies.map((orbit, i) => (
+      {_buildKeyedBodies(input.bodies).map(({ key, orbit }) => (
         <OrbitingBody
-          key={i}
+          key={key}
           orbit={orbit}
           frame={frame}
           color={getContentColorFromValue(orbit.color, { tokens, accent })}

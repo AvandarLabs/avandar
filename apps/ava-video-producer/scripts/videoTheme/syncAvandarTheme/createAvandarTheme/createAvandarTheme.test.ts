@@ -18,7 +18,7 @@ const THEME_FILE = fileURLToPath(
 test("the tracked avandar theme matches a fresh sync from the Avandar theme", async () => {
   assert.deepEqual(
     JSON.parse(await fs.readFile(THEME_FILE, "utf8")),
-    JSON.parse(JSON.stringify(createAvandarTheme(readAvandarThemeSource()))),
+    structuredClone(createAvandarTheme(readAvandarThemeSource())),
   );
 });
 

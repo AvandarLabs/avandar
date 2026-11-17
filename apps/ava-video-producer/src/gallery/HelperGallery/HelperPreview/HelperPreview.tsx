@@ -42,6 +42,10 @@ export function HelperPreview({ helper }: Props) {
   return (
     <section className={css.preview} aria-label="Live preview">
       <div className={css.stage}>
+        {/* Do not add `sandbox` without `allow-same-origin`: `/live.html` is a
+            first-party player that reads `sessionStorage` and verifies
+            `event.origin === location.origin` on `postMessage`. */}
+        {/* react-doctor-disable-next-line react-doctor/iframe-missing-sandbox */}
         <iframe
           key={helper.id}
           ref={player}

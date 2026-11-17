@@ -68,12 +68,12 @@ function _compositeSchema(
   tier: SchemaTier,
 ): z.ZodType {
   const spec = COMPOSITE_TOKEN_FIELDS[kind];
-  const required: readonly string[] = spec.required;
+  const required = new Set<string>(spec.required);
   const fields: Readonly<Record<string, FieldSpec>> = spec.fields;
   const shape = Object.fromEntries(
     Object.entries(fields).map(([name, field]) => {
       const schema = _fieldSchema(field, tier);
-      return [name, required.includes(name) ? schema : schema.optional()];
+      return [name, required.has(name) ? schema : schema.optional()];
     }),
   );
   return _union([z.strictObject(shape), tokenReferenceSchema]);

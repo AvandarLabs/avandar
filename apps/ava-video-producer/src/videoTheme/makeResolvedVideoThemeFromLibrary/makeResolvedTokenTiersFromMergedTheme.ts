@@ -205,12 +205,12 @@ function _buildCompositeFromFields(
     return undefined;
   }
   const spec = COMPOSITE_TOKEN_FIELDS[kind];
-  const required: readonly string[] = spec.required;
+  const required = new Set<string>(spec.required);
   const fields: Readonly<Record<string, FieldSpec>> = spec.fields;
   const resolved = Object.fromEntries(
     Object.entries(fields).flatMap(([name, field]) => {
       if (raw[name] === undefined) {
-        if (required.includes(name)) {
+        if (required.has(name)) {
           context.issues.push({ path: `${path}.${name}`, message: "Missing" });
         }
         return [];
