@@ -115,13 +115,23 @@ Unchecked datasets stay in Data Sources.
   named. The rows collapse into one count line: "1 more dataset you can't see
   stays" (plural through Lingui `Plural`).
 - The dependents list appears under a row only while it is checked.
-- The confirm button reads "Uninstall" with nothing checked, and "Uninstall
+- The confirm button stays disabled while what reads any checked dataset is
+  still loading, so an admin never deletes a dataset before seeing what stops
+  working, as Delete Dataset in Data Sources does. It only waits: a lookup that
+  failed shows its error ("We could not load what reads this dataset.") and
+  does not keep the button disabled, and unchecking the dataset releases it.
+  Each row reports its loading state to the modal through a context, in a
+  layout effect, so the button is never enabled for a frame after a row is
+  checked.- The confirm button reads "Uninstall" with nothing checked, and "Uninstall
   and delete 1 dataset" / "Uninstall and delete N datasets" otherwise.
 - While the uninstall and deletes run, the confirm button shows a loader, and
   the modal cannot be closed (no close button, no Escape, no outside click),
   the same rule as the install wizard. Focus returns to the card heading
   afterwards, because the Uninstall button is gone once the plugin is
-  uninstalled.
+  uninstalled. If the uninstall fails and the modal stays open, focus returns
+  to the confirm button, which was disabled while it ran. The card passes its
+  heading id and the clicked button to the modal, since a click does not focus
+  a button in every browser.
 - A plugin with imports but status `unavailable` (no manifest in this build)
   gets the same modal. Every value it shows comes from the import rows and
   the dataset rows, not the manifest.
@@ -201,6 +211,7 @@ unless stated otherwise.
 | `UninstallContentRow.tsx` | One dataset row, with its checkbox or its "Kept" reason, and its dependents while checked |
 | `useUninstallContentRows.ts` | Builds the rows. See Data flow |
 | `useDatasetDependents.ts` | For one dataset id, the linked datasets that read it and the other installs' data slot bindings on it |
+| `useDependentsLoading.ts` | A context and two hooks. A checked row reports whether what reads its dataset is loading, and the modal keeps its confirm button disabled until none is |
 | `uninstallPluginAndDeleteDatasets.ts` | Plain async function, no React. Uninstalls, then deletes each chosen dataset. Returns the ids it deleted, the ids the user may not delete, and the ids whose delete did not finish |
 | `UninstallPluginError.ts` | The error `uninstallPluginAndDeleteDatasets` throws when it cannot show the install is gone. Its `reason` is `still_installed` or `not_confirmed`, and its message is for logs |
 | `useRunUninstall.ts` | Runs an uninstall from the modal. Logs a failure, refreshes the plugin and dataset lists, says how it went (the translated copy for each `UninstallPluginError` reason, a generic sentence for any other error), and calls `onDone` once the lists have refreshed |
@@ -227,7 +238,7 @@ Changes to existing files:
 
 ## Data flow
 
-`useUninstallContentRows({ pluginId, installationId })`:
+`useUninstallContentRows(pluginId)`:
 
 1. Loads the workspace's `plugin_content_imports` rows for `pluginId`
    (`useImportedPluginContent`).
@@ -257,10 +268,11 @@ checked row:
 - Linked datasets: reuse `useLinkedDatasets` (the hook behind
   `DeleteDatasetConfirmBody`).
 - Data slots: `plugin_data_slot_bindings` rows with this `dataset_id` and an
-  `installation_id` other than the one being uninstalled. Each is labelled
-  "<plugin name>: <slot title>", localized from the bundled manifests
-  (`useBundledPluginManifests`, `useLocalizePluginText`). A binding whose
-  plugin has no manifest in this build is labelled with its plugin id.
+  `installation_id` other than the one being uninstalled. Each reads
+  "<slot title> in the <plugin name> plugin", localized from the bundled
+  manifests (`useBundledPluginManifests`). A binding whose plugin has no
+  manifest in this build uses the plugin id and the slot id in the same
+  sentence.
 - Case type bindings are not listed. A case type that reads the dataset is a
   concept relation, which Data Sources does not list either.
 
@@ -362,11 +374,14 @@ No schema change, so no pgTAP tests and no Supabase switch.
 | Unit | `useLookupState.test.tsx` | A first load is `ok`. A failure is `failed`. A load after a failure is `retrying`. A failed retry is `failed` again, and a successful one is `ok` |
 | Component | `PluginLookupFeedback.test.tsx` | The alert and Retry show on failure and are described by the owner. During a retry the alert stays and Retry is loading. Retry calls `onRetry` and moves focus to the status region. The retry and the recovery are announced, and nothing is announced without an error |
 | Unit | `useUninstallContentRows.test.tsx` | Uses the dataset's current name. `canDelete` follows `canAccessResource`. Unreadable datasets count toward `hiddenCount`. Rows are sorted by name. `hasFailed` is true for each failure source (imports, datasets, an access check), with no rows and no `hiddenCount`. While a failed lookup is retried, `hasFailed` is false, `isRetrying` and `isLoading` are true, and nothing is listed. Nothing is listed or checked while a restored imports list refetches. `retry` refetches only what failed, and the rows return when it succeeds |
-| Unit | `useDatasetDependents.test.ts` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
-| Component | `UninstallPluginModal.test.tsx` | Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. When a lookup failed it shows the alert and Retry, no "can't see" count and no "Kept" line, reads "Uninstall and keep all datasets" with "Every dataset it imported stays in Data Sources.", and deletes nothing on confirm. During a retry it keeps the alert, a loading Retry and the disabled keep-all button, and announces the retry. Retry moves focus to the status region. After a successful retry it shows the list and announces it |
+| Unit | `useDatasetDependents.test.tsx` | Lists linked datasets. Describes other installs' bindings as "<slot> in the <plugin> plugin". Leaves out the uninstalled install's own bindings. Falls back to the plugin id without a manifest |
+| Unit | `useDependentsLoading.test.tsx` | The tracker is loading while any checked dataset reports loading, and stops when it reports loaded, when the others finish, or when its row goes away |
+| Component | `UninstallDatasetDependents.test.tsx` | Lists what reads a dataset, says when a lookup failed, and reports loading to the modal while the lookups load, and not loading once they settle or fail |
+| Component | `UninstallPluginModal.test.tsx` | The confirm button is disabled while what reads a checked dataset loads, enabled once it has, when the dataset is unchecked, and never waits for an unchecked dataset. After a failed uninstall focus returns to the confirm button. Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. When a lookup failed it shows the alert and Retry, no "can't see" count and no "Kept" line, reads "Uninstall and keep all datasets" with "Every dataset it imported stays in Data Sources.", and deletes nothing on confirm. During a retry it keeps the alert, a loading Retry and the disabled keep-all button, and announces the retry. Retry moves focus to the status region. After a successful retry it shows the list and announces it |
+| Unit | `usePluginInstallationActions.test.tsx` (existing) | The uninstall modal opens with the install's ids, the clicked button, and the card's heading id |
 | Unit | `useRunUninstall/useRunUninstall.test.tsx` | The notification matches the outcome, and counts only the datasets this run deleted. A refused dataset, an incomplete dataset, and both together each get their own warning text, and a warning is never replaced by a success when other datasets were deleted. An `UninstallPluginError` shows translated copy by reason, and any other error shows the generic sentence. A failure is logged with the install id. The lists refresh when the uninstall fails. A refresh that rejects is logged, and neither hides the result nor blocks `onDone`. `onDone` waits for the refresh |
 | Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first. When the imports lookup failed, Uninstall gets the plain confirm with the two kept-datasets paragraphs and never opens the modal |
-| Component | `WorkspacePluginsTab.test.tsx` (existing) | Uninstall is disabled while the imports load or retry. When the lookup failed, the card shows the alert with Retry (only to an admin of an installed plugin), Retry is described by the plugin, Retry refetches and moves focus to the status region, Uninstall is enabled, and its confirm carries the kept-datasets paragraphs. During a retry the alert stays with a loading Retry and Uninstall is disabled. After it succeeds the alert goes, the recovery is announced and Uninstall is enabled |
+| Component | `WorkspacePluginsTab.test.tsx` (existing) | Uninstall is disabled while the imports load or retry. When the lookup failed, the card shows the alert with Retry (only to an admin of an installed plugin), Retry is described by the plugin, Retry refetches and moves focus to the status region, Uninstall is enabled, and its confirm carries the kept-datasets paragraphs. During a retry the alert stays with a loading Retry and Uninstall is disabled. After it succeeds the alert goes, the recovery is announced and Uninstall is enabled. The uninstall modal returns focus to the Uninstall button on Cancel, and to the card heading after an uninstall, without the button having been focused by the click |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/mozambiquePackFlow.ts` |
 
 The E2E runs under the 45-second local limit, using the existing Mozambique
@@ -410,6 +425,11 @@ push to `demo/**` deploys.
   row. A user who may delete a row but not read it can also end with the row
   deleted and the parquet left behind. The uninstall still counts such a
   dataset as deleted. No data is lost that the admin did not ask to delete.
+- **Known limit, desktop.** A dataset deleted on the server but still in the
+  desktop SQLite mirror is found by `fullDelete`'s read, while the server's
+  access check no longer finds it, so the admin sees "You don't have
+  permission to delete this dataset." It is narrow and desktop only, and this
+  spec does not change it.
 
 ## Done when
 
