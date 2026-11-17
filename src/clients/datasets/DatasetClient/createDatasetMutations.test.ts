@@ -1,34 +1,75 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createDatasetMutations } from "@/clients/datasets/DatasetClient/createDatasetMutations";
+import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetMutationConfig } from "@/clients/datasets/DatasetClient/DatasetClient.types";
 import type { ILogger } from "@avandar/logger";
 
-const { rpcMock } = vi.hoisted(() => {
-  return { rpcMock: vi.fn() };
+const mocks = vi.hoisted(() => {
+  return {
+    rpcMock: vi.fn(),
+    canAccessResourceMock: vi.fn(),
+    deleteParquetMock: vi.fn(),
+    deleteOriginalFileMock: vi.fn(),
+    getLocalDatasetMock: vi.fn(),
+    deleteLocalDatasetMock: vi.fn(),
+    dropDuckDbTableMock: vi.fn(),
+  };
 });
+const { rpcMock } = mocks;
 
 vi.mock("$/ServerApiClient", () => {
   return {
     createServerApiClient: () => {
-      return { rpc: rpcMock };
+      return { rpc: mocks.rpcMock };
     },
   };
 });
 
 vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
-  return { LocalDatasetClient: { dropLocalDataset: vi.fn() } };
+  return {
+    LocalDatasetClient: {
+      dropLocalDataset: vi.fn(),
+      getById: mocks.getLocalDatasetMock,
+      delete: mocks.deleteLocalDatasetMock,
+    },
+  };
 });
 
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
-  return { DuckDbClient: { dropTable: vi.fn() } };
+  return {
+    DuckDbClient: {
+      dropTable: vi.fn(),
+      dropTableViewAndFile: mocks.dropDuckDbTableMock,
+    },
+  };
 });
 
 vi.mock(
   "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient",
   () => {
-    return { DatasetParquetStorageClient: { deleteDataset: vi.fn() } };
+    return {
+      DatasetParquetStorageClient: { deleteDataset: mocks.deleteParquetMock },
+    };
   },
 );
+
+vi.mock(
+  "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient",
+  () => {
+    return {
+      DatasetOriginalFileStorageClient: {
+        deleteOriginalFile: mocks.deleteOriginalFileMock,
+      },
+    };
+  },
+);
+
+vi.mock("@/clients/UserClient", () => {
+  return {
+    UserClient: { canAccessResource: mocks.canAccessResourceMock },
+  };
+});
 
 function _makeLogger(): ILogger {
   const logger = {
@@ -36,6 +77,9 @@ function _makeLogger(): ILogger {
       return logger;
     },
     log: () => {
+      return undefined;
+    },
+    error: () => {
       return undefined;
     },
   };
@@ -70,8 +114,6 @@ const BASE_PARAMS = {
 async function _insert(
   overrides: Readonly<{ sheetName?: string }> = {},
 ): Promise<Record<string, unknown>> {
-  const { createDatasetMutations } =
-    await import("@/clients/datasets/DatasetClient/createDatasetMutations");
   await createDatasetMutations(CONFIG).insertGoogleSheetsDataset({
     ...BASE_PARAMS,
     ...overrides,
@@ -108,5 +150,203 @@ describe("insertGoogleSheetsDataset", () => {
 
     expect(args.p_google_document_id).toBe(BASE_PARAMS.googleDocumentId);
     expect(args.p_google_account_id).toBe(BASE_PARAMS.googleAccountId);
+  });
+});
+
+describe("fullDelete", () => {
+  const datasetId = BASE_PARAMS.datasetId;
+  const workspaceId = BASE_PARAMS.workspaceId;
+  let callOrder: string[];
+  let getByIdMock: ReturnType<typeof vi.fn>;
+  let deleteRowMock: ReturnType<typeof vi.fn>;
+
+  function _fullDelete(): Promise<void> {
+    const config = {
+      ...CONFIG,
+      client: { getById: getByIdMock, delete: deleteRowMock, getAll: vi.fn() },
+    } as unknown as DatasetMutationConfig;
+    return createDatasetMutations(config).fullDelete({ id: datasetId });
+  }
+
+  function _recordCall(
+    name: string,
+    mock: ReturnType<typeof vi.fn>,
+    result: unknown,
+  ): void {
+    mock.mockImplementation(async () => {
+      callOrder.push(name);
+      return result;
+    });
+  }
+
+  beforeEach(() => {
+    callOrder = [];
+    getByIdMock = vi.fn();
+    deleteRowMock = vi.fn();
+    Object.values(mocks).forEach((mock) => {
+      mock.mockReset();
+    });
+    _recordCall("canAccess", mocks.canAccessResourceMock, true);
+    _recordCall("deleteParquet", mocks.deleteParquetMock, undefined);
+    _recordCall("deleteOriginal", mocks.deleteOriginalFileMock, undefined);
+    _recordCall("deleteRow", deleteRowMock, undefined);
+    _recordCall("deleteLocal", mocks.deleteLocalDatasetMock, undefined);
+    _recordCall("dropDuckDb", mocks.dropDuckDbTableMock, undefined);
+    mocks.getLocalDatasetMock.mockResolvedValue(undefined);
+    // The row is there before the delete and gone after it.
+    getByIdMock
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRow");
+        return { id: datasetId, workspaceId, sourceType: "csv_file" };
+      })
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRowBack");
+        return undefined;
+      });
+  });
+
+  it("deletes the files, then the row, after checking admin access", async () => {
+    await _fullDelete();
+
+    expect(callOrder).toEqual([
+      "readRow",
+      "canAccess",
+      "deleteParquet",
+      "deleteRow",
+      "readRowBack",
+    ]);
+  });
+
+  it("asks for admin access to the dataset being deleted", async () => {
+    await _fullDelete();
+
+    expect(mocks.canAccessResourceMock).toHaveBeenCalledWith({
+      resourceType: "dataset",
+      resourceId: datasetId,
+      minRole: "admin",
+    });
+  });
+
+  it("leaves Storage and the row alone when the user is not a dataset admin", async () => {
+    _recordCall("canAccess", mocks.canAccessResourceMock, false);
+
+    await expect(_fullDelete()).rejects.toMatchObject({
+      name: "DatasetDeleteError",
+      reason: "not_allowed",
+    });
+
+    expect(mocks.deleteParquetMock).not.toHaveBeenCalled();
+    expect(mocks.deleteOriginalFileMock).not.toHaveBeenCalled();
+    expect(deleteRowMock).not.toHaveBeenCalled();
+    expect(mocks.deleteLocalDatasetMock).not.toHaveBeenCalled();
+  });
+
+  it("throws when the row is still there after the delete", async () => {
+    // A delete that RLS refuses succeeds with zero rows, so only reading the
+    // row back proves it was removed.
+    getByIdMock.mockReset();
+    getByIdMock.mockResolvedValue({
+      id: datasetId,
+      workspaceId,
+      sourceType: "csv_file",
+    });
+
+    const error = await _fullDelete().catch((caught: unknown) => {
+      return caught;
+    });
+
+    expect(error).toBeInstanceOf(DatasetDeleteError);
+    expect(error).toMatchObject({ reason: "still_present", datasetId });
+  });
+
+  it("keeps the local copy when the row is still there after the delete", async () => {
+    getByIdMock.mockReset();
+    getByIdMock.mockResolvedValue({
+      id: datasetId,
+      workspaceId,
+      sourceType: "csv_file",
+    });
+    mocks.getLocalDatasetMock.mockResolvedValue({ datasetId });
+
+    await _fullDelete().catch(() => {
+      return undefined;
+    });
+
+    expect(mocks.deleteLocalDatasetMock).not.toHaveBeenCalled();
+    expect(mocks.dropDuckDbTableMock).not.toHaveBeenCalled();
+  });
+
+  it("removes the local copy after the row is confirmed gone", async () => {
+    mocks.getLocalDatasetMock.mockResolvedValue({ datasetId });
+
+    await _fullDelete();
+
+    expect(callOrder.slice(-3)).toEqual([
+      "readRowBack",
+      "deleteLocal",
+      "dropDuckDb",
+    ]);
+  });
+
+  it("does not remove a retained original for a source that keeps none", async () => {
+    await _fullDelete();
+
+    expect(mocks.deleteOriginalFileMock).not.toHaveBeenCalled();
+  });
+
+  it("removes the retained original of a pdf dataset before the row", async () => {
+    getByIdMock.mockReset();
+    getByIdMock
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRow");
+        return { id: datasetId, workspaceId, sourceType: "pdf_file" };
+      })
+      .mockImplementationOnce(async () => {
+        callOrder.push("readRowBack");
+        return undefined;
+      });
+
+    await _fullDelete();
+
+    expect(mocks.deleteOriginalFileMock).toHaveBeenCalledWith({
+      workspaceId,
+      datasetId,
+      fileExtension: "pdf",
+    });
+    expect(callOrder).toEqual([
+      "readRow",
+      "canAccess",
+      "deleteParquet",
+      "deleteOriginal",
+      "deleteRow",
+      "readRowBack",
+    ]);
+  });
+
+  it("still deletes the row when the retained original cannot be removed", async () => {
+    getByIdMock.mockReset();
+    getByIdMock
+      .mockResolvedValueOnce({
+        id: datasetId,
+        workspaceId,
+        sourceType: "pdf_file",
+      })
+      .mockResolvedValueOnce(undefined);
+    mocks.deleteOriginalFileMock.mockRejectedValue(new Error("storage down"));
+
+    await _fullDelete();
+
+    expect(deleteRowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the access check and Storage for a row the user cannot read", async () => {
+    getByIdMock.mockReset();
+    getByIdMock.mockResolvedValue(undefined);
+
+    await _fullDelete();
+
+    expect(mocks.canAccessResourceMock).not.toHaveBeenCalled();
+    expect(mocks.deleteParquetMock).not.toHaveBeenCalled();
+    expect(deleteRowMock).toHaveBeenCalledTimes(1);
   });
 });

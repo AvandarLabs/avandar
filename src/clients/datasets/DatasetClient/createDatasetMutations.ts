@@ -7,6 +7,9 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { UserClient } from "@/clients/UserClient";
+import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { CompositeTypes } from "$/types/database.types";
 import type {
   DatasetColumnInput,
@@ -223,6 +226,67 @@ function _makeInsertOpenDataDataset(
   };
 }
 
+/**
+ * Throws unless the current user may delete the dataset. This is the same
+ * rule as the `datasets` DELETE policy, so a delete that passes it cannot be
+ * silently refused by row level security.
+ */
+async function _assertCanDeleteDataset(datasetId: Dataset.Id): Promise<void> {
+  const canDelete = await UserClient.canAccessResource({
+    resourceType: "dataset",
+    resourceId: datasetId,
+    minRole: "admin",
+  });
+  if (!canDelete) {
+    throw new DatasetDeleteError({ datasetId, reason: "not_allowed" });
+  }
+}
+
+/**
+ * Throws if the dataset row can still be read. The CRUD client's delete does
+ * not report how many rows it removed, so a delete that row level security
+ * refuses looks like a success until the row is read back.
+ */
+async function _assertDatasetRowGone(
+  options: Readonly<DatasetMutationConfig>,
+  datasetId: Dataset.Id,
+): Promise<void> {
+  const remaining = await options.client.getById({ id: datasetId });
+  if (remaining) {
+    throw new DatasetDeleteError({ datasetId, reason: "still_present" });
+  }
+}
+
+async function _deleteDatasetFiles(
+  options: Readonly<DatasetMutationConfig>,
+  dataset: Dataset.T,
+): Promise<void> {
+  const logger = options.logger.appendName("fullDelete");
+  await DatasetParquetStorageClient.deleteDataset({
+    workspaceId: dataset.workspaceId,
+    datasetId: dataset.id,
+  });
+  if (requiresOriginalFileRetention(dataset.sourceType)) {
+    // The metadata row deletion that follows is the point of no return for the
+    // user (the dataset disappears from their workspace either way), so
+    // a failure to remove the retained-original blob must not strand
+    // them with a dataset they can no longer delete. Unlike the parquet
+    // deletion above, which throws and aborts the delete, we log and
+    // swallow: worst case is an orphaned blob to clean up later, not a
+    // dataset stuck in limbo.
+    await DatasetOriginalFileStorageClient.deleteOriginalFile({
+      workspaceId: dataset.workspaceId,
+      datasetId: dataset.id,
+      fileExtension: getOriginalFileExtensionFromSourceType(dataset.sourceType),
+    }).catch((error: unknown) => {
+      logger.error(
+        "Failed to delete the dataset's retained original file; leaving the object storage blob in place",
+        { datasetId: dataset.id, error },
+      );
+    });
+  }
+}
+
 function _makeFullDelete(
   options: Readonly<DatasetMutationConfig>,
 ): DatasetMutationRecord["fullDelete"] {
@@ -231,33 +295,15 @@ function _makeFullDelete(
     logger.log("Deleting dataset", params);
     const dataset = await options.client.getById(params);
     if (dataset) {
-      await DatasetParquetStorageClient.deleteDataset({
-        workspaceId: dataset.workspaceId,
-        datasetId: params.id,
-      });
-      if (requiresOriginalFileRetention(dataset.sourceType)) {
-        // The metadata row deletion below is the point of no return for the
-        // user (the dataset disappears from their workspace either way), so
-        // a failure to remove the retained-original blob must not strand
-        // them with a dataset they can no longer delete. Unlike the parquet
-        // deletion above, which throws and aborts the delete, we log and
-        // swallow: worst case is an orphaned blob to clean up later, not a
-        // dataset stuck in limbo.
-        await DatasetOriginalFileStorageClient.deleteOriginalFile({
-          workspaceId: dataset.workspaceId,
-          datasetId: params.id,
-          fileExtension: getOriginalFileExtensionFromSourceType(
-            dataset.sourceType,
-          ),
-        }).catch((error: unknown) => {
-          logger.error(
-            "Failed to delete the dataset's retained original file; leaving the object storage blob in place",
-            { datasetId: params.id, error },
-          );
-        });
-      }
+      // Check access before touching Storage: the files go first, so a row
+      // that row level security would refuse to delete must be caught here.
+      await _assertCanDeleteDataset(params.id);
+      await _deleteDatasetFiles(options, dataset);
     }
     await options.client.delete(params);
+    if (dataset) {
+      await _assertDatasetRowGone(options, params.id);
+    }
     const localDataset = await LocalDatasetClient.getById(params);
     if (!localDataset) {
       return;
