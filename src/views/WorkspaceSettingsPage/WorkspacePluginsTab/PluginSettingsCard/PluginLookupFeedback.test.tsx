@@ -69,6 +69,23 @@ describe("PluginLookupFeedback", () => {
     expect(screen.getByRole("status")).toHaveFocus();
   });
 
+  it("announces the failure again when a retry fails", () => {
+    const { rerender } = render(_buildFeedback("failed"));
+    rerender(_buildFeedback("retrying"));
+
+    rerender(_buildFeedback("failed"));
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "We could not load it.",
+    );
+  });
+
+  it("announces nothing on the first failure, since the alert announces it", () => {
+    render(_buildFeedback("failed"));
+
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+  });
+
   it("removes the alert and announces the recovery once a retry succeeds", () => {
     const { rerender } = render(_buildFeedback("failed"));
     rerender(_buildFeedback("retrying"));

@@ -34,13 +34,26 @@ function useHasRecovered(isInError: boolean): boolean {
   return hasBeenInError && !isInError;
 }
 
+/** True once a retry started and the lookup has not been fine since. */
+function useHasRetried(state: LookupState): boolean {
+  const [hasRetried, setHasRetried] = useState(false);
+  useEffect(() => {
+    if (state === "retrying") {
+      setHasRetried(true);
+    } else if (state === "ok") {
+      setHasRetried(false);
+    }
+  }, [state]);
+  return hasRetried;
+}
+
 /**
  * Tells an admin that a lookup behind a plugin's uninstall failed, with a
  * Retry button, instead of showing an answer that never loaded. The alert
  * stays until a retry succeeds, and Retry shows a loader meanwhile. A status
- * region that is always mounted announces the retry and the recovery, and
- * takes focus when Retry is pressed, since the button is disabled during the
- * retry and gone after it.
+ * region that is always mounted announces the retry, a retry that fails
+ * again, and the recovery. It takes focus when Retry is pressed, since the
+ * button is disabled during the retry and gone after it.
  *
  * Use it wherever a plugin's uninstall depends on a lookup that can fail, for
  * example on a plugin's card or in its uninstall dialog.
@@ -57,9 +70,12 @@ export function PluginLookupFeedback({
   const { t } = useLingui();
   const statusRef = useRef<HTMLDivElement>(null);
   const hasRecovered = useHasRecovered(state !== "ok");
+  const hasRetried = useHasRetried(state);
   const statusMessage = {
     ok: hasRecovered ? recoveredMessage : "",
-    failed: "",
+    // The first failure is announced by the alert. A failure after a retry
+    // is not, because the alert is already mounted.
+    failed: hasRetried ? message : "",
     retrying: retryingMessage,
   }[state];
   return (
