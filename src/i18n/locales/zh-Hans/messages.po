@@ -3216,10 +3216,6 @@ msgstr "半径"
 msgid "Week of {day}"
 msgstr "{day}当周"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "You don't have permission to delete this dataset."
-msgstr "您无权删除此数据集。"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "排序和限制"
@@ -4719,6 +4715,11 @@ msgstr "此查询在完成前已停止。"
 msgid "Needs geometry"
 msgstr "需要几何数据"
 
+#. placeholder {0}: summary.deletedCount
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{0, plural, one {# dataset deleted.} other {# datasets deleted.}}"
+msgstr "{0, plural, one {已删除 # 个数据集。} other {已删除 # 个数据集。}}"
+
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Another format"
 msgstr "其他格式"
@@ -5829,6 +5830,11 @@ msgstr "此地点数据集已在地图外发生更改，无法再在此处编辑
 msgid "Keep the measurements as found"
 msgstr "保留原始测量值"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset, or it has already been "
+"deleted."
+msgstr "您无权删除此数据集，或它已被删除。"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
 msgstr "添加字段"
@@ -6783,6 +6789,11 @@ msgstr "要导入的标签页"
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Couldn't search. Keep typing to retry."
 msgstr "无法搜索。继续输入以重试。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because we could not check them, and "
+"they are still in Data Sources: {unreadList}"
+msgstr "这些数据集未被删除，因为我们无法检查它们，它们仍在数据源中：{unreadList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
 msgid "Saved {dictionaryName} to Dictionaries."
@@ -8905,11 +8916,6 @@ msgstr "{threshold}% 或以上"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# 个要素} other {# 个要素}}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
-msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
-"deleted.}}"
-msgstr "{deletedCount, plural, one {已删除 # 个数据集。} other {已删除 # 个数据集。}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "

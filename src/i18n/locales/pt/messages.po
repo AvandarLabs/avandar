@@ -3361,10 +3361,6 @@ msgstr "Raio"
 msgid "Week of {day}"
 msgstr "Semana de {day}"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "You don't have permission to delete this dataset."
-msgstr "Você não tem permissão para excluir este conjunto de dados."
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Ordenação e limite"
@@ -4937,6 +4933,12 @@ msgstr "Esta consulta foi interrompida antes de ser concluída."
 msgid "Needs geometry"
 msgstr "Requer geometria"
 
+#. placeholder {0}: summary.deletedCount
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{0, plural, one {# dataset deleted.} other {# datasets deleted.}}"
+msgstr "{0, plural, one {# conjunto de dados excluído.} other {# conjuntos de "
+"dados excluídos.}}"
+
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Another format"
 msgstr "Outro formato"
@@ -6103,6 +6105,12 @@ msgstr "Este conjunto de dados de locais foi alterado fora do mapa e não pode "
 msgid "Keep the measurements as found"
 msgstr "Manter as medições como encontradas"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset, or it has already been "
+"deleted."
+msgstr "Você não tem permissão para excluir este conjunto de dados, ou ele já "
+"foi excluído."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
 msgstr "Adicionar um campo"
@@ -7091,6 +7099,12 @@ msgstr "Aba para importar"
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Couldn't search. Keep typing to retry."
 msgstr "Não foi possível pesquisar. Continue digitando para tentar novamente."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because we could not check them, and "
+"they are still in Data Sources: {unreadList}"
+msgstr "Estes conjuntos de dados não foram excluídos porque não foi possível "
+"verificá-los, e eles continuam em Fontes de Dados: {unreadList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
 msgid "Saved {dictionaryName} to Dictionaries."
@@ -9305,12 +9319,6 @@ msgstr "{threshold}% ou mais"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# recurso} other {# recursos}}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
-msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
-"deleted.}}"
-msgstr "{deletedCount, plural, one {# conjunto de dados excluído.} other {# "
-"conjuntos de dados excluídos.}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "

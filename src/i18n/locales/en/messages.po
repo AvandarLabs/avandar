@@ -3312,10 +3312,6 @@ msgstr "Radius"
 msgid "Week of {day}"
 msgstr "Week of {day}"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "You don't have permission to delete this dataset."
-msgstr "You don't have permission to delete this dataset."
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Sort & limit"
@@ -4859,6 +4855,11 @@ msgstr "This query was stopped before it finished."
 msgid "Needs geometry"
 msgstr "Needs geometry"
 
+#. placeholder {0}: summary.deletedCount
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{0, plural, one {# dataset deleted.} other {# datasets deleted.}}"
+msgstr "{0, plural, one {# dataset deleted.} other {# datasets deleted.}}"
+
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Another format"
 msgstr "Another format"
@@ -6009,6 +6010,12 @@ msgstr "This places dataset was changed outside the map and can no longer be "
 msgid "Keep the measurements as found"
 msgstr "Keep the measurements as found"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset, or it has already been "
+"deleted."
+msgstr "You don't have permission to delete this dataset, or it has already "
+"been deleted."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
 msgstr "Add a field"
@@ -6987,6 +6994,12 @@ msgstr "Tab to import"
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Couldn't search. Keep typing to retry."
 msgstr "Couldn't search. Keep typing to retry."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because we could not check them, and "
+"they are still in Data Sources: {unreadList}"
+msgstr "These datasets were not deleted because we could not check them, and "
+"they are still in Data Sources: {unreadList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
 msgid "Saved {dictionaryName} to Dictionaries."
@@ -9171,12 +9184,6 @@ msgstr "{threshold}% or above"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# feature} other {# features}}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
-msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
-"deleted.}}"
-msgstr "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
-"deleted.}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "

@@ -3397,10 +3397,6 @@ msgstr "Rayon"
 msgid "Week of {day}"
 msgstr "Semaine du {day}"
 
-#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
-msgid "You don't have permission to delete this dataset."
-msgstr "Vous n’avez pas l’autorisation de supprimer ce jeu de données."
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Tri et limite"
@@ -4986,6 +4982,12 @@ msgstr "Cette requête a été arrêtée avant d’être terminée."
 msgid "Needs geometry"
 msgstr "Géométrie requise"
 
+#. placeholder {0}: summary.deletedCount
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "{0, plural, one {# dataset deleted.} other {# datasets deleted.}}"
+msgstr "{0, plural, one {# jeu de données supprimé.} other {# jeux de données "
+"supprimés.}}"
+
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 msgid "Another format"
 msgstr "Autre format"
@@ -6167,6 +6169,12 @@ msgstr "Ce jeu de données de lieux a été modifié en dehors de la carte et ne
 msgid "Keep the measurements as found"
 msgstr "Conserver les mesures telles qu’elles ont été trouvées"
 
+#: src/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError.ts
+msgid "You don't have permission to delete this dataset, or it has already been "
+"deleted."
+msgstr "Vous n’avez pas l’autorisation de supprimer ce jeu de données, ou il a "
+"déjà été supprimé."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
 msgstr "Ajouter un champ"
@@ -7168,6 +7176,13 @@ msgstr "Onglet à importer"
 msgid "Couldn't search. Keep typing to retry."
 msgstr "Impossible d’effectuer la recherche. Continuez à saisir du texte pour "
 "réessayer."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
+msgid "These datasets were not deleted because we could not check them, and "
+"they are still in Data Sources: {unreadList}"
+msgstr "Ces jeux de données n’ont pas été supprimés, car nous n’avons pas pu "
+"les vérifier, et ils figurent toujours dans Sources de données : "
+"{unreadList}"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
 msgid "Saved {dictionaryName} to Dictionaries."
@@ -9405,12 +9420,6 @@ msgstr "{threshold}% ou plus"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
 msgstr "{0, plural, one {# entité} other {# entités}}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useRunUninstall/useRunUninstall.ts
-msgid "{deletedCount, plural, one {# dataset deleted.} other {# datasets "
-"deleted.}}"
-msgstr "{deletedCount, plural, one {# jeu de données supprimé.} other {# jeux "
-"de données supprimés.}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
