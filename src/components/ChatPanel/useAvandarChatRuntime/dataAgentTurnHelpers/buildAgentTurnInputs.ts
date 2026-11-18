@@ -1,4 +1,7 @@
-import { formatDashboardCardLine } from "$/agent/dashboardBlocks/dashboardCardLine";
+import {
+  formatDashboardCardLine,
+  REDACTED_DASHBOARD_NAME,
+} from "$/agent/dashboardBlocks/dashboardCardLine";
 import { getAgentGadgetName } from "$/agent/mentions/AgentGadgetContext";
 import {
   buildAgentContextBlocks,
@@ -205,16 +208,23 @@ function _cardIdentityOf(
 
 /**
  * One line per card the user resolved since the agent last heard, and a
- * callback that marks them heard once the agent has replied.
+ * callback that marks them heard once the agent has replied. A hosted
+ * turn's name that looks personal on its own is replaced, since the user
+ * may have picked a name the model never saw.
  */
 function _dashboardCardInputs(
   turn: Readonly<DataAgentTurnOptions>,
-  mask: (text: string) => string,
+  options: Readonly<{ isHosted: boolean; mask: (text: string) => string }>,
 ): Pick<AgentTurnInputs, "dashboardCardLines" | "onReplied"> {
   const identity = _cardIdentityOf(turn);
   if (!identity) {
     return { dashboardCardLines: [] };
   }
+  const maskName = (name: string): string => {
+    return options.isHosted && isPersonalDataText(name)
+      ? REDACTED_DASHBOARD_NAME
+      : options.mask(name);
+  };
   const unreported = AgentDashboardCardStore.listUnreported(identity);
   return {
     dashboardCardLines: unreported.map(({ status }) => {
@@ -226,7 +236,7 @@ function _dashboardCardInputs(
               isUnsaved: status.isUnsaved,
             }
           : { kind: "cancelled" },
-        mask,
+        maskName,
       );
     }),
     onReplied: () => {
@@ -288,6 +298,6 @@ export function buildAgentTurnInputs(
     ...(isHosted ? { unmaskReplyText: conversation.sqlVault.unmaskText } : {}),
     // Built after the blocks, so the vault holds every value a name could
     // match.
-    ..._dashboardCardInputs(options.turn, mask),
+    ..._dashboardCardInputs(options.turn, { isHosted, mask }),
   };
 }

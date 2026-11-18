@@ -177,6 +177,36 @@ describe("buildAgentTurnInputs", () => {
       ]);
     });
 
+    describe("a dashboard name that looks personal on its own", () => {
+      const EMAIL_NAME = "jane.doe@example.com";
+
+      function _cardLines(privacy: "hosted" | "device") {
+        AgentDashboardCardStore.setStatus(IDENTITY, "card-1", {
+          ...JANE_CARD,
+          dashboardName: EMAIL_NAME,
+        });
+        return buildAgentTurnInputs({
+          conversation: _conversation(),
+          datasets: DATASETS,
+          pageContext: undefined,
+          turn: _turn(),
+          privacy,
+        }).dashboardCardLines;
+      }
+
+      it("is hidden in a hosted card line", () => {
+        expect(_cardLines("hosted")).toEqual([
+          '<dashboard_card>Confirmed: added to "Untitled dashboard".</dashboard_card>',
+        ]);
+      });
+
+      it("is kept in a device card line", () => {
+        expect(_cardLines("device")).toEqual([
+          `<dashboard_card>Confirmed: added to "${EMAIL_NAME}".</dashboard_card>`,
+        ]);
+      });
+    });
+
     it("keeps real names even when the vault holds the value", () => {
       const conversation = _conversation();
       buildAgentTurnInputs({

@@ -1,5 +1,11 @@
 import { quoteBlockText } from "$/agent/pageContext/agentBlockText.ts";
 
+/**
+ * A dashboard's name in a card line sent to a hosted model when the name
+ * itself looks like personal data.
+ */
+export const REDACTED_DASHBOARD_NAME = "Untitled dashboard";
+
 /** What the user did with a dashboard card, as the agent hears it. */
 export type DashboardCardOutcome =
   | { kind: "confirmed"; dashboardName: string; isUnsaved: boolean }
