@@ -25,7 +25,7 @@ export function useNotifyDatasetDeleteError(
         title: t`Dataset not deleted`,
         message:
           error.reason === "not_allowed"
-            ? t`You don't have permission to delete this dataset.`
+            ? t`You don't have permission to delete this dataset, or it has already been deleted.`
             : t`The dataset could not be fully deleted. Its data may already be gone. Check it in Data Sources and delete it again.`,
       });
       return;

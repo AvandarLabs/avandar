@@ -359,7 +359,7 @@ describe("DatasetActionsMenu", () => {
 
     expect(notifyErrorMock).toHaveBeenCalledWith({
       title: "Dataset not deleted",
-      message: "You don't have permission to delete this dataset.",
+      message: "You don't have permission to delete this dataset, or it has already been deleted.",
     });
   });
 });
