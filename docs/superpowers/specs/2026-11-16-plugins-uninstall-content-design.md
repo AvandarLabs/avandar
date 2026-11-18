@@ -49,8 +49,9 @@ Three facts shape the design:
   cannot delete. The admin is told, can retry, and can still uninstall with
   every dataset kept.
 - A failed delete never blocks the uninstall. A dataset the user may not
-  delete is never touched, and one whose delete did not finish is named, so
-  the admin can check it.
+  delete is never touched. One whose delete did not finish is named, so the
+  admin can check it. One that could not even be read first is named
+  separately, as not deleted and still in Data Sources.
 
 ## Non-goals
 
@@ -302,8 +303,8 @@ checked row:
       nothing to do. A dataset the user can no longer read looks the same, so
       it too is nothing to do. It is in none of the outcome lists, and
       `fullDelete` is not called. A read that throws records the id as
-      incomplete. Nothing was
-      deleted, but the admin should check it.
+      unread. Nothing of it was touched, so it is still in Data Sources, but
+      it was not checked.
    2. Calls `DatasetClient.fullDelete({ id })`. It does not check admin access
       itself, because `fullDelete` checks it before it touches Storage (through
       `UserClient.canAccessResource`, the one access check, which uses the
@@ -318,10 +319,12 @@ checked row:
       dataset is read again, since `fullDelete` can throw after it deleted
       the row, for example while it cleans up local copies or reads the row
       back. A dataset whose row is gone counts as deleted. A dataset whose
-      row is still there, or whose re-read throws, is incomplete. A failure
-      never stops the loop.
-3. Returns `{ deletedDatasetIds, refusedDatasetIds, incompleteDatasetIds }`.
-   A dataset that was already gone is in none of the lists.
+      row is still there, or whose re-read throws, is incomplete: the delete
+      may have started, unlike a dataset that could not be read first. A
+      failure never stops the loop.
+3. Returns `{ deletedDatasetIds, refusedDatasetIds, incompleteDatasetIds,
+   unreadDatasetIds }`. A dataset that was already gone is in none of the
+   lists.
 
 The modal then:
 
@@ -347,8 +350,13 @@ The modal then:
     reading "These datasets could not be fully deleted. Their data may
     already be gone. Check them in Data Sources and delete them again:" and
     their names.
-  - Both kinds: one warning with both sentences, the incomplete one first.
-    Each sentence is its own translatable message with its own list of names.
+  - Some datasets that could not be read first: a warning with the same
+    title, reading "These datasets were not deleted because we could not
+    check them, and they are still in Data Sources:" and their names.
+  - Several kinds: one warning with each sentence, the incomplete one first,
+    then the one that could not be checked, then the refused one, joined by a
+    space. Each sentence is its own translatable message with its own list of
+    names.
   - Any warning replaces the success message, even when other datasets were
     deleted, so a failure never hides behind a success.
   - Uninstall failed with `still_installed`: "Could not update Mozambique.
@@ -374,7 +382,7 @@ No schema change, so no pgTAP tests and no Supabase switch.
 
 | Level | File | Proves |
 | --- | --- | --- |
-| Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there (`still_installed`) or could not be read back (`not_confirmed`). Deletes run one at a time, and a delete does not start before the one before it settles. A failed delete does not stop the others and is returned as incomplete. A dataset `fullDelete` refuses with `not_allowed` is returned as refused without an error log. A dataset whose row survives (`still_present`) is returned as incomplete and its error is logged. A dataset that cannot be read first, or whose re-read also throws, is incomplete. A dataset whose row is gone after `fullDelete` threw counts as deleted. A dataset that is already gone is not failed and never reaches `fullDelete`. A duplicate id is deleted once |
+| Unit | `uninstallPluginAndDeleteDatasets.test.ts` | Uninstall runs before any delete. A failed uninstall deletes nothing, including one whose install is still there (`still_installed`) or could not be read back (`not_confirmed`). Deletes run one at a time, and a delete does not start before the one before it settles. A failed delete does not stop the others and is returned as incomplete. A dataset `fullDelete` refuses with `not_allowed` is returned as refused without an error log. A dataset whose row survives (`still_present`) is returned as incomplete and its error is logged. A dataset that cannot be read first is returned as unread, not incomplete, is never passed to `fullDelete`, and does not stop the others. A dataset whose re-read also throws after `fullDelete` threw is incomplete. A dataset whose row is gone after `fullDelete` threw counts as deleted. A dataset that is already gone is not failed and never reaches `fullDelete`. A duplicate id is deleted once |
 | Unit | `useImportedPluginContent.test.tsx` | `refetch` asks the imports lookup again. `hasFailed` is true for a failure, and false while a retry runs or when the lookup succeeded |
 | Unit | `useLookupState.test.tsx` | A first load is `ok`. A failure is `failed`. A load after a failure is `retrying`. A failed retry is `failed` again, and a successful one is `ok` |
 | Component | `PluginLookupFeedback.test.tsx` | The alert and Retry show on failure and are described by the owner. During a retry the alert stays and Retry is loading. Retry calls `onRetry` and moves focus to the status region. The retry and the recovery are announced, and nothing is announced without an error |
@@ -384,7 +392,7 @@ No schema change, so no pgTAP tests and no Supabase switch.
 | Component | `UninstallDatasetDependents.test.tsx` | Lists what reads a dataset, says when a lookup failed, and reports loading to the modal while the lookups load, and not loading once they settle or fail |
 | Component | `UninstallPluginModal.test.tsx` | The confirm button is disabled while what reads a checked dataset loads, enabled once it has, when the dataset is unchecked, and never waits for an unchecked dataset. After a failed uninstall focus returns to the confirm button. Checkboxes start unchecked. The confirm label follows the count. Dependents show only for checked rows. A non-deletable row has no checkbox. The modal cannot close while running. When a lookup failed it shows the alert and Retry, no "can't see" count and no "Kept" line, reads "Uninstall and keep all datasets" with "Every dataset it imported stays in Data Sources.", and deletes nothing on confirm. During a retry it keeps the alert, a loading Retry and the disabled keep-all button, and announces the retry. Retry moves focus to the status region. After a successful retry it shows the list and announces it |
 | Unit | `usePluginInstallationActions.test.tsx` (existing) | The uninstall modal opens with the install's ids, the clicked button, and the card's heading id |
-| Unit | `useRunUninstall/useRunUninstall.test.tsx` | The notification matches the outcome, and counts only the datasets this run deleted. A refused dataset, an incomplete dataset, and both together each get their own warning text, and a warning is never replaced by a success when other datasets were deleted. An `UninstallPluginError` shows translated copy by reason, and any other error shows the generic sentence. A failure is logged with the install id. The lists refresh when the uninstall fails. A refresh that rejects is logged, and neither hides the result nor blocks `onDone`. `onDone` waits for the refresh |
+| Unit | `useRunUninstall/useRunUninstall.test.tsx` | The notification matches the outcome, and counts only the datasets this run deleted. A refused dataset, an incomplete dataset, an unread dataset, and all three together (incomplete, unread, refused, in that order) each get their own warning text, and a warning is never replaced by a success when other datasets were deleted. An `UninstallPluginError` shows translated copy by reason, and any other error shows the generic sentence. A failure is logged with the install id. The lists refresh when the uninstall fails. A refresh that rejects is logged, and neither hides the result nor blocks `onDone`. `onDone` waits for the refresh |
 | Component | `PluginActions.test.tsx` (existing) | A plugin with no imports still gets the one-line confirm. A plugin with imports opens the modal without a confirm first. When the imports lookup failed, Uninstall gets the plain confirm with the two kept-datasets paragraphs and never opens the modal |
 | Component | `WorkspacePluginsTab.test.tsx` (existing) | Uninstall is disabled while the imports load or retry. When the lookup failed, the card shows the alert with Retry (only to an admin of an installed plugin), Retry is described by the plugin, Retry refetches and moves focus to the status region, Uninstall is enabled, and its confirm carries the kept-datasets paragraphs. During a retry the alert stays with a loading Retry and Uninstall is disabled. After it succeeds the alert goes, the recovery is announced and Uninstall is enabled. The uninstall modal returns focus to the Uninstall button on Cancel, and to the card heading after an uninstall, without the button having been focused by the click |
 | E2E | `tests/e2e/plugins-mozambique-uninstall.spec.ts` | Install the Mozambique pack through the UI, uninstall it with one dataset checked. That dataset is gone from Data Sources and the other stays. `finally` deletes whatever the test left and removes the install, through the helpers in `tests/e2e/helpers/mozambiquePackFlow.ts` |
