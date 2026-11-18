@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* oxlint-disable typescript/no-namespace */
 import {
   FIRST_DASHBOARD_TUTORIAL_KEY,
   NUX_MILESTONE_KEYS,

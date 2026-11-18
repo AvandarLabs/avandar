@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* oxlint-disable typescript/no-namespace */
 import { z } from "zod";
 import type { Enums } from "$/types/database.types.ts";
 

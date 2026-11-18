@@ -108,7 +108,7 @@ function _createLayerQuery(
     // other queryable binding is spatial and carries the zoom in
     // `spatialContext` instead. Keying every layer on zoom would refetch fill
     // and line layers on every zoom step for a value they never read.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // oxlint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       context.workspaceId,
       ...MapLayerData.getQueryKeyFromMapLayer(

@@ -81,7 +81,7 @@ function useFeatureListRows(
   return useQuery({
     enabled: inputs.isEnabled && metadata !== undefined,
     // `keyParts` names exactly the inputs that change the result.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // oxlint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["mapLayerFeatureList", ...inputs.keyParts, i18n.locale],
     queryFn: async ({ signal }) => {
       if (!layerId || !metadata) {
@@ -111,7 +111,7 @@ function useFeatureCount(
   return useQuery({
     enabled: inputs.isEnabled && metadata !== undefined,
     // `keyParts` names exactly the inputs that change the result.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // oxlint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["mapLayerFeatureCount", ...inputs.keyParts],
     queryFn: async ({ signal }) => {
       if (!layerId || !metadata) {

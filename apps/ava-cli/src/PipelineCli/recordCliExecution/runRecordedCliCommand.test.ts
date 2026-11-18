@@ -120,7 +120,10 @@ describe("runRecordedCliCommand", () => {
       },
     });
 
-    const executionId = (calls[0]?.body.p_execution as { id: string }).id;
+    const firstExecution = calls[0]?.body.p_execution as
+      | { id: string }
+      | undefined;
+    const executionId = firstExecution?.id;
     expect(
       calls.map((call) => {
         return [call.functionName, call.body.p_execution_id ?? executionId];

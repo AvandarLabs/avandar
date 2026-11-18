@@ -107,8 +107,6 @@ export function useMapViewSync({
         onViewChange: publishViewChange,
       });
     },
-    // useEffectEvent callbacks must not be listed in effect deps.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [mapInstance],
   );
 

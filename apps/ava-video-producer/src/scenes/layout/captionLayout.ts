@@ -68,7 +68,7 @@ export function safePublicPath(src: string): string {
   if (
     !src ||
     src.startsWith("/") ||
-    // eslint-disable-next-line no-control-regex -- intentional: rejecting control characters in a media URL
+    // oxlint-disable-next-line no-control-regex -- intentional: rejecting control characters in a media URL
     /[\\:%?#\u0000-\u001f]/.test(src) ||
     src.split("/").some((part) => !part || part === "." || part === "..")
   ) {

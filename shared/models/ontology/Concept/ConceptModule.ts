@@ -72,7 +72,7 @@ function createConceptModule(): WithBind<IConceptUtils> {
       for (const moduleKey of moduleKeys) {
         const moduleMember = module[moduleKey];
         if (typeof moduleMember === "function") {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           boundModule[moduleKey] = (...args: readonly unknown[]): any => {
             return (moduleMember as AnyFunction)(concept, ...args);
           };

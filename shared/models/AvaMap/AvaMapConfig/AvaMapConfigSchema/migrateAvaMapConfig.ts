@@ -23,7 +23,7 @@ import {
 import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
 import { AvaMapConfigV8Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV8Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-// eslint-disable-next-line no-restricted-imports
+// oxlint-disable-next-line no-restricted-imports
 import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 type ConfigV1 = z.infer<typeof AvaMapConfigV1Schema>;

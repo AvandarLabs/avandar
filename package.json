@@ -52,7 +52,7 @@
     "release": "pnpm build:packages && changeset publish",
     "skills:update": "./scripts/skills/update-skills.sh",
     "verify:packages": "./scripts/verify-packages.sh",
-    "lint": "oxlint . && stylelint \"src/**/*.css\" \"apps/ava-video-producer/**/*.css\" && (CI=1 react-doctor --yes --scope changed --base develop --no-score || true)",
+    "lint": "oxlint --report-unused-disable-directives-severity=error . && stylelint \"src/**/*.css\" \"apps/ava-video-producer/**/*.css\" && (CI=1 react-doctor --yes --scope changed --base develop --no-score || true)",
     "lint:react-doctor": "CI=1 react-doctor --yes --scope changed --base develop --no-score",
     "lint:css": "stylelint \"src/**/*.css\" \"apps/ava-video-producer/**/*.css\"",
     "i18n:extract": "lingui extract --overwrite",

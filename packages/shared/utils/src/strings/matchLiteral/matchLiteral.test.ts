@@ -34,7 +34,7 @@ describe("matchLiteral", () => {
       b: "valueB",
       _otherwise: "fallback",
       // Key "c" omitted to test _otherwise path at runtime
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
     } as any);
     expect(result).toBe("fallback");
   });
@@ -46,7 +46,7 @@ describe("matchLiteral", () => {
         return `fallback-${key}`;
       },
       // Key "z" omitted to test _otherwise path at runtime
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
     } as any);
     expect(result).toBe("fallback-z");
   });
@@ -57,7 +57,7 @@ describe("matchLiteral", () => {
         a: "valueA",
         b: "valueB",
         // Intentionally omit "missing" and _otherwise to test error path
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line typescript/no-explicit-any
       } as any);
     }).toThrow("No matching value found for input: missing");
   });

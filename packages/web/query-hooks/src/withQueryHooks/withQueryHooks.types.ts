@@ -25,7 +25,7 @@ import type { ConditionalKeys, Simplify } from "type-fest";
  * `useQuery` or `useMutation` hooks.
  */
 export type FnNameReturningPromise<T extends object> = Extract<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   ConditionalKeys<T, AnyFunctionWithSignature<[any], Promise<any>>>,
   string
 >;
@@ -133,7 +133,7 @@ export type QueryKeysRecord<
   QueryFnName extends FnNameReturningPromise<Client>,
 > = {
   [QName in QueryFnName]: Client[QName] extends AnyFunctionWithReturn<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     Promise<any>
   >
     ? ClientQueryKeyBuilderFn<Client, QName>

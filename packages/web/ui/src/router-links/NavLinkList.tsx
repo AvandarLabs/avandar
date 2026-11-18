@@ -35,7 +35,7 @@ function generateLinkKey(linkProps: NavLinkProps): string {
   const keyParts: string[] = [linkProps.to as string];
   if (linkProps.params && typeof linkProps.params === "object") {
     // Using `any` here but it's safe.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     const paramKeyVals = objectEntries(linkProps.params as any).map(
       ([key, val]: [string, unknown]) => {
         return `${key}=${String(val)}`;

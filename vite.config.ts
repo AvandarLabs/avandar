@@ -82,6 +82,11 @@ export default defineConfig(({ mode }) => {
               semicolons: true,
               routesDirectory: "src/routes",
               generatedRouteTree: "src/routeTree.gen.ts",
+              routeTreeFileHeader: [
+                "/* oxlint-disable */",
+                "// @ts-nocheck",
+                "// noinspection JSUnusedGlobalSymbols",
+              ],
             }),
             reactWithLinguiMacro(),
             lingui(),

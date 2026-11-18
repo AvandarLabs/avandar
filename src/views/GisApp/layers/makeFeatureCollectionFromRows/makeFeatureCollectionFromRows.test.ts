@@ -13,6 +13,16 @@ const binding: MapLayer.GeoBindingColumnNames = {
 const exact = { mode: "exact" } as const;
 const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
 
+function getFirstPointCoordinates(
+  featureCollection: GeoJSON.FeatureCollection,
+): GeoJSON.Position {
+  const geometry = featureCollection.features[0]?.geometry;
+  if (!geometry || geometry.type !== "Point") {
+    throw new Error("Expected first feature to be a Point");
+  }
+  return geometry.coordinates;
+}
+
 describe("makeFeatureCollectionFromRows", () => {
   it("builds a point per row with the row index as the feature id", () => {
     const result = makeFeatureCollectionFromRows({
@@ -222,9 +232,9 @@ describe("makeFeatureCollectionFromRows", () => {
       layerId: "layer-1",
       jitterSalt: MAP_SALT,
     });
-    const [longitude, latitude] = (
-      jittered.featureCollection.features[0]?.geometry as GeoJSON.Point
-    ).coordinates;
+    const [longitude, latitude] = getFirstPointCoordinates(
+      jittered.featureCollection,
+    );
     expect(longitude).not.toBe(15.27);
     expect(latitude).not.toBe(-4.44);
   });
@@ -239,8 +249,7 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         jitterSalt,
       });
-      return (result.featureCollection.features[0]?.geometry as GeoJSON.Point)
-        .coordinates;
+      return getFirstPointCoordinates(result.featureCollection);
     };
     const expected = jitterCoordinate({
       longitude: 15.27,
@@ -291,9 +300,9 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         jitterSalt: MAP_SALT,
       });
-      const [longitude = 0, latitude = 0] = (
-        result.featureCollection.features[0]?.geometry as GeoJSON.Point
-      ).coordinates;
+      const [longitude = 0, latitude = 0] = getFirstPointCoordinates(
+        result.featureCollection,
+      );
       return [longitude - point.lon, latitude - point.lat];
     };
 

@@ -37,6 +37,6 @@ export function useAttachMapInstance({
       view: initialViewRef.current,
     });
     // Construction is one-shot. Later prop changes use the map sync hooks.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, []);
 }

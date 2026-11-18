@@ -27,7 +27,7 @@ export type AppLink<
 
 type AppLinksRecord = Record<
   string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   AppLink | ((params: any) => AppLink)
 >;
 
