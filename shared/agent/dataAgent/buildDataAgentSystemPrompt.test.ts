@@ -455,6 +455,38 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v6");
   });
 
+  it("tells v6 to ask which chart before changing how one is shown, right after the run_query sentence", () => {
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v5",
+    });
+    const v6 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v6",
+    });
+    const dashboardRules = v6.slice(v6.indexOf("DASHBOARD BLOCKS"));
+    const bullets = dashboardRules.split("\n- ");
+    const addBullet = bullets[1]!;
+    const changeBullet = bullets[2]!;
+
+    expect(v5).not.toContain("how a chart on the page is shown");
+    expect(addBullet.endsWith("a question about the data, uses run_query.")).toBe(
+      true,
+    );
+    expect(changeBullet).toContain(
+      "Changing how a chart on the page is shown",
+    );
+    expect(changeBullet).toContain(
+      "When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer.",
+    );
+    expect(changeBullet).toContain(
+      "A request to add, put, or pin something on a dashboard is not covered by this rule",
+    );
+    expect(bullets[3]).toMatch(/^dashboard: "current"/);
+  });
+
   it.each([
     "data-agent-v1",
     "data-agent-v2",
