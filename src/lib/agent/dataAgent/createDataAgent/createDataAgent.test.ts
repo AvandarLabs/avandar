@@ -576,4 +576,53 @@ describe("createDataAgent across several asks", () => {
 
     expect(second.text).toBe("One row of numbers.");
   });
+
+  describe("after a run_query answer", () => {
+    function _createQueryAgent(streamFn: StreamFn) {
+      const host: DataAgentHost = {
+        ...HOST,
+        approveValuesForModel: vi.fn().mockResolvedValue(true),
+        showQuery: vi
+          .fn()
+          .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      };
+      return createDataAgent({
+        datasets: [],
+        host,
+        policy: { primary: { model: MODEL, thinkingLevel: "off" } },
+        streamFn,
+        today: "2026-11-08",
+        promptId: "data-agent-v6",
+      });
+    }
+
+    const FIRST_QUERY = toolCallMessage("run_query", {
+      sql: "SELECT 1",
+      summary: "One row of numbers.",
+    });
+
+    it("keeps its query out of a later message-only reply", async () => {
+      const dataAgent = _createQueryAgent(
+        scriptedStream([FIRST_QUERY, textMessage("Glad to help.")]),
+      );
+
+      const first = await dataAgent.ask("How many deaths?");
+      expect(first.state.lastQuery?.summary).toBe("One row of numbers.");
+      const second = await dataAgent.ask("Thanks");
+
+      expect(second.text).toBe("Glad to help.");
+      expect(second.state.lastQuery).toBeUndefined();
+    });
+
+    it("does not fall back to its summary for an empty reply", async () => {
+      const dataAgent = _createQueryAgent(
+        scriptedStream([FIRST_QUERY, _createAssistantMessage([], "stop")]),
+      );
+
+      await dataAgent.ask("How many deaths?");
+      const second = await dataAgent.ask("Thanks");
+
+      expect(second.text).toBe("");
+    });
+  });
 });

@@ -58,9 +58,11 @@ export function createDataAgentRunState(): DataAgentRunState {
 
 /**
  * The run state for one new user message. Query bookkeeping starts over, and
- * so does the dashboard block, which is explicitly undefined so that merging
- * this into the live state clears the earlier answer's block. Earlier user
- * texts stay, so a retry of a column question is still one.
+ * so do the last query and the dashboard block. Both are explicitly
+ * undefined so that merging this into the live state clears the earlier
+ * answer's values: an optional field left out of the result would survive
+ * the merge. Earlier user texts stay, so a retry of a column question is
+ * still one.
  */
 export function beginDataAgentRun(
   previous: DataAgentRunState,
@@ -68,6 +70,7 @@ export function beginDataAgentRun(
 ): DataAgentRunState {
   return {
     ...createDataAgentRunState(),
+    lastQuery: undefined,
     dashboardBlock: undefined,
     userTexts: [...previous.userTexts, message],
   };
