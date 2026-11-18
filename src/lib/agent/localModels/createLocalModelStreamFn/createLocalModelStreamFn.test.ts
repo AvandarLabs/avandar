@@ -189,6 +189,38 @@ describe("createLocalModelStreamFn", () => {
     ]);
   });
 
+  it("lists a tool added between turns without sending an empty user message", async () => {
+    const { llm, requests } = _createScriptedLlm([
+      '{"action":"reply","text":"One."}',
+      '{"action":"reply","text":"Two."}',
+    ]);
+    const agent = _createAgent(llm);
+    await agent.prompt("First question");
+    const lateTool: AgentTool<typeof ECHO_PARAMETERS> = {
+      ..._createEchoTool(),
+      name: "late_echo",
+      description: "Added after the first turn.",
+    };
+    agent.state.tools = [...agent.state.tools, lateTool];
+
+    await agent.prompt("Second question");
+
+    const secondTurn = requests[1]!;
+    expect(secondTurn.messages[0]?.content).toContain(
+      "late_echo: Added after the first turn.",
+    );
+    expect(JSON.stringify(secondTurn.jsonSchema)).toContain("late_echo");
+    expect(
+      secondTurn.messages.slice(1).map((message) => {
+        return [message.role, message.content];
+      }),
+    ).toEqual([
+      ["user", "First question"],
+      ["assistant", '{"action":"reply","text":"One."}'],
+      ["user", "Second question"],
+    ]);
+  });
+
   it("replays the model's own output so the runtime can reuse its cache", async () => {
     const rawOutput = '{\n  "action": "echo",\n  "args": { "word": "hi" }\n}';
     const { llm, requests } = _createScriptedLlm([rawOutput]);

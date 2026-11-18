@@ -402,6 +402,49 @@ describe("createDataAgentToolList", () => {
     ).toEqual(["plan_query", "run_query", "ask_user", "add_dashboard_block"]);
   });
 
+  it("leaves the dashboard tool out when the caller does not offer it", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v6",
+          shouldOfferDashboardTool: () => {
+            return false;
+          },
+        }),
+      ),
+    ).toEqual(["run_query", "lookup_values", "ask_user"]);
+  });
+
+  it("keeps the plugin tools when the caller does not offer the dashboard tool", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v6",
+          shouldOfferDashboardTool: () => {
+            return false;
+          },
+          getPluginAiTools: () => {
+            return [FIT_DECLARATION];
+          },
+          runPluginAiTool: vi.fn(),
+        }),
+      ),
+    ).toEqual(["run_query", "lookup_values", "ask_user", FIT_DECLARATION.name]);
+  });
+
+  it("never offers the dashboard tool to a version that does not serve it", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v5",
+          shouldOfferDashboardTool: () => {
+            return true;
+          },
+        }),
+      ),
+    ).not.toContain("add_dashboard_block");
+  });
+
   it("lists v6's built-in tools, then the plugin tools, as the proxy does", () => {
     expect(
       _namesOf(

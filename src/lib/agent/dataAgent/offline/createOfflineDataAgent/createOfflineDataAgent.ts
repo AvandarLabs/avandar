@@ -82,6 +82,12 @@ function _replaceSystemPrompt(agent: Agent, systemPrompt: string): void {
 /** What the offline agent remembers between questions. */
 type OfflineSession = {
   route: { current: OfflineMessageRoute };
+  /**
+   * Whether the latest turn carries context blocks or names a dashboard.
+   * Adds the dashboard rules to its prompt and the dashboard tool to its
+   * tool list.
+   */
+  hasDashboardContext: boolean;
   profiles?: Promise<OfflineDatasetProfile[]>;
   previousMessage?: string;
 };
@@ -115,8 +121,9 @@ async function _routeQuestion(
  * finds the question's stored values. Returns the system prompt (the same
  * for every plain question, so it stays cached, and longer only when the
  * turn carries blocks or names a dashboard) and the message the model reads
- * for this question. Routing and value matching read only the user's
- * message; the blocks before it go to the model unchanged.
+ * for this question. Records on the session whether the turn has dashboard
+ * context. Routing and value matching read only the user's message; the
+ * blocks before it go to the model unchanged.
  */
 async function _prepareQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
@@ -127,12 +134,13 @@ async function _prepareQuestion(
   session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
   await _routeQuestion(options, session, question);
   const profiles = await session.profiles;
+  session.hasDashboardContext = blocks !== "" || namesDashboard(question);
   const systemPrompt = buildOfflineDataAgentSystemPrompt({
     datasets: options.datasets,
     profiles,
     today: options.today,
     queryStyle: options.queryStyle,
-    hasDashboardContext: blocks !== "" || namesDashboard(question),
+    hasDashboardContext: session.hasDashboardContext,
   });
   if (session.route.current === "chat") {
     return { systemPrompt, messageText: _withBlocks(blocks, question) };
@@ -163,12 +171,15 @@ function _createLocalChoice(modelId: string, contextWindow: number) {
  * model is local, it may see the data, so each question gets more help than
  * a hosted model would: a profile of every dataset, the question's values as
  * stored, the first rows of each result to check, and a router that makes a
- * data question run a query before the agent replies.
+ * data question run a query before the agent replies. Its dashboard tool and
+ * rules come only on a turn that can use them, since a small model reads a
+ * longer prompt and tool list less well.
  */
 export function createOfflineDataAgent(
   options: Readonly<CreateOfflineDataAgentOptions>,
 ): DataAgent {
   const route: { current: OfflineMessageRoute } = { current: "data" };
+  const session: OfflineSession = { route, hasDashboardContext: false };
   const { models, contextWindow } = options;
   const dataAgent = createDataAgent({
     datasets: options.datasets,
@@ -188,8 +199,10 @@ export function createOfflineDataAgent(
     today: options.today,
     previewRowCount: OFFLINE_PREVIEW_ROW_COUNT,
     queryTools: options.queryStyle ?? "sql",
+    shouldOfferDashboardTool: () => {
+      return session.hasDashboardContext;
+    },
   });
-  const session: OfflineSession = { route };
   return {
     agent: dataAgent.agent,
     ask: async (message) => {

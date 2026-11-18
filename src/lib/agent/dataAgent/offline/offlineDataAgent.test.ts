@@ -744,3 +744,74 @@ describe("offline dashboard requests", () => {
     expect(asked.modelText).toContain("how many deaths in total?");
   });
 });
+
+/**
+ * Asks the offline agent each turn in order, with a model that runs one
+ * query and then replies, and reports for each turn whether the model's
+ * first request offered `add_dashboard_block`.
+ */
+async function _offersDashboardToolOnEachTurn(
+  turnTexts: readonly string[],
+): Promise<boolean[]> {
+  const { llm, requests } = _createLlm(
+    turnTexts.flatMap(() => {
+      return [
+        '{"action":"run_query","args":{"sql":"SELECT 1 FROM \\"t0\\"","summary":"Deaths."}}',
+        '{"action":"reply","text":"Done."}',
+      ];
+    }),
+  );
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm,
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+  const offered: boolean[] = [];
+  for (const turnText of turnTexts) {
+    const firstRequestIndex = requests.length;
+    await agent.ask(turnText);
+    offered.push(
+      JSON.stringify(requests[firstRequestIndex]?.jsonSchema).includes(
+        "add_dashboard_block",
+      ),
+    );
+  }
+  return offered;
+}
+
+describe("offline dashboard tool", () => {
+  it("is not offered on a plain question", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn(["how many deaths in total?"]),
+    ).toEqual([false]);
+  });
+
+  it("is offered when the turn carries a context block", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn([
+        "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+      ]),
+    ).toEqual([true]);
+  });
+
+  it("is offered when the message names a dashboard", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn([
+        "Add a heading to the Budget dashboard",
+      ]),
+    ).toEqual([true]);
+  });
+
+  it("goes away again on the next plain question", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn([
+        "Add a heading to the Budget dashboard",
+        "how many deaths in total?",
+        "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+      ]),
+    ).toEqual([true, false, true]);
+  });
+});

@@ -242,9 +242,23 @@ function _servesDashboardTool(
 }
 
 /**
+ * Whether this ask lists the dashboard tool: the prompt version serves it,
+ * and the caller has not held it back for this turn.
+ */
+function _offersDashboardTool(
+  options: Readonly<CreateDataAgentOptions>,
+): boolean {
+  return (
+    _servesDashboardTool(options) &&
+    (options.shouldOfferDashboardTool?.() ?? true)
+  );
+}
+
+/**
  * The built-in tools: the query tools for the query style, `ask_user`, and
- * `add_dashboard_block` when the prompt version serves it, so the browser
- * never offers a tool the proxy would refuse.
+ * `add_dashboard_block` when the prompt version serves it and the caller
+ * offers it for this ask, so the browser never offers a tool the proxy
+ * would refuse.
  */
 function _createBuiltInTools(
   options: Readonly<CreateDataAgentOptions>,
@@ -258,7 +272,7 @@ function _createBuiltInTools(
     previewRowCount: options.previewRowCount,
   };
   const askUser = createAskUserTool({ host: options.host, state });
-  const dashboardTools = _servesDashboardTool(options)
+  const dashboardTools = _offersDashboardTool(options)
     ? [createAddDashboardBlockTool(queryContext)]
     : [];
   const queryTools =
@@ -369,6 +383,13 @@ export type CreateDataAgentOptions = {
   getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
   /** Runs a plugin AI tool the model calls. Without it, none is offered. */
   runPluginAiTool?: RunPluginAiTool;
+  /**
+   * Whether the next `ask` lists `add_dashboard_block`, for a prompt version
+   * that serves it. Read at the start of every `ask`. A model that reads a
+   * long tool list less well, such as the offline one, lists it only on
+   * turns that can use it. Default: always listed.
+   */
+  shouldOfferDashboardTool?: () => boolean;
 };
 
 /**
