@@ -303,7 +303,7 @@ export type AgentTurnInputs = {
   unmaskReplyText?: (text: string) => string;
   /** Lines about dashboard cards the user resolved, sent first. */
   dashboardCardLines?: readonly string[];
-  /** Runs after the agent replied, to mark those cards heard. */
+  /** Runs after a kept reply, to mark those cards heard. */
   onReplied?: () => void;
 };
 
@@ -378,6 +378,20 @@ function _toRunResult(options: Readonly<RunResultOptions>): ChatModelRunResult {
 }
 
 /**
+ * Tells the turn's inputs the agent replied, unless the reply is being
+ * discarded. A discarded reply leaves nothing in the thread, so the agent
+ * must hear about its cards again on the next turn.
+ */
+function _reportReplyIfKept(
+  turn: Readonly<DataAgentTurnOptions>,
+  inputs: AgentTurnInputs | undefined,
+): void {
+  if (!turn.isStale?.()) {
+    inputs?.onReplied?.();
+  }
+}
+
+/**
  * Asks this conversation's agent the turn's message, creating the
  * conversation on its first turn, and returns the reply with any results
  * this turn added to the chat. `conversations` holds one per
@@ -421,7 +435,7 @@ export async function askConversationDataAgent(
       dashboardCardLines: inputs?.dashboardCardLines,
     }),
   );
-  inputs?.onReplied?.();
+  _reportReplyIfKept(turn, inputs);
   conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
   conversation.lastAttachedBlock = blocks.attachedBlock;
   return _toRunResult({

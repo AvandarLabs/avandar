@@ -493,6 +493,48 @@ describe("askConversationDataAgent", () => {
     ]);
   });
 
+  describe("when the chat has moved on during the ask", () => {
+    function _askWithStaleness(
+      isStale: () => boolean,
+      onReplied: () => void,
+    ): Promise<unknown> {
+      return askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", _fakeConversation()]]),
+        turn: { ..._turn("Add a heading"), isStale },
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            dashboardCardLines: ["<dashboard_card>x</dashboard_card>"],
+            onReplied,
+          };
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    it("keeps card lines unheard when the reply is discarded", async () => {
+      const onReplied = vi.fn();
+
+      await _askWithStaleness(() => {
+        return true;
+      }, onReplied);
+
+      expect(onReplied).not.toHaveBeenCalled();
+    });
+
+    it("marks card lines heard when the chat is still current", async () => {
+      const onReplied = vi.fn();
+
+      await _askWithStaleness(() => {
+        return false;
+      }, onReplied);
+
+      expect(onReplied).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it("keeps card lines unheard when the agent fails to reply", async () => {
     const onReplied = vi.fn();
     const conversation = _fakeConversation(async () => {

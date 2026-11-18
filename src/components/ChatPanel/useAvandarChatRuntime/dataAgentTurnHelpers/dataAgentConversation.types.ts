@@ -86,6 +86,11 @@ export type DataAgentTurnOptions = {
   };
   /** The chat session the turn belongs to, for its dashboard cards. */
   sessionId?: string;
+  /**
+   * True once the chat moved on (a reset or another session) and the turn's
+   * reply will be thrown away. Then nothing about the reply is recorded.
+   */
+  isStale?: () => boolean;
 };
 
 /**

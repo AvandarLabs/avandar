@@ -628,6 +628,7 @@ export function createChatModelAdapter(
         workspaceId,
         currentUser,
         chatGeneration: generation,
+        isStale: isGenerationStale,
         titleMaskRef,
         parseSqlRef,
         dataExplorerDispatch,
