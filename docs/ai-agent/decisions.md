@@ -800,7 +800,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 ## D44. Dashboard blocks from any page, online and offline (approved)
 
 - **Decision (Pablo, 2026-11-11).** The agent gets `add_dashboard_block`
-  under prompt `data-agent-v4`, with today's ten block kinds. On the
+  under prompt `data-agent-v6`, with today's ten block kinds. On the
   dashboard open in the editor the block is added unsaved, as today's chat
   does. On any other dashboard a card in the chat shows the block and the
   target, and only Confirm saves it. The tool names the dashboard as the
@@ -817,9 +817,14 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   list. Offline ships too because nothing in it needs a connection except
   the save itself (Pablo: offline is left out only when it cannot be built
   without one).
-- **Tools per version.** v1 to v3 keep their three tools unchanged. v4
-  is the first version whose tool list differs, so the proxy and the
-  browser read `DATA_AGENT_TOOLS_BY_PROMPT_ID`.
+- **Tools per version.** v1 to v5 keep their three built-in tools
+  unchanged. v6 is the first version whose built-in tool list differs, so
+  the proxy and the browser read `DATA_AGENT_TOOLS_BY_PROMPT_ID`, and the
+  proxy adds plugin tools after them for v4 to v6.
+- **Renumbered on rebase (2026-11-18).** Approved as `data-agent-v4`,
+  built on v3. `demo/measles` shipped v4 (plugin tools) and v5 (coded
+  columns) first, so the dashboard prompt is `data-agent-v6`, v5's
+  instructions plus the dashboard rules. v4 and v5 stay as they shipped.
 - **Revised after a review against the code (2026-11-11).** The editor
   saves without checking for changes made elsewhere, so Confirm on a
   dashboard open in the editor adds the block there, unsaved, instead of

@@ -131,6 +131,9 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T11-40-15](2026-11-09T11-40-15-phase-1b_agent-page/results.jsonl) | `phase-1b:agent-page` | 7/7 | 0 | 0 | $0.00021 | 1.7 s / 2.7 s | none |
 | [2026-11-09T11-40-56](2026-11-09T11-40-56-phase-1b_agent-45/results.jsonl) | `phase-1b:agent-45` | 44/45 | 0 | 0 | $0.00055 | 2.1 s / 3.5 s | N04 |
 | [2026-11-09T11-41-09](2026-11-09T11-41-09-phase-1b_rerun-n04/results.jsonl) | `phase-1b:rerun-n04` | 1/1 | 0 | 0 | $0.00036 | 3.5 s / 3.5 s | none |
+| [2026-11-11T19-32-45](2026-11-11T19-32-45-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 1 | 0 | $0.00149 | 3.0 s / 9.1 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-07](2026-11-11T19-33-07-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00122 | 2.8 s / 4.7 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-16](2026-11-11T19-33-16-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00124 | 3.0 s / 4.8 s | D06 D07 D08 D09 |
 | [2026-11-13T05-21-34](2026-11-13T05-21-34-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00055 | 2.5 s / 2.6 s | none |
 | [2026-11-13T05-21-42](2026-11-13T05-21-42-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00013 | 1.7 s / 1.8 s | none |
 | [2026-11-13T05-21-48](2026-11-13T05-21-48-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00306 | 1.9 s / 3.2 s | none |
@@ -144,9 +147,6 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-13T20-44-22](2026-11-13T20-44-22-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00016 | 1.7 s / 2.0 s | none |
 | [2026-11-13T20-44-29](2026-11-13T20-44-29-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00014 | 1.8 s / 2.1 s | none |
 | [2026-11-13T20-46-47](2026-11-13T20-46-47-dictionary-conversions_converted-offline/results.jsonl) | `dictionary-conversions:converted-offline` | 6/7 | 1 | 0 | $0.00000 | 8.6 s / 76.8 s | D04 |
-| [2026-11-11T19-32-45](2026-11-11T19-32-45-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 1 | 0 | $0.00149 | 3.0 s / 9.1 s | D06 D07 D08 D09 |
-| [2026-11-11T19-33-07](2026-11-11T19-33-07-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00122 | 2.8 s / 4.7 s | D06 D07 D08 D09 |
-| [2026-11-11T19-33-16](2026-11-11T19-33-16-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00124 | 3.0 s / 4.8 s | D06 D07 D08 D09 |
 | [2026-11-17T19-33-12](2026-11-17T19-33-12-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 8/9 | 0 | 0 | $0.00061 | 2.5 s / 3.2 s | D01 |
 | [2026-11-17T19-33-21](2026-11-17T19-33-21-phase-1d_rerun-d01/results.jsonl) | `phase-1d:rerun-d01` | 0/1 | 0 | 0 | $0.00019 | 1.8 s / 1.8 s | D01 |
 | [2026-11-17T19-33-25](2026-11-17T19-33-25-phase-1d_rerun-d01/results.jsonl) | `phase-1d:rerun-d01` | 0/1 | 0 | 0 | $0.00019 | 1.9 s / 1.9 s | D01 |

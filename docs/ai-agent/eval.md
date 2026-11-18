@@ -347,9 +347,13 @@ dashboard tool was built.
   table, since both ask for a chart. Today's chat added no block on either,
   so its numbers do not change.
 
-The agent and the offline agent ran on 2026-11-17 with prompt v4 (the
-browser's version), all on the Pi harness with Haiku 5.5 and Sonnet 5.5
-escalation unless the row says offline.
+The agent and the offline agent ran on 2026-11-17 with the dashboard
+prompt as first numbered, v4 (the browser's version then): v3 plus
+DASHBOARD BLOCKS. It ships as `data-agent-v6`, v5 plus DASHBOARD BLOCKS,
+because `demo/measles` shipped v4 (the plugin tools' TOOLS bullet) and v5
+(CODED COLUMNS) first. v6 also carries those two additions, and these runs
+have not been repeated on v6. All runs are on the Pi harness with Haiku
+5.5 and Sonnet 5.5 escalation unless the row says offline.
 
 | Run | Correct | D01 to D05 (open editor) | D06 to D09 (elsewhere) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
 |---|---|---|---|---|---|---|---|
@@ -392,8 +396,8 @@ escalation unless the row says offline.
   reruns. P01 cost $0.0152 in the P run (two calls, 10,645 prompt tokens),
   which is why that row costs $0.00239 per question against $0.00021 on
   Phase 1B's last run. The other six P questions cost $0.0002 to $0.0004.
-- **Prompt v4 costs about 1,700 to 1,800 more input tokens per call than
-  v3.** P: 5,354 against 3,556 (+51%). The 45: 5,250 against 3,478 (+51%).
+- **The dashboard prompt (then v4) costs about 1,700 to 1,800 more input
+  tokens per call than v3.** P: 5,354 against 3,556 (+51%). The 45: 5,250 against 3,478 (+51%).
   M: 5,334 against 3,557 to 3,560 (+50%). Most of it is the dashboard
   tool's schema and the dashboard rules, in the cached prefix: on the runs
   that followed another run, 85 to 100% of input tokens were cache reads.
@@ -891,8 +895,8 @@ Each was made after reading the failing answers by hand.
 | A query result ends the turn, so run only the final query | Agent prompt and tool description | Haiku sometimes ran an exploratory query, which became the answer. |
 | Always ask when a name means different things in different datasets | Agent prompt | Haiku answered Georgia as the US state without asking. |
 | D05 says "US deaths" | Question | "What were total deaths in 2022?" could mean the US or the global deaths dataset, and today's chat rightly asked which (Phase 1D baseline run #1). |
-| Prompt v4: "add a chart, table, heading, or note" on a dashboard page means that dashboard, never `run_query` alone | Agent prompt (v4, not yet deployed) | The agent showed D01's chart in the reply and added no block, on 4 of 4 runs. |
-| Prompt v4: say plainly that you cannot find a dashboard with that name | Agent prompt (v4, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
+| Prompt v6 (then v4): "add a chart, table, heading, or note" on a dashboard page means that dashboard, never `run_query` alone | Agent prompt (v6, not yet deployed) | The agent showed D01's chart in the reply and added no block, on 4 of 4 runs. |
+| Prompt v6 (then v4): say plainly that you cannot find a dashboard with that name | Agent prompt (v6, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
 
 After the last two changes, needless and missed questions on the chosen
 setup went from 1 per run to 0.

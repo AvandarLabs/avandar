@@ -16,7 +16,7 @@ names. It does this online and offline. The model never sees row values.
 In:
 
 - An `add_dashboard_block` tool with today's ten block kinds.
-- Prompt `data-agent-v4`, served beside v1 to v3, with its own tool list.
+- Prompt `data-agent-v6`, served beside v1 to v5, with its own tool list.
 - Finding the target dashboard on the device, by name or as the open one.
 - The open editor's path, unchanged from today's chat: the block is added
   unsaved and the user saves.
@@ -106,9 +106,12 @@ The parsing in `parseDashboardBlock`, `dashboardBlockSummary`, and
 blocks with the same code. The edge function keeps a thin wrapper that
 parses the tool call's JSON string. Today's chat behaves as before.
 
-## Prompt v4 and the proxy
+## Prompt v6 and the proxy
 
-`data-agent-v4` is v3 plus `DASHBOARD_BLOCK_RULES`:
+`data-agent-v6` is v5 plus `DASHBOARD_BLOCK_RULES`. This spec first numbered
+it v4, built on v3. `demo/measles` then shipped v4 (a TOOLS bullet for
+plugin tools) and v5 (the coded-column rules) first, so the dashboard
+prompt became v6, built on v5's full text. Its rules:
 
 - Add a block only when the user asks to add something to a dashboard.
 - One block per answer.
@@ -117,13 +120,15 @@ parses the tool call's JSON string. Today's chat behaves as before.
   `run_query`.
 - A `<dashboard_card>` line reports what the user did with an earlier card.
 
-v1 to v3 are served unchanged. v3 gets the same instruction-hash test v1
-and v2 have before v4 is written. Tools become per version:
-`DATA_AGENT_TOOLS_BY_PROMPT_ID` gives v1 to v3 their three tools and v4
-four. The proxy's tool list and its known-tool check both read it, and so
-does the browser's tool list. `DATA_AGENT_PROMPT_ID` becomes
-`data-agent-v4`. v4 can change until the commit that deploys it. After
-that, a change needs v5.
+v1 to v5 are served unchanged, and their instruction-hash tests stay as
+they are. Tools become per version: `DATA_AGENT_TOOLS_BY_PROMPT_ID` gives
+v1 to v5 their three built-in tools and v6 four. The proxy's tool list and
+its known-tool check both read it, and so does the browser's tool list.
+Plugin tools follow the built-in ones for every version in
+`PLUGIN_TOOL_PROMPT_IDS` (v4 to v6), and a bundled plugin tool stays
+accepted in the history for every version, as before.
+`DATA_AGENT_PROMPT_ID` becomes `data-agent-v6`. v6 can change until the
+commit that deploys it. After that, a change needs v7.
 
 ## Finding the dashboard
 
@@ -288,17 +293,20 @@ runs set the bar before the agent side is built.
 | Run | Label | Bar |
 |---|---|---|
 | Today's chat, Claude Haiku 5.5, D01 to D09 | `phase-1d:today-dashboards` | The baseline: D01 to D05 5/5 and D06 to D09 0/4 on every run (recorded in `eval.md`). |
-| Agent v4, D01 to D09, three runs | `phase-1d:agent-dashboards` | D01 to D05 at least as good as the baseline. D06 to D09 pass on all three. |
-| Agent v4 on P, M, and the 45 | `phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45` | Unchanged from v3. A single miss is rerun before calling it a regression. |
+| Agent v6, D01 to D09, three runs | `phase-1d:agent-dashboards` | D01 to D05 at least as good as the baseline. D06 to D09 pass on all three. |
+| Agent v6 on P, M, and the 45 | `phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45` | Unchanged from v3. A single miss is rerun before calling it a regression. |
 | Offline Qwen3 4B on D and the 45 | `phase-1d:offline-dashboards`, `phase-1d:offline-45` | No write that was not asked for, no write without Confirm, the D score recorded, and the 45 at 26 or better. |
 
 ## Testing
 
 Red/green TDD with Vitest, plus one browser spec:
 
-- v3's instructions keep their hash. v4 holds `DASHBOARD_BLOCK_RULES`.
-- The per-version tool lists: v1 to v3 serve and accept three tools,
-  unchanged, and v4 four, in the proxy and the browser.
+- v1 to v5's instructions keep their hashes. v6 is v5 plus
+  `DASHBOARD_BLOCK_RULES`.
+- The per-version tool lists: v1 to v5 serve and accept their built-in
+  tools unchanged, never `add_dashboard_block`, and v6 four, in the proxy
+  and the browser, with plugin tools after them where v4 to v6 offer
+  them.
 - The shared block parser gets tests (the edge file had none), and the
   edge wrapper still parses today's tool calls.
 - The vault's `unmaskText`.
@@ -315,7 +323,7 @@ Red/green TDD with Vitest, plus one browser spec:
 - Offline: routing reads only the message, blocks carry at most three
   tiles of SQL, results go to the chat off the explorer, and the router
   sends an add-to-dashboard request to `data`.
-- The specs that mock `data-agent-v3` move to `data-agent-v4`.
+- The specs that mock `data-agent-v5` move to `data-agent-v6`.
 - `tests/e2e/agent-dashboard-block.spec.ts`: with the agent proxy mocked,
   seed a test dashboard, ask from the Data Explorer to add a chart to it by
   name, see the card, confirm, see the link, open the dashboard, and see

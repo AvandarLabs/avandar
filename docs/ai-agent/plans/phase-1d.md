@@ -4,13 +4,25 @@
 
 **Goal:** The agent adds one block to a dashboard from any page, online and offline: unsaved into the dashboard open in the editor, or through a confirm card for any other dashboard, without the model ever seeing rows.
 
-**Architecture:** A new `add_dashboard_block` tool is served only under prompt `data-agent-v4`; tool lists become per version on the proxy and in the browser. The browser host resolves the dashboard name on the device (page, then mentions and tray, then the workspace), checks a chart's SQL locally, and either queues the block into the open editor or adds a card data part to the reply. The card's status lives in a per-session localStorage store, and each later turn tells the agent what the user did with it. The offline agent gets the same tool and starts answering on every page, reading the same blocks without a vault and with a smaller SQL budget.
+**Architecture:** A new `add_dashboard_block` tool is served only under prompt `data-agent-v6`; tool lists become per version on the proxy and in the browser. The browser host resolves the dashboard name on the device (page, then mentions and tray, then the workspace), checks a chart's SQL locally, and either queues the block into the open editor or adds a card data part to the reply. The card's status lives in a per-session localStorage store, and each later turn tells the agent what the user did with it. The offline agent gets the same tool and starts answering on every page, reading the same blocks without a vault and with a smaller SQL budget.
 
 **Tech Stack:** TypeScript, React 19, Mantine 9, assistant-ui, Pi (`@earendil-works/pi-agent-core`, `pi-schema`), Vitest, Playwright, Lingui, the `chat` edge function (Deno).
 
 **Spec:** [../specs/phase-1d.md](../specs/phase-1d.md). Decision D44 in [../decisions.md](../decisions.md). Rules R1 to R4 in [../specs/phase-1.md](../specs/phase-1.md). The eval questions, grader, and today's-chat baseline are already committed (`cbd39cc75`, `54306749e`).
 
 This plan lives beside the Phase 1A to 1C plans. That location overrides the writing-plans default of `docs/superpowers/plans/`.
+
+> **Renumbered after execution (2026-11-18).** This plan was written and
+> run on a `demo/measles` that served v1 to v3, so it builds the dashboard
+> prompt as v4, on v3. `demo/measles` then shipped v4 (a TOOLS bullet for
+> plugin tools) and v5 (the coded-column rules) first. On rebasing, the
+> dashboard prompt became `data-agent-v6`, v5's instructions plus
+> `DASHBOARD_BLOCK_RULES`, with v1 to v5 left as they shipped. Its tool list
+> is v5's three built-in tools plus `add_dashboard_block`, and the proxy
+> adds plugin tools after them as it does for v4 and v5. The prose below
+> says v6; the code snippets stay as they were run, so where a snippet says
+> v4 or compares with v3, the code compares v6 with v5. The feature log
+> entry is F139, since F129 to F138 were taken.
 
 ---
 
@@ -49,8 +61,8 @@ This plan lives beside the Phase 1A to 1C plans. That location overrides the wri
 | `shared/agent/dashboardBlocks/DashboardBlockFields.ts` (new) | Block kinds, chart types, `parseDashboardBlockFields` with a reason when invalid, `mapDashboardBlockText`. |
 | `shared/agent/dashboardBlocks/dashboardCardLine.ts` (new) | The `<dashboard_card>` line for a resolved card. |
 | `supabase/functions/chat/PostChatMessages/parsing/parseDashboardBlock.ts` | Thin JSON wrapper over the shared parser, plus `dashboardBlockSummary`. |
-| `shared/agent/dataAgent/dataAgentTools.ts` | `ADD_DASHBOARD_BLOCK_TOOL`, `DATA_AGENT_TOOLS_BY_PROMPT_ID`, `data-agent-v4`. |
-| `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` | `DASHBOARD_BLOCK_RULES` and v4. |
+| `shared/agent/dataAgent/dataAgentTools.ts` | `ADD_DASHBOARD_BLOCK_TOOL`, `DATA_AGENT_TOOLS_BY_PROMPT_ID`, `data-agent-v6`. |
+| `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` | `DASHBOARD_BLOCK_RULES` and v6. |
 | `shared/agent/pageContext/buildAgentTurnText.ts` | Card lines first in the turn, and `splitAgentTurnText`. |
 | `shared/agent/mentions/buildAgentContextBlocks.ts` | Optional `maxSqlTiles`. |
 | `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.ts` | Tool list and known-tool check per version. |
@@ -604,7 +616,7 @@ git commit -m "refactor(chat): share dashboard block parsing between the chat an
 
 ---
 
-### Task 3: The tool and prompt v4
+### Task 3: The tool and prompt v6
 
 **Files:**
 - Modify: `shared/agent/dataAgent/dataAgentTools.ts`
@@ -612,7 +624,7 @@ git commit -m "refactor(chat): share dashboard block parsing between the chat an
 - Test: `shared/agent/dataAgent/buildDataAgentSystemPrompt.test.ts`
 - Test: `shared/agent/dataAgent/dataAgentTools.test.ts` (new)
 
-`DATA_AGENT_PROMPT_ID` stays `data-agent-v3` until Task 23, so the browser keeps requesting v3 while the agent side is built. v4 is served from this task on.
+`DATA_AGENT_PROMPT_ID` stays `data-agent-v3` until Task 23, so the browser keeps requesting v3 while the agent side is built. v6 is served from this task on.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -687,7 +699,7 @@ In `buildDataAgentSystemPrompt.test.ts`, add:
 - [ ] **Step 2: Run them to verify they fail**
 
 Run: `pnpm vitest run shared/agent/dataAgent`
-Expected: FAIL: `ADD_DASHBOARD_BLOCK_TOOL` is not exported, and `data-agent-v4` is not a prompt id.
+Expected: FAIL: `ADD_DASHBOARD_BLOCK_TOOL` is not exported, and `data-agent-v6` is not a prompt id.
 
 - [ ] **Step 3: Add the tool and the per-version lists**
 
@@ -812,7 +824,7 @@ export function isDataAgentPromptId(value: string): value is DataAgentPromptId {
 
 If `oneOf`'s type wants a mutable array, pass `[...DASHBOARD_BLOCK_KINDS]` and `[...DASHBOARD_VIZ_TYPES]`; the schema it builds is the same.
 
-- [ ] **Step 4: Add v4's rules**
+- [ ] **Step 4: Add v6's rules**
 
 In `buildDataAgentSystemPrompt.ts`, after `DATA_AGENT_INSTRUCTIONS_V3`:
 
@@ -837,7 +849,7 @@ const DATA_AGENT_INSTRUCTIONS_V4 =
   DATA_AGENT_INSTRUCTIONS_V3 + DASHBOARD_BLOCK_RULES;
 ```
 
-Add `"data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,` to `INSTRUCTIONS_BY_PROMPT_ID`. Move the misplaced comment "v3: v2's rules, plus how to read the attached…" from above `SCHEMA_ANSWER_RULES` to above `DATA_AGENT_INSTRUCTIONS_V3` (a comment move changes no prompt text; Task 1's hash proves it).
+Add `"data-agent-v6": DATA_AGENT_INSTRUCTIONS_V6,` to `INSTRUCTIONS_BY_PROMPT_ID`. Move the misplaced comment "v3: v2's rules, plus how to read the attached…" from above `SCHEMA_ANSWER_RULES` to above `DATA_AGENT_INSTRUCTIONS_V3` (a comment move changes no prompt text; Task 1's hash proves it).
 
 - [ ] **Step 5: Run the tests**
 
@@ -4908,7 +4920,7 @@ git commit -m "feat(ai-agent): answer offline on every page with the page in con
 
 ---
 
-### Task 22: Switch the browser to prompt v4
+### Task 22: Switch the browser to prompt v6
 
 **Files:**
 - Modify: `shared/agent/dataAgent/dataAgentTools.ts`
@@ -4917,7 +4929,7 @@ git commit -m "feat(ai-agent): answer offline on every page with the page in con
 
 - [ ] **Step 1: Flip the version**
 
-Set `export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v4";`. Replace `data-agent-v3/api/stream` with `data-agent-v4/api/stream` in the three e2e specs. Leave `chatTitlePrompt.test.ts`'s `isChatTitlePromptId("data-agent-v3")` as it is: it proves an agent id is never a title id, and v3 still is one.
+Set `export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v6";`. Replace `data-agent-v3/api/stream` with `data-agent-v6/api/stream` in the three e2e specs. Leave `chatTitlePrompt.test.ts`'s `isChatTitlePromptId("data-agent-v3")` as it is: it proves an agent id is never a title id, and v3 still is one.
 
 - [ ] **Step 2: Run the unit suites that read the version**
 
@@ -5150,7 +5162,7 @@ Check `getWorkspaceIdBySlug`'s parameters in `tests/e2e/helpers/supabaseAdminCli
 Run: `pnpm test:e2e agent-dashboard-block.spec.ts`
 Expected: PASS. Look at both screenshots under `.temp/feat-agent-dashboards/`.
 
-- [ ] **Step 3: Run the three specs whose mock moved to v4, one at a time**
+- [ ] **Step 3: Run the three specs whose mock moved to v6, one at a time**
 
 ```bash
 pnpm test:e2e agent-chat-result.spec.ts
@@ -5178,11 +5190,11 @@ git commit -m "test(e2e): add a chart to a named dashboard through the agent"
 
 - [ ] **Step 1: Roadmap and specs**
 
-In `roadmap.md`, change the 1D row to "Done (<date>)" with what was met (the D runs, the P, M, and 45 runs, the offline runs, the browser spec), and the eval label `phase-1d` linking to `eval.md#phase-1d`. Note that prompt v4 is fixed once pushed to the demo. In "What keeps the agent off", change the dashboard row's "Agent today" to say the agent adds blocks from any page, and its "Planned" to "Done in 1D". In `specs/phase-1.md`, set the 1D row's status. In `specs/phase-1d.md`, change the status line to "Built on <date>." In `README.md`, keep the decision range at D01 to D44.
+In `roadmap.md`, change the 1D row to "Done (<date>)" with what was met (the D runs, the P, M, and 45 runs, the offline runs, the browser spec), and the eval label `phase-1d` linking to `eval.md#phase-1d`. Note that prompt v6 is fixed once pushed to the demo. In "What keeps the agent off", change the dashboard row's "Agent today" to say the agent adds blocks from any page, and its "Planned" to "Done in 1D". In `specs/phase-1.md`, set the 1D row's status. In `specs/phase-1d.md`, change the status line to "Built on <date>." In `README.md`, keep the decision range at D01 to D44.
 
-- [ ] **Step 2: Feature log F129**
+- [ ] **Step 2: Feature log F139**
 
-In `docs/measles-demo/pr-feature-log.md`, add **F129: Dashboard blocks from any page, online and offline**, in the shape of F128: a summary paragraph; every commit on this branch since `demo/measles` (`git log --reverse --format='%h %s' demo/measles..HEAD`) with the files each touches (`git show --stat --format= <sha>`); the shared-files rows for files other features also own (`createChatModelAdapter.ts`, `useAvandarChatRuntime.ts`, `dataAgentTools.ts`, `buildDataAgentSystemPrompt.ts`, `buildAgentContextBlocks.ts`, `PiHarness.ts`, `eval.md`, `roadmap.md`, `decisions.md`, the three e2e specs) added to the "AI agent context and the chat panel" table; and an Open decisions item: prompt v4 joins item 3's list of served versions.
+In `docs/measles-demo/pr-feature-log.md`, add **F139: Dashboard blocks from any page, online and offline**, in the shape of F128: a summary paragraph; every commit on this branch since `demo/measles` (`git log --reverse --format='%h %s' demo/measles..HEAD`) with the files each touches (`git show --stat --format= <sha>`); the shared-files rows for files other features also own (`createChatModelAdapter.ts`, `useAvandarChatRuntime.ts`, `dataAgentTools.ts`, `buildDataAgentSystemPrompt.ts`, `buildAgentContextBlocks.ts`, `PiHarness.ts`, `eval.md`, `roadmap.md`, `decisions.md`, the three e2e specs) added to the "AI agent context and the chat panel" table; and an Open decisions item: prompt v6 joins item 3's list of served versions.
 
 - [ ] **Step 3: Final checks**
 
@@ -5204,7 +5216,7 @@ git commit -m "docs(ai-agent): mark Phase 1D built and log it as F129"
 |---|---|
 | The tool, its outcomes, one block per answer, consent, cap, escalation, summary reply | 3, 7, 8 |
 | Shared parsing; the edge keeps working | 2 |
-| Prompt v4, per-version tools in the proxy and browser, v3 frozen | 1, 3, 4, 8, 22 |
+| Prompt v6, per-version tools in the proxy and browser, v3 frozen | 1, 3, 4, 8, 22 |
 | Finding the dashboard: current, tiers, trailing word, workspace filter, edit rights | 6, 14, 16 |
 | The open editor path | 16 |
 | The card: data part, statuses in a per-session store, picker details, preview, confirm into the editor when open, prepared bindings, stale retry, link | 13, 14, 15, 18 |
@@ -5213,5 +5225,5 @@ git commit -m "docs(ai-agent): mark Phase 1D built and log it as F129"
 | Offline: every page, blocks with real names, three tiles, routing on the message, results by page, prompt, router, case-design pipeline | 11, 17, 20, 21 |
 | Errors table | 6, 7, 14, 18 |
 | Eval: harness support, runs, bars | 12, 23 (baseline already committed) |
-| Browser spec; v3 mocks moved to v4 | 22, 24 |
-| Done when: roadmap, D44, F129, tsc, i18n | 25 |
+| Browser spec; v3 mocks moved to v6 | 22, 24 |
+| Done when: roadmap, D44, F139, tsc, i18n | 25 |
