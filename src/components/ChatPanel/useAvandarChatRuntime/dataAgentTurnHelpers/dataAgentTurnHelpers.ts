@@ -291,8 +291,8 @@ export type AgentTurnInputs = {
   /**
    * An earlier assistant reply as the model reads it in the recap, with
    * the values the vault holds masked. Called after every redaction of the
-   * turn. Offline answers never get here: the thread already reads them as
-   * a fixed line.
+   * turn. A hosted turn's thread already reads an offline answer as a fixed
+   * line. A device turn reads it as the chat shows it.
    */
   maskAssistantText: (text: string) => string;
   /**

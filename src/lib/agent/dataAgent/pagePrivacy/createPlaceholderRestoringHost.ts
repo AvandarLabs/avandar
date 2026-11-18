@@ -125,8 +125,7 @@ function _restoringAskUser(
  * A dashboard chart's check is restored and masked like a query. A
  * dashboard block is restored before the host shows or saves it. The text
  * the user reads (a query's summary, a question card's question and option
- * labels)
- * shows real values, and none of it goes back to the model.
+ * labels) shows real values, and none of it goes back to the model.
  *
  * Nothing the model reads back carries a restored value: a query's column
  * names, preview cells, and error are masked, and a lookup that ran with

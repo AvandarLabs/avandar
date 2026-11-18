@@ -21,8 +21,9 @@ import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /**
  * Results go to the Data Explorer when the user is on it, and for an
- * offline turn that carries no page (as before offline turns read the
- * page). An unknown page sends them to the chat, which shows them anywhere.
+ * offline turn that carries no page at all. Any other page, including one
+ * the app could not identify, sends them to the chat, which shows them
+ * anywhere.
  */
 function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
   return (
