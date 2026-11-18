@@ -372,7 +372,8 @@ msgstr "Extensión derecha"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This can't be added right now. Reload the page or ask again."
-msgstr ""
+msgstr "No se puede agregar en este momento. Recarga la página o vuelve a "
+"intentarlo."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -1544,7 +1545,7 @@ msgstr "{publisher} · versión {version} · licencia {license}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Which dashboard?"
-msgstr ""
+msgstr "¿Qué panel?"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -2270,7 +2271,7 @@ msgstr "Expresión regular"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "edited {editedDate}"
-msgstr ""
+msgstr "editado {editedDate}"
 
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
@@ -2570,7 +2571,7 @@ msgstr "{areaValue} m²"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Open {dashboardName}"
-msgstr ""
+msgstr "Abrir {dashboardName}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
@@ -2998,7 +2999,7 @@ msgstr "Resumen de datos"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This dashboard is no longer available."
-msgstr ""
+msgstr "Este panel ya no está disponible."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
@@ -4509,7 +4510,7 @@ msgstr "Eliminar"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Nothing was added."
-msgstr ""
+msgstr "No se agregó nada."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
@@ -6582,7 +6583,7 @@ msgstr "Aún no hay registros de {conceptName}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This chart has no rows yet."
-msgstr ""
+msgstr "Este gráfico aún no tiene filas."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
@@ -9983,7 +9984,7 @@ msgstr "Inactivo"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I couldn't build that chart. Its query kept failing."
-msgstr ""
+msgstr "No pude crear ese gráfico. Su consulta siguió fallando."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -10303,7 +10304,7 @@ msgstr "Convertir valores y agregar descripciones de columnas"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "It is in the open editor. Save the dashboard to keep it."
-msgstr ""
+msgstr "Está en el editor abierto. Guarda el panel para conservarlo."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
@@ -11979,7 +11980,7 @@ msgstr "Geometría no disponible"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "{chartCount, plural, one {# chart} other {# charts}}"
-msgstr ""
+msgstr "{chartCount, plural, one {# gráfico} other {# gráficos}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Custom colors"
@@ -13277,11 +13278,6 @@ msgstr "{0} funciones"
 msgid "Another number"
 msgstr "Otro número"
 
-#. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
-#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#~ msgid "edited {0}"
-#~ msgstr ""
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -13719,7 +13715,7 @@ msgstr "Expresión de columna sin nombre en SELECT; se omitió."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Added to the dashboard."
-msgstr ""
+msgstr "Se agregó al panel."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
@@ -14041,7 +14037,7 @@ msgstr "Editar grupo de roles"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Couldn't save. Check your connection and try again."
-msgstr ""
+msgstr "No se pudo guardar. Verifica tu conexión e inténtalo de nuevo."
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "A places dataset holds at most {maxPlaces} places."
@@ -15369,7 +15365,7 @@ msgstr "{codedCount, plural, one {# con una lista de códigos: abra la etiqueta 
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "The dashboard changed while saving. Try again."
-msgstr ""
+msgstr "El panel cambió mientras se guardaba. Inténtalo de nuevo."
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
 msgid "Note:"

@@ -13055,11 +13055,6 @@ msgstr "{0} features"
 msgid "Another number"
 msgstr "Another number"
 
-#. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
-#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#~ msgid "edited {0}"
-#~ msgstr "edited {0}"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx

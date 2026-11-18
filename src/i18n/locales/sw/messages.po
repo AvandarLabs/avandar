@@ -365,7 +365,7 @@ msgstr "Span ya kulia"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This can't be added right now. Reload the page or ask again."
-msgstr ""
+msgstr "Hiki hakiwezi kuongezwa kwa sasa. Pakia upya ukurasa au uombe tena."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -1534,7 +1534,7 @@ msgstr "{publisher} · toleo la {version} · leseni ya {license}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Which dashboard?"
-msgstr ""
+msgstr "Dashibodi ipi?"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -2259,7 +2259,7 @@ msgstr "Usemi wa kawaida"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "edited {editedDate}"
-msgstr ""
+msgstr "imehaririwa {editedDate}"
 
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
@@ -2556,7 +2556,7 @@ msgstr "{areaValue} m²"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Open {dashboardName}"
-msgstr ""
+msgstr "Fungua {dashboardName}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
@@ -2982,7 +2982,7 @@ msgstr "Muhtasari wa Data"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This dashboard is no longer available."
-msgstr ""
+msgstr "Dashibodi hii haipatikani tena."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
@@ -4493,7 +4493,7 @@ msgstr "Futa"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Nothing was added."
-msgstr ""
+msgstr "Hakuna kilichoongezwa."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
@@ -6554,7 +6554,7 @@ msgstr "Bado hakuna rekodi za {conceptName}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This chart has no rows yet."
-msgstr ""
+msgstr "Chati hii bado haina safu."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
@@ -9942,7 +9942,7 @@ msgstr "Isiyotumika"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I couldn't build that chart. Its query kept failing."
-msgstr ""
+msgstr "Sikuweza kuunda chati hiyo. Hoja yake iliendelea kushindwa."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -10261,7 +10261,7 @@ msgstr "Badilisha thamani na uongeze maelezo ya safu"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "It is in the open editor. Save the dashboard to keep it."
-msgstr ""
+msgstr "Iko kwenye kihariri kilichofunguliwa. Hifadhi dashibodi ili ibaki."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
@@ -11925,7 +11925,7 @@ msgstr "Jiometri haipatikani"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "{chartCount, plural, one {# chart} other {# charts}}"
-msgstr ""
+msgstr "{chartCount, plural, one {# chati} other {# chati}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Custom colors"
@@ -13214,11 +13214,6 @@ msgstr "Vipengele {0}"
 msgid "Another number"
 msgstr "Nambari nyingine"
 
-#. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
-#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#~ msgid "edited {0}"
-#~ msgstr ""
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -13653,7 +13648,7 @@ msgstr "Usemi wa safu usio na jina katika SELECT; umerukwa."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Added to the dashboard."
-msgstr ""
+msgstr "Imeongezwa kwenye dashibodi."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
@@ -13972,7 +13967,7 @@ msgstr "Hariri kundi la jukumu"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Couldn't save. Check your connection and try again."
-msgstr ""
+msgstr "Imeshindwa kuhifadhi. Angalia muunganisho wako kisha ujaribu tena."
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "A places dataset holds at most {maxPlaces} places."
@@ -15290,7 +15285,7 @@ msgstr "{codedCount, plural, one {# yenye orodha ya misimbo: fungua lebo ili "
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "The dashboard changed while saving. Try again."
-msgstr ""
+msgstr "Dashibodi ilibadilika wakati wa kuhifadhi. Jaribu tena."
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
 msgid "Note:"

@@ -345,7 +345,7 @@ msgstr "右跨度"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This can't be added right now. Reload the page or ask again."
-msgstr ""
+msgstr "目前无法添加。请重新加载页面或再次请求。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -1466,7 +1466,7 @@ msgstr "{publisher} · 版本 {version} · {license} 许可证"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Which dashboard?"
-msgstr ""
+msgstr "哪个仪表板？"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 msgid "Cases"
@@ -2155,7 +2155,7 @@ msgstr "正则表达式"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "edited {editedDate}"
-msgstr ""
+msgstr "编辑于 {editedDate}"
 
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
@@ -2443,7 +2443,7 @@ msgstr "{areaValue} 平方米"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Open {dashboardName}"
-msgstr ""
+msgstr "打开 {dashboardName}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
@@ -2852,7 +2852,7 @@ msgstr "数据摘要"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This dashboard is no longer available."
-msgstr ""
+msgstr "此仪表板已不可用。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
@@ -4294,7 +4294,7 @@ msgstr "删除"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Nothing was added."
-msgstr ""
+msgstr "未添加任何内容。"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
@@ -6272,7 +6272,7 @@ msgstr "尚无 {conceptName} 记录"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "This chart has no rows yet."
-msgstr ""
+msgstr "此图表目前没有数据行。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 msgid "More dataset actions"
@@ -9530,7 +9530,7 @@ msgstr "未激活"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I couldn't build that chart. Its query kept failing."
-msgstr ""
+msgstr "无法构建该图表。其查询持续失败。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -9841,7 +9841,7 @@ msgstr "转换值并添加列描述"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "It is in the open editor. Save the dashboard to keep it."
-msgstr ""
+msgstr "该内容位于打开的编辑器中。请保存仪表板以保留该内容。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmDataSlotsSummary.tsx
 msgid "not chosen yet"
@@ -11432,7 +11432,7 @@ msgstr "几何功能不可用"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "{chartCount, plural, one {# chart} other {# charts}}"
-msgstr ""
+msgstr "{chartCount, plural, one {# 个图表} other {# 个图表}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Custom colors"
@@ -12668,11 +12668,6 @@ msgstr "{0} 个功能"
 msgid "Another number"
 msgstr "另一个数字"
 
-#. placeholder {0}: i18n.date(updatedDate, { dateStyle: "medium" })
-#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#~ msgid "edited {0}"
-#~ msgstr ""
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -13094,7 +13089,7 @@ msgstr "SELECT 中的列表达式未命名；已跳过。"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Added to the dashboard."
-msgstr ""
+msgstr "已添加到仪表板。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
@@ -13399,7 +13394,7 @@ msgstr "编辑角色组"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "Couldn't save. Check your connection and try again."
-msgstr ""
+msgstr "无法保存。请检查网络连接，然后重试。"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "A places dataset holds at most {maxPlaces} places."
@@ -14664,7 +14659,7 @@ msgstr "{codedCount, plural, one {# 个带代码列表：打开标签即可查�
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 msgid "The dashboard changed while saving. Try again."
-msgstr ""
+msgstr "保存期间仪表板发生了更改。请重试。"
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
 msgid "Note:"
