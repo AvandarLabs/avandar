@@ -40,23 +40,33 @@ and implementation, in order.
 | 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). Three live checks with live models in the real app passed (2026-11-09). Pushed to the demo on 2026-11-09, so prompt v2 is now fixed: a prompt change needs a new version served beside v1 and v2. The agent stays off until 1D and 1E close the gaps listed under [What keeps the agent off](#what-keeps-the-agent-off-pablo-2026-11-09). |
 | 1B | **Attachable context.** Done (2026-11-09). `@` mentions of gadgets in the chat composer and a context picker ([spec](specs/phase-1b.md)). | Done (2026-11-09) on `feat/agent-context` (D41, D42). Met: unit tests; an adversarial privacy review over three rounds, with eight leaks found and fixed; mention questions M01 to M06 passing on all three runs, with P01 to P07 passing and the 45 questions at 44/45 (the miss passed on rerun) on prompt v3. Eval label `phase-1b` ([results](eval.md#phase-1b)). A mocked browser spec, and a live check with live models in the real app that passed all six steps. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). Built (2026-11-10) ([plan](plans/phase-1c.md), [spec](specs/phase-1c.md), D43). | Unit tests, one browser spec, and a data session's turn text unchanged. |
-| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17), with one online bar missed: P04** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 45/45, and the offline 45 30/45 against a bar of 26 (it scored 25/45 on the rebased tree, 26/45 after the dashboard text joined the offline prompt only on a turn with blocks or a dashboard in the message, and 30/45 after the offline agent also listed the dashboard tool only on such a turn). **Missed:** P01 to P07 scored 6/7 against a bar of 7/7 (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. Two wordings added to v6 for it did not close it and none was kept: one reached 10/10 but broke D01 and D06, the other scored 8/10. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
+| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17). P04 is closed (2026-11-18). One online bar is still missed by the strict reading: D04, a question that is flaky on v6 itself** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 45/45, and the offline 45 30/45 against a bar of 26 (it scored 25/45 on the rebased tree, 26/45 after the dashboard text joined the offline prompt only on a turn with blocks or a dashboard in the message, and 30/45 after the offline agent also listed the dashboard tool only on such a turn). **P04, closed:** P01 to P07 scored 6/7 on the first v6 run (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. A bullet in DASHBOARD BLOCKS (`5a508a3c2`) makes v6 ask which chart before changing how one is shown: P04 10/10, P 7/7, M 7/7, the 45 45/45, and D01 and D06 on all six D runs. Two earlier wordings did not close it and were not kept: one reached 10/10 but broke D01 and D06, the other scored 8/10. **Still missed:** D04 ("Add a table of the 5 states with the most deaths") misses once in three D runs on the new prompt, so D01 to D05 5/5 on every run is missed by the strict reading. It is not the new bullet: committed v6 misses D04 on 7 of 13 runs. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
 | 1E | **"Try again" and parity in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). The agent's question cards are audit-logged and bias-checked like today's clarification cards, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40). | Covered by unit tests and the browser test (1F). |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
 
 ### Open after 1D (2026-11-17)
 
-- **P04 on v5 and v6.** Still open (updated 2026-11-18). "make this a pie
-  chart" with two charts on a dashboard should ask which one. It does on 10
+- **P04 on v5 and v6.** Closed (2026-11-18, `5a508a3c2`). "make this a pie
+  chart" with two charts on a dashboard should ask which one. It did on 10
   of 10 runs of v3 and v4 and on 5 of 10 of v5 and of v6, so the drop came
-  with v5's CODED COLUMNS rules on `demo/measles`. Two wordings were tried in
-  v6 and neither was kept. Wording 1 (a last section covering "this" or "it",
-  with an "@mention" clause and "before you run any query or add any block")
-  scored P04 10/10 and P and M 7/7, but D01 missed 10 of 11 runs and D06 6
-  of 11, and the 45 scored 42/45. Wording 2 (only "this", on a page that
-  lists several charts, placed before DASHBOARD BLOCKS) scored P04 8/10. The
-  full wordings and numbers are in [eval.md](eval.md#phase-1d). A next
-  attempt needs a wording that keeps D01 and D06 passing.
+  with v5's CODED COLUMNS rules on `demo/measles`. v6 now has a bullet in
+  DASHBOARD BLOCKS, right after the `run_query` sentence, that asks which
+  chart before changing how one is shown when the page lists several. P04
+  scored 10/10, P 7/7, M 7/7, the 45 45/45, and D01 and D06 passed on all
+  six D runs. Two earlier wordings failed: wording 1 (a last section with
+  "this" or "it", an "@mention" clause, and "before you run any query or
+  add any block") scored P04 10/10 but D01 missed 10 of 11 runs and D06 6 of
+  11, and the 45 scored 42/45. Wording 2 (only "this", before DASHBOARD
+  BLOCKS) scored P04 8/10. The wordings and numbers are in
+  [eval.md](eval.md#phase-1d).
+- **D04 flakiness.** Open (2026-11-18). "Add a table of the 5 states with
+  the most deaths" misses on some runs because the model adds
+  `year("date") = 2022` when the dashboard is titled "COVID 2022". On ten
+  runs of D04 alone it passed 3 on committed v6 and 7 on v6 with the new
+  bullet, so the bullet is not the cause, and the three-run D bar (D01 to
+  D05 5/5 on every run) cannot be met reliably until it is settled. Options:
+  a rule against taking a period from a dashboard's title, or a question
+  wording that says "overall" (as D05 says "US deaths").
 - **Offline bar.** Closed (updated 2026-11-18): the offline 45 is 30/45
   against a bar of 26. It was 25/45 on the rebased tree and 26/45 after the
   offline prompt stopped carrying the dashboard text on plain questions,

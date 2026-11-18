@@ -350,7 +350,8 @@ dashboard tool was built.
 **Prompt v6, the shipping prompt (2026-11-18).** These are the final runs.
 `data-agent-v6` is v5 plus DASHBOARD BLOCKS, and v5 is v3 plus the plugin
 tools' TOOLS bullet and the CODED COLUMNS rules, both from `demo/measles`.
-The prompt text did not change during these runs. Every run is on the Pi
+The prompt text did not change during these runs. A bullet was added to it
+afterwards: see "Closing the open items" below. Every run is on the Pi
 harness with Haiku 5.5 and Sonnet 5.5 escalation unless the row says
 offline (Qwen3 4B). `--questions D` on the default COVID workspace selects
 the dashboard questions D01 to D09. The measles workspace's coded-column
@@ -371,7 +372,9 @@ questions also have the ids D01 to D04, but they run only with
 | phase-1d:offline-dashboards (Qwen3 4B, after the fix) | 6/9 | 4/5 | 2/4 | 1 / 0 | $0 | 880 | 18.0 s / 83.2 s |
 
 - **Bars.** Dashboards D01 to D09 on all three runs: **met**. P 7/7:
-  **missed** (6/7 on the run, see the next bullet). M 7/7: **met**. The 45
+  **missed** (6/7 on the run, see the next bullet), and **met** afterwards
+  (7/7 once the prompt asks which chart, see "Closing the open items").
+  M 7/7: **met**. The 45
   at 44 or 45: **met** (45/45). Offline: D05 and D08 write nothing and every
   write outside the editor has `via: "card"`: **met**. The D score is
   recorded (6/9). The offline 45 at 26 or better: **met at exactly 26, after
@@ -397,8 +400,8 @@ questions also have the ids D01 to D04, but they run only with
   changed for it in these runs: a fix would be new text in v6 (for example,
   ask which chart when "this" could mean several), outside the dashboard
   rules this eval set out to check. The samples are small (10 runs each).
-  Two such wordings were tried afterwards. Neither closed it and neither was
-  kept: see "Closing the open items" below.
+  Three such wordings were tried afterwards. The third closed it (`5a508a3c2`)
+  and the first two were not kept: see "Closing the open items" below.
 - **The 45 scored 45/45.** The 45's earlier miss, H07, passed.
 - **No dashboard prompt fix was needed.** The three D runs passed every
   question, including D01 (a chart with the editor open, 3 of 3) and D08 (a
@@ -471,11 +474,13 @@ questions also have the ids D01 to D04, but they run only with
 
 **Closing the open items (2026-11-18, after the v6 runs above).** Two open
 items were worked on the committed v6 prompt: the online P04 miss and the
-offline margin. P04 did not close in the two prompt iterations allowed, and
-no prompt change was kept. The offline margin closed in one change. Every
-run is the Pi harness on Haiku 5.5 with Sonnet 5.5 escalation unless the row
-says offline (Qwen3 4B). "Wording 1" and "wording 2" are the two prompt
-iterations, quoted below.
+offline margin. P04 closed on the third prompt wording (`5a508a3c2`), after
+two wordings that did not and were not kept. The offline margin closed in
+one change (`a68dac7f8`). One D bar is still missed by the strict reading,
+because of D04, a question that is flaky on committed v6 itself: see the
+last bullets. Every run is the Pi harness on Haiku 5.5 with Sonnet 5.5
+escalation unless the row says offline (Qwen3 4B). "Wording 1", "wording 2",
+and "wording 3" are the three prompt iterations, quoted below.
 
 | Run | What it tested | Result | Bar |
 |---|---|---|---|
@@ -486,6 +491,14 @@ iterations, quoted below.
 | phase-1d:agent-dashboards-fix1 (3 runs) | D, wording 1 | 7/9, 7/9, 8/9 | D01 to D05 5/5 and D06 to D09 on every run: **missed** |
 | phase-1d:diag-d-fix1 (8 runs) | D01, D04, D06, wording 1 | D01 missed 8 of 8, D06 4 of 8, D04 1 of 8 | A diagnostic, no bar |
 | phase-1d:p04-fix2 (10 runs) | P04, wording 2 | 8/10 | P04 target 10/10, or 9/10 with one explained miss: **missed** |
+| phase-1d:p04-fix3 (10 runs) | P04, wording 3 | 10/10 | P04 target 10/10: **met** |
+| phase-1d:agent-dashboards-fix3 (3 runs) | D, wording 3 | 9/9, 9/9, 8/9 (D04) | D01 to D05 5/5 and D06 to D09 on every run: **missed** by D04 alone, which is not caused by the wording (see below) |
+| phase-1d:agent-dashboards-fix3b (3 more runs) | D, wording 3 | 9/9, 9/9, 8/9 (D04) | Same: **missed** by D04 alone |
+| phase-1d:agent-page-fix3 | P, wording 3 | 7/7 | P 7/7: **met** |
+| phase-1d:agent-mentions-fix3 | M, wording 3 | 7/7 | M 7/7: **met** |
+| phase-1d:agent-45-fix3 | The 45, wording 3 | 45/45 | 44 or 45: **met** |
+| phase-1d:diag-d04-fix3 (10 runs) | D04 alone, wording 3 | 7/10 | A diagnostic, no bar |
+| phase-1d:diag-d04-v6 (10 runs) | D04 alone, committed v6 without wording 3 | 3/10 | A diagnostic, no bar |
 | phase-1d:offline-45-tool-gate | Offline 45, the dashboard tool only on dashboard turns | 30/45 | 26 or better: **met** |
 | phase-1d:offline-dashboards-tool-gate | Offline D | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
 
@@ -499,6 +512,7 @@ iterations, quoted below.
   | v6 as committed | 5/10 (and 5 of 9 on the single reruns) |
   | v6 with wording 1 | 10/10 |
   | v6 with wording 2 | 8/10 |
+  | **v6 with wording 3 (committed)** | **10/10** (and 1 of 1 in the P run) |
 
 - **Wording 1 fixed P04 and broke other questions.** It was a new last
   section, after DASHBOARD BLOCKS:
@@ -515,13 +529,13 @@ iterations, quoted below.
   was written to stop, and it passed on every earlier v6 run. D06 ("Add this
   as a bar chart to @COVID 2022", on a page showing a deaths query) missed 6
   times by adding the mentioned dashboard's cases chart instead of the
-  Explorer's deaths query. D04 missed 2 times with a wrong ranking, which may
-  be noise. In the 45, F02 ("make it weekly instead") asked "Should the
+  Explorer's deaths query. D04 missed 2 times with a wrong ranking, which
+  turned out to be noise (see the D04 bullet below). In the 45, F02 ("make it weekly instead") asked "Should the
   weekly view cover California, Texas, or both?", a needless question, and F03
   followed it. N11 has missed on other runs before. The likely causes are
   "or it" (follow-ups say "it" all the time), the "@mention" clause (D06 has
   a mention), and "add any block". That is a reading of the answers, not an
-  experiment, since the iterations ran out.
+  experiment. Wording 3 drops all three, and D01, D06, F02, and F03 passed.
 - **Wording 2 was narrower and still missed.** It names only "this" on a page
   that lists several charts, drops "@mention" and the query and block
   clause, and sits before DASHBOARD BLOCKS so that section stays last:
@@ -533,9 +547,44 @@ iterations, quoted below.
 
   P04 scored 8/10. One miss answered in plain text with no query and no
   `ask_user`, and one ran the cases chart's query without asking. Two
-  iterations were allowed, so no suite ran on wording 2 and its D runs are
-  unknown. The v6 text in the tree is the committed one, and the v1 to v5
-  hash tests pass.
+  iterations were allowed at that point, so no suite ran on wording 2 and
+  its D runs are unknown. Neither wording 1 nor wording 2 was kept.
+- **Wording 3 closed P04 (`5a508a3c2`).** It reads the prompt's order: the
+  model chose `run_query` at the last sentence of DASHBOARD BLOCKS' first
+  bullet ("A chart that only needs to show here ... uses `run_query`"), so
+  the new rule is a bullet right after that sentence, inside DASHBOARD
+  BLOCKS (which stays last). It covers only a change to how an existing
+  chart is shown, with examples that differ from the eval's own wording,
+  says an add to a dashboard is not covered, and has no "it" and no
+  "@mention" clause. It names `ask_user`, which the grader needs: a
+  clarification counts only when asked through that tool, and an answer in
+  plain text has no result.
+
+  ```text
+  - Changing how a chart on the page is shown (for example "show this as a table" or "turn this into a line chart") is a different request from adding to a dashboard. When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer. Never pick a chart yourself. A request to add, put, or pin something on a dashboard is not covered by this rule, and neither is a question with one clear target.
+  ```
+
+  P04 asked once and passed on 10 of 10 runs, then 1 of 1 inside the P run.
+  P scored 7/7, M 7/7, and the 45 scored 45/45 (F02, F03, and N11, which
+  wording 1 broke, passed). D01 and D06 passed on all six D runs (two sets
+  of three). The v1 to v5 hash tests pass.
+- **D04 is flaky on committed v6, and wording 3 does not cause it.** D04
+  ("Add a table of the 5 states with the most deaths") missed once in each
+  of the two D sets on wording 3, so by the strict reading the D bar (D01 to
+  D05 5/5 on every run) is **missed** on 2 of 6 runs. The miss is the model
+  adding `year("date") = 2022` to a request that names no period, because
+  the dashboard is titled "COVID 2022". The request has no "this" and is not
+  a chart change, so the new bullet does not apply to it. Ten runs of D04
+  alone passed 7 on wording 3 and 3 on committed v6 (the bullet emptied
+  temporarily, then restored), so the wording does not make D04 worse:
+  counting the first D set on committed v6 (3 of 3 passed), D04 is
+  6 of 13 on committed v6 against 11 of 16 on wording 3. The earlier 9/9 on
+  three D runs was luck, and the D bar as written cannot be met reliably
+  by any v6 text until D04 is settled. That is open, and it is the
+  Phase 1D eval's remaining miss. It is not part of this fix, and no prompt
+  or grader was changed for it. The options are a rule against taking a
+  period from a dashboard's title, or a question wording that names "overall"
+  (the D05 precedent).
 - **Offline: the dashboard tool only on a turn that can use it (`a68dac7f8`).**
   The offline agent lists `add_dashboard_block` only on a turn with context
   blocks or a dashboard named in the message, the condition that already
@@ -571,9 +620,11 @@ iterations, quoted below.
   block, D08 and D09 asked twice and ended with no reply and no block, and D07
   asked once. D05 and D08 wrote nothing, D01 to D03 wrote through the editor,
   and D06 and D07 wrote through the card.
-- **Cost.** The 34 online runs cost $0.0365: wording 1 $0.0329 (P04 $0.0042,
-  P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058)
-  and wording 2 $0.0036. The two offline runs cost $0.
+- **Cost.** The 73 online runs cost $0.0754: wording 1 $0.0329 (P04 $0.0042,
+  P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058),
+  wording 2 $0.0036, and wording 3 $0.0389 (P04 $0.0039, the two D sets
+  $0.0063 and $0.0061, P $0.0017, M $0.0016, the 45 $0.0135, the D04
+  diagnostics $0.0058). The two offline runs cost $0.
 
 **Earlier runs on the first-numbered prompt (v4), kept as history.** They
 ran on 2026-11-17, before the rebase, with the dashboard prompt as first
@@ -1133,6 +1184,7 @@ Each was made after reading the failing answers by hand.
 | Prompt v6 (then v4): say plainly that you cannot find a dashboard with that name | Agent prompt (v6, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
 | D08 also accepts "don't have", "do not have", and similar | Grader | A correct "I don't have a dashboard named ..." reply failed `NOT_FOUND_PATTERN` (`9925721e3`). |
 | The offline prompt carries the context and dashboard rules only on a turn with context blocks or a dashboard in the message | Offline prompt | The longer prompt on every turn turned H04 and N05 from passes into misses, 25/45 against a bar of 26 (`7c4f95033`). |
+| A bullet in DASHBOARD BLOCKS: ask which chart before changing how one is shown, when the page lists several | Agent prompt (v6, not yet deployed) | P04 asked on 5 of 10 runs of v5 and v6 and now asks on 10 of 10 (`5a508a3c2`). |
 | The offline agent lists `add_dashboard_block` only on that same kind of turn | Offline agent | The tool in every plain turn's list turned N01 from a pass into a miss. The offline 45 went from 26/45 to 30/45 (`a68dac7f8`). |
 | A system update with no text is not sent to a local model | Local model messages | Pi declares a tool-list change as an empty system message, which the local model read as an empty user turn (`a68dac7f8`). |
 
