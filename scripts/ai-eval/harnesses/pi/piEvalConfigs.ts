@@ -4,6 +4,13 @@ import type { ThinkingLevel } from "@earendil-works/pi-agent-core";
 export type PiEvalModelSpec = { id: string; thinkingLevel: ThinkingLevel };
 
 /**
+ * A page the Pi harnesses put on screen for every question that sets none
+ * (`--page data-explorer`). The 45 original questions set no page, so a run
+ * without it never sends the `<current_page>` block the app always sends.
+ */
+export type PiEvalDefaultPage = "data-explorer";
+
+/**
  * Named model policies the eval can run with `--harness pi --config <name>`.
  * A one-model run needs no entry: pass `--config single --model id@thinking`.
  */

@@ -90,6 +90,12 @@ describe("createPiConversation", () => {
   });
 });
 
+function _pageQuestionById(id: string): EvalQuestion {
+  return PAGE_QUESTIONS.find((question) => {
+    return question.id === id;
+  })!;
+}
+
 /** P07: a dashboard chart filtered to Kings County, a personal column. */
 const P07 = PAGE_QUESTIONS.find((question) => {
   return question.id === "P07";
@@ -625,5 +631,116 @@ describe("createPiConversation with dashboard questions", () => {
     const answer = await conversation.ask(questionOf("D08"));
 
     expect(answer.dashboardWrites).toEqual([]);
+  });
+});
+
+/**
+ * A data agent that records each message it is asked and, as the app's
+ * Data Explorer would, ends each answer with `sql` on screen.
+ */
+function _createQueryingAgent(
+  host: DataAgentHost,
+  asked: string[],
+  sql: string,
+): DataAgent {
+  return {
+    agent: { state: { messages: [] } },
+    ask: async (text: string) => {
+      asked.push(text);
+      await host.showQuery({ sql, summary: "Totals" });
+      return {
+        text: "Done.",
+        state: { questions: [], valuesSentToModel: [], lastQuery: { sql } },
+        usage: {},
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+describe("createPiConversation with a default page", () => {
+  it("sends a plain question no page block when no default page is set", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(asked[0]).toBe("How many cases?");
+  });
+
+  it("sends a plain question the Data Explorer page block", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(asked[0]).toBe(
+      "<current_page>\nPage: Data Explorer\n</current_page>\n\nHow many cases?",
+    );
+  });
+
+  it("keeps a page question's own page instead of the default", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(_pageQuestionById("P05"));
+
+    expect(asked[0]).toContain("Page: Map");
+    expect(asked[0]).not.toContain("Data Explorer");
+  });
+
+  it("shows a follow-up the query and columns the last answer left on screen", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "cases", type: "BIGINT" }], rows: [[42]] },
+    });
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: (host) => {
+        return _createQueryingAgent(host, asked, "SELECT 42 AS cases");
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and by month?" });
+
+    expect(asked[1]).toContain("Query on screen: SELECT 42 AS cases");
+    expect(asked[1]).toContain("Result columns: cases bigint");
+  });
+
+  it("sends the unchanged line when the page did not change", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and last year?" });
+
+    expect(asked[1]).toBe(
+      "<current_page>Unchanged since the last message.</current_page>\n\nand last year?",
+    );
   });
 });

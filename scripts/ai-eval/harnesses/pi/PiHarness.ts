@@ -32,6 +32,7 @@ import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
@@ -43,7 +44,7 @@ import type {
   EvalHarness,
   EvalUsage,
 } from "../EvalHarness";
-import type { PiEvalModelSpec } from "./piEvalConfigs";
+import type { PiEvalDefaultPage, PiEvalModelSpec } from "./piEvalConfigs";
 import type {
   DataAgent,
   DataAgentModelPolicy,
@@ -229,6 +230,31 @@ async function _addEvalDashboardBlock(
   return _placeEvalBlock({ database, recorder, target, block: request.block });
 }
 
+/** Runs the agent's query in DuckDB and records its result for grading. */
+async function _showEvalQuery(
+  database: EvalDatabase,
+  recorder: QuestionRecorder,
+  request: Parameters<DataAgentHost["showQuery"]>[0],
+): Promise<DataAgentQueryOutcome> {
+  const outcome = await runEvalSql(database, request.sql);
+  recorder.vizType = request.chart;
+  if (outcome.kind === "failed") {
+    recorder.result = undefined;
+    recorder.error = outcome.error;
+    return outcome;
+  }
+  recorder.result = outcome.result;
+  recorder.error = undefined;
+  return {
+    kind: outcome.kind,
+    columns: outcome.result.columns,
+    rowCount: outcome.result.rows.length,
+    previewRows: request.previewRowCount
+      ? outcome.result.rows.slice(0, request.previewRowCount)
+      : undefined,
+  };
+}
+
 /** The data agent's host in the eval: DuckDB in Node and a simulated user. */
 function _createEvalHost(
   database: EvalDatabase,
@@ -236,23 +262,7 @@ function _createEvalHost(
 ): DataAgentHost {
   return {
     showQuery: async (request) => {
-      const outcome = await runEvalSql(database, request.sql);
-      recorder.vizType = request.chart;
-      if (outcome.kind === "failed") {
-        recorder.result = undefined;
-        recorder.error = outcome.error;
-        return outcome;
-      }
-      recorder.result = outcome.result;
-      recorder.error = undefined;
-      return {
-        kind: outcome.kind,
-        columns: outcome.result.columns,
-        rowCount: outcome.result.rows.length,
-        previewRows: request.previewRowCount
-          ? outcome.result.rows.slice(0, request.previewRowCount)
-          : undefined,
-      };
+      return _showEvalQuery(database, recorder, request);
     },
     readColumnValues: async (sql) => {
       const outcome = await runEvalSql(database, sql);
@@ -524,9 +534,48 @@ type PiConversationState = {
   recorder: QuestionRecorder;
   vault: SqlPlaceholderVault;
   privacy: PiConversationPrivacy;
+  defaultPage?: PiEvalDefaultPage;
+  /** The query and columns the default page's Data Explorer shows. */
+  explorer?: AgentPageContext["explorer"];
   lastPageBlock?: string;
   lastAttachedBlock?: string;
 };
+
+/**
+ * The question with the conversation's default page on screen when it sets
+ * none, as the app always sends a page block. The Data Explorer shows the
+ * last answer's query and result columns, as it does after a real answer.
+ */
+function _withDefaultPage(
+  question: EvalQuestion,
+  state: Readonly<PiConversationState>,
+): EvalQuestion {
+  if (question.pageContext || state.defaultPage === undefined) {
+    return question;
+  }
+  return {
+    ...question,
+    pageContext: {
+      app: state.defaultPage,
+      explorer: state.explorer ?? { resultColumns: [] },
+    },
+  };
+}
+
+/** What the Data Explorer shows after an answer, when it ran a query. */
+function _readExplorerFromAnswer(
+  answer: EvalAnswer,
+): AgentPageContext["explorer"] {
+  if (!answer.finalSql || !answer.result) {
+    return undefined;
+  }
+  return {
+    sql: answer.finalSql,
+    resultColumns: answer.result.columns.map((column) => {
+      return { name: column.name, dataType: column.type.toLowerCase() };
+    }),
+  };
+}
 
 /** Asks one question in the conversation and records how it went. */
 async function _askPiQuestion(
@@ -534,14 +583,15 @@ async function _askPiQuestion(
   question: EvalQuestion,
 ): Promise<EvalAnswer> {
   const { dataAgent, recorder } = state;
-  Object.assign(recorder, _startQuestion(question));
+  const shown = _withDefaultPage(question, state);
+  Object.assign(recorder, _startQuestion(shown));
   const startedAt = performance.now();
   const firstMessageIndex = dataAgent.agent.state.messages.length;
-  const inputs = _buildTurnInputs(question, state.vault, state.privacy);
+  const inputs = _buildTurnInputs(shown, state.vault, state.privacy);
   try {
     const reply = await dataAgent.ask(
       buildAgentTurnText({
-        message: ChatMentionToken.toModelText(question.prompt, inputs.nameOf),
+        message: ChatMentionToken.toModelText(shown.prompt, inputs.nameOf),
         pageBlock: inputs.blocks.pageBlock,
         previousPageBlock: state.lastPageBlock,
         attachedBlock: inputs.blocks.attachedBlock,
@@ -552,7 +602,9 @@ async function _askPiQuestion(
     state.lastPageBlock = inputs.blocks.pageBlock ?? state.lastPageBlock;
     state.lastAttachedBlock = inputs.blocks.attachedBlock;
     const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
-    return _toEvalAnswer(reply, recorder, startedAt, toolNames);
+    const answer = _toEvalAnswer(reply, recorder, startedAt, toolNames);
+    state.explorer = _readExplorerFromAnswer(answer) ?? state.explorer;
+    return answer;
   } catch (error) {
     const usage = _usageSince(dataAgent, firstMessageIndex);
     const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
@@ -576,6 +628,12 @@ export function createPiConversation(
      * nothing redacted, three charts of SQL. Defaults to `hosted`.
      */
     privacy?: PiConversationPrivacy;
+    /**
+     * The page on screen for every question that sets none, so a question
+     * with no page of its own is sent the page block the app always sends.
+     * Unset sends no page block, as the original 45 questions were run.
+     */
+    defaultPage?: PiEvalDefaultPage;
   }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = _startQuestion(undefined);
@@ -584,6 +642,7 @@ export function createPiConversation(
     recorder,
     vault,
     privacy: options.privacy ?? "hosted",
+    defaultPage: options.defaultPage,
     dataAgent: options.createAgent(
       createPlaceholderRestoringHost(
         _createEvalHost(options.database, recorder),
@@ -609,20 +668,25 @@ function _parseModelSpec(text: string): PiEvalModelSpec {
   };
 }
 
+/** What `createPiHarness` needs to call OpenRouter and read the data. */
+type CreatePiHarnessOptions = {
+  openRouterApiKey: string;
+  database: EvalDatabase;
+  configName: string;
+  model: string;
+  /** The workspace's datasets as the agent sees them. COVID by default. */
+  datasets?: readonly DataAgentDataset[];
+  /** The page on screen for questions that set none. None by default. */
+  defaultPage?: PiEvalDefaultPage;
+};
+
 /**
  * Creates the Pi-based harness: the browser data agent from
  * `src/lib/agent/dataAgent`, calling OpenRouter directly, with a host backed
  * by DuckDB and the simulated user.
  */
 export function createPiHarness(
-  options: Readonly<{
-    openRouterApiKey: string;
-    database: EvalDatabase;
-    configName: string;
-    model: string;
-    /** The workspace's datasets as the agent sees them. COVID by default. */
-    datasets?: readonly DataAgentDataset[];
-  }>,
+  options: Readonly<CreatePiHarnessOptions>,
 ): EvalHarness {
   const models = createModels();
   models.setProvider(openrouterProvider());
@@ -649,6 +713,7 @@ export function createPiHarness(
     startConversation: () => {
       return createPiConversation({
         database: options.database,
+        defaultPage: options.defaultPage,
         createAgent: (host) => {
           return createDataAgent({
             datasets: options.datasets ?? COVID_DATASETS,
