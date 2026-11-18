@@ -40,7 +40,7 @@ and implementation, in order.
 | 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). Three live checks with live models in the real app passed (2026-11-09). Pushed to the demo on 2026-11-09, so prompt v2 is now fixed: a prompt change needs a new version served beside v1 and v2. The agent stays off until 1D and 1E close the gaps listed under [What keeps the agent off](#what-keeps-the-agent-off-pablo-2026-11-09). |
 | 1B | **Attachable context.** Done (2026-11-09). `@` mentions of gadgets in the chat composer and a context picker ([spec](specs/phase-1b.md)). | Done (2026-11-09) on `feat/agent-context` (D41, D42). Met: unit tests; an adversarial privacy review over three rounds, with eight leaks found and fixed; mention questions M01 to M06 passing on all three runs, with P01 to P07 passing and the 45 questions at 44/45 (the miss passed on rerun) on prompt v3. Eval label `phase-1b` ([results](eval.md#phase-1b)). A mocked browser spec, and a live check with live models in the real app that passed all six steps. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). Built (2026-11-10) ([plan](plans/phase-1c.md), [spec](specs/phase-1c.md), D43). | Unit tests, one browser spec, and a data session's turn text unchanged. |
-| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17). P04 and D04 are closed (2026-11-18). No eval bar is missed.** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 45/45, and the offline 45 30/45 against a bar of 26 (it scored 25/45 on the rebased tree, 26/45 after the dashboard text joined the offline prompt only on a turn with blocks or a dashboard in the message, and 30/45 after the offline agent also listed the dashboard tool only on such a turn). **P04, closed:** P01 to P07 scored 6/7 on the first v6 run (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. A bullet in DASHBOARD BLOCKS (`5a508a3c2`) makes v6 ask which chart before changing how one is shown: P04 10/10, P 7/7, M 7/7, the 45 45/45, and D01 and D06 on all six D runs. Two earlier wordings did not close it and were not kept: one reached 10/10 but broke D01 and D06, the other scored 8/10. **D04, closed:** D04 ("Add a table of the 5 states with the most deaths") missed on about half the runs of committed v6 (7 of 13), because the model added a year taken from the dashboard's title, and sometimes dropped the "Unassigned" and "Out of" rows from the ranking. That made the three-run D bar unreliable (the earlier 9/9 was luck). A second bullet in DASHBOARD BLOCKS (`a4def86ad`) says a dashboard's name, title, and charts are labels, not filters, and that a ranking keeps those rows: D04 10/10, then D 9/9 on all three runs, P 7/7, P04 10/10, M 7/7, and the 45 44/45. Two earlier wordings were not kept. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
+| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17). P04 and D04 are closed (2026-11-18). No eval bar is missed.** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 44/45 on the final prompt (45/45 on the first v6 runs; the miss is N11, answered in text), and the offline 45 26/45 against a bar of 26, run with the page block the app sends on every turn (the earlier offline runs sent none: they scored 25/45 on the rebased tree, 26/45 after the dashboard text was gated, and 30/45 after the tool was gated too; with the page block, the code before the final gate scored 27/45 and the final code 26/45, with the offline D questions 6/9). **P04, closed:** P01 to P07 scored 6/7 on the first v6 run (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. A bullet in DASHBOARD BLOCKS (`5a508a3c2`) makes v6 ask which chart before changing how one is shown: P04 10/10, P 7/7, M 7/7, the 45 45/45, and D01 and D06 on all six D runs. Two earlier wordings did not close it and were not kept: one reached 10/10 but broke D01 and D06, the other scored 8/10. **D04, closed:** D04 ("Add a table of the 5 states with the most deaths") missed on about half the runs of committed v6 (7 of 13), because the model added a year taken from the dashboard's title, and sometimes dropped the "Unassigned" and "Out of" rows from the ranking. That made the three-run D bar unreliable (the earlier 9/9 was luck). A second bullet in DASHBOARD BLOCKS (`a4def86ad`) says a dashboard's name, title, and charts are labels, not filters, and that a ranking keeps those rows: D04 10/10, then D 9/9 on all three runs, P 7/7, P04 10/10, M 7/7, and the 45 44/45. Two earlier wordings were not kept. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
 | 1E | **"Try again" and parity in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). The agent's question cards are audit-logged and bias-checked like today's clarification cards, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40). | Covered by unit tests and the browser test (1F). |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
 
@@ -72,12 +72,19 @@ and implementation, in order.
   of 3 D runs, and wording B scored 8/10 (the year gone, but the rows still
   dropped on 2 runs). The wordings and numbers are in
   [eval.md](eval.md#phase-1d).
-- **Offline bar.** Closed (updated 2026-11-18): the offline 45 is 30/45
-  against a bar of 26. It was 25/45 on the rebased tree and 26/45 after the
-  offline prompt stopped carrying the dashboard text on plain questions,
-  with N01 newly missing. The offline agent now also lists the dashboard
-  tool only on a turn with blocks or a dashboard in the message (`a68dac7f8`),
-  which brought N01 back and also H05, I06, and N12. The offline dashboard
+- **Offline bar.** Closed (updated 2026-11-18): the offline 45 is 26/45
+  against a bar of 26, with no margin, run with the page block the app sends
+  on every turn (`--page data-explorer`). It was 25/45 on the rebased tree
+  and 26/45 after the offline prompt stopped carrying the dashboard text on
+  plain questions, with N01 newly missing. Listing the dashboard tool only on
+  a turn with blocks or a dashboard in the message (`a68dac7f8`) brought it
+  to 30/45, but those runs sent no page block, so the app never took that
+  path: the app's page block on every turn turned the rules and the tool on
+  for every offline turn. The rules and the tool now come only on a turn that
+  can be about a dashboard. With the page block the offline 45 scored 27/45
+  before that gate and 26/45 after it, at 939 input tokens per call against
+  1,129. The page block itself costs the offline model four questions (H05,
+  N01, N05, N12) against the same prompt without it. The offline dashboard
   questions are 6/9, as before: D04 replied with no block, and D08 and D09
   ended with no reply and no block. D05 and D08 correctly wrote no block.
   Every write outside the open editor used the confirm card.
@@ -90,11 +97,11 @@ and implementation, in order.
   consent check.
 - **Chart results.** Closed in `d2ab8f862`: the dashboard tool's result now
   tells the model the chart's row count and column names, never its rows.
-- **Forged card lines.** `dashboard_card` is not in `PLAIN_BLOCK_TAG_START`
-  (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a
-  card line.
-- **Translations.** The card's strings in non-English locales await
-  `pnpm translations`.
+- **Forged card lines.** Closed in `0e05fe689`: `dashboard_card` is in
+  `PLAIN_BLOCK_TAG_START` (`shared/agent/pageContext/agentBlockText.ts`), so
+  tile SQL cannot forge a card line.
+- **Translations.** Closed in `1da720482`: the card's strings are translated
+  in every locale.
 
 ### What keeps the agent off (Pablo, 2026-11-09)
 

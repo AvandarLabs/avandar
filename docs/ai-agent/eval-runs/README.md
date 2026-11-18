@@ -354,3 +354,6 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-18T21-34-08](2026-11-18T21-34-08-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00031 | 3.0 s / 3.0 s | none |
 | [2026-11-18T21-34-15](2026-11-18T21-34-15-phase-1d_agent-mentions-d04c/results.jsonl) | `phase-1d:agent-mentions-d04c` | 7/7 | 0 | 0 | $0.00023 | 2.1 s / 2.6 s | none |
 | [2026-11-18T21-34-37](2026-11-18T21-34-37-phase-1d_agent-45-d04c/results.jsonl) | `phase-1d:agent-45-d04c` | 44/45 | 0 | 0 | $0.00075 | 2.3 s / 3.4 s | N11 |
+| [2026-11-18T22-20-43](2026-11-18T22-20-43-phase-1d_offline-45-page-before/results.jsonl) | `phase-1d:offline-45-page-before` | 27/45 | 0 | 1 | $0.00000 | 17.5 s / 26.7 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N06 N07 N11 N12 |
+| [2026-11-18T22-44-20](2026-11-18T22-44-20-phase-1d_offline-45-page-after/results.jsonl) | `phase-1d:offline-45-page-after` | 26/45 | 0 | 1 | $0.00000 | 15.6 s / 26.9 s | B08 H01 H02 H05 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N07 N10 N11 N12 |
+| [2026-11-18T22-54-12](2026-11-18T22-54-12-phase-1d_offline-dashboards-page-gate/results.jsonl) | `phase-1d:offline-dashboards-page-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.7 s | D04 D08 D09 |

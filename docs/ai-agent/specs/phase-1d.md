@@ -222,9 +222,16 @@ Every string on the card is translated.
   page, the chat everywhere else.
 - Routing and value matching read only the user's message, never the
   blocks before it.
-- It has the same `add_dashboard_block` tool, host, card, and card line.
-  The offline prompt gains a short dashboard rule, and its rule that a data
-  question needs `run_query` also allows `add_dashboard_block`.
+- It has the same `add_dashboard_block` tool, host, card, and card line,
+  but only on a turn that can be about a dashboard: the page is a dashboard,
+  a dashboard or one of its charts is attached or mentioned, the turn has a
+  card line, or the message names a dashboard. On such a turn the offline
+  prompt gains how to read the blocks and a short dashboard rule, and its
+  rule that a data question needs `run_query` also allows
+  `add_dashboard_block`. Every other turn, a plain question on a Data
+  Explorer page included, gets the prompt and the tool list `demo/measles`
+  builds, since a 4B model reads a longer prompt and tool list less well.
+  The page block is sent on every turn, so having a block is not the test.
 - A turn too long for the window gets today's overflow reply.
 - Saving needs a connection. Without one, Confirm fails and the card
   stays retryable. Adding to the open editor works without one, and saving
@@ -296,7 +303,7 @@ runs set the bar before the agent side is built.
 | Today's chat, Claude Haiku 5.5, D01 to D09 | `phase-1d:today-dashboards` | The baseline: D01 to D05 5/5 and D06 to D09 0/4 on every run (recorded in `eval.md`). |
 | Agent v6, D01 to D09, three runs | `phase-1d:agent-dashboards` | D01 to D05 at least as good as the baseline. D06 to D09 pass on all three. |
 | Agent v6 on P, M, and the 45 | `phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45` | Unchanged from v3. A single miss is rerun before calling it a regression. |
-| Offline Qwen3 4B on D and the 45 | `phase-1d:offline-dashboards`, `phase-1d:offline-45` | No write that was not asked for, no write without Confirm, the D score recorded, and the 45 at 26 or better. |
+| Offline Qwen3 4B on D and the 45 | `phase-1d:offline-dashboards`, `phase-1d:offline-45` | No write that was not asked for, no write without Confirm, the D score recorded, and the 45 at 26 or better. The 45 runs with the page block the app sends (`--page data-explorer`), since the app sends it on every turn. |
 
 ## Testing
 
