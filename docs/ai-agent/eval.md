@@ -347,13 +347,133 @@ dashboard tool was built.
   table, since both ask for a chart. Today's chat added no block on either,
   so its numbers do not change.
 
-The agent and the offline agent ran on 2026-11-17 with the dashboard
-prompt as first numbered, v4 (the browser's version then): v3 plus
-DASHBOARD BLOCKS. It ships as `data-agent-v6`, v5 plus DASHBOARD BLOCKS,
-because `demo/measles` shipped v4 (the plugin tools' TOOLS bullet) and v5
-(CODED COLUMNS) first. v6 also carries those two additions, and these runs
-have not been repeated on v6. All runs are on the Pi harness with Haiku
-5.5 and Sonnet 5.5 escalation unless the row says offline.
+**Prompt v6, the shipping prompt (2026-11-18).** These are the final runs.
+`data-agent-v6` is v5 plus DASHBOARD BLOCKS, and v5 is v3 plus the plugin
+tools' TOOLS bullet and the CODED COLUMNS rules, both from `demo/measles`.
+The prompt text did not change during these runs. Every run is on the Pi
+harness with Haiku 5.5 and Sonnet 5.5 escalation unless the row says
+offline (Qwen3 4B). `--questions D` on the default COVID workspace selects
+the dashboard questions D01 to D09. The measles workspace's coded-column
+questions also have the ids D01 to D04, but they run only with
+`--workspace measles`, so the two sets are never mixed.
+
+| Run | Correct | D01 to D05 (open editor) | D06 to D09 (elsewhere) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|
+| phase-1d:agent-dashboards #1 (v6; 39% of input cached) | 9/9 | 5/5 | 4/4 | 0 / 0 | $0.00065 | 5,544 | 2.6 s / 3.2 s |
+| phase-1d:agent-dashboards #2 (v6) | 9/9 | 5/5 | 4/4 | 0 / 0 | $0.00022 | 5,544 | 1.9 s / 2.4 s |
+| phase-1d:agent-dashboards #3 (v6) | 9/9 | 5/5 | 4/4 | 0 / 0 | $0.00023 | 5,543 | 1.9 s / 2.3 s |
+| phase-1d:agent-page (P01 to P07) | 6/7 | | | 0 / 1 | $0.00023 | 5,575 | 1.9 s / 2.5 s |
+| phase-1d:rerun-p04 (nine single reruns of P04) | 5/9 | | | 0 / 4 | $0.00020 to $0.00039 | 5,636 to 5,756 | 1.7 to 3.9 s |
+| phase-1d:agent-mentions (M01 to M06, M03b) | 7/7 | | | 0 / 0 | $0.00023 | 5,607 | 1.9 s / 2.6 s |
+| phase-1d:agent-45 | 45/45 | | | 0 / 0 | $0.00031 | 5,534 | 2.2 s / 3.3 s |
+| phase-1d:offline-45 (Qwen3 4B, before the offline prompt fix) | 25/45 | | | 0 / 1 | $0 | 1,109 | 19.5 s / 28.1 s |
+| **phase-1d:offline-45 (Qwen3 4B, after the offline prompt fix)** | **26/45** | | | **0 / 1** | **$0** | **1,015** | **16.4 s / 27.7 s** |
+| phase-1d:offline-dashboards (Qwen3 4B, after the fix) | 6/9 | 4/5 | 2/4 | 1 / 0 | $0 | 880 | 18.0 s / 83.2 s |
+
+- **Bars.** Dashboards D01 to D09 on all three runs: **met**. P 7/7:
+  **missed** (6/7 on the run, see the next bullet). M 7/7: **met**. The 45
+  at 44 or 45: **met** (45/45). Offline: D05 and D08 write nothing and every
+  write outside the editor has `via: "card"`: **met**. The D score is
+  recorded (6/9). The offline 45 at 26 or better: **met at exactly 26, after
+  one fix** (25/45 before it).
+- **P04 missed on the P run, and the cause is v5, not the dashboard rules.**
+  "make this a pie chart", with two charts on the dashboard, should ask
+  which one. The miss ran `run_query` on the cases chart and replied that it
+  matched the "Monthly US cases in 2022" chart, with no question. Nine
+  single reruns passed 5 and missed 4, so P04 is 5 of 10 on v6. The same
+  question on older prompts (ten runs each, a temporary local edit of
+  `DATA_AGENT_PROMPT_ID`, labels `phase-1d:diag-p04-v3`, `-v4`, and `-v5`):
+
+  | Prompt | P04 asked and passed | Input tokens per call (two-call runs) |
+  |---|---|---|
+  | v3 | 10/10 | 3,889 to 3,921 |
+  | v4 (v3 plus the plugin tools' bullet) | 10/10 | 3,956 to 3,970 |
+  | v5 (v4 plus CODED COLUMNS) | 5/10 | 4,166 to 4,197 |
+  | v6 (v5 plus DASHBOARD BLOCKS) | 5/10 | 5,730 to 5,756 |
+
+  The drop is between v4 and v5, and v6 matches v5, so the dashboard rules
+  did not change P04's rate. v5 is already on `demo/measles`. No prompt was
+  changed for it here: a fix would be new text in v6 (for example, ask
+  which chart when "this" could mean several), outside the dashboard rules
+  this eval set out to check. The samples are small (10 runs each).
+- **The 45 scored 45/45.** The 45's earlier miss, H07, passed.
+- **No dashboard prompt fix was needed.** The three D runs passed every
+  question, including D01 (a chart with the editor open, 3 of 3) and D08 (a
+  missing dashboard, 3 of 3 with the widened phrase list), so
+  `DASHBOARD_BLOCK_RULES` is as it was before these runs.
+- **v6 costs about 1,550 more input tokens per call than v5 and about
+  1,850 more than v3.** On the same question (P04, two calls): 5,730 to
+  5,756 on v6, 4,166 to 4,197 on v5, 3,889 to 3,921 on v3 (+37% and +47%).
+  Across whole runs against v3's last runs: P 5,575 against 3,556 (+57%),
+  the 45 5,534 against 3,478 (+59%), M 5,607 against 3,557 to 3,560 (+58%).
+  Against the first-numbered prompt's runs below, v6 adds 221 to 285 tokens
+  per call (+4 to +5%): the plugin tools' bullet and CODED COLUMNS. The
+  dashboard tool's schema and rules are in the cached prefix: 95 to 100% of
+  input tokens were cache reads on every run but D run #1
+  (39% cached, which cost $0.00065 per question against $0.00022 and
+  $0.00023 on the next two). The 45 cost $0.00031 per question against
+  $0.00055 on v3's last run.
+- **The offline 45 scored 25/45 on the rebased tree, then 26/45 after a
+  fix.** Compared with the last archived offline run before dashboards
+  (`local_qwen3-4b_final2`, 26/45), question by question:
+
+  | Question | `final2` | Rebased tree | After the fix |
+  |---|---|---|---|
+  | B09 | miss | pass | pass |
+  | H04 | pass | miss | pass |
+  | N05 | pass | miss | pass |
+  | N01 | pass | pass | miss |
+
+  Every other question kept its result in all three runs. The same three
+  flips (B09, H04, N05) showed on 2026-11-17, so offline runs repeat for the
+  same code. H04 and N05 missed as before: N05 ("covid deaths last year")
+  filtered 2025 where `final2` chose 2022, and H04 put the 2021 range in
+  the WHERE clause, so its 2022 column was empty. Neither touches
+  dashboards. The cause was the longer offline prompt: this phase appended
+  the CONTEXT and DASHBOARDS rules and the dashboard form of the run-query
+  rule to every turn, and a 4B model reads a longer prompt less well. The
+  prompt grew from 953 input tokens per call in `final2` to 1,109. The fix
+  (`7c4f95033`) adds them only on a turn that carries context blocks or
+  names a dashboard. A plain question gets the prompt `demo/measles` builds,
+  byte for byte (a hash test pins it). H04, N05, and B09 passed in a
+  targeted run (`phase-1d:offline-diag-a`) before the full run, which
+  scored 26/45 at 1,015 tokens per call.
+- **N01 now misses, because of the dashboard tool in the tool list.** N01
+  ("how bad was covid in florida") filtered the dates to end at
+  `"date" < '2023-01-01'`, which dropped the last three months of the
+  data. With `add_dashboard_block` taken out of the tool list in a
+  temporary local edit (`phase-1d:offline-diag-notool`), N01 ended its
+  filter at `'2024-01-01'` and passed. A plain question still sees that one
+  tool entry. Offering the tool only on a turn with dashboard
+  context is the next candidate. It was not tried on the full 45: it
+  changes the shared tool list per turn, and the bar of 26 is met. The
+  offline agent has no plugin tools, so its tool list differs from
+  `demo/measles` by that one tool.
+- **Offline, nothing was written that should not have been.** D05 (a data
+  question) and D08 (a missing dashboard) wrote no block. The editor
+  questions D01 to D03 wrote through the editor, and the two other writes
+  (D06 and D07) have `via: "card"`. Neither offline 45 run wrote a block or
+  called the dashboard tool. The offline questions' results did not change
+  from the first-numbered prompt's run (6/9, the same questions missed):
+  D01 to D03 passed in the editor, D04 ("a table of the 5 states with the
+  most deaths") ran `run_query` and answered in words with no block, D06
+  added a bar chart through the card, and D07 asked which dashboard (a
+  needless question, since the request named it) before adding the weekly
+  chart. On D08 and D09 it asked which dashboard twice, got an answer both
+  times, and ended with no reply text and no block: it neither said it
+  cannot find "Budget" (D08) nor added to the chosen dashboard (D09).
+- All the v6 runs on this page cost $0.0395 in 45 online runs: the six
+  final runs $0.0272 (D $0.0099, P $0.0016, M $0.0016, the 45 $0.0140),
+  the nine P04 reruns $0.0028, and the 30 prompt comparison runs $0.0096.
+  The five offline runs cost $0.
+
+**Earlier runs on the first-numbered prompt (v4), kept as history.** They
+ran on 2026-11-17, before the rebase, with the dashboard prompt as first
+numbered, v4: v3 plus DASHBOARD BLOCKS. It ships as `data-agent-v6`, v5
+plus DASHBOARD BLOCKS, because `demo/measles` shipped v4 (the plugin tools'
+TOOLS bullet) and v5 (CODED COLUMNS) first. The v6 runs above repeat all of
+them. All runs below are on the Pi harness with Haiku 5.5 and Sonnet 5.5
+escalation unless the row says offline.
 
 | Run | Correct | D01 to D05 (open editor) | D06 to D09 (elsewhere) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
 |---|---|---|---|---|---|---|---|
@@ -366,7 +486,7 @@ have not been repeated on v6. All runs are on the Pi harness with Haiku
 | phase-1d:offline-dashboards (Qwen3 4B) | 6/9 | 4/5 | 2/4 | 1 / 0 | $0 | 880 | 18.0 s / 82.8 s |
 | phase-1d:offline-45 (Qwen3 4B) | 25/45 | | | 0 / 1 | $0 | 1,101 | 16.9 s / 23.0 s |
 
-- **The agent's bars are met on the final prompt.** D01 to D05 scored 5/5
+- **The agent's bars were met on that prompt, after its second fix.** D01 to D05 scored 5/5
   and D06 to D09 4/4 on all three final runs, P and M scored 7/7, and the
   45 scored 44/45. The runs before the final prompt are kept in the table
   because they missed (see below).
@@ -425,9 +545,10 @@ have not been repeated on v6. All runs are on the Pi harness with Haiku
   in the WHERE clause, so its 2022 column is empty. Neither question touches dashboards.
   The offline prompt changed in this phase (the dashboard rules and the
   page in context), and the earlier note holds that borderline questions
-  move between prompt revisions, but this total is below the bar.
-- All the Phase 1D online runs on this page's rows cost $0.06, in 17 runs,
-  reruns included (the baseline's $0.035 not included).
+  move between prompt revisions, but this total is below the bar. The v6
+  runs above repeat it (25/45), find the cause, and fix it.
+- The first-numbered prompt's online runs cost $0.06, in 17 runs, reruns
+  included (the baseline's $0.035 not included).
 
 ## Offline mode
 
@@ -836,10 +957,13 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The converted-column questions (add `--label dictionary-conversions:converted`) | `--harness pi --config haiku-sonnet --workspace measles` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 | Today's chat on the dashboard questions (add `--label phase-1d:today-dashboards`) | `--harness baseline --model anthropic/claude-haiku-5.5 --questions D --concurrency 6` |
-| The agent on the dashboard questions (add `--label phase-1d:agent-dashboards`) | `--harness pi --config haiku-sonnet --questions D --concurrency 6` |
+| The agent on the dashboard questions, three runs (add `--label phase-1d:agent-dashboards`) | `--harness pi --config haiku-sonnet --questions D --concurrency 6` |
 | The agent on P, M, and the 45 (add `--label phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45`) | `--harness pi --config haiku-sonnet --questions P`, then `--questions M`, then `--concurrency 6` |
 | The offline agent on the dashboard questions (add `--label phase-1d:offline-dashboards`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions D --concurrency 1` |
 | The offline agent on the 45 (add `--label phase-1d:offline-45`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1` |
+| A single question again (add `--label phase-1d:rerun-p04`) | `--harness pi --config haiku-sonnet --questions P04` |
+| P04 on an older prompt (add `--label phase-1d:diag-p04-v5`) | Set `DATA_AGENT_PROMPT_ID` in `shared/agent/dataAgent/dataAgentTools.ts` to `"data-agent-v5"` (or v3, v4) without committing, then `--harness pi --config haiku-sonnet --questions P04`. Restore the file after. |
+| Offline N01 without the dashboard tool (add `--label phase-1d:offline-diag-notool`) | Make `_servesDashboardTool` in `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` return false without committing, then `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions N01 --concurrency 1`. Restore the file after. |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -875,7 +999,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 154 runs (every
+chat index lists all 204 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -897,6 +1021,8 @@ Each was made after reading the failing answers by hand.
 | D05 says "US deaths" | Question | "What were total deaths in 2022?" could mean the US or the global deaths dataset, and today's chat rightly asked which (Phase 1D baseline run #1). |
 | Prompt v6 (then v4): "add a chart, table, heading, or note" on a dashboard page means that dashboard, never `run_query` alone | Agent prompt (v6, not yet deployed) | The agent showed D01's chart in the reply and added no block, on 4 of 4 runs. |
 | Prompt v6 (then v4): say plainly that you cannot find a dashboard with that name | Agent prompt (v6, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
+| D08 also accepts "don't have", "do not have", and similar | Grader | A correct "I don't have a dashboard named ..." reply failed `NOT_FOUND_PATTERN` (`9925721e3`). |
+| The offline prompt carries the context and dashboard rules only on a turn with context blocks or a dashboard in the message | Offline prompt | The longer prompt on every turn turned H04 and N05 from passes into misses, 25/45 against a bar of 26 (`7c4f95033`). |
 
 After the last two changes, needless and missed questions on the chosen
 setup went from 1 per run to 0.

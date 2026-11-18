@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:offline-diag-a",
+  "questionCount": 3,
+  "passCount": 3,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 6,
+  "promptTokens": 6452,
+  "cachedPromptTokens": 0,
+  "completionTokens": 689,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 21377.371291999996,
+  "latencyP90Ms": 89107.339292,
+  "failedIds": []
+}

@@ -40,18 +40,27 @@ and implementation, in order.
 | 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). Three live checks with live models in the real app passed (2026-11-09). Pushed to the demo on 2026-11-09, so prompt v2 is now fixed: a prompt change needs a new version served beside v1 and v2. The agent stays off until 1D and 1E close the gaps listed under [What keeps the agent off](#what-keeps-the-agent-off-pablo-2026-11-09). |
 | 1B | **Attachable context.** Done (2026-11-09). `@` mentions of gadgets in the chat composer and a context picker ([spec](specs/phase-1b.md)). | Done (2026-11-09) on `feat/agent-context` (D41, D42). Met: unit tests; an adversarial privacy review over three rounds, with eight leaks found and fixed; mention questions M01 to M06 passing on all three runs, with P01 to P07 passing and the 45 questions at 44/45 (the miss passed on rerun) on prompt v3. Eval label `phase-1b` ([results](eval.md#phase-1b)). A mocked browser spec, and a live check with live models in the real app that passed all six steps. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). Built (2026-11-10) ([plan](plans/phase-1c.md), [spec](specs/phase-1c.md), D43). | Unit tests, one browser spec, and a data session's turn text unchanged. |
-| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17), with one offline bar missed** ([spec](specs/phase-1d.md), D44). | Met online: dashboard questions D01 to D09 passed 9/9 on each of three final runs, P01 to P07 7/7, M01 to M06 (with M03b) 7/7, and the 45 questions at 44/45 on one run. **Missed offline:** the offline 45 scored 25/45 against a bar of 26 (H04 and N05 regressed, B09 now passes). The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The eval runs used it as first numbered: v3 plus the dashboard rules. |
+| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17), with one online bar missed: P04** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 45/45, and the offline 45 26/45 against a bar of 26 (25/45 before an offline prompt fix: the dashboard text now joins the offline prompt only on a turn with blocks or a dashboard in the message, which brought H04 and N05 back). **Missed:** P01 to P07 scored 6/7 against a bar of 7/7 (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
 | 1E | **"Try again" and parity in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). The agent's question cards are audit-logged and bias-checked like today's clarification cards, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40). | Covered by unit tests and the browser test (1F). |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
 
 ### Open after 1D (2026-11-17)
 
-- **Offline bar.** The offline 45 is 25/45 against a bar of 26. The offline
-  dashboard questions are 6/9: D04 replied with no block, and D08 and D09
-  ended with no reply and no block. D05 and D08 correctly wrote no block.
-  Every write outside the open editor used the confirm card.
-- **D08 grader.** `NOT_FOUND_PATTERN` misses "don't have", so a correct "I
-  don't have a dashboard named ..." reply fails the grader.
+- **P04 on v5 and v6.** "make this a pie chart" with two charts on a
+  dashboard should ask which one. It does on 10 of 10 runs of v3 and v4 and
+  on 5 of 10 of v5 and of v6, so the drop came with v5's CODED COLUMNS rules
+  on `demo/measles`. No prompt was changed for it. A fix would be new text
+  in v6 (ask which chart when "this" could mean several).
+- **Offline bar.** Updated 2026-11-18: the offline 45 is 26/45 against a bar
+  of 26, after the offline prompt stopped carrying the dashboard text on
+  plain questions (25/45 before). N01 now misses, and passes without the
+  dashboard tool in the offline tool list, so offering the tool only on a
+  dashboard turn is the next candidate. The offline dashboard questions
+  are 6/9: D04 replied with no block, and D08 and D09 ended with no reply
+  and no block. D05 and D08 correctly wrote no block. Every write outside
+  the open editor used the confirm card.
+- **D08 grader.** Fixed in `9925721e3`: `NOT_FOUND_PATTERN` now accepts "don't
+  have" and similar, and D08 passed 3 of 3 on v6.
 - **Unmasked text.** Updated 2026-11-18: a hosted turn shows real values in
   its replies, a query's summary, and a question card's text and option
   labels (D39). Still masked: the message that posts a picked option reads

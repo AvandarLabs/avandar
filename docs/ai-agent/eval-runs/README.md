@@ -167,3 +167,53 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-17T19-40-19](2026-11-17T19-40-19-phase-1d_offline-dashboards/results.jsonl) | `phase-1d:offline-dashboards` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 82.8 s | D04 D08 D09 |
 | [2026-11-17T19-55-12](2026-11-17T19-55-12-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 25/45 | 0 | 1 | $0.00000 | 16.9 s / 23.0 s | B08 H01 H02 H04 H05 H06 H09 H10 I04 I06 I07 I08 I09 N03 N04 N05 N07 N10 N11 N12 |
 | [2026-11-17T19-58-24](2026-11-17T19-58-24-phase-1d_offline-rerun/results.jsonl) | `phase-1d:offline-rerun` | 0/2 | 0 | 0 | $0.00000 | 154.9 s / 154.9 s | H04 N05 |
+| [2026-11-18T19-43-28](2026-11-18T19-43-28-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00065 | 2.6 s / 3.2 s | none |
+| [2026-11-18T19-43-34](2026-11-18T19-43-34-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00022 | 1.9 s / 2.4 s | none |
+| [2026-11-18T19-43-40](2026-11-18T19-43-40-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00023 | 1.9 s / 2.3 s | none |
+| [2026-11-18T19-44-00](2026-11-18T19-44-00-phase-1d_agent-page/results.jsonl) | `phase-1d:agent-page` | 6/7 | 0 | 1 | $0.00023 | 1.9 s / 2.5 s | P04 |
+| [2026-11-18T19-44-06](2026-11-18T19-44-06-phase-1d_agent-mentions/results.jsonl) | `phase-1d:agent-mentions` | 7/7 | 0 | 0 | $0.00023 | 1.9 s / 2.6 s | none |
+| [2026-11-18T19-44-28](2026-11-18T19-44-28-phase-1d_agent-45/results.jsonl) | `phase-1d:agent-45` | 45/45 | 0 | 0 | $0.00031 | 2.2 s / 3.3 s | none |
+| [2026-11-18T19-44-51](2026-11-18T19-44-51-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00036 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-44-57](2026-11-18T19-44-57-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00039 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-45-01](2026-11-18T19-45-01-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00022 | 2.1 s / 2.1 s | P04 |
+| [2026-11-18T19-45-16](2026-11-18T19-45-16-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00035 | 3.1 s / 3.1 s | none |
+| [2026-11-18T19-45-22](2026-11-18T19-45-22-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00036 | 3.3 s / 3.3 s | none |
+| [2026-11-18T19-45-26](2026-11-18T19-45-26-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00024 | 2.2 s / 2.2 s | P04 |
+| [2026-11-18T19-45-31](2026-11-18T19-45-31-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00025 | 2.4 s / 2.4 s | P04 |
+| [2026-11-18T19-45-38](2026-11-18T19-45-38-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00039 | 3.9 s / 3.9 s | none |
+| [2026-11-18T19-45-42](2026-11-18T19-45-42-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00020 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-06](2026-11-18T19-46-06-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00066 | 1.8 s / 1.8 s | P04 |
+| [2026-11-18T19-46-10](2026-11-18T19-46-10-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00018 | 1.8 s / 1.8 s | P04 |
+| [2026-11-18T19-46-14](2026-11-18T19-46-14-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00018 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-19](2026-11-18T19-46-19-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-46-23](2026-11-18T19-46-23-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00019 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-28](2026-11-18T19-46-28-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-46-34](2026-11-18T19-46-34-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-46-39](2026-11-18T19-46-39-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-46-45](2026-11-18T19-46-45-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00035 | 3.1 s / 3.1 s | none |
+| [2026-11-18T19-46-49](2026-11-18T19-46-49-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00019 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-59](2026-11-18T19-46-59-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00062 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-47-04](2026-11-18T19-47-04-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-09](2026-11-18T19-47-09-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-47-15](2026-11-18T19-47-15-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-47-20](2026-11-18T19-47-20-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-25](2026-11-18T19-47-25-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-47-31](2026-11-18T19-47-31-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-36](2026-11-18T19-47-36-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-47-41](2026-11-18T19-47-41-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.5 s / 2.5 s | none |
+| [2026-11-18T19-47-46](2026-11-18T19-47-46-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-04](2026-11-18T19-48-04-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00060 | 2.5 s / 2.5 s | none |
+| [2026-11-18T19-48-09](2026-11-18T19-48-09-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00031 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-15](2026-11-18T19-48-15-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00029 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-48-20](2026-11-18T19-48-20-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-25](2026-11-18T19-48-25-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-48-30](2026-11-18T19-48-30-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-48-36](2026-11-18T19-48-36-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-48-41](2026-11-18T19-48-41-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-46](2026-11-18T19-48-46-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-51](2026-11-18T19-48-51-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-05-11](2026-11-18T20-05-11-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 25/45 | 0 | 1 | $0.00000 | 19.5 s / 28.1 s | B08 H01 H02 H04 H05 H06 H09 H10 I04 I06 I07 I08 I09 N03 N04 N05 N07 N10 N11 N12 |
+| [2026-11-18T20-09-47](2026-11-18T20-09-47-phase-1d_offline-diag-a/results.jsonl) | `phase-1d:offline-diag-a` | 3/3 | 0 | 0 | $0.00000 | 21.4 s / 89.1 s | none |
+| [2026-11-18T20-25-18](2026-11-18T20-25-18-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 26/45 | 0 | 1 | $0.00000 | 16.4 s / 27.7 s | B08 H01 H02 H05 H06 H09 H10 I04 I06 I07 I08 I09 N01 N03 N04 N07 N10 N11 N12 |
+| [2026-11-18T20-27-08](2026-11-18T20-27-08-phase-1d_offline-diag-notool/results.jsonl) | `phase-1d:offline-diag-notool` | 1/1 | 0 | 0 | $0.00000 | 86.3 s / 86.3 s | none |
+| [2026-11-18T20-31-40](2026-11-18T20-31-40-phase-1d_offline-dashboards/results.jsonl) | `phase-1d:offline-dashboards` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 83.2 s | D04 D08 D09 |

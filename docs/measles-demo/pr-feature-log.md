@@ -575,7 +575,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `shared/agent/mentions/buildAgentContextBlocks.{ts,test.ts}` | F89, F139 | F89 creates it. F139: an offline turn caps the chart SQL its blocks keep, through `offlineContextBudget.ts` (`5412ad50c`). |
 | `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.{ts,test.ts}` | F82, F86, F89 to F91, F139 | F139: each prompt version is served its own tool list, and the proxy checks tool calls against that version's list (`7d60451b6`). |
 | `src/lib/agent/dataAgent/{DataAgentHost.ts,browser/createBrowserDataAgentHost.ts}` | F82, F83, F86, F87, F139 | F139: the dashboard method on the host (`927a968b5`), and the browser host's block placement (`a666b6ba9`). |
-| `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`628843924`). |
+| `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`628843924`). The dashboard text joins the offline prompt only on a turn with blocks or a dashboard in the message (`7c4f95033`). |
 | `src/lib/agent/dataAgent/pagePrivacy/{SqlPlaceholderVault,createPlaceholderRestoringHost}.{ts,test.ts}` | F87, F139 | F87 creates them. F139: `unmaskText` restores the names the agent writes (`7fee248f9`), and the host restores placeholders in dashboard blocks (`c3c2e936c`). |
 | `tests/e2e/agent-chat-mentions.spec.ts` | F91, F139 | F91 creates it. F139: the `data-agent-v6` route (`a693f179c`). |
 | `tests/e2e/agent-chat-sessions.spec.ts` | F128, F139 | F128 creates it. F139: the `data-agent-v6` route (`a693f179c`). |
@@ -11937,14 +11937,19 @@ v5 with its own built-in tool list, and only v6 serves `add_dashboard_block`.
 **Value:** A person can ask for a chart or table on a dashboard from any page,
 online or offline, and see it added without leaving the chat.
 
-**Eval:** On the final prompt the online bars are met: dashboard questions
-D01 to D09 scored 9/9 on each of three runs, P01 to P07 7/7, M01 to M06 (with
-M03b) 7/7, and the 45 questions 44/45 on one run. The offline 45 scored
-25/45 against a bar of 26, so that bar is **missed**, and the offline
-dashboard questions scored 6/9. The runs are in `docs/ai-agent/eval.md`
-(`#phase-1d`). They ran before the rebase, on the dashboard prompt as first
-numbered (v4: v3 plus the dashboard rules), and have not been repeated on
-v6, which adds the plugin tools' TOOLS bullet and the coded-column rules.
+**Eval:** The final runs are on prompt v6 (2026-11-18), recorded in
+`docs/ai-agent/eval.md` (`#phase-1d`). Dashboard questions D01 to D09 scored
+9/9 on each of three runs, M01 to M06 (with M03b) 7/7, and the 45 questions
+45/45, so those bars are met. The offline 45 scored 26/45 against a bar of
+26, which is met after a fix (25/45 before it: the offline prompt now carries
+the context and dashboard rules only on a turn with blocks or a dashboard in
+the message). The offline dashboard questions scored 6/9. The P bar of 7/7
+is **missed**: P01 to P07 scored 6/7, because P04 ("make this a pie chart"
+with two charts) answered without asking which chart, and it does so on 5 of
+10 runs of v5 and of v6 against 0 of 10 on v3 and v4, so the drop came with v5 (the
+coded-column rules from `demo/measles`), not with the dashboard rules. The earlier
+runs (2026-11-17, before the rebase, on the dashboard prompt as first
+numbered: v3 plus the dashboard rules) are kept in `eval.md` as history.
 
 **Design:** `docs/ai-agent/specs/phase-1d.md` and D44 in
 `docs/ai-agent/decisions.md`. The task plan is `docs/ai-agent/plans/phase-1d.md`
@@ -12053,15 +12058,16 @@ already has, and `1a9a157d5`, whose formatting `demo/measles` already has):
 are in the browser, per chat session.
 
 **Known gaps** (open, not part of this feature's acceptance):
-- The offline 45 is 25/45 against a bar of 26. H04 and N05 regressed, and B09 now passes.
+- P04 scores 5 of 10 on v6 (and on v5), where v3 and v4 score 10 of 10. The P bar of 7/7 is missed, and no prompt was changed for it.
+- The offline 45 scored 25/45 before the offline prompt fix and 26/45 after it, against a bar of 26. N01 now misses because `add_dashboard_block` is in every offline turn's tool list.
 - The offline D questions scored 6/9. D04 gave a reply with no block, and D08 and D09 ended with no reply and no block.
-- The D08 grader pattern (`NOT_FOUND_PATTERN`) misses "don't have".
+- The D08 grader pattern (`NOT_FOUND_PATTERN`) was widened in `9925721e3`, and D08 passed 3 of 3 on v6.
 - Updated 2026-11-18: a hosted turn shows real values in replies, a query's summary, and a question card's text and option labels. The message that posts a picked option still reads `<value N>` in the thread, since the option goes back to the model with no consent check.
 - A chart result gives the model no row count or columns, where the spec calls for them.
 - `dashboard_card` is not in `PLAIN_BLOCK_TAG_START` (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a card line.
 - The card's strings are untranslated in the non-English `.po` files until `pnpm translations` runs.
 - Prompt v6 is fixed once it is pushed to the demo.
-- The agent and offline eval ran on the prompt as first numbered (v3 plus the dashboard rules), not yet on v6.
+- The final eval ran on v6 (2026-11-18). The 2026-11-17 runs used the prompt as first numbered (v3 plus the dashboard rules).
 
 **Verification:**
 ```sh
