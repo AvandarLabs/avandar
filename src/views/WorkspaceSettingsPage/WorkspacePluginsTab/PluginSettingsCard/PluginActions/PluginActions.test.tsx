@@ -206,6 +206,9 @@ describe("PluginActions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Install" }));
 
     expect(actions.install).toHaveBeenCalledTimes(1);
+    expect(actions.install).toHaveBeenCalledWith(
+      screen.getByRole("button", { name: "Install" }),
+    );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 

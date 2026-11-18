@@ -698,7 +698,7 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
     const card = await screen.findByRole("region", { name: "Epidemiology" });
     const installButton = within(card).getByRole("button", { name: "Install" });
-    installButton.focus();
+    // Safari and Firefox on macOS do not focus a button on click.
     fireEvent.click(installButton);
     await screen.findByRole("dialog", { name: "Install Epidemiology" });
 
@@ -718,7 +718,7 @@ describe("WorkspacePluginsTab", () => {
       const installButton = within(card).getByRole("button", {
         name: "Install",
       });
-      installButton.focus();
+      // Safari and Firefox on macOS do not focus a button on click.
       fireEvent.click(installButton);
       await screen.findByRole("dialog", { name: "Install Epidemiology" });
       // The install lands: the card's Install button is replaced.

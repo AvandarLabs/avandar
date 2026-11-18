@@ -647,6 +647,8 @@ describe("PluginInstallWizard", () => {
       act(() => {
         openPluginInstallWizard({
           pluginName: "Mozambique",
+          opener: document.body,
+          headingId: "card-heading",
           manifestModule: _makeManifestModule({
             permissions: [],
             contributes: {

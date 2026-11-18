@@ -14,10 +14,14 @@ import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 export function openPluginInstallWizard(options: {
   pluginName: string;
   manifestModule: PluginManifestModule;
+
+  /** The button that opened the wizard, where focus returns on close. */
+  opener: HTMLElement;
+
+  /** The id of the card's heading, where focus goes if the opener is gone. */
+  headingId: string;
 }): void {
-  const { pluginName, manifestModule } = options;
-  const opener = document.activeElement;
-  const headingId = opener?.getAttribute("aria-describedby") ?? null;
+  const { pluginName, manifestModule, opener, headingId } = options;
   const modalId = randomId();
   modals.open({
     modalId,

@@ -13,8 +13,12 @@ export type PluginInstallationActions = Readonly<{
   /** True while any action is saving, so the card can disable its buttons. */
   isPending: boolean;
 
-  /** Opens the install wizard, which installs the plugin when it finishes. */
-  install: () => void;
+  /**
+   * Opens the install wizard, which installs the plugin when it finishes.
+   * Pass the button that opened it, since a click does not focus a button in
+   * every browser, so focus can go back to it afterwards.
+   */
+  install: (opener: HTMLElement) => void;
   setIsEnabled: (isEnabled: boolean) => void;
   approvePermissions: () => void;
   uninstall: () => void;
@@ -50,9 +54,14 @@ function _makeInstallActionsFromContext(
   const { pluginName, manifestModule, installation, mutations } = context;
   const { headingId } = context;
   return {
-    install: () => {
+    install: (opener) => {
       if (manifestModule !== undefined) {
-        openPluginInstallWizard({ pluginName, manifestModule });
+        openPluginInstallWizard({
+          pluginName,
+          manifestModule,
+          opener,
+          headingId,
+        });
       }
     },
     uninstall: () => {

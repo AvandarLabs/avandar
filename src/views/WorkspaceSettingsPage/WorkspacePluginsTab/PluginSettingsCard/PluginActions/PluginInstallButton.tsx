@@ -5,7 +5,9 @@ type Props = Readonly<{
   /** The id of the plugin's card heading, which describes this button. */
   headingId: string;
   isDisabled: boolean;
-  onInstall: () => void;
+
+  /** Runs with the clicked button, where focus returns after the wizard. */
+  onInstall: (opener: HTMLElement) => void;
 }>;
 
 /**
@@ -24,7 +26,9 @@ export function PluginInstallButton({
       size="compact-sm"
       aria-describedby={headingId}
       disabled={isDisabled}
-      onClick={onInstall}
+      onClick={(event) => {
+        onInstall(event.currentTarget);
+      }}
     >
       {t`Install`}
     </Button>
