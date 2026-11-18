@@ -715,6 +715,26 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   with no consent check, so that message reads `<value N>` in the thread.
   The dashboard card carries no summary: the reply above it is the
   summary. Device turns are unchanged.
+- **Updated 2026-11-18: an earlier chat's placeholders mean nothing in a
+  new one.** A placeholder's number means a value only inside the vault that
+  issued it, and each new conversation (a reload, or a switch to another
+  session and back) starts a new vault that numbers its own values from
+  `<value 1>`. The recap of the thread kept the old numbers, so a model that
+  repeated "`<value 1>` had 2 visits" could be shown the new vault's
+  `<value 1>`: another person's name. The recap, and the message being
+  answered, now read every placeholder in the thread's own text as
+  `[earlier value]`, a text no vault issues or unmasks
+  (`hideEarlierPlaceholders`, in `askConversationDataAgent`). The names and
+  values the new vault masks afterwards stay as they are. Nothing stored
+  changes: the thread keeps the model's text with its placeholders. The
+  other design, starting the new vault's numbers above the highest one in
+  the thread, was not taken. It would change how the vault numbers,
+  restores, and checks placeholders, depend on scanning every stored message
+  for numbers, and still show the model old placeholders it would try to
+  reuse in SQL. The cost of the chosen one: the model cannot tell that an
+  `[earlier value]` is the page's `<value 1>` again, even when the same
+  page shows the same person. The chat title request reads the model's text
+  as it is, since a title is never unmasked.
 - **Costs.** About 120 to 170 more input tokens per call for the prompt
   rules.
   Columns outside the page's datasets count as personal, and DuckDB-only

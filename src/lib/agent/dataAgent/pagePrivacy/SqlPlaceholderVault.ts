@@ -16,7 +16,7 @@ const PLACEHOLDERS_IN_TEXT = /<value ([1-9]\d*)>/g;
  * Anything a model may have meant as a placeholder: any case, spacing, or
  * leading zeros, as in `<VALUE 01>`.
  */
-const PLACEHOLDER_LIKE = /<\s*value\s*\d+\s*>/i;
+export const PLACEHOLDER_LIKE = /<\s*value\s*\d+\s*>/i;
 
 /**
  * In SQL that could not be read, numbers this small stay as written when

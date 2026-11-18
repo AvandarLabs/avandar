@@ -2,9 +2,12 @@
  * Guards the path a hosted agent reply takes: the user reads it with real
  * values, the stored thread keeps what the model wrote, and every later
  * request to a hosted model (the next turn, the recap after a reload, the
- * chat title) carries placeholders and never the real value. Runs the real
- * adapter, `runDataAgentTurn`, the turn's vault, and the title request,
- * with the model, the network, and the page read stood in.
+ * chat title) carries placeholders and never the real value. A new
+ * conversation starts a new vault whose numbers mean other values, so it
+ * also guards that an earlier chat's placeholder is never read as a value of
+ * the new one. Runs the real adapter, `runDataAgentTurn`, the turn's vault,
+ * and the title request, with the model, the network, and the page read
+ * stood in.
  */
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -114,6 +117,26 @@ const PAGE_WITH_DOE: AgentPageContext = {
         title: "Visits",
         chartType: "table",
         sql: `SELECT * FROM t WHERE "last_name" = 'Doe' AND (`,
+      },
+    ],
+  },
+};
+
+/**
+ * A page whose chart filters on a different personal value. In a new vault
+ * `Smith` is `<value 1>`, the number `Doe` had in the vault of the first
+ * conversation.
+ */
+const PAGE_WITH_SMITH: AgentPageContext = {
+  app: "dashboard",
+  dashboard: {
+    id: DASHBOARD_ID,
+    name: "Outbreak",
+    tiles: [
+      {
+        title: "Visits",
+        chartType: "table",
+        sql: `SELECT * FROM t WHERE "last_name" = 'Smith' AND (`,
       },
     ],
   },
@@ -261,7 +284,7 @@ describe("hosted reply privacy", () => {
     expect(_askedText(1)).not.toContain("Doe");
   });
 
-  it("sends a recap after a reload the placeholder, though the new vault holds no value", async () => {
+  it("sends a recap after a reload no real value and no placeholder of the closed vault", async () => {
     const fixture = _createFixture();
     const { thread } = await _firstTurn(fixture);
     // A reload starts a new conversation with an empty vault, and the page
@@ -273,7 +296,8 @@ describe("hosted reply privacy", () => {
     await _run(fixture.adapter, [...thread, _userMessage("And last week?")]);
 
     expect(_askedText(1)).toContain("Earlier in this conversation:");
-    expect(_askedText(1)).toContain(`Assistant: ${MODEL_REPLY}`);
+    expect(_askedText(1)).toContain("Assistant: [earlier value] had 2 visits.");
+    expect(_askedText(1)).not.toContain("<value");
     expect(_askedText(1)).not.toContain("Doe");
   });
 
@@ -297,6 +321,64 @@ describe("hosted reply privacy", () => {
     const { excerpt } = apiPostMock.mock.calls[0]![0].body;
     expect(excerpt).toContain(`assistant: ${MODEL_REPLY}`);
     expect(excerpt).not.toContain("Doe");
+  });
+
+  it("gives the same number to a different value in a new conversation", async () => {
+    const fixture = _createFixture();
+    await _firstTurn(fixture);
+    fixture.chatGenerationRef.current += 1;
+    createAgentPageContextMock.mockResolvedValueOnce(PAGE_WITH_SMITH);
+    askMock.mockResolvedValueOnce({ text: "<value 1> had 0 visits." });
+    const question = _userMessage("Who visited?");
+
+    const result = await _run(fixture.adapter, [question]);
+
+    expect(result.content?.[0]).toEqual({
+      type: "text",
+      text: "Smith had 0 visits.",
+    });
+  });
+
+  it("never shows another person's value for a placeholder an earlier chat wrote", async () => {
+    const fixture = _createFixture();
+    const { thread } = await _firstTurn(fixture);
+    // The user comes back to the thread after a session switch. The page now
+    // filters on Smith, so the new vault numbers Smith `<value 1>`.
+    fixture.chatGenerationRef.current += 1;
+    createAgentPageContextMock.mockResolvedValueOnce(PAGE_WITH_SMITH);
+    // A model that repeats what the recap says about the earlier answer.
+    askMock.mockImplementationOnce(async (text: string) => {
+      return { text: /^Assistant: (.*)$/m.exec(text)![1] };
+    });
+
+    const result = await _run(fixture.adapter, [
+      ...thread,
+      _userMessage("What did you say before?"),
+    ]);
+
+    expect(result.content?.[0]).toEqual({
+      type: "text",
+      text: "[earlier value] had 2 visits.",
+    });
+    expect(JSON.stringify(result)).not.toContain("Smith");
+    expect(JSON.stringify(result)).not.toContain("Doe");
+  });
+
+  it("sends a new conversation the new vault's number only where the page shows it", async () => {
+    const fixture = _createFixture();
+    const { thread } = await _firstTurn(fixture);
+    fixture.chatGenerationRef.current += 1;
+    createAgentPageContextMock.mockResolvedValueOnce(PAGE_WITH_SMITH);
+    askMock.mockResolvedValueOnce({ text: "Ok." });
+
+    await _run(fixture.adapter, [...thread, _userMessage("And last week?")]);
+
+    const asked = _askedText(1);
+    const recap = asked.slice(asked.indexOf("Earlier in this conversation:"));
+    expect(asked).toContain(`"last_name" = '<value 1>'`);
+    expect(recap).not.toContain("<value");
+    expect(asked).not.toContain("Smith");
+    expect(asked).not.toContain("Doe");
   });
 
   it("shows and resends a placeholder no value stands for as written", async () => {

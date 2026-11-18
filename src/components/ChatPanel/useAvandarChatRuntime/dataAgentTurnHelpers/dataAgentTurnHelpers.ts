@@ -14,6 +14,7 @@ import {
   waitForAppliedSqlOutcome,
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { hideEarlierPlaceholders } from "@/lib/agent/dataAgent/pagePrivacy/hideEarlierPlaceholders/hideEarlierPlaceholders";
 import { loadColumnCodes } from "@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
@@ -325,24 +326,35 @@ type AskConversationDataAgentOptions = {
 /**
  * The thread as the agent reads it: each user message's mentions as
  * `@"Name"` with the turn's masked names, and each assistant reply with
- * vault values masked. Without inputs, the thread as is.
+ * vault values masked. Without inputs, the thread as is. In a new
+ * conversation every placeholder in the thread's own text is hidden first:
+ * it came from a vault that is gone, and the new vault numbers other values
+ * from `<value 1>` again. The names and values masked after that use the
+ * new vault, so they keep meaning what the turn's blocks say they mean.
  */
 function _namedMessages(
   turn: Readonly<DataAgentTurnOptions>,
   inputs: AgentTurnInputs | undefined,
+  isNewConversation: boolean,
 ): ReadonlyArray<Pick<ChatClientMessage.T, "role" | "content">> {
   if (!inputs) {
     return turn.apiMessages;
   }
+  const readText = (text: string): string => {
+    return isNewConversation ? hideEarlierPlaceholders(text) : text;
+  };
   return turn.apiMessages.map((message) => {
     return message.role === "user"
       ? {
           role: message.role,
-          content: ChatMentionToken.toModelText(message.content, inputs.nameOf),
+          content: ChatMentionToken.toModelText(
+            readText(message.content),
+            inputs.nameOf,
+          ),
         }
       : {
           role: message.role,
-          content: inputs.maskAssistantText(message.content),
+          content: inputs.maskAssistantText(readText(message.content)),
         };
   });
 }
@@ -439,7 +451,7 @@ export async function askConversationDataAgent(
   const reply = await _askAgent(
     conversation,
     buildAgentTurnText({
-      message: _buildPromptText(_namedMessages(turn, inputs), isNew),
+      message: _buildPromptText(_namedMessages(turn, inputs, isNew), isNew),
       pageBlock: blocks.pageBlock,
       previousPageBlock: conversation.lastPageBlock,
       attachedBlock: blocks.attachedBlock,
