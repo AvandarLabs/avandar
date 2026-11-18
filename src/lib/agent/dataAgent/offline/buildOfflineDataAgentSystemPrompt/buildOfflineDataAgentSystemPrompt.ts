@@ -73,9 +73,10 @@ const MAX_CODE_MATCH_PLACES = 5;
 
 /**
  * How to read the context blocks and use the dashboard tool. Shared by the
- * SQL and plan instructions. A turn gets it only when it can matter (see
- * `hasDashboardContext`): a small model reads a longer prompt less well,
- * so a plain question keeps the prompt it was tuned on.
+ * SQL and plan instructions. A turn gets it only when it can be about a
+ * dashboard (see `hasDashboardContext`): a small model reads a longer
+ * prompt less well, so a plain question, even on a page with a page block,
+ * keeps the prompt it was tuned on.
  */
 const OFFLINE_CONTEXT_AND_DASHBOARD_RULES = `
 
@@ -353,8 +354,9 @@ export function buildOfflineDataAgentSystemPrompt(
     /** `plan` teaches `plan_query`; `sql` (default) teaches SQL. */
     queryStyle?: "sql" | "plan";
     /**
-     * True when the turn carries context blocks or names a dashboard: adds
-     * how to read the blocks and use `add_dashboard_block`. Default false.
+     * True when the turn can be about a dashboard (the page or an attached
+     * gadget is one, or the turn mentions or names one): adds how to read
+     * the blocks and use `add_dashboard_block`. Default false.
      */
     hasDashboardContext?: boolean;
   }>,

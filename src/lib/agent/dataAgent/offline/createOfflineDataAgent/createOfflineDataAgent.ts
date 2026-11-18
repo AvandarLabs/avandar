@@ -1,4 +1,5 @@
 import { splitAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
+import { getDashboardContextFromTurnBlocks } from "$/agent/pageContext/getDashboardContextFromTurnBlocks/getDashboardContextFromTurnBlocks";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import {
   buildOfflineDataAgentSystemPrompt,
@@ -15,6 +16,7 @@ import {
   createLocalModelStreamFn,
 } from "@/lib/agent/localModels/createLocalModelStreamFn/createLocalModelStreamFn";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { TurnDashboardContext } from "$/agent/pageContext/getDashboardContextFromTurnBlocks/getDashboardContextFromTurnBlocks";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { OfflineMessageRoute } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
@@ -83,11 +85,17 @@ function _replaceSystemPrompt(agent: Agent, systemPrompt: string): void {
 type OfflineSession = {
   route: { current: OfflineMessageRoute };
   /**
-   * Whether the latest turn carries context blocks or names a dashboard.
-   * Adds the dashboard rules to its prompt and the dashboard tool to its
-   * tool list.
+   * Whether the latest turn can be about a dashboard: the page or an
+   * attached gadget is one, a card line or mention brings one, or the
+   * message names one. Adds the dashboard rules to its prompt and the
+   * dashboard tool to its tool list.
    */
   hasDashboardContext: boolean;
+  /**
+   * What the latest turn's blocks said about the page and the tray, so a
+   * later block that says "unchanged" still counts.
+   */
+  dashboardContext: TurnDashboardContext;
   profiles?: Promise<OfflineDatasetProfile[]>;
   previousMessage?: string;
 };
@@ -95,6 +103,29 @@ type OfflineSession = {
 /** Puts the turn's leading blocks back in front of the model's text. */
 function _withBlocks(blocks: string, text: string): string {
   return blocks ? `${blocks}\n\n${text}` : text;
+}
+
+/**
+ * Whether a turn can be about a dashboard, remembering what its blocks said
+ * about the page and the tray. A plain question on a Data Explorer page, with
+ * its page block, is not.
+ */
+function _readDashboardContext(
+  session: OfflineSession,
+  blocks: string,
+  question: string,
+): boolean {
+  const context = getDashboardContextFromTurnBlocks(
+    blocks,
+    session.dashboardContext,
+  );
+  session.dashboardContext = context;
+  return (
+    context.isPageDashboard ||
+    context.isAttachedDashboard ||
+    context.hasDashboardInTurn ||
+    namesDashboard(question)
+  );
 }
 
 /** Sorts the user's message into data or chat, and remembers it. */
@@ -120,10 +151,10 @@ async function _routeQuestion(
  * Routes the question, profiles the datasets once per conversation, and
  * finds the question's stored values. Returns the system prompt (the same
  * for every plain question, so it stays cached, and longer only when the
- * turn carries blocks or names a dashboard) and the message the model reads
- * for this question. Records on the session whether the turn has dashboard
- * context. Routing and value matching read only the user's message; the
- * blocks before it go to the model unchanged.
+ * turn can be about a dashboard) and the message the model reads for this
+ * question. Records on the session whether the turn has dashboard context.
+ * Routing and value matching read only the user's message; the blocks before
+ * it go to the model unchanged.
  */
 async function _prepareQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
@@ -134,7 +165,11 @@ async function _prepareQuestion(
   session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
   await _routeQuestion(options, session, question);
   const profiles = await session.profiles;
-  session.hasDashboardContext = blocks !== "" || namesDashboard(question);
+  session.hasDashboardContext = _readDashboardContext(
+    session,
+    blocks,
+    question,
+  );
   const systemPrompt = buildOfflineDataAgentSystemPrompt({
     datasets: options.datasets,
     profiles,
@@ -179,7 +214,15 @@ export function createOfflineDataAgent(
   options: Readonly<CreateOfflineDataAgentOptions>,
 ): DataAgent {
   const route: { current: OfflineMessageRoute } = { current: "data" };
-  const session: OfflineSession = { route, hasDashboardContext: false };
+  const session: OfflineSession = {
+    route,
+    hasDashboardContext: false,
+    dashboardContext: {
+      isPageDashboard: false,
+      isAttachedDashboard: false,
+      hasDashboardInTurn: false,
+    },
+  };
   const { models, contextWindow } = options;
   const dataAgent = createDataAgent({
     datasets: options.datasets,

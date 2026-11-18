@@ -1,5 +1,8 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
+import { formatDashboardCardLine } from "$/agent/dashboardBlocks/dashboardCardLine";
+import { buildAgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import {
   buildOfflineDataAgentSystemPrompt,
   buildOfflineQuestionMessage,
@@ -14,6 +17,8 @@ import {
   findQuestionValues,
 } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import { profileOfflineDatasets } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type {
@@ -627,6 +632,91 @@ function _sha256(text: string): string {
   return createHash("sha256").update(text).digest("hex");
 }
 
+const EXPLORER_PAGE: AgentPageContext = { app: "data-explorer" };
+
+/** The Data Explorer after an answer, showing its query and columns. */
+const EXPLORER_PAGE_WITH_QUERY: AgentPageContext = {
+  app: "data-explorer",
+  explorer: {
+    sql: 'SELECT SUM("cases") FROM "t0"',
+    resultColumns: [{ name: "sum", dataType: "bigint" }],
+  },
+};
+
+const DASHBOARD_ID = "dddddddd-4444-4444-8444-dddddddddddd";
+
+const DASHBOARD_PAGE: AgentPageContext = {
+  app: "dashboard",
+  dashboard: {
+    id: DASHBOARD_ID,
+    name: "Budget",
+    tiles: [{ title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' }],
+  },
+};
+
+const DASHBOARD: AgentGadgetContext = {
+  kind: "dashboard",
+  ref: { gadgetType: "dashboard", gadgetId: DASHBOARD_ID, subId: null },
+  name: "Budget",
+  tiles: [{ title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' }],
+};
+
+const DASHBOARD_TILE: AgentGadgetContext = {
+  kind: "dashboard_tile",
+  ref: {
+    gadgetType: "dashboard_tile",
+    gadgetId: DASHBOARD_ID,
+    subId: "tile-1",
+  },
+  dashboardName: "Budget",
+  tile: { title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' },
+};
+
+const CANCELLED_CARD_LINE = formatDashboardCardLine(
+  { kind: "cancelled" },
+  (text) => {
+    return text;
+  },
+);
+
+type TurnInput = {
+  message: string;
+  page?: AgentPageContext;
+  attached?: AgentGadgetContext[];
+  mentioned?: AgentGadgetContext[];
+  cardLines?: string[];
+};
+
+/**
+ * The text of each turn of one conversation as the app builds it: the card
+ * lines, the page, attached, and mentioned blocks, then the message. A page
+ * or tray identical to the last turn's reads "unchanged".
+ */
+function _buildTurnTexts(turns: readonly TurnInput[]): string[] {
+  let lastPageBlock: string | undefined;
+  let lastAttachedBlock: string | undefined;
+  return turns.map((turn) => {
+    const blocks = buildAgentContextBlocks({
+      page: turn.page,
+      attached: turn.attached ?? [],
+      mentioned: turn.mentioned ?? [],
+      aliases: [],
+    });
+    const text = buildAgentTurnText({
+      message: turn.message,
+      pageBlock: blocks.pageBlock,
+      previousPageBlock: lastPageBlock,
+      attachedBlock: blocks.attachedBlock,
+      previousAttachedBlock: lastAttachedBlock,
+      mentionedBlock: blocks.mentionedBlock,
+      dashboardCardLines: turn.cardLines,
+    });
+    lastPageBlock = blocks.pageBlock ?? lastPageBlock;
+    lastAttachedBlock = blocks.attachedBlock;
+    return text;
+  });
+}
+
 describe("offline dashboard requests", () => {
   it("routes an add-to-dashboard request to data by rules", () => {
     expect(
@@ -718,9 +808,36 @@ describe("offline dashboard requests", () => {
     expect(asked.systemText).not.toContain("<current_page>");
   });
 
-  it("sends the dashboard text when the turn carries a context block", async () => {
+  it("sends no dashboard text with a plain question on a Data Explorer page", async () => {
     const asked = await _askOffline(
-      "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+      _buildTurnTexts([
+        { message: "how many deaths in total?", page: EXPLORER_PAGE },
+      ])[0]!,
+    );
+
+    expect(asked.systemText).not.toContain("DASHBOARDS");
+    expect(asked.systemText).not.toContain("CONTEXT");
+    expect(asked.systemText).not.toContain("add_dashboard_block");
+    expect(asked.modelText.startsWith("<current_page>")).toBe(true);
+  });
+
+  it.each([
+    ["on a dashboard page", { page: DASHBOARD_PAGE }],
+    [
+      "when a dashboard is mentioned",
+      { page: EXPLORER_PAGE, mentioned: [DASHBOARD] },
+    ],
+    [
+      "when a chart from a dashboard is attached",
+      { page: EXPLORER_PAGE, attached: [DASHBOARD_TILE] },
+    ],
+    [
+      "when the turn has a dashboard card line",
+      { page: EXPLORER_PAGE, cardLines: [CANCELLED_CARD_LINE] },
+    ],
+  ])("sends the dashboard text %s", async (_name, turn) => {
+    const asked = await _askOffline(
+      _buildTurnTexts([{ message: "how many deaths in total?", ...turn }])[0]!,
     );
 
     expect(asked.systemText).toContain("DASHBOARDS");
@@ -789,11 +906,49 @@ describe("offline dashboard tool", () => {
     ).toEqual([false]);
   });
 
-  it("is offered when the turn carries a context block", async () => {
+  it("is not offered on a plain question on a Data Explorer page", async () => {
     expect(
-      await _offersDashboardToolOnEachTurn([
-        "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
-      ]),
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([
+          { message: "how many deaths in total?", page: EXPLORER_PAGE },
+          {
+            message: "how many deaths in Ohio?",
+            page: EXPLORER_PAGE_WITH_QUERY,
+          },
+        ]),
+      ),
+    ).toEqual([false, false]);
+  });
+
+  it("is not offered on a map page", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([
+          { message: "how many deaths in total?", page: { app: "map" } },
+        ]),
+      ),
+    ).toEqual([false]);
+  });
+
+  it.each([
+    ["on a dashboard page", { page: DASHBOARD_PAGE }],
+    [
+      "when a dashboard is mentioned",
+      { page: EXPLORER_PAGE, mentioned: [DASHBOARD] },
+    ],
+    [
+      "when a dashboard is attached",
+      { page: EXPLORER_PAGE, attached: [DASHBOARD] },
+    ],
+    [
+      "when the turn has a dashboard card line",
+      { page: EXPLORER_PAGE, cardLines: [CANCELLED_CARD_LINE] },
+    ],
+  ])("is offered %s", async (_name, turn) => {
+    expect(
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([{ message: "how many deaths in total?", ...turn }]),
+      ),
     ).toEqual([true]);
   });
 
@@ -810,8 +965,47 @@ describe("offline dashboard tool", () => {
       await _offersDashboardToolOnEachTurn([
         "Add a heading to the Budget dashboard",
         "how many deaths in total?",
-        "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+        ..._buildTurnTexts([
+          { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+        ]),
       ]),
     ).toEqual([true, false, true]);
+  });
+
+  it("stays offered while the user stays on a dashboard page, then goes away", async () => {
+    const turnTexts = _buildTurnTexts([
+      { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Ohio?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+    ]);
+
+    expect(turnTexts[1]).toContain("Unchanged since the last message.");
+    expect(await _offersDashboardToolOnEachTurn(turnTexts)).toEqual([
+      true,
+      true,
+      false,
+    ]);
+  });
+
+  it("stays offered while a dashboard stays attached, then goes away", async () => {
+    const turnTexts = _buildTurnTexts([
+      {
+        message: "how many deaths?",
+        page: EXPLORER_PAGE,
+        attached: [DASHBOARD],
+      },
+      {
+        message: "how many deaths in Ohio?",
+        page: EXPLORER_PAGE,
+        attached: [DASHBOARD],
+      },
+      { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+    ]);
+
+    expect(await _offersDashboardToolOnEachTurn(turnTexts)).toEqual([
+      true,
+      true,
+      false,
+    ]);
   });
 });
