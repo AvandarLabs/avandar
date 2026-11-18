@@ -134,7 +134,7 @@ function _isChart(block: ChatGeneratedDashboardBlock): Verdict {
 
 /** Words a reply uses to say it found no such dashboard. */
 const NOT_FOUND_PATTERN =
-  /\b(can(?:no|['’])t find|could(?:n['’]t| not) find|unable to find|no dashboard|not find|doesn['’]t exist|does not exist|don['’]t see|do not see)\b/i;
+  /\b(can(?:no|['’])t find|could(?:n['’]t| not) find|unable to find|no (?:\w+ )?dashboard|not find|doesn['’]t exist|does not exist|don['’]t see|do not see|don['’]t have|do not have|isn['’]t a dashboard)\b/i;
 
 /** Questions that add a block to the current editor's dashboard. */
 const EDITOR_QUESTIONS: readonly EvalQuestion[] = [
