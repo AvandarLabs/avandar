@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import {
   buildOfflineDataAgentSystemPrompt,
@@ -572,13 +573,14 @@ describe("routeOfflineMessageByRules", () => {
 
 /**
  * Asks the offline agent one turn and reports the message the router was
- * given, the question the value matcher read, and the text the answer
- * model read as the user's turn.
+ * given, the question the value matcher read, the text the answer model
+ * read as the user's turn, and the system message it read first.
  */
 async function _askOffline(turnText: string): Promise<{
   routerMessage: string | undefined;
   matchedQuestion: string | undefined;
   modelText: string;
+  systemText: string;
 }> {
   const { llm, requests } = _createLlm([
     '{"action":"run_query","args":{"sql":"SELECT 1 FROM \\"t0\\"","summary":"Deaths."}}',
@@ -600,11 +602,29 @@ async function _askOffline(turnText: string): Promise<{
   const userMessage = requests[0]?.messages.find((message) => {
     return message.role === "user";
   });
+  const systemMessage = requests[0]?.messages.find((message) => {
+    return message.role === "system";
+  });
   return {
     routerMessage: vi.mocked(classifyOfflineMessage).mock.calls[0]?.[1].message,
     matchedQuestion: vi.mocked(findQuestionValues).mock.calls[0]?.[1].question,
     modelText: userMessage?.content ?? "",
+    systemText: systemMessage?.content ?? "",
   };
+}
+
+/**
+ * SHA-256 of the offline prompt for a plain question with no datasets, as
+ * `origin/demo/measles` builds it. A plain question must keep it, since a
+ * small model reads a longer prompt less well.
+ */
+const PLAIN_SQL_PROMPT_SHA256 =
+  "249e1098f621a8aa52c2309d7350c699279542e58276457ce68d27661dac0069";
+const PLAIN_PLAN_PROMPT_SHA256 =
+  "fbf6f7a6eb62bc1593b6dba40ce977b21c83c6f613b4294a5d9442e5df617880";
+
+function _sha256(text: string): string {
+  return createHash("sha256").update(text).digest("hex");
 }
 
 describe("offline dashboard requests", () => {
@@ -617,7 +637,28 @@ describe("offline dashboard requests", () => {
     );
   });
 
-  it("tells the offline model about blocks and the dashboard tool", () => {
+  it("tells the offline model about blocks and the dashboard tool when asked to", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      hasDashboardContext: true,
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+      hasDashboardContext: true,
+    });
+
+    expect(prompt).toContain("add_dashboard_block");
+    expect(prompt).toContain("<current_page>");
+    expect(planPrompt).toContain("add_dashboard_block");
+    expect(planPrompt).toContain("<current_page>");
+  });
+
+  it("keeps the dashboard text out of the prompt for a plain question", () => {
     const prompt = buildOfflineDataAgentSystemPrompt({
       datasets: [],
       profiles: [],
@@ -630,10 +671,66 @@ describe("offline dashboard requests", () => {
       queryStyle: "plan",
     });
 
-    expect(prompt).toContain("add_dashboard_block");
-    expect(prompt).toContain("<current_page>");
-    expect(planPrompt).toContain("add_dashboard_block");
-    expect(planPrompt).toContain("<current_page>");
+    for (const text of [prompt, planPrompt]) {
+      expect(text).not.toContain("add_dashboard_block");
+      expect(text).not.toContain("<current_page>");
+      expect(text).not.toContain("DASHBOARDS");
+    }
+    expect(prompt).toContain(
+      "Never answer a data question without calling run_query. Never ask",
+    );
+  });
+
+  it("builds the same prompt for a plain question as before dashboards", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+    });
+
+    expect(_sha256(prompt)).toBe(PLAIN_SQL_PROMPT_SHA256);
+    expect(_sha256(planPrompt)).toBe(PLAIN_PLAN_PROMPT_SHA256);
+  });
+
+  it("names the dashboard tool in the never-answer rule once it applies", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      hasDashboardContext: true,
+    });
+
+    expect(prompt).toContain(
+      "Never answer a data question without calling run_query, or add_dashboard_block when the user asks to add something to a dashboard. Never ask",
+    );
+  });
+
+  it("sends no dashboard text with a plain question", async () => {
+    const asked = await _askOffline("how many deaths in total?");
+
+    expect(asked.systemText).not.toContain("DASHBOARDS");
+    expect(asked.systemText).not.toContain("<current_page>");
+  });
+
+  it("sends the dashboard text when the turn carries a context block", async () => {
+    const asked = await _askOffline(
+      "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+    );
+
+    expect(asked.systemText).toContain("DASHBOARDS");
+    expect(asked.systemText).toContain("<current_page>");
+  });
+
+  it("sends the dashboard text when the message names a dashboard", async () => {
+    const asked = await _askOffline("Add a heading to the Budget dashboard");
+
+    expect(asked.systemText).toContain("DASHBOARDS");
   });
 
   it("routes and matches values on the message, keeping the blocks", async () => {

@@ -22,6 +22,11 @@ const CHAT_PATTERN =
 /** A request to change a dashboard, which only the data tools can do. */
 const DASHBOARD_PATTERN = /\bdashboards?\b/i;
 
+/** True when a message names a dashboard. */
+export function namesDashboard(message: string): boolean {
+  return DASHBOARD_PATTERN.test(message);
+}
+
 /** Words that only a question about the data would use. */
 const DATA_PATTERN =
   /\b(how many|how much|total|count|sum|average|mean|median|most|least|top|highest|lowest|trend|over time|per|by (day|week|month|year|state|county|country|region)|daily|weekly|monthly|yearly|compare|vs|versus|chart|graph|plot|table|show|list|which|when|where|rate|percent|share|change|growth|increase|decrease|rank)\b/i;
@@ -40,7 +45,7 @@ export function routeOfflineMessageByRules(
   if (CHAT_PATTERN.test(text)) {
     return "chat";
   }
-  if (DASHBOARD_PATTERN.test(text)) {
+  if (namesDashboard(text)) {
     return "data";
   }
   const namesDataset = datasetNames.some((name) => {

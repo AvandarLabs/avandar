@@ -4,7 +4,10 @@ import {
   buildOfflineDataAgentSystemPrompt,
   buildOfflineQuestionMessage,
 } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt";
-import { classifyOfflineMessage } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
+import {
+  classifyOfflineMessage,
+  namesDashboard,
+} from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
 import { findQuestionValues } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import { profileOfflineDatasets } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import {
@@ -109,10 +112,11 @@ async function _routeQuestion(
 
 /**
  * Routes the question, profiles the datasets once per conversation, and
- * finds the question's stored values. Returns the conversation's system
- * prompt (the same for every question, so it stays cached) and the message
- * the model reads for this question. Routing and value matching read only
- * the user's message; the blocks before it go to the model unchanged.
+ * finds the question's stored values. Returns the system prompt (the same
+ * for every plain question, so it stays cached, and longer only when the
+ * turn carries blocks or names a dashboard) and the message the model reads
+ * for this question. Routing and value matching read only the user's
+ * message; the blocks before it go to the model unchanged.
  */
 async function _prepareQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
@@ -128,6 +132,7 @@ async function _prepareQuestion(
     profiles,
     today: options.today,
     queryStyle: options.queryStyle,
+    hasDashboardContext: blocks !== "" || namesDashboard(question),
   });
   if (session.route.current === "chat") {
     return { systemPrompt, messageText: _withBlocks(blocks, question) };
