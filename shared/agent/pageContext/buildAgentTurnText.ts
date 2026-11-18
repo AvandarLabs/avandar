@@ -72,9 +72,9 @@ export function buildAgentTurnText(
   return [...blocks, options.message].join("\n\n");
 }
 
-/** A block at the start of a turn's text, with the blank line after it. */
-const LEADING_TURN_BLOCK =
-  /^<(dashboard_card|current_page|attached|mentioned)>[\s\S]*?<\/\1>(?:\n\n|$)/;
+/** The blocks at the start of a turn's text, each with its blank line. */
+const LEADING_TURN_BLOCKS =
+  /^(?:<(dashboard_card|current_page|attached|mentioned)>[\s\S]*?<\/\1>(?:\n\n|$))*/;
 
 /**
  * A turn's text split into the blocks `buildAgentTurnText` put first and
@@ -86,15 +86,6 @@ export function splitAgentTurnText(text: string): {
   blocks: string;
   message: string;
 } {
-  const blocks: string[] = [];
-  let rest = text;
-  for (
-    let match = LEADING_TURN_BLOCK.exec(rest);
-    match;
-    match = LEADING_TURN_BLOCK.exec(rest)
-  ) {
-    blocks.push(match[0].trimEnd());
-    rest = rest.slice(match[0].length);
-  }
-  return { blocks: blocks.join("\n\n"), message: rest };
+  const leading = LEADING_TURN_BLOCKS.exec(text)?.[0] ?? "";
+  return { blocks: leading.trimEnd(), message: text.slice(leading.length) };
 }
