@@ -1,0 +1,33 @@
+{
+  "label": "phase-1d:offline-45-page-omit",
+  "questionCount": 45,
+  "passCount": 30,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 99,
+  "promptTokens": 96001,
+  "cachedPromptTokens": 0,
+  "completionTokens": 9647,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 15095.760500000091,
+  "latencyP90Ms": 24487.784375000047,
+  "failedIds": [
+    "B08",
+    "H01",
+    "H02",
+    "H06",
+    "H09",
+    "H10",
+    "I04",
+    "I07",
+    "I08",
+    "I09",
+    "N03",
+    "N04",
+    "N07",
+    "N10",
+    "N11"
+  ]
+}

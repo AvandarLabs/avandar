@@ -232,6 +232,12 @@ Every string on the card is translated.
   Explorer page included, gets the prompt and the tool list `demo/measles`
   builds, since a 4B model reads a longer prompt and tool list less well.
   The page block is sent on every turn, so having a block is not the test.
+- An offline turn sends no page block while the Data Explorer shows nothing
+  (only `Page: Data Explorer`), since the offline model cannot use it and
+  it costs the model questions. The block is sent whenever the page shows an
+  open dataset, a query and its columns, a dashboard, or a map, and for an
+  empty Data Explorer once the model last heard of something on screen.
+  Hosted turns always send it.
 - A turn too long for the window gets today's overflow reply.
 - Saving needs a connection. Without one, Confirm fails and the card
   stays retryable. Adding to the open editor works without one, and saving

@@ -380,8 +380,10 @@ questions also have the ids D01 to D04, but they run only with
   recorded (6/9). The offline 45 at 26 or better: **met at exactly 26, after
   one fix** (25/45 before it). A later change raised it to 30/45. None of
   those offline runs sent a page block, which the app does on every turn.
-  With the page block the app sends, the final code scores 26/45 (27/45
-  before the last gate): see "Closing the open items" below.
+  With the page block the app sends, the final code scores 30/45 (27/45
+  with the dashboard gate on any block, 26/45 with the gate on dashboard
+  turns and every empty page block sent): see "Closing the open items"
+  below.
 - **P04 missed on the P run, and the cause is v5, not the dashboard rules.**
   "make this a pie chart", with two charts on the dashboard, should ask
   which one. The miss ran `run_query` on the cases chart and replied that it
@@ -522,7 +524,9 @@ iterations, quoted below.
 | phase-1d:offline-dashboards-tool-gate | Offline D, the dashboard tool only on turns with blocks or a dashboard in the message | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
 | phase-1d:offline-45-page-before | Offline 45 with the page block the app sends (`--page data-explorer`), the rules and tool on any turn with a block | 27/45 | 26 or better: **met** |
 | phase-1d:offline-45-page-after | Offline 45 with the page block, the rules and tool only on dashboard turns | 26/45 | 26 or better: **met, with no margin** |
+| phase-1d:offline-45-page-omit | Offline 45 with the page block, an empty Data Explorer's block left out | 30/45 | 26 or better: **met** |
 | phase-1d:offline-dashboards-page-gate | Offline D, the rules and tool only on dashboard turns | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
+| phase-1d:offline-dashboards-page-omit | Offline D, an empty Data Explorer's block left out | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
 
 - **P04 before and after, ten runs each.**
 
@@ -713,13 +717,19 @@ iterations, quoted below.
   now come only when the page is a dashboard, a dashboard or one of its
   charts is attached or mentioned, the turn has a card line, or the message
   names a dashboard. A page block that says "unchanged" keeps the answer of
-  the turn before it.
+  the turn before it. A last change leaves out the page block of a Data
+  Explorer that shows nothing (only `Page: Data Explorer`), on device turns
+  only: the offline model cannot use it, and it costs the model questions
+  (below). A page that shows a dataset, a query and its columns, a
+  dashboard, or a map keeps its block, and so does an empty one once the
+  model last heard of something on screen.
 
   | Run (Qwen3 4B) | Correct | Input tokens per call | Misses |
   |---|---|---|---|
   | `phase-1d:offline-45-tool-gate`, no page block, gate on any block (earlier) | 30/45 | 962 | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
   | `phase-1d:offline-45-page-before`, page block, rules and tool on every turn | 27/45 | 1,129 | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N06 N07 N11 N12 |
-  | **`phase-1d:offline-45-page-after`, page block, rules and tool only on dashboard turns** | **26/45** | **939** | B08 H01 H02 H05 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N07 N10 N11 N12 |
+  | `phase-1d:offline-45-page-after`, page block, rules and tool only on dashboard turns | 26/45 | 939 | B08 H01 H02 H05 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N07 N10 N11 N12 |
+  | **`phase-1d:offline-45-page-omit`, as above, an empty Data Explorer's page block left out** | **30/45** | **970** | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
 
   - **Before the gate, with the page block, the offline 45 scored 27/45,
     not the 25/45 the rebased tree scored.** The longer prompt and the tool
@@ -736,19 +746,37 @@ iterations, quoted below.
   - **The page block itself costs the offline model four questions.** The
     prompt is the same as in the 30/45 run, so the difference is the block's
     text in the user message: H05, N01, N05, and N12 passed without it and
-    miss with it, and N06 passes in both. The prompt has no line that
-    explains `<current_page>`, because it is the prompt `demo/measles`
-    builds. A line that explains the block, or leaving the block out when it
-    says only `Page: Data Explorer`, was not tried. Both are decisions for
-    the product, since the app sends the block today.
-  - **Offline D stayed at 6/9** (`phase-1d:offline-dashboards-page-gate`):
-    D01 to D03 passed in the editor, D04 ran `run_query` with no block, D05
-    and D08 wrote nothing, D06 and D07 wrote through the card, and D08 and
-    D09 asked twice and ended with no reply and no block, as in every
-    earlier run. Offline runs repeat exactly for the same code and the same
-    block text, so 26/45 holds for this code, and moves with any change to
-    the prompt or the block.
-  - The three runs cost $0.
+    miss with it, and N06 passes in both. A block that says only `Page: Data
+    Explorer` tells the model nothing it can use.
+  - **Leaving that block out brings the score back to 30/45.** A device turn
+    now sends no page block while the Data Explorer shows nothing, so a plain
+    question reaches the model as it did on `demo/measles`. The 41 questions
+    that are not follow-ups reach it exactly as in the run with no page
+    block, and the four follow-ups (N12, F01, F02, and F03, which follow an
+    answer) are sent the query and columns the last answer left on screen.
+    The miss list is identical to the no-page-block run's, and the run used
+    970 input tokens per call against 962. Hosted turns are unchanged, and
+    the page block is still sent for a dashboard, a map, an open dataset, a
+    query on screen, and for an empty Data Explorer once the model last
+    heard of something on screen. Every question that differs among the four
+    runs:
+
+    | Question | No page block (30/45) | Block, gate on any block (27/45) | Block, gate on dashboard turns (26/45) | Block left out when empty (30/45) |
+    |---|---|---|---|---|
+    | H05 | pass | pass | miss | pass |
+    | N01 | pass | miss | miss | pass |
+    | N05 | pass | miss | miss | pass |
+    | N06 | pass | miss | pass | pass |
+    | N10 | miss | pass | miss | miss |
+    | N12 | pass | miss | miss | pass |
+  - **Offline D stayed at 6/9** (`phase-1d:offline-dashboards-page-gate` and
+    `phase-1d:offline-dashboards-page-omit`): D01 to D03 passed in the
+    editor, D04 ran `run_query` with no block, D05 and D08 wrote nothing, D06
+    and D07 wrote through the card, and D08 and D09 asked twice and ended
+    with no reply and no block, as in every earlier run. Offline runs repeat
+    exactly for the same code and the same block text, so 30/45 holds for
+    this code, and moves with any change to the prompt or the block.
+  - The five runs cost $0.
 - **Cost.** The 135 online runs cost $0.1579: wording 1 $0.0329 (P04 $0.0042,
   P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058),
   wording 2 $0.0036, wording 3 $0.0389 (P04 $0.0039, the two D sets
@@ -883,8 +911,8 @@ Every WebLLM model that fits the 16 GB budget, on every other question
 
 Qwen3 4B scored 26 to 28 across runs with different prompt wording; which
 borderline questions pass moves between runs, the total does not. (Phase 1D's
-last run without a page block scored 30/45, and 26/45 with the page block the
-app sends: see "Phase 1D".) It
+last runs scored 30/45 with no page block and 30/45 with the page block the
+app sends, once an empty one is left out: see "Phase 1D".) It
 misses what needs several steps at once: per-person rates, combining two
 datasets, top day per group, running totals. The online regression miss
 (N05) passed 4 of 4 reruns. Times are on a 64 GB M4 Pro; a 16 GB laptop
@@ -1258,7 +1286,7 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The agent on P, M, and the 45 (add `--label phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45`) | `--harness pi --config haiku-sonnet --questions P`, then `--questions M`, then `--concurrency 6` |
 | The offline agent on the dashboard questions (add `--label phase-1d:offline-dashboards`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions D --concurrency 1` |
 | The offline agent on the 45 (add `--label phase-1d:offline-45`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1` |
-| The offline agent on the 45 with the page block the app sends (add `--label phase-1d:offline-45-page-after`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1 --page data-explorer` |
+| The offline agent on the 45 with the page block the app sends (add `--label phase-1d:offline-45-page-omit`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1 --page data-explorer` |
 | A single question again (add `--label phase-1d:rerun-p04`) | `--harness pi --config haiku-sonnet --questions P04` |
 | P04 ten times in a row (add `--label phase-1d:p04-fix1`) | `for i in 1 2 3 4 5 6 7 8 9 10; do pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions P04 --label phase-1d:p04-fix1; done` |
 | P04 on an older prompt (add `--label phase-1d:diag-p04-v5`) | Set `DATA_AGENT_PROMPT_ID` in `shared/agent/dataAgent/dataAgentTools.ts` to `"data-agent-v5"` (or v3, v4) without committing, then `--harness pi --config haiku-sonnet --questions P04`. Restore the file after. |
@@ -1298,7 +1326,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 344 runs (every
+chat index lists all 346 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -1326,6 +1354,7 @@ Each was made after reading the failing answers by hand.
 | A bullet in DASHBOARD BLOCKS: a dashboard's name, title, and charts are labels, not filters, and a ranking keeps "Unassigned" and "Out of <state>" rows | Agent prompt (v6, not yet deployed) | D04 added a year taken from the dashboard's title on about half the runs, and dropped those rows from the ranking on some. D04 went from 3/10 to 10/10 (`a4def86ad`). |
 | The offline agent lists `add_dashboard_block` only on that same kind of turn | Offline agent | The tool in every plain turn's list turned N01 from a pass into a miss. The offline 45 went from 26/45 to 30/45 (`a68dac7f8`). |
 | The offline rules and tool come only on a turn that can be about a dashboard (a dashboard page, a dashboard or chart attached or mentioned, a card line, or a message that names one), not on any turn with a block | Offline agent | The app sends a page block on every turn, so "any block" put the longer prompt and the tool on every offline turn. Measured with the page block, the prompt fell from 1,129 to 939 tokens per call and the offline 45 went from 27/45 to 26/45 (see "Closing the open items"). |
+| A device turn leaves out the page block of a Data Explorer that shows nothing | Offline agent | The block says only `Page: Data Explorer`, and with it the offline 45 lost H05, N01, N05, and N12. Without it the score is 30/45, as with no page block at all. |
 | `--page data-explorer` sends every question that sets no page the Data Explorer page block | Eval runner | The 45 carry no page, so offline runs never sent the block the app always sends. |
 | A system update with no text is not sent to a local model | Local model messages | Pi declares a tool-list change as an empty system message, which the local model read as an empty user turn (`a68dac7f8`). |
 

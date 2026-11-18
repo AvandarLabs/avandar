@@ -357,3 +357,5 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-18T22-20-43](2026-11-18T22-20-43-phase-1d_offline-45-page-before/results.jsonl) | `phase-1d:offline-45-page-before` | 27/45 | 0 | 1 | $0.00000 | 17.5 s / 26.7 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N06 N07 N11 N12 |
 | [2026-11-18T22-44-20](2026-11-18T22-44-20-phase-1d_offline-45-page-after/results.jsonl) | `phase-1d:offline-45-page-after` | 26/45 | 0 | 1 | $0.00000 | 15.6 s / 26.9 s | B08 H01 H02 H05 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N07 N10 N11 N12 |
 | [2026-11-18T22-54-12](2026-11-18T22-54-12-phase-1d_offline-dashboards-page-gate/results.jsonl) | `phase-1d:offline-dashboards-page-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.7 s | D04 D08 D09 |
+| [2026-11-18T23-21-31](2026-11-18T23-21-31-phase-1d_offline-45-page-omit/results.jsonl) | `phase-1d:offline-45-page-omit` | 30/45 | 0 | 1 | $0.00000 | 15.1 s / 24.5 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
+| [2026-11-18T23-31-40](2026-11-18T23-31-40-phase-1d_offline-dashboards-page-omit/results.jsonl) | `phase-1d:offline-dashboards-page-omit` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.8 s | D04 D08 D09 |
