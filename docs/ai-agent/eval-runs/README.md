@@ -217,3 +217,39 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-18T20-25-18](2026-11-18T20-25-18-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 26/45 | 0 | 1 | $0.00000 | 16.4 s / 27.7 s | B08 H01 H02 H05 H06 H09 H10 I04 I06 I07 I08 I09 N01 N03 N04 N07 N10 N11 N12 |
 | [2026-11-18T20-27-08](2026-11-18T20-27-08-phase-1d_offline-diag-notool/results.jsonl) | `phase-1d:offline-diag-notool` | 1/1 | 0 | 0 | $0.00000 | 86.3 s / 86.3 s | none |
 | [2026-11-18T20-31-40](2026-11-18T20-31-40-phase-1d_offline-dashboards/results.jsonl) | `phase-1d:offline-dashboards` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 83.2 s | D04 D08 D09 |
+| [2026-11-18T20-39-54](2026-11-18T20-39-54-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00101 | 3.5 s / 3.5 s | none |
+| [2026-11-18T20-40-00](2026-11-18T20-40-00-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00035 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-05](2026-11-18T20-40-05-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00037 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-10](2026-11-18T20-40-10-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-15](2026-11-18T20-40-15-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-21](2026-11-18T20-40-21-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00035 | 3.2 s / 3.2 s | none |
+| [2026-11-18T20-40-27](2026-11-18T20-40-27-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-32](2026-11-18T20-40-32-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-37](2026-11-18T20-40-37-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.9 s / 2.9 s | none |
+| [2026-11-18T20-40-43](2026-11-18T20-40-43-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.9 s / 2.9 s | none |
+| [2026-11-18T20-40-58](2026-11-18T20-40-58-phase-1d_agent-page-fix1/results.jsonl) | `phase-1d:agent-page-fix1` | 7/7 | 0 | 0 | $0.00024 | 1.7 s / 2.9 s | none |
+| [2026-11-18T20-41-04](2026-11-18T20-41-04-phase-1d_agent-mentions-fix1/results.jsonl) | `phase-1d:agent-mentions-fix1` | 7/7 | 0 | 0 | $0.00023 | 1.7 s / 2.4 s | none |
+| [2026-11-18T20-41-26](2026-11-18T20-41-26-phase-1d_agent-45-fix1/results.jsonl) | `phase-1d:agent-45-fix1` | 42/45 | 1 | 1 | $0.00030 | 2.1 s / 3.4 s | F02 F03 N11 |
+| [2026-11-18T20-41-32](2026-11-18T20-41-32-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 7/9 | 0 | 0 | $0.00024 | 1.8 s / 2.6 s | D01 D06 |
+| [2026-11-18T20-41-38](2026-11-18T20-41-38-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 7/9 | 0 | 0 | $0.00022 | 1.8 s / 2.3 s | D04 D06 |
+| [2026-11-18T20-41-45](2026-11-18T20-41-45-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 8/9 | 0 | 0 | $0.00022 | 1.8 s / 2.3 s | D01 |
+| [2026-11-18T20-43-50](2026-11-18T20-43-50-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.2 s / 2.3 s | D01 |
+| [2026-11-18T20-43-55](2026-11-18T20-43-55-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.0 s / 2.5 s | D01 |
+| [2026-11-18T20-44-00](2026-11-18T20-44-00-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00024 | 2.1 s / 2.3 s | D01 D06 |
+| [2026-11-18T20-44-05](2026-11-18T20-44-05-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00025 | 2.3 s / 2.6 s | D01 |
+| [2026-11-18T20-44-10](2026-11-18T20-44-10-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.1 s / 2.6 s | D01 |
+| [2026-11-18T20-44-15](2026-11-18T20-44-15-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00024 | 1.9 s / 2.5 s | D01 D06 |
+| [2026-11-18T20-44-19](2026-11-18T20-44-19-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00025 | 1.9 s / 2.5 s | D01 D06 |
+| [2026-11-18T20-44-24](2026-11-18T20-44-24-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 0/3 | 0 | 0 | $0.00024 | 2.2 s / 2.5 s | D01 D04 D06 |
+| [2026-11-18T20-45-24](2026-11-18T20-45-24-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 0/1 | 0 | 1 | $0.00052 | 1.4 s / 1.4 s | P04 |
+| [2026-11-18T20-45-29](2026-11-18T20-45-29-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-45-35](2026-11-18T20-45-35-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.4 s / 3.4 s | none |
+| [2026-11-18T20-45-39](2026-11-18T20-45-39-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 0/1 | 0 | 1 | $0.00023 | 2.2 s / 2.2 s | P04 |
+| [2026-11-18T20-45-45](2026-11-18T20-45-45-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-45-50](2026-11-18T20-45-50-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-45-55](2026-11-18T20-45-55-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.2 s / 3.2 s | none |
+| [2026-11-18T20-46-00](2026-11-18T20-46-00-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.6 s / 2.6 s | none |
+| [2026-11-18T20-46-07](2026-11-18T20-46-07-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.7 s / 3.7 s | none |
+| [2026-11-18T20-46-12](2026-11-18T20-46-12-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00036 | 3.0 s / 3.0 s | none |
+| [2026-11-18T21-05-20](2026-11-18T21-05-20-phase-1d_offline-45-tool-gate/results.jsonl) | `phase-1d:offline-45-tool-gate` | 30/45 | 0 | 1 | $0.00000 | 15.1 s / 24.5 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
+| [2026-11-18T21-09-46](2026-11-18T21-09-46-phase-1d_offline-dashboards-tool-gate/results.jsonl) | `phase-1d:offline-dashboards-tool-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 97.2 s | D04 D08 D09 |

@@ -1,0 +1,33 @@
+{
+  "label": "phase-1d:offline-45-tool-gate",
+  "questionCount": 45,
+  "passCount": 30,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 99,
+  "promptTokens": 95269,
+  "cachedPromptTokens": 0,
+  "completionTokens": 9631,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 15089.357375000007,
+  "latencyP90Ms": 24493.790500000003,
+  "failedIds": [
+    "B08",
+    "H01",
+    "H02",
+    "H06",
+    "H09",
+    "H10",
+    "I04",
+    "I07",
+    "I08",
+    "I09",
+    "N03",
+    "N04",
+    "N07",
+    "N10",
+    "N11"
+  ]
+}

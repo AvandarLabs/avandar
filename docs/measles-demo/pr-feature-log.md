@@ -569,13 +569,14 @@ Take only your feature's hunks from these files. The last feature in the
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
 | `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131, F139 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). F139: the `dashboard` category, D01 to D09, `gradeDashboardWrites`, the dashboard support in `EvalHarness.ts`, and the dashboard tests (`51d5145f9`, `38d7683f3`). |
 | `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131, F139 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). F139: dashboard blocks in the Pi harnesses, and the device check that real values stay on the device (`390264f2e`, `a54d46891`). `PiLocalHarness.ts` gets one line (`390264f2e`). |
-| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95, F139 | F95: user texts kept across a run, and a schema turn answered without a query. F139: `baselinePageContext` and the dashboard questions, with `DenoChatTurnRunner.ts` (`51d5145f9`); the dashboard tool's run state, its offer by prompt version, and the shared run cap `MAX_QUERY_RUNS_PER_ANSWER` (`927a968b5`, `35acb82c6`). |
+| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95, F139 | F95: user texts kept across a run, and a schema turn answered without a query. F139: `baselinePageContext` and the dashboard questions, with `DenoChatTurnRunner.ts` (`51d5145f9`); the dashboard tool's run state, its offer by prompt version, and the shared run cap `MAX_QUERY_RUNS_PER_ANSWER` (`927a968b5`, `35acb82c6`). The `shouldOfferDashboardTool` option, read on every `ask`, lets the offline agent hold the tool back on a plain turn (`a68dac7f8`). |
 | `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`, `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts` | F22, F95 | F95: the schema paragraph after ANALYST CHECKS, and the `generateSql` description. |
 | `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131, F139 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). F139: the `data-agent-v6` route (`a693f179c`). |
 | `shared/agent/mentions/buildAgentContextBlocks.{ts,test.ts}` | F89, F139 | F89 creates it. F139: an offline turn caps the chart SQL its blocks keep, through `offlineContextBudget.ts` (`5412ad50c`). |
 | `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.{ts,test.ts}` | F82, F86, F89 to F91, F139 | F139: each prompt version is served its own tool list, and the proxy checks tool calls against that version's list (`7d60451b6`). |
 | `src/lib/agent/dataAgent/{DataAgentHost.ts,browser/createBrowserDataAgentHost.ts}` | F82, F83, F86, F87, F139 | F139: the dashboard method on the host (`927a968b5`), and the browser host's block placement (`a666b6ba9`). |
-| `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`628843924`). The dashboard text joins the offline prompt only on a turn with blocks or a dashboard in the message (`7c4f95033`). |
+| `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`628843924`). The dashboard text joins the offline prompt only on a turn with blocks or a dashboard in the message (`7c4f95033`), and the dashboard tool joins the tool list only on such a turn (`a68dac7f8`). |
+| `src/lib/agent/localModels/createLocalModelStreamFn/{toLocalLlmMessages.ts,createLocalModelStreamFn.test.ts}` | F83, F139 | F83 creates them. F139: a system update with no text, such as a tool-only change, is not sent to a local model as an empty user message (`a68dac7f8`). |
 | `src/lib/agent/dataAgent/pagePrivacy/{SqlPlaceholderVault,createPlaceholderRestoringHost}.{ts,test.ts}` | F87, F139 | F87 creates them. F139: `unmaskText` restores the names the agent writes (`7fee248f9`), and the host restores placeholders in dashboard blocks (`c3c2e936c`). |
 | `tests/e2e/agent-chat-mentions.spec.ts` | F91, F139 | F91 creates it. F139: the `data-agent-v6` route (`a693f179c`). |
 | `tests/e2e/agent-chat-sessions.spec.ts` | F128, F139 | F128 creates it. F139: the `data-agent-v6` route (`a693f179c`). |
@@ -11940,14 +11941,19 @@ online or offline, and see it added without leaving the chat.
 **Eval:** The final runs are on prompt v6 (2026-11-18), recorded in
 `docs/ai-agent/eval.md` (`#phase-1d`). Dashboard questions D01 to D09 scored
 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, and the 45 questions
-45/45, so those bars are met. The offline 45 scored 26/45 against a bar of
-26, which is met after a fix (25/45 before it: the offline prompt now carries
-the context and dashboard rules only on a turn with blocks or a dashboard in
-the message). The offline dashboard questions scored 6/9. The P bar of 7/7
+45/45, so those bars are met. The offline 45 scored 30/45 against a bar of
+26, which is met after two fixes (25/45 on the rebased tree, then 26/45 once
+the offline prompt carried the context and dashboard rules only on a turn
+with blocks or a dashboard in the message, then 30/45 once the offline agent
+also listed the dashboard tool only on such a turn). The offline dashboard
+questions scored 6/9. The P bar of 7/7
 is **missed**: P01 to P07 scored 6/7, because P04 ("make this a pie chart"
 with two charts) answered without asking which chart, and it does so on 5 of
 10 runs of v5 and of v6 against 0 of 10 on v3 and v4, so the drop came with v5 (the
-coded-column rules from `demo/measles`), not with the dashboard rules. The earlier
+coded-column rules from `demo/measles`), not with the dashboard rules. Two
+wordings added to v6 for it did not close it and none was kept: one scored
+P04 10/10 but broke D01 and D06 and left the 45 at 42/45, the other scored
+P04 8/10. The earlier
 runs (2026-11-17, before the rebase, on the dashboard prompt as first
 numbered: v3 plus the dashboard rules) are kept in `eval.md` as history.
 
@@ -12032,6 +12038,7 @@ already has, and `1a9a157d5`, whose formatting `demo/measles` already has):
 - Offline agent (shared rows below): `offline/offlineDataAgent.test.ts`,
   `offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts`,
   `offline/classifyOfflineMessage/classifyOfflineMessage.ts`, and `offline/createOfflineDataAgent/createOfflineDataAgent.ts`.
+- Local models (shared row below): `src/lib/agent/localModels/createLocalModelStreamFn/{toLocalLlmMessages.ts,createLocalModelStreamFn.test.ts}`.
 - Chat runtime (shared rows below): `useAvandarChatRuntime/createChatModelAdapter/{createChatModelAdapter,runLocalChatTurn}.{ts,test.ts}`,
   `runOfflineDataAgentTurn/runOfflineDataAgentTurn.{ts,test.ts}`,
   `runDataAgentTurn/runDataAgentTurn.ts`, `dataAgentTurnHelpers/{buildAgentTurnInputs (new),dataAgentTurnHelpers,createConversationAgentHost,dataAgentConversation.types,showQueryInChat}.{ts,test.ts}`,
@@ -12058,12 +12065,12 @@ already has, and `1a9a157d5`, whose formatting `demo/measles` already has):
 are in the browser, per chat session.
 
 **Known gaps** (open, not part of this feature's acceptance):
-- P04 scores 5 of 10 on v6 (and on v5), where v3 and v4 score 10 of 10. The P bar of 7/7 is missed, and no prompt was changed for it.
-- The offline 45 scored 25/45 before the offline prompt fix and 26/45 after it, against a bar of 26. N01 now misses because `add_dashboard_block` is in every offline turn's tool list.
+- P04 scores 5 of 10 on v6 (and on v5), where v3 and v4 score 10 of 10. The P bar of 7/7 is missed. Two wordings added to v6 were tried and neither was kept: wording 1 scored P04 10/10 but D01 missed 10 of 11 runs and D06 6 of 11, and wording 2 scored P04 8/10 (the full wordings are in `eval.md`).
+- Closed: the offline 45 scored 25/45 on the rebased tree and 26/45 after the offline prompt fix, against a bar of 26, with N01 newly missing because `add_dashboard_block` was in every offline turn's tool list. The offline agent now lists it only on a turn with blocks or a dashboard in the message (`a68dac7f8`), and the offline 45 scored 30/45.
 - The offline D questions scored 6/9. D04 gave a reply with no block, and D08 and D09 ended with no reply and no block.
 - The D08 grader pattern (`NOT_FOUND_PATTERN`) was widened in `9925721e3`, and D08 passed 3 of 3 on v6.
 - Updated 2026-11-18: a hosted turn shows real values in replies, a query's summary, and a question card's text and option labels. The message that posts a picked option still reads `<value N>` in the thread, since the option goes back to the model with no consent check.
-- A chart result gives the model no row count or columns, where the spec calls for them.
+- Closed in `d2ab8f862`: the dashboard tool's result tells the model the chart's row count and column names, never its rows.
 - `dashboard_card` is not in `PLAIN_BLOCK_TAG_START` (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a card line.
 - The card's strings are untranslated in the non-English `.po` files until `pnpm translations` runs.
 - Prompt v6 is fixed once it is pushed to the demo.

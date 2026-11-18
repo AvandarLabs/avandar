@@ -375,7 +375,8 @@ questions also have the ids D01 to D04, but they run only with
   at 44 or 45: **met** (45/45). Offline: D05 and D08 write nothing and every
   write outside the editor has `via: "card"`: **met**. The D score is
   recorded (6/9). The offline 45 at 26 or better: **met at exactly 26, after
-  one fix** (25/45 before it).
+  one fix** (25/45 before it). A later change raised it to 30/45, see
+  "Closing the open items" below.
 - **P04 missed on the P run, and the cause is v5, not the dashboard rules.**
   "make this a pie chart", with two charts on the dashboard, should ask
   which one. The miss ran `run_query` on the cases chart and replied that it
@@ -393,9 +394,11 @@ questions also have the ids D01 to D04, but they run only with
 
   The drop is between v4 and v5, and v6 matches v5, so the dashboard rules
   did not change P04's rate. v5 is already on `demo/measles`. No prompt was
-  changed for it here: a fix would be new text in v6 (for example, ask
-  which chart when "this" could mean several), outside the dashboard rules
-  this eval set out to check. The samples are small (10 runs each).
+  changed for it in these runs: a fix would be new text in v6 (for example,
+  ask which chart when "this" could mean several), outside the dashboard
+  rules this eval set out to check. The samples are small (10 runs each).
+  Two such wordings were tried afterwards. Neither closed it and neither was
+  kept: see "Closing the open items" below.
 - **The 45 scored 45/45.** The 45's earlier miss, H07, passed.
 - **No dashboard prompt fix was needed.** The three D runs passed every
   question, including D01 (a chart with the editor open, 3 of 3) and D08 (a
@@ -443,12 +446,11 @@ questions also have the ids D01 to D04, but they run only with
   `"date" < '2023-01-01'`, which dropped the last three months of the
   data. With `add_dashboard_block` taken out of the tool list in a
   temporary local edit (`phase-1d:offline-diag-notool`), N01 ended its
-  filter at `'2024-01-01'` and passed. A plain question still sees that one
-  tool entry. Offering the tool only on a turn with dashboard
-  context is the next candidate. It was not tried on the full 45: it
-  changes the shared tool list per turn, and the bar of 26 is met. The
-  offline agent has no plugin tools, so its tool list differs from
-  `demo/measles` by that one tool.
+  filter at `'2024-01-01'` and passed. At that point a plain question still
+  saw that one tool entry. Offering the tool only on a turn with dashboard
+  context was the next candidate and was done afterwards (`a68dac7f8`, see
+  "Closing the open items" below). The offline agent has no plugin tools, so
+  until then its tool list differed from `demo/measles` by that one tool.
 - **Offline, nothing was written that should not have been.** D05 (a data
   question) and D08 (a missing dashboard) wrote no block. The editor
   questions D01 to D03 wrote through the editor, and the two other writes
@@ -466,6 +468,112 @@ questions also have the ids D01 to D04, but they run only with
   final runs $0.0272 (D $0.0099, P $0.0016, M $0.0016, the 45 $0.0140),
   the nine P04 reruns $0.0028, and the 30 prompt comparison runs $0.0096.
   The five offline runs cost $0.
+
+**Closing the open items (2026-11-18, after the v6 runs above).** Two open
+items were worked on the committed v6 prompt: the online P04 miss and the
+offline margin. P04 did not close in the two prompt iterations allowed, and
+no prompt change was kept. The offline margin closed in one change. Every
+run is the Pi harness on Haiku 5.5 with Sonnet 5.5 escalation unless the row
+says offline (Qwen3 4B). "Wording 1" and "wording 2" are the two prompt
+iterations, quoted below.
+
+| Run | What it tested | Result | Bar |
+|---|---|---|---|
+| phase-1d:p04-fix1 (10 runs) | P04, wording 1 | 10/10 | P04 target 10/10: **met** |
+| phase-1d:agent-page-fix1 | P, wording 1 | 7/7 | P 7/7: **met** |
+| phase-1d:agent-mentions-fix1 | M, wording 1 | 7/7 | M 7/7: **met** |
+| phase-1d:agent-45-fix1 | The 45, wording 1 | 42/45 (F02, F03, N11) | 44 or 45: **missed** |
+| phase-1d:agent-dashboards-fix1 (3 runs) | D, wording 1 | 7/9, 7/9, 8/9 | D01 to D05 5/5 and D06 to D09 on every run: **missed** |
+| phase-1d:diag-d-fix1 (8 runs) | D01, D04, D06, wording 1 | D01 missed 8 of 8, D06 4 of 8, D04 1 of 8 | A diagnostic, no bar |
+| phase-1d:p04-fix2 (10 runs) | P04, wording 2 | 8/10 | P04 target 10/10, or 9/10 with one explained miss: **missed** |
+| phase-1d:offline-45-tool-gate | Offline 45, the dashboard tool only on dashboard turns | 30/45 | 26 or better: **met** |
+| phase-1d:offline-dashboards-tool-gate | Offline D | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
+
+- **P04 before and after, ten runs each.**
+
+  | Prompt | P04 asked and passed |
+  |---|---|
+  | v3 | 10/10 |
+  | v4 | 10/10 |
+  | v5 | 5/10 |
+  | v6 as committed | 5/10 (and 5 of 9 on the single reruns) |
+  | v6 with wording 1 | 10/10 |
+  | v6 with wording 2 | 8/10 |
+
+- **Wording 1 fixed P04 and broke other questions.** It was a new last
+  section, after DASHBOARD BLOCKS:
+
+  ```text
+  WHICH CHART
+  - When "this" or "it" could mean any of several charts on the page and no @mention says which, call ask_user with their titles as options before you run any query or add any block. Never pick one yourself.
+  ```
+
+  P04 asked once and passed on 10 of 10 runs, and P and M scored 7/7. The
+  rest missed. Over the three D runs and the eight-run diagnostic (11 runs
+  of D01, D04, and D06), D01 missed 10 times: it ran `run_query` and said it
+  had not added the chart to the dashboard, the failure that DASHBOARD BLOCKS
+  was written to stop, and it passed on every earlier v6 run. D06 ("Add this
+  as a bar chart to @COVID 2022", on a page showing a deaths query) missed 6
+  times by adding the mentioned dashboard's cases chart instead of the
+  Explorer's deaths query. D04 missed 2 times with a wrong ranking, which may
+  be noise. In the 45, F02 ("make it weekly instead") asked "Should the
+  weekly view cover California, Texas, or both?", a needless question, and F03
+  followed it. N11 has missed on other runs before. The likely causes are
+  "or it" (follow-ups say "it" all the time), the "@mention" clause (D06 has
+  a mention), and "add any block". That is a reading of the answers, not an
+  experiment, since the iterations ran out.
+- **Wording 2 was narrower and still missed.** It names only "this" on a page
+  that lists several charts, drops "@mention" and the query and block
+  clause, and sits before DASHBOARD BLOCKS so that section stays last:
+
+  ```text
+  WHICH CHART
+  - When the page lists several charts and the user says "this" about a chart without naming it, your first step is ask_user with their titles as options. Never pick one yourself.
+  ```
+
+  P04 scored 8/10. One miss answered in plain text with no query and no
+  `ask_user`, and one ran the cases chart's query without asking. Two
+  iterations were allowed, so no suite ran on wording 2 and its D runs are
+  unknown. The v6 text in the tree is the committed one, and the v1 to v5
+  hash tests pass.
+- **Offline: the dashboard tool only on a turn that can use it (`a68dac7f8`).**
+  The offline agent lists `add_dashboard_block` only on a turn with context
+  blocks or a dashboard named in the message, the condition that already
+  adds the dashboard rules to its prompt. `createDataAgent` takes a
+  `shouldOfferDashboardTool` option, read at the start of every `ask`. It
+  defaults to always, so the online agent and the per-version tool lists are
+  unchanged. A second change was needed. Pi declares a tool-list change as a
+  system message with an empty body, and the local model conversion sent it to
+  the model as an empty user message, so a turn that added or removed the
+  tool showed the model an empty user turn. `toLocalLlmMessages` now drops a
+  system update that has no text, since the model learns its tools from the
+  instructions and the action schema.
+- **The offline 45 scored 30/45, up from 26.** Compared with the run before
+  the change (26/45) and with `local_qwen3-4b_final2` (26/45):
+
+  | Question | `final2` | Before the change | After |
+  |---|---|---|---|
+  | N01 | pass | miss | pass |
+  | H05 | miss | miss | pass |
+  | I06 | miss | miss | pass |
+  | N12 | miss | miss | pass |
+  | B09 | miss | pass | pass |
+
+  Every other question kept its result, so nothing that passed before
+  missed. Why H05, I06, and N12 also flipped was not investigated. A plain
+  question now gets the prompt and the tool list `demo/measles` builds. The
+  run used 962 input tokens per call (1,015 before, 1,109 on the rebased
+  tree) at 15.1 s / 24.5 s. It called no dashboard tool and wrote no block.
+  The 15 misses are B08, I04, I07, I08, I09, H01, H02, H06, H09, H10, N03,
+  N04, N07, N10, and N11.
+- **The offline D questions are unchanged at 6/9.** Same questions and same
+  tool calls as the run before the change: D04 ran `run_query` with no
+  block, D08 and D09 asked twice and ended with no reply and no block, and D07
+  asked once. D05 and D08 wrote nothing, D01 to D03 wrote through the editor,
+  and D06 and D07 wrote through the card.
+- **Cost.** The 34 online runs cost $0.0365: wording 1 $0.0329 (P04 $0.0042,
+  P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058)
+  and wording 2 $0.0036. The two offline runs cost $0.
 
 **Earlier runs on the first-numbered prompt (v4), kept as history.** They
 ran on 2026-11-17, before the rebase, with the dashboard prompt as first
@@ -591,7 +699,8 @@ Every WebLLM model that fits the 16 GB budget, on every other question
 | Online agent, Haiku 5.5 with Sonnet 5.5 (regression check) | 44/45 | 0 | 0 | 2.4 s / 3.5 s |
 
 Qwen3 4B scored 26 to 28 across runs with different prompt wording; which
-borderline questions pass moves between runs, the total does not. It
+borderline questions pass moves between runs, the total does not. (Phase 1D's
+last run on the current code scored 30/45: see "Phase 1D".) It
 misses what needs several steps at once: per-person rates, combining two
 datasets, top day per group, running totals. The online regression miss
 (N05) passed 4 of 4 reruns. Times are on a 64 GB M4 Pro; a 16 GB laptop
@@ -962,8 +1071,9 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The offline agent on the dashboard questions (add `--label phase-1d:offline-dashboards`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions D --concurrency 1` |
 | The offline agent on the 45 (add `--label phase-1d:offline-45`) | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1` |
 | A single question again (add `--label phase-1d:rerun-p04`) | `--harness pi --config haiku-sonnet --questions P04` |
+| P04 ten times in a row (add `--label phase-1d:p04-fix1`) | `for i in 1 2 3 4 5 6 7 8 9 10; do pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions P04 --label phase-1d:p04-fix1; done` |
 | P04 on an older prompt (add `--label phase-1d:diag-p04-v5`) | Set `DATA_AGENT_PROMPT_ID` in `shared/agent/dataAgent/dataAgentTools.ts` to `"data-agent-v5"` (or v3, v4) without committing, then `--harness pi --config haiku-sonnet --questions P04`. Restore the file after. |
-| Offline N01 without the dashboard tool (add `--label phase-1d:offline-diag-notool`) | Make `_servesDashboardTool` in `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` return false without committing, then `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions N01 --concurrency 1`. Restore the file after. |
+| Offline N01 without the dashboard tool (add `--label phase-1d:offline-diag-notool`) | Make `_offersDashboardTool` in `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` return false without committing (the offline agent now does this on every plain turn, so this repeats the diagnostic on a dashboard turn), then `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions N01 --concurrency 1`. Restore the file after. |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -999,7 +1109,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 204 runs (every
+chat index lists all 240 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -1023,6 +1133,8 @@ Each was made after reading the failing answers by hand.
 | Prompt v6 (then v4): say plainly that you cannot find a dashboard with that name | Agent prompt (v6, not yet deployed) | D08's replies said "I don't have a dashboard named ...", which the question's phrase list did not accept. |
 | D08 also accepts "don't have", "do not have", and similar | Grader | A correct "I don't have a dashboard named ..." reply failed `NOT_FOUND_PATTERN` (`9925721e3`). |
 | The offline prompt carries the context and dashboard rules only on a turn with context blocks or a dashboard in the message | Offline prompt | The longer prompt on every turn turned H04 and N05 from passes into misses, 25/45 against a bar of 26 (`7c4f95033`). |
+| The offline agent lists `add_dashboard_block` only on that same kind of turn | Offline agent | The tool in every plain turn's list turned N01 from a pass into a miss. The offline 45 went from 26/45 to 30/45 (`a68dac7f8`). |
+| A system update with no text is not sent to a local model | Local model messages | Pi declares a tool-list change as an empty system message, which the local model read as an empty user turn (`a68dac7f8`). |
 
 After the last two changes, needless and missed questions on the chosen
 setup went from 1 per run to 0.
