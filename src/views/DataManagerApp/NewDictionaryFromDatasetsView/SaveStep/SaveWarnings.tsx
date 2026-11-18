@@ -55,14 +55,14 @@ function useUnlabeledMessage(valueCount: number, listNames: string): string {
   // The whole sentence sits in each plural branch, so the verb and the
   // pronoun agree with the count in every language.
   return plural(valueCount, {
-    one: `# value in ${listNames} has no label yet. It is saved without one and marked as needing a label, so you can finish it on the dictionary.`,
-    other: `# values in ${listNames} have no label yet. They are saved without one and marked as needing a label, so you can finish them on the dictionary.`,
+    one: `# value in ${listNames} has no target value yet. It is saved without one and marked as needing one, so you can finish it on the dictionary.`,
+    other: `# values in ${listNames} have no target value yet. They are saved without one and marked as needing one, so you can finish them on the dictionary.`,
   });
 }
 
 /**
- * The Save step's warnings: values with no label yet, which are saved
- * without one and marked as needing a label on the dictionary, and anything
+ * The Save step's warnings: values with no target value yet, which are saved
+ * without one and marked as needing one on the dictionary, and anything
  * the dictionary would refuse, which blocks Create dictionary until it is
  * fixed.
  */

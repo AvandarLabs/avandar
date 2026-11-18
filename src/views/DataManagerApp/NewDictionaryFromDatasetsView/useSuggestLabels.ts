@@ -133,13 +133,15 @@ export function useSuggestLabels(options: SuggestOptions): SuggestLabels {
         suggestions,
       });
       if (isMountedRef.current) {
-        notifySuccess(t`Suggested labels filled in. Check them before saving.`);
+        notifySuccess(
+          t`Suggested target values filled in. Check them before saving.`,
+        );
       }
     },
     onError: () => {
       if (isMountedRef.current) {
         notifyError(
-          t`Suggestions did not come back. Labeling still works without them.`,
+          t`Suggestions did not come back. You can still map values without them.`,
         );
       }
     },

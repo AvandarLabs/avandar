@@ -1,6 +1,5 @@
 import { Stack, Text } from "@mantine/core";
 import { CodeListPaneHeader } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListPaneHeader";
-import { EntryDescriptionField } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField";
 import { LabelValuesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable";
 import { SuggestionsOffNote } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote";
 import { useCodeListHint } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint";
@@ -27,7 +26,7 @@ type Props = {
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
 };
 
-/** The selected code list: its values to label and Suggest labels. */
+/** The selected code list: its values to map and Suggest target values. */
 export function CodeListLabelsPane({
   codeList,
   entries,
@@ -41,7 +40,6 @@ export function CodeListLabelsPane({
   onSuggest,
 }: Readonly<Props>): ReactNode {
   const hint = useCodeListHint(codeList, entries);
-  const [onlyEntry] = entries.length === 1 ? entries : [];
   const isOff =
     suggestionAvailability === "unavailable" ||
     suggestionAvailability === "declined";
@@ -70,9 +68,6 @@ export function CodeListLabelsPane({
         labels={labels}
         dispatch={dispatch}
       />
-      {onlyEntry ? (
-        <EntryDescriptionField entry={onlyEntry} dispatch={dispatch} />
-      ) : null}
     </Stack>
   );
 }

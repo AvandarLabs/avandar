@@ -46,23 +46,40 @@ const TWO_DATASETS = DictionaryProposal.fromColumnProfiles([
   _column("sex", ["M", "F", "U"], ERIE_ID),
 ]);
 
-function _renderStep(
-  options: {
-    proposal?: DictionaryProposal.T;
-    originDatasetName?: string;
-    meaningMatchStatus?: MeaningMatchStatus;
-  } = {},
-) {
+type StepOptions = {
+  proposal?: DictionaryProposal.T;
+  originDatasetName?: string;
+  meaningMatchStatus?: MeaningMatchStatus;
+};
+
+function _renderStep(options: StepOptions = {}) {
   const dispatch = vi.fn();
-  render(
-    <ReviewColumnsStep
-      proposal={options.proposal ?? TWO_DATASETS}
-      originDatasetName={options.originDatasetName}
-      meaningMatchStatus={options.meaningMatchStatus ?? "done"}
-      dispatch={dispatch}
-    />,
-  );
-  return { dispatch };
+  const buildStep = (stepOptions: StepOptions) => {
+    return (
+      <ReviewColumnsStep
+        proposal={stepOptions.proposal ?? TWO_DATASETS}
+        originDatasetName={stepOptions.originDatasetName}
+        meaningMatchStatus={stepOptions.meaningMatchStatus ?? "done"}
+        dispatch={dispatch}
+      />
+    );
+  };
+  const { rerender } = render(buildStep(options));
+  return {
+    dispatch,
+    rerenderWith: (nextOptions: StepOptions) => {
+      rerender(buildStep(nextOptions));
+    },
+  };
+}
+
+/** The entry names typed into the table's name inputs, top to bottom. */
+function _entryNamesInOrder(): string[] {
+  return screen
+    .getAllByRole("textbox", { name: /^Name of the entry from / })
+    .map((input) => {
+      return (input as HTMLInputElement).value;
+    });
 }
 
 function _keyOf(proposal: DictionaryProposal.T, name: string): string {
@@ -74,18 +91,59 @@ function _keyOf(proposal: DictionaryProposal.T, name: string): string {
 }
 
 describe("ReviewColumnsStep", () => {
-  it("sorts entries into coded, ordered, and description-only sections", () => {
+  it("lists every entry in one table, in the proposal's order", () => {
+    _renderStep();
+    expect(screen.getAllByRole("table")).toHaveLength(1);
+    expect(_entryNamesInOrder()).toEqual(
+      TWO_DATASETS.entries.map((entry) => {
+        return entry.name;
+      }),
+    );
+  });
+
+  it("shows no table when no entries were proposed", () => {
+    _renderStep({ proposal: DictionaryProposal.fromColumnProfiles([]) });
+    expect(screen.queryByRole("table")).toBeNull();
+  });
+
+  it("keeps a row in the same place when its kind changes", () => {
+    const { rerenderWith } = _renderStep();
+    const orderBefore = _entryNamesInOrder();
+    for (const kind of ["ordered", "text", "number", "categorical"] as const) {
+      rerenderWith({
+        proposal: DictionaryProposal.setEntryKind(TWO_DATASETS, {
+          entryKey: _keyOf(TWO_DATASETS, "hosp_yn"),
+          kind,
+        }),
+      });
+      expect(_entryNamesInOrder()).toEqual(orderBefore);
+    }
+  });
+
+  it("shows the columns an entry came from in their own column", () => {
     _renderStep();
     expect(
-      screen.getByRole("heading", { name: "Coded columns" }),
+      screen.getByRole("columnheader", { name: /^Entry name/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Ordered scales" }),
+      screen.getByRole("columnheader", { name: "Column source" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Descriptions only" }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("GENDER (Bronx), sex (Erie)")).toBeInTheDocument();
+    const genderRow = screen.getByRole("row", { name: /GENDER \(Bronx\)/ });
+    const cells = within(genderRow).getAllByRole("cell");
+    expect(within(cells[1] as HTMLElement).getByRole("textbox")).toHaveValue(
+      "gender",
+    );
+    expect(cells[2]).toHaveTextContent("GENDER (Bronx), sex (Erie)");
+  });
+
+  it("explains the entry name on a focusable info icon", async () => {
+    _renderStep();
+    const explanation =
+      "The name this entry is shown under in the dictionary. Changing it doesn't rename any column in your data.";
+    const info = screen.getByRole("button", { name: "About entry names" });
+    expect(info).toHaveAccessibleDescription(explanation);
+    fireEvent.focus(info);
+    expect(await screen.findByRole("tooltip")).toHaveTextContent(explanation);
   });
 
   it("leaves an entry out when it is unchecked", () => {
@@ -102,7 +160,7 @@ describe("ReviewColumnsStep", () => {
     const { dispatch } = _renderStep();
     expect(
       screen.getByText(
-        "Same name, different codes. Kept as separate code lists under one entry.",
+        "Same name, different values. Kept as separate code lists under one entry.",
       ),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Keep apart: gender" }));
@@ -155,16 +213,64 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Fix the entry names marked above to go on."),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Next: label values" }),
+      screen.getByRole("button", { name: "Next: map values" }),
     ).toBeDisabled();
   });
 
-  it("says in each row whether the entry needs labels or a description", () => {
+  it("says in each row whether the entry gets its values mapped and a description, or only a description", () => {
     _renderStep();
     const hospRow = screen.getByRole("row", { name: /hosp_yn/ });
-    expect(within(hospRow).getByText("Needs labels")).toBeInTheDocument();
+    expect(
+      within(hospRow).getByText("Map values + describe"),
+    ).toBeInTheDocument();
     const idRow = screen.getByRole("row", { name: /case_id/ });
-    expect(within(idRow).getByText("Description")).toBeInTheDocument();
+    expect(within(idRow).getByText("Describe")).toBeInTheDocument();
+  });
+
+  it("offers to deselect all when every entry is included", () => {
+    const { dispatch } = _renderStep();
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Deselect all columns",
+    });
+    expect(selectAll).toBeChecked();
+    fireEvent.click(selectAll);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "set_all_entries_included",
+      isIncluded: false,
+    });
+  });
+
+  it("shows the select-all box as indeterminate when only some are included", () => {
+    const some = DictionaryProposal.setEntryIncluded(TWO_DATASETS, {
+      entryKey: _keyOf(TWO_DATASETS, "hosp_yn"),
+      isIncluded: false,
+    });
+    const { dispatch } = _renderStep({ proposal: some });
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Select all columns",
+    });
+    expect(selectAll).not.toBeChecked();
+    expect(selectAll).toHaveProperty("indeterminate", true);
+    fireEvent.click(selectAll);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "set_all_entries_included",
+      isIncluded: true,
+    });
+  });
+
+  it("shows the select-all box unchecked when none are included", () => {
+    const none = TWO_DATASETS.entries.reduce((current, entry) => {
+      return DictionaryProposal.setEntryIncluded(current, {
+        entryKey: entry.key,
+        isIncluded: false,
+      });
+    }, TWO_DATASETS);
+    _renderStep({ proposal: none });
+    const selectAll = screen.getByRole("checkbox", {
+      name: "Select all columns",
+    });
+    expect(selectAll).not.toBeChecked();
+    expect(selectAll).toHaveProperty("indeterminate", false);
   });
 
   it("holds Next and says why when every entry is left out", () => {
@@ -179,8 +285,44 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Include at least one entry to go on."),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Next: label values" }),
+      screen.getByRole("button", { name: "Next: describe columns" }),
     ).toBeDisabled();
+  });
+
+  it("explains that every checked column joins the dictionary and which also get mapped", () => {
+    _renderStep();
+    expect(
+      screen.getByText(
+        "Every checked column becomes a dictionary entry. Columns with a fixed set of values also get their values mapped next. Text, number, and date columns aren't mapped, but they still join the dictionary with a description, so anyone using it knows what the column holds.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("goes on to Map values when an included entry has values to map", () => {
+    const { dispatch } = _renderStep();
+    fireEvent.click(screen.getByRole("button", { name: "Next: map values" }));
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "go_to_step",
+      step: "label",
+    });
+  });
+
+  it("skips Map values and goes on to Describe when no included entry has values to map", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("case_id", undefined),
+      _column("clinic_notes", undefined),
+    ]);
+    const { dispatch } = _renderStep({ proposal });
+    expect(
+      screen.queryByRole("button", { name: "Next: map values" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Next: describe columns" }),
+    );
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "go_to_step",
+      step: "describe",
+    });
   });
 
   it("changes an entry's kind", () => {

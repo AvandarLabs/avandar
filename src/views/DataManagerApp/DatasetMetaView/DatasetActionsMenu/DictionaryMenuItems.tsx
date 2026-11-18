@@ -1,6 +1,7 @@
 import { Menu } from "@mantine/core";
 import { useCombiningCrosswalk } from "@/hooks/crosswalks/useCombiningCrosswalk/useCombiningCrosswalk";
 import { useDatasetHasBindings } from "@/hooks/dataDictionaries/useDatasetHasBindings";
+import { useWorkspaceHasDictionaries } from "@/hooks/dataDictionaries/useWorkspaceHasDictionaries";
 import { useCanEditDataset } from "@/hooks/datasets/useCanEditDataset/useCanEditDataset";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { ApplyDictionaryMenuItem } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem";
@@ -16,10 +17,11 @@ type Props = {
 /**
  * The dataset menu's dictionary actions, and a divider after them when any
  * shows. Apply shows to someone who can edit the dataset and read
- * dictionaries. It is hidden on a crosswalk's combined dataset, whose code
- * lists come from the crosswalk, which replaces its bindings on every
- * update, and while that is being looked up. A failed lookup does not hide
- * it. Create shows to a dictionary editor once the bindings are
+ * dictionaries, once the workspace has at least one dictionary to apply. It
+ * is hidden on a crosswalk's combined dataset, whose code lists come from
+ * the crosswalk, which replaces its bindings on every update, and while
+ * that or the workspace's dictionaries are being looked up. A failed lookup
+ * does not hide it. Create shows to a dictionary editor once the bindings are
  * read and no dictionary is attached: not while they load, and not when
  * they cannot be read. Neither shows while its check is still loading.
  */
@@ -39,7 +41,10 @@ export function DictionaryMenuItems({
   const combining = useCombiningCrosswalk(datasetId, {
     isEnabled: sourceType === "virtual",
   });
+  const dictionaries = useWorkspaceHasDictionaries();
   const canApply =
+    !dictionaries.isLoading &&
+    (dictionaries.hasDictionaries || dictionaries.isError) &&
     !editRights.isLoading &&
     editRights.canEdit &&
     canViewDictionaries &&

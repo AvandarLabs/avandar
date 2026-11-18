@@ -12,7 +12,10 @@ type Props = {
   onAccepted: () => void;
 };
 
-/** Back, Accept and next list, and Next: save, under the Label values step. */
+/**
+ * Back, Accept and next list, and Next: describe columns, under the Map
+ * values step.
+ */
 export function LabelValuesFooter({
   selectedKey,
   dispatch,
@@ -44,10 +47,10 @@ export function LabelValuesFooter({
       ) : null}
       <Button
         onClick={() => {
-          dispatch({ type: "go_to_step", step: "save" });
+          dispatch({ type: "go_to_step", step: "describe" });
         }}
       >
-        <Trans>Next: save</Trans>
+        <Trans>Next: describe columns</Trans>
       </Button>
     </NewDictionaryFooter>
   );

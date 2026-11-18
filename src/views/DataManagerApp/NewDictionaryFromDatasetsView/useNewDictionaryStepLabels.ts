@@ -13,7 +13,8 @@ export function useNewDictionaryStepLabels(): Record<
   return {
     pick: t`Pick datasets`,
     review: t`Review columns`,
-    label: t`Label values`,
+    label: t`Map values`,
+    describe: t`Describe columns`,
     save: t`Save`,
   };
 }

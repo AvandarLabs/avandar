@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Table, Text } from "@mantine/core";
+import { ValueSideHeading } from "@/components/dataDictionaries/ValueSideHint/ValueSideHeading";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { ReactNode } from "react";
 
@@ -7,7 +8,7 @@ type Props = {
   codeList: DataDictionary.CodeListDraft;
 };
 
-/** A read-only table of a code list's codes and labels. */
+/** A read-only table of a code list's source values and target values. */
 export function CodeListValuesTable({ codeList }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const listName = codeList.name;
@@ -17,10 +18,10 @@ export function CodeListValuesTable({ codeList }: Readonly<Props>): ReactNode {
       <Table.Thead>
         <Table.Tr>
           <Table.Th>
-            <Trans>Code</Trans>
+            <ValueSideHeading side="source" />
           </Table.Th>
           <Table.Th>
-            <Trans>Label</Trans>
+            <ValueSideHeading side="target" />
           </Table.Th>
         </Table.Tr>
       </Table.Thead>
@@ -33,7 +34,7 @@ export function CodeListValuesTable({ codeList }: Readonly<Props>): ReactNode {
               <Table.Td>
                 {pair.label.trim() === "" ? (
                   <Text span c="dimmed" fs="italic">
-                    <Trans>No label yet</Trans>
+                    <Trans>No target value yet</Trans>
                   </Text>
                 ) : (
                   pair.label

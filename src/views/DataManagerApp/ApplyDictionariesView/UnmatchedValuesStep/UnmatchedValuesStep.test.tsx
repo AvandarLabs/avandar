@@ -88,7 +88,7 @@ describe("UnmatchedValuesStep", () => {
       name: "What to do with Kings in county",
     });
     expect(
-      within(reference).getByRole("radio", { name: "Leave unlabeled" }),
+      within(reference).getByRole("radio", { name: "Leave unmapped" }),
     ).toBeChecked();
     expect(within(reference).getAllByRole("radio")).toHaveLength(2);
   });
@@ -127,9 +127,12 @@ describe("UnmatchedValuesStep", () => {
     _render(flow);
 
     fireEvent.click(screen.getByRole("radio", { name: "Leave empty" }));
-    fireEvent.change(screen.getByRole("textbox", { name: "Label for 7" }), {
-      target: { value: "Other" },
-    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Target value for 7" }),
+      {
+        target: { value: "Other" },
+      },
+    );
 
     expect(flow.dispatch).toHaveBeenCalledWith({
       type: "resolve_value",
@@ -150,7 +153,7 @@ describe("UnmatchedValuesStep", () => {
     _render(flow);
 
     fireEvent.click(
-      screen.getByRole("radio", { name: "Use an existing label" }),
+      screen.getByRole("radio", { name: "Use an existing target value" }),
     );
 
     expect(flow.dispatch).toHaveBeenCalledWith({
@@ -224,11 +227,15 @@ describe("UnmatchedValuesStep", () => {
     });
 
     expect(
-      screen.getByRole("textbox", { name: "Code for X" }),
-    ).toHaveAccessibleDescription("The code 8 is added twice to this list.");
+      screen.getByRole("textbox", { name: "Source value for X" }),
+    ).toHaveAccessibleDescription(
+      "The source value 8 is added twice to this list.",
+    );
     expect(
-      screen.getByRole("textbox", { name: "Code for Y" }),
-    ).toHaveAccessibleDescription("The code 8 is added twice to this list.");
+      screen.getByRole("textbox", { name: "Source value for Y" }),
+    ).toHaveAccessibleDescription(
+      "The source value 8 is added twice to this list.",
+    );
   });
 
   it("disables Add to list for a code already in the list without a label", async () => {
@@ -262,7 +269,7 @@ describe("UnmatchedValuesStep", () => {
     fireEvent.mouseEnter(add.closest("span") ?? add);
     expect(
       await screen.findByText(
-        "8 is already in the list, without a label. Label it on the dictionary.",
+        "8 is already in the list, with no target value. Add one on the dictionary.",
       ),
     ).toBeInTheDocument();
   });

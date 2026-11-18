@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * The flank of the Label values step: every code list waiting for labels,
+ * The flank of the Map values step: every code list waiting to be mapped,
  * with how far along each one is and how many are done. It is full height,
  * on the body surface, and outside the content column's gutter.
  */
@@ -35,10 +35,10 @@ export function CodeListsToLabelNav({
   });
 
   return (
-    <nav aria-label={t`Code lists to label`} className={css.labelValuesStepNav}>
+    <nav aria-label={t`Code lists to map`} className={css.labelValuesStepNav}>
       <div className={css.labelValuesStepNavHeader}>
         <Text component="h3" fz="sm" fw={600}>
-          {t`Code lists to label`}
+          {t`Code lists to map`}
         </Text>
         <Text size="xs" c="dimmed">
           {progress}

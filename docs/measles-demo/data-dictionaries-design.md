@@ -75,7 +75,7 @@ This spec adds two things to the Data Sources app:
 
 Applying a dictionary to a column does one of two things, chosen per column:
 
-- **Attach labels only as reference.** The data is untouched. The labels and
+- **Attach as reference only.** The data is untouched. The target values and
   descriptions travel with the column: a code-list icon on the dataset page
   and in the Data Explorer, and the code list in Ask Avandar's context, so
   "how many female cases" becomes `WHERE "GENDER" = 2`.
@@ -123,7 +123,7 @@ Applying a dictionary to a column does one of two things, chosen per column:
 | Where codes live | In dictionaries only. A crosswalk reads its code translations from dictionary code lists. |
 | Code list reuse | Code lists are reusable within a dictionary and shared by entries. An entry can also own a one-off list. |
 | Direction | Pairs are bidirectional. Apply detects whether a column holds codes or labels and picks decode or encode; the user can flip it. |
-| Apply modes | Per column: **Attach labels only as reference** (no data change) or **Apply conversions**. Conversions keep the list attached too. |
+| Apply modes | Per column: **Attach as reference only** (no data change) or **Apply conversions**. Conversions keep the list attached too. |
 | Where conversions go | Uploads: a new linked dataset, or this dataset. Live connections: a linked dataset only. |
 | Edits after applying | Linked datasets follow the dictionary. A dataset converted in place keeps the version it was given and offers **Re-apply**. Reference-only columns always show the current list. |
 | Unmatched values | Shown with row counts. Default keeps the value as is; the user can map it, add it to the list, or empty it. |
@@ -131,8 +131,8 @@ Applying a dictionary to a column does one of two things, chosen per column:
 | Placement | Dictionaries and Crosswalks are groups in the Data Sources list, each opening its own view in the slate. |
 | Apply layout | Pairing table (one column per dictionary, up to 3; beyond that, one **Apply** column with a Select), a side pane for the selected column, a horizontal step bar, and a data preview that slides up from the bottom. |
 | Crosswalk layout | Reference layout first, then one dataset (or layout family) at a time, with a stub column stamping every layout Reference, Mapped, Review, To do, or Skipped. |
-| Create layout | Pick datasets, Review columns, Label values, Save. Starting from a dataset's menu skips Pick. |
-| Defaults | Uploaded and offline datasets default to **Apply conversions**; live connections default to **Attach labels only as reference**. |
+| Create layout | Pick datasets, Review columns, Map values, Save. Starting from a dataset's menu skips Pick. |
+| Defaults | Uploaded and offline datasets default to **Apply conversions**; live connections default to **Attach as reference only**. |
 
 ## 4. Vocabulary
 
@@ -145,20 +145,20 @@ UI says (see the copy rule in `AGENTS.md`).
 | `DataDictionaryEntry` | entry | One kind of column: name, other column names, kind, unit, valid range, description, codings. |
 | `columnNames` | also matches columns named | The other names an entry recognizes (`GENDER`, `sex_at_birth`). |
 | `DataDictionaryCodeList` | code list | An ordered list of pairs, optionally ordered as a scale. |
-| `CodePair` | value, label | `{ code, label, acceptedSpellings, isMissing }`. |
-| `acceptedSpellings` | also accept as this label | Extra labels that encode to the pair's code (`M`, `man`). |
+| `CodePair` | source value, target value | `{ code, label, acceptedSpellings, isMissing }`. `code` is the source value and `label` is the target value, whether or not the target is a human-readable label. |
+| `acceptedSpellings` | also accept as this target value | Extra target values that convert back to the pair's source value (`M`, `man`). |
 | entry coding | code list (on an entry) | The link between an entry and a code list. An entry can have several codings of the same meaning (`1/2/9` and `M/F/U`); one is primary. |
 | `DictionaryBinding` | applied, attached | One dataset column bound to one entry, with a mode. |
-| `mode: "reference"` | attached as reference | Labels and description only. Values unchanged. |
+| `mode: "reference"` | attached as reference | Target values and description only. Values unchanged. |
 | `mode: "convert"` | converted | Values change when the dataset loads. |
-| `direction: "decode" \| "encode"` | codes → labels, labels → codes | Which side of the pair the data holds. |
+| `direction: "decode" \| "encode"` | Source → Target, Target → Source | Which side of the pair the data holds. |
 | `pinnedPairs` | (version shown in the rail) | The pairs a dataset converted in place was given. |
 | linked dataset | linked dataset | A virtual dataset reading from the source with conversions applied, following the dictionary. |
 | `Crosswalk` | crosswalk | A set of datasets mapped onto a reference layout. |
 | `CrosswalkLayout` | layout | Datasets that share the same column names, mapped once together. |
 | `CrosswalkColumn` | column of the combined dataset | One output column, optionally governed by a dictionary entry. |
 | `CrosswalkMapping` | how a column is filled | For one layout and one output column: a source column with a conversion, a fixed value, an expression, or empty. |
-| `holdsLabels` | The column holds | On a fill that translates codes: whether the source column holds the list's labels (`true`) or its codes (`false`). Replaces the earlier `alreadyLabels`. |
+| `holdsLabels` | The column holds | On a fill that translates values: whether the source column holds the list's target values (`true`) or its source values (`false`). Replaces the earlier `alreadyLabels`. |
 | mapping `reason` | Name and type, Same values, Similar layout, Meaning | Why a fill was prefilled: `name_and_type`, `same_values`, `similar_layout` (carried over from the most similar layout already mapped), or `meaning` (an AI suggestion). |
 | combined dataset | combined dataset | The crosswalk's output virtual dataset. |
 
@@ -626,11 +626,12 @@ the Dictionary view's **Add from datasets**, and a dataset's overflow menu
    different codes." (which becomes a second coding on the same entry, per
    section 5.1). From a single dataset the notice offers **Learn from more
    datasets**, which returns to Pick.
-3. **Label values.** Master-detail of code lists to label, each tagged
-   Labeled, Suggested, or To do. Detail: Value in data, Rows, Label (input,
-   AI suggestions prefilled with a marker), Missing value. Ordered lists
+3. **Map values.** Master-detail of code lists to map, each tagged
+   Mapped, Suggested, or To do. Detail: Source value (the value found in the
+   data), Rows, Target value (input, AI suggestions prefilled with a
+   marker), Missing value. Source value and Target value carry info icons. Ordered lists
    arrive in scale order and are reordered on the dictionary, so there are
-   no drag handles here. **Suggest labels** asks the AI pass for the
+   no drag handles here. **Suggest target values** asks the AI pass for the
    selected list.
    **Accept and next list** moves on.
 4. **Save.** Name, description, a summary (entries, code lists, values
@@ -723,10 +724,10 @@ is named **Attach** when no column converts.
   its values, then any description-only match. Mode defaults per section 3.
 - The side pane for the selected column: Applying (dictionary › entry, code
   list), **How to apply the dictionary** with **Apply conversions** ·
-  **Attach labels only as reference** and its explanatory sentence. Only
-  under Apply conversions: the direction switch (**Codes → labels** ·
-  **Labels → codes**, with "Chosen from the data" when automatic), the Value
-  in data · Rows · Becomes table (accepted spellings marked), and "Also keep
+  **Attach as reference only** and its explanatory sentence. Only
+  under Apply conversions: the direction switch (**Source → Target** ·
+  **Target → Source**, with an info icon defining both sides and "Chosen
+  from the data" when automatic), the Value in data · Rows · Becomes table (accepted spellings marked), and "Also keep
   the original values in a new column, <name>_original". Then "Also matches
   ..." for other dictionaries. A description-only entry shows the
   description that will be added.
@@ -1070,19 +1071,24 @@ tooltip, not `title`, and also open on keyboard focus.
 | Where | Copy |
 |---|---|
 | Global switch | **Convert all** · **Attach dictionaries only as references** |
-| Convert all tooltip | Changes the values in every column that has codes, using the labels from your dictionaries. Charts, filters, and downloads show the labels from then on. |
+| Convert all tooltip | Changes the values in every column that matches a dictionary, replacing each source value with its target value. Charts, filters, and downloads show the target values from then on. |
 | Attach dictionaries only as references tooltip | Leaves every column exactly as it is. Your dictionaries are attached alongside the data, so anyone can hover a column to see what its values mean, and Ask Avandar can use them to answer questions. |
 | Side pane label | How to apply the dictionary |
-| Side pane switch | **Apply conversions** · **Attach labels only as reference** |
-| Apply conversions tooltip | Changes the values in this column using the dictionary. For example, every 1 becomes Male, and charts, filters, and downloads show Male from then on. |
-| Attach labels only as reference tooltip | Leaves this column exactly as it is. The dictionary is attached alongside it, so anyone can hover the column to see what each value means, and Ask Avandar can use it to answer questions. |
-| Explanation, converting | Your data will change. The labels stay attached too, so the column is still explained. |
-| Explanation, reference | Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the labels. |
+| Side pane switch | **Apply conversions** · **Attach as reference only** |
+| Apply conversions tooltip | Replaces each source value in this column with its target value. For example, every 1 becomes Male, and charts, filters, and downloads show Male from then on. |
+| Attach as reference only tooltip | Leaves this column exactly as it is. The dictionary is attached alongside it, so anyone can hover the column to see what each value means, and Ask Avandar can use it to answer questions. |
+| Explanation, converting | Your data will change. The dictionary stays attached too, so the column is still explained. |
+| Explanation, reference | Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the target values. |
 | Row chip | **Convert** · **Reference only** (tooltip: the matching side-pane tooltip plus "Click to attach as reference only instead." or "Click to convert instead.") |
-| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions (slice 3 shipped "Show what codes mean and add column descriptions" until conversions, section 7.4). **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
-| Popover footer | From <dictionary> › <entry>. Attached as reference. The values in the data are unchanged. / The values were converted to these labels. |
+| Dataset menu | **Apply a dictionary** / Convert values and add column descriptions (slice 3 shipped "Show what codes mean and add column descriptions" until conversions, section 7.4). **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
+| Popover footer | From <dictionary> › <entry>. Attached as reference. The values in the data are unchanged. / The values were converted to these target values (or these source values, when the column was converted the other way). |
 | Rail | Attached as reference · data unchanged / Linked dataset: <name> / Converted this dataset · version <n> |
-| Save step, reference only | Nothing in your data changes. <n> columns keep their values, with labels attached as reference. Edits to the dictionaries show up here right away. |
+| Save step, reference only | Nothing in your data changes. <n> columns keep their values, with the dictionaries attached as reference. Edits to the dictionaries show up here right away. |
+| Source value / Target value | Used for the two sides of every pair, in place of "code" and "label": the column headings of the map-values table, the code list editor, and the entry's value table, the direction switch (**Source → Target** · **Target → Source**), and field names. Each first prominent heading carries an info icon, focusable by keyboard, with a tooltip. |
+| Source value tooltip | A value as it appears in the data, such as 1 or "M". |
+| Target value tooltip | What the source value is converted to when the dictionary is applied. It can be a readable label, such as "Male", or a value in another coding system. |
+| New-dictionary step | **Map values** (was "Label values"), **Next: map values**, a row badge **Needs mapping**, **Suggest target values**. |
+| Values with no target value | "Values with no target value" (apply flow), "# value in the data has no target value." with **Add them in <dictionary>** (popover), **Leave unmapped** (reference mode), **Use an existing target value**. |
 
 "Reference" was chosen over "documentation" because people already say "for
 reference" to mean "look it up, don't change it".
@@ -1196,6 +1202,7 @@ Each slice is one PR into `demo/measles`, recorded in
 - **Import dictionaries** from REDCap data dictionary CSVs, SPSS value
   labels, and CDISC codelists; publish starter dictionaries (CDC race and
   ethnicity, NNDSS case report codes).
+- **Display-only target values.** Today a dictionary's target value is also what charts show for a column attached as reference. Separate "value" from "display value" so a dictionary can add a display value without converting data, while a conversion dictionary changes the stored value. Raised in QA when "Source/Target" replaced "code/label" in the UI.
 - **Show labels on raw grids** as a display toggle, without converting.
 - **Crosswalk joins** (side by side), building on the joined-cases key
   matching.

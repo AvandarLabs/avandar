@@ -1,18 +1,4 @@
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
-
-/** The three groups the Review step sorts proposed entries into. */
-export type ReviewSection = "coded" | "ordered" | "description";
-
-/** Which Review group an entry of this kind belongs to. */
-export function getReviewSectionFromKind(
-  kind: DataDictionaryEntry.Kind,
-): ReviewSection {
-  if (kind === "categorical") {
-    return "coded";
-  }
-  return kind === "ordered" ? "ordered" : "description";
-}
 
 /** For each entry on a shared code list, the other entries on it. */
 export function getSharedNamesByEntryKey(
@@ -42,4 +28,21 @@ export function getSharedNamesByEntryKey(
       });
     });
   return shared;
+}
+
+/**
+ * The columns an entry came from, comma separated. Datasets are named after
+ * each column only when more than one was read.
+ */
+export function buildEntrySourcesText(
+  entry: DictionaryProposal.Entry,
+  isSingleDataset: boolean,
+): string {
+  return DictionaryProposal.getColumnSources(entry)
+    .map(({ columnName, datasetNames }) => {
+      return isSingleDataset
+        ? columnName
+        : `${columnName} (${datasetNames.join(", ")})`;
+    })
+    .join(", ");
 }

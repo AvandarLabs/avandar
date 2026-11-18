@@ -57,10 +57,12 @@ describe("SaveAsStep", () => {
       screen.getByRole("radio", { name: /Create a new linked dataset/ }),
     ).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue(
-      "Bronx line list (labeled)",
+      "Bronx line list (target values)",
     );
     expect(
-      screen.getByText("Codes become labels in the linked dataset"),
+      screen.getByText(
+        "Source values become target values in the linked dataset",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -74,7 +76,7 @@ describe("SaveAsStep", () => {
     expect(saveMock).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: "linked",
-        linkedDatasetName: "Bronx line list (labeled)",
+        linkedDatasetName: "Bronx line list (target values)",
       }),
     );
   });
@@ -109,7 +111,7 @@ describe("SaveAsStep", () => {
     });
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "The code 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
+      "The source value 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
     );
     expect(
       screen.getByRole("button", { name: "Create linked dataset" }),

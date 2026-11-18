@@ -30,7 +30,7 @@ export function PastePairsModal({
       <Stack gap="md">
         <Textarea
           label={t`Values to add`}
-          description={t`One per line, with the code first: 1 = Male, 1: Male, or 1, Male.`}
+          description={t`One per line, with the source value first: 1 = Male, 1: Male, or 1, Male.`}
           autosize
           minRows={6}
           value={text}

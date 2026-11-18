@@ -36,7 +36,7 @@ export function ApplyDictionaryMenuItem({
         <Trans>Apply a dictionary</Trans>
       </Text>
       <Text size="xs" c="dimmed">
-        <Trans>Turn codes into labels and add column descriptions</Trans>
+        <Trans>Convert values and add column descriptions</Trans>
       </Text>
     </Menu.Item>
   );

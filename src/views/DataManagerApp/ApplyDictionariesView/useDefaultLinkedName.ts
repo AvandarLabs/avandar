@@ -3,9 +3,10 @@ import { isConvertingPick } from "@/views/DataManagerApp/ApplyDictionariesView/a
 import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 
 /**
- * The name a new linked dataset is offered: `<dataset> (labeled)` when
- * every converted column turns codes into labels, `(coded)` when every one
- * turns labels into codes, and `(converted)` for a mix.
+ * The name a new linked dataset is offered: `<dataset> (target values)`
+ * when every converted column turns source values into target values,
+ * `(source values)` when every one turns target values into source values,
+ * and `(converted)` for a mix.
  */
 export function useDefaultLinkedName(
   datasetName: string,
@@ -20,9 +21,9 @@ export function useDefaultLinkedName(
       }),
   );
   if (directions.size === 1 && directions.has("encode")) {
-    return t`${datasetName} (coded)`;
+    return t`${datasetName} (source values)`;
   }
   return directions.size > 1
     ? t`${datasetName} (converted)`
-    : t`${datasetName} (labeled)`;
+    : t`${datasetName} (target values)`;
 }

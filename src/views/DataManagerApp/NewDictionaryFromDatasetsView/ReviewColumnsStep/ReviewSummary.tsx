@@ -35,9 +35,10 @@ export function ReviewSummary({
         </Text>
         <Text size="sm" c="dimmed">
           <Trans>
-            Coded columns get labeled next. The rest become entries with a
-            description, so the dictionary documents them too. Uncheck anything
-            you don't want, or change its kind.
+            Every checked column becomes a dictionary entry. Columns with a
+            fixed set of values also get their values mapped next. Text, number,
+            and date columns aren't mapped, but they still join the dictionary
+            with a description, so anyone using it knows what the column holds.
           </Trans>
         </Text>
         <MeaningMatchStatusLine status={meaningMatchStatus} />

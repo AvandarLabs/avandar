@@ -1,5 +1,7 @@
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import { DescribeColumnsStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/DescribeColumnsStep/DescribeColumnsStep";
 import { LabelValuesStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep";
+import { hasValuesToMap } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import { ReviewColumnsStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep";
 import { SaveStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveStep";
 import type {
@@ -26,7 +28,10 @@ function _getLearnedFromNames(proposal: DictionaryProposal.T): string[] {
   return [...new Set(names)];
 }
 
-/** The step to show once the datasets are read: Review, Label, or Save. */
+/**
+ * The step to show once the datasets are read: Review, Map values, Describe
+ * columns, or Save.
+ */
 export function ProposalStepBody({
   proposal,
   state,
@@ -45,6 +50,20 @@ export function ProposalStepBody({
         getLabelsBlockReason={flow.getLabelsBlockReason}
         dispatch={dispatch}
         onSuggest={flow.suggestLabels}
+      />
+    );
+  }
+  if (state.step === "describe") {
+    return (
+      <DescribeColumnsStep
+        proposal={proposal}
+        suggestionAvailability={flow.suggestionAvailability}
+        hasValuesToMap={hasValuesToMap(proposal)}
+        statusByEntryKey={flow.descriptions.statusByEntryKey}
+        isSuggesting={flow.descriptions.isSuggesting}
+        progress={flow.descriptions.progress}
+        dispatch={dispatch}
+        onSuggest={flow.descriptions.suggestDescriptions}
       />
     );
   }

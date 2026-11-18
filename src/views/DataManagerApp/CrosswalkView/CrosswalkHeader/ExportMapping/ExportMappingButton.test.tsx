@@ -178,7 +178,7 @@ describe("ExportMappingButton", () => {
       text: [
         "\uFEFFLayout,Dataset,Column of the combined dataset,How it is filled,Filled from,Change to the values,Code list,Status",
         "Kings line list 2026-03 (reference),Kings line list 2026-03,case_id,A column,CaseNo,,,Confirmed",
-        "Kings line list 2026-03 (reference),Kings line list 2026-03,sex,A column,GENDER,Translate codes,Sex (1/2/9),Confirmed",
+        "Kings line list 2026-03 (reference),Kings line list 2026-03,sex,A column,GENDER,Translate source values,Sex (1/2/9),Confirmed",
         '"Queens, March","Queens, March",case_id,A column,case id,"Trim spaces, UPPERCASE",,Suggested',
         '"Queens, March","Queens, March",sex,Not filled yet,,,,Not filled yet',
       ].join("\r\n"),

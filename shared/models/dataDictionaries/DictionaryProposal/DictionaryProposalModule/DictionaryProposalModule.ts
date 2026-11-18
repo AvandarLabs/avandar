@@ -243,13 +243,17 @@ function setEntryDescription(
 
 function suggestEntryDescription(
   proposal: Readonly<DictionaryProposalT>,
-  options: Readonly<EntryRef & { description: string }>,
+  options: Readonly<
+    EntryRef & { description: string; isRewriteAllowed?: boolean }
+  >,
 ): DictionaryProposalT {
   return _changeEntry(proposal, {
     entryKey: options.entryKey,
     change: (entry) => {
       const isReplaceable =
-        entry.description.trim() === "" || entry.isDescriptionSuggested;
+        options.isRewriteAllowed === true ||
+        entry.description.trim() === "" ||
+        entry.isDescriptionSuggested;
       return isReplaceable
         ? {
             ...entry,
@@ -405,7 +409,10 @@ export const DictionaryProposalModule = {
   /** The proposal with one entry's description typed by the user. */
   setEntryDescription,
 
-  /** The proposal with a suggested description, unless one was typed. */
+  /**
+   * The proposal with a suggested description, unless one was typed. A
+   * typed one is replaced only when `isRewriteAllowed` says the user agreed.
+   */
   suggestEntryDescription,
 
   /** The proposal with an entry's guessed columns split into entries. */

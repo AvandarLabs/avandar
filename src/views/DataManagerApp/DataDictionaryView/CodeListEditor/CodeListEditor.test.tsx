@@ -46,13 +46,35 @@ describe("CodeListEditor", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("Label 1"), {
+    fireEvent.change(screen.getByLabelText("Target value 1"), {
       target: { value: "Man" },
     });
     expect(_lastDraft(onDraftChange).codeLists[0]?.pairs[0]?.label).toBe("Man");
 
     fireEvent.click(screen.getByRole("button", { name: "Add value" }));
     expect(_lastDraft(onDraftChange).codeLists[0]?.pairs).toHaveLength(2);
+  });
+
+  it("heads the pairs with source and target values and an info icon for each", () => {
+    render(
+      <CodeListEditor
+        draft={_draft([
+          { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+        ])}
+        codeListId={LIST_ID}
+        issues={[]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("Source value")).toBeInTheDocument();
+    expect(screen.getByText("Target value")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "What is a source value?" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "What is a target value?" }),
+    ).toBeInTheDocument();
   });
 
   it("marks a value without a label as needing one, without blocking it", () => {
@@ -69,8 +91,8 @@ describe("CodeListEditor", () => {
         onDraftChange={vi.fn()}
       />,
     );
-    expect(screen.getAllByText(/Needs a label/)).not.toHaveLength(0);
-    expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
+    expect(screen.getAllByText(/Needs a target value/)).not.toHaveLength(0);
+    expect(screen.getByLabelText("Target value 2")).not.toHaveAttribute(
       "aria-invalid",
       "true",
     );
@@ -90,8 +112,8 @@ describe("CodeListEditor", () => {
         onDraftChange={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("Label 2")).toHaveAccessibleDescription(
-      /Needs a label/,
+    expect(screen.getByLabelText("Target value 2")).toHaveAccessibleDescription(
+      /Needs a target value/,
     );
   });
 
@@ -128,9 +150,9 @@ describe("CodeListEditor", () => {
       />,
     );
     expect(
-      screen.getAllByText(/This code is already in the list/),
+      screen.getAllByText(/This source value is already in the list/),
     ).not.toHaveLength(0);
-    expect(screen.queryByText(/Needs a label/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Needs a target value/)).not.toBeInTheDocument();
   });
 
   it("replaces a single empty row with pasted values", async () => {
@@ -179,15 +201,15 @@ describe("CodeListEditor", () => {
     );
     expect(screen.getByText(/Pairs work both ways/)).toBeInTheDocument();
     expect(
-      screen.getAllByText(/This code is already in the list/),
+      screen.getAllByText(/This source value is already in the list/),
     ).not.toHaveLength(0);
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    const codeInput = screen.getByLabelText("Code 2");
+    const codeInput = screen.getByLabelText("Source value 2");
     expect(codeInput).toHaveAttribute("aria-invalid", "true");
     expect(codeInput).toHaveAccessibleDescription(
-      /This code is already in the list/,
+      /This source value is already in the list/,
     );
-    expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
+    expect(screen.getByLabelText("Target value 2")).not.toHaveAttribute(
       "aria-invalid",
     );
   });
@@ -208,11 +230,13 @@ describe("CodeListEditor", () => {
         onDraftChange={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("Label 2")).toHaveAttribute(
+    expect(screen.getByLabelText("Target value 2")).toHaveAttribute(
       "aria-invalid",
       "true",
     );
-    expect(screen.getByLabelText("Code 2")).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText("Source value 2")).not.toHaveAttribute(
+      "aria-invalid",
+    );
   });
 
   it("moves a value one place with Alt and an arrow on an ordered list", () => {

@@ -30,11 +30,12 @@ export function DataDictionaryRail({ dictionary }: Readonly<Props>): ReactNode {
       </AppViewRail.Group>
       {/* Group children render inside a `<dl>`, so the explanation is a
           fact rather than a paragraph. */}
-      <AppViewRail.Group title={<Trans>How codes work</Trans>}>
+      <AppViewRail.Group title={<Trans>How values map</Trans>}>
         <AppViewRail.Fact label={<Trans>Both ways</Trans>}>
           <Trans>
-            Data holding 1 becomes Male, and data holding Male becomes 1, from
-            the same pair.
+            Data holding a source value becomes its target value, and data
+            holding a target value becomes its source value, from the same pair.
+            For example, 1 becomes Male, and Male becomes 1.
           </Trans>
         </AppViewRail.Fact>
       </AppViewRail.Group>

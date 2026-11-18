@@ -2,8 +2,9 @@ import { Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { hasValuesToMap } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import { ReviewColumnsFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter";
-import { ReviewSections } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections";
+import { ReviewEntriesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTable";
 import { ReviewSummary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
@@ -18,9 +19,9 @@ type Props = {
 
 /**
  * The second step of learning a dictionary: what reading the datasets
- * proposed, ready to adjust before labeling. Back to Pick is offered only
- * when the flow started there. Next waits until something is included and
- * every included entry has a name the save will accept.
+ * proposed, ready to adjust before mapping and describing. Back to Pick is
+ * offered only when the flow started there. Next waits until something is
+ * included and every included entry has a name the save will accept.
  */
 export function ReviewColumnsStep({
   proposal,
@@ -47,7 +48,7 @@ export function ReviewColumnsStep({
               dispatch({ type: "learn_from_more" });
             }}
           />
-          <ReviewSections
+          <ReviewEntriesTable
             proposal={proposal}
             nameIssues={nameIssues}
             dispatch={dispatch}
@@ -57,6 +58,7 @@ export function ReviewColumnsStep({
       <ReviewColumnsFooter
         hasBack={!originDatasetName}
         hasIncludedEntry={hasIncludedEntry}
+        hasValuesToMap={hasValuesToMap(proposal)}
         hasNameIssue={nameIssues.size > 0}
         dispatch={dispatch}
       />

@@ -78,8 +78,8 @@ export function useMappingCsvCopy(): MappingCsvCopy {
   const describeChange = (row: MappingCsvRow): string => {
     if (row.translation) {
       return row.translation.holdsLabels
-        ? t`Translate labels`
-        : t`Translate codes`;
+        ? t`Translate target values`
+        : t`Translate source values`;
     }
     return row.convert ? describeConvert(row.convert) : "";
   };

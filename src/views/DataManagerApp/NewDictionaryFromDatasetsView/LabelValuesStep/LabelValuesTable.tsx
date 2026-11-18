@@ -1,7 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { Table } from "@mantine/core";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import { ValueSideHeading } from "@/components/dataDictionaries/ValueSideHint/ValueSideHeading";
 import { LabelValueRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValueRow";
+import { MissingValueHeader } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
 
@@ -11,7 +13,7 @@ type Props = {
   dispatch: Dispatch<NewDictionaryAction>;
 };
 
-/** One code list's values, each with its row count, label, and missing flag. */
+/** One code list's values, each with its rows, target, and missing flag. */
 export function LabelValuesTable({
   codeList,
   labels,
@@ -22,17 +24,17 @@ export function LabelValuesTable({
     <Table verticalSpacing="xs" maw={760}>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th w={140}>
-            <Trans>Value in data</Trans>
+          <Table.Th w={160}>
+            <ValueSideHeading side="source" />
           </Table.Th>
           <Table.Th w={90} ta="right">
             <Trans>Rows</Trans>
           </Table.Th>
           <Table.Th>
-            <Trans>Label</Trans>
+            <ValueSideHeading side="target" />
           </Table.Th>
-          <Table.Th w={130}>
-            <Trans>Missing value</Trans>
+          <Table.Th w={150}>
+            <MissingValueHeader />
           </Table.Th>
         </Table.Tr>
       </Table.Thead>

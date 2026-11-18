@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import {
+  hasValuesToMap,
   makeInitialNewDictionaryState,
   newDictionaryReducer,
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
@@ -174,6 +175,28 @@ describe("newDictionaryReducer", () => {
         code: "1",
       })?.label,
     ).toBe("Male");
+  });
+
+  it("includes or leaves out every entry at once", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const leftOut = newDictionaryReducer(read, {
+      type: "set_all_entries_included",
+      isIncluded: false,
+    });
+    expect(
+      leftOut.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([false, false]);
+    const included = newDictionaryReducer(leftOut, {
+      type: "set_all_entries_included",
+      isIncluded: true,
+    });
+    expect(
+      included.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([true, true]);
   });
 
   it("remembers the answer to the first online suggestion", () => {
@@ -377,5 +400,136 @@ describe("newDictionaryReducer", () => {
         }),
       ).toBe(read);
     });
+  });
+});
+
+describe("newDictionaryReducer descriptions", () => {
+  const NOTES_PROFILE: ColumnProfile.T = {
+    ..._column("clinic_notes", []),
+    distinctCount: 180,
+    values: undefined,
+  };
+  const MIXED = DictionaryProposal.fromColumnProfiles([
+    _column("GENDER", ["1", "2", "9"]),
+    NOTES_PROFILE,
+  ]);
+  const GENDER_KEY = MIXED.entries[0]?.key ?? "";
+  const NOTES_KEY = MIXED.entries[1]?.key ?? "";
+
+  function _readMixed(): NewDictionaryState {
+    const picked = newDictionaryReducer(
+      makeInitialNewDictionaryState(undefined),
+      { type: "toggle_dataset", datasetId: DATASET_ID },
+    );
+    return newDictionaryReducer(picked, {
+      type: "datasets_read",
+      proposal: MIXED,
+      datasetIds: [DATASET_ID],
+      readId: READ_ID,
+      defaultName: "Mixed",
+    });
+  }
+
+  function _descriptionOf(state: NewDictionaryState, entryKey: string) {
+    return state.proposal?.entries.find((entry) => {
+      return entry.key === entryKey;
+    });
+  }
+
+  it("goes to Describe like any other step", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "go_to_step",
+      step: "describe",
+    });
+    expect(state.step).toBe("describe");
+  });
+
+  it("has values to map only while an included entry has a value list", () => {
+    expect(hasValuesToMap(MIXED)).toBe(true);
+    const gendersLeftOut = DictionaryProposal.setEntryIncluded(MIXED, {
+      entryKey: GENDER_KEY,
+      isIncluded: false,
+    });
+    expect(hasValuesToMap(gendersLeftOut)).toBe(false);
+  });
+
+  it("fills a suggested description in for an empty entry, marked as suggested", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "Nurse notes." }],
+      rewritableEntryKeys: [],
+    });
+    expect(_descriptionOf(state, NOTES_KEY)).toMatchObject({
+      description: "Nurse notes.",
+      isDescriptionSuggested: true,
+    });
+  });
+
+  it("keeps a typed description unless its entry may be rewritten", () => {
+    const typed = [GENDER_KEY, NOTES_KEY].reduce((current, entryKey) => {
+      return newDictionaryReducer(current, {
+        type: "set_entry_description",
+        entryKey,
+        description: `Typed for ${entryKey}`,
+      });
+    }, _readMixed());
+    const state = newDictionaryReducer(typed, {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [
+        { entryKey: GENDER_KEY, description: "Suggested gender." },
+        { entryKey: NOTES_KEY, description: "Suggested notes." },
+      ],
+      rewritableEntryKeys: [NOTES_KEY],
+    });
+    expect(_descriptionOf(state, GENDER_KEY)).toMatchObject({
+      description: `Typed for ${GENDER_KEY}`,
+      isDescriptionSuggested: false,
+    });
+    expect(_descriptionOf(state, NOTES_KEY)).toMatchObject({
+      description: "Suggested notes.",
+      isDescriptionSuggested: true,
+    });
+  });
+
+  it("replaces an earlier suggestion without being told it may rewrite", () => {
+    const first = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "First try." }],
+      rewritableEntryKeys: [],
+    });
+    const second = newDictionaryReducer(first, {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "Second try." }],
+      rewritableEntryKeys: [],
+    });
+    expect(_descriptionOf(second, NOTES_KEY)?.description).toBe("Second try.");
+  });
+
+  it("drops suggestions asked for an earlier read of the datasets", () => {
+    const read = _readMixed();
+    const state = newDictionaryReducer(read, {
+      type: "descriptions_suggested",
+      readId: uuid<ProposalReadId>(),
+      suggestions: [{ entryKey: NOTES_KEY, description: "Stale." }],
+      rewritableEntryKeys: [NOTES_KEY],
+    });
+    expect(state).toBe(read);
+  });
+
+  it("ignores a suggestion for an entry that no longer exists", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: "missing", description: "Nobody's." }],
+      rewritableEntryKeys: ["missing"],
+    });
+    const descriptions = state.proposal?.entries.map((entry) => {
+      return entry.description;
+    });
+    expect(descriptions).toEqual(["", ""]);
   });
 });

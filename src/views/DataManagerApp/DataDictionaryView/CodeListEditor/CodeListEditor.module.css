@@ -1,3 +1,8 @@
+/* The headings sit above the list with the same gap the rows are spaced by. */
+.codeListEditorHeader {
+  margin-block-end: var(--mantine-spacing-xs);
+}
+
 .codeListEditorList {
   display: flex;
   flex-direction: column;
@@ -11,7 +16,8 @@
  * One value is a grid so the inputs line up across rows. Only rows with a
  * drag handle have the first track, so an unordered row starts at the code.
  */
-.codeListEditorRow {
+.codeListEditorRow,
+.codeListEditorHeader {
   align-items: center;
   display: grid;
   gap: var(--mantine-spacing-xs);
@@ -20,7 +26,8 @@
     auto auto;
 }
 
-.codeListEditorRow[data-has-handle="true"] {
+.codeListEditorRow[data-has-handle="true"],
+.codeListEditorHeader[data-has-handle="true"] {
   grid-template-columns:
     auto 7rem auto minmax(8rem, 1fr)
     minmax(8rem, 1fr) auto auto;

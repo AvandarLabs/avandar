@@ -8,6 +8,8 @@ type Props = {
   /** Back to Pick is offered only when the flow started there. */
   hasBack: boolean;
   hasIncludedEntry: boolean;
+  /** Next goes to Map values, or straight to Describe when nothing is coded. */
+  hasValuesToMap: boolean;
   hasNameIssue: boolean;
   dispatch: Dispatch<NewDictionaryAction>;
 };
@@ -20,6 +22,7 @@ type Props = {
 export function ReviewColumnsFooter({
   hasBack,
   hasIncludedEntry,
+  hasValuesToMap,
   hasNameIssue,
   dispatch,
 }: Readonly<Props>): ReactNode {
@@ -51,10 +54,17 @@ export function ReviewColumnsFooter({
       <Button
         disabled={!hasIncludedEntry || hasNameIssue}
         onClick={() => {
-          dispatch({ type: "go_to_step", step: "label" });
+          dispatch({
+            type: "go_to_step",
+            step: hasValuesToMap ? "label" : "describe",
+          });
         }}
       >
-        <Trans>Next: label values</Trans>
+        {hasValuesToMap ? (
+          <Trans>Next: map values</Trans>
+        ) : (
+          <Trans>Next: describe columns</Trans>
+        )}
       </Button>
     </NewDictionaryFooter>
   );

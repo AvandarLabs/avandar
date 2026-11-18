@@ -20,6 +20,6 @@ describe("NewDictionaryStepHeading", () => {
   it("moves focus to the heading when the step changes", () => {
     const { rerender } = render(<NewDictionaryStepHeading step="review" />);
     rerender(<NewDictionaryStepHeading step="label" />);
-    expect(screen.getByRole("heading", { name: "Label values" })).toHaveFocus();
+    expect(screen.getByRole("heading", { name: "Map values" })).toHaveFocus();
   });
 });

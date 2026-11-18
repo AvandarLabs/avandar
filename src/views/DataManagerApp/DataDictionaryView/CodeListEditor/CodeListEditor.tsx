@@ -99,10 +99,11 @@ function PairsWorkBothWaysNote(): ReactNode {
   return (
     <Text size="sm" c="dimmed" maw="70ch">
       <Trans>
-        Pairs work both ways. Applying this list to a column of codes turns them
-        into labels, and applying it to a column of labels turns them into
-        codes. Matching ignores capitalization and extra spaces, and also
-        accepts the other spellings listed beside each label.
+        Pairs work both ways. Applying this list to a column of source values
+        turns them into target values, and applying it to a column of target
+        values turns them into source values. Matching ignores capitalization
+        and extra spaces, and also accepts the other spellings listed beside
+        each target value.
       </Trans>
     </Text>
   );

@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
+import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep.module.css";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
@@ -33,6 +34,7 @@ export function KeepApartButton({
       variant="subtle"
       color="neutral"
       size="compact-xs"
+      className={css.keepApartButton}
       aria-label={t`Keep apart: ${entryName}`}
       aria-describedby={hasTag ? explanationId : undefined}
       onClick={() => {

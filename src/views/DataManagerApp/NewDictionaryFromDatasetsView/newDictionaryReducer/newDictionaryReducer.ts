@@ -5,7 +5,12 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UUID } from "@avandar/utils";
 
 /** The create flow's steps, in order. */
-export type NewDictionaryStep = "pick" | "review" | "label" | "save";
+export type NewDictionaryStep =
+  | "pick"
+  | "review"
+  | "label"
+  | "describe"
+  | "save";
 
 /**
  * The user's answer to sending suggestions online, asked on the first
@@ -72,8 +77,21 @@ export type NewDictionaryAction =
   | { type: "rename_entry"; entryKey: string; name: string }
   | { type: "set_entry_kind"; entryKey: string; kind: DataDictionaryEntry.Kind }
   | { type: "set_entry_included"; entryKey: string; isIncluded: boolean }
+  /** Includes or leaves out every entry, for the select-all checkbox. */
+  | { type: "set_all_entries_included"; isIncluded: boolean }
   | { type: "keep_apart"; entryKey: string }
   | { type: "set_entry_description"; entryKey: string; description: string }
+  | {
+      type: "descriptions_suggested";
+      /** The read of the proposal the descriptions were asked for. */
+      readId: ProposalReadId | undefined;
+      suggestions: ReadonlyArray<{ entryKey: string; description: string }>;
+      /**
+       * The entries whose typed description the user agreed to have
+       * rewritten. A typed description of any other entry is kept.
+       */
+      rewritableEntryKeys: readonly string[];
+    }
   | {
       type: "meaning_matches_found";
       matches: readonly DictionaryProposal.MeaningMatch[];
@@ -165,6 +183,14 @@ function _dropKeptApartMatches(
   });
 }
 
+/**
+ * Whether an included entry has a value list to map. When none does, the
+ * flow goes from Review straight to Describe, which is never skipped.
+ */
+export function hasValuesToMap(proposal: DictionaryProposal.T): boolean {
+  return DictionaryProposal.getCodings(proposal).codeLists.length > 0;
+}
+
 /** The state with a new proposal, its labels filled in, a list selected. */
 function _withProposal(
   state: NewDictionaryState,
@@ -247,6 +273,26 @@ function _applySuggestedLabels(
   });
 }
 
+function _applySuggestedDescriptions(
+  state: NewDictionaryState,
+  action: Extract<NewDictionaryAction, { type: "descriptions_suggested" }>,
+): NewDictionaryState {
+  // Descriptions asked for an earlier read describe a proposal that is gone.
+  if (state.readId !== action.readId) {
+    return state;
+  }
+  return _editProposal(state, (proposal) => {
+    return action.suggestions.reduce((current, suggestion) => {
+      return DictionaryProposal.suggestEntryDescription(current, {
+        ...suggestion,
+        isRewriteAllowed: action.rewritableEntryKeys.includes(
+          suggestion.entryKey,
+        ),
+      });
+    }, proposal);
+  });
+}
+
 const HANDLERS: Handlers = {
   toggle_dataset: (state, action) => {
     const pickedDatasetIds = _toggleDataset(
@@ -307,6 +353,16 @@ const HANDLERS: Handlers = {
       return DictionaryProposal.setEntryIncluded(proposal, action);
     });
   },
+  set_all_entries_included: (state, action) => {
+    return _editProposal(state, (proposal) => {
+      return proposal.entries.reduce((current, entry) => {
+        return DictionaryProposal.setEntryIncluded(current, {
+          entryKey: entry.key,
+          isIncluded: action.isIncluded,
+        });
+      }, proposal);
+    });
+  },
   keep_apart: (state, action) => {
     if (!state.proposal) {
       return state;
@@ -330,6 +386,7 @@ const HANDLERS: Handlers = {
       return DictionaryProposal.setEntryDescription(proposal, action);
     });
   },
+  descriptions_suggested: _applySuggestedDescriptions,
   meaning_matches_found: (state, action) => {
     // Matches for an older read are dropped, even for the same datasets, and
     // so are matches that would rejoin what Keep apart separated.
