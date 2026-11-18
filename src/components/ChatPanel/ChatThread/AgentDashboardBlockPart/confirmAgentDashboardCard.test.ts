@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
+import { useAgentDashboardCardStatus } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { confirmAgentDashboardCard } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/confirmAgentDashboardCard";
+import { renderHook } from "@/test-utils";
 
 const { appendMock } = vi.hoisted(() => {
   return { appendMock: vi.fn() };
@@ -18,6 +19,12 @@ const CARD = {
   summary: "s",
   candidates: [{ id: "d-1", name: "COVID 2022" }],
 };
+
+function _statusOf(cardId: string) {
+  return renderHook(() => {
+    return useAgentDashboardCardStatus(IDENTITY, cardId);
+  }).result.current;
+}
 
 function _closedEditor(): {
   activeDashboardId: undefined;
@@ -50,7 +57,7 @@ describe("confirmAgentDashboardCard", () => {
       dashboardId: "d-1",
       block: CARD.block,
     });
-    expect(AgentDashboardCardStore.readStatus(IDENTITY, "card-1")).toEqual({
+    expect(_statusOf("card-1")).toEqual({
       status: "confirmed",
       dashboardId: "d-1",
       dashboardName: "COVID 2022",
@@ -73,7 +80,7 @@ describe("confirmAgentDashboardCard", () => {
     expect(queuePendingBlock).toHaveBeenCalledWith(
       expect.objectContaining({ dashboardId: "d-1" }),
     );
-    expect(AgentDashboardCardStore.readStatus(IDENTITY, "card-1")).toEqual(
+    expect(_statusOf("card-1")).toEqual(
       expect.objectContaining({ status: "confirmed", isUnsaved: true }),
     );
   });
@@ -92,7 +99,7 @@ describe("confirmAgentDashboardCard", () => {
       editor: _closedEditor(),
     });
 
-    expect(AgentDashboardCardStore.readStatus(IDENTITY, "card-1")).toEqual({
+    expect(_statusOf("card-1")).toEqual({
       status: "failed",
       reason,
     });

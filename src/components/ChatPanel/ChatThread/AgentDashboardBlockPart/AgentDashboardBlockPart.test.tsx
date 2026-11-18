@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
+import {
+  AgentDashboardCardStore,
+  useAgentDashboardCardStatus,
+} from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentDashboardBlockPart } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { fireEvent, render, renderHook, screen, waitFor } from "@/test-utils";
 import type { AgentDashboardCardStatus } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { DataMessagePartProps } from "@assistant-ui/react";
@@ -108,6 +111,12 @@ const HEADING_CARD = AgentDashboardBlock.create({
   candidates: [{ id: "d-1", name: "COVID 2022" }],
 });
 
+function _statusOf(cardId: string) {
+  return renderHook(() => {
+    return useAgentDashboardCardStatus(IDENTITY, cardId);
+  }).result.current;
+}
+
 function _props(card: AgentDashboardBlockData): DataMessagePartProps {
   return {
     type: "data",
@@ -198,9 +207,10 @@ describe("AgentDashboardBlockPart pending card", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(
-      AgentDashboardCardStore.readStatus(IDENTITY, HEADING_CARD.cardId),
-    ).toEqual({ status: "cancelled", isReported: false });
+    expect(_statusOf(HEADING_CARD.cardId)).toEqual({
+      status: "cancelled",
+      isReported: false,
+    });
     expect(screen.getByText("Nothing was added.")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Confirm" })).toBeNull();
   });
@@ -294,9 +304,7 @@ describe("AgentDashboardBlockPart resolved card", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
-    expect(
-      AgentDashboardCardStore.readStatus(IDENTITY, HEADING_CARD.cardId),
-    ).toBeUndefined();
+    expect(_statusOf(HEADING_CARD.cardId)).toBeUndefined();
     expect(screen.getByRole("button", { name: "Confirm" })).toBeEnabled();
   });
 

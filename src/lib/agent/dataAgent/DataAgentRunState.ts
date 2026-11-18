@@ -28,10 +28,7 @@ export type DataAgentRunState = {
    * The block this answer added or proposed. Set once: an answer adds one
    * block, and its summary is the reply.
    */
-  dashboardBlock?: {
-    summary: string;
-    outcome: "added_to_editor" | "card_shown";
-  };
+  dashboardBlock?: { summary: string };
   questions: DataAgentQuestionRecord[];
   /** A question card is on screen, so the turn ends until the user answers. */
   isWaitingForUser: boolean;

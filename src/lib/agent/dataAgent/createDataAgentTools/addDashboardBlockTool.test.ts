@@ -76,7 +76,6 @@ describe("add_dashboard_block", () => {
     expect(_textOf(result)).toContain("Nothing changes until they confirm");
     expect(state.dashboardBlock).toEqual({
       summary: "Added a heading to COVID 2022.",
-      outcome: "card_shown",
     });
   });
 

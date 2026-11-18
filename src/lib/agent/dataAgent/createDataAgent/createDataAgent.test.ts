@@ -440,10 +440,7 @@ function _endedOn(
 describe("getDataAgentReplyText", () => {
   it("replies with the dashboard tool's summary when the turn ended on it", () => {
     const state = createDataAgentRunState();
-    state.dashboardBlock = {
-      summary: "Added a heading to COVID 2022.",
-      outcome: "added_to_editor",
-    };
+    state.dashboardBlock = { summary: "Added a heading to COVID 2022." };
 
     expect(getDataAgentReplyText(_endedOn("add_dashboard_block"), state)).toBe(
       "Added a heading to COVID 2022.",

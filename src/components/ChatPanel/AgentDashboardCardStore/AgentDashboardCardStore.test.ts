@@ -1,6 +1,10 @@
 /** Behavioral tests for the per-session dashboard card status store. */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
+import {
+  AgentDashboardCardStore,
+  useAgentDashboardCardStatus,
+} from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
+import { renderHook } from "@/test-utils";
 
 const IDENTITY = { workspaceId: "ws-1", userId: "user-1", sessionId: "s-1" };
 const CONFIRMED = {
@@ -11,6 +15,12 @@ const CONFIRMED = {
   isReported: false,
 } as const;
 
+function _statusOf(cardId: string) {
+  return renderHook(() => {
+    return useAgentDashboardCardStatus(IDENTITY, cardId);
+  }).result.current;
+}
+
 afterEach(() => {
   window.localStorage.clear();
   vi.restoreAllMocks();
@@ -20,15 +30,13 @@ describe("AgentDashboardCardStore", () => {
   it("stores a status per card and session", () => {
     AgentDashboardCardStore.setStatus(IDENTITY, "card-1", CONFIRMED);
 
-    expect(AgentDashboardCardStore.readStatus(IDENTITY, "card-1")).toEqual(
-      CONFIRMED,
-    );
+    expect(_statusOf("card-1")).toEqual(CONFIRMED);
     expect(
-      AgentDashboardCardStore.readStatus(
-        { ...IDENTITY, sessionId: "s-2" },
-        "card-1",
-      ),
-    ).toBeUndefined();
+      AgentDashboardCardStore.listUnreported({
+        ...IDENTITY,
+        sessionId: "s-2",
+      }),
+    ).toEqual([]);
   });
 
   it("lists resolved cards the agent has not heard about, then marks them", () => {
@@ -55,13 +63,13 @@ describe("AgentDashboardCardStore", () => {
 
   it("drops a stored entry that is not a status", () => {
     window.localStorage.setItem(
-      AgentDashboardCardStore.storageKey(IDENTITY),
+      "ava.chat.dashboardCards.ws-1.user-1.s-1",
       JSON.stringify({ "card-1": { status: "exploded" }, "card-2": CONFIRMED }),
     );
 
-    expect(AgentDashboardCardStore.read(IDENTITY)).toEqual({
-      "card-2": CONFIRMED,
-    });
+    expect(AgentDashboardCardStore.listUnreported(IDENTITY)).toEqual([
+      { cardId: "card-2", status: CONFIRMED },
+    ]);
   });
 
   it("returns false and keeps the old value when storage refuses a write", () => {
@@ -76,9 +84,7 @@ describe("AgentDashboardCardStore", () => {
         isReported: false,
       }),
     ).toBe(false);
-    expect(AgentDashboardCardStore.readStatus(IDENTITY, "card-1")).toEqual(
-      CONFIRMED,
-    );
+    expect(_statusOf("card-1")).toEqual(CONFIRMED);
   });
 
   it("makes a failed card pending again", () => {
@@ -89,9 +95,7 @@ describe("AgentDashboardCardStore", () => {
 
     AgentDashboardCardStore.clearStatus(IDENTITY, "card-1");
 
-    expect(
-      AgentDashboardCardStore.readStatus(IDENTITY, "card-1"),
-    ).toBeUndefined();
+    expect(_statusOf("card-1")).toBeUndefined();
   });
 
   it("tells subscribers when a status changes", () => {

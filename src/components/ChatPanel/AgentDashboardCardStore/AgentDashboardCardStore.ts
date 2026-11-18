@@ -142,14 +142,6 @@ function _isUnreported(
  * record in place.
  */
 export const AgentDashboardCardStore = {
-  storageKey: _storageKey,
-  read: _read,
-  readStatus: (
-    identity: AgentDashboardCardIdentity,
-    cardId: string,
-  ): AgentDashboardCardStatus | undefined => {
-    return _read(identity)[cardId];
-  },
   setStatus: (
     identity: AgentDashboardCardIdentity,
     cardId: string,

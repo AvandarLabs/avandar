@@ -230,11 +230,14 @@ describe("deleteStoredChatSession", () => {
     const cardIdentity = { ...IDENTITY, sessionId: closedId };
     AgentDashboardCardStore.setStatus(cardIdentity, "card-1", {
       status: "cancelled",
-      isReported: true,
+      isReported: false,
     });
+    expect(AgentDashboardCardStore.listUnreported(cardIdentity)).toHaveLength(
+      1,
+    );
 
     deleteStoredChatSession(IDENTITY, withArchived, closedId);
 
-    expect(AgentDashboardCardStore.read(cardIdentity)).toEqual({});
+    expect(AgentDashboardCardStore.listUnreported(cardIdentity)).toEqual([]);
   });
 });

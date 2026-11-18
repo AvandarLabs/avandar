@@ -109,10 +109,7 @@ function _toToolResult(
   switch (outcome.kind) {
     case "added_to_editor":
     case "card_shown":
-      context.state.dashboardBlock = {
-        summary: request.summary,
-        outcome: outcome.kind,
-      };
+      context.state.dashboardBlock = { summary: request.summary };
       return _reply(_describePlacement(outcome.kind, shape), outcome.kind, {
         terminate: true,
       });
