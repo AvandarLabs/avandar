@@ -40,9 +40,27 @@ and implementation, in order.
 | 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). Three live checks with live models in the real app passed (2026-11-09). Pushed to the demo on 2026-11-09, so prompt v2 is now fixed: a prompt change needs a new version served beside v1 and v2. The agent stays off until 1D and 1E close the gaps listed under [What keeps the agent off](#what-keeps-the-agent-off-pablo-2026-11-09). |
 | 1B | **Attachable context.** Done (2026-11-09). `@` mentions of gadgets in the chat composer and a context picker ([spec](specs/phase-1b.md)). | Done (2026-11-09) on `feat/agent-context` (D41, D42). Met: unit tests; an adversarial privacy review over three rounds, with eight leaks found and fixed; mention questions M01 to M06 passing on all three runs, with P01 to P07 passing and the 45 questions at 44/45 (the miss passed on rerun) on prompt v3. Eval label `phase-1b` ([results](eval.md#phase-1b)). A mocked browser spec, and a live check with live models in the real app that passed all six steps. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). Built (2026-11-10) ([plan](plans/phase-1c.md), [spec](specs/phase-1c.md), D43). | Unit tests, one browser spec, and a data session's turn text unchanged. |
-| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). Designed (2026-11-11) ([spec](specs/phase-1d.md), D44). | Dashboard eval questions exist and the agent matches today's chat on them. |
+| 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17), with one offline bar missed** ([spec](specs/phase-1d.md), D44). | Met online: dashboard questions D01 to D09 passed 9/9 on each of three final runs, P01 to P07 7/7, M01 to M06 (with M03b) 7/7, and the 45 questions at 44/45 on one run. **Missed offline:** the offline 45 scored 25/45 against a bar of 26 (H04 and N05 regressed, B09 now passes). The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v4 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v4 is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v4. |
 | 1E | **"Try again" and parity in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). The agent's question cards are audit-logged and bias-checked like today's clarification cards, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40). | Covered by unit tests and the browser test (1F). |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
+
+### Open after 1D (2026-11-17)
+
+- **Offline bar.** The offline 45 is 25/45 against a bar of 26. The offline
+  dashboard questions are 6/9: D04 replied with no block, and D08 and D09
+  ended with no reply and no block. D05 and D08 correctly wrote no block.
+  Every write outside the open editor used the confirm card.
+- **D08 grader.** `NOT_FOUND_PATTERN` misses "don't have", so a correct "I
+  don't have a dashboard named ..." reply fails the grader.
+- **Unmasked text.** A hosted turn does not unmask the dashboard `summary` or
+  free-text replies.
+- **Chart results.** A chart result gives the model no row count or columns,
+  where the spec calls for them.
+- **Forged card lines.** `dashboard_card` is not in `PLAIN_BLOCK_TAG_START`
+  (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a
+  card line.
+- **Translations.** The card's strings in non-English locales await
+  `pnpm translations`.
 
 ### What keeps the agent off (Pablo, 2026-11-09)
 
@@ -50,7 +68,7 @@ Turning it on today would lose things today's chat does:
 
 | Today's chat feature | Agent today | Planned |
 |---|---|---|
-| "Add a chart to this dashboard" adds a block in the dashboard editor | No dashboard tool; shows the result in the chat instead | 1D |
+| "Add a chart to this dashboard" adds a block in the dashboard editor | Adds the block from any page: unsaved in the open editor, or through a confirm card for another dashboard, online and offline | Done in 1D |
 | "Try again" sends the previous attempt (`retryContext`) | The agent branch runs before the retry logic; it just asks again | 1E |
 | Clarification cards are audit-logged (`ClarificationAuditEntryClient.recordShown`) and bias-checked (`detectBias`) in `applyChatModelTurnResponse.ts` | The agent's `ask_user` cards skip both | 1E (D40) |
 | Analytics `chat.sql_generated`, `dashboard.block_added_via_chat` | Not logged (`chat.message_sent` is logged for both) | 1E (D40) |

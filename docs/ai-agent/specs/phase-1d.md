@@ -1,7 +1,7 @@
 # Phase 1D: dashboard actions from anywhere
 
 Status: designed with Pablo on 2026-11-11, revised the same day after a
-review against the code. Part of [Phase 1](phase-1.md). Follows rules R1 to
+review against the code. Built on 2026-11-17. Part of [Phase 1](phase-1.md). Follows rules R1 to
 R4 there. Decision D44 in [decisions.md](../decisions.md). Builds on
 [phase-1c.md](phase-1c.md).
 

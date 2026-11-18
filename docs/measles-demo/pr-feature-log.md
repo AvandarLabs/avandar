@@ -207,6 +207,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F134 | Convert a dataset in place with a dictionary, pinned to the version applied, with the synced-data warning and Re-apply | not started | F133 | |
 | F136 | Crosswalks: map datasets with different column layouts onto one reference layout and save a combined dataset, with Export mapping, the stale banner, and Used by | not started | F129, F130, F131, F132, F133, F134 | |
 | F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
+| F139 | Dashboard blocks from any page, online and offline: `add_dashboard_block`, prompt v6, and the confirm card | not started | F81 to F87, F89 to F91, F128, F22 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -350,6 +351,7 @@ API. It's new work, not something this branch built.
 | after F133 | F134 | Frontend only: F133's migration already carries the pinned columns and `rpc_dataset_columns__reapply_dictionary`. Deploy the frontend. |
 | after F134 | F136 | Builds on F130's scorer and pick table, F131's bindings, popover, and Used by, F133's `ColumnConversion`, linked-dataset creation, virtual dataset freshness, and `clearCachedDatasetRows`, and F134's Re-apply in Used by. Adds five crosswalk tables and two RPCs (migration) and the desktop sync entries. Deploy the migration, then the frontend; the desktop app syncs the new tables from its next build. |
 | after F136 | F137 | Frontend only: F136's migration carries everything it reads. Deploy the frontend; the `chat` function is unchanged (same prompt, same route). |
+| after F128, F131 | F139 | Stores each session's dashboard card statuses beside its thread and tray, and adds the card to F128's panel. Its e2e specs read F128's session tabs. Its prompt `data-agent-v6` is F131's `data-agent-v5` plus the dashboard rules, and its proxy adds the dashboard tool to the plugin AI tools' per-version list, so it ships after F131 and the plugin AI tools. Deploy the `chat` edge function (it serves v6), then the frontend (it asks for v6). |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -542,7 +544,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `docs/ai-agent/**` | F88, F89 to F91 | See F88. |
 | `src/i18n/locales/*/messages.{po,ts}` | F79, F80, F84, F85, F86 | Generated: regenerate in each. |
 
-### AI agent context and the chat panel (F89 to F95, F128)
+### AI agent context and the chat panel (F89 to F95, F128, F139)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
@@ -550,24 +552,33 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/ChatThread/Composer/Composer.module.css` | F94, F90 | F94: the raised field and the split foot. F90: the editor, chip, and placeholder styles. |
 | `src/components/ChatPanel/ChatThread/Composer/Composer.test.tsx` | F86 and F87, F90, F91, F128 | F86 and F87: `eb4428ac3`. F90: the editor with the agent on. F91: the tray mount. F128: the session-kind cases. |
 | `src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx` | F94, F90 | F94: one quiet suggestion list above the composer ("Try asking"). F90: the agent-on copy that invites a question on every page and mentions `@` (`05efea0f2`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts` | F22, F81 to F85, F86 and F87, F89, F91, F128 | F89: an empty `contextTrayRef` passed to `createChatModelAdapter` (`b3b7dacd4`). F91: the tray read from `ChatPanelStateManager`, hydrated once from `ChatContextTrayStore` and persisted (`15508bb95`, `65523931a`). F128: the thread and tray keyed by the selected session, pending cards kept across a switch, the kickoff run, and the title request. |
+| `src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts` | F22, F81 to F85, F86 and F87, F89, F91, F128, F139 | F89: an empty `contextTrayRef` passed to `createChatModelAdapter` (`b3b7dacd4`). F91: the tray read from `ChatPanelStateManager`, hydrated once from `ChatContextTrayStore` and persisted (`15508bb95`, `65523931a`). F128: the thread and tray keyed by the selected session, pending cards kept across a switch, the kickoff run, and the title request. F139: the open editor and the session passed to the adapter (`16f2825cc`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks.tsx` | F22, F91, F128 | F91: the `contextTray` state and store mocks. F128: the session provider mocks. |
 | `src/components/ChatPanel/{ChatContextTrayStore,ChatPanelStateManager,ChatPanelProvider}/**`, `ChatThread/ChatContextTray/__tests__/ChatContextTrayTestFixtures.tsx`, `__tests__/useAvandarChatRuntime.contextTray.test.tsx`, `src/components/Nux/NuxTour/useNuxOpenChatPanel/useNuxOpenChatPanel.test.tsx` | F91, F128 | F128: the session id in the tray key, `ChatSessionProvider` mounted in the panel provider, and the session fields in the test fixtures. |
 | `src/components/ChatPanel/ChatThreadStore/ChatThreadStore.{ts,test.ts}` | F85, F128 | F128: the session id in the key, `readRecord` and `writeRecord`, and the legacy reads the migration uses. |
+| `src/components/ChatPanel/ChatSessionStore/ChatSessionStore.{ts,test.ts}` | F128, F139 | F128 creates it. F139: archiving and deleting a session also clear its dashboard card statuses (`c8f6f75e7`). |
+| `src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx` | F85, F139 | F139: `AgentQueryResultBody` is exported, so the dashboard card previews a chart the same way (`35e96f8d7`). |
 | `src/components/ChatPanel/{ChatPanel/ChatPanel.tsx,ChatPanelHeader/ChatPanelHeader.tsx}` | F94, F128 | F128: the session strip in the header and the panel. |
 | `src/views/OntologyDesignerApp/NewCaseTypeButton.{tsx,test.tsx}`, `src/routes/_auth/$workspaceSlug/ontology-designer/{index.tsx,-index.test.tsx}` | F57, F128 | F128: New case type and the home card start a case-design session. |
 | `tests/e2e/case-list-field.spec.ts` | F74, F75, F128 | F128: the Dock-by-Enter hunk of `b503e1762`. F74 takes its record-link hunk. |
 | `src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts`, `applyChatModelTurnResponse.test.ts` (new in F89) | F22, F89, F95 | F22: BUG-012's `explorerResponse` and BUG-014's labels. F89: `questionLabel` (`de3ff542e`) and the new test file. F95: a schema turn applies no SQL, and its tests. |
 | `src/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/*` | F22, F89 | F22: the file itself (BUG-014). F89: tokens read as `@Name` (`c757b60a7`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. |
-| `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. |
-| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95, F131 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v5`, the plugin AI tools' v4 plus CODED COLUMNS, with a code list sub-line per bound column, served beside v1 to v4. v4 is SHA-pinned as shipped (`03ca7f39c`, `5ba9698b6`, `b60b9206d`). |
+| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128, F139 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. F139: the open editor and the session passed to the adapter (`16f2825cc`), the offline turn on every page with the page in context (`9e17148e9`), the card lines and device-turn blocks built in `buildAgentTurnInputs.ts` (`3656d472b`, `bc55ef1fb`), and the host that places dashboard blocks, with `showQueryInChat.ts` (`cf537f079`). |
+| `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89, F139 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. F139: the dashboard card lines in the turn text, and the short line for a block that did not change since the last turn (`49b9d1a9d`). |
+| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts,dataAgentTools.test.ts}` | F81 to F85, F86 and F87, F89, F95, F131, F139 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v5`, the plugin AI tools' v4 plus CODED COLUMNS, with a code list sub-line per bound column, served beside v1 to v4. v4 is SHA-pinned as shipped (`03ca7f39c`, `5ba9698b6`, `b60b9206d`). F139: prompt `data-agent-v6`, v5's instructions plus `add_dashboard_block`'s rules, with each version's own built-in tool list (v1 to v5 keep the three) (`c23e9195a`, `58d7c9a76`, `0d0a1eac7`, `d7a51b5b1`), and the per-version tool tests (`c23e9195a`). |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
-| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). |
-| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). |
-| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95 | F95: user texts kept across a run, and a schema turn answered without a query. |
+| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131, F139 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). F139: the `dashboard` category, D01 to D09, `gradeDashboardWrites`, the dashboard support in `EvalHarness.ts`, and the dashboard tests (`cbd39cc75`, `54306749e`). |
+| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131, F139 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). F139: dashboard blocks in the Pi harnesses, and the device check that real values stay on the device (`e24a90a08`, `a3c99ff42`). `PiLocalHarness.ts` gets one line (`e24a90a08`). |
+| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95, F139 | F95: user texts kept across a run, and a schema turn answered without a query. F139: `baselinePageContext` and the dashboard questions, with `DenoChatTurnRunner.ts` (`cbd39cc75`); the dashboard tool's run state, its offer by prompt version, and the shared run cap `MAX_QUERY_RUNS_PER_ANSWER` (`518b565e7`, `bd67438a3`). |
 | `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`, `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts` | F22, F95 | F95: the schema paragraph after ANALYST CHECKS, and the `generateSql` description. |
-| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). |
+| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131, F139 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). F139: the `data-agent-v6` route (`58d7c9a76`). |
+| `shared/agent/mentions/buildAgentContextBlocks.{ts,test.ts}` | F89, F139 | F89 creates it. F139: an offline turn caps the chart SQL its blocks keep, through `offlineContextBudget.ts` (`819667a2b`). |
+| `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.{ts,test.ts}` | F82, F86, F89 to F91, F139 | F139: each prompt version is served its own tool list, and the proxy checks tool calls against that version's list (`77cbf6eb5`). |
+| `src/lib/agent/dataAgent/{DataAgentHost.ts,browser/createBrowserDataAgentHost.ts}` | F82, F83, F86, F87, F139 | F139: the dashboard method on the host (`518b565e7`), and the browser host's block placement (`cf537f079`). |
+| `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`bd0060099`). |
+| `src/lib/agent/dataAgent/pagePrivacy/{SqlPlaceholderVault,createPlaceholderRestoringHost}.{ts,test.ts}` | F87, F139 | F87 creates them. F139: `unmaskText` restores the names the agent writes (`95d389cc9`), and the host restores placeholders in dashboard blocks (`0dc0e355c`). |
+| `tests/e2e/agent-chat-mentions.spec.ts` | F91, F139 | F91 creates it. F139: the `data-agent-v6` route (`58d7c9a76`). |
+| `tests/e2e/agent-chat-sessions.spec.ts` | F128, F139 | F128 creates it. F139: the `data-agent-v6` route (`58d7c9a76`). The formatting hunks of `1a9a157d5` and `2ebf88256` are F128's. |
 | `src/components/RichText/MentionMenu/{createMentionMenuSuggestion.ts,MentionMenuList/MentionMenuFooter.tsx,MentionMenuList/MentionMenuList.tsx}` | F21, F90 | F90: `variant: "chat"`: no people, an allowed-types filter, links only, one Enter hint, no audience hint. |
 | `docs/measles-demo/gadgets.md` | F21, F91 | F91: the chat `@` menu and tray paragraph, and the Notes line (`1f3bc348d`). |
 | `src/components/AppShell/AppShell.tsx`, `src/components/layouts/AppSlate/AppSlate.tsx` | F20, F94 | F20: `--ava-shell-main-offset-top`. F94: the `chat-fused` mod and the aside's z-index; the slate's `.frame` class. The hunks sit next to each other; apply by hand when F20 is not merged. |
@@ -575,7 +586,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/config/Theme/{Theme.ts,Theme.test.ts,index.ts}` | F93, F94, F36 | F93: Paper `borderColor` reads `--ava-paper-border-color` first, and its test. F94: `APP_CHAT_ASIDE_Z_INDEX`, its export, and its test. F36: the Drawer root marker class. |
 | `DESIGN.md` | Postgres branch, F93, F94 | Postgres branch: the copy-rule Do and Don't. F93: the paragraph on `--ava-paper-border-color` in the slate section. F94: the Gutter Rule exception and the fused-aside sentences in the slate shadow paragraph. |
 | `docs/app-shell-nomenclature.md` | F94, F36 | F94: the fused chat aside row, the `APP_CHAT_ASIDE_Z_INDEX` tier, the stacking rule, and the Do line. F36: the checklist entries. |
-| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. |
+| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. |
 
 ### Plugins (F96 to F112)
 
@@ -11906,6 +11917,156 @@ stylelint on changed files, and vitest over `src/views/DataManagerApp`,
 
 ---
 
+## F139: Dashboard blocks from any page, online and offline
+
+Status: not started. Built on `feat/agent-dashboards`, not merged into
+`demo/measles`. This is Phase 1D of the agent roadmap (decision D44).
+
+**Purpose:** The agent adds one block to a dashboard from any page, with the
+`add_dashboard_block` tool and today's ten block kinds. The target is the
+dashboard open in the editor, a mentioned or attached dashboard, or one the
+user names. The open editor gets the block unsaved, as today's chat does,
+because Save confirms it. Any other dashboard gets a confirm card in the
+chat: Confirm saves the block to that dashboard and links to it. The browser
+finds the dashboard on the device by name, and the model never sees row
+values. The offline agent gets the same tool and card on every page. Prompt
+`data-agent-v6`, F131's v5 plus the dashboard rules, is served beside v1 to
+v5 with its own built-in tool list, and only v6 serves `add_dashboard_block`.
+
+**Value:** A person can ask for a chart or table on a dashboard from any page,
+online or offline, and see it added without leaving the chat.
+
+**Eval:** On the final prompt the online bars are met: dashboard questions
+D01 to D09 scored 9/9 on each of three runs, P01 to P07 7/7, M01 to M06 (with
+M03b) 7/7, and the 45 questions 44/45 on one run. The offline 45 scored
+25/45 against a bar of 26, so that bar is **missed**, and the offline
+dashboard questions scored 6/9. The runs are in `docs/ai-agent/eval.md`
+(`#phase-1d`).
+
+**Design:** `docs/ai-agent/specs/phase-1d.md` and D44 in
+`docs/ai-agent/decisions.md`. The task plan is `docs/ai-agent/plans/phase-1d.md`
+(see Open decisions).
+
+**PR title:** `feat(ai-agent): add dashboard blocks from any page, online and offline`
+
+**Depends on:** F128 (the card's statuses live in the per-session stores F128
+made, and the thread and tray are per session), F89 to F91 (mentions, the
+tray, and the `<attached>` block), F81 to F87 (the agent turn, the offline
+agent, the adapter, and the page placeholders), and F22 (the chat runtime it
+extends).
+
+**Commits to read** (all of `feat/agent-dashboards`, oldest first. `2ebf88256`
+is MIXED, and `1a9a157d5` is F128's):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `532a0751c` | docs(ai-agent): add the Phase 1D spec and D44 | All of it. Its `README.md`, `roadmap.md`, and `specs/phase-1.md` hunks are one line each, in the shared rows below. |
+| `cbd39cc75` | test(ai-eval): add the dashboard questions and today's chat baseline | All of it. Its `eval-runs/` files are the `phase-1d_today-dashboards` runs. |
+| `54306749e` | docs(ai-agent): revise the Phase 1D spec after a review against the code | All of it. |
+| `043e77401` | docs(ai-agent): add the Phase 1D plan | All of it. The plan is open decision 11. |
+| `2ebf88256` | updated formatting | MIXED: the three `eval-runs/*phase-1d_today-dashboards/summary.json` files go here. The harness and `agent-chat-sessions.spec.ts` formatting hunks are F128's. |
+| `1a9a157d5` | chore(e2e): format the agent chat sessions spec | F128's. Format only. |
+| `51c2eab67` | test(ai-agent): freeze prompt v3's instructions | All of it. |
+| `3be928ac8` | refactor(chat): share dashboard block parsing between the chat and the agent | All of it. |
+| `528fb4544` | fix(chat): read a null block kind as a chart | All of it. |
+| `c23e9195a` | feat(ai-agent): add add_dashboard_block under prompt data-agent-v6 | All of it. |
+| `77cbf6eb5` | feat(chat): serve and check agent tools per prompt version | All of it. |
+| `95d389cc9` | feat(ai-agent): restore placeholders in names the agent writes | All of it. |
+| `66ed8faf8` | feat(ai-agent): resolve the dashboard the agent names on the device | All of it. |
+| `518b565e7` | feat(ai-agent): add the add_dashboard_block tool | All of it. |
+| `bd67438a3` | feat(ai-agent): offer the dashboard tool by prompt version | All of it. |
+| `0dc0e355c` | feat(ai-agent): restore placeholders in dashboard blocks on the device | All of it. |
+| `49b9d1a9d` | feat(ai-agent): tell the agent what the user did with a dashboard card | All of it. |
+| `819667a2b` | feat(ai-agent): cap chart SQL in an offline turn's blocks | All of it. |
+| `e24a90a08` | test(ai-eval): let the Pi harnesses add dashboard blocks | All of it. |
+| `a3c99ff42` | test(ai-eval): prove device conversations keep real values | All of it. |
+| `c8f6f75e7` | feat(chat): keep dashboard card statuses per chat session | All of it. Its `ChatSessionStore.ts` hunks are the shared row below. |
+| `f8ebd1a8c` | feat(dashboards): append an agent's block to a dashboard safely | All of it. |
+| `ec3912600` | feat(chat): store the agent's dashboard cards as message parts | All of it. |
+| `cf537f079` | feat(ai-agent): place dashboard blocks from the browser host | All of it. |
+| `bc55ef1fb` | refactor(ai-agent): move the agent's turn blocks into their own module | All of it. |
+| `3656d472b` | feat(ai-agent): send card lines and build device turns' blocks | All of it. |
+| `77f62aa04` | test(ai-agent): pin hosted masking and device names in turn inputs | All of it. |
+| `35e96f8d7` | feat(chat): confirm the agent's dashboard blocks on a card | All of it. Its `messages.po` hunks are regenerated, never copied. |
+| `a85b49937` | fix(chat): load the dashboard card lazily and manage its focus | All of it. Its catalogs are regenerated, never copied. |
+| `16f2825cc` | feat(ai-agent): give agent turns the open editor and the session | All of it. |
+| `bd0060099` | feat(ai-agent): teach the offline agent blocks and dashboards | All of it. |
+| `9e17148e9` | feat(ai-agent): answer offline on every page with the page in context | All of it. |
+| `58d7c9a76` | feat(ai-agent): use prompt data-agent-v6 in the browser | All of it. Its three e2e spec hunks are in the shared rows below. |
+| `0d0a1eac7` | fix(ai-agent): tighten prompt v6's dashboard rules | All of it. |
+| `d7a51b5b1` | fix(ai-agent): tighten prompt v6's dashboard rules | All of it. |
+| `adc83d918` | docs(ai-agent): record the Phase 1D agent and offline eval | All of it. Its `eval.md` and `eval-runs/` hunks are F139's. |
+| `f114f8bbd` | test(e2e): add a chart to a named dashboard through the agent | All of it. |
+
+**Files:**
+- Shared parsing (new): `shared/agent/dashboardBlocks/{DashboardBlockFields,dashboardCardLine}.{ts,test.ts}`.
+  `DashboardBlockFields` holds the block fields the chat and the agent both parse,
+  moved out of `supabase/functions/chat/PostChatMessages/parsing/parseDashboardBlock.ts`.
+  `shared/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts` (new) and
+  `supabase/functions/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts` share the SQL cleanup.
+- Prompt, tools, and proxy (shared rows below): `shared/agent/dataAgent/{buildDataAgentSystemPrompt,dataAgentTools}.{ts,test.ts}`,
+  and `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.{ts,test.ts}`.
+- Turn text and context (shared rows below): `shared/agent/pageContext/buildAgentTurnText.{ts,test.ts}`,
+  `shared/agent/mentions/buildAgentContextBlocks.{ts,test.ts}`, and
+  `src/lib/agent/dataAgent/offline/offlineContextBudget.ts` (new), which caps offline chart SQL.
+- Target and placement (new): `src/lib/agent/dataAgent/dashboards/resolveAgentDashboardTarget.{ts,test.ts}`,
+  `src/lib/agent/dataAgent/createDataAgentTools/addDashboardBlockTool.{ts,test.ts}`,
+  `src/clients/dashboards/agentDashboards/agentDashboards.{ts,test.ts}` (the safe append and the edit-rights check),
+  and `src/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock.{ts,test.ts}`.
+- Browser agent (shared rows below): `src/lib/agent/dataAgent/{DataAgentHost,DataAgentRunState}.ts`,
+  `createDataAgent/createDataAgent.{ts,test.ts}`, `createDataAgentTools/runQueryTool.ts`,
+  `browser/createBrowserDataAgentHost.ts`, and `pagePrivacy/{SqlPlaceholderVault,createPlaceholderRestoringHost}.{ts,test.ts}`.
+- Offline agent (shared rows below): `offline/offlineDataAgent.test.ts`,
+  `offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts`,
+  `offline/classifyOfflineMessage/classifyOfflineMessage.ts`, and `offline/createOfflineDataAgent/createOfflineDataAgent.ts`.
+- Chat runtime (shared rows below): `useAvandarChatRuntime/createChatModelAdapter/{createChatModelAdapter,runLocalChatTurn}.{ts,test.ts}`,
+  `runOfflineDataAgentTurn/runOfflineDataAgentTurn.{ts,test.ts}`,
+  `runDataAgentTurn/runDataAgentTurn.ts`, `dataAgentTurnHelpers/{buildAgentTurnInputs (new),dataAgentTurnHelpers,createConversationAgentHost,dataAgentConversation.types,showQueryInChat}.{ts,test.ts}`,
+  and `useAvandarChatRuntime.ts`.
+- Card (new): `src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/{AgentDashboardBlockPart.{tsx,test.tsx,module.css},AgentDashboardBlockPartLazy.{tsx,test.tsx},AgentDashboardBlock.{ts,test.ts},confirmAgentDashboardCard.{ts,test.ts}}`,
+  and `src/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore.{ts,test.ts}`
+  (each session's card statuses, cleared with the session). `ChatThread/AssistantMessage/AssistantMessage.{tsx,test.tsx}` renders the card.
+  `ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx` exports its chart body for the card.
+- Session store (shared row below): `src/components/ChatPanel/ChatSessionStore/ChatSessionStore.{ts,test.ts}`.
+- Eval (new): `scripts/ai-eval/covid/covidDashboardQuestions.{ts,test.ts}` (D01 to D09),
+  `scripts/ai-eval/runtime/gradeDashboardWrites.{ts,test.ts}`, and
+  `scripts/ai-eval/harnesses/baseline/baselinePageContext.{ts,test.ts}`. Eval (shared rows below):
+  `EvalQuestion.ts`, `runEval.ts`, `covid/covidQuestions.ts`, `harnesses/EvalHarness.ts`,
+  `harnesses/baseline/{BaselineHarness,DenoChatTurnRunner}.ts`,
+  `harnesses/pi/{PiHarness,PiLocalHarness}.{ts,test.ts}`, and `runtime/gradeEvalAnswer.ts`.
+- E2E: `tests/e2e/agent-dashboard-block.spec.ts` (new), and the v6 route hunks of the three agent specs (shared rows below).
+- Docs: `docs/ai-agent/specs/phase-1d.md` and `docs/ai-agent/plans/phase-1d.md` (new), D44 in `decisions.md`,
+  the 1D rows in `roadmap.md` and `specs/phase-1.md`, the Phase 1D section of `eval.md`,
+  and the `phase-1d` run folders under `docs/ai-agent/eval-runs/`.
+- `src/i18n/locales/*/messages.{po,ts}`: regenerate with `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Confirm writes the existing dashboard row. The card's statuses
+are in the browser, per chat session.
+
+**Known gaps** (open, not part of this feature's acceptance):
+- The offline 45 is 25/45 against a bar of 26. H04 and N05 regressed, and B09 now passes.
+- The offline D questions scored 6/9. D04 gave a reply with no block, and D08 and D09 ended with no reply and no block.
+- The D08 grader pattern (`NOT_FOUND_PATTERN`) misses "don't have".
+- A hosted turn does not unmask the dashboard `summary` or free-text replies.
+- A chart result gives the model no row count or columns, where the spec calls for them.
+- `dashboard_card` is not in `PLAIN_BLOCK_TAG_START` (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a card line.
+- The card's strings are untranslated in the non-English `.po` files until `pnpm translations` runs.
+- Prompt v6 is fixed once it is pushed to the demo.
+
+**Verification:**
+```sh
+pnpm exec tsc -b --force --noEmit
+pnpm i18n:check
+pnpm vitest run shared/agent src/lib/agent src/components/ChatPanel src/clients/dashboards scripts/ai-eval supabase/functions/chat
+pnpm test:e2e agent-dashboard-block.spec.ts
+pnpm test:e2e agent-chat-result.spec.ts
+pnpm test:e2e agent-chat-mentions.spec.ts
+pnpm test:e2e agent-chat-sessions.spec.ts
+```
+The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
+
+---
+
 ## Open decisions
 
 Questions the 2026-11-10 mapping could not settle from the code alone. Each
@@ -11980,7 +12141,7 @@ needs a decision before its feature's PR is built.
    `bucket_grain` change on a mapped field. Decide whether these become Linear
    issues.
 
-### AI data agent and agent context (F77 to F95, F128)
+### AI data agent and agent context (F77 to F95, F128, F139)
 
 1. **Eval run archive.** `docs/ai-agent/eval-runs/` is 266 generated files,
    about 5 MB. Recommended: keep it and `scripts/ai-eval/archiveEvalRuns.ts`
@@ -11996,7 +12157,10 @@ needs a decision before its feature's PR is built.
    because demo tabs opened before a deploy kept naming the old version.
    Nothing on `develop` has served any of them. Port as built, or collapse to
    one version, which rewrites F82's, F86's, F87's, and F89's prompt and proxy
-   tests.
+   tests. The plugin AI tools add `data-agent-v4` and F131 adds
+   `data-agent-v5`. F139 adds `data-agent-v6`, v5 plus the dashboard rules
+   (`c23e9195a`, served by `77cbf6eb5`), so v4 to v6 join this list, and
+   only v6 serves `add_dashboard_block`.
 4. **F95 and prompt v3.** `11816d5d0` appended `SCHEMA_ANSWER_RULES` to v3
    after v3 was pushed to the demo. If F89 and F95 ship in one deploy, keep
    the rules in v3. If F89 deploys first, F95 adds `data-agent-v4` and keeps
@@ -12020,6 +12184,9 @@ needs a decision before its feature's PR is built.
 10. **F128's plan.** `docs/ai-agent/plans/phase-1c.md`, committed after
     the branch merged, sits behind F128 the way `phase-1a.md` and
     `phase-1b.md` sit behind their features. Decide it with item 2.
+11. **F139's plan.** `docs/ai-agent/plans/phase-1d.md`, committed on this
+    branch, sits behind F139 the way `phase-1c.md` sits behind F128. Decide it
+    with item 10.
 
 ### Plugins (F96 to F112)
 
