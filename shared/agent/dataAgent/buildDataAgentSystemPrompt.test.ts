@@ -437,6 +437,54 @@ describe("buildDataAgentSystemPrompt", () => {
     ).toBe(true);
     expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v5");
   });
+
+  it("builds v6 as v5 plus the dashboard rules", () => {
+    const instructionsOf = (promptId: "data-agent-v5" | "data-agent-v6") => {
+      const prompt = buildDataAgentSystemPrompt({
+        datasets: DATASETS,
+        today: "2026-11-18",
+        promptId,
+      });
+      return prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+    };
+    const v5 = instructionsOf("data-agent-v5");
+    const v6 = instructionsOf("data-agent-v6");
+
+    expect(v6.startsWith(`${v5}\n\nDASHBOARD BLOCKS\n`)).toBe(true);
+    expect(v6).toContain("add_dashboard_block");
+    expect(v6).toContain("<dashboard_card>");
+  });
+
+  it.each([
+    "data-agent-v1",
+    "data-agent-v2",
+    "data-agent-v3",
+    "data-agent-v4",
+    "data-agent-v5",
+  ] as const)("leaves the dashboard rules out of %s", (promptId) => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId,
+    });
+
+    expect(prompt).not.toContain("DASHBOARD BLOCKS");
+    expect(prompt).not.toContain("add_dashboard_block");
+  });
+
+  it("lists v6's datasets and code lists exactly as v5 does", () => {
+    const datasetsOf = (promptId: "data-agent-v5" | "data-agent-v6") => {
+      const prompt = buildDataAgentSystemPrompt({
+        datasets: CODED_DATASETS,
+        today: "2026-11-18",
+        promptId,
+      });
+      return prompt.slice(prompt.indexOf("\n\nDATASETS\n"));
+    };
+
+    expect(datasetsOf("data-agent-v6")).toContain("GENDER: codes 1=Male");
+    expect(datasetsOf("data-agent-v6")).toBe(datasetsOf("data-agent-v5"));
+  });
 });
 
 const PLUGIN_TOOL_SENTENCE =

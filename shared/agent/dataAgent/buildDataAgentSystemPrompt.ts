@@ -107,9 +107,6 @@ ATTACHED AND MENTIONED
 - A dataset marked not queryable in this chat cannot be queried; say so. An unavailable item is one you cannot see: tell the user, never guess what it held.
 - Call mentioned things by their names, without the @ and never with the tags.`;
 
-/**
- * v3: v2's rules, plus how to read the attached and mentioned blocks.
- */
 const SCHEMA_ANSWER_RULES = `
 
 SCHEMA
@@ -122,6 +119,9 @@ SCHEMA
   stacked as they are, and name columns that match and columns that differ,
   including names that differ only by a character such as _ or /.`;
 
+/**
+ * v3: v2's rules, plus how to read the attached and mentioned blocks.
+ */
 const DATA_AGENT_INSTRUCTIONS_V3 =
   DATA_AGENT_INSTRUCTIONS_V2 +
   ATTACHED_AND_MENTIONED_RULES +
@@ -158,12 +158,32 @@ CODED COLUMNS
 const DATA_AGENT_INSTRUCTIONS_V5 =
   DATA_AGENT_INSTRUCTIONS_V4 + CODED_COLUMN_RULES;
 
+/**
+ * How to add to a dashboard: when, which dashboard, which kind, and what a
+ * `<dashboard_card>` line means. v6's addition to v5.
+ */
+const DASHBOARD_BLOCK_RULES = `
+
+DASHBOARD BLOCKS
+- add_dashboard_block adds one block to a dashboard. Call it only when the user asks to add, put, or pin something on a dashboard. A chart that only needs to show here or in the Data Explorer uses run_query.
+- dashboard: "current" for the dashboard on the current page. Otherwise the dashboard's name exactly as written in the page block, <mentioned>, <attached>, or the user's message, without @ or quotes. Keep a placeholder such as <value 1> exactly as written.
+- One block per answer. When the user asks for several, add the most important one and say in summary what else you would add.
+- DataViz is a chart or table from SQL: prompt is a short chart title, sql follows the same rules as run_query, and vizType is table for a table. Every other kind holds text you write: HeadingBlock, ParagraphBlock, QuoteBlock, CalloutBlock (tone info, warning, or neutral), ListBlock, CodeBlock, TableBlock (CSV text), Card, DividerBlock. Never write numbers from the data into a text block: you have not seen the rows.
+- summary is one sentence for the user saying what you added and where. When the block waits for the user's confirmation, say so.
+- If the tool says no dashboard matched, tell the user and ask which dashboard they mean. Never try another name you made up.
+- A <dashboard_card> line before the message says what the user did with a block you proposed: confirmed or cancelled. Do not propose it again unless asked.`;
+
+/** v6: v5's instructions, plus the dashboard tool's rules. */
+const DATA_AGENT_INSTRUCTIONS_V6 =
+  DATA_AGENT_INSTRUCTIONS_V5 + DASHBOARD_BLOCK_RULES;
+
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
   "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
   "data-agent-v3": DATA_AGENT_INSTRUCTIONS_V3,
   "data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,
   "data-agent-v5": DATA_AGENT_INSTRUCTIONS_V5,
+  "data-agent-v6": DATA_AGENT_INSTRUCTIONS_V6,
 };
 
 /**
@@ -176,6 +196,7 @@ const LISTS_COLUMN_CODES: Record<DataAgentPromptId, boolean> = {
   "data-agent-v3": false,
   "data-agent-v4": false,
   "data-agent-v5": true,
+  "data-agent-v6": true,
 };
 
 /** `  - GENDER: codes 1=Male, 2=Female. Sex at intake.`, or undefined. */
