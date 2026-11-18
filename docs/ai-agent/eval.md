@@ -476,11 +476,13 @@ questions also have the ids D01 to D04, but they run only with
 items were worked on the committed v6 prompt: the online P04 miss and the
 offline margin. P04 closed on the third prompt wording (`5a508a3c2`), after
 two wordings that did not and were not kept. The offline margin closed in
-one change (`a68dac7f8`). One D bar is still missed by the strict reading,
-because of D04, a question that is flaky on committed v6 itself: see the
-last bullets. Every run is the Pi harness on Haiku 5.5 with Sonnet 5.5
-escalation unless the row says offline (Qwen3 4B). "Wording 1", "wording 2",
-and "wording 3" are the three prompt iterations, quoted below.
+one change (`a68dac7f8`). A third item came up on the way: D04, a question
+that was flaky on committed v6 itself and missed the three-run D bar. It
+closed on the sixth wording overall (`a4def86ad`), after two wordings that
+did not and were not kept. Every run is the Pi harness on Haiku 5.5 with
+Sonnet 5.5 escalation unless the row says offline (Qwen3 4B). "Wording 1" to
+"wording 3" are the P04 iterations and "wording A" to "wording C" the D04
+iterations, quoted below.
 
 | Run | What it tested | Result | Bar |
 |---|---|---|---|
@@ -506,6 +508,12 @@ and "wording 3" are the three prompt iterations, quoted below.
 | phase-1d:agent-mentions-d04a | M, wording A | 7/7 | M 7/7: **met** |
 | phase-1d:agent-45-d04a | The 45, wording A | 44/45 (N11) | 44 or 45: **met** |
 | phase-1d:d04-fix-b (10 runs) | D04 alone, wording B | 8/10 | D04 10/10, or 9/10 with one explained miss: **missed** |
+| phase-1d:d04-fix-c (10 runs) | D04 alone, wording C | 10/10 | D04 10/10: **met** |
+| phase-1d:agent-dashboards-d04c (3 runs) | D, wording C | 9/9, 9/9, 9/9 | Every D run 9/9: **met** |
+| phase-1d:agent-page-d04c | P, wording C | 7/7 | P 7/7: **met** |
+| phase-1d:p04-d04c (10 runs) | P04, wording C | 10/10 | P04 10/10: **met** |
+| phase-1d:agent-mentions-d04c | M, wording C | 7/7 | M 7/7: **met** |
+| phase-1d:agent-45-d04c | The 45, wording C | 44/45 (N11 answered in text) | 44 or 45: **met** |
 | phase-1d:offline-45-tool-gate | Offline 45, the dashboard tool only on dashboard turns | 30/45 | 26 or better: **met** |
 | phase-1d:offline-dashboards-tool-gate | Offline D | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
 
@@ -587,9 +595,10 @@ and "wording 3" are the three prompt iterations, quoted below.
   counting the first D set on committed v6 (3 of 3 passed), D04 is
   6 of 13 on committed v6 against 11 of 16 on wording 3. The earlier 9/9 on
   three D runs was luck, and the D bar as written cannot be met reliably
-  by any v6 text until D04 is settled. That is open, and it is the
-  Phase 1D eval's remaining miss. It is not part of this fix, and no prompt
-  or grader was changed for it. The options are a rule against taking a
+  by any v6 text until D04 is settled. That was open then, and it was the
+  Phase 1D eval's remaining miss until wording C below. It was not part of
+  the P04 fix, and no prompt or grader was changed for it in that
+  commit. The options were a rule against taking a
   period from a dashboard's title, or a question wording that names "overall"
   (the D05 precedent).
 - **Two wordings for D04 were tried and not kept.** Each is a bullet right
@@ -624,7 +633,28 @@ and "wording 3" are the three prompt iterations, quoted below.
   showed up in 2 of 10 runs on wording B, in 1 of 11 on wording 1, and in 0
   of 10 on committed v6. A third wording would pair wording B with a sentence
   that a ranking or a total over the data keeps the "Unassigned" and "Out of
-  <state>" rows, in the same bullet. It was not tried.
+  <state>" rows, in the same bullet. That is wording C.
+- **Wording C closed D04 (`a4def86ad`).** It is wording B plus a last
+  sentence in the same bullet, which points at the SQL rule that already
+  says to keep "Unassigned" and "Out of <state>" rows in totals (it does not
+  change that rule: a ranking by state was not being read as a total):
+
+  ```text
+  - A dashboard's name, title, and charts are labels, not filters. Never copy their year or place into a chart or table you build from the user's words: use only the filters and period the user asked for, and all dates when they named no period, even when the dashboard is about one year. Take a period from the dashboard or from a chart on the page only when the user refers to that period. A chart copied from the page keeps its own filters. A ranking or top-N is still a total, so each total keeps the "Unassigned" and "Out of <state>" rows, as the SQL rules say.
+  ```
+
+  D04 alone scored 10/10 (0 year filters, 0 dropped rows), and the three D
+  runs scored 9/9 each. P scored 7/7, P04 10/10 (so `5a508a3c2` still
+  works), M 7/7, and the 45 44/45 (N11 answered in text without a query, a
+  known flaky question). The v1 to v5 hash tests pass.
+
+  | D04 alone | Passed |
+  |---|---|
+  | v6 as committed before the D04 work | 3/10 (6 of 13 with the first D set) |
+  | v6 with the P04 bullet (wording 3) | 7/10 |
+  | wording A | 9/10 |
+  | wording B | 8/10 |
+  | **wording C (committed)** | **10/10** |
 - **Offline: the dashboard tool only on a turn that can use it (`a68dac7f8`).**
   The offline agent lists `add_dashboard_block` only on a turn with context
   blocks or a dashboard named in the message, the condition that already
@@ -660,13 +690,14 @@ and "wording 3" are the three prompt iterations, quoted below.
   block, D08 and D09 asked twice and ended with no reply and no block, and D07
   asked once. D05 and D08 wrote nothing, D01 to D03 wrote through the editor,
   and D06 and D07 wrote through the card.
-- **Cost.** The 109 online runs cost $0.1082: wording 1 $0.0329 (P04 $0.0042,
+- **Cost.** The 135 online runs cost $0.1579: wording 1 $0.0329 (P04 $0.0042,
   P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058),
   wording 2 $0.0036, wording 3 $0.0389 (P04 $0.0039, the two D sets
   $0.0063 and $0.0061, P $0.0017, M $0.0016, the 45 $0.0135, the D04
   diagnostics $0.0058), wording A $0.0298 (D04 $0.0031, D $0.0063, P $0.0017,
-  P04 $0.0033, M $0.0016, the 45 $0.0138), and wording B $0.0030. The two
-  offline runs cost $0.
+  P04 $0.0033, M $0.0016, the 45 $0.0138), wording B $0.0030, and wording C
+  $0.0497 (D04 $0.0031, D $0.0063, P $0.0017, P04 $0.0032, M $0.0016, the 45
+  $0.0337, which ran on a cold cache). The two offline runs cost $0.
 
 **Earlier runs on the first-numbered prompt (v4), kept as history.** They
 ran on 2026-11-17, before the rebase, with the dashboard prompt as first
@@ -1227,6 +1258,7 @@ Each was made after reading the failing answers by hand.
 | D08 also accepts "don't have", "do not have", and similar | Grader | A correct "I don't have a dashboard named ..." reply failed `NOT_FOUND_PATTERN` (`9925721e3`). |
 | The offline prompt carries the context and dashboard rules only on a turn with context blocks or a dashboard in the message | Offline prompt | The longer prompt on every turn turned H04 and N05 from passes into misses, 25/45 against a bar of 26 (`7c4f95033`). |
 | A bullet in DASHBOARD BLOCKS: ask which chart before changing how one is shown, when the page lists several | Agent prompt (v6, not yet deployed) | P04 asked on 5 of 10 runs of v5 and v6 and now asks on 10 of 10 (`5a508a3c2`). |
+| A bullet in DASHBOARD BLOCKS: a dashboard's name, title, and charts are labels, not filters, and a ranking keeps "Unassigned" and "Out of <state>" rows | Agent prompt (v6, not yet deployed) | D04 added a year taken from the dashboard's title on about half the runs, and dropped those rows from the ranking on some. D04 went from 3/10 to 10/10 (`a4def86ad`). |
 | The offline agent lists `add_dashboard_block` only on that same kind of turn | Offline agent | The tool in every plain turn's list turned N01 from a pass into a miss. The offline 45 went from 26/45 to 30/45 (`a68dac7f8`). |
 | A system update with no text is not sent to a local model | Local model messages | Pi declares a tool-list change as an empty system message, which the local model read as an empty user turn (`a68dac7f8`). |
 

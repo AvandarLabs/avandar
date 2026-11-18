@@ -1,0 +1,19 @@
+{
+  "label": "phase-1d:agent-45-d04c",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 58,
+  "promptTokens": 339593,
+  "cachedPromptTokens": 325085,
+  "completionTokens": 18950,
+  "totalCost": 0.03366625,
+  "costPerQuestion": 0.0007481388888888889,
+  "latencyMedianMs": 2289.5791659999995,
+  "latencyP90Ms": 3382.115540999999,
+  "failedIds": [
+    "N11"
+  ]
+}
