@@ -487,6 +487,48 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(bullets[3]).toMatch(/^dashboard: "current"/);
   });
 
+  it("tells v6 not to copy a dashboard's year into a chart or drop rows from a ranking, right after the DataViz bullet", () => {
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v5",
+    });
+    const v6 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v6",
+    });
+    const bullets = v6.slice(v6.indexOf("DASHBOARD BLOCKS")).split("\n- ");
+    const dataVizIndex = bullets.findIndex((bullet) => {
+      return bullet.startsWith("DataViz is a chart or table from SQL");
+    });
+    const filterBullet = bullets[dataVizIndex + 1]!;
+
+    expect(v5).not.toContain("are labels, not filters");
+    expect(dataVizIndex).toBeGreaterThan(0);
+    expect(
+      filterBullet.startsWith(
+        "A dashboard's name, title, and charts are labels, not filters.",
+      ),
+    ).toBe(true);
+    expect(filterBullet).toContain(
+      "Never copy their year or place into a chart or table you build from the user's words",
+    );
+    expect(filterBullet).toContain(
+      "use only the filters and period the user asked for, and all dates when they named no period",
+    );
+    expect(filterBullet).toContain(
+      "only when the user refers to that period",
+    );
+    expect(filterBullet).toContain(
+      "A chart copied from the page keeps its own filters.",
+    );
+    expect(filterBullet).toContain(
+      'A ranking or top-N is still a total, so each total keeps the "Unassigned" and "Out of <state>" rows, as the SQL rules say.',
+    );
+    expect(filterBullet).not.toMatch(/covid|2022/i);
+  });
+
   it.each([
     "data-agent-v1",
     "data-agent-v2",

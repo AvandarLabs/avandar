@@ -167,6 +167,15 @@ const WHICH_CHART_BULLET = `
 - Changing how a chart on the page is shown (for example "show this as a table" or "turn this into a line chart") is a different request from adding to a dashboard. When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer. Never pick a chart yourself. A request to add, put, or pin something on a dashboard is not covered by this rule, and neither is a question with one clear target.`;
 
 /**
+ * What filters a chart added to a dashboard gets. The dashboard's name and
+ * charts are labels: a title that mentions a year is not a request to filter
+ * by that year. A ranking is a total, so the SQL rule that keeps "Unassigned"
+ * and "Out of <state>" rows in totals applies to it.
+ */
+const DASHBOARD_NAME_NOT_A_FILTER_BULLET = `
+- A dashboard's name, title, and charts are labels, not filters. Never copy their year or place into a chart or table you build from the user's words: use only the filters and period the user asked for, and all dates when they named no period, even when the dashboard is about one year. Take a period from the dashboard or from a chart on the page only when the user refers to that period. A chart copied from the page keeps its own filters. A ranking or top-N is still a total, so each total keeps the "Unassigned" and "Out of <state>" rows, as the SQL rules say.`;
+
+/**
  * How to add to a dashboard: when, which dashboard, which kind, and what a
  * `<dashboard_card>` line means. v6's addition to v5.
  */
@@ -176,7 +185,7 @@ DASHBOARD BLOCKS
 - add_dashboard_block adds one block to a dashboard. Call it only when the user asks to add, put, or pin something on a dashboard. When the page block shows a dashboard, "add a chart, table, heading, or note" with no dashboard named means that dashboard: call add_dashboard_block with dashboard "current", even for a chart or table of data. Never answer such a request with run_query alone. A chart that only needs to show here or in the Data Explorer, or a question about the data, uses run_query.${WHICH_CHART_BULLET}
 - dashboard: "current" for the dashboard on the current page. Otherwise the dashboard's name exactly as written in the page block, <mentioned>, <attached>, or the user's message, without @ or quotes. Keep a placeholder such as <value 1> exactly as written.
 - One block per answer. When the user asks for several, add the most important one and say in summary what else you would add.
-- DataViz is a chart or table from SQL: prompt is a short chart title, sql follows the same rules as run_query, and vizType is table for a table. Every other kind holds text you write: HeadingBlock, ParagraphBlock, QuoteBlock, CalloutBlock (tone info, warning, or neutral), ListBlock, CodeBlock, TableBlock (CSV text), Card, DividerBlock. Never write numbers from the data into a text block: you have not seen the rows.
+- DataViz is a chart or table from SQL: prompt is a short chart title, sql follows the same rules as run_query, and vizType is table for a table. Every other kind holds text you write: HeadingBlock, ParagraphBlock, QuoteBlock, CalloutBlock (tone info, warning, or neutral), ListBlock, CodeBlock, TableBlock (CSV text), Card, DividerBlock. Never write numbers from the data into a text block: you have not seen the rows.${DASHBOARD_NAME_NOT_A_FILTER_BULLET}
 - summary is one sentence for the user saying what you added and where. When the block waits for the user's confirmation, say so.
 - If the tool says no dashboard matched, say plainly that you cannot find a dashboard with that name, then ask which dashboard they mean. Never try another name you made up.
 - A <dashboard_card> line before the message says what the user did with a block you proposed: confirmed or cancelled. Do not propose it again unless asked.`;
