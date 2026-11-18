@@ -23,6 +23,18 @@ describe("DATA_AGENT_TOOLS", () => {
       ),
     );
   });
+
+  it("reserves every built-in tool any prompt version serves", () => {
+    const servedNames = Object.values(DATA_AGENT_TOOLS_BY_PROMPT_ID).flatMap(
+      (tools) => {
+        return tools.map((tool) => {
+          return tool.name;
+        });
+      },
+    );
+
+    expect(RESERVED_AI_TOOL_NAMES).toEqual(expect.arrayContaining(servedNames));
+  });
 });
 
 describe("DATA_AGENT_TOOLS_BY_PROMPT_ID", () => {
