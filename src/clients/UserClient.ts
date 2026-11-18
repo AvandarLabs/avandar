@@ -19,13 +19,10 @@ import type {
   MembershipId,
   UserProfileId,
 } from "$/models/User/UserProfile.types";
+import type { ServerApiClient } from "$/ServerApiClient";
 import type { Database } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
-
-// Platform-aware server API client: on web it is the same Supabase client, on
-// desktop it goes through the main process, which carries the access token.
-const serverApi = createServerApiClient();
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -60,6 +57,14 @@ type TUserClient = WithSupabaseClient<
 
 type TUserClientOptions = {
   dbClient?: AvaSupabaseDBClient;
+
+  /**
+   * Builds the platform-aware server API client. Called on every use, never
+   * at module load: the desktop shell marks the page as desktop only after
+   * it has loaded, so a client built at import time can keep the browser
+   * adapter, which runs as `anon`, for the whole session.
+   */
+  getServerApi?: () => ServerApiClient;
 };
 
 export const UserProfileDBReadToModelReadSchema: z.ZodType<
@@ -93,7 +98,10 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
   });
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
-  const { dbClient = AvaSupabase.db() } = options ?? {};
+  const {
+    dbClient = AvaSupabase.db(),
+    getServerApi = createServerApiClient,
+  } = options ?? {};
   const baseClient = createServiceClient("UserClient");
 
   const client = withLogger(baseClient, (baseLogger: ILogger) => {
@@ -222,10 +230,10 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             minRole,
           });
 
-          // Through `serverApi`, not `dbClient`: on desktop the webview's
+          // Through the server API, not `dbClient`: on desktop the webview's
           // Supabase client holds no session, so its RPC would run as `anon`,
           // which may not execute this function.
-          const canAccess = await serverApi.rpc<boolean | null>(
+          const canAccess = await getServerApi().rpc<boolean | null>(
             "util__auth_user_can_access_resource",
             {
               p_resource_type: resourceType,

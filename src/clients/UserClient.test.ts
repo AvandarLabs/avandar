@@ -4,15 +4,12 @@ const mocks = vi.hoisted(() => {
   return {
     rpcMock: vi.fn(),
     dbRpcMock: vi.fn(),
+    createServerApiMock: vi.fn(),
   };
 });
 
 vi.mock("$/ServerApiClient", () => {
-  return {
-    createServerApiClient: () => {
-      return { rpc: mocks.rpcMock };
-    },
-  };
+  return { createServerApiClient: mocks.createServerApiMock };
 });
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
@@ -29,7 +26,13 @@ vi.mock("@/clients/AuthClient/AuthClient", () => {
   return { AuthClient: { getCurrentSession: vi.fn() } };
 });
 
+mocks.createServerApiMock.mockImplementation(() => {
+  return { rpc: mocks.rpcMock };
+});
+
 const { UserClient } = await import("@/clients/UserClient");
+const serverApiCreationsAtImport =
+  mocks.createServerApiMock.mock.calls.length;
 
 const PARAMS = {
   resourceType: "dataset",
@@ -41,7 +44,19 @@ describe("UserClient.canAccessResource", () => {
   beforeEach(() => {
     mocks.rpcMock.mockReset();
     mocks.dbRpcMock.mockReset();
+    mocks.createServerApiMock.mockClear();
     mocks.rpcMock.mockResolvedValue(true);
+  });
+
+  it("creates the server API client on the call, not when it loads", async () => {
+    // `isDesktop()` reads a marker the desktop shell sets only after the page
+    // loads. A client created at import time could pick the browser adapter
+    // and keep it for the whole session.
+    expect(serverApiCreationsAtImport).toBe(0);
+
+    await UserClient.canAccessResource(PARAMS);
+
+    expect(mocks.createServerApiMock).toHaveBeenCalled();
   });
 
   it("asks the platform server API with the RPC's argument names", async () => {
@@ -72,7 +87,8 @@ describe("UserClient.canAccessResource", () => {
   });
 
   it("returns false when the server answers null", async () => {
-    // The SQL helper answers null for a resource with no effective role.
+    // The SQL helper answers false for a resource with no effective role. Null
+    // is not expected, but is read as no access rather than as an answer.
     mocks.rpcMock.mockResolvedValue(null);
 
     await expect(UserClient.canAccessResource(PARAMS)).resolves.toBe(false);
