@@ -108,7 +108,6 @@ const IDENTITY = { workspaceId: "ws-1", userId: "user-1", sessionId: "s-1" };
 
 const HEADING_CARD = AgentDashboardBlock.create({
   block: { kind: "HeadingBlock", text: "Deaths by month" },
-  summary: "Adds a heading.",
   candidates: [{ id: "d-1", name: "COVID 2022" }],
 });
 
@@ -173,7 +172,6 @@ describe("AgentDashboardBlockPart pending card", () => {
   it("holds Confirm until one of several dashboards is picked", async () => {
     const card = AgentDashboardBlock.create({
       block: HEADING_CARD.block,
-      summary: "s",
       candidates: [
         {
           id: "d-1",
@@ -225,7 +223,6 @@ describe("AgentDashboardBlockPart pending card", () => {
         sql: "SELECT 1 AS n",
         vizType: "bar",
       },
-      summary: "s",
       candidates: [{ id: "d-1", name: "COVID 2022" }],
     });
     useAgentQueryResultViewMock.mockReturnValue({ status: "ready", data: [] });
@@ -246,7 +243,6 @@ describe("AgentDashboardBlockPart pending card", () => {
         sql: "SELECT 1 AS n",
         vizType: "bar",
       },
-      summary: "s",
       candidates: [{ id: "d-1", name: "COVID 2022" }],
     });
     useAgentQueryResultViewMock.mockReturnValue({

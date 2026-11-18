@@ -27,7 +27,7 @@ vi.mock(
     await loadPart.loaded;
     return {
       AgentDashboardBlockPart: ({ data }: DataMessagePartProps) => {
-        return <p>Loaded {(data as { summary: string }).summary}</p>;
+        return <p>Loaded {(data as { block: { text: string } }).block.text}</p>;
       },
     };
   },
@@ -38,7 +38,6 @@ const PROPS = {
   name: AgentDashboardBlock.PART_NAME,
   data: AgentDashboardBlock.create({
     block: { kind: "HeadingBlock", text: "Deaths" },
-    summary: "Adds a heading.",
     candidates: [{ id: "d-1", name: "COVID 2022" }],
   }),
 } as unknown as DataMessagePartProps;
@@ -56,7 +55,7 @@ describe("AgentDashboardBlockPartLazy", () => {
 
     loadPart.resolve();
 
-    expect(await screen.findByText("Loaded Adds a heading.")).toBeVisible();
+    expect(await screen.findByText("Loaded Deaths")).toBeVisible();
     expect(
       screen.queryByTestId("agent-dashboard-block-placeholder-body"),
     ).not.toBeInTheDocument();

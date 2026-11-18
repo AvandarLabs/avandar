@@ -282,13 +282,12 @@ describe("createConversationAgentHost placeholders", () => {
     );
   });
 
-  it("puts the real value in a dashboard card's summary", async () => {
+  it("puts the real value in a dashboard card's block", async () => {
     addAgentDashboardBlockMock.mockImplementation(
       async ({ cards, request }) => {
         cards.push(
           AgentDashboardBlock.create({
             block: request.block,
-            summary: request.summary,
             candidates: [{ id: "dashboard-1", name: "Mortality" }],
           }),
         );
@@ -299,11 +298,13 @@ describe("createConversationAgentHost placeholders", () => {
 
     await createConversationAgentHost(state).addDashboardBlock!({
       dashboard: "Mortality",
-      block: { kind: "HeadingBlock", text: "Deaths" },
-      summary: "Added a heading for <value 1>.",
+      block: { kind: "HeadingBlock", text: "Deaths in <value 1>" },
     });
 
-    expect(state.dashboardCards[0]?.summary).toBe("Added a heading for Kings.");
+    expect(state.dashboardCards[0]?.block).toEqual({
+      kind: "HeadingBlock",
+      text: "Deaths in Kings",
+    });
   });
 
   it("shows a question card's text with the real value and its options masked", async () => {
@@ -392,7 +393,6 @@ describe("createAgentConversation", () => {
     await agentHost!.addDashboardBlock!({
       dashboard: "Mortality",
       block: { kind: "HeadingBlock", text: "Deaths" },
-      summary: "s",
     });
 
     expect(conversation.dashboardCards).toEqual([{ cardId: "card-1" }]);

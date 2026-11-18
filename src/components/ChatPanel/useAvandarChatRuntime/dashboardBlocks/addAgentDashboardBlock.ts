@@ -99,7 +99,6 @@ export async function addAgentDashboardBlock(
     options.cards.push(
       AgentDashboardBlock.create({
         block: request.block,
-        summary: request.summary,
         candidates: target.candidates,
       }),
     );

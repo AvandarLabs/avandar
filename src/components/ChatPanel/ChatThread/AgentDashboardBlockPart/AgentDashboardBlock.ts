@@ -14,7 +14,6 @@ const AgentDashboardBlockSchema = z.object({
   version: z.literal(1),
   cardId: z.string().min(1),
   block: z.unknown(),
-  summary: z.string(),
   candidates: z.array(CandidateSchema).min(1),
 });
 
@@ -43,7 +42,6 @@ export const AgentDashboardBlock = {
   create: (
     options: Readonly<{
       block: ChatGeneratedDashboardBlock;
-      summary: string;
       candidates: readonly AgentDashboardCandidate[];
     }>,
   ): AgentDashboardBlockData => {

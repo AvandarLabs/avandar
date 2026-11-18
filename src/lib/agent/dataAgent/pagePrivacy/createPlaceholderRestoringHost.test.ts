@@ -262,7 +262,6 @@ describe("createPlaceholderRestoringHost", () => {
         sql: MODEL_SQL,
         vizType: "line",
       },
-      summary: "Added it.",
     });
 
     expect(addDashboardBlock).toHaveBeenCalledWith({
@@ -273,7 +272,6 @@ describe("createPlaceholderRestoringHost", () => {
         sql: RESTORED_SQL,
         vizType: "line",
       },
-      summary: "Added it.",
     });
   });
 
@@ -290,24 +288,6 @@ describe("createPlaceholderRestoringHost", () => {
       sql: RESTORED_SQL,
       summary: "Weekly cases for Kings.",
     });
-  });
-
-  it("shows a dashboard card's summary with the real value", async () => {
-    const addDashboardBlock = vi.fn().mockResolvedValue({ kind: "card_shown" });
-    const host = createPlaceholderRestoringHost(
-      _createInnerHost({ addDashboardBlock }),
-      _createVault(),
-    );
-
-    await host.addDashboardBlock!({
-      dashboard: "current",
-      block: { kind: "HeadingBlock", text: "Deaths", level: 2 },
-      summary: "Added a heading for <value 1>.",
-    });
-
-    expect(addDashboardBlock).toHaveBeenCalledWith(
-      expect.objectContaining({ summary: "Added a heading for Kings." }),
-    );
   });
 
   it("shows a question card's text with the real value, and keeps its options masked", async () => {
@@ -343,8 +323,7 @@ describe("createPlaceholderRestoringHost", () => {
     await host.showQuery({ sql: MODEL_SQL, summary: "About <value 9>." });
     await host.addDashboardBlock!({
       dashboard: "current",
-      block: { kind: "HeadingBlock", text: "Deaths", level: 2 },
-      summary: "About <value 9>.",
+      block: { kind: "HeadingBlock", text: "About <value 9>.", level: 2 },
     });
     await host.askUser({
       question: "About <value 9>?",
@@ -357,7 +336,9 @@ describe("createPlaceholderRestoringHost", () => {
       expect.objectContaining({ summary: "About <value 9>." }),
     );
     expect(inner.addDashboardBlock).toHaveBeenCalledWith(
-      expect.objectContaining({ summary: "About <value 9>." }),
+      expect.objectContaining({
+        block: expect.objectContaining({ text: "About <value 9>." }),
+      }),
     );
     expect(inner.askUser).toHaveBeenCalledWith(
       expect.objectContaining({ question: "About <value 9>?" }),

@@ -41,7 +41,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn,
         cards,
-        request: { dashboard: "current", block: HEADING, summary: "s" },
+        request: { dashboard: "current", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "added_to_editor" });
     expect(
@@ -61,7 +61,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn: _turn({}),
         cards,
-        request: { dashboard: "Mortality", block: HEADING, summary: "s" },
+        request: { dashboard: "Mortality", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "card_shown" });
     expect(cards).toHaveLength(1);
@@ -98,7 +98,7 @@ describe("addAgentDashboardBlock", () => {
     await addAgentDashboardBlock({
       turn,
       cards,
-      request: { dashboard: "Mortality", block: HEADING, summary: "s" },
+      request: { dashboard: "Mortality", block: HEADING },
     });
 
     expect(loadCandidatesMock).not.toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn: _turn({}),
         cards: [],
-        request: { dashboard: "Budget", block: HEADING, summary: "s" },
+        request: { dashboard: "Budget", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "not_found" });
   });
@@ -123,7 +123,7 @@ describe("addAgentDashboardBlock", () => {
       return addAgentDashboardBlock({
         turn,
         cards: [],
-        request: { dashboard, block: HEADING, summary: "s" },
+        request: { dashboard, block: HEADING },
       });
     }
 

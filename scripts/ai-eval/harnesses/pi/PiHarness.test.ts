@@ -546,7 +546,7 @@ describe("createPiConversation with dashboard questions", () => {
     return {
       agent: { state: { messages: [] } },
       ask: async () => {
-        await host.addDashboardBlock!({ ...request, summary: "Added." });
+        await host.addDashboardBlock!(request);
         return {
           text: "Added.",
           state: { questions: [], valuesSentToModel: [] },

@@ -104,7 +104,6 @@ export type DataAgentHost = {
     request: Readonly<{
       dashboard: string;
       block: ChatGeneratedDashboardBlock;
-      summary: string;
     }>,
   ) => Promise<DataAgentDashboardBlockOutcome>;
   /**

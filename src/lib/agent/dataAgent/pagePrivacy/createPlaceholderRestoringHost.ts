@@ -47,10 +47,9 @@ function _restoringCheckQuery(
 }
 
 /**
- * The host's dashboard add, with the dashboard name, the card's summary,
- * and every string the block shows restored, and its SQL restored, so the
- * user sees and saves real values. Nothing restored here goes back to the
- * model.
+ * The host's dashboard add, with the dashboard name and every string the
+ * block shows restored, and its SQL restored, so the user sees and saves
+ * real values. Nothing restored here goes back to the model.
  */
 function _restoringAddDashboardBlock(
   addDashboardBlock: NonNullable<DataAgentHost["addDashboardBlock"]>,
@@ -60,7 +59,6 @@ function _restoringAddDashboardBlock(
     return addDashboardBlock({
       ...request,
       dashboard: vault.unmaskText(request.dashboard),
-      summary: vault.unmaskText(request.summary),
       block: mapDashboardBlockText(request.block, {
         mapSql: vault.restore,
         mapText: vault.unmaskText,
@@ -120,7 +118,7 @@ function _restoringAskUser(
  *
  * A dashboard chart's check is restored and masked like a query. A
  * dashboard block is restored before the host shows or saves it. The text
- * the user reads (a query's or card's summary, a question card's question)
+ * the user reads (a query's summary, a question card's question)
  * shows real values, and none of it goes back to the model.
  *
  * Nothing the model reads back carries a restored value: a query's column

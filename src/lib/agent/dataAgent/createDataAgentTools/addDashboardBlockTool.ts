@@ -168,7 +168,6 @@ export function createAddDashboardBlockTool(
       const outcome = await addDashboardBlock({
         dashboard: params.dashboard,
         block: checked.block,
-        summary: params.summary,
       });
       return _toToolResult(outcome, params, context, checked.shape);
     },

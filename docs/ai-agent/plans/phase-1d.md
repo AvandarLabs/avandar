@@ -1562,7 +1562,6 @@ Add to `DataAgentHost`, after `approveValuesForModel`:
     request: Readonly<{
       dashboard: string;
       block: ChatGeneratedDashboardBlock;
-      summary: string;
     }>,
   ) => Promise<DataAgentDashboardBlockOutcome>;
 ```
@@ -1980,7 +1979,6 @@ git commit -m "feat(ai-agent): offer the dashboard tool by prompt version"
         sql: `SELECT 1 FROM t WHERE "Admin2" = '<value 1>'`,
         vizType: "line",
       },
-      summary: "Added it.",
     });
 
     expect(addDashboardBlock).toHaveBeenCalledWith({
@@ -1991,7 +1989,6 @@ git commit -m "feat(ai-agent): offer the dashboard tool by prompt version"
         sql: `SELECT 1 FROM t WHERE "Admin2" = 'Kings'`,
         vizType: "line",
       },
-      summary: "Added it.",
     });
   });
 
@@ -2452,7 +2449,7 @@ describe("createPiConversation with dashboard questions", () => {
     return {
       agent: { state: { messages: [] } },
       ask: async () => {
-        await host.addDashboardBlock!({ ...request, summary: "Added." });
+        await host.addDashboardBlock!(request);
         return {
           text: "Added.",
           state: { questions: [], valuesSentToModel: [] },
@@ -3479,7 +3476,6 @@ describe("AgentDashboardBlock", () => {
   it("creates a card with a fresh id and reads it back from its data part", () => {
     const card = AgentDashboardBlock.create({
       block: HEADING,
-      summary: "Adds a heading.",
       candidates: [COVID],
     });
     const part = AgentDashboardBlock.toDataPart(card);
@@ -3496,7 +3492,6 @@ describe("AgentDashboardBlock", () => {
   it("rejects stored data whose block is invalid or has no candidate", () => {
     const card = AgentDashboardBlock.create({
       block: HEADING,
-      summary: "Adds a heading.",
       candidates: [COVID],
     });
 
@@ -3532,7 +3527,6 @@ const AgentDashboardBlockSchema = z.object({
   version: z.literal(1),
   cardId: z.string().min(1),
   block: z.unknown(),
-  summary: z.string(),
   candidates: z.array(CandidateSchema).min(1),
 });
 
@@ -3561,7 +3555,6 @@ export const AgentDashboardBlock = {
   create: (
     options: Readonly<{
       block: ChatGeneratedDashboardBlock;
-      summary: string;
       candidates: readonly AgentDashboardCandidate[];
     }>,
   ): AgentDashboardBlockData => {
@@ -3683,7 +3676,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn,
         cards,
-        request: { dashboard: "current", block: HEADING, summary: "s" },
+        request: { dashboard: "current", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "added_to_editor" });
     expect(turn.dashboardEditor?.dispatch.queuePendingBlock).toHaveBeenCalledWith(
@@ -3703,7 +3696,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn: _turn({}),
         cards,
-        request: { dashboard: "Mortality", block: HEADING, summary: "s" },
+        request: { dashboard: "Mortality", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "card_shown" });
     expect(cards).toHaveLength(1);
@@ -3735,7 +3728,7 @@ describe("addAgentDashboardBlock", () => {
     await addAgentDashboardBlock({
       turn,
       cards,
-      request: { dashboard: "Mortality", block: HEADING, summary: "s" },
+      request: { dashboard: "Mortality", block: HEADING },
     });
 
     expect(loadCandidatesMock).not.toHaveBeenCalled();
@@ -3750,7 +3743,7 @@ describe("addAgentDashboardBlock", () => {
       addAgentDashboardBlock({
         turn: _turn({}),
         cards: [],
-        request: { dashboard: "Budget", block: HEADING, summary: "s" },
+        request: { dashboard: "Budget", block: HEADING },
       }),
     ).resolves.toEqual({ kind: "not_found" });
   });
@@ -3770,7 +3763,6 @@ Append to `createConversationAgentHost.test.ts` a case that the host built by `c
     await conversation.dataAgentHost.addDashboardBlock!({
       dashboard: "Mortality",
       block: { kind: "HeadingBlock", text: "Deaths" },
-      summary: "s",
     });
 
     expect(conversation.dashboardCards).toEqual([{ cardId: "card-1" }]);
@@ -3859,7 +3851,6 @@ export async function addAgentDashboardBlock(
     options.cards.push(
       AgentDashboardBlock.create({
         block: request.block,
-        summary: request.summary,
         candidates: target.candidates,
       }),
     );
@@ -4278,7 +4269,6 @@ const CARD = {
   version: 1 as const,
   cardId: "card-1",
   block: { kind: "HeadingBlock", text: "Deaths" } as const,
-  summary: "s",
   candidates: [{ id: "d-1", name: "COVID 2022" }],
 };
 

@@ -16,7 +16,6 @@ const CARD = {
   version: 1 as const,
   cardId: "card-1",
   block: { kind: "HeadingBlock", text: "Deaths" } as const,
-  summary: "s",
   candidates: [{ id: "d-1", name: "COVID 2022" }],
 };
 

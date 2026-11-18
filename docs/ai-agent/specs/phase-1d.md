@@ -166,7 +166,8 @@ canvas unsaved, and the user saves it.
 ## The card
 
 The proposal is an `agent-dashboard-block` data part in the assistant
-message: a card id, the block, the summary, and the candidate dashboards.
+message: a card id, the block, and the candidate dashboards. The reply text
+above it is the tool's `summary`, so the card does not repeat it.
 `AgentDashboardBlockPart` draws it.
 
 The card's status lives in `AgentDashboardCardStore`, one localStorage

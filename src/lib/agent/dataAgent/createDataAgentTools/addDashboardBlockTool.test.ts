@@ -69,7 +69,6 @@ describe("add_dashboard_block", () => {
     expect(host.addDashboardBlock).toHaveBeenCalledWith({
       dashboard: "COVID 2022",
       block: { kind: "HeadingBlock", text: "Deaths in 2022" },
-      summary: "Added a heading to COVID 2022.",
     });
     expect(host.checkQuery).not.toHaveBeenCalled();
     expect(result.terminate).toBe(true);

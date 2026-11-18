@@ -8,7 +8,6 @@ describe("AgentDashboardBlock", () => {
   it("creates a card with a fresh id and reads it back from its data part", () => {
     const card = AgentDashboardBlock.create({
       block: HEADING,
-      summary: "Adds a heading.",
       candidates: [COVID],
     });
     const part = AgentDashboardBlock.toDataPart(card);
@@ -22,10 +21,21 @@ describe("AgentDashboardBlock", () => {
     expect(AgentDashboardBlock.parse(part.data)).toEqual(card);
   });
 
+  it("reads a card stored with no summary, and keeps none it is given", () => {
+    const card = AgentDashboardBlock.create({
+      block: HEADING,
+      candidates: [COVID],
+    });
+
+    expect(card).not.toHaveProperty("summary");
+    expect(AgentDashboardBlock.parse({ ...card, summary: "old" })).toEqual(
+      card,
+    );
+  });
+
   it("rejects stored data whose block is invalid or has no candidate", () => {
     const card = AgentDashboardBlock.create({
       block: HEADING,
-      summary: "Adds a heading.",
       candidates: [COVID],
     });
 
