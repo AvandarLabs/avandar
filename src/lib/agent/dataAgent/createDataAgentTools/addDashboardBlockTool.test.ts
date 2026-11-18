@@ -16,6 +16,15 @@ const CHART = {
   vizType: "bar",
 };
 
+const _ROWS_OUTCOME = {
+  kind: "rows",
+  columns: [
+    { name: "state", type: "VARCHAR" },
+    { name: "deaths", type: "INTEGER" },
+  ],
+  rowCount: 3,
+};
+
 function _createHost(overrides: Partial<DataAgentHost> = {}): DataAgentHost {
   return {
     showQuery: vi.fn(),
@@ -79,6 +88,63 @@ describe("add_dashboard_block", () => {
 
     expect(_textOf(result)).toBe("Added to the open dashboard (unsaved).");
     expect(result.terminate).toBe(true);
+  });
+
+  it("tells the model a chart's row count and columns on the editor path", async () => {
+    const host = _createHost({
+      checkQuery: vi.fn().mockResolvedValue(_ROWS_OUTCOME),
+      addDashboardBlock: vi.fn().mockResolvedValue({ kind: "added_to_editor" }),
+    });
+    const { result } = await _add(host, CHART);
+
+    expect(_textOf(result)).toBe(
+      "Added to the open dashboard (unsaved). The chart has 3 rows; columns state, deaths.",
+    );
+    expect(result.terminate).toBe(true);
+  });
+
+  it("tells the model a chart's row count and columns on the card path", async () => {
+    const host = _createHost({
+      checkQuery: vi.fn().mockResolvedValue(_ROWS_OUTCOME),
+    });
+    const { result } = await _add(host, CHART);
+
+    expect(_textOf(result)).toBe(
+      "The card is on the user's screen. Nothing changes until they confirm. The chart has 3 rows; columns state, deaths.",
+    );
+    expect(result.terminate).toBe(true);
+  });
+
+  it("still adds a chart with no rows and says it had none", async () => {
+    const host = _createHost({
+      checkQuery: vi.fn().mockResolvedValue({
+        kind: "empty",
+        columns: [{ name: "deaths", type: "INTEGER" }],
+        rowCount: 0,
+      }),
+      addDashboardBlock: vi.fn().mockResolvedValue({ kind: "added_to_editor" }),
+    });
+    const { result, state } = await _add(host, CHART);
+
+    expect(host.addDashboardBlock).toHaveBeenCalledTimes(1);
+    expect(_textOf(result)).toBe(
+      "Added to the open dashboard (unsaved). The chart has 0 rows; columns deaths.",
+    );
+    expect(result.terminate).toBe(true);
+    expect(state.needsEscalation).toBe(false);
+  });
+
+  it("never puts preview rows in the result", async () => {
+    const host = _createHost({
+      checkQuery: vi.fn().mockResolvedValue({
+        ..._ROWS_OUTCOME,
+        previewRows: [["SENTINEL_STATE", 987654]],
+      }),
+    });
+    const { result } = await _add(host, CHART);
+
+    expect(_textOf(result)).not.toContain("SENTINEL_STATE");
+    expect(_textOf(result)).not.toContain("987654");
   });
 
   it("checks a chart's SQL with table names and the consent check first", async () => {

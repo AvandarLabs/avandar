@@ -16,7 +16,12 @@ import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
  */
 export const MAX_QUERY_RUNS_PER_ANSWER = 3;
 
-function _describeShape(
+/**
+ * Describes a query result as its row count and column names, never its
+ * rows. Use it wherever a tool tells the model what a query returned, for
+ * example `run_query` and the dashboard chart check.
+ */
+export function describeQueryShape(
   columns: ReadonlyArray<{ name: string }>,
   rowCount: number,
 ): string {
@@ -55,7 +60,7 @@ function _describePreview(
 function _describeRowsForCheck(
   outcome: Exclude<DataAgentQueryOutcome, { kind: "failed" }>,
 ): string {
-  return `Shown to the user: ${_describeShape(outcome.columns, outcome.rowCount)}. First rows:
+  return `Shown to the user: ${describeQueryShape(outcome.columns, outcome.rowCount)}. First rows:
 ${_describePreview(outcome.columns, outcome.previewRows ?? [])}
 If these rows answer the question, reply with the answer in one or two sentences. If they do not, fix the SQL and run it again.`;
 }
@@ -91,7 +96,7 @@ function _toToolResult(
     };
   }
   if (outcome.kind === "rows") {
-    const shape = _describeShape(outcome.columns, outcome.rowCount);
+    const shape = describeQueryShape(outcome.columns, outcome.rowCount);
     return {
       content: [{ type: "text", text: `Shown to the user: ${shape}.` }],
       details,

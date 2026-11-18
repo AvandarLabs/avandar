@@ -2,7 +2,10 @@ import { parseDashboardBlockFields } from "$/agent/dashboardBlocks/DashboardBloc
 import { ADD_DASHBOARD_BLOCK_TOOL } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { extractSingleQuotedSqlLiterals } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
-import { MAX_QUERY_RUNS_PER_ANSWER } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
+import {
+  MAX_QUERY_RUNS_PER_ANSWER,
+  describeQueryShape,
+} from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { sanitizeQueryError } from "@/lib/agent/dataAgent/sanitizeQueryError/sanitizeQueryError";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { QueryToolContext } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
@@ -16,9 +19,12 @@ type DashboardToolResult = AgentToolResult<{ outcome: string }>;
 
 type ChartBlock = Extract<ChatGeneratedDashboardBlock, { kind: "DataViz" }>;
 
-/** The block to add, or the result that stops it. */
+/**
+ * The block to add, or the result that stops it. A chart that ran carries
+ * its shape (row count and column names) for the model to read back.
+ */
 type CheckedBlock =
-  | { block: ChatGeneratedDashboardBlock }
+  | { block: ChatGeneratedDashboardBlock; shape?: string }
   | { result: DashboardToolResult };
 
 function _reply(
@@ -60,7 +66,10 @@ async function _checkChart(
   state.queryRuns += 1;
   const outcome = await checkQuery(sql);
   if (outcome.kind !== "failed") {
-    return { block: { ...block, sql } };
+    return {
+      block: { ...block, sql },
+      shape: describeQueryShape(outcome.columns, outcome.rowCount),
+    };
   }
   state.needsEscalation = true;
   return {
@@ -75,11 +84,27 @@ async function _checkChart(
   };
 }
 
+/**
+ * What the model reads once a block is placed. A chart adds the shape of
+ * its result, so a chart with no rows reads as "0 rows".
+ */
+function _describePlacement(
+  kind: "added_to_editor" | "card_shown",
+  shape: string | undefined,
+): string {
+  const placement =
+    kind === "added_to_editor"
+      ? "Added to the open dashboard (unsaved)."
+      : "The card is on the user's screen. Nothing changes until they confirm.";
+  return shape ? `${placement} The chart has ${shape}.` : placement;
+}
+
 /** What the model reads once the host has placed the block, or could not. */
 function _toToolResult(
   outcome: DataAgentDashboardBlockOutcome,
   request: Readonly<{ dashboard: string; summary: string }>,
   context: QueryToolContext,
+  shape?: string,
 ): DashboardToolResult {
   switch (outcome.kind) {
     case "added_to_editor":
@@ -88,13 +113,9 @@ function _toToolResult(
         summary: request.summary,
         outcome: outcome.kind,
       };
-      return _reply(
-        outcome.kind === "added_to_editor"
-          ? "Added to the open dashboard (unsaved)."
-          : "The card is on the user's screen. Nothing changes until they confirm.",
-        outcome.kind,
-        { terminate: true },
-      );
+      return _reply(_describePlacement(outcome.kind, shape), outcome.kind, {
+        terminate: true,
+      });
     case "no_current":
       return _reply(
         "No dashboard is on this page. Ask the user which dashboard they mean.",
@@ -152,7 +173,7 @@ export function createAddDashboardBlockTool(
         block: checked.block,
         summary: params.summary,
       });
-      return _toToolResult(outcome, params, context);
+      return _toToolResult(outcome, params, context, checked.shape);
     },
   };
 }
