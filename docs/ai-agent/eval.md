@@ -380,10 +380,11 @@ questions also have the ids D01 to D04, but they run only with
   recorded (6/9). The offline 45 at 26 or better: **met at exactly 26, after
   one fix** (25/45 before it). A later change raised it to 30/45. None of
   those offline runs sent a page block, which the app does on every turn.
-  With the page block the app sends, the final code scores 30/45 (27/45
-  with the dashboard gate on any block, 26/45 with the gate on dashboard
-  turns and every empty page block sent): see "Closing the open items"
-  below.
+  With the page block the app sends, the final code scores 30/45 on an
+  empty Data Explorer (27/45 with the dashboard gate on any block, 26/45
+  with the gate on dashboard turns and every empty page block sent): see
+  "Closing the open items" below, which says what that score does and does
+  not measure.
 - **P04 missed on the P run, and the cause is v5, not the dashboard rules.**
   "make this a pie chart", with two charts on the dashboard, should ask
   which one. The miss ran `run_query` on the cases chart and replied that it
@@ -769,6 +770,16 @@ iterations, quoted below.
     | N06 | pass | miss | pass | pass |
     | N10 | miss | pass | miss | miss |
     | N12 | pass | miss | miss | pass |
+  - **What the 30/45 measures.** The run with `--page data-explorer` is a
+    fresh, empty Data Explorer: no open dataset, no query on screen, so the
+    41 questions that are not follow-ups reach the model with no page block.
+    In the app the Data Explorer keeps its last query and open dataset across
+    chats, so a first turn there often carries a non-empty page block, and
+    such a turn behaves like the earlier 26/45 and 27/45 runs, which sent the
+    block. The score in the real app depends on that state, and 30/45 is the
+    score for an empty Data Explorer. The eval also differs from the app after
+    a failed query: it keeps the previous query on screen for the next
+    follow-up, while the app shows the failed SQL.
   - **Offline D stayed at 6/9** (`phase-1d:offline-dashboards-page-gate` and
     `phase-1d:offline-dashboards-page-omit`): D01 to D03 passed in the
     editor, D04 ran `run_query` with no block, D05 and D08 wrote nothing, D06
@@ -912,7 +923,8 @@ Every WebLLM model that fits the 16 GB budget, on every other question
 Qwen3 4B scored 26 to 28 across runs with different prompt wording; which
 borderline questions pass moves between runs, the total does not. (Phase 1D's
 last runs scored 30/45 with no page block and 30/45 with the page block the
-app sends, once an empty one is left out: see "Phase 1D".) It
+app sends on an empty Data Explorer, once an empty one is left out: see
+"Phase 1D".) It
 misses what needs several steps at once: per-person rates, combining two
 datasets, top day per group, running totals. The online regression miss
 (N05) passed 4 of 4 reruns. Times are on a 64 GB M4 Pro; a 16 GB laptop
