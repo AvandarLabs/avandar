@@ -247,8 +247,10 @@ Changes to existing files:
    read. It counts toward the "can't see" line.
 3. For each readable dataset, checks
    `UserClient.canAccessResource({ resourceType: "dataset", resourceId, minRole: "admin" })`
-   through one React Query query per dataset. A check that throws counts as a
-   failure (see `hasFailed`), not as "not allowed".
+   through one React Query query per dataset. The check goes through the
+   platform server API, so on desktop it carries the user's token instead of
+   running as `anon` in the webview. A check that throws counts as a failure
+   (see `hasFailed`), not as "not allowed".
 4. Returns rows `{ datasetId, name, canDelete }`, sorted by name, plus
    `hiddenCount`, `isLoading`, `hasFailed`, and `retry`.
 
@@ -297,13 +299,16 @@ checked row:
    id in that order:
    1. Reads the dataset with `DatasetClient.getById`. A row that is already
       missing, such as one deleted by someone else after the dialog loaded, is
-      nothing to do. It is in none of the outcome lists, and `fullDelete` is
-      not called. A read that throws records the id as incomplete. Nothing was
+      nothing to do. A dataset the user can no longer read looks the same, so
+      it too is nothing to do. It is in none of the outcome lists, and
+      `fullDelete` is not called. A read that throws records the id as
+      incomplete. Nothing was
       deleted, but the admin should check it.
    2. Calls `DatasetClient.fullDelete({ id })`. It does not check admin access
       itself, because `fullDelete` checks it before it touches Storage (through
-      the platform server API, since the desktop webview has no Supabase
-      session) and throws a `DatasetDeleteError` with reason `not_allowed`.
+      `UserClient.canAccessResource`, the one access check, which uses the
+      platform server API since the desktop webview has no Supabase session)
+      and throws a `DatasetDeleteError` with reason `not_allowed`.
       That error records the id as refused. Nothing of it was touched, and it
       is not logged as unexpected.
    3. Any other throw is logged. `fullDelete` removes a dataset's files before
@@ -419,17 +424,44 @@ push to `demo/**` deploys.
   records a `not_allowed` refusal from `fullDelete` as a refused dataset. Any
   other failure after that check is recorded as incomplete, since the files
   may already be gone.
+- **`UserClient.canAccessResource` ran as `anon` on desktop.** It used the
+  webview's Supabase client, which holds no session on desktop (only the main
+  process carries the token), and `anon` may not execute
+  `util__auth_user_can_access_resource`. The uninstall dialog's access checks
+  and the dashboard route guards therefore failed there. It now calls the RPC
+  through the platform server API, which is the same Supabase client on web
+  and the IPC with the token on desktop. `fullDelete` calls the same method, so
+  there is one access check, and it still runs before any Storage delete.
 - **Known limit.** A dataset that becomes unreadable to the user between the
   uninstall's first read and `fullDelete`'s own read makes `fullDelete` skip
-  the Storage cleanup and return normally after a delete that may remove no
-  row. A user who may delete a row but not read it can also end with the row
-  deleted and the parquet left behind. The uninstall still counts such a
-  dataset as deleted. No data is lost that the admin did not ask to delete.
+  the Storage cleanup and return normally, and the uninstall counts the
+  dataset as deleted. Nothing was deleted: a Postgres `DELETE ... WHERE` also
+  applies the table's SELECT policy, so for a row the user cannot read the
+  delete affects zero rows and reports no error (probed on the local stack with
+  a user who is a `data_sources` app role admin with no share on an
+  unrestricted dataset: `util__auth_user_can_access_resource(..., 'admin')` is
+  true, `util__auth_user_may_select_dataset` is false, and the `DELETE` removed
+  zero rows). The dataset, its parquet, and its retained original are all
+  still there, so no data is lost. Deleting the Storage objects without the
+  row is not a fix. The `workspaces` bucket's DELETE policy needs only
+  `editor` through a security definer check, not read access, so it would
+  succeed while the row stayed, and leave a dataset with no data. A user who
+  may delete a dataset but not read it cannot delete it through the client at
+  all. That needs a server-side delete, which is a schema change and out of
+  scope. Until then the uninstall can report such a dataset as deleted when it
+  is still there.
 - **Known limit, desktop.** A dataset deleted on the server but still in the
   desktop SQLite mirror is found by `fullDelete`'s read, while the server's
   access check no longer finds it, so the admin sees "You don't have
-  permission to delete this dataset." It is narrow and desktop only, and this
-  spec does not change it.
+  permission to delete this dataset." The server's answer cannot tell "gone"
+  from "the user has no admin access": `util__auth_user_can_access_resource`
+  and `util__auth_user_may_select_dataset` are false for both, no RPC reveals
+  whether a dataset exists regardless of the user's rights, `serverApi` offers
+  only RPCs and edge functions, and the desktop snapshot bootstrap only fills
+  empty tables and never reconciles deletes. Treating a refusal as "already
+  deleted" would hide a real permission refusal, so it needs a server-side
+  existence check (a schema change) or delete reconciliation in the desktop
+  sync. This spec does not change it.
 
 ## Done when
 
