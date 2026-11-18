@@ -47,6 +47,9 @@ declare -A _edge_env=(
   [OPENAI_API_KEY]="$OPENAI_API_KEY"
   [OPEN_ROUTER_API_KEY]="$OPEN_ROUTER_API_KEY"
 
+  # Pipeline Server
+  [AVA_PIPELINE_SERVER_SECRET]="$AVA_PIPELINE_SERVER_SECRET"
+
   # Featurebase (Customer support)
   [FEATUREBASE_JWT_SECRET]="$FEATUREBASE_JWT_SECRET"
 )

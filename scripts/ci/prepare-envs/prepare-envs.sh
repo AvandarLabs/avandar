@@ -30,6 +30,8 @@ ALLOW_EMPTY_ENV_VAR_NAMES=(
   E2E_GOOGLE_REFRESH_TOKEN
   E2E_GOOGLE_SHEET_NAME
   E2E_GOOGLE_EMAIL
+  # Empty turns address search off. The e2e suite mocks the geocode route.
+  GEOAPIFY_API_KEY
 )
 
 # Returns 0 if key is listed in ALLOW_EMPTY_ENV_VAR_NAMES.
