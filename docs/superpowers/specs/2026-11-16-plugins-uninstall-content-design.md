@@ -455,8 +455,9 @@ push to `demo/**` deploys.
   `editor` through a security definer check, not read access, so it would
   succeed while the row stayed, and leave a dataset with no data. A user who
   may delete a dataset but not read it cannot delete it through the client at
-  all. That needs a server-side delete, which is a schema change and out of
-  scope. Until then the uninstall can report such a dataset as deleted when it
+  all. That needs a server-side delete: either a security-definer RPC (a schema
+  change) or a service-role edge function (no schema change, but it needs a
+  `supabase/config.toml` change). Both are out of scope. Until then the uninstall can report such a dataset as deleted when it
   is still there.
 - **Known limit, desktop.** A dataset deleted on the server but still in the
   desktop SQLite mirror is found by `fullDelete`'s read, while the server's
@@ -471,6 +472,22 @@ push to `demo/**` deploys.
   deleted" would hide a real permission refusal, so it needs a server-side
   existence check (a schema change) or delete reconciliation in the desktop
   sync. This spec only makes the message honest about both causes.
+
+- **Known limit, desktop.** The access check can fail when several run at
+  once. `callIpc` (`shared/platform/ipc/client.ts`) waits for the reply on the
+  channel `${contract.name}.reply` and rejects with "IPC reply id mismatch" when
+  the reply's id is not its own. The webview bridge
+  (`apps/desktop/main/ipc/desktopIpcBridgeScript/desktopIpcBridgeScript.ts`)
+  delivers a reply by channel name only, never by request id. Two concurrent
+  `serverApi.rpc` calls share one channel, so one of them can receive the
+  other's reply and reject. The dialog runs one check per dataset at once, and
+  the route guards run checks of their own, so a check can fail on desktop under
+  concurrency. Every outcome fails closed: the route guard shows its error
+  page, the dialog shows `hasFailed` with Retry, and `fullDelete` throws before
+  it touches Storage. A failed check is never read as an answer. The bug
+  predates this work and belongs to the IPC layer, which this spec does not
+  change. The uninstall dialog is not reachable on desktop anyway, because
+  `plugin_installations` is not mirrored to the desktop SQLite database.
 
 ## Done when
 
