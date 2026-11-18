@@ -1363,7 +1363,7 @@ describe("createChatModelAdapter offline reply name scrub bypasses", () => {
   });
 });
 
-describe("createChatModelAdapter offline answers in hosted requests", () => {
+describe("createChatModelAdapter stored replies in hosted requests", () => {
   beforeEach(() => {
     _setNavigatorOnLine(true);
     OfflineModeStore.setOn(false);
@@ -1477,6 +1477,44 @@ describe("createChatModelAdapter offline answers in hosted requests", () => {
 
     const offline = runOfflineChatTurnMock.mock.calls[0]![0];
     expect(offline.messages[1].content).toBe("jane.doe@example.com called.");
+  });
+
+  it("hands the agent's recap the text the model wrote for a reply shown with real values", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { hostedText: "<value 1> called." } }),
+    );
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(turn.apiMessages[1].content).toBe("<value 1> called.");
+    expect(JSON.stringify(turn.apiMessages)).not.toContain("jane.doe");
+  });
+
+  it("posts today's chat the text the model wrote for a reply shown with real values", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { hostedText: "<value 1> called." } }),
+    );
+
+    const body = apiPostMock.mock.calls[0]![0].body;
+    expect(body.messages[1].content).toBe("<value 1> called.");
+    expect(JSON.stringify(body)).not.toContain("jane.doe");
+  });
+
+  it("lets an offline agent turn read the real values a hosted reply showed", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+    OfflineModeStore.setOn(true);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { hostedText: "<value 1> called." } }),
+    );
+
+    const offlineTurn = runOfflineDataAgentTurnMock.mock.calls[0]![0];
+    expect(offlineTurn.apiMessages[1].content).toBe(
+      "jane.doe@example.com called.",
+    );
   });
 
   it("keeps an unmarked hosted answer as written", async () => {

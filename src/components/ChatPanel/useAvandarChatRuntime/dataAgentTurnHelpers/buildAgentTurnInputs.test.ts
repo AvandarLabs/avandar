@@ -254,6 +254,28 @@ describe("buildAgentTurnInputs", () => {
       );
     });
 
+    it("shows a hosted turn's reply with the vault's value in place of its placeholder", () => {
+      const { inputs } = _build("hosted");
+
+      expect(inputs.unmaskReplyText?.("<value 1> had 2 visits.")).toBe(
+        "Jane Doe had 2 visits.",
+      );
+    });
+
+    it("leaves a placeholder the vault does not hold as written in a hosted reply", () => {
+      const { inputs } = _build("hosted");
+
+      expect(inputs.unmaskReplyText?.("<value 7> had 2 visits.")).toBe(
+        "<value 7> had 2 visits.",
+      );
+    });
+
+    it("gives a device turn no way to unmask its reply", () => {
+      const { inputs } = _build("device");
+
+      expect(inputs.unmaskReplyText).toBeUndefined();
+    });
+
     it("keeps a mention's name and an earlier reply real on a device turn", () => {
       const { inputs } = _build("device");
 

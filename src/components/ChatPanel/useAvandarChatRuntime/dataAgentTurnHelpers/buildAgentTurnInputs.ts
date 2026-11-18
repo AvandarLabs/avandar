@@ -285,6 +285,7 @@ export function buildAgentTurnInputs(
     // Called only once the blocks above have redacted every piece of the
     // turn's SQL, so the vault holds every value to mask.
     maskAssistantText: mask,
+    ...(isHosted ? { unmaskReplyText: conversation.sqlVault.unmaskText } : {}),
     // Built after the blocks, so the vault holds every value a name could
     // match.
     ..._dashboardCardInputs(options.turn, mask),

@@ -210,6 +210,32 @@ describe("runOfflineDataAgentTurn", () => {
     expect(explorerShowQueryMock).not.toHaveBeenCalled();
   });
 
+  it("shows an offline reply as written, even when it reads like a placeholder", async () => {
+    askMock.mockResolvedValue({ text: "<value 1> had 3 visits." });
+
+    const result = await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 9 }),
+      _onPage({
+        app: "dashboard",
+        dashboard: {
+          id: "d-1",
+          name: "COVID 2022",
+          tiles: [
+            {
+              title: "Visits",
+              chartType: "table",
+              sql: `SELECT * FROM t WHERE "last_name" = 'Doe'`,
+            },
+          ],
+        },
+      }),
+    );
+
+    expect(result).toEqual({
+      content: [{ type: "text", text: "<value 1> had 3 visits." }],
+    });
+  });
+
   it("builds device blocks for the offline agent", async () => {
     await runOfflineDataAgentTurn(
       _createTurnOptions({ chatGeneration: 8 }),

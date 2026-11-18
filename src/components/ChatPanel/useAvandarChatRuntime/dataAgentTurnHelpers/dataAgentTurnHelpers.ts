@@ -1,4 +1,5 @@
 import { where } from "@avandar/utils";
+import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
@@ -293,6 +294,13 @@ export type AgentTurnInputs = {
    * a fixed line.
    */
   maskAssistantText: (text: string) => string;
+  /**
+   * The agent's reply as the user reads it, with each placeholder a hosted
+   * model wrote swapped for the value the vault holds. Set only on a hosted
+   * turn. A device turn's model never sees placeholders, so its reply is
+   * shown as written. Never send its result to a hosted model.
+   */
+  unmaskReplyText?: (text: string) => string;
   /** Lines about dashboard cards the user resolved, sent first. */
   dashboardCardLines?: readonly string[];
   /** Runs after the agent replied, to mark those cards heard. */
@@ -339,15 +347,46 @@ function _namedMessages(
   });
 }
 
+/** What one turn's run result is built from. */
+type RunResultOptions = {
+  /** The reply as the model wrote it, placeholders included. */
+  replyText: string;
+  inputs: AgentTurnInputs | undefined;
+  results: readonly AgentQueryResultData[];
+  dashboardCards: readonly AgentDashboardBlockData[];
+};
+
+/**
+ * The turn's run result: the reply the user reads, then the turn's results
+ * and dashboard cards. A hosted reply is shown with real values in place of
+ * its placeholders, and the text the model wrote is kept in the message
+ * metadata, so no later request to a hosted model reads the real values.
+ */
+function _toRunResult(options: Readonly<RunResultOptions>): ChatModelRunResult {
+  const { replyText, inputs } = options;
+  const shownText = inputs?.unmaskReplyText?.(replyText) ?? replyText;
+  return {
+    content: [
+      { type: "text", text: shownText },
+      ...options.results.map(AgentQueryResult.toDataPart),
+      ...options.dashboardCards.map(AgentDashboardBlock.toDataPart),
+    ],
+    ...(shownText === replyText
+      ? {}
+      : { metadata: HostedAnswerText.toMetadata(replyText) }),
+  };
+}
+
 /**
  * Asks this conversation's agent the turn's message, creating the
  * conversation on its first turn, and returns the reply with any results
  * this turn added to the chat. `conversations` holds one per
  * `${workspaceId}:${chatGeneration}`, so follow-ups see earlier turns. The
  * page, attached, and mentioned blocks, when there are any, start the
- * message, and each mention in the thread reads as `@"Name"`. A run still
- * in progress is stopped first, since a conversation answers one message at
- * a time.
+ * message, and each mention in the thread reads as `@"Name"`. A hosted
+ * turn's reply is shown with real values in place of its placeholders. A
+ * run still in progress is stopped first, since a conversation answers one
+ * message at a time.
  */
 export async function askConversationDataAgent(
   options: Readonly<AskConversationDataAgentOptions>,
@@ -385,11 +424,10 @@ export async function askConversationDataAgent(
   inputs?.onReplied?.();
   conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
   conversation.lastAttachedBlock = blocks.attachedBlock;
-  return {
-    content: [
-      { type: "text", text: reply.text },
-      ...results.map(AgentQueryResult.toDataPart),
-      ...dashboardCards.map(AgentDashboardBlock.toDataPart),
-    ],
-  };
+  return _toRunResult({
+    replyText: reply.text,
+    inputs,
+    results,
+    dashboardCards,
+  });
 }

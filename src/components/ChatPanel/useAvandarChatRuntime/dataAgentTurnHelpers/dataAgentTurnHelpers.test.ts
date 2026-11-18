@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
@@ -383,6 +384,75 @@ describe("askConversationDataAgent", () => {
         AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
       ),
     ]);
+  });
+
+  describe("a reply that holds a placeholder", () => {
+    const MODEL_TEXT = "<value 1> has 2 visits.";
+
+    function _askWithUnmask(
+      unmaskReplyText: ((text: string) => string) | undefined,
+    ) {
+      return askConversationDataAgent({
+        conversations: new Map([
+          [
+            "workspace-1:0",
+            _fakeConversation(async () => {
+              return { text: MODEL_TEXT };
+            }),
+          ],
+        ]),
+        turn: _turn("How many visits?"),
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            unmaskReplyText,
+          };
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    function _unmaskJane(text: string): string {
+      return text.replaceAll("<value 1>", "Jane Doe");
+    }
+
+    it("shows the real value on a hosted turn", async () => {
+      const reply = await _askWithUnmask(_unmaskJane);
+
+      expect(reply.content?.[0]).toEqual({
+        type: "text",
+        text: "Jane Doe has 2 visits.",
+      });
+    });
+
+    it("keeps the text the model wrote beside the real text, for the next request", async () => {
+      const reply = await _askWithUnmask(_unmaskJane);
+
+      expect(
+        HostedAnswerText.getModelText({
+          text: "Jane Doe has 2 visits.",
+          metadata: reply.metadata,
+        }),
+      ).toBe(MODEL_TEXT);
+    });
+
+    it("leaves a device turn's reply as written, with no kept text", async () => {
+      const reply = await _askWithUnmask(undefined);
+
+      expect(reply).toEqual({
+        content: [{ type: "text", text: MODEL_TEXT }],
+      });
+    });
+
+    it("keeps no model text when the vault holds no value for the placeholder", async () => {
+      const reply = await _askWithUnmask(_keepText);
+
+      expect(reply).toEqual({
+        content: [{ type: "text", text: MODEL_TEXT }],
+      });
+    });
   });
 
   it("starts with card lines, then marks them heard after the reply", async () => {

@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import {
   createAgentConversation,
@@ -261,6 +262,65 @@ describe("createConversationAgentHost placeholders", () => {
       expect.objectContaining({
         request: expect.objectContaining({
           sql: `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`,
+        }),
+      }),
+    );
+  });
+
+  it("shows a chat result's summary with the real value", async () => {
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "Cases for <value 1>.",
+    });
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({ summary: "Cases for Kings." }),
+      }),
+    );
+  });
+
+  it("puts the real value in a dashboard card's summary", async () => {
+    addAgentDashboardBlockMock.mockImplementation(
+      async ({ cards, request }) => {
+        cards.push(
+          AgentDashboardBlock.create({
+            block: request.block,
+            summary: request.summary,
+            candidates: [{ id: "dashboard-1", name: "Mortality" }],
+          }),
+        );
+        return { kind: "card_shown" };
+      },
+    );
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).addDashboardBlock!({
+      dashboard: "Mortality",
+      block: { kind: "HeadingBlock", text: "Deaths" },
+      summary: "Added a heading for <value 1>.",
+    });
+
+    expect(state.dashboardCards[0]?.summary).toBe("Added a heading for Kings.");
+  });
+
+  it("shows a question card's text with the real value and its options masked", async () => {
+    const turn = _turn("dashboard");
+
+    await createConversationAgentHost(_stateWithKings(turn)).askUser({
+      question: "Did you mean <value 1>?",
+      options: ["<value 1>", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        question: "Did you mean Kings?",
+        responseShape: expect.objectContaining({
+          options: ["<value 1>", "Queens"],
         }),
       }),
     );

@@ -258,7 +258,10 @@ function _showChatResultOnNextAsk(result: AgentQueryResultData): void {
     },
   );
   askMock.mockImplementationOnce(async () => {
-    await _lastAgentOptions().host.showQuery({ sql: "SELECT 1" } as never);
+    await _lastAgentOptions().host.showQuery({
+      sql: "SELECT 1",
+      summary: "Here it is.",
+    });
     return { text: "Here it is." };
   });
 }
@@ -534,6 +537,44 @@ describe("runDataAgentTurn", () => {
         }),
       }),
     );
+  });
+
+  it("shows a hosted reply with the real value its placeholder stands for", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(`SELECT * FROM t WHERE "last_name" = 'Doe'`),
+    );
+    askMock.mockResolvedValueOnce({ text: "<value 1> had 2 visits." });
+
+    const result = await runDataAgentTurn(
+      _turn("workspace-reply-unmask", "Who visited?"),
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    expect(result.content?.[0]).toEqual({
+      type: "text",
+      text: "Doe had 2 visits.",
+    });
+    expect(result.metadata?.custom).toEqual({
+      hostedText: "<value 1> had 2 visits.",
+    });
+  });
+
+  it("leaves a hosted reply's placeholder as written when no value is held for it", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(`SELECT * FROM t WHERE "last_name" = 'Doe'`),
+    );
+    askMock.mockResolvedValueOnce({ text: "<value 9> had 2 visits." });
+
+    const result = await runDataAgentTurn(
+      _turn("workspace-reply-unknown", "Who visited?"),
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    expect(result).toEqual({
+      content: [{ type: "text", text: "<value 9> had 2 visits." }],
+    });
   });
 
   it("sends attached and mentioned blocks and names mentions in the message", async () => {
