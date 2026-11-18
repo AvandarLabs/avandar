@@ -2,7 +2,10 @@ import { Group } from "@mantine/core";
 import { PluginActionButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton";
 import { PluginInstallButton } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginInstallButton";
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
-import type { PluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type {
+  ImportedDatasetsState,
+  PluginActionKind,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 
 type Props = Readonly<{
@@ -13,8 +16,12 @@ type Props = Readonly<{
   headingId: string;
   canManage: boolean;
 
-  /** Whether the plugin's manifest bundles datasets that it imports. */
-  hasBundledContent: boolean;
+  /**
+   * What the card knows about the datasets the plugin imported. Uninstall is
+   * disabled while it loads, opens the uninstall modal when there are some,
+   * and confirms an uninstall that keeps every dataset when the lookup failed.
+   */
+  importedDatasets: ImportedDatasetsState;
   actions: PluginInstallationActions;
 }>;
 
@@ -34,14 +41,17 @@ const ACTION_KINDS_BY_STATUS: Record<
  * The buttons for one plugin's current status, such as Install for a plugin
  * the workspace does not have yet. Users who cannot manage plugins see them
  * disabled, and so does everyone while a change is saving. Install opens the
- * install wizard; every other action asks the user to confirm first.
+ * install wizard; every other action asks the user to confirm first, except
+ * Uninstall of a plugin that imported datasets, which opens its own modal.
+ * When the imported datasets could not be looked up, Uninstall confirms an
+ * uninstall that keeps every dataset.
  */
 export function PluginActions({
   status,
   pluginName,
   headingId,
   canManage,
-  hasBundledContent,
+  importedDatasets,
   actions,
 }: Props): JSX.Element {
   const isDisabled = !canManage || actions.isPending;
@@ -62,7 +72,7 @@ export function PluginActions({
             pluginName={pluginName}
             headingId={headingId}
             isDisabled={isDisabled}
-            hasBundledContent={hasBundledContent}
+            importedDatasets={importedDatasets}
             actions={actions}
           />
         );

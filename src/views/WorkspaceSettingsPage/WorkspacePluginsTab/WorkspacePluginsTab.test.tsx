@@ -28,6 +28,11 @@ const mocks = vi.hoisted(() => {
     isLoadingInstallations: false,
     hasInstallationsError: false,
     hasInstallationsData: true,
+    contentImports: [] as unknown[],
+    isLoadingContentImports: false,
+    isFetchingContentImports: false,
+    hasContentImportsError: false,
+    refetchContentImports: vi.fn(),
   };
 });
 
@@ -109,6 +114,11 @@ vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetClient", "getAll"];
+        },
+      },
       useGetAll: () => {
         return [[], false, {}];
       },
@@ -147,7 +157,15 @@ vi.mock(
           },
         },
         useGetAll: () => {
-          return [[], false, {}];
+          return [
+            mocks.contentImports,
+            mocks.isLoadingContentImports,
+            {
+              isFetching: mocks.isFetchingContentImports,
+              isError: mocks.hasContentImportsError,
+              refetch: mocks.refetchContentImports,
+            },
+          ];
         },
       },
     };
@@ -181,6 +199,28 @@ vi.mock("@/hooks/users/useCurrentUser", () => {
     useCurrentUser: () => {
       return { id: "user-id" };
     },
+  };
+});
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets",
+  () => {
+    return {
+      uninstallPluginAndDeleteDatasets: vi.fn(() => {
+        return Promise.resolve({
+          deletedDatasetIds: [],
+          refusedDatasetIds: [],
+          incompleteDatasetIds: [],
+          unreadDatasetIds: [],
+        });
+      }),
+    };
+  },
+);
+vi.mock("@/utils/notifications/notify", () => {
+  return {
+    notifySuccess: vi.fn(),
+    notifyWarning: vi.fn(),
+    notifyError: vi.fn(),
   };
 });
 vi.mock("@/utils/Logger", () => {
@@ -297,6 +337,11 @@ describe("WorkspacePluginsTab", () => {
     mocks.isLoadingInstallations = false;
     mocks.hasInstallationsError = false;
     mocks.hasInstallationsData = true;
+    mocks.contentImports = [];
+    mocks.isLoadingContentImports = false;
+    mocks.isFetchingContentImports = false;
+    mocks.hasContentImportsError = false;
+    mocks.refetchContentImports.mockReset();
   });
 
   it("offers Install for a bundled plugin the workspace lacks", async () => {
@@ -363,6 +408,269 @@ describe("WorkspacePluginsTab", () => {
     expect(_getButtonLabelsIn(card)).toEqual(["Uninstall"]);
   });
 
+  it("opens the uninstall modal, not a confirm, for an unavailable plugin that imported datasets", async () => {
+    _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+    mocks.contentImports = [
+      { contentId: "cases", pluginId: REMOVED_PLUGIN_ID, datasetId: "gone" },
+    ];
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
+    await waitFor(() => {
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
+    });
+    fireEvent.click(within(card).getByRole("button", { name: "Uninstall" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
+    expect(dialog).toHaveTextContent("Datasets it imported");
+    expect(dialog).toHaveTextContent("1 more dataset you can't see stays.");
+  });
+
+  it.each([
+    ["while the imports load", { isLoadingContentImports: true }],
+    ["while the imports refetch", { isFetchingContentImports: true }],
+    [
+      "while the imports refetch after a failure",
+      { isFetchingContentImports: true, hasContentImportsError: true },
+    ],
+  ] as const)(
+    "keeps Uninstall disabled and opens no confirm %s",
+    async (_label, state) => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      Object.assign(mocks, state);
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      const button = within(card).getByRole("button", { name: "Uninstall" });
+      expect(button).toBeDisabled();
+      fireEvent.click(button);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    },
+  );
+
+  describe("when the imports fail to load", () => {
+    const LOOKUP_ERROR =
+      "We could not check whether this plugin imported datasets.";
+
+    beforeEach(() => {
+      mocks.hasContentImportsError = true;
+    });
+
+    it("says the lookup failed, in an alert on the card", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(within(card).getByRole("alert")).toHaveTextContent(LOOKUP_ERROR);
+    });
+
+    it("asks for the imports again when Retry is pressed", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Retry" }));
+
+      expect(mocks.refetchContentImports).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps Uninstall enabled", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
+    });
+
+    it("confirms an uninstall that keeps every dataset, never opening the dataset modal", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      // A restored cache may still list imports after a failed refetch.
+      mocks.contentImports = [
+        { contentId: "cases", pluginId: REMOVED_PLUGIN_ID, datasetId: "d1" },
+      ];
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Uninstall" }));
+
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog).toHaveTextContent(`Uninstall ${REMOVED_PLUGIN_ID}?`);
+      expect(dialog).toHaveTextContent(
+        "We could not check for datasets this plugin imported.",
+      );
+      expect(dialog).toHaveTextContent(
+        "If you uninstall it now, every dataset it imported is kept.",
+      );
+      expect(dialog).not.toHaveTextContent("Datasets it imported");
+    });
+
+    it("shows no alert to a user who cannot manage plugins", async () => {
+      mocks.canManage = false;
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("shows no alert on a plugin that is not installed", async () => {
+      _addBundledPlugin();
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("ties Retry to the plugin it belongs to", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+      _renderTab();
+
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      expect(
+        within(card).getByRole("button", { name: "Retry" }),
+      ).toHaveAccessibleDescription(REMOVED_PLUGIN_ID);
+    });
+
+    it("keeps the alert, Retry loading and Uninstall disabled while the retry runs", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      const { rerender } = _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      // A query with no data drops its error as soon as the retry starts.
+      mocks.hasContentImportsError = false;
+      mocks.isFetchingContentImports = true;
+      rerender(<WorkspacePluginsTab />);
+
+      expect(within(card).getByRole("alert")).toHaveTextContent(LOOKUP_ERROR);
+      expect(
+        within(card).getByRole("button", { name: "Retry" }),
+      ).toHaveAttribute("data-loading", "true");
+      expect(within(card).getByRole("status")).toHaveTextContent(
+        "Checking for datasets this plugin imported.",
+      );
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeDisabled();
+    });
+
+    it("moves focus to the status when Retry is pressed", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+
+      fireEvent.click(within(card).getByRole("button", { name: "Retry" }));
+
+      expect(within(card).getByRole("status")).toHaveFocus();
+    });
+
+    it("drops the alert and announces the recovery once the retry succeeds", async () => {
+      _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+      const { rerender } = _renderTab();
+      const card = await screen.findByRole("region", {
+        name: REMOVED_PLUGIN_ID,
+      });
+      mocks.hasContentImportsError = false;
+      mocks.isFetchingContentImports = true;
+      rerender(<WorkspacePluginsTab />);
+
+      mocks.isFetchingContentImports = false;
+      rerender(<WorkspacePluginsTab />);
+
+      expect(within(card).queryByRole("alert")).not.toBeInTheDocument();
+      expect(within(card).getByRole("status")).toHaveTextContent(
+        "We checked for datasets this plugin imported.",
+      );
+      expect(
+        within(card).getByRole("button", { name: "Uninstall" }),
+      ).toBeEnabled();
+    });
+  });
+
+  it("enables Uninstall once the imports lookup is settled", async () => {
+    _addInstallation({ pluginId: REMOVED_PLUGIN_ID });
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
+    expect(within(card).getByRole("button", { name: "Uninstall" })).toBeEnabled();
+  });
+
+  describe("the uninstall modal of a plugin that imported datasets", () => {
+    async function _openUninstallModal(): Promise<HTMLElement> {
+      _addBundledPlugin();
+      _addInstallation({ pluginId: (mocks.entries[0] as PluginIndexEntry).id });
+      mocks.contentImports = [
+        { contentId: "cases", pluginId: "any", datasetId: "gone" },
+      ];
+      _renderTab();
+      const card = await screen.findByRole("region", { name: "Epidemiology" });
+      const uninstallButton = within(card).getByRole("button", {
+        name: "Uninstall",
+      });
+      // Safari and Firefox on macOS do not focus a button on click.
+      fireEvent.click(uninstallButton);
+      await screen.findByRole("dialog");
+      return uninstallButton;
+    }
+
+    it("returns focus to the Uninstall button on Cancel", async () => {
+      const uninstallButton = await _openUninstallModal();
+
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      await waitFor(() => {
+        expect(uninstallButton).toHaveFocus();
+      });
+    });
+
+    it("moves focus to the card heading after the plugin is uninstalled", async () => {
+      const uninstallButton = await _openUninstallModal();
+
+      fireEvent.click(
+        within(screen.getByRole("dialog")).getByRole("button", {
+          name: "Uninstall",
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Epidemiology" }),
+        ).toHaveFocus();
+      });
+      expect(uninstallButton).not.toHaveFocus();
+    });
+  });
+
   it("says so when this deployment bundles no plugins", async () => {
     _renderTab();
 
@@ -391,7 +699,7 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
     const card = await screen.findByRole("region", { name: "Epidemiology" });
     const installButton = within(card).getByRole("button", { name: "Install" });
-    installButton.focus();
+    // Safari and Firefox on macOS do not focus a button on click.
     fireEvent.click(installButton);
     await screen.findByRole("dialog", { name: "Install Epidemiology" });
 
@@ -411,7 +719,7 @@ describe("WorkspacePluginsTab", () => {
       const installButton = within(card).getByRole("button", {
         name: "Install",
       });
-      installButton.focus();
+      // Safari and Firefox on macOS do not focus a button on click.
       fireEvent.click(installButton);
       await screen.findByRole("dialog", { name: "Install Epidemiology" });
       // The install lands: the card's Install button is replaced.

@@ -502,6 +502,10 @@ are prompted to re-bind.
 | Disable | Hidden | Kept | Kept | Kept |
 | Uninstall | Removed immediately | Kept 30 days so a reinstall restores them, then purged. Exportable as JSON first | Deleted immediately. Managed sub-accounts are closed and billing finalized | Kept by default, since the workspace owns them. Each item gets a keep or delete choice |
 
+Built so far: the keep or delete choice for imported datasets
+(`docs/superpowers/specs/2026-11-16-plugins-uninstall-content-design.md`).
+Plugin storage retention, secrets, and plugin-created datasets do not exist yet.
+
 A plugin cannot be uninstalled while other installed plugins depend on it.
 The wizard lists them.
 

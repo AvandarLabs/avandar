@@ -19,6 +19,16 @@ export type LinkedDataset = {
 export type LinkedDatasets = {
   linkedDatasets: readonly LinkedDataset[];
   isLoading: boolean;
+
+  /**
+   * Whether any lookup is in flight, including a refetch of a restored
+   * cache. `isLoading` is false during a refetch, so gate on this one when
+   * a stale list is not acceptable.
+   */
+  isFetching: boolean;
+
+  /** Whether a lookup failed, so `linkedDatasets` may be incomplete. */
+  hasFailed: boolean;
 };
 
 const NO_LINKED_DATASETS: readonly LinkedDataset[] = [];
@@ -58,40 +68,55 @@ function _toLinkedDatasets(
 /**
  * The linked datasets that read one dataset, that the user can see, each
  * with the dictionaries it converts with. A linked dataset created a
- * moment ago is listed, since the virtual datasets refetch on mount. Used
- * by the dataset's rail and its delete confirmation.
+ * moment ago is listed, since the virtual datasets refetch on mount.
+ *
+ * Use it wherever something needs to know what would break if a dataset
+ * went away, for example a dataset's rail or a delete confirmation.
+ * `isFetching` and `hasFailed` cover every lookup behind the list, so a
+ * caller that cannot show a stale or partial list can gate on them.
  */
 export function useLinkedDatasets(
   datasetId: Dataset.Id | undefined,
 ): LinkedDatasets {
-  const [virtualDatasets, isLoadingVirtual] = VirtualDatasetClient.useGetAll({
+  const virtualResult = VirtualDatasetClient.useGetAll({
     ...where("linked_source_dataset_id", "eq", datasetId),
     useQueryOptions: {
       ...ALWAYS_REFETCH_ON_MOUNT,
       enabled: datasetId !== undefined,
     },
   });
+  const [virtualDatasets, isLoadingVirtual, virtualQuery] = virtualResult;
   const linkedIds = useMemo(() => {
     return (virtualDatasets ?? []).map(prop("datasetId"));
   }, [virtualDatasets]);
   const hasLinked = linkedIds.length > 0;
-  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
+  const [datasets, isLoadingDatasets, datasetsQuery] = DatasetClient.useGetAll({
     ...where("id", "in", linkedIds),
     useQueryOptions: { enabled: hasLinked },
   });
-  const [bindings, isLoadingBindings] = DictionaryBindingClient.useGetAll({
+  const bindingsResult = DictionaryBindingClient.useGetAll({
     ...where("dataset_id", "in", linkedIds),
     useQueryOptions: { enabled: hasLinked },
   });
+  const [bindings, isLoadingBindings, bindingsQuery] = bindingsResult;
   const linkedDatasets = useMemo(() => {
     return hasLinked
       ? _toLinkedDatasets(datasets ?? [], bindings ?? [])
       : NO_LINKED_DATASETS;
   }, [hasLinked, datasets, bindings]);
+  // The dictionary bindings feed each linked dataset's `dictionaryIds`, so
+  // the flags below include that lookup: a failure there leaves the list
+  // incomplete.
   return {
     linkedDatasets,
     isLoading:
       isLoadingVirtual ||
       (hasLinked && (isLoadingDatasets || isLoadingBindings)),
+    isFetching:
+      virtualQuery.isFetching ||
+      (hasLinked && (datasetsQuery.isFetching || bindingsQuery.isFetching)),
+    hasFailed:
+      virtualQuery.isError ||
+      (hasLinked && (datasetsQuery.isError || bindingsQuery.isError)),
   };
 }

@@ -14,3 +14,11 @@ export type PluginActionKind =
  * out because it opens the install wizard, which is its own confirmation.
  */
 export type ConfirmedPluginActionKind = Exclude<PluginActionKind, "install">;
+
+/**
+ * What a plugin's card knows about the datasets the plugin imported into
+ * this workspace. `loading` means the lookup is loading or refetching, so the
+ * answer is not yet known. `failed` means the lookup failed and the answer
+ * stays unknown. `none` and `some` are answers from a fresh, successful lookup.
+ */
+export type ImportedDatasetsState = "loading" | "failed" | "none" | "some";

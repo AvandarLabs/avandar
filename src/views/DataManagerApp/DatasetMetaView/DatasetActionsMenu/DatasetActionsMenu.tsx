@@ -8,6 +8,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useLinkedDatasets } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
+import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { DatasetRefreshMenuItem } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem";
@@ -35,8 +36,10 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
   const { linkedDatasets, isLoading: isLoadingLinkedDatasets } =
     useLinkedDatasets(dataset.id);
+  const notifyDeleteError = useNotifyDatasetDeleteError();
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    onError: notifyDeleteError,
   });
 
   const onDelete = (): void => {

@@ -1,4 +1,5 @@
 import { openPluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/openPluginInstallWizard";
+import { openUninstallPluginModal } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal";
 import { usePluginInstallationMutations } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
@@ -12,11 +13,24 @@ export type PluginInstallationActions = Readonly<{
   /** True while any action is saving, so the card can disable its buttons. */
   isPending: boolean;
 
-  /** Opens the install wizard, which installs the plugin when it finishes. */
-  install: () => void;
+  /**
+   * Opens the install wizard, which installs the plugin when it finishes.
+   * Pass the button that opened it, since a click does not focus a button in
+   * every browser, so focus can go back to it afterwards.
+   */
+  install: (opener: HTMLElement) => void;
   setIsEnabled: (isEnabled: boolean) => void;
   approvePermissions: () => void;
   uninstall: () => void;
+
+  /**
+   * Opens the uninstall dialog that lets an admin delete the datasets the
+   * plugin imported. The card uses it instead of `uninstall` when the plugin
+   * imported datasets into this workspace. Pass the button that opened it,
+   * since a click does not focus a button in every browser, so focus can go
+   * back to it afterwards.
+   */
+  uninstallWithImportedDatasets: (opener: HTMLElement) => void;
 }>;
 
 /** Everything the actions of one plugin read, gathered by the hook. */
@@ -24,23 +38,46 @@ type ActionContext = Readonly<{
   pluginName: string;
   manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
+
+  /** The id of the card's heading, where focus goes if the opener is gone. */
+  headingId: string;
   mutations: ReturnType<typeof usePluginInstallationMutations>;
 }>;
 
 /** Builds the actions that add a plugin to the workspace or remove it. */
 function _makeInstallActionsFromContext(
   context: ActionContext,
-): Pick<PluginInstallationActions, "install" | "uninstall"> {
+): Pick<
+  PluginInstallationActions,
+  "install" | "uninstall" | "uninstallWithImportedDatasets"
+> {
   const { pluginName, manifestModule, installation, mutations } = context;
+  const { headingId } = context;
   return {
-    install: () => {
+    install: (opener) => {
       if (manifestModule !== undefined) {
-        openPluginInstallWizard({ pluginName, manifestModule });
+        openPluginInstallWizard({
+          pluginName,
+          manifestModule,
+          opener,
+          headingId,
+        });
       }
     },
     uninstall: () => {
       if (installation !== undefined) {
         mutations.deleteInstallation({ id: installation.id });
+      }
+    },
+    uninstallWithImportedDatasets: (opener) => {
+      if (installation !== undefined) {
+        openUninstallPluginModal({
+          pluginName,
+          pluginId: installation.pluginId,
+          installationId: installation.id,
+          opener,
+          headingId,
+        });
       }
     },
   };
@@ -95,6 +132,7 @@ export function usePluginInstallationActions(options: {
   pluginName: string;
   manifestModule: PluginManifestModule | undefined;
   installation: PluginInstallation.T | undefined;
+  headingId: string;
 }): PluginInstallationActions {
   const mutations = usePluginInstallationMutations(options.pluginName);
   return _makeActionsFromContext({ ...options, mutations });

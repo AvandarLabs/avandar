@@ -1001,7 +1001,21 @@ works like this:
 After install, the plugin's card lists its items under "Datasets it includes",
 each linked to its dataset once imported, with Import for an item that is
 missing and Retry for one that failed. Uninstalling the plugin keeps the
-datasets. Deleting an imported dataset lets the item be imported again.
+datasets unless the admin chooses to delete them, as described below. Deleting
+an imported dataset lets the item be imported again.
+
+When an admin uninstalls a plugin that imported datasets, the uninstall dialog
+lists each one with an unchecked "Delete" box, so every dataset is kept unless
+the admin chooses otherwise. Only datasets the admin could delete from Data
+Sources can be deleted there. A checked dataset lists the linked datasets and
+the other plugins that use it, each as "<slot title> in the <plugin name>
+plugin".
+
+When the card cannot check whether the plugin imported datasets, it says so
+with a Retry button, and Uninstall confirms an uninstall that keeps every
+dataset. When the dialog cannot load the datasets, it shows the same kind of
+error with Retry, and its confirm button reads "Uninstall and keep all
+datasets".
 
 Bundled data needs attribution recorded with it. Credit its source and license
 in the description, because that is where workspace members see where the data

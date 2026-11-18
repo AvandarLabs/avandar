@@ -50,6 +50,16 @@ function _runQuery(state: QueryState): unknown {
   return matchingRows;
 }
 
+const mocks = vi.hoisted(() => {
+  return { openUninstallPluginModal: vi.fn() };
+});
+
+vi.mock(
+  "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/openUninstallPluginModal",
+  () => {
+    return { openUninstallPluginModal: mocks.openUninstallPluginModal };
+  },
+);
 vi.mock("$/db/supabase/AvaSupabase", () => {
   return {
     AvaSupabase: {
@@ -142,6 +152,7 @@ function Harness(): ReactNode {
     pluginName: "Epidemiology",
     manifestModule: MANIFEST_MODULE,
     installation,
+    headingId: "card-heading",
   });
   return (
     <div>
@@ -164,6 +175,14 @@ function Harness(): ReactNode {
       </button>
       <button type="button" onClick={actions.uninstall}>
         uninstall
+      </button>
+      <button
+        type="button"
+        onClick={(event) => {
+          actions.uninstallWithImportedDatasets(event.currentTarget);
+        }}
+      >
+        uninstall with datasets
       </button>
     </div>
   );
@@ -189,6 +208,7 @@ describe("usePluginInstallationActions", () => {
       defaultOptions: { queries: { retry: false } },
     });
     fakeDatabase.rows = [];
+    mocks.openUninstallPluginModal.mockClear();
   });
 
   it("shows a disabled install to the host's installs query right away", async () => {
@@ -218,5 +238,21 @@ describe("usePluginInstallationActions", () => {
     fireEvent.click(screen.getByText("uninstall"));
 
     expect(await screen.findByText("no installation")).toBeInTheDocument();
+  });
+
+  it("opens the uninstall modal with the install's ids, the button that opened it and the card heading, and deletes nothing", async () => {
+    _seedInstallation({});
+    await _renderAfterFirstLoad();
+
+    fireEvent.click(screen.getByText("uninstall with datasets"));
+
+    expect(mocks.openUninstallPluginModal).toHaveBeenCalledWith({
+      pluginName: "Epidemiology",
+      pluginId: MANIFEST.id,
+      installationId: "00000000-0000-4000-8000-000000000101",
+      opener: screen.getByText("uninstall with datasets"),
+      headingId: "card-heading",
+    });
+    expect(fakeDatabase.rows).toHaveLength(1);
   });
 });

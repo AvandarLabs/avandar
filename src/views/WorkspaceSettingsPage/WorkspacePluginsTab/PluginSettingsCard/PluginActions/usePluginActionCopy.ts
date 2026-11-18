@@ -10,18 +10,28 @@ export type PluginActionCopy = Readonly<{
 }>;
 
 /**
+ * The words of Uninstall. When the lookup of the datasets the plugin imported
+ * failed, its confirmation adds these two sentences, one per paragraph: what
+ * could not be checked, and that every dataset is kept.
+ */
+export type UninstallActionCopy = PluginActionCopy &
+  Readonly<{
+    lookupFailedProblem: string;
+    lookupFailedOutcome: string;
+  }>;
+
+/**
  * The translated button label and confirmation text of every plugin action
  * that asks before it runs, naming the plugin the action applies to. A
  * plugin action button reads its own entry before it asks the user to
- * confirm. For a plugin that bundles datasets, the uninstall confirmation
- * also says that the datasets it imported stay, because uninstalling removes
- * the plugin's features but never the data a workspace now owns.
+ * confirm. A plugin that imported datasets gets the uninstall modal instead
+ * of this confirmation.
  */
 export function usePluginActionCopy(options: {
   pluginName: string;
-  hasBundledContent: boolean;
-}): Record<ConfirmedPluginActionKind, PluginActionCopy> {
-  const { pluginName, hasBundledContent } = options;
+}): Record<Exclude<ConfirmedPluginActionKind, "uninstall">, PluginActionCopy> &
+  Record<"uninstall", UninstallActionCopy> {
+  const { pluginName } = options;
   const { t } = useLingui();
   return {
     review: {
@@ -45,10 +55,10 @@ export function usePluginActionCopy(options: {
     uninstall: {
       label: t`Uninstall`,
       confirmTitle: t`Uninstall ${pluginName}?`,
-      confirmBody: hasBundledContent
-        ? t`Its features are removed from this workspace. The datasets it imported stay in Data Sources.`
-        : t`Its features are removed from this workspace.`,
+      confirmBody: t`Its features are removed from this workspace.`,
       confirmLabel: t`Uninstall`,
+      lookupFailedProblem: t`We could not check for datasets this plugin imported.`,
+      lookupFailedOutcome: t`If you uninstall it now, every dataset it imported is kept.`,
     },
   };
 }

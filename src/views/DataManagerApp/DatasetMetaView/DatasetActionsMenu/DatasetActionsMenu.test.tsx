@@ -2,11 +2,13 @@ import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
+import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-const { navigateMock, permissionState } = vi.hoisted(() => {
+const { navigateMock, notifyErrorMock, permissionState } = vi.hoisted(() => {
   return {
     navigateMock: vi.fn(),
+    notifyErrorMock: vi.fn(),
     permissionState: {
       canEditDictionaries: true,
       canViewDictionaries: true,
@@ -18,8 +20,15 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       isLoadingCombiningCrosswalk: false,
       hasCombiningCrosswalkError: false,
       combiningCrosswalkOptions: undefined as unknown,
+      deleteOptions: undefined as
+        | { onError?: (error: Error) => void }
+        | undefined,
     },
   };
+});
+
+vi.mock("@/utils/notifications/notify", () => {
+  return { notifyError: notifyErrorMock, notifySuccess: vi.fn() };
 });
 
 vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
@@ -90,7 +99,8 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
-      useFullDelete: () => {
+      useFullDelete: (options: { onError?: (error: Error) => void }) => {
+        permissionState.deleteOptions = options;
         return [vi.fn(), false];
       },
       QueryKeys: {
@@ -337,6 +347,19 @@ describe("DatasetActionsMenu", () => {
     await screen.findByRole("menuitem", { name: /Delete Dataset/ });
     expect(permissionState.combiningCrosswalkOptions).toEqual({
       isEnabled: true,
+    });
+  });
+
+  it("tells the user they lack permission when the delete is refused", () => {
+    render(<DatasetActionsMenu dataset={DATASET} />);
+
+    permissionState.deleteOptions?.onError?.(
+      new DatasetDeleteError({ datasetId: DATASET.id, reason: "not_allowed" }),
+    );
+
+    expect(notifyErrorMock).toHaveBeenCalledWith({
+      title: "Dataset not deleted",
+      message: "You don't have permission to delete this dataset, or it has already been deleted.",
     });
   });
 });

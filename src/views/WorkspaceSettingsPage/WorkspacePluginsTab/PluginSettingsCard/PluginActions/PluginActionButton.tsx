@@ -1,8 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
-import { Button, Text } from "@mantine/core";
+import { Button, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { usePluginActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
-import type { ConfirmedPluginActionKind } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type {
+  ConfirmedPluginActionKind,
+  ImportedDatasetsState,
+} from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
+import type { UninstallActionCopy } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 import type { ButtonProps } from "@mantine/core";
 
@@ -14,8 +18,12 @@ type Props = Readonly<{
   headingId: string;
   isDisabled: boolean;
 
-  /** Whether the plugin's manifest bundles datasets that it imports. */
-  hasBundledContent: boolean;
+  /**
+   * What the card knows about the datasets the plugin imported. Uninstall is
+   * disabled while it loads, opens the uninstall modal when there are some,
+   * and confirms an uninstall that keeps every dataset when the lookup failed.
+   */
+  importedDatasets: ImportedDatasetsState;
   actions: PluginInstallationActions;
 }>;
 
@@ -45,32 +53,67 @@ function _makeOnConfirmByKind(
   };
 }
 
+/** The sentences Uninstall adds when the datasets could not be looked up. */
+function _listLookupFailedNotes(copy: UninstallActionCopy): string[] {
+  return [copy.lookupFailedProblem, copy.lookupFailedOutcome];
+}
+
+/** The paragraphs of a confirmation: its body, then any extra notes. */
+function ConfirmParagraphs({
+  paragraphs,
+}: Readonly<{ paragraphs: readonly string[] }>): JSX.Element {
+  return (
+    <Stack gap="xs">
+      {paragraphs.map((paragraph) => {
+        return (
+          <Text key={paragraph} size="sm">
+            {paragraph}
+          </Text>
+        );
+      })}
+    </Stack>
+  );
+}
+
 /**
  * One action button on a plugin's settings card. Clicking it opens a
  * confirmation, and the action runs only once the user confirms, because
  * every action changes the plugin for every member of the workspace.
+ * Uninstall of a plugin that imported datasets opens the uninstall modal
+ * instead, which is its own confirmation. When the lookup of imported
+ * datasets failed, Uninstall confirms an uninstall that keeps every dataset.
  */
 export function PluginActionButton({
   kind,
   pluginName,
   headingId,
   isDisabled,
-  hasBundledContent,
+  importedDatasets,
   actions,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const copy = usePluginActionCopy({ pluginName, hasBundledContent })[kind];
+  const copies = usePluginActionCopy({ pluginName });
+  const copy = copies[kind];
+  const isUninstall = kind === "uninstall";
   const style = STYLE_BY_KIND[kind];
+  const paragraphs =
+    isUninstall && importedDatasets === "failed"
+      ? [copy.confirmBody, ..._listLookupFailedNotes(copies.uninstall)]
+      : [copy.confirmBody];
   return (
     <Button
       size="compact-sm"
       {...style}
       aria-describedby={headingId}
-      disabled={isDisabled}
-      onClick={() => {
+      disabled={isDisabled || (isUninstall && importedDatasets === "loading")}
+      onClick={(event) => {
+        if (isUninstall && importedDatasets === "some") {
+          actions.uninstallWithImportedDatasets(event.currentTarget);
+          return;
+        }
         modals.openConfirmModal({
           title: copy.confirmTitle,
-          children: <Text size="sm">{copy.confirmBody}</Text>,
+          children: <ConfirmParagraphs paragraphs={paragraphs} />,
           labels: { confirm: copy.confirmLabel, cancel: t`Cancel` },
           confirmProps: { color: style.color },
           onConfirm: _makeOnConfirmByKind(actions)[kind],

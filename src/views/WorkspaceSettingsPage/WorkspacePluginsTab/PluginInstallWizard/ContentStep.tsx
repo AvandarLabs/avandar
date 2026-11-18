@@ -4,7 +4,7 @@ import { getOwnValue } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/g
 import { InstallWizardStepHeading } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/InstallWizardStepHeading";
 import { useLocalizePluginText } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useLocalizePluginText";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
-import type { ImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent";
+import type { ImportedPluginContent } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/pluginContent/useImportedPluginContent/useImportedPluginContent";
 
 type Props = Readonly<{
   manifestModule: PluginManifestModule;
