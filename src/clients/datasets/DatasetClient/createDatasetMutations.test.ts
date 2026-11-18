@@ -8,6 +8,7 @@ import type { ILogger } from "@avandar/logger";
 const mocks = vi.hoisted(() => {
   return {
     rpcMock: vi.fn(),
+    canAccessResourceMock: vi.fn(),
     deleteParquetMock: vi.fn(),
     deleteOriginalFileMock: vi.fn(),
     getLocalDatasetMock: vi.fn(),
@@ -23,6 +24,10 @@ vi.mock("$/ServerApiClient", () => {
       return { rpc: mocks.rpcMock };
     },
   };
+});
+
+vi.mock("@/clients/UserClient", () => {
+  return { UserClient: { canAccessResource: mocks.canAccessResourceMock } };
 });
 
 vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
@@ -196,7 +201,7 @@ describe("fullDelete", () => {
     Object.values(mocks).forEach((mock) => {
       mock.mockReset();
     });
-    _recordCall("canAccess", mocks.rpcMock, true);
+    _recordCall("canAccess", mocks.canAccessResourceMock, true);
     _recordCall("deleteParquet", mocks.deleteParquetMock, undefined);
     _recordCall("deleteOriginal", mocks.deleteOriginalFileMock, undefined);
     _recordCall("deleteRow", deleteRowMock, undefined);
@@ -218,15 +223,16 @@ describe("fullDelete", () => {
     ]);
   });
 
-  it("asks the platform server API for admin access to the dataset", async () => {
-    // Through `serverApi`, not the webview's Supabase client: on desktop the
-    // webview holds no session and only the main process carries the token.
+  it("asks for admin access to the dataset through the user client", async () => {
+    // `UserClient.canAccessResource` goes through the platform server API,
+    // never the webview's Supabase client: on desktop the webview holds no
+    // session and only the main process carries the token.
     await _fullDelete();
 
-    expect(rpcMock).toHaveBeenCalledWith("util__auth_user_can_access_resource", {
-      p_resource_type: "dataset",
-      p_resource_id: datasetId,
-      p_min_role: "admin",
+    expect(mocks.canAccessResourceMock).toHaveBeenCalledWith({
+      resourceType: "dataset",
+      resourceId: datasetId,
+      minRole: "admin",
     });
   });
 
@@ -234,7 +240,7 @@ describe("fullDelete", () => {
     // A pdf dataset, so the retained original is in play and a check moved
     // after its deletion would turn this red.
     _stubRowReads({ sourceType: "pdf_file" });
-    _recordCall("canAccess", mocks.rpcMock, false);
+    _recordCall("canAccess", mocks.canAccessResourceMock, false);
 
     await expect(_fullDelete()).rejects.toMatchObject({
       name: "DatasetDeleteError",
@@ -246,7 +252,7 @@ describe("fullDelete", () => {
 
   it("leaves Storage and the row alone when the access check itself fails", async () => {
     _stubRowReads({ sourceType: "pdf_file" });
-    mocks.rpcMock.mockImplementation(async () => {
+    mocks.canAccessResourceMock.mockImplementation(async () => {
       callOrder.push("canAccess");
       throw new Error("rpc unavailable");
     });
@@ -349,7 +355,7 @@ describe("fullDelete", () => {
 
     await _fullDelete();
 
-    expect(rpcMock).not.toHaveBeenCalled();
+    expect(mocks.canAccessResourceMock).not.toHaveBeenCalled();
     expect(mocks.deleteParquetMock).not.toHaveBeenCalled();
     expect(deleteRowMock).toHaveBeenCalledTimes(1);
   });

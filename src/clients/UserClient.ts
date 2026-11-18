@@ -5,6 +5,7 @@ import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
 import { z } from "zod";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import { createServerApiClient } from "$/ServerApiClient";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import { Tables } from "$/types/database.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
@@ -21,6 +22,10 @@ import type {
 import type { Database } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
+
+// Platform-aware server API client: on web it is the same Supabase client, on
+// desktop it goes through the main process, which carries the access token.
+const serverApi = createServerApiClient();
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -192,7 +197,10 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
 
         /**
          * Returns whether the auth user can access a resource at a minimum
-         * role. Wraps the SQL helper `util__auth_user_can_access_resource`.
+         * role. Wraps the SQL helper `util__auth_user_can_access_resource`,
+         * called through the platform server API so it carries the user's
+         * session on desktop as well as on web. A failed call throws and is
+         * never read as "no access".
          *
          * Used by the route middleware `resourceFallback` so a user who only
          * has share-derived access on a dataset or dashboard can still load
@@ -214,7 +222,10 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             minRole,
           });
 
-          const { data, error } = await dbClient.rpc(
+          // Through `serverApi`, not `dbClient`: on desktop the webview's
+          // Supabase client holds no session, so its RPC would run as `anon`,
+          // which may not execute this function.
+          const canAccess = await serverApi.rpc<boolean | null>(
             "util__auth_user_can_access_resource",
             {
               p_resource_type: resourceType,
@@ -223,11 +234,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             },
           );
 
-          if (error) {
-            throw new Error(error.message);
-          }
-
-          return data ?? false;
+          return canAccess ?? false;
         },
 
         /**
