@@ -236,6 +236,7 @@ export function useAvandarChatRuntime(): {
     contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
     agentAccessDenied: t`Answering data questions needs access to the Data Explorer in this workspace.`,
     agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
+    chartNotBuilt: t`I couldn't build that chart. Its query kept failing.`,
   });
   const [initialMessages] = useState(() => {
     const selectedId = sessions?.index.selectedId;
@@ -308,6 +309,7 @@ export function useAvandarChatRuntime(): {
         contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
         agentAccessDenied: t`Answering data questions needs access to the Data Explorer in this workspace.`,
         agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
+        chartNotBuilt: t`I couldn't build that chart. Its query kept failing.`,
       };
     },
     [

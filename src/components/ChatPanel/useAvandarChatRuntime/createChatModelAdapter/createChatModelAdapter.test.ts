@@ -128,6 +128,7 @@ vi.mock(
 const OFFLINE_MODEL_REQUIRED = "Download the offline models first.";
 const AGENT_ACCESS_DENIED = "Needs Data Explorer access.";
 const AGENT_UNAVAILABLE = "Could not answer.";
+const CHART_NOT_BUILT = "Could not build that chart.";
 
 function _createAdapter(
   app: ChatPageContext.T["app"],
@@ -152,6 +153,7 @@ function _createAdapter(
       offlineModelRequired: OFFLINE_MODEL_REQUIRED,
       agentAccessDenied: AGENT_ACCESS_DENIED,
       agentUnavailable: AGENT_UNAVAILABLE,
+      chartNotBuilt: CHART_NOT_BUILT,
     }),
     dataExplorerDispatch: {},
     dashboardEditorDispatch: {},
@@ -401,6 +403,14 @@ describe("createChatModelAdapter with the agent on", () => {
       queuePendingBlock,
     );
     expect(turn.sessionId).toBe("s-1");
+  });
+
+  it("gives the agent the translated chart-not-built copy", async () => {
+    await _ask(_createAdapter("dashboards"));
+
+    expect(runDataAgentTurnMock.mock.calls[0]![0].copy).toEqual({
+      chartNotBuilt: CHART_NOT_BUILT,
+    });
   });
 
   it("keeps a stored case id out of the agent's messages", async () => {

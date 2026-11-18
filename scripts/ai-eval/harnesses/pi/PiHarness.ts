@@ -307,6 +307,10 @@ function _createPolicy(
   };
 }
 
+/** What the eval records when the agent could not build a chart. */
+const CHART_NOT_BUILT_TEXT =
+  "I couldn't build that chart. Its query kept failing.";
+
 /** What a finished answer produced, in the eval's shape. */
 function _toEvalAnswer(
   reply: DataAgentReply,
@@ -324,7 +328,8 @@ function _toEvalAnswer(
       : recorder.dashboardWrites.length > 0
         ? undefined
         : "Answered in text without running a query",
-    assistantText: reply.text,
+    assistantText:
+      reply.failure === "chart_not_built" ? CHART_NOT_BUILT_TEXT : reply.text,
     clarifications: reply.state.questions.map((record) => {
       return {
         kind: record.kind === "values" ? "discovery" : "fixed_options",

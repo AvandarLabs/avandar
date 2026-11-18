@@ -9,6 +9,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
@@ -86,6 +87,11 @@ export type DataAgentTurnOptions = {
   };
   /** The chat session the turn belongs to, for its dashboard cards. */
   sessionId?: string;
+  /**
+   * The words for replies the agent has none for, already translated.
+   * `chartNotBuilt` is the reply when a dashboard chart's query kept failing.
+   */
+  copy: Pick<ChatRuntimeCopy, "chartNotBuilt">;
   /**
    * True once the chat moved on (a reset or another session) and the turn's
    * reply will be thrown away. Then nothing about the reply is recorded.

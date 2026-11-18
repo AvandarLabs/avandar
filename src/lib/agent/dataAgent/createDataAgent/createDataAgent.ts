@@ -65,10 +65,23 @@ export type DataAgentUsage = {
   cost: number;
 };
 
+/**
+ * Why an answer has no text of its own. The code that shows the reply
+ * writes the words, in the user's language.
+ *
+ * - `chart_not_built`: a chart's query kept failing until the query cap.
+ */
+export type DataAgentReplyFailure = "chart_not_built";
+
 /** What one user message produced. */
 export type DataAgentReply = {
-  /** The text to show: the model's reply, or the query summary. */
+  /**
+   * The text to show: the model's reply, or the query summary. Empty when
+   * `failure` is set.
+   */
   text: string;
+  /** Set when the answer failed in a way the reader must be told. */
+  failure?: DataAgentReplyFailure;
   state: DataAgentRunState;
   usage: DataAgentUsage;
   /** Models that answered, in order. */
@@ -128,10 +141,6 @@ function _throwIfModelCallFailed(messages: Agent["state"]["messages"]): void {
   }
 }
 
-/** The reply when a chart's query kept failing until the query cap. */
-const CHART_NOT_BUILT_REPLY =
-  "I couldn't build that chart. Its query kept failing.";
-
 /** Whether the answer ended on a chart whose query cap ran out. */
 function _endedOnFailedChart(
   lastToolNames: readonly string[],
@@ -144,38 +153,69 @@ function _endedOnFailedChart(
   );
 }
 
+function _toolNamesOfLastAssistant(
+  messages: Agent["state"]["messages"],
+): string[] {
+  return (_findLastAssistant(messages)?.content ?? []).flatMap((block) => {
+    return block.type === "toolCall" ? [block.name] : [];
+  });
+}
+
+/**
+ * Why the answer has no text of its own, if it does not: its dashboard
+ * chart could not be built because the query cap ran out. Read with
+ * `getDataAgentReplyText` for every answer, so the code that shows the
+ * reply can write the failure's words in the user's language.
+ */
+export function getDataAgentReplyFailure(
+  messages: Agent["state"]["messages"],
+  state: DataAgentRunState,
+): DataAgentReplyFailure | undefined {
+  return _endedOnFailedChart(_toolNamesOfLastAssistant(messages), state)
+    ? "chart_not_built"
+    : undefined;
+}
+
 /**
  * The reply to show. When the turn ended on a query, the query's summary is
  * the answer; any text the model wrote beside the tool call is narration
  * ("let me run that") written before the query ran. When it ended on a
- * dashboard block, that tool's summary is the reply, or a note that the
- * chart could not be built if its query ran out of attempts.
+ * dashboard block, that tool's summary is the reply. It is empty when the
+ * chart could not be built, which `getDataAgentReplyFailure` reports.
  */
 export function getDataAgentReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
 ): string {
-  const lastAssistant = _findLastAssistant(messages);
-  const lastToolNames = (lastAssistant?.content ?? []).flatMap((block) => {
-    return block.type === "toolCall" ? [block.name] : [];
-  });
+  const lastToolNames = _toolNamesOfLastAssistant(messages);
   const endedOnToolCall = lastToolNames.length > 0;
   if (endedOnToolCall && state.dashboardBlock) {
     return state.dashboardBlock.summary;
   }
   if (_endedOnFailedChart(lastToolNames, state)) {
-    return CHART_NOT_BUILT_REPLY;
+    return "";
   }
   if (endedOnToolCall && state.lastQuery?.outcome.kind === "rows") {
     return state.lastQuery.summary;
   }
-  const text = (lastAssistant?.content ?? [])
+  const text = (_findLastAssistant(messages)?.content ?? [])
     .flatMap((block) => {
       return block.type === "text" ? [block.text] : [];
     })
     .join("\n")
     .trim();
   return text || state.lastQuery?.summary || "";
+}
+
+function _buildReply(
+  messages: Agent["state"]["messages"],
+  run: Pick<DataAgentReply, "state" | "usage" | "modelIds">,
+): DataAgentReply {
+  return {
+    text: getDataAgentReplyText(messages, run.state),
+    failure: getDataAgentReplyFailure(messages, run.state),
+    ...run,
+  };
 }
 
 function _getNoPluginAiTools(): readonly PluginAiToolDeclaration[] {
@@ -372,12 +412,7 @@ export function createDataAgent(
         unsubscribe();
       }
       _throwIfModelCallFailed(agent.state.messages);
-      return {
-        text: getDataAgentReplyText(agent.state.messages, state),
-        state,
-        usage,
-        modelIds,
-      };
+      return _buildReply(agent.state.messages, { state, usage, modelIds });
     },
   };
 }

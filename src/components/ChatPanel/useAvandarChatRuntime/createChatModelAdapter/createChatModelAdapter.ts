@@ -629,6 +629,7 @@ export function createChatModelAdapter(
         currentUser,
         chatGeneration: generation,
         isStale: isGenerationStale,
+        copy: { chartNotBuilt: copyRef.current.chartNotBuilt },
         titleMaskRef,
         parseSqlRef,
         dataExplorerDispatch,

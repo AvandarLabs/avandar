@@ -378,6 +378,19 @@ function _toRunResult(options: Readonly<RunResultOptions>): ChatModelRunResult {
 }
 
 /**
+ * The text of the agent's reply. A reply with no text of its own because
+ * the agent failed to build a chart reads as the turn's translated copy.
+ */
+function _replyTextOf(
+  reply: Awaited<ReturnType<DataAgentConversation["dataAgent"]["ask"]>>,
+  turn: Readonly<DataAgentTurnOptions>,
+): string {
+  return reply.failure === "chart_not_built"
+    ? turn.copy.chartNotBuilt
+    : reply.text;
+}
+
+/**
  * Tells the turn's inputs the agent replied, unless the reply is being
  * discarded. A discarded reply leaves nothing in the thread, so the agent
  * must hear about its cards again on the next turn.
@@ -439,7 +452,7 @@ export async function askConversationDataAgent(
   conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
   conversation.lastAttachedBlock = blocks.attachedBlock;
   return _toRunResult({
-    replyText: reply.text,
+    replyText: _replyTextOf(reply, turn),
     inputs,
     results,
     dashboardCards,

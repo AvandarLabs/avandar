@@ -9524,6 +9524,10 @@ msgstr "为这些记录选择状态。"
 msgid "Inactive"
 msgstr "未激活"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I couldn't build that chart. Its query kept failing."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"

@@ -4,6 +4,7 @@ import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import {
   createDataAgent,
   createDataAgentToolList,
+  getDataAgentReplyFailure,
   getDataAgentReplyText,
 } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
@@ -447,14 +448,24 @@ describe("getDataAgentReplyText", () => {
     );
   });
 
-  it("says the chart could not be built when its query cap ran out", () => {
+  it("marks the chart as not built when its query cap ran out", () => {
     const state = createDataAgentRunState();
     state.queryRuns = 3;
     state.needsEscalation = true;
+    const messages = _endedOn("add_dashboard_block");
 
-    expect(getDataAgentReplyText(_endedOn("add_dashboard_block"), state)).toBe(
-      "I couldn't build that chart. Its query kept failing.",
-    );
+    expect(getDataAgentReplyFailure(messages, state)).toBe("chart_not_built");
+    expect(getDataAgentReplyText(messages, state)).toBe("");
+  });
+
+  it("marks no failure when the dashboard tool placed its block", () => {
+    const state = createDataAgentRunState();
+    state.queryRuns = 3;
+    state.dashboardBlock = { summary: "Added a chart." };
+
+    expect(
+      getDataAgentReplyFailure(_endedOn("add_dashboard_block"), state),
+    ).toBeUndefined();
   });
 
   it("keeps the model's text while the chart query may still be retried", () => {
@@ -464,6 +475,9 @@ describe("getDataAgentReplyText", () => {
     expect(getDataAgentReplyText(_endedOn("add_dashboard_block"), state)).toBe(
       "Let me add that.",
     );
+    expect(
+      getDataAgentReplyFailure(_endedOn("add_dashboard_block"), state),
+    ).toBeUndefined();
   });
 });
 
@@ -523,16 +537,19 @@ function _addHeading(summary: string): ScriptedToolCall {
 }
 
 describe("createDataAgent across several asks", () => {
-  function _createDashboardAgent(script: readonly ScriptedToolCall[]) {
+  function _createDashboardAgent(
+    script: readonly ScriptedToolCall[],
+    checkOutcome: Awaited<
+      ReturnType<NonNullable<DataAgentHost["checkQuery"]>>
+    > = { kind: "rows", columns: [], rowCount: 2 },
+  ) {
     const host: DataAgentHost = {
       ...HOST,
       approveValuesForModel: vi.fn().mockResolvedValue(true),
       showQuery: vi
         .fn()
         .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
-      checkQuery: vi
-        .fn()
-        .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      checkQuery: vi.fn().mockResolvedValue(checkOutcome),
       addDashboardBlock: vi.fn().mockResolvedValue({ kind: "added_to_editor" }),
     };
     const dataAgent = createDataAgent({
@@ -557,6 +574,31 @@ describe("createDataAgent across several asks", () => {
 
     expect(host.addDashboardBlock).toHaveBeenCalledTimes(2);
     expect(second.text).toBe("Added the second heading.");
+  });
+
+  it("carries a chart-not-built marker, not text, when the chart's query keeps failing", async () => {
+    const chart: ScriptedToolCall = {
+      name: "add_dashboard_block",
+      arguments: {
+        dashboard: "COVID 2022",
+        block: {
+          kind: "DataViz",
+          prompt: "Deaths",
+          sql: "SELECT 1",
+          vizType: "bar",
+        },
+        summary: "Added a chart.",
+      },
+    };
+    const { dataAgent } = _createDashboardAgent([chart, chart, chart], {
+      kind: "failed",
+      error: "bad column",
+    });
+
+    const reply = await dataAgent.ask("Add a chart");
+
+    expect(reply.failure).toBe("chart_not_built");
+    expect(reply.text).toBe("");
   });
 
   it("does not reply with an earlier answer's block summary", async () => {

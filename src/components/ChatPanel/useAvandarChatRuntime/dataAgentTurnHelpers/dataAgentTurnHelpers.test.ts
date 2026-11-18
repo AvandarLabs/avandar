@@ -68,6 +68,7 @@ function _createTurnOptions(): DataAgentTurnOptions {
       setActiveVizType: vi.fn(),
     } as unknown as DataAgentTurnOptions["dataExplorerDispatch"],
     chatPanelDispatch: {} as DataAgentTurnOptions["chatPanelDispatch"],
+    copy: { chartNotBuilt: "Chart not built." },
   };
 }
 
@@ -532,6 +533,36 @@ describe("askConversationDataAgent", () => {
       }, onReplied);
 
       expect(onReplied).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when the agent could not build the chart", () => {
+    function _askWithChartFailure(failure: "chart_not_built" | undefined) {
+      const conversation = _fakeConversation(async () => {
+        return { text: failure ? "" : "Here it is.", failure };
+      });
+      return askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", conversation]]),
+        turn: {
+          ..._turn("Add a chart"),
+          copy: { chartNotBuilt: "Translated: chart not built." },
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    it("shows the translated copy as the reply", async () => {
+      const reply = await _askWithChartFailure("chart_not_built");
+
+      expect(reply.content).toEqual([
+        { type: "text", text: "Translated: chart not built." },
+      ]);
+    });
+
+    it("leaves an ordinary reply as the agent wrote it", async () => {
+      const reply = await _askWithChartFailure(undefined);
+
+      expect(reply.content).toEqual([{ type: "text", text: "Here it is." }]);
     });
   });
 

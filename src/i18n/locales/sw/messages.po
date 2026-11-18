@@ -9936,6 +9936,10 @@ msgstr "Chagua hali ya rekodi hizi."
 msgid "Inactive"
 msgstr "Isiyotumika"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I couldn't build that chart. Its query kept failing."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
