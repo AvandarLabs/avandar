@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { buildAgentTurnInputs } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/buildAgentTurnInputs";
@@ -111,6 +111,25 @@ describe("buildAgentTurnInputs", () => {
     first.onReplied?.();
 
     expect(buildAgentTurnInputs(options).dashboardCardLines).toEqual([]);
+  });
+
+  it("writes nothing and notifies no card after a reply with no card to report", () => {
+    const onWrite = vi.fn();
+    const unsubscribe = AgentDashboardCardStore.subscribe(onWrite);
+    const inputs = buildAgentTurnInputs({
+      conversation: _conversation(),
+      datasets: DATASETS,
+      pageContext: undefined,
+      turn: _turn(),
+      privacy: "hosted",
+    });
+
+    inputs.onReplied?.();
+    unsubscribe();
+
+    expect(inputs.dashboardCardLines).toEqual([]);
+    expect(onWrite).not.toHaveBeenCalled();
+    expect(window.localStorage.length).toBe(0);
   });
 
   describe("names that hold a personal value", () => {

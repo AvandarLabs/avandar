@@ -208,9 +208,10 @@ function _cardIdentityOf(
 
 /**
  * One line per card the user resolved since the agent last heard, and a
- * callback that marks them heard once the agent has replied. A hosted
- * turn's name that looks personal on its own is replaced, since the user
- * may have picked a name the model never saw.
+ * callback that marks them heard once the agent has replied. With no such
+ * card there is no callback, so a reply writes nothing to the card store. A
+ * hosted turn's name that looks personal on its own is replaced, since the
+ * user may have picked a name the model never saw.
  */
 function _dashboardCardInputs(
   turn: Readonly<DataAgentTurnOptions>,
@@ -226,6 +227,9 @@ function _dashboardCardInputs(
       : options.mask(name);
   };
   const unreported = AgentDashboardCardStore.listUnreported(identity);
+  if (unreported.length === 0) {
+    return { dashboardCardLines: [] };
+  }
   return {
     dashboardCardLines: unreported.map(({ status }) => {
       return formatDashboardCardLine(
