@@ -249,4 +249,37 @@ describe("runOfflineDataAgentTurn", () => {
     expect(askedText.startsWith("<current_page>")).toBe(true);
     expect(askedText).toContain("COVID 2022");
   });
+
+  it("sends a plain question on an empty Data Explorer with no page block", async () => {
+    await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 9 }),
+      _onPage({ app: "data-explorer", explorer: { resultColumns: [] } }),
+    );
+
+    expect(askMock.mock.calls[0]![0]).toBe("How many cases?");
+  });
+
+  it("sends a follow-up the query on screen, then an unchanged line", async () => {
+    const turn = _createTurnOptions({ chatGeneration: 10 });
+    const withQuery: AgentPageContext = {
+      app: "data-explorer",
+      explorer: {
+        sql: 'SELECT SUM("cases") FROM "t0"',
+        resultColumns: [{ name: "sum", dataType: "bigint" }],
+      },
+    };
+
+    await runOfflineDataAgentTurn(
+      turn,
+      _onPage({ app: "data-explorer", explorer: { resultColumns: [] } }),
+    );
+    await runOfflineDataAgentTurn(turn, _onPage(withQuery));
+    await runOfflineDataAgentTurn(turn, _onPage(withQuery));
+
+    expect(askMock.mock.calls[0]![0]).not.toContain("<current_page>");
+    expect(askMock.mock.calls[1]![0]).toContain("Query on screen:");
+    expect(askMock.mock.calls[2]![0]).toContain(
+      "<current_page>Unchanged since the last message.</current_page>",
+    );
+  });
 });

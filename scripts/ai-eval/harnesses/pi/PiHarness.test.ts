@@ -743,4 +743,47 @@ describe("createPiConversation with a default page", () => {
       "<current_page>Unchanged since the last message.</current_page>\n\nand last year?",
     );
   });
+
+  it("sends a device conversation no page block while the Data Explorer shows nothing", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and last year?" });
+
+    expect(asked).toEqual(["How many cases?", "and last year?"]);
+  });
+
+  it("sends a device follow-up the query its last answer left on screen", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "cases", type: "BIGINT" }], rows: [[42]] },
+    });
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      defaultPage: "data-explorer",
+      createAgent: (host) => {
+        return _createQueryingAgent(host, asked, "SELECT 42 AS cases");
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and by month?" });
+    await conversation.ask({ ...QUESTION, prompt: "and by week?" });
+
+    expect(asked[0]).toBe("How many cases?");
+    expect(asked[1]).toContain("Query on screen: SELECT 42 AS cases");
+    expect(asked[2]).toContain(
+      "<current_page>Unchanged since the last message.</current_page>",
+    );
+  });
 });

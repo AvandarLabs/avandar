@@ -8,6 +8,7 @@ import {
   buildAgentGadgetModelName,
 } from "$/agent/mentions/buildAgentContextBlocks";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { omitEmptyPageBlock } from "$/agent/pageContext/omitEmptyPageBlock/omitEmptyPageBlock";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { AgentDashboardCardStore } from "@/components/ChatPanel/AgentDashboardCardStore/AgentDashboardCardStore";
 import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
@@ -156,11 +157,25 @@ function _redactEarlierMentionSql(
 }
 
 /**
+ * The blocks with the page block left out when it is the empty Data
+ * Explorer's and the model has not been told of anything else on screen.
+ */
+function _leaveOutEmptyPageBlock(
+  blocks: AgentContextBlocks,
+  previousPageBlock: string | undefined,
+): AgentContextBlocks {
+  const { pageBlock, ...otherBlocks } = blocks;
+  const kept = omitEmptyPageBlock({ pageBlock, previousPageBlock });
+  return kept === undefined ? otherBlocks : { ...otherBlocks, pageBlock: kept };
+}
+
+/**
  * The page, attached, and mentioned blocks in one redaction pass through
  * the conversation's vault. Mentions come from the message being answered.
  * Nothing is attached or mentioned when the gadgets failed to load. The SQL
  * of gadgets earlier messages mention is redacted first, so their recap
- * names are masked too.
+ * names are masked too. A device turn sends no page block for a Data
+ * Explorer that shows nothing, since a small offline model cannot use it.
  */
 function _buildBlocks(
   options: Readonly<TurnInputsOptions>,
@@ -182,7 +197,7 @@ function _buildBlocks(
   if (isHosted) {
     _redactEarlierMentionSql(options.turn, question, redactSql);
   }
-  return buildAgentContextBlocks({
+  const blocks = buildAgentContextBlocks({
     page: options.pageContext,
     attached: isLoaded ? gadgetContext.attachedRefs.map(toContext) : [],
     mentioned: isLoaded
@@ -194,6 +209,9 @@ function _buildBlocks(
     maskText: isHosted ? sqlVault.maskText : undefined,
     maxSqlTiles: isHosted ? undefined : OFFLINE_SQL_TILE_BUDGET,
   });
+  return isHosted
+    ? blocks
+    : _leaveOutEmptyPageBlock(blocks, options.conversation.lastPageBlock);
 }
 
 /** The session the turn's dashboard cards belong to, when it is known. */

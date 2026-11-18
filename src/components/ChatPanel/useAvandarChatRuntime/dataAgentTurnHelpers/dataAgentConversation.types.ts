@@ -132,7 +132,11 @@ export type DataAgentConversation = AgentConversationState & {
    * so every page block in this conversation is built from this same list.
    */
   datasets: readonly DataAgentDataset[];
-  /** The page block sent last, to send "unchanged" instead of repeats. */
+  /**
+   * The page block last sent in full, to send "unchanged" instead of
+   * repeats. An empty Data Explorer's block that a device turn left out is
+   * not recorded.
+   */
   lastPageBlock?: string;
   /**
    * The attached block built last turn, to send "unchanged" or "cleared"

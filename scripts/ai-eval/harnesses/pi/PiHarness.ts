@@ -7,6 +7,7 @@ import {
 } from "$/agent/mentions/buildAgentContextBlocks";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
+import { omitEmptyPageBlock } from "$/agent/pageContext/omitEmptyPageBlock/omitEmptyPageBlock";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import {
   detectPii,
@@ -577,6 +578,23 @@ function _readExplorerFromAnswer(
   };
 }
 
+/**
+ * The page block a turn sends. A device conversation leaves out an empty
+ * Data Explorer's, as the app's device turns do, and a hosted one always
+ * sends it.
+ */
+function _getPageBlockToSend(
+  state: Readonly<PiConversationState>,
+  blocks: AgentContextBlocks,
+): string | undefined {
+  return state.privacy === "device"
+    ? omitEmptyPageBlock({
+        pageBlock: blocks.pageBlock,
+        previousPageBlock: state.lastPageBlock,
+      })
+    : blocks.pageBlock;
+}
+
 /** Asks one question in the conversation and records how it went. */
 async function _askPiQuestion(
   state: PiConversationState,
@@ -588,18 +606,19 @@ async function _askPiQuestion(
   const startedAt = performance.now();
   const firstMessageIndex = dataAgent.agent.state.messages.length;
   const inputs = _buildTurnInputs(shown, state.vault, state.privacy);
+  const pageBlock = _getPageBlockToSend(state, inputs.blocks);
   try {
     const reply = await dataAgent.ask(
       buildAgentTurnText({
         message: ChatMentionToken.toModelText(shown.prompt, inputs.nameOf),
-        pageBlock: inputs.blocks.pageBlock,
+        pageBlock,
         previousPageBlock: state.lastPageBlock,
         attachedBlock: inputs.blocks.attachedBlock,
         previousAttachedBlock: state.lastAttachedBlock,
         mentionedBlock: inputs.blocks.mentionedBlock,
       }),
     );
-    state.lastPageBlock = inputs.blocks.pageBlock ?? state.lastPageBlock;
+    state.lastPageBlock = pageBlock ?? state.lastPageBlock;
     state.lastAttachedBlock = inputs.blocks.attachedBlock;
     const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
     const answer = _toEvalAnswer(reply, recorder, startedAt, toolNames);

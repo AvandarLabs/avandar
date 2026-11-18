@@ -86,6 +86,56 @@ describe("buildAgentTurnInputs", () => {
     expect(sqlCount - 1).toBe(3);
   });
 
+  describe("a Data Explorer page that shows nothing", () => {
+    const EMPTY_EXPLORER_PAGE = {
+      app: "data-explorer" as const,
+      explorer: { resultColumns: [] },
+    };
+    const QUERY_PAGE = {
+      app: "data-explorer" as const,
+      explorer: {
+        sql: 'SELECT SUM("deaths") FROM "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa"',
+        resultColumns: [{ name: "sum", dataType: "bigint" }],
+      },
+    };
+
+    function _pageBlock(
+      privacy: "hosted" | "device",
+      pageContext: typeof EMPTY_EXPLORER_PAGE | typeof QUERY_PAGE,
+      lastPageBlock?: string,
+    ): string | undefined {
+      return buildAgentTurnInputs({
+        conversation: { ..._conversation(), lastPageBlock },
+        datasets: DATASETS,
+        pageContext,
+        turn: _turn(),
+        privacy,
+      }).blocks.pageBlock;
+    }
+
+    it("sends a device turn no page block", () => {
+      expect(_pageBlock("device", EMPTY_EXPLORER_PAGE)).toBeUndefined();
+    });
+
+    it("sends a hosted turn its page block", () => {
+      expect(_pageBlock("hosted", EMPTY_EXPLORER_PAGE)).toBe(
+        "<current_page>\nPage: Data Explorer\n</current_page>",
+      );
+    });
+
+    it("sends a device turn the block of a Data Explorer that shows a query", () => {
+      expect(_pageBlock("device", QUERY_PAGE)).toContain("Query on screen:");
+    });
+
+    it("sends a device turn the empty block once the model last heard of a query on screen", () => {
+      const lastBlock = _pageBlock("device", QUERY_PAGE);
+
+      expect(_pageBlock("device", EMPTY_EXPLORER_PAGE, lastBlock)).toBe(
+        "<current_page>\nPage: Data Explorer\n</current_page>",
+      );
+    });
+  });
+
   it("sends each resolved card once, after the reply", () => {
     AgentDashboardCardStore.setStatus(IDENTITY, "card-1", {
       status: "confirmed",
