@@ -499,6 +499,13 @@ and "wording 3" are the three prompt iterations, quoted below.
 | phase-1d:agent-45-fix3 | The 45, wording 3 | 45/45 | 44 or 45: **met** |
 | phase-1d:diag-d04-fix3 (10 runs) | D04 alone, wording 3 | 7/10 | A diagnostic, no bar |
 | phase-1d:diag-d04-v6 (10 runs) | D04 alone, committed v6 without wording 3 | 3/10 | A diagnostic, no bar |
+| phase-1d:d04-fix-a (10 runs) | D04 alone, wording A | 9/10 | D04 10/10, or 9/10 with one explained miss: **met** |
+| phase-1d:agent-dashboards-d04a (3 runs) | D, wording A | 8/9, 8/9, 9/9 (D04) | Every D run 9/9: **missed** |
+| phase-1d:agent-page-d04a | P, wording A | 7/7 | P 7/7: **met** |
+| phase-1d:p04-d04a (10 runs) | P04, wording A | 10/10 | P04 10/10: **met** |
+| phase-1d:agent-mentions-d04a | M, wording A | 7/7 | M 7/7: **met** |
+| phase-1d:agent-45-d04a | The 45, wording A | 44/45 (N11) | 44 or 45: **met** |
+| phase-1d:d04-fix-b (10 runs) | D04 alone, wording B | 8/10 | D04 10/10, or 9/10 with one explained miss: **missed** |
 | phase-1d:offline-45-tool-gate | Offline 45, the dashboard tool only on dashboard turns | 30/45 | 26 or better: **met** |
 | phase-1d:offline-dashboards-tool-gate | Offline D | 6/9 | D05 and D08 write nothing, every write outside the editor has `via: "card"`: **met** |
 
@@ -585,6 +592,39 @@ and "wording 3" are the three prompt iterations, quoted below.
   or grader was changed for it. The options are a rule against taking a
   period from a dashboard's title, or a question wording that names "overall"
   (the D05 precedent).
+- **Two wordings for D04 were tried and not kept.** Each is a bullet right
+  after the DataViz bullet in DASHBOARD BLOCKS, with no "it", no place name,
+  and no year. Wording A:
+
+  ```text
+  - A dashboard's name or title is a label, not a filter. Build a chart or table from the user's words with only the filters and period they asked for, and no period when they named none, unless they refer to the dashboard's own period or to a chart on the page. A chart copied from the page keeps its own filters.
+  ```
+
+  D04 alone scored 9/10 (the miss added the year "so it matches the
+  dashboard's year"), P04 10/10, P 7/7, M 7/7, and the 45 44/45 (N11). The D
+  set then missed D04 in 2 of 3 runs (8/9, 8/9, 9/9), both times with the
+  year in the title and the filter, so "every D run 9/9" failed. That is 3
+  misses in 13 runs of D04 against 7 in 13 on committed v6. Wording B:
+
+  ```text
+  - A dashboard's name, title, and charts are labels, not filters. Never copy their year or place into a chart or table you build from the user's words: use only the filters and period the user asked for, and all dates when they named no period, even when the dashboard is about one year. Take a period from the dashboard or from a chart on the page only when the user refers to that period. A chart copied from the page keeps its own filters.
+  ```
+
+  D04 alone scored 8/10. Neither miss added a year: both said "using all
+  dates ... since you named no period". Both dropped the "Unassigned" and
+  "Out of <state>" county rows from the totals (`"Admin2" <> 'Unassigned'`),
+  which the SQL rules say to keep, so row 3 was not Florida. No suite ran on
+  wording B, because D04 alone missed the gate, and the two iterations
+  allowed for D04 were used. The prompt in the tree is the one committed in
+  `5a508a3c2`. **Root cause, a reading of the answers:** D04 has two
+  independent failure modes. Taking the year from the dashboard's title is
+  the common one on committed v6 (6 of the 7 misses in ten runs), and
+  wording B removed it (0 of 10 runs added a year). What is left is the
+  model dropping the "Unassigned" and "Out of" rows from a ranking, which
+  showed up in 2 of 10 runs on wording B, in 1 of 11 on wording 1, and in 0
+  of 10 on committed v6. A third wording would pair wording B with a sentence
+  that a ranking or a total over the data keeps the "Unassigned" and "Out of
+  <state>" rows, in the same bullet. It was not tried.
 - **Offline: the dashboard tool only on a turn that can use it (`a68dac7f8`).**
   The offline agent lists `add_dashboard_block` only on a turn with context
   blocks or a dashboard named in the message, the condition that already
@@ -620,11 +660,13 @@ and "wording 3" are the three prompt iterations, quoted below.
   block, D08 and D09 asked twice and ended with no reply and no block, and D07
   asked once. D05 and D08 wrote nothing, D01 to D03 wrote through the editor,
   and D06 and D07 wrote through the card.
-- **Cost.** The 73 online runs cost $0.0754: wording 1 $0.0329 (P04 $0.0042,
+- **Cost.** The 109 online runs cost $0.1082: wording 1 $0.0329 (P04 $0.0042,
   P $0.0017, M $0.0016, the 45 $0.0134, D $0.0062, the diagnostic $0.0058),
-  wording 2 $0.0036, and wording 3 $0.0389 (P04 $0.0039, the two D sets
+  wording 2 $0.0036, wording 3 $0.0389 (P04 $0.0039, the two D sets
   $0.0063 and $0.0061, P $0.0017, M $0.0016, the 45 $0.0135, the D04
-  diagnostics $0.0058). The two offline runs cost $0.
+  diagnostics $0.0058), wording A $0.0298 (D04 $0.0031, D $0.0063, P $0.0017,
+  P04 $0.0033, M $0.0016, the 45 $0.0138), and wording B $0.0030. The two
+  offline runs cost $0.
 
 **Earlier runs on the first-numbered prompt (v4), kept as history.** They
 ran on 2026-11-17, before the rebase, with the dashboard prompt as first
