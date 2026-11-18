@@ -52,8 +52,11 @@ and implementation, in order.
   Every write outside the open editor used the confirm card.
 - **D08 grader.** `NOT_FOUND_PATTERN` misses "don't have", so a correct "I
   don't have a dashboard named ..." reply fails the grader.
-- **Unmasked text.** A hosted turn does not unmask the dashboard `summary` or
-  free-text replies.
+- **Unmasked text.** Updated 2026-11-18: a hosted turn shows real values in
+  its replies, a query's summary, and a question card's text and option
+  labels (D39). Still masked: the message that posts a picked option reads
+  `<value N>` in the thread, since the option goes back to the model with no
+  consent check.
 - **Chart results.** A chart result gives the model no row count or columns,
   where the spec calls for them.
 - **Forged card lines.** `dashboard_card` is not in `PLAIN_BLOCK_TAG_START`

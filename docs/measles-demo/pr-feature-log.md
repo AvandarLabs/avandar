@@ -12056,7 +12056,7 @@ are in the browser, per chat session.
 - The offline 45 is 25/45 against a bar of 26. H04 and N05 regressed, and B09 now passes.
 - The offline D questions scored 6/9. D04 gave a reply with no block, and D08 and D09 ended with no reply and no block.
 - The D08 grader pattern (`NOT_FOUND_PATTERN`) misses "don't have".
-- A hosted turn does not unmask the dashboard `summary` or free-text replies.
+- Updated 2026-11-18: a hosted turn shows real values in replies, a query's summary, and a question card's text and option labels. The message that posts a picked option still reads `<value N>` in the thread, since the option goes back to the model with no consent check.
 - A chart result gives the model no row count or columns, where the spec calls for them.
 - `dashboard_card` is not in `PLAIN_BLOCK_TAG_START` (`shared/agent/pageContext/agentBlockText.ts`), so tile SQL could forge a card line.
 - The card's strings are untranslated in the non-English `.po` files until `pnpm translations` runs.

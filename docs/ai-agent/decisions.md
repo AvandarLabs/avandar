@@ -702,6 +702,19 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   refused, and names show placeholders unescaped. Replies still show
   `<value N>`: mapping them back for the user needs the recap redacted
   first.
+- **Updated 2026-11-18: replies show real values.** A hosted reply now
+  shows the user real values on their device. The chat stores the text the
+  user reads and keeps the model's own text, with its placeholders, in the
+  message's `metadata.custom` (`shared/agent/HostedAnswerText`). Every later
+  hosted request reads the model's text: the recap after a reload or
+  session switch, today's chat, and the chat title excerpt. This holds even
+  when a reload has lost the vault that knew the value. The same unmasking
+  applies to a query's summary, a question card's text, and the labels of a
+  question card's options. An option's value stays a placeholder, since the
+  option the user picks is posted back to the model as their next message
+  with no consent check, so that message reads `<value N>` in the thread.
+  The dashboard card carries no summary: the reply above it is the
+  summary. Device turns are unchanged.
 - **Costs.** About 120 to 170 more input tokens per call for the prompt
   rules.
   Columns outside the page's datasets count as personal, and DuckDB-only
