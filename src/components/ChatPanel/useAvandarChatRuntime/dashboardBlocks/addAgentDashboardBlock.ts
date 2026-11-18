@@ -32,6 +32,35 @@ function _contextDashboardsOf(
 }
 
 /**
+ * The workspace's dashboards each turn loaded, by the turn's options. A turn
+ * is a fresh object, so nothing carries over to the next one.
+ */
+const workspaceDashboardsByTurn = new WeakMap<
+  DataAgentTurnOptions,
+  Promise<readonly AgentDashboardCandidate[]>
+>();
+
+/**
+ * The workspace's dashboards, loaded once per turn however many times the
+ * agent names a dashboard. A failed load is not kept, so the next call
+ * tries again.
+ */
+function _loadWorkspaceDashboardsOnce(
+  turn: DataAgentTurnOptions,
+): Promise<readonly AgentDashboardCandidate[]> {
+  const existing = workspaceDashboardsByTurn.get(turn);
+  if (existing) {
+    return existing;
+  }
+  const loading = loadWorkspaceDashboardCandidates(turn.workspaceId);
+  workspaceDashboardsByTurn.set(turn, loading);
+  loading.catch(() => {
+    workspaceDashboardsByTurn.delete(turn);
+  });
+  return loading;
+}
+
+/**
  * The browser's `addDashboardBlock`. Finds the dashboard the agent named
  * on this device, then queues the block unsaved into the open editor, or
  * adds a card to this turn's reply. Nothing is saved here: a card saves
@@ -54,7 +83,7 @@ export async function addAgentDashboardBlock(
       : undefined,
     contextDashboards: _contextDashboardsOf(turn.gadgetContext),
     loadWorkspaceDashboards: () => {
-      return loadWorkspaceDashboardCandidates(turn.workspaceId);
+      return _loadWorkspaceDashboardsOnce(turn);
     },
     canEdit: canEditDashboard,
   });

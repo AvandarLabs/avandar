@@ -117,4 +117,57 @@ describe("addAgentDashboardBlock", () => {
       }),
     ).resolves.toEqual({ kind: "not_found" });
   });
+
+  describe("when the agent names a dashboard twice in one turn", () => {
+    function _ask(turn: DataAgentTurnOptions, dashboard: string) {
+      return addAgentDashboardBlock({
+        turn,
+        cards: [],
+        request: { dashboard, block: HEADING, summary: "s" },
+      });
+    }
+
+    it("loads the workspace's dashboards once", async () => {
+      canEditMock.mockResolvedValue(true);
+      loadCandidatesMock.mockReset();
+      loadCandidatesMock.mockResolvedValue([
+        { id: "d-mortality", name: "Mortality" },
+      ]);
+      const turn = _turn({});
+
+      await expect(_ask(turn, "Budget")).resolves.toEqual({
+        kind: "not_found",
+      });
+      await expect(_ask(turn, "Mortality")).resolves.toEqual({
+        kind: "card_shown",
+      });
+
+      expect(loadCandidatesMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("loads them again on the next turn", async () => {
+      canEditMock.mockResolvedValue(true);
+      loadCandidatesMock.mockReset();
+      loadCandidatesMock.mockResolvedValue([]);
+
+      await _ask(_turn({}), "Budget");
+      await _ask(_turn({}), "Budget");
+
+      expect(loadCandidatesMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("loads again after a load failed", async () => {
+      canEditMock.mockResolvedValue(true);
+      loadCandidatesMock.mockReset();
+      loadCandidatesMock
+        .mockRejectedValueOnce(new Error("offline"))
+        .mockResolvedValue([{ id: "d-mortality", name: "Mortality" }]);
+      const turn = _turn({});
+
+      await expect(_ask(turn, "Mortality")).rejects.toThrow("offline");
+      await expect(_ask(turn, "Mortality")).resolves.toEqual({
+        kind: "card_shown",
+      });
+    });
+  });
 });
