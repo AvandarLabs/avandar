@@ -19,8 +19,8 @@
  * in a headless Chromium instead of calling OpenRouter.
  *
  * `--page data-explorer` (pi and pi-local) sends every question that sets no
- * page the Data Explorer page block the app always sends. Without it the 45
- * original questions carry no page block, as the earlier runs did.
+ * page the Data Explorer page block the app always sends. Without it a
+ * question that sets no page is sent no page block.
  *
  * `--workspace measles` asks the coded-column questions (D) over the
  * measles line list with its code lists attached, on the `pi` and

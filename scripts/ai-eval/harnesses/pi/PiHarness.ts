@@ -650,7 +650,7 @@ export function createPiConversation(
     /**
      * The page on screen for every question that sets none, so a question
      * with no page of its own is sent the page block the app always sends.
-     * Unset sends no page block, as the original 45 questions were run.
+     * Unset sends a question that sets no page no page block.
      */
     defaultPage?: PiEvalDefaultPage;
   }>,
