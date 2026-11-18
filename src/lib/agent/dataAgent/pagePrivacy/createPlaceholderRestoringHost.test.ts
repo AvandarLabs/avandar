@@ -290,7 +290,7 @@ describe("createPlaceholderRestoringHost", () => {
     });
   });
 
-  it("shows a question card's text with the real value, and keeps its options masked", async () => {
+  it("shows a question card's text and option labels with the real value, and keeps its options masked", async () => {
     const askUser = vi.fn().mockResolvedValue({ kind: "deferred" });
     const host = createPlaceholderRestoringHost(
       _createInnerHost({ askUser }),
@@ -305,12 +305,41 @@ describe("createPlaceholderRestoringHost", () => {
     });
 
     // An option the user picks is posted back to the model as their next
-    // message without a consent check, so it must stay a placeholder.
+    // message without a consent check, so its value must stay a placeholder.
+    // Only its label, which the screen shows, carries the real value.
     expect(askUser).toHaveBeenCalledWith({
       question: "Did you mean Kings or Queens?",
       options: ["<value 1>", "Queens"],
+      optionLabels: ["Kings", "Queens"],
       isMulti: false,
       kind: "choice",
+    });
+  });
+
+  it("adds no option labels when no option holds a value", async () => {
+    const askUser = vi.fn().mockResolvedValue({ kind: "deferred" });
+    const request = {
+      question: "Which year?",
+      options: ["2021", "2022"],
+      isMulti: false,
+      kind: "choice" as const,
+    };
+    const hosted = createPlaceholderRestoringHost(
+      _createInnerHost({ askUser }),
+      _createVault(),
+    );
+    const device = createPlaceholderRestoringHost(
+      _createInnerHost({ askUser }),
+      createSqlPlaceholderVault(),
+    );
+
+    await hosted.askUser(request);
+    await device.askUser({ ...request, options: ["<value 1>", "2022"] });
+
+    expect(askUser).toHaveBeenNthCalledWith(1, request);
+    expect(askUser).toHaveBeenNthCalledWith(2, {
+      ...request,
+      options: ["<value 1>", "2022"],
     });
   });
 

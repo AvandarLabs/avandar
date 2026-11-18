@@ -9,12 +9,14 @@ import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/Clar
 
 type Props = {
   options: readonly string[];
+  optionLabels?: readonly string[];
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 };
 
 /** Collects one preset clarification answer or custom text. */
 export function SingleOptionBody({
   options,
+  optionLabels,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   const answer = useSingleOptionAnswer(onSubmit);
@@ -22,6 +24,7 @@ export function SingleOptionBody({
     <Stack gap="xs" onKeyDown={answer.onKeyDown}>
       <SingleOptionList
         options={options}
+        optionLabels={optionLabels}
         selectedOption={answer.selectedOption}
         noneOfAboveLabel={noneOfAboveLabel()}
         somethingElseLabel={somethingElseLabel()}

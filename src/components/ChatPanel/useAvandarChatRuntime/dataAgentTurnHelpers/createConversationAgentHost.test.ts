@@ -307,7 +307,7 @@ describe("createConversationAgentHost placeholders", () => {
     });
   });
 
-  it("shows a question card's text with the real value and its options masked", async () => {
+  it("shows a question card's text and labels with the real value and posts its options masked", async () => {
     const turn = _turn("dashboard");
 
     await createConversationAgentHost(_stateWithKings(turn)).askUser({
@@ -322,6 +322,7 @@ describe("createConversationAgentHost placeholders", () => {
         question: "Did you mean Kings?",
         responseShape: expect.objectContaining({
           options: ["<value 1>", "Queens"],
+          optionLabels: ["Kings", "Queens"],
         }),
       }),
     );

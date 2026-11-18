@@ -63,6 +63,11 @@ export type DataAgentHost = {
     request: Readonly<{
       question: string;
       options: readonly string[];
+      /**
+       * What the screen shows for each option, in the same order, when it
+       * differs from `options`. An answer still posts the option itself.
+       */
+      optionLabels?: readonly string[];
       isMulti: boolean;
       kind: "choice" | "values";
       /**

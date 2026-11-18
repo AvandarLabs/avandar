@@ -73,6 +73,9 @@ export function createBrowserDataAgentHost(
           : {
               kind: "fixed_options",
               options: [...request.options],
+              ...(request.optionLabels
+                ? { optionLabels: [...request.optionLabels] }
+                : {}),
               multi: request.isMulti,
             },
       });

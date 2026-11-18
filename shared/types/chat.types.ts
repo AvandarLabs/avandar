@@ -90,7 +90,17 @@ export type ChatGeneratedDashboardBlock =
  */
 export type ChatClarifyResponseShape =
   | { kind: "free_text"; placeholder?: string }
-  | { kind: "fixed_options"; options: string[]; multi: boolean }
+  | {
+      kind: "fixed_options";
+      options: string[];
+      /**
+       * What the screen shows for each option, in the same order. The
+       * option itself is what an answer posts. Absent when every option
+       * shows as it is.
+       */
+      optionLabels?: string[];
+      multi: boolean;
+    }
   /**
    * Discovery clarifications. The LLM emits a DuckDB SELECT
    * (typically a `SELECT DISTINCT col FROM ...`) whose result populates a

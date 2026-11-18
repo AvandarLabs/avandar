@@ -92,18 +92,24 @@ function _restoringShowQuery(
 
 /**
  * The host's question card with the question's placeholders shown as their
- * values. The options stay as the model wrote them: the one the user picks
- * is posted back to the model as their next message, which must never
- * carry a held value.
+ * values, and each option's label too. The options themselves stay as the
+ * model wrote them: the one the user picks is posted back to the model as
+ * their next message, which must never carry a held value. Labels are added
+ * only when one differs from its option.
  */
 function _restoringAskUser(
   askUser: DataAgentHost["askUser"],
   vault: SqlPlaceholderVault,
 ): DataAgentHost["askUser"] {
   return (request) => {
+    const optionLabels = request.options.map(vault.unmaskText);
+    const hasRealLabel = optionLabels.some((label, index) => {
+      return label !== request.options[index];
+    });
     return askUser({
       ...request,
       question: vault.unmaskText(request.question),
+      ...(hasRealLabel ? { optionLabels } : {}),
     });
   };
 }
@@ -118,7 +124,8 @@ function _restoringAskUser(
  *
  * A dashboard chart's check is restored and masked like a query. A
  * dashboard block is restored before the host shows or saves it. The text
- * the user reads (a query's summary, a question card's question)
+ * the user reads (a query's summary, a question card's question and option
+ * labels)
  * shows real values, and none of it goes back to the model.
  *
  * Nothing the model reads back carries a restored value: a query's column
