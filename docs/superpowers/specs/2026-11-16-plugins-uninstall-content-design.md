@@ -461,7 +461,8 @@ push to `demo/**` deploys.
 - **Known limit, desktop.** A dataset deleted on the server but still in the
   desktop SQLite mirror is found by `fullDelete`'s read, while the server's
   access check no longer finds it, so the admin sees "You don't have
-  permission to delete this dataset." The server's answer cannot tell "gone"
+  permission to delete this dataset, or it has already been deleted." The
+  message covers both causes because the server's answer cannot tell "gone"
   from "the user has no admin access": `util__auth_user_can_access_resource`
   and `util__auth_user_may_select_dataset` are false for both, no RPC reveals
   whether a dataset exists regardless of the user's rights, `serverApi` offers
@@ -469,7 +470,7 @@ push to `demo/**` deploys.
   empty tables and never reconciles deletes. Treating a refusal as "already
   deleted" would hide a real permission refusal, so it needs a server-side
   existence check (a schema change) or delete reconciliation in the desktop
-  sync. This spec does not change it.
+  sync. This spec only makes the message honest about both causes.
 
 ## Done when
 
