@@ -202,7 +202,7 @@ export const DATA_AGENT_TOOLS_BY_PROMPT_ID: Readonly<
  * the code lists of columns a dictionary is attached to. v6 adds the
  * dashboard tool and its rules.
  */
-export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v5";
+export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v6";
 
 /**
  * The prompt versions whose TOOLS section describes plugin tools. The proxy

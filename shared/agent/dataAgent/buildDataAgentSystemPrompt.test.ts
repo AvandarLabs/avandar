@@ -435,7 +435,6 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(
       v5Instructions.startsWith(`${v4Instructions}\n\nCODED COLUMNS\n`),
     ).toBe(true);
-    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v5");
   });
 
   it("builds v6 as v5 plus the dashboard rules", () => {
@@ -453,6 +452,7 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(v6.startsWith(`${v5}\n\nDASHBOARD BLOCKS\n`)).toBe(true);
     expect(v6).toContain("add_dashboard_block");
     expect(v6).toContain("<dashboard_card>");
+    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v6");
   });
 
   it.each([
