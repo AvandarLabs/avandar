@@ -460,6 +460,19 @@ function PendingActions({
 }
 
 /**
+ * Why a card has no buttons: the signed-in user or the chat session is not
+ * known, so there is nowhere to keep what the user does with the card.
+ */
+function UnavailableNote(): ReactNode {
+  const { t } = useLingui();
+  return (
+    <Text size="sm" c="dimmed">
+      {t`This can't be added right now. Reload the page or ask again.`}
+    </Text>
+  );
+}
+
+/**
  * The agent's proposal to add one block to a dashboard, inside an
  * assistant message: a preview of the block, the dashboard it goes to (or
  * a picker), and Confirm and Cancel. Confirming saves the block with no
@@ -504,6 +517,7 @@ export function AgentDashboardBlockPart({
         {status === undefined && identity ? (
           <PendingActions card={card} identity={identity} />
         ) : null}
+        {status === undefined && !identity ? <UnavailableNote /> : null}
       </Stack>
     </div>
   );

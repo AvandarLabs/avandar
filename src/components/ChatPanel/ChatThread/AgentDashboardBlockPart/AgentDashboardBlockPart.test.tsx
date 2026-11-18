@@ -11,9 +11,14 @@ import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/
 import type { DataMessagePartProps } from "@assistant-ui/react";
 import type { ReactNode } from "react";
 
-const { confirmMock, useAgentQueryResultViewMock } = vi.hoisted(() => {
-  return { confirmMock: vi.fn(), useAgentQueryResultViewMock: vi.fn() };
-});
+const { confirmMock, useAgentQueryResultViewMock, useChatSessionsMock } =
+  vi.hoisted(() => {
+    return {
+      confirmMock: vi.fn(),
+      useAgentQueryResultViewMock: vi.fn(),
+      useChatSessionsMock: vi.fn(),
+    };
+  });
 
 // Renders the link target into `href`, so a test can assert params
 // without a router.
@@ -73,11 +78,7 @@ vi.mock("@/hooks/users/useCurrentUser", () => {
 });
 
 vi.mock("@/components/ChatPanel/ChatSessionProvider/useChatSessions", () => {
-  return {
-    useChatSessions: () => {
-      return { index: { selectedId: "s-1" } };
-    },
-  };
+  return { useChatSessions: useChatSessionsMock };
 });
 
 vi.mock(
@@ -131,6 +132,7 @@ function _withStatus(status: AgentDashboardCardStatus): void {
 }
 
 beforeEach(() => {
+  useChatSessionsMock.mockReturnValue({ index: { selectedId: "s-1" } });
   confirmMock.mockResolvedValue({ status: "cancelled", isReported: false });
 });
 
@@ -255,6 +257,33 @@ describe("AgentDashboardBlockPart pending card", () => {
 
     expect(screen.getByTestId("viz")).toBeInTheDocument();
     expect(screen.queryByText("This chart has no rows yet.")).toBeNull();
+  });
+});
+
+describe("AgentDashboardBlockPart card with no chat session", () => {
+  const NOTE = "This can't be added right now. Reload the page or ask again.";
+
+  it("explains why there is nothing to confirm when no chat is loaded", () => {
+    useChatSessionsMock.mockReturnValue(undefined);
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(screen.getByText("Deaths by month")).toBeVisible();
+    expect(screen.getByText(NOTE)).toBeVisible();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("explains it when the chat has no selected session", () => {
+    useChatSessionsMock.mockReturnValue({ index: { selectedId: undefined } });
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(screen.getByText(NOTE)).toBeVisible();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("shows no note once the card can be confirmed", () => {
+    render(<AgentDashboardBlockPart {..._props(HEADING_CARD)} />);
+
+    expect(screen.queryByText(NOTE)).toBeNull();
   });
 });
 

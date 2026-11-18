@@ -355,6 +355,10 @@ msgstr "{removedCount, plural, one {لم يعد العمود # يستخدم قا
 msgid "Right span"
 msgstr "امتداد أيمن"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "This can't be added right now. Reload the page or ask again."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "بحث في مجموعات البيانات..."

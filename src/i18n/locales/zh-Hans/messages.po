@@ -343,6 +343,10 @@ msgstr "{removedCount, plural, one {# 列不再使用字典。} other {# 列不�
 msgid "Right span"
 msgstr "右跨度"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "This can't be added right now. Reload the page or ask again."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "搜索数据集..."

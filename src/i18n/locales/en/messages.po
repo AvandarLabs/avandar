@@ -358,6 +358,10 @@ msgstr "{removedCount, plural, one {# column no longer uses a dictionary.} "
 msgid "Right span"
 msgstr "Right span"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "This can't be added right now. Reload the page or ask again."
+msgstr "This can't be added right now. Reload the page or ask again."
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Search datasets..."

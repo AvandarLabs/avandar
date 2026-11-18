@@ -363,6 +363,10 @@ msgstr "{removedCount, plural, one {Safu wima # haitumii tena kamusi.} other "
 msgid "Right span"
 msgstr "Span ya kulia"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "This can't be added right now. Reload the page or ask again."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Tafuta datasets..."

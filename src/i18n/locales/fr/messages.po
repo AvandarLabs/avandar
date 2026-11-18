@@ -371,6 +371,10 @@ msgstr "{removedCount, plural, one {# colonne n’utilise plus de dictionnaire.}
 msgid "Right span"
 msgstr "Étendue droite"
 
+#: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
+msgid "This can't be added right now. Reload the page or ask again."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Rechercher des ensembles de données..."
