@@ -94,6 +94,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
       deletedDatasetIds: [PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID],
       refusedDatasetIds: [],
       incompleteDatasetIds: [],
+      unreadDatasetIds: [],
     });
   });
 
@@ -163,6 +164,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
         refusedDatasetIds: [],
         incompleteDatasetIds: [PROVINCES_DATASET_ID],
+        unreadDatasetIds: [],
       });
     });
 
@@ -190,6 +192,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
         refusedDatasetIds: [PROVINCES_DATASET_ID],
         incompleteDatasetIds: [],
+        unreadDatasetIds: [],
       });
       expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
     });
@@ -229,6 +232,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [],
         refusedDatasetIds: [],
         incompleteDatasetIds: [PROVINCES_DATASET_ID],
+        unreadDatasetIds: [],
       });
     });
 
@@ -261,6 +265,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [PROVINCES_DATASET_ID],
         refusedDatasetIds: [],
         incompleteDatasetIds: [],
+        unreadDatasetIds: [],
       });
     });
 
@@ -285,6 +290,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [],
         refusedDatasetIds: [],
         incompleteDatasetIds: [PROVINCES_DATASET_ID],
+        unreadDatasetIds: [],
       });
     });
   });
@@ -305,6 +311,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         deletedDatasetIds: [DISTRICTS_DATASET_ID],
         refusedDatasetIds: [],
         incompleteDatasetIds: [],
+        unreadDatasetIds: [],
       });
     });
 
@@ -364,7 +371,7 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     ]);
   });
 
-  it("returns a dataset as incomplete without deleting it when reading it first throws", async () => {
+  it("returns a dataset as unread, not incomplete, without deleting it when reading it first throws", async () => {
     mocks.getDatasetById.mockRejectedValueOnce(new Error("network down"));
 
     const outcome = await _run([PROVINCES_DATASET_ID]);
@@ -373,8 +380,23 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     expect(outcome).toEqual({
       deletedDatasetIds: [],
       refusedDatasetIds: [],
-      incompleteDatasetIds: [PROVINCES_DATASET_ID],
+      incompleteDatasetIds: [],
+      unreadDatasetIds: [PROVINCES_DATASET_ID],
     });
     expect(mocks.loggerError).toHaveBeenCalledTimes(1);
+  });
+
+  it("deletes the other datasets when one cannot be read first", async () => {
+    mocks.getDatasetById.mockRejectedValueOnce(new Error("network down"));
+
+    const outcome = await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
+
+    expect(mocks.fullDelete).toHaveBeenCalledTimes(1);
+    expect(outcome).toEqual({
+      deletedDatasetIds: [DISTRICTS_DATASET_ID],
+      refusedDatasetIds: [],
+      incompleteDatasetIds: [],
+      unreadDatasetIds: [PROVINCES_DATASET_ID],
+    });
   });
 });

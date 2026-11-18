@@ -46,9 +46,11 @@ const loggerError = vi.spyOn(Logger, "error");
 const INSTALLATION_ID = "installation-1" as PluginInstallation.Id;
 const DISTRICTS_ID = "dataset-districts" as Dataset.Id;
 const PROVINCES_ID = "dataset-provinces" as Dataset.Id;
+const REGIONS_ID = "dataset-regions" as Dataset.Id;
 const ROWS: UninstallContentRow[] = [
   { datasetId: DISTRICTS_ID, name: "Mozambique districts", canDelete: true },
   { datasetId: PROVINCES_ID, name: "Mozambique provinces", canDelete: true },
+  { datasetId: REGIONS_ID, name: "Mozambique regions", canDelete: true },
 ];
 
 type Rendered = {
@@ -99,6 +101,7 @@ describe("useRunUninstall", () => {
           deletedDatasetIds: datasetIds,
           refusedDatasetIds: [],
           incompleteDatasetIds: [],
+          unreadDatasetIds: [],
         };
       },
     );
@@ -120,12 +123,15 @@ describe("useRunUninstall", () => {
       "These datasets were not deleted because you can't delete them, and they are still in Data Sources: Mozambique districts";
     const INCOMPLETE_SENTENCE =
       "These datasets could not be fully deleted. Their data may already be gone. Check them in Data Sources and delete them again: Mozambique provinces";
+    const UNREAD_SENTENCE =
+      "These datasets were not deleted because we could not check them, and they are still in Data Sources: Mozambique regions";
 
     it("names a dataset the user may not delete and says it is still in Data Sources", async () => {
       mocks.uninstall.mockResolvedValue({
         deletedDatasetIds: [],
         refusedDatasetIds: [DISTRICTS_ID],
         incompleteDatasetIds: [],
+        unreadDatasetIds: [],
       });
       const { run } = _renderRunUninstall();
 
@@ -142,6 +148,7 @@ describe("useRunUninstall", () => {
         deletedDatasetIds: [],
         refusedDatasetIds: [],
         incompleteDatasetIds: [PROVINCES_ID],
+        unreadDatasetIds: [],
       });
       const { run } = _renderRunUninstall();
 
@@ -153,11 +160,65 @@ describe("useRunUninstall", () => {
       });
     });
 
+    it("names a dataset that could not be checked and says it is still in Data Sources", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [],
+        unreadDatasetIds: [REGIONS_ID],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([REGIONS_ID]);
+
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: UNREAD_SENTENCE,
+      });
+    });
+
+    it("warns instead of reporting success when a dataset could not be checked and another was deleted", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [PROVINCES_ID],
+        refusedDatasetIds: [],
+        incompleteDatasetIds: [],
+        unreadDatasetIds: [REGIONS_ID],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([REGIONS_ID, PROVINCES_ID]);
+
+      expect(mocks.notifySuccess).not.toHaveBeenCalled();
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: UNREAD_SENTENCE,
+      });
+    });
+
+    it("lists the incomplete, unread and refused sentences in that order in one warning", async () => {
+      mocks.uninstall.mockResolvedValue({
+        deletedDatasetIds: [],
+        refusedDatasetIds: [DISTRICTS_ID],
+        incompleteDatasetIds: [PROVINCES_ID],
+        unreadDatasetIds: [REGIONS_ID],
+      });
+      const { run } = _renderRunUninstall();
+
+      await run([DISTRICTS_ID, PROVINCES_ID, REGIONS_ID]);
+
+      expect(mocks.notifyWarning).toHaveBeenCalledTimes(1);
+      expect(mocks.notifyWarning).toHaveBeenCalledWith({
+        title: "Mozambique uninstalled",
+        message: `${INCOMPLETE_SENTENCE} ${UNREAD_SENTENCE} ${REFUSED_SENTENCE}`,
+      });
+    });
+
     it("shows both sentences in one warning when both kinds are present", async () => {
       mocks.uninstall.mockResolvedValue({
         deletedDatasetIds: [],
         refusedDatasetIds: [DISTRICTS_ID],
         incompleteDatasetIds: [PROVINCES_ID],
+        unreadDatasetIds: [],
       });
       const { run } = _renderRunUninstall();
 
@@ -175,6 +236,7 @@ describe("useRunUninstall", () => {
         deletedDatasetIds: [DISTRICTS_ID],
         refusedDatasetIds: [],
         incompleteDatasetIds: [PROVINCES_ID],
+        unreadDatasetIds: [],
       });
       const { run } = _renderRunUninstall();
 
@@ -190,6 +252,7 @@ describe("useRunUninstall", () => {
       deletedDatasetIds: [],
       refusedDatasetIds: [],
       incompleteDatasetIds: [],
+      unreadDatasetIds: [],
     });
     const { run } = _renderRunUninstall();
 

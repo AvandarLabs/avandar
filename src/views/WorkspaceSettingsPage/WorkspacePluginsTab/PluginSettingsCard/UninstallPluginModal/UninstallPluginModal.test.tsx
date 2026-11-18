@@ -83,6 +83,7 @@ type UninstallOutcomeStub = {
   deletedDatasetIds: string[];
   refusedDatasetIds: string[];
   incompleteDatasetIds: string[];
+  unreadDatasetIds: string[];
 };
 
 function _buildModal(): JSX.Element {
@@ -151,6 +152,7 @@ describe("UninstallPluginModal", () => {
           deletedDatasetIds: datasetIds,
           refusedDatasetIds: [],
           incompleteDatasetIds: [],
+          unreadDatasetIds: [],
         };
       },
     );
@@ -595,6 +597,7 @@ describe("UninstallPluginModal", () => {
         deletedDatasetIds: [],
         refusedDatasetIds: [],
         incompleteDatasetIds: [],
+        unreadDatasetIds: [],
       });
       await waitFor(() => {
         expect(mocks.onClose).toHaveBeenCalled();

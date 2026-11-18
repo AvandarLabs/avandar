@@ -210,6 +210,7 @@ vi.mock(
           deletedDatasetIds: [],
           refusedDatasetIds: [],
           incompleteDatasetIds: [],
+          unreadDatasetIds: [],
         });
       }),
     };

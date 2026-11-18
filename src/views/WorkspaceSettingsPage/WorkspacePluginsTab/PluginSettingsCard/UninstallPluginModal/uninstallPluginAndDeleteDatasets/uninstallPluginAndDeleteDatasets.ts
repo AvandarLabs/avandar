@@ -22,17 +22,27 @@ export type UninstallOutcome = {
   refusedDatasetIds: Dataset.Id[];
 
   /**
-   * The datasets whose state is unknown after a failure. Most failed after
-   * the delete could have started, so their files and their row may already
-   * be gone. One that could not even be read first was not touched. None of
-   * them can be assumed to be intact in Data Sources, so the admin should
-   * check each one.
+   * The datasets whose delete failed after it could have started, so their
+   * files and their row may already be gone. None of them can be assumed to
+   * be intact in Data Sources, so the admin should check each one.
    */
   incompleteDatasetIds: Dataset.Id[];
+
+  /**
+   * The datasets that could not be read before their delete. Nothing of them
+   * was touched, so they are all still in Data Sources, but they were not
+   * checked, so the admin should delete them again.
+   */
+  unreadDatasetIds: Dataset.Id[];
 };
 
 /** How deleting one dataset ended. */
-type DatasetResult = "deleted" | "already_gone" | "refused" | "incomplete";
+type DatasetResult =
+  | "deleted"
+  | "already_gone"
+  | "refused"
+  | "incomplete"
+  | "unread";
 
 /**
  * Deletes the install and proves it is gone, or throws an
@@ -111,8 +121,8 @@ async function _settleAfterFailedDelete(
  * Deletes one dataset and says how it ended. A dataset whose row is already
  * missing, such as one deleted by someone else after the dialog loaded, is
  * left alone. A dataset that cannot be deleted is reported instead of thrown.
- * A dataset that cannot even be read first is `incomplete`: nothing was
- * deleted, but the admin should check it.
+ * A dataset that cannot even be read first is `unread`: nothing of it was
+ * touched.
  */
 async function _deleteDataset(datasetId: Dataset.Id): Promise<DatasetResult> {
   try {
@@ -125,7 +135,7 @@ async function _deleteDataset(datasetId: Dataset.Id): Promise<DatasetResult> {
       datasetId,
       error,
     });
-    return "incomplete";
+    return "unread";
   }
   try {
     await DatasetClient.fullDelete({ id: datasetId });
@@ -156,9 +166,9 @@ function _selectIdsByResult(
  * time in the order given and each at most once. Use it where an admin
  * confirms an uninstall that may also delete what the plugin imported, such
  * as the uninstall dialog on a plugin's card. It returns the datasets it
- * deleted, the ones the user may not delete, and the ones whose delete did not
- * finish, so the caller can tell the admin which are untouched and which need
- * checking.
+ * deleted, the ones the user may not delete, the ones whose delete did not
+ * finish, and the ones that could not be read first, so the caller can tell
+ * the admin which are untouched and which need checking.
  *
  * Throws an `UninstallPluginError` when it cannot show the install is gone.
  * Nothing is deleted unless the install is gone, and a dataset the user may
@@ -187,5 +197,6 @@ export async function uninstallPluginAndDeleteDatasets(
       results,
       wanted: "incomplete",
     }),
+    unreadDatasetIds: _selectIdsByResult({ results, wanted: "unread" }),
   };
 }
