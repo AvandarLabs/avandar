@@ -268,6 +268,50 @@ async function _askAgent(
   }
 }
 
+/**
+ * Notes the page and tray blocks the agent just took, so the next turn's
+ * blocks read "unchanged" or "cleared" against what the model has.
+ */
+function _rememberBlocks(
+  conversation: DataAgentConversation,
+  blocks: AgentContextBlocks,
+): void {
+  conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
+  conversation.lastAttachedBlock = blocks.attachedBlock;
+}
+
+/**
+ * How many messages the agent's transcript holds. Read fresh each time, as
+ * the agent may swap its messages array during a run.
+ */
+function _countTranscriptMessages(conversation: DataAgentConversation): number {
+  return conversation.dataAgent.agent.state.messages.length;
+}
+
+/**
+ * Asks the agent and remembers the blocks it was sent. The agent adds a
+ * turn's text to its transcript as soon as it takes it, so a model call that
+ * then fails leaves the blocks with the model and they are remembered. A
+ * turn that fails before the agent takes its text leaves them as they were.
+ */
+async function _askAndRememberBlocks(
+  conversation: DataAgentConversation,
+  blocks: AgentContextBlocks,
+  text: string,
+): Promise<Awaited<ReturnType<typeof _askAgent>>> {
+  const transcriptLength = _countTranscriptMessages(conversation);
+  try {
+    const reply = await _askAgent(conversation, text);
+    _rememberBlocks(conversation, blocks);
+    return reply;
+  } catch (error) {
+    if (_countTranscriptMessages(conversation) > transcriptLength) {
+      _rememberBlocks(conversation, blocks);
+    }
+    throw error;
+  }
+}
+
 async function _getConversation(
   options: Readonly<AskConversationDataAgentOptions>,
 ): Promise<{ conversation: DataAgentConversation; isNew: boolean }> {
@@ -448,8 +492,9 @@ export async function askConversationDataAgent(
   options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};
-  const reply = await _askAgent(
+  const reply = await _askAndRememberBlocks(
     conversation,
+    blocks,
     buildAgentTurnText({
       message: _buildPromptText(_namedMessages(turn, inputs, isNew), isNew),
       pageBlock: blocks.pageBlock,
@@ -461,8 +506,6 @@ export async function askConversationDataAgent(
     }),
   );
   _reportReplyIfKept(turn, inputs);
-  conversation.lastPageBlock = blocks.pageBlock ?? conversation.lastPageBlock;
-  conversation.lastAttachedBlock = blocks.attachedBlock;
   return _toRunResult({
     replyText: _replyTextOf(reply, turn),
     inputs,

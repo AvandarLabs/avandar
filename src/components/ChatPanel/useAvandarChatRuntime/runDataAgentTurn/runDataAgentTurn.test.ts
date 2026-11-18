@@ -269,7 +269,7 @@ function _showChatResultOnNextAsk(result: AgentQueryResultData): void {
 beforeEach(() => {
   askMock.mockResolvedValue({ text: "Done." });
   createDataAgentMock.mockImplementation(() => {
-    return { agent: { abort: vi.fn() }, ask: askMock };
+    return { agent: { abort: vi.fn(), state: { messages: [] } }, ask: askMock };
   });
   showQueryInChatMock.mockResolvedValue({
     kind: "empty",

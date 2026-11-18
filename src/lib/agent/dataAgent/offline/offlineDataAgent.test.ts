@@ -1009,3 +1009,91 @@ describe("offline dashboard tool", () => {
     ]);
   });
 });
+
+/**
+ * An offline agent with a router, whose local model fails while `isDown` is
+ * set, and the requests its model received.
+ */
+function _createFlakyOfflineAgent(): {
+  agent: ReturnType<typeof createOfflineDataAgent>;
+  requests: LocalLlmRequest[];
+  setIsDown: (isDown: boolean) => void;
+} {
+  const { llm, requests } = _createLlm([]);
+  let isDown = false;
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm: {
+      complete: async (request) => {
+        if (isDown) {
+          throw new Error("engine down");
+        }
+        return llm.complete(request);
+      },
+    },
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+  return {
+    agent,
+    requests,
+    setIsDown: (nextIsDown) => {
+      isDown = nextIsDown;
+    },
+  };
+}
+
+/** Whether a model request listed `add_dashboard_block`. */
+function _offersDashboardTool(request: LocalLlmRequest | undefined): boolean {
+  return JSON.stringify(request?.jsonSchema).includes("add_dashboard_block");
+}
+
+describe("offline dashboard tool after a failed turn", () => {
+  it("stays offered when a turn failed before the model had its text", async () => {
+    const { agent, requests } = _createFlakyOfflineAgent();
+    // The failed turn never reached the model, so the app's memory is still
+    // the first turn's and the third turn's page reads unchanged.
+    const [firstText, unchangedThirdText] = _buildTurnTexts([
+      { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Utah?", page: DASHBOARD_PAGE },
+    ]);
+    const [explorerText] = _buildTurnTexts([
+      { message: "how many deaths in Ohio?", page: EXPLORER_PAGE },
+    ]);
+    await agent.ask(firstText!);
+    vi.mocked(findQuestionValues).mockRejectedValueOnce(
+      new Error("host failed"),
+    );
+    await expect(agent.ask(explorerText!)).rejects.toThrow("host failed");
+
+    const firstRequestIndex = requests.length;
+    await agent.ask(unchangedThirdText!);
+
+    expect(unchangedThirdText).toContain("Unchanged since the last message.");
+    expect(_offersDashboardTool(requests[firstRequestIndex])).toBe(true);
+  });
+
+  it("follows the turn the model heard when its call then failed", async () => {
+    const { agent, requests, setIsDown } = _createFlakyOfflineAgent();
+    const [dashboardText, explorerText, unchangedExplorerText] =
+      _buildTurnTexts([
+        { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+        { message: "how many deaths in Ohio?", page: EXPLORER_PAGE },
+        { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+      ]);
+    await agent.ask(dashboardText!);
+    setIsDown(true);
+    await expect(agent.ask(explorerText!)).rejects.toThrow("engine down");
+    setIsDown(false);
+
+    const firstRequestIndex = requests.length;
+    await agent.ask(unchangedExplorerText!);
+
+    expect(unchangedExplorerText).toContain(
+      "Unchanged since the last message.",
+    );
+    expect(_offersDashboardTool(requests[firstRequestIndex])).toBe(false);
+  });
+});

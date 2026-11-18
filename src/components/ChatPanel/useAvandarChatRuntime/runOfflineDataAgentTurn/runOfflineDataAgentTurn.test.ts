@@ -126,7 +126,10 @@ describe("runOfflineDataAgentTurn", () => {
       .mockReset()
       .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 });
     createOfflineDataAgentMock.mockReset().mockImplementation(() => {
-      return { agent: { abort: vi.fn() }, ask: askMock };
+      return {
+        agent: { abort: vi.fn(), state: { messages: [] } },
+        ask: askMock,
+      };
     });
     decideMock.mockReset();
   });

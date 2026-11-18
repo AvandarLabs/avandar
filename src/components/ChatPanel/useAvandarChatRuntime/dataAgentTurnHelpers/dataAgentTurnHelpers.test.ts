@@ -258,6 +258,9 @@ describe("askConversationDataAgent", () => {
     ask?: (text: string) => Promise<{ text: string }>,
   ): FakeConversation {
     const asked: string[] = [];
+    // Like the real agent, the fake takes a turn's text into its transcript
+    // before the model answers, so a failed answer still leaves it there.
+    const messages: string[] = [];
     const conversation = {
       asked,
       turnRef: { current: _createTurnOptions() },
@@ -266,9 +269,10 @@ describe("askConversationDataAgent", () => {
       dashboardCards: [],
       datasets: [],
       dataAgent: {
-        agent: { abort: vi.fn() },
+        agent: { abort: vi.fn(), state: { messages } },
         ask: vi.fn(async (text: string) => {
           asked.push(text);
+          messages.push(text);
           if (ask) {
             return await ask(text);
           }
@@ -340,7 +344,7 @@ describe("askConversationDataAgent", () => {
     expect(conversation.asked[1]).toBe(`${dashboardBlock}\n\nAnd here?`);
   });
 
-  it("resends a block the agent failed to answer", async () => {
+  it("resends a block the agent never took", async () => {
     const conversation = _fakeConversation();
     const conversations = new Map([["workspace-1:0", conversation]]);
     const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
@@ -352,10 +356,74 @@ describe("askConversationDataAgent", () => {
     await expect(
       _ask(conversations, _turn("And here?"), dashboardBlock),
     ).rejects.toThrow("model down");
-    await _ask(conversations, _turn("And here?"), dashboardBlock);
 
+    expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
+    await _ask(conversations, _turn("And here?"), dashboardBlock);
     expect(conversation.lastPageBlock).toBe(dashboardBlock);
     expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd here?`);
+  });
+
+  it("remembers a block the agent took and then failed to answer", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+    await _ask(conversations, _turn("How many?"), dashboardBlock);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+
+    await expect(
+      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+    ).rejects.toThrow("model down");
+
+    expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
+  });
+
+  it("sends the page in full on the turn after a failed turn on another page", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+    const fakeAsk = conversation.dataAgent.ask;
+    await _ask(conversations, _turn("How many?"), dashboardBlock);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+    await expect(
+      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+    ).rejects.toThrow("model down");
+    conversation.dataAgent.ask = fakeAsk;
+
+    await _ask(conversations, _turn("And back?"), dashboardBlock);
+
+    expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd back?`);
+  });
+
+  it("remembers the tray a failed turn took", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+
+    await expect(
+      askConversationDataAgent({
+        conversations,
+        turn: _turn("How many?"),
+        buildTurnInputs: () => {
+          return {
+            blocks: { attachedBlock: "<attached>\nA\n</attached>" },
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+          };
+        },
+        createConversation: vi.fn(),
+      }),
+    ).rejects.toThrow("model down");
+
+    expect(conversation.lastAttachedBlock).toBe("<attached>\nA\n</attached>");
   });
 
   it("clears the previous turn's question card", async () => {

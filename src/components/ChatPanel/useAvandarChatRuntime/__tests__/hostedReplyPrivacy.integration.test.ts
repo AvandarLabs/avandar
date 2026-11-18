@@ -258,7 +258,10 @@ describe("hosted reply privacy", () => {
     getAllDatasetsMock.mockReset().mockResolvedValue([DATASET]);
     createAgentPageContextMock.mockReset();
     createDataAgentMock.mockReset().mockImplementation(() => {
-      return { agent: { abort: vi.fn() }, ask: askMock };
+      return {
+        agent: { abort: vi.fn(), state: { messages: [] } },
+        ask: askMock,
+      };
     });
   });
 

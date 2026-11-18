@@ -17,7 +17,10 @@ import {
 } from "@/lib/agent/localModels/createLocalModelStreamFn/createLocalModelStreamFn";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { TurnDashboardContext } from "$/agent/pageContext/getDashboardContextFromTurnBlocks/getDashboardContextFromTurnBlocks";
-import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type {
+  DataAgent,
+  DataAgentReply,
+} from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { OfflineMessageRoute } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
 import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
@@ -106,27 +109,38 @@ function _withBlocks(blocks: string, text: string): string {
 }
 
 /**
- * Whether a turn can be about a dashboard, remembering what its blocks said
- * about the page and the tray. A plain question on a Data Explorer page, with
- * its page block, is not.
+ * What a turn's blocks say about the page and the tray, read against what the
+ * model last heard, and whether that makes the turn one that can be about a
+ * dashboard. A plain question on a Data Explorer page, with its page block, is
+ * not. Nothing is remembered here: the session takes the context only once
+ * the model has the turn's text.
  */
 function _readDashboardContext(
   session: OfflineSession,
   blocks: string,
   question: string,
-): boolean {
+): { context: TurnDashboardContext; hasDashboardContext: boolean } {
   const context = getDashboardContextFromTurnBlocks(
     blocks,
     session.dashboardContext,
   );
-  session.dashboardContext = context;
-  return (
-    context.isPageDashboard ||
-    context.isAttachedDashboard ||
-    context.hasDashboardInTurn ||
-    namesDashboard(question)
-  );
+  return {
+    context,
+    hasDashboardContext:
+      context.isPageDashboard ||
+      context.isAttachedDashboard ||
+      context.hasDashboardInTurn ||
+      namesDashboard(question),
+  };
 }
+
+/** What the offline agent hands its model for one question. */
+type PreparedQuestion = {
+  systemPrompt: string;
+  messageText: string;
+  /** What the turn's blocks said, to remember once the agent has the turn. */
+  dashboardContext: TurnDashboardContext;
+};
 
 /** Sorts the user's message into data or chat, and remembers it. */
 async function _routeQuestion(
@@ -152,33 +166,39 @@ async function _routeQuestion(
  * finds the question's stored values. Returns the system prompt (the same
  * for every plain question, so it stays cached, and longer only when the
  * turn can be about a dashboard) and the message the model reads for this
- * question. Records on the session whether the turn has dashboard context.
- * Routing and value matching read only the user's message; the blocks before
- * it go to the model unchanged.
+ * question, with what the turn's blocks said about the page and the tray, for
+ * the session to remember once the model has the turn. Records on the session
+ * whether the turn has dashboard context. Routing and value matching read
+ * only the user's message; the blocks before it go to the model unchanged.
  */
 async function _prepareQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
   session: OfflineSession,
   message: string,
-): Promise<{ systemPrompt: string; messageText: string }> {
+): Promise<PreparedQuestion> {
   const { blocks, message: question } = splitAgentTurnText(message);
   session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
   await _routeQuestion(options, session, question);
   const profiles = await session.profiles;
-  session.hasDashboardContext = _readDashboardContext(
+  const { context, hasDashboardContext } = _readDashboardContext(
     session,
     blocks,
     question,
   );
+  session.hasDashboardContext = hasDashboardContext;
   const systemPrompt = buildOfflineDataAgentSystemPrompt({
     datasets: options.datasets,
     profiles,
     today: options.today,
     queryStyle: options.queryStyle,
-    hasDashboardContext: session.hasDashboardContext,
+    hasDashboardContext,
   });
   if (session.route.current === "chat") {
-    return { systemPrompt, messageText: _withBlocks(blocks, question) };
+    return {
+      systemPrompt,
+      messageText: _withBlocks(blocks, question),
+      dashboardContext: context,
+    };
   }
   const matches = await findQuestionValues(options.host, {
     datasets: options.datasets,
@@ -190,7 +210,30 @@ async function _prepareQuestion(
     matches,
     datasets: options.datasets,
   });
-  return { systemPrompt, messageText: _withBlocks(blocks, questionMessage) };
+  return {
+    systemPrompt,
+    messageText: _withBlocks(blocks, questionMessage),
+    dashboardContext: context,
+  };
+}
+
+/**
+ * Prepares the question, then hands it to the agent. The session takes the
+ * turn's page and tray context only at that hand-off, so a turn that failed
+ * before the model had its text leaves what the model last heard as it was.
+ * Once the agent has the text it is in the transcript, so a model call that
+ * then fails does not undo it.
+ */
+async function _askPrepared(
+  options: Readonly<CreateOfflineDataAgentOptions>,
+  session: OfflineSession,
+  dataAgent: DataAgent,
+  message: string,
+): Promise<DataAgentReply> {
+  const prepared = await _prepareQuestion(options, session, message);
+  _replaceSystemPrompt(dataAgent.agent, prepared.systemPrompt);
+  session.dashboardContext = prepared.dashboardContext;
+  return dataAgent.ask(prepared.messageText);
 }
 
 function _createLocalChoice(modelId: string, contextWindow: number) {
@@ -249,9 +292,7 @@ export function createOfflineDataAgent(
   return {
     agent: dataAgent.agent,
     ask: async (message) => {
-      const prepared = await _prepareQuestion(options, session, message);
-      _replaceSystemPrompt(dataAgent.agent, prepared.systemPrompt);
-      return dataAgent.ask(prepared.messageText);
+      return _askPrepared(options, session, dataAgent, message);
     },
   };
 }

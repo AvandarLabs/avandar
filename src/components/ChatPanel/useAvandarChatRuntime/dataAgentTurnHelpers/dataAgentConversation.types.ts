@@ -134,13 +134,14 @@ export type DataAgentConversation = AgentConversationState & {
   datasets: readonly DataAgentDataset[];
   /**
    * The page block last sent in full, to send "unchanged" instead of
-   * repeats. An empty Data Explorer's block that a device turn left out is
-   * not recorded.
+   * repeats. Recorded once the agent has the turn's text, even if its answer
+   * then failed, and not for a turn that failed before. An empty Data
+   * Explorer's block that a device turn left out is not recorded.
    */
   lastPageBlock?: string;
   /**
-   * The attached block built last turn, to send "unchanged" or "cleared"
-   * lines.
+   * The attached block the agent last took, to send "unchanged" or "cleared"
+   * lines. Recorded on the same terms as `lastPageBlock`.
    */
   lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */
