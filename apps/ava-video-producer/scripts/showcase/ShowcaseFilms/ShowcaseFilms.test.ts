@@ -51,53 +51,20 @@ async function _withCatalogCopy(
 ) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-catalog-"));
   try {
-    const files = [
-      "scripts/showcase/ShowcaseFilms/ShowcaseFilms.ts",
-      "scripts/stock/buildStockContracts/buildStockContracts.ts",
-      "scripts/require-license.mjs",
-      "scripts/lib/readLicense.mjs",
-      "scripts/stock/StockFingerprintModule/StockFingerprintModule.ts",
-      "scripts/lib/planHelpers.ts",
-      "scripts/lib/productRequirements/productRequirements.ts",
-      "scripts/lib/product-source.mjs",
-      "src/avandar/cursor-targets.json",
-      "src/storyboard/schema/schema.ts",
-      "src/storyboard/schema/primitives.ts",
-      "src/storyboard/schema/shotSchema.ts",
-      "src/storyboard/schema/storyboardSchema.ts",
-      "src/storyboard/schema/timeline.ts",
-      "src/storyboard/schema/getCueWindowFromShot.ts",
-      "src/scenes/layout/layout.ts",
-      "src/scenes/layout/geometry.ts",
-      "src/scenes/layout/graphLayout.ts",
-      "src/scenes/layout/textLayout.ts",
-      "src/scenes/layout/captionLayout.ts",
-      "src/motion.ts",
-      "src/gallery/palette.ts",
-      "src/gallery/theme-colors.json",
-      "src/stock/catalog.ts",
-    ];
+    // The whole source, script, and theme trees, so a new import in a module
+    // the catalog loads never breaks this copy. The generated product bridge
+    // is large and the catalog never imports it.
+    const generated = path.join(appRoot, "src/avandar/generated");
     await Promise.all(
-      files.map(async (file) => {
-        await fs.mkdir(path.dirname(path.join(root, file)), {
+      ["src", "scripts", "themes"].map(async (directory) => {
+        await fs.cp(path.join(appRoot, directory), path.join(root, directory), {
           recursive: true,
+          filter: (source) => {
+            return !source.startsWith(generated);
+          },
         });
-        await fs.copyFile(path.join(appRoot, file), path.join(root, file));
       }),
     );
-    await fs.cp(
-      path.join(appRoot, "src/continuity"),
-      path.join(root, "src/continuity"),
-      { recursive: true },
-    );
-    await fs.cp(
-      path.join(appRoot, "src/motion-components"),
-      path.join(root, "src/motion-components"),
-      { recursive: true },
-    );
-    await fs.cp(path.join(appRoot, "src/stock"), path.join(root, "src/stock"), {
-      recursive: true,
-    });
     await fs.writeFile(
       path.join(root, "package.json"),
       JSON.stringify({ type: "module" }),
