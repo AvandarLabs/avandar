@@ -7,6 +7,8 @@ import { AliquotTubeLabels } from "./AliquotTubeLabels";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
 
+/** How strongly the liquid in a tube shows. */
+const LIQUID_OPACITY = 0.7;
 type Props = {
   tube: Input["parent"];
   parentId: string;
@@ -60,7 +62,7 @@ export function AliquotTube({
         width={40}
         height={volume * 9}
         fill={accent}
-        opacity={0.7}
+        opacity={LIQUID_OPACITY}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M${x - 29} 146 H${x + 29}` }}

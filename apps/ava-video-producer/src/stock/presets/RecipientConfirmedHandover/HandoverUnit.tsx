@@ -3,8 +3,8 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";

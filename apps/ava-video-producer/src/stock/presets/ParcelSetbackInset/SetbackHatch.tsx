@@ -1,6 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+/** How strongly the setback hatching shows. */
+const HATCH_OPACITY = 0.45;
 /** Inputs for SetbackHatch. */
 type Props = { hatchId: string };
 
@@ -16,7 +18,7 @@ export function SetbackHatch({ hatchId }: Readonly<Props>): ReactNode {
           shape={{ kind: "path", d: "M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" }}
           profile={tokens.sketch.shape}
           stroke={tokens.color.highlight}
-          strokeOpacity={0.45}
+          strokeOpacity={HATCH_OPACITY}
         />
       </pattern>
     </defs>

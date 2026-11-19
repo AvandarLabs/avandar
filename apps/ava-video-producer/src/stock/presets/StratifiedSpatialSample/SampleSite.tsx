@@ -9,6 +9,8 @@ import { SiteKey } from "./SiteKey";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
+/** How strongly a site's leader line to the sample rail shows. */
+const LEADER_OPACITY = 0.2;
 type Props = {
   site: Input["sites"][number];
   index: number;
@@ -41,7 +43,7 @@ export function SampleSite({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeOpacity={0.2}
+        strokeOpacity={LEADER_OPACITY}
       />
       <SiteAnchor
         siteId={site.id}

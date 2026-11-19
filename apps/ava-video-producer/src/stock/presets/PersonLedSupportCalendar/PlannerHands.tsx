@@ -2,8 +2,8 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPlannerHandsFromInputAndFrame } from "./getPlannerHandsFromInputAndFrame";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";

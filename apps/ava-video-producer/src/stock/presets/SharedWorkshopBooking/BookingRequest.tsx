@@ -3,8 +3,8 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AgreementTab } from "./AgreementTab";
 import { BookingParticipant } from "./BookingParticipant";
 import { getBookingFromFrame } from "./getBookingFromFrame";

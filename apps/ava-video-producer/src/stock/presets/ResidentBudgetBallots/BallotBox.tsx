@@ -31,8 +31,12 @@ export function BallotBox({ frame }: Readonly<Props>): ReactNode {
         stroke={tokens.color.inactive}
       />
       <path d="M424 252 h112 v12 H424 Z" fill={tokens.color.ground} />
-      <polygon
-        points={`420,250 540,${250 - lift} 540,${264 - lift} 420,264`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M420,250 540,${250 - lift} 540,${264 - lift} 420,264 Z`,
+        }}
+        profile={tokens.sketch.shape}
         fill={tokens.color.surface}
         stroke={tokens.color.inactive}
       />

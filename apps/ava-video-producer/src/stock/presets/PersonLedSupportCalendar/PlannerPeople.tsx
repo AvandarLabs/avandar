@@ -10,6 +10,8 @@ import { PlannerHands } from "./PlannerHands";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
 
+/** The normalised path length the agreement check draws on along. */
+const DRAW_ON_LENGTH = 1;
 type Props = { input: Input; frame: number; accent: string };
 /** Two actors perform the proposal, participant-led move and agreement. */
 export function PlannerPeople({
@@ -54,9 +56,9 @@ export function PlannerPeople({
           fill="none"
           stroke={accent}
           strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - motion.reveal(frame, 120)}
+          pathLength={DRAW_ON_LENGTH}
+          strokeDasharray={DRAW_ON_LENGTH}
+          strokeDashoffset={DRAW_ON_LENGTH - motion.reveal(frame, 120)}
           opacity={motion.ramp(
             frame,
             120,

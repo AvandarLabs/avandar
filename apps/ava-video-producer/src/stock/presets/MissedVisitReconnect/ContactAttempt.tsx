@@ -6,6 +6,8 @@ import {
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
+/** The dash of a contact attempt that did not reach the person. */
+const UNREACHED_DASH = "2 3";
 type Props = {
   item: Input["cases"][number];
   index: number;
@@ -49,7 +51,9 @@ export function ContactAttempt({
         shape={{ kind: "path", d: `M325 ${y} H337` }}
         profile={tokens.sketch.shape}
         stroke={accent}
-        strokeDasharray={item.outcome === "unreached" ? "2 3" : undefined}
+        strokeDasharray={
+          item.outcome === "unreached" ? UNREACHED_DASH : undefined
+        }
       />
     </g>
   );

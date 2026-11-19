@@ -32,7 +32,8 @@ export function ReconnectOutcomes({ input }: Readonly<Props>): ReactNode {
                   x={55 + index * 230}
                   y={480}
                   fill={tokens.color.text}
-                  fontSize={18}
+                  fontSize={tokens.text.graphic.label.fontSize}
+                  fontFamily={tokens.text.graphic.label.fontFamily}
                 >
                   {input.cases.filter(propEq("outcome", outcome)).length}/
                   {input.cases.length}

@@ -1,8 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getFloorTileGeometryFromInputAndFrame } from "./getFloorTileGeometryFromInputAndFrame";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
@@ -51,7 +53,7 @@ export function ShelterTile({
         width={width}
         height={height}
         fill={isSleeping ? accent : tokens.color.surface}
-        fillOpacity={isSleeping ? 0.4 : 1}
+        fillOpacity={isSleeping ? tokens.alpha.dimmed : 1}
         stroke={isSleeping ? accent : tokens.color.highlight}
       />
       {!isSleeping ? (

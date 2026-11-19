@@ -10,6 +10,8 @@ import { TrackLabels } from "./TrackLabels";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
+/** The experiment track's tint, before the theme's tint strength. */
+const TRACK_TINT = 0.3;
 type Props = { input: Input; frame: number; accent: string };
 /**
  * A single released ball stops at the supplied observation after all flags
@@ -42,7 +44,7 @@ export function ExperimentTrack({
         height={390}
         rx={scales.corner(15)}
         fill={tokens.color.surface}
-        fillOpacity={0.3}
+        fillOpacity={scales.wash(TRACK_TINT)}
         stroke={tokens.color.line}
       />
       <SketchedShape

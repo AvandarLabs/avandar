@@ -7,6 +7,10 @@ import {
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
+/** A stratum's tint, before the theme's tint strength. */
+const STRATUM_TINT = 0.06;
+/** How strongly a stratum's callout leader shows. */
+const LEADER_OPACITY = 0.3;
 type Props = {
   stratum: Input["strata"][number];
   index: number;
@@ -27,28 +31,32 @@ export function StratumBoundary({
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const [firstX, firstY] = stratum.polygon[0];
+  const points = stratum.polygon
+    .map(([x, y]) => {
+      return `${70 + x * 4.8},${170 + y * 2.7}`;
+    })
+    .join(" ");
   return (
     <g>
-      <polygon
-        data-stratum-boundary={stratum.id}
-        points={stratum.polygon
-          .map(([x, y]) => {
-            return `${70 + x * 4.8},${170 + y * 2.7}`;
-          })
-          .join(" ")}
-        fill={color}
-        fillOpacity={
-          0.06 * motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
-        }
-        stroke={color}
-        strokeOpacity={motion.ramp(
-          frame,
-          18,
-          motion.hero,
-          motion.reveal.easing,
-        )}
-        strokeWidth={scales.stroke(tokens.stroke.outline)}
-      />
+      <g data-stratum-boundary={stratum.id}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M${points} Z` }}
+          profile={tokens.sketch.shape}
+          fill={color}
+          fillOpacity={
+            scales.wash(STRATUM_TINT) *
+            motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
+          }
+          stroke={color}
+          strokeOpacity={motion.ramp(
+            frame,
+            18,
+            motion.hero,
+            motion.reveal.easing,
+          )}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
+        />
+      </g>
       <SketchedShape
         shape={{
           kind: "path",
@@ -58,7 +66,8 @@ export function StratumBoundary({
         fill="none"
         stroke={color}
         strokeOpacity={
-          0.3 * motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
+          LEADER_OPACITY *
+          motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
         }
       />
       <text
@@ -66,7 +75,8 @@ export function StratumBoundary({
         y={468}
         textAnchor="middle"
         fill={color}
-        fontSize={12}
+        fontSize={tokens.text.graphic.data.fontSize}
+        fontFamily={tokens.text.graphic.data.fontFamily}
       >
         {index + 1}
       </text>

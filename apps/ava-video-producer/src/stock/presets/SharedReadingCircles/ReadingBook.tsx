@@ -3,14 +3,18 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReadingGeometryFromInput } from "./getReadingGeometryFromInput";
 import { PhysicalReadingBook } from "./PhysicalReadingBook";
 import { ReadingBookLabels } from "./ReadingBookLabels";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
 
+/** The reading table's horizontal radius. */
+const TABLE_RADIUS_X = 94;
+/** The reading table's vertical radius. */
+const TABLE_RADIUS_Y = 48;
 type Props = {
   input: Input;
   groupIndex: number;
@@ -38,7 +42,13 @@ export function ReadingBook({
   return (
     <g>
       <SketchedShape
-        shape={{ kind: "ellipse", cx: tableX, cy: 330, rx: 94, ry: 48 }}
+        shape={{
+          kind: "ellipse",
+          cx: tableX,
+          cy: 330,
+          rx: TABLE_RADIUS_X,
+          ry: TABLE_RADIUS_Y,
+        }}
         profile={tokens.sketch.shape}
         fill={tokens.color.surface}
         stroke={tokens.color.line}

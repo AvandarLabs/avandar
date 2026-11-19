@@ -29,8 +29,9 @@ export function ZoneGround({
   const motion = useGraphicMotion();
   return (
     <g>
-      <polygon
-        points={points}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${points} Z` }}
+        profile={tokens.sketch.shape}
         fill={tokens.color.surface}
         stroke={tokens.color.inactive}
         strokeDasharray={tokens.dash.pending.join(" ")}
@@ -45,7 +46,7 @@ export function ZoneGround({
           fill="none"
           stroke={accent}
           strokeOpacity={
-            0.4 *
+            tokens.alpha.dimmed *
             motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing)
           }
         />

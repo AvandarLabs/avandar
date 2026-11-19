@@ -7,6 +7,8 @@ import {
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 
+/** How strongly an observer's leader line to the tape shows. */
+const LEADER_OPACITY = 0.35;
 type Props = { input: Input; endX: number; accent: string };
 /** Two named observers hold the moving tape ends with attached hands. */
 export function TapeObservers({
@@ -54,7 +56,7 @@ export function TapeObservers({
               }}
               profile={tokens.sketch.shape}
               stroke={accent}
-              opacity={0.35}
+              opacity={LEADER_OPACITY}
               fill="none"
             />
           </g>

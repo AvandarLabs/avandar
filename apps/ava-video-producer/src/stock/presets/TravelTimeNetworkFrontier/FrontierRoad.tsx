@@ -40,8 +40,9 @@ export function FrontierRoad({
   });
   return (
     <g>
-      <line
-        {...source}
+      <SketchedShape
+        shape={{ kind: "line", ...source }}
+        profile={tokens.sketch.shape}
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />

@@ -7,6 +7,11 @@ import {
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 
+/**
+ * The ladle bowl: a 12 by 5 ellipse centred 5 below the handle's top, drawn
+ * as two arcs.
+ */
+const LADLE_BOWL = "M-12 5 a12 5 0 1 0 24 0 a12 5 0 1 0 -24 0";
 type Props = {
   component: Input["plannedComponents"][number];
   frame: number;
@@ -35,7 +40,7 @@ export function ServingUtensil({
       }
     >
       <SketchedShape
-        shape={{ kind: "ellipse", cx: 0, cy: 5, rx: 12, ry: 5 }}
+        shape={{ kind: "path", d: LADLE_BOWL }}
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.text}

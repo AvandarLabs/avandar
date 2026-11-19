@@ -1,7 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getRehearsalFromFrame } from "./getRehearsalFromFrame";
 import { PracticeInterior } from "./PracticeInterior";
 import { PracticePeople } from "./PracticePeople";

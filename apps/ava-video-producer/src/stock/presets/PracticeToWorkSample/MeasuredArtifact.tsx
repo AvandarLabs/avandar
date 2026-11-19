@@ -9,6 +9,12 @@ import { MeasurementMark } from "./MeasurementMark";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
+/** A fabric workpiece's corner, before the theme's corner style. */
+const FABRIC_CORNER = 14;
+/** A sheet workpiece's corner, before the theme's corner style. */
+const SHEET_CORNER = 2;
+/** How strongly the practice piece's rough edges show. */
+const EDGE_GUIDE_OPACITY = 0.3;
 type Props = {
   input: Input;
   x: number;
@@ -34,7 +40,7 @@ export function MeasuredArtifact({
       <StockRect
         width={220}
         height={116}
-        rx={material === "fabric" ? 14 : 2}
+        rx={scales.corner(material === "fabric" ? FABRIC_CORNER : SHEET_CORNER)}
         fill={tokens.color.surface}
         stroke={isPractice ? tokens.color.text : tokens.color.highlight}
         strokeWidth={scales.stroke(tokens.stroke.default)}
@@ -48,7 +54,7 @@ export function MeasuredArtifact({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={tokens.color.highlight}
-          strokeOpacity={0.3}
+          strokeOpacity={EDGE_GUIDE_OPACITY}
         />
       ) : undefined}
       {material === "fabric" ? (

@@ -1,10 +1,15 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import { ShadeFootprint } from "./ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
+/** The existing shade's tint, before the theme's tint strength. */
+const EXISTING_SHADE_TINT = 0.3;
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** Zone-owned footprints preserve the complete supplied ground area. */
 export function ShadeZone({
@@ -14,6 +19,7 @@ export function ShadeZone({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const zone = input.zones[index];
   const y = 165 + index * 65;
   return (
@@ -35,7 +41,7 @@ export function ShadeZone({
         width={(zone.existingShadeM2 / zone.areaM2) * 600}
         height={36}
         fill={tokens.color.accentAlt}
-        fillOpacity={0.3}
+        fillOpacity={scales.wash(EXISTING_SHADE_TINT)}
       />
       {input.installations.map((item, itemIndex) => {
         return item.zoneId === zone.id ? (

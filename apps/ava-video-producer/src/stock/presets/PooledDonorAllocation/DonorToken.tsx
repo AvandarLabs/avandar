@@ -7,6 +7,8 @@ import {
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { ReactNode } from "react";
 
+/** The size of the request ordinal printed on an earmark tag. */
+const REQUEST_ORDINAL_SIZE = 10;
 type Props = {
   token: ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
   requestOrdinal: number;
@@ -54,7 +56,8 @@ export function DonorToken({
             x={0}
             y={17}
             textAnchor="middle"
-            fontSize={10}
+            fontSize={REQUEST_ORDINAL_SIZE}
+            fontFamily={tokens.text.graphic.data.fontFamily}
             fill={tokens.color.ground}
           >
             {requestOrdinal}

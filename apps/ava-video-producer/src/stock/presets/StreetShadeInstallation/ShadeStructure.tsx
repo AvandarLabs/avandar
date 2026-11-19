@@ -1,8 +1,13 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
+/** An installed canopy's tint, before the theme's tint strength. */
+const CANOPY_TINT = 0.3;
 type Props = {
   kind: Input["installations"][number]["kind"];
   index: number;
@@ -25,6 +30,7 @@ export function ShadeStructure({
   color,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   if (width === 0) {
     return undefined;
   }
@@ -40,7 +46,7 @@ export function ShadeStructure({
         }}
         profile={tokens.sketch.shape}
         fill={isInstalled ? color : "none"}
-        fillOpacity={0.3}
+        fillOpacity={scales.wash(CANOPY_TINT)}
         stroke={color}
       />
     </g>

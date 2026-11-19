@@ -12,6 +12,8 @@ import { HandoverRecipient } from "./HandoverRecipient";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+/** The dash of the handover zone between giver and recipient. */
+const HANDOVER_ZONE_DASH = "4 6";
 /** Complete authored handover and shared frame controls. */
 export type Props = GraphicProps & { input: Input };
 /** Physical recipient selection precedes the quantity acknowledgement. */
@@ -40,7 +42,7 @@ export function RecipientConfirmedHandover({
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.elevated}
         stroke={tokens.color.line}
-        strokeDasharray="4 6"
+        strokeDasharray={HANDOVER_ZONE_DASH}
       />
       <SketchedShape
         shape={{

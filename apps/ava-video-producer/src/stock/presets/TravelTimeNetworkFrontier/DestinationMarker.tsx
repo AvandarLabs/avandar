@@ -1,4 +1,5 @@
 import { Text } from "../../graphics-common/Text";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
@@ -38,16 +39,17 @@ export function DestinationMarker({
   const center = { cx: 48 + node.x * 4, cy: 150 + node.y * 3.4 };
   return (
     <g>
-      <circle
-        data-reachable={reached}
-        {...center}
-        r={10}
-        fill={tokens.color.surface}
-        stroke={reached ? accent : tokens.color.highlight}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
-      />
+      <g data-reachable={reached}>
+        <SketchedShape
+          shape={{ kind: "circle", ...center, r: 10 }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={reached ? accent : tokens.color.highlight}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+        />
+      </g>
       <circle {...center} r={7} fill={accent} fillOpacity={active} />
-      <Text x={center.cx} y={center.cy + 4} size={12} anchor="middle">
+      <Text x={center.cx} y={center.cy + 4} role="data" anchor="middle">
         {index + 1}
       </Text>
     </g>

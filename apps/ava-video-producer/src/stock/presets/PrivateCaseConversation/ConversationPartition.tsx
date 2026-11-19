@@ -7,6 +7,8 @@ import {
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
+/** The privacy screen's tint, before the theme's tint strength. */
+const SCREEN_TINT = 0.45;
 type Props = { frame: number; partition: "door" | "screen" };
 /** Both separators close only after the supporter clears the doorway. */
 export function ConversationPartition({
@@ -39,7 +41,7 @@ export function ConversationPartition({
           width={12}
           height={140 * closure}
           fill={tokens.color.accentAlt}
-          fillOpacity={0.45}
+          fillOpacity={scales.wash(SCREEN_TINT)}
           stroke={tokens.color.accentAlt}
         />
       ) : (

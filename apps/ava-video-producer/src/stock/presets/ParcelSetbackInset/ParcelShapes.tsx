@@ -1,3 +1,4 @@
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
@@ -24,14 +25,14 @@ export function ParcelShapes({
   const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-original-parcel={parcelId}
         {...geometry.original}
         fill={`url(#${hatchId})`}
         stroke={tokens.color.inactive}
         strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
-      <rect
+      <StockRect
         data-envelope={parcelId}
         data-envelope-width={geometry.finalWidth}
         data-envelope-height={geometry.finalHeight}

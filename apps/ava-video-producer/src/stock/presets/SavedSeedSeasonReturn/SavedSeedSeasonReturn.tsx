@@ -2,8 +2,8 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import { SeedCaptions } from "./SeedCaptions";
 import { SeedContainers } from "./SeedContainers";

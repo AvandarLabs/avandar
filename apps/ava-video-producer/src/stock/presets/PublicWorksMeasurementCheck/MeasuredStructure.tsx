@@ -8,6 +8,8 @@ import { MeasurementRuler } from "./MeasurementRuler";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 
+/** The dash of the promised outline the built structure is measured against. */
+const PROMISED_DASH = "6 5";
 type Props = { input: Input; accent: string };
 /**
  * One physical dimension uses the same 65-pixel unit for promise and object.
@@ -30,7 +32,7 @@ export function MeasuredStructure({
         height={94}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray="6 5"
+        strokeDasharray={PROMISED_DASH}
       />
       <StockRect
         data-actual-structure={input.structure}

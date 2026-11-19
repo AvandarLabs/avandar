@@ -11,6 +11,8 @@ import { ClinicVehicle } from "./ClinicVehicle";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
+/** The dash of the drive between the two clinic sites. */
+const ROUTE_DASH = "5 10";
 type Props = { input: Input; frame: number; accent: string };
 /** A schematic route preserves authored local coordinates in both contexts. */
 export function ClinicMap({
@@ -49,8 +51,9 @@ export function ClinicMap({
             1 - motion.ramp(frame, 36, motion.scale(24), motion.exit.easing)
           }
         >
-          <circle
-            r={35}
+          <SketchedShape
+            shape={{ kind: "circle", cx: 0, cy: 0, r: 35 }}
+            profile={tokens.sketch.shape}
             fill={tokens.color.surface}
             stroke={tokens.color.line}
           />
@@ -81,7 +84,7 @@ export function ClinicMap({
         }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
-        strokeDasharray="5 10"
+        strokeDasharray={ROUTE_DASH}
         fill="none"
       />
       {sites.map((site, index) => {

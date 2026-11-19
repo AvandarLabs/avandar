@@ -1,4 +1,5 @@
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
+import { getZoneShadeFromFraction } from "./zoneShade";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PopulationNormalizedMap.schema";
 
@@ -24,11 +25,10 @@ export function getZoneShadeFromInputAndFrame({
     rateBase: input.rateBase,
   });
   const rateFraction = rate / input.colorDomains.normalizedMaximum;
-  const opacity =
-    0.12 +
-    0.76 *
-      (countFraction +
-        (rateFraction - countFraction) *
-          motion.ramp(frame, 72, motion.scale(36), motion.travel.easing));
+  const opacity = getZoneShadeFromFraction(
+    countFraction +
+      (rateFraction - countFraction) *
+        motion.ramp(frame, 72, motion.scale(36), motion.travel.easing),
+  );
   return { rate, opacity };
 }

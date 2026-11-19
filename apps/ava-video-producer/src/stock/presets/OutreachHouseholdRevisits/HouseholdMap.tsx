@@ -1,7 +1,10 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -15,6 +18,7 @@ export function HouseholdMap({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.households.map((household, index) => {
@@ -61,7 +65,11 @@ export function HouseholdMap({
                 profile={tokens.sketch.shape}
                 fill={tokens.color.surface}
                 stroke={color}
-                strokeWidth={state === "contacted" ? 3 : 1.5}
+                strokeWidth={scales.stroke(
+                  state === "contacted"
+                    ? tokens.stroke.emphasis
+                    : tokens.stroke.outline,
+                )}
               />
             </g>
             <FitText

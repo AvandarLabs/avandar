@@ -2,8 +2,8 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassroomLearners } from "./ClassroomLearners";
 import { CoverStaff } from "./CoverStaff";
 import { getCoverPositionsFromFrame } from "./getCoverPositionsFromFrame";

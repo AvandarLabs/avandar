@@ -5,6 +5,8 @@ import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
+/** The dash of an appointment slot left empty. */
+const EMPTY_SLOT_DASH = "3 3";
 type Props = { item: Input["cases"][number]; y: number };
 /** The original person label, home and empty appointment remain visible. */
 export function CaseHome({ item, y }: Readonly<Props>): ReactNode {
@@ -27,7 +29,7 @@ export function CaseHome({ item, y }: Readonly<Props>): ReactNode {
         height={22}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray="3 3"
+        strokeDasharray={EMPTY_SLOT_DASH}
       />
     </g>
   );

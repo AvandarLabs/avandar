@@ -8,6 +8,8 @@ import { WATER_DESTINATIONS } from "./waterDestinationKeys";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
 
+/** The normalised path length the overflow path draws on along. */
+const DRAW_ON_LENGTH = 1;
 type Props = { input: Input; frame: number };
 /** Excess water traverses a distinct crest only after detention has filled. */
 export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
@@ -41,9 +43,9 @@ export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
             tokens.color.categorical[WATER_DESTINATIONS.overflow.category]
           }
           strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - progress}
+          pathLength={DRAW_ON_LENGTH}
+          strokeDasharray={DRAW_ON_LENGTH}
+          strokeDashoffset={DRAW_ON_LENGTH - progress}
           opacity={overflow > 0 ? 1 : 0}
         />
       </g>

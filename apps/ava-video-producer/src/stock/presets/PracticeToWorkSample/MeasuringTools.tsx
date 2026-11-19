@@ -8,6 +8,8 @@ import { RulerTicks } from "./RulerTicks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
+/** The ruler's tint, before the theme's tint strength. */
+const RULER_TINT = 0.2;
 type Props = {
   input: Input;
   isMeasuring: boolean;
@@ -52,7 +54,7 @@ export function MeasuringTools({
         width={input.task.value * 12 + 28}
         height={16}
         fill={tokens.color.highlight}
-        fillOpacity={0.2}
+        fillOpacity={scales.wash(RULER_TINT)}
         stroke={tokens.color.highlight}
       />
       <RulerTicks input={input} origin={origin} rulerY={rulerY} />

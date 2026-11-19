@@ -6,6 +6,8 @@ import {
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
+/** The dash of the alignment guides. */
+const ALIGNMENT_DASH = "3 4";
 type Props = { input: Input };
 /** Alignment Guides for the authored scene. */
 export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {
@@ -21,7 +23,7 @@ export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray="3 4"
+        strokeDasharray={ALIGNMENT_DASH}
       />
     </g>
   ) : undefined;

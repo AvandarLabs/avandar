@@ -2,8 +2,8 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReadingLearnerFromInput } from "./getReadingLearnerFromInput";
 import { getReadingSeatPathFromFrame } from "./getReadingSeatPathFromFrame";
 import { ReadingPerson } from "./ReadingPerson";

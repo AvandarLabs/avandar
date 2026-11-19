@@ -56,7 +56,9 @@ export function TrayCompartment({
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.surface}
         stroke={tokens.color.line}
-        strokeWidth={mix(outlineEmphasis, 1, 2)}
+        strokeWidth={scales.stroke(
+          mix(outlineEmphasis, tokens.stroke.hairline, tokens.stroke.default),
+        )}
       />
       <CompartmentLabel
         component={component}

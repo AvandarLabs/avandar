@@ -36,7 +36,8 @@ export function SiteKey({
         x={638}
         y={railY + 4}
         fill={tokens.color.text}
-        fontSize={12}
+        fontSize={tokens.text.graphic.data.fontSize}
+        fontFamily={tokens.text.graphic.data.fontFamily}
         textAnchor="middle"
       >
         {index + 1}

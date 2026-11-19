@@ -45,7 +45,13 @@ export function StratumRegion({
         frame={frame}
         color={color}
       />
-      <text x={40 + index * 230} y={88} fill={color} fontSize={12}>
+      <text
+        x={40 + index * 230}
+        y={88}
+        fill={color}
+        fontSize={tokens.text.graphic.data.fontSize}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+      >
         {index + 1}
       </text>
       <LabelSlots

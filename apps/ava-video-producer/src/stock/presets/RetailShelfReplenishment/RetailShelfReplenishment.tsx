@@ -2,8 +2,8 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
 import { ShelfActors } from "./ShelfActors";

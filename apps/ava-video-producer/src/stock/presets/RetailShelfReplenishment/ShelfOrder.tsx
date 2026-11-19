@@ -4,8 +4,8 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
+  useGraphicMotion,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getOrderSlipPoseFromFrame } from "./getOrderSlipPoseFromFrame";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";

@@ -38,7 +38,7 @@ export function NetworkCosts({ input, frame }: Readonly<Props>): ReactNode {
             <Text
               x={238 + (index % 4) * 220}
               y={532 + Math.floor(index / 4) * 32}
-              size={12}
+              role="data"
               anchor="end"
             >
               {road.minutes}

@@ -7,6 +7,8 @@ import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
 
+/** The size of the session's balancing totals. */
+const TOTAL_SIZE = 28;
 type Props = { input: Input; frame: number };
 /**
  * The conservation equation and unique-person count are separate quantities.
@@ -28,14 +30,21 @@ export function SessionTotals({ input, frame }: Readonly<Props>): ReactNode {
             x={32}
             y={570}
             fill={tokens.color.text}
-            fontSize={28}
+            fontSize={TOTAL_SIZE}
+            fontFamily={tokens.text.graphic.data.fontFamily}
           >{`${input.units.length} = ${counts.join(" + ")}`}</text>
         </g>
       ) : undefined}
       {input.showPeopleTotal ? (
         <g data-people-total={input.recipients.length}>
           <SceneLabel text={input.copy.people} x={540} y={495} width={385} />
-          <text x={540} y={570} fill={tokens.color.text} fontSize={28}>
+          <text
+            x={540}
+            y={570}
+            fill={tokens.color.text}
+            fontSize={TOTAL_SIZE}
+            fontFamily={tokens.text.graphic.data.fontFamily}
+          >
             {input.recipients.length}
           </text>
         </g>

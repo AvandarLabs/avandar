@@ -7,6 +7,8 @@ import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokens
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
 
+/** The funding pool's tint, before the theme's tint strength. */
+const POOL_TINT = 0.025;
 type Props = {
   input: Input;
   tokens: ReturnType<typeof getAllocationTokensFromInputAndFrame>;
@@ -33,7 +35,7 @@ export function FundingPool({
         height={104}
         rx={scales.corner(graphicTokens.corner.card)}
         fill={accent}
-        fillOpacity={0.025}
+        fillOpacity={scales.wash(POOL_TINT)}
         stroke={graphicTokens.color.inactive}
       />
       {input.showAllocationTotals ? (
@@ -42,7 +44,8 @@ export function FundingPool({
           x={220}
           y={277}
           fill={accent}
-          fontSize={16}
+          fontSize={graphicTokens.text.graphic.secondary.fontSize}
+          fontFamily={graphicTokens.text.graphic.secondary.fontFamily}
         >
           {remaining}
         </text>

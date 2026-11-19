@@ -6,6 +6,10 @@ import {
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 
+/** A grain's horizontal radius. */
+const GRAIN_RADIUS_X = 3;
+/** A grain's vertical radius. */
+const GRAIN_RADIUS_Y = 5;
 type Props = {
   symbol: Input["plannedComponents"][number]["symbol"];
   color: string;
@@ -18,13 +22,8 @@ export function FoodSymbol({ symbol, color }: Readonly<Props>): ReactNode {
     <g fill={color} stroke={color} strokeWidth={scales.stroke(1.3)}>
       {symbol === "grain" ? (
         <>
-          <ellipse
-            cx={-4}
-            cy={-3}
-            rx={scales.corner(3)}
-            ry={scales.corner(5)}
-          />
-          <ellipse cx={4} cy={3} rx={scales.corner(3)} ry={scales.corner(5)} />
+          <ellipse cx={-4} cy={-3} rx={GRAIN_RADIUS_X} ry={GRAIN_RADIUS_Y} />
+          <ellipse cx={4} cy={3} rx={GRAIN_RADIUS_X} ry={GRAIN_RADIUS_Y} />
         </>
       ) : undefined}
       {symbol === "beans" ? (

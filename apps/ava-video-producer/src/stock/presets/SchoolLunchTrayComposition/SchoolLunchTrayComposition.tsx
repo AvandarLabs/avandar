@@ -8,6 +8,8 @@ import { LunchTray } from "./LunchTray";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
+/** The tray's tint, before the theme's tint strength. */
+const TRAY_TINT = 0.35;
 /** Inputs for SchoolLunchTrayComposition. */
 type Props = GraphicProps & { input: Input };
 
@@ -28,7 +30,7 @@ export function SchoolLunchTrayComposition({
         height={304}
         rx={scales.corner(20)}
         fill={tokens.color.surface}
-        fillOpacity={0.35}
+        fillOpacity={scales.wash(TRAY_TINT)}
         stroke={tokens.color.line}
       />
       <LunchLabels input={input} accent={accent} frame={frame} />

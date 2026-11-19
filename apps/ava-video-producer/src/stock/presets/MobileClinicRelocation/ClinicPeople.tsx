@@ -8,6 +8,8 @@ import {
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
+/** The dash of a person's path to a booked slot. */
+const BOOKING_DASH = "4 5";
 type Props = { input: Input; frame: number; accent: string };
 
 /**
@@ -68,7 +70,7 @@ export function ClinicPeople({
                     motion.scale(10),
                     motion.reveal.easing,
                   )}
-                  strokeDasharray="4 5"
+                  strokeDasharray={BOOKING_DASH}
                 />
               </g>
             ) : undefined}

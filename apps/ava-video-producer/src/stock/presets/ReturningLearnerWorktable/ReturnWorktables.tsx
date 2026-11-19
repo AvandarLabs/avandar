@@ -5,6 +5,8 @@ import {
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
+/** The dash of the portfolio trail across the worktables. */
+const PORTFOLIO_TRAIL_DASH = "3 7";
 type Props = { showPortfolioTrail: boolean; accent: string };
 /** Two work surfaces retain the portfolio through its visible journey. */
 export function ReturnWorktables({
@@ -32,7 +34,7 @@ export function ReturnWorktables({
             profile={tokens.sketch.shape}
             fill="none"
             stroke={accent}
-            strokeDasharray="3 7"
+            strokeDasharray={PORTFOLIO_TRAIL_DASH}
             opacity={tokens.alpha.guide}
           />
         </g>

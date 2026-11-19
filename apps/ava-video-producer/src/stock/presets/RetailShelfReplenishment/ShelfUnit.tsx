@@ -38,7 +38,11 @@ export function ShelfUnit({
         y={-14}
         width={24}
         height={28}
-        rx={good.symbol === "vegetables" ? 12 : 4}
+        rx={scales.corner(
+          good.symbol === "vegetables"
+            ? tokens.corner.card
+            : tokens.corner.chip,
+        )}
         fill={tokens.color.surface}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}

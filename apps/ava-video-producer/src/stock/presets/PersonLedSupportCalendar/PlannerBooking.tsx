@@ -7,6 +7,8 @@ import { PlannerBookingLabel } from "./PlannerBookingLabel";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
 
+/** The dash of a booking that is still a proposal. */
+const PROPOSAL_DASH = "6 3";
 type Props = {
   commitment: Input["commitments"][number];
   x: number;
@@ -45,7 +47,7 @@ export function PlannerBooking({
         fill={isProposal ? "none" : tokens.color.elevated}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
-        strokeDasharray={isProposal ? "6 3" : undefined}
+        strokeDasharray={isProposal ? PROPOSAL_DASH : undefined}
       />
       {showLabel ? (
         <PlannerBookingLabel

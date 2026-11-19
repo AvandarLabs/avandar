@@ -1,5 +1,8 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AppointmentGeometry } from "./AppointmentGeometry";
 import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerBooking } from "./PlannerBooking";
@@ -20,7 +23,7 @@ export function PlannerAppointments({
     <g>
       <ExistingPlannerCommitments input={input} />
       {input.showOriginalAppointment && frame >= 52 ? (
-        <rect
+        <StockRect
           data-proposal-ghost={appointment.commitment.id}
           {...appointment.initial}
           fill="none"

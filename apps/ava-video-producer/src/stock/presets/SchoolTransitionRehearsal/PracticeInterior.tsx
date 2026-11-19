@@ -1,13 +1,14 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SchoolLocker } from "./SchoolLocker";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
 
+/** A floor mark's horizontal radius. */
+const FLOOR_MARK_RADIUS_X = 7;
+/** A floor mark's vertical radius. */
+const FLOOR_MARK_RADIUS_Y = 3;
 type Props = {
   input: Input;
   doorWidth: number;
@@ -25,7 +26,6 @@ export function PracticeInterior({
   finalStep,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <SketchedShape
@@ -47,15 +47,15 @@ export function PracticeInterior({
         />
       </g>
       {input.showFootprints ? (
-        <g opacity={0.25 * finalStep} fill={accent}>
+        <g opacity={tokens.alpha.ghost * finalStep} fill={accent}>
           {Array.from({ length: 7 }, (_, index) => {
             return (
               <ellipse
                 key={index}
                 cx={410 + index * 45}
                 cy={420 + (index % 2) * 7}
-                rx={scales.corner(7)}
-                ry={scales.corner(3)}
+                rx={FLOOR_MARK_RADIUS_X}
+                ry={FLOOR_MARK_RADIUS_Y}
               />
             );
           })}

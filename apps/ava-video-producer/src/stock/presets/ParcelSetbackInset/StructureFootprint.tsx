@@ -8,6 +8,8 @@ import { DimensionTicks } from "./DimensionTicks";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
 
+/** The structure footprint's tint, before the theme's tint strength. */
+const FOOTPRINT_TINT = 0.32;
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The whole authored footprint lowers without rotation or automatic resizing.
@@ -42,7 +44,7 @@ export function StructureFootprint({
         width={width}
         height={height}
         fill={accent}
-        fillOpacity={0.32}
+        fillOpacity={scales.wash(FOOTPRINT_TINT)}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />
