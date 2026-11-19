@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -20,9 +20,10 @@ export function CleanupLaneHeading({
   x,
   y,
   opacity = 1,
-  color = STOCK.muted,
+  color,
   fontSize = 14,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g
       data-cleanup-label={labelRole}
@@ -38,7 +39,7 @@ export function CleanupLaneHeading({
         maxLines={1}
         breakLongWords
         normalizeWhitespace
-        color={color}
+        color={color ?? tokens.color.textMuted}
       />
     </g>
   );

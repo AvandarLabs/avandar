@@ -1,7 +1,11 @@
 import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CellLiteralValue } from "./CellLiteralValue";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
+import { RAIL_CUE, RAIL_FRAMES } from "./cleanupTiming";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
@@ -12,9 +16,19 @@ export function CleanupRetainedValue({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const inline = input.comparison === "inline-ghost";
   return (
-    <g data-original-value={row.before} opacity={ramp(frame, 60, 52)}>
+    <g
+      data-original-value={row.before}
+      opacity={ramp(
+        frame,
+        RAIL_CUE,
+        motion.scale(RAIL_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
       {inline ? (
         <CleanupLaneHeading
           text={input.columnLabels.original}
@@ -31,7 +45,7 @@ export function CleanupRetainedValue({
           x={inline ? 88 : 514}
           y={inline ? 62 : 22}
           showWhitespace={input.showWhitespace}
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
       </g>
     </g>

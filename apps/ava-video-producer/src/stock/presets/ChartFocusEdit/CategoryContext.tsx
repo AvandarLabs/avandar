@@ -1,5 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CategoryContextHeading } from "./CategoryContextHeading";
+import { VALUE_FONT_SIZE } from "./chartShape";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +19,7 @@ export function CategoryContext({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.showValueLabels ? (
@@ -25,9 +27,9 @@ export function CategoryContext({
           data-value-label={category.id}
           x={884}
           y={y + 15}
-          fill={STOCK.text}
-          fontSize={14}
-          fontFamily="Arial, sans-serif"
+          fill={tokens.color.text}
+          fontSize={VALUE_FONT_SIZE}
+          fontFamily={tokens.text.graphic.data.fontFamily}
           textAnchor="end"
         >
           {category.value}
