@@ -10,7 +10,15 @@
  * stood in.
  */
 import { Model } from "@avandar/models";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
 import { requestStoredSessionTitle } from "@/components/ChatPanel/useAvandarChatRuntime/requestStoredSessionTitle";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -252,6 +260,13 @@ function _sessions(): ChatSessionActions {
 }
 
 describe("hosted reply privacy", () => {
+  // The adapter loads runDataAgentTurn with a dynamic import on its first run,
+  // which can take over 5s on a cold start. Loading it here keeps that cost out
+  // of the first test's timeout.
+  beforeAll(async () => {
+    await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
+  }, 20_000);
+
   beforeEach(() => {
     askMock.mockReset();
     apiPostMock.mockReset().mockResolvedValue({ title: "Visits" });
