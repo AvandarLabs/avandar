@@ -10,9 +10,6 @@ type Props = {
   opacity?: number;
   letterSpacing?: number;
 };
-
-/** A literal cell value's size, as content: no graphic text role is 14 px. */
-const VALUE_FONT_SIZE = 14;
 function _valuePresentation({
   value,
   showWhitespace,
@@ -46,10 +43,10 @@ export function CellLiteralValue({
       aria-label={value}
       x={x}
       y={y}
-      fontSize={VALUE_FONT_SIZE}
-      fontFamily={tokens.text.graphic.data.fontFamily}
+      fontSize={tokens.text.graphic.value.fontSize}
+      fontFamily={tokens.text.graphic.value.fontFamily}
       xmlSpace="preserve"
-      fill={color ?? tokens.color.text}
+      fill={color ?? tokens.text.graphic.value.color}
       opacity={opacity}
       letterSpacing={letterSpacing}
     >

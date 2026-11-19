@@ -44,7 +44,7 @@ export function ExpectationStation({
       data-state={state}
       opacity={ramp(
         frame,
-        12 + index * motion.scale(STATION_STAGGER_FRAMES),
+        12 + index * motion.scaleStagger(STATION_STAGGER_FRAMES),
         motion.scale(STATION_FRAMES),
         motion.reveal.easing,
       )}

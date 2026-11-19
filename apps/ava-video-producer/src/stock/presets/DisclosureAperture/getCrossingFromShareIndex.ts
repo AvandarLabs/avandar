@@ -16,7 +16,9 @@ export function getCrossingFromShareIndex(
   motion: VideoMotion,
 ): Readonly<{ at: number; duration: number }> {
   return {
-    at: FIRST_CROSSING_CUE + shareIndex * motion.scale(CROSSING_STAGGER_FRAMES),
+    at:
+      FIRST_CROSSING_CUE +
+      shareIndex * motion.scaleStagger(CROSSING_STAGGER_FRAMES),
     duration: motion.scale(CROSSING_FRAMES),
   };
 }

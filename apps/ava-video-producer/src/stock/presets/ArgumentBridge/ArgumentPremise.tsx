@@ -37,13 +37,13 @@ export function ArgumentPremise({
   const center = x + slotWidth / 2;
   const arrival = ramp(
     frame,
-    12 + index * motion.scale(ARRIVAL_STAGGER_FRAMES),
+    12 + index * motion.scaleStagger(ARRIVAL_STAGGER_FRAMES),
     motion.hero,
     motion.entrance.easing,
   );
   const joining = ramp(
     frame,
-    48 + index * motion.scale(JOIN_STAGGER_FRAMES),
+    48 + index * motion.scaleStagger(JOIN_STAGGER_FRAMES),
     motion.scale(JOIN_FRAMES),
     motion.travel.easing,
   );

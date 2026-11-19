@@ -44,7 +44,8 @@ export function ReceiptHalf({
     motion,
   });
   // Each receipt registers on its entry's cue, as that fold starts to close.
-  const leaveAt = RECEIPT_CUE + index * motion.scale(RECEIPT_STAGGER_FRAMES);
+  const leaveAt =
+    RECEIPT_CUE + index * motion.scaleStagger(RECEIPT_STAGGER_FRAMES);
   const progress = ramp(
     frame,
     leaveAt,

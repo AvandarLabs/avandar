@@ -39,9 +39,6 @@ const UNIT = {
   | "breakLongWords"
   | "normalizeWhitespace"
 >;
-/** The lifetime value's size, as content: no graphic text role is 14 px. */
-const VALUE_FONT_SIZE = 14;
-
 /**
  * Possession and neutral-dock copy reflect authored expiry, never a successor.
  */
@@ -75,9 +72,9 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
           <text
             x={52}
             y={151}
-            fontSize={VALUE_FONT_SIZE}
+            fontSize={tokens.text.graphic.value.fontSize}
             fill={tokens.color.textMuted}
-            fontFamily={tokens.text.graphic.data.fontFamily}
+            fontFamily={tokens.text.graphic.value.fontFamily}
           >
             {input.lifetime.value}
           </text>

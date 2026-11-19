@@ -71,7 +71,7 @@ export function getWidgetRectFromInput({
   const dock = motion.scale(DOCK_FRAMES);
   const progress = ramp(
     frame,
-    featured ? 40 : 64 + position * motion.scale(DOCK_STAGGER_FRAMES),
+    featured ? 40 : 64 + position * motion.scaleStagger(DOCK_STAGGER_FRAMES),
     dock,
     motion.travel.easing,
   );

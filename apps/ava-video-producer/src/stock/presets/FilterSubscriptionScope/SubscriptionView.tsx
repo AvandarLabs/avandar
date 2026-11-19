@@ -48,7 +48,7 @@ export function SubscriptionView({
       data-count-unit={input.metric.countUnit}
       opacity={ramp(
         frame,
-        13 + index * motion.scale(VIEW_STAGGER_FRAMES),
+        13 + index * motion.scaleStagger(VIEW_STAGGER_FRAMES),
         motion.scale(VIEW_FRAMES),
         motion.reveal.easing,
       )}
