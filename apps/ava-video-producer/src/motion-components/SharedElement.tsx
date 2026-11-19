@@ -19,6 +19,15 @@ export type SharedElementProps = {
   style?: CSSProperties;
 };
 
+function _rectToGeometry(rect: MotionRect) {
+  return {
+    left: rect.x,
+    top: rect.y,
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
 /** Keep one semantic object mounted as its measured rectangle changes. */
 export function SharedElement({
   source,
@@ -43,20 +52,7 @@ export function SharedElement({
   const geometry = interpolateStyles(
     progress,
     [0, 1],
-    [
-      {
-        left: source.x,
-        top: source.y,
-        width: source.width,
-        height: source.height,
-      },
-      {
-        left: target.x,
-        top: target.y,
-        width: target.width,
-        height: target.height,
-      },
-    ],
+    [_rectToGeometry(source), _rectToGeometry(target)],
   );
   return (
     <div

@@ -34,11 +34,26 @@ export function AppFrame(props: Props): ReactNode {
 
 function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
   const tokens = useVideoTokens();
+  const scales = useVideoShapeScales();
+  const rule = `${scales.stroke(tokens.stroke.hairline)}px solid ${tokens.color.scene.border}`;
+  return (
+    <>
+      <AppTitleBar w={w} title={title} rule={rule} />
+      <AppHeader w={w} heading={heading} sub={sub} rule={rule} />
+    </>
+  );
+}
+
+/** The window title bar: three dots and the window title. */
+function AppTitleBar({
+  w,
+  title,
+  rule,
+}: Readonly<{ w: number; title: string; rule: string }>): ReactNode {
+  const tokens = useVideoTokens();
   const { spacing } = useVideoTheme().mantine;
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
-  const appBody = tokens.text.stage.appBody;
-  const rule = `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`;
   const dot: CSSProperties = {
     width: DOT_SIZE,
     height: DOT_SIZE,
@@ -47,67 +62,95 @@ function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
     display: "block",
   };
   return (
-    <>
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: w,
+        height: BAR,
+        display: "flex",
+        alignItems: "center",
+        gap: spacing["8"],
+        padding: `0 ${spacing["2xs"]}`,
+        borderBottom: rule,
+        background: scene.background,
+        ...getStageTextStyle(tokens.text.stage.appBody),
+      }}
+    >
+      <i style={dot} />
+      <i style={dot} />
+      <i style={dot} />
+      {title}
+    </div>
+  );
+}
+
+/** The app header under the title bar: the orb, a heading, and a subline. */
+function AppHeader({
+  w,
+  heading,
+  sub,
+  rule,
+}: Readonly<{
+  w: number;
+  heading: string;
+  sub: string;
+  rule: string;
+}>): ReactNode {
+  const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
+  const scene = tokens.color.scene;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: BAR,
+        width: w,
+        height: HEAD,
+        display: "flex",
+        alignItems: "center",
+        gap: spacing["12"],
+        padding: `0 ${spacing["24"]}`,
+        borderBottom: rule,
+        background: scene.background,
+        fontFamily: tokens.text.stage.appTitle.fontFamily,
+        color: scene.foreground,
+      }}
+    >
+      <Orb />
+      <AppHeaderTitles heading={heading} sub={sub} />
+    </div>
+  );
+}
+
+/** The header's heading over its subline. */
+function AppHeaderTitles({
+  heading,
+  sub,
+}: Readonly<{ heading: string; sub: string }>): ReactNode {
+  const tokens = useVideoTokens();
+  return (
+    <div>
       <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: w,
-          height: BAR,
-          display: "flex",
-          alignItems: "center",
-          gap: spacing["8"],
-          padding: `0 ${spacing["2xs"]}`,
-          borderBottom: rule,
-          background: scene.background,
-          ...getStageTextStyle(appBody),
-        }}
+        style={getStageTextStyle(tokens.text.stage.appTitle, [
+          "fontSize",
+          "fontWeight",
+          "color",
+        ])}
       >
-        <i style={dot} />
-        <i style={dot} />
-        <i style={dot} />
-        {title}
+        {heading}
       </div>
       <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: BAR,
-          width: w,
-          height: HEAD,
-          display: "flex",
-          alignItems: "center",
-          gap: spacing["12"],
-          padding: `0 ${spacing["24"]}`,
-          borderBottom: rule,
-          background: scene.background,
-          fontFamily: tokens.text.stage.appTitle.fontFamily,
-          color: scene.foreground,
-        }}
+        style={getStageTextStyle(tokens.text.stage.appBody, [
+          "fontSize",
+          "fontWeight",
+          "color",
+        ])}
       >
-        <Orb />
-        <div>
-          <div
-            style={getStageTextStyle(tokens.text.stage.appTitle, [
-              "fontSize",
-              "fontWeight",
-              "color",
-            ])}
-          >
-            {heading}
-          </div>
-          <div
-            style={getStageTextStyle(appBody, [
-              "fontSize",
-              "fontWeight",
-              "color",
-            ])}
-          >
-            {sub}
-          </div>
-        </div>
+        {sub}
       </div>
-    </>
+    </div>
   );
 }

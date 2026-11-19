@@ -52,28 +52,64 @@ export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
         }}
       />
       {active && signal > 0 && (
-        <svg
-          className={css.connector}
-          viewBox={`0 0 ${CONTINUITY_STAGE.width} ${CONTINUITY_STAGE.height}`}
-          style={{
-            width: CONTINUITY_STAGE.width,
-            height: CONTINUITY_STAGE.height,
-            opacity: opacity * signal,
-          }}
-        >
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${active.overlay.target.x} ${source.y + source.height / 2} ${active.overlay.target.x + connector.bend} ${active.overlay.target.y + connector.drop}`,
-            }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={accent}
-            strokeWidth={connector.strokeWidth}
-            strokeDasharray={connector.dash.join(" ")}
-          />
-        </svg>
+        <ConnectorLine
+          source={source}
+          target={active.overlay.target}
+          opacity={opacity * signal}
+          accent={accent}
+        />
       )}
     </>
+  );
+}
+
+type SourceRect = Props["content"]["source"];
+type ConnectorTarget = Readonly<{ x: number; y: number }>;
+
+/** A curve from the source's centre to the active diagram's target. */
+function _buildConnectorPath(
+  source: SourceRect,
+  target: ConnectorTarget,
+  bend: Readonly<{ bend: number; drop: number }>,
+): string {
+  return `M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${target.x} ${source.y + source.height / 2} ${target.x + bend.bend} ${target.y + bend.drop}`;
+}
+
+/** The sketched connector line, drawn across the whole stage. */
+function ConnectorLine({
+  source,
+  target,
+  opacity,
+  accent,
+}: Readonly<{
+  source: SourceRect;
+  target: ConnectorTarget;
+  opacity: number;
+  accent: string;
+}>): ReactNode {
+  const connector = useVideoProps("Connector", {});
+  const tokens = useVideoTokens();
+  return (
+    <svg
+      className={css.connector}
+      viewBox={`0 0 ${CONTINUITY_STAGE.width} ${CONTINUITY_STAGE.height}`}
+      style={{
+        width: CONTINUITY_STAGE.width,
+        height: CONTINUITY_STAGE.height,
+        opacity,
+      }}
+    >
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: _buildConnectorPath(source, target, connector),
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={connector.strokeWidth}
+        strokeDasharray={connector.dash.join(" ")}
+      />
+    </svg>
   );
 }

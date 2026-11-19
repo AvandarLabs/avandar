@@ -62,20 +62,9 @@ type TitleCardProps = {
 
 function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
   const tokens = useVideoTokens();
-  const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
-  const scales = useVideoShapeScales();
-  const titleRole = tokens.text.stage.title;
-  const kickerRole = tokens.text.stage.kicker;
-  const words = name.split(" ");
   // The card fades out over the reveal, ending on the card's last frame.
   const fadeOut = motion.reveal;
-  const kickerIn = motion.ramp(
-    frame,
-    KICKER_IN,
-    motion.sheet,
-    motion.entrance.easing,
-  );
 
   // The whole card leaves together, onto the same dark field the app
   // arrives on, so the handover is a dissolve between two states of one
@@ -95,7 +84,7 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
     <AbsoluteFill
       style={{
         background: tokens.color.scene.ground,
-        fontFamily: titleRole.fontFamily,
+        fontFamily: tokens.text.stage.title.fontFamily,
         alignItems: "center",
         justifyContent: "center",
         opacity: out,
@@ -108,84 +97,135 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
           alignItems: "center",
         }}
       >
-        <div style={{ display: "flex", gap: spacing["22"] }}>
-          {words.map((word, i) => {
-            const t = motion.ramp(
-              frame,
-              WORD_IN + i * motion.rise.stagger,
-              motion.rise.duration,
-              motion.rise.easing,
-            );
-            return (
-              // One mask per word, never one mask around several lines. The
-              // word travels out from behind a hard edge; a word that
-              // merely fades up reads as a slide transition, not as
-              // typography.
-              <span
-                key={`${word}-${i}`}
-                style={{
-                  display: "inline-block",
-                  overflow: "hidden",
-                  lineHeight: titleRole.lineHeight,
-                  paddingBottom: spacing["6"],
-                }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
-                    // Negative tracking is what makes a title look set
-                    // rather than typed. At 92px, default tracking reads
-                    // loose and webby.
-                    ...getStageTextStyle(titleRole, WORD_FIELDS),
-                    // translateY only. Scaling a headline is the one thing
-                    // that must never happen here: it bites hardest on a
-                    // title, where type is the whole frame.
-                    transform: `translateY(${mix(t, 110, 0).toFixed(2)}%)`,
-                    // No opacity here, on purpose. Masking and fading at
-                    // the same time cancel out: the fade makes the word
-                    // visible above the edge it is supposed to be emerging
-                    // from, and what reads is a slide transition again. The
-                    // mask alone is the effect.
-                  }}
-                >
-                  {word}
-                </span>
-              </span>
-            );
-          })}
-        </div>
+        <TitleCardWords name={name} frame={frame} />
 
         {/* One accent, and it is a rule rather than a second colour on the
             letterforms. scaleX so it grows without relayout. Never a
             gradient across the type. */}
-        <div
-          style={{
-            width: 120,
-            height: 3,
-            borderRadius: scales.corner(tokens.corner.pill),
-            marginTop: spacing["26"],
-            background: tokens.color.scene.brand,
-            transformOrigin: "center",
-            transform: `scaleX(${motion
-              .ramp(frame, RULE_IN, motion.sheet, motion.entrance.easing)
-              .toFixed(3)})`,
-          }}
-        />
+        <TitleCardRule frame={frame} />
 
         {/* The kicker follows the name: two type elements arriving
             together have no hierarchy. The kicker role's alpha, not a
             second grey token. */}
-        <div
-          style={{
-            marginTop: spacing["22"],
-            ...getStageTextStyle(kickerRole),
-            opacity: kickerIn,
-            transform: `translateY(${mix(kickerIn, KICKER_RISE, 0).toFixed(2)}px)`,
-          }}
-        >
-          {kicker}
-        </div>
+        <TitleCardKicker kicker={kicker} frame={frame} />
       </div>
     </AbsoluteFill>
+  );
+}
+
+/** The name, one masked word at a time. */
+function TitleCardWords({
+  name,
+  frame,
+}: Readonly<{ name: string; frame: number }>): ReactNode {
+  const { spacing } = useVideoTheme().mantine;
+  const motion = useVideoMotion();
+  return (
+    <div style={{ display: "flex", gap: spacing["22"] }}>
+      {name.split(" ").map((word, i) => {
+        const t = motion.ramp(
+          frame,
+          WORD_IN + i * motion.rise.stagger,
+          motion.rise.duration,
+          motion.rise.easing,
+        );
+        return (
+          // One mask per word, never one mask around several lines. The
+          // word travels out from behind a hard edge; a word that
+          // merely fades up reads as a slide transition, not as
+          // typography.
+          <TitleCardWord key={`${word}-${i}`} word={word} progress={t} />
+        );
+      })}
+    </div>
+  );
+}
+
+function TitleCardWord({
+  word,
+  progress,
+}: Readonly<{ word: string; progress: number }>): ReactNode {
+  const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
+  const titleRole = tokens.text.stage.title;
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        overflow: "hidden",
+        lineHeight: titleRole.lineHeight,
+        paddingBottom: spacing["6"],
+      }}
+    >
+      <span
+        style={{
+          display: "inline-block",
+          // Negative tracking is what makes a title look set
+          // rather than typed. At 92px, default tracking reads
+          // loose and webby.
+          ...getStageTextStyle(titleRole, WORD_FIELDS),
+          // translateY only. Scaling a headline is the one thing
+          // that must never happen here: it bites hardest on a
+          // title, where type is the whole frame.
+          transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
+          // No opacity here, on purpose. Masking and fading at
+          // the same time cancel out: the fade makes the word
+          // visible above the edge it is supposed to be emerging
+          // from, and what reads is a slide transition again. The
+          // mask alone is the effect.
+        }}
+      >
+        {word}
+      </span>
+    </span>
+  );
+}
+
+function TitleCardRule({ frame }: Readonly<{ frame: number }>): ReactNode {
+  const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  return (
+    <div
+      style={{
+        width: 120,
+        height: 3,
+        borderRadius: scales.corner(tokens.corner.pill),
+        marginTop: spacing["26"],
+        background: tokens.color.scene.brand,
+        transformOrigin: "center",
+        transform: `scaleX(${motion
+          .ramp(frame, RULE_IN, motion.sheet, motion.entrance.easing)
+          .toFixed(3)})`,
+      }}
+    />
+  );
+}
+
+function TitleCardKicker({
+  kicker,
+  frame,
+}: Readonly<{ kicker: string; frame: number }>): ReactNode {
+  const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
+  const motion = useVideoMotion();
+  const kickerIn = motion.ramp(
+    frame,
+    KICKER_IN,
+    motion.sheet,
+    motion.entrance.easing,
+  );
+  return (
+    <div
+      style={{
+        marginTop: spacing["22"],
+        ...getStageTextStyle(tokens.text.stage.kicker),
+        opacity: kickerIn,
+        transform: `translateY(${mix(kickerIn, KICKER_RISE, 0).toFixed(2)}px)`,
+      }}
+    >
+      {kicker}
+    </div>
   );
 }

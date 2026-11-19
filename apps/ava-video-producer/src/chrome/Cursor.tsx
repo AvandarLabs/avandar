@@ -54,20 +54,12 @@ function CursorContent({
         pointerEvents: "none",
       }}
     >
-      {cursorShutter(frame, path, motion).map((sample, index) => {
-        return sample.opacity > 0 ? (
-          <MacOSCursor
-            key={index}
-            cursor={cursor}
-            showInTimeline={false}
-            style={{
-              left: sample.x / scale,
-              top: sample.y / scale,
-              opacity: sample.opacity,
-            }}
-          />
-        ) : null;
-      })}
+      <CursorShutterTrail
+        frame={frame}
+        path={path}
+        cursor={cursor}
+        scale={scale}
+      />
       <MacOSCursor
         cursor={cursor}
         showInTimeline={false}
@@ -79,4 +71,33 @@ function CursorContent({
       />
     </div>
   );
+}
+
+/** The motion-blur copies of the cursor along its recent path. */
+function CursorShutterTrail({
+  frame,
+  path,
+  cursor,
+  scale,
+}: Readonly<{
+  frame: number;
+  path: readonly CursorKey[];
+  cursor: CursorKind;
+  scale: number;
+}>): ReactNode {
+  const motion = useCursorMotion();
+  return cursorShutter(frame, path, motion).map((sample, index) => {
+    return sample.opacity > 0 ? (
+      <MacOSCursor
+        key={index}
+        cursor={cursor}
+        showInTimeline={false}
+        style={{
+          left: sample.x / scale,
+          top: sample.y / scale,
+          opacity: sample.opacity,
+        }}
+      />
+    ) : null;
+  });
 }

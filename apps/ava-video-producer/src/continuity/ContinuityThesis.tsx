@@ -16,10 +16,7 @@ const UNDERLINE_CUE = 95;
 
 /** Staggered statement with a single deterministic teaching underline. */
 export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
-  const { annotations } = useContinuityAppearance();
-  const { sketch } = useVideoTokens();
   const thesis = useVideoProps("Thesis", {});
-  const underline = useVideoProps("Underline", {});
   const motion = useVideoMotion();
   return (
     <div className={css.continuityThesis}>
@@ -42,23 +39,42 @@ export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
           </div>
         );
       })}
-      <div className={css.continuityEmphasis}>
-        <Underline
-          disabled={!annotations}
-          progress={motion.ramp(
-            frame,
-            UNDERLINE_CUE,
-            motion.scale(underline.drawIn),
-            motion.reveal.easing,
-          )}
-          color={accent}
-          roughness={sketch.annotation.roughness}
-          seed={underline.seed}
-          strokeWidth={underline.strokeWidth}
-        >
-          {content.emphasis}
-        </Underline>
-      </div>
+      <ContinuityThesisEmphasis
+        emphasis={content.emphasis}
+        frame={frame}
+        accent={accent}
+      />
+    </div>
+  );
+}
+
+/** The thesis emphasis with its deterministic teaching underline. */
+function ContinuityThesisEmphasis({
+  emphasis,
+  frame,
+  accent,
+}: Readonly<{ emphasis: string; frame: number; accent: string }>): ReactNode {
+  const { annotations } = useContinuityAppearance();
+  const { sketch } = useVideoTokens();
+  const underline = useVideoProps("Underline", {});
+  const motion = useVideoMotion();
+  return (
+    <div className={css.continuityEmphasis}>
+      <Underline
+        disabled={!annotations}
+        progress={motion.ramp(
+          frame,
+          UNDERLINE_CUE,
+          motion.scale(underline.drawIn),
+          motion.reveal.easing,
+        )}
+        color={accent}
+        roughness={sketch.annotation.roughness}
+        seed={underline.seed}
+        strokeWidth={underline.strokeWidth}
+      >
+        {emphasis}
+      </Underline>
     </div>
   );
 }

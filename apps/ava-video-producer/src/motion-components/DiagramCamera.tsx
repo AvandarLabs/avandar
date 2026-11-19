@@ -98,6 +98,13 @@ function CameraViewport({
   );
 }
 
+/** The shutter angle scaled by the blur strength, capped at a full turn. */
+function _getScaledShutterAngle(
+  settings: Readonly<{ shutterAngle: number; blurStrength: number }>,
+): number {
+  return Math.min(360, settings.shutterAngle * settings.blurStrength);
+}
+
 /** Pan and zoom through SVG artwork with travel-only temporal motion blur. */
 export function DiagramCamera({
   track,
@@ -116,10 +123,7 @@ export function DiagramCamera({
   }, [track, width, height]);
   const theme = useMotionSettingsTheme();
   const settings = resolveMotionSettings({ ...motion, ...blurOptions }, theme);
-  const shutterAngle = Math.min(
-    360,
-    settings.shutterAngle * settings.blurStrength,
-  );
+  const shutterAngle = _getScaledShutterAngle(settings);
   const blur =
     enabled &&
     motionBlur &&
