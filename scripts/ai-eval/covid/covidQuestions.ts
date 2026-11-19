@@ -5,6 +5,7 @@ import { MENTION_QUESTIONS } from "./covidMentionQuestions";
 import { PAGE_QUESTIONS } from "./covidPageQuestions";
 import { SCHEMA_QUESTIONS } from "./covidSchemaQuestions";
 import { CovidTruthSql as Sql, US_STATE_NAMES } from "./covidTruthSql";
+import { createTryAgainQuestions } from "./covidTryAgainQuestions";
 import type { EvalQuestion, GradeContext } from "../EvalQuestion";
 import type { TruthRowSpec } from "../grading/ResultChecks";
 import type { Verdict } from "../grading/ResultMatchers";
@@ -1010,4 +1011,10 @@ export const COVID_QUESTIONS: readonly EvalQuestion[] = [
   ...MENTION_QUESTIONS,
   ...SCHEMA_QUESTIONS,
   ...DASHBOARD_QUESTIONS,
+  ...createTryAgainQuestions([
+    ...BASIC_QUESTIONS,
+    ...NON_TECHNICAL_QUESTIONS,
+    ...SCHEMA_QUESTIONS,
+    ...DASHBOARD_QUESTIONS,
+  ]),
 ];
