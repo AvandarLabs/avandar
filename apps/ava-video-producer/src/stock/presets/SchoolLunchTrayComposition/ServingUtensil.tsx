@@ -30,13 +30,20 @@ export function ServingUtensil({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  return isServed && frame >= 36 + index * 12 && frame < 50 + index * 12 ? (
+  return isServed &&
+    frame >= 36 + index * motion.scaleStagger(12) &&
+    frame < 50 + index * motion.scaleStagger(12) ? (
     <g
       data-serving-utensil={component.id}
       transform={`translate(-50 ${foodY})`}
       opacity={
         1 -
-        motion.ramp(frame, 48 + index * 12, motion.scale(2), motion.exit.easing)
+        motion.ramp(
+          frame,
+          48 + index * motion.scaleStagger(12),
+          motion.scale(2),
+          motion.exit.easing,
+        )
       }
     >
       <SketchedShape

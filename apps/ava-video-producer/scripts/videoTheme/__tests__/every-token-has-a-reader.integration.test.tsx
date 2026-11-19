@@ -4,19 +4,17 @@
  * or referenced by a token that is. Readers are found four ways: stock
  * shapes report reads while all 170 stock presets render, the continuity
  * plan builder reports reads through a usage proxy for all 36 compositions
- * and sample films, stage CSS modules name
- * `--video-*` variables or the scene palette names `VideoThemeProvider`
- * emits (`--brand` for `color.scene.brand`), and stage TSX names token paths
- * or calls `useVideoProps("Name"`. `sketch.profile`, `camera.presets`, and
- * `motion.easingProfiles` are menus: one member in use keeps the whole menu,
- * like an atomic scale. A token a slice budget lists as pending is skipped
- * until that slice's renderer reads it, and a token one slice hands off to
- * others is skipped until one of them reads it.
+ * and sample films, stage CSS modules name `--video-*` variables, and stage
+ * TSX, with its comments removed, names token paths, or calls
+ * `useVideoProps("Name"` and names the prop. `sketch.profile`,
+ * `camera.presets`, and `motion.easingProfiles` are menus: one member in
+ * use keeps the whole menu, like an atomic scale.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createContinuityPlanFromVideoTheme } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { STOCK_IDS } from "../../../src/stock/catalog";
@@ -46,11 +44,6 @@ import {
   createTokenUsageProxy,
   VideoTokenUsageContext,
 } from "../../../src/videoTheme/tokenUsageHelpers/tokenUsageHelpers";
-import {
-  getHandoffTokensFromBudgets,
-  getPendingTokensFromBudgets,
-  listThemeLiteralBudgets,
-} from "../themeLiteralBudgets/themeLiteralBudgets";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
@@ -86,17 +79,6 @@ const PALETTE_GROUPS = [
  * them: `elevation.strength` scales every resolved shadow.
  */
 const RESOLVER_TOKEN_PATHS = ["elevation.strength"];
-/** The scene palette names `VideoThemeProvider` emits, by token path. */
-const SCENE_VARIABLES = Object.keys(SEMANTIC_TOKENS.color.scene).map((name) => {
-  return {
-    tokenPath: `color.scene.${name}`,
-    variable: `--${name.replace(/[A-Z]/g, (letter) => {
-      return `-${letter.toLowerCase()}`;
-    })}`,
-  };
-});
-const PENDING_TOKEN_PATHS = getPendingTokensFromBudgets();
-const HANDOFF_TOKENS = getHandoffTokensFromBudgets();
 
 const TOKEN_PATHS = listTokenDefinitions()
   .map((entry) => {
@@ -218,11 +200,34 @@ function _planBuilderReads(): string[] {
  * The text of every stage renderer file with one of the extensions, tests and
  * gallery UI excluded.
  */
+const COMMENT_FREE_PRINTER = ts.createPrinter({ removeComments: true });
+
+/**
+ * A TS or TSX source as code alone, so a token path or prop name that only
+ * a comment mentions is not a read.
+ */
+function _removeComments(fileName: string, source: string): string {
+  if (!/\.tsx?$/.test(fileName)) {
+    return source;
+  }
+  return COMMENT_FREE_PRINTER.printFile(
+    ts.createSourceFile(
+      fileName,
+      source,
+      ts.ScriptTarget.Latest,
+      false,
+      fileName.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+    ),
+  );
+}
+
 function _readStageSources(pattern: RegExp): string {
   return STAGE_SOURCE_PATHS.flatMap((sourcePath) => {
     const url = new URL(`../../../${sourcePath}`, import.meta.url);
     if (fs.statSync(url).isFile()) {
-      return pattern.test(sourcePath) ? [fs.readFileSync(url, "utf8")] : [];
+      return pattern.test(sourcePath)
+        ? [_removeComments(sourcePath, fs.readFileSync(url, "utf8"))]
+        : [];
     }
     const root = new URL(`${url.href}/`);
     return fs
@@ -235,17 +240,12 @@ function _readStageSources(pattern: RegExp): string {
         );
       })
       .map((file) => {
-        return fs.readFileSync(new URL(file, root), "utf8");
+        return _removeComments(
+          file,
+          fs.readFileSync(new URL(file, root), "utf8"),
+        );
       });
   }).join("\n");
-}
-
-/** Scene palette colours a stage file reads by their emitted CSS name. */
-function _sceneVariableReads(): string[] {
-  const source = _readStageSources(/\.(?:css|tsx?)$/);
-  return SCENE_VARIABLES.flatMap(({ tokenPath, variable }) => {
-    return new RegExp(`var\\(${variable}[,)]`).test(source) ? [tokenPath] : [];
-  });
 }
 
 function _kebab(segment: string): string {
@@ -300,9 +300,12 @@ function _scriptReads(): string[] {
     }),
   );
   return TOKEN_PATHS.filter((tokenPath) => {
-    const [root, name] = tokenPath.split(".");
+    const [root, name, prop] = tokenPath.split(".");
     if (root === "components") {
-      return components.has(name);
+      return (
+        components.has(name) &&
+        (prop === undefined || new RegExp(`\\b${prop}\\b`).test(source))
+      );
     }
     return (
       root !== "atomic" &&
@@ -408,7 +411,6 @@ const READS = {
   planBuilder: _planBuilderReads(),
   css: _cssReads(),
   script: _scriptReads(),
-  sceneVariables: _sceneVariableReads(),
 };
 const LIVE_TOKEN_PATHS = _liveTokenPaths([
   ...Object.values(READS).flat(),
@@ -424,65 +426,7 @@ test("every reader source finds tokens, so a broken collector cannot pass the au
 test("every token is read by a renderer or referenced by one that is", () => {
   assert.deepEqual(
     AUDITED_TOKEN_PATHS.filter((tokenPath) => {
-      return (
-        !LIVE_TOKEN_PATHS.has(tokenPath) &&
-        !PENDING_TOKEN_PATHS.has(tokenPath) &&
-        !HANDOFF_TOKENS.has(tokenPath)
-      );
-    }),
-    [],
-  );
-});
-
-test("every pending token in a slice budget is a catalog token", () => {
-  assert.deepEqual(
-    [...PENDING_TOKEN_PATHS].filter((tokenPath) => {
-      return !TOKEN_PATH_SET.has(tokenPath);
-    }),
-    [],
-  );
-});
-
-test("a slice that has landed leaves no token pending", () => {
-  assert.deepEqual(
-    listThemeLiteralBudgets().flatMap((budget) => {
-      return budget.enforceLint
-        ? budget.pendingTokens.map((tokenPath) => {
-            return `${budget.slice}: ${tokenPath}`;
-          })
-        : [];
-    }),
-    [],
-  );
-});
-
-test("every handed-off token is a catalog token for slices that have a budget", () => {
-  const slices = new Set(
-    listThemeLiteralBudgets().map((budget) => {
-      return budget.slice;
-    }),
-  );
-  assert.deepEqual(
-    [...HANDOFF_TOKENS].flatMap(([tokenPath, readers]) => {
-      return [
-        ...(TOKEN_PATH_SET.has(tokenPath) ? [] : [tokenPath]),
-        ...readers
-          .filter((reader) => {
-            return !slices.has(reader);
-          })
-          .map((reader) => {
-            return `${tokenPath}: ${reader}`;
-          }),
-      ];
-    }),
-    [],
-  );
-});
-
-test("a handed-off token leaves the handoff list once a renderer reads it", () => {
-  assert.deepEqual(
-    [...HANDOFF_TOKENS.keys()].filter((tokenPath) => {
-      return LIVE_TOKEN_PATHS.has(tokenPath);
+      return !LIVE_TOKEN_PATHS.has(tokenPath);
     }),
     [],
   );

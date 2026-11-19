@@ -31,7 +31,7 @@ export function CustodyCheckpoint({
       data-seal={checkpoint.seal}
       opacity={motion.ramp(
         frame,
-        [22, 60, 101][stopIndex] + crateIndex * 2,
+        [22, 60, 101][stopIndex] + crateIndex * motion.scaleStagger(2),
         motion.chip,
       )}
       transform={`translate(${280 + stopIndex * 230} ${y + 25})`}

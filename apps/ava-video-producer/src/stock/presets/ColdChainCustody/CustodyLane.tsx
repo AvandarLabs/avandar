@@ -32,19 +32,22 @@ export function CustodyLane({
   const y = 165 + index * 50;
   const first = motion.ramp(
     frame,
-    36 + index * 2,
+    36 + index * motion.scaleStagger(2),
     motion.scale(30),
     motion.travel.easing,
   );
   const second = motion.ramp(
     frame,
-    72 + index * 2,
+    72 + index * motion.scaleStagger(2),
     motion.scale(35),
     motion.travel.easing,
   );
   const x = mix(first, 280, 510) + 230 * second;
   return (
-    <g data-container={crate.id} opacity={motion.reveal(frame, 12 + index * 2)}>
+    <g
+      data-container={crate.id}
+      opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
+    >
       <SketchedShape
         shape={{ kind: "path", d: `M280 ${y} H740` }}
         profile={tokens.sketch.shape}

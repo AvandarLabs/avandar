@@ -35,7 +35,7 @@ export function TrayCompartment({
   const scales = useGraphicShapeScales();
   const progress = motion.ramp(
     frame,
-    36 + index * 12,
+    36 + index * motion.scaleStagger(12),
     motion.scale(12),
     motion.travel.easing,
   );

@@ -11,7 +11,7 @@ export function makeCountCopyPositionFromFrame({
 } {
   const progress = motion.ramp(
     frame,
-    106 + index * 2,
+    106 + index * motion.scaleStagger(2),
     motion.scale(23),
     motion.travel.easing,
   );

@@ -54,6 +54,10 @@ export function getQueueItemLayoutFromInputAndFrame({
       state === "entering" || state === "service"
         ? schedule.slot.id
         : undefined,
-    opacity: motion.ramp(frame, 12 + index * 4, motion.whip),
+    opacity: motion.ramp(
+      frame,
+      12 + index * motion.scaleStagger(4),
+      motion.whip,
+    ),
   };
 }

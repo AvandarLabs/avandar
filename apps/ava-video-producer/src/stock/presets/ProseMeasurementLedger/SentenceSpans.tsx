@@ -76,7 +76,11 @@ export function SentenceSpans({
                   PATTERNS[spans[spanIndex].role] ??
                   atomic.dash.dotted.join(" ")
                 }
-                opacity={motion.ramp(frame, 13 + spanIndex * 3, motion.hero)}
+                opacity={motion.ramp(
+                  frame,
+                  13 + spanIndex * motion.scaleStagger(3),
+                  motion.hero,
+                )}
               />
             ) : undefined}
           </g>

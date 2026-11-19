@@ -2,13 +2,14 @@
 /*
  * Renderers follow the theme even where a literal hides in a constant. Each
  * item renders under a sentinel theme that moves every swatch, palette
- * shade, stroke width, radius, dash step, opacity step, and multiplier to an
- * improbable value, and its markup must then hold none of their `classic`
- * values. The pattern scan in
+ * shade, stroke width, radius, dash step, opacity step, type step, weight,
+ * tracking step, and multiplier to an improbable value, and its markup must
+ * then hold none of their `classic` values. The pattern scan in
  * `renderers-draw-no-literals` cannot see a literal routed through a
  * constant; this test can. It covers the stock primitives, the graphic
- * primitives, and all 170 stock presets. The sentinel theme and the checks
- * live in `tests/helpers/sentinelVideoTheme.ts`, shared with the composition,
+ * primitives, and all 170 stock presets, at their default input and at
+ * every other fixture their contract declares. The sentinel theme and the
+ * checks live in `tests/helpers/sentinelVideoTheme.ts`, shared with the
  * film, fixed-composition, and helper sentinel tests.
  */
 import assert from "node:assert/strict";
@@ -33,6 +34,7 @@ import { PersonGlyph } from "../../../src/stock/primitives/PersonGlyph/PersonGly
 import { QuantityBand } from "../../../src/stock/primitives/QuantityBand/QuantityBand";
 import { RoutePath } from "../../../src/stock/primitives/RoutePath/RoutePath";
 import { TableCell } from "../../../src/stock/primitives/TableCell/TableCell";
+import { stockContracts } from "../../../src/stock/registry/stockContracts";
 import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
 import {
@@ -44,6 +46,8 @@ import type { StockRequest } from "../../../src/stock/contracts/StockContract.ty
 import type { ReactNode } from "react";
 
 const SAMPLE_FRAMES = [0, 45, 90, 135, 178];
+/** Frames a non-default fixture is checked at: mid-build and settled. */
+const FIXTURE_FRAMES = [90, 178];
 /**
  * Presets that lay a sentence out word by word at a size measured against
  * glyph widths. Their text size is content, so it is not a finding.
@@ -163,27 +167,55 @@ test("stock and graphic primitives draw no classic value under the sentinel them
   );
 });
 
+/** The sentinel findings of one stock request over some frames. */
+function _stockFindings(
+  request: StockRequest,
+  frames: readonly number[],
+): string[] {
+  return findClassicValuesAcrossFrames({
+    frames,
+    render: (frame) => {
+      return renderToStaticMarkup(
+        <VideoThemeScope patches={[SENTINEL_THEME]}>
+          <StockGraphic {...request} frame={frame} />
+        </VideoThemeScope>,
+      );
+    },
+  }).filter((value) => {
+    return (
+      !MEASURED_SENTENCE_PRESETS.has(request.preset) ||
+      !value.startsWith("font-size ")
+    );
+  });
+}
+
 test("every stock preset draws no classic value under the sentinel theme", () => {
   assert.deepEqual(
     STOCK_IDS.flatMap((preset) => {
-      return findClassicValuesAcrossFrames({
-        frames: SAMPLE_FRAMES,
-        render: (frame) => {
-          return renderToStaticMarkup(
-            <VideoThemeScope patches={[SENTINEL_THEME]}>
-              <StockGraphic {...({ preset } as StockRequest)} frame={frame} />
-            </VideoThemeScope>,
-          );
-        },
-      })
-        .filter((value) => {
-          return (
-            !MEASURED_SENTENCE_PRESETS.has(preset) ||
-            !value.startsWith("font-size ")
-          );
-        })
-        .map((value) => {
+      return _stockFindings({ preset } as StockRequest, SAMPLE_FRAMES).map(
+        (value) => {
           return `${preset}: ${value}`;
+        },
+      );
+    }),
+    [],
+  );
+});
+
+test("every non-default stock fixture draws no classic value under the sentinel theme", () => {
+  assert.deepEqual(
+    STOCK_IDS.flatMap((preset) => {
+      return stockContracts[preset].fixtures
+        .filter((fixture) => {
+          return fixture.id !== "default";
+        })
+        .flatMap((fixture) => {
+          // TypeScript cannot pair a preset id with its own input type
+          // across the 170-preset union.
+          const request = { preset, input: fixture.input } as StockRequest;
+          return _stockFindings(request, FIXTURE_FRAMES).map((value) => {
+            return `${preset} ${fixture.id}: ${value}`;
+          });
         });
     }),
     [],

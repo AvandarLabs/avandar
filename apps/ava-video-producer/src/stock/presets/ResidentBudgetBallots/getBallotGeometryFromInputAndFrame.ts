@@ -46,7 +46,7 @@ export function getBallotGeometryFromInputAndFrame({
       ? 0
       : motion.ramp(
           frame,
-          40 + index * 3,
+          40 + index * motion.scaleStagger(3),
           motion.scale(14),
           motion.travel.easing,
         );

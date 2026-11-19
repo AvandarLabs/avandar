@@ -32,7 +32,11 @@ export function FoundationApproach({
   const scales = useGraphicShapeScales();
   const x = 80 + index * 440;
   const lift = motion.ramp(frame, 36, motion.scale(36), motion.travel.easing);
-  const arrival = motion.ramp(frame, 12 + index * 6, motion.hero);
+  const arrival = motion.ramp(
+    frame,
+    12 + index * motion.scaleStagger(6),
+    motion.hero,
+  );
   return (
     <g
       data-approach={approach.id}

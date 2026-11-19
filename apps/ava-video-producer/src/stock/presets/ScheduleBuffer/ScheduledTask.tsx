@@ -36,7 +36,7 @@ export function ScheduledTask({
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   return (
-    <g opacity={motion.reveal(frame, 12 + index * 5)}>
+    <g opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(5))}>
       <StockRect
         data-task-id={task.id}
         x={task.x}

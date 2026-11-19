@@ -26,7 +26,7 @@ export function PredictionParticipant({
     450 + (430 * learner.predictionDistance) / input.track.maximum;
   const progress = motion.ramp(
     frame,
-    36 + index * 6,
+    36 + index * motion.scaleStagger(6),
     motion.scale(12),
     motion.travel.easing,
   );

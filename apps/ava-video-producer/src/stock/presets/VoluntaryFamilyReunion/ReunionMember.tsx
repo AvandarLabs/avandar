@@ -51,11 +51,11 @@ export function ReunionMember({
   const side = groupIndex === 0 ? 1 : -1;
   const accepting =
     index === 0 &&
-    frame >= 28 + groupIndex * 18 &&
-    frame <= 40 + groupIndex * 18;
+    frame >= 28 + groupIndex * motion.scaleStagger(18) &&
+    frame <= 40 + groupIndex * motion.scaleStagger(18);
   const acceptProgress = motion.ramp(
     frame,
-    28 + groupIndex * 18,
+    28 + groupIndex * motion.scaleStagger(18),
     motion.whip,
     motion.travel.easing,
   );

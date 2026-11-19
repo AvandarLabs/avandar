@@ -29,7 +29,7 @@ export function ContactAttempt({
   const motion = useGraphicMotion();
   const contact = motion.ramp(
     frame,
-    39 + index * 9,
+    39 + index * motion.scaleStagger(9),
     motion.whip,
     motion.entrance.easing,
   );

@@ -30,7 +30,7 @@ export function VisitHeader({
     mix(
       motion.ramp(
         frame,
-        24 + index * 18,
+        24 + index * motion.scaleStagger(18),
         motion.scale(24),
         motion.travel.easing,
       ),
@@ -41,7 +41,7 @@ export function VisitHeader({
     <g
       data-visit={visit.id}
       data-denominator={input.participants.length}
-      opacity={motion.reveal(frame, 12 + index * 2)}
+      opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
     >
       <SceneLabel text={visit.label} x={x - 75} y={100} width={140} lines={3} />
       {input.showFractions ? (

@@ -18,7 +18,12 @@ export function MissedVisitReconnect({
   const motion = useGraphicMotion();
   const workerPosition = input.cases.reduce((position, _, index) => {
     return mix(
-      motion.ramp(frame, 39 + index * 9, motion.scale(7), motion.travel.easing),
+      motion.ramp(
+        frame,
+        39 + index * motion.scaleStagger(9),
+        motion.scale(7),
+        motion.travel.easing,
+      ),
       position,
       160 + index * 48,
     );

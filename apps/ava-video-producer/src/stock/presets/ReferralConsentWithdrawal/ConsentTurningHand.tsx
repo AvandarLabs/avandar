@@ -25,7 +25,7 @@ export function ConsentTurningHand({
   );
   const activeTurn = motion.ramp(
     frame,
-    36 + activeIndex * 8,
+    36 + activeIndex * motion.scaleStagger(8),
     motion.whip,
     motion.entrance.easing,
   );

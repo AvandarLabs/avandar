@@ -31,7 +31,7 @@ export function SavedRevision({
   const scales = useGraphicShapeScales();
   const x = 40 + index * 225;
   return (
-    <g opacity={motion.reveal(frame, 16 + index * 3)}>
+    <g opacity={motion.reveal(frame, 16 + index * motion.scaleStagger(3))}>
       <StockRect
         data-history-id={revision.id}
         x={x}

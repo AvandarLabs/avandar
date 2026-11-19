@@ -28,7 +28,12 @@ export function getMarketProductPositionFromInputAndFrame({
   const product = input.products[index];
   const ordinal = input.products.slice(0, index).filter(prop("chosen")).length;
   const travel = product.chosen
-    ? motion.ramp(frame, 34 + ordinal * 24, motion.hero, motion.travel.easing)
+    ? motion.ramp(
+        frame,
+        34 + ordinal * motion.scaleStagger(24),
+        motion.hero,
+        motion.travel.easing,
+      )
     : 0;
   const lift = Math.min(1, travel / 0.25);
   const reach = Math.max(0, Math.min(1, (travel - 0.25) / 0.4));

@@ -4,7 +4,7 @@ import ts from "typescript";
  * The theme areas a literal can belong to, after Appendix A of the theme
  * coverage review: colour, the starter palette's `var(--…)` names, type,
  * line and shape, motion, ramps with implicit easing, stroked shapes that
- * bypass the sketch profiles, and stylesheet values.
+ * bypass the sketch profiles, inline spacing, and stylesheet values.
  */
 export type ThemeLiteralArea =
   | "colour"
@@ -14,6 +14,7 @@ export type ThemeLiteralArea =
   | "motion"
   | "implicitEasing"
   | "sketch"
+  | "spacing"
   | "css";
 
 /** How many theme literals of each area one source file holds. */
@@ -27,6 +28,7 @@ const EMPTY_COUNTS: ThemeLiteralCounts = {
   motion: 0,
   implicitEasing: 0,
   sketch: 0,
+  spacing: 0,
   css: 0,
 };
 
@@ -53,12 +55,52 @@ const STYLE_NUMBER_KEYS = new Set([
   "letterSpacing",
 ]);
 const LINE_NUMBER_KEYS = new Set(["strokeWidth", "rx", "ry", "borderRadius"]);
-const OPACITY_KEYS = new Set(["opacity", "fillOpacity", "strokeOpacity"]);
+const OPACITY_KEYS = new Set([
+  "opacity",
+  "fillOpacity",
+  "strokeOpacity",
+  "stopOpacity",
+  "floodOpacity",
+]);
+/** Inline spacing, which follows the theme's spacing scale. */
+const SPACING_KEY =
+  /^(?:padding|margin)(?:Top|Right|Bottom|Left|Inline|Block)?$|^(?:gap|rowGap|columnGap)$/;
+/** Colour words that name no colour of their own. */
+const NEUTRAL_COLOR_WORDS = new Set([
+  "none",
+  "transparent",
+  "currentcolor",
+  "inherit",
+  "initial",
+  "unset",
+]);
 const SHADOW_KEYS = new Set(["boxShadow", "textShadow"]);
 const MOTION_CONSTANTS = new Set(["EASE", "DUR"]);
 const STAGGER_NAMES = new Set(["STAGGER", "STAGGER_COLUMN"]);
 const ENTRANCE_HELPERS = new Set(["enter", "enterAt", "leave"]);
 const ENTRANCE_KEYS = new Set(["dur", "x", "y"]);
+/**
+ * Themed motion helpers by the index of the argument that holds their
+ * duration. A literal there ignores tempo unless `scale` wraps it.
+ */
+const DURATION_ARGUMENT: Readonly<Record<string, number>> = {
+  ramp: 2,
+  pop: 2,
+  count: 3,
+};
+/** Themed motion helpers whose second argument is the frame they start on. */
+const CUE_HELPERS = new Set([
+  "ramp",
+  "reveal",
+  "enter",
+  "enterAt",
+  "leave",
+  "pop",
+  "count",
+  "press",
+]);
+/** A duration or blur radius written into an inline style string. */
+const INLINE_EFFECT_PATTERN = /\bblur\(\s*\d|\b\d*\.?\d+m?s\b/;
 
 type Counter = (area: ThemeLiteralArea, amount?: number) => void;
 
@@ -90,6 +132,115 @@ function _isDecimalLiteral(node: ts.Node | undefined): boolean {
   );
 }
 
+/**
+ * The values an expression can take that a reader sees in source: the
+ * expression itself, or both branches of a conditional, so `a ? 0.4 : 1`
+ * is judged like `0.4` and `1`.
+ */
+function _valueBranches(node: ts.Expression | undefined): ts.Expression[] {
+  if (!node) {
+    return [];
+  }
+  if (ts.isParenthesizedExpression(node)) {
+    return _valueBranches(node.expression);
+  }
+  return ts.isConditionalExpression(node)
+    ? [..._valueBranches(node.whenTrue), ..._valueBranches(node.whenFalse)]
+    : [node];
+}
+
+/**
+ * Whether a duration starts from a literal, such as `18`, `48 - index * 3`,
+ * or `isFirst ? 4 : 3`. A duration that starts from a name, such as
+ * `duration * 0.4` or `duration - 1`, is a share of a length read elsewhere.
+ */
+function _leadsWithLiteral(node: ts.Expression): boolean {
+  if (ts.isParenthesizedExpression(node)) {
+    return _leadsWithLiteral(node.expression);
+  }
+  if (ts.isConditionalExpression(node)) {
+    return (
+      _leadsWithLiteral(node.whenTrue) || _leadsWithLiteral(node.whenFalse)
+    );
+  }
+  if (ts.isBinaryExpression(node)) {
+    return _leadsWithLiteral(node.left);
+  }
+  return _isNumericLiteral(node);
+}
+
+/** The terms of a sum, such as `reviewAt` and `8` in `reviewAt + 8`. */
+function _addedTerms(node: ts.Expression): string[] {
+  return ts.isBinaryExpression(node) &&
+    node.operatorToken.kind === ts.SyntaxKind.PlusToken
+    ? [..._addedTerms(node.left), node.right.getText()]
+    : [node.getText()];
+}
+
+/** The terms a difference subtracts, such as `88` in `92 - 88`. */
+function _subtractedTerms(node: ts.Expression): string[] {
+  return ts.isBinaryExpression(node) &&
+    node.operatorToken.kind === ts.SyntaxKind.MinusToken
+    ? [..._subtractedTerms(node.left), node.right.getText()]
+    : [];
+}
+
+/**
+ * Whether a duration is a cue window: the frames from the call's own cue to
+ * a later cue, such as `ramp(frame, 88, 92 - 88)`. Cue frames stay as
+ * authored at every tempo, so a window between them does too.
+ */
+function _isCueWindow(duration: ts.Expression, cue: ts.Expression): boolean {
+  const subtracted = _subtractedTerms(duration);
+  return (
+    subtracted.length > 0 &&
+    _addedTerms(cue).every((term) => {
+      return subtracted.includes(term);
+    })
+  );
+}
+
+/**
+ * Whether an expression multiplies a name by a whole-number literal outside
+ * any call, such as `index * 6`: a per-item stagger that ignores the Stagger
+ * option unless `motion.scaleStagger` wraps it.
+ */
+function _holdsLiteralStagger(node: ts.Node): boolean {
+  if (ts.isCallExpression(node)) {
+    return false;
+  }
+  if (
+    ts.isBinaryExpression(node) &&
+    node.operatorToken.kind === ts.SyntaxKind.AsteriskToken &&
+    (ts.isIdentifier(node.left) || ts.isPropertyAccessExpression(node.left)) &&
+    ts.isNumericLiteral(node.right) &&
+    !node.right.text.includes(".")
+  ) {
+    return true;
+  }
+  return ts.forEachChild(node, _holdsLiteralStagger) ?? false;
+}
+
+/** A spacing value with a length in it: a non-zero number or a `px` string. */
+function _isSpacingLiteral(node: ts.Expression): boolean {
+  const text = _stringText(node);
+  if (text !== undefined) {
+    return /\b[1-9]\d*(?:\.\d+)?px\b/.test(text);
+  }
+  if (ts.isTemplateExpression(node)) {
+    const parts = [
+      node.head,
+      ...node.templateSpans.map((span) => {
+        return span.literal;
+      }),
+    ];
+    return parts.some((part) => {
+      return /\b[1-9]\d*(?:\.\d+)?px\b/.test(part.text);
+    });
+  }
+  return _isNumericLiteral(node) && node.getText() !== "0";
+}
+
 function _stringText(node: ts.Node | undefined): string | undefined {
   return node &&
     (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node))
@@ -112,20 +263,58 @@ function _attributeName(attribute: ts.JsxAttribute): string {
   return attribute.name.getText();
 }
 
-/** One `key: value` or `key={value}` pair, from an object or a JSX tag. */
+/**
+ * One `key: value` or `key={value}` pair, from an object or a JSX tag. On a
+ * JSX tag any colour word counts; in an object, where a word may name a
+ * colour role, only white and black do.
+ */
 function _countKeyedValue(
   key: string,
   value: ts.Expression | undefined,
   count: Counter,
+  isJsxAttribute = false,
 ): void {
   const text = _stringText(value);
-  if (COLOR_KEYWORD_KEYS.has(key) && (text === "white" || text === "black")) {
+  const isColorWord =
+    text !== undefined &&
+    (isJsxAttribute
+      ? /^[a-z]+$/i.test(text) && !NEUTRAL_COLOR_WORDS.has(text.toLowerCase())
+      : text === "white" || text === "black");
+  if (COLOR_KEYWORD_KEYS.has(key) && isColorWord) {
     count("colour");
   }
-  if (LINE_NUMBER_KEYS.has(key) && _isNumericLiteral(value)) {
-    count("line");
+  _valueBranches(value).forEach((branch) => {
+    const branchText = _stringText(branch);
+    // 0 on a line key means none: no stroke or a square corner.
+    if (
+      LINE_NUMBER_KEYS.has(key) &&
+      branch.getText() !== "0" &&
+      (_isNumericLiteral(branch) || /^-?\d/.test(branchText ?? ""))
+    ) {
+      count("line");
+    }
+    if (
+      OPACITY_KEYS.has(key) &&
+      (_isDecimalLiteral(branch) || /^0?\.\d/.test(branchText ?? ""))
+    ) {
+      count("line");
+    }
+    if (
+      SPACING_KEY.test(key) &&
+      branch.getSourceFile().fileName.endsWith(".tsx") &&
+      _isSpacingLiteral(branch)
+    ) {
+      count("spacing");
+    }
+  });
+  if (
+    key === "transition" &&
+    text !== undefined &&
+    INLINE_EFFECT_PATTERN.test(text)
+  ) {
+    count("motion");
   }
-  if (OPACITY_KEYS.has(key) && _isDecimalLiteral(value)) {
+  if (key === "filter" && text !== undefined && /\bblur\(\s*\d/.test(text)) {
     count("line");
   }
   if (
@@ -147,17 +336,19 @@ function _countTextElement(
   attributes.forEach((attribute) => {
     const name = _attributeName(attribute);
     const value = _attributeValue(attribute);
-    if (tag === "Text" && ["size", "weight", "spacing"].includes(name)) {
-      if (_isNumericLiteral(value)) {
-        count("type");
-      }
+    if (tag === "Text" && name === "size" && _isNumericLiteral(value)) {
+      count("type");
     }
     if (SVG_TEXT_TAGS.has(tag)) {
-      if (
-        ["fontSize", "fontWeight", "letterSpacing"].includes(name) &&
-        _isNumericLiteral(value)
-      ) {
-        count("type");
+      if (["fontSize", "fontWeight", "letterSpacing"].includes(name)) {
+        count(
+          "type",
+          _valueBranches(value).filter((branch) => {
+            return (
+              _isNumericLiteral(branch) || /^\d/.test(_stringText(branch) ?? "")
+            );
+          }).length,
+        );
       }
       if (name === "fontFamily" && _stringText(value) !== undefined) {
         count("type");
@@ -178,6 +369,7 @@ function _countJsxElement(
       _attributeName(attribute),
       _attributeValue(attribute),
       count,
+      true,
     );
   });
   if (STROKED_SHAPE_TAGS.has(tag)) {
@@ -209,7 +401,8 @@ function _countEntranceOptions(node: ts.CallExpression, count: Counter): void {
     options.properties.filter(ts.isPropertyAssignment).forEach((property) => {
       if (
         ENTRANCE_KEYS.has(property.name.getText()) &&
-        _isNumericLiteral(property.initializer)
+        _isNumericLiteral(property.initializer) &&
+        property.initializer.getText() !== "0"
       ) {
         count("motion");
       }
@@ -217,16 +410,45 @@ function _countEntranceOptions(node: ts.CallExpression, count: Counter): void {
   });
 }
 
+/** The helper a call names: `ramp` for `ramp(…)` and `motion.ramp(…)`. */
+function _calleeName(callee: ts.Expression): string | undefined {
+  if (ts.isIdentifier(callee)) {
+    return callee.text;
+  }
+  return ts.isPropertyAccessExpression(callee) ? callee.name.text : undefined;
+}
+
 function _countCall(node: ts.CallExpression, count: Counter): void {
   const callee = node.expression;
-  const name = ts.isIdentifier(callee) ? callee.text : undefined;
-  if (name === "ramp") {
-    if (node.arguments.length <= 3) {
-      count("implicitEasing");
-    }
-    if (_isNumericLiteral(node.arguments[2])) {
-      count("motion");
-    }
+  const name = _calleeName(callee);
+  if (
+    ts.isIdentifier(callee) &&
+    name === "ramp" &&
+    node.arguments.length <= 3
+  ) {
+    count("implicitEasing");
+  }
+  const durationIndex =
+    name === undefined ? undefined : DURATION_ARGUMENT[name];
+  const duration =
+    durationIndex === undefined ? undefined : node.arguments[durationIndex];
+  const cue = node.arguments[1];
+  if (
+    duration &&
+    cue &&
+    _leadsWithLiteral(duration) &&
+    !_isCueWindow(duration, cue)
+  ) {
+    count("motion");
+  }
+  if (
+    ts.isPropertyAccessExpression(callee) &&
+    name !== undefined &&
+    CUE_HELPERS.has(name) &&
+    cue &&
+    _holdsLiteralStagger(cue)
+  ) {
+    count("motion");
   }
   if (name === "bezier" && _isNumericLiteral(node.arguments[0])) {
     count("motion");
@@ -354,6 +576,14 @@ function _countCss(source: string): number {
       _countMatches(value, /cubic-bezier\(/g);
     const propertyCount = [
       /^font-(?:size|weight|family)$/.test(property) && !isVariable,
+      property === "letter-spacing" &&
+        !isVariable &&
+        !/^(?:0|normal)$/.test(value.trim()),
+      /^(?:color|background(?:-color)?|fill|stroke|border(?:-\w+)?-color)$/.test(
+        property,
+      ) && /^(?:white|black)$/i.test(value.trim()),
+      /^(?:opacity|fill-opacity|stroke-opacity)$/.test(property) &&
+        /^0?\.\d+$/.test(value.trim()),
       property === "border-radius" && !isVariable,
       /^(?:box|text)-shadow$/.test(property) && !isVariable,
       /^(?:transition|animation)(?:-|$)/.test(property) &&

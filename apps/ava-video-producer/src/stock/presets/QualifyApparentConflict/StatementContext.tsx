@@ -29,7 +29,11 @@ export function StatementContext({
       <g
         {...{ [`data-context-${index}`]: true }}
         data-y={contextY}
-        opacity={motion.ramp(frame, 60 + index * 4, motion.scale(24))}
+        opacity={motion.ramp(
+          frame,
+          60 + index * motion.scaleStagger(4),
+          motion.scale(24),
+        )}
       >
         <FitText
           text={statement.context}

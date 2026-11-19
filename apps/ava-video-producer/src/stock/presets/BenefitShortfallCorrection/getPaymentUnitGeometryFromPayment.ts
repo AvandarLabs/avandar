@@ -42,7 +42,7 @@ export function getPaymentUnitGeometryFromPayment({
     : mix(
         motion.ramp(
           frame,
-          72 + index * 4,
+          72 + index * motion.scaleStagger(4),
           motion.scale(32),
           motion.travel.easing,
         ),
@@ -52,7 +52,7 @@ export function getPaymentUnitGeometryFromPayment({
   const isHandling =
     isCorrection &&
     unitIndex === payment.receivedUnits &&
-    frame >= 72 + index * 4 &&
-    frame <= 104 + index * 4;
+    frame >= 72 + index * motion.scaleStagger(4) &&
+    frame <= 104 + index * motion.scaleStagger(4);
   return { x, y, isOriginal, isCorrection, tokenY, isHandling };
 }

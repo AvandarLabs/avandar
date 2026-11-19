@@ -30,13 +30,13 @@ export function getShelfUnitPoseFromInputAndFrame({
   };
   const load = motion.ramp(
     frame,
-    58 + incomingIndex * 5,
+    58 + incomingIndex * motion.scaleStagger(5),
     motion.scale(5),
     motion.travel.easing,
   );
   const purchase = motion.ramp(
     frame,
-    96 + selectedIndex * 8,
+    96 + selectedIndex * motion.scaleStagger(8),
     motion.whip,
     motion.travel.easing,
   );

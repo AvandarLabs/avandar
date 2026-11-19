@@ -36,7 +36,12 @@ export function ShadeFootprint({
   const width =
     (item.addedShadeM2 / zone.areaM2) *
     600 *
-    motion.ramp(frame, 36 + index * 4, motion.scale(60), motion.travel.easing);
+    motion.ramp(
+      frame,
+      36 + index * motion.scaleStagger(4),
+      motion.scale(60),
+      motion.travel.easing,
+    );
   const color = tokens.color.categorical[INSTALLATION_CATEGORIES[index]];
   const isInstalled = input.decision.stage === "installed";
   return (

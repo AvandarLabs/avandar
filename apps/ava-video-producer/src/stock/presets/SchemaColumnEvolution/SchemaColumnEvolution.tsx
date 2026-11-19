@@ -44,7 +44,7 @@ export function SchemaColumnEvolution({
             missingLabel={input.fields.missingLabel}
             missingOpacity={motion.ramp(
               frame,
-              49 + index * 6,
+              49 + index * motion.scaleStagger(6),
               motion.scale(31),
             )}
           />

@@ -36,7 +36,11 @@ export function ReleasedCountToken({
       fill={accent}
 
       textAnchor="middle"
-      opacity={motion.ramp(frame, 106 + cell.index * 2, motion.press.duration)}
+      opacity={motion.ramp(
+        frame,
+        106 + cell.index * motion.scaleStagger(2),
+        motion.press.duration,
+      )}
     >
       {cell.value}
     </text>

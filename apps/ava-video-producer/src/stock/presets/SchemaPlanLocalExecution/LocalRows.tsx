@@ -32,7 +32,11 @@ export function LocalRows({
       />
       {input.rows.map((row, index) => {
         const selected = row.category === input.request.selectedCategory;
-        const applied = motion.ramp(frame, 101 + index * 5, motion.whip);
+        const applied = motion.ramp(
+          frame,
+          101 + index * motion.scaleStagger(5),
+          motion.whip,
+        );
         return (
           <g key={row.id} data-local-row={row.id}>
             <StockRect

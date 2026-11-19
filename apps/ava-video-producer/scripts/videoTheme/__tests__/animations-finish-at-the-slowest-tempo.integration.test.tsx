@@ -1,10 +1,12 @@
 /** @jsxRuntime automatic */
 /*
- * At the slowest tempo (0.8) every animation still finishes before its
- * stock loop or continuity beat ends: every stock preset, and every
- * continuity composition. Tempo stretches only one-shot animations, never
- * cue frames or repeating motion, so a stock graphic has finished when its
- * picture at the slowest tempo equals its picture at tempo 1. The fixed
+ * Stock and continuity animations follow tempo. At the slowest tempo (0.8)
+ * every animation still finishes before its stock loop or continuity beat
+ * ends: every stock preset, and every continuity composition. Tempo
+ * stretches only one-shot animations, never cue frames or repeating motion,
+ * so a stock graphic has finished when its picture at the slowest tempo
+ * equals its picture at tempo 1. While it animates, the two pictures must
+ * differ somewhere, or none of its animation lengths reads tempo. The fixed
  * compositions (`Demo`, `MotionLab`, `TitleStudy`, the title card) need
  * Remotion's frame hook stubbed, so their half of this guard is
  * `src/compositions/__tests__/fixed-compositions-finish-at-the-slowest-tempo`.
@@ -23,10 +25,6 @@ import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoTheme
 import { createVideoMotion } from "../../../src/videoTheme/createVideoMotion/createVideoMotion";
 import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
-import {
-  getTempoPendingIdsFromBudgets,
-  listThemeLiteralBudgets,
-} from "../themeLiteralBudgets/themeLiteralBudgets";
 import type { ContinuityBeat } from "../../../src/continuity/continuitySchema";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
@@ -36,6 +34,20 @@ const SLOWEST_TEMPO: VideoThemePatch = {
 };
 /** The last frame of a 180-frame stock loop. */
 const LAST_LOOP_FRAME = 179;
+/**
+ * Presets whose motion only repeats (orbits, drifts, packet flow). Tempo
+ * never stretches a repeating motion, so their pictures match at every
+ * tempo.
+ */
+const REPEATING_MOTION_PRESETS: ReadonlySet<string> = new Set([
+  "orbital-system",
+  "packet-stream",
+  "plexus-field",
+]);
+/** Frames from the first cue to well inside every one-shot animation. */
+const MID_ANIMATION_FRAMES = Array.from({ length: 41 }, (_, index) => {
+  return index * 3;
+});
 /**
  * Cue frames from `ContinuityToken`: the shared object fades in at 12 and an
  * outline starts fading 60 frames into its beat.
@@ -167,6 +179,36 @@ test("every stock loop finishes its animations before the loop ends", () => {
   });
 });
 
+test("every stock loop with one-shot motion follows tempo while it animates", () => {
+  assert.deepEqual(
+    STOCK_IDS.filter((preset) => {
+      const request = { preset } as StockRequest;
+      return (
+        !REPEATING_MOTION_PRESETS.has(preset) &&
+        MID_ANIMATION_FRAMES.every((frame) => {
+          return (
+            _picture(request, frame, true) === _picture(request, frame, false)
+          );
+        })
+      );
+    }),
+    [],
+  );
+});
+
+test("a repeating-motion preset draws the same picture at every tempo", () => {
+  REPEATING_MOTION_PRESETS.forEach((preset) => {
+    const request = { preset } as StockRequest;
+    MID_ANIMATION_FRAMES.forEach((frame) => {
+      assert.equal(
+        _picture(request, frame, true),
+        _picture(request, frame, false),
+        `${preset} at ${frame}`,
+      );
+    });
+  });
+});
+
 test("every continuity composition's stage animations finish inside their beats", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const readableEnd = _readableEnd(beats, index);
@@ -180,10 +222,9 @@ test("every continuity composition's stage animations finish inside their beats"
 });
 
 test("every nested stock graphic has settled before its beat stops being readable", () => {
-  const pendingIds = getTempoPendingIdsFromBudgets();
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const content = beat.content;
-    if (content.kind === "stock" && !pendingIds.has(id)) {
+    if (content.kind === "stock") {
       const frame = sampleStockFrame(
         _readableEnd(beats, index),
         content.settleFrame,
@@ -195,13 +236,4 @@ test("every nested stock graphic has settled before its beat stops being readabl
       );
     }
   });
-});
-
-test("a slice that has landed skips no composition at the slowest tempo", () => {
-  assert.deepEqual(
-    listThemeLiteralBudgets().flatMap((budget) => {
-      return budget.enforceLint ? budget.tempoPendingIds : [];
-    }),
-    [],
-  );
 });

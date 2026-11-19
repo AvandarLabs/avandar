@@ -39,6 +39,61 @@ test("a ramp with a literal duration and no curve counts twice", () => {
   assert.deepEqual([counts.motion, counts.implicitEasing], [6, 1]);
 });
 
+test("a themed helper's literal duration counts unless scale wraps it", () => {
+  const counts = _count(`
+    const a = motion.ramp(frame, 10, 18);
+    const b = motion.ramp(frame, 10, motion.scale(18));
+    const c = motion.count(frame, 4, total, 30);
+    const d = motion.pop(frame, 4, 48 - index * 3);
+    const e = motion.ramp(frame, 4, ordinal === 0 ? 4 : 3);
+    const f = motion.enter(frame, 4, { dur: 9 });
+    const g = motion.ramp(frame, 4, motion.panel);
+    const h = motion.ramp(frame, 88, 92 - 88);
+    const i = motion.ramp(frame, reviewAt + 8, returnAt - reviewAt - 8);
+    const j = motion.ramp(frame, at, duration * 0.4);
+  `);
+  assert.deepEqual([counts.motion, counts.implicitEasing], [5, 0]);
+});
+
+test("a per-item stagger counts unless scaleStagger wraps it", () => {
+  const counts = _count(`
+    const a = motion.ramp(frame, 12 + index * 6, motion.panel);
+    const b = motion.enter(frame, base + row.order * 4);
+    const c = motion.ramp(frame, 12 + index * motion.scaleStagger(6), motion.panel);
+    const d = motion.reveal(frame, at + index);
+    const e = motion.ramp(frame, at + duration * 0.55, duration * 0.45);
+  `);
+  assert.equal(counts.motion, 2);
+});
+
+test("string, negative, and conditional literals count like numbers", () => {
+  const counts = _count(`
+    <g>
+      <rect strokeWidth="2" opacity="0.5" rx={-3} stopOpacity={0.3} />
+      <rect opacity={isFaded ? 0.4 : 1} strokeWidth={isBold ? 2 : 1} />
+      <text fontSize={isLarge ? 18 : 14} fill="red" />
+      <rect fill="none" stroke="currentColor" opacity={isShown ? 1 : 0} />
+    </g>
+  `);
+  assert.deepEqual([counts.line, counts.type, counts.colour], [7, 2, 1]);
+});
+
+test("inline transitions and blurs written as strings count", () => {
+  const counts = _count(`
+    const a = { transition: "opacity 300ms", filter: "blur(4px)" };
+    const b = { transition: transitionFromTheme, filter: \`blur(\${radius}px)\` };
+  `);
+  assert.deepEqual([counts.motion, counts.line], [1, 1]);
+});
+
+test("inline spacing with a length counts, and zero does not", () => {
+  const counts = _count(`
+    const a = { padding: 28, gap: "0 20px", margin: 0, marginTop: spacing.md };
+    const b = { padding: \`\${spacing.xs} 12px\`, paddingTop: "0" };
+  `);
+  assert.equal(counts.spacing, 3);
+});
+
 test("numeric line attributes and decimal opacities count as line", () => {
   const counts = _count(`
     <rect rx={8} strokeWidth={3} opacity={0.5} fillOpacity={1}
@@ -58,15 +113,16 @@ test("stroked raw shapes count as sketch bypass", () => {
   assert.equal(counts.sketch, 1);
 });
 
-test("text sizes count on Text and raw text, never on FitText", () => {
+test("text sizes count on Text and raw text, never on FitText or a fitted size", () => {
   const counts = _count(`
     <g>
-      <Text size={18} weight={600} />
+      <Text size={18} />
+      <Text size="29" fittedSize={137} />
       <text fontSize={14} fontFamily="Arial, sans-serif" />
       <FitText fontSize={16} />
     </g>
   `);
-  assert.equal(counts.type, 4);
+  assert.equal(counts.type, 3);
 });
 
 test("starter palette names count apart from colour", () => {
@@ -110,6 +166,16 @@ test("transitions and animations count only when a timing literal remains outsid
     "Shape.module.css",
   );
   assert.equal(counts.css, 5);
+});
+
+test("stylesheet tracking, named colours, and decimal opacities count", () => {
+  const counts = _count(
+    `.a { letter-spacing: -0.02em; color: white; opacity: 0.6; }
+     .b { letter-spacing: var(--atlas-tracking); color: var(--x); opacity: 1; }
+     .c { letter-spacing: 0; }`,
+    "Shape.module.css",
+  );
+  assert.equal(counts.css, 3);
 });
 
 test("CSS-wide keywords never count as font literals", () => {

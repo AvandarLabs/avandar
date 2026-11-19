@@ -1,6 +1,6 @@
 /*
  * Every stage stylesheet (each CSS module in a renderer directory, listed in
- * `scripts/videoTheme/themeLiteralBudgets/rendererGlobs.json`) reads only
+ * `scripts/videoTheme/themeLiterals/rendererGlobs.json`) reads only
  * `--video-*` variables the theme actually emits, so a typo or a renamed
  * token cannot silently fall back to the browser default. None reads an
  * Atlas chrome token: the chrome scale is not the video theme.
@@ -12,7 +12,7 @@ import test from "node:test";
 import {
   APP_ROOT,
   listRendererFiles,
-} from "../../../scripts/videoTheme/themeLiteralBudgets/themeLiteralBudgets";
+} from "../../../scripts/videoTheme/themeLiterals/rendererFiles/rendererFiles";
 import { buildVideoCssVariables } from "../../videoTheme/buildVideoCssVariables/buildVideoCssVariables";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";

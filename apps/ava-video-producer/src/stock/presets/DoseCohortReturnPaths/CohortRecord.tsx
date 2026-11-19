@@ -64,7 +64,7 @@ export function CohortRecord({
   const shift = mix(
     motion.ramp(
       frame,
-      24 + visitIndex * 18,
+      24 + visitIndex * motion.scaleStagger(18),
       motion.scale(24),
       motion.travel.easing,
     ),
@@ -76,7 +76,12 @@ export function CohortRecord({
       data-record-person={participant.id}
       data-record-visit={visit.id}
       data-state={state}
-      opacity={motion.reveal(frame, 32 + visitIndex * 18 + personIndex * 2)}
+      opacity={motion.reveal(
+        frame,
+        32 +
+          visitIndex * motion.scaleStagger(18) +
+          personIndex * motion.scaleStagger(2),
+      )}
     >
       {state === "recorded" ? (
         <SketchedShape

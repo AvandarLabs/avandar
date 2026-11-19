@@ -33,7 +33,7 @@ export function ReturnActivity({
   const motion = useGraphicMotion();
   const progress = motion.ramp(
     frame,
-    94 + index * 16,
+    94 + index * motion.scaleStagger(16),
     motion.scale(12),
     motion.travel.easing,
   );
@@ -41,7 +41,7 @@ export function ReturnActivity({
   const priorIndex = input.priorWork.findIndex(
     propEq("id", activity.priorWorkId),
   );
-  const visible = frame >= 94 + index * 16;
+  const visible = frame >= 94 + index * motion.scaleStagger(16);
   return (
     <g data-activity-id={activity.id} opacity={visible ? 1 : 0}>
       {activity.kind === "review" && progress === 1 ? (

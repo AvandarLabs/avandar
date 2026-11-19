@@ -16,7 +16,10 @@ export function CustodyStops({
     <g>
       {input.stops.map((stop, index) => {
         return (
-          <g key={stop.id} opacity={motion.reveal(frame, 12 + index * 2)}>
+          <g
+            key={stop.id}
+            opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
+          >
             <ObjectGlyph
               kind={
                 stop.kind === "vehicle" || stop.kind === "courier"

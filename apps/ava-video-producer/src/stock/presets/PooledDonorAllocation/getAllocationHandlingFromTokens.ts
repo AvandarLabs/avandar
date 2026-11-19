@@ -69,7 +69,7 @@ export function getAllocationHandlingFromTokens({
     0,
     Math.min(input.requests.length - 1, Math.floor((frame - 62) / 20)),
   );
-  const start = 62 + index * 20;
+  const start = 62 + index * motion.scaleStagger(20);
   const batch = _getBatchBounds({
     tokens,
     requestId: input.requests[index].id,
@@ -97,7 +97,7 @@ export function getAllocationHandlingFromTokens({
   const handY = mix(lift, previous.bottom, batch.bottom + release * 26);
   const retreat = motion.ramp(
     frame,
-    62 + input.requests.length * 20,
+    62 + input.requests.length * motion.scaleStagger(20),
     motion.scale(10),
     motion.entrance.easing,
   );

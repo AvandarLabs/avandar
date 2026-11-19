@@ -85,7 +85,7 @@ export function getAllocationTokensFromInputAndFrame({
     });
     const pooling = motion.ramp(
       frame,
-      32 + token.donorIndex * 3,
+      32 + token.donorIndex * motion.scaleStagger(3),
       motion.scale(20),
       motion.travel.easing,
     );
@@ -98,7 +98,7 @@ export function getAllocationTokensFromInputAndFrame({
         ? 0
         : motion.ramp(
             frame,
-            64 + placement.requestIndex * 20,
+            64 + placement.requestIndex * motion.scaleStagger(20),
             motion.scale(14),
             motion.travel.easing,
           );

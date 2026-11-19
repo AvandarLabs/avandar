@@ -54,7 +54,11 @@ export function ConvoyMap({
                   )
                 : tokens.stroke.heavy,
             )}
-            strokeOpacity={motion.ramp(frame, 10 + index * 3, motion.word)}
+            strokeOpacity={motion.ramp(
+              frame,
+              10 + index * motion.scaleStagger(3),
+              motion.word,
+            )}
             strokeLinejoin="round"
           />
         );

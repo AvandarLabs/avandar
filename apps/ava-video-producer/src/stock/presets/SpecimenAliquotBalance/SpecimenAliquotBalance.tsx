@@ -23,7 +23,7 @@ export function SpecimenAliquotBalance({
       aliquot.volume *
         motion.ramp(
           frame,
-          36 + index * 12,
+          36 + index * motion.scaleStagger(12),
           motion.scale(24),
           motion.entrance.easing,
         )
@@ -51,7 +51,7 @@ export function SpecimenAliquotBalance({
               aliquot.volume *
               motion.ramp(
                 frame,
-                36 + index * 12,
+                36 + index * motion.scaleStagger(12),
                 motion.scale(24),
                 motion.entrance.easing,
               )

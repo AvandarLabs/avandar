@@ -28,7 +28,7 @@ export function ThresholdShutter({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const shutter = isSuppressed
-    ? motion.ramp(frame, 51 + index * 4, motion.scale(34))
+    ? motion.ramp(frame, 51 + index * motion.scaleStagger(4), motion.scale(34))
     : 0;
   return (
     <g>

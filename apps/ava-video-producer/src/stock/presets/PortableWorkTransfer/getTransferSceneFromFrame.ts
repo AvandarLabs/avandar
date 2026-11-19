@@ -36,7 +36,7 @@ export function getTransferSceneFromFrame({
   const copies = input.artifacts.map((artifact, index) => {
     const packing = motion.ramp(
       frame,
-      43 + (index * 36) / input.artifacts.length,
+      43 + (index * motion.scaleStagger(36)) / input.artifacts.length,
       motion.scale(12),
       motion.travel.easing,
     );
@@ -44,8 +44,8 @@ export function getTransferSceneFromFrame({
       input.transferState === "accepted"
         ? motion.ramp(
             frame,
-            124 + (index * 6) / input.artifacts.length,
-            6 / input.artifacts.length,
+            124 + (index * motion.scaleStagger(6)) / input.artifacts.length,
+            motion.scale(6) / input.artifacts.length,
             motion.travel.easing,
           )
         : 0;

@@ -34,14 +34,16 @@ export function PreparedContact({
       ? 0
       : motion.ramp(
           frame,
-          60 + order * 16,
+          60 + order * motion.scaleStagger(16),
           motion.scale(16),
           motion.entrance.easing,
         );
   const x = mix(progress, 520, 560);
   const y = 194 + index * 102 - 20 * Math.sin(progress * Math.PI);
   const isHandling =
-    order >= 0 && frame >= 60 + order * 16 && frame <= 76 + order * 16;
+    order >= 0 &&
+    frame >= 60 + order * motion.scaleStagger(16) &&
+    frame <= 76 + order * motion.scaleStagger(16);
   return (
     <g>
       <ContactHandling

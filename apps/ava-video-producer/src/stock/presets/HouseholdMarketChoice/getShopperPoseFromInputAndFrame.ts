@@ -30,7 +30,7 @@ export function getShopperPoseFromInputAndFrame({
     Math.min(selections.length - 1, Math.floor((frame - 30) / 24)),
   );
   const index = selections[ordinal];
-  const start = 30 + ordinal * 24;
+  const start = 30 + ordinal * motion.scaleStagger(24);
   const product = getMarketProductPositionFromInputAndFrame({
     motion,
     input,
@@ -47,7 +47,11 @@ export function getShopperPoseFromInputAndFrame({
     ordinal === 0 ? 300 : 370,
     product.bodyY,
   );
-  const retreat = motion.ramp(frame, 30 + selections.length * 24, motion.chip);
+  const retreat = motion.ramp(
+    frame,
+    30 + selections.length * motion.scaleStagger(24),
+    motion.chip,
+  );
   const x = mix(Math.max(0, retreat * 2 - 1), bodyX, 175);
   const y = mix(Math.min(1, retreat * 2), bodyY, 414);
   const grip = approach * (1 - release) * (1 - retreat);

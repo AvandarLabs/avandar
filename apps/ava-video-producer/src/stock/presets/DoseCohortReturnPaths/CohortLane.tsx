@@ -33,7 +33,9 @@ function _getPersonPosition({
       ? mix(
           motion.ramp(
             frame,
-            30 + visitIndex * 18 + index * 2,
+            30 +
+              visitIndex * motion.scaleStagger(18) +
+              index * motion.scaleStagger(2),
             motion.hero,
             motion.travel.easing,
           ),
@@ -59,7 +61,7 @@ export function CohortLane({
   return (
     <g
       data-participant={participant.id}
-      opacity={motion.reveal(frame, 12 + index * 2)}
+      opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
     >
       <SceneLabel
         text={participant.label}

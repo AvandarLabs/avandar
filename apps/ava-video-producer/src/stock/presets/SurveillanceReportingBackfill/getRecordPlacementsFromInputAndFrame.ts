@@ -44,7 +44,7 @@ export function getRecordPlacementsFromInputAndFrame({
         ? 1
         : motion.ramp(
             frame,
-            36 + arrival * 2,
+            36 + arrival * motion.scaleStagger(2),
             motion.scale(50),
             motion.travel.easing,
           );

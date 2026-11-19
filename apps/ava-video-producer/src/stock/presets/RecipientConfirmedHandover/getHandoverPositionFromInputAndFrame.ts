@@ -33,7 +33,7 @@ export function getHandoverPositionFromInputAndFrame({
     unitIndex < content.selectedUnits
       ? motion.ramp(
           frame,
-          34 + ordinal * 14,
+          34 + ordinal * motion.scaleStagger(14),
           motion.scale(10),
           motion.travel.easing,
         )

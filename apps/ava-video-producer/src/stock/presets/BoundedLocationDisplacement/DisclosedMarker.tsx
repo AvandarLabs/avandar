@@ -26,7 +26,7 @@ export function DisclosedMarker({
     cy: 180 + (location.y + location.offsetY) * 2.2,
   };
   return (
-    <g opacity={motion.reveal(frame, 70 + index * 2)}>
+    <g opacity={motion.reveal(frame, 70 + index * motion.scaleStagger(2))}>
       <circle
         data-public-position={location.id}
         data-public-coordinate={`${location.x + location.offsetX},${location.y + location.offsetY}`}

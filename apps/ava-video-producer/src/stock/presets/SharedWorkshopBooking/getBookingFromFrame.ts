@@ -69,10 +69,20 @@ export function getBookingFromFrame({
   );
   const hasBooking = request.agreedSlotId !== null;
   const horizontal = hasBooking
-    ? motion.ramp(frame, 36 + index * 3, motion.scale(30), motion.travel.easing)
+    ? motion.ramp(
+        frame,
+        36 + index * motion.scaleStagger(3),
+        motion.scale(30),
+        motion.travel.easing,
+      )
     : 0;
   const vertical = hasBooking
-    ? motion.ramp(frame, 75 + index * 3, motion.scale(24), motion.travel.easing)
+    ? motion.ramp(
+        frame,
+        75 + index * motion.scaleStagger(3),
+        motion.scale(24),
+        motion.travel.easing,
+      )
     : 0;
   const x = mix(
     horizontal,

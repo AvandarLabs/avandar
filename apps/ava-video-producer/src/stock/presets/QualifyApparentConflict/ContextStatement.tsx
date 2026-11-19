@@ -28,7 +28,11 @@ export function ContextStatement({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const arrival = motion.ramp(frame, 12 + index * 6, motion.hero);
+  const arrival = motion.ramp(
+    frame,
+    12 + index * motion.scaleStagger(6),
+    motion.hero,
+  );
   const split = motion.ramp(frame, 48, motion.scale(36), motion.travel.easing);
   const x =
     mix(split, index ? 680 : 280, index ? 710 : 250) +

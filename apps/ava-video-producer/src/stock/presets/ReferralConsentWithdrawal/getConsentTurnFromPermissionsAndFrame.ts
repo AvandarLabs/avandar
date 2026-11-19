@@ -18,5 +18,10 @@ export function getConsentTurnFromPermissionsAndFrame({
     .findIndex(propEq("id", permissionId));
   return order < 0
     ? 0
-    : motion.ramp(frame, 36 + order * 8, motion.whip, motion.entrance.easing);
+    : motion.ramp(
+        frame,
+        36 + order * motion.scaleStagger(8),
+        motion.whip,
+        motion.entrance.easing,
+      );
 }

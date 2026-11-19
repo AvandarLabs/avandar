@@ -53,11 +53,11 @@ export function getRecipientPoseFromInputAndFrame({
           ...selections[ordinal - 1],
           motion,
         });
-  const start = 30 + ordinal * 14;
+  const start = 30 + ordinal * motion.scaleStagger(14);
   const approach = motion.ramp(
     frame,
     start + (ordinal === 0 ? 0 : 1),
-    ordinal === 0 ? 4 : 3,
+    motion.scale(ordinal === 0 ? 4 : 3),
     motion.entrance.easing,
   );
   const waypoint = Math.min(1, approach * 3);
@@ -71,7 +71,7 @@ export function getRecipientPoseFromInputAndFrame({
   const y = mix(vertical, previous.y + 35, product.y + 35);
   const release = motion.ramp(
     frame,
-    30 + selections.length * 14,
+    30 + selections.length * motion.scaleStagger(14),
     motion.press.duration,
     motion.entrance.easing,
   );

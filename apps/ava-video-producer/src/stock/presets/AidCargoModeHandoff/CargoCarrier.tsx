@@ -30,7 +30,7 @@ export function CargoCarrier({
     <g
       data-carrier={carrier.id}
       data-mode={carrier.mode}
-      opacity={motion.reveal(frame, 10 + index * 3)}
+      opacity={motion.reveal(frame, 10 + index * motion.scaleStagger(3))}
       transform={`translate(${x} ${y})`}
     >
       <CargoCarrierShape mode={carrier.mode} accent={accent} />

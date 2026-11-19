@@ -41,7 +41,7 @@ export function PresenceRibbon({
     <g
       data-presence={record.id}
       data-state={state}
-      opacity={motion.reveal(frame, 12 + index * 2)}
+      opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
     >
       <PersonGlyph x={45} y={y} size={28} color={accent} />
       <SceneLabel text={record.label} x={70} y={y - 3} width={195} lines={3} />
@@ -58,7 +58,11 @@ export function PresenceRibbon({
           fill="none"
           stroke={accent}
           strokeWidth={scales.stroke(tokens.stroke.default)}
-          opacity={motion.ramp(frame, 96 + index * 2, motion.scale(10))}
+          opacity={motion.ramp(
+            frame,
+            96 + index * motion.scaleStagger(2),
+            motion.scale(10),
+          )}
         />
       ) : undefined}
     </g>
