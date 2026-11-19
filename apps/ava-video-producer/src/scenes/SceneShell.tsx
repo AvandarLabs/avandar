@@ -1,5 +1,5 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { assertFinite, fitTextLines } from "./layout/layout";
 import { getStageTextStyle } from "./stageTheme/stageTheme";
 import { getHeadingRevealStyles } from "./textReveal";
@@ -25,6 +25,7 @@ export function SceneShell({
 }: SceneBase & { children: ReactNode }): ReactNode {
   assertFinite(frame, "scene frame");
   const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
   const heading = tokens.text.stage.sceneHeading;
   const body = tokens.text.stage.sceneBody;
@@ -76,7 +77,7 @@ export function SceneShell({
           {kicker ? (
             <p
               style={{
-                margin: "16px 0 0",
+                margin: `${spacing["2xs"]} 0 0`,
                 maxWidth: "100%",
                 ...getStageTextStyle(body, ["fontSize", "lineHeight"]),
                 color: tokens.color.scene.mutedForeground,

@@ -62,7 +62,7 @@ function EmptyState({ frame }: { frame: number }): ReactNode {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 16,
+        gap: mantine.spacing["2xs"],
         opacity:
           motion.ramp(frame, APP_IN + CUES.emptyState, motion.sheet, easing) *
           (1 - motion.ramp(frame, ROWS_AT, motion.chip, easing)),
@@ -100,7 +100,7 @@ function Results({
         borderRadius: scales.corner(semantic.corner.scene),
         border: hairline,
         background: scene.card,
-        padding: 28,
+        padding: mantine.spacing["28"],
         ...motion.enter(frame, ROWS_AT, {
           dur: motion.sheet,
           y: RISE.panel,
@@ -127,8 +127,8 @@ function Results({
        * catches without being able to name. */}
       <div
         style={{
-          marginTop: 30,
-          paddingTop: 20,
+          marginTop: mantine.spacing["30"],
+          paddingTop: mantine.spacing.xs,
           borderTop: hairline,
           display: "flex",
           justifyContent: "space-between",
@@ -198,7 +198,7 @@ function ResultRow({
   return (
     <div
       style={{
-        marginTop: 34,
+        marginTop: mantine.spacing["34"],
         ...entrance,
         // Dimmed, not removed. A row that vanishes takes its slot with it
         // and the four below jump up a line; leaving it at a quarter says
@@ -212,7 +212,7 @@ function ResultRow({
           display: "flex",
           justifyContent: "space-between",
           fontSize: mantine.fontSizes["19"],
-          marginBottom: 9,
+          marginBottom: mantine.spacing["9"],
         }}
       >
         <span>{row.label}</span>

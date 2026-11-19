@@ -19,6 +19,7 @@ type MotionDefaults = Readonly<{
   pressDepth: number;
   caret: Readonly<{ halfPeriod: number }>;
   entranceStyle: "rise" | "fade" | "scale" | "none";
+  entranceScale: number;
   stagger: Readonly<{ list: number }>;
 }>;
 
@@ -34,9 +35,6 @@ export type ThemedEnterOptions = Readonly<{
   scale?: number;
   easing?: EasingFunction;
 }>;
-
-/** The starting scale of an entrance whose theme style is `scale`. */
-const SCALE_STYLE_START = 0.96;
 
 /**
  * The `motion.ts` helpers with the theme's defaults in place of their
@@ -126,7 +124,7 @@ function _rise(
   if (style === "fade") {
     return { opacity: t };
   }
-  const scale = options.scale ?? (style === "scale" ? SCALE_STYLE_START : 1);
+  const scale = options.scale ?? (style === "scale" ? defaults.entranceScale : 1);
   const travel = style === "scale" ? { x: 0, y: 0 } : { x, y };
   const parts = [
     `translate(${mix(t, travel.x, 0).toFixed(2)}px, ${mix(t, travel.y, 0).toFixed(2)}px)`,

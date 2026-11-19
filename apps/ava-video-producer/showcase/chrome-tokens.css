@@ -207,6 +207,17 @@
   --atlas-tracking-wide-1-4: 1.4px;
   --atlas-tracking-wide-1-7: 1.7px;
   --atlas-tracking-wide-1-8: 1.8px;
+  /* Letter spacing relative to the font size: em-tight-* and em-wide-*. */
+  --atlas-tracking-em-tight-0-025: -0.025em;
+  --atlas-tracking-em-wide-0-02: 0.02em;
+  --atlas-tracking-em-wide-0-04: 0.04em;
+  --atlas-tracking-em-wide-0-08: 0.08em;
+
+  /* Opacity: the percent a dimmed or disabled control keeps. */
+  --atlas-opacity-50: 0.5;
+  --atlas-opacity-55: 0.55;
+  --atlas-opacity-60: 0.6;
+  --atlas-opacity-80: 0.8;
 
   /* Spacing: padding, margin, gap, offsets, translations. */
   --atlas-space-1: 1px;

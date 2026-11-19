@@ -291,7 +291,7 @@ h1 em {
 
 button:disabled {
   cursor: wait;
-  opacity: 0.6;
+  opacity: var(--atlas-opacity-60);
 }
 
 .export-status {

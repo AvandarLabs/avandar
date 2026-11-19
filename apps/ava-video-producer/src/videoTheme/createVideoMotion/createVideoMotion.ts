@@ -63,6 +63,7 @@ export type VideoMotion = Readonly<{
   pressDepth: number;
   caret: Readonly<{ halfPeriod: number }>;
   entranceStyle: MotionTokens["entranceStyle"];
+  entranceScale: number;
   pulse: Readonly<{ period: number }>;
   drift: Readonly<{ distance: number }>;
   packetFlow: Readonly<{ period: number }>;
@@ -185,6 +186,7 @@ function _cycles(motion: MotionTokens) {
     pressDepth: motion.pressDepth,
     caret: motion.caret,
     entranceStyle: motion.entranceStyle,
+    entranceScale: motion.entranceScale,
   };
 }
 

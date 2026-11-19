@@ -48,6 +48,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
   } = props;
   _validate(props);
   const motion = useVideoMotion();
+  const { spacing } = useVideoTheme().mantine;
   const bounds = sceneBounds(width, height, Boolean(title || kicker));
   const iconSize = icon ? (icon.size ?? ICON_SIZE) : 0;
   const isCaption = size === "caption";
@@ -81,7 +82,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
         {icon ? (
           <div
             style={{
-              marginBottom: 48,
+              marginBottom: spacing["48"],
               ...getStagedExitStyle(
                 frame,
                 props.exit,

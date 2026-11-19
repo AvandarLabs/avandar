@@ -48,7 +48,7 @@ export function SidePanel({
         borderRadius: scales.corner(semantic.corner.scene),
         border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.border}`,
         background: scene.card,
-        padding: 28,
+        padding: mantine.spacing["28"],
         ...motion.enter(frame, ROWS_AT + CUES.panel, {
           dur: motion.sheet,
           y: RISE.panel,
@@ -77,7 +77,7 @@ function MatchedCount({ shown }: { shown: number }): ReactNode {
         fontSize: mantine.fontSizes["76"],
         fontWeight: atomic.fontWeight.bold,
         letterSpacing: `${atomic.letterSpacing.counter}em`,
-        marginTop: 6,
+        marginTop: mantine.spacing["6"],
         // Weight and size stay stepped. Tweening fontSize reflows the
         // line every frame; this number changes its value, not its type.
       }}
@@ -104,7 +104,14 @@ function FilterChips({
     motion.pressDepth * CHIP_PRESS_SCALE,
   );
   return (
-    <div style={{ display: "flex", gap: 10, marginTop: 30, flexWrap: "wrap" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: mantine.spacing["10"],
+        marginTop: mantine.spacing["30"],
+        flexWrap: "wrap",
+      }}
+    >
       {CHIPS.map((chip, index) => {
         // A filter group always has exactly one selection. "All channels"
         // is lit from the start and hands over to "Paid only" on the same
@@ -115,7 +122,7 @@ function FilterChips({
           <div
             key={chip}
             style={{
-              padding: "10px 18px",
+              padding: `${mantine.spacing["10"]} ${mantine.spacing["18"]}`,
               borderRadius: scales.corner(semantic.corner.pill),
               fontSize: mantine.fontSizes.lg,
               border: `${scales.stroke(semantic.stroke.hairline)}px solid ${mixToken(lit, scene.border, scene.brand)}`,
@@ -175,8 +182,8 @@ function Facts({
           display: "flex",
           justifyContent: "space-between",
           fontSize: mantine.fontSizes.lg,
-          marginTop: 20,
-          paddingTop: 20,
+          marginTop: mantine.spacing.xs,
+          paddingTop: mantine.spacing.xs,
           borderTop: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.border}`,
           ...motion.enterAt(frame, ROWS_AT + CUES.facts, index, {
             y: RISE.fact,
@@ -203,13 +210,13 @@ function PublishedToast({ frame }: { frame: number }): ReactNode {
   return (
     <div
       style={{
-        marginTop: 34,
-        padding: 22,
+        marginTop: mantine.spacing["34"],
+        padding: mantine.spacing["22"],
         borderRadius: scales.corner(semantic.corner.card),
         background: scene.brandSoft,
         border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.brand}`,
         display: "flex",
-        gap: 14,
+        gap: mantine.spacing["14"],
         alignItems: "center",
         opacity: motion.ramp(
           frame,

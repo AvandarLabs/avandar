@@ -171,15 +171,23 @@
     "2xl": "70px",
     "3xl": "96px",
     "4xl": "192px",
+    "2": "2px",
+    "3": "3px",
     "4": "4px",
     "6": "6px",
     "8": "8px",
+    "9": "9px",
     "10": "10px",
     "12": "12px",
     "14": "14px",
     "18": "18px",
+    "22": "22px",
     "24": "24px",
+    "26": "26px",
     "28": "28px",
+    "30": "30px",
+    "34": "34px",
+    "38": "38px",
     "40": "40px",
     "48": "48px",
     "120": "120px"
@@ -247,6 +255,7 @@
           "wide": 0.17142857142857143,
           "title": -0.02717391304347826,
           "headline": -0.02,
+        "slight": -0.01,
           "wordmark": -0.03,
           "figure": -0.035,
           "capitals": 0.125,
@@ -942,7 +951,8 @@
             "gentle": "$atomic.easing.gentle"
           },
           "staggerScale": "$atomic.multiplier.identity",
-          "entranceStyle": "rise"
+          "entranceStyle": "rise",
+          "entranceScale": 0.96
         },
         "camera": {
           "preset": "authored",

@@ -136,10 +136,10 @@ function BuildingBlocks({ frame }: { frame: number }): ReactNode {
           top: 212 + index * 170,
           width: 704,
           height: 146,
-          padding: 28,
+          padding: mantine.spacing["28"],
           display: "flex",
           alignItems: "center",
-          gap: 26,
+          gap: mantine.spacing["26"],
           ...motion.enterAt(frame, ROWS_AT, index, {
             y: motion.entrance.distance,
             dur: motion.reveal.duration,
@@ -159,7 +159,7 @@ function BuildingBlocks({ frame }: { frame: number }): ReactNode {
             style={{
               fontSize: mantine.fontSizes["7xl"],
               fontWeight: atomic.fontWeight.semibold,
-              marginBottom: 10,
+              marginBottom: mantine.spacing["10"],
             }}
           >
             {title}
@@ -190,11 +190,16 @@ function TypedCard({ frame }: { frame: number }): ReactNode {
         top: 212,
         width: 736,
         height: 204,
-        padding: 32,
+        padding: mantine.spacing.sm,
       }}
     >
       <SectionLabel>TYPE A THOUGHT</SectionLabel>
-      <div style={{ marginTop: 38, fontSize: mantine.fontSizes["8xl"] }}>
+      <div
+        style={{
+          marginTop: mantine.spacing["38"],
+          fontSize: mantine.fontSizes["8xl"],
+        }}
+      >
         {typed(
           frame,
           TYPE_AT,
@@ -227,13 +232,13 @@ function CounterCard({ frame }: { frame: number }): ReactNode {
         top: 444,
         width: 736,
         height: 300,
-        padding: 32,
+        padding: mantine.spacing.sm,
       }}
     >
       <SectionLabel>COUNT TOWARD A RESULT</SectionLabel>
       <div
         style={{
-          marginTop: 18,
+          marginTop: mantine.spacing["18"],
           fontSize: mantine.fontSizes["108"],
           lineHeight: mantine.lineHeights["115"],
           fontWeight: atomic.fontWeight.semibold,
@@ -245,7 +250,7 @@ function CounterCard({ frame }: { frame: number }): ReactNode {
       </div>
       <div
         style={{
-          marginTop: 22,
+          marginTop: mantine.spacing["22"],
           height: 5,
           background: semantic.color.scene.muted,
           borderRadius: pill,

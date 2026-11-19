@@ -19,7 +19,7 @@
 
 .compositionActionsLink:disabled {
   cursor: wait;
-  opacity: 0.55;
+  opacity: var(--atlas-opacity-55);
 }
 
 .compositionActionsStatus {

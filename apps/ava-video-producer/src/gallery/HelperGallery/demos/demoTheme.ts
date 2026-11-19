@@ -65,6 +65,17 @@ function _scaleVariables(
   );
 }
 
+/** Tracking steps as CSS lengths relative to the font size. */
+function _toEms(
+  scale: Readonly<Record<string, number>>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(scale).map(([key, value]) => {
+      return [key, `${value}em`];
+    }),
+  );
+}
+
 function _shapeVariables(
   theme: ResolvedVideoTheme,
   scales: VideoShapeScales,
@@ -106,7 +117,8 @@ function _shapeVariables(
  * the preview palette (`--demo-ground`, `--demo-brand`, ...), the stage and
  * monospace faces, the type, weight, and spacing scales
  * (`--demo-font-size-lg`, `--demo-font-weight-semibold`,
- * `--demo-space-2xs`), and corners and strokes through the Look and feel
+ * `--demo-space-2xs`), the tracking steps (`--demo-tracking-headline`), and
+ * corners and strokes through the Look and feel
  * scales (`--demo-corner-card`, `--demo-stroke-hairline`), and the guide
  * dash (`--demo-dash-guide`). Set on every
  * preview root by `HelperDemoFrame`.
@@ -131,6 +143,7 @@ export function useDemoThemeStyle(): CSSProperties {
     ..._scaleVariables("font-size", theme.mantine.fontSizes),
     ..._scaleVariables("font-weight", theme.atomic.fontWeight),
     ..._scaleVariables("space", theme.mantine.spacing),
+    ..._scaleVariables("tracking", _toEms(theme.atomic.letterSpacing)),
     ..._shapeVariables(theme, scales),
   } as CSSProperties;
 }

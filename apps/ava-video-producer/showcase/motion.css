@@ -115,7 +115,7 @@ p {
 .skip-link {
   background: var(--ink);
   border-radius: var(--atlas-radius-5);
-  color: white;
+  color: var(--atlas-color-white);
   left: 10px;
   padding: var(--atlas-space-12) var(--atlas-space-20);
   position: fixed;
@@ -274,7 +274,7 @@ p {
 
 .category-button > svg {
   height: 16px;
-  opacity: 0.8;
+  opacity: var(--atlas-opacity-80);
   width: 16px;
 }
 
@@ -2131,7 +2131,7 @@ p {
 .dialog-heading h2 {
   font-size: var(--atlas-font-size-23);
   font-weight: var(--atlas-font-weight-520);
-  letter-spacing: -0.025em;
+  letter-spacing: var(--atlas-tracking-em-tight-0-025);
   line-height: 1.2;
 }
 
@@ -2214,7 +2214,7 @@ p {
 
 .transport-row .icon-button:hover {
   background: var(--ava-neutral-8);
-  color: white;
+  color: var(--atlas-color-white);
 }
 
 .time-code {
@@ -2241,7 +2241,7 @@ p {
 .scrubber-labels {
   color: var(--ava-primary-2);
   font-size: var(--atlas-font-size-9);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--atlas-tracking-em-wide-0-04);
 }
 
 .dialog-details {
@@ -2345,7 +2345,7 @@ p {
 /* Mantine buttons keep their own disabled styling. */
 .preview-dialog button:disabled:not(.mantine-UnstyledButton-root) {
   cursor: wait;
-  opacity: 0.6;
+  opacity: var(--atlas-opacity-60);
 }
 
 .preview-dialog input {

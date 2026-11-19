@@ -80,6 +80,7 @@ export function GraphScene({
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const fontSizes = useVideoTheme().mantine.fontSizes;
+  const spacing = useVideoTheme().mantine.spacing;
   const scene = tokens.color.scene;
   const cardTitle = tokens.text.stage.cardTitle;
   const edgeWidth = scales.stroke(tokens.stroke.emphasis);
@@ -223,7 +224,7 @@ export function GraphScene({
               ...positioned(rect),
               display: "flex",
               flexDirection: "column",
-              padding: 20,
+              padding: spacing.xs,
               justifyContent: node.items?.length ? "flex-start" : "center",
               border:
                 node.frame === "ticks"
@@ -251,7 +252,7 @@ export function GraphScene({
             {detail ? (
               <div
                 style={{
-                  marginTop: 10,
+                  marginTop: spacing["10"],
                   fontSize: detail.fontSize,
                   color: scene.mutedForeground,
                   lineHeight: cardTitle.lineHeight,

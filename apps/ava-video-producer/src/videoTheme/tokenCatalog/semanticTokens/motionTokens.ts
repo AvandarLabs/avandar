@@ -200,6 +200,15 @@ export const MOTION_TOKENS = {
     description:
       "What an entrance animates besides opacity: a rise, a plain fade, a scale up, or nothing, so elements appear on their cue.",
   }),
+  entranceScale: token({
+    kind: "number",
+    min: 0.5,
+    max: 1,
+    step: 0.01,
+    label: "Entrance scale start",
+    description:
+      "The size an element starts from when the entrance style scales it up, as a fraction of its full size.",
+  }),
   stagger: {
     list: _stagger("List stagger", "Frames between siblings in a list."),
     edge: _stagger("Edge stagger", "Frames between edges drawing in."),

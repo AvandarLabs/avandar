@@ -1,7 +1,7 @@
 import { getStageTextStyle } from "../scenes/stageTheme/stageTheme";
 import { StageThemeBoundary } from "../scenes/stageTheme/StageThemeBoundary";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { Orb } from "./Orb";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -34,6 +34,7 @@ export function AppFrame(props: Props): ReactNode {
 
 function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
   const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
   const appBody = tokens.text.stage.appBody;
@@ -56,8 +57,8 @@ function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
           height: BAR,
           display: "flex",
           alignItems: "center",
-          gap: 8,
-          padding: "0 16px",
+          gap: spacing["8"],
+          padding: `0 ${spacing["2xs"]}`,
           borderBottom: rule,
           background: scene.background,
           ...getStageTextStyle(appBody),
@@ -77,8 +78,8 @@ function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
           height: HEAD,
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          padding: "0 24px",
+          gap: spacing["12"],
+          padding: `0 ${spacing["24"]}`,
           borderBottom: rule,
           background: scene.background,
           fontFamily: tokens.text.stage.appTitle.fontFamily,

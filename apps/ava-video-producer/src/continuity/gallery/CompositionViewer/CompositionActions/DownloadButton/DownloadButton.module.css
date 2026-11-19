@@ -9,7 +9,7 @@
 
 .downloadButton:disabled {
   cursor: wait;
-  opacity: 0.55;
+  opacity: var(--atlas-opacity-55);
 }
 
 /* A download the theme blocks is unavailable, not busy: it explains itself in the notice below. */

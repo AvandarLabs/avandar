@@ -1,6 +1,6 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   assertFrame,
   assertRect,
@@ -51,6 +51,7 @@ export function MediaScene({
     throw new Error("Media fit must be contain or cover");
   sceneBounds(width, height); // Apply the shared minimum-size checks.
   const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
@@ -103,7 +104,7 @@ export function MediaScene({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 24,
+            gap: spacing["24"],
           }}
         >
           {heading ? (
@@ -231,7 +232,7 @@ export function MediaScene({
                   left: labelX,
                   top: labelY,
                   width: labelWidth,
-                  padding: "10px 16px",
+                  padding: `${spacing["10"]} ${spacing["2xs"]}`,
                   fontSize: label.fontSize,
                   ...getStageTextStyle(caption, ["lineHeight", "fontWeight"]),
                   color: scene.foreground,

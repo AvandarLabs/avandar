@@ -8,7 +8,7 @@ import {
 import { StageThemeBoundary } from "./scenes/stageTheme/StageThemeBoundary";
 import { useVideoMotion } from "./videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "./videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "./videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "./videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 export { TITLE_LEN } from "./composition-timing";
@@ -62,6 +62,7 @@ type TitleCardProps = {
 
 function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
   const tokens = useVideoTokens();
+  const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const titleRole = tokens.text.stage.title;
@@ -107,7 +108,7 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
           alignItems: "center",
         }}
       >
-        <div style={{ display: "flex", gap: 22 }}>
+        <div style={{ display: "flex", gap: spacing["22"] }}>
           {words.map((word, i) => {
             const t = motion.ramp(
               frame,
@@ -126,7 +127,7 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
                   display: "inline-block",
                   overflow: "hidden",
                   lineHeight: titleRole.lineHeight,
-                  paddingBottom: 6,
+                  paddingBottom: spacing["6"],
                 }}
               >
                 <span
@@ -162,7 +163,7 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
             width: 120,
             height: 3,
             borderRadius: scales.corner(tokens.corner.pill),
-            marginTop: 26,
+            marginTop: spacing["26"],
             background: tokens.color.scene.brand,
             transformOrigin: "center",
             transform: `scaleX(${motion
@@ -176,7 +177,7 @@ function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
             second grey token. */}
         <div
           style={{
-            marginTop: 22,
+            marginTop: spacing["22"],
             ...getStageTextStyle(kickerRole),
             opacity: kickerIn,
             transform: `translateY(${mix(kickerIn, KICKER_RISE, 0).toFixed(2)}px)`,

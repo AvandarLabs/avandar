@@ -11,6 +11,10 @@ import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; assembled: number };
+/** The assembled shell's own corners: a rounded appliance, a squared module. */
+const APPLIANCE_CORNER = 12;
+const MODULE_CORNER = 2;
+
 /**
  * Distinct returned and output silhouettes never suggest a zero-mass assembly.
  */
@@ -59,7 +63,7 @@ export function MaterialBoundary({
           y={288}
           width={305}
           height={48}
-          rx={isAppliance ? 12 : 2}
+          rx={scales.corner(isAppliance ? APPLIANCE_CORNER : MODULE_CORNER)}
           fill="none"
           stroke={tokens.color.line}
           strokeWidth={scales.stroke(tokens.stroke.emphasis)}

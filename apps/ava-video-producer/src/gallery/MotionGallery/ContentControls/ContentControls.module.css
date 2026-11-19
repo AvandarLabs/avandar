@@ -42,5 +42,5 @@
 
 .contentControlsEditor button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--atlas-opacity-50);
 }

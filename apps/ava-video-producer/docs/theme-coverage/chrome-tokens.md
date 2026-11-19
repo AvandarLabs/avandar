@@ -33,7 +33,8 @@ video token.
 | Font size | `--atlas-font-size-*` | Pixel value, `6-5` for 6.5px. The fluid page titles are named by role: `atlas-title`, `showcase-title`, `productions-title`, `productions-title-narrow`. |
 | Font weight | `--atlas-font-weight-*` | Numeric weight. |
 | Font family | `--atlas-font-family-*` | `serif`, `mono-system`, `system`. The product face is `--ava-font` and the code face is `--mono`. |
-| Letter spacing | `--atlas-tracking-*` | `tight-<px>` for negative tracking, `wide-<px>` for positive. |
+| Letter spacing | `--atlas-tracking-*` | `tight-<px>` for negative tracking, `wide-<px>` for positive. `em-tight-<em>` and `em-wide-<em>` track relative to the font size, `0-025` for 0.025em. |
+| Opacity | `--atlas-opacity-*` | Percent, `55` for 0.55. A dimmed or disabled control. |
 | Spacing | `--atlas-space-*` | Pixel value. Padding, margin, gap, outline and underline offsets, translations. A negative offset reads `calc(var(--atlas-space-4) * -1)`. |
 | Geometry | `--atlas-size-*` | Pixel value. Header and strip heights that other rules compute with, and the basis inside a `flex` shorthand. |
 | Border width | `--atlas-border-*` | Pixel value. Borders and outlines. |
@@ -59,8 +60,8 @@ theme values.
 ## Guard
 
 `scripts/videoTheme/__tests__/renderers-draw-no-literals.integration.test.ts`
-scans every chrome stylesheet with the stylesheet patterns from the theme
-coverage review and compares the count with
-`scripts/videoTheme/themeLiteralBudgets/s9.json`. The budget is empty, so a
-new literal fails the test. The scan skips `showcase/chrome-tokens.css`
+scans every chrome stylesheet listed in
+`scripts/videoTheme/themeLiterals/chromeStylesheetGlobs.json` with the
+stylesheet patterns from the theme coverage review, including tracking,
+`white` and `black`, and decimal opacities. Any literal fails the test. The scan skips `showcase/chrome-tokens.css`
 alone, since it is the source of the values.

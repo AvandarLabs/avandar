@@ -7,7 +7,7 @@ import { FIELD, RUN_CLICK } from "./timeline";
 import type { ReactNode } from "react";
 
 /** The caret: a bar as tall as the typed line, beside it. */
-const CARET = { width: 2, height: 28, gap: 3 };
+const CARET = { width: 2, height: 28 };
 
 /** The prompt field phase: a text field gaining focus, filling with the
  *  query, and a Run button answering the click. */
@@ -42,8 +42,8 @@ export function PromptField({
         boxShadow: focusRing,
         display: "flex",
         alignItems: "center",
-        padding: "0 20px",
-        gap: 2,
+        padding: `0 ${mantine.spacing.xs}`,
+        gap: mantine.spacing["2"],
       }}
     >
       <span
@@ -61,7 +61,7 @@ export function PromptField({
         style={{
           width: CARET.width,
           height: CARET.height,
-          marginLeft: CARET.gap,
+          marginLeft: mantine.spacing["3"],
           background: scene.brand,
           opacity: focus > 0.5 && (typing || motion.caretOn(frame)) ? 1 : 0,
         }}
@@ -70,7 +70,7 @@ export function PromptField({
       <div
         style={{
           marginLeft: "auto",
-          padding: "12px 28px",
+          padding: `${mantine.spacing["12"]} ${mantine.spacing["28"]}`,
           borderRadius: scales.corner(semantic.corner.label),
           fontSize: mantine.fontSizes["19"],
           fontWeight: atomic.fontWeight.semibold,
