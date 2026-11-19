@@ -124,6 +124,16 @@ export type AgentConversationState = {
   dashboardCards: AgentDashboardBlockData[];
 };
 
+/** The thread one ask was given, and how the ask ended. */
+export type AgentAskRecord = {
+  /** `chatMessagesKey` of the turn's `apiMessages`. */
+  threadKey: string;
+  /** How many messages that thread held. */
+  messageCount: number;
+  /** The ask resolved and its turn was not stale. */
+  isKept: boolean;
+};
+
 /** One conversation's agent, the turn it is answering, and its results. */
 export type DataAgentConversation = AgentConversationState & {
   dataAgent: DataAgent;
@@ -146,4 +156,10 @@ export type DataAgentConversation = AgentConversationState & {
   lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */
   activeAsk?: Promise<unknown>;
+  /**
+   * The last ask that settled, to tell a Try again from a follow-up. Unset
+   * until one does. In memory only, so a reload or a session switch forgets
+   * it.
+   */
+  lastAsk?: AgentAskRecord;
 };
