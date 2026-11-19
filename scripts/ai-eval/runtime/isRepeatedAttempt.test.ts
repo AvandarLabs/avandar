@@ -65,7 +65,7 @@ describe("isRepeatedAttempt", () => {
     ).toBe(false);
   });
 
-  it("skips a card the client answered on its own", () => {
+  it("counts the same first shown card as a repeat when an automatic card came first", () => {
     expect(
       isRepeatedAttempt(
         _attempt({
@@ -86,7 +86,7 @@ describe("isRepeatedAttempt", () => {
     expect(
       isRepeatedAttempt(
         _attempt({ dashboardWrites: [write] }),
-        _attempt({ dashboardWrites: [{ ...write }] }),
+        _attempt({ dashboardWrites: [{ ...write, block: { ...HEADING } }] }),
       ),
     ).toBe(true);
   });
