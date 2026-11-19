@@ -1,7 +1,5 @@
+import { MIN_VISIBLE_BLUR } from "./getHorizontalBlurFilter/getHorizontalBlurFilter";
 import type { ReactNode } from "react";
-
-/** Blur radii below this are invisible at delivery size, so no filter runs. */
-const MIN_VISIBLE_BLUR = 0.25;
 
 type Props = {
   /** Unique within the document; pass the same id to the style helper. */
@@ -39,15 +37,4 @@ export function HorizontalBlurFilter({ id, amount }: Props): ReactNode {
       </filter>
     </svg>
   );
-}
-
-/**
- * The CSS `filter` value that applies a `HorizontalBlurFilter`, or undefined
- * when the blur is too small to see, so a resting layer is never filtered.
- */
-export function getHorizontalBlurFilter(
-  id: string,
-  amount: number,
-): string | undefined {
-  return amount < MIN_VISIBLE_BLUR ? undefined : `url(#${id})`;
 }

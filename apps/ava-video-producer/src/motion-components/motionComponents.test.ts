@@ -1,12 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { EASE } from "../motion";
-import { getOverlayPose, getOverlayTimings } from "./AnchoredOverlay";
 import {
   createCameraTrackSchema,
   getCameraPose,
   retimeCameraTrack,
 } from "./cameraTrack";
+import { createSceneTransition } from "./createSceneTransition";
+import { getObjectFlight } from "./getObjectFlight";
+import { getOverlayPose } from "./getOverlayPose";
+import { getOverlayTimings } from "./getOverlayTimings";
+import { getSceneTransitionStyle } from "./getSceneTransitionStyle";
 import {
   getMotionDuration,
   getMotionEasing,
@@ -16,11 +20,6 @@ import {
   motionOptionsSchema,
   resolveMotionSettings,
 } from "./motionSettings";
-import {
-  createSceneTransition,
-  getSceneTransitionStyle,
-} from "./SceneTransition";
-import { getObjectFlight } from "./SvgObjectDeparture";
 import type { CameraKeyframe } from "./cameraTrack";
 
 const route: CameraKeyframe[] = [

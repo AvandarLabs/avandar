@@ -1,16 +1,14 @@
 import clsx from "clsx";
 import { useId } from "react";
-import {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "../../../motion-components/HorizontalBlur";
+import { getHorizontalBlurFilter } from "../../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
+import { getSceneTransitionStyle } from "../../../motion-components/getSceneTransitionStyle";
+import { HorizontalBlurFilter } from "../../../motion-components/HorizontalBlur";
 import { getMotionProgress } from "../../../motion-components/motionSettings";
-import { getSceneTransitionStyle } from "../../../motion-components/SceneTransition";
 import { getShotTransitionLayers } from "../../../storyboard/StoryFilm/getShotTransitionLayers";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import type { SceneTransitionKind } from "../../../motion-components/SceneTransition";
+import type { SceneTransitionKind } from "../../../motion-components/getSceneTransitionStyle";
 import type { ShotTransition } from "../../../storyboard/schema/shotTransitionSchema";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";

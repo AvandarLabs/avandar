@@ -23,25 +23,15 @@ import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import slateCss from "@/components/layouts/AppSlate/AppSlate.module.css";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import { Theme, cssVariablesResolver } from "@/config/Theme/Theme";
-import {
-  AttributeMappingScreen,
-  ATTRIBUTE_MAPPING_BEATS,
-} from "./AttributeMappingScreen/AttributeMappingScreen";
-import { CasesScreen, CASES_BEATS } from "./CasesScreen/CasesScreen";
-import {
-  DashboardScreen,
-  DASHBOARD_BEATS,
-} from "./DashboardScreen/DashboardScreen";
+import { AttributeMappingScreen } from "./AttributeMappingScreen/AttributeMappingScreen";
+import { CasesScreen } from "./CasesScreen/CasesScreen";
+import { DashboardScreen } from "./DashboardScreen/DashboardScreen";
 import { ExplorerScreen } from "./ExplorerScreen/ExplorerScreen";
-import { EXPLORER_BEATS } from "./ExplorerScreen/explorerStage";
-import { ImportScreen, IMPORT_BEATS } from "./ImportScreen/ImportScreen";
-import { MapScreen, MAP_BEATS } from "./MapScreen/MapScreen";
-import {
-  OntologyScreen,
-  ONTOLOGY_BEATS,
-} from "./OntologyScreen/OntologyScreen";
+import { ImportScreen } from "./ImportScreen/ImportScreen";
+import { MapScreen } from "./MapScreen/MapScreen";
+import { OntologyScreen } from "./OntologyScreen/OntologyScreen";
 import { ProductThemeRoot } from "./ProductThemeRoot/ProductThemeRoot";
-import { VideoRouteContext } from "./shims/router";
+import { VideoRouteContext } from "./shims/VideoRouteContext";
 import "./stage.css";
 import type { ExplorerMode } from "./ExplorerScreen/explorerStage";
 import type { ReactNode } from "react";
@@ -74,15 +64,6 @@ const routeIndex = {
   cases: 5,
   ontology: 5,
   "attribute-mapping": 5,
-};
-export const FEATURE_BEATS = {
-  import: IMPORT_BEATS,
-  explorer: EXPLORER_BEATS,
-  dashboards: DASHBOARD_BEATS,
-  cases: CASES_BEATS,
-  map: MAP_BEATS,
-  ontology: ONTOLOGY_BEATS,
-  "attribute-mapping": ATTRIBUTE_MAPPING_BEATS,
 };
 
 /**

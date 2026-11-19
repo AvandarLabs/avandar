@@ -9,29 +9,24 @@ export {
   retimeCameraTrack,
 } from "./cameraTrack";
 export type { CameraKeyframe, CameraPose } from "./cameraTrack";
-export {
-  AnchoredOverlay,
-  getOverlayPose,
-  getOverlayTimings,
-} from "./AnchoredOverlay";
-export type { MotionRect, OverlayCue } from "./AnchoredOverlay";
-export { SvgObjectDeparture, getObjectFlight } from "./SvgObjectDeparture";
-export type { ObjectFlight } from "./SvgObjectDeparture";
+export { AnchoredOverlay } from "./AnchoredOverlay";
+export { getOverlayPose } from "./getOverlayPose";
+export { getOverlayTimings } from "./getOverlayTimings";
+export type { MotionRect, OverlayCue } from "./getOverlayTimings";
+export { SvgObjectDeparture } from "./SvgObjectDeparture";
+export { getObjectFlight } from "./getObjectFlight";
+export type { ObjectFlight } from "./getObjectFlight";
 export { SharedElement } from "./SharedElement";
-export {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "./HorizontalBlur";
+export { HorizontalBlurFilter } from "./HorizontalBlur";
+export { getHorizontalBlurFilter } from "./getHorizontalBlurFilter/getHorizontalBlurFilter";
 export type { SharedElementProps } from "./SharedElement";
-export {
-  SceneTransition,
-  createSceneTransition,
-  getSceneTransitionStyle,
-} from "./SceneTransition";
+export { SceneTransition } from "./SceneTransition";
+export { createSceneTransition } from "./createSceneTransition";
+export { getSceneTransitionStyle } from "./getSceneTransitionStyle";
 export type {
   SceneTransitionKind,
   SceneTransitionProps,
-} from "./SceneTransition";
+} from "./getSceneTransitionStyle";
 export {
   MOTION_PRESETS,
   motionOptionsSchema,

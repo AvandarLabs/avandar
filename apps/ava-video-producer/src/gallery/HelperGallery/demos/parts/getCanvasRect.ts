@@ -1,5 +1,5 @@
 import { DEMO_CANVAS } from "./DemoCanvas";
-import type { MotionRect } from "../../../../motion-components/AnchoredOverlay";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 
 /** A rect on the mini canvas from fractions of it, as windowTilt boxes are. */
 export function getCanvasRect(fractions: {

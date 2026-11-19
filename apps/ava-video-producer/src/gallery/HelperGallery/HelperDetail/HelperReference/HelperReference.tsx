@@ -1,19 +1,8 @@
-import css from "./HelperDetail.module.css";
-import type { HelperEntry } from "../helperCatalog.types";
+import css from "../HelperDetail.module.css";
+import { SourceLink } from "./SourceLink";
+import { SourceList } from "./SourceList";
+import type { HelperEntry } from "../../helperCatalog.types";
 import type { ReactNode } from "react";
-
-/** Where app-relative source paths are browsable. */
-const SOURCE_BASE_URL =
-  "https://github.com/AvandarLabs/avandar/blob/develop/apps/ava-video-producer/";
-
-/** A link to one app-relative source file. */
-function SourceLink({ path }: { path: string }) {
-  return (
-    <a href={`${SOURCE_BASE_URL}${path}`} target="_blank" rel="noreferrer">
-      <code>{path}</code>
-    </a>
-  );
-}
 
 /** The helper's named defaults, or a note that it has none. */
 function DefaultsList({ helper }: { helper: HelperEntry }) {
@@ -81,7 +70,7 @@ export function HelperReference({
       <h3>Used by</h3>
       <UsedByList helper={helper} />
       <h3>Source</h3>
-      <SourceLink path={helper.source} />
+      <SourceList helper={helper} />
     </aside>
   );
 }

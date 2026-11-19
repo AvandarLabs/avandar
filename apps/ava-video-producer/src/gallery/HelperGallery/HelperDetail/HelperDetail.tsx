@@ -1,7 +1,7 @@
 import { HELPER_CATALOG } from "../helperCatalog";
 import { CodeBlock } from "./CodeBlock";
 import css from "./HelperDetail.module.css";
-import { HelperReference } from "./HelperReference";
+import { HelperReference } from "./HelperReference/HelperReference";
 import type { HelperEntry } from "../helperCatalog.types";
 import type { ReactNode } from "react";
 

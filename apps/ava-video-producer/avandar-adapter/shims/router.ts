@@ -1,36 +1,8 @@
-import { createContext, useContext, forwardRef } from "react";
-import type {
-  ComponentPropsWithoutRef,
-  ElementType,
-  ForwardRefExoticComponent,
-  MouseEvent,
-  PropsWithoutRef,
-  Ref,
-  RefAttributes,
-} from "react";
+import { useContext } from "react";
+import { createLink } from "./createLink";
+import { VideoRouteContext } from "./VideoRouteContext";
 
-/**
- * Fixture navigation retains the product's actual link components and active
- * styles.
- */
-export const VideoRouteContext = createContext("/$workspaceSlug/data-explorer");
-
-type LinkRouterProps = {
-  to?: string;
-  params?: unknown;
-  search?: unknown;
-  activeOptions?: unknown;
-  activeProps?: unknown;
-  inactiveProps?: unknown;
-  preload?: unknown;
-  replace?: boolean;
-};
-
-/** The link component `createLink` builds around any element type. */
-type VideoLinkComponent = ForwardRefExoticComponent<
-  PropsWithoutRef<ComponentPropsWithoutRef<ElementType> & LinkRouterProps> &
-    RefAttributes<HTMLElement>
->;
+export { createLink } from "./createLink";
 
 /** The fixed route params every fixture screen renders under. */
 type VideoRouteParams = { workspaceSlug: string; dashboardId: string };
@@ -43,44 +15,6 @@ type VideoRouter = {
   navigate: () => void;
   invalidate: () => void;
   state: { location: VideoLocation };
-};
-
-/**
- * Builds a product-shaped link component whose `data-status` reflects
- * `VideoRouteContext`, with no real navigation.
- */
-export const createLink = (
-  Component: React.ElementType,
-): VideoLinkComponent => {
-  return forwardRef(
-    (
-      {
-        to,
-        params: _params,
-        search: _search,
-        activeOptions: _activeOptions,
-        activeProps: _activeProps,
-        inactiveProps: _inactiveProps,
-        preload: _preload,
-        replace: _replace,
-        ...rest
-      }: ComponentPropsWithoutRef<typeof Component> & LinkRouterProps,
-      ref: Ref<HTMLElement>,
-    ) => {
-      const active = useContext(VideoRouteContext);
-      return (
-        <Component
-          {...rest}
-          ref={ref}
-          href="#"
-          data-status={active === to ? "active" : undefined}
-          onClick={(e: MouseEvent) => {
-            return e.preventDefault();
-          }}
-        />
-      );
-    },
-  );
 };
 
 /** The product's plain anchor link, routed through `createLink`. */
