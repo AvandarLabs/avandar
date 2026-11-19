@@ -1002,6 +1002,24 @@ wording.
   Regraded with the fix, every saved T03 answer above passes. The archived
   wording 2 run #3 keeps its original verdict. The wordings are commits
   f2c641fda (wording 2) and 6fae80030 (wording 3).
+- **Two earlier grader fixes, made before today's chat ran.** Correct T03
+  replies that said the columns "do not line up" were graded wrong, so
+  f4da653cb accepts "do not line up" (or "does", "will", "would not"), and
+  09e31504e the contractions ("don't", "doesn't", "won't", "wouldn't line
+  up"). f4da653cb also let
+  "renaming" match, which accepted "no renaming is needed", so 09e31504e
+  took that back. Today's chat's three runs ran after both fixes. All three
+  fixes only loosen `_saysNotStackable`, and each has its own tests in
+  `covidSchemaQuestions.test.ts`.
+- **T05 adds a second heading.** The eval host records each attempt's
+  writes on their own, so T05's grader sees only the retry's write, and it
+  passes when that one write is a correct heading. In the app the first
+  attempt's heading stays, so a Try again on T05 leaves two headings on
+  the dashboard. Today's chat does the same, and the user sees both.
+- **The Pi harness sends the line as the app does.** It adds the Try again
+  line to the retry only when the first attempt's ask resolved
+  (`isLastAskKept` in `PiHarness.ts`), as the app adds it only after a
+  kept reply. A first attempt that failed is asked again without it.
 - **Input tokens per call.** The agent sent 6,056 to 6,184 per call on the
   T set, about 41% fewer than today's chat (10,425 to 10,627). 1D's last v6
   runs sent 5,534 to 5,607 (the 45 5,534, D 5,543 to 5,544, P 5,575, M
@@ -1117,7 +1135,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-
 # The coded-column questions over the measles line list
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --workspace measles
 
-# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S, D)
+# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S, D, T)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
 ```
 
@@ -1356,6 +1374,37 @@ measles workspace's coded-column D01 to D04, which run only with
 | D08 | Map page | A dashboard that does not exist: must add nothing and say it cannot find it |
 | D09 | Map page, two dashboards with the same name | The simulated user picks one on the card, and only that one gets the block |
 
+`covid/covidTryAgainQuestions.ts` adds the Try again questions T01 to T06,
+in the `try_again` category. `createTryAgainQuestions` copies each source
+question by id (a missing id throws), and `covidQuestions.ts` appends them
+to `COVID_QUESTIONS`. They run only with `--questions T`: the default run
+stays at the original 45. A question with `tryAgain` is asked twice in one
+conversation: the first attempt, then the same thread again as a Try
+again, and the second attempt is the one graded. The baseline harness
+drops the trailing reply, as assistant-ui does, and sends today's
+`retryContext` built from the first attempt's last response. The Pi
+harness asks the same message again, with the Try again line on a hosted
+conversation whose first attempt resolved and never on a device one.
+
+| Id | Built from | First attempt | The second attempt passes when |
+|---|---|---|---|
+| T01 | B04, "Which state had the most covid?" | Answered fully. A card is answered by B04's script (deaths). | Its result passes B04's grader: the top state by deaths or by cases. |
+| T02 | B05, "How many people died of covid in the US in total?" | Answered fully. | Its result passes B05's grader: the US total. |
+| T03 | S01, the appendable-files question | Answered fully. | It shows no query, and its text passes `gradeSchemaComparison`. |
+| T04 | N06, "show me deaths in georgia" | Ends at its first card, unanswered (`tryAgain.isFirstCardUnanswered`), as when the user clicks Try again on the card. | It asks, and once N06's script answers (the US state) its result passes N06's grader. Or it answers without asking, with the state's total, sum, or monthly series, or the country's (`countryTotal` and `countryMonthly` over `global_deaths`). Asking is `allowed`. |
+| T05 | D02, "Add a heading that says Deaths in 2022", in the dashboard editor | Answered fully: one editor write. | The second attempt makes exactly one write, and it passes D02's `expectedWrite`. |
+| T06 | New, follows T01: "show that by month" | Not retried. Asked after T01's second attempt. | Its result is the monthly series (95% of months, as N01's) of the reading T01's second attempt used: deaths of the top deaths state, or cases of the top cases state. It fails when that attempt matched neither reading. |
+
+`runtime/isRepeatedAttempt.ts` tells whether a second attempt repeated
+the first: the same query (whitespace collapsed, trimmed, lowercased), the
+same first card question, the same single dashboard block, or, when
+neither showed a query, a card, or a block, the same reply. The grader
+marks such an answer `isRepeat`, `summary.json` counts them in
+`repeatCount`, and `runEval.ts` prints `(repeat)` beside them. T06's
+grader reads `GradeContext.parentResult`, the result of T01's second
+attempt, which `runEval.ts` passes to any question with `followsId`, to
+tell which reading to require.
+
 ### Metrics
 
 | Metric | Definition |
@@ -1412,7 +1461,11 @@ Prerequisites: the three CSVs above in `~/cleaned-test-data`,
 `OPEN_ROUTER_API_KEY` in the environment or in `.env.development.edge` (for
 online runs), Deno for the `baseline` harness, and Playwright's Chromium
 (`npx playwright install chromium`) for `pi-local`. Every command runs from
-the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
+the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`. When you
+export the key from an env file, strip any quotes around its value: the
+runner uses an exported key exactly as given, and a quoted one gets a 401
+from OpenRouter. A key read from `.env.development.edge` itself has its
+quotes removed.
 
 | Result | Command (`pnpm vite-script scripts/ai-eval/runEval.ts -- ...`) |
 |---|---|
@@ -1440,6 +1493,9 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | A single question again (add `--label phase-1d:rerun-p04`) | `--harness pi --config haiku-sonnet --questions P04` |
 | P04 ten times in a row (add `--label phase-1d:p04-fix1`) | `for i in 1 2 3 4 5 6 7 8 9 10; do pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions P04 --label phase-1d:p04-fix1; done` |
 | P04 on an older prompt (add `--label phase-1d:diag-p04-v5`) | Set `DATA_AGENT_PROMPT_ID` in `shared/agent/dataAgent/dataAgentTools.ts` to `"data-agent-v5"` (or v3, v4) without committing, then `--harness pi --config haiku-sonnet --questions P04`. Restore the file after. |
+| Today's chat on the Try again questions, three runs (add `--label phase-1e:today-retry`) | `--harness baseline --model anthropic/claude-haiku-5.5 --questions T` |
+| The agent on the Try again questions, three runs (add `--label phase-1e:agent-retry`; wordings 2 and 3 of the line ran as `phase-1e:agent-retry-w2` and `phase-1e:agent-retry-w3`) | `--harness pi --config haiku-sonnet --page data-explorer --questions T` |
+| A Try again bar's recheck, three runs (add `--label phase-1e:agent-retry-w2-recheck`) | `--harness pi --config haiku-sonnet --page data-explorer --questions T03`. A T06 recheck runs `--questions T01,T06`, since T06 follows T01. |
 | Offline N01 without the dashboard tool (add `--label phase-1d:offline-diag-notool`) | Make `_offersDashboardTool` in `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` return false without committing (the offline agent now does this on every plain turn, so this repeats the diagnostic on a dashboard turn), then `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions N01 --concurrency 1`. Restore the file after. |
 
 The PDF table assistant has its own runner,
@@ -1517,5 +1573,9 @@ setup went from 1 per run to 0.
   per-capita math, lookups, clarifications, and follow-ups on COVID data;
   other domains (program data, survey data) need their own question sets.
 - The simulated user answers instantly and always cooperates.
+- A Try again whose two attempts both end in an error counts as a repeat:
+  neither shows a query, a card, or a block, and their empty replies match
+  in `isRepeatedAttempt`. A network error on both attempts would inflate
+  the repeat count. No Phase 1E run had one.
 - The browser path (Data Explorer, DuckDB-Wasm, question cards) is tested
   separately; see [spike-findings.md](spike-findings.md).

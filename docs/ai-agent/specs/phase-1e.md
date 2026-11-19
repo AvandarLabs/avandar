@@ -2,9 +2,10 @@
 
 Status: specified on 2026-11-19 from the
 [brainstorm](phase-1e-brainstorm.md), with every design choice decided
-(Pablo delegated the call). Not built. Part of [Phase 1](phase-1.md).
-Follows rules R1 to R4 there. Decisions D40 and D45 in
-[decisions.md](../decisions.md) (D45 is written with the build). Builds on
+(Pablo delegated the call). Built on 2026-11-19, with the changes the
+build made noted where they apply (see D45's "How a Try again is told
+apart, as built"). Part of [Phase 1](phase-1.md). Follows rules R1 to R4
+there. Decisions D40 and D45 in [decisions.md](../decisions.md). Builds on
 [phase-1d.md](phase-1d.md). Everything a plan needs is here: the brainstorm
 is background only.
 
@@ -86,25 +87,27 @@ or add to it:
 
 Try again:
 
-1. A hosted agent turn (`turn.isOffline` not set) whose thread equals the
-   thread its conversation was last asked, when that ask ended in a kept
-   reply, puts the Try again line between the turn's blocks and the user's
-   message.
+1. A hosted agent turn (`turn.isOffline` not set) whose user messages
+   equal those of the thread its conversation was last asked, when that
+   ask ended in a kept reply, puts the Try again line between the turn's
+   blocks and the user's message.
 2. The first attempt stays in the Pi transcript. Nothing in the transcript
    is cut, rewritten, or summarized.
 3. The same thread on an offline turn, or after an ask that failed or
    whose reply was discarded, is asked again with no line, on the same
    conversation.
-4. A thread that starts with the recorded thread and is longer (a
-   follow-up, a card answer, a view change) is asked as today.
-5. A thread that neither equals nor extends the recorded thread (Try again
-   on an earlier answer) stops and drops the conversation. A new
+4. A thread whose user messages start with the recorded ones and add more
+   (a follow-up, a card answer, a view change) is asked as today.
+5. A thread whose user messages neither equal nor extend the recorded ones
+   (Try again on an earlier answer) stops and drops the conversation. A new
    conversation starts from the thread's recap, as after a reload, with no
    line.
 6. Each conversation keeps, in memory only, the key `chatMessagesKey`
-   builds from the thread it was last asked, that thread's message count,
-   and whether the ask ended in a kept reply. A reload or a session switch
-   forgets it, as today's `lastTurnRef` is forgotten.
+   builds from the user messages of the thread it was last asked, how many
+   user messages that thread held, and whether the ask ended in a kept
+   reply. Assistant messages are left out (see
+   [Classifying the turn](#classifying-the-turn)). A reload or a session
+   switch forgets it, as today's `lastTurnRef` is forgotten.
 7. `buildAgentTurnText` without `isRetry` returns exactly what it returns
    today, for every input.
 8. The line follows the wording rules under
@@ -184,11 +187,11 @@ earlier. Today's chat compares `chatMessagesKey(hostedChatMessages)` with
 gains a field:
 
 ```ts
-/** The thread one ask was given, and how the ask ended. */
+/** The user messages of the thread one ask was given, and how it ended. */
 export type AgentAskRecord = {
-  /** `chatMessagesKey` of the turn's `apiMessages`. */
+  /** `chatMessagesKey` of the user messages in the turn's `apiMessages`. */
   threadKey: string;
-  /** How many messages that thread held. */
+  /** How many user messages that thread held. */
   messageCount: number;
   /** The ask resolved and its turn was not stale. */
   isKept: boolean;
@@ -210,9 +213,16 @@ both outcomes:
   today.
 
 It writes only while `conversation.turnRef.current === turn`, so a run that
-a newer message stopped never overwrites the newer turn's record. A turn
-that fails before it reaches `askConversationDataAgent` (for example, while
-loading the datasets) writes nothing.
+settles after a newer turn has started never overwrites that turn's record.
+As built, a run a newer message stops usually settles before the newer
+turn takes the conversation, so it can write its own record first. The
+newer turn's user messages extend it, so that turn is `continues`, and it
+writes its record last. A stopped run never logs `chat.sql_generated`:
+stopping it clears the query it showed and marks its turn as stopped
+(`stoppedTurn`). A turn that fails before it reaches
+`askConversationDataAgent` (for example, while loading the datasets)
+writes nothing. `createAgentAskRecord` in `getAgentTurnKind.ts` builds the
+record.
 
 ### Classifying the turn
 
@@ -233,13 +243,21 @@ export function getAgentTurnKind(
 | The turn's thread | Kind |
 |---|---|
 | The conversation has no record (it is new, or no ask has settled) | `first` |
-| The same length as the record, and its key equals `threadKey` | `same_thread` |
-| Longer than the record, and the key of its first `messageCount` messages equals `threadKey` | `continues` |
+| As many user messages as the record, and their key equals `threadKey` | `same_thread` |
+| More user messages than the record, and the key of the first `messageCount` user messages equals `threadKey` | `continues` |
 | Anything else | `rewound` |
 
-`chatMessagesKey` is imported from `chatRuntimeTurnHelpers.ts`. It covers
-each message's role and text, so two threads match only when assistant-ui
-reran the same one.
+`chatMessagesKey` is imported from `chatRuntimeTurnHelpers.ts`. As built,
+the key and the count cover the thread's user messages only. A run that a
+newer message stops can land its reply after the newer turn was sent
+without it, which puts an assistant message between two user messages, so
+a key over every message would make that follow-up look like a rewind. Try
+again on the latest answer keeps the same user messages (`same_thread`).
+Try again on an earlier answer has fewer, and an edited user message
+differs, so both still rewind. Known limit: the app has no branch picker
+and no edit action, so two branches with the same user messages and
+different replies cannot happen today, and the record would not tell them
+apart. Revisit if either is added.
 
 ### What each case does
 
@@ -999,7 +1017,7 @@ files above.
 | The kept first attempt misleads a later follow-up ("show that by month" builds on the first attempt). | T06. Fallback: A2. |
 | Each extra Try again adds an attempt to the transcript. | The attempts are cached prefix, a few hundred tokens each. Context pruning is roadmap 2.5. |
 | Starting over after an earlier answer's Try again uses a new vault, so the thread's placeholders read `[earlier value]` and cards resolved earlier are not reported again. | The same as after a reload or a session switch today (D39). |
-| Two different threads match by accident. | The key covers every message's role and text. A thread repeats exactly only when assistant-ui reruns it. |
+| Two different threads match by accident. | The key covers every user message's text. Their user messages repeat exactly only when assistant-ui reruns the thread. Two branches with the same user messages and different replies would match, but the app has no branch picker or edit action to make one. |
 | A change slips into the text of turns that are not a Try again and shifts the 45 unnoticed. | The guard test in `buildAgentTurnText.test.ts` and the existing Pi harness turn tests. |
 | Awaiting the audit write delays the card. | One local Dexie insert. Today's chat awaits the same call. |
 | `recordShown` writes `outcome: "answered"` before any answer, so a card that a Try again or a new message replaces stays `answered`. | Today's chat does the same. Listed, not fixed: 1E is parity. |

@@ -208,6 +208,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F136 | Crosswalks: map datasets with different column layouts onto one reference layout and save a combined dataset, with Export mapping, the stale banner, and Used by | not started | F129, F130, F131, F132, F133, F134 | |
 | F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
 | F139 | Dashboard blocks from any page, online and offline: `add_dashboard_block`, prompt v6, and the confirm card | not started | F81 to F87, F89 to F91, F128, F22 | |
+| F140 | Try again and parity in the agent: the Try again line, the shared card audit, and the agent's analytics events | not started | F139 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -352,6 +353,7 @@ API. It's new work, not something this branch built.
 | after F134 | F136 | Builds on F130's scorer and pick table, F131's bindings, popover, and Used by, F133's `ColumnConversion`, linked-dataset creation, virtual dataset freshness, and `clearCachedDatasetRows`, and F134's Re-apply in Used by. Adds five crosswalk tables and two RPCs (migration) and the desktop sync entries. Deploy the migration, then the frontend; the desktop app syncs the new tables from its next build. |
 | after F136 | F137 | Frontend only: F136's migration carries everything it reads. Deploy the frontend; the `chat` function is unchanged (same prompt, same route). |
 | after F128, F131 | F139 | Stores each session's dashboard card statuses beside its thread and tray, and adds the card to F128's panel. Its e2e specs read F128's session tabs. Its prompt `data-agent-v6` is F131's `data-agent-v5` plus the dashboard rules, and its proxy adds the dashboard tool to the plugin AI tools' per-version list, so it ships after F131 and the plugin AI tools. Deploy the `chat` edge function (it serves v6), then the frontend (it asks for v6). |
+| after F139 | F140 | Frontend only: no edge function or migration to deploy first. It changes the agent turn F139 builds and the dashboard paths F139 adds. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -504,7 +506,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter.ts`, moved to `createChatModelAdapter/createChatModelAdapter.ts` by F84 | F22, F80, F78, F82, F84, F86, F89 to F91 | F22: BUG-015's discovery-continuation content. F80: `action: copyRef.current.fallbackAction`. F78: `_userModelContent` and `ChatViewEvent.toModelContent`. F82: the `DataAgentFeature` branch that runs `runDataAgentTurn` in the Data Explorer (`2fb2a1f91`, `658b112f4`). F84: the move and rewrite (`5f51ce819`); keep F78's and F80's hunks when moving it. F86: every page, the page capture, the offline offer on network failure, and the agent-failure replies. F89 to F91: mentions and the tray. |
 | `src/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter.test.ts` | F84, F86, F89 to F91 | F84 creates it. F86: `9f24d9779`, `f1b04d4dd`, `3615d4be7`, `228a6a51c`, and F78's case id cases (`1f0734f04`, `49164114f`), which need this file. |
 | `src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts` | F22, F80, F84, F86, F89 to F91 | F80: the two `fallbackAction` copies. F84: offline mode (`5f51ce819`). F86: `9f24d9779`, `228a6a51c`. |
-| `src/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers.ts` | F22, F80, F86 | F22: BUG-012. F80: `fallbackAction` on `ChatRuntimeCopy`. F86: the agent-failure copy (`228a6a51c`). |
+| `src/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers.ts` | F22, F80, F86, F140 | F22: BUG-012. F80: `fallbackAction` on `ChatRuntimeCopy`. F86: the agent-failure copy (`228a6a51c`). F140: `RetryContextSource`, the fields `buildRetryContext` reads, so the eval's baseline can build today's retry context (`a75f93953`, `4fd2273be`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome.ts` | F22, F82, F85 | F22: BUG-011. F82: `readAppliedSqlResult`. F85: the doc note that a mounted result card matches too (`ad9df5c53`). |
 | `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` | F94, F84, F86, F89 to F91 | F94 (`f2e44f2e4`): the panel polish. F84: `OfflineModeControl` replaces `ChatModelPicker`. F86: input on every page with the switch on (`eb4428ac3`). |
 | `src/components/ChatPanel/ChatModelPicker/**` | F94, F84 | F94 (`f2e44f2e4`) edits `ChatModelPickerView.tsx`. F84 deletes the folder. |
@@ -544,7 +546,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `docs/ai-agent/**` | F88, F89 to F91 | See F88. |
 | `src/i18n/locales/*/messages.{po,ts}` | F79, F80, F84, F85, F86 | Generated: regenerate in each. |
 
-### AI agent context and the chat panel (F89 to F95, F128, F139)
+### AI agent context and the chat panel (F89 to F95, F128, F139, F140)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
@@ -561,20 +563,20 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/{ChatPanel/ChatPanel.tsx,ChatPanelHeader/ChatPanelHeader.tsx}` | F94, F128 | F128: the session strip in the header and the panel. |
 | `src/views/OntologyDesignerApp/NewCaseTypeButton.{tsx,test.tsx}`, `src/routes/_auth/$workspaceSlug/ontology-designer/{index.tsx,-index.test.tsx}` | F57, F128 | F128: New case type and the home card start a case-design session. |
 | `tests/e2e/case-list-field.spec.ts` | F74, F75, F128 | F128: the Dock-by-Enter hunk of `b503e1762`. F74 takes its record-link hunk. |
-| `src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts`, `applyChatModelTurnResponse.test.ts` (new in F89) | F22, F89, F95 | F22: BUG-012's `explorerResponse` and BUG-014's labels. F89: `questionLabel` (`de3ff542e`) and the new test file. F95: a schema turn applies no SQL, and its tests. |
+| `src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts`, `applyChatModelTurnResponse.test.ts` (new in F89) | F22, F89, F95, F140 | F22: BUG-012's `explorerResponse` and BUG-014's labels. F89: `questionLabel` (`de3ff542e`) and the new test file. F95: a schema turn applies no SQL, and its tests. F140: the bias check and audit write move into the shared `recordClarificationShown`, with a guard test written before the move (`6ec75f1ee`), and the dashboard id passed to the payload builder (`b225e7bd3`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/*` | F22, F89 | F22: the file itself (BUG-014). F89: tokens read as `@Name` (`c757b60a7`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128, F139 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. F139: the open editor and the session passed to the adapter (`9647073b9`), the offline turn on every page with the page in context (`8ae87e837`), the card lines and device-turn blocks built in `buildAgentTurnInputs.ts` (`ac7b47425`, `218f476aa`), and the host that places dashboard blocks, with `showQueryInChat.ts` (`a666b6ba9`). A new conversation's recap and message read an earlier chat's placeholders as `[earlier value]` (`5ee20a04d`), a device turn leaves out an empty Data Explorer's page block in `buildAgentTurnInputs.ts` (`1b2f80d47`), and a turn with no card to report has no `onReplied` (`dc7c27664`). |
-| `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89, F139 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. F139: the dashboard card lines in the turn text, and the short line for a block that did not change since the last turn (`8ff40bbe7`). |
+| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128, F139, F140 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. F139: the open editor and the session passed to the adapter (`9647073b9`), the offline turn on every page with the page in context (`8ae87e837`), the card lines and device-turn blocks built in `buildAgentTurnInputs.ts` (`ac7b47425`, `218f476aa`), and the host that places dashboard blocks, with `showQueryInChat.ts` (`a666b6ba9`). A new conversation's recap and message read an earlier chat's placeholders as `[earlier value]` (`5ee20a04d`), a device turn leaves out an empty Data Explorer's page block in `buildAgentTurnInputs.ts` (`1b2f80d47`), and a turn with no card to report has no `onReplied` (`dc7c27664`). F140: the Try again turn in `dataAgentTurnHelpers.ts` (`_resolveTurnConversation`, `_startTurn`, `_recordAsk`), with `getAgentTurnKind/` (new) classifying a turn by its user messages (`6f3ef1716`, `5f346ef91`, `9925288ba`, `4c0aea0da`); every card recorded through `recordClarificationShown` in `createConversationAgentHost.ts` (`1e6fa6402`, `d4529ccc4`); `toAnalyticsApp` and the block's dashboard named directly in `ChatAnalyticsPayloads.ts` (`b225e7bd3`); the turn's `analyticsApp` and the editor's `getState` from `createChatModelAdapter.ts` (`f1cba77a9`); one `chat.sql_generated` per kept answer that showed a query, never for a stopped run (`0217514e5`, `bf7602463`); and the second-turn threads in `runDataAgentTurn.test.ts` extended so they stay follow-ups (`5f346ef91`). |
+| `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89, F139, F140 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. F139: the dashboard card lines in the turn text, and the short line for a block that did not change since the last turn (`8ff40bbe7`). F140: `TRY_AGAIN_LINE` and the `isRetry` option, with a guard that every other turn's text is unchanged (`6ecf08bc9`), reworded twice by the Try again eval (`f2c641fda`, `6fae80030`). |
 | `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts,dataAgentTools.test.ts}` | F81 to F85, F86 and F87, F89, F95, F131, F139 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v5`, the plugin AI tools' v4 plus CODED COLUMNS, with a code list sub-line per bound column, served beside v1 to v4. v4 is SHA-pinned as shipped (`03ca7f39c`, `5ba9698b6`, `b60b9206d`). F139: prompt `data-agent-v6`, v5's instructions plus `add_dashboard_block`'s rules, a bullet that asks which chart before changing how one is shown (`5a508a3c2`), and a bullet that keeps a dashboard's name out of a chart's filters (`a4def86ad`), with each version's own built-in tool list (v1 to v5 keep the three) (`114376fb4`, `a693f179c`, `9e46d4924`, `834bef76f`), and the per-version tool tests (`114376fb4`). |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
-| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131, F139 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). F139: the `dashboard` category, D01 to D09, `gradeDashboardWrites`, the dashboard support in `EvalHarness.ts`, and the dashboard tests (`51d5145f9`, `38d7683f3`). |
-| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131, F139 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). F139: dashboard blocks in the Pi harnesses, and the device check that real values stay on the device (`390264f2e`, `a54d46891`). `PiLocalHarness.ts` gets one line (`390264f2e`). F139: `--page data-explorer`, which sends every question that sets no page the Data Explorer page block, in `PiHarness.ts`, `PiLocalHarness.ts`, `piEvalConfigs.ts`, and `runEval.ts` (`61a1b9d5a`), and a device conversation that leaves an empty Data Explorer's block out as the app does (`1b2f80d47`). |
-| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95, F139 | F95: user texts kept across a run, and a schema turn answered without a query. F139: `baselinePageContext` and the dashboard questions, with `DenoChatTurnRunner.ts` (`51d5145f9`); the dashboard tool's run state, its offer by prompt version, and the shared run cap `MAX_QUERY_RUNS_PER_ANSWER` (`927a968b5`, `35acb82c6`). The `shouldOfferDashboardTool` option, read on every `ask`, lets the offline agent hold the tool back on a plain turn (`a68dac7f8`). |
+| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131, F139, F140 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). F139: the `dashboard` category, D01 to D09, `gradeDashboardWrites`, the dashboard support in `EvalHarness.ts`, and the dashboard tests (`51d5145f9`, `38d7683f3`). F140: the `try_again` category and `tryAgain` in `EvalQuestion.ts`, T01 to T06 appended to `COVID_QUESTIONS`, the parent's result passed to a follow-up and `(repeat)` printed in `runEval.ts`, `isRepeat` in `gradeEvalAnswer.ts`, and, beside them, `firstAttempt` in `harnesses/EvalHarness.ts`, `T` in `selectEvalQuestions.{ts,test.ts}`, and `repeatCount` in `runtime/summarizeEvalRun.ts` (`8996850f4`, `266f24f4e`, `50c746df8`, `2835a3aa0`, `7a663808f`). |
+| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131, F139, F140 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). F139: dashboard blocks in the Pi harnesses, and the device check that real values stay on the device (`390264f2e`, `a54d46891`). `PiLocalHarness.ts` gets one line (`390264f2e`). F139: `--page data-explorer`, which sends every question that sets no page the Data Explorer page block, in `PiHarness.ts`, `PiLocalHarness.ts`, `piEvalConfigs.ts`, and `runEval.ts` (`61a1b9d5a`), and a device conversation that leaves an empty Data Explorer's block out as the app does (`1b2f80d47`). F140: a Try again question asked twice on one conversation, with the Try again line only on a hosted conversation whose first attempt resolved (`isLastAskKept`), and a first card left unanswered for T04 (`6e711c6ee`). |
+| `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95, F139, F140 | F95: user texts kept across a run, and a schema turn answered without a query. F139: `baselinePageContext` and the dashboard questions, with `DenoChatTurnRunner.ts` (`51d5145f9`); the dashboard tool's run state, its offer by prompt version, and the shared run cap `MAX_QUERY_RUNS_PER_ANSWER` (`927a968b5`, `35acb82c6`). The `shouldOfferDashboardTool` option, read on every `ask`, lets the offline agent hold the tool back on a plain turn (`a68dac7f8`). F140: today's chat asks a Try again question with its `retryContext` (`buildBaselineTryAgainTurn`), with `DenoChatTurnRunner.ts` taking the retry context and `baselinePageContext.ts` treating a `try_again` question with dashboards as a dashboard question (`a75f93953`, `b8318ee3e`). |
 | `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`, `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts` | F22, F95 | F95: the schema paragraph after ANALYST CHECKS, and the `generateSql` description. |
 | `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131, F139 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). F139: the `data-agent-v6` route (`a693f179c`). |
 | `shared/agent/mentions/buildAgentContextBlocks.{ts,test.ts}` | F89, F139 | F89 creates it. F139: an offline turn caps the chart SQL its blocks keep, through `offlineContextBudget.ts` (`5412ad50c`). |
 | `supabase/functions/chat/PostAgentStream/buildDataAgentProxyContext.{ts,test.ts}` | F82, F86, F89 to F91, F139 | F139: each prompt version is served its own tool list, and the proxy checks tool calls against that version's list (`7d60451b6`). |
-| `src/lib/agent/dataAgent/{DataAgentHost.ts,browser/createBrowserDataAgentHost.ts}` | F82, F83, F86, F87, F139 | F139: the dashboard method on the host (`927a968b5`), and the browser host's block placement (`a666b6ba9`). |
+| `src/lib/agent/dataAgent/{DataAgentHost.ts,browser/createBrowserDataAgentHost.ts}` | F82, F83, F86, F87, F139, F140 | F139: the dashboard method on the host (`927a968b5`), and the browser host's block placement (`a666b6ba9`). F140: `showQuestionCard` awaited and given no `turnNumber`, with the host's first test file (`1e6fa6402`). |
 | `src/lib/agent/dataAgent/offline/{offlineDataAgent.test.ts,buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt.ts,classifyOfflineMessage/classifyOfflineMessage.ts,createOfflineDataAgent/createOfflineDataAgent.ts}` | F83, F86, F139 | F86: the failed-model-call case (`25467983a`). F139: blocks and dashboards in the offline prompt, and a router rule that sends a message naming a dashboard to the data agent (`628843924`). The dashboard text and the dashboard tool join the offline prompt and tool list only on a turn that can be about a dashboard (`7c4f95033`, `a68dac7f8`, and the gate on a dashboard page, attachment, mention, card line, or named dashboard in `8937db90b`, read by `getDashboardContextFromTurnBlocks`, and a device turn without the empty Data Explorer's page block in `1b2f80d47`). |
 | `src/lib/agent/localModels/createLocalModelStreamFn/{toLocalLlmMessages.ts,createLocalModelStreamFn.test.ts}` | F83, F139 | F83 creates them. F139: a system update with no text, such as a tool-only change, is not sent to a local model as an empty user message (`a68dac7f8`). |
 | `src/lib/agent/dataAgent/pagePrivacy/{SqlPlaceholderVault,createPlaceholderRestoringHost}.{ts,test.ts}` | F87, F139 | F87 creates them. F139: `unmaskText` restores the names the agent writes (`7fee248f9`), and the host restores placeholders in dashboard blocks (`c3c2e936c`). `SqlPlaceholderVault.ts` exports `PLACEHOLDER_LIKE` for `hideEarlierPlaceholders` (`5ee20a04d`). |
@@ -587,7 +589,11 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/config/Theme/{Theme.ts,Theme.test.ts,index.ts}` | F93, F94, F36 | F93: Paper `borderColor` reads `--ava-paper-border-color` first, and its test. F94: `APP_CHAT_ASIDE_Z_INDEX`, its export, and its test. F36: the Drawer root marker class. |
 | `DESIGN.md` | Postgres branch, F93, F94 | Postgres branch: the copy-rule Do and Don't. F93: the paragraph on `--ava-paper-border-color` in the slate section. F94: the Gutter Rule exception and the fused-aside sentences in the slate shadow paragraph. |
 | `docs/app-shell-nomenclature.md` | F94, F36 | F94: the fused chat aside row, the `APP_CHAT_ASIDE_Z_INDEX` tier, the stacking rule, and the Do line. F36: the checklist entries. |
-| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. |
+| `src/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock.{ts,test.ts}` | F139, F140 | F139 creates it. F140: a block the tool queues into the open editor logs `dashboard.block_added_via_chat` (`1fbc7565b`). |
+| `src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/{confirmAgentDashboardCard.{ts,test.ts},AgentDashboardBlockPart.tsx}` | F139, F140 | F139 creates them. F140: Confirm logs `dashboard.block_added_via_chat` once the block is queued or saved, and the part passes `editor.editorData` (`e2cac534d`). |
+| `src/lib/agent/schemaAnswer/isSchemaAnswerTurn.test.ts` | F95, F140 | F95 creates it. F140: a retried column question stays one, and the Try again line alone is not one (`6a1cc904a`). |
+| `scripts/ai-eval/covid/covidSchemaQuestions.{ts,test.ts}` | F95, F140 | F95 creates them. F140: `_saysNotStackable` accepts "do not line up" and its contractions, "not directly", and "renaming is needed", and still rejects the negated forms (`f4da653cb`, `09e31504e`, `d8ef5c4f9`). |
+| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139, F140 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. F140: D45, the 1E rows in `roadmap.md` and `phase-1.md`, section 8 of `architecture.md`, and the Phase 1E section and T questions in `eval.md`. |
 
 ### Plugins (F96 to F112)
 
@@ -12108,6 +12114,157 @@ pnpm test:e2e agent-dashboard-block.spec.ts
 pnpm test:e2e agent-chat-result.spec.ts
 pnpm test:e2e agent-chat-mentions.spec.ts
 pnpm test:e2e agent-chat-sessions.spec.ts
+```
+The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
+
+## F140: Try again and parity in the agent
+
+Status: not started. Built on `jpsyx/agent-parity-1e`, based on
+`demo/measles`, and not merged into it. This is Phase 1E of the agent
+roadmap (decision D45, with D40).
+
+**Purpose:** The agent loses nothing today's chat does on three counts.
+Try again on the agent's latest answer reruns it with the first attempt
+kept in the agent's transcript, and a hosted turn adds one fixed line
+before the message (`TRY_AGAIN_LINE`) saying the user wants a different
+answer. Try again on an earlier answer starts the agent over from the
+thread's recap. Offline, or after a failed attempt, the message is asked
+again with no line. A turn is told apart from a follow-up by the user
+messages of the thread its conversation was last asked, kept in memory
+only. Every card the agent shows, `ask_user` and value cards, hosted and
+offline, goes through `recordClarificationShown`, now shared with today's
+chat: the bias check, then the audit row, before the card shows, with
+`turnNumber` counted from the thread. The agent logs one
+`chat.sql_generated` per kept answer that showed a query, and
+`dashboard.block_added_via_chat` for every block that reaches a dashboard
+through the open editor or a confirmed card. No prompt change: v6 stays.
+
+**Value:** Turning the agent on (roadmap 1F) keeps Try
+again useful, keeps the clarification audit log and bias check complete,
+and keeps the chat analytics comparable with today's.
+
+**Eval:** The Try again questions T01 to T06 (`--questions T`), recorded in
+`docs/ai-agent/eval.md` (`#phase-1e`). Today's chat with its
+`retryContext` set the bar first: 18/18 graded answers over three runs, 0
+repeats on T01 and T04. The agent on v6 met all five bars on the third
+wording of the line, the one that ships: 18/18, 0 repeats on T01 and T04,
+and T03, T04, and T06 on all three runs. The starting line and wording 2
+missed bar 1 (15/18 each as graded). No fallback was taken. Three grader
+gaps in the schema grader's `_saysNotStackable` were fixed along the way
+(`f4da653cb`, `09e31504e`, `d8ef5c4f9`). The 45, P, M, and D were not
+rerun, since no prompt changed.
+
+**Design:** `docs/ai-agent/specs/phase-1e.md` and D45 in
+`docs/ai-agent/decisions.md`. The task plan is
+`docs/ai-agent/plans/phase-1e.md`.
+
+**PR title:** `feat(ai-agent): try again and parity in the agent`
+
+**Depends on:** F139 (it changes the agent turn F139 builds, and logs the
+blocks F139's `add_dashboard_block` and confirm card add).
+
+**Commits to read** (all of `jpsyx/agent-parity-1e`, oldest first:
+`git log --reverse --format='%h %s' demo/measles..HEAD`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `446e67637` | docs(ai-agent): brainstorm Phase 1E, Try again and agent parity | All of it. |
+| `e9cad33df` | docs(ai-agent): spec Phase 1E, Try again and agent parity | All of it. |
+| `4a232ed7c` | docs(ai-agent): plan Phase 1E, Try again and agent parity | All of it. |
+| `8996850f4` | feat(ai-eval): add the Try again questions T01 to T06 | All of it. |
+| `b11ca97d6` | refactor(ai-eval): tighten the Try again questions and their tests | All of it. |
+| `266f24f4e` | feat(ai-eval): select the Try again questions with T, outside the default 45 | All of it. |
+| `50c746df8` | feat(ai-eval): tell when a Try again repeated its first attempt | All of it. |
+| `c6a3aea7c` | test(ai-eval): compare repeated blocks by value in the repeat test | All of it. |
+| `2835a3aa0` | feat(ai-eval): grade follow-ups with their parent's result and count repeats | All of it. |
+| `7a663808f` | test(ai-eval): name builders create* and pin the non-repeat case | All of it. |
+| `a75f93953` | feat(ai-eval): build today's chat's Try again turn for the baseline | All of it. Its `chatRuntimeTurnHelpers.ts` hunk is the shared row below. |
+| `4fd2273be` | docs(chat): describe what buildRetryContext reads | All of it. |
+| `b8318ee3e` | feat(ai-eval): ask Try again questions on today's chat with its retry context | All of it. |
+| `f4da653cb` | fix(ai-eval): accept a stackable-after-renaming reply in the schema grader | All of it. |
+| `09e31504e` | fix(ai-eval): keep the schema grader from accepting negated renaming | All of it. |
+| `3b312cd30` | docs(ai-eval): record today's chat on the Try again set | All of it. Its `eval-runs/` files are the `phase-1e_today-retry` runs. |
+| `6ecf08bc9` | feat(ai-agent): add the Try again line to the agent's turn text | All of it. |
+| `6a1cc904a` | test(ai-agent): keep a retried column question a column question | All of it. |
+| `6f3ef1716` | feat(ai-agent): classify an agent turn against its conversation's last ask | All of it. |
+| `5f346ef91` | feat(ai-agent): rerun the agent's latest answer with the Try again line, and restart on an earlier one | All of it. |
+| `9925288ba` | refactor(ai-agent): tighten the Try again turn helpers and their tests | All of it. |
+| `07f4575af` | test(ai-agent): guard Try again through the chat adapter | All of it. |
+| `571f07acd` | test(ai-agent): warm the agent import and sharpen the Try again adapter tests | All of it. |
+| `4c0aea0da` | fix(ai-agent): classify a turn by its user messages so a stopped run's late reply is not a rewind | All of it. |
+| `6e711c6ee` | feat(ai-eval): ask Try again questions on the agent with the Try again line | All of it. |
+| `f2c641fda` | fix(ai-agent): reword the Try again line | All of it (wording 2). |
+| `d8ef5c4f9` | fix(ai-eval): accept a not-directly-stackable reply in the schema grader | All of it. |
+| `6fae80030` | fix(ai-agent): reword the Try again line | All of it (wording 3, the one that ships). |
+| `4f743fe7c` | docs(ai-eval): record the agent's Try again runs against today's chat | All of it. Its `eval-runs/` files are the `phase-1e_agent-retry*` runs. |
+| `6ec75f1ee` | refactor(ai-agent): share recordClarificationShown between today's chat and the agent | All of it. |
+| `f848a8251` | test(chat): pin the audit row and the failed write in recordClarificationShown | All of it. |
+| `c7b79bb41` | feat(ai-agent): count a card's turn number from the thread | All of it. |
+| `1e6fa6402` | feat(ai-agent): bias-check and audit-log every card the agent shows | All of it. |
+| `d4529ccc4` | refactor(chat): take an options object in the agent host's question card helper | All of it. |
+| `b225e7bd3` | refactor(ai-agent): map chat analytics apps in one place and name a block's dashboard directly | All of it. |
+| `f1cba77a9` | feat(ai-agent): give the agent's turn its analytics app and the editor's state | All of it. |
+| `0217514e5` | feat(ai-agent): log one chat.sql_generated per agent answer that showed a query | All of it. |
+| `bf7602463` | fix(ai-agent): never log a query for a run a newer message stopped | All of it. |
+| `1fbc7565b` | feat(ai-agent): log a block the agent queues into the open editor | All of it. |
+| `e2cac534d` | feat(ai-agent): log a block a confirmed dashboard card adds | All of it. |
+| `73ebeb1da` | test(ai-agent): warm the agent import in the hosted reply privacy tests | All of it. |
+| the commit with the subject `docs(ai-agent): record Phase 1E, Try again and parity in the agent, as built` | | All of it: D45, the 1E rows, the eval notes, and this section. |
+
+**Files:**
+- Turn text (shared row below): `shared/agent/pageContext/buildAgentTurnText.{ts,test.ts}`:
+  `TRY_AGAIN_LINE` and the `isRetry` option (`6ecf08bc9`, reworded in `f2c641fda` and `6fae80030`).
+  `src/lib/agent/schemaAnswer/isSchemaAnswerTurn.test.ts` (shared row below) pins that a retried column question stays one (`6a1cc904a`).
+- Classifying a turn (new): `src/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind.{ts,test.ts}`:
+  `AgentTurnKind`, `getAgentTurnKind`, and `createAgentAskRecord`, over the thread's user messages only (`6f3ef1716`, `4c0aea0da`).
+- Agent turn (shared row below): `dataAgentTurnHelpers/{dataAgentTurnHelpers,dataAgentConversation.types,createConversationAgentHost}.ts`
+  and their tests, `runDataAgentTurn/runDataAgentTurn.test.ts`, and `runOfflineDataAgentTurn/runOfflineDataAgentTurn.test.ts`:
+  `_resolveTurnConversation`, `_startTurn`, `_recordAsk`, `_logShownQuery`, `lastAsk`, `lastShownQuery`, and `stoppedTurn`
+  (`5f346ef91`, `9925288ba`, `4c0aea0da`, `1e6fa6402`, `d4529ccc4`, `f1cba77a9`, `0217514e5`, `bf7602463`).
+- Chat runtime integration tests: `useAvandarChatRuntime/__tests__/agentTryAgain.integration.test.ts` (new: `07f4575af`, `571f07acd`, `4c0aea0da`),
+  and `__tests__/hostedReplyPrivacy.integration.test.ts` (`73ebeb1da`). Both warm the adapter's dynamic import of the agent in a `beforeAll`,
+  because on a cold start that import can take longer than the 5 s test timeout.
+- Question cards: `src/components/ChatPanel/recordClarificationShown/recordClarificationShown.{ts,test.ts}` (new: `6ec75f1ee`, `f848a8251`);
+  `useAvandarChatRuntime/applyChatModelTurnResponse.{ts,test.ts}` (shared row below);
+  `src/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions.{ts,test.ts}` (`buildClarificationTurnNumber`, `c7b79bb41`);
+  and `src/lib/agent/dataAgent/browser/createBrowserDataAgentHost.ts` with its new test (shared row below, `1e6fa6402`).
+- Analytics (shared rows below): `ChatAnalyticsPayloads/ChatAnalyticsPayloads.{ts,test.ts}` (`toAnalyticsApp`, and the dashboard named directly, `b225e7bd3`),
+  `createChatModelAdapter/createChatModelAdapter.{ts,test.ts}` (`f1cba77a9`), `dashboardBlocks/addAgentDashboardBlock.{ts,test.ts}` (`1fbc7565b`),
+  and `src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/{confirmAgentDashboardCard.{ts,test.ts},AgentDashboardBlockPart.tsx}` (`e2cac534d`).
+- Retry context type (shared row below): `useAvandarChatRuntime/chatRuntimeTurnHelpers.ts` (`RetryContextSource`, `a75f93953`, `4fd2273be`).
+- Eval (new): `scripts/ai-eval/covid/covidTryAgainQuestions.{ts,test.ts}`, `runtime/isRepeatedAttempt.{ts,test.ts}`,
+  `runtime/summarizeEvalRun.test.ts`, and `harnesses/baseline/BaselineHarness.test.ts`. Eval (shared rows below):
+  `EvalQuestion.ts`, `harnesses/EvalHarness.ts`, `covid/covidQuestions.ts`, `selectEvalQuestions.{ts,test.ts}`, `runEval.ts`,
+  `runtime/{gradeEvalAnswer,summarizeEvalRun}.ts`, `runtime/gradeEvalAnswer.test.ts`,
+  `harnesses/baseline/{BaselineHarness,DenoChatTurnRunner,baselinePageContext}.ts`, `baselinePageContext.test.ts`,
+  `harnesses/pi/PiHarness.{ts,test.ts}`, and `covid/covidSchemaQuestions.{ts,test.ts}`.
+- Docs: `docs/ai-agent/specs/{phase-1e.md,phase-1e-brainstorm.md}` and `docs/ai-agent/plans/phase-1e.md` (new), D45 in `decisions.md`,
+  the 1E rows in `roadmap.md` and `specs/phase-1.md`, section 8 of `architecture.md`, the Phase 1E section and the T questions in `eval.md`,
+  and the `phase-1e` run folders under `docs/ai-agent/eval-runs/`.
+- No user-facing string: `pnpm i18n:check` shows no catalog change.
+
+**Schema:** none. The retry record is in memory only, and the audit rows
+and analytics events use today's tables.
+
+**Known gaps** (open, not part of this feature's acceptance):
+- The retry record covers user messages only. The app has no branch picker
+  and no edit action, so two branches with the same user messages and
+  different replies cannot happen today, and the record would not tell them
+  apart. Revisit if either is added.
+- A Try again on a dashboard answer adds a second block beside the first,
+  as today's chat does (T05 leaves two headings).
+- In the eval, a Try again whose two attempts both end in an error counts as
+  a repeat (both replies are empty). No run had one.
+- `recordShown` writes `outcome: "answered"` before any answer, so a card a
+  Try again replaces stays `answered`. Today's chat does the same.
+
+**Verification:**
+```sh
+pnpm exec tsc -b --force --noEmit
+pnpm lint
+pnpm i18n:check
+pnpm test:frontend
+pnpm vitest run scripts/ai-eval
 ```
 The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
 
