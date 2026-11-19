@@ -38,7 +38,7 @@
     "src/stock/presets/WordReveal/**",
     "src/stock/presets/legacy/**"
   ],
-  "enforceLint": false,
+  "enforceLint": true,
   "coveredIds": [
     "bar-race",
     "choropleth-class-breaks",
@@ -70,10 +70,7 @@
     "terminal-type",
     "word-reveal"
   ],
-  "pendingTokens": [
-    "stroke.heavy",
-    "dash.pending"
-  ],
+  "pendingTokens": [],
   "tempoPendingIds": [],
   "literals": {}
 }

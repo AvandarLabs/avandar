@@ -1,0 +1,17 @@
+[
+  "src/stock/presets/**",
+  "src/stock/graphics-*/**",
+  "src/stock/primitives/**",
+  "src/stock/graphics-common/**",
+  "src/stock/StockGraphic/**",
+  "src/scenes/**",
+  "src/chrome/**",
+  "src/title-card.tsx",
+  "src/storyboard/StoryFilm/**",
+  "src/motion-components/**",
+  "src/continuity/**",
+  "!src/continuity/gallery/**",
+  "src/compositions/**",
+  "src/gallery/HelperGallery/demos/**",
+  "src/gallery/HelperGallery/HelperPlayer/**"
+]

@@ -9,11 +9,11 @@ import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LEGACY_IDS } from "../../../../../../tests/fixtures/legacyStockIds";
+import classicTheme from "../../../../../../themes/classic.theme.json";
 import { parseStockInput } from "../../../../contracts/parseStockInput/parseStockInput";
 import { stockContracts } from "../../../../registry/stockContracts";
 import { stockRenderers } from "../../../../registry/stockRenderers/stockRenderers";
 import { StockGraphic } from "../../../../StockGraphic/StockGraphic";
-import { STOCK } from "../../../../stockPalette";
 import { applyApprovedMoves } from "./legacyApprovedMoves";
 
 const BASELINE: {
@@ -79,8 +79,8 @@ test("original twenty samples preserve every SVG label and geometry at all sixty
       createElement(StockGraphic, {
         preset,
         frame,
-        accent: STOCK.mint,
-        background: STOCK.ground,
+        accent: classicTheme.other.video.atomic.swatch.mint,
+        background: classicTheme.other.video.atomic.swatch.ground,
       }),
     );
     assert.equal(

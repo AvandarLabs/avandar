@@ -12,7 +12,6 @@ import {
   MOTION_PRESETS,
   resolveMotionSettings,
 } from "../../motion-components/motionSettings";
-import { STOCK } from "../../stock/stockPalette";
 import { createEasingFromToken } from "../createEasingFromToken/createEasingFromToken";
 import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { BUILT_IN_VIDEO_THEMES } from "./builtInVideoThemes";
@@ -24,8 +23,21 @@ const SAMPLES = Array.from({ length: 21 }, (_, index) => {
   return index / 20;
 });
 
-test("classic's swatches equal the stock palette", () => {
-  for (const [name, color] of Object.entries(STOCK)) {
+/** The stock palette every stock preset drew from before it read the theme. */
+const STOCK_SWATCHES = {
+  ground: "#0b1219",
+  surface: "#101e28",
+  elevated: "#142632",
+  line: "#2a404e",
+  muted: "#728794",
+  text: "#edf7f4",
+  mint: "#9fefca",
+  cyan: "#82c8f2",
+  orange: "#f0ba83",
+};
+
+test("classic's swatches keep the stock palette", () => {
+  for (const [name, color] of Object.entries(STOCK_SWATCHES)) {
     assert.equal(
       atomic.swatch[name as keyof typeof atomic.swatch],
       color,
@@ -156,7 +168,7 @@ test("every continuity composition keeps its authored accent through classic's o
         overrideIds: [id],
       },
     );
-    assert.equal(theme.semantic.color.accent, STOCK[swatch], id);
+    assert.equal(theme.semantic.color.accent, STOCK_SWATCHES[swatch], id);
   }
 });
 

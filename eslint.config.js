@@ -277,7 +277,7 @@ export default [
   },
 
   ...privacyChokepoint,
-  // Video producer renderers of slices whose theme migration has landed.
+  // Video producer renderers read every style value from the video theme.
   ...videoThemeRestrictions,
   {
     // Plain JavaScript has no syntax for parameter or return types, so the

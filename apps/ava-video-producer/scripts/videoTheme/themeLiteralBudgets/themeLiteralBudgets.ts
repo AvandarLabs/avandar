@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import rendererGlobs from "./rendererGlobs.json";
 
 /** The app directory every budget glob and file path is relative to. */
 export const APP_ROOT: string = fileURLToPath(
@@ -29,7 +30,10 @@ const budgetSchema = z.strictObject({
  *
  * - `globs` are the renderer files the slice owns, relative to the app. A
  *   glob starting with `!` removes files a previous glob matched.
- * - `enforceLint` turns on the renderer ESLint restrictions for `globs`.
+ * - `enforceLint` marks a slice whose migration has landed. The guards
+ *   then refuse pending tokens, tempo-pending ids, and literals for it. The
+ *   renderer ESLint restrictions apply to every budget's `globs` and to
+ *   `rendererGlobs.json` whatever this flag says.
  * - `coveredIds` are Atlas ids the slice has made theme-driven. They join
  *   the parity gate, the slowest-tempo test, the token reader audit, and the
  *   sentinel theme test.
@@ -153,24 +157,10 @@ export function writeThemeLiteralBudget(budget: ThemeLiteralBudget): void {
 /**
  * The renderer directories the literal budget test scans even where no slice
  * owns a file, so a literal in a new, unowned renderer file still fails. A
- * glob starting with `!` removes files, as in a budget.
+ * glob starting with `!` removes files, as in a budget. The list lives in
+ * `rendererGlobs.json` because the root ESLint config reads it too.
  */
-const RENDERER_GLOBS = [
-  "src/stock/presets/**",
-  "src/stock/graphics-*/**",
-  "src/stock/primitives/**",
-  "src/stock/graphics-common/**",
-  "src/stock/StockGraphic/**",
-  "src/scenes/**",
-  "src/chrome/**",
-  "src/title-card.tsx",
-  "src/storyboard/StoryFilm/**",
-  "src/motion-components/**",
-  "src/continuity/**",
-  "!src/continuity/gallery/**",
-  "src/compositions/**",
-  "src/gallery/HelperGallery/demos/**",
-];
+const RENDERER_GLOBS: readonly string[] = rendererGlobs;
 const SOURCE_DIRECTORIES = ["src", "showcase"];
 const SOURCE_EXTENSION = /\.(?:tsx?|css)$/;
 /**

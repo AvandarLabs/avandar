@@ -6,11 +6,11 @@ import fs from "node:fs";
  * (apps/ava-video-producer/docs/video-theme.md). These restrictions ban the
  * literal sources a renderer could still reach for.
  *
- * They apply only to the files of slices that have finished their theme
- * migration. Each slice owns a budget file in
- * apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/<slice>.json
- * and turns the restrictions on for its own globs by setting
- * `"enforceLint": true` there, so this file never needs editing.
+ * They apply to every renderer directory in
+ * apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/rendererGlobs.json
+ * and to the globs of every slice budget beside it, so a new renderer file
+ * is covered without editing this file. The stock palette module is gone:
+ * importing it from anywhere in the app is an error, so it cannot come back.
  */
 
 const APP = "apps/ava-video-producer";
@@ -33,17 +33,18 @@ const LITERAL_ATTRIBUTES = [
 /** Fitted text sizes are content checked against measured glyph widths. */
 const FITTED_TEXT_COMPONENTS = ["FitText", "LiteralDataText"];
 
-const VIDEO_THEME_RULES = {
+const STOCK_PALETTE_PATTERN = {
+  group: ["**/stockPalette", "**/stockPalette.ts"],
+  message:
+    "The stock palette is retired. Read colours from the video theme (useGraphicTokens().color).",
+};
+
+const RENDERER_RULES = {
   "no-restricted-imports": [
     "error",
     {
       patterns: [
-        {
-          group: ["**/stockPalette"],
-          importNames: ["STOCK"],
-          message:
-            "Read colours from the video theme (useGraphicTokens().color), not the stock palette.",
-        },
+        STOCK_PALETTE_PATTERN,
         {
           group: ["**/motion"],
           importNames: ["EASE", "DUR", "STAGGER", "STAGGER_COLUMN"],
@@ -83,50 +84,62 @@ const VIDEO_THEME_RULES = {
   ],
 };
 
-function _readBudgets() {
-  return fs
+function _readJson(file) {
+  return JSON.parse(fs.readFileSync(new URL(file, BUDGET_DIRECTORY), "utf8"));
+}
+
+function _readGlobSets() {
+  const budgets = fs
     .readdirSync(BUDGET_DIRECTORY)
     .filter((file) => {
       return /^s\d+\.json$/.test(file);
     })
     .map((file) => {
-      return JSON.parse(
-        fs.readFileSync(new URL(file, BUDGET_DIRECTORY), "utf8"),
-      );
+      return _readJson(file).globs;
     });
+  return [_readJson("rendererGlobs.json"), ...budgets];
 }
 
-function _restrictionFromBudget(budget) {
-  const toRepoGlob = (glob) => {
+function _restrictionFromGlobs(globs) {
+  const toAppGlob = (glob) => {
     return `${APP}/${glob}`;
   };
   return {
-    files: budget.globs
+    files: globs
       .filter((glob) => {
         return !glob.startsWith("!") && !glob.endsWith(".css");
       })
-      .map(toRepoGlob),
+      .map(toAppGlob),
     ignores: [
-      ...budget.globs
+      ...globs
         .filter((glob) => {
           return glob.startsWith("!");
         })
         .map((glob) => {
-          return toRepoGlob(glob.slice(1));
+          return toAppGlob(glob.slice(1));
         }),
       `${APP}/**/*.test.*`,
       `${APP}/**/__tests__/**`,
+      `${APP}/**/*.css`,
     ],
-    rules: VIDEO_THEME_RULES,
+    rules: RENDERER_RULES,
   };
 }
 
-/** Renderer restrictions for every slice budget with `enforceLint` on. */
-export const videoThemeRestrictions = _readBudgets()
-  .filter((budget) => {
-    return budget.enforceLint;
-  })
-  .map(_restrictionFromBudget)
-  .filter((restriction) => {
-    return restriction.files.length > 0;
-  });
+/**
+ * The app-wide stock palette ban, then the renderer restrictions for every
+ * renderer directory and slice budget.
+ */
+export const videoThemeRestrictions = [
+  {
+    files: [`${APP}/**/*.{js,jsx,mjs,ts,tsx}`],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [STOCK_PALETTE_PATTERN] }],
+    },
+  },
+  ..._readGlobSets()
+    .map(_restrictionFromGlobs)
+    .filter((restriction) => {
+      return restriction.files.length > 0;
+    }),
+];
