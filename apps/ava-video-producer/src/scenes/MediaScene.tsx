@@ -150,8 +150,7 @@ export function MediaScene({
           ...positioned(bounds),
           margin: 0,
           border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
-          // No corner token holds the starter 14 px radius yet.
-          borderRadius: "var(--radius)",
+          borderRadius: scales.corner(tokens.corner.scene),
           background: scene.background,
           overflow: "hidden",
           ...motion.enter(frame, 0, { y: 0, dur: motion.sheet }),

@@ -1,6 +1,4 @@
-import { buildColorWithAlpha } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoTheme } from "../../videoTheme/useVideoTheme";
-import { VIDEO_FONT_REGISTRY } from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import { fitTextLines } from "../layout/layout";
 import { getStageTextStyle } from "../stageTheme/stageTheme";
 import { getLineRevealStyle } from "../textReveal";
@@ -23,8 +21,8 @@ type Props = {
  * The headline column beside a tilted window: lines fade in a rise stagger
  * apart, a later headline replaces the earlier one, and on exit the copy
  * fades where it stands while the window leaves. Lines are
- * `text.stage.windowHeadline` at their fitted size; the subtitle is a
- * monospace line in the faded foreground.
+ * `text.stage.windowHeadline` at their fitted size; the subtitle is
+ * `text.stage.windowSubtitle` at its fitted size.
  */
 export function WindowHeadlines({
   frame,
@@ -97,13 +95,11 @@ export function WindowHeadlines({
         <div
           style={{
             marginTop: height * 0.02,
-            fontFamily:
-              VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
+            ...getStageTextStyle(theme.semantic.text.stage.windowSubtitle, [
+              "fontFamily",
+              "color",
+            ]),
             fontSize: Math.round(height * 0.024),
-            color: buildColorWithAlpha(
-              scene.foreground,
-              theme.atomic.opacity["45"],
-            ),
             ...getLineRevealStyle(
               frame,
               headline.atFrame + fitted.lines.length * lineStagger,

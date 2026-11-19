@@ -1,4 +1,5 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   activeCaption,
@@ -12,7 +13,7 @@ import type { ReactNode } from "react";
 /**
  * Whole-cue captions. Alignment comes from authored or imported cue times.
  * Type is `text.stage.caption`, its size the default the fit starts from,
- * on a box in the scene palette.
+ * on a box in the scene palette with the scene corner.
  */
 export function CaptionOverlay({
   frame,
@@ -24,6 +25,7 @@ export function CaptionOverlay({
 }: CaptionOverlayProps): ReactNode {
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
   const caption = tokens.text.stage.caption;
   validateCaptions(cues);
   const cue = activeCaption(frame, cues);
@@ -53,8 +55,7 @@ export function CaptionOverlay({
         boxSizing: "border-box",
         padding: `${geometry.paddingY}px ${geometry.paddingX}px`,
         border: `${geometry.borderWidth}px solid ${tokens.color.scene.border}`,
-        // No corner token holds the starter 14 px radius yet.
-        borderRadius: "var(--radius)",
+        borderRadius: scales.corner(tokens.corner.scene),
         background: tokens.color.scene.ground,
         ...getStageTextStyle(caption, ["fontFamily", "fontWeight", "color"]),
         fontSize: geometry.fontSize,

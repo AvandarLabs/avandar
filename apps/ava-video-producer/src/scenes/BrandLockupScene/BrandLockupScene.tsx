@@ -7,7 +7,6 @@ import {
   useVideoTheme,
   useVideoTokens,
 } from "../../videoTheme/useVideoTheme";
-import { VIDEO_FONT_REGISTRY } from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import { safePublicPath, textUnits } from "../layout/layout";
 import { positioned } from "../positioned";
 import { SceneShell } from "../SceneShell";
@@ -27,8 +26,6 @@ import type { Rect } from "../layout/layout";
 import type { BrandLockupSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
 
-/** Perspective distance of the fly-through, in pixels. */
-const FLIGHT_PERSPECTIVE = 1400;
 /** Default command typing speed, about one character per frame. */
 const COMMAND_CHARS_PER_SECOND = 30;
 
@@ -71,8 +68,10 @@ export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
             style={{
               fontSize: geometry.wordmarkFontSize,
               lineHeight: `${geometry.wordmark.height}px`,
-              fontWeight: theme.atomic.fontWeight.semibold,
-              letterSpacing: `${theme.atomic.letterSpacing.wordmark}em`,
+              ...getStageTextStyle(theme.semantic.text.stage.wordmark, [
+                "fontWeight",
+                "letterSpacing",
+              ]),
               whiteSpace: "nowrap",
               ...getLineRevealStyle(frame, wordmarkAt, "wipe", {}, motion),
             }}
@@ -148,7 +147,10 @@ function LockupMark({
 }: BrandLockupSceneProps & { mark: Rect; width: number; height: number }) {
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
-  const { flightTilt, columnStagger } = useVideoProps("BrandLockup", {});
+  const { flightTilt, flightPerspective, columnStagger } = useVideoProps(
+    "BrandLockup",
+    {},
+  );
   const buildMotion = { motion, columnStagger };
   const src = staticFile(safePublicPath(logo.src));
   const columns = build?.columns ?? MARK_BUILD_DEFAULTS.columns;
@@ -184,7 +186,7 @@ function LockupMark({
       style={{
         position: "absolute",
         inset: 0,
-        perspective: FLIGHT_PERSPECTIVE,
+        perspective: flightPerspective,
       }}
     >
       <div
@@ -299,8 +301,7 @@ function LockupCta({
         <div
           style={{
             ...line(0.735, height * 0.03),
-            fontFamily:
-              VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
+            fontFamily: tokens.text.stage.command.fontFamily,
             opacity: frame >= beats.promptAt ? 1 : 0,
           }}
         >
