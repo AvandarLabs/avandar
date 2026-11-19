@@ -4,6 +4,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
@@ -31,7 +32,10 @@ export function DecisionCondition({
   const style = useGraphicProps("DecisionFork", {});
   const { color } = useGraphicTokens();
   const motion = useGraphicMotion();
-  const selected = isSelected ? ramp(frame, SELECTION_CUE, motion.sheet) : 0;
+  const scales = useGraphicShapeScales();
+  const selected = isSelected
+    ? ramp(frame, SELECTION_CUE, motion.sheet, motion.reveal.easing)
+    : 0;
   return (
     <Arrive frame={frame} at={20} index={index}>
       <StockRect
@@ -39,7 +43,7 @@ export function DecisionCondition({
         y={302}
         width={192}
         height={72}
-        rx={style.conditionRadius}
+        rx={scales.corner(style.conditionRadius)}
         fill={color.ground}
       />
       <ForkLabel text={branch.condition} x={x} y={321} />
@@ -48,11 +52,11 @@ export function DecisionCondition({
         y={302}
         width={192}
         height={72}
-        rx={style.conditionRadius}
+        rx={scales.corner(style.conditionRadius)}
         fill="none"
         stroke={accent}
         strokeOpacity={selected}
-        strokeWidth={style.conditionStrokeWidth}
+        strokeWidth={scales.stroke(style.conditionStrokeWidth)}
       />
     </Arrive>
   );

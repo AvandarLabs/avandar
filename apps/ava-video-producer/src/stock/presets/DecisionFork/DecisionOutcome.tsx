@@ -3,6 +3,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
@@ -31,8 +32,13 @@ export function DecisionOutcome({
   const style = useGraphicProps("DecisionFork", {});
   const { color } = useGraphicTokens();
   const motion = useGraphicMotion();
-  const selected = isSelected ? ramp(frame, SELECTION_CUE, motion.sheet) : 0;
-  const opacity = isSelected ? ramp(frame, HOLD_CUE, motion.chip) : 1;
+  const scales = useGraphicShapeScales();
+  const selected = isSelected
+    ? ramp(frame, SELECTION_CUE, motion.sheet, motion.reveal.easing)
+    : 0;
+  const opacity = isSelected
+    ? ramp(frame, HOLD_CUE, motion.chip, motion.reveal.easing)
+    : 1;
   if (!isSelected && !showUnchosenOutcomes) {
     return null;
   }
@@ -43,21 +49,21 @@ export function DecisionOutcome({
         y={424}
         width={208}
         height={94}
-        rx={style.outcomeRadius}
+        rx={scales.corner(style.outcomeRadius)}
         fill={color.surface}
         stroke={color.line}
-        strokeWidth={style.outcomeStrokeWidth}
+        strokeWidth={scales.stroke(style.outcomeStrokeWidth)}
       />
       <StockRect
         x={x - 104}
         y={424}
         width={208}
         height={94}
-        rx={style.outcomeRadius}
+        rx={scales.corner(style.outcomeRadius)}
         fill="none"
         stroke={accent}
         strokeOpacity={selected}
-        strokeWidth={style.outcomeStrokeWidth}
+        strokeWidth={scales.stroke(style.outcomeStrokeWidth)}
       />
       <ForkLabel text={branch.outcome} x={x} y={449} width={184} />
     </g>

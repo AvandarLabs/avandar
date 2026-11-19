@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../motion";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props as BranchProps } from "./DecisionBranch";
@@ -21,13 +22,16 @@ export function DecisionGate({
   const style = useGraphicProps("DecisionFork", {});
   const { color } = useGraphicTokens();
   const motion = useGraphicMotion();
-  const closed = isSelected ? 0 : ramp(frame, CLOSE_CUE, motion.sheet);
+  const scales = useGraphicShapeScales();
+  const closed = isSelected
+    ? 0
+    : ramp(frame, CLOSE_CUE, motion.sheet, motion.reveal.easing);
   const spread = mix(closed, 0, style.gateSpread);
   return (
     <g
       opacity={closed}
       stroke={color.inactive}
-      strokeWidth={style.gateWidth}
+      strokeWidth={scales.stroke(style.gateWidth)}
       data-closed-gate={branch.id}
     >
       <path

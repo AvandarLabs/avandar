@@ -47,7 +47,7 @@ export function DecisionFork({ frame, accent, input }: Props): ReactNode {
         accent={accent}
         branchId={input.selectedBranchId}
       />
-      <g opacity={ramp(frame, 120, motion.chip)}>
+      <g opacity={ramp(frame, 120, motion.chip, motion.reveal.easing)}>
         <Text role="secondary" x={480} y={557} anchor="middle">
           {input.selectionLabel}
         </Text>
