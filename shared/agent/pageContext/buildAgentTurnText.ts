@@ -15,7 +15,7 @@ export const ATTACHED_CLEARED_BLOCK =
 
 /** Sent before the message on a hosted Try again of the latest answer. */
 export const TRY_AGAIN_LINE =
-  "The user clicked Try again: they want a different answer to the message below than your last one above. Do not repeat it. Read the message another way, take a different approach, or ask one question if your last answer had to guess.";
+  "The user clicked Try again: they want a different answer to the message below than your last one above, and one that still does everything the message asks, even what your last answer already did. Do not repeat it, but if the message has only one right answer, give that answer again, reached another way. Read the message another way, take a different approach, or ask one question if your last answer had to guess.";
 
 function _pageText(
   pageBlock: string | undefined,
