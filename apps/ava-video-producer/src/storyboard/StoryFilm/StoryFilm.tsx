@@ -15,7 +15,7 @@ import {
 import { createThemeStyleFromTheme } from "./createThemeStyleFromTheme";
 import { getShotTransitionLayers } from "./getShotTransitionLayers";
 import { ShotView, type ProductSceneRenderer } from "./ShotView";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export type { ProductSceneRenderer } from "./ShotView";
 
@@ -34,14 +34,14 @@ export function StoryFilm({
   plan: Storyboard;
   productScene?: ProductSceneRenderer;
   showCaptions?: boolean;
-}) {
+}): ReactNode {
   const frame = useCurrentFrame();
   const shots = timeline(plan);
   const index = Math.max(
     0,
-    shots.findIndex(
-      (shot) => frame >= shot.startFrame && frame < shot.endFrame,
-    ),
+    shots.findIndex((shot) => {
+      return frame >= shot.startFrame && frame < shot.endFrame;
+    }),
   );
   const shot = shots[index];
   const localFrame = frame - shot.startFrame;

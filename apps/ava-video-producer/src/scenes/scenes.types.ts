@@ -15,7 +15,9 @@ import type {
 } from "./TiltedWindowScene/windowMotion";
 import type { WindowBoxName } from "./TiltedWindowScene/windowTilt";
 
-/** All times are scene-local frames. Coordinates are normalized unless noted. */
+/**
+ * All times are scene-local frames. Coordinates are normalized unless noted.
+ */
 export type SceneBase = {
   frame: number;
   width?: number;

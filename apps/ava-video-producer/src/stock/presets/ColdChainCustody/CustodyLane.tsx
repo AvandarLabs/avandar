@@ -29,18 +29,20 @@ export function CustodyLane({
     <g data-container={crate.id} opacity={ramp(frame, 12 + index * 2, 12)}>
       <path d={`M280 ${y} H740`} stroke={STOCK.line} strokeDasharray="4 6" />
       <SceneLabel text={crate.label} x={32} y={y - 5} width={190} lines={3} />
-      {crate.checkpoints.map((checkpoint, stopIndex) => (
-        <CustodyCheckpoint
-          key={checkpoint.stopId}
-          checkpoint={checkpoint}
-          stopIndex={stopIndex}
-          crateIndex={index}
-          y={y}
-          frame={frame}
-          accent={accent}
-          showMonitoring={input.showMonitoring}
-        />
-      ))}
+      {crate.checkpoints.map((checkpoint, stopIndex) => {
+        return (
+          <CustodyCheckpoint
+            key={checkpoint.stopId}
+            checkpoint={checkpoint}
+            stopIndex={stopIndex}
+            crateIndex={index}
+            y={y}
+            frame={frame}
+            accent={accent}
+            showMonitoring={input.showMonitoring}
+          />
+        );
+      })}
       <g data-moving-container={crate.id} transform={`translate(${x} ${y})`}>
         <ObjectGlyph
           kind={crate.kind === "carrier" ? "resource" : "box"}

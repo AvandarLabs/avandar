@@ -2,14 +2,15 @@ import { CONTINUITY_CATALOG, isSceneEntry } from "../../../continuityCatalog";
 import { VocabularyControl } from "./VocabularyControl";
 import css from "./VocabularyGuide.module.css";
 import type { ContinuityVocabularyEntry } from "../../../continuityCatalog";
+import type { ReactNode } from "react";
 
 type Props = { entry: ContinuityVocabularyEntry };
 
 /** Practical reuse guidance linked to the study's complete source argument. */
-export function VocabularyGuide({ entry }: Props) {
-  const source = CONTINUITY_CATALOG.find(
-    (film) => film.family === "films" && film.id === entry.sourceFilm,
-  );
+export function VocabularyGuide({ entry }: Props): ReactNode {
+  const source = CONTINUITY_CATALOG.find((film) => {
+    return film.family === "films" && film.id === entry.sourceFilm;
+  });
   return (
     <section className={css.vocabularyGuide} aria-label="Reuse this study">
       <h3>{"Reuse this study"}</h3>
@@ -38,9 +39,9 @@ export function VocabularyGuide({ entry }: Props) {
           : "These paths refer to the continuity beat schema. Adjust the authored input, then inspect the result at native scale."}
       </p>
       <ul className={css.vocabularyGuideControls}>
-        {entry.controls.map((control) => (
-          <VocabularyControl key={control.path} control={control} />
-        ))}
+        {entry.controls.map((control) => {
+          return <VocabularyControl key={control.path} control={control} />;
+        })}
       </ul>
       {source && (
         <p className={css.vocabularyGuideSource}>

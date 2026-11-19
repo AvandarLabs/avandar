@@ -88,7 +88,10 @@ function safeUrl(value) {
   return sanitizeText(clean);
 }
 
-/** Curate one passed capture. Never read source paths outside that run directory. */
+/**
+ * Curate one passed capture. Never read source paths outside that run
+ * directory.
+ */
 export async function curateCapture({
   root = process.cwd(),
   runDir,
@@ -280,7 +283,10 @@ export async function curateCapture({
   };
 }
 
-/** CLI entry: curate a passed capture run into public/avandar, with --help and --replace. */
+/**
+ * CLI entry: curate a passed capture run into public/avandar, with --help and
+ * --replace.
+ */
 export async function main(args = process.argv.slice(2)) {
   requireLicense();
   if (args.length === 1 && ["--help", "-h"].includes(args[0])) {

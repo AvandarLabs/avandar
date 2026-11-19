@@ -19,21 +19,21 @@ export function LineTrace({
   id,
 }: Readonly<Props>): ReactNode {
   const points = input.points;
-  const chartPoint = (value: number, index: number) => ({
-    x: 121 + index * (718 / (points.length - 1)),
-    y: 458 - value * 3.1,
-  });
+  const chartPoint = (value: number, index: number) => {
+    return {
+      x: 121 + index * (718 / (points.length - 1)),
+      y: 458 - value * 3.1,
+    };
+  };
   const tracePath = points
-    .map(
-      (value, index) =>
-        `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`,
-    )
+    .map((value, index) => {
+      return `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`;
+    })
     .join(" ");
   const referencePath = input.reference
-    .map(
-      (value, index) =>
-        `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`,
-    )
+    .map((value, index) => {
+      return `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`;
+    })
     .join(" ");
   const t = ramp(frame, 23, 94, EASE.inOut);
   const tracePosition = t * (points.length - 1);
@@ -84,25 +84,27 @@ export function LineTrace({
       <Text x={64} y={111} size={29} weight={600}>
         {input.heading}
       </Text>
-      {[0, 25, 50, 75, 100].map((value) => (
-        <g key={value}>
-          <path
-            d={`M121 ${458 - value * 3.1} H839`}
-            stroke={STOCK.line}
-            strokeOpacity={0.6}
-          />
-          <Text
-            x={99}
-            y={463 - value * 3.1}
-            size={13}
-            fill={STOCK.muted}
-            mono
-            anchor="end"
-          >
-            {value}
-          </Text>
-        </g>
-      ))}
+      {[0, 25, 50, 75, 100].map((value) => {
+        return (
+          <g key={value}>
+            <path
+              d={`M121 ${458 - value * 3.1} H839`}
+              stroke={STOCK.line}
+              strokeOpacity={0.6}
+            />
+            <Text
+              x={99}
+              y={463 - value * 3.1}
+              size={13}
+              fill={STOCK.muted}
+              mono
+              anchor="end"
+            >
+              {value}
+            </Text>
+          </g>
+        );
+      })}
       {input.showReference ? (
         <path
           d={referencePath}
@@ -126,15 +128,17 @@ export function LineTrace({
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {points.map((v, i) => (
-          <circle
-            key={i}
-            cx={chartPoint(v, i).x}
-            cy={chartPoint(v, i).y}
-            r={3}
-            fill={accent}
-          />
-        ))}
+        {points.map((v, i) => {
+          return (
+            <circle
+              key={i}
+              cx={chartPoint(v, i).x}
+              cy={chartPoint(v, i).y}
+              r={3}
+              fill={accent}
+            />
+          );
+        })}
       </g>
       <path
         d={`M${head.x} ${head.y} V458`}

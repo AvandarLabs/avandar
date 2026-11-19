@@ -101,7 +101,9 @@ registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
     ),
     [
       {
@@ -123,9 +125,9 @@ test("serialized semantic rules retain every runtime relation", () => {
     ],
   );
   assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
   );
 });
 
@@ -232,8 +234,8 @@ test("hidden loss paths leave the full conserved equation and supplied loss numb
     input: { ...changedInput, showLossChannels: false },
   });
   assert.doesNotMatch(markup, /data-loss-channel/);
-  ["0.5", "0.75", "2.75"].forEach((value) =>
-    assert.ok(markup.includes(`aria-label="${value}"`)),
-  );
+  ["0.5", "0.75", "2.75"].forEach((value) => {
+    return assert.ok(markup.includes(`aria-label="${value}"`));
+  });
   assert.match(markup, /data-energy-equation/);
 });

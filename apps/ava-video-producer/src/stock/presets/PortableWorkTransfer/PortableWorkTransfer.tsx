@@ -34,17 +34,19 @@ export function PortableWorkTransfer({
         stroke={STOCK.line}
         strokeWidth={4}
       />
-      {input.artifacts.map((artifact, index) => (
-        <TransferArtifact
-          key={artifact.id}
-          artifact={artifact}
-          x={50}
-          y={210 + index * 86}
-          isCopy={false}
-          showIdentityTabs={input.showIdentityTabs}
-          accent={accent}
-        />
-      ))}
+      {input.artifacts.map((artifact, index) => {
+        return (
+          <TransferArtifact
+            key={artifact.id}
+            artifact={artifact}
+            x={50}
+            y={210 + index * 86}
+            isCopy={false}
+            showIdentityTabs={input.showIdentityTabs}
+            accent={accent}
+          />
+        );
+      })}
       <TransferFolio
         input={input}
         scene={scene}

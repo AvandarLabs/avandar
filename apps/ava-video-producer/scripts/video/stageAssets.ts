@@ -9,7 +9,7 @@ export async function stageAssets(
   plan: Storyboard,
   directory: string,
   workspace: string,
-) {
+): Promise<string> {
   const target = path.join(directory, "bundle-public");
   await fs.mkdir(target);
   await fs.mkdir(path.join(target, "fonts"));

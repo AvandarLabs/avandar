@@ -19,17 +19,19 @@ export function ProvenancePeelback({
   );
   return (
     <g>
-      {[...remaining, selected].map((source) => (
-        <ProvenanceSource
-          key={source.id}
-          source={source}
-          index={input.sources.indexOf(source)}
-          otherIndex={remaining.indexOf(source)}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {[...remaining, selected].map((source) => {
+        return (
+          <ProvenanceSource
+            key={source.id}
+            source={source}
+            index={input.sources.indexOf(source)}
+            otherIndex={remaining.indexOf(source)}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ProvenanceSummary input={input} frame={frame} accent={accent} />
       <g
         data-focal-citation="authored"

@@ -22,28 +22,30 @@ export function ExteriorAddress({ frame, input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g data-exterior-address="routing">
-      {labels.map(({ text, y }) => (
-        <g key={y}>
-          <rect
-            x={28}
-            y={y - 16}
-            width={480}
-            height={40}
-            fill={STOCK.elevated}
-          />
-          <FitText
-            {...{ text, y }}
-            x={268}
-            width={464}
-            fontSize={12}
-            maxLines={2}
-            anchor="middle"
-            normalizeWhitespace
-            breakLongWords
-            color={STOCK.muted}
-          />
-        </g>
-      ))}
+      {labels.map(({ text, y }) => {
+        return (
+          <g key={y}>
+            <rect
+              x={28}
+              y={y - 16}
+              width={480}
+              height={40}
+              fill={STOCK.elevated}
+            />
+            <FitText
+              {...{ text, y }}
+              x={268}
+              width={464}
+              fontSize={12}
+              maxLines={2}
+              anchor="middle"
+              normalizeWhitespace
+              breakLongWords
+              color={STOCK.muted}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

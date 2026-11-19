@@ -10,6 +10,8 @@ export function createThemeStyleFromTheme(
   theme: Theme | ShotTheme | undefined,
 ): CSSProperties {
   return Object.fromEntries(
-    Object.entries(theme ?? {}).map(([name, value]) => [`--${name}`, value]),
+    Object.entries(theme ?? {}).map(([name, value]) => {
+      return [`--${name}`, value];
+    }),
   ) as CSSProperties;
 }

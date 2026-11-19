@@ -18,8 +18,8 @@ import type { PresetAssertions } from "../../../../tests/helpers/registerStockPr
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(PublicationSnapshotSlice, {
       frame,
       input,
@@ -27,6 +27,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 function _marker({
   markup,
   key,
@@ -36,10 +37,12 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const tag = tags.find((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
   assert.ok(tag, `${key} ${value}`);
   return tag;
 }
@@ -107,26 +110,30 @@ const EXCLUDED_TEXT_FIELDS: string[] = [
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  input.publication.label,
-  input.publication.revision,
-  ...input.table.columns
-    .filter(
-      ({ id }) =>
-        input.showExcludedCells || input.selection.columnIds.includes(id),
-    )
-    .map(prop("label")),
-  ...input.table.rows.flatMap((row) =>
-    row.cells.filter(
-      (cell, index) =>
-        input.showExcludedCells ||
-        (input.selection.rowIds.includes(row.id) &&
-          input.selection.columnIds.includes(input.table.columns[index].id)),
-    ),
-  ),
-  ...(frame >= 139 ? [input.liveEdit.value] : []),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    input.publication.label,
+    input.publication.revision,
+    ...input.table.columns
+      .filter(({ id }) => {
+        return (
+          input.showExcludedCells || input.selection.columnIds.includes(id)
+        );
+      })
+      .map(prop("label")),
+    ...input.table.rows.flatMap((row) => {
+      return row.cells.filter((cell, index) => {
+        return (
+          input.showExcludedCells ||
+          (input.selection.rowIds.includes(row.id) &&
+            input.selection.columnIds.includes(input.table.columns[index].id))
+        );
+      });
+    }),
+    ...(frame >= 139 ? [input.liveEdit.value] : []),
+  ];
+};
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -240,10 +247,11 @@ function _assertReadablePaint(markup: string): void {
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
   SvgPaintAssertions.assertPaintClearance({
     texts: paint.filter(propEq("kind", "text")),
-    rectangles: paint.filter(
-      (item) =>
-        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0,
-    ),
+    rectangles: paint.filter((item) => {
+      return (
+        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0
+      );
+    }),
   });
 }
 
@@ -253,36 +261,39 @@ test("reversed full-table snapshot travel preserves visible text and foreground 
 
 test("PublicationSnapshotSlice transfer sampling preserves visible text and foreground clearance", () => {
   [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
-    Array.from({ length: 111 }, (_, index) => 56 + index / 2).forEach(
-      (frame) => {
-        SvgPaintAssertions.assertTextCanvasBounds({
-          markup: render({ frame: frame, input: input }),
-        });
-        _assertReadablePaint(render({ frame: frame, input: input }));
-      },
-    );
+    Array.from({ length: 111 }, (_, index) => {
+      return 56 + index / 2;
+    }).forEach((frame) => {
+      SvgPaintAssertions.assertTextCanvasBounds({
+        markup: render({ frame: frame, input: input }),
+      });
+      _assertReadablePaint(render({ frame: frame, input: input }));
+    });
   });
 });
 
 test("reversed arbitrary-string copies retain readable destination column attribution from first copy through settling", () => {
   [2, 4].forEach((numColumns) => {
-    const columnIds = Array.from(
-      { length: numColumns },
-      (_, index) => `column${index}`,
-    );
+    const columnIds = Array.from({ length: numColumns }, (_, index) => {
+      return `column${index}`;
+    });
     const input = inputSchema.parse({
       ...DEFAULT_INPUT,
       table: {
-        columns: columnIds.map((id, index) => ({
-          id,
-          label: `${"W".repeat(16)}${index}X`,
-        })),
-        rows: ["first", "second"].map((id, rowIndex) => ({
-          id,
-          cells: columnIds.map(
-            (_, columnIndex) => `v${rowIndex}${columnIndex}`,
-          ),
-        })),
+        columns: columnIds.map((id, index) => {
+          return {
+            id,
+            label: `${"W".repeat(16)}${index}X`,
+          };
+        }),
+        rows: ["first", "second"].map((id, rowIndex) => {
+          return {
+            id,
+            cells: columnIds.map((_, columnIndex) => {
+              return `v${rowIndex}${columnIndex}`;
+            }),
+          };
+        }),
       },
       selection: {
         rowIds: ["second", "first"],
@@ -290,92 +301,103 @@ test("reversed arbitrary-string copies retain readable destination column attrib
       },
       liveEdit: { rowId: "first", columnId: columnIds[0], value: "changed" },
     });
-    [83, ...Array.from({ length: 87 }, (_, index) => 56.5 + index / 2)].forEach(
-      (frame) => {
-        const markup = render({ frame: frame, input: input }),
-          paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-        input.selection.columnIds.forEach((columnId, selectedColumn) => {
-          const columnIndex = input.table.columns.findIndex(
-              propEq("id", columnId),
-            ),
-            column = input.table.columns[columnIndex];
-          const left = 508 + (selectedColumn * 400) / numColumns,
-            right = left + 400 / numColumns;
-          const labels = paint.filter(
-            (item) =>
-              item.kind === "text" &&
-              item.ariaLabel === column.label &&
-              item.left >= left &&
-              item.right <= right,
+    [
+      83,
+      ...Array.from({ length: 87 }, (_, index) => {
+        return 56.5 + index / 2;
+      }),
+    ].forEach((frame) => {
+      const markup = render({ frame: frame, input: input }),
+        paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
+      input.selection.columnIds.forEach((columnId, selectedColumn) => {
+        const columnIndex = input.table.columns.findIndex(
+            propEq("id", columnId),
+          ),
+          column = input.table.columns[columnIndex];
+        const left = 508 + (selectedColumn * 400) / numColumns,
+          right = left + 400 / numColumns;
+        const labels = paint.filter((item) => {
+          return (
+            item.kind === "text" &&
+            item.ariaLabel === column.label &&
+            item.left >= left &&
+            item.right <= right
           );
-          assert.ok(
-            labels.length > 0,
-            `Missing visible column attribution for ${columnId} at reversed frame${frame}.`,
-          );
-          assert.equal(labels.map(prop("text")).join(""), column.label);
-          input.table.rows
-            .filter((row) => row.id === "first" || frame > 74)
-            .forEach((row) => {
-              const value = paint.find(
-                (item) =>
-                  item.kind === "text" &&
-                  item.text === row.cells[columnIndex] &&
-                  item.left >= left &&
-                  item.right <= right,
-              );
-              assert.ok(
-                value,
-                `Expected visible arbitrary copy ${row.cells[columnIndex]}.`,
-              );
-              assert.ok(
-                labels.every((label) => label.bottom < value.top),
-                "The readable heading must precede its actual values in the same column.",
+        });
+        assert.ok(
+          labels.length > 0,
+          `Missing visible column attribution for ${columnId} at reversed frame${frame}.`,
+        );
+        assert.equal(labels.map(prop("text")).join(""), column.label);
+        input.table.rows
+          .filter((row) => {
+            return row.id === "first" || frame > 74;
+          })
+          .forEach((row) => {
+            const value = paint.find((item) => {
+              return (
+                item.kind === "text" &&
+                item.text === row.cells[columnIndex] &&
+                item.left >= left &&
+                item.right <= right
               );
             });
-        });
-        SvgPaintAssertions.assertTextCanvasBounds({ markup });
-        _assertReadablePaint(markup);
-      },
-    );
+            assert.ok(
+              value,
+              `Expected visible arbitrary copy ${row.cells[columnIndex]}.`,
+            );
+            assert.ok(
+              labels.every((label) => {
+                return label.bottom < value.top;
+              }),
+              "The readable heading must precede its actual values in the same column.",
+            );
+          });
+      });
+      SvgPaintAssertions.assertTextCanvasBounds({ markup });
+      _assertReadablePaint(markup);
+    });
   });
 });
 
 test("snapshot transfer heading envelopes clear the retained top border stroke", () => {
   [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
-    Array.from({ length: 87 }, (_, index) => 56.5 + index / 2).forEach(
-      (frame) => {
-        const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
-          render({ frame: frame, input: input }),
+    Array.from({ length: 87 }, (_, index) => {
+      return 56.5 + index / 2;
+    }).forEach((frame) => {
+      const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
+        render({ frame: frame, input: input }),
+      );
+      const outline = paint.find((item) => {
+        return (
+          item.kind === "rect" &&
+          item.left === 500 &&
+          item.attributes.fill === "none"
         );
-        const outline = paint.find(
-          (item) =>
-            item.kind === "rect" &&
-            item.left === 500 &&
-            item.attributes.fill === "none",
-        );
-        assert.ok(outline);
-        const headings = paint.filter(
-          (item) =>
-            item.kind === "text" &&
-            item.left >= 508 &&
-            input.table.columns.some(
-              propEq<{ label: unknown }, "label", unknown>(
-                "label",
-                item.ariaLabel,
-              ),
+      });
+      assert.ok(outline);
+      const headings = paint.filter((item) => {
+        return (
+          item.kind === "text" &&
+          item.left >= 508 &&
+          input.table.columns.some(
+            propEq<{ label: unknown }, "label", unknown>(
+              "label",
+              item.ariaLabel,
             ),
+          )
         );
-        assert.ok(headings.length > 0);
-        const strokeHalfWidth =
-          Number(outline.attributes["stroke-width"] ?? 1) / 2;
-        headings.forEach((heading) =>
-          assert.ok(
-            heading.top > outline.top + strokeHalfWidth ||
-              heading.bottom < outline.top - strokeHalfWidth,
-            `Heading ${heading.text} intersects top stroke at frame ${frame}`,
-          ),
+      });
+      assert.ok(headings.length > 0);
+      const strokeHalfWidth =
+        Number(outline.attributes["stroke-width"] ?? 1) / 2;
+      headings.forEach((heading) => {
+        return assert.ok(
+          heading.top > outline.top + strokeHalfWidth ||
+            heading.bottom < outline.top - strokeHalfWidth,
+          `Heading ${heading.text} intersects top stroke at frame ${frame}`,
         );
-      },
-    );
+      });
+    });
   });
 });

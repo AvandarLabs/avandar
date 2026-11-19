@@ -15,7 +15,9 @@ const compatible: StockControl[] = makeStockControlsFromSchema({
     additionalProperties: false,
     required: COMPATIBLE_PATHS,
     properties: Object.fromEntries(
-      COMPATIBLE_PATHS.map((path) => [path, jsonSchema.properties![path]]),
+      COMPATIBLE_PATHS.map((path) => {
+        return [path, jsonSchema.properties![path]];
+      }),
     ),
   },
   messageNamespace: "motionAtlas.ordered-lock-acquisition",

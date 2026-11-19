@@ -28,7 +28,9 @@ test("capture ids and fixture paths reject traversal and hidden files", () => {
     "",
     "x".repeat(81),
   ])
-    assert.throws(() => validateId(id));
+    assert.throws(() => {
+      return validateId(id);
+    });
   for (const path of [
     "../cases.csv",
     "/tmp/cases.csv",
@@ -37,12 +39,16 @@ test("capture ids and fixture paths reject traversal and hidden files", () => {
     "fixtures\\cases.csv",
     "fixtures/%2e%2e/key.csv",
   ])
-    assert.throws(() => safeRelativePath(path));
+    assert.throws(() => {
+      return safeRelativePath(path);
+    });
 });
 
 test("unique output directories preserve prior runs and fixture inventory hashes actual bytes", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "capture-files-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   await mkdir(join(root, "demo-data"));
   await writeFile(join(root, "demo-data", "cases.csv"), "id,value\n1,3\n");
   await writeFile(join(root, "demo-data", "ignored.md"), "not a fixture");
@@ -59,7 +65,9 @@ test("unique output directories preserve prior runs and fixture inventory hashes
   assert.notEqual(first, second);
   const inventory = await fixtureInventory(root, "demo-data");
   assert.deepEqual(
-    inventory.files.map((file: { path: string }) => file.path),
+    inventory.files.map((file: { path: string }) => {
+      return file.path;
+    }),
     ["cases.csv"],
   );
   assert.match(inventory.files[0].sha256, /^[a-f0-9]{64}$/);
@@ -74,12 +82,12 @@ test("unique output directories preserve prior runs and fixture inventory hashes
 test("output path refuses a symlink before creating directories outside its root", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "capture-link-"));
   const outside = await mkdtemp(join(tmpdir(), "capture-outside-"));
-  t.after(() =>
-    Promise.all([
+  t.after(() => {
+    return Promise.all([
       rm(root, { recursive: true, force: true }),
       rm(outside, { recursive: true, force: true }),
-    ]),
-  );
+    ]);
+  });
   await symlink(outside, join(root, "out"));
   await assert.rejects(
     createRunDirectory(root, "test-run"),

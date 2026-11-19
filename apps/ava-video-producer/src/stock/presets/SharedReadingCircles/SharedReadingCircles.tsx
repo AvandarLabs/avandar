@@ -32,25 +32,29 @@ export function SharedReadingCircles({
         stroke={STOCK.line}
         strokeWidth={3}
       />
-      {input.readingGroups.map((group, groupIndex) => (
-        <ReadingBook
-          key={group.bookId}
-          input={input}
-          groupIndex={groupIndex}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
-      {input.learners.map((learner, index) => (
-        <ReadingLearner
-          key={learner.id}
-          learner={learner}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.readingGroups.map((group, groupIndex) => {
+        return (
+          <ReadingBook
+            key={group.bookId}
+            input={input}
+            groupIndex={groupIndex}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      {input.learners.map((learner, index) => {
+        return (
+          <ReadingLearner
+            key={learner.id}
+            learner={learner}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <SceneText
         text={input.caption}
         anchor="middle"

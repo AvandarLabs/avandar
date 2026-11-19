@@ -36,7 +36,9 @@ export async function bundleShowcaseFilms(
     { recursive: true },
   );
   const assets = new Set(
-    films.flatMap((film) => (film.plan ? assetReferences(film.plan) : [])),
+    films.flatMap((film) => {
+      return film.plan ? assetReferences(film.plan) : [];
+    }),
   );
   for (const asset of assets) {
     const target = path.join(publicDir, asset);

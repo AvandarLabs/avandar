@@ -122,7 +122,9 @@ test("lids lift and settle while legends change units and preserve denominators"
 test("count and rate equality remain distinct and domains reject clipping", () => {
   const equalCounts = inputSchema.parse({
     ...defaultInput,
-    zones: defaultInput.zones.map((zone) => ({ ...zone, records: 4 })),
+    zones: defaultInput.zones.map((zone) => {
+      return { ...zone, records: 4 };
+    }),
   });
   assert.match(
     _render({ frame: 150, input: equalCounts }),
@@ -154,15 +156,17 @@ test("count and rate equality remain distinct and domains reject clipping", () =
     },
     {
       ...defaultInput,
-      zones: defaultInput.zones.map((zone) => ({ ...zone, records: 100 })),
+      zones: defaultInput.zones.map((zone) => {
+        return { ...zone, records: 100 };
+      }),
     },
     {
       ...defaultInput,
       zones: [defaultInput.zones[0], { ...defaultInput.zones[0], id: "other" }],
     },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.match(
     _render({ frame: 150, input: fixtures[1].input }),
     /data-records="0" data-population="1" data-rate="0"/,
@@ -190,17 +194,21 @@ test("adjacent zones keep all fraction shelves and use each explicit color domai
     ...hold.matchAll(
       /data-denominator-connector="[^"]+" d="M[^"]+ L590 ([\d.]+) L627 ([\d.]+)"/g,
     ),
-  ].forEach((match) => assert.equal(match[1], match[2]));
+  ].forEach((match) => {
+    return assert.equal(match[1], match[2]);
+  });
 });
 
 test("exact normalized maximum accepts seven records per twenty-five people at rate twenty-eight", () => {
   const input = {
     ...defaultInput,
-    zones: defaultInput.zones.map((zone) => ({
-      ...zone,
-      records: 7,
-      population: 25,
-    })),
+    zones: defaultInput.zones.map((zone) => {
+      return {
+        ...zone,
+        records: 7,
+        population: 25,
+      };
+    }),
     rateBase: 100 as const,
     colorDomains: { countMaximum: 7, normalizedMaximum: 28 },
   };
@@ -219,22 +227,24 @@ test("exact normalized maximum accepts seven records per twenty-five people at r
     ...markup.matchAll(/<polygon\b([^>]*data-zone-shade=[^>]*)>/g),
   ];
   assert.equal(shades.length, 2);
-  shades.forEach(([, attributes]) =>
-    assert.equal(
+  shades.forEach(([, attributes]) => {
+    return assert.equal(
       SvgAttributes.getNumberFromMarkup({ attributes, name: "fill-opacity" }),
       0.88,
-    ),
-  );
+    );
+  });
 });
 test("a normalized maximum immediately below twenty-eight rejects clipping without epsilon", () => {
   assert.equal(
     inputSchema.safeParse({
       ...defaultInput,
-      zones: defaultInput.zones.map((zone) => ({
-        ...zone,
-        records: 7,
-        population: 25,
-      })),
+      zones: defaultInput.zones.map((zone) => {
+        return {
+          ...zone,
+          records: 7,
+          population: 25,
+        };
+      }),
       rateBase: 100,
       colorDomains: { countMaximum: 7, normalizedMaximum: 27.999999999999996 },
     }).success,

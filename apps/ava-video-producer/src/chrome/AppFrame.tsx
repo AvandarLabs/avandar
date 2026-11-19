@@ -1,6 +1,6 @@
 import { TYPE } from "../fonts";
 import { Orb } from "./Orb";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export const BAR = 40;
 export const HEAD = 68;
@@ -27,7 +27,7 @@ export function AppFrame({
   title: string;
   heading: string;
   sub: string;
-}) {
+}): ReactNode {
   return (
     <>
       <div

@@ -16,10 +16,9 @@ export function HabitatLandBalance({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const habitat = input.patches.reduce(
-      (total, patch) => total + patch.areaHa,
-      0,
-    ),
+  const habitat = input.patches.reduce((total, patch) => {
+      return total + patch.areaHa;
+    }, 0),
     corridor = (input.corridor.lengthM * input.corridor.widthM) / 10000;
   const other = input.landBoundaryHa - habitat,
     afterHabitat = habitat + corridor,
@@ -74,30 +73,32 @@ export function HabitatLandBalance({
         width={896}
         height={12}
       />
-      {terms.map(({ label, value }, index) => (
-        <g key={index}>
-          <FitText
-            text={label}
-            x={32 + index * 310}
-            y={512}
-            width={276}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={value}
-            x={32 + index * 310}
-            y={555}
-            width={276}
-            fontSize={12}
-            maxLines={2}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      {terms.map(({ label, value }, index) => {
+        return (
+          <g key={index}>
+            <FitText
+              text={label}
+              x={32 + index * 310}
+              y={512}
+              width={276}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <FitText
+              text={value}
+              x={32 + index * 310}
+              y={555}
+              width={276}
+              fontSize={12}
+              maxLines={2}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -182,10 +182,12 @@ export const DENSE_INPUT: Input = {
 const smallThenLargeInput: Input = {
   ...DENSE_INPUT,
   requests: DENSE_INPUT.requests.slice(0, 2),
-  contributions: DENSE_INPUT.contributions.map((contribution, index) => ({
-    ...contribution,
-    earmarkedRequestId: index === 3 ? "1" : null,
-  })),
+  contributions: DENSE_INPUT.contributions.map((contribution, index) => {
+    return {
+      ...contribution,
+      earmarkedRequestId: index === 3 ? "1" : null,
+    };
+  }),
   allocations: [
     { contributionId: "0", requestId: "0", credits: 1 },
     { contributionId: "0", requestId: "1", credits: 4 },
@@ -200,18 +202,20 @@ const smallThenLargeInput: Input = {
  */
 export const unequalBatchFixtures: Array<{ id: string; input: Input }> = (
   ["fan", "side-by-side"] as const
-).flatMap((envelopeArrangement) =>
-  [false, true].map((isLargeFirst) => ({
-    id: `${isLargeFirst ? "13-1" : "1-13"}-${envelopeArrangement}`,
-    input: {
-      ...smallThenLargeInput,
-      envelopeArrangement,
-      requests: isLargeFirst
-        ? [...smallThenLargeInput.requests].reverse()
-        : smallThenLargeInput.requests,
-    },
-  })),
-);
+).flatMap((envelopeArrangement) => {
+  return [false, true].map((isLargeFirst) => {
+    return {
+      id: `${isLargeFirst ? "13-1" : "1-13"}-${envelopeArrangement}`,
+      input: {
+        ...smallThenLargeInput,
+        envelopeArrangement,
+        requests: isLargeFirst
+          ? [...smallThenLargeInput.requests].reverse()
+          : smallThenLargeInput.requests,
+      },
+    };
+  });
+});
 
 /** Default, minimal, dense, changed and semantic edge cases. */
 export const fixtures: Array<{ id: string; input: Input }> = [

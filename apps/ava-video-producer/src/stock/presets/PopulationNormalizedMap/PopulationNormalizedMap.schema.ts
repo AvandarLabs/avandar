@@ -10,10 +10,9 @@ const polygonSchema: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>> =
     .array(z.tuple([coordinate, coordinate]))
     .min(3)
     .max(8)
-    .refine(
-      (polygon) => PlanarPolygon.isSimple({ polygon }),
-      "Requires a simple open polygon.",
-    );
+    .refine((polygon) => {
+      return PlanarPolygon.isSimple({ polygon });
+    }, "Requires a simple open polygon.");
 /** Strict count-to-rate input with explicit non-clipping color domains. */
 export const inputSchema = z
   .strictObject({
@@ -80,14 +79,15 @@ export const inputSchema = z
       }
       if (
         PlanarPolygon.isSimple({ polygon: zone.polygon }) &&
-        input.zones.slice(index + 1).some(
-          (other) =>
+        input.zones.slice(index + 1).some((other) => {
+          return (
             PlanarPolygon.isSimple({ polygon: other.polygon }) &&
             PlanarPolygon.doInteriorsOverlap({
               firstPolygon: zone.polygon,
               secondPolygon: other.polygon,
-            }),
-        )
+            })
+          );
+        })
       ) {
         context.addIssue({
           code: "custom",

@@ -14,9 +14,9 @@ export function MarketCheckout({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const total = input.products
-    .filter(prop("chosen"))
-    .reduce((sum, product) => sum + product.price, 0);
+  const total = input.products.filter(prop("chosen")).reduce((sum, product) => {
+    return sum + product.price;
+  }, 0);
   const paid = frame >= 126 ? total : 0;
   const balance = input.availableCredits - paid;
   return (

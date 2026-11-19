@@ -34,22 +34,24 @@ export function BatchMembers({
         breakLongWords
         color={accent}
       />
-      {batch.items.map((item, itemIndex) => (
-        <BatchMember
-          key={item.id}
-          item={item}
-          batchId={batch.id}
-          index={itemIndex}
-          numItems={batch.items.length}
-          frame={frame}
-          start={start}
-          completeAt={completeAt}
-          envelopeX={x}
-          y={y}
-          showLabel={input.showItemLabels}
-          accent={accent}
-        />
-      ))}
+      {batch.items.map((item, itemIndex) => {
+        return (
+          <BatchMember
+            key={item.id}
+            item={item}
+            batchId={batch.id}
+            index={itemIndex}
+            numItems={batch.items.length}
+            frame={frame}
+            start={start}
+            completeAt={completeAt}
+            envelopeX={x}
+            y={y}
+            showLabel={input.showItemLabels}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -31,9 +31,11 @@ export function ProportionalSymbolArea({
         fill={STOCK.surface}
         stroke={STOCK.line}
       />
-      {input.sites.map((site, index) => (
-        <AreaSite key={site.id} {...{ site, index, input, frame, accent }} />
-      ))}
+      {input.sites.map((site, index) => {
+        return (
+          <AreaSite key={site.id} {...{ site, index, input, frame, accent }} />
+        );
+      })}
       <AreaLegend {...{ input, frame, accent }} />
     </g>
   );

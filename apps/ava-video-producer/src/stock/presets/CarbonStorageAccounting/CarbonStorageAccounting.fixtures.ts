@@ -204,10 +204,12 @@ export const allReleasedInput: Input = {
 /** A full finite signed fractional value alongside maximum authored labels. */
 export const fractionalNegativeInput: Input = {
   ...DENSE_INPUT,
-  operatingEmissions: DENSE_INPUT.operatingEmissions.map((row, index) => ({
-    ...row,
-    tonnesCO2e: index === 0 ? 0.0000020000000000000003 : 0,
-  })),
+  operatingEmissions: DENSE_INPUT.operatingEmissions.map((row, index) => {
+    return {
+      ...row,
+      tonnesCO2e: index === 0 ? 0.0000020000000000000003 : 0,
+    };
+  }),
 };
 
 /** Stable complete accepted examples. */

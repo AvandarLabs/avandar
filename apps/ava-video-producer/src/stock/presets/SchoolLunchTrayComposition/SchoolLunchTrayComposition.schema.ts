@@ -59,7 +59,9 @@ export const inputSchema = z
     if (
       trayIds.length !== learnerIds.length ||
       new Set(trayIds).size !== trayIds.length ||
-      trayIds.some((id) => !learnerIds.includes(id))
+      trayIds.some((id) => {
+        return !learnerIds.includes(id);
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -70,7 +72,9 @@ export const inputSchema = z
     input.trays.forEach((tray, index) => {
       if (
         new Set(tray.componentIds).size !== tray.componentIds.length ||
-        tray.componentIds.some((id) => !componentIds.includes(id))
+        tray.componentIds.some((id) => {
+          return !componentIds.includes(id);
+        })
       ) {
         context.addIssue({
           code: "custom",

@@ -31,15 +31,17 @@ export function HouseholdMarketChoice({
         strokeWidth={2}
         fill="none"
       />
-      {input.products.map((product, index) => (
-        <MarketProduct
-          key={product.id}
-          input={input}
-          frame={frame}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.products.map((product, index) => {
+        return (
+          <MarketProduct
+            key={product.id}
+            input={input}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
       <MarketShopper input={input} frame={frame} accent={accent} />
       <MarketCheckout input={input} frame={frame} accent={accent} />
     </g>

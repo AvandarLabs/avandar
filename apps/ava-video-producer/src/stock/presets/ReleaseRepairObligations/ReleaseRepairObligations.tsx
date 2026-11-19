@@ -17,9 +17,9 @@ export function ReleaseRepairObligations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const isHeld = input.issues.some(
-    (issue) => issue.state === "open" && issue.releaseRole === "blocking",
-  );
+  const isHeld = input.issues.some((issue) => {
+    return issue.state === "open" && issue.releaseRole === "blocking";
+  });
   const artifactX = mix(isHeld ? 0 : ramp(frame, 91, 39, EASE.inOut), 60, 580);
   return (
     <g>

@@ -21,7 +21,11 @@ export function PreviewPlaybackControls({
       <div className="transport-row">
         <button
           className="transport-button"
-          onClick={() => setPlaying((value) => !value)}
+          onClick={() => {
+            return setPlaying((value) => {
+              return !value;
+            });
+          }}
           aria-label={playing ? "Pause preview" : "Play preview"}
         >
           <Icon name={playing ? "pause" : "play"} size={17} />
@@ -29,7 +33,9 @@ export function PreviewPlaybackControls({
         </button>
         <button
           className="icon-button"
-          onClick={() => setFrame(0)}
+          onClick={() => {
+            return setFrame(0);
+          }}
           aria-label="Restart preview"
         >
           <Icon name="restart" size={17} />

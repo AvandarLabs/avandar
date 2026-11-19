@@ -35,28 +35,33 @@ test("only declared share fields produce outbound copies while every original re
     );
     assert.equal(
       (markup.match(/data-outbound-copy=/g) ?? []).length,
-      fixture.input.fields.filter(({ disclosure }) => disclosure === "share")
-        .length,
+      fixture.input.fields.filter(({ disclosure }) => {
+        return disclosure === "share";
+      }).length,
     );
-    fixture.input.fields.forEach(({ id, disclosure }) =>
-      assert.equal(
+    fixture.input.fields.forEach(({ id, disclosure }) => {
+      return assert.equal(
         markup.includes(`data-outbound-copy="${id}"`),
         disclosure === "share",
-      ),
-    );
+      );
+    });
   });
 });
 test("all-retain creates zero outbound copies or apertures at every frame", () => {
   const input = {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      disclosure: "retain" as const,
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        disclosure: "retain" as const,
+      };
+    }),
   };
   Array.from(
     { length: Math.max(0, Math.ceil((180 - 0) / 1)) },
-    (_, sampleIndex) => 0 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 0 + sampleIndex * 1;
+    },
   ).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     assert.equal(

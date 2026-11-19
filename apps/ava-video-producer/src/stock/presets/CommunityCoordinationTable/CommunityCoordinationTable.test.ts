@@ -58,11 +58,13 @@ import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 
 test("one team lifts its own marker from maximum initial concentration, preserving all request tags", () => {
   fixtures.forEach(({ input }) => {
-    const markers = (frame: number) => [
-      ..._render({ frame: frame, input: input }).matchAll(
-        /<g data-team="([^"]*)"[^>]*data-x="([^"]*)" data-y="([^"]*)"/g,
-      ),
-    ];
+    const markers = (frame: number) => {
+      return [
+        ..._render({ frame: frame, input: input }).matchAll(
+          /<g data-team="([^"]*)"[^>]*data-x="([^"]*)" data-y="([^"]*)"/g,
+        ),
+      ];
+    };
     const before = markers(24);
     const final = markers(150);
     assert.equal(final.length, input.teams.length);
@@ -76,9 +78,9 @@ test("one team lifts its own marker from maximum initial concentration, preservi
     const carried = _render({ frame: 70, input: input });
     const marker =
       markers(70)[
-        input.teams.findIndex(
-          (team) => team.initialPlaceId !== team.agreedPlaceId,
-        )
+        input.teams.findIndex((team) => {
+          return team.initialPlaceId !== team.agreedPlaceId;
+        })
       ];
     assert.ok(marker);
     const hand = carried.match(/<circle data-team-hand[^>]*>/);
@@ -91,12 +93,14 @@ test("one team lifts its own marker from maximum initial concentration, preservi
       SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cy" }),
       Number(marker[3]),
     );
-    const target = input.places.find(
-      (place) =>
+    const target = input.places.find((place) => {
+      return (
         place.id ===
-        input.teams.find((team) => team.initialPlaceId !== team.agreedPlaceId)!
-          .agreedPlaceId,
-    )!;
+        input.teams.find((team) => {
+          return team.initialPlaceId !== team.agreedPlaceId;
+        })!.agreedPlaceId
+      );
+    })!;
     const pointing = _render({ frame: 36, input: input }).match(
       /<circle data-community-hand[^>]*>/,
     );
@@ -136,16 +140,20 @@ function _getVisibleTexts({
     input.scenarioCaption,
     input.communityLabel,
     frame >= 108 ? input.planLabels.agreed : input.planLabels.initial,
-    ...input.places.flatMap((place) => [
-      place.label,
-      place.requestLabel,
-      ...(frame >= 108 &&
-      input.showUnassignedRequests &&
-      !input.teams.some(propEq("agreedPlaceId", place.id))
-        ? [input.planLabels.unassigned]
-        : []),
-    ]),
-    ...input.teams.flatMap((team) => [team.label, team.serviceLabel]),
+    ...input.places.flatMap((place) => {
+      return [
+        place.label,
+        place.requestLabel,
+        ...(frame >= 108 &&
+        input.showUnassignedRequests &&
+        !input.teams.some(propEq("agreedPlaceId", place.id))
+          ? [input.planLabels.unassigned]
+          : []),
+      ];
+    }),
+    ...input.teams.flatMap((team) => {
+      return [team.label, team.serviceLabel];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = [
@@ -183,9 +191,9 @@ test("emitted marker shapes occupy the exact agreed places with separate concent
     ];
     assert.equal(groups.length, input.teams.length);
     groups.forEach((group, index) => {
-      const place = input.places.find(
-        (candidate) => candidate.id === input.teams[index].agreedPlaceId,
-      )!;
+      const place = input.places.find((candidate) => {
+        return candidate.id === input.teams[index].agreedPlaceId;
+      })!;
       const expectedX = 340 + place.x * 270 + (index % 2 === 0 ? -8.5 : 8.5);
       const expectedY = 160 + place.y * 280 + (index < 2 ? -10.5 : 10.5);
       if (input.markerStyle === "wooden-pieces") {
@@ -216,10 +224,12 @@ test("emitted marker shapes occupy the exact agreed places with separate concent
   assert.ok(
     inputSchema.safeParse({
       ...DEFAULT_INPUT,
-      teams: DEFAULT_INPUT.teams.map((team) => ({
-        ...team,
-        serviceLabel: "Advice desk",
-      })),
+      teams: DEFAULT_INPUT.teams.map((team) => {
+        return {
+          ...team,
+          serviceLabel: "Advice desk",
+        };
+      }),
     }).success,
   );
 });

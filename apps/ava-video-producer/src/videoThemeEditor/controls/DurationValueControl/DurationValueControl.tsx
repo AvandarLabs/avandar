@@ -2,6 +2,7 @@ import { Group } from "@mantine/core";
 import { RangeNumberInput } from "../RangeNumberInput";
 import css from "./DurationValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 /** A duration token in frames, with its length in milliseconds beside it. */
 export function DurationValueControl({
@@ -9,7 +10,7 @@ export function DurationValueControl({
   definition,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const frames = typeof value === "number" ? value : 0;
   const milliseconds = Math.round((frames / 30) * 1000);
   return (

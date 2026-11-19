@@ -56,7 +56,9 @@ test("connectors terminate on card boundaries, including vertical and diagonal p
   const diagonal = edgeEndpoints(a, { ...a, x: 300, y: 300 });
   assert.deepEqual(diagonal.start, { x: 90, y: 80 });
   assert.deepEqual(diagonal.end, { x: 310, y: 300 });
-  assert.throws(() => edgeEndpoints(a, a), /share a center/);
+  assert.throws(() => {
+    return edgeEndpoints(a, a);
+  }, /share a center/);
 });
 
 test("short graph cards reserve connector clearance without changing size during animation", () => {
@@ -102,29 +104,37 @@ test("graph validates references and ordering, while traversal is deterministic 
   assert.equal(edgeHighlight(59, edge, beats), 0);
   assert.equal(edgeHighlight(100, edge, beats), 1);
   assert.equal(nodeHighlight(40, "a", beats), 1);
-  assert.throws(
-    () => validateGraph(nodes, [{ ...edge, to: "missing" }]),
-    /Invalid graph edge/,
-  );
-  assert.throws(() => validateGraph([...nodes, nodes[0]], []), /Duplicate/);
-  assert.throws(
-    () => validateGraph(nodes, [edge], [...beats].reverse()),
-    /increasing/,
-  );
+  assert.throws(() => {
+    return validateGraph(nodes, [{ ...edge, to: "missing" }]);
+  }, /Invalid graph edge/);
+  assert.throws(() => {
+    return validateGraph([...nodes, nodes[0]], []);
+  }, /Duplicate/);
+  assert.throws(() => {
+    return validateGraph(nodes, [edge], [...beats].reverse());
+  }, /increasing/);
 });
 
 test("flowchart routes sequential nodes along a serpentine grid without losing input order", () => {
-  const steps = Array.from({ length: 6 }, (_, index) => ({
-    id: String(index),
-    label: String(index),
-  }));
+  const steps = Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: String(index),
+      label: String(index),
+    };
+  });
   const nodes = flowNodes(steps);
   assert.deepEqual(
-    nodes.map(({ id }) => id),
-    steps.map(({ id }) => id),
+    nodes.map(({ id }) => {
+      return id;
+    }),
+    steps.map(({ id }) => {
+      return id;
+    }),
   );
   assert.deepEqual(
-    nodes.map(({ x, y }) => [x, y]),
+    nodes.map(({ x, y }) => {
+      return [x, y];
+    }),
     [
       [0, 0],
       [0.5, 0],
@@ -135,10 +145,14 @@ test("flowchart routes sequential nodes along a serpentine grid without losing i
     ],
   );
   assert.deepEqual(
-    flowNodes(steps.slice(0, 1)).map(({ x, y }) => [x, y]),
+    flowNodes(steps.slice(0, 1)).map(({ x, y }) => {
+      return [x, y];
+    }),
     [[0.5, 0.5]],
   );
-  assert.throws(() => flowNodes([]), /1 to 6/);
+  assert.throws(() => {
+    return flowNodes([]);
+  }, /1 to 6/);
 });
 
 test("metric formatting preserves fractional values, negatives, grouping, and zero", () => {
@@ -146,8 +160,12 @@ test("metric formatting preserves fractional values, negatives, grouping, and ze
   assert.equal(formatMetric(-12.5, 1), "-12.5");
   assert.equal(formatMetric(-0.001, 2), "0.00");
   assert.equal(formatMetric(0), "0");
-  assert.throws(() => formatMetric(Infinity), /finite/);
-  assert.throws(() => formatMetric(1, 7), /precision/);
+  assert.throws(() => {
+    return formatMetric(Infinity);
+  }, /finite/);
+  assert.throws(() => {
+    return formatMetric(1, 7);
+  }, /precision/);
 });
 
 test("metric fitting reserves the complete stack on a compact captioned canvas", () => {
@@ -195,10 +213,9 @@ test("metric fitting reserves the complete stack on a compact captioned canvas",
   assert.ok(
     withUnit.requiredHeight <= bounds.height && withUnit.unitSize >= 28,
   );
-  assert.throws(
-    () => fitMetricContent({ ...bounds, ...content, height: 100 }),
-    /cannot fit legibly/,
-  );
+  assert.throws(() => {
+    return fitMetricContent({ ...bounds, ...content, height: 100 });
+  }, /cannot fit legibly/);
 });
 
 test("metric fitting preserves the spacious layout when the whole stack fits", () => {
@@ -232,13 +249,12 @@ test("typography wraps at word boundaries and resolves a stable readable size", 
     fit.lines.join(" "),
     "A clear explanation stays readable across the whole canvas Every word has a purpose",
   );
-  fit.lines.forEach((line) =>
-    assert.ok(textUnits(line) * fit.fontSize <= 1000),
-  );
-  assert.throws(
-    () => fitTextLines(["W".repeat(100)], 200, 300, 92),
-    /cannot fit legibly/,
-  );
+  fit.lines.forEach((line) => {
+    return assert.ok(textUnits(line) * fit.fontSize <= 1000);
+  });
+  assert.throws(() => {
+    return fitTextLines(["W".repeat(100)], 200, 300, 92);
+  }, /cannot fit legibly/);
 });
 
 test("media accepts only public-relative assets and crop rectangles inside the viewport", () => {
@@ -258,17 +274,17 @@ test("media accepts only public-relative assets and crop rectangles inside the v
     "a.png#anchor",
     "data:image/png,abc",
   ]) {
-    assert.throws(() => safePublicPath(path), /public-relative/);
+    assert.throws(() => {
+      return safePublicPath(path);
+    }, /public-relative/);
   }
   assertRect({ x: 0.2, y: 0.1, width: 0.8, height: 0.9 }, "crop");
-  assert.throws(
-    () => assertRect({ x: 0.8, y: 0, width: 0.3, height: 1 }, "crop"),
-    /inside/,
-  );
-  assert.throws(
-    () => assertRect({ x: 0, y: 0, width: 0, height: 1 }, "crop"),
-    /nonempty/,
-  );
+  assert.throws(() => {
+    return assertRect({ x: 0.8, y: 0, width: 0.3, height: 1 }, "crop");
+  }, /inside/);
+  assert.throws(() => {
+    return assertRect({ x: 0, y: 0, width: 0, height: 1 }, "crop");
+  }, /nonempty/);
 });
 
 test("captions use exact half-open cue boundaries and reject overlap or duplicate ids", () => {
@@ -282,14 +298,12 @@ test("captions use exact half-open cue boundaries and reject overlap or duplicat
   assert.equal(activeCaption(39, cues)?.id, "a");
   assert.equal(activeCaption(40, cues)?.id, "b");
   assert.equal(activeCaption(80, cues), undefined);
-  assert.throws(
-    () => validateCaptions([{ ...cues[0], endFrame: 41 }, cues[1]]),
-    /overlap/,
-  );
-  assert.throws(
-    () => validateCaptions([cues[0], { ...cues[1], id: "a" }]),
-    /Duplicate/,
-  );
+  assert.throws(() => {
+    return validateCaptions([{ ...cues[0], endFrame: 41 }, cues[1]]);
+  }, /overlap/);
+  assert.throws(() => {
+    return validateCaptions([cues[0], { ...cues[1], id: "a" }]);
+  }, /Duplicate/);
 });
 
 test("the tallest caption reserves its full box, inset and clearance without resizing the scene", () => {

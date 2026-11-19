@@ -26,15 +26,17 @@ export function BackfillChart({
             width={480 / input.eventBins.length}
             prior={items.filter(propEq("firstSnapshot", 0)).length}
             revised={items.length}
-            height={items.reduce((sum, item) => sum + 18 * item.progress, 0)}
+            height={items.reduce((sum, item) => {
+              return sum + 18 * item.progress;
+            }, 0)}
             showPrior={input.showPriorOutline}
             accent={accent}
           />
         );
       })}
-      {records.map((record) => (
-        <ReceiptToken key={record.id} record={record} accent={accent} />
-      ))}
+      {records.map((record) => {
+        return <ReceiptToken key={record.id} record={record} accent={accent} />;
+      })}
     </g>
   );
 }

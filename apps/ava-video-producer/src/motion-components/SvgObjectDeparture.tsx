@@ -5,7 +5,9 @@ import type { MotionRect } from "./AnchoredOverlay";
 import type { MotionOptions } from "./motionSettings";
 import type { ReactNode } from "react";
 
-/** Authored cutout and its departure vector, in the parent SVG's coordinates. */
+/**
+ * Authored cutout and its departure vector, in the parent SVG's coordinates.
+ */
 export type ObjectFlight = {
   at: number;
   duration: number;
@@ -15,8 +17,22 @@ export type ObjectFlight = {
   motion?: MotionOptions;
 };
 
-/** Deterministic departure geometry. Its active flag can drive DiagramCamera blurActive. */
-export function getObjectFlight(flight: ObjectFlight, frame: number) {
+/** A departing object's offset, opacity, and whether it is still moving. */
+export type ObjectFlightPose = {
+  x: number;
+  y: number;
+  opacity: number;
+  active: boolean;
+};
+
+/**
+ * Deterministic departure geometry. Its active flag can drive DiagramCamera
+ * blurActive.
+ */
+export function getObjectFlight(
+  flight: ObjectFlight,
+  frame: number,
+): ObjectFlightPose {
   if (frame < flight.at) return { x: 0, y: 0, opacity: 1, active: false };
   const duration = getMotionDuration(flight.duration, flight.motion);
   const progress = getMotionProgress(
@@ -34,7 +50,10 @@ export function getObjectFlight(flight: ObjectFlight, frame: number) {
   };
 }
 
-/** Isolate a vector object for independent travel. Never pass live product components. */
+/**
+ * Isolate a vector object for independent travel. Never pass live product
+ * components.
+ */
 export function SvgObjectDeparture({
   children,
   frame,
@@ -47,7 +66,7 @@ export function SvgObjectDeparture({
   flight: ObjectFlight;
   width?: number;
   height?: number;
-}) {
+}): ReactNode {
   const identity = `departure-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   if (frame < flight.at) return children;
   const pose = getObjectFlight(flight, frame);

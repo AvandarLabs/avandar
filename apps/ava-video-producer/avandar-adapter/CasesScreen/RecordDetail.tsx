@@ -4,6 +4,7 @@ import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualVi
 import { enter } from "../../src/motion";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
+import type { ReactNode } from "react";
 
 type Props = {
   frame: number;
@@ -21,7 +22,7 @@ function _ignoreSubmit(): Promise<boolean> {
  * the real details rail and the real update composer. Nothing is posted or
  * saved; the composer only appears.
  */
-export function RecordDetail({ frame, caseLabel, fields }: Props) {
+export function RecordDetail({ frame, caseLabel, fields }: Props): ReactNode {
   const attributes: CaseDetailsRow[] = fields.map((field) => {
     return {
       id: field.name as ConceptAttribute.Id,

@@ -57,7 +57,9 @@ export function getWidgetRectFromInput({
   const slot = _getWidgetSlotFromInput({ input, widgetId });
   const featured = widgetId === input.featuredWidgetId;
   const position = input.widgets
-    .filter((widget) => widget.id !== input.featuredWidgetId)
+    .filter((widget) => {
+      return widget.id !== input.featuredWidgetId;
+    })
     .findIndex(propEq("id", widgetId));
   const progress = ramp(
     frame,

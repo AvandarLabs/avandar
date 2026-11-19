@@ -28,33 +28,35 @@ export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g data-energy-equation="true">
-      {terms.map(({ label, value, operator }, index) => (
-        <g key={index}>
-          <FitText
-            text={label}
-            x={32 + index * 152}
-            y={455}
-            width={124}
-            fontSize={12}
-            maxLines={4}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(value)}
-            x={32 + index * 152}
-            y={530}
-            width={124}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <Text x={164 + index * 152} y={539} size={16} fill={STOCK.muted}>
-            {operator}
-          </Text>
-        </g>
-      ))}
+      {terms.map(({ label, value, operator }, index) => {
+        return (
+          <g key={index}>
+            <FitText
+              text={label}
+              x={32 + index * 152}
+              y={455}
+              width={124}
+              fontSize={12}
+              maxLines={4}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <FitText
+              text={String(value)}
+              x={32 + index * 152}
+              y={530}
+              width={124}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <Text x={164 + index * 152} y={539} size={16} fill={STOCK.muted}>
+              {operator}
+            </Text>
+          </g>
+        );
+      })}
     </g>
   );
 }

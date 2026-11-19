@@ -1,6 +1,7 @@
 import { Badge, Group } from "@mantine/core";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   themes: readonly ThemeSummary[];
@@ -17,18 +18,22 @@ export function ThemePicker({
   isDirty,
   isDisabled,
   onSelectTheme,
-}: Props) {
+}: Props): ReactNode {
   return (
     <Group gap="xs" wrap="nowrap">
       <AtlasSelect
         aria-label="Theme"
-        data={themes.map(({ id, label, builtIn }) => ({
-          value: id,
-          label: builtIn ? `${label} (built-in)` : label,
-        }))}
+        data={themes.map(({ id, label, builtIn }) => {
+          return {
+            value: id,
+            label: builtIn ? `${label} (built-in)` : label,
+          };
+        })}
         value={themeId}
         disabled={isDisabled}
-        onChange={(id) => id && onSelectTheme(id)}
+        onChange={(id) => {
+          return id && onSelectTheme(id);
+        }}
       />
       {isDirty ? (
         <Badge size="sm" variant="light">

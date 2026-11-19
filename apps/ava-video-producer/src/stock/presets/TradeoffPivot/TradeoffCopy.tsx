@@ -30,19 +30,21 @@ export function TradeoffCopy({
   ];
   return (
     <g>
-      {labels.map(({ opacity, ...label }, index) => (
-        <g key={index} opacity={opacity} aria-label={label.text}>
-          <FitText
-            {...label}
-            x={480}
-            width={840}
-            maxLines={2}
-            breakLongWords
-            normalizeWhitespace
-            anchor="middle"
-          />
-        </g>
-      ))}
+      {labels.map(({ opacity, ...label }, index) => {
+        return (
+          <g key={index} opacity={opacity} aria-label={label.text}>
+            <FitText
+              {...label}
+              x={480}
+              width={840}
+              maxLines={2}
+              breakLongWords
+              normalizeWhitespace
+              anchor="middle"
+            />
+          </g>
+        );
+      })}
       <DrawPath
         d="M330 520 H630"
         frame={frame}

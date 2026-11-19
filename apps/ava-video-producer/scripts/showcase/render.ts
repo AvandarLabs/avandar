@@ -172,9 +172,12 @@ export async function renderFilm(
       puppeteerInstance: browser,
       ...options,
       envVariables: {},
-      onStart: () => progress("Rendering frames…"),
-      onFrameUpdate: (count) =>
-        progress(`Rendering frame ${count} of ${film.frames}…`),
+      onStart: () => {
+        return progress("Rendering frames…");
+      },
+      onFrameUpdate: (count) => {
+        return progress(`Rendering frame ${count} of ${film.frames}…`);
+      },
     });
   } finally {
     await browser.close({ silent: true });

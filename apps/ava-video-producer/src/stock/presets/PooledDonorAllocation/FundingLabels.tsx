@@ -18,32 +18,36 @@ export function FundingLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize, maxLines], index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={fontSize}
-          maxLines={maxLines}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
-      {input.contributions.map((donor, index) => (
-        <FitText
-          key={donor.id}
-          text={donor.donorLabel}
-          x={40 + (index * 880) / input.contributions.length}
-          y={83}
-          width={880 / input.contributions.length - 22}
-          fontSize={12}
-          maxLines={3}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map(([text, x, y, width, fontSize, maxLines], index) => {
+        return (
+          <FitText
+            key={index}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={fontSize}
+            maxLines={maxLines}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
+      {input.contributions.map((donor, index) => {
+        return (
+          <FitText
+            key={donor.id}
+            text={donor.donorLabel}
+            x={40 + (index * 880) / input.contributions.length}
+            y={83}
+            width={880 / input.contributions.length - 22}
+            fontSize={12}
+            maxLines={3}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

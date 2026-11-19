@@ -49,8 +49,9 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(48),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
 
     [input.requests, input.contributions].forEach((items) => {
       if (
@@ -73,7 +74,9 @@ export const inputSchema = z
       );
     }
     if (
-      input.contributions.reduce((sum, item) => sum + item.credits, 0) > 14 ||
+      input.contributions.reduce((sum, item) => {
+        return sum + item.credits;
+      }, 0) > 14 ||
       !input.contributions.some(propEq("earmarkedRequestId", null)) ||
       !input.contributions.some(propNotEq("earmarkedRequestId", null))
     ) {
@@ -85,7 +88,9 @@ export const inputSchema = z
     input.contributions.forEach((item) => {
       if (
         item.earmarkedRequestId !== null &&
-        !input.requests.some(({ id }) => id === item.earmarkedRequestId)
+        !input.requests.some(({ id }) => {
+          return id === item.earmarkedRequestId;
+        })
       ) {
         issue(
           "contributions",
@@ -94,20 +99,25 @@ export const inputSchema = z
       }
       if (
         input.allocations
-          .filter(({ contributionId }) => contributionId === item.id)
-          .reduce((sum, allocation) => sum + allocation.credits, 0) >
-        item.credits
+          .filter(({ contributionId }) => {
+            return contributionId === item.id;
+          })
+          .reduce((sum, allocation) => {
+            return sum + allocation.credits;
+          }, 0) > item.credits
       ) {
         issue("allocations", "Allocations may not overspend a contribution.");
       }
     });
     input.allocations.forEach((allocation, index) => {
-      const contributor = input.contributions.find(
-        ({ id }) => id === allocation.contributionId,
-      );
+      const contributor = input.contributions.find(({ id }) => {
+        return id === allocation.contributionId;
+      });
       if (
         !contributor ||
-        !input.requests.some(({ id }) => id === allocation.requestId) ||
+        !input.requests.some(({ id }) => {
+          return id === allocation.requestId;
+        }) ||
         (contributor.earmarkedRequestId !== null &&
           contributor.earmarkedRequestId !== allocation.requestId)
       ) {
@@ -117,22 +127,22 @@ export const inputSchema = z
         );
       }
       if (
-        input.allocations
-          .slice(0, index)
-          .some(
-            (prior) =>
-              prior.contributionId === allocation.contributionId &&
-              prior.requestId === allocation.requestId,
-          )
+        input.allocations.slice(0, index).some((prior) => {
+          return (
+            prior.contributionId === allocation.contributionId &&
+            prior.requestId === allocation.requestId
+          );
+        })
       ) {
         issue("allocations", "Contribution/request pairs must be unique.");
       }
     });
     if (
-      input.requests.some(
-        ({ id }) =>
-          !input.allocations.some(({ requestId }) => id === requestId),
-      )
+      input.requests.some(({ id }) => {
+        return !input.allocations.some(({ requestId }) => {
+          return id === requestId;
+        });
+      })
     ) {
       issue("allocations", "Every request must receive at least one credit.");
     }

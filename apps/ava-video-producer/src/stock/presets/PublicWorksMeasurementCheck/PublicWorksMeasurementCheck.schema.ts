@@ -32,8 +32,11 @@ export const inputSchema = z
     }),
   })
   .refine(
-    (input) =>
-      new Set(input.observers.map(prop("id"))).size === input.observers.length,
+    (input) => {
+      return (
+        new Set(input.observers.map(prop("id"))).size === input.observers.length
+      );
+    },
     { path: ["observers"], message: "Observer IDs must be unique." },
   ) satisfies z.ZodType;
 /** Schema-inferred scene input. */

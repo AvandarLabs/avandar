@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type ReactNode } from "react";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import { isTokenReference } from "../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { humanizeScaleKey } from "../../customScaleKey/customScaleKey";
@@ -29,7 +29,10 @@ export type Props = Readonly<{
   /** Empty for the token itself, or the composite field, such as `["size"]`. */
   fieldPath: readonly string[];
   kind: TokenKind;
-  /** The field's authored value: a reference, a literal, or undefined when unset. */
+  /**
+   * The field's authored value: a reference, a literal, or undefined when
+   * unset.
+   */
   value: unknown;
   /** The token's whole authored value, for writing one field of a composite. */
   tokenValue: unknown;
@@ -72,20 +75,18 @@ function useReferenceOptions({
 >): readonly ReferenceOption[] {
   const { rows, theme } = useTokenEditor();
   const isCameraCurve = isCameraCurveToken(tokenPath, fieldPath);
-  return useMemo(
-    () =>
-      orderReferenceOptions({
-        referenceOptions: listReferenceOptions({
-          kind,
-          excludePath: tokenPath,
-          rows,
-          theme,
-          isCameraCurve,
-        }),
-        current: value,
+  return useMemo(() => {
+    return orderReferenceOptions({
+      referenceOptions: listReferenceOptions({
+        kind,
+        excludePath: tokenPath,
+        rows,
+        theme,
+        isCameraCurve,
       }),
-    [kind, tokenPath, value, rows, theme, isCameraCurve],
-  );
+      current: value,
+    });
+  }, [kind, tokenPath, value, rows, theme, isCameraCurve]);
 }
 
 /** Each option's colour chip, keyed by its reference. Only colours have one. */
@@ -93,16 +94,21 @@ function _buildChipsFromOptions(
   options: readonly ReferenceOption[],
 ): Map<string, string | undefined> {
   return new Map(
-    options.map((option) => [
-      option.reference,
-      option.kind === "color" && typeof option.value === "string"
-        ? option.value
-        : undefined,
-    ]),
+    options.map((option) => {
+      return [
+        option.reference,
+        option.kind === "color" && typeof option.value === "string"
+          ? option.value
+          : undefined,
+      ];
+    }),
   );
 }
 
-/** The picker's items, plus a disabled one naming a reference that no longer resolves. */
+/**
+ * The picker's items, plus a disabled one naming a reference that no longer
+ * resolves.
+ */
 function _buildSelectData(
   input: Readonly<{
     options: readonly ReferenceOption[];
@@ -112,10 +118,12 @@ function _buildSelectData(
   }>,
 ) {
   const { options, toLabel, unresolved, isColor } = input;
-  const data = options.map((option) => ({
-    value: option.reference,
-    label: toLabel(option),
-  }));
+  const data = options.map((option) => {
+    return {
+      value: option.reference,
+      label: toLabel(option),
+    };
+  });
   return unresolved
     ? [
         ...data,
@@ -144,7 +152,7 @@ export function ReferenceControl({
   value,
   onChange,
   ...customValueProps
-}: Props) {
+}: Props): ReactNode {
   const toLabel = useOptionLabel();
   const options = useReferenceOptions({ kind, tokenPath, fieldPath, value });
   const hasIssue = useRowHasIssue();
@@ -164,12 +172,14 @@ export function ReferenceControl({
         value={isTokenReference(value) ? value : null}
         placeholder={value === undefined ? "Not set" : "Custom value"}
         nothingFoundMessage="No matching settings"
-        onChange={(pickedReference) =>
-          pickedReference && onChange(pickedReference)
-        }
-        renderOption={({ option }) => (
-          <OptionRow label={option.label} chip={chips.get(option.value)} />
-        )}
+        onChange={(pickedReference) => {
+          return pickedReference && onChange(pickedReference);
+        }}
+        renderOption={({ option }) => {
+          return (
+            <OptionRow label={option.label} chip={chips.get(option.value)} />
+          );
+        }}
       />
       {unresolved ? (
         <PickAnotherButton

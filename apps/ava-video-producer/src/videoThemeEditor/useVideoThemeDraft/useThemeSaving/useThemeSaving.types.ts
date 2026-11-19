@@ -1,6 +1,8 @@
 import type { VideoThemeIssue } from "../../../videoTheme/videoTheme.types";
 
-/** What a refused theme request reports: the HTTP status and the schema issues. */
+/**
+ * What a refused theme request reports: the HTTP status and the schema issues.
+ */
 type ThemeSaveFailure = Readonly<{
   status: number;
   issues: readonly VideoThemeIssue[];

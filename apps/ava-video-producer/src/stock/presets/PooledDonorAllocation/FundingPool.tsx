@@ -15,7 +15,9 @@ export function FundingPool({
   tokens,
   accent,
 }: Readonly<Props>): ReactNode {
-  const remaining = tokens.filter(({ owner }) => owner === "pool").length;
+  const remaining = tokens.filter(({ owner }) => {
+    return owner === "pool";
+  }).length;
   return (
     <g>
       <rect

@@ -6,6 +6,7 @@ import { ContinuityContent } from "./ContinuityContent";
 import css from "./ContinuityScene.module.css";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   beat: ContinuityBeat;
@@ -14,7 +15,11 @@ type Props = {
 };
 
 /** A single editorial or native-product beat in a continuity film. */
-export function ContinuityBeatView({ beat, accent, productScene }: Props) {
+export function ContinuityBeatView({
+  beat,
+  accent,
+  productScene,
+}: Props): ReactNode {
   const frame = useCurrentFrame();
   const heading = useVideoProps("Heading", {});
   const motion = useVideoMotion();

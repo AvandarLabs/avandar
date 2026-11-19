@@ -16,7 +16,10 @@ const SHORT_TEXT_LIMIT = 140;
 const LONG_TEXT_LIMIT = 356;
 const PILL_TEXT_PADDING = 20;
 
-/** The badge width for a measured text width, or undefined when the text needs a card. */
+/**
+ * The badge width for a measured text width, or undefined when the text needs a
+ * card.
+ */
 function _buildPillWidthFromTextWidth(textWidth: number): number | undefined {
   if (textWidth <= SHORT_TEXT_LIMIT) {
     return SHORT_PILL_WIDTH;

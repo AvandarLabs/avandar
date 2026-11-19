@@ -19,6 +19,7 @@ import {
   SOURCE_WIDTH,
 } from "./SourceMerge.constants";
 import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.schema";
+import type { ReactNode } from "react";
 
 type Source = SourceMergeInput["sources"][number];
 
@@ -30,8 +31,16 @@ type Props = Readonly<{
   showPackets: boolean;
 }>;
 
-/** One source: its edge into the merge node, packets, and its labelled panel. */
-export function SourceRow({ source, index, frame, color, showPackets }: Props) {
+/**
+ * One source: its edge into the merge node, packets, and its labelled panel.
+ */
+export function SourceRow({
+  source,
+  index,
+  frame,
+  color,
+  showPackets,
+}: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
   const { layout } = useGraphicTokens();
   const x = layout.graphic.margin;

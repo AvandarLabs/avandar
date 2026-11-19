@@ -94,7 +94,9 @@ export const inputSchema = z
       });
     }
     items.forEach((item) => {
-      const part = input.sentenceParts.find(({ id }) => id === item.partId);
+      const part = input.sentenceParts.find(({ id }) => {
+        return id === item.partId;
+      });
       const label = _normalizePhrase(item.label);
       if (!part || !label || !_normalizePhrase(part.text).includes(label)) {
         context.addIssue({
@@ -107,13 +109,16 @@ export const inputSchema = z
     });
     const entities = new Set(input.draft.entities.map(prop("id")));
     if (
-      input.draft.relationships.some(
-        (item) =>
+      input.draft.relationships.some((item) => {
+        return (
           !entities.has(item.fromEntityId) ||
           !entities.has(item.toEntityId) ||
-          item.fromEntityId === item.toEntityId,
-      ) ||
-      input.draft.attributes.some((item) => !entities.has(item.entityId))
+          item.fromEntityId === item.toEntityId
+        );
+      }) ||
+      input.draft.attributes.some((item) => {
+        return !entities.has(item.entityId);
+      })
     ) {
       context.addIssue({
         code: "custom",

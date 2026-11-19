@@ -1,6 +1,8 @@
 import { BODY_Y } from "../../chrome/chrome";
 
-/** Total length, in frames, of the Demo clip's body (excluding the title card). */
+/**
+ * Total length, in frames, of the Demo clip's body (excluding the title card).
+ */
 export const DEMO_LEN = 414;
 
 /* ------------------------------------------------------------ beat sheet -- */

@@ -25,26 +25,30 @@ export function WaterOutlets({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {outlets.map((outlet) => (
-        <g key={outlet.id}>
-          <path
-            data-outlet={outlet.id}
-            d={outlet.path}
-            fill="none"
-            stroke={outlet.color}
-            strokeWidth={3}
-            opacity={outlet.amount > 0 ? progress : 0}
-          />
-          <rect
-            data-water-pool={outlet.id}
-            x={outlet.x}
-            y={400}
-            width={((140 * outlet.amount) / input.event.incomingM3) * progress}
-            height={12}
-            fill={outlet.color}
-          />
-        </g>
-      ))}
+      {outlets.map((outlet) => {
+        return (
+          <g key={outlet.id}>
+            <path
+              data-outlet={outlet.id}
+              d={outlet.path}
+              fill="none"
+              stroke={outlet.color}
+              strokeWidth={3}
+              opacity={outlet.amount > 0 ? progress : 0}
+            />
+            <rect
+              data-water-pool={outlet.id}
+              x={outlet.x}
+              y={400}
+              width={
+                ((140 * outlet.amount) / input.event.incomingM3) * progress
+              }
+              height={12}
+              fill={outlet.color}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

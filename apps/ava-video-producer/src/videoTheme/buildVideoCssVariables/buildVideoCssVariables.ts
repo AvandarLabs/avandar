@@ -24,7 +24,9 @@ import type {
 const UNSTYLED_GROUPS = new Set(["motion", "camera", "motionBlur", "sketch"]);
 
 function _kebab(segment: string): string {
-  return segment.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  return segment.replace(/[A-Z]/g, (letter) => {
+    return `-${letter.toLowerCase()}`;
+  });
 }
 
 function _typeStyleVariables(
@@ -66,10 +68,9 @@ function _elevationVariables(
 
 function _boxVariables(name: string, box: ResolvedBox): Record<string, string> {
   return Object.fromEntries(
-    Object.entries(box).map(([side, pixels]) => [
-      `${name}-${side}`,
-      `${String(pixels)}px`,
-    ]),
+    Object.entries(box).map(([side, pixels]) => {
+      return [`${name}-${side}`, `${String(pixels)}px`];
+    }),
   );
 }
 
@@ -149,7 +150,9 @@ export function buildVideoCssVariables(
   theme: ResolvedVideoTheme,
 ): Record<string, string> {
   const variableSets = listTokenDefinitions()
-    .filter(({ path, isScale }) => !_isSkippedPath(path, isScale))
+    .filter(({ path, isScale }) => {
+      return !_isSkippedPath(path, isScale);
+    })
     .flatMap(({ path, definition }) => {
       const value = getResolvedTokenValue(theme, path);
       return value === undefined
@@ -163,6 +166,8 @@ export function buildVideoCssVariables(
           ];
     });
   return Object.fromEntries(
-    variableSets.flatMap((variables) => Object.entries(variables)),
+    variableSets.flatMap((variables) => {
+      return Object.entries(variables);
+    }),
   );
 }

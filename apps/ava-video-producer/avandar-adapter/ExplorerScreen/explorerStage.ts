@@ -67,13 +67,42 @@ export const EXPLORER_BEATS = [
   { frame: 650, target: "explorer-viz-type", action: "click" },
 ] as const;
 
+/** What the explorer film shows on one frame. */
+type ExplorerStage = {
+  time: number;
+  isAggregate: boolean;
+  isChart: boolean;
+  isVisualizations: boolean;
+  isSql: boolean;
+  isEditingSql: boolean;
+  drawerProgress: number;
+  hasFilterRule: boolean;
+  filterColumn: string;
+  filterText: string;
+  filterCommitted: boolean;
+  sql: string;
+};
+
+type ExplorerBeat = (typeof EXPLORER_BEATS)[number];
+
+/** An explorer beat with a mutable frame in a focused variant's local time. */
+type LocalExplorerBeat<Beat extends ExplorerBeat = ExplorerBeat> =
+  Beat extends unknown
+    ? {
+        -readonly [Key in keyof Beat]: Key extends "frame" ? number : Beat[Key];
+      }
+    : never;
+
 /**
  * Works out what the explorer film shows on a frame: which panels are open,
  * the filter being typed, and the SQL in the editor. A focused `mode` plays
  * one part of the full sequence from its own frame 0 and holds its completed
  * state. Called by `ExplorerScreen` on every frame.
  */
-export function explorerStage(frame: number, mode: ExplorerMode = "full") {
+export function explorerStage(
+  frame: number,
+  mode: ExplorerMode = "full",
+): ExplorerStage {
   const time =
     mode === "query"
       ? Math.min(610, frame + 290)
@@ -109,15 +138,20 @@ export function explorerStage(frame: number, mode: ExplorerMode = "full") {
 }
 
 /** Return the same click list in the local coordinates of a focused variant. */
-export function explorerBeats(mode: ExplorerMode = "full") {
+export function explorerBeats(
+  mode: ExplorerMode = "full",
+): LocalExplorerBeat[] {
   const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
-  return EXPLORER_BEATS.filter(
-    (beat) =>
+  return EXPLORER_BEATS.filter((beat) => {
+    return (
       mode === "full" ||
       (mode === "filter"
         ? beat.frame < 290
         : mode === "query"
           ? beat.frame >= 290 && beat.frame <= 570
-          : beat.frame >= 620),
-  ).map((beat) => ({ ...beat, frame: beat.frame - offset }));
+          : beat.frame >= 620)
+    );
+  }).map((beat) => {
+    return { ...beat, frame: beat.frame - offset };
+  });
 }

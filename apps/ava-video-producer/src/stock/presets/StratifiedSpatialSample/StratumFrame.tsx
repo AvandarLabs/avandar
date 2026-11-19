@@ -20,16 +20,18 @@ export function StratumFrame({
         rx={8}
         fill={STOCK.surface}
       />
-      {input.strata.map((stratum, index) => (
-        <StratumRegion
-          key={stratum.id}
-          input={input}
-          stratum={stratum}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.strata.map((stratum, index) => {
+        return (
+          <StratumRegion
+            key={stratum.id}
+            input={input}
+            stratum={stratum}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

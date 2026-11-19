@@ -16,11 +16,13 @@ export function InvalidTableQuarantine({
   const isReplaced = input.reload.performed && frame >= 112;
   const rows = isReplaced
     ? input.reload.rows
-    : input.originalRows.map((value, index) =>
-        frame >= 46 && input.showAttempt && index === input.attempt.rowIndex
+    : input.originalRows.map((value, index) => {
+        return frame >= 46 &&
+          input.showAttempt &&
+          index === input.attempt.rowIndex
           ? input.attempt.replacement
-          : value,
-      );
+          : value;
+      });
   const closing = ramp(frame, 13, 32, EASE.inOut),
     opening = input.reload.performed ? ramp(frame, 113, 26, EASE.inOut) : 0;
   const height = 300 * closing * (1 - opening),

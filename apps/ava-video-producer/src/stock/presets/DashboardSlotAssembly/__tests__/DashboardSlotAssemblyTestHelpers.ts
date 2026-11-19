@@ -33,14 +33,16 @@ function _getVisibleTextsFromInput({
   return [
     input.boardTitle,
     ...(input.scopeLabel ? [input.scopeLabel] : []),
-    ...input.widgets.flatMap((widget) => [widget.title, ...widget.lines]),
+    ...input.widgets.flatMap((widget) => {
+      return [widget.title, ...widget.lines];
+    }),
   ];
 }
 
 function _getPanelsFromMarkup(markup: string): string[] {
-  return (markup.match(/<[^>]+>/g) ?? []).filter((element) =>
-    element.includes("data-widget="),
-  );
+  return (markup.match(/<[^>]+>/g) ?? []).filter((element) => {
+    return element.includes("data-widget=");
+  });
 }
 
 function _getPanelFromMarkup({
@@ -50,9 +52,9 @@ function _getPanelFromMarkup({
   markup: string;
   id: string;
 }): string {
-  const element = _getPanelsFromMarkup(markup).find((item) =>
-    item.includes(`data-widget="${id}"`),
-  );
+  const element = _getPanelsFromMarkup(markup).find((item) => {
+    return item.includes(`data-widget="${id}"`);
+  });
   assert.ok(element, id);
   return element;
 }

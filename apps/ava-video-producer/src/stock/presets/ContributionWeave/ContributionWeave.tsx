@@ -36,31 +36,37 @@ export function ContributionWeave({
     <g>
       <rect {...LOOM} opacity={ramp(frame, 12, 12)} />
       <defs>
-        {[...input.warp, ...input.weft].map((contributor, index) => (
-          <WeaveBandPattern
-            key={contributor.id}
-            id={`${id}-band-${index}`}
-            color={colors[index % 3]}
-            pattern={contributor.pattern}
-          />
-        ))}
+        {[...input.warp, ...input.weft].map((contributor, index) => {
+          return (
+            <WeaveBandPattern
+              key={contributor.id}
+              id={`${id}-band-${index}`}
+              color={colors[index % 3]}
+              pattern={contributor.pattern}
+            />
+          );
+        })}
       </defs>
-      {input.warp.map((contributor, index) => (
-        <WeaveWarp
-          key={contributor.id}
-          contributor={contributor}
-          index={index}
-          {...warpProps}
-        />
-      ))}
-      {input.weft.map((contributor, index) => (
-        <WeaveShuttle
-          key={contributor.id}
-          contributor={contributor}
-          index={index}
-          {...shuttleProps}
-        />
-      ))}
+      {input.warp.map((contributor, index) => {
+        return (
+          <WeaveWarp
+            key={contributor.id}
+            contributor={contributor}
+            index={index}
+            {...warpProps}
+          />
+        );
+      })}
+      {input.weft.map((contributor, index) => {
+        return (
+          <WeaveShuttle
+            key={contributor.id}
+            contributor={contributor}
+            index={index}
+            {...shuttleProps}
+          />
+        );
+      })}
       {input.showLabels ? <WeaveCaptions copy={input.copy} /> : undefined}
     </g>
   );

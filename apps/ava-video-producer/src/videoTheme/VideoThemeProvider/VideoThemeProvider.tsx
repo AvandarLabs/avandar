@@ -8,7 +8,10 @@ import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 type Props = Readonly<{
   source: VideoThemeSource;
   children: ReactNode;
-  /** `none` renders no wrapper, for use inside an SVG; CSS variables are then unset. */
+  /**
+   * `none` renders no wrapper, for use inside an SVG; CSS variables are then
+   * unset.
+   */
   element?: "div" | "none";
 }>;
 
@@ -39,12 +42,13 @@ export function VideoThemeProvider({
   source,
   children,
   element = "div",
-}: Props) {
-  const theme = useMemo(
-    () => makeResolvedVideoThemeFromSource(source),
-    [source],
-  );
-  const value = useMemo(() => ({ theme, source }), [theme, source]);
+}: Props): ReactNode {
+  const theme = useMemo(() => {
+    return makeResolvedVideoThemeFromSource(source);
+  }, [source]);
+  const value = useMemo(() => {
+    return { theme, source };
+  }, [theme, source]);
   const style = _styleFromTheme(theme);
   const content = (
     <MantineThemeProvider theme={theme.mantine} inherit={false}>

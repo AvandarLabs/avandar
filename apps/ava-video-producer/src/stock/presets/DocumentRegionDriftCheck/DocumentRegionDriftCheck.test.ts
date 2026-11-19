@@ -17,8 +17,8 @@ import type { PresetAssertions } from "../../../../tests/helpers/registerStockPr
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(DocumentRegionDriftCheck, {
       frame,
       input,
@@ -26,6 +26,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 function _marker({
   markup,
   key,
@@ -35,10 +36,12 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const tag = tags.find((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
   assert.ok(tag, `${key} ${value}`);
   return tag;
 }
@@ -135,24 +138,26 @@ const EXCLUDED_TEXT_FIELDS: string[] = [];
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  input.labels.saved,
-  input.labels.current,
-  input.labels.geometry,
-  input.saved.header,
-  input.saved.fingerprint,
-  input.current.header,
-  input.current.fingerprint,
-  ...(frame >= 139
-    ? [
-        input.saved.header === input.current.header &&
-        input.saved.fingerprint === input.current.fingerprint
-          ? input.labels.matched
-          : input.labels.review,
-      ]
-    : []),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    input.labels.saved,
+    input.labels.current,
+    input.labels.geometry,
+    input.saved.header,
+    input.saved.fingerprint,
+    input.current.header,
+    input.current.fingerprint,
+    ...(frame >= 139
+      ? [
+          input.saved.header === input.current.header &&
+          input.saved.fingerprint === input.current.fingerprint
+            ? input.labels.matched
+            : input.labels.review,
+        ]
+      : []),
+  ];
+};
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -217,8 +222,8 @@ test("saved geometry preserves full boundary extents while comparison captions r
   ["saved", "current"].forEach((side) => {
     const page = _marker({ markup, key: "page-outline", value: side }),
       region = _marker({ markup, key: "saved-region", value: side });
-    ["x", "y", "width", "height"].forEach((attribute) =>
-      assert.equal(
+    ["x", "y", "width", "height"].forEach((attribute) => {
+      return assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: region,
           name: attribute,
@@ -227,8 +232,8 @@ test("saved geometry preserves full boundary extents while comparison captions r
           attributes: page,
           name: attribute,
         }),
-      ),
-    );
+      );
+    });
   });
   const closed = _marker({
       markup: render({ frame: 150 }),

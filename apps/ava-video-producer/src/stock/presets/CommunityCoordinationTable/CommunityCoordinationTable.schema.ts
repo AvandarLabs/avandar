@@ -39,36 +39,39 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(54),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     if (new Set(input.places.map(prop("id"))).size !== input.places.length) {
       issue("places", "Place IDs must be unique.");
     }
     if (new Set(input.teams.map(prop("id"))).size !== input.teams.length) {
       issue("teams", "Team IDs must be unique.");
     }
-    input.places.forEach((place, index) =>
-      input.places.slice(index + 1).forEach((other) => {
+    input.places.forEach((place, index) => {
+      return input.places.slice(index + 1).forEach((other) => {
         if (
           Math.hypot(place.x - other.x, place.y - other.y) <
           0.2 - Number.EPSILON
         ) {
           issue("places", "Place separation must be at least 0.2.");
         }
-      }),
-    );
+      });
+    });
     input.teams.forEach((team) => {
       if (
-        ![team.initialPlaceId, team.agreedPlaceId].every((reference) =>
-          input.places.some(({ id }) => id === reference),
-        )
+        ![team.initialPlaceId, team.agreedPlaceId].every((reference) => {
+          return input.places.some(({ id }) => {
+            return id === reference;
+          });
+        })
       ) {
         issue("teams", "Every place reference must exist.");
       }
     });
-    const moved = input.teams.filter(
-      (team) => team.initialPlaceId !== team.agreedPlaceId,
-    );
+    const moved = input.teams.filter((team) => {
+      return team.initialPlaceId !== team.agreedPlaceId;
+    });
     if (moved.length !== 1) {
       issue("teams", "Exactly one team changes place.");
     }

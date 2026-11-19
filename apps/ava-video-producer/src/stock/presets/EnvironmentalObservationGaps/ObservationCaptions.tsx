@@ -45,46 +45,50 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
   ].filter(isDefined);
   return (
     <g>
-      {labels.map(({ text, x, y, width, maxLines }, index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={maxLines}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
-      {input.fieldChecks.map((check, index) => (
-        <g key={check.id}>
-          <Text x={32 + index * 310} y={479} size={12} fill={STOCK.orange}>
-            {index + 1}
-          </Text>
+      {labels.map(({ text, x, y, width, maxLines }, index) => {
+        return (
           <FitText
-            text={check.label}
-            x={52 + index * 310}
-            y={479}
-            width={270}
+            key={index}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
             fontSize={12}
-            maxLines={3}
+            maxLines={maxLines}
             breakLongWords
             normalizeWhitespace
           />
-          <FitText
-            text={String(check.value)}
-            x={52 + index * 310}
-            y={530}
-            width={270}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+        );
+      })}
+      {input.fieldChecks.map((check, index) => {
+        return (
+          <g key={check.id}>
+            <Text x={32 + index * 310} y={479} size={12} fill={STOCK.orange}>
+              {index + 1}
+            </Text>
+            <FitText
+              text={check.label}
+              x={52 + index * 310}
+              y={479}
+              width={270}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <FitText
+              text={String(check.value)}
+              x={52 + index * 310}
+              y={530}
+              width={270}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
       {input.showCoverageTotals ? (
         <g
           data-coverage="true"
@@ -94,40 +98,42 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
           {[
             { label: input.copy.observed, value: observed },
             { label: input.copy.missing, value: missing },
-          ].map(({ label, value }, index) => (
-            <g key={index}>
-              <FitText
-                text={label}
-                x={32 + index * 466}
-                y={546}
-                width={428}
-                fontSize={12}
-                maxLines={3}
-                breakLongWords
-                normalizeWhitespace
-              />
-              <FitText
-                text={String(value)}
-                x={32 + index * 466}
-                y={594}
-                width={290}
-                fontSize={12}
-                maxLines={1}
-                breakLongWords
-                normalizeWhitespace
-              />
-              <FitText
-                text={input.copy.areaUnit}
-                x={340 + index * 466}
-                y={594}
-                width={120}
-                fontSize={12}
-                maxLines={1}
-                breakLongWords
-                normalizeWhitespace
-              />
-            </g>
-          ))}
+          ].map(({ label, value }, index) => {
+            return (
+              <g key={index}>
+                <FitText
+                  text={label}
+                  x={32 + index * 466}
+                  y={546}
+                  width={428}
+                  fontSize={12}
+                  maxLines={3}
+                  breakLongWords
+                  normalizeWhitespace
+                />
+                <FitText
+                  text={String(value)}
+                  x={32 + index * 466}
+                  y={594}
+                  width={290}
+                  fontSize={12}
+                  maxLines={1}
+                  breakLongWords
+                  normalizeWhitespace
+                />
+                <FitText
+                  text={input.copy.areaUnit}
+                  x={340 + index * 466}
+                  y={594}
+                  width={120}
+                  fontSize={12}
+                  maxLines={1}
+                  breakLongWords
+                  normalizeWhitespace
+                />
+              </g>
+            );
+          })}
         </g>
       ) : undefined}
     </g>

@@ -81,11 +81,9 @@ export function wrapTextToLines({
   const layoutText = normalizeWhitespace
     ? text.replace(/\s+/gu, " ").trim()
     : text;
-  const lines = layoutText
-    .split("\n")
-    .flatMap((paragraph) =>
-      _wrapParagraph({ paragraph, width, fontSize, breakLongWords }),
-    );
+  const lines = layoutText.split("\n").flatMap((paragraph) => {
+    return _wrapParagraph({ paragraph, width, fontSize, breakLongWords });
+  });
   if (lines.length > maxLines) {
     throw new Error("Text cannot fit within the declared line count.");
   }
@@ -106,11 +104,9 @@ function _estimateWidth({
   text: string;
   fontSize: number;
 }): number {
-  return Array.from(GRAPHEMES.segment(text)).reduce(
-    (total, { segment }) =>
-      total + _getWidthFromGrapheme({ grapheme: segment, fontSize }),
-    0,
-  );
+  return Array.from(GRAPHEMES.segment(text)).reduce((total, { segment }) => {
+    return total + _getWidthFromGrapheme({ grapheme: segment, fontSize });
+  }, 0);
 }
 
 function _getWidthFromGrapheme({
@@ -122,12 +118,11 @@ function _getWidthFromGrapheme({
 }): number {
   // Sum base advances to cover fallback glyphs without charging marks or
   // joiners.
-  const bases = Array.from(grapheme).filter(
-    (character) =>
-      !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
-        character,
-      ),
-  );
+  const bases = Array.from(grapheme).filter((character) => {
+    return !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
+      character,
+    );
+  });
   const baseWidth = bases.reduce((total, character) => {
     const factor = /\s/.test(character)
       ? 0.35

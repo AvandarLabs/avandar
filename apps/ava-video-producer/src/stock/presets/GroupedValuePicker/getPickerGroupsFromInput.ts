@@ -17,23 +17,30 @@ export function getPickerGroupsFromInput(
     ...new Set(
       input.nullPolicy === "include-in-mode"
         ? values
-        : values.filter((value) => value !== null),
+        : values.filter((value) => {
+            return value !== null;
+          }),
     ),
   ];
   const counted = candidates
-    .map((value) => ({
-      value,
-      count: values.filter((candidate) => candidate === value).length,
-    }))
-    .sort(
-      (first, second) =>
+    .map((value) => {
+      return {
+        value,
+        count: values.filter((candidate) => {
+          return candidate === value;
+        }).length,
+      };
+    })
+    .sort((first, second) => {
+      return (
         second.count - first.count ||
         (first.value === null
           ? 1
           : second.value === null
             ? -1
-            : first.value - second.value),
-    );
+            : first.value - second.value)
+      );
+    });
   return counted.reduce<{ bottoms: number[]; groups: PickerValueGroup[] }>(
     (layout, group) => {
       const column = layout.bottoms.indexOf(Math.min(...layout.bottoms));

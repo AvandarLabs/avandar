@@ -31,12 +31,16 @@ async function _withServer(run: (origin: string) => Promise<void>) {
       }
     });
   });
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  await new Promise<void>((resolve) => {
+    return server.listen(0, "127.0.0.1", resolve);
+  });
   const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   try {
     await run(origin);
   } finally {
-    await new Promise((resolve) => server.close(resolve));
+    await new Promise((resolve) => {
+      return server.close(resolve);
+    });
     await fs.rm(directory, { recursive: true, force: true });
   }
 }
@@ -61,26 +65,28 @@ function _write({
   });
 }
 
-test("the theme list is served", () =>
-  _withServer(async (origin) => {
+test("the theme list is served", () => {
+  return _withServer(async (origin) => {
     const response = await fetch(`${origin}/api/themes`);
     assert.equal(response.status, 200);
     assert.equal(
       ((await response.json()) as Array<{ id: string }>)[0].id,
       "classic",
     );
-  }));
+  });
+});
 
-test("the JSON Schema is served at schema.json, not read as a theme id", () =>
-  _withServer(async (origin) => {
+test("the JSON Schema is served at schema.json, not read as a theme id", () => {
+  return _withServer(async (origin) => {
     const schema = (await (
       await fetch(`${origin}/api/themes/schema.json`)
     ).json()) as { type: string };
     assert.equal(schema.type, "object");
-  }));
+  });
+});
 
-test("a theme is created with POST and saved with PUT using its hash", () =>
-  _withServer(async (origin) => {
+test("a theme is created with POST and saved with PUT using its hash", () => {
+  return _withServer(async (origin) => {
     const created = (await (
       await _write({
         origin,
@@ -97,10 +103,11 @@ test("a theme is created with POST and saved with PUT using its hash", () =>
       headers: { "If-Match": created.hash },
     });
     assert.equal(saved.status, 200);
-  }));
+  });
+});
 
-test("a save without If-Match is refused with 428", () =>
-  _withServer(async (origin) => {
+test("a save without If-Match is refused with 428", () => {
+  return _withServer(async (origin) => {
     await _write({
       origin,
       method: "POST",
@@ -118,10 +125,11 @@ test("a save without If-Match is refused with 428", () =>
       ).status,
       428,
     );
-  }));
+  });
+});
 
-test("a stale If-Match is a conflict", () =>
-  _withServer(async (origin) => {
+test("a stale If-Match is a conflict", () => {
+  return _withServer(async (origin) => {
     await _write({
       origin,
       method: "POST",
@@ -140,10 +148,11 @@ test("a stale If-Match is a conflict", () =>
       ).status,
       409,
     );
-  }));
+  });
+});
 
-test("a cross-origin write is refused", () =>
-  _withServer(async (origin) => {
+test("a cross-origin write is refused", () => {
+  return _withServer(async (origin) => {
     const response = await _write({
       origin,
       method: "POST",
@@ -152,14 +161,18 @@ test("a cross-origin write is refused", () =>
       headers: { Origin: "http://evil.test" },
     });
     assert.equal(response.status, 403);
-  }));
+  });
+});
 
-test("paths outside /api/themes are left to other routes", () =>
-  _withServer(async (origin) => {
+test("paths outside /api/themes are left to other routes", () => {
+  return _withServer(async (origin) => {
     assert.equal((await fetch(`${origin}/api/exports`)).status, 404);
-  }));
+  });
+});
 
-/** Sends a JSON body in two TCP writes cut inside the first multibyte character. */
+/**
+ * Sends a JSON body in two TCP writes cut inside the first multibyte character.
+ */
 function _postSplitMidCharacter(origin: string, body: unknown) {
   const bytes = Buffer.from(JSON.stringify(body), "utf8");
   const cut = bytes.indexOf(0xc3) + 1;
@@ -181,16 +194,19 @@ function _postSplitMidCharacter(origin: string, body: unknown) {
     );
     req.on("error", reject);
     req.write(bytes.subarray(0, cut));
-    setTimeout(() => req.end(bytes.subarray(cut)), 50);
+    setTimeout(() => {
+      return req.end(bytes.subarray(cut));
+    }, 50);
   });
 }
 
-test("a label with multibyte characters survives a body split across chunks", () =>
-  _withServer(async (origin) => {
+test("a label with multibyte characters survives a body split across chunks", () => {
+  return _withServer(async (origin) => {
     const label = "Café ✓";
     assert.equal(await _postSplitMidCharacter(origin, { ...WARM, label }), 201);
     const read = (await (await fetch(`${origin}/api/themes/warm`)).json()) as {
       document: { label: string };
     };
     assert.equal(read.document.label, label);
-  }));
+  });
+});

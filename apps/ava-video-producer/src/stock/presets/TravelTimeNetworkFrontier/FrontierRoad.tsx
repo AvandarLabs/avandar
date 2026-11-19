@@ -35,19 +35,21 @@ export function FrontierRoad({
   return (
     <g>
       <line {...source} stroke={STOCK.line} strokeWidth={3} />
-      {intervals.map(([start, end]) => (
-        <line
-          key={`${start}:${end}`}
-          data-frontier-road={road.id}
-          x1={mix(start, source.x1, source.x2)}
-          y1={mix(start, source.y1, source.y2)}
-          x2={mix(end, source.x1, source.x2)}
-          y2={mix(end, source.y1, source.y2)}
-          stroke={accent}
-          strokeWidth={5}
-          strokeLinecap="round"
-        />
-      ))}
+      {intervals.map(([start, end]) => {
+        return (
+          <line
+            key={`${start}:${end}`}
+            data-frontier-road={road.id}
+            x1={mix(start, source.x1, source.x2)}
+            y1={mix(start, source.y1, source.y2)}
+            x2={mix(end, source.x1, source.x2)}
+            y2={mix(end, source.y1, source.y2)}
+            stroke={accent}
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
+        );
+      })}
     </g>
   );
 }

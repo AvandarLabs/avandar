@@ -4,6 +4,7 @@ import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
 import { SceneShell } from "./SceneShell";
 import type { StockRequest } from "../stock/contracts/StockContract.types";
 import type { SceneBase } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Storyboard heading and frame context around a typed stock request. */
 export type Props = SceneBase & StockRequest;
@@ -19,7 +20,7 @@ export function StockScene({
   title,
   kicker,
   ...request
-}: Props) {
+}: Props): ReactNode {
   const top = title || kicker ? 200 : 0;
   return (
     <SceneShell

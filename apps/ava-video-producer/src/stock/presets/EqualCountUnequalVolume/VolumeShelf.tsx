@@ -36,17 +36,19 @@ export function VolumeShelf({
         ]}
       />
       <VolumeScale {...{ input, group, y, accent }} />
-      {group.items.map((item, itemIndex) => (
-        <ByteItem
-          key={item.id}
-          item={item}
-          input={input}
-          x={mix(alignment, 55 + index * 18, 55)}
-          y={y + 62 + itemIndex * 39}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {group.items.map((item, itemIndex) => {
+        return (
+          <ByteItem
+            key={item.id}
+            item={item}
+            input={input}
+            x={mix(alignment, 55 + index * 18, 55)}
+            y={y + 62 + itemIndex * 39}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <VolumeTotal {...{ input, group, frame, y }} />
     </g>
   );

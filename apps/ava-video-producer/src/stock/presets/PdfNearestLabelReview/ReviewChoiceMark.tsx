@@ -25,7 +25,13 @@ export function ReviewChoiceMark({
       ) : (
         <path
           data-review-choice={input.reviewedLabelId}
-          d={`M904 ${225 + input.labels.findIndex(({ id }) => id === input.reviewedLabelId) * 95} H${rowRight + 8} V440 H${rowRight}`}
+          d={`M904 ${
+            225 +
+            input.labels.findIndex(({ id }) => {
+              return id === input.reviewedLabelId;
+            }) *
+              95
+          } H${rowRight + 8} V440 H${rowRight}`}
           fill="none"
           stroke={accent}
           strokeWidth={2}

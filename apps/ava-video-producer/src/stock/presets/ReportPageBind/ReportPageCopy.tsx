@@ -39,14 +39,16 @@ export function ReportPageCopy({
   ];
   return (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={`${label.y}:${label.anchor ?? "start"}`}
-          {...label}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={`${label.y}:${label.anchor ?? "start"}`}
+            {...label}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       {showPageNumbers ? (
         <text
           data-page-number={index + 1}

@@ -51,16 +51,18 @@ export function ReferralReturnAcknowledgement({
         breakLongWords
         normalizeWhitespace
       />
-      {input.referrals.map((referral, index) => (
-        <ReferralLane
-          key={referral.id}
-          referral={referral}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.referrals.map((referral, index) => {
+        return (
+          <ReferralLane
+            key={referral.id}
+            referral={referral}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       {input.showLedger ? (
         <ReferralLedger input={input} frame={frame} />
       ) : undefined}

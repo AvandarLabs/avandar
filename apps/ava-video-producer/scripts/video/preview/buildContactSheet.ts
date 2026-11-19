@@ -7,7 +7,11 @@ export async function buildContactSheet({
   plan,
   directory,
   sampleCount,
-}: Readonly<{ plan: Storyboard; directory: string; sampleCount: number }>) {
+}: Readonly<{
+  plan: Storyboard;
+  directory: string;
+  sampleCount: number;
+}>): Promise<void> {
   const tileHeight = Math.round((320 * plan.height) / plan.width);
   await run(
     ffmpeg,

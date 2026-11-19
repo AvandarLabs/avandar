@@ -45,10 +45,9 @@ export function RoutePath({
   _validateRouteStage([x, y, width, height]);
   const marker = getRoutePointFromProgress({ points, progress });
   const path = points
-    .map(
-      (point, index) =>
-        `${index ? "L" : "M"}${x + point.x * width} ${y + point.y * height}`,
-    )
+    .map((point, index) => {
+      return `${index ? "L" : "M"}${x + point.x * width} ${y + point.y * height}`;
+    })
     .join(" ");
   return (
     <g>

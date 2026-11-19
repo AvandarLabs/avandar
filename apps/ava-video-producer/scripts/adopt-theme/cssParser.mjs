@@ -34,8 +34,9 @@ function declarations(body) {
 }
 
 /** Merge declarations, refusing the one shape that silently destroys a
- *  palette. Tailwind 4 re-exports a theme with `@theme inline { --x: var(--x) }`
- *  so utilities can reach it; that block usually sits BELOW the real
+ *  palette. Tailwind 4 re-exports a theme with
+ *  `@theme inline { --x: var(--x) }` so utilities can reach it; that block
+ *  usually sits BELOW the real
  *  definitions, and a plain Object.assign lets the self-reference overwrite the
  *  colour with a pointer at itself. Measured on a real Tailwind 4 stylesheet:
  *  every easing came back as `var(--ease-out-expo)` and the curve adoption
@@ -58,7 +59,8 @@ const isDark = (sel) =>
   /prefers-color-scheme:\s*dark/.test(sel);
 
 /** Collect every light and dark custom property declared at :root, html, or
- *  `@theme`, following Tailwind's `.dark` / `[data-theme]` / media-query forms. */
+ *  `@theme`, following Tailwind's `.dark` / `[data-theme]` / media-query forms.
+ */
 export function collect(css) {
   const light = {};
   const dark = {};

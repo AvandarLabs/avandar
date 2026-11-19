@@ -18,8 +18,13 @@ const FACILITY_FIELDS: readonly OntologyField[] = [
   { name: "supply_kits_available", source: "facilities" },
 ];
 
+type OntologyStage = {
+  readonly conceptKey: "response" | "facility";
+  readonly fields: readonly OntologyField[];
+};
+
 /** Concept inspection state depends only on the requested body frame. */
-export function createOntologyStageFromFrame(frame: number) {
+export function createOntologyStageFromFrame(frame: number): OntologyStage {
   const conceptKey = frame < 338 ? "response" : "facility";
   return {
     conceptKey,

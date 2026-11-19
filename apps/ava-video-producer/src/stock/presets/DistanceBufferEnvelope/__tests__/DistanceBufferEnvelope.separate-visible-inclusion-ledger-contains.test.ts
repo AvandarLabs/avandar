@@ -59,20 +59,25 @@ test("separate visible inclusion ledger contains only qualifying stable keys whi
     });
     assert.deepEqual(
       _getVisibleRowKeys({ markup, lane: "source" }),
-      locations.map((_, index) => String(index + 1)),
+      locations.map((_, index) => {
+        return String(index + 1);
+      }),
     );
     assert.deepEqual(_getVisibleRowKeys({ markup, lane: "included" }), keys);
     const painted = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       markup,
-    ).filter(
-      (item) =>
+    ).filter((item) => {
+      return (
         item.kind === "text" &&
         item.left >= 715 &&
         item.top >= 260 &&
-        item.bottom < 560,
-    );
+        item.bottom < 560
+      );
+    });
     const expectedLabels = keys
-      .map((key) => locations[Number(key) - 1].label)
+      .map((key) => {
+        return locations[Number(key) - 1].label;
+      })
       .filter(Boolean);
     assert.deepEqual(painted.map(prop("ariaLabel")), expectedLabels);
     assert.equal(
@@ -88,10 +93,12 @@ test("separate visible inclusion ledger contains only qualifying stable keys whi
 test("dense keyed rows and the actual transfer corridor keep tokens clear of all authored captions", () => {
   const input = {
     ...fixtures[2].input,
-    locations: fixtures[2].input.locations.map((location) => ({
-      ...location,
-      label: "界界界界界界 界界界界界界 界界界界界界",
-    })),
+    locations: fixtures[2].input.locations.map((location) => {
+      return {
+        ...location,
+        label: "界界界界界界 界界界界界界 界界界界界界",
+      };
+    }),
     labels: {
       ...fixtures[2].input.labels,
       unit: "界界界界界界界界 界界界界界界界界 界界界界界界界界 界界界界界界界界 界界界界界界界界",
@@ -100,18 +107,21 @@ test("dense keyed rows and the actual transfer corridor keep tokens clear of all
     },
   };
   inputSchema.parse(input);
-  Array.from({ length: 34 }, (_, index) => 106 + index).forEach((frame) => {
+  Array.from({ length: 34 }, (_, index) => {
+    return 106 + index;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: input }),
       paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup),
       texts = paint.filter(propEq("kind", "text"));
     SvgPaintAssertions.assertPaintClearance({
       texts,
-      rectangles: paint.filter(
-        (item) =>
+      rectangles: paint.filter((item) => {
+        return (
           item.kind === "rect" &&
           item.fill !== "none" &&
-          item.opacity * item.fillOpacity > 0.9,
-      ),
+          item.opacity * item.fillOpacity > 0.9
+        );
+      }),
     });
     _tags({ markup, attribute: "data-ledger-token" }).forEach((tag) => {
       const x = SvgAttributes.getNumberFromMarkup({
@@ -123,18 +133,14 @@ test("dense keyed rows and the actual transfer corridor keep tokens clear of all
           attributes: tag,
           name: "r",
         });
-      texts
-        .filter(propNotEq("ariaLabel", undefined))
-        .forEach((text) =>
-          assert.equal(
-            Math.max(x - radius, text.left) <
-              Math.min(x + radius, text.right) &&
-              Math.max(y - radius, text.top) <
-                Math.min(y + radius, text.bottom),
-            false,
-            `Token crosses ${text.ariaLabel} at ${frame}`,
-          ),
+      texts.filter(propNotEq("ariaLabel", undefined)).forEach((text) => {
+        return assert.equal(
+          Math.max(x - radius, text.left) < Math.min(x + radius, text.right) &&
+            Math.max(y - radius, text.top) < Math.min(y + radius, text.bottom),
+          false,
+          `Token crosses ${text.ariaLabel} at ${frame}`,
         );
+      });
     });
   });
 });

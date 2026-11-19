@@ -18,7 +18,8 @@ export function useExplorerVideoTargets({
 }>): RefObject<HTMLDivElement | null> {
   const rootRef = useRef<HTMLDivElement>(null);
   // Attribute-only instrumentation preserves the product DOM and styles.
-  // Targets come from the actual rendered leaves, never estimated CSS coordinates.
+  // Targets come from the actual rendered leaves, never estimated CSS
+  // coordinates.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -28,9 +29,11 @@ export function useExplorerVideoTargets({
       ['[aria-label="Column"]', "explorer-filter-column"],
       ['[aria-label="Condition"]', "explorer-filter-operator"],
     ];
-    targets.forEach(([selector, target]) =>
-      root.querySelector(selector)?.setAttribute("data-video-target", target),
-    );
+    targets.forEach(([selector, target]) => {
+      return root
+        .querySelector(selector)
+        ?.setAttribute("data-video-target", target);
+    });
     root.querySelectorAll("button").forEach((button) => {
       if (button.textContent?.trim() === "+ Condition")
         button.setAttribute("data-video-target", "explorer-add-condition");

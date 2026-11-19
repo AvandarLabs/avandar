@@ -74,14 +74,14 @@ function _buildBodyPath({
 }: Readonly<Pick<Props, "vehicle" | "heading">>) {
   const outlines = VEHICLE_OUTLINES[vehicle];
   return outlines
-    .map((points) =>
-      points
+    .map((points) => {
+      return points
         .map(([x, y], index) => {
           const point = _getRotatedPoint({ x, y, heading });
           return `${index ? "L" : "M"}${point.x} ${point.y}`;
         })
-        .join(" "),
-    )
+        .join(" ");
+    })
     .join(" ");
 }
 /** Delivery silhouette turns with the supplied safe journey. */

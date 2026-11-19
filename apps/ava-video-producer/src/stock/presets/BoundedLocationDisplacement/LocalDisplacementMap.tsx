@@ -20,16 +20,18 @@ export function LocalDisplacementMap({
         fill="none"
         stroke={STOCK.line}
       />
-      {input.locations.map((location, index) => (
-        <LocalOffsetMarker
-          key={location.id}
-          location={location}
-          index={index}
-          showOriginal={input.showLocalOriginal}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.locations.map((location, index) => {
+        return (
+          <LocalOffsetMarker
+            key={location.id}
+            location={location}
+            index={index}
+            showOriginal={input.showLocalOriginal}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

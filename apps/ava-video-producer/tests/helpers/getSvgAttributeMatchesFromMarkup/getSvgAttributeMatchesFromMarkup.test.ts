@@ -48,16 +48,16 @@ test("entities are decoded exactly once so literal entity-looking author text su
   );
 });
 test("invalid attribute selectors and unsupported entities fail explicitly", () => {
-  assert.throws(() =>
-    getSvgAttributeMatchesFromMarkup({
+  assert.throws(() => {
+    return getSvgAttributeMatchesFromMarkup({
       markup: '<g data-key="x"/>',
       attribute: "data-.*",
-    }),
-  );
-  assert.throws(() =>
-    getSvgAttributeMatchesFromMarkup({
+    });
+  });
+  assert.throws(() => {
+    return getSvgAttributeMatchesFromMarkup({
       markup: '<g data-key="&mystery;"/>',
       attribute: "data-key",
-    }),
-  );
+    });
+  });
 });

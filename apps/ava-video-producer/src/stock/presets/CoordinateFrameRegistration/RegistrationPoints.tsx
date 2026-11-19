@@ -16,20 +16,22 @@ export function RegistrationPoints({
   return (
     <g>
       <RegistrationReferences input={input} frame={frame} />
-      {points.map((point) => (
-        <circle
-          key={point.id}
-          data-landmark={point.id}
-          data-target-x={point.targetX}
-          data-target-y={point.targetY}
-          cx={point.canvasX}
-          cy={point.canvasY}
-          r={5}
-          fill={accent}
-          fillOpacity={0.6}
-          stroke={accent}
-        />
-      ))}
+      {points.map((point) => {
+        return (
+          <circle
+            key={point.id}
+            data-landmark={point.id}
+            data-target-x={point.targetX}
+            data-target-y={point.targetY}
+            cx={point.canvasX}
+            cy={point.canvasY}
+            r={5}
+            fill={accent}
+            fillOpacity={0.6}
+            stroke={accent}
+          />
+        );
+      })}
     </g>
   );
 }

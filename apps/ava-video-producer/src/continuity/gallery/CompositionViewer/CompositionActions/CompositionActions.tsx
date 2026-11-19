@@ -15,22 +15,30 @@ import { useCompositionDownload } from "./useCompositionDownload";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
 import type { CompositionExportOptions } from "../compositionExportOptions";
 import type { ThemeExportState } from "../themeExportStateHelpers/themeExportStateHelpers";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   id: string;
   options: CompositionExportOptions | undefined;
   captions: boolean | undefined;
-  /** Scene studies carry no narration, so they offer no transcript or captions. */
+  /**
+   * Scene studies carry no narration, so they offer no transcript or captions.
+   */
   isScene: boolean;
   /** The theme the export renders with, unsaved edits included. */
   theme: ExportTheme;
-  /** Whether the live player shows this theme, so the MP4 will match the preview. */
+  /**
+   * Whether the live player shows this theme, so the MP4 will match the
+   * preview.
+   */
   themeState: ThemeExportState;
   /** Sends the theme to the player again after it timed out. */
   onRetryTheme: () => void;
 }>;
 
-/** Explicit exports use only the options and theme the live player acknowledged. */
+/**
+ * Explicit exports use only the options and theme the live player acknowledged.
+ */
 export function CompositionActions({
   id,
   captions,
@@ -39,7 +47,7 @@ export function CompositionActions({
   theme,
   themeState,
   onRetryTheme,
-}: Props) {
+}: Props): ReactNode {
   const noticeId = useId();
   const download = useCompositionDownload({
     id,
@@ -88,14 +96,16 @@ function useCaptionDownload(
       }
       setState(started);
       downloadCaptionFile({ id, options }).then(
-        () =>
-          setState((current) =>
-            finishCaptionDownload(current, { id, hasFailed: false }),
-          ),
-        () =>
-          setState((current) =>
-            finishCaptionDownload(current, { id, hasFailed: true }),
-          ),
+        () => {
+          return setState((current) => {
+            return finishCaptionDownload(current, { id, hasFailed: false });
+          });
+        },
+        () => {
+          return setState((current) => {
+            return finishCaptionDownload(current, { id, hasFailed: true });
+          });
+        },
       );
     },
   };

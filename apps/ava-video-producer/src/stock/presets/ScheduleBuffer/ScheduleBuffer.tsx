@@ -20,17 +20,19 @@ export function ScheduleBuffer({
   return (
     <g opacity={ramp(frame, 12, 12)}>
       <ScheduleBackdrop input={input} />
-      {state.tasks.map((task, index) => (
-        <ScheduledTask
-          key={task.id}
-          task={task}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-          numSlots={numSlots}
-        />
-      ))}
+      {state.tasks.map((task, index) => {
+        return (
+          <ScheduledTask
+            key={task.id}
+            task={task}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+            numSlots={numSlots}
+          />
+        );
+      })}
       <ScheduleReserve state={state} input={input} numSlots={numSlots} />
       <ScheduleInterruption
         state={state}

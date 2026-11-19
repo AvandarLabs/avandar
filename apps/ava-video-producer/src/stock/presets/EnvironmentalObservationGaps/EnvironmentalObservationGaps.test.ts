@@ -123,7 +123,9 @@ registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
     ),
     [
       {
@@ -158,9 +160,9 @@ test("serialized semantic rules retain every runtime relation", () => {
     ],
   );
   assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
   );
 });
 
@@ -173,21 +175,29 @@ test("offset rectangles retain all cells and point references including empty ID
   assert.match(markup, /data-point-check=""/);
   const cells = Array.from(
     markup.matchAll(/<rect[^>]*data-missing-cell=[^>]*>/g),
-    (match) => match[0],
+    (match) => {
+      return match[0];
+    },
   );
   assert.equal(
     Math.min(
-      ...cells.map((cell) =>
-        SvgAttributes.getNumberFromMarkup({ attributes: cell, name: "x" }),
-      ),
+      ...cells.map((cell) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: cell,
+          name: "x",
+        });
+      }),
     ),
     270,
   );
   assert.equal(
     Math.min(
-      ...cells.map((cell) =>
-        SvgAttributes.getNumberFromMarkup({ attributes: cell, name: "y" }),
-      ),
+      ...cells.map((cell) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: cell,
+          name: "y",
+        });
+      }),
     ),
     105,
   );
@@ -198,72 +208,74 @@ test("concentrated checks stay distinct and the team clears all previously place
     fixtures.find(propEq("id", "separated-checks"))!.input,
     {
       ...fixtures[2].input,
-      fieldChecks: fixtures[2].input.fieldChecks.map((check, index) => ({
-        ...check,
-        cellId: fixtures[2].input.cells[index].id,
-      })),
+      fieldChecks: fixtures[2].input.fieldChecks.map((check, index) => {
+        return {
+          ...check,
+          cellId: fixtures[2].input.cells[index].id,
+        };
+      }),
     },
   ];
   layouts.forEach((input) => {
-    Array.from({ length: 105 }, (_, index) => 54 + index / 2).forEach(
-      (frame) => {
-        const markup = _render({ frame: frame, input: input }),
-          team = SvgAttributes.fromMarker({ markup, marker: "team-position" });
-        const x = SvgAttributes.getNumberFromMarkup({
-            attributes: team,
-            name: "data-x",
-          }),
-          y = SvgAttributes.getNumberFromMarkup({
-            attributes: team,
-            name: "data-y",
-          });
-        assert.ok(x - 5 > 225 && x + 5 < 920 && y - 8 >= 105 && y + 9 <= 405);
-        const hand = SvgAttributes.fromMarker({
-            markup,
-            marker: "sampling-hand",
-          }),
-          handX = SvgAttributes.getNumberFromMarkup({
-            attributes: hand,
-            name: "cx",
-          });
-        Array.from(
-          markup.matchAll(/<circle[^>]*data-point-check="([^"]*)"[^>]*>/g),
-        ).forEach((match) => {
-          const pointX = SvgAttributes.getNumberFromMarkup({
-              attributes: match[0],
-              name: "cx",
-            }),
-            pointY = SvgAttributes.getNumberFromMarkup({
-              attributes: match[0],
-              name: "cy",
-            });
-          assert.ok(
-            x + 5 < pointX - 5.5 ||
-              x - 5 > pointX + 5.5 ||
-              y + 9 < pointY - 5.5 ||
-              y - 8 > pointY + 5.5,
-            "full team body clears retained point",
-          );
-          if (Math.abs(pointX - handX) < 1e-9) {
-            assert.equal(
-              pointY,
-              SvgAttributes.getNumberFromMarkup({
-                attributes: hand,
-                name: "cy",
-              }),
-            );
-          }
+    Array.from({ length: 105 }, (_, index) => {
+      return 54 + index / 2;
+    }).forEach((frame) => {
+      const markup = _render({ frame: frame, input: input }),
+        team = SvgAttributes.fromMarker({ markup, marker: "team-position" });
+      const x = SvgAttributes.getNumberFromMarkup({
+          attributes: team,
+          name: "data-x",
+        }),
+        y = SvgAttributes.getNumberFromMarkup({
+          attributes: team,
+          name: "data-y",
         });
-      },
-    );
+      assert.ok(x - 5 > 225 && x + 5 < 920 && y - 8 >= 105 && y + 9 <= 405);
+      const hand = SvgAttributes.fromMarker({
+          markup,
+          marker: "sampling-hand",
+        }),
+        handX = SvgAttributes.getNumberFromMarkup({
+          attributes: hand,
+          name: "cx",
+        });
+      Array.from(
+        markup.matchAll(/<circle[^>]*data-point-check="([^"]*)"[^>]*>/g),
+      ).forEach((match) => {
+        const pointX = SvgAttributes.getNumberFromMarkup({
+            attributes: match[0],
+            name: "cx",
+          }),
+          pointY = SvgAttributes.getNumberFromMarkup({
+            attributes: match[0],
+            name: "cy",
+          });
+        assert.ok(
+          x + 5 < pointX - 5.5 ||
+            x - 5 > pointX + 5.5 ||
+            y + 9 < pointY - 5.5 ||
+            y - 8 > pointY + 5.5,
+          "full team body clears retained point",
+        );
+        if (Math.abs(pointX - handX) < 1e-9) {
+          assert.equal(
+            pointY,
+            SvgAttributes.getNumberFromMarkup({
+              attributes: hand,
+              name: "cy",
+            }),
+          );
+        }
+      });
+    });
     const points = Array.from(
       _render({ frame: 150, input: input }).matchAll(
         /<circle[^>]*data-point-check="([^"]*)"[^>]*>/g,
       ),
     );
-    points.forEach((point, index) =>
-      points.slice(index + 1).forEach((other) =>
-        assert.ok(
+    points.forEach((point, index) => {
+      return points.slice(index + 1).forEach((other) => {
+        return assert.ok(
           Math.hypot(
             SvgAttributes.getNumberFromMarkup({
               attributes: point[0],
@@ -282,9 +294,9 @@ test("concentrated checks stay distinct and the team clears all previously place
                 name: "cy",
               }),
           ) >= 36,
-        ),
-      ),
-    );
+        );
+      });
+    });
   });
 });
 test("an extreme finite metric yields finite readings without inventing coverage", () => {

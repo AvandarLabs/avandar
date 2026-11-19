@@ -25,16 +25,18 @@ export function FractionMaterialTranslation({
           slot={[480, 109, 850, 28, 1]}
         />
       ) : undefined}
-      {input.representations.map((representation, index) => (
-        <FractionDesk
-          key={representation.id}
-          representation={representation}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.representations.map((representation, index) => {
+        return (
+          <FractionDesk
+            key={representation.id}
+            representation={representation}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <SceneText
         text={input.caption}
         anchor="middle"

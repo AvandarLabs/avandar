@@ -21,15 +21,17 @@ export function ProseMeasurementLedger({
     >
       <ProseHeadings input={input} frame={frame} />
       <SentenceSpans input={input} frame={frame} accent={accent} />
-      {Array.from({ length: 6 }, (_, index) => (
-        <ObservationSlot
-          key={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-          index={index}
-        />
-      ))}
+      {Array.from({ length: 6 }, (_, index) => {
+        return (
+          <ObservationSlot
+            key={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+            index={index}
+          />
+        );
+      })}
     </g>
   );
 }

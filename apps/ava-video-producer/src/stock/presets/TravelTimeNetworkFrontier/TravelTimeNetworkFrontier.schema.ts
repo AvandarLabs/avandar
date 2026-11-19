@@ -39,9 +39,9 @@ function _validateNetworkReferences({
 }): void {
   const nodeIds = input.nodes.map(prop("id"));
   const roadIds = input.roads.map(prop("id"));
-  const edges = input.roads.map((road) =>
-    JSON.stringify([road.fromId, road.toId].sort()),
-  );
+  const edges = input.roads.map((road) => {
+    return JSON.stringify([road.fromId, road.toId].sort());
+  });
   if (
     new Set(nodeIds).size !== nodeIds.length ||
     new Set(roadIds).size !== roadIds.length ||
@@ -55,12 +55,13 @@ function _validateNetworkReferences({
   }
   if (
     !nodeIds.includes(input.originId) ||
-    input.roads.some(
-      (road) =>
+    input.roads.some((road) => {
+      return (
         road.fromId === road.toId ||
         !nodeIds.includes(road.fromId) ||
-        !nodeIds.includes(road.toId),
-    )
+        !nodeIds.includes(road.toId)
+      );
+    })
   ) {
     context.addIssue({
       code: "custom",
@@ -77,15 +78,19 @@ function _validateNetworkConnectivity({
   context: z.RefinementCtx;
 }): void {
   const reached = new Set([input.originId]);
-  input.nodes.forEach(() =>
-    input.roads.forEach((road) => {
+  input.nodes.forEach(() => {
+    return input.roads.forEach((road) => {
       if (reached.has(road.fromId) || reached.has(road.toId)) {
         reached.add(road.fromId);
         reached.add(road.toId);
       }
-    }),
-  );
-  if (input.nodes.some((node) => !reached.has(node.id))) {
+    });
+  });
+  if (
+    input.nodes.some((node) => {
+      return !reached.has(node.id);
+    })
+  ) {
     context.addIssue({
       code: "custom",
       path: ["roads"],

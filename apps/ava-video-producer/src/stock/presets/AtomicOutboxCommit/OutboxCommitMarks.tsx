@@ -29,16 +29,18 @@ export function OutboxCommitMarks({
         strokeWidth={3}
       />
       {input.outcome === "commit"
-        ? [400, 840].map((x) => (
-            <circle
-              key={x}
-              data-commit-stamp={x}
-              cx={x}
-              cy={490}
-              r={9 * ramp(frame, 111, 28)}
-              fill={accent}
-            />
-          ))
+        ? [400, 840].map((x) => {
+            return (
+              <circle
+                key={x}
+                data-commit-stamp={x}
+                cx={x}
+                cy={490}
+                r={9 * ramp(frame, 111, 28)}
+                fill={accent}
+              />
+            );
+          })
         : undefined}
     </g>
   );

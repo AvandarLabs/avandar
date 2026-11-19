@@ -3,6 +3,7 @@ import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { sampleStockFrame } from "../continuityTimeline";
 import type { ContinuityBeat } from "../continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   content: Extract<ContinuityBeat["content"], { kind: "stock" }>;
@@ -14,7 +15,7 @@ type Props = {
  * place. The stock graphic inherits the composition's theme and adds its
  * preset override.
  */
-export function ContinuityGraphicObjects({ content, frame }: Props) {
+export function ContinuityGraphicObjects({ content, frame }: Props): ReactNode {
   const { cameraMotion } = useContinuityAppearance();
   const flight = cameraMotion ? content.flight : undefined;
   const props = {

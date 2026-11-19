@@ -19,19 +19,21 @@ export function ObservationContext({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(({ text, x, y, width }, index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {labels.map(({ text, x, y, width }, index) => {
+        return (
+          <FitText
+            key={index}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={12}
+            maxLines={3}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       {input.context === "globe-and-schematic-tile" ? (
         <g data-globe-context="true" transform="translate(115 175)">
           <circle r={65} fill={STOCK.surface} stroke={STOCK.line} />

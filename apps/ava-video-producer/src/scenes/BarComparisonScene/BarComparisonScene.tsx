@@ -1,7 +1,8 @@
 import { DUR, EASE, STAGGER, enter, ramp } from "../../motion";
 import { getEraseMaskStyle } from "../../motion-components/eraseMask";
 import { fitTextLines, formatMetric, sceneBounds } from "../layout/layout";
-import { positioned, SceneShell } from "../SceneShell";
+import { positioned } from "../positioned";
+import { SceneShell } from "../SceneShell";
 import { getLineRevealStyle } from "../textReveal";
 import {
   BAR_GROW_FRAMES,
@@ -32,7 +33,7 @@ const ROUGH_EDGE_DEPTH = 10;
  * per-element left-to-right erase. Figures are authored data; label them as
  * fictional unless they are sourced.
  */
-export function BarComparisonScene(props: BarComparisonSceneProps) {
+export function BarComparisonScene(props: BarComparisonSceneProps): ReactNode {
   const {
     frame,
     width = 1600,
@@ -58,20 +59,22 @@ export function BarComparisonScene(props: BarComparisonSceneProps) {
     : undefined;
   return (
     <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
-      {panels.map((panel, panelIndex) => (
-        <_Panel
-          key={panelIndex}
-          {...props}
-          panel={panel}
-          panelIndex={panelIndex}
-          rect={{
-            ...bounds,
-            x: bounds.x + panelIndex * (panelWidth + gap),
-            width: panelWidth,
-          }}
-          eraseStarts={eraseStarts?.[panelIndex]}
-        />
-      ))}
+      {panels.map((panel, panelIndex) => {
+        return (
+          <_Panel
+            key={panelIndex}
+            {...props}
+            panel={panel}
+            panelIndex={panelIndex}
+            rect={{
+              ...bounds,
+              x: bounds.x + panelIndex * (panelWidth + gap),
+              width: panelWidth,
+            }}
+            eraseStarts={eraseStarts?.[panelIndex]}
+          />
+        );
+      })}
       {props.footnote ? (
         <p
           style={{
@@ -121,16 +124,18 @@ function _Panel(props: PanelProps) {
   );
   // Erase order: hero, caption, then label, bar and value of each row.
   let elementIndex = 0;
-  const erasable = (children: ReactNode, key: string) => (
-    <_Erasable
-      key={key}
-      frame={frame}
-      startFrame={eraseStarts?.[elementIndex++]}
-      durationInFrames={props.exit?.durationInFrames ?? DUR.press}
-    >
-      {children}
-    </_Erasable>
-  );
+  const erasable = (children: ReactNode, key: string) => {
+    return (
+      <_Erasable
+        key={key}
+        frame={frame}
+        startFrame={eraseStarts?.[elementIndex++]}
+        durationInFrames={props.exit?.durationInFrames ?? DUR.press}
+      >
+        {children}
+      </_Erasable>
+    );
+  };
   return (
     <>
       {erasable(
@@ -172,8 +177,8 @@ function _Panel(props: PanelProps) {
             "caption",
           )
         : null}
-      {panel.rows.map((row, rowIndex) =>
-        _renderRow({
+      {panel.rows.map((row, rowIndex) => {
+        return _renderRow({
           ...props,
           row,
           rowIndex,
@@ -182,8 +187,8 @@ function _Panel(props: PanelProps) {
           fraction: getBarFractions(panel.rows)[rowIndex],
           beats,
           erasable,
-        }),
-      )}
+        });
+      })}
     </>
   );
 }

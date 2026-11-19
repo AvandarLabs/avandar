@@ -6,7 +6,10 @@ import {
   type Storyboard,
 } from "../src/storyboard/schema/schema";
 
-/** A small two-shot plan with narration and a sound effect, used by the pipeline unit tests. */
+/**
+ * A small two-shot plan with narration and a sound effect, used by the pipeline
+ * unit tests.
+ */
 export function fixture(): Storyboard {
   return storyboardSchema.parse({
     version: 1,
@@ -51,8 +54,13 @@ export function fixture(): Storyboard {
   });
 }
 
-/** Runs `action` against a scratch directory with `public/` and `src/` subdirectories, cleaning up after. */
-export async function temporary(action: (root: string) => Promise<void>) {
+/**
+ * Runs `action` against a scratch directory with `public/` and `src/`
+ * subdirectories, cleaning up after.
+ */
+export async function temporary(
+  action: (root: string) => Promise<void>,
+): Promise<void> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "video-pipeline-"));
   try {
     await fs.mkdir(path.join(root, "public"));

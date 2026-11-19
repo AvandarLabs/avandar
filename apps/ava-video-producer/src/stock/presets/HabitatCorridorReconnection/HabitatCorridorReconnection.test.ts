@@ -117,7 +117,9 @@ registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
     ),
     [
       {
@@ -140,9 +142,9 @@ test("serialized semantic rules retain every runtime relation", () => {
     ],
   );
   assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
   );
 });
 
@@ -155,43 +157,43 @@ test("the entire illustrative marker clears the unchanged road through both rout
     },
   ].forEach((input) => {
     const variant = { ...input, showIllustrativeTraversal: true };
-    Array.from({ length: 53 }, (_, index) => 82 + index / 2).forEach(
-      (frame) => {
-        const markup = _render({ frame: frame, input: variant }),
-          marker = SvgAttributes.fromMarker({
-            markup,
-            marker: "illustrative-traversal",
-          });
-        const x = SvgAttributes.getNumberFromMarkup({
+    Array.from({ length: 53 }, (_, index) => {
+      return 82 + index / 2;
+    }).forEach((frame) => {
+      const markup = _render({ frame: frame, input: variant }),
+        marker = SvgAttributes.fromMarker({
+          markup,
+          marker: "illustrative-traversal",
+        });
+      const x = SvgAttributes.getNumberFromMarkup({
+          attributes: marker,
+          name: "cx",
+        }),
+        y = SvgAttributes.getNumberFromMarkup({
+          attributes: marker,
+          name: "cy",
+        }),
+        radius =
+          SvgAttributes.getNumberFromMarkup({
             attributes: marker,
-            name: "cx",
-          }),
-          y = SvgAttributes.getNumberFromMarkup({
+            name: "r",
+          }) +
+          SvgAttributes.getNumberFromMarkup({
             attributes: marker,
-            name: "cy",
-          }),
-          radius =
-            SvgAttributes.getNumberFromMarkup({
-              attributes: marker,
-              name: "r",
-            }) +
-            SvgAttributes.getNumberFromMarkup({
-              attributes: marker,
-              name: "stroke-width",
-            }) /
-              2;
-        assert.ok(
-          x - radius >= 233 &&
-            x + radius <= 727 &&
-            y - radius >= 243 &&
-            y + radius <= 307,
-        );
-        if (x + radius >= 462 && x - radius <= 498) {
-          assert.ok(Math.abs(y - 250) < 1e-9);
-          assert.ok(y - radius > 232 && y + radius < 268);
-        }
-      },
-    );
+            name: "stroke-width",
+          }) /
+            2;
+      assert.ok(
+        x - radius >= 233 &&
+          x + radius <= 727 &&
+          y - radius >= 243 &&
+          y + radius <= 307,
+      );
+      if (x + radius >= 462 && x - radius <= 498) {
+        assert.ok(Math.abs(y - 250) < 1e-9);
+        assert.ok(y - radius > 232 && y + radius < 268);
+      }
+    });
   });
 });
 test("proposals stay outlined with traversal enabled and implemented footprints stay solid", () => {

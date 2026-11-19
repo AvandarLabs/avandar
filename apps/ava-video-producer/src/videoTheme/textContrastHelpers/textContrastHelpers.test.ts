@@ -19,8 +19,12 @@ function _failures(themeId: string, isLightGround: boolean): string[] {
     isLightGround ? { patches: [LIGHT_GROUND] } : {},
   );
   return listTextContrastFromTheme(theme)
-    .filter((entry) => entry.level === "fail")
-    .map((entry) => `${entry.path} ${entry.ratio.toFixed(2)}`);
+    .filter((entry) => {
+      return entry.level === "fail";
+    })
+    .map((entry) => {
+      return `${entry.path} ${entry.ratio.toFixed(2)}`;
+    });
 }
 
 test("black on white has the maximum contrast of 21", () => {

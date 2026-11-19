@@ -14,25 +14,31 @@ export function GroupingSeams({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {[0, 1].map((index) => (
-        <g
-          key={index}
-          data-seam-partition={index}
-          transform={`translate(0 ${index === 0 ? -28 * ramp(frame, 36, 36) : -28 * (1 - ramp(frame, 72, 36))})`}
-          opacity={index === 0 ? 1 - ramp(frame, 60, 12) : ramp(frame, 72, 36)}
-        >
-          {getGroupingFromCells({ input, index }).map((zone) => (
-            <path
-              key={zone.id}
-              data-zone-outline={zone.id}
-              d={buildZoneOutlineFromCells(zone.cells)}
-              fill="none"
-              stroke={[accent, STOCK.cyan, STOCK.orange][zone.zoneIndex]}
-              strokeWidth={4}
-            />
-          ))}
-        </g>
-      ))}
+      {[0, 1].map((index) => {
+        return (
+          <g
+            key={index}
+            data-seam-partition={index}
+            transform={`translate(0 ${index === 0 ? -28 * ramp(frame, 36, 36) : -28 * (1 - ramp(frame, 72, 36))})`}
+            opacity={
+              index === 0 ? 1 - ramp(frame, 60, 12) : ramp(frame, 72, 36)
+            }
+          >
+            {getGroupingFromCells({ input, index }).map((zone) => {
+              return (
+                <path
+                  key={zone.id}
+                  data-zone-outline={zone.id}
+                  d={buildZoneOutlineFromCells(zone.cells)}
+                  fill="none"
+                  stroke={[accent, STOCK.cyan, STOCK.orange][zone.zoneIndex]}
+                  strokeWidth={4}
+                />
+              );
+            })}
+          </g>
+        );
+      })}
     </g>
   );
 }

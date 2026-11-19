@@ -35,12 +35,12 @@ export function registerStockDefaultTextAssertions<Input extends object>({
     });
     assert.deepEqual(resolved.defaultInput, original);
     assert.deepEqual(contract.defaultInput, original);
-    suppliedInputs.forEach((input, index) =>
-      assert.deepEqual(
+    suppliedInputs.forEach((input, index) => {
+      return assert.deepEqual(
         contract.inputSchema.parse(input),
         suppliedOriginals[index],
-      ),
-    );
+      );
+    });
     assert.deepEqual(suppliedInputs, suppliedOriginals);
   });
 }

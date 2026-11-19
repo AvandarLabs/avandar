@@ -28,9 +28,9 @@ test("grouping preserves every identity and returns to authored coordinates", ()
       assert.equal(points.length, input.points.length);
       assert.equal(
         new Set(
-          points.map((mark) =>
-            _attribute({ markup: mark, name: "data-point" }),
-          ),
+          points.map((mark) => {
+            return _attribute({ markup: mark, name: "data-point" });
+          }),
         ).size,
         input.points.length,
       );
@@ -47,11 +47,12 @@ test("grouping preserves every identity and returns to authored coordinates", ()
       name: "cluster",
     });
     assert.deepEqual(
-      grouped.map((mark) => _number({ markup: mark, name: "data-count" })),
-      input.clusters.map(
-        (cluster: Input["clusters"][number]) =>
-          input.points.filter(propEq("clusterId", cluster.id)).length,
-      ),
+      grouped.map((mark) => {
+        return _number({ markup: mark, name: "data-count" });
+      }),
+      input.clusters.map((cluster: Input["clusters"][number]) => {
+        return input.points.filter(propEq("clusterId", cluster.id)).length;
+      }),
     );
     const initial = _marks({
         markup: render({ frame: 52, input: input }),
@@ -94,12 +95,12 @@ test("grouping preserves every identity and returns to authored coordinates", ()
 });
 
 test("fixtures retain exact input while schemas reject invalid documents", () => {
-  fixtures.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  fixtures.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 registerStockPresetAssertions({
@@ -149,36 +150,38 @@ test("three coincident cluster anchors retain unequal counts and exact empty ref
       { id: "界 key", label: "Same", x: 50, y: 50 },
       { id: "W".repeat(12), label: "Same", x: 50, y: 50 },
     ],
-    points: Array.from({ length: 8 }, (_, index) => ({
-      id: index === 0 ? "" : String(index),
-      label: "Same",
-      x: 50,
-      y: 50,
-      clusterId: index === 0 ? "" : index < 3 ? "界 key" : "W".repeat(12),
-    })),
+    points: Array.from({ length: 8 }, (_, index) => {
+      return {
+        id: index === 0 ? "" : String(index),
+        label: "Same",
+        x: 50,
+        y: 50,
+        clusterId: index === 0 ? "" : index < 3 ? "界 key" : "W".repeat(12),
+      };
+    }),
     showMemberIds: false,
   };
   assert.deepEqual(inputSchema.parse(input), input);
   const markup = render({ frame: 98, input: input });
   assert.deepEqual(
-    _marks({ markup, name: "cluster" }).map((mark) =>
-      _number({ markup: mark, name: "data-count" }),
-    ),
+    _marks({ markup, name: "cluster" }).map((mark) => {
+      return _number({ markup: mark, name: "data-count" });
+    }),
     [1, 2, 5],
   );
   assert.equal(_marks({ markup, name: "roster-point" }).length, 8);
   assert.deepEqual(
-    _marks({ markup, name: "location-count" }).map((mark) =>
-      _number({ markup: mark, name: "data-location-count" }),
-    ),
+    _marks({ markup, name: "location-count" }).map((mark) => {
+      return _number({ markup: mark, name: "data-location-count" });
+    }),
     [8],
   );
   assert.doesNotMatch(markup, /data-literal-value/);
 });
 
 test("roster leaders remain attached to each moving point identity", () => {
-  [DEFAULT_INPUT, fixtures[2].input].forEach((input) =>
-    [52, 75, 98, 120, 150].forEach((frame) => {
+  [DEFAULT_INPUT, fixtures[2].input].forEach((input) => {
+    return [52, 75, 98, 120, 150].forEach((frame) => {
       const markup = render({ frame: frame, input: input }),
         points = _marks({ markup, name: "point" }),
         leaders = _marks({ markup, name: "point-leader" });
@@ -193,18 +196,20 @@ test("roster leaders remain attached to each moving point identity", () => {
           `M${_number({ markup: points[index], name: "cx" })} ${_number({ markup: points[index], name: "cy" })} L584 ${149 + index * 44}`,
         );
       });
-    }),
-  );
+    });
+  });
 });
 
 test("grouped map badges remain visible for every reviewed hold frame", () => {
-  Array.from({ length: 18 }, (_, index) => 82 + index).forEach((frame) => {
+  Array.from({ length: 18 }, (_, index) => {
+    return 82 + index;
+  }).forEach((frame) => {
     const markup = render({ frame: frame }),
       badges = _marks({ markup, name: "location-count" });
     assert.deepEqual(
-      badges.map((badge) =>
-        _number({ markup: badge, name: "data-location-count" }),
-      ),
+      badges.map((badge) => {
+        return _number({ markup: badge, name: "data-location-count" });
+      }),
       [2, 2],
       `frame ${frame}`,
     );
@@ -229,10 +234,9 @@ test("grouped map badges remain visible for every reviewed hold frame", () => {
       _marks({
         markup: render({ frame: frame }),
         name: "location-count",
-      }).filter(
-        (badge) =>
-          _number({ markup: badge, name: "data-location-count" }) === 2,
-      ).length,
+      }).filter((badge) => {
+        return _number({ markup: badge, name: "data-location-count" }) === 2;
+      }).length,
       0,
     );
     assert.notEqual(
@@ -247,13 +251,15 @@ test("grouped map badges remain visible for every reviewed hold frame", () => {
 
 test("stationary coincident map counts stay intelligible throughout both transitions", () => {
   const input = fixtures[2].input;
-  Array.from({ length: 87 }, (_, index) => 53 + index).forEach((frame) => {
+  Array.from({ length: 87 }, (_, index) => {
+    return 53 + index;
+  }).forEach((frame) => {
     const markup = render({ frame: frame, input: input }),
       badges = _marks({ markup, name: "location-count" });
     assert.deepEqual(
-      badges.map((badge) =>
-        _number({ markup: badge, name: "data-location-count" }),
-      ),
+      badges.map((badge) => {
+        return _number({ markup: badge, name: "data-location-count" });
+      }),
       [8],
       `frame ${frame}`,
     );
@@ -265,9 +271,9 @@ test("stationary coincident map counts stay intelligible throughout both transit
 test("fractional cluster anchors hold exact coordinates and complete grouped counts", () => {
   const input: Input = {
     ...DEFAULT_INPUT,
-    points: DEFAULT_INPUT.points.map((point, index) =>
-      index === 0 ? { ...point, x: 5.9 } : point,
-    ),
+    points: DEFAULT_INPUT.points.map((point, index) => {
+      return index === 0 ? { ...point, x: 5.9 } : point;
+    }),
     clusters: [
       { ...DEFAULT_INPUT.clusters[0], x: 24.4, y: 10.2 },
       { ...DEFAULT_INPUT.clusters[1], x: 89.9, y: 89.8 },
@@ -276,15 +282,15 @@ test("fractional cluster anchors hold exact coordinates and complete grouped cou
   [82, 90, 98, 99].forEach((frame) => {
     const markup = render({ frame: frame, input: input });
     assert.deepEqual(
-      _marks({ markup, name: "location-count" }).map((mark) =>
-        _number({ markup: mark, name: "data-location-count" }),
-      ),
+      _marks({ markup, name: "location-count" }).map((mark) => {
+        return _number({ markup: mark, name: "data-location-count" });
+      }),
       [2, 2],
     );
     _marks({ markup, name: "point" }).forEach((mark, index) => {
-      const cluster = input.clusters.find(
-        (item) => item.id === input.points[index].clusterId,
-      )!;
+      const cluster = input.clusters.find((item) => {
+        return item.id === input.points[index].clusterId;
+      })!;
       assert.equal(_number({ markup: mark, name: "cx" }), 48 + cluster.x * 4.8);
       assert.equal(
         _number({ markup: mark, name: "cy" }),

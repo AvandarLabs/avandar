@@ -1,5 +1,6 @@
 import css from "./HelperDetail.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
+import type { ReactNode } from "react";
 
 /** Where app-relative source paths are browsable. */
 const SOURCE_BASE_URL =
@@ -25,14 +26,16 @@ function DefaultsList({ helper }: { helper: HelperEntry }) {
   }
   return (
     <dl className={css.defaults}>
-      {helper.defaults.map((item) => (
-        <div key={item.name}>
-          <dt>{item.name}</dt>
-          <dd>
-            <code>{item.value}</code>
-          </dd>
-        </div>
-      ))}
+      {helper.defaults.map((item) => {
+        return (
+          <div key={item.name}>
+            <dt>{item.name}</dt>
+            <dd>
+              <code>{item.value}</code>
+            </dd>
+          </div>
+        );
+      })}
     </dl>
   );
 }
@@ -44,26 +47,34 @@ function UsedByList({ helper }: { helper: HelperEntry }) {
   }
   return (
     <ul className={css.links}>
-      {helper.usedBy.map((path) => (
-        <li key={path}>
-          <SourceLink path={path} />
-        </li>
-      ))}
+      {helper.usedBy.map((path) => {
+        return (
+          <li key={path}>
+            <SourceLink path={path} />
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
 /** Exports, defaults, consumers and source of the selected helper. */
-export function HelperReference({ helper }: { helper: HelperEntry }) {
+export function HelperReference({
+  helper,
+}: {
+  helper: HelperEntry;
+}): ReactNode {
   return (
     <aside className={css.reference}>
       <h3>Exports</h3>
       <ul className={css.exports}>
-        {helper.exports.map((name) => (
-          <li key={name}>
-            <code>{name}</code>
-          </li>
-        ))}
+        {helper.exports.map((name) => {
+          return (
+            <li key={name}>
+              <code>{name}</code>
+            </li>
+          );
+        })}
       </ul>
       <h3>Defaults</h3>
       <DefaultsList helper={helper} />

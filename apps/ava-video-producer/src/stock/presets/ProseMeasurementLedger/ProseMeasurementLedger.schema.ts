@@ -53,12 +53,15 @@ export const inputSchema = z
     if (
       new Set(input.fragments.map(prop("id"))).size !==
         input.fragments.length ||
-      input.fragments.reduce((total, { text }) => total + text.length, 0) >
-        110 ||
-      SEMANTIC_ROLES.some(
-        (role) => input.fragments.filter(propEq("role", role)).length !== 1,
-      ) ||
-      input.fragments.some((f) => !_validFragment(f))
+      input.fragments.reduce((total, { text }) => {
+        return total + text.length;
+      }, 0) > 110 ||
+      SEMANTIC_ROLES.some((role) => {
+        return input.fragments.filter(propEq("role", role)).length !== 1;
+      }) ||
+      input.fragments.some((f) => {
+        return !_validFragment(f);
+      })
     ) {
       context.addIssue({
         code: "custom",

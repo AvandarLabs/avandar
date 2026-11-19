@@ -45,11 +45,12 @@ export const inputSchema = z
       });
     }
     if (
-      [input.origin.x, input.origin.y].some(
-        (coordinate) =>
+      [input.origin.x, input.origin.y].some((coordinate) => {
+        return (
           coordinate - input.radiusUnits < 0 ||
-          coordinate + input.radiusUnits > 100,
-      )
+          coordinate + input.radiusUnits > 100
+        );
+      })
     ) {
       context.addIssue({
         code: "custom",

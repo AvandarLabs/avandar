@@ -35,10 +35,11 @@ const render: ({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
-test("complete rejection fixtures reject structural and reference violations", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("complete rejection fixtures reject structural and reference violations", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 test("only joins brings a second chair and contacting hand to the still-open owner task", () => {
   ["joins", "later", "declines"].forEach((state) => {
     const input: Input = {
@@ -208,8 +209,8 @@ test("the colleague hand carries the actual moving chair before reaching the tas
 test("response tail clears every painted line of accepted dense colleague names", () => {
   ["V".repeat(18), `界 ${"界".repeat(14)} 界`, "é👩‍🔬é👩‍🔬é"].forEach(
     (colleague) => {
-      ["joins", "later", "declines"].forEach((state) =>
-        [50, 90, 110, 150].forEach((frame) => {
+      ["joins", "later", "declines"].forEach((state) => {
+        return [50, 90, 110, 150].forEach((frame) => {
           const input = inputSchema.parse({
             ...fixtures[2].input,
             people: { ...fixtures[2].input.people, colleague },
@@ -247,7 +248,9 @@ test("response tail clears every painted line of accepted dense colleague names"
           ];
           assert.equal(
             spans
-              .map(([, , line]) => line)
+              .map(([, , line]) => {
+                return line;
+              })
               .join("")
               .replace(/\s/gu, ""),
             colleague.replace(/\s/gu, ""),
@@ -263,14 +266,12 @@ test("response tail clears every painted line of accepted dense colleague names"
                 attributes: text[1],
                 name: "y",
               }) +
-              spans
-                .slice(0, index + 1)
-                .reduce(
-                  (offset, [, spanAttributes]) =>
-                    offset +
-                    Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0),
-                  0,
-                ) -
+              spans.slice(0, index + 1).reduce((offset, [, spanAttributes]) => {
+                return (
+                  offset +
+                  Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0)
+                );
+              }, 0) -
               fontSize;
             const right =
               left + getConservativeWidthFromText({ text: line, fontSize });
@@ -283,8 +284,8 @@ test("response tail clears every painted line of accepted dense colleague names"
               `tail intersects colleague line ${index}`,
             );
           });
-        }),
-      );
+        });
+      });
     },
   );
 });

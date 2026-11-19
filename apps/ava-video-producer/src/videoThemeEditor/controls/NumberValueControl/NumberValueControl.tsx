@@ -4,6 +4,7 @@ import { RangeNumberInput } from "../RangeNumberInput";
 import { NumberSlider } from "./NumberSlider/NumberSlider";
 import css from "./NumberValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const SLIDER_STEP_LIMIT = 1000;
 const UNIT_SUFFIXES: Readonly<Record<string, string>> = {
@@ -31,7 +32,7 @@ export function NumberValueControl({
   definition,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const scale = definition.unit === "%" ? 100 : 1;
   const min = (definition.min ?? 0) * scale;
   const max = (definition.max ?? 100) * scale;
@@ -39,13 +40,14 @@ export function NumberValueControl({
   const shown = Number(
     ((parseCssPixels(value) ?? min / scale) * scale).toFixed(4),
   );
-  const emit = (shownNumber: number) =>
-    onChange(
+  const emit = (shownNumber: number) => {
+    return onChange(
       _buildTokenValue(
         definition.kind,
         Number((shownNumber / scale).toFixed(6)),
       ),
     );
+  };
   return (
     <Group className={css.numberValueRow} gap="xs" wrap="nowrap">
       {(max - min) / step <= SLIDER_STEP_LIMIT ? (

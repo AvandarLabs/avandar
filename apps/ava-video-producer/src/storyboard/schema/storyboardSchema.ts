@@ -62,26 +62,35 @@ export const storyboardSchema = z
       .default([]),
   })
   .superRefine((plan, ctx) => {
-    const issue = (message: string) =>
-      ctx.addIssue({ code: "custom", message });
+    const issue = (message: string) => {
+      return ctx.addIssue({ code: "custom", message });
+    };
     const unique = (ids: string[], name: string) => {
       if (new Set(ids).size !== ids.length) issue(`${name} IDs must be unique`);
     };
     unique(
-      plan.shots.map((shot) => shot.id),
+      plan.shots.map((shot) => {
+        return shot.id;
+      }),
       "Shot",
     );
     unique(
-      plan.narration.map((item) => item.id),
+      plan.narration.map((item) => {
+        return item.id;
+      }),
       "Narration cue",
     );
     unique(
-      plan.soundEffects.map((item) => item.id),
+      plan.soundEffects.map((item) => {
+        return item.id;
+      }),
       "Sound effect",
     );
     if (
       [plan.width, plan.height, plan.delivery.width, plan.delivery.height].some(
-        (value) => value % 2,
+        (value) => {
+          return value % 2;
+        },
       )
     )
       issue("Canvas and delivery dimensions must be even");
@@ -172,20 +181,30 @@ export const storyboardSchema = z
         issue(`${shot.id}: the exit must start inside the shot`);
       if (shot.scene === "tilted-window")
         _checkTiltedWindow(shot.props, shot.durationInFrames).forEach(
-          (message) => issue(`${shot.id}: ${message}`),
+          (message) => {
+            return issue(`${shot.id}: ${message}`);
+          },
         );
       if (shot.scene === "title" && shot.durationInFrames !== 66)
         issue(`${shot.id}: existing TitleCard requires 66 frames`);
       if (shot.scene === "graph") {
         unique(
-          shot.props.nodes.map((node) => node.id),
+          shot.props.nodes.map((node) => {
+            return node.id;
+          }),
           `${shot.id} node`,
         );
         unique(
-          shot.props.edges.map((item) => item.id),
+          shot.props.edges.map((item) => {
+            return item.id;
+          }),
           `${shot.id} edge`,
         );
-        const ids = new Set(shot.props.nodes.map((node) => node.id));
+        const ids = new Set(
+          shot.props.nodes.map((node) => {
+            return node.id;
+          }),
+        );
         for (const edge of shot.props.edges)
           if (!ids.has(edge.from) || !ids.has(edge.to) || edge.from === edge.to)
             issue(`${shot.id}: edge references an unknown node or itself`);
@@ -202,10 +221,16 @@ export const storyboardSchema = z
       }
       if (shot.scene === "flowchart") {
         unique(
-          shot.props.steps.map((step) => step.id),
+          shot.props.steps.map((step) => {
+            return step.id;
+          }),
           `${shot.id} step`,
         );
-        const ids = new Set(shot.props.steps.map((step) => step.id));
+        const ids = new Set(
+          shot.props.steps.map((step) => {
+            return step.id;
+          }),
+        );
         for (const edge of shot.props.connectors)
           if (!ids.has(edge.from) || !ids.has(edge.to) || edge.from === edge.to)
             issue(`${shot.id}: connector references an unknown step or itself`);
@@ -215,11 +240,12 @@ export const storyboardSchema = z
         if (
           times &&
           (times.length !== shot.props.steps.length ||
-            times.some(
-              (at, index) =>
+            times.some((at, index) => {
+              return (
                 at >= shot.durationInFrames ||
-                (index > 0 && at <= times[index - 1]),
-            ))
+                (index > 0 && at <= times[index - 1])
+              );
+            }))
         )
           issue(`${shot.id}: invalid step timing`);
       }
@@ -229,13 +255,15 @@ export const storyboardSchema = z
           ...(shot.props.crop ? [shot.props.crop] : []),
         ];
         if (
-          regions.some(
-            (r) => r.x + r.width > 1.000001 || r.y + r.height > 1.000001,
-          )
+          regions.some((r) => {
+            return r.x + r.width > 1.000001 || r.y + r.height > 1.000001;
+          })
         )
           issue(`${shot.id}: region extends beyond the source frame`);
         unique(
-          (shot.props.callouts ?? []).map((item) => item.id),
+          (shot.props.callouts ?? []).map((item) => {
+            return item.id;
+          }),
           `${shot.id} callout`,
         );
         for (const item of shot.props.callouts ?? [])
@@ -248,7 +276,9 @@ export const storyboardSchema = z
     }
     let lastEnd = -1;
     for (const item of plan.narration) {
-      const shot = plan.shots.find((candidate) => candidate.id === item.shotId);
+      const shot = plan.shots.find((candidate) => {
+        return candidate.id === item.shotId;
+      });
       let window = { start: 0, duration: shot?.durationInFrames ?? 0 };
       try {
         window = getCueWindowFromShot({ shot, beatId: item.beatId });
@@ -272,7 +302,11 @@ export const storyboardSchema = z
     }
     if (plan.narrationTrack && plan.narrationTrack.startFrame >= offset)
       issue("Narration track starts after the film ends");
-    if (plan.soundEffects.some((sound) => sound.atFrame >= offset))
+    if (
+      plan.soundEffects.some((sound) => {
+        return sound.atFrame >= offset;
+      })
+    )
       issue("Sound effect starts after the film ends");
   });
 
@@ -324,8 +358,11 @@ function _checkTiltedWindow(
 ): string[] {
   const isPair = props.layout === "pair";
   const windows = props.windows ?? [];
-  const isIncreasing = (frames: number[]) =>
-    frames.every((value, index) => index === 0 || value > frames[index - 1]);
+  const isIncreasing = (frames: number[]) => {
+    return frames.every((value, index) => {
+      return index === 0 || value > frames[index - 1];
+    });
+  };
   return [
     isPair && !props.pair ? "the pair layout needs pair columns" : "",
     isPair && props.windows ? "the pair layout takes pair, not windows" : "",
@@ -337,19 +374,34 @@ function _checkTiltedWindow(
     windows[0]?.atFrame !== undefined
       ? "the first window is on screen from the start; omit its atFrame"
       : "",
-    windows.slice(1).some((window) => window.atFrame === undefined) ||
-    !isIncreasing(windows.slice(1).map((window) => window.atFrame ?? 0))
+    windows.slice(1).some((window) => {
+      return window.atFrame === undefined;
+    }) ||
+    !isIncreasing(
+      windows.slice(1).map((window) => {
+        return window.atFrame ?? 0;
+      }),
+    )
       ? "carousel windows need increasing atFrame values"
       : "",
-    !isIncreasing((props.headlines ?? []).map((headline) => headline.atFrame))
+    !isIncreasing(
+      (props.headlines ?? []).map((headline) => {
+        return headline.atFrame;
+      }),
+    )
       ? "headlines need increasing atFrame values"
       : "",
-    props.camera && !isIncreasing(props.camera.map((key) => key.at))
+    props.camera &&
+    !isIncreasing(
+      props.camera.map((key) => {
+        return key.at;
+      }),
+    )
       ? "camera keys need increasing frames"
       : "",
-    (props.pair ?? []).some(
-      (column) => column.counter.endFrame <= column.counter.startFrame,
-    )
+    (props.pair ?? []).some((column) => {
+      return column.counter.endFrame <= column.counter.startFrame;
+    })
       ? "a counter must end after it starts"
       : "",
     props.exit && props.exit.atFrame >= durationInFrames

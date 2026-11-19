@@ -9,19 +9,23 @@ import type {
   ShadowValue,
 } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const MAX_SHADOW_LAYERS = 4;
 
-/** A shadow token: up to four layers, previewed in the theme's shadow colour. */
+/**
+ * A shadow token: up to four layers, previewed in the theme's shadow colour.
+ */
 export function ShadowValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const { theme } = useTokenEditor();
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
-  const setLayers = (nextLayers: readonly ShadowLayer[]) =>
-    onChange({ layers: nextLayers });
+  const setLayers = (nextLayers: readonly ShadowLayer[]) => {
+    return onChange({ layers: nextLayers });
+  };
   const boxShadow = elevationToBoxShadow({
     layers,
     color: theme.semantic.color.shadowColor,
@@ -34,7 +38,9 @@ export function ShadowValueControl({
           size="compact-xs"
           variant="default"
           disabled={layers.length >= MAX_SHADOW_LAYERS}
-          onClick={() => setLayers([...layers, DEFAULT_SHADOW_LAYER])}
+          onClick={() => {
+            return setLayers([...layers, DEFAULT_SHADOW_LAYER]);
+          }}
         >
           {"Add layer"}
         </Button>

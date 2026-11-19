@@ -32,7 +32,10 @@ const SLOWEST_TEMPO: VideoThemePatch = {
 };
 /** The last frame of a 180-frame stock loop. */
 const LAST_LOOP_FRAME = 179;
-/** Cue frames from `ContinuityToken`: the shared object fades in at 12 and an outline starts fading 60 frames into its beat. */
+/**
+ * Cue frames from `ContinuityToken`: the shared object fades in at 12 and an
+ * outline starts fading 60 frames into its beat.
+ */
 const SHARED_OBJECT_FADE_IN_AT = 12;
 const OUTLINE_FADE_AT = 60;
 
@@ -63,7 +66,9 @@ function _picture(
 function _readContinuityShots(
   id: string,
 ): ReadonlyArray<readonly ContinuityBeat[]> {
-  const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
+  const entry = CONTINUITY_CATALOG.find((candidate) => {
+    return candidate.id === id;
+  });
   assert.ok(entry, id);
   const plan = storyboardSchema.parse(
     JSON.parse(
@@ -73,17 +78,22 @@ function _readContinuityShots(
       ),
     ),
   );
-  return plan.shots.flatMap((shot) =>
-    shot.scene === "continuity" ? [shot.props.beats] : [],
-  );
+  return plan.shots.flatMap((shot) => {
+    return shot.scene === "continuity" ? [shot.props.beats] : [];
+  });
 }
 
-const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => ({
-  id,
-  shots: _readContinuityShots(id),
-}));
+const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
+  return {
+    id,
+    shots: _readContinuityShots(id),
+  };
+});
 
-/** The last beat-local frame before the next beat's transition starts covering this one. */
+/**
+ * The last beat-local frame before the next beat's transition starts covering
+ * this one.
+ */
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   const nextBeat = beats[index + 1];
   const outgoing = nextBeat
@@ -92,7 +102,10 @@ function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   return beats[index].duration - outgoing - 1;
 }
 
-/** One row per beat of every in-scope composition, with its shot's beats and its index in them. */
+/**
+ * One row per beat of every in-scope composition, with its shot's beats and its
+ * index in them.
+ */
 function _listBeatRows(): Array<
   Readonly<{
     id: string;
@@ -101,14 +114,18 @@ function _listBeatRows(): Array<
     beats: readonly ContinuityBeat[];
   }>
 > {
-  return COMPOSITIONS.flatMap(({ id, shots }) =>
-    shots.flatMap((beats) =>
-      beats.map((beat, index) => ({ id, beat, index, beats })),
-    ),
-  );
+  return COMPOSITIONS.flatMap(({ id, shots }) => {
+    return shots.flatMap((beats) => {
+      return beats.map((beat, index) => {
+        return { id, beat, index, beats };
+      });
+    });
+  });
 }
 
-/** When each tempo-scaled stage animation of a beat ends, in beat-local frames. */
+/**
+ * When each tempo-scaled stage animation of a beat ends, in beat-local frames.
+ */
 function _stageAnimationEnds(
   beats: readonly ContinuityBeat[],
   index: number,

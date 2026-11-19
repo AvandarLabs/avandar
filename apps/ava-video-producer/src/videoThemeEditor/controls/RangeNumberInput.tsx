@@ -2,6 +2,7 @@ import { NumberInput, type NumberInputProps } from "@mantine/core";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { parseNumberInRange } from "./controlValueHelpers/controlValueHelpers";
 import { useDraftValue } from "./useDraftValue";
+import type { ReactNode } from "react";
 
 type Props = Omit<NumberInputProps, "value" | "onChange" | "min" | "max"> &
   Readonly<{
@@ -24,13 +25,17 @@ export function RangeNumberInput({
   onBlur,
   error,
   ...props
-}: Props) {
+}: Props): ReactNode {
   const hasIssue = useRowHasIssue();
   const field = useDraftValue<number, number | string>({
     value,
     toKey: String,
-    toDraft: (current) => current,
-    parse: (draft) => parseNumberInRange({ value: draft, min, max }),
+    toDraft: (current) => {
+      return current;
+    },
+    parse: (draft) => {
+      return parseNumberInRange({ value: draft, min, max });
+    },
     onChange,
   });
   return (

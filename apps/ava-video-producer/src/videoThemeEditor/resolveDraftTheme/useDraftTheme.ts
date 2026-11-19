@@ -12,7 +12,10 @@ import type {
   VideoThemePatch,
 } from "../../videoTheme/videoTheme.types";
 
-/** A draft as the editor shows it: current values, a theme to preview, and problems. */
+/**
+ * A draft as the editor shows it: current values, a theme to preview, and
+ * problems.
+ */
 export type DraftTheme = Readonly<{
   merged: VideoThemePatch;
   theme: ResolvedVideoTheme;
@@ -39,20 +42,17 @@ export function useDraftTheme({
 }: Options): DraftTheme {
   const scopeKey = scope.kind === "item" ? scope.itemId : "";
   // Callers rebuild the scope object on every render; its key is what matters.
-  const stableScope = useMemo<ThemeEditScope>(
-    () => (scopeKey ? { kind: "item", itemId: scopeKey } : { kind: "theme" }),
-    [scopeKey],
-  );
-  const result = useMemo(
-    () =>
-      makeDraftThemeResultFromDraft({
-        library,
-        themeId,
-        draft,
-        scope: stableScope,
-      }),
-    [library, themeId, draft, stableScope],
-  );
+  const stableScope = useMemo<ThemeEditScope>(() => {
+    return scopeKey ? { kind: "item", itemId: scopeKey } : { kind: "theme" };
+  }, [scopeKey]);
+  const result = useMemo(() => {
+    return makeDraftThemeResultFromDraft({
+      library,
+      themeId,
+      draft,
+      scope: stableScope,
+    });
+  }, [library, themeId, draft, stableScope]);
   const saved = useMemo(() => {
     const unedited = makeDraftThemeResultFromDraft({
       library,

@@ -20,7 +20,9 @@ export function WorkDecomposition({
 }: Readonly<Props>): ReactNode {
   const separation = ramp(frame, 86, 38);
   const pieces = getWorkPartitionFromInput(input);
-  const total = input.workItems.reduce((sum, item) => sum + item.effort, 0);
+  const total = input.workItems.reduce((sum, item) => {
+    return sum + item.effort;
+  }, 0);
   return (
     <g opacity={ramp(frame, 12, 26)}>
       <rect
@@ -40,17 +42,19 @@ export function WorkDecomposition({
         fill="none"
       />
       <g opacity={ramp(frame, 38, 2)}>
-        {pieces.map((piece, index) => (
-          <WorkPiece
-            key={piece.id}
-            piece={piece}
-            index={index}
-            frame={frame}
-            accent={accent}
-            parentLabel={input.parentLabel}
-            showEffortValues={input.showEffortValues}
-          />
-        ))}
+        {pieces.map((piece, index) => {
+          return (
+            <WorkPiece
+              key={piece.id}
+              piece={piece}
+              index={index}
+              frame={frame}
+              accent={accent}
+              parentLabel={input.parentLabel}
+              showEffortValues={input.showEffortValues}
+            />
+          );
+        })}
       </g>
       <WorkCutLines
         frame={frame}

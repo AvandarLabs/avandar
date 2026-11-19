@@ -16,8 +16,8 @@ import type { PresetAssertions } from "../../../../../tests/helpers/registerStoc
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(ProseMeasurementLedger, {
       frame,
       input,
@@ -25,6 +25,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 
 function _marker({
   markup,
@@ -35,10 +36,12 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const tag = tags.find((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
   assert.ok(tag, `${key} ${value}`);
   return tag;
 }
@@ -54,15 +57,21 @@ const EXCLUDED_TEXT_FIELDS: string[] = [
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  input.copy.context,
-  input.copy.source,
-  input.copy.result,
-  input.fragments.map(prop("text")).join(""),
-  ...input.fragments
-    .filter(({ role }) => role !== "connector")
-    .map((f) => f.text.slice(f.contentStart, f.contentEnd).trim()),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    input.copy.context,
+    input.copy.source,
+    input.copy.result,
+    input.fragments.map(prop("text")).join(""),
+    ...input.fragments
+      .filter(({ role }) => {
+        return role !== "connector";
+      })
+      .map((f) => {
+        return f.text.slice(f.contentStart, f.contentEnd).trim();
+      }),
+  ];
+};
 
 const options = {
   inputSchema,
@@ -79,10 +88,11 @@ function _assertReadablePaint(markup: string): void {
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
   SvgPaintAssertions.assertPaintClearance({
     texts: paint.filter(propEq("kind", "text")),
-    rectangles: paint.filter(
-      (item) =>
-        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0,
-    ),
+    rectangles: paint.filter((item) => {
+      return (
+        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0
+      );
+    }),
   });
 }
 

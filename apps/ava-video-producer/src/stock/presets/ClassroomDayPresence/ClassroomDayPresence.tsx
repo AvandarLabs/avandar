@@ -22,16 +22,18 @@ export function ClassroomDayPresence({
   return (
     <g>
       <ClassroomDays input={input} activeIndex={activeIndex} />
-      {desks.map((desk) => (
-        <ClassroomDesk
-          key={desk.id}
-          desk={desk}
-          transition={transition}
-          accent={accent}
-          input={input}
-          activeIndex={activeIndex}
-        />
-      ))}
+      {desks.map((desk) => {
+        return (
+          <ClassroomDesk
+            key={desk.id}
+            desk={desk}
+            transition={transition}
+            accent={accent}
+            input={input}
+            activeIndex={activeIndex}
+          />
+        );
+      })}
       <ClassroomTotals input={input} day={day} />
     </g>
   );

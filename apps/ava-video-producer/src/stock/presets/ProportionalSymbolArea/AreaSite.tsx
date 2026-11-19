@@ -23,13 +23,15 @@ export function AreaSite({
     progress = ramp(frame, 51, 59, EASE.inOut);
   return (
     <g opacity={ramp(frame, 13 + index * 3, 28)}>
-      {Array.from({ length: site.value }, (_, unitIndex) => (
-        <AreaTile
-          key={unitIndex}
-          {...{ site, unitIndex, progress, radius, accent }}
-          areaPerUnit={input.areaPerUnit}
-        />
-      ))}
+      {Array.from({ length: site.value }, (_, unitIndex) => {
+        return (
+          <AreaTile
+            key={unitIndex}
+            {...{ site, unitIndex, progress, radius, accent }}
+            areaPerUnit={input.areaPerUnit}
+          />
+        );
+      })}
       <circle
         data-symbol={site.id}
         data-area={site.value * input.areaPerUnit}

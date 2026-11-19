@@ -32,13 +32,17 @@ export function useContentField({
     ...control.path
       .split(".")
       .filter(Boolean)
-      .map((key) => (/^\d+$/.test(key) ? Number(key) : key)),
+      .map((key) => {
+        return /^\d+$/.test(key) ? Number(key) : key;
+      }),
   ];
-  const issueIds = state.issues.flatMap((issue, index) =>
-    path.every((key, position) => issue.path[position] === key)
+  const issueIds = state.issues.flatMap((issue, index) => {
+    return path.every((key, position) => {
+      return issue.path[position] === key;
+    })
       ? [`content-issue-${index}`]
-      : [],
-  );
+      : [];
+  });
   const describedBy =
     [control.help ? `${id}-help` : "", ...issueIds].filter(Boolean).join(" ") ||
     undefined;
@@ -50,10 +54,11 @@ export function useContentField({
     label,
     value: getStockValueFromPath({ value: state.draft, path }),
     help: control.help ? control.help.message : undefined,
-    update: (replacement: StockJsonValue) =>
-      onChange(
+    update: (replacement: StockJsonValue) => {
+      return onChange(
         ContentDraftModule.edit({ preset, state, path, value: replacement }),
-      ),
+      );
+    },
     field: {
       id,
       "aria-label": label,

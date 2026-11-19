@@ -29,10 +29,14 @@ export const barRaceInputSchema = z
   })
   .superRefine((input, context) => {
     (["from", "to"] as const).forEach((field) => {
-      const ranks = input.bars.map((bar) => bar[field]);
+      const ranks = input.bars.map((bar) => {
+        return bar[field];
+      });
       if (
         new Set(ranks).size !== ranks.length ||
-        ranks.some((rank) => rank >= input.bars.length)
+        ranks.some((rank) => {
+          return rank >= input.bars.length;
+        })
       ) {
         context.addIssue({
           code: "custom",

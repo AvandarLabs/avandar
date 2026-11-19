@@ -94,20 +94,26 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     input: {
       ...DEFAULT_INPUT,
       recordTitle: "W".repeat(42),
-      sources: DEFAULT_INPUT.sources.map((source) => ({
-        ...source,
-        label: "W".repeat(26),
-      })),
-      fields: Array.from({ length: 4 }, (_, index) => ({
-        id: `field ${index}`,
-        label: "W".repeat(22),
-        candidates: DEFAULT_INPUT.sources.map((source) => ({
-          sourceId: source.id,
-          value: "W".repeat(26),
-        })),
-        chosenSourceId:
-          index === 3 ? null : DEFAULT_INPUT.sources[index % 2].id,
-      })),
+      sources: DEFAULT_INPUT.sources.map((source) => {
+        return {
+          ...source,
+          label: "W".repeat(26),
+        };
+      }),
+      fields: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: `field ${index}`,
+          label: "W".repeat(22),
+          candidates: DEFAULT_INPUT.sources.map((source) => {
+            return {
+              sourceId: source.id,
+              value: "W".repeat(26),
+            };
+          }),
+          chosenSourceId:
+            index === 3 ? null : DEFAULT_INPUT.sources[index % 2].id,
+        };
+      }),
       labels: {
         result: "W".repeat(28),
         selected: "W".repeat(28),
@@ -120,10 +126,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "changed",
     input: {
       ...DEFAULT_INPUT,
-      fields: DEFAULT_INPUT.fields.map((field) => ({
-        ...field,
-        chosenSourceId: "notes",
-      })),
+      fields: DEFAULT_INPUT.fields.map((field) => {
+        return {
+          ...field,
+          chosenSourceId: "notes",
+        };
+      }),
       showRetainedAlternatives: false,
       decisionStyle: "selection-bracket",
     },
@@ -140,24 +148,30 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, fields: [] },
   {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      chosenSourceId: "absent",
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        chosenSourceId: "absent",
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      candidates: [field.candidates[0], field.candidates[0]],
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        candidates: [field.candidates[0], field.candidates[0]],
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      candidates: [{ sourceId: "absent", value: "" }, field.candidates[1]],
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        candidates: [{ sourceId: "absent", value: "" }, field.candidates[1]],
+      };
+    }),
   },
   { ...DEFAULT_INPUT, recordTitle: "" },
 ];

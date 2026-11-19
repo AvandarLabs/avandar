@@ -8,7 +8,9 @@ type Props = { input: Input; frame: number };
  * Person booking totals and finite slot capacity use different denominators.
  */
 export function ClinicLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const numBooked = input.people.filter(({ slotId }) => slotId !== null).length;
+  const numBooked = input.people.filter(({ slotId }) => {
+    return slotId !== null;
+  }).length;
   const rows = [
     { label: input.copy.people, value: input.people.length, visible: true },
     { label: input.copy.booked, value: numBooked, visible: true },
@@ -30,8 +32,8 @@ export function ClinicLedger({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g opacity={ramp(frame, 114, 10)}>
-      {rows.map((row, index) =>
-        row.visible ? (
+      {rows.map((row, index) => {
+        return row.visible ? (
           <g key={index}>
             <FitText
               text={String(row.value)}
@@ -53,8 +55,8 @@ export function ClinicLedger({ input, frame }: Readonly<Props>): ReactNode {
               normalizeWhitespace
             />
           </g>
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

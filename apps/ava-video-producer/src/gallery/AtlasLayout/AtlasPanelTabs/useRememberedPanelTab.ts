@@ -22,9 +22,9 @@ function _getSessionStorage(): Storage | undefined {
 export function useRememberedPanelTab(
   itemId: string,
 ): [AtlasPanelTab, (tab: AtlasPanelTab) => void] {
-  const [tab, setTab] = useState<AtlasPanelTab>(() =>
-    readRememberedPanelTab(_getSessionStorage(), itemId),
-  );
+  const [tab, setTab] = useState<AtlasPanelTab>(() => {
+    return readRememberedPanelTab(_getSessionStorage(), itemId);
+  });
   useEffect(
     function rememberOpenTab() {
       rememberPanelTab({ storage: _getSessionStorage(), itemId, tab });

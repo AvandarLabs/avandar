@@ -59,10 +59,12 @@ registerStockPresetAssertions({
     },
     {
       ...DEFAULT_INPUT,
-      attempts: DEFAULT_INPUT.attempts.map((attempt) => ({
-        ...attempt,
-        outcome: "complete",
-      })),
+      attempts: DEFAULT_INPUT.attempts.map((attempt) => {
+        return {
+          ...attempt,
+          outcome: "complete",
+        };
+      }),
     },
   ],
 });
@@ -71,9 +73,9 @@ test("waiting brackets preserve supplied delay ratios and only declared attempts
   const markup = _render({ frame: 150, input: DEFAULT_INPUT });
   const brackets = [
     ...markup.matchAll(/<rect[^>]*data-wait-index="\d+"[^>]*>/g),
-  ].map(([attributes]) =>
-    SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-  );
+  ].map(([attributes]) => {
+    return SvgAttributes.getNumberFromMarkup({ attributes, name: "width" });
+  });
   assert.equal(brackets.length, 2);
   assert.ok(Math.abs(brackets[1] / brackets[0] - 2) < 1e-8);
   assert.equal([...markup.matchAll(/data-attempt-index=/g)].length, 3);
@@ -106,37 +108,43 @@ test("external label slots remain separated from proportional crowded brackets",
   const markup = _render({ frame: 150, input: FIXTURES[2].input });
   const slots = [
     ...markup.matchAll(/<rect[^>]*data-attempt-label-slot="\d+"[^>]*>/g),
-  ].map(([attributes]) => ({
-    x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-    width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-  }));
-  slots
-    .slice(1)
-    .forEach((slot, index) =>
-      assert.ok(slot.x >= slots[index].x + slots[index].width),
-    );
+  ].map(([attributes]) => {
+    return {
+      x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+      width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+    };
+  });
+  slots.slice(1).forEach((slot, index) => {
+    return assert.ok(slot.x >= slots[index].x + slots[index].width);
+  });
   assert.equal(slots.length, 4);
 });
 test("extreme increasing waits keep distinct markers and finite geometry at every frame", () => {
   const input: Input = {
     ...FIXTURES[2].input,
-    attempts: FIXTURES[2].input.attempts.map((attempt, index) => ({
-      ...attempt,
-      delayAfter: [1, 15, 16, 0][index],
-    })),
+    attempts: FIXTURES[2].input.attempts.map((attempt, index) => {
+      return {
+        ...attempt,
+        delayAfter: [1, 15, 16, 0][index],
+      };
+    }),
   };
-  Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) =>
-    assert.doesNotMatch(
+  Array.from({ length: 180 }, (_, frame) => {
+    return frame;
+  }).forEach((frame) => {
+    return assert.doesNotMatch(
       _render({ frame: frame, input: input }),
       /NaN|Infinity/,
-    ),
-  );
+    );
+  });
   const markup = _render({ frame: 150, input: input });
   const markers = [
     ...markup.matchAll(/<circle[^>]*data-attempt-index="\d+"[^>]*>/g),
-  ].map(([value]) => value);
-  markers.slice(1).forEach((marker, index) =>
-    assert.ok(
+  ].map(([value]) => {
+    return value;
+  });
+  markers.slice(1).forEach((marker, index) => {
+    return assert.ok(
       SvgAttributes.getNumberFromMarkup({ attributes: marker, name: "cx" }) -
         SvgAttributes.getNumberFromMarkup({
           attributes: markers[index],
@@ -147,8 +155,8 @@ test("extreme increasing waits keep distinct markers and finite geometry at ever
             attributes: markers[index],
             name: "r",
           }),
-    ),
-  );
+    );
+  });
 });
 test("label toggles remove attempt captions and wait units while keeping the chain", () => {
   const markup = _render({

@@ -23,27 +23,31 @@ export function RepeatingBlocksToTable({
         ]}
       />
       <TableFieldHeadings input={input} frame={frame} />
-      {input.blocks.map((block, index) => (
-        <BlockIdentity
-          key={block.id}
-          input={input}
-          frame={frame}
-          accent={accent}
-          index={index}
-        />
-      ))}
-      {input.blocks.flatMap((block, blockIndex) =>
-        input.fields.map((field, fieldIndex) => (
-          <BlockCellStrip
-            key={`${blockIndex}:${fieldIndex}`}
+      {input.blocks.map((block, index) => {
+        return (
+          <BlockIdentity
+            key={block.id}
             input={input}
             frame={frame}
             accent={accent}
-            blockIndex={blockIndex}
-            fieldIndex={fieldIndex}
+            index={index}
           />
-        )),
-      )}
+        );
+      })}
+      {input.blocks.flatMap((block, blockIndex) => {
+        return input.fields.map((field, fieldIndex) => {
+          return (
+            <BlockCellStrip
+              key={`${blockIndex}:${fieldIndex}`}
+              input={input}
+              frame={frame}
+              accent={accent}
+              blockIndex={blockIndex}
+              fieldIndex={fieldIndex}
+            />
+          );
+        });
+      })}
     </g>
   );
 }

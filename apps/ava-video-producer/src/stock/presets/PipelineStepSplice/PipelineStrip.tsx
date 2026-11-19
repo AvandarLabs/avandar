@@ -14,43 +14,51 @@ export function PipelineStrip({
   accent,
 }: Readonly<Props>): ReactNode {
   const steps = getSpliceGeometryFromInputAndFrame({ input, frame });
-  const originalSteps = steps.filter((step) => !step.isInserted);
+  const originalSteps = steps.filter((step) => {
+    return !step.isInserted;
+  });
   const closing = ramp(frame, 82, 16);
   return (
     <g>
-      {originalSteps.slice(1).map((step, index) => (
-        <line
-          key={step.id}
-          data-original-join={step.id}
-          x1={originalSteps[index].x + 140}
-          y1={345}
-          x2={step.x}
-          y2={345}
-          stroke={STOCK.muted}
-          strokeWidth={2}
-          opacity={1 - ramp(frame, 38, 30)}
-        />
-      ))}
-      {steps.slice(1).map((step, index) => (
-        <SpliceJoint
-          key={step.id}
-          from={steps[index]}
-          to={step}
-          index={index}
-          closing={closing}
-          joinStyle={input.joinStyle}
-          accent={accent}
-        />
-      ))}
-      {steps.map((step, index) => (
-        <SpliceModule
-          key={step.id}
-          step={step}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {originalSteps.slice(1).map((step, index) => {
+        return (
+          <line
+            key={step.id}
+            data-original-join={step.id}
+            x1={originalSteps[index].x + 140}
+            y1={345}
+            x2={step.x}
+            y2={345}
+            stroke={STOCK.muted}
+            strokeWidth={2}
+            opacity={1 - ramp(frame, 38, 30)}
+          />
+        );
+      })}
+      {steps.slice(1).map((step, index) => {
+        return (
+          <SpliceJoint
+            key={step.id}
+            from={steps[index]}
+            to={step}
+            index={index}
+            closing={closing}
+            joinStyle={input.joinStyle}
+            accent={accent}
+          />
+        );
+      })}
+      {steps.map((step, index) => {
+        return (
+          <SpliceModule
+            key={step.id}
+            step={step}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

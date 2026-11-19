@@ -45,7 +45,9 @@ function _assertUnequalScoopBounds({
 }: Readonly<ScoopAssertion>): void {
   Array.from(
     { length: Math.max(0, Math.floor((112 - 60) / 0.25) + 1) },
-    (_, sampleIndex) => 60 + sampleIndex * 0.25,
+    (_, sampleIndex) => {
+      return 60 + sampleIndex * 0.25;
+    },
   ).forEach((frame) => {
     const markup = render({ frame: frame, input: input });
     const { points, opacity, strokeRadius, hand, handRadius } =
@@ -85,12 +87,12 @@ function _assertScoopContinuity({
     const current = _getScoopGeometry(render({ frame: frame, input: input }));
     [...current.points, current.hand].forEach((point, index) => {
       const earlierPoint = [...before.points, before.hand][index];
-      point.forEach((coordinate, axis) =>
-        assert.ok(
+      point.forEach((coordinate, axis) => {
+        return assert.ok(
           Math.abs(coordinate - earlierPoint[axis]) < 0.1,
           `scoop or hand jumps at frame ${frame}: ${earlierPoint[axis]} to ${coordinate}`,
-        ),
-      );
+        );
+      });
     });
   });
 }
@@ -148,31 +150,36 @@ function _assertBatchJourney({
       /<g data-token="([^"]*)"[^>]*>/g,
     ),
   ]
-    .filter(([attributes]) => attributes.includes('data-owner="coordinator"'))
-    .map((match) => match[1]);
+    .filter(([attributes]) => {
+      return attributes.includes('data-owner="coordinator"');
+    })
+    .map((match) => {
+      return match[1];
+    });
   const expected = _getAllocatedCount({ input, requestId });
   assert.equal(ids.length, expected);
   let relativePositions: number[][] | undefined;
   Array.from(
     { length: Math.max(0, Math.floor((start + 14 - start) / 1) + 1) },
-    (_, sampleIndex) => start + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return start + sampleIndex * 1;
+    },
   ).forEach((frame) => {
     const markup = render({ frame: frame, input: input });
     const points = _getBatchPoints({ markup, ids });
     _assertScoopContact({ markup, points });
-    const currentRelative = points.map(([x, y]) => [
-      x - points[0][0],
-      y - points[0][1],
-    ]);
+    const currentRelative = points.map(([x, y]) => {
+      return [x - points[0][0], y - points[0][1]];
+    });
     const previousPositions = relativePositions;
     if (previousPositions) {
-      currentRelative.forEach((point, tokenIndex) =>
-        point.forEach((coordinate, axis) =>
-          assert.ok(
+      currentRelative.forEach((point, tokenIndex) => {
+        return point.forEach((coordinate, axis) => {
+          return assert.ok(
             Math.abs(coordinate - previousPositions[tokenIndex][axis]) < 0.001,
-          ),
-        ),
-      );
+          );
+        });
+      });
     }
     relativePositions = currentRelative;
   });
@@ -189,7 +196,12 @@ function _assertBatchJourney({
   assert.ok(hand);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cy" }) >
-      Math.max(...points.map(([, y]) => y)) + 24,
+      Math.max(
+        ...points.map(([, y]) => {
+          return y;
+        }),
+      ) +
+        24,
   );
 }
 
@@ -228,19 +240,26 @@ export function registerFundingActionAssertions(render: Render): void {
   test("tipped donor credits remain supported above the actual tray edge", () => {
     fixtures.forEach(({ input }) => {
       const markup = render({ frame: 30, input: input });
-      input.contributions.forEach((_, donorIndex) =>
-        _assertTippedSupport({ markup, donorIndex }),
-      );
+      input.contributions.forEach((_, donorIndex) => {
+        return _assertTippedSupport({ markup, donorIndex });
+      });
     });
   });
   test("the scoop picks up, carries and releases the intact request batch without crossing copy", () => {
     fixtures.forEach(({ input }) => {
-      input.requests.forEach((request, index) =>
-        _assertBatchJourney({ render, input, requestId: request.id, index }),
-      );
+      input.requests.forEach((request, index) => {
+        return _assertBatchJourney({
+          render,
+          input,
+          requestId: request.id,
+          index,
+        });
+      });
       Array.from(
         { length: Math.max(0, Math.ceil((180 - 0) / 1)) },
-        (_, sampleIndex) => 0 + sampleIndex * 1,
+        (_, sampleIndex) => {
+          return 0 + sampleIndex * 1;
+        },
       ).forEach((frame) => {
         _assertScoopClearance(render({ frame: frame, input: input }));
       });
@@ -249,10 +268,9 @@ export function registerFundingActionAssertions(render: Render): void {
 }
 
 function _getPoints(path: string): number[][] {
-  return [...path.matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map((match) => [
-    Number(match[1]),
-    Number(match[2]),
-  ]);
+  return [...path.matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map((match) => {
+    return [Number(match[1]), Number(match[2])];
+  });
 }
 
 type Journey = {
@@ -270,7 +288,9 @@ function _getBatchPoints({
   ids: string[];
 }): number[][] {
   const tokens = [...markup.matchAll(/<g data-token="([^"]*)"[^>]*>/g)].filter(
-    (match) => ids.includes(match[1]),
+    (match) => {
+      return ids.includes(match[1]);
+    },
   );
   assert.equal(tokens.length, ids.length);
   return tokens.map(([attributes]) => {
@@ -290,8 +310,18 @@ function _assertScoopContact({
   const hand = markup.match(/<circle data-coordinator-hand[^>]*>/);
   const scoop = markup.match(/<path data-allocation-scoop[^>]*d="([^"]+)"/);
   assert.ok(hand && scoop);
-  const right = Math.max(...points.map(([x]) => x)) + 23;
-  const bottom = Math.max(...points.map(([, y]) => y)) + 24;
+  const right =
+    Math.max(
+      ...points.map(([x]) => {
+        return x;
+      }),
+    ) + 23;
+  const bottom =
+    Math.max(
+      ...points.map(([, y]) => {
+        return y;
+      }),
+    ) + 24;
   assert.ok(
     Math.abs(
       SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }) -
@@ -305,10 +335,9 @@ function _assertScoopContact({
     ) < 0.000001,
   );
   assert.ok(
-    _getPoints(scoop[1]).some(
-      ([x, y]) =>
-        Math.abs(x - right) < 0.000001 && Math.abs(y - bottom) < 0.000001,
-    ),
+    _getPoints(scoop[1]).some(([x, y]) => {
+      return Math.abs(x - right) < 0.000001 && Math.abs(y - bottom) < 0.000001;
+    }),
   );
 }
 
@@ -321,5 +350,7 @@ function _getAllocatedCount({
 }): number {
   return input.allocations
     .filter(propEq("requestId", requestId))
-    .reduce((sum, item) => sum + item.credits, 0);
+    .reduce((sum, item) => {
+      return sum + item.credits;
+    }, 0);
 }

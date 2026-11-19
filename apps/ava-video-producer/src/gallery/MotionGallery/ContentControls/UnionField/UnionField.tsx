@@ -26,11 +26,10 @@ export function UnionField({
   context,
   ...remainingProps
 }: Props): ReactNode {
-  const [selectedType, setSelectedType] = useState(
-    () =>
-      ContentFields.getVariantFromValue({ control, value: context.value })
-        .valueType,
-  );
+  const [selectedType, setSelectedType] = useState(() => {
+    return ContentFields.getVariantFromValue({ control, value: context.value })
+      .valueType;
+  });
   const activeType =
     context.value === ""
       ? selectedType
@@ -51,13 +50,17 @@ export function UnionField({
         <select
           className={styles.unionFieldVariant}
           value={activeType}
-          onChange={(event) => selectType(event.target.value)}
+          onChange={(event) => {
+            return selectType(event.target.value);
+          }}
         >
-          {control.variants.map((item) => (
-            <option key={item.valueType} value={item.valueType}>
-              {item.label.message}
-            </option>
-          ))}
+          {control.variants.map((item) => {
+            return (
+              <option key={item.valueType} value={item.valueType}>
+                {item.label.message}
+              </option>
+            );
+          })}
         </select>
       </label>
       <ContentField

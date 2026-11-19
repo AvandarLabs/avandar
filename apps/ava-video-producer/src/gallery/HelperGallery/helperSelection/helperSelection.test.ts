@@ -48,18 +48,28 @@ test("filtering narrows by category and by text across titles, exports and copy"
     query: "",
   });
   assert.ok(masks.length > 0);
-  assert.ok(masks.every((helper) => helper.category === "masks"));
+  assert.ok(
+    masks.every((helper) => {
+      return helper.category === "masks";
+    }),
+  );
   const byExport = filterHelpers(HELPER_CATALOG.helpers, {
     category: "all",
     query: "getEraseMaskStyle",
   });
   assert.deepEqual(
-    byExport.map((helper) => helper.id),
+    byExport.map((helper) => {
+      return helper.id;
+    }),
     ["erase-mask"],
   );
   const byCopy = filterHelpers(HELPER_CATALOG.helpers, {
     category: "all",
     query: "FLY-THROUGH",
   });
-  assert.ok(byCopy.some((helper) => helper.id === "fly-through"));
+  assert.ok(
+    byCopy.some((helper) => {
+      return helper.id === "fly-through";
+    }),
+  );
 });

@@ -10,6 +10,7 @@ import {
 import { DestinationSlots } from "./DestinationSlots";
 import { DESTINATION } from "./SourceMerge.constants";
 import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.schema";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   input: SourceMergeInput;
@@ -18,7 +19,7 @@ type Props = Readonly<{
 }>;
 
 /** The destination panel the merged output lands in. */
-export function Destination({ input, frame, accent }: Props) {
+export function Destination({ input, frame, accent }: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
   const { layout } = useGraphicTokens();
   const x = GRAPHIC_WIDTH - layout.graphic.margin - DESTINATION.width;

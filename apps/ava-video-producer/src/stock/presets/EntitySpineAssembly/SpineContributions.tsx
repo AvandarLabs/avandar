@@ -56,9 +56,9 @@ export function SpineContributions({
       })}
       {frame >= 100
         ? input.entities.map((entity) => {
-            const index = observations.findIndex(
-              ({ entityId }) => entityId === entity.id,
-            );
+            const index = observations.findIndex(({ entityId }) => {
+              return entityId === entity.id;
+            });
             return index >= 0 ? (
               <SpineSum
                 key={entity.id}

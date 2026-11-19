@@ -15,31 +15,33 @@ export function RegistrationReferences({
   return (
     <g>
       {" "}
-      {points.map((point) => (
-        <g key={point.id}>
-          <path
-            d={`M${555 + point.targetX * 2.4} ${185 + point.targetY * 2.4} L${54 + point.index * 220} 432`}
-            stroke={STOCK.line}
-            strokeDasharray="3 4"
-            fill="none"
-          />
-          <circle
-            data-stationary-target={point.id}
-            cx={555 + point.targetX * 2.4}
-            cy={185 + point.targetY * 2.4}
-            r={10 + point.index * 2}
-            fill="none"
-            stroke={STOCK.mint}
-          />
-          <circle
-            cx={65 + point.x * 2.4}
-            cy={185 + point.y * 2.4}
-            r={5}
-            fill={STOCK.muted}
-            fillOpacity={0.3}
-          />
-        </g>
-      ))}
+      {points.map((point) => {
+        return (
+          <g key={point.id}>
+            <path
+              d={`M${555 + point.targetX * 2.4} ${185 + point.targetY * 2.4} L${54 + point.index * 220} 432`}
+              stroke={STOCK.line}
+              strokeDasharray="3 4"
+              fill="none"
+            />
+            <circle
+              data-stationary-target={point.id}
+              cx={555 + point.targetX * 2.4}
+              cy={185 + point.targetY * 2.4}
+              r={10 + point.index * 2}
+              fill="none"
+              stroke={STOCK.mint}
+            />
+            <circle
+              cx={65 + point.x * 2.4}
+              cy={185 + point.y * 2.4}
+              r={5}
+              fill={STOCK.muted}
+              fillOpacity={0.3}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

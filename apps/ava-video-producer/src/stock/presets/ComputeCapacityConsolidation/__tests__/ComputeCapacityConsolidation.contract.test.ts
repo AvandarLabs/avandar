@@ -55,14 +55,20 @@ test("every job stays intact with unchanged assignments and fits its final host"
     const held = _render({ frame: 150, input: input });
     const initialJobs = [
       ...initial.matchAll(/<rect[^>]*data-job="\d+"[^>]*>/g),
-    ].map((match) => match[0]);
+    ].map((match) => {
+      return match[0];
+    });
     Array.from(
       { length: Math.max(0, Math.floor((120 - 24) / 0.5) + 1) },
-      (_, sampleIndex) => 24 + sampleIndex * 0.5,
+      (_, sampleIndex) => {
+        return 24 + sampleIndex * 0.5;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const jobs = [...markup.matchAll(/<rect[^>]*data-job="\d+"[^>]*>/g)].map(
-        (match) => match[0],
+        (match) => {
+          return match[0];
+        },
       );
       assert.equal(jobs.length, input.jobs.length);
       jobs.forEach((attributes, index) => {
@@ -100,28 +106,30 @@ test("every job stays intact with unchanged assignments and fits its final host"
     });
     input.hosts.forEach((host, index) => {
       const jobs = [...held.matchAll(/<rect[^>]*data-job="\d+"[^>]*>/g)].map(
-        (match) => match[0],
+        (match) => {
+          return match[0];
+        },
       );
-      const assigned = jobs.filter(
-        (_, jobIndex) => input.jobs[jobIndex].finalHostId === host.id,
-      );
-      const occupied = assigned.reduce(
-        (sum, attributes) =>
+      const assigned = jobs.filter((_, jobIndex) => {
+        return input.jobs[jobIndex].finalHostId === host.id;
+      });
+      const occupied = assigned.reduce((sum, attributes) => {
+        return (
           sum +
-          SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
-        0,
-      );
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "height" })
+        );
+      }, 0);
       const capacity =
         (host.capacityCpuHours /
           Math.max(...input.hosts.map(prop("capacityCpuHours")))) *
         110;
       assert.ok(occupied <= capacity + 1e-9);
-      assigned.forEach((attributes) =>
-        assert.equal(
+      assigned.forEach((attributes) => {
+        return assert.equal(
           SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
           75 + index * 215,
-        ),
-      );
+        );
+      });
       const bay = held.match(
         new RegExp(`<rect[^>]*data-bay="${index}"[^>]*>`),
       )![0];
@@ -144,24 +152,28 @@ test("all opaque work rectangles remain pairwise disjoint through fractional tra
       inputSchema.parse(input);
       Array.from(
         { length: Math.max(0, Math.floor((108 - 36) / 0.25) + 1) },
-        (_, sampleIndex) => 36 + sampleIndex * 0.25,
+        (_, sampleIndex) => {
+          return 36 + sampleIndex * 0.25;
+        },
       ).forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
         const jobs = [
           ...markup.matchAll(/<rect[^>]*data-job="\d+"[^>]*>/g),
-        ].map(([attributes]) => ({
-          x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-          y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-          width: SvgAttributes.getNumberFromMarkup({
+        ].map(([attributes]) => {
+          return {
+            x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+            y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+            width: SvgAttributes.getNumberFromMarkup({
+              attributes,
+              name: "width",
+            }),
+            height: SvgAttributes.getNumberFromMarkup({
+              attributes,
+              name: "height",
+            }),
             attributes,
-            name: "width",
-          }),
-          height: SvgAttributes.getNumberFromMarkup({
-            attributes,
-            name: "height",
-          }),
-          attributes,
-        }));
+          };
+        });
         assert.equal(jobs.length, input.jobs.length);
         jobs.forEach((job, index) => {
           assert.equal(job.width, 80);
@@ -188,11 +200,15 @@ test("staggered transfers clear the complete visible capacity caption rails", ()
   Array.from(REVIEW_FIXTURES).forEach(({ id, input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((108 - 36) / 0.25) + 1) },
-      (_, sampleIndex) => 36 + sampleIndex * 0.25,
+      (_, sampleIndex) => {
+        return 36 + sampleIndex * 0.25;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const jobs = [...markup.matchAll(/<rect[^>]*data-job="\d+"[^>]*>/g)].map(
-        ([attributes]) => attributes,
+        ([attributes]) => {
+          return attributes;
+        },
       );
       const captions = [
         ...markup.matchAll(/<text[^>]* y="366"[^>]*>(.*?)<\/text>/g),
@@ -201,13 +217,12 @@ test("staggered transfers clear the complete visible capacity caption rails", ()
         const x = SvgAttributes.getNumberFromMarkup({ attributes, name: "x" });
         const bottom =
           366 +
-          [...text.matchAll(/dy="([^"]+)"/g)].reduce(
-            (sum, match) => sum + Number(match[1]),
-            0,
-          ) +
+          [...text.matchAll(/dy="([^"]+)"/g)].reduce((sum, match) => {
+            return sum + Number(match[1]);
+          }, 0) +
           3.6;
-        jobs.forEach((job) =>
-          assert.ok(
+        jobs.forEach((job) => {
+          return assert.ok(
             SvgAttributes.getNumberFromMarkup({ attributes: job, name: "x" }) +
               80 <=
               x ||
@@ -230,25 +245,25 @@ test("staggered transfers clear the complete visible capacity caption rails", ()
                 name: "y",
               }) >= bottom,
             `${id}: job covers caption rail at ${frame}`,
-          ),
-        );
+          );
+        });
       });
     });
   });
 });
 
 test("accepted fractional full stacks render all work during backward seeks", () => {
-  const input = REVIEW_FIXTURES.find(
-    ({ id }) => id === "fractional-full-stack",
-  )!.input;
+  const input = REVIEW_FIXTURES.find(({ id }) => {
+    return id === "fractional-full-stack";
+  })!.input;
   inputSchema.parse(input);
   const frames = [
     0, 24, 36, 47.999999, 48, 48.000001, 72, 107.999999, 108, 108.000001, 150,
     179,
   ];
-  const snapshots = frames.map((frame) =>
-    _render({ frame: frame, input: input }),
-  );
+  const snapshots = frames.map((frame) => {
+    return _render({ frame: frame, input: input });
+  });
   [...frames].reverse().forEach((frame) => {
     assert.equal(
       _render({ frame: frame, input: input }),
@@ -284,10 +299,10 @@ test("route endpoints outside the grid never alias another valid cell", () => {
     { from: { x: 75, y: 100 }, to: { x: 290, y: 99 } },
     { from: { x: 54, y: 100 }, to: { x: 290, y: 260 } },
     { from: { x: 75, y: 100 }, to: { x: 826, y: 260 } },
-  ].forEach((endpoints) =>
-    assert.equal(
+  ].forEach((endpoints) => {
+    return assert.equal(
       findJobRoute({ ...endpoints, height: 110, obstacles: [] }),
       undefined,
-    ),
-  );
+    );
+  });
 });

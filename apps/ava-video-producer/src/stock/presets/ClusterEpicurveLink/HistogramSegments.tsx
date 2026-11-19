@@ -28,38 +28,40 @@ export function HistogramSegments({
   return (
     <g>
       {getCasePositionsFromInput(input).map(
-        ({ record, index, histogramX, histogramY, isInvestigated }) => (
-          <g
-            key={record.id}
-            data-histogram-case={record.id}
-            data-onset-bin={record.onsetBinId ?? undefined}
-            data-unknown-onset={record.onsetBinId === null}
-          >
-            <rect
-              x={histogramX - 15}
-              y={histogramY - 13}
-              width={30}
-              height={15}
-              fill={isInvestigated && frame >= 36 ? accent : STOCK.cyan}
-              fillOpacity={
-                isInvestigated ? 0.45 + 0.55 * ramp(frame, 36, 48) : 0.4
-              }
-            />
-            <text
-              x={histogramX}
-              y={histogramY - 1}
-              fontSize={12}
-              fill={
-                isInvestigated && frame >= 36
-                  ? _getIdentityInk(accent)
-                  : STOCK.text
-              }
-              textAnchor="middle"
+        ({ record, index, histogramX, histogramY, isInvestigated }) => {
+          return (
+            <g
+              key={record.id}
+              data-histogram-case={record.id}
+              data-onset-bin={record.onsetBinId ?? undefined}
+              data-unknown-onset={record.onsetBinId === null}
             >
-              {index + 1}
-            </text>
-          </g>
-        ),
+              <rect
+                x={histogramX - 15}
+                y={histogramY - 13}
+                width={30}
+                height={15}
+                fill={isInvestigated && frame >= 36 ? accent : STOCK.cyan}
+                fillOpacity={
+                  isInvestigated ? 0.45 + 0.55 * ramp(frame, 36, 48) : 0.4
+                }
+              />
+              <text
+                x={histogramX}
+                y={histogramY - 1}
+                fontSize={12}
+                fill={
+                  isInvestigated && frame >= 36
+                    ? _getIdentityInk(accent)
+                    : STOCK.text
+                }
+                textAnchor="middle"
+              >
+                {index + 1}
+              </text>
+            </g>
+          );
+        },
       )}
     </g>
   );

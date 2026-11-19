@@ -3,7 +3,10 @@ import { durationInFrames } from "../../../src/storyboard/schema/schema";
 import { writeJson } from "../writeJson";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 
-/** Records a finished render: its fingerprint, final file, and what the gate decided. */
+/**
+ * Records a finished render: its fingerprint, final file, and what the gate
+ * decided.
+ */
 export function writeRenderManifest({
   plan,
   directory,
@@ -14,7 +17,7 @@ export function writeRenderManifest({
   directory: string;
   fingerprint: unknown;
   hasAudio: boolean;
-}>) {
+}>): Promise<void> {
   return writeJson(path.join(directory, "manifest.json"), {
     version: 1,
     complete: true,

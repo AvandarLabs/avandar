@@ -13,6 +13,7 @@ import {
   TITLE_INSET,
   TITLE_Y,
 } from "./SchemaMapping.constants";
+import type { ReactNode } from "react";
 
 type Props = {
   x: number;
@@ -22,7 +23,7 @@ type Props = {
 };
 
 /** One side panel of the mapping: its title and the divider under it. */
-export function SchemaPanel({ x, title, frame, index }: Props) {
+export function SchemaPanel({ x, title, frame, index }: Props): ReactNode {
   const style = useGraphicProps("SchemaMapping", {});
   const { color } = useGraphicTokens();
   return (

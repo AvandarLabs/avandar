@@ -20,18 +20,16 @@ function _getPersonPosition({
   index,
   frame,
 }: Omit<Props, "accent">) {
-  return input.visits.reduce(
-    (position, visit, visitIndex) =>
-      participant.records.find(propEq("visitId", visit.id))?.state ===
+  return input.visits.reduce((position, visit, visitIndex) => {
+    return participant.records.find(propEq("visitId", visit.id))?.state ===
       "recorded"
-        ? mix(
-            ramp(frame, 30 + visitIndex * 18 + index * 2, 18, EASE.inOut),
-            position,
-            380 + visitIndex * 155,
-          )
-        : position,
-    285,
-  );
+      ? mix(
+          ramp(frame, 30 + visitIndex * 18 + index * 2, 18, EASE.inOut),
+          position,
+          380 + visitIndex * 155,
+        )
+      : position;
+  }, 285);
 }
 /** Stable identities move only to authored recorded visit positions. */
 export function CohortLane({
@@ -60,19 +58,21 @@ export function CohortLane({
         stroke={STOCK.line}
         strokeDasharray="3 6"
       />
-      {input.visits.map((visit, visitIndex) => (
-        <CohortRecord
-          key={visit.id}
-          input={input}
-          participant={participant}
-          visit={visit}
-          visitIndex={visitIndex}
-          personIndex={index}
-          y={y}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.visits.map((visit, visitIndex) => {
+        return (
+          <CohortRecord
+            key={visit.id}
+            input={input}
+            participant={participant}
+            visit={visit}
+            visitIndex={visitIndex}
+            personIndex={index}
+            y={y}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <CohortPerson id={participant.id} x={x} y={y - 10} accent={accent} />
     </g>
   );

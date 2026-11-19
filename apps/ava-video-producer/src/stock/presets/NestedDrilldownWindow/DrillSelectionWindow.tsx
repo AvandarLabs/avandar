@@ -13,13 +13,21 @@ export function DrillSelectionWindow({
   accent,
 }: Readonly<Props>): ReactNode {
   const parentGroups = [
-    ...new Set(input.records.map((record) => record.groups[0])),
+    ...new Set(
+      input.records.map((record) => {
+        return record.groups[0];
+      }),
+    ),
   ];
   const subgroups = [
     ...new Set(
       input.records
-        .filter((record) => record.groups[0] === input.selectionPath[0])
-        .map((record) => record.groups[1]),
+        .filter((record) => {
+          return record.groups[0] === input.selectionPath[0];
+        })
+        .map((record) => {
+          return record.groups[1];
+        }),
     ),
   ];
   const parent = ramp(frame, 40, 34);

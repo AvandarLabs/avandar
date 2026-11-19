@@ -98,8 +98,8 @@ test("late evidence remains in original order under both widening and held-revie
 });
 
 test("three and six rows preserve negative, zero and exact lexical numeric forms and longest late string", () => {
-  [fixtures[1].input, fixtures[2].input].forEach((input) =>
-    ["widen-to-text", "hold-for-review"].forEach((policy) => {
+  [fixtures[1].input, fixtures[2].input].forEach((input) => {
+    return ["widen-to-text", "hold-for-review"].forEach((policy) => {
       const markup = _render({
         frame: 150,
         input: {
@@ -118,8 +118,8 @@ test("three and six rows preserve negative, zero and exact lexical numeric forms
       assert.ok(
         !_values({ markup, attribute: "data-output-value" }).includes("null"),
       );
-    }),
-  );
+    });
+  });
 });
 
 test("late cell physically appends and review bracket opens before values move to retained output slots", () => {
@@ -193,9 +193,9 @@ test("all preserved cells and source-state headings avoid dense foreground overp
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -226,8 +226,8 @@ test("hidden originals preserve whitespace and whole-grapheme late evidence in v
 });
 
 test("dense late and long numeric glyphs avoid the actual review-bracket strokes during both policy transfers", () => {
-  ["widen-to-text", "hold-for-review"].forEach((policy) =>
-    [124, 125, 128].forEach((frame) => {
+  ["widen-to-text", "hold-for-review"].forEach((policy) => {
+    return [124, 125, 128].forEach((frame) => {
       const input = inputSchema.parse({
         ...fixtures[2].input,
         values: ["-1234567890.0000", ...fixtures[2].input.values.slice(1)],
@@ -235,29 +235,30 @@ test("dense late and long numeric glyphs avoid the actual review-bracket strokes
       });
       const markup = _render({ frame: frame, input: input }),
         paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-      const glyphs = paint.filter(
-        (item) =>
+      const glyphs = paint.filter((item) => {
+        return (
           item.kind === "text" &&
           (item.ariaLabel === input.values[0] ||
-            item.ariaLabel === input.values.at(-1)),
-      );
+            item.ariaLabel === input.values.at(-1))
+        );
+      });
       assert.ok(glyphs.length >= 32);
-      _getBracketStrokes(markup).forEach((stroke) =>
-        glyphs.forEach((glyph) =>
-          assert.equal(
+      _getBracketStrokes(markup).forEach((stroke) => {
+        return glyphs.forEach((glyph) => {
+          return assert.equal(
             _overlaps({ first: stroke, second: glyph }),
             false,
             `Bracket intersects ${glyph.text} at ${frame}`,
-          ),
-        ),
-      );
-    }),
-  );
+          );
+        });
+      });
+    });
+  });
 });
 
 test("opaque moving cells shield dense late and long numeric glyphs from source and destination border strokes", () => {
-  ["widen-to-text", "hold-for-review"].forEach((policy) =>
-    [124, 125, 128].forEach((frame) => {
+  ["widen-to-text", "hold-for-review"].forEach((policy) => {
+    return [124, 125, 128].forEach((frame) => {
       const input = inputSchema.parse({
         ...fixtures[2].input,
         values: ["-1234567890.0000", ...fixtures[2].input.values.slice(1)],
@@ -266,8 +267,8 @@ test("opaque moving cells shield dense late and long numeric glyphs from source 
       const markup = _render({ frame: frame, input: input });
       _assertStationaryStrokeShielding({ markup, value: input.values[0] });
       _assertStationaryStrokeShielding({ markup, value: input.values.at(-1)! });
-    }),
-  );
+    });
+  });
 });
 
 test("moving cell stroke shields use the configured graphic background", () => {
@@ -287,14 +288,14 @@ test("moving cell stroke shields use the configured graphic background", () => {
     ),
   );
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup),
-    glyphs = paint.filter(
-      (item) => item.kind === "text" && item.ariaLabel === input.values.at(-1),
-    );
+    glyphs = paint.filter((item) => {
+      return item.kind === "text" && item.ariaLabel === input.values.at(-1);
+    });
   assert.ok(glyphs.length >= 16);
-  glyphs.forEach((glyph) =>
-    assert.ok(
-      paint.some(
-        (backing) =>
+  glyphs.forEach((glyph) => {
+    return assert.ok(
+      paint.some((backing) => {
+        return (
           backing.kind === "rect" &&
           backing.fill === background &&
           backing.opacity * backing.fillOpacity === 1 &&
@@ -302,8 +303,9 @@ test("moving cell stroke shields use the configured graphic background", () => {
           backing.left < glyph.left &&
           backing.right > glyph.right &&
           backing.top < glyph.top &&
-          backing.bottom > glyph.bottom,
-      ),
-    ),
-  );
+          backing.bottom > glyph.bottom
+        );
+      }),
+    );
+  });
 });

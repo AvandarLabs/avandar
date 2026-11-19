@@ -161,10 +161,14 @@ function _assertBalanceCaptions({
   const markup = _render({ frame: frame, input: input });
   const labels = [
     ...markup.matchAll(/<text aria-label="([^"]*)"[^>]*y="450"[^>]*>/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   const quantities = [
     ...markup.matchAll(/<text aria-label="([^"]*)"[^>]*y="535"[^>]*>/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   assert.deepEqual(labels, [
     input.balanceLabels.currentUse,
     frame < 144 ? input.balanceLabels.reserved : input.balanceLabels.remaining,
@@ -178,7 +182,9 @@ function _assertBalanceCaptions({
       frame < 144 ? value.reserve : value.remaining,
       value.loss,
       frame < 144 ? "0" : value.sown,
-    ].map((amount) => `${amount} ${input.crop.unitLabel}`),
+    ].map((amount) => {
+      return `${amount} ${input.crop.unitLabel}`;
+    }),
   );
   const sown = SvgAttributes.fromMarker({ markup, marker: "seed-sown" });
   if (input.crop.sownQuantity > 0) {

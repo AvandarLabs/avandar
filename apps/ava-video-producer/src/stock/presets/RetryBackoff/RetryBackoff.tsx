@@ -27,15 +27,17 @@ export function RetryBackoff({
         breakLongWords
       />
       <path d="M80 310 H880" stroke={accent} strokeOpacity={0.24} />
-      {state.markers.map((marker) => (
-        <BackoffAttempt
-          key={marker.index}
-          {...marker}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {state.markers.map((marker) => {
+        return (
+          <BackoffAttempt
+            key={marker.index}
+            {...marker}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       <circle
         data-operation-token="true"
         cx={state.tokenX}

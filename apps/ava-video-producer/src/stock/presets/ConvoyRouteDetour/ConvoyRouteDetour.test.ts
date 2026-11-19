@@ -107,20 +107,23 @@ function _distanceToSegment({
 }
 test("the actual vehicle follows authored edges and never occupies the closed interior", () => {
   fixtures.forEach(({ input }) => {
-    const blocked = input.routes.find(({ role }) => role === "blocked")!.points;
-    const detour = input.routes.find(({ role }) => role === "detour")!.points;
+    const blocked = input.routes.find(({ role }) => {
+      return role === "blocked";
+    })!.points;
+    const detour = input.routes.find(({ role }) => {
+      return role === "detour";
+    })!.points;
     const start = blocked[input.obstruction.segmentIndex];
     const end = blocked[input.obstruction.segmentIndex + 1];
-    Array.from({ length: 180 }, (_, index) => index * 1).forEach((frame) => {
+    Array.from({ length: 180 }, (_, index) => {
+      return index * 1;
+    }).forEach((frame) => {
       const point = _getVehiclePoint(_render({ frame: frame, input: input }));
       const route = frame >= 78 ? detour : blocked;
       assert.ok(
-        route
-          .slice(1)
-          .some(
-            (to, index) =>
-              _distanceToSegment({ point, from: route[index], to }) < 1e-9,
-          ),
+        route.slice(1).some((to, index) => {
+          return _distanceToSegment({ point, from: route[index], to }) < 1e-9;
+        }),
       );
       const isEndpoint =
         Math.hypot(point.x - start.x, point.y - start.y) < 1e-9 ||
@@ -145,10 +148,12 @@ test("the actual vehicle follows authored edges and never occupies the closed in
 test("crossings and positive-length overlap are rejected while shared endpoints and degenerate routes remain accepted", () => {
   const crossing = {
     ...DEFAULT_INPUT,
-    routes: DEFAULT_INPUT.routes.map((route) => ({
-      ...route,
-      points: [...DEFAULT_INPUT.routes[0].points],
-    })),
+    routes: DEFAULT_INPUT.routes.map((route) => {
+      return {
+        ...route,
+        points: [...DEFAULT_INPUT.routes[0].points],
+      };
+    }),
   };
   assert.equal(inputSchema.safeParse(crossing).success, false);
   assert.equal(
@@ -174,7 +179,9 @@ test("crossings and positive-length overlap are rejected while shared endpoints 
   assert.equal(inputSchema.safeParse(MINIMUM_INPUT).success, true);
   assert.equal(
     inputSchema.safeParse(
-      fixtures.find(({ id }) => id === "stationary-closure")!.input,
+      fixtures.find(({ id }) => {
+        return id === "stationary-closure";
+      })!.input,
     ).success,
     true,
   );
@@ -193,23 +200,29 @@ test("route shape bounds reject malformed points and out-of-range coordinates", 
     { ...DEFAULT_INPUT, routes: DEFAULT_INPUT.routes.slice(0, 1) },
     {
       ...DEFAULT_INPUT,
-      routes: DEFAULT_INPUT.routes.map((route) => ({
-        ...route,
-        points: route.points.slice(0, 3),
-      })),
+      routes: DEFAULT_INPUT.routes.map((route) => {
+        return {
+          ...route,
+          points: route.points.slice(0, 3),
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      routes: DEFAULT_INPUT.routes.map((route) => ({
-        ...route,
-        points: route.points.map((point) => ({ ...point, x: 0.95 })),
-      })),
+      routes: DEFAULT_INPUT.routes.map((route) => {
+        return {
+          ...route,
+          points: route.points.map((point) => {
+            return { ...point, x: 0.95 };
+          }),
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
       locations: { ...DEFAULT_INPUT.locations, extra: true },
     },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });

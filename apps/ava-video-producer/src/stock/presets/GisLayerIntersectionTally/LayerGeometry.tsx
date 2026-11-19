@@ -8,10 +8,9 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number; accent: string };
 function _buildPath(polygon: ReadonlyArray<readonly [number, number]>): string {
   return `${polygon
-    .map(
-      ([x, y], index) =>
-        `${index ? "L" : "M"}${110 + x * 3.8} ${180 + y * 2.7}`,
-    )
+    .map(([x, y], index) => {
+      return `${index ? "L" : "M"}${110 + x * 3.8} ${180 + y * 2.7}`;
+    })
     .join(" ")} Z`;
 }
 /**

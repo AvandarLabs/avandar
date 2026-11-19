@@ -6,11 +6,9 @@ export function getStockValueFromPath({
   value: unknown;
   path: ReadonlyArray<string | number>;
 }): unknown {
-  return path.reduce<unknown>(
-    (item, key) =>
-      item !== null && typeof item === "object"
-        ? Reflect.get(item, key)
-        : undefined,
-    value,
-  );
+  return path.reduce<unknown>((item, key) => {
+    return item !== null && typeof item === "object"
+      ? Reflect.get(item, key)
+      : undefined;
+  }, value);
 }

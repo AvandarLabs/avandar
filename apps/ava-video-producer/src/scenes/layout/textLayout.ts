@@ -12,10 +12,12 @@ export function formatMetric(value: number, precision = 0): string {
   }).format(Object.is(rounded, -0) ? 0 : rounded);
 }
 
-/** Conservative width estimate, used for a stable font size before rendering. */
+/**
+ * Conservative width estimate, used for a stable font size before rendering.
+ */
 export function textUnits(text: string): number {
-  return Array.from(text).reduce(
-    (sum, character) =>
+  return Array.from(text).reduce((sum, character) => {
+    return (
       sum +
       (/[\s.,:;!'|ilI]/.test(character)
         ? 0.3
@@ -23,9 +25,9 @@ export function textUnits(text: string): number {
           ? 0.95
           : character.codePointAt(0)! > 0x2ff
             ? 1
-            : 0.62),
-    0,
-  );
+            : 0.62)
+    );
+  }, 0);
 }
 
 export function wrapText(
@@ -50,19 +52,39 @@ export function wrapText(
   return result;
 }
 
+/** Wrapped lines and the font size they fit at. */
+type FittedTextLines = { fontSize: number; lines: string[] };
+
+/** The metric stack's fitted copy, type sizes, spacing and heights. */
+type MetricContentFit = {
+  label: FittedTextLines;
+  detail: FittedTextLines | undefined;
+  numberSize: number;
+  numberHeight: number;
+  unitSize: number;
+  paddingX: number;
+  paddingY: number;
+  numberGap: number;
+  unitGap: number;
+  contentHeight: number;
+  requiredHeight: number;
+};
+
 export function fitTextLines(
   lines: string[],
   width: number,
   height: number,
   requested = 92,
   minimum = 40,
-): { fontSize: number; lines: string[] } {
+): FittedTextLines {
   assertFinite(requested, "fontSize");
   if (requested < minimum || requested > 160)
     throw new Error(`fontSize must be from ${minimum} to 160`);
   for (let size = requested; size >= minimum; size -= 1) {
     try {
-      const wrapped = lines.flatMap((line) => wrapText(line, width, size));
+      const wrapped = lines.flatMap((line) => {
+        return wrapText(line, width, size);
+      });
       if (wrapped.length && wrapped.length * size * 1.22 <= height)
         return { fontSize: size, lines: wrapped };
     } catch {
@@ -74,7 +96,10 @@ export function fitTextLines(
   );
 }
 
-/** Fit the complete metric stack once, including padding, gaps and both count endpoints. */
+/**
+ * Fit the complete metric stack once, including padding, gaps and both count
+ * endpoints.
+ */
 export function fitMetricContent({
   width,
   height,
@@ -87,7 +112,7 @@ export function fitMetricContent({
 }: Pick<
   MetricSceneProps,
   "label" | "value" | "from" | "unit" | "precision" | "detail"
-> & { width: number; height: number }) {
+> & { width: number; height: number }): MetricContentFit {
   assertFinite(width, "metric width");
   assertFinite(height, "metric height");
   const paddingX = 80;
@@ -96,11 +121,13 @@ export function fitMetricContent({
     textUnits(formatMetric(from, precision)),
     textUnits(formatMetric(value, precision)),
   );
-  // Prefer the original spacious treatment; compact only when the whole stack needs it.
+  // Prefer the original spacious treatment; compact only when the whole stack
+  // needs it.
   for (let step = 0; step <= 24; step++) {
     const amount = step / 24;
-    const choose = (large: number, small: number) =>
-      Math.round(large + (small - large) * amount);
+    const choose = (large: number, small: number) => {
+      return Math.round(large + (small - large) * amount);
+    };
     const paddingY = choose(50, 20);
     const numberGap = choose(28, 12);
     const unitGap = choose(28, 14);

@@ -83,16 +83,20 @@ registerStockPresetAssertions({
   render: _render,
   excludedTextFields: ["id", "deviceShape"],
   textFrames: [18, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.surfaceLabel,
-    ...(frame >= 44
-      ? input.entries.flatMap(({ label, value }) => [label, value])
-      : []),
-    input.copy[frame < 36 ? "connected" : "offline"],
-    ...(frame >= 44 ? [input.copy.storage] : []),
-    ...(frame >= 108 ? [input.copy.retained] : []),
-    input.copy.example,
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.surfaceLabel,
+      ...(frame >= 44
+        ? input.entries.flatMap(({ label, value }) => {
+            return [label, value];
+          })
+        : []),
+      input.copy[frame < 36 ? "connected" : "offline"],
+      ...(frame >= 44 ? [input.copy.storage] : []),
+      ...(frame >= 108 ? [input.copy.retained] : []),
+      input.copy.example,
+    ];
+  },
 });
 test("retention captions wait for the first impression and completed notebook", () => {
   assert.doesNotMatch(

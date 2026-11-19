@@ -9,6 +9,7 @@ import {
 } from "./windowMotion";
 import { PAIR_BOXES, PAIR_TILT } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
+import type { ReactNode } from "react";
 
 type Props = TiltedWindowSceneProps & {
   pair: [RaceColumn, RaceColumn];
@@ -21,18 +22,20 @@ type Props = TiltedWindowSceneProps & {
  * below, for a race between two runs of the same task. The pair can enter
  * as one card that flips in and splits apart.
  */
-export function RacePair(props: Props) {
+export function RacePair(props: Props): ReactNode {
   const { frame, pair, width, height, enter: entrance, exit } = props;
   const at = entrance?.atFrame ?? 1;
   const isFlip = (entrance?.kind ?? "flip-split") === "flip-split";
   const flip = isFlip ? getFlipSplit(frame, at, width) : undefined;
   const split = flip ? flip.split : 1;
-  const boxes = PAIR_BOXES.map((box) => ({
-    x: box.x * width,
-    y: box.y * height,
-    width: box.width * width,
-    height: box.height * height,
-  }));
+  const boxes = PAIR_BOXES.map((box) => {
+    return {
+      x: box.x * width,
+      y: box.y * height,
+      width: box.width * width,
+      height: box.height * height,
+    };
+  });
   return (
     <>
       <div
@@ -95,15 +98,17 @@ export function RacePair(props: Props) {
           );
         })}
       </div>
-      {pair.map((column, side) => (
-        <_RaceStats
-          key={`${side}-${column.label}`}
-          {...props}
-          column={column}
-          side={side}
-          labelsAt={at + 2}
-        />
-      ))}
+      {pair.map((column, side) => {
+        return (
+          <_RaceStats
+            key={`${side}-${column.label}`}
+            {...props}
+            column={column}
+            side={side}
+            labelsAt={at + 2}
+          />
+        );
+      })}
     </>
   );
 }
@@ -125,7 +130,9 @@ function _RaceStats({
     frame,
     counter.startFrame,
     counter.endFrame - counter.startFrame,
-    (t) => t,
+    (t) => {
+      return t;
+    },
   );
   const done = ramp(frame, counter.endFrame, DUR.chip, EASE.out);
   const fade = exit

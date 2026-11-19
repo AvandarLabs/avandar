@@ -6,10 +6,12 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const readJson = async (relative: string) =>
-  JSON.parse(await fs.readFile(path.join(root, relative), "utf8"));
-const sha256 = (bytes: Buffer) =>
-  createHash("sha256").update(bytes).digest("hex");
+const readJson = async (relative: string) => {
+  return JSON.parse(await fs.readFile(path.join(root, relative), "utf8"));
+};
+const sha256 = (bytes: Buffer) => {
+  return createHash("sha256").update(bytes).digest("hex");
+};
 type Row = Record<string, string>;
 type Dataset =
   | "cases"
@@ -54,7 +56,9 @@ function readCsv(text: string): Row[] {
   return records.map((values) => {
     assert.equal(values.length, columns.length);
     return Object.fromEntries(
-      columns.map((column, index) => [column, values[index]]),
+      columns.map((column, index) => {
+        return [column, values[index]];
+      }),
     );
   });
 }
@@ -94,12 +98,25 @@ test("film aggregations and joined case detail keep the source dataset grain", a
     ],
     [240, 297, 12, 6, 36],
   );
-  const caseIds = new Set(fixtures.cases.map((row) => row.case_id));
+  const caseIds = new Set(
+    fixtures.cases.map((row) => {
+      return row.case_id;
+    }),
+  );
   const facilityIds = new Set(
-    fixtures.facilities.map((row) => row.facility_id),
+    fixtures.facilities.map((row) => {
+      return row.facility_id;
+    }),
   );
   assert.equal(caseIds.size, 240);
-  assert.equal(new Set(fixtures.visits.map((row) => row.visit_id)).size, 297);
+  assert.equal(
+    new Set(
+      fixtures.visits.map((row) => {
+        return row.visit_id;
+      }),
+    ).size,
+    297,
+  );
   assert.equal(facilityIds.size, 12);
   for (const row of fixtures.visits) {
     assert.ok(caseIds.has(row.case_id), row.visit_id);
@@ -109,11 +126,15 @@ test("film aggregations and joined case detail keep the source dataset grain", a
   for (const row of fixtures.cases)
     counts.set(row.district_name, (counts.get(row.district_name) ?? 0) + 1);
   const grouped = [...counts]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([district_name, recorded_cases]) => ({
-      district_name,
-      recorded_cases,
-    }));
+    .sort(([a], [b]) => {
+      return a.localeCompare(b);
+    })
+    .map(([district_name, recorded_cases]) => {
+      return {
+        district_name,
+        recorded_cases,
+      };
+    });
   assert.deepEqual(fixtures.districtCounts, grouped);
   assert.deepEqual(Object.fromEntries(counts), {
     "North Quay": 51,
@@ -123,36 +144,46 @@ test("film aggregations and joined case detail keep the source dataset grain", a
     Ridge: 29,
     "West Marsh": 25,
   });
-  const visitedIds = new Set(fixtures.visits.map((row) => row.case_id));
-  assert.equal(visitedIds.size, 221);
-  const awaiting = fixtures.cases.filter(
-    (row) => row.referral_status === "awaiting_contact",
+  const visitedIds = new Set(
+    fixtures.visits.map((row) => {
+      return row.case_id;
+    }),
   );
+  assert.equal(visitedIds.size, 221);
+  const awaiting = fixtures.cases.filter((row) => {
+    return row.referral_status === "awaiting_contact";
+  });
   assert.equal(awaiting.length, 19);
   assert.ok(
-    awaiting.every(
-      (row) => row.district_name === "Eastbank" && !visitedIds.has(row.case_id),
-    ),
+    awaiting.every((row) => {
+      return row.district_name === "Eastbank" && !visitedIds.has(row.case_id);
+    }),
   );
-  const selected = fixtures.cases.find((row) => row.case_id === "HF-0001")!;
+  const selected = fixtures.cases.find((row) => {
+    return row.case_id === "HF-0001";
+  })!;
   assert.deepEqual(
     [selected.case_label, selected.district_name, selected.referral_status],
     ["Response case 001", "North Quay", "contacted"],
   );
   assert.equal(
     fixtures.visits
-      .filter((row) => row.case_id === selected.case_id)
-      .reduce((sum, row) => sum + Number(row.supply_kits_delivered), 0),
+      .filter((row) => {
+        return row.case_id === selected.case_id;
+      })
+      .reduce((sum, row) => {
+        return sum + Number(row.supply_kits_delivered);
+      }, 0),
     1,
   );
-  const missing = fixtures.weekly_reports.filter(
-    (row) => row.reporting_status === "not_received",
-  );
+  const missing = fixtures.weekly_reports.filter((row) => {
+    return row.reporting_status === "not_received";
+  });
   assert.equal(missing.length, 2);
   assert.ok(
-    missing.every(
-      (row) => row.reported_cases === "" && row.awaiting_contact === "",
-    ),
+    missing.every((row) => {
+      return row.reported_cases === "" && row.awaiting_contact === "";
+    }),
   );
 });
 
@@ -168,9 +199,9 @@ test("native map inputs contain 252 valid geographic points and the inspected fa
     assert.ok(Number.isFinite(latitude) && Math.abs(latitude) <= 90);
     assert.ok(Number.isFinite(longitude) && Math.abs(longitude) <= 180);
   }
-  const selected = fixtures.facilities.find(
-    (row) => row.facility_id === "F03",
-  )!;
+  const selected = fixtures.facilities.find((row) => {
+    return row.facility_id === "F03";
+  })!;
   assert.deepEqual(
     [
       selected.facility_name,

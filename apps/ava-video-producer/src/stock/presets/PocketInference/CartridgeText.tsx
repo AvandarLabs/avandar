@@ -37,9 +37,16 @@ export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map((label) => (
-        <FitText key={label.x} {...label} normalizeWhitespace breakLongWords />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={label.x}
+            {...label}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

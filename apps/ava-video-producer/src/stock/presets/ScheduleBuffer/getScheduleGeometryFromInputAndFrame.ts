@@ -22,14 +22,13 @@ export function getScheduleGeometryFromInputAndFrame({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): GetScheduleGeometryResult {
-  const taskUnits = input.tasks.reduce(
-    (total, task) => total + task.duration,
-    0,
-  );
+  const taskUnits = input.tasks.reduce((total, task) => {
+    return total + task.duration;
+  }, 0);
   const scale = 880 / (taskUnits + input.reserveUnits);
-  const interruptionIndex = input.tasks.findIndex(
-    ({ id }) => id === input.interruption.afterTaskId,
-  );
+  const interruptionIndex = input.tasks.findIndex(({ id }) => {
+    return id === input.interruption.afterTaskId;
+  });
   const progress = ramp(frame, 74, 44, EASE.inOut);
   const delayWidth = input.interruption.duration * scale;
   let units = 0;

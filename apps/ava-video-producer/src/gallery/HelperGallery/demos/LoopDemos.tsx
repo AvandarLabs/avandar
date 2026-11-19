@@ -4,6 +4,7 @@ import { DEMO_COLORS, formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Width and height of the value-over-time plots beside each loop. */
 const PLOT = { width: 420, height: 160 };
@@ -91,16 +92,18 @@ function Orbits({ frame }: { frame: number }) {
 }
 
 /** Three dots orbiting with offset phases, beside one phase's sawtooth. */
-export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
+export function LoopPhaseDemo({ frame, frames }: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
       label={`loopPhase(frame, ${PERIOD}, offset)  offsets ${ORBITS.join(", ")}`}
-      readouts={ORBITS.map((offset) => ({
-        name: `offset ${offset}`,
-        value: formatReadout(loopPhase(frame, PERIOD, offset)),
-      }))}
+      readouts={ORBITS.map((offset) => {
+        return {
+          name: `offset ${offset}`,
+          value: formatReadout(loopPhase(frame, PERIOD, offset)),
+        };
+      })}
     >
       <div className={css.cards}>
         <Orbits frame={frame} />
@@ -108,7 +111,9 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => loopPhase(value, PERIOD)}
+            sample={(value) => {
+              return loopPhase(value, PERIOD);
+            }}
           />
         </div>
       </div>
@@ -117,7 +122,7 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** A halo pulsing on a smooth cosine, beside the pulse over time. */
-export function WaveDemo({ frame, frames }: HelperDemoProps) {
+export function WaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const pulse = wave(frame, 45);
   return (
     <HelperDemoFrame
@@ -144,7 +149,9 @@ export function WaveDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => wave(value, 45)}
+            sample={(value) => {
+              return wave(value, 45);
+            }}
           />
         </div>
       </div>
@@ -153,7 +160,10 @@ export function WaveDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** A graphic revealed and returned to the ground on both loop boundaries. */
-export function LoopEnvelopeDemo({ frame, frames }: HelperDemoProps) {
+export function LoopEnvelopeDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const envelope = loopEnvelope(frame, frames);
   return (
     <HelperDemoFrame
@@ -177,7 +187,9 @@ export function LoopEnvelopeDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => loopEnvelope(value, frames)}
+            sample={(value) => {
+              return loopEnvelope(value, frames);
+            }}
           />
         </div>
       </div>

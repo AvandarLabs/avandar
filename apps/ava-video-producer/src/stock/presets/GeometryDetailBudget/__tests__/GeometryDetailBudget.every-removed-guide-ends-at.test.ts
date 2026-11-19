@@ -24,7 +24,9 @@ test("every removed guide ends at its own finite retained segment without moving
         attributes: guide,
         name: "data-removed-index",
       });
-      const upper = kept.find((retained) => retained > index)!;
+      const upper = kept.find((retained) => {
+        return retained > index;
+      })!;
       const lower = kept[kept.indexOf(upper) - 1];
       const [x, y] = input.vertices[index];
       const [ax, ay] = input.vertices[lower];
@@ -65,11 +67,15 @@ test("every removed guide ends at its own finite retained segment without moving
       getSvgAttributeMatchesFromMarkup({
         markup: markup,
         attribute: "data-source-vertex",
-      }).tags.map((tag) => [
-        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-      ]),
-      input.vertices.map(([x, y]) => [60 + x * 3.6, 160 + y * 3.6]),
+      }).tags.map((tag) => {
+        return [
+          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
+          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
+        ];
+      }),
+      input.vertices.map(([x, y]) => {
+        return [60 + x * 3.6, 160 + y * 3.6];
+      }),
     );
   });
 });
@@ -91,7 +97,9 @@ test("near-threshold displayed deviations preserve the exact comparison on both 
       const comparisons = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
         markup,
       )
-        .filter((item) => item.kind === "text" && item.top >= 390)
+        .filter((item) => {
+          return item.kind === "text" && item.top >= 390;
+        })
         .map(prop("text"))
         .join(" ");
       assert.ok(comparisons.includes(String(distance)), comparisons);
@@ -114,9 +122,9 @@ test("both trace captions own explicit style samples matching the overlaid trace
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
     [DEFAULT_INPUT.labels.original, DEFAULT_INPUT.labels.simplified].forEach(
       (label, index) => {
-        const caption = paint.find(
-          (item) => item.kind === "text" && item.ariaLabel === label,
-        )!;
+        const caption = paint.find((item) => {
+          return item.kind === "text" && item.ariaLabel === label;
+        })!;
         const x = SvgAttributes.getNumberFromMarkup({
           attributes: samples[index],
           name: "data-sample-right",
@@ -143,13 +151,15 @@ test("full precision deviations and tolerance preserve all dense event text with
     const markup = _render({ frame: frame, input: input });
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
     SvgPaintAssertions.assertPaintClearance({
-      texts: paint.filter(
-        (item) => item.kind === "text" && item.ariaLabel !== undefined,
-      ),
+      texts: paint.filter((item) => {
+        return item.kind === "text" && item.ariaLabel !== undefined;
+      }),
       rectangles: [],
     });
     assert.ok(
-      paint.some((item) => item.ariaLabel?.includes(String(input.tolerance))),
+      paint.some((item) => {
+        return item.ariaLabel?.includes(String(input.tolerance));
+      }),
     );
   });
 });

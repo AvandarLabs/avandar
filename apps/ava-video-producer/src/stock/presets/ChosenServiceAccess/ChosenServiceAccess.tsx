@@ -26,16 +26,18 @@ export function ChosenServiceAccess({
   return (
     <g>
       <path d="M50 356 H860" fill="none" stroke={STOCK.line} strokeWidth={2} />
-      {input.services.map((service, index) => (
-        <ServiceEntrance
-          key={service.id}
-          service={service}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.services.map((service, index) => {
+        return (
+          <ServiceEntrance
+            key={service.id}
+            service={service}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <path
         data-access-route
         d={`M25 440 H${doorX - 170} L${doorX - 100} 356 L${doorX - 42} ${threshold} H${doorX + 42}`}

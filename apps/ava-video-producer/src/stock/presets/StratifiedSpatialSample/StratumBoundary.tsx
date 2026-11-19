@@ -24,7 +24,9 @@ export function StratumBoundary({
       <polygon
         data-stratum-boundary={stratum.id}
         points={stratum.polygon
-          .map(([x, y]) => `${70 + x * 4.8},${170 + y * 2.7}`)
+          .map(([x, y]) => {
+            return `${70 + x * 4.8},${170 + y * 2.7}`;
+          })
           .join(" ")}
         fill={color}
         fillOpacity={0.06 * ramp(frame, 18, 18)}

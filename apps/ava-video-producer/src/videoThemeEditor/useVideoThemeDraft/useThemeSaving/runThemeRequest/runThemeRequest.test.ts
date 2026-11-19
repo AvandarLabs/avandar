@@ -12,7 +12,9 @@ test("a request that succeeds resolves true and ends saved", async () => {
   });
   assert.equal(didSucceed, true);
   assert.deepEqual(
-    harness.statuses.map((status) => status.kind),
+    harness.statuses.map((status) => {
+      return status.kind;
+    }),
     ["saving", "saved"],
   );
   assert.equal(harness.inFlight.current, false);

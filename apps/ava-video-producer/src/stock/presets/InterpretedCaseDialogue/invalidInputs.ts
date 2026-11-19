@@ -4,15 +4,21 @@ export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "people"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "people";
+    }),
   ),
   { ...DEFAULT_INPUT, people: { ...DEFAULT_INPUT.people, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "languages"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "languages";
+    }),
   ),
   { ...DEFAULT_INPUT, languages: { ...DEFAULT_INPUT.languages, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "turns"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "turns";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
@@ -53,16 +59,20 @@ export const invalidInputs: unknown[] = [
     turns: [{ ...DEFAULT_INPUT.turns[0], extra: true }, DEFAULT_INPUT.turns[1]],
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "labels"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "labels";
+    }),
   ),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showSightlines",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showSightlines";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "bubbleLayout"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "bubbleLayout";
+    }),
   ),
   {
     ...DEFAULT_INPUT,

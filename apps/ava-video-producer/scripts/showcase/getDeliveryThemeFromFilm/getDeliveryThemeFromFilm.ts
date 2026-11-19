@@ -12,8 +12,9 @@ function _savedThemeId(snapshot: VideoThemeSnapshot | undefined): string {
     return snapshot?.themeId ?? "classic";
   }
   return (
-    snapshot.documents.find((document) => document.id === DRAFT_THEME_ID)
-      ?.extends ?? DRAFT_THEME_ID
+    snapshot.documents.find((document) => {
+      return document.id === DRAFT_THEME_ID;
+    })?.extends ?? DRAFT_THEME_ID
   );
 }
 

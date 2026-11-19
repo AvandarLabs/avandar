@@ -29,12 +29,18 @@ export const inputSchema = z
     showFootprints: z.boolean(),
   })
   .refine(
-    (input) => new Set(input.stops.map(prop("id"))).size === input.stops.length,
+    (input) => {
+      return new Set(input.stops.map(prop("id"))).size === input.stops.length;
+    },
     { path: ["stops"], message: "Stop IDs must be unique." },
   )
   .refine(
-    (input) =>
-      input.stops[0]?.kind === "locker" && input.stops[1]?.kind === "classroom",
+    (input) => {
+      return (
+        input.stops[0]?.kind === "locker" &&
+        input.stops[1]?.kind === "classroom"
+      );
+    },
     { path: ["stops"], message: "Stops must be locker then classroom." },
   ) satisfies z.ZodType;
 /** Schema-inferred scene input. */

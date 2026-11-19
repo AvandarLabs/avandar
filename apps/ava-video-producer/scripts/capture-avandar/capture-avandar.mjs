@@ -273,7 +273,8 @@ export async function runCapture(options = {}) {
     }
     if (recordingContext) {
       try {
-        // Finalize the stream first. saveAs() is never awaited on a live context.
+        // Finalize the stream first. saveAs() is never awaited on a live
+        // context.
         await recordingContext.close();
         if (!video)
           throw new Error("Recording context produced no video handle");

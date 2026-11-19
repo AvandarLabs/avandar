@@ -60,9 +60,9 @@ export const inputSchema = z
     input.visits.forEach((visit, index) => {
       if (
         !ids.has(visit.householdId) ||
-        input.visits.filter(
-          ({ householdId }) => householdId === visit.householdId,
-        ).length > 3
+        input.visits.filter(({ householdId }) => {
+          return householdId === visit.householdId;
+        }).length > 3
       ) {
         context.addIssue({
           code: "custom",

@@ -31,14 +31,16 @@ function _getLabelsFromCriterion({
       fontSize: 14 as const,
       color: STOCK.muted,
     },
-    ...[row.leftText, row.rightText].map((text, side) => ({
-      text,
-      x: 224 + side * 512,
-      y: y - 9,
-      width: 288,
-      fontSize: 18 as const,
-      color: STOCK.text,
-    })),
+    ...[row.leftText, row.rightText].map((text, side) => {
+      return {
+        text,
+        x: 224 + side * 512,
+        y: y - 9,
+        width: 288,
+        fontSize: 18 as const,
+        color: STOCK.text,
+      };
+    }),
   ];
 }
 
@@ -80,17 +82,19 @@ export function ContrastRow({
           />
         </g>
       ) : null}
-      {labels.map((label, side) => (
-        <g key={side} aria-label={label.text}>
-          <FitText
-            {...label}
-            maxLines={4}
-            breakLongWords
-            normalizeWhitespace
-            anchor="middle"
-          />
-        </g>
-      ))}
+      {labels.map((label, side) => {
+        return (
+          <g key={side} aria-label={label.text}>
+            <FitText
+              {...label}
+              maxLines={4}
+              breakLongWords
+              normalizeWhitespace
+              anchor="middle"
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

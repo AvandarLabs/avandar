@@ -16,6 +16,7 @@ import { ShadowValueControl } from "./ShadowValueControl/ShadowValueControl";
 import { SpringValueControl } from "./SpringValueControl/SpringValueControl";
 import { TextShadowValueControl } from "./TextShadowValueControl";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 const LAYER_CONTROLS = {
   shadow: ShadowValueControl,
@@ -27,7 +28,7 @@ const LAYER_CONTROLS = {
  * The control for a literal value of any token kind, such as an atomic
  * value, a Mantine key, or a custom component value.
  */
-export function ValueControl(props: ValueControlProps) {
+export function ValueControl(props: ValueControlProps): ReactNode {
   const { swatches } = useTokenEditor();
   switch (TOKEN_CONTROLS[props.definition.kind]) {
     case "color":

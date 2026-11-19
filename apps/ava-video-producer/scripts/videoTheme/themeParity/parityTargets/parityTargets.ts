@@ -39,7 +39,9 @@ export type ParityTarget = Readonly<{
   options: Readonly<Record<string, unknown>>;
 }>;
 
-/** A deliberate `classic` change: where it may alter pixels, in design units. */
+/**
+ * A deliberate `classic` change: where it may alter pixels, in design units.
+ */
 type ParityAllowance = Readonly<{
   id: string;
   reason: string;
@@ -78,21 +80,29 @@ const PARITY_ALLOWANCES: readonly ParityAllowance[] = [
  */
 export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
   const targets = [
-    ...PARITY_STOCK_PRESET_IDS.map((id) => ({
-      id,
-      filmId: `stock-${id}`,
-      options: { accent: DEFAULT_ACCENT, background: DEFAULT_BACKGROUND },
-    })),
-    ...PARITY_COMPOSITION_IDS.map((id) => ({ id, filmId: id, options: {} })),
+    ...PARITY_STOCK_PRESET_IDS.map((id) => {
+      return {
+        id,
+        filmId: `stock-${id}`,
+        options: { accent: DEFAULT_ACCENT, background: DEFAULT_BACKGROUND },
+      };
+    }),
+    ...PARITY_COMPOSITION_IDS.map((id) => {
+      return { id, filmId: id, options: {} };
+    }),
   ];
-  const unknownIds = ids.filter(
-    (id) => !targets.some((target) => target.id === id),
-  );
+  const unknownIds = ids.filter((id) => {
+    return !targets.some((target) => {
+      return target.id === id;
+    });
+  });
   if (unknownIds.length > 0) {
     throw new Error(`Unknown parity target: ${unknownIds.join(", ")}`);
   }
   return ids.length
-    ? targets.filter((target) => ids.includes(target.id))
+    ? targets.filter((target) => {
+        return ids.includes(target.id);
+      })
     : targets;
 }
 
@@ -118,12 +128,14 @@ export function getAllowedRegionsFromFilm(
   film: Pick<Film, "kind" | "width">,
 ): ParityRegion[] {
   const scale = film.kind === "stock" ? film.width / STOCK_VIEWBOX_WIDTH : 1;
-  return PARITY_ALLOWANCES.filter((allowance) => allowance.id === id).map(
-    ({ region }) => ({
+  return PARITY_ALLOWANCES.filter((allowance) => {
+    return allowance.id === id;
+  }).map(({ region }) => {
+    return {
       x: Math.floor(region.x * scale),
       y: Math.floor(region.y * scale),
       width: Math.ceil(region.width * scale),
       height: Math.ceil(region.height * scale),
-    }),
-  );
+    };
+  });
 }

@@ -12,9 +12,9 @@ export function LunchLabels({
   accent,
   frame,
 }: Readonly<Props>): ReactNode {
-  const complete = input.trays.filter(
-    (tray) => tray.componentIds.length === input.plannedComponents.length,
-  ).length;
+  const complete = input.trays.filter((tray) => {
+    return tray.componentIds.length === input.plannedComponents.length;
+  }).length;
   return (
     <g>
       <FitText

@@ -26,28 +26,32 @@ export function KeyedRowZipper({
         normalizeWhitespace
       />
       <JoinHeadings frame={frame} input={input} />
-      {input.leftRows.map((row, index) => (
-        <JoinRow
-          key={row.key}
-          frame={frame}
-          accent={accent}
-          input={input}
-          row={row}
-          index={index}
-          side="left"
-        />
-      ))}
-      {input.rightRows.map((row, index) => (
-        <JoinRow
-          key={row.key}
-          frame={frame}
-          accent={accent}
-          input={input}
-          row={row}
-          index={index}
-          side="right"
-        />
-      ))}
+      {input.leftRows.map((row, index) => {
+        return (
+          <JoinRow
+            key={row.key}
+            frame={frame}
+            accent={accent}
+            input={input}
+            row={row}
+            index={index}
+            side="left"
+          />
+        );
+      })}
+      {input.rightRows.map((row, index) => {
+        return (
+          <JoinRow
+            key={row.key}
+            frame={frame}
+            accent={accent}
+            input={input}
+            row={row}
+            index={index}
+            side="right"
+          />
+        );
+      })}
     </g>
   );
 }

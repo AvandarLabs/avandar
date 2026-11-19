@@ -9,10 +9,12 @@ import fixtures from "../fixtures.json";
 import css from "./CasesScreen.module.css";
 import { CaseTypeDetails } from "./CaseTypeDetails";
 import { RecordDetail } from "./RecordDetail";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import "@mantine/tiptap/styles.css";
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 const caseType = {
   id: "0239e74b-cd03-4b78-8fa3-5cb10ff02919",
   name: "Video - Harborfield response case - pilot",
@@ -21,10 +23,16 @@ const caseType = {
 };
 const casesSource = "Video - Harborfield cases";
 const visitsSource = "Video - Harborfield visits";
-const record = fixtures.cases.find((item) => item.case_id === "HF-0001")!;
+const record = fixtures.cases.find((item) => {
+  return item.case_id === "HF-0001";
+})!;
 const kits = fixtures.visits
-  .filter((item) => item.case_id === record.case_id)
-  .reduce((total, item) => total + Number(item.supply_kits_delivered), 0);
+  .filter((item) => {
+    return item.case_id === record.case_id;
+  })
+  .reduce((total, item) => {
+    return total + Number(item.supply_kits_delivered);
+  }, 0);
 const fields = [
   {
     name: "case_label",
@@ -62,22 +70,26 @@ const datasets = [
 ] as unknown as NonNullable<
   ComponentProps<typeof CaseTypeAttributesList>["datasets"]
 >;
-const attributes = fields.map((field, index) => ({
-  id: `field-${index}`,
-  name: field.name,
-  description: undefined,
-  isLabel: field.isLabel ?? false,
-  isIdentifier: field.isIdentifier ?? false,
-  mappingType: "dataset_column",
-  mapping: {
-    type: "dataset_column",
-    datasetId: field.sourceName === casesSource ? "cases" : "visits",
-  },
-})) as unknown as NonNullable<
+const attributes = fields.map((field, index) => {
+  return {
+    id: `field-${index}`,
+    name: field.name,
+    description: undefined,
+    isLabel: field.isLabel ?? false,
+    isIdentifier: field.isIdentifier ?? false,
+    mappingType: "dataset_column",
+    mapping: {
+      type: "dataset_column",
+      datasetId: field.sourceName === casesSource ? "cases" : "visits",
+    },
+  };
+}) as unknown as NonNullable<
   ComponentProps<typeof CaseTypeAttributesList>["attributes"]
 >;
 
-/** Body-local times. The movie's cursor measures these targets after rendering. */
+/**
+ * Body-local times. The movie's cursor measures these targets after rendering.
+ */
 export const CASES_BEATS = [
   { frame: 90, target: "cases-type", action: "click" },
   { frame: 250, target: "cases-view-records", action: "click" },
@@ -95,13 +107,15 @@ export function CasesScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const root = useRef<HTMLDivElement>(null);
   useLayoutEffect(
     function markCasesVideoTargets() {
       const homeButton = [
         ...(root.current?.querySelectorAll("button") ?? []),
-      ].find((button) => button.textContent?.startsWith(caseType.name));
+      ].find((button) => {
+        return button.textContent?.startsWith(caseType.name);
+      });
       homeButton?.setAttribute("data-video-target", "cases-type");
       const firstRecord = root.current?.querySelector(
         'a[data-record="HF-0001"]',
@@ -163,14 +177,16 @@ export function CasesScreen({
                 gap="xs"
                 inactiveHoverColor="neutral.1"
                 className={css.casesSidebarList}
-                links={fixtures.cases.map((item) => ({
-                  key: item.case_id,
-                  label: item.case_label,
-                  to: "/",
-                  "data-record": item.case_id,
-                  active: selected && item.case_id === record.case_id,
-                  style: { height: 50 },
-                }))}
+                links={fixtures.cases.map((item) => {
+                  return {
+                    key: item.case_id,
+                    label: item.case_label,
+                    to: "/",
+                    "data-record": item.case_id,
+                    active: selected && item.case_id === record.case_id,
+                    style: { height: 50 },
+                  };
+                })}
               />
             </ScrollArea>
           </div>

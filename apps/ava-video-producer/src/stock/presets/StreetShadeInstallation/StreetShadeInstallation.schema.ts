@@ -47,8 +47,9 @@ export const inputSchema = z
     }),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     Array.from(["zones", "installations"] as const).forEach((field) => {
       if (
         new Set(input[field].map(prop<{ id: string }, "id", string>("id")))
@@ -58,7 +59,11 @@ export const inputSchema = z
       }
     });
     input.installations.forEach((installation) => {
-      if (!input.zones.some(({ id }) => id === installation.zoneId)) {
+      if (
+        !input.zones.some(({ id }) => {
+          return id === installation.zoneId;
+        })
+      ) {
         issue(
           "installations",
           "Each installation must reference an existing zone.",
@@ -67,8 +72,12 @@ export const inputSchema = z
     });
     input.zones.forEach((zone) => {
       const added = input.installations
-        .filter(({ zoneId }) => zoneId === zone.id)
-        .reduce((sum, item) => sum + item.addedShadeM2, 0);
+        .filter(({ zoneId }) => {
+          return zoneId === zone.id;
+        })
+        .reduce((sum, item) => {
+          return sum + item.addedShadeM2;
+        }, 0);
       if (zone.existingShadeM2 + added > zone.areaM2) {
         issue(
           "zones",

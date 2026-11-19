@@ -1,21 +1,21 @@
 import { downloadFilm } from "./download.js";
 import { watchFilms } from "./watch-films.js";
 
-const films = [...document.querySelectorAll(".production-card")].map(
-  (card) => ({
+const films = [...document.querySelectorAll(".production-card")].map((card) => {
+  return {
     id: card.id,
     player: card.querySelector("iframe"),
     button: card.querySelector("[data-download]"),
     status: card.querySelector("[data-export-status]"),
     options: {},
-  }),
-);
+  };
+});
 
 window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin || !event.data) return;
-  const film = films.find(
-    ({ player }) => player.contentWindow === event.source,
-  );
+  const film = films.find(({ player }) => {
+    return player.contentWindow === event.source;
+  });
   if (!film) return;
   if (event.data.type === "film-options" && event.data.id === film.id) {
     film.options = { captions: event.data.options?.captions !== false };
@@ -55,4 +55,8 @@ films.forEach((film) => {
   });
   film.player.src = film.player.dataset.src;
 });
-watchFilms(films.map(({ player }) => player));
+watchFilms(
+  films.map(({ player }) => {
+    return player;
+  }),
+);

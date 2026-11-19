@@ -7,7 +7,10 @@ import {
   createStrokeToken,
 } from "./componentTokenHelpers";
 
-/** Tokens of the stage: heading, subtitle, shared object, evidence chip, and product frame. */
+/**
+ * Tokens of the stage: heading, subtitle, shared object, evidence chip, and
+ * product frame.
+ */
 export const STAGE_TOKENS = {
   Heading: {
     entranceDuration: createDurationToken(

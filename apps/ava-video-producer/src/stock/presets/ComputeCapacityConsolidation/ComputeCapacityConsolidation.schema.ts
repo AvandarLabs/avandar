@@ -45,8 +45,9 @@ export const inputSchema = z
     }),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     Array.from(["hosts", "jobs"] as const).forEach((field) => {
       if (
         new Set(input[field].map(prop<{ id: string }, "id", string>("id")))
@@ -57,7 +58,11 @@ export const inputSchema = z
     });
     input.jobs.forEach((job) => {
       Array.from(["initialHostId", "finalHostId"] as const).forEach((field) => {
-        if (!input.hosts.some(({ id }) => id === job[field])) {
+        if (
+          !input.hosts.some(({ id }) => {
+            return id === job[field];
+          })
+        ) {
           issue("jobs", "Both host references must exist.");
         }
       });
@@ -65,8 +70,12 @@ export const inputSchema = z
     input.hosts.forEach((host) => {
       Array.from(["initialHostId", "finalHostId"] as const).forEach((field) => {
         const used = input.jobs
-          .filter((job) => job[field] === host.id)
-          .reduce((sum, job) => sum + job.cpuHours, 0);
+          .filter((job) => {
+            return job[field] === host.id;
+          })
+          .reduce((sum, job) => {
+            return sum + job.cpuHours;
+          }, 0);
         if (used > host.capacityCpuHours) {
           issue("jobs", "Each placement must fit every host capacity.");
         }

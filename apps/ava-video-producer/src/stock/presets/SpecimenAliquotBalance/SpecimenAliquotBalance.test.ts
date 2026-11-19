@@ -44,16 +44,16 @@ function _attributes({
   attribute: string;
   value: string;
 }): string {
-  const element = markup
-    .match(/<[^>]+>/g)
-    ?.find((tag) => tag.includes(`${attribute}="${value}"`));
+  const element = markup.match(/<[^>]+>/g)?.find((tag) => {
+    return tag.includes(`${attribute}="${value}"`);
+  });
   assert.ok(element, `${attribute}=${value}`);
   return element;
 }
 test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("transferred liquid reduces the parent and preserves every child's lineage", () => {
   const before = _render({ frame: 30, input: DEFAULT_INPUT });
@@ -183,8 +183,9 @@ test("every intermediate fill conserves material at the common tube scale", () =
       });
       assert.ok(
         Math.abs(
-          volumes.reduce((total, volume) => total + volume, 0) -
-            input.parent.volume,
+          volumes.reduce((total, volume) => {
+            return total + volume;
+          }, 0) - input.parent.volume,
         ) < 1e-10,
       );
     });
@@ -270,11 +271,14 @@ test("serialized contract exposes tube identity validation", () => {
     JSON.stringify(specimenAliquotBalanceContract.semanticRules),
   ) as typeof specimenAliquotBalanceContract.semanticRules;
   const paths = ["parent.id", "aliquots.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique.*distinct.*parent\.id/i);
 });
@@ -284,11 +288,14 @@ test("serialized contract exposes volume conservation validation", () => {
     JSON.stringify(specimenAliquotBalanceContract.semanticRules),
   ) as typeof specimenAliquotBalanceContract.semanticRules;
   const paths = ["parent.volume", "aliquots.*.volume"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /sum.*<=.*parent\.volume/i);
 });

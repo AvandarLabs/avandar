@@ -36,9 +36,9 @@ import { continuitySchema } from "./continuitySchema";
 
 test("all authored overlays stay in safe stage space and clear their measured source", () => {
   const folder = new URL("../../storyboards/explainers/", import.meta.url);
-  for (const file of readdirSync(folder).filter((name) =>
-    name.endsWith(".json"),
-  )) {
+  for (const file of readdirSync(folder).filter((name) => {
+    return name.endsWith(".json");
+  })) {
     const document = JSON.parse(readFileSync(new URL(file, folder), "utf8"));
     const plan = continuitySchema.parse(document.shots[0].props);
     for (const beat of plan.beats) {
@@ -89,7 +89,9 @@ test("composites reject diagrams with no visible overlay placement", () => {
     ),
   );
   const composite = document.shots[0].props.beats.find(
-    (beat: { content: { kind: string } }) => beat.content.kind === "composite",
+    (beat: { content: { kind: string } }) => {
+      return beat.content.kind === "composite";
+    },
   );
   delete composite.content.diagrams[0].overlay;
   assert.equal(
@@ -119,7 +121,9 @@ test("a longer themed draw-in slows an annotation's arrival", () => {
 });
 
 test("a connector's themed timing sets its draw-in", () => {
-  const linear = (progress: number) => progress;
+  const linear = (progress: number) => {
+    return progress;
+  };
   assert.equal(
     getConnectorProgress(10, "signal", 0, { duration: 20, easing: linear }),
     0.5,

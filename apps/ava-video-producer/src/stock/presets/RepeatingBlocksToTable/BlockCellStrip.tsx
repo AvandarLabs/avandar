@@ -21,7 +21,9 @@ export function BlockCellStrip({
 }: Readonly<Props>): ReactNode {
   const field = input.fields[fieldIndex],
     block = input.blocks[blockIndex];
-  const value = block.cells.find(({ fieldId }) => fieldId === field.id)!.text;
+  const value = block.cells.find(({ fieldId }) => {
+    return fieldId === field.id;
+  })!.text;
   const { x, y, width } = getBlockCellGeometryFromFrame({
     input,
     frame,

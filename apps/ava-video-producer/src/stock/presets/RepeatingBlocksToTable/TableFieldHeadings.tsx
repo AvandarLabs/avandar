@@ -15,21 +15,23 @@ export function TableFieldHeadings({
   return (
     <g opacity={ramp(frame, 106, 12)}>
       <LabelSlots labels={[[input.copy.result, 300, 145, 608, 14, 2]]} />
-      {input.fields.map((field, index) => (
-        <g key={field.id}>
-          <rect
-            data-output-field={field.id}
-            x={300 + index * 208}
-            y={185}
-            width={192}
-            height={48}
-            fill="none"
-          />
-          <LabelSlots
-            labels={[[field.label, 310 + index * 208, 199, 172, 12, 3]]}
-          />
-        </g>
-      ))}
+      {input.fields.map((field, index) => {
+        return (
+          <g key={field.id}>
+            <rect
+              data-output-field={field.id}
+              x={300 + index * 208}
+              y={185}
+              width={192}
+              height={48}
+              fill="none"
+            />
+            <LabelSlots
+              labels={[[field.label, 310 + index * 208, 199, 172, 12, 3]]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

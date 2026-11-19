@@ -34,16 +34,18 @@ export function VaccinationSessionBalance({
         stroke={STOCK.line}
       />
       <SessionRecipients input={input} frame={frame} accent={accent} />
-      {input.units.map((unit, index) => (
-        <DoseToken
-          key={unit.id}
-          input={input}
-          unit={unit}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.units.map((unit, index) => {
+        return (
+          <DoseToken
+            key={unit.id}
+            input={input}
+            unit={unit}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <SessionTotals input={input} frame={frame} />
     </g>
   );

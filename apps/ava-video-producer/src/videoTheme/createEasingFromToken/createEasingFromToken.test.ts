@@ -3,7 +3,9 @@ import test from "node:test";
 import { bezier, EASE } from "../../motion";
 import { createEasingFromToken } from "./createEasingFromToken";
 
-const SAMPLES = Array.from({ length: 21 }, (_, index) => index / 20);
+const SAMPLES = Array.from({ length: 21 }, (_, index) => {
+  return index / 20;
+});
 
 test("a bezier token eases exactly like the same bezier", () => {
   const easing = createEasingFromToken([0.16, 1, 0.3, 1]);

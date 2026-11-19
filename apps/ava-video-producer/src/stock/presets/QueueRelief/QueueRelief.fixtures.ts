@@ -66,15 +66,19 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      items: Array.from({ length: 8 }, (_, index) => ({
-        id: `item ${index}`,
-        label: "W".repeat(14),
-      })),
-      serviceSlots: Array.from({ length: 4 }, (_, index) => ({
-        id: `slot ${index}`,
-        label: "W".repeat(18),
-        initiallyOpen: index === 0,
-      })),
+      items: Array.from({ length: 8 }, (_, index) => {
+        return {
+          id: `item ${index}`,
+          label: "W".repeat(14),
+        };
+      }),
+      serviceSlots: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: `slot ${index}`,
+          label: "W".repeat(18),
+          initiallyOpen: index === 0,
+        };
+      }),
       queueLabel: "W".repeat(24),
       completionLabel: "W".repeat(24),
       capacityChangeLabel: "W".repeat(36),
@@ -96,10 +100,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "long-backlog",
     input: {
       ...DEFAULT_INPUT,
-      items: Array.from({ length: 8 }, (_, index) => ({
-        id: `item ${index}`,
-        label: "W".repeat(14),
-      })),
+      items: Array.from({ length: 8 }, (_, index) => {
+        return {
+          id: `item ${index}`,
+          label: "W".repeat(14),
+        };
+      }),
     },
   },
 ];
@@ -118,17 +124,21 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    serviceSlots: DEFAULT_INPUT.serviceSlots.map((slot) => ({
-      ...slot,
-      initiallyOpen: true,
-    })),
+    serviceSlots: DEFAULT_INPUT.serviceSlots.map((slot) => {
+      return {
+        ...slot,
+        initiallyOpen: true,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    serviceSlots: DEFAULT_INPUT.serviceSlots.map((slot) => ({
-      ...slot,
-      initiallyOpen: false,
-    })),
+    serviceSlots: DEFAULT_INPUT.serviceSlots.map((slot) => {
+      return {
+        ...slot,
+        initiallyOpen: false,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -140,10 +150,12 @@ export const invalidInputs: unknown[] = [
   {
     ...DEFAULT_INPUT,
     items: DEFAULT_INPUT.items.slice(0, 3),
-    serviceSlots: Array.from({ length: 4 }, (_, index) => ({
-      id: String(index),
-      label: "",
-      initiallyOpen: index < 3,
-    })),
+    serviceSlots: Array.from({ length: 4 }, (_, index) => {
+      return {
+        id: String(index),
+        label: "",
+        initiallyOpen: index < 3,
+      };
+    }),
   },
 ];

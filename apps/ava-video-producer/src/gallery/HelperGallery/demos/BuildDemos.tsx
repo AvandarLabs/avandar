@@ -25,13 +25,14 @@ import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCanvas, DEMO_CANVAS } from "./parts/DemoCanvas";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const BUILD = { columns: 8 };
 /** An abstract block mark, never another brand's geometry. */
 const MARK = { x: 200, y: 110, width: 180, height: 180 };
 
 /** An abstract mark rising through eight column masks, left to right. */
-export function MarkBuildDemo({ frame, frames }: HelperDemoProps) {
+export function MarkBuildDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const progress = getMarkBuildProgress(frame, BUILD);
   return (
     <HelperDemoFrame
@@ -45,19 +46,21 @@ export function MarkBuildDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <DemoCanvas>
-        {progress.map((columnProgress, index) => (
-          <span
-            key={`column-${MARK.x + index * 25}`}
-            className={css.markColumn}
-            style={{
-              left: MARK.x + (index * MARK.width) / BUILD.columns,
-              top: MARK.y,
-              width: MARK.width / BUILD.columns,
-              height: MARK.height,
-              clipPath: `inset(${((1 - columnProgress) * 100).toFixed(2)}% 0 0 0)`,
-            }}
-          />
-        ))}
+        {progress.map((columnProgress, index) => {
+          return (
+            <span
+              key={`column-${MARK.x + index * 25}`}
+              className={css.markColumn}
+              style={{
+                left: MARK.x + (index * MARK.width) / BUILD.columns,
+                top: MARK.y,
+                width: MARK.width / BUILD.columns,
+                height: MARK.height,
+                clipPath: `inset(${((1 - columnProgress) * 100).toFixed(2)}% 0 0 0)`,
+              }}
+            />
+          );
+        })}
       </DemoCanvas>
     </HelperDemoFrame>
   );
@@ -97,7 +100,7 @@ function FlightColumns({ flight, cover }: { flight: number; cover: number }) {
 }
 
 /** The mark's columns flying out to cover the frame in a token colour. */
-export function FlyThroughDemo({ frame, frames }: HelperDemoProps) {
+export function FlyThroughDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const { retract, flight, cover } = getFlightProgress(frame, FLY_THROUGH);
   return (
     <HelperDemoFrame
@@ -128,7 +131,7 @@ const CTA = { atFrame: 10, command: COMMAND };
 const CPS = 30;
 
 /** Subtitle, URL, typed command and badge arriving on their computed beats. */
-export function CtaBeatsDemo({ frame, frames }: HelperDemoProps) {
+export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const beats = getCtaBeats(CTA, CPS);
   return (
     <HelperDemoFrame
@@ -212,7 +215,7 @@ function BarRow({ frame, beats, index, label, value, fraction }: BarRowProps) {
 }
 
 /** A bar panel building on its computed beats: hero, labels, bars, values. */
-export function BarBeatsDemo({ frame, frames }: HelperDemoProps) {
+export function BarBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const beats = getBarComparisonBeats(8, 0, 3);
   const fractions = getBarFractions(ROWS);
   const labels = ["North", "Harbor", "Valley", "Ridge"];
@@ -221,26 +224,30 @@ export function BarBeatsDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="getBarComparisonBeats(8, 0, 3)  getBarFractions(rows)"
-      readouts={Object.entries(beats).map(([name, value]) => ({
-        name,
-        value: `${value}f`,
-      }))}
+      readouts={Object.entries(beats).map(([name, value]) => {
+        return {
+          name,
+          value: `${value}f`,
+        };
+      })}
     >
       <div className={css.barPanel}>
         <p className={css.headline} style={enter(frame, beats.heroAt)}>
           42
         </p>
-        {ROWS.map((row, index) => (
-          <BarRow
-            key={row.id}
-            frame={frame}
-            beats={beats}
-            index={index}
-            label={labels[index]}
-            value={row.value}
-            fraction={fractions[index]}
-          />
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <BarRow
+              key={row.id}
+              frame={frame}
+              beats={beats}
+              index={index}
+              label={labels[index]}
+              value={row.value}
+              fraction={fractions[index]}
+            />
+          );
+        })}
       </div>
       <span className={css.footnote}>{"Fictional demonstration data"}</span>
     </HelperDemoFrame>

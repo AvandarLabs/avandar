@@ -98,8 +98,9 @@ registerStockPresetAssertions({
   contract,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
   textFrames: [24, 72, 150],
 });
 registerStockTextLayoutAssertions({
@@ -198,21 +199,28 @@ test("maximum packed headings clear subsequent measurement text", () => {
   const texts = [
     ...markup.matchAll(/<text aria-label="([^"]*)"[^>]*>.*?<\/text>/g),
   ];
-  const heading = texts.find(
-    (match) => match[1] === input.labels.specification,
-  )![0];
-  const label = texts.find(
-    (match) => match[1] === input.specification.label,
-  )![0];
-  const numeric = texts.find((match) => match[1] === "4")![0];
-  const bottom = (text: string) =>
-    SvgAttributes.getNumberFromMarkup({ attributes: text, name: "y" }) +
-    [...text.matchAll(/ dy="([^"]*)"/g)].reduce(
-      (sum, match) => sum + Number(match[1]),
-      0,
-    ) +
-    SvgAttributes.getNumberFromMarkup({ attributes: text, name: "font-size" }) *
-      0.3;
+  const heading = texts.find((match) => {
+    return match[1] === input.labels.specification;
+  })![0];
+  const label = texts.find((match) => {
+    return match[1] === input.specification.label;
+  })![0];
+  const numeric = texts.find((match) => {
+    return match[1] === "4";
+  })![0];
+  const bottom = (text: string) => {
+    return (
+      SvgAttributes.getNumberFromMarkup({ attributes: text, name: "y" }) +
+      [...text.matchAll(/ dy="([^"]*)"/g)].reduce((sum, match) => {
+        return sum + Number(match[1]);
+      }, 0) +
+      SvgAttributes.getNumberFromMarkup({
+        attributes: text,
+        name: "font-size",
+      }) *
+        0.3
+    );
+  };
   assert.ok(
     bottom(heading) <
       SvgAttributes.getNumberFromMarkup({ attributes: label, name: "y" }) - 16,

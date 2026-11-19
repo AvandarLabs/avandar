@@ -27,7 +27,9 @@ export function HabitatPlan({
   const laid = ramp(frame, 36, 22, EASE.inOut),
     crossing = ramp(frame, 58, 20, EASE.inOut);
   const marker = getRoutePointFromProgress({
-    points: points.map((point) => ({ x: point.x / 960, y: point.y / 960 })),
+    points: points.map((point) => {
+      return { x: point.x / 960, y: point.y / 960 };
+    }),
     progress: ramp(frame, 82, 26, EASE.inOut),
   });
   return (
@@ -39,40 +41,42 @@ export function HabitatPlan({
         strokeDasharray="7 5"
         fill="none"
       />
-      {input.patches.map((patch, index) => (
-        <g key={patch.id}>
-          <ellipse
-            data-habitat-patch={patch.id}
-            cx={155 + index * 650}
-            cy={300}
-            rx={100}
-            ry={62}
-            fill={accent}
-            fillOpacity={0.22}
-            stroke={accent}
-          />
-          <FitText
-            text={patch.label}
-            x={32 + index * 684}
-            y={200}
-            width={212}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(patch.areaHa)}
-            x={72 + index * 650}
-            y={382}
-            width={180}
-            fontSize={12}
-            maxLines={2}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      {input.patches.map((patch, index) => {
+        return (
+          <g key={patch.id}>
+            <ellipse
+              data-habitat-patch={patch.id}
+              cx={155 + index * 650}
+              cy={300}
+              rx={100}
+              ry={62}
+              fill={accent}
+              fillOpacity={0.22}
+              stroke={accent}
+            />
+            <FitText
+              text={patch.label}
+              x={32 + index * 684}
+              y={200}
+              width={212}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <FitText
+              text={String(patch.areaHa)}
+              x={72 + index * 650}
+              y={382}
+              width={180}
+              fontSize={12}
+              maxLines={2}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
       <path
         d={path}
         stroke={background}

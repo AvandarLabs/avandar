@@ -10,7 +10,10 @@ export const motionEasingSchema = z.union([
 /** Named easing or CSS-style [x1, y1, x2, y2] cubic Bezier control points. */
 export type MotionEasing = z.infer<typeof motionEasingSchema>;
 
-/** Editorial motion vocabulary. Speed multiplies travel rate, never reading holds. */
+/**
+ * Editorial motion vocabulary. Speed multiplies travel rate, never reading
+ * holds.
+ */
 export const MOTION_PRESETS = {
   deliberate: { speed: 0.25, shutterAngle: 45, easing: "ease-in-out" },
   gentle: { speed: 0.5, shutterAngle: 90, easing: "ease-in-out" },
@@ -43,8 +46,22 @@ export const motionOptionsSchema = z
 /** Numeric overrides take precedence over the selected semantic preset. */
 export type MotionOptions = z.infer<typeof motionOptionsSchema>;
 
+/** Every motion override resolved against its preset and defaults. */
+type ResolvedMotionSettings = {
+  speed: number;
+  easing: MotionEasing;
+  shutterAngle: number;
+  samples: number;
+  blurStrength: number;
+  velocityBlurFactor: number;
+  velocityBlurLimit: number;
+  transitionBlur: number;
+};
+
 /** Resolve safe motion settings without modifying the caller's options. */
-export function resolveMotionSettings(options: MotionOptions = {}) {
+export function resolveMotionSettings(
+  options: MotionOptions = {},
+): ResolvedMotionSettings {
   const parsed = motionOptionsSchema.parse(options);
   const preset = MOTION_PRESETS[parsed.preset ?? "brisk"];
   return {
@@ -59,7 +76,10 @@ export function resolveMotionSettings(options: MotionOptions = {}) {
   };
 }
 
-/** Convert authored travel frames to actual frames. A zero-length cut stays zero. */
+/**
+ * Convert authored travel frames to actual frames. A zero-length cut stays
+ * zero.
+ */
 export function getMotionDuration(
   frames: number,
   options?: MotionOptions,
@@ -69,17 +89,22 @@ export function getMotionDuration(
   return frames === 0 ? 0 : Math.max(1, Math.round(frames / speed));
 }
 
-/** Existing cues retain their curve unless a preset or explicit easing replaces it. */
+/**
+ * Existing cues retain their curve unless a preset or explicit easing replaces
+ * it.
+ */
 export function getMotionEasing(
   options?: MotionOptions,
   fallback = EASE.inOut,
-) {
+): (t: number) => number {
   if (!options?.easing && !options?.preset) return fallback;
   const { easing } = resolveMotionSettings(options);
   if (Array.isArray(easing)) return bezier(...easing);
   switch (easing) {
     case "linear":
-      return (progress: number) => progress;
+      return (progress: number) => {
+        return progress;
+      };
     case "ease-in":
       return bezier(0.42, 0, 1, 1);
     case "ease-out":
@@ -91,14 +116,16 @@ export function getMotionEasing(
   }
 }
 
-/** Clamp movement at its endpoints, including fractional shutter-sample frames. */
+/**
+ * Clamp movement at its endpoints, including fractional shutter-sample frames.
+ */
 export function getMotionProgress(
   frame: number,
   at: number,
   duration: number,
   options?: MotionOptions,
   fallback = EASE.inOut,
-) {
+): number {
   return ramp(
     frame,
     at,

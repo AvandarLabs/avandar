@@ -17,16 +17,18 @@ export function ReportPageBind({
   return (
     <g>
       <ReportHeader input={input} frame={frame} accent={accent} />
-      {input.sections.map((section, index) => (
-        <ReportPage
-          key={section.id}
-          section={section}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.sections.map((section, index) => {
+        return (
+          <ReportPage
+            key={section.id}
+            section={section}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       <DestinationTray
         label={input.destinationLabel}
         frame={frame}

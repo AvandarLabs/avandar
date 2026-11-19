@@ -49,11 +49,13 @@ export function FitText({
       fontFamily={data.fontFamily}
       textAnchor={anchor}
     >
-      {lines.map((line, index) => (
-        <tspan key={index} x={x} dy={index ? fontSize * lineHeight : 0}>
-          {line}
-        </tspan>
-      ))}
+      {lines.map((line, index) => {
+        return (
+          <tspan key={index} x={x} dy={index ? fontSize * lineHeight : 0}>
+            {line}
+          </tspan>
+        );
+      })}
     </text>
   );
 }

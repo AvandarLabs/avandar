@@ -38,9 +38,9 @@ export const inputSchema = z
     if (
       !(source.min < source.max) ||
       source.baseline === source.trial ||
-      [source.baseline, source.trial].some(
-        (value) => value < source.min || value > source.max,
-      )
+      [source.baseline, source.trial].some((value) => {
+        return value < source.min || value > source.max;
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -62,19 +62,20 @@ export const inputSchema = z
       });
     }
     outputs.forEach((output, index) => {
-      const values = [source.baseline, source.trial].map((value) =>
-        evaluateAffineRule({
+      const values = [source.baseline, source.trial].map((value) => {
+        return evaluateAffineRule({
           source: value,
           multiplier: output.multiplier,
           offset: output.offset,
-        }),
-      );
+        });
+      });
       if (
         !(output.min < output.max) ||
-        values.some(
-          (value) =>
-            !Number.isFinite(value) || value < output.min || value > output.max,
-        )
+        values.some((value) => {
+          return (
+            !Number.isFinite(value) || value < output.min || value > output.max
+          );
+        })
       ) {
         context.addIssue({
           code: "custom",

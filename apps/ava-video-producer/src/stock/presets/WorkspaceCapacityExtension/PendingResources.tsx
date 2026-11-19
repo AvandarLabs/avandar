@@ -24,18 +24,20 @@ export function PendingResources({
           {...{ requestX, requestY, accent }}
         />
       ) : null}
-      {input.requestedResources.map((resource, index) => (
-        <ResourceTab
-          key={resource.id}
-          resource={resource}
-          index={input.existingResources.length + index}
-          x={requestX + index * 86}
-          y={requestY}
-          accent={accent}
-          showLabel={input.showResourceLabels}
-          isSeated={seating === 1}
-        />
-      ))}
+      {input.requestedResources.map((resource, index) => {
+        return (
+          <ResourceTab
+            key={resource.id}
+            resource={resource}
+            index={input.existingResources.length + index}
+            x={requestX + index * 86}
+            y={requestY}
+            accent={accent}
+            showLabel={input.showResourceLabels}
+            isSeated={seating === 1}
+          />
+        );
+      })}
     </g>
   );
 }

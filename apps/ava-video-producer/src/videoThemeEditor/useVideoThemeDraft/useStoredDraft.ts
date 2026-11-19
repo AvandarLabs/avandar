@@ -49,10 +49,12 @@ type StoredDraftOptions = Readonly<{
  */
 function useStoredDraftRecord(options: StoredDraftOptions) {
   const { themeId, storage } = options;
-  const [state, setState] = useState(() => ({
-    themeId,
-    record: readStoredThemeDraft({ storage, themeId }),
-  }));
+  const [state, setState] = useState(() => {
+    return {
+      themeId,
+      record: readStoredThemeDraft({ storage, themeId }),
+    };
+  });
   const record =
     state.themeId === themeId
       ? state.record
@@ -87,35 +89,35 @@ function useStoredDraftActions(
 ): StoredDraftActions {
   const { store, draft, baseHash, recordHash, isDirty } = options;
   const setDraft = useCallback(
-    (nextDraft: ThemeDraft) =>
-      store(
+    (nextDraft: ThemeDraft) => {
+      return store(
         createEditedRecord({
           previousHash: recordHash,
           hadEdits: isDirty,
           fileHash: baseHash,
           draft: nextDraft,
         }),
-      ),
+      );
+    },
     [store, recordHash, isDirty, baseHash],
   );
-  const keepDraft = useCallback(
-    () => store(createKeptRecord({ fileHash: baseHash, draft })),
-    [store, baseHash, draft],
-  );
+  const keepDraft = useCallback(() => {
+    return store(createKeptRecord({ fileHash: baseHash, draft }));
+  }, [store, baseHash, draft]);
   const rebaseDraft = useCallback(
-    (rebaseOptions: Readonly<{ baseHash: string; draft?: ThemeDraft }>) =>
-      store(
+    (rebaseOptions: Readonly<{ baseHash: string; draft?: ThemeDraft }>) => {
+      return store(
         createRebasedRecord({
           baseHash: rebaseOptions.baseHash,
           draft: rebaseOptions.draft ?? draft,
         }),
-      ),
+      );
+    },
     [store, draft],
   );
-  const discard = useCallback(
-    () => store(createDiscardedRecord(baseHash)),
-    [store, baseHash],
-  );
+  const discard = useCallback(() => {
+    return store(createDiscardedRecord(baseHash));
+  }, [store, baseHash]);
   return { setDraft, keepDraft, rebaseDraft, discard };
 }
 
@@ -140,8 +142,8 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     isDirty,
   });
   const isChangedOnDisk = isRecordChangedOnDisk({ record, fileHash: baseHash });
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    return {
       draft,
       isDirty,
       isChangedOnDisk,
@@ -149,15 +151,14 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
       keepDraft,
       rebaseDraft,
       discard,
-    }),
-    [
-      draft,
-      isDirty,
-      isChangedOnDisk,
-      setDraft,
-      keepDraft,
-      rebaseDraft,
-      discard,
-    ],
-  );
+    };
+  }, [
+    draft,
+    isDirty,
+    isChangedOnDisk,
+    setDraft,
+    keepDraft,
+    rebaseDraft,
+    discard,
+  ]);
 }

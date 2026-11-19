@@ -22,10 +22,12 @@ export function getHelperSelectionFromSearch(
   const parameters = new URLSearchParams(search);
   const requestedHelper = parameters.get("helper");
   const requestedCategory = parameters.get("category");
-  const helper = catalog.helpers.find((entry) => entry.id === requestedHelper);
-  const category = catalog.categories.some(
-    (entry) => entry.id === requestedCategory,
-  )
+  const helper = catalog.helpers.find((entry) => {
+    return entry.id === requestedHelper;
+  });
+  const category = catalog.categories.some((entry) => {
+    return entry.id === requestedCategory;
+  })
     ? requestedCategory!
     : ALL_ATLAS_CATEGORIES;
   return { helperId: helper?.id, category, query: "" };
@@ -71,10 +73,11 @@ export function filterHelpers(
   },
 ): HelperEntry[] {
   const query = options.query.trim().toLowerCase();
-  return helpers.filter(
-    (helper) =>
+  return helpers.filter((helper) => {
+    return (
       (options.category === ALL_ATLAS_CATEGORIES ||
         helper.category === options.category) &&
-      (!query || _buildSearchText(helper).includes(query)),
-  );
+      (!query || _buildSearchText(helper).includes(query))
+    );
+  });
 }

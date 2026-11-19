@@ -19,9 +19,9 @@ export function assertUnit(value: number, name: string): void {
 }
 
 export function assertRect(rect: NormalizedRect, name: string): void {
-  (["x", "y", "width", "height"] as const).forEach((key) =>
-    assertUnit(rect[key], `${name}.${key}`),
-  );
+  (["x", "y", "width", "height"] as const).forEach((key) => {
+    return assertUnit(rect[key], `${name}.${key}`);
+  });
   if (
     !rect.width ||
     !rect.height ||

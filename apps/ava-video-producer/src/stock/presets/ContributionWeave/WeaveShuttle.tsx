@@ -45,14 +45,16 @@ export function WeaveShuttle({
       </defs>
       <rect data-weft-band={contributor.id} {...band} fill={pattern} />
       <g clipPath={`url(#${clipId})`}>
-        {input.warp.map((warp, column) => (
-          <WeaveCrossing
-            key={warp.id}
-            warp={warp}
-            column={column}
-            {...crossingProps}
-          />
-        ))}
+        {input.warp.map((warp, column) => {
+          return (
+            <WeaveCrossing
+              key={warp.id}
+              warp={warp}
+              column={column}
+              {...crossingProps}
+            />
+          );
+        })}
       </g>
       {input.showContributorEnds ? (
         <rect data-contributor-end={contributor.id} {...end} />

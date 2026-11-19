@@ -43,21 +43,25 @@ const options = {
     "agreedSlotId",
     "protectedPattern",
   ],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.workerLabel,
-    input.request.label,
-    input.labels.unit,
-    input.labels.example,
-    input.labels.protected,
-    input.request.placement === "defer"
-      ? input.labels.deferred
-      : input.labels.rescheduled,
-    ...input.slots.flatMap((slot) => [
-      input.labels[slot.kind],
-      ...(input.showSlotLabels ? [slot.label] : []),
-      ...(slot.workLabel === null ? [] : [slot.workLabel]),
-    ]),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.workerLabel,
+      input.request.label,
+      input.labels.unit,
+      input.labels.example,
+      input.labels.protected,
+      input.request.placement === "defer"
+        ? input.labels.deferred
+        : input.labels.rescheduled,
+      ...input.slots.flatMap((slot) => {
+        return [
+          input.labels[slot.kind],
+          ...(input.showSlotLabels ? [slot.label] : []),
+          ...(slot.workLabel === null ? [] : [slot.workLabel]),
+        ];
+      }),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -77,21 +81,22 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: ({
     input,
     frame,
-  }: Readonly<{ input: Input; frame: number }>) =>
-    frame >= 141 ? options.getVisibleTexts({ input: input }) : [],
+  }: Readonly<{ input: Input; frame: number }>) => {
+    return frame >= 141 ? options.getVisibleTexts({ input: input }) : [];
+  },
 });
 
 test("existing slots retain kind and commitment while the request remains outstanding", () => {
   [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
     [38, 60, 76, 105, 130, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
-      input.slots.forEach((slot) =>
-        assert.ok(
+      input.slots.forEach((slot) => {
+        return assert.ok(
           markup.includes(
             `data-slot="${slot.id}" data-kind="${slot.kind}" data-commitment="${slot.workLabel ?? ""}"`,
           ),
-        ),
-      );
+        );
+      });
     });
     const markup = _render({ frame: 150, input: input });
     assert.match(
@@ -212,7 +217,9 @@ test("dense slot names clear their protected-kind caption band", () => {
   const label = `界 ${"界".repeat(6)} ${"界".repeat(13)}`;
   const input = {
     ...fixtures[2].input,
-    slots: fixtures[2].input.slots.map((slot) => ({ ...slot, label })),
+    slots: fixtures[2].input.slots.map((slot) => {
+      return { ...slot, label };
+    }),
   };
   const text = _render({ frame: 150, input: input }).match(
     /<text aria-label="[^"]+" x="58" y="[^"]+"[^>]*>(.*?)<\/text>/s,

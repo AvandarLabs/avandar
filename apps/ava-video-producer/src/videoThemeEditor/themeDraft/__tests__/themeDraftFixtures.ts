@@ -28,7 +28,10 @@ export const STUDIO: VideoThemeDocument = {
 };
 export const LIBRARY = createVideoThemeLibrary([STUDIO]);
 
-/** Classic with a per-item accent override, like the accents classic authors per composition. */
+/**
+ * Classic with a per-item accent override, like the accents classic authors per
+ * composition.
+ */
 export const CLASSIC_WITH_OVERRIDE = new Map<string, VideoThemeDocument>([
   ...BUILT_IN_VIDEO_THEMES,
   [

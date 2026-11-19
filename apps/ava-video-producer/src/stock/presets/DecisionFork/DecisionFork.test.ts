@@ -40,21 +40,24 @@ test("only the selected branch receives the traveling scenario marker", () => {
   Array.from([2, 3, 4]).forEach((branchCount) => {
     Array.from(
       { length: Math.max(0, Math.ceil((branchCount - 0) / 1)) },
-      (_, sampleIndex) => 0 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 0 + sampleIndex * 1;
+      },
     ).forEach((selectedIndex) => {
       const input = {
         ...DECISION_FORK_DENSE_INPUT,
         branches: DECISION_FORK_DENSE_INPUT.branches.slice(0, branchCount),
         selectedBranchId: DECISION_FORK_DENSE_INPUT.branches[selectedIndex].id,
       };
-      const render = ({ frame }: Readonly<{ frame: number }>) =>
-        renderToStaticMarkup(
+      const render = ({ frame }: Readonly<{ frame: number }>) => {
+        return renderToStaticMarkup(
           createElement(StockGraphic, {
             preset: "decision-fork",
             frame,
             input,
           }),
         );
+      };
       assert.deepEqual(_markerPosition(render({ frame: 50 })), [480, 235]);
       const final = render({ frame: 150 });
       assert.equal((final.match(/data-marker-branch=/g) ?? []).length, 1);
@@ -82,14 +85,15 @@ test("only the selected branch receives the traveling scenario marker", () => {
 test("hiding alternate outcomes keeps the selected route and its condition", () => {
   const render = ({
     showUnchosenOutcomes,
-  }: Readonly<{ showUnchosenOutcomes: boolean }>) =>
-    renderToStaticMarkup(
+  }: Readonly<{ showUnchosenOutcomes: boolean }>) => {
+    return renderToStaticMarkup(
       createElement(StockGraphic, {
         preset: "decision-fork",
         frame: 150,
         input: { ...DECISION_FORK_DENSE_INPUT, showUnchosenOutcomes },
       }),
     );
+  };
   const shown = render({ showUnchosenOutcomes: true });
   const hidden = render({ showUnchosenOutcomes: false });
   assert.match(shown, /Continue to review/);
@@ -120,19 +124,20 @@ test("the complete contract rejects foreign branch IDs and keeps authored select
   ]);
   decisionForkContract.fixtures.forEach(({ input }) => {
     assert.deepEqual(decisionForkContract.inputSchema.parse(input), input);
-    const render = ({ frame }: Readonly<{ frame: number }>) =>
-      renderToStaticMarkup(
+    const render = ({ frame }: Readonly<{ frame: number }>) => {
+      return renderToStaticMarkup(
         createElement(StockGraphic, { preset: "decision-fork", frame, input }),
       );
-    const samples = [0, 36, 90, 150, 179].map((frame) => ({
-      frame,
-      markup: render({ frame: frame }),
-    }));
-    [...samples]
-      .reverse()
-      .forEach(({ frame, markup }) =>
-        assert.equal(render({ frame: frame }), markup),
-      );
+    };
+    const samples = [0, 36, 90, 150, 179].map((frame) => {
+      return {
+        frame,
+        markup: render({ frame: frame }),
+      };
+    });
+    [...samples].reverse().forEach(({ frame, markup }) => {
+      return assert.equal(render({ frame: frame }), markup);
+    });
     assert.equal(
       (render({ frame: 150 }).match(/data-marker-branch=/g) ?? []).length,
       1,
@@ -147,9 +152,9 @@ test("the complete contract rejects foreign branch IDs and keeps authored select
 test("strict decision documents reject duplicate, foreign and extra branch fields", async () => {
   const { inputSchema } = await import("./DecisionFork.schema");
   const { invalidInputs } = await import("./DecisionFork.fixtures");
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("shown alternative outcomes retain readable text contrast", async () => {
@@ -174,16 +179,16 @@ test("shown alternative outcomes retain readable text contrast", async () => {
 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
     input.branches.forEach((branch) => {
-      const labels = paint.filter(
-        (item) => item.kind === "text" && item.ariaLabel === branch.outcome,
-      );
+      const labels = paint.filter((item) => {
+        return item.kind === "text" && item.ariaLabel === branch.outcome;
+      });
       assert.ok(labels.length > 0);
-      labels.forEach((label) =>
-        assert.ok(
+      labels.forEach((label) => {
+        return assert.ok(
           label.opacity >= 0.8,
           "Every explicitly shown outcome retains readable contrast",
-        ),
-      );
+        );
+      });
     });
   });
 });

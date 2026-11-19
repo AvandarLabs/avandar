@@ -17,8 +17,8 @@ import { inputSchema, type Input } from "./UncertaintyUnfold.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -30,6 +30,7 @@ const render = ({
       }),
     ),
   );
+};
 test("one fixed ruler positions the estimate, both endpoints and an immovable optional reference", () => {
   fixtures.forEach(({ input }) => {
     const scale = (value: number) => {
@@ -117,10 +118,11 @@ test("folded sleeves begin at the estimate before exposing the complete interval
     SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "width" }) > 0,
   );
 });
-test("out-of-axis estimates, inverted intervals and nonfinite bounds fail", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("out-of-axis estimates, inverted intervals and nonfinite bounds fail", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 
 registerStockPresetAssertions({
   inputSchema,
@@ -130,13 +132,15 @@ registerStockPresetAssertions({
   contract,
   render,
   excludedTextFields: ["id", "insertBeforeId", "kind", "partitionLayout"],
-  getVisibleTexts: ({ input }) => [
-    input.estimate.label,
-    input.axis.unit,
-    input.interval.label,
-    input.interpretation,
-    input.contextLabel,
-    ...(input.reference ? [input.reference.label] : []),
-  ],
+  getVisibleTexts: ({ input }) => {
+    return [
+      input.estimate.label,
+      input.axis.unit,
+      input.interval.label,
+      input.interpretation,
+      input.contextLabel,
+      ...(input.reference ? [input.reference.label] : []),
+    ];
+  },
   textFrames: [150],
 });

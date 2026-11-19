@@ -52,23 +52,25 @@ const textLayoutOptions = {
     "state",
     "geographyMode",
   ],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    input.copy.schematic,
-    ...input.stops.map(prop("label")),
-    ...input.crates.map(prop("label")),
-    ...(input.showIdentityRibbon ? input.crates.map(prop("id")) : []),
-    ...(input.showMonitoring
-      ? [input.copy.logged, input.copy.review, input.copy.missing]
-      : []),
-    input.copy.acknowledged,
-    input.copy.receiptMissing,
-    input.copy.sealIntact,
-    input.copy.sealBroken,
-    input.copy.sealUnknown,
-    input.copy.arrival,
-    ...(input.showLedger ? [input.copy.total] : []),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      input.copy.schematic,
+      ...input.stops.map(prop("label")),
+      ...input.crates.map(prop("label")),
+      ...(input.showIdentityRibbon ? input.crates.map(prop("id")) : []),
+      ...(input.showMonitoring
+        ? [input.copy.logged, input.copy.review, input.copy.missing]
+        : []),
+      input.copy.acknowledged,
+      input.copy.receiptMissing,
+      input.copy.sealIntact,
+      input.copy.sealBroken,
+      input.copy.sealUnknown,
+      input.copy.arrival,
+      ...(input.showLedger ? [input.copy.total] : []),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -95,7 +97,9 @@ test("the same containers cross the three stops with independent final facts", (
       ),
     );
     assert.deepEqual(
-      containers.map((match) => match[1]),
+      containers.map((match) => {
+        return match[1];
+      }),
       input.crates.map(prop("id")),
     );
     containers.forEach((match) => {
@@ -105,10 +109,14 @@ test("the same containers cross the three stops with independent final facts", (
       assert.ok(Number(match[3]) + 28 < 405);
     });
     if (frame === 32) {
-      containers.forEach((match) => assert.equal(Number(match[2]), 280));
+      containers.forEach((match) => {
+        return assert.equal(Number(match[2]), 280);
+      });
     }
     if (frame >= 116) {
-      containers.forEach((match) => assert.equal(Number(match[2]), 740));
+      containers.forEach((match) => {
+        return assert.equal(Number(match[2]), 740);
+      });
     }
   });
   const markup = _render({ frame: 150, input: input });
@@ -144,9 +152,9 @@ test("empty references are accepted only for an existing unique empty stop", () 
   assert.equal(
     inputSchema.safeParse({
       ...input,
-      stops: input.stops.map((stop, index) =>
-        index === 1 ? { ...stop, id: "" } : stop,
-      ),
+      stops: input.stops.map((stop, index) => {
+        return index === 1 ? { ...stop, id: "" } : stop;
+      }),
     }).success,
     false,
   );

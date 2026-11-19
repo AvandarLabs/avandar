@@ -5,9 +5,15 @@ function _sortValue(value: unknown): unknown {
   if (typeof value === "object" && value !== null) {
     return Object.fromEntries(
       Object.entries(value)
-        .filter(([, child]) => child !== undefined)
-        .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
-        .map(([key, child]) => [key, _sortValue(child)]),
+        .filter(([, child]) => {
+          return child !== undefined;
+        })
+        .sort(([left], [right]) => {
+          return left < right ? -1 : left > right ? 1 : 0;
+        })
+        .map(([key, child]) => {
+          return [key, _sortValue(child)];
+        }),
     );
   }
   return value;
@@ -47,6 +53,8 @@ function _cyrb53(text: string, seed: number): number {
 export function buildVideoThemeHashFromContent(content: unknown): string {
   const text = buildCanonicalJsonFromValue(content);
   return [_cyrb53(text, 1), _cyrb53(text, 2)]
-    .map((part) => part.toString(16).padStart(14, "0"))
+    .map((part) => {
+      return part.toString(16).padStart(14, "0");
+    })
     .join("");
 }

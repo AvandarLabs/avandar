@@ -15,17 +15,19 @@ export function usePreviewKeys({
   onNext,
   onClose,
   frame,
-}: Props) {
+}: Props): void {
   useEffect(() => {
     if (!enabled) {
       return;
     }
-    const navigate = (event: KeyboardEvent) =>
-      _navigate(event, { enabled, onPrevious, onNext, onClose });
+    const navigate = (event: KeyboardEvent) => {
+      return _navigate(event, { enabled, onPrevious, onNext, onClose });
+    };
     window.addEventListener("keydown", navigate);
     const iframe = frame?.current?.querySelector("iframe");
-    const listenInFrame = () =>
-      iframe?.contentWindow?.addEventListener("keydown", navigate);
+    const listenInFrame = () => {
+      return iframe?.contentWindow?.addEventListener("keydown", navigate);
+    };
     listenInFrame();
     iframe?.addEventListener("load", listenInFrame);
     return () => {

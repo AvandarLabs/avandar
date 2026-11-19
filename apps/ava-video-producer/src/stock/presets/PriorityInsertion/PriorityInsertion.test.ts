@@ -18,8 +18,8 @@ import { inputSchema, type Input } from "./PriorityInsertion.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -31,34 +31,40 @@ const render = ({
       }),
     ),
   );
+};
 function _items({ frame, input }: { frame: number; input: Input }) {
   return [
     ...render({ frame: frame, input: input }).matchAll(
       /<rect[^>]*data-queue-id="[^"]*"[^>]*>/g,
     ),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 test("incoming work occupies its insertion slot without changing existing relative order", () => {
-  fixtures.forEach(({ input }) =>
-    input.queue.forEach((target) => {
+  fixtures.forEach(({ input }) => {
+    return input.queue.forEach((target) => {
       const document = { ...input, insertBeforeId: target.id };
       const insertion = input.queue.findIndex(propEq("id", target.id));
-      const pieces = _items({ frame: 150, input: document }).sort(
-        (a, b) =>
+      const pieces = _items({ frame: 150, input: document }).sort((a, b) => {
+        return (
           SvgAttributes.getNumberFromMarkup({ attributes: a, name: "y" }) -
-          SvgAttributes.getNumberFromMarkup({ attributes: b, name: "y" }),
-      );
+          SvgAttributes.getNumberFromMarkup({ attributes: b, name: "y" })
+        );
+      });
       assert.equal(pieces.length, input.queue.length + 1);
       const expected = [
         ...input.queue.slice(0, insertion),
         input.incomingItem,
         ...input.queue.slice(insertion),
       ];
-      pieces.forEach((piece, index) =>
-        assert.ok(piece.includes(`data-queue-id="${expected[index].id}"`)),
-      );
-    }),
-  );
+      pieces.forEach((piece, index) => {
+        return assert.ok(
+          piece.includes(`data-queue-id="${expected[index].id}"`),
+        );
+      });
+    });
+  });
 });
 test("only the chosen suffix shifts one slot before the incoming item leaves its side spur", () => {
   const start = _items({ frame: 38, input: DEFAULT_INPUT }),
@@ -95,10 +101,11 @@ test("only the chosen suffix shifts one slot before the incoming item leaves its
     SvgAttributes.getNumberFromMarkup({ attributes: opened[0], name: "x" }),
   );
 });
-test("unknown insertion references and duplicate incoming identities are rejected", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("unknown insertion references and duplicate incoming identities are rejected", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 
 registerStockPresetAssertions({
   inputSchema,
@@ -108,12 +115,14 @@ registerStockPresetAssertions({
   contract,
   render,
   excludedTextFields: ["id", "insertBeforeId", "kind", "partitionLayout"],
-  getVisibleTexts: ({ input }) => [
-    input.priorityLabel,
-    input.serviceLabel,
-    input.incomingItem.label,
-    ...input.queue.map(prop("label")),
-  ],
+  getVisibleTexts: ({ input }) => {
+    return [
+      input.priorityLabel,
+      input.serviceLabel,
+      input.incomingItem.label,
+      ...input.queue.map(prop("label")),
+    ];
+  },
   textFrames: [150],
 });
 test("the incoming item follows the side spur before crossing into the opened slot", () => {
@@ -135,38 +144,41 @@ test("the incoming item follows the side spur before crossing into the opened sl
 });
 test("dense queue items stay inside the canvas throughout every insertion position", () => {
   const input = fixtures[2].input;
-  input.queue.forEach((target) =>
-    Array.from({ length: 133 }, (_, frame) => frame).forEach((frame) =>
-      _items({ frame, input: { ...input, insertBeforeId: target.id } }).forEach(
-        (item) => {
-          const x = SvgAttributes.getNumberFromMarkup({
-              attributes: item,
-              name: "x",
-            }),
-            y = SvgAttributes.getNumberFromMarkup({
-              attributes: item,
-              name: "y",
-            });
-          assert.ok(
-            x >= 0 &&
-              x +
-                SvgAttributes.getNumberFromMarkup({
-                  attributes: item,
-                  name: "width",
-                }) <=
-                960,
-          );
-          assert.ok(
-            y >= 0 &&
-              y +
-                SvgAttributes.getNumberFromMarkup({
-                  attributes: item,
-                  name: "height",
-                }) <=
-                600,
-          );
-        },
-      ),
-    ),
-  );
+  input.queue.forEach((target) => {
+    return Array.from({ length: 133 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
+      return _items({
+        frame,
+        input: { ...input, insertBeforeId: target.id },
+      }).forEach((item) => {
+        const x = SvgAttributes.getNumberFromMarkup({
+            attributes: item,
+            name: "x",
+          }),
+          y = SvgAttributes.getNumberFromMarkup({
+            attributes: item,
+            name: "y",
+          });
+        assert.ok(
+          x >= 0 &&
+            x +
+              SvgAttributes.getNumberFromMarkup({
+                attributes: item,
+                name: "width",
+              }) <=
+              960,
+        );
+        assert.ok(
+          y >= 0 &&
+            y +
+              SvgAttributes.getNumberFromMarkup({
+                attributes: item,
+                name: "height",
+              }) <=
+              600,
+        );
+      });
+    });
+  });
 });

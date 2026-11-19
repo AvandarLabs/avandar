@@ -67,7 +67,9 @@ export function getSvgAttributes(token: string): Attributes {
   return Object.fromEntries(
     Array.from(
       token.matchAll(/([\w:-]+)=(?:"([^"]*)"|'([^']*)')/g),
-      ([, name, double, single]) => [name, decodeSvgEntities(double ?? single)],
+      ([, name, double, single]) => {
+        return [name, decodeSvgEntities(double ?? single)];
+      },
     ),
   );
 }
@@ -82,7 +84,9 @@ function _transform({ frame, value }: { frame: Frame; value: string }): Frame {
     const values = argumentsText
       .trim()
       .split(/[\s,]+/)
-      .map((part) => getSvgNumber({ value: part, fallback: 0 }));
+      .map((part) => {
+        return getSvgNumber({ value: part, fallback: 0 });
+      });
     assert.ok(
       values.length >= 1 && values.length <= 2,
       "Unsupported transform arguments.",
@@ -136,13 +140,13 @@ export function createSvgFrame({
     "Unsupported indirect SVG text layout.",
   );
   if (tag === "svg") {
-    ["viewBox", "x", "y", "width", "height"].forEach((key) =>
-      assert.equal(
+    ["viewBox", "x", "y", "width", "height"].forEach((key) => {
+      return assert.equal(
         attributes[key],
         undefined,
         `Unsupported SVG viewport ${key}.`,
-      ),
-    );
+      );
+    });
   }
   [
     "style",
@@ -156,13 +160,13 @@ export function createSvgFrame({
     "letter-spacing",
     "word-spacing",
     "dominant-baseline",
-  ].forEach((key) =>
-    assert.equal(
+  ].forEach((key) => {
+    return assert.equal(
       attributes[key],
       undefined,
       `Unsupported relevant SVG ${key}.`,
-    ),
-  );
+    );
+  });
   const frame = _transform({
     frame: {
       ...parent,

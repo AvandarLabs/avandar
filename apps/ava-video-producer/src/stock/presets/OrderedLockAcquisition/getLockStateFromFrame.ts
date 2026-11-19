@@ -12,9 +12,9 @@ export function getLockStateFromFrame({
   y: number;
   owner: string;
 } {
-  const firstIndex = input.operations.findIndex(
-    ({ id }) => id === input.firstOperationId,
-  );
+  const firstIndex = input.operations.findIndex(({ id }) => {
+    return id === input.firstOperationId;
+  });
   const firstY = 235 + firstIndex * 200,
     secondY = 235 + (1 - firstIndex) * 200;
   const firstAcquire = 92 + resourceIndex * 6,

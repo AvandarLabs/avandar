@@ -91,10 +91,13 @@ test("excluded roles lift while only sleeping tiles unroll into the measured str
   const setup = _render({ frame: 0 }),
     lift = _render({ frame: 72 }),
     hold = _render({ frame: 150 });
-  const tile = (markup: string, id: string) =>
-    [...markup.matchAll(/<rect data-floor-tile="([^"]*)"[^>]+>/g)].find(
-      (match) => match[1] === id,
+  const tile = (markup: string, id: string) => {
+    return [...markup.matchAll(/<rect data-floor-tile="([^"]*)"[^>]+>/g)].find(
+      (match) => {
+        return match[1] === id;
+      },
     )![0];
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: tile(setup, "c"),
@@ -137,18 +140,18 @@ test("decimal hundredths yield exactly 33 places without double rounding", () =>
     _render({ frame: 150, input: inputSchema.parse(changedInput) }),
     /data-gross="48.18" data-usable="24.09" data-equivalents="33" data-shortfall="0" data-spare="25"/,
   );
-  [8.03, 1.01, 19.99].forEach((areaPerTile) =>
-    assert.equal(
+  [8.03, 1.01, 19.99].forEach((areaPerTile) => {
+    return assert.equal(
       inputSchema.safeParse({ ...DEFAULT_INPUT, areaPerTile }).success,
       true,
-    ),
-  );
-  [8.030000000000001, 1.001].forEach((areaPerTile) =>
-    assert.equal(
+    );
+  });
+  [8.030000000000001, 1.001].forEach((areaPerTile) => {
+    return assert.equal(
       inputSchema.safeParse({ ...DEFAULT_INPUT, areaPerTile }).success,
       false,
-    ),
-  );
+    );
+  });
   assert.match(
     _render({ frame: 150, input: fixtures[1].input }),
     /data-gross="16" data-usable="0" data-equivalents="0" data-shortfall="0" data-spare="0"/,

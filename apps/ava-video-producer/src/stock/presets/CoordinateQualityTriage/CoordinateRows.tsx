@@ -9,13 +9,15 @@ export function CoordinateRows({ input, frame }: Readonly<Props>): ReactNode {
   const { rows } = makeCoordinateTriageFromInputAndFrame({ input, frame });
   return (
     <g>
-      {rows.map((row) => (
-        <CoordinateRowSource
-          key={row.id}
-          row={row}
-          showValues={input.showValues}
-        />
-      ))}
+      {rows.map((row) => {
+        return (
+          <CoordinateRowSource
+            key={row.id}
+            row={row}
+            showValues={input.showValues}
+          />
+        );
+      })}
     </g>
   );
 }

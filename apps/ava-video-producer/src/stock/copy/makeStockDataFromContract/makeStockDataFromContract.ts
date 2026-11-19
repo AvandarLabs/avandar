@@ -33,10 +33,9 @@ function _buildPlainCopyFromDescriptors<Value>(
     return value.map(_buildPlainCopyFromDescriptors) as ResolvedCopy<Value>;
   }
   return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [
-      key,
-      _buildPlainCopyFromDescriptors(item),
-    ]),
+    Object.entries(value).map(([key, item]) => {
+      return [key, _buildPlainCopyFromDescriptors(item)];
+    }),
   ) as ResolvedCopy<Value>;
 }
 

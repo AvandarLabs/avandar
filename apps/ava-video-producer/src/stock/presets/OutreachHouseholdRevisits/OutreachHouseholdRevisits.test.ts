@@ -43,16 +43,16 @@ function _attributes({
   attribute: string;
   value: string;
 }): string {
-  const element = markup
-    .match(/<[^>]+>/g)
-    ?.find((tag) => tag.includes(`${attribute}="${value}"`));
+  const element = markup.match(/<[^>]+>/g)?.find((tag) => {
+    return tag.includes(`${attribute}="${value}"`);
+  });
   assert.ok(element, `${attribute}=${value}`);
   return element;
 }
 test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("repeated activity leaves one contacted household after a later failed contact", () => {
   const first = _render({ frame: 60, input: changedInput });
@@ -200,11 +200,14 @@ test("serialized contract exposes household identity validation", () => {
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
   const paths = ["households.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique/i);
 });
@@ -214,11 +217,14 @@ test("serialized contract exposes household separation validation", () => {
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
   const paths = ["households.*.x", "households.*.y"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /Euclidean.*at least 0\.18/i);
 });
@@ -228,11 +234,14 @@ test("serialized contract exposes visit reference validation", () => {
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
   const paths = ["visits.*.householdId", "households.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /every.*must reference.*supplied household/i);
 });
@@ -242,11 +251,14 @@ test("serialized contract exposes revisit limit validation", () => {
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
   const paths = ["visits.*.householdId"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /at most 3 visits per household/i);
 });

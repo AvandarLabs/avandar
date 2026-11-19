@@ -34,6 +34,9 @@ function _getNormalizedLongitudeFromLongitude(longitude: number): number {
   return ((((longitude + 180) % 360) + 360) % 360) - 180;
 }
 
+type GetNormalizedLongitudeFromLongitude =
+  typeof _getNormalizedLongitudeFromLongitude;
+
 /** Related globe view module operations. */
 export const GlobeViewModule = {
   /** Validates a globe view and normalizes equivalent longitude wraps. */
@@ -42,5 +45,5 @@ export const GlobeViewModule = {
   getNormalizedLongitudeFromLongitude: _getNormalizedLongitudeFromLongitude,
 } satisfies {
   fromInput: typeof _getGlobeViewFromInput;
-  getNormalizedLongitudeFromLongitude: typeof _getNormalizedLongitudeFromLongitude;
+  getNormalizedLongitudeFromLongitude: GetNormalizedLongitudeFromLongitude;
 };

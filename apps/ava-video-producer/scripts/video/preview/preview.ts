@@ -18,7 +18,7 @@ export async function preview(
   filename: string,
   workspace: string,
   theme: VideoThemeSnapshot,
-) {
+): Promise<string> {
   const fingerprint = await fingerprintThemedPlan({
     plan,
     filename,

@@ -15,15 +15,20 @@ function _createStubThumb(): StubThumb {
   const attributes = new Map<string, string>();
   return {
     attributes,
-    setAttribute: (name, value) => attributes.set(name, value),
-    removeAttribute: (name) => attributes.delete(name),
+    setAttribute: (name, value) => {
+      return attributes.set(name, value);
+    },
+    removeAttribute: (name) => {
+      return attributes.delete(name);
+    },
   };
 }
 
 function _createStubRoot(thumb: StubThumb | null) {
   return {
-    querySelector: (selector: string) =>
-      selector === '[role="slider"]' ? thumb : null,
+    querySelector: (selector: string) => {
+      return selector === '[role="slider"]' ? thumb : null;
+    },
   };
 }
 

@@ -43,9 +43,9 @@ let generation = 0;
 const publish = async () => {
   await buildStockContracts(appRoot);
   generation += 1;
-  clients.forEach((client) =>
-    client.write(`data: ${session}:${generation}\n\n`),
-  );
+  clients.forEach((client) => {
+    return client.write(`data: ${session}:${generation}\n\n`);
+  });
 };
 const live = await buildLivePlayers(publish);
 const atlas = await buildAtlas({
@@ -60,9 +60,15 @@ const plansWatcher = watch(
   () => {
     clearTimeout(planTimer);
     planTimer = setTimeout(() => {
-      void Promise.all(Object.keys(PLANS).map((id) => ShowcaseFilms.load(id)))
+      void Promise.all(
+        Object.keys(PLANS).map((id) => {
+          return ShowcaseFilms.load(id);
+        }),
+      )
         .then(publish)
-        .catch((error) => console.error("Storyboard not ready:", error));
+        .catch((error) => {
+          return console.error("Storyboard not ready:", error);
+        });
     }, 200);
   },
 );
@@ -70,7 +76,8 @@ const themeStore = createThemeStore({
   directory: path.join(appRoot, "themes"),
 });
 let themeTimer: ReturnType<typeof setTimeout> | undefined;
-// A theme saved here or edited on disk republishes, so open galleries reload it.
+// A theme saved here or edited on disk republishes, so open galleries reload
+// it.
 const themesWatcher = watch(
   path.join(appRoot, "themes"),
   (_event, filename) => {
@@ -79,7 +86,9 @@ const themesWatcher = watch(
     }
     clearTimeout(themeTimer);
     themeTimer = setTimeout(() => {
-      publish().catch((error) => console.error("Theme reload failed:", error));
+      publish().catch((error) => {
+        return console.error("Theme reload failed:", error);
+      });
     }, 200);
   },
 );
@@ -104,7 +113,9 @@ const requestSchema = z.strictObject({
   id: z.string().max(80),
   options: z.record(z.string(), z.unknown()).optional(),
 });
-/** An export body: the film id, its options, and a theme patch of up to 256 KB. */
+/**
+ * An export body: the film id, its options, and a theme patch of up to 256 KB.
+ */
 const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
 
 function json(res: ServerResponse, status: number, body: unknown) {
@@ -123,9 +134,9 @@ async function filmForPlayer(id: string) {
       ? film.assets
       : [];
   await Promise.all(
-    assets.map(async (asset) =>
-      media.set(`/${asset}`, await publicAsset(appRoot, asset)),
-    ),
+    assets.map(async (asset) => {
+      return media.set(`/${asset}`, await publicAsset(appRoot, asset));
+    }),
   );
   return film;
 }
@@ -324,7 +335,9 @@ const server = createServer(async (req, res) => {
       });
       res.write(`data: ${session}:${generation}\n\n`);
       clients.add(res);
-      req.on("close", () => clients.delete(res));
+      req.on("close", () => {
+        return clients.delete(res);
+      });
       return;
     }
     const generated = [
@@ -355,9 +368,11 @@ const server = createServer(async (req, res) => {
     res.end();
   }
 });
-server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () =>
-  console.log(`Live showcase: http://localhost:${process.env.PORT ?? 4173}`),
-);
+server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () => {
+  return console.log(
+    `Live showcase: http://localhost:${process.env.PORT ?? 4173}`,
+  );
+});
 server.on("error", (error: NodeJS.ErrnoException) => {
   if (error.code === "EADDRINUSE") {
     const port = Number(process.env.PORT ?? 4173);
@@ -373,12 +388,18 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 async function close() {
   clearTimeout(planTimer);
   clearTimeout(themeTimer);
-  clients.forEach((client) => client.end());
+  clients.forEach((client) => {
+    return client.end();
+  });
   plansWatcher.close();
   themesWatcher.close();
   server.close();
   await live.dispose();
   await atlas?.dispose();
 }
-process.once("SIGINT", () => void close());
-process.once("SIGTERM", () => void close());
+process.once("SIGINT", () => {
+  return void close();
+});
+process.once("SIGTERM", () => {
+  return void close();
+});

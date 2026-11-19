@@ -11,20 +11,29 @@ export function WorkshopTimeRuler({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
       {" "}
-      {input.timeSlots.map((slot, index) => (
-        <g key={slot.id}>
-          <path
-            d={`M${390 + index * slotWidth} 490 V500 H${390 + (index + 1) * slotWidth} V490`}
-            fill="none"
-            stroke={STOCK.muted}
-          />
-          <LabelSlots
-            labels={[
-              [slot.label, 395 + index * slotWidth, 515, slotWidth - 15, 12, 5],
-            ]}
-          />
-        </g>
-      ))}
+      {input.timeSlots.map((slot, index) => {
+        return (
+          <g key={slot.id}>
+            <path
+              d={`M${390 + index * slotWidth} 490 V500 H${390 + (index + 1) * slotWidth} V490`}
+              fill="none"
+              stroke={STOCK.muted}
+            />
+            <LabelSlots
+              labels={[
+                [
+                  slot.label,
+                  395 + index * slotWidth,
+                  515,
+                  slotWidth - 15,
+                  12,
+                  5,
+                ],
+              ]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

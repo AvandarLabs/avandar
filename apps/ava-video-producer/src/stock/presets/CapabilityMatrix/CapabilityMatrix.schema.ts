@@ -58,7 +58,9 @@ export const inputSchema = z
       if (
         cellIds.length !== optionIds.length ||
         new Set(cellIds).size !== cellIds.length ||
-        cellIds.some((id) => !optionIds.includes(id))
+        cellIds.some((id) => {
+          return !optionIds.includes(id);
+        })
       ) {
         context.addIssue({
           code: "custom",

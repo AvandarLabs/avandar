@@ -69,14 +69,20 @@ registerStockTextLayoutAssertions({
 
 test("one physical parcel survives every boundary in all carrier arrangements", () => {
   fixtures.forEach(({ input }) => {
-    Array.from({ length: 180 }, (_, index) => index * 1).forEach((frame) => {
+    Array.from({ length: 180 }, (_, index) => {
+      return index * 1;
+    }).forEach((frame) => {
       const objects = [
         ..._render({ frame: frame, input: input }).matchAll(
           /<g data-parcel="([^"]*)"[^>]*>/g,
         ),
       ];
       assert.deepEqual(
-        objects.map((match) => match[1]).sort(),
+        objects
+          .map((match) => {
+            return match[1];
+          })
+          .sort(),
         input.parcels.map(prop("id")).sort(),
       );
       objects.forEach(([attributes]) => {
@@ -112,9 +118,9 @@ test("boat placement, adjacent duplicates and hoist without boat fail", () => {
       transferMethod: "handcart",
     },
     { ...DEFAULT_INPUT, carriers: DEFAULT_INPUT.carriers.slice(1) },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 function _getParcelCoordinate({
@@ -137,18 +143,20 @@ test("load and carrier collection bounds reject extra objects and incomplete par
     { ...DEFAULT_INPUT, parcels: [] },
     {
       ...DEFAULT_INPUT,
-      parcels: Array.from({ length: 5 }, (_, index) => ({
-        ...DEFAULT_INPUT.parcels[0],
-        id: String(index),
-      })),
+      parcels: Array.from({ length: 5 }, (_, index) => {
+        return {
+          ...DEFAULT_INPUT.parcels[0],
+          id: String(index),
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
       parcels: [{ ...DEFAULT_INPUT.parcels[0], extra: true }],
     },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("each loaded carrier advances with an attached intact load before the next handoff", () => {
@@ -158,14 +166,15 @@ test("each loaded carrier advances with an attached intact load before the next 
       const isMiddle = index < input.carriers.length - 1;
       const start = index === 1 ? 66 : 112;
       const end = isMiddle ? 80 : index === 1 ? 96 : 132;
-      const centers = Array.from(
-        { length: end - start + 1 },
-        (_, step) => start + step,
-      ).map((frame) => {
+      const centers = Array.from({ length: end - start + 1 }, (_, step) => {
+        return start + step;
+      }).map((frame) => {
         const markup = _render({ frame: frame, input: input });
         const vehicle = [
           ...markup.matchAll(/<g data-carrier="([^"]*)"[^>]*>/g),
-        ].find((match) => match[1] === carrier.id);
+        ].find((match) => {
+          return match[1] === carrier.id;
+        });
         assert.ok(vehicle);
         const center = _getParcelCoordinate({
           attributes: vehicle[0],
@@ -190,14 +199,13 @@ test("each loaded carrier advances with an attached intact load before the next 
         "the loaded carrier must advance before unloading",
       );
     });
-    const first = [112, 150].map(
-      (frame) =>
-        [
-          ..._render({ frame: frame, input: input }).matchAll(
-            /<g data-carrier="[^"]*"[^>]*>/g,
-          ),
-        ][0][0],
-    );
+    const first = [112, 150].map((frame) => {
+      return [
+        ..._render({ frame: frame, input: input }).matchAll(
+          /<g data-carrier="[^"]*"[^>]*>/g,
+        ),
+      ][0][0];
+    });
     assert.equal(
       _getParcelCoordinate({ attributes: first[0], axis: "x" }),
       _getParcelCoordinate({ attributes: first[1], axis: "x" }),

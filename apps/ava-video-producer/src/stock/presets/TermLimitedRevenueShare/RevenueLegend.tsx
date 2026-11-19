@@ -22,18 +22,22 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         {input.periods[0].receiptsMinor / input.money.minorUnitsPerUnit}
       </text>
       {[input.copy.operating, input.copy.distribution, input.copy.retained].map(
-        (label, index) => (
-          <g key={index}>
-            <rect
-              x={60 + index * 290}
-              y={500}
-              width={12}
-              height={12}
-              fill={[STOCK.cyan, STOCK.orange, accent][index]}
-            />
-            <LabelSlots labels={[[label, 80 + index * 290, 511, 260, 12, 3]]} />
-          </g>
-        ),
+        (label, index) => {
+          return (
+            <g key={index}>
+              <rect
+                x={60 + index * 290}
+                y={500}
+                width={12}
+                height={12}
+                fill={[STOCK.cyan, STOCK.orange, accent][index]}
+              />
+              <LabelSlots
+                labels={[[label, 80 + index * 290, 511, 260, 12, 3]]}
+              />
+            </g>
+          );
+        },
       )}
     </g>
   );

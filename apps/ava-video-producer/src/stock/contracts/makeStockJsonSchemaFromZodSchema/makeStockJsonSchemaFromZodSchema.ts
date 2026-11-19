@@ -21,11 +21,9 @@ export function makeStockJsonSchemaFromZodSchema(
       if (items.length === 0) {
         delete jsonSchema.prefixItems;
       }
-      const minimum = items.reduce(
-        (minimumItems, item, index) =>
-          item._zod.optin === "optional" ? minimumItems : index + 1,
-        0,
-      );
+      const minimum = items.reduce((minimumItems, item, index) => {
+        return item._zod.optin === "optional" ? minimumItems : index + 1;
+      }, 0);
       jsonSchema.minItems = Math.max(jsonSchema.minItems ?? 0, minimum);
       if (!rest) {
         jsonSchema.maxItems = Math.min(

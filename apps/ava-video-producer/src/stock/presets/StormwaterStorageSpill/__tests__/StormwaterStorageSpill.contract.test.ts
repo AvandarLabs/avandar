@@ -120,7 +120,9 @@ test("the operator physically holds the moving outlet handle", () => {
   const positions: number[] = [];
   Array.from(
     { length: Math.max(0, Math.floor((48 - 36) / 0.25) + 1) },
-    (_, sampleIndex) => 36 + sampleIndex * 0.25,
+    (_, sampleIndex) => {
+      return 36 + sampleIndex * 0.25;
+    },
   ).forEach((frame) => {
     const markup = _render({ frame: frame });
     const hand = SvgAttributes.fromMarker({ markup, marker: "hand" });
@@ -156,10 +158,9 @@ test("the left spill path clears the full storage caption rail", () => {
   });
   const bottom =
     baseline +
-    [...caption[1].matchAll(/dy="([^"]+)"/g)].reduce(
-      (sum, match) => sum + Number(match[1]),
-      0,
-    ) +
+    [...caption[1].matchAll(/dy="([^"]+)"/g)].reduce((sum, match) => {
+      return sum + Number(match[1]);
+    }, 0) +
     3.6;
   assert.ok(bottom < crestY - 1.5);
 });

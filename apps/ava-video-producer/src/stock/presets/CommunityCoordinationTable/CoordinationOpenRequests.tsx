@@ -11,11 +11,11 @@ export function CoordinationOpenRequests({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const open = input.places.flatMap((place, index) =>
-    input.teams.some(propEq("agreedPlaceId", place.id))
+  const open = input.places.flatMap((place, index) => {
+    return input.teams.some(propEq("agreedPlaceId", place.id))
       ? []
-      : [{ place, index }],
-  );
+      : [{ place, index }];
+  });
   return (
     <g>
       {open.map(({ place, index }, ordinal) => {

@@ -38,17 +38,21 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      brief: Array.from({ length: 4 }, (_, index) => ({
-        id: `line-${index}`,
-        line: "W".repeat(36),
-      })),
+      brief: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: `line-${index}`,
+          line: "W".repeat(36),
+        };
+      }),
       address: {
         sender: "W".repeat(28),
         recipient: "W".repeat(28),
         reference: "W".repeat(28),
       },
       copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "W".repeat(34)]),
+        Object.keys(DEFAULT_INPUT.copy).map((key) => {
+          return [key, "W".repeat(34)];
+        }),
       ) as Input["copy"],
     },
   },

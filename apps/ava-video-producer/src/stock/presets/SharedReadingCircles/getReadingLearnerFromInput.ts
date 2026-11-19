@@ -27,9 +27,9 @@ export function getReadingLearnerFromInput({
   learner: Input["learners"][number];
   frame: number;
 }>): GetReadingLearnerFromInputResult {
-  const groupIndex = input.readingGroups.findIndex((group) =>
-    group.learnerIds.includes(learner.id),
-  );
+  const groupIndex = input.readingGroups.findIndex((group) => {
+    return group.learnerIds.includes(learner.id);
+  });
   const group = input.readingGroups[groupIndex];
   const memberIndex = group.learnerIds.indexOf(learner.id);
   const isSide = input.startingShelf === "side";

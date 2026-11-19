@@ -48,7 +48,9 @@ test("every section retains its order and page identity in both final arrangemen
         middle = _render({ frame: 78, input: chosen }),
         hold = _render({ frame: 150, input: chosen });
       assert.deepEqual(
-        [...hold.matchAll(/data-page="([^"]*)"/g)].map((match) => match[1]),
+        [...hold.matchAll(/data-page="([^"]*)"/g)].map((match) => {
+          return match[1];
+        }),
         input.sections.map(prop("id")),
       );
       assert.equal(

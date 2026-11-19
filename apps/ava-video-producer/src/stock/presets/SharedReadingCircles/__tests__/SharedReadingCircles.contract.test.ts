@@ -25,12 +25,12 @@ test("book inventory and reader identities survive shelf-to-table travel", () =>
   [0, 36, 64.5, 90, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: changedInput });
     assert.equal([...markup.matchAll(/data-book-id="book-a"/g)].length, 1);
-    changedInput.learners.forEach((learner) =>
-      assert.equal(
+    changedInput.learners.forEach((learner) => {
+      return assert.equal(
         markup.split(`data-reader-id="${learner.id}"`).length - 1,
         1,
-      ),
-    );
+      );
+    });
   });
 });
 
@@ -49,16 +49,16 @@ test("four copies and nonuniform reader groups survive both shelf positions and 
         ].forEach((frame) => {
           const markup = _render({ frame: frame, input: input });
           assert.equal(_bookPositions(markup).length, input.books.length);
-          _bookPositions(markup).forEach(([, bookY]) =>
-            assert.ok(
+          _bookPositions(markup).forEach(([, bookY]) => {
+            return assert.ok(
               bookY - 20 > 188.6,
               `${input.startingShelf} frame ${frame}: book enters maximum-label roster rail`,
-            ),
-          );
+            );
+          });
           input.learners.forEach((learner) => {
-            const group = input.readingGroups.find((candidate) =>
-              candidate.learnerIds.includes(learner.id),
-            )!;
+            const group = input.readingGroups.find((candidate) => {
+              return candidate.learnerIds.includes(learner.id);
+            })!;
             assert.equal(
               markup.split(
                 `data-reader-id="${learner.id}" data-reader-book="${group.bookId}"`,
@@ -74,14 +74,12 @@ test("four copies and nonuniform reader groups survive both shelf positions and 
                 y - 22 > 180 &&
                 y + 24 < 440,
             );
-            positions
-              .slice(index + 1)
-              .forEach(([otherX, otherY]) =>
-                assert.ok(
-                  Math.abs(x - otherX) >= 2 * halfWidth ||
-                    Math.abs(y - otherY) >= 46,
-                ),
+            positions.slice(index + 1).forEach(([otherX, otherY]) => {
+              return assert.ok(
+                Math.abs(x - otherX) >= 2 * halfWidth ||
+                  Math.abs(y - otherY) >= 46,
               );
+            });
           });
         });
       });
@@ -106,9 +104,9 @@ test("the first reader picks up and carries the single physical copy with hand c
         const frames =
           startingShelf === "front"
             ? [44, 44.001, 64.5, 93.999, 94]
-            : [4, 4.001, 7, 10, 15.5, 19.999, 20, 22.999, 23].map(
-                (offset) => start + offset,
-              );
+            : [4, 4.001, 7, 10, 15.5, 19.999, 20, 22.999, 23].map((offset) => {
+                return start + offset;
+              });
         frames.forEach((frame) => {
           const markup = _render({ frame: frame, input: input });
           const books = _bookPositions(markup);
@@ -174,9 +172,9 @@ test("every book is assigned once and references do not mutate during stress reg
         DEFAULT_INPUT.books[1],
       ],
     },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
   assert.deepEqual(denseInput.readingGroups[0].learnerIds, [
     "reader 0",
     "reader 1",
@@ -187,11 +185,12 @@ test("every book is assigned once and references do not mutate during stress reg
     JSON.stringify(contract.semanticRules),
   ) as typeof contract.semanticRules;
   assert.ok(
-    rules.some(
-      (rule) =>
+    rules.some((rule) => {
+      return (
         rule.paths.includes("readingGroups.*.learnerIds") &&
-        rule.description.includes("exactly once"),
-    ),
+        rule.description.includes("exactly once")
+      );
+    }),
   );
 });
 
@@ -234,26 +233,28 @@ test("concentrated groups remain intact when the large group changes table posit
           ),
         ];
         assert.equal(readers.length, 8);
-        readers.forEach((reader) =>
-          assert.ok(
+        readers.forEach((reader) => {
+          return assert.ok(
             groups
               .find(propEq("bookId", reader[2]))!
               .learnerIds.includes(reader[1]),
-          ),
-        );
+          );
+        });
       });
     });
   });
 });
 
 test("seats physically pivot toward their group book and clear the caption rail", () => {
-  const paths = (markup: string) => [
-    ...markup.matchAll(/data-reading-seat="([^"]+)" d="([^"]+)"/g),
-  ];
+  const paths = (markup: string) => {
+    return [...markup.matchAll(/data-reading-seat="([^"]+)" d="([^"]+)"/g)];
+  };
   const setup = paths(_render({ frame: 0, input: denseInput }));
   const hold = paths(_render({ frame: 150, input: denseInput }));
   assert.equal(hold.length, 8);
-  hold.forEach((seat, index) => assert.notEqual(seat[2], setup[index][2]));
+  hold.forEach((seat, index) => {
+    return assert.notEqual(seat[2], setup[index][2]);
+  });
   [44, 64.5, 94, 108, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: denseInput });
     paths(markup).forEach((seat) => {
@@ -266,14 +267,14 @@ test("seats physically pivot toward their group book and clear the caption rail"
       const points = seat[2]
         .match(/-?\d+(?:\.\d+)?(?:e[-+]?\d+)?/g)!
         .map(Number);
-      points.forEach((coordinate, index) =>
-        assert.ok(
+      points.forEach((coordinate, index) => {
+        return assert.ok(
           index % 2 === 0
             ? Number(reader[1]) + coordinate >= 0 &&
                 Number(reader[1]) + coordinate <= 960
             : Number(reader[2]) + coordinate < 435,
-        ),
-      );
+        );
+      });
     });
   });
 });

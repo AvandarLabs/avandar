@@ -13,37 +13,129 @@ import {
 } from "../capture-lib.mjs";
 
 /** @typedef {{path: string, sha256: string}} CaptureArtifact */
-/** @typedef {{id: string, flowId: string, status: string, sourceUrl: string, startedAtMs: number, videoStartedAtMs: number|null, endedAtMs?: number, videoEndedAtMs?: number|null, resultUrl?: string, error?: string}} CaptureAction */
-/** @typedef {{id: string, flowId: string, status: string, sourceUrl: string, startedAtMs: number, atMs?: number, videoAtMs?: number|null, completedAtMs?: number, screenshot?: CaptureArtifact, text?: CaptureArtifact, error?: string}} CaptureCheckpoint */
-/** @typedef {{id: string, status: string, startedAtMs?: number, endedAtMs?: number, videoStartedAtMs?: number|null, videoEndedAtMs?: number|null}} CaptureFeature */
-/** @typedef {{sourceUrl: string, method: string, reason: string, atMs: number, videoAtMs: number|null}} BlockedRequest */
+/**
+ * @typedef {{
+ *   id: string,
+ *   flowId: string,
+ *   status: string,
+ *   sourceUrl: string,
+ *   startedAtMs: number,
+ *   videoStartedAtMs: number|null,
+ *   endedAtMs?: number,
+ *   videoEndedAtMs?: number|null,
+ *   resultUrl?: string,
+ *   error?: string
+ * }} CaptureAction
+ */
+/**
+ * @typedef {{
+ *   id: string,
+ *   flowId: string,
+ *   status: string,
+ *   sourceUrl: string,
+ *   startedAtMs: number,
+ *   atMs?: number,
+ *   videoAtMs?: number|null,
+ *   completedAtMs?: number,
+ *   screenshot?: CaptureArtifact,
+ *   text?: CaptureArtifact,
+ *   error?: string
+ * }} CaptureCheckpoint
+ */
+/**
+ * @typedef {{
+ *   id: string,
+ *   status: string,
+ *   startedAtMs?: number,
+ *   endedAtMs?: number,
+ *   videoStartedAtMs?: number|null,
+ *   videoEndedAtMs?: number|null
+ * }} CaptureFeature
+ */
+/**
+ * @typedef {{
+ *   sourceUrl: string,
+ *   method: string,
+ *   reason: string,
+ *   atMs: number,
+ *   videoAtMs: number|null
+ * }} BlockedRequest
+ */
 /**
  * @typedef {object} CaptureManifest
  * @property {number} schemaVersion
  * @property {string} runId
  * @property {string} status
  * @property {string} startedAt
- * @property {{baseUrl: string, workspace: string, runLabel: string, flowIds: string[], viewport: {width: number,height: number}, fixtureDir: string, checkpointSettleMs: number}} inputs
+ * @property {{
+ *   baseUrl: string,
+ *   workspace: string,
+ *   runLabel: string,
+ *   flowIds: string[],
+ *   viewport: {width: number,height: number},
+ *   fixtureDir: string,
+ *   checkpointSettleMs: number
+ * }} inputs
  * @property {{path: string, bytes: number, sha256: string}[]} fixtures
- * @property {{engine: string, version: string|null, playwrightVersion: string}} browser
- * @property {{status: string, recorded: boolean, completedAtMs?: number}} authentication
- * @property {{scope: string, serviceWorkers: string, blockedRequests: BlockedRequest[], suppressedRequests: BlockedRequest[]}} networkPolicy
- * @property {{unit: string, clock: string, recordingOrigin: string, exactFrameAlignment: boolean, recordingStartedAtMs?: number}} timing
+ * @property {{
+ *   engine: string,
+ *   version: string|null,
+ *   playwrightVersion: string
+ * }} browser
+ * @property {{
+ *   status: string,
+ *   recorded: boolean,
+ *   completedAtMs?: number
+ * }} authentication
+ * @property {{
+ *   scope: string,
+ *   serviceWorkers: string,
+ *   blockedRequests: BlockedRequest[],
+ *   suppressedRequests: BlockedRequest[]
+ * }} networkPolicy
+ * @property {{
+ *   unit: string,
+ *   clock: string,
+ *   recordingOrigin: string,
+ *   exactFrameAlignment: boolean,
+ *   recordingStartedAtMs?: number
+ * }} timing
  * @property {CaptureFeature[]} features
  * @property {CaptureAction[]} actions
  * @property {CaptureCheckpoint[]} checkpoints
- * @property {{flowId: string, kind: string, id: string, name: string}[]} resources
- * @property {{status: string, originalFps: number, fpsBasis: string, normalizationRequired: boolean, rawPath: string|null, path?: string, sha256?: string}} video
+ * @property {{
+ *   flowId: string,
+ *   kind: string,
+ *   id: string,
+ *   name: string
+ * }[]} resources
+ * @property {{
+ *   status: string,
+ *   originalFps: number,
+ *   fpsBasis: string,
+ *   normalizationRequired: boolean,
+ *   rawPath: string|null,
+ *   path?: string,
+ *   sha256?: string
+ * }} video
  * @property {{stage: string, message: string, atMs: number}[]} errors
  * @property {string} [finishedAt]
  * @property {number} [durationMs]
  */
-/** @typedef {{status: string, runDir: string, manifestPath: string, manifest: CaptureManifest}} CaptureResult */
+/**
+ * @typedef {{
+ *   status: string,
+ *   runDir: string,
+ *   manifestPath: string,
+ *   manifest: CaptureManifest
+ * }} CaptureResult
+ */
 
 /**
  * Build a fresh capture manifest plus the `checkpoint`/`step`/`recordResource`
  * closures a run uses to record evidence against it. `live` is a plain object
- * the caller mutates as the run progresses (`live.page`, `live.recordingOrigin`),
+ * the caller mutates as the run progresses (`live.page`,
+ * `live.recordingOrigin`),
  * so these closures always see the current page and video origin.
  */
 export function createCaptureContext({

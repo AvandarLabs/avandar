@@ -34,16 +34,16 @@ const render: ({
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
 test("all authored fixtures are accepted and every rejection fixture fails", () => {
-  FIXTURES.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(
+  FIXTURES.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(
       inputSchema.safeParse(input).success,
       false,
       JSON.stringify(input),
-    ),
-  );
+    );
+  });
 });
 test("one cache widens from key/name to key/name/value preserving both B occurrences", () => {
   const first = render({ frame: 55, input: DEFAULT_INPUT }),
@@ -87,7 +87,9 @@ function _getVisibleTexts({
     frame >= 140 ? input.copy.after : input.copy.before,
     ...input.requests.map(prop("label")),
     ...input.columns
-      .filter(({ id }) => input.cachedColumnIds.includes(id) || frame >= 106)
+      .filter(({ id }) => {
+        return input.cachedColumnIds.includes(id) || frame >= 106;
+      })
       .map(prop("label")),
   ];
 }
@@ -163,7 +165,9 @@ test("literal cells wrap at whole graphemes and retain exact line concatenation 
     );
     const segments = Array.from(
       new Intl.Segmenter("und", { granularity: "grapheme" }).segment(value),
-      ({ segment }) => segment,
+      ({ segment }) => {
+        return segment;
+      },
     );
     const expected = [
       segments.slice(0, 8).join(""),
@@ -173,12 +177,13 @@ test("literal cells wrap at whole graphemes and retain exact line concatenation 
     assert.equal(texts.length, expected.length);
     assert.equal(expected.join(""), value);
     texts.forEach(([, attributes, body], index) => {
-      const escape = (text: string) =>
-        text
+      const escape = (text: string) => {
+        return text
           .replaceAll("&", "&amp;")
           .replaceAll('"', "&quot;")
           .replaceAll("<", "&lt;")
           .replaceAll(">", "&gt;");
+      };
       assert.ok(
         attributes.includes(`data-literal-value="${escape(expected[index])}"`),
       );
@@ -191,7 +196,9 @@ test("literal cells wrap at whole graphemes and retain exact line concatenation 
         439 + index * 17,
       );
       const rawSpans = [...body.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)]
-        .map(([, text]) => text)
+        .map(([, text]) => {
+          return text;
+        })
         .join("");
       assert.ok(
         getConservativeWidthFromText({
@@ -220,7 +227,9 @@ test("hidden notation retains a missing-column cue and every empty or repeated o
     ...hold.matchAll(
       /data-cache-cell="key" data-row-index="(\d+)" data-raw-cell="([^"]*)"/g,
     ),
-  ].map(([, row, value]) => [Number(row), value]);
+  ].map(([, row, value]) => {
+    return [Number(row), value];
+  });
   assert.deepEqual(cells, [
     [0, "A"],
     [1, "B"],
@@ -250,12 +259,12 @@ test("adding an earlier source column leaves all existing cached cell positions 
       name: "x",
     });
   };
-  ["key", "value"].forEach((id) =>
-    assert.equal(
+  ["key", "value"].forEach((id) => {
+    return assert.equal(
       getX(render({ frame: 150, input: input }), id),
       getX(render({ frame: 55, input: input }), id),
-    ),
-  );
+    );
+  });
 });
 
 test("the covered request routes to its actual selected columns", () => {

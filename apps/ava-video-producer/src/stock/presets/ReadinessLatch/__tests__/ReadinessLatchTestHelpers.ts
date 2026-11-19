@@ -38,8 +38,8 @@ function _getVisibleTextsFromInput({
       ? input.copy.released
       : input.copy.held,
     ...input.participants.map(prop("label")),
-    ...input.participants.map((participant) =>
-      input.showParticipantStates
+    ...input.participants.map((participant) => {
+      return input.showParticipantStates
         ? participant.ready &&
           frame >=
             24 +
@@ -47,8 +47,8 @@ function _getVisibleTextsFromInput({
                 Math.max(...input.participants.map(prop("workUnits")))
           ? input.copy.ready
           : input.copy.waiting
-        : undefined,
-    ),
+        : undefined;
+    }),
     input.showWorkValues ? input.unitLabel : undefined,
   ].filter(isDefined);
 }
@@ -63,9 +63,9 @@ function _getAttributesFromMarkup({
   kind: string;
 }): string {
   const elements = markup.match(/<[^>]+>/g) ?? [];
-  const element = elements.find((item) =>
-    item.includes(`data-${kind}="${id}"`),
-  );
+  const element = elements.find((item) => {
+    return item.includes(`data-${kind}="${id}"`);
+  });
   assert.ok(element, `${kind} ${id}`);
   return element;
 }

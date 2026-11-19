@@ -39,18 +39,20 @@ export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {
         strokeWidth={2}
       />
       {input.showPackets
-        ? [0, 1, 2, 3].map((i) => (
-            <Packet
-              key={i}
-              frame={frame}
-              from={{ x: 165, y: 306 }}
-              to={{ x: 794, y: 306 }}
-              delay={i * 25}
-              period={100}
-              color={accent}
-              radius={4.5}
-            />
-          ))
+        ? [0, 1, 2, 3].map((i) => {
+            return (
+              <Packet
+                key={i}
+                frame={frame}
+                from={{ x: 165, y: 306 }}
+                to={{ x: 794, y: 306 }}
+                delay={i * 25}
+                period={100}
+                color={accent}
+                radius={4.5}
+              />
+            );
+          })
         : null}
       {producers.map((name, i) => {
         const x = 160 + i * 260;

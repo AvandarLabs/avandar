@@ -14,7 +14,7 @@ export function ColorValueControl({
   onChange,
   swatches = [],
   badge,
-}: Props) {
+}: Props): ReactNode {
   return (
     <Group gap="xs" wrap="nowrap" align="center">
       <HexColorInput

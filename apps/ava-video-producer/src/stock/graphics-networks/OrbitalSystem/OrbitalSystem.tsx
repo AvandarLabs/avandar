@@ -13,6 +13,7 @@ import { CENTER } from "./OrbitalSystem.constants";
 import { OrbitingBody } from "./OrbitingBody/OrbitingBody";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { OrbitalSystemInput } from "../../presets/OrbitalSystem/OrbitalSystem.schema";
+import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: OrbitalSystemInput };
 
@@ -20,7 +21,11 @@ const CUBE_GLYPH =
   "M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311";
 
 /** Draws the bounded authored orbital-system study at an explicit frame. */
-export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
+export function OrbitalSystem({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
   const style = useGraphicProps("OrbitalSystem", {});
   const tokens = useGraphicTokens();
   return (
@@ -30,15 +35,17 @@ export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
           descriptor: LEGACY_DISPLAY_COPY["orbital-system"].orbitalSystem,
         })}
       </Eyebrow>
-      {input.bodies.map((orbit, i) => (
-        <OrbitingBody
-          key={i}
-          orbit={orbit}
-          frame={frame}
-          color={getContentColorFromValue(orbit.color, { tokens, accent })}
-          showOrbit={input.showOrbits}
-        />
-      ))}
+      {input.bodies.map((orbit, i) => {
+        return (
+          <OrbitingBody
+            key={i}
+            orbit={orbit}
+            frame={frame}
+            color={getContentColorFromValue(orbit.color, { tokens, accent })}
+            showOrbit={input.showOrbits}
+          />
+        );
+      })}
       <circle
         cx={CENTER.x}
         cy={CENTER.y}

@@ -43,13 +43,27 @@ interface DispatchResult {
   fulfilled?: FakeFulfillOptions;
 }
 
+/** The flow context callbacks the capture runner hands each test flow. */
+interface FakeFlowContext {
+  step: <T>(id: string, action: () => Promise<T>) => Promise<T>;
+  checkpoint: (id: string, options?: { text?: boolean }) => Promise<void>;
+  recordResource: (resource: {
+    kind: string;
+    id: string;
+    name: string;
+  }) => Promise<void>;
+}
+
 /** Minimal stand-in for a Playwright `Video`; only `saveAs`/`path` are used. */
 interface FakeVideo {
   saveAs: (path: string) => Promise<void>;
   path: () => Promise<string>;
 }
 
-/** The screenshot options the mock reads; the rest of `PageScreenshotOptions` is unused. */
+/**
+ * The screenshot options the mock reads; the rest of `PageScreenshotOptions` is
+ * unused.
+ */
 type FakeScreenshotOptions = Pick<PageScreenshotOptions, "animations"> & {
   path: string;
 };
@@ -87,7 +101,10 @@ interface FakeContext extends Pick<
   }>;
 }
 
-/** The subset of a Playwright `Browser` the capture runner receives from its caller. */
+/**
+ * The subset of a Playwright `Browser` the capture runner receives from its
+ * caller.
+ */
 interface FakeBrowser extends Pick<Browser, "version" | "close"> {
   newContext: (options?: BrowserContextOptions) => Promise<FakeContext>;
 }
@@ -100,7 +117,9 @@ function fakeBrowser(): {
   const events: string[] = [];
   const contexts: FakeContext[] = [];
   const browser: FakeBrowser = {
-    version: () => "fake-browser-for-lifecycle-unit-test",
+    version: () => {
+      return "fake-browser-for-lifecycle-unit-test";
+    },
     close: async () => {
       events.push("browser-close");
     },
@@ -125,19 +144,28 @@ function fakeBrowser(): {
         goto: async (url: string) => {
           currentUrl = url;
         },
-        url: () => currentUrl,
-        video: () => video,
+        url: () => {
+          return currentUrl;
+        },
+        video: () => {
+          return video;
+        },
         evaluate: async () => {
           events.push("fonts-ready");
         },
         waitForTimeout: async (milliseconds: number) => {
           events.push(`settle-${milliseconds}`);
         },
-        locator: () => ({
-          innerText: async () =>
-            "Visible result for user@example.test with capture-test-password",
-        }),
-        getByText: () => ({}),
+        locator: () => {
+          return {
+            innerText: async () => {
+              return "Visible result for user@example.test with capture-test-password";
+            },
+          };
+        },
+        getByText: () => {
+          return {};
+        },
         screenshot: async ({ path, animations }) => {
           assert.equal(animations, "disabled");
           await writeFile(path, "unit-test-image-placeholder");
@@ -155,11 +183,19 @@ function fakeBrowser(): {
           assert.ok(routeHandler, "network guard must be installed first");
           const result: DispatchResult = { continued: false, aborted: false };
           await routeHandler({
-            request: () => ({
-              url: () => url,
-              method: () => method,
-              resourceType: () => "fetch",
-            }),
+            request: () => {
+              return {
+                url: () => {
+                  return url;
+                },
+                method: () => {
+                  return method;
+                },
+                resourceType: () => {
+                  return "fetch";
+                },
+              };
+            },
             continue: async () => {
               result.continued = true;
             },
@@ -172,11 +208,15 @@ function fakeBrowser(): {
           });
           return result;
         },
-        newPage: async () => page,
-        storageState: async () => ({
-          cookies: [{ name: "session", value: "never-persist-this" }],
-          origins: [],
-        }),
+        newPage: async () => {
+          return page;
+        },
+        storageState: async () => {
+          return {
+            cookies: [{ name: "session", value: "never-persist-this" }],
+            origins: [],
+          };
+        },
         close: async () => {
           events.push(`close-${number}`);
         },
@@ -190,7 +230,9 @@ function fakeBrowser(): {
 
 async function captureFixture(t: TestContext) {
   const root = await mkdtemp(join(tmpdir(), "capture-run-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   await mkdir(join(root, "demo-data"));
   await writeFile(join(root, "demo-data", "cases.csv"), "id\n1\n");
   return root;
@@ -210,8 +252,13 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
       assert.equal(contexts[0].options.recordVideo, undefined);
     },
     flowMap: {
-      import: async (ctx: any) => {
-        assert.equal(await ctx.step("read-result", async () => 42), 42);
+      import: async (ctx: FakeFlowContext) => {
+        assert.equal(
+          await ctx.step("read-result", async () => {
+            return 42;
+          }),
+          42,
+        );
         await ctx.checkpoint("ready", { text: true });
         await ctx.recordResource({
           kind: "dataset",
@@ -226,7 +273,9 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
   assert.ok(typeof storageState === "object" && storageState !== null);
   assert.equal(storageState.cookies[0].value, "never-persist-this");
   assert.ok(
-    contexts.every((context) => context.options.serviceWorkers === "block"),
+    contexts.every((context) => {
+      return context.options.serviceWorkers === "block";
+    }),
   );
   assert.equal(events.includes("browser-close"), false);
   assert.ok(events.includes("fonts-ready") && events.includes("settle-600"));
@@ -260,7 +309,7 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   const { browser, contexts } = fakeBrowser();
   const endpoint =
     "https://avandar.featurebase.app/api/v1/feedback/widget/config";
-  const responses: any[] = [];
+  const responses: DispatchResult[] = [];
   const result = await runCapture({
     root,
     browser,
@@ -271,7 +320,7 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
       responses.push(await contexts[0].dispatchRequest(endpoint));
     },
     flowMap: {
-      import: async (ctx: any) => {
+      import: async (ctx: FakeFlowContext) => {
         await ctx.step("read-result", async () => {
           responses.push(await contexts[1].dispatchRequest(endpoint));
         });
@@ -284,11 +333,12 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   assert.deepEqual(result.manifest.networkPolicy.blockedRequests, []);
   assert.equal(result.manifest.networkPolicy.suppressedRequests.length, 2);
   assert.ok(
-    result.manifest.networkPolicy.suppressedRequests.every(
-      (request: any) =>
+    result.manifest.networkPolicy.suppressedRequests.every((request) => {
+      return (
         request.sourceUrl === endpoint &&
-        request.reason === "nonessential-feedback-widget",
-    ),
+        request.reason === "nonessential-feedback-widget"
+      );
+    }),
   );
   assert.equal(
     result.manifest.networkPolicy.suppressedRequests[0].videoAtMs,
@@ -309,9 +359,9 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
       "no request may leave for the feedback service",
     );
     assert.equal(response.aborted, false);
-    assert.equal(response.fulfilled.status, 200);
-    assert.equal(response.fulfilled.contentType, "application/json");
-    assert.deepEqual(JSON.parse(response.fulfilled.body), {});
+    assert.equal(response.fulfilled?.status, 200);
+    assert.equal(response.fulfilled?.contentType, "application/json");
+    assert.deepEqual(JSON.parse(String(response.fulfilled?.body)), {});
   }
   assert.equal(
     (await readFile(result.manifestPath, "utf8")).includes("[invalid source]"),
@@ -323,7 +373,7 @@ test("unknown external writes still fail capture and retain a useful source URL"
   const root = await captureFixture(t);
   const { browser, contexts } = fakeBrowser();
   const endpoint = "https://avandar.featurebase.app/api/v1/feedback/submit";
-  let response: any;
+  let response: DispatchResult | undefined;
   await assert.rejects(
     runCapture({
       root,
@@ -333,7 +383,7 @@ test("unknown external writes still fail capture and retain a useful source URL"
       flowIds: ["import"],
       login: async () => {},
       flowMap: {
-        import: async (ctx: any) => {
+        import: async (ctx: FakeFlowContext) => {
           await ctx.step("read-result", async () => {
             response = await contexts[1].dispatchRequest(
               `${endpoint}?token=hidden`,
@@ -358,15 +408,15 @@ test("unknown external writes still fail capture and retain a useful source URL"
       return true;
     },
   );
-  assert.equal(response.continued, false);
-  assert.equal(response.aborted, true);
-  assert.equal(response.fulfilled, undefined);
+  assert.equal(response?.continued, false);
+  assert.equal(response?.aborted, true);
+  assert.equal(response?.fulfilled, undefined);
 });
 
 test("swallowed action failures remain failed evidence and skip later flows while preserving artifacts", async (t) => {
   const root = await captureFixture(t);
   const { browser } = fakeBrowser();
-  let failure: any;
+  let failure: unknown;
   try {
     await runCapture({
       root,
@@ -376,7 +426,7 @@ test("swallowed action failures remain failed evidence and skip later flows whil
       flowIds: ["import", "explorer"],
       login: async () => {},
       flowMap: {
-        import: async (ctx: any) => {
+        import: async (ctx: FakeFlowContext) => {
           try {
             await ctx.step("failed-save", async () => {
               throw new Error("Save failed with capture-test-password");
@@ -396,7 +446,9 @@ test("swallowed action failures remain failed evidence and skip later flows whil
   assert.ok(failure instanceof CaptureRunError);
   assert.equal(failure.manifest.status, "failed");
   assert.deepEqual(
-    failure.manifest.features.map((feature: any) => feature.status),
+    failure.manifest.features.map((feature) => {
+      return feature.status;
+    }),
     ["failed", "skipped"],
   );
   assert.equal(failure.manifest.actions[0].status, "failed");

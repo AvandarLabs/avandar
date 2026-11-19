@@ -9,10 +9,10 @@ test("Arial estimates bound regular and bold measurements at supported sizes", (
     { text: "mmWmmWmm", fontSize: 16, minimumWidth: 114 },
     { text: "0 mmmmmm", fontSize: 103, minimumWidth: 638 },
   ];
-  measurements.forEach(({ text, fontSize, minimumWidth }) =>
-    assert.ok(
+  measurements.forEach(({ text, fontSize, minimumWidth }) => {
+    return assert.ok(
       getLegacyWidthFromText({ text, fontSize }) >= minimumWidth,
       `${text} must reserve at least ${minimumWidth}px`,
-    ),
-  );
+    );
+  });
 });

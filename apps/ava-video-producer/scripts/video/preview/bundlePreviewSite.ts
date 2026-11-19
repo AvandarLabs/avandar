@@ -10,7 +10,11 @@ export function bundlePreviewSite({
   plan,
   directory,
   publicDir,
-}: Readonly<{ plan: Storyboard; directory: string; publicDir: string }>) {
+}: Readonly<{
+  plan: Storyboard;
+  directory: string;
+  publicDir: string;
+}>): Promise<string> {
   return bundle({
     webpackOverride: withWorkspaceAliases,
     entryPoint: path.join(

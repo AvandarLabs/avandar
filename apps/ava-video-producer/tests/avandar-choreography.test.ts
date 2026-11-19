@@ -14,24 +14,31 @@ test("measured cursor paths hold every destination from the click through click 
       assert.ok(key.at >= keys[index - 1].at, "Keys must be chronological");
   });
   for (const beat of beats) {
-    const arrival = keys.filter((key) => key.at <= beat.frame).at(-1)!;
+    const arrival = keys
+      .filter((key) => {
+        return key.at <= beat.frame;
+      })
+      .at(-1)!;
     assert.deepEqual({ x: arrival.x, y: arrival.y }, { x: beat.x, y: beat.y });
-    const hold = keys.filter(
-      (key) => key.at >= beat.frame && key.at <= beat.frame + 8,
-    );
+    const hold = keys.filter((key) => {
+      return key.at >= beat.frame && key.at <= beat.frame + 8;
+    });
     assert.ok(
-      hold.some((key) => key.at === beat.frame + 8),
+      hold.some((key) => {
+        return key.at === beat.frame + 8;
+      }),
       "The full click hold needs an explicit key",
     );
     assert.ok(
-      hold.every((key) => key.x === beat.x && key.y === beat.y),
+      hold.every((key) => {
+        return key.x === beat.x && key.y === beat.y;
+      }),
       "The next destination cannot begin during the click hold",
     );
   }
-  assert.throws(
-    () => measuredPath([beats[0], { ...beats[1], frame: 92 }]),
-    /overlap/,
-  );
+  assert.throws(() => {
+    return measuredPath([beats[0], { ...beats[1], frame: 92 }]);
+  }, /overlap/);
 });
 
 test("selection followed by typing at the same measured field retains one dwell", () => {
@@ -41,5 +48,10 @@ test("selection followed by typing at the same measured field retains one dwell"
     { frame: 358, x: 891, y: 452, action: "type", holdUntil: 442 },
   ]);
   assert.deepEqual(keys.at(-1), { at: 442, x: 891, y: 452 });
-  assert.equal(keys.filter((key) => key.x === 891).length, 2);
+  assert.equal(
+    keys.filter((key) => {
+      return key.x === 891;
+    }).length,
+    2,
+  );
 });

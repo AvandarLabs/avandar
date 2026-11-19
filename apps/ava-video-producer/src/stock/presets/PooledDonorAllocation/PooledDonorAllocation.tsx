@@ -27,27 +27,31 @@ export function PooledDonorAllocation({
         frame={frame}
         accent={accent}
       />
-      {input.contributions.map((donor, donorIndex) => (
-        <DonorTray
-          key={donor.id}
-          input={input}
-          frame={frame}
-          donorIndex={donorIndex}
-        />
-      ))}
+      {input.contributions.map((donor, donorIndex) => {
+        return (
+          <DonorTray
+            key={donor.id}
+            input={input}
+            frame={frame}
+            donorIndex={donorIndex}
+          />
+        );
+      })}
       <AllocationCoordinator input={input} frame={frame} tokens={tokens} />
-      {tokens.map((token) => (
-        <DonorToken
-          key={`${token.donorIndex}:${token.unitIndex}`}
-          token={token}
-          requestOrdinal={
-            input.requests.findIndex(
-              ({ id }) => id === token.donor.earmarkedRequestId,
-            ) + 1
-          }
-          accent={accent}
-        />
-      ))}
+      {tokens.map((token) => {
+        return (
+          <DonorToken
+            key={`${token.donorIndex}:${token.unitIndex}`}
+            token={token}
+            requestOrdinal={
+              input.requests.findIndex(({ id }) => {
+                return id === token.donor.earmarkedRequestId;
+              }) + 1
+            }
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

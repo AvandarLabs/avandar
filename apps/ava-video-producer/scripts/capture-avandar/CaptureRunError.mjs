@@ -1,4 +1,7 @@
-/** Raised when a capture run finishes without passing; carries the manifest for review. */
+/**
+ * Raised when a capture run finishes without passing; carries the manifest for
+ * review.
+ */
 export class CaptureRunError extends Error {
   /** @param {import("./createCaptureContext.mjs").CaptureResult} result */
   constructor(result) {

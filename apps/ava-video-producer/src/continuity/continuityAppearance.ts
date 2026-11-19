@@ -38,10 +38,10 @@ export function createContinuityPlanFromOptions(
     .parse(raw);
   return {
     ...plan,
-    shots: plan.shots.map((shot) =>
-      shot.scene === "continuity"
+    shots: plan.shots.map((shot) => {
+      return shot.scene === "continuity"
         ? { ...shot, props: { ...shot.props, ...appearance } }
-        : shot,
-    ),
+        : shot;
+    }),
   };
 }

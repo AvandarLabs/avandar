@@ -103,7 +103,9 @@ test("full adult shapes cover every fractional handoff and the six learner ident
         session: { ...denseInput.session, mode },
         showClassroomResponsibility,
       };
-      Array.from({ length: 361 }, (_, index) => index / 2).forEach((frame) => {
+      Array.from({ length: 361 }, (_, index) => {
+        return index / 2;
+      }).forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
         const teacherX = _staffX({ markup, role: "teacher" });
         const coverX = _staffX({ markup, role: "cover" });
@@ -115,9 +117,9 @@ test("full adult shapes cover every fractional handoff and the six learner ident
           assert.equal(coverX, 180);
         }
         assert.deepEqual(
-          [...markup.matchAll(/data-learner-id="([^"]+)"/g)].map(
-            (match) => match[1],
-          ),
+          [...markup.matchAll(/data-learner-id="([^"]+)"/g)].map((match) => {
+            return match[1];
+          }),
           input.learners.map(prop("id")),
         );
         assert.equal(
@@ -128,14 +130,14 @@ test("full adult shapes cover every fractional handoff and the six learner ident
       [24, 42, 48, 72, 104, 124, 132, 150].forEach((boundary) => {
         const before = _render({ frame: boundary - 0.001, input: input });
         const after = _render({ frame: boundary + 0.001, input: input });
-        ["teacher", "cover"].forEach((role) =>
-          assert.ok(
+        ["teacher", "cover"].forEach((role) => {
+          return assert.ok(
             Math.abs(
               _staffX({ markup: before, role }) -
                 _staffX({ markup: after, role }),
             ) < 0.001,
-          ),
-        );
+          );
+        });
       });
       assert.equal(
         _staffX({
@@ -169,9 +171,9 @@ test("full adult shapes cover every fractional handoff and the six learner ident
   });
 });
 test("both support modes contact the teaching board with different physical gestures", () => {
-  const hands = (markup: string) => [
-    ...markup.matchAll(/data-teaching-hand="([^"]+)" d="([^"]+)"/g),
-  ];
+  const hands = (markup: string) => {
+    return [...markup.matchAll(/data-teaching-hand="([^"]+)" d="([^"]+)"/g)];
+  };
   const rehearsal = hands(_render({ frame: 80, input: denseInput }));
   const planning = hands(
     _render({
@@ -185,17 +187,21 @@ test("both support modes contact the teaching board with different physical gest
   assert.equal(rehearsal.length, 2);
   assert.equal(planning.length, 2);
   assert.notDeepEqual(
-    rehearsal.map((match) => match[2]),
-    planning.map((match) => match[2]),
+    rehearsal.map((match) => {
+      return match[2];
+    }),
+    planning.map((match) => {
+      return match[2];
+    }),
   );
-  [rehearsal, planning].forEach((gestures) =>
-    gestures.forEach((gesture) => {
+  [rehearsal, planning].forEach((gestures) => {
+    return gestures.forEach((gesture) => {
       const coordinates = gesture[2].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
       const x = (gesture[1] === "teacher" ? 660 : 850) + coordinates.at(-2)!;
       assert.ok(x >= 592 && x <= 908);
       assert.equal(250 + coordinates.at(-1)!, 300);
-    }),
-  );
+    });
+  });
   assert.ok(
     _render({ frame: 150, input: denseInput }).includes(
       `aria-label="${denseInput.session.prompt}"`,
@@ -219,18 +225,19 @@ test("staff role identity and exact collection bounds survive contract serializa
       },
     },
     { ...minimumInput, session: { ...DEFAULT_INPUT.session, extra: true } },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
   const rules = JSON.parse(
     JSON.stringify(contract.semanticRules),
   ) as typeof contract.semanticRules;
   assert.ok(
-    rules.some(
-      (rule) =>
+    rules.some((rule) => {
+      return (
         rule.paths.includes("staff.cover.id") &&
-        rule.description.includes("distinct"),
-    ),
+        rule.description.includes("distinct")
+      );
+    }),
   );
 });
 test("every accepted learner count remains independent from staff and session mode", () => {

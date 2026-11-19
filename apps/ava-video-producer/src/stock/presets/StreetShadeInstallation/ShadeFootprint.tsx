@@ -18,7 +18,9 @@ export function ShadeFootprint({
   const preceding = input.installations
     .slice(0, index)
     .filter(propEq("zoneId", item.zoneId))
-    .reduce((sum, prior) => sum + prior.addedShadeM2, 0);
+    .reduce((sum, prior) => {
+      return sum + prior.addedShadeM2;
+    }, 0);
   const x = 285 + ((zone.existingShadeM2 + preceding) / zone.areaM2) * 600;
   const y = 165 + zoneIndex * 65;
   const width =

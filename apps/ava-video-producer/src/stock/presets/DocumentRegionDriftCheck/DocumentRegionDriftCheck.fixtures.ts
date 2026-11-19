@@ -93,14 +93,18 @@ export const invalidInputs: unknown[] = [
     [0, 0, 101, 10],
     [0, 0, 10, 101],
     [0, 0, 1],
-  ].map((box) => ({
-    ...DEFAULT_INPUT,
-    saved: { ...DEFAULT_INPUT.saved, box },
-  })),
-  ...[0, 21, 1.5].map((page) => ({
-    ...DEFAULT_INPUT,
-    saved: { ...DEFAULT_INPUT.saved, page },
-  })),
+  ].map((box) => {
+    return {
+      ...DEFAULT_INPUT,
+      saved: { ...DEFAULT_INPUT.saved, box },
+    };
+  }),
+  ...[0, 21, 1.5].map((page) => {
+    return {
+      ...DEFAULT_INPUT,
+      saved: { ...DEFAULT_INPUT.saved, page },
+    };
+  }),
   {
     ...DEFAULT_INPUT,
     saved: { ...DEFAULT_INPUT.saved, header: "x".repeat(31) },

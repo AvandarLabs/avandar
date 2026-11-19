@@ -23,29 +23,33 @@ export function PublicDisplacementMap({
         stroke={STOCK.line}
       />
       {frame >= 71
-        ? input.locations.map((location, index) => (
-            <DisclosedMarker
-              key={location.id}
-              location={location}
-              index={index}
-              frame={frame}
-              accent={accent}
-            />
-          ))
+        ? input.locations.map((location, index) => {
+            return (
+              <DisclosedMarker
+                key={location.id}
+                location={location}
+                index={index}
+                frame={frame}
+                accent={accent}
+              />
+            );
+          })
         : undefined}
-      {input.locations.map((location, index) => (
-        <g key={location.id} data-approximate-label={location.id}>
-          <Text x={485} y={440 + index * 52} size={12}>
-            {index + 1}·
-          </Text>
-          <LabelSlots
-            labels={[
-              [location.label, 510, 440 + index * 52, 165, 12, 3],
-              [input.labels.approximate, 695, 440 + index * 52, 220, 12, 3],
-            ]}
-          />
-        </g>
-      ))}
+      {input.locations.map((location, index) => {
+        return (
+          <g key={location.id} data-approximate-label={location.id}>
+            <Text x={485} y={440 + index * 52} size={12}>
+              {index + 1}·
+            </Text>
+            <LabelSlots
+              labels={[
+                [location.label, 510, 440 + index * 52, 165, 12, 3],
+                [input.labels.approximate, 695, 440 + index * 52, 220, 12, 3],
+              ]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

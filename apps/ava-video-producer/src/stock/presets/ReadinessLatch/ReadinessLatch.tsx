@@ -26,14 +26,16 @@ export function ReadinessLatch({
   };
   return (
     <g>
-      {input.participants.map((participant, index) => (
-        <ReadinessRibbon
-          key={participant.id}
-          participant={participant}
-          index={index}
-          {...ribbonProps}
-        />
-      ))}
+      {input.participants.map((participant, index) => {
+        return (
+          <ReadinessRibbon
+            key={participant.id}
+            participant={participant}
+            index={index}
+            {...ribbonProps}
+          />
+        );
+      })}
       <ReadinessGate
         horizontal={horizontal}
         allReady={allReady}

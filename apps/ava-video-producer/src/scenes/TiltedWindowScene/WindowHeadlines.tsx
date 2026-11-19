@@ -5,6 +5,7 @@ import { getLineRevealStyle } from "../textReveal";
 import { getActiveHeadline } from "./windowMotion";
 import { HEADLINE_BOX } from "./windowTilt";
 import type { WindowHeadline } from "../scenes.types";
+import type { ReactNode } from "react";
 
 /** Frames between headline lines fading in. */
 const LINE_STAGGER = 3;
@@ -29,7 +30,7 @@ export function WindowHeadlines({
   width,
   height,
   exitAtFrame,
-}: Props) {
+}: Props): ReactNode {
   const { index, opacity } = getActiveHeadline(frame, headlines);
   const headline = headlines[index];
   const columnWidth = width * HEADLINE_BOX.width;
@@ -54,25 +55,27 @@ export function WindowHeadlines({
         opacity: opacity * exitOpacity,
       }}
     >
-      {fitted.lines.map((line, row) => (
-        <div
-          key={`${headline.atFrame}-${row}`}
-          style={{
-            fontSize: fitted.fontSize,
-            lineHeight: 1.25,
-            fontWeight: 600,
-            letterSpacing: -fitted.fontSize * 0.02,
-            color: "var(--foreground)",
-            ...getLineRevealStyle(
-              frame,
-              headline.atFrame + row * LINE_STAGGER,
-              "line-fade",
-            ),
-          }}
-        >
-          {line}
-        </div>
-      ))}
+      {fitted.lines.map((line, row) => {
+        return (
+          <div
+            key={`${headline.atFrame}-${row}`}
+            style={{
+              fontSize: fitted.fontSize,
+              lineHeight: 1.25,
+              fontWeight: 600,
+              letterSpacing: -fitted.fontSize * 0.02,
+              color: "var(--foreground)",
+              ...getLineRevealStyle(
+                frame,
+                headline.atFrame + row * LINE_STAGGER,
+                "line-fade",
+              ),
+            }}
+          >
+            {line}
+          </div>
+        );
+      })}
       {headline.subtitle ? (
         <div
           style={{

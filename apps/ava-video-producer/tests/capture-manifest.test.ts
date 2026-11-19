@@ -40,9 +40,8 @@ test("manifest sanitization removes credentials and URL queries; secret containe
     { value: jwt },
     { message: "contains capture-secret" },
   ]) {
-    assert.throws(
-      () => assertSafeManifest(record, ["capture-secret"]),
-      /Credential|credential/,
-    );
+    assert.throws(() => {
+      return assertSafeManifest(record, ["capture-secret"]);
+    }, /Credential|credential/);
   }
 });

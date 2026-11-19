@@ -24,7 +24,9 @@ export function ZoneLid({
   lift,
 }: Readonly<Props>): ReactNode {
   const points = zone.polygon
-    .map(([x, y]) => `${55 + x * 5},${180 + y * 2.5}`)
+    .map(([x, y]) => {
+      return `${55 + x * 5},${180 + y * 2.5}`;
+    })
     .join(" ");
   const first = zone.polygon[0];
   const { rate, opacity } = getZoneShadeFromInputAndFrame({

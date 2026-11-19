@@ -20,7 +20,9 @@ const MAX_TOKEN_PATH_LENGTH = 256;
 const MAX_FILM_ID_LENGTH = 256;
 const MAX_REQUEST_KEY_LENGTH = 512;
 
-/** Controls that change a film's look, so they must name the film they target. */
+/**
+ * Controls that change a film's look, so they must name the film they target.
+ */
 const FILM_SCOPED_ACTIONS: ReadonlySet<string> = new Set([
   "appearance",
   "theme",
@@ -101,7 +103,9 @@ export type FilmControl = Readonly<{
   requestKey?: string;
 }>;
 
-/** The live player's answer to a theme: the resolved hash, or why it refused. */
+/**
+ * The live player's answer to a theme: the resolved hash, or why it refused.
+ */
 export type FilmThemeAcknowledgement = Readonly<
   z.infer<typeof acknowledgementSchema>
 >;
@@ -117,7 +121,10 @@ export function parseVideoThemeSnapshot(value: unknown): VideoThemeSnapshot {
   return snapshotSchema.parse(value);
 }
 
-/** The serialized size of a payload in bytes, or undefined if it cannot be serialized. */
+/**
+ * The serialized size of a payload in bytes, or undefined if it cannot be
+ * serialized.
+ */
 function _byteLengthOf(value: unknown): number | undefined {
   try {
     return new TextEncoder().encode(JSON.stringify(value) ?? "").byteLength;
@@ -152,7 +159,9 @@ function _issuesFromError(error: unknown): VideoThemeIssue[] {
   return [{ path: "", message: THEME_UNRESOLVABLE }];
 }
 
-/** Why a payload is refused before parsing, or undefined if its size is fine. */
+/**
+ * Why a payload is refused before parsing, or undefined if its size is fine.
+ */
 function _payloadIssue(value: unknown): VideoThemeIssue | undefined {
   const byteLength = _byteLengthOf(value);
   if (byteLength === undefined) {
@@ -241,7 +250,9 @@ export function createFilmTokensUsedMessage(
   paths: readonly string[],
 ): FilmTokensUsedMessage {
   const boundedPaths = paths
-    .filter((path) => path.length <= MAX_TOKEN_PATH_LENGTH)
+    .filter((path) => {
+      return path.length <= MAX_TOKEN_PATH_LENGTH;
+    })
     .slice(0, MAX_TOKEN_PATHS);
   return { type: "film-tokens-used", id, paths: boundedPaths };
 }

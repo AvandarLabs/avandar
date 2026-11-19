@@ -7,11 +7,12 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MERGE, MERGE_GLYPH } from "./SourceMerge.constants";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ frame: number; accent: string }>;
 
 /** The node where every source edge meets, with its glyph and label. */
-export function MergeNode({ frame, accent }: Props) {
+export function MergeNode({ frame, accent }: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
   const { color } = useGraphicTokens();
   return (

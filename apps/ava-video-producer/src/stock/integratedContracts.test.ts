@@ -10,11 +10,17 @@ import { StockGraphic } from "./StockGraphic/StockGraphic";
 
 test("the integrated additions preserve every independent accepted default", () => {
   acceptedAdditions.forEach(({ id, inputs }) => {
-    const preset = STOCK_IDS.find((candidate) => candidate === id);
+    const preset = STOCK_IDS.find((candidate) => {
+      return candidate === id;
+    });
     assert.ok(preset, id);
     assert.deepEqual(
       stockContracts[preset].defaultInput,
-      Object.fromEntries(inputs.map((input) => [input.name, input.default])),
+      Object.fromEntries(
+        inputs.map((input) => {
+          return [input.name, input.default];
+        }),
+      ),
       id,
     );
   });

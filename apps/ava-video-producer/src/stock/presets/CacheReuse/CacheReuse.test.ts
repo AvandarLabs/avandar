@@ -158,16 +158,16 @@ test("hidden stored values preserve the key and result identity without explanat
   assert.doesNotMatch(markup, /aria-label="Use stored copy"/);
 });
 test("both returning journeys carry the authored result while outgoing requests carry only the key", () => {
-  [62, 82, 128].forEach((frame) =>
-    assert.match(
+  [62, 82, 128].forEach((frame) => {
+    return assert.match(
       _render({ frame: frame, input: DEFAULT_INPUT }),
       /data-carried-result="Sample tile"/,
-    ),
-  );
-  [36, 110].forEach((frame) =>
-    assert.doesNotMatch(
+    );
+  });
+  [36, 110].forEach((frame) => {
+    return assert.doesNotMatch(
       _render({ frame: frame, input: DEFAULT_INPUT }),
       /data-carried-result=/,
-    ),
-  );
+    );
+  });
 });

@@ -25,14 +25,16 @@ export function ReviewSourcePage({
         stroke={STOCK.line}
       />
       <FigureAnchor input={input} frame={frame} accent={accent} />
-      {input.labels.map((label, index) => (
-        <CandidateAnchorGuides
-          key={label.id}
-          input={input}
-          index={index}
-          frame={frame}
-        />
-      ))}
+      {input.labels.map((label, index) => {
+        return (
+          <CandidateAnchorGuides
+            key={label.id}
+            input={input}
+            index={index}
+            frame={frame}
+          />
+        );
+      })}
     </g>
   );
 }

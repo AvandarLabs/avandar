@@ -37,7 +37,9 @@ test("a snapshot keeps the theme and the custom themes it extends, without built
     "warm",
   );
   assert.deepEqual(
-    snapshot.documents.map(({ id }) => id),
+    snapshot.documents.map(({ id }) => {
+      return id;
+    }),
     ["warm"],
   );
 });

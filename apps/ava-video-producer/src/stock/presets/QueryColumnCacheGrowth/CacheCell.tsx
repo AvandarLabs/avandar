@@ -19,10 +19,9 @@ export function CacheCell({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const segments = Array.from(
-    GRAPHEMES.segment(value),
-    ({ segment }) => segment,
-  );
+  const segments = Array.from(GRAPHEMES.segment(value), ({ segment }) => {
+    return segment;
+  });
   const lines = [
     segments.slice(0, 8).join(""),
     ...(segments.length > 8 ? [segments.slice(8).join("")] : []),
@@ -34,9 +33,11 @@ export function CacheCell({
       data-raw-cell={value}
       aria-label={value}
     >
-      {lines.map((line, index) => (
-        <LiteralDataText key={index} value={line} x={x} y={y + index * 17} />
-      ))}
+      {lines.map((line, index) => {
+        return (
+          <LiteralDataText key={index} value={line} x={x} y={y + index * 17} />
+        );
+      })}
     </g>
   );
 }

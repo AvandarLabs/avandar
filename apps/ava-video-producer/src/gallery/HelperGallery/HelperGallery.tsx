@@ -12,27 +12,37 @@ import { HelperDetail } from "./HelperDetail/HelperDetail";
 import css from "./HelperGallery.module.css";
 import { HelperPreview } from "./HelperPreview/HelperPreview";
 import { useHelperGallery } from "./useHelperGallery";
+import type { ReactNode } from "react";
 
 /** Each helper category with its helper count, in catalog order. */
-const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => ({
-  id: category.id,
-  label: category.title,
-  count: HELPER_CATALOG.helpers.filter(
-    (helper) => helper.category === category.id,
-  ).length,
-}));
+const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => {
+  return {
+    id: category.id,
+    label: category.title,
+    count: HELPER_CATALOG.helpers.filter((helper) => {
+      return helper.category === category.id;
+    }).length,
+  };
+});
 
 /**
  * The Helpers section of the Motion Atlas: the shared helpers motions and
  * compositions are built from, as live thumbnail cards by category, each
  * opening its live preview and reference in the shared modal.
  */
-export function HelperGallery() {
+export function HelperGallery(): ReactNode {
   const gallery = useHelperGallery();
-  const [playing, setPlaying] = useState(() => !isReducedMotionPreferred());
+  const [playing, setPlaying] = useState(() => {
+    return !isReducedMotionPreferred();
+  });
   const { selection, open, previous, next } = gallery;
-  const labelOf = (id: string) =>
-    HELPER_CATEGORIES.find((category) => category.id === id)?.label ?? id;
+  const labelOf = (id: string) => {
+    return (
+      HELPER_CATEGORIES.find((category) => {
+        return category.id === id;
+      })?.label ?? id
+    );
+  };
   return (
     <>
       <a className="skip-link" href="#library">
@@ -61,8 +71,9 @@ export function HelperGallery() {
             "The shared helpers every motion and composition is built from, each previewed live with the real code."
           }
           heading={
-            HELPER_CATEGORIES.find((item) => item.id === selection.category)
-              ?.label ?? "All helpers"
+            HELPER_CATEGORIES.find((item) => {
+              return item.id === selection.category;
+            })?.label ?? "All helpers"
           }
           resultCount={gallery.entries.length}
           query={selection.query}
@@ -73,7 +84,11 @@ export function HelperGallery() {
             <button
               type="button"
               className="play-all"
-              onClick={() => setPlaying((value) => !value)}
+              onClick={() => {
+                return setPlaying((value) => {
+                  return !value;
+                });
+              }}
               aria-label={
                 playing ? "Pause all animations" : "Play all animations"
               }
@@ -89,15 +104,17 @@ export function HelperGallery() {
           }}
           resetLabel="All helpers"
         >
-          {gallery.entries.map((helper) => (
-            <HelperCard
-              key={helper.id}
-              helper={helper}
-              category={labelOf(helper.category)}
-              playing={playing && !open}
-              onOpen={gallery.openHelper}
-            />
-          ))}
+          {gallery.entries.map((helper) => {
+            return (
+              <HelperCard
+                key={helper.id}
+                helper={helper}
+                category={labelOf(helper.category)}
+                playing={playing && !open}
+                onOpen={gallery.openHelper}
+              />
+            );
+          })}
         </AtlasCollection>
       </div>
       {open ? (
@@ -108,9 +125,19 @@ export function HelperGallery() {
           nextLabel="Next helper"
           onClose={gallery.close}
           onPrevious={
-            previous ? () => gallery.openHelper(previous.id) : undefined
+            previous
+              ? () => {
+                  return gallery.openHelper(previous.id);
+                }
+              : undefined
           }
-          onNext={next ? () => gallery.openHelper(next.id) : undefined}
+          onNext={
+            next
+              ? () => {
+                  return gallery.openHelper(next.id);
+                }
+              : undefined
+          }
         >
           <div className={css.modalBody}>
             <HelperPreview helper={open} />
