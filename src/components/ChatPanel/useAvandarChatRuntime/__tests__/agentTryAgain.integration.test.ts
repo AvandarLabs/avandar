@@ -7,7 +7,15 @@
  * switched off, today's chat still posts its retry context.
  */
 import { Model } from "@avandar/models";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { TRY_AGAIN_LINE } from "$/agent/pageContext/buildAgentTurnText";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -115,6 +123,7 @@ function _createAdapter(): ChatModelAdapter {
   const ref = <T>(current: T) => {
     return { current };
   };
+  // Stub refs and dispatches only partly match, so this needs as unknown as.
   return createChatModelAdapter({
     chatGenerationRef: ref(0),
     lastTurnRef: ref(undefined),
@@ -153,7 +162,7 @@ async function _run(
 ): Promise<void> {
   await adapter.run({
     messages,
-  } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+  } as Parameters<ChatModelAdapter["run"]>[0]);
 }
 
 /** The text the agent was asked on its `index`th ask. */
@@ -162,6 +171,13 @@ function _askedText(index: number): string {
 }
 
 describe("agent Try again", () => {
+  // The adapter loads runDataAgentTurn with a dynamic import on its first run,
+  // which can take over 5s on a cold start. Loading it here keeps that cost out
+  // of the first test's timeout.
+  beforeAll(async () => {
+    await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
+  }, 20_000);
+
   beforeEach(() => {
     isAgentEnabledMock.mockReset().mockReturnValue(true);
     askMock.mockReset();
@@ -190,9 +206,10 @@ describe("agent Try again", () => {
 
     expect(createDataAgentMock).toHaveBeenCalledTimes(1);
     expect(_askedText(0)).not.toContain(TRY_AGAIN_LINE);
-    expect(_askedText(1).endsWith(`${TRY_AGAIN_LINE}\n\nHow many cases?`)).toBe(
-      true,
-    );
+    expect(_askedText(1).split("\n\n").slice(-2)).toEqual([
+      TRY_AGAIN_LINE,
+      "How many cases?",
+    ]);
   });
 
   it("starts a new agent from the recap, with no line, when an earlier answer is retried", async () => {
@@ -212,6 +229,7 @@ describe("agent Try again", () => {
     await _run(adapter, second);
 
     expect(createDataAgentMock).toHaveBeenCalledTimes(2);
+    expect(_askedText(2)).not.toContain(TRY_AGAIN_LINE);
     expect(_askedText(3)).toContain(
       "Earlier in this conversation:\nUser: How many cases?\nAssistant: Forty-two.\n\nAnd deaths?",
     );
