@@ -309,6 +309,30 @@ function _stripCssComments(source: string): string {
 const STRUCTURAL_LAYOUT_PROPERTY =
   /^(?:(?:min-|max-)?(?:width|height)|top|right|bottom|left|inset(?:-.+)?|grid-template(?:-.+)?|flex-basis)$/;
 
+/**
+ * The one stylesheet that declares the Atlas chrome scale (`--atlas-*` on
+ * `:root`). It is the chrome's counterpart of `classic.theme.json`: the source
+ * of the values every other chrome stylesheet reads, so it holds them by
+ * design.
+ */
+const CHROME_TOKEN_SHEET = "showcase/chrome-tokens.css";
+/** Values that defer to the cascade rather than naming a value. */
+const CSS_WIDE_KEYWORD = /^(?:inherit|initial|unset|revert|revert-layer)$/;
+/** A duration, a timing function, or a named easing in a transition. */
+const TIMING_LITERAL =
+  /\b\d*\.?\d+m?s\b|cubic-bezier\(|steps\(|\b(?:ease(?:-in|-out|-in-out)?|linear|step-start|step-end)\b/;
+
+/** A value with every `var(...)` read removed, nested reads included. */
+function _removeVariableReads(value: string): string {
+  let remaining = value;
+  let previous = "";
+  while (remaining !== previous) {
+    previous = remaining;
+    remaining = remaining.replace(/var\([^()]*\)/g, "");
+  }
+  return remaining;
+}
+
 function _countCss(source: string): number {
   const declarations = _stripCssComments(source)
     .split(/[;{}]/)
@@ -318,7 +342,8 @@ function _countCss(source: string): number {
   return declarations.reduce((total, declaration) => {
     const property = declaration.split(":")[0]?.trim() ?? "";
     const value = declaration.slice(property.length + 1);
-    const isVariable = value.trim().startsWith("var(");
+    const isVariable =
+      value.trim().startsWith("var(") || CSS_WIDE_KEYWORD.test(value.trim());
     const valueCount =
       _countMatches(value, HEX_PATTERN) +
       _countMatches(value, COLOR_FUNCTION_PATTERN) +
@@ -331,7 +356,8 @@ function _countCss(source: string): number {
       /^font-(?:size|weight|family)$/.test(property) && !isVariable,
       property === "border-radius" && !isVariable,
       /^(?:box|text)-shadow$/.test(property) && !isVariable,
-      /^(?:transition|animation)(?:-|$)/.test(property),
+      /^(?:transition|animation)(?:-|$)/.test(property) &&
+        TIMING_LITERAL.test(_removeVariableReads(value)),
     ].filter(Boolean).length;
     return total + valueCount + propertyCount;
   }, 0);
@@ -347,6 +373,9 @@ export function countThemeLiteralsFromSource(
   fileName: string,
   source: string,
 ): ThemeLiteralCounts {
+  if (fileName === CHROME_TOKEN_SHEET) {
+    return EMPTY_COUNTS;
+  }
   if (fileName.endsWith(".css")) {
     return { ...EMPTY_COUNTS, css: _countCss(source) };
   }
