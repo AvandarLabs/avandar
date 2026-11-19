@@ -53,12 +53,12 @@ export function StoryFilmPicture({
       patches={createThemePatchesFromTheme(plan.theme)}
       element="div"
     >
-      <_Film plan={plan} {...props} />
+      <FilmFrame plan={plan} {...props} />
     </VideoThemeScope>
   );
 }
 
-function _Film({
+function FilmFrame({
   plan,
   productScene,
   showCaptions = true,
@@ -92,7 +92,8 @@ function _Film({
   const loopFade = motion.loopFade.film;
   const loopOut =
     plan.purpose === "loop"
-      ? 1 - motion.ramp(frame, total - loopFade, loopFade, motion.dissolve.easing)
+      ? 1 -
+        motion.ramp(frame, total - loopFade, loopFade, motion.dissolve.easing)
       : 1;
   const common = { width: plan.width, height: sceneHeight, productScene };
   return (
@@ -153,12 +154,12 @@ function _ShotLayer(props: ShotLayerProps) {
       patches={createThemePatchesFromTheme(props.shot.theme)}
       element="div"
     >
-      <_ShotSurface {...props} />
+      <ShotSurface {...props} />
     </VideoThemeScope>
   );
 }
 
-function _ShotSurface({
+function ShotSurface({
   shot,
   frame,
   width,
@@ -168,9 +169,7 @@ function _ShotSurface({
 }: ShotLayerProps) {
   const tokens = useVideoTokens();
   return (
-    <AbsoluteFill
-      style={{ background: tokens.color.scene.ground, ...style }}
-    >
+    <AbsoluteFill style={{ background: tokens.color.scene.ground, ...style }}>
       <ShotView
         shot={shot}
         frame={frame}

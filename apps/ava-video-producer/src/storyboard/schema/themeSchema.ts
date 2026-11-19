@@ -42,7 +42,9 @@ const colorSchema = z
   .string()
   .max(100)
   .refine((value) => {
-    return COLOR_PATTERN.test(value) || THEME_COLOR_REFERENCE_PATTERN.test(value);
+    return (
+      COLOR_PATTERN.test(value) || THEME_COLOR_REFERENCE_PATTERN.test(value)
+    );
   }, COLOR_MESSAGE);
 
 /**

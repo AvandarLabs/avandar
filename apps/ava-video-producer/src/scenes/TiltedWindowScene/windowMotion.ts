@@ -369,8 +369,7 @@ export function getActiveHeadline(
   const { motion } = stage;
   const fade = motion.press.duration;
   const opacity = next
-    ? 1 -
-      motion.ramp(frame, next.atFrame - fade, fade, motion.dissolve.easing)
+    ? 1 - motion.ramp(frame, next.atFrame - fade, fade, motion.dissolve.easing)
     : 1;
   return { index, opacity };
 }

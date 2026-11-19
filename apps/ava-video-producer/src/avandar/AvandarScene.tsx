@@ -78,7 +78,7 @@ export function AvandarScene({
     });
   const cursor = cursorOnTarget(productFrame, keys, beats);
   return (
-    <_ProductBackdrop width={width} height={height}>
+    <ProductBackdrop width={width} height={height}>
       <AvandarStage
         feature={feature}
         frame={productFrame}
@@ -103,7 +103,7 @@ export function AvandarScene({
           />
         )}
       </div>
-    </_ProductBackdrop>
+    </ProductBackdrop>
   );
 }
 
@@ -111,7 +111,7 @@ export function AvandarScene({
  * The product stage's box, painted with `components.ProductFrame.backdrop`
  * behind the product UI.
  */
-function _ProductBackdrop({
+function ProductBackdrop({
   width,
   height,
   children,

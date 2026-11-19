@@ -49,7 +49,7 @@ const WORD_FIELDS: readonly StageTextField[] = [
 export function TitleCard(props: TitleCardProps): ReactNode {
   return (
     <StageThemeBoundary>
-      <_TitleCard {...props} />
+      <TitleCardContent {...props} />
     </StageThemeBoundary>
   );
 }
@@ -60,7 +60,7 @@ type TitleCardProps = {
   frame: number;
 };
 
-function _TitleCard({ name, kicker, frame }: TitleCardProps): ReactNode {
+function TitleCardContent({ name, kicker, frame }: TitleCardProps): ReactNode {
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();

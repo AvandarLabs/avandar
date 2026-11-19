@@ -27,12 +27,12 @@ type Props = {
 export function Cursor(props: Props): ReactNode {
   return (
     <StageThemeBoundary>
-      <_Cursor {...props} />
+      <CursorContent {...props} />
     </StageThemeBoundary>
   );
 }
 
-function _Cursor({
+function CursorContent({
   frame,
   path,
   clicks = [],

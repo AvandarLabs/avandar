@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { getClassicStageMotion } from "../scenes/stageTheme/stageTheme";
 import {
   getOverlayPose,
   getAnnotationProgress,
   getConnectorProgress,
 } from "./overlayMotion";
-import { getClassicStageMotion } from "../scenes/stageTheme/stageTheme";
 
 const motion = getClassicStageMotion();
 /** The draw timings the continuity stage passes in `classic`. */

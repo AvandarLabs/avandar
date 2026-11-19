@@ -7,7 +7,10 @@ import {
   isCameraMoving,
 } from "./cameraTrack";
 import css from "./MotionComponents.module.css";
-import { resolveMotionSettings, useMotionSettingsTheme } from "./motionSettings";
+import {
+  resolveMotionSettings,
+  useMotionSettingsTheme,
+} from "./motionSettings";
 import type { CameraKeyframe } from "./cameraTrack";
 import type { MotionOptions } from "./motionSettings";
 import type { ReactNode } from "react";

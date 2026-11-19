@@ -67,7 +67,9 @@ export function ContinuityToken({
       className={css.continuityToken}
       style={{
         borderColor: isSketched ? "transparent" : undefined,
-        borderRadius: isSketched ? 0 : scales.corner(tokens.corner.sharedObject),
+        borderRadius: isSketched
+          ? 0
+          : scales.corner(tokens.corner.sharedObject),
         background:
           beat.token.appearance === "outline" ? "transparent" : undefined,
         opacity:

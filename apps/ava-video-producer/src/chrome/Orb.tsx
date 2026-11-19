@@ -13,12 +13,12 @@ const HIGHLIGHT_AT = "circle at 30% 30%";
 export function Orb({ size = 28 }: { size?: number }): ReactNode {
   return (
     <StageThemeBoundary>
-      <_Orb size={size} />
+      <OrbContent size={size} />
     </StageThemeBoundary>
   );
 }
 
-function _Orb({ size }: { size: number }): ReactNode {
+function OrbContent({ size }: { size: number }): ReactNode {
   const { ringWidth, ringColor } = useVideoProps("Orb", {});
   const tokens = useVideoTokens();
   const scales = useVideoShapeScales();

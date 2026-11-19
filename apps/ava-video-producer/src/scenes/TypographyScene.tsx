@@ -117,7 +117,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
                 ...getStagedExitStyle(frame, props.exit, row, motion),
               }}
             >
-              <_TypographyLine
+              <TypographyLine
                 {...props}
                 line={line}
                 fontSize={fitted.fontSize}
@@ -145,7 +145,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
  * captions the `text.stage.sceneBody` weight; emphasised words are the
  * scene's strong brand colour.
  */
-function _TypographyLine({
+function TypographyLine({
   frame,
   line,
   fontSize,

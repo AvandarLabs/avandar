@@ -114,7 +114,7 @@ export function RacePair(props: Props): ReactNode {
       </div>
       {pair.map((column, side) => {
         return (
-          <_RaceStats
+          <RaceStats
             key={`${side}-${column.label}`}
             {...props}
             column={column}
@@ -133,7 +133,7 @@ export function RacePair(props: Props): ReactNode {
  * `text.stage.windowHeadline` weight. The counter turns from the foreground
  * to the brand colour as it finishes.
  */
-function _RaceStats({
+function RaceStats({
   frame,
   column,
   side,

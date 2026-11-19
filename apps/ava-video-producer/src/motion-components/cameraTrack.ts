@@ -178,7 +178,14 @@ export function isCameraMoving(
     viewport,
     theme,
   );
-  const after = getCameraPose(keys, frame + 0.3, true, options, viewport, theme);
+  const after = getCameraPose(
+    keys,
+    frame + 0.3,
+    true,
+    options,
+    viewport,
+    theme,
+  );
   return (
     Math.abs(before.x - after.x) +
       Math.abs(before.y - after.y) +

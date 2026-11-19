@@ -52,18 +52,18 @@ export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
     getMarkBuildEndFrame(props.build, buildMotion) + motion.sheet;
   return (
     <SceneShell frame={frame} width={width} height={height}>
-      <_Mark {...props} mark={geometry.mark} width={width} height={height} />
+      <LockupMark
+        {...props}
+        mark={geometry.mark}
+        width={width}
+        height={height}
+      />
       {wordmark && geometry.wordmark ? (
         <div
           style={{
             ...positioned(geometry.wordmark),
             ...(props.exit
-              ? getWipeExitStyle(
-                  frame,
-                  props.exit.atFrame,
-                  motion.chip,
-                  motion,
-                )
+              ? getWipeExitStyle(frame, props.exit.atFrame, motion.chip, motion)
               : {}),
           }}
         >
@@ -82,7 +82,7 @@ export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
         </div>
       ) : null}
       {cta ? (
-        <_LockupCta frame={frame} cta={cta} width={width} height={height} />
+        <LockupCta frame={frame} cta={cta} width={width} height={height} />
       ) : null}
     </SceneShell>
   );
@@ -137,7 +137,7 @@ function _sceneColorFromName(
 }
 
 /** The mark: whole at rest, as column masks while building or flying. */
-function _Mark({
+function LockupMark({
   frame,
   logo,
   build,
@@ -239,7 +239,7 @@ function _Mark({
 }
 
 /** Subtitle, URL, typed command and badge, cascading in below the mark. */
-function _LockupCta({
+function LockupCta({
   frame,
   cta,
   width,
@@ -299,7 +299,8 @@ function _LockupCta({
         <div
           style={{
             ...line(0.735, height * 0.03),
-            fontFamily: VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
+            fontFamily:
+              VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
             opacity: frame >= beats.promptAt ? 1 : 0,
           }}
         >

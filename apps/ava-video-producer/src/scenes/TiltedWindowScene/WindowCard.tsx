@@ -4,17 +4,20 @@ import {
   HorizontalBlurFilter,
   getHorizontalBlurFilter,
 } from "../../motion-components/HorizontalBlur";
-import { buildColorWithAlpha, elevationToBoxShadow } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import {
+  buildColorWithAlpha,
+  elevationToBoxShadow,
+} from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
 import { useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { MediaPlane } from "../MediaPlane";
 import { positioned } from "../positioned";
 import { useWindowStage } from "./useWindowStage";
-import { getScrollOffset, type WindowStage } from "./windowMotion";
+import { getScrollOffset } from "./windowMotion";
 import { WINDOW_SHADOW_FALLBACK_ALPHA } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { WindowSource } from "../scenes.types";
-import type { WindowPose } from "./windowMotion";
+import type { WindowPose, WindowStage } from "./windowMotion";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -69,9 +72,7 @@ export function WindowCard({
   });
   const boxShadow = tilt > 0 && !clipPath ? shadow : undefined;
   const titlebar =
-    chrome === "titlebar"
-      ? canvasHeight * windowTilt.titlebarHeight * tilt
-      : 0;
+    chrome === "titlebar" ? canvasHeight * windowTilt.titlebarHeight * tilt : 0;
   const transform = [
     `perspective(${perspective ?? windowTilt.perspective}px)`,
     `translateX(${pose.translateX.toFixed(2)}px)`,

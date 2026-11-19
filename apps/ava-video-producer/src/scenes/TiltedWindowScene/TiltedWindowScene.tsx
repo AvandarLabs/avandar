@@ -46,17 +46,17 @@ export function TiltedWindowScene(props: TiltedWindowSceneProps): ReactNode {
       {props.layout === "pair" && props.pair ? (
         <RacePair {...props} pair={props.pair} width={width} height={height} />
       ) : (
-        <_SingleWindow {...props} width={width} height={height} />
+        <SingleWindow {...props} width={width} height={height} />
       )}
       {props.footnote ? (
-        <_Footnote frame={frame} text={props.footnote} exit={exit} />
+        <WindowFootnote frame={frame} text={props.footnote} exit={exit} />
       ) : null}
     </SceneShell>
   );
 }
 
 /** The primary window, its carousel and camera, and the secondary window. */
-function _SingleWindow(
+function SingleWindow(
   props: TiltedWindowSceneProps & { width: number; height: number },
 ) {
   const { frame, width, height, windows = [], exit, camera, secondary } = props;
@@ -205,7 +205,7 @@ function _toPixels(
 }
 
 /** A small muted note at the bottom left that fades out with the exit. */
-function _Footnote({
+function WindowFootnote({
   frame,
   text,
   exit,

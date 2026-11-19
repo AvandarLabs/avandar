@@ -28,11 +28,15 @@ export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
           <div
             className={css.continuityThesisLine}
             key={line}
-            style={motion.enter(frame, index * motion.scale(thesis.lineStagger), {
-              y: thesis.lineDistance,
-              dur: motion.scale(thesis.lineDuration),
-              easing: motion.curve(thesis.lineEasing),
-            })}
+            style={motion.enter(
+              frame,
+              index * motion.scale(thesis.lineStagger),
+              {
+                y: thesis.lineDistance,
+                dur: motion.scale(thesis.lineDuration),
+                easing: motion.curve(thesis.lineEasing),
+              },
+            )}
           >
             {line}
           </div>

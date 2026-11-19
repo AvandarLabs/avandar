@@ -27,12 +27,12 @@ type Props = {
 export function AppFrame(props: Props): ReactNode {
   return (
     <StageThemeBoundary>
-      <_AppFrame {...props} />
+      <AppFrameContent {...props} />
     </StageThemeBoundary>
   );
 }
 
-function _AppFrame({ w, title, heading, sub }: Props): ReactNode {
+function AppFrameContent({ w, title, heading, sub }: Props): ReactNode {
   const tokens = useVideoTokens();
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
