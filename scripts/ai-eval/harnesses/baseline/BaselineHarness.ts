@@ -2,6 +2,7 @@ import { getGadgetTypeName } from "$/agent/mentions/AgentGadgetContext";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
+import { buildRetryContext } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { reviewGeneratedSqlAssumptions } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
@@ -15,13 +16,17 @@ import {
   toBaselinePageContext,
 } from "./baselinePageContext";
 import { DenoChatTurnRunner } from "./DenoChatTurnRunner";
-import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
+import type {
+  ChatGeneratedDashboardBlock,
+  ChatRetryContext,
+} from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type { SimulatedAnswer } from "../../runtime/SimulatedUser";
 import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
 import type { BaselinePageContext } from "./baselinePageContext";
 import type { DenoChatTurnResponse } from "./DenoChatTurnRunner";
+import type { RetryContextSource } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 
 const MAX_MODEL_TURNS_PER_QUESTION = 6;
 
@@ -73,6 +78,29 @@ function _needsConsent(values: readonly string[]): boolean {
   return (
     values.length > 0 && detectPii({ values: [...values] }).severity !== "clean"
   );
+}
+
+/**
+ * The thread and retry context today's chat sends when the user clicks Try
+ * again on the latest answer. assistant-ui drops the trailing assistant
+ * message, and the adapter describes the last response it got with
+ * `buildRetryContext`.
+ */
+export function buildBaselineTryAgainTurn(
+  options: Readonly<{
+    messages: readonly ThreadMessage[];
+    lastResult: Readonly<RetryContextSource> | undefined;
+  }>,
+): { messages: ThreadMessage[]; retryContext: ChatRetryContext | undefined } {
+  const isAssistantLast = options.messages.at(-1)?.role === "assistant";
+  return {
+    messages: isAssistantLast
+      ? options.messages.slice(0, -1)
+      : [...options.messages],
+    retryContext: options.lastResult
+      ? buildRetryContext(options.lastResult)
+      : undefined,
+  };
 }
 
 /**
