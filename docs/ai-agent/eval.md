@@ -880,6 +880,34 @@ escalation unless the row says offline.
 - The first-numbered prompt's online runs cost $0.06, in 17 runs, reruns
   included (the baseline's $0.035 not included).
 
+### Phase 1E
+
+Runs for Try again and parity in the agent (D45,
+[phase-1e.md](specs/phase-1e.md)), archived under the `phase-1e` label.
+The Try again questions T01 to T06 are described under "Questions and
+ground truth". Today's chat set the bar first, on 2026-11-19, before the
+agent side was built. It ran with its `retryContext`, on
+`anthropic/claude-haiku-5.5`.
+
+| Run | Correct | T01 | T02 | T03 | T04 | T05 | T06 | Repeats (T01 and T04 / all) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| phase-1e:today-retry #1 | 6/6 | pass | pass | pass | pass | pass (repeat) | pass | 0 / 1 | 1 / 0 | $0.00301 | 10,425 | 5.3 s / 6.4 s |
+| phase-1e:today-retry #2 | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 1 / 0 | $0.00292 | 10,433 | 4.6 s / 5.0 s |
+| phase-1e:today-retry #3 | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 0 / 0 | $0.00280 | 10,627 | 4.6 s / 4.8 s |
+
+- **The bars for the agent:** today's chat passes 18 of the 18 graded
+  answers, and repeats on T01 and T04 sum to 0 over the three runs.
+- On T01 the first attempt asked whether to rank by cases or deaths, and
+  the retry ran a different query. On T04 the first attempt asked which
+  Georgia, and the retry answered without asking, with the US state's
+  monthly deaths, on all three runs.
+- T05's retry asked a needless question on runs #1 and #2 (what to put
+  under the heading) before it wrote the heading again. It repeated the
+  first attempt's block on run #1. On runs #2 and #3 it avoided a repeat
+  only narrowly: the block differs only in its heading level or alignment.
+  T05 has one right answer, so a repeat there is fine.
+- The three runs cost $0.052.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -1338,7 +1366,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 346 runs (every
+chat index lists all 349 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

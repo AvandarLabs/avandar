@@ -359,3 +359,6 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-18T22-54-12](2026-11-18T22-54-12-phase-1d_offline-dashboards-page-gate/results.jsonl) | `phase-1d:offline-dashboards-page-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.7 s | D04 D08 D09 |
 | [2026-11-18T23-21-31](2026-11-18T23-21-31-phase-1d_offline-45-page-omit/results.jsonl) | `phase-1d:offline-45-page-omit` | 30/45 | 0 | 1 | $0.00000 | 15.1 s / 24.5 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
 | [2026-11-18T23-31-40](2026-11-18T23-31-40-phase-1d_offline-dashboards-page-omit/results.jsonl) | `phase-1d:offline-dashboards-page-omit` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.8 s | D04 D08 D09 |
+| [2026-11-19T18-39-44](2026-11-19T18-39-44-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00301 | 5.3 s / 6.4 s | none |
+| [2026-11-19T18-40-03](2026-11-19T18-40-03-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00292 | 4.6 s / 5.0 s | none |
+| [2026-11-19T18-40-23](2026-11-19T18-40-23-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 0 | 0 | $0.00280 | 4.6 s / 4.8 s | none |
