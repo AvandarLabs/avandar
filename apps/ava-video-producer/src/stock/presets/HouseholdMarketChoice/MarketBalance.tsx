@@ -1,4 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +11,7 @@ export function MarketBalance({
   balance,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (!input.showRemainingBalance) {
     return null;
   }
@@ -31,7 +33,8 @@ export function MarketBalance({
         y={521}
         textAnchor="end"
         fill={accent}
-        fontSize={16}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontSize={tokens.text.graphic.secondary.fontSize}
       >
         {balance}
       </text>

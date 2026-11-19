@@ -26,7 +26,13 @@ export function OverlapSetting({ input, accent }: Readonly<Props>): ReactNode {
         width={300}
         lines={3}
       />
-      <text x={32} y={140} fill={tokens.color.text} fontSize={18}>
+      <text
+        x={32}
+        y={140}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.label.fontFamily}
+        fontSize={tokens.text.graphic.label.fontSize}
+      >
         {input.records.length}
       </text>
     </g>

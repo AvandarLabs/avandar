@@ -14,6 +14,7 @@ type Props = {
   gapEmphasis: Input["gapEmphasis"];
   covered: boolean;
 };
+const LEADER_OPACITY = 0.22;
 /**
  * One fixed anchor and one clear keyed glyph belong to each supplied household.
  */
@@ -37,7 +38,7 @@ export function HouseholdRecord({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={0.22}
+        strokeOpacity={LEADER_OPACITY}
       />
       <HouseholdAnchor
         householdId={household.id}

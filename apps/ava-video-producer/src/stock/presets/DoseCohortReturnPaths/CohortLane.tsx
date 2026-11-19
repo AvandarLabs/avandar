@@ -19,6 +19,7 @@ type Props = {
   frame: number;
   accent: string;
 };
+const LANE_DASH = "3 6";
 function _getPersonPosition({
   input,
   participant,
@@ -70,7 +71,7 @@ export function CohortLane({
         shape={{ kind: "path", d: `M280 ${y + 12} H900` }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
-        strokeDasharray="3 6"
+        strokeDasharray={LANE_DASH}
       />
       {input.visits.map((visit, visitIndex) => {
         return (

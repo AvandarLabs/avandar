@@ -30,7 +30,11 @@ export function CoordinationPlaceConnections({
             profile={tokens.sketch.shape}
             data-place-connector={place.id}
             fill="none"
-            stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+            stroke={getCoordinationPlaceColorFromIndex({
+              index,
+              accent,
+              color: tokens.color,
+            })}
             strokeWidth={scales.stroke(tokens.stroke.outline)}
           />
         );

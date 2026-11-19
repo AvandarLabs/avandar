@@ -7,6 +7,7 @@ import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 
 type Props = { record: Input["records"][number]; axisEnd: number; y: number };
+const INTERVAL_TINT = 0.35;
 /** Missing times receive a question mark, never an invented duration. */
 export function RecordedInterval({
   record,
@@ -24,7 +25,7 @@ export function RecordedInterval({
       height={14}
       rx={scales.corner(tokens.corner.chip)}
       fill={tokens.color.inactive}
-      fillOpacity={0.35}
+      fillOpacity={scales.wash(INTERVAL_TINT)}
     />
   ) : (
     <SketchedShape

@@ -24,7 +24,11 @@ export function CoordinationPlaceCopy({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
-  const color = getCoordinationPlaceColorFromIndex({ index, accent });
+  const color = getCoordinationPlaceColorFromIndex({
+    index,
+    accent,
+    color: tokens.color,
+  });
   const y = 120 + 108 * index;
   return (
     <g data-request={place.id} data-request-face={frame >= 108 ? "up" : "edge"}>
@@ -39,7 +43,8 @@ export function CoordinationPlaceCopy({
         x={25}
         y={y}
         textAnchor="middle"
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         fill={color}
       >
         {String.fromCharCode(65 + index)}

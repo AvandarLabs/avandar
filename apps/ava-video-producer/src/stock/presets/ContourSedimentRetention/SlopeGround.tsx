@@ -4,6 +4,8 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+const EXIT_DASH = "5 5";
 /** The common slope and outlet remain fixed through the intervention. */
 export function SlopeGround(): ReactNode {
   const tokens = useGraphicTokens();
@@ -22,7 +24,7 @@ export function SlopeGround(): ReactNode {
         profile={tokens.sketch.shape}
         data-exit="boundary"
         stroke={tokens.color.inactive}
-        strokeDasharray="5 5"
+        strokeDasharray={EXIT_DASH}
       />
     </g>
   );

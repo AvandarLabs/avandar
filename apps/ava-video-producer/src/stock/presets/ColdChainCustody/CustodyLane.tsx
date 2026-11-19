@@ -17,6 +17,7 @@ type Props = {
   accent: string;
   input: Input;
 };
+const LANE_DASH = "4 6";
 /** One persistent container and three independent checkpoint facts per stop. */
 export function CustodyLane({
   crate,
@@ -47,7 +48,7 @@ export function CustodyLane({
         shape={{ kind: "path", d: `M280 ${y} H740` }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
-        strokeDasharray="4 6"
+        strokeDasharray={LANE_DASH}
       />
       <SceneLabel text={crate.label} x={32} y={y - 5} width={190} lines={3} />
       {crate.checkpoints.map((checkpoint, stopIndex) => {

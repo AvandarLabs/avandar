@@ -3,6 +3,8 @@ import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; definitionId: string; accent: string };
+/** Luminance mask value that keeps a region, not a colour. */
+const MASK_SHOWN = "white";
 /** Solid union alpha creates a single fill and a fused exterior boundary. */
 export function CatchmentDefinitions({
   input,
@@ -20,7 +22,9 @@ export function CatchmentDefinitions({
         height={320}
       >
         {getCatchmentShapesFromInput(input).map((shape) => {
-          return <polygon key={shape.id} points={shape.points} fill="white" />;
+          return (
+            <polygon key={shape.id} points={shape.points} fill={MASK_SHOWN} />
+          );
         })}
       </mask>
       <filter

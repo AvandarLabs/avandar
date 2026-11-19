@@ -15,6 +15,7 @@ import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+const ROUTE_DASH = "5 8";
 /**
  * One authored reallocation responds to community input on a schematic table.
  */
@@ -45,7 +46,7 @@ export function CommunityCoordinationTable({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray="5 8"
+        strokeDasharray={ROUTE_DASH}
       />
       {input.places.map((place, index) => {
         return (
@@ -59,7 +60,11 @@ export function CommunityCoordinationTable({
               }}
               profile={tokens.sketch.shape}
               fill="none"
-              stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+              stroke={getCoordinationPlaceColorFromIndex({
+                index,
+                accent,
+                color: tokens.color,
+              })}
             />
             <SketchedShape
               shape={{
@@ -69,7 +74,11 @@ export function CommunityCoordinationTable({
               profile={tokens.sketch.shape}
               data-request-tag={place.id}
               fill={tokens.color.surface}
-              stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+              stroke={getCoordinationPlaceColorFromIndex({
+                index,
+                accent,
+                color: tokens.color,
+              })}
             />
           </g>
         );

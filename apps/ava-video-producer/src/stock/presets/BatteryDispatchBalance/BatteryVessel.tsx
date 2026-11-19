@@ -10,6 +10,11 @@ import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryVessel. */
 type Props = { frame: number; accent: string; input: Input };
+const DRAW_ON_LENGTH = 1;
+const CHARGE_FILL_OPACITY = 0.65;
+const CHANNEL_WIDTH = 8;
+const LOSS_CHANNEL_WIDTH = 5;
+const EMPTY_CHANNEL_OPACITY = 0.2;
 
 /**
  * Charge and dispatch paths have distinct boundaries and separately timed
@@ -79,30 +84,34 @@ export function BatteryVessel({
         width={144}
         height={fillHeight}
         fill={accent}
-        fillOpacity={0.65}
+        fillOpacity={CHARGE_FILL_OPACITY}
       />
       <SketchedShape
         shape={{ kind: "path", d: paths.charge }}
         profile={tokens.sketch.shape}
         data-charge-path="true"
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - charge}
+        pathLength={DRAW_ON_LENGTH}
+        strokeDasharray={DRAW_ON_LENGTH}
+        strokeDashoffset={DRAW_ON_LENGTH - charge}
         stroke={accent}
-        strokeWidth={cycle.chargeInputKwh ? 8 : 1}
-        opacity={cycle.chargeInputKwh ? 1 : 0.2}
+        strokeWidth={scales.stroke(
+          cycle.chargeInputKwh ? CHANNEL_WIDTH : tokens.stroke.hairline,
+        )}
+        opacity={cycle.chargeInputKwh ? 1 : EMPTY_CHANNEL_OPACITY}
         fill="none"
       />
       <SketchedShape
         shape={{ kind: "path", d: paths.delivery }}
         profile={tokens.sketch.shape}
         data-delivery-path="true"
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - dispatch}
+        pathLength={DRAW_ON_LENGTH}
+        strokeDasharray={DRAW_ON_LENGTH}
+        strokeDashoffset={DRAW_ON_LENGTH - dispatch}
         stroke={tokens.color.accentAlt}
-        strokeWidth={cycle.deliveredKwh ? 8 : 1}
-        opacity={cycle.deliveredKwh ? 1 : 0.2}
+        strokeWidth={scales.stroke(
+          cycle.deliveredKwh ? CHANNEL_WIDTH : tokens.stroke.hairline,
+        )}
+        opacity={cycle.deliveredKwh ? 1 : EMPTY_CHANNEL_OPACITY}
         fill="none"
       />
       {input.showLossChannels ? (
@@ -127,11 +136,11 @@ export function BatteryVessel({
                 shape={{ kind: "path", d: path }}
                 profile={tokens.sketch.shape}
                 data-loss-channel={key}
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1 - progress}
+                pathLength={DRAW_ON_LENGTH}
+                strokeDasharray={DRAW_ON_LENGTH}
+                strokeDashoffset={DRAW_ON_LENGTH - progress}
                 stroke={tokens.color.highlight}
-                strokeWidth={scales.stroke(5)}
+                strokeWidth={scales.stroke(LOSS_CHANNEL_WIDTH)}
                 opacity={value ? 1 : 0}
                 fill="none"
               />

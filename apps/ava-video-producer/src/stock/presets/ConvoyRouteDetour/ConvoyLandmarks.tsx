@@ -31,7 +31,8 @@ export function ConvoyLandmarks({
             x={80 + point.x * 800}
             y={180 + point.y * 280 + 44}
             fill={tokens.color.accentAlt}
-            fontSize={14}
+            fontFamily={tokens.text.graphic.value.fontFamily}
+            fontSize={tokens.text.graphic.value.fontSize}
             textAnchor="middle"
           >
             {index + 1}

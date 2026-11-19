@@ -52,7 +52,8 @@ export function PaymentQuantity({
           x={76 + index * 224}
           y={258}
           fill={tokens.color.text}
-          fontSize={20}
+          fontFamily={tokens.text.graphic.body.fontFamily}
+          fontSize={tokens.text.graphic.body.fontSize}
         >
           {total}
         </text>

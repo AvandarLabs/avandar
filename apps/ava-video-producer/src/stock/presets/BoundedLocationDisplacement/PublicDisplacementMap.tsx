@@ -40,7 +40,7 @@ export function PublicDisplacementMap({
       {input.locations.map((location, index) => {
         return (
           <g key={location.id} data-approximate-label={location.id}>
-            <Text x={485} y={440 + index * 52} size={12}>
+            <Text x={485} y={440 + index * 52} role="data">
               {index + 1}·
             </Text>
             <LabelSlots

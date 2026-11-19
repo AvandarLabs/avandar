@@ -29,7 +29,7 @@ export function MinimumCountMapSuppression({
           [input.labels.missing, 660, 520, 260, 14, 3],
         ]}
       />
-      <Text x={480} y={300} size={20} anchor="middle">
+      <Text x={480} y={300} anchor="middle">
         ≥{input.minimum}
       </Text>
       <LocalCountSheet input={input} frame={frame} />

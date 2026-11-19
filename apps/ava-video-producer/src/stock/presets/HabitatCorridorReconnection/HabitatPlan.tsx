@@ -16,6 +16,10 @@ type Props = {
   background?: string;
   input: Input;
 };
+const ROAD_LINE_DASH = "7 5";
+const PATCH_RADIUS_X = 100;
+const PATCH_RADIUS_Y = 62;
+const PATCH_TINT = 0.22;
 
 /**
  * The complete outline or solid route crosses the road before optional
@@ -51,7 +55,7 @@ export function HabitatPlan({
         shape={{ kind: "path", d: "M 480 225 V 370" }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
-        strokeDasharray="7 5"
+        strokeDasharray={ROAD_LINE_DASH}
         fill="none"
       />
       {input.patches.map((patch, index) => {
@@ -62,13 +66,13 @@ export function HabitatPlan({
                 kind: "ellipse",
                 cx: 155 + index * 650,
                 cy: 300,
-                rx: 100,
-                ry: 62,
+                rx: PATCH_RADIUS_X,
+                ry: PATCH_RADIUS_Y,
               }}
               profile={tokens.sketch.shape}
               data-habitat-patch={patch.id}
               fill={accent}
-              fillOpacity={0.22}
+              fillOpacity={scales.wash(PATCH_TINT)}
               stroke={accent}
             />
             <FitText

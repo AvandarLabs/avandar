@@ -12,6 +12,9 @@ import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AquiferCutaway. */
 type Props = { frame: number; accent: string; input: Input };
+const FLOW_GUIDE_DASH = "3 4";
+const REQUEST_DASH = "5 5";
+const DRAW_ON_LENGTH = 1;
 
 /** Recharge, pumping and natural outflow cross separate physical boundaries. */
 export function AquiferCutaway({
@@ -109,7 +112,7 @@ export function AquiferCutaway({
               data-flow-guide={key}
               stroke={tokens.color.inactive}
               strokeWidth={scales.stroke(tokens.stroke.hairline)}
-              strokeDasharray="3 4"
+              strokeDasharray={FLOW_GUIDE_DASH}
               fill="none"
             />
             <SketchedShape
@@ -117,9 +120,9 @@ export function AquiferCutaway({
               profile={tokens.sketch.shape}
               data-flow={key}
               data-quantity={value}
-              pathLength={1}
-              strokeDasharray={1}
-              strokeDashoffset={1 - progress}
+              pathLength={DRAW_ON_LENGTH}
+              strokeDasharray={DRAW_ON_LENGTH}
+              strokeDashoffset={DRAW_ON_LENGTH - progress}
               opacity={value ? 1 : 0}
               stroke={color}
               strokeWidth={scales.stroke(7)}
@@ -139,7 +142,7 @@ export function AquiferCutaway({
         rx={scales.corner(tokens.corner.cell)}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray="5 5"
+        strokeDasharray={REQUEST_DASH}
       />
       <FitText
         text={input.copy.requested}

@@ -55,7 +55,7 @@ export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
             <Text
               x={164 + index * 152}
               y={539}
-              size={16}
+              role="secondary"
               fill={tokens.color.textMuted}
             >
               {operator}

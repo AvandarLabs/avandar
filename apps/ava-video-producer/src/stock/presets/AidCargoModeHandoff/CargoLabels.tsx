@@ -1,10 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string };
 /** Carrier places and persistent ordinal parcel labels occupy fixed rails. */
 export function CargoLabels({ input, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <FitText
@@ -46,7 +48,13 @@ export function CargoLabels({ input, accent }: Readonly<Props>): ReactNode {
         ? input.parcels.map((parcel, index) => {
             return (
               <g key={parcel.id}>
-                <text x={40 + index * 230} y={505} fill={accent} fontSize={16}>
+                <text
+                  x={40 + index * 230}
+                  y={505}
+                  fill={accent}
+                  fontFamily={tokens.text.graphic.secondary.fontFamily}
+                  fontSize={tokens.text.graphic.secondary.fontSize}
+                >
                   {index + 1}
                 </text>
                 <FitText

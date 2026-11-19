@@ -51,7 +51,8 @@ export function CaseKey({
         y={160 + index * 26}
         textAnchor="middle"
         fill={tokens.color.text}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
       >
         {index + 1}
       </text>

@@ -22,7 +22,11 @@ export function CoordinationOpenRequests({
     <g>
       {open.map(({ place, index }, ordinal) => {
         const x = 25 + ordinal * 460,
-          color = getCoordinationPlaceColorFromIndex({ index, accent });
+          color = getCoordinationPlaceColorFromIndex({
+            index,
+            accent,
+            color: tokens.color,
+          });
         return (
           <g key={place.id} data-unassigned-caption={place.id}>
             <SketchedShape
@@ -36,7 +40,8 @@ export function CoordinationOpenRequests({
               x={x}
               y={86}
               textAnchor="middle"
-              fontSize={12}
+              fontFamily={tokens.text.graphic.data.fontFamily}
+              fontSize={tokens.text.graphic.data.fontSize}
               fill={color}
             >
               {String.fromCharCode(65 + index)}

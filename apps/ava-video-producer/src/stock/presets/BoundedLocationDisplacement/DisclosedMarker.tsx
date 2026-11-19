@@ -37,7 +37,7 @@ export function DisclosedMarker({
       <Text
         x={center.cx}
         y={center.cy + 4}
-        size={12}
+        role="data"
         fill={tokens.color.ground}
         anchor="middle"
       >

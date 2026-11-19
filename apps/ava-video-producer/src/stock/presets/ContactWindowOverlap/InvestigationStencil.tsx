@@ -3,12 +3,14 @@ import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normali
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const STENCIL_TINT = 0.06;
 /** The supplied window lowers onto the same axis as each presence ribbon. */
 export function InvestigationStencil({
   input,
@@ -16,6 +18,7 @@ export function InvestigationStencil({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const start =
     280 +
@@ -45,7 +48,7 @@ export function InvestigationStencil({
       width={end - start}
       height={270}
       fill={accent}
-      fillOpacity={0.06}
+      fillOpacity={scales.wash(STENCIL_TINT)}
       stroke={accent}
       strokeDasharray={tokens.dash.pending.join(" ")}
       opacity={motion.reveal(frame, 36)}

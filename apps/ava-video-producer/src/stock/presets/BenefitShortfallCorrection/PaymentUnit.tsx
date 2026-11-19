@@ -15,6 +15,7 @@ type Props = {
   unitIndex: number;
   accent: string;
 };
+const GAP_DASH = "2 4";
 /**
  * Exactly one original, correction or empty position accounts for each unit.
  */
@@ -62,7 +63,7 @@ export function PaymentUnit({
           data-unit-kind="gap"
           fill="none"
           stroke={tokens.color.highlight}
-          strokeDasharray="2 4"
+          strokeDasharray={GAP_DASH}
         />
       )}
     </g>

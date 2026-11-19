@@ -22,7 +22,11 @@ export function CoordinationTeamCopy({
   const team = input.teams[index],
     reference = frame >= 108 ? team.agreedPlaceId : team.initialPlaceId;
   const placeIndex = input.places.findIndex(propEq("id", reference)),
-    color = getCoordinationPlaceColorFromIndex({ index: placeIndex, accent });
+    color = getCoordinationPlaceColorFromIndex({
+      index: placeIndex,
+      accent,
+      color: tokens.color,
+    });
   const y = 130 + 100 * index;
   return (
     <g data-team-legend={team.id} data-assignment-place={reference}>
@@ -40,7 +44,8 @@ export function CoordinationTeamCopy({
         x={642}
         y={y}
         textAnchor="middle"
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         fill={tokens.color.text}
       >
         {index + 1}
@@ -65,7 +70,8 @@ export function CoordinationTeamCopy({
         x={642}
         y={y + 47}
         textAnchor="middle"
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         fill={color}
       >
         {String.fromCharCode(65 + placeIndex)}

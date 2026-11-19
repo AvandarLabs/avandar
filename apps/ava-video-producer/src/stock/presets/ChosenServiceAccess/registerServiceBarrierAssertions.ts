@@ -16,6 +16,12 @@ import {
   ServiceSvgGeometry,
 } from "./ServiceSvgGeometry";
 
+/**
+ * Geometry assertions ignore colour, so the participant draws in the
+ * inherited colour.
+ */
+const GEOMETRY_ACCENT = "currentColor";
+
 function _renderParticipant({
   frame,
   input,
@@ -24,7 +30,7 @@ function _renderParticipant({
   input: Readonly<Input>;
 }): string {
   return renderToStaticMarkup(
-    createElement(AccessParticipant, { input, frame, accent: "#9fefca" }),
+    createElement(AccessParticipant, { input, frame, accent: GEOMETRY_ACCENT }),
   );
 }
 
@@ -39,7 +45,7 @@ function _renderScene({
     createElement(ChosenServiceAccess, {
       input,
       frame,
-      accent: "#9fefca",
+      accent: GEOMETRY_ACCENT,
       id: "test",
     }),
   );

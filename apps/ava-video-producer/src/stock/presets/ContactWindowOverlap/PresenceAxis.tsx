@@ -29,14 +29,21 @@ export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
       />
-      <text x={280} y={170} fill={tokens.color.text} fontSize={12}>
+      <text
+        x={280}
+        y={170}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
+      >
         {input.axis.start}
       </text>
       <text
         x={910}
         y={170}
         fill={tokens.color.text}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         textAnchor="end"
       >
         {input.axis.end}

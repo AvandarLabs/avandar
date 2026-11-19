@@ -11,6 +11,9 @@ type Props = {
   second: string;
   accent: string;
 };
+/** Luminance mask values that keep or drop a region, not colours. */
+const MASK_SHOWN = "white";
+const MASK_HIDDEN = "black";
 /** Layer Definitions for the authored scene. */
 export function LayerDefinitions({
   identity,
@@ -36,8 +39,8 @@ export function LayerDefinitions({
         width={520}
         height={350}
       >
-        <rect x={30} y={140} width={520} height={350} fill="white" />
-        <path d={second} fill="black" />
+        <rect x={30} y={140} width={520} height={350} fill={MASK_SHOWN} />
+        <path d={second} fill={MASK_HIDDEN} />
       </mask>
       <pattern
         id={`${identity}-hatch`}

@@ -40,7 +40,8 @@ export function ConvoyCopy({ input, accent }: Readonly<Props>): ReactNode {
             x={40 + index * 300}
             y={95}
             fill={tokens.color.accentAlt}
-            fontSize={14}
+            fontFamily={tokens.text.graphic.value.fontFamily}
+            fontSize={tokens.text.graphic.value.fontSize}
           >
             {index + 1}
           </text>

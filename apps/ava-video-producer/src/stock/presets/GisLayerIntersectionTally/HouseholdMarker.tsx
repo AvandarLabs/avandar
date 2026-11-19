@@ -16,6 +16,7 @@ type Props = {
   isSelected: boolean;
   accent: string;
 };
+const LEADER_OPACITY = 0.35;
 /**
  * Separate keyed records retain exact map anchors, even for coincident homes.
  */
@@ -49,7 +50,7 @@ export function HouseholdMarker({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={isSelected ? accent : tokens.color.inactive}
-        strokeOpacity={0.35}
+        strokeOpacity={LEADER_OPACITY}
       />
       <HouseholdBadge
         household={household}

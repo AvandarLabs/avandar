@@ -12,6 +12,8 @@ import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const ACTIVITY_CORNER = 45;
+const ACTIVITY_TINT = 0.04;
 /**
  * Furniture clears the approach before learners enter, with selected changes
  * only.
@@ -45,9 +47,9 @@ export function ClassroomFurniture({
         y={240}
         width={450}
         height={255}
-        rx={scales.corner(45)}
+        rx={scales.corner(ACTIVITY_CORNER)}
         fill={accent}
-        fillOpacity={0.04}
+        fillOpacity={scales.wash(ACTIVITY_TINT)}
         stroke={accent}
         strokeOpacity={tokens.alpha.ghost}
       />

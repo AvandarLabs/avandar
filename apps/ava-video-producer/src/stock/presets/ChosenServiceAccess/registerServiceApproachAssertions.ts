@@ -13,6 +13,12 @@ import {
 import { inputSchema, type Input } from "./ChosenServiceAccess.schema";
 import { ServiceSvgGeometry } from "./ServiceSvgGeometry";
 
+/**
+ * Geometry assertions ignore colour, so the participant draws in the
+ * inherited colour.
+ */
+const GEOMETRY_ACCENT = "currentColor";
+
 type Point = { x: number; y: number };
 type Circle = Point & { radius: number };
 /** Data for Pose. */
@@ -139,7 +145,7 @@ function _getPose({
   input: Readonly<Input>;
 }): Pose {
   const markup = renderToStaticMarkup(
-    createElement(AccessParticipant, { frame, input, accent: "#9fefca" }),
+    createElement(AccessParticipant, { frame, input, accent: GEOMETRY_ACCENT }),
   );
   const circles = [...markup.matchAll(/<circle\b[^>]*>/g)].map((match) => {
     return match[0];
@@ -182,7 +188,7 @@ function _getFloorSegments({
     createElement(ChosenServiceAccess, {
       frame,
       input,
-      accent: "#9fefca",
+      accent: GEOMETRY_ACCENT,
       id: "test",
     }),
   );
@@ -322,7 +328,7 @@ function _assertParticipantEnvelope({
     createElement(ChosenServiceAccess, {
       frame,
       input,
-      accent: "#9fefca",
+      accent: GEOMETRY_ACCENT,
       id: "test",
     }),
   );

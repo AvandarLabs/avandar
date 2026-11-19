@@ -11,6 +11,7 @@ import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const TREATMENT_TINT = 0.35;
 /** A steward carries the selected barrier into contact with the slope. */
 export function ContourTreatment({
   input,
@@ -36,7 +37,7 @@ export function ContourTreatment({
             ? tokens.color.inactive
             : accent
         }
-        fillOpacity={0.35}
+        fillOpacity={scales.wash(TREATMENT_TINT)}
         stroke={accent}
       />
       {input.intervention.kind === "vegetated-strip" ? (

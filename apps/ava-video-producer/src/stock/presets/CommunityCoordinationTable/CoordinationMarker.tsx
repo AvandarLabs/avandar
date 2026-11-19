@@ -33,6 +33,7 @@ export function CoordinationMarker({
   const color = getCoordinationPlaceColorFromIndex({
     index: input.places.findIndex(propEq("id", reference)),
     accent,
+    color: tokens.color,
   });
   return (
     <g
@@ -68,7 +69,8 @@ export function CoordinationMarker({
         data-team-key
         x={x}
         y={y + 3}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         textAnchor="middle"
         fill={tokens.color.text}
       >

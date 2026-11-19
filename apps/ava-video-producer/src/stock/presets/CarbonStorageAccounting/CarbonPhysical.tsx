@@ -12,6 +12,8 @@ import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const GROUND_DASH = "5 7";
+const STORAGE_BAND_TINT = 0.22;
 /** An operator cues separate retained and released physical CO2 ribbons. */
 export function CarbonPhysical({
   input,
@@ -37,7 +39,7 @@ export function CarbonPhysical({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray="5 7"
+        strokeDasharray={GROUND_DASH}
       />
       <StockRect
         x={205}
@@ -58,7 +60,7 @@ export function CarbonPhysical({
         profile={tokens.sketch.shape}
         stroke={accent}
         strokeWidth={scales.stroke(24)}
-        strokeOpacity={0.22}
+        strokeOpacity={scales.wash(STORAGE_BAND_TINT)}
         fill="none"
       />
       <SketchedShape

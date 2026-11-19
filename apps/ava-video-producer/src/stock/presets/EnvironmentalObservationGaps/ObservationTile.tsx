@@ -98,7 +98,7 @@ export function ObservationTile({
             <Text
               x={check.x + 8}
               y={check.y + 4}
-              size={12}
+              role="data"
               fill={tokens.color.highlight}
             >
               {check.key}

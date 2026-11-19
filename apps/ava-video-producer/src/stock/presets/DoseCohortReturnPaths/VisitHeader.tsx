@@ -1,5 +1,8 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
@@ -19,6 +22,7 @@ export function VisitHeader({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const x =
     380 +
@@ -45,7 +49,8 @@ export function VisitHeader({
           data-fraction={visit.id}
           x={x}
           y={150}
-          fontSize={16}
+          fontFamily={tokens.text.graphic.secondary.fontFamily}
+          fontSize={tokens.text.graphic.secondary.fontSize}
           fill={accent}
           textAnchor="middle"
         >

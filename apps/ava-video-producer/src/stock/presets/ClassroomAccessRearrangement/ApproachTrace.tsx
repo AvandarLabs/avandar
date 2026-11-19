@@ -7,6 +7,7 @@ import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; progress: number; accent: string };
+const TRACE_DASH = "5 7";
 /** Approach Trace for the authored scene. */
 export function ApproachTrace({
   input,
@@ -23,8 +24,8 @@ export function ApproachTrace({
       fill="none"
       stroke={accent}
       strokeWidth={scales.stroke(tokens.stroke.default)}
-      strokeDasharray="5 7"
-      opacity={progress * 0.5}
+      strokeDasharray={TRACE_DASH}
+      opacity={progress * tokens.alpha.guide}
     />
   ) : undefined;
 }

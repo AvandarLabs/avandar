@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
 import { SceneLabel } from "./SceneLabel";
@@ -9,18 +11,10 @@ import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
-const COLORS: string[] = [
-  STOCK.mint,
-  STOCK.cyan,
-  STOCK.orange,
-  "#df95aa",
-  "#b7a3e8",
-  "#e7b792",
-  "#87bac7",
-  "#bfc790",
-];
+const CATEGORY_KEYS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const plan = useMemo(() => {
     return makeJobTransfersFromInput(input);
@@ -34,7 +28,7 @@ export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
           index,
           frame,
         });
-        const color = COLORS[index];
+        const color = tokens.color.categorical[CATEGORY_KEYS[index]];
         const legendX = 55 + (index % 4) * 215;
         const legendY = 437 + Math.floor(index / 4) * 44;
         return (

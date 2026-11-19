@@ -49,7 +49,14 @@ export function MarketTender({
         fill={tokens.color.surface}
         stroke={accent}
       />
-      <text x={0} y={5} fontSize={14} fill={accent} textAnchor="middle">
+      <text
+        x={0}
+        y={5}
+        fontFamily={tokens.text.graphic.value.fontFamily}
+        fontSize={tokens.text.graphic.value.fontSize}
+        fill={accent}
+        textAnchor="middle"
+      >
         {total}
       </text>
     </g>

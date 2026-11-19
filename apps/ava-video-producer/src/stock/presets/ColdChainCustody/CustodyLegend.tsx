@@ -44,7 +44,13 @@ export function CustodyLegend({
             width={280}
             lines={3}
           />
-          <text x={315} y={562} fill={tokens.color.text} fontSize={14}>
+          <text
+            x={315}
+            y={562}
+            fill={tokens.color.text}
+            fontFamily={tokens.text.graphic.value.fontFamily}
+            fontSize={tokens.text.graphic.value.fontSize}
+          >
             {input.crates.length}
           </text>
         </g>

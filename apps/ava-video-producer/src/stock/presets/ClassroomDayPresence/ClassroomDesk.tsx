@@ -81,7 +81,6 @@ export function ClassroomDesk({
           <Text
             x={desk.x}
             y={desk.y - 8}
-            size={20}
             anchor="middle"
             fill={tokens.color.highlight}
           >

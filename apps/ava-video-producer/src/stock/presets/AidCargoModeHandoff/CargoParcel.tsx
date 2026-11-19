@@ -92,7 +92,8 @@ export function CargoParcel({
         <text
           x={6}
           y={10}
-          fontSize={14}
+          fontFamily={tokens.text.graphic.value.fontFamily}
+          fontSize={tokens.text.graphic.value.fontSize}
           fill={tokens.color.text}
           textAnchor="middle"
         >

@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
@@ -66,21 +67,23 @@ export function LocalOffsetMarker({
           fill={tokens.color.highlight}
         />
       ) : undefined}
-      <line
+      <SketchedShape
+        shape={{ kind: "line", ...vector }}
+        profile={tokens.sketch.shape}
         data-local-offset={location.id}
-        {...vector}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
         opacity={progress}
       />
-      <circle
-        {...displaced}
-        r={7}
+      <SketchedShape
+        shape={{ kind: "circle", ...displaced, r: 7 }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
         opacity={progress}
       />
-      <Text x={displaced.cx} y={displaced.cy + 4} size={12}>
+      <Text x={displaced.cx} y={displaced.cy + 4} role="data">
         {index + 1}
       </Text>
     </g>

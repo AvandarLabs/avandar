@@ -13,6 +13,7 @@ type Props = {
   frame: number;
   accent: string;
 };
+const LEADER_OPACITY = 0.16;
 /**
  * A stable coordinate and visible roster key keep coincident records distinct.
  */
@@ -30,7 +31,7 @@ export function CasePin({
         shape={{ kind: "path", d: `M${mapX} ${mapY} L628 ${154 + index * 26}` }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
-        strokeOpacity={0.16}
+        strokeOpacity={LEADER_OPACITY}
       />
       <circle
         data-map-case={record.id}

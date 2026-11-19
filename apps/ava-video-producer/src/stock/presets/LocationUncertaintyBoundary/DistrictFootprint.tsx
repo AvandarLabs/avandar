@@ -31,13 +31,17 @@ export function DistrictFootprint({
     (isPossible ? 8 * motion.ramp(frame, 60, motion.scale(36)) : 0);
   return (
     <g>
-      <polygon
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${district.polygon
+            .map(([x, y]) => {
+              return `${50 + x * 3.6},${140 + y * 3.6}`;
+            })
+            .join(" ")}Z`,
+        }}
+        profile={tokens.sketch.shape}
         data-district={district.id}
-        points={district.polygon
-          .map(([x, y]) => {
-            return `${50 + x * 3.6},${140 + y * 3.6}`;
-          })
-          .join(" ")}
         fill={index % 2 ? tokens.color.accentAlt : accent}
         fillOpacity={scales.wash(tokens.alpha.wash)}
         stroke={tokens.color.line}

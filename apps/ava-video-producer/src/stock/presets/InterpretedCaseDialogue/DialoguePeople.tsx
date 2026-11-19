@@ -10,6 +10,7 @@ import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const LINK_DASH = "4 6";
 /** Direct participant-worker orientation keeps interpretation to one side. */
 export function DialoguePeople({
   input,
@@ -32,7 +33,7 @@ export function DialoguePeople({
           profile={tokens.sketch.shape}
           data-sightline=""
           stroke={tokens.color.inactive}
-          strokeDasharray="4 6"
+          strokeDasharray={LINK_DASH}
         />
       ) : undefined}
       <PersonGlyph x={210} y={485} posture="seated" color={accent} />

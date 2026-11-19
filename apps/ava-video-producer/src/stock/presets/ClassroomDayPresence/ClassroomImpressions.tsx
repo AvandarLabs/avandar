@@ -43,7 +43,7 @@ export function ClassroomImpressions({
             <Text
               x={center - 11}
               y={y + 4}
-              size={12}
+              role="data"
               fill={tokens.color.textMuted}
             >
               {index + 1}

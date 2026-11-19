@@ -46,7 +46,8 @@ export function OverlapLedger({ input, frame }: Readonly<Props>): ReactNode {
                   x={32 + index * 305}
                   y={490}
                   fill={tokens.color.text}
-                  fontSize={20}
+                  fontFamily={tokens.text.graphic.body.fontFamily}
+                  fontSize={tokens.text.graphic.body.fontSize}
                 >
                   {counts[index]}/{input.records.length}
                 </text>

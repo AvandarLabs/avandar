@@ -13,6 +13,7 @@ type Props = {
   accent: string;
   showGuide: boolean;
 };
+const GUIDE_OPACITY = 0.45;
 /**
  * A numbered copy rises along its identity guide without implying transmission.
  */
@@ -48,7 +49,7 @@ export function TravelingCase({
           profile={tokens.sketch.shape}
           data-identity-guide={record.id}
           stroke={accent}
-          strokeOpacity={0.45}
+          strokeOpacity={GUIDE_OPACITY}
           strokeDasharray={tokens.dash.guide.join(" ")}
         />
       ) : undefined}
@@ -64,7 +65,8 @@ export function TravelingCase({
         y={y + 4}
         fill={tokens.color.text}
         textAnchor="middle"
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
       >
         {index + 1}
       </text>

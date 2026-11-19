@@ -21,7 +21,7 @@ export function ClassroomDays({
             <Text
               x={32 + index * 310}
               y={32}
-              size={16}
+              role="secondary"
               fill={tokens.color.textMuted}
             >
               {index + 1}

@@ -1,3 +1,4 @@
+import { mix } from "../../../motion";
 import {
   useGraphicMotion,
   useGraphicTokens,
@@ -7,17 +8,7 @@ import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
-function _getIdentityInk(accent: string): string {
-  const channels = accent.slice(1).match(/../g) ?? [];
-  const luminance = channels.reduce((sum, channel, index) => {
-    const value = Number.parseInt(channel, 16) / 255;
-    const linear =
-      value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-    return sum + linear * [0.2126, 0.7152, 0.0722][index];
-  }, 0);
-  return luminance > 0.179 ? "#000000" : "#ffffff";
-}
+const INVESTIGATED_START_ALPHA = 0.45;
 
 /**
  * Every case supplies exactly one numbered segment, including unknown onset.
@@ -52,17 +43,22 @@ export function HistogramSegments({
                 }
                 fillOpacity={
                   isInvestigated
-                    ? 0.45 + 0.55 * motion.ramp(frame, 36, motion.scale(48))
-                    : 0.4
+                    ? mix(
+                        motion.ramp(frame, 36, motion.scale(48)),
+                        INVESTIGATED_START_ALPHA,
+                        1,
+                      )
+                    : tokens.alpha.dimmed
                 }
               />
               <text
                 x={histogramX}
                 y={histogramY - 1}
-                fontSize={12}
+                fontFamily={tokens.text.graphic.data.fontFamily}
+                fontSize={tokens.text.graphic.data.fontSize}
                 fill={
                   isInvestigated && frame >= 36
-                    ? _getIdentityInk(accent)
+                    ? tokens.color.onAccent
                     : tokens.color.text
                 }
                 textAnchor="middle"

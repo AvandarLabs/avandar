@@ -8,6 +8,7 @@ import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
+const SHEET_DASH = "5 5";
 /** Aggregate-only local sheet with explicit analysis boundary and shutters. */
 export function LocalCountSheet({ input, frame }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
@@ -22,7 +23,7 @@ export function LocalCountSheet({ input, frame }: Readonly<Props>): ReactNode {
         rx={scales.corner(14)}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray="5 5"
+        strokeDasharray={SHEET_DASH}
       />
       {input.cells.map((cell, index) => {
         return (

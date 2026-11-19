@@ -36,7 +36,8 @@ export function CaseHistogram({
               y={361}
               textAnchor="middle"
               fill={tokens.color.textMuted}
-              fontSize={12}
+              fontFamily={tokens.text.graphic.data.fontFamily}
+              fontSize={tokens.text.graphic.data.fontSize}
             >
               {index === input.timeBins.length ? "?" : index + 1}
             </text>

@@ -12,6 +12,7 @@ import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; index: number; frame: number; accent: string };
+const CAPACITY_GUIDE_DASH = "3 4";
 /** A common capacity scale persists while truly empty hosts fold. */
 export function HostBay({
   input,
@@ -49,7 +50,7 @@ export function HostBay({
           profile={tokens.sketch.shape}
           data-guide={index}
           stroke={tokens.color.inactive}
-          strokeDasharray="3 4"
+          strokeDasharray={CAPACITY_GUIDE_DASH}
         />
       ) : undefined}
       <HostLabels input={input} index={index} frame={frame} />

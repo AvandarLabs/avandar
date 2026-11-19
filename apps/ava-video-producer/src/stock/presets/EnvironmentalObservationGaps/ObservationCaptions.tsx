@@ -67,7 +67,7 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
             <Text
               x={32 + index * 310}
               y={479}
-              size={12}
+              role="data"
               fill={tokens.color.highlight}
             >
               {index + 1}

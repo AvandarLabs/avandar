@@ -50,10 +50,22 @@ export function CarbonNetAccounting({
           />
         );
       })}
-      <text x={658} y={515} fill={tokens.color.text} fontSize={16}>
+      <text
+        x={658}
+        y={515}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         −
       </text>
-      <text x={793} y={515} fill={tokens.color.text} fontSize={16}>
+      <text
+        x={793}
+        y={515}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         =
       </text>
       <FitText

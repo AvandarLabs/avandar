@@ -6,6 +6,7 @@ import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationContext. */
 type Props = { input: Input };
+const LAND_OPACITY = 0.7;
 
 /**
  * Pinned continental geometry provides context without locating the detached
@@ -51,7 +52,7 @@ export function ObservationContext({ input }: Readonly<Props>): ReactNode {
               radius: 65,
             })}
             fill={tokens.color.inactive}
-            fillOpacity={0.7}
+            fillOpacity={LAND_OPACITY}
           />
         </g>
       ) : undefined}
