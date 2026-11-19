@@ -6,123 +6,33 @@
  * markup must then hold no `classic` colour. Plan and shot field colours
  * name theme swatches, so they move too.
  */
+import "../../../tests/helpers/registerRemotionTestHooks";
+import {
+  findClassicValuesAcrossFrames,
+  SENTINEL_THEME,
+} from "../../../tests/helpers/sentinelVideoTheme";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { register } from "node:module";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import {
-  CONTINUITY_CATALOG,
-  isSceneEntry,
-} from "../../continuity/continuityCatalog";
-import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { getValueAtPath } from "../../videoTheme/getValueAtPath";
-import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
-import { storyboardSchema, timeline } from "../schema/schema";
-import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { Storyboard } from "../schema/schema";
+import type { ReactNode } from "react";
 
-/**
- * Node cannot load the stage's CSS modules, and Remotion's media components
- * need a registered composition. The film's markup is what the test reads,
- * so each CSS module loads as class names equal to their keys, and stage
- * source gets Remotion with plain `img` and `video` elements.
- */
-const REMOTION_STUB = `
-import React from ${JSON.stringify(import.meta.resolve("react"))};
-export * from ${JSON.stringify(import.meta.resolve("remotion"))};
-export const Img = (props) => React.createElement("img", props);
-export const OffthreadVideo = (props) =>
-  React.createElement("video", { src: props.src, style: props.style });
-export const Freeze = (props) =>
-  React.createElement(React.Fragment, null, props.children);
-`;
-const STAGE_TEST_HOOKS = `
-const REMOTION_STUB_URL = ${JSON.stringify(
-  `data:text/javascript,${encodeURIComponent(REMOTION_STUB)}`,
-)};
-export async function resolve(specifier, context, nextResolve) {
-  const parent = context.parentURL ?? "";
-  if (
-    specifier === "remotion" &&
-    parent.startsWith("file:") &&
-    !parent.includes("/node_modules/")
-  ) {
-    return { url: REMOTION_STUB_URL, shortCircuit: true };
-  }
-  return nextResolve(specifier, context);
-}
-export async function load(url, context, nextLoad) {
-  if (url.endsWith(".css")) {
-    return {
-      format: "module",
-      shortCircuit: true,
-      source: "export default new Proxy({}, { get: (_, key) => String(key) });",
-    };
-  }
-  return nextLoad(url, context);
-}`;
-register(`data:text/javascript,${encodeURIComponent(STAGE_TEST_HOOKS)}`);
+// Loaded after the hooks register: static imports load before any module
+// runs, so a renderer reached through one would get the real Remotion.
+const { CONTINUITY_CATALOG } = await import("../../continuity/continuityCatalog");
+const { BUILT_IN_VIDEO_THEMES } =
+  await import("../../videoTheme/builtInVideoThemes/builtInVideoThemes");
+const { VideoThemeScope } =
+  await import("../../videoTheme/VideoThemeScope/VideoThemeScope");
+const { storyboardSchema, timeline } = await import("../schema/schema");
+const { makeResolvedVideoThemeFromLibrary } =
+  await import("../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary");
+const { createContinuityPlanFromVideoTheme } =
+  await import("../../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme");
 const { StoryFilmPicture } = await import("../StoryFilm/StoryFilm");
 
-const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic");
-
-function _record(path: readonly string[]): Readonly<Record<string, unknown>> {
-  const value = getValueAtPath(CLASSIC, path);
-  return typeof value === "object" && value !== null
-    ? (value as Readonly<Record<string, unknown>>)
-    : {};
-}
-
-function _sentinelColor(index: number): string {
-  return `#${(0x3a1f00 + index * 7).toString(16).padStart(6, "0")}`;
-}
-
-/** Every classic swatch, palette shade, white, and black, lowercased. */
-const CLASSIC_COLORS = new Set(
-  [
-    ...Object.values(_record(["other", "video", "atomic", "swatch"])),
-    ...Object.values(_record(["colors"])).flat(),
-    getValueAtPath(CLASSIC, ["white"]),
-    getValueAtPath(CLASSIC, ["black"]),
-  ]
-    .filter((value): value is string => {
-      return typeof value === "string";
-    })
-    .map((value) => {
-      return value.toLowerCase();
-    }),
-);
-
-const SENTINEL_THEME: VideoThemePatch = {
-  colors: Object.fromEntries(
-    Object.keys(_record(["colors"])).map((name, paletteIndex) => {
-      return [
-        name,
-        Array.from({ length: 10 }, (_, shade) => {
-          return _sentinelColor(100 + paletteIndex * 10 + shade);
-        }),
-      ];
-    }),
-  ),
-  white: _sentinelColor(200),
-  black: _sentinelColor(201),
-  other: {
-    video: {
-      atomic: {
-        swatch: Object.fromEntries(
-          Object.keys(_record(["other", "video", "atomic", "swatch"])).map(
-            (name, index) => {
-              return [name, _sentinelColor(index)];
-            },
-          ),
-        ),
-      },
-    },
-  },
-};
-
-const SCENE_FILMS = CONTINUITY_CATALOG.filter(isSceneEntry).map((entry) => {
+const SCENE_FILMS = CONTINUITY_CATALOG.map((entry) => {
   const plan: Storyboard = storyboardSchema.parse(
     JSON.parse(
       fs.readFileSync(
@@ -140,43 +50,58 @@ function _sampleFrames(plan: Storyboard): number[] {
     return [
       shot.startFrame,
       shot.startFrame + Math.floor(shot.durationInFrames / 2),
-      shot.endFrame - 1,
+      shot.endFrame - 2,
     ];
   });
 }
 
-function _findClassicColors(markup: string): string[] {
-  return [
-    ...new Set(
-      [...markup.matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-        .map(([color]) => {
-          return color.toLowerCase();
-        })
-        .filter((color) => {
-          return CLASSIC_COLORS.has(color);
-        }),
-    ),
-  ];
+/**
+ * Product reenactment is exempt footage: the real product draws it with the
+ * product's own palette. The test stands an empty box in for it.
+ */
+function ProductPlaceholder(): ReactNode {
+  return <div data-product-placeholder="" />;
 }
 
-test("the catalog has scene films to check", () => {
-  assert.ok(SCENE_FILMS.length >= 13);
+/** The plan as its film draws it: continuity shots read the theme. */
+function _createThemedPlan(id: string, plan: Storyboard): Storyboard {
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+    { overrideIds: [id], patches: [SENTINEL_THEME] },
+  );
+  return createContinuityPlanFromVideoTheme(plan, theme);
+}
+
+test("the catalog has every Atlas composition and sample film to check", () => {
+  assert.equal(SCENE_FILMS.length, CONTINUITY_CATALOG.length);
+  assert.ok(SCENE_FILMS.length >= 36);
 });
 
-test("scene films draw no classic colour under the sentinel theme", () => {
+test("compositions and sample films draw no classic value under the sentinel theme", () => {
   assert.deepEqual(
     SCENE_FILMS.flatMap(({ id, plan }) => {
-      const markup = _sampleFrames(plan)
-        .map((frame) => {
+      const themedPlan = _createThemedPlan(id, plan);
+      return findClassicValuesAcrossFrames({
+        frames: _sampleFrames(themedPlan),
+        render: (frame) => {
+          (globalThis as { __testFrame?: number }).__testFrame = frame;
           return renderToStaticMarkup(
-            <VideoThemeScope patches={[SENTINEL_THEME]} element="div">
-              <StoryFilmPicture plan={plan} frame={frame} />
+            <VideoThemeScope
+              overrideIds={[id]}
+              patches={[SENTINEL_THEME]}
+              element="div"
+            >
+              <StoryFilmPicture
+                plan={themedPlan}
+                frame={frame}
+                productScene={ProductPlaceholder}
+              />
             </VideoThemeScope>,
           );
-        })
-        .join("");
-      return _findClassicColors(markup).map((color) => {
-        return `${id}: ${color}`;
+        },
+      }).map((value) => {
+        return `${id}: ${value}`;
       });
     }),
     [],

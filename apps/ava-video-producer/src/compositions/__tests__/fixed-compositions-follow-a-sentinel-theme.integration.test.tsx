@@ -2,21 +2,23 @@
 /*
  * The fixed compositions and the helper previews draw from the video theme.
  * `Demo`, `MotionLab`, and `TitleStudy` render in `starter`, and every helper
- * preview in `classic`, under a patch that moves every swatch, palette shade,
- * white, black, radius, stroke width, and multiplier to an improbable value.
- * Their markup must then hold no `classic` or product palette colour, no
- * starter palette `var(--…)` read, and no `classic` radius or border width.
+ * preview in `classic`, under the shared sentinel theme
+ * (`tests/helpers/sentinelVideoTheme.ts`). Their markup must then hold no
+ * `classic` or product palette colour, stroke, radius, dash, or opacity
+ * step, and no starter palette `var(--…)` read.
  */
-import "./registerCompositionTestHooks";
+import "../../../tests/helpers/registerRemotionTestHooks";
+import {
+  findClassicValuesInMarkup,
+  SENTINEL_THEME,
+} from "../../../tests/helpers/sentinelVideoTheme";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
 import { createStarterVideoThemeSource } from "../StarterVideoTheme/createStarterVideoThemeSource";
-import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { ComponentType } from "react";
 
 const { Demo } = await import("../Demo/Demo");
@@ -39,137 +41,23 @@ const PRODUCT_COLORS: unknown = fs.existsSync(PRODUCT_COLORS_FILE)
   ? JSON.parse(fs.readFileSync(PRODUCT_COLORS_FILE, "utf8"))
   : {};
 
-const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic");
-const SENTINEL_STROKE = 0.7;
-const SENTINEL_RADIUS = 7;
-const SENTINEL_MULTIPLIER = 1.37;
-
-function _record(path: readonly string[]): Readonly<Record<string, unknown>> {
-  const value = getValueAtPath(CLASSIC, path);
-  return typeof value === "object" && value !== null
-    ? (value as Readonly<Record<string, unknown>>)
-    : {};
-}
-
-function _sentinelColor(index: number): string {
-  return `#${(0x3a1f00 + index * 7).toString(16).padStart(6, "0")}`;
-}
-
-function _mapKeys(
-  path: readonly string[],
-  value: (index: number) => unknown,
-): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.keys(_record(path)).map((key, index) => {
-      return [key, value(index)];
-    }),
-  );
-}
-
-/** Every hex string anywhere in a JSON value. */
-function _hexStrings(value: unknown): string[] {
-  if (typeof value === "string") {
-    return /^#[0-9a-fA-F]{3,8}$/.test(value) ? [value] : [];
-  }
-  return typeof value === "object" && value !== null
-    ? Object.values(value).flatMap(_hexStrings)
-    : [];
-}
-
-/**
- * Every classic swatch, palette shade, white, and black, plus the product
- * palette helper previews used to draw with, lowercased.
- */
-const CLASSIC_COLORS = new Set(
-  [
-    ..._hexStrings(PRODUCT_COLORS),
-    ...Object.values(_record(["other", "video", "atomic", "swatch"])),
-    ...Object.values(_record(["colors"])).flat(),
-    getValueAtPath(CLASSIC, ["white"]),
-    getValueAtPath(CLASSIC, ["black"]),
-  ]
-    .filter((value): value is string => {
-      return typeof value === "string";
-    })
-    .map((value) => {
-      return value.toLowerCase();
-    }),
-);
-const CLASSIC_RADII = new Set(
-  Object.values(_record(["radius"])).map((value) => {
-    return String(value).replace("px", "");
-  }),
-);
-const CLASSIC_STROKES = new Set(
-  Object.values(_record(["other", "video", "atomic", "strokeWidth"])).map(
-    String,
-  ),
-);
-
-const SENTINEL_THEME: VideoThemePatch = {
-  colors: Object.fromEntries(
-    Object.keys(_record(["colors"])).map((name, paletteIndex) => {
-      return [
-        name,
-        Array.from({ length: 10 }, (_, shade) => {
-          return _sentinelColor(100 + paletteIndex * 10 + shade);
-        }),
-      ];
-    }),
-  ),
-  white: _sentinelColor(200),
-  black: _sentinelColor(201),
-  radius: _mapKeys(["radius"], () => {
-    return `${SENTINEL_RADIUS}px`;
-  }),
-  other: {
-    video: {
-      atomic: {
-        swatch: _mapKeys(["other", "video", "atomic", "swatch"], (index) => {
-          return _sentinelColor(index);
-        }),
-        strokeWidth: _mapKeys(
-          ["other", "video", "atomic", "strokeWidth"],
-          () => {
-            return SENTINEL_STROKE;
-          },
-        ),
-        multiplier: { identity: SENTINEL_MULTIPLIER },
-      },
-    },
-  },
-};
-
 const STARTER_NAMES =
   /var\(--(?:brand|brand-soft|brand-strong|ground|foreground|background|card|muted|muted-foreground|border|shadow)\)/g;
 
-/** The classic values a markup string still holds, one line each. */
+/**
+ * The classic values a markup string still holds, one line each, plus any
+ * starter palette `var(--…)` read.
+ */
 function _findClassicValues(markup: string): string[] {
-  const colors = [...markup.matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-    .map(([color]) => {
-      return color.toLowerCase();
-    })
-    .filter((color) => {
-      return CLASSIC_COLORS.has(color);
-    });
   const starterReads = [...markup.matchAll(STARTER_NAMES)].map(([read]) => {
     return read;
   });
-  const radii = [...markup.matchAll(/border-radius:([\d.]+)px/g)]
-    .filter(([, radius]) => {
-      return CLASSIC_RADII.has(radius!);
-    })
-    .map(([read]) => {
-      return read;
-    });
-  const borders = [...markup.matchAll(/border(?:-\w+)?:([\d.]+)px/g)]
-    .filter(([, width]) => {
-      return CLASSIC_STROKES.has(width!);
-    })
-    .map(([read]) => {
-      return read;
-    });
-  return [...new Set([...colors, ...starterReads, ...radii, ...borders])];
+  return [
+    ...new Set([
+      ...findClassicValuesInMarkup(markup, { extraColors: PRODUCT_COLORS }),
+      ...starterReads,
+    ]),
+  ];
 }
 
 const COMPOSITIONS: ReadonlyArray<

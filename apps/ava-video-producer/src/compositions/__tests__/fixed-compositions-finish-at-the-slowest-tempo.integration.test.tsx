@@ -10,7 +10,7 @@
  * The stock and continuity side of this guard is
  * `scripts/videoTheme/__tests__/animations-finish-at-the-slowest-tempo`.
  */
-import "./registerCompositionTestHooks";
+import "../../../tests/helpers/registerRemotionTestHooks";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
