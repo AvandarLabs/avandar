@@ -103,7 +103,7 @@ function _restrictionFromBudget(budget) {
   return {
     files: budget.globs
       .filter((glob) => {
-        return !glob.startsWith("!");
+        return !glob.startsWith("!") && !glob.endsWith(".css");
       })
       .map(toRepoGlob),
     ignores: [
