@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildClarificationTurnNumber,
   collectApprovedClarificationValues,
   countClarificationAnswersInThread,
   extractSingleQuotedSqlLiterals,
@@ -100,4 +101,29 @@ describe("reviewGeneratedSqlAssumptions", () => {
     expect(review.needsApproval).toBe(true);
     expect(review.unapprovedValues).toContain("user@example.com");
   });
+});
+
+describe("buildClarificationTurnNumber", () => {
+  function _threadWithAnswers(answerCount: number) {
+    return [
+      { role: "user", content: "show me deaths in georgia" },
+      ...Array.from({ length: answerCount }, (_unused, index) => {
+        return { role: "user", content: `[Clarification answer: ${index}]` };
+      }),
+    ];
+  }
+
+  it.each([
+    [0, 1],
+    [1, 2],
+    [2, 3],
+    [5, 3],
+  ])(
+    "numbers a card after %i card answers as %i",
+    (answerCount, turnNumber) => {
+      expect(
+        buildClarificationTurnNumber(_threadWithAnswers(answerCount)),
+      ).toBe(turnNumber);
+    },
+  );
 });
