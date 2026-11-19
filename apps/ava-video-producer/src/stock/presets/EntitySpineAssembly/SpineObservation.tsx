@@ -1,8 +1,12 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -23,6 +27,9 @@ export function SpineObservation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const entityIndex = input.entities.findIndex(({ id }) => {
       return id === observation.entityId;
     }),
@@ -30,20 +37,24 @@ export function SpineObservation({
   const targetY = 164 + entityIndex * 100;
   return (
     <g data-observation-row={observation.id}>
-      <path
-        d={`M390 ${sourceY + 25} H420 V${targetY} H455`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M390 ${sourceY + 25} H420 V${targetY} H455`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        opacity={ramp(frame, 49, 12)}
+        stroke={tokens.color.line}
+        opacity={motion.reveal(frame, 49)}
       />
       <StockRect
         x={50}
         y={sourceY}
         width={340}
         height={54}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <LiteralDataText value={observation.id} x={60} y={sourceY + 14} />
       <LiteralDataText value={observation.entityId} x={60} y={sourceY + 32} />

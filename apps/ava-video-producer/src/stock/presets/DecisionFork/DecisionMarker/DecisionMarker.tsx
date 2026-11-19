@@ -50,7 +50,12 @@ export function DecisionMarker({
   return (
     <g
       data-marker-branch={branchId}
-      opacity={ramp(frame, APPEAR_CUE, motion.scale(APPEAR_FRAMES))}
+      opacity={ramp(
+        frame,
+        APPEAR_CUE,
+        motion.scale(APPEAR_FRAMES),
+        motion.reveal.easing,
+      )}
     >
       <MarkerDot x={point.x} y={markerY} accent={accent} />
     </g>

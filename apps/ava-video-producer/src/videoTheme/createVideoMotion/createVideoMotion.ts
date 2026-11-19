@@ -28,6 +28,12 @@ export type VideoMotion = Readonly<{
    * frame.
    */
   scale: (frames: number) => number;
+  /**
+   * Divides an authored stagger by the tempo and multiplies it by
+   * `motion.staggerScale`, so a preset's own stagger follows the Stagger
+   * option like `stagger.list` does.
+   */
+  scaleStagger: (frames: number) => number;
   curve: (easing: EasingValue) => EasingFunction;
   chip: number;
   whip: number;
@@ -196,6 +202,7 @@ export function createVideoMotion(motion: MotionTokens): VideoMotion {
   const values = {
     tempo: motion.tempo,
     scale,
+    scaleStagger: staggerScale,
     curve: _curve,
     press: scale(motion.press),
     chip: scale(motion.chip),

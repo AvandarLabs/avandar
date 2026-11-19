@@ -1,16 +1,30 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+/** A repair object's rounded corner before the corner style scales it. */
+const REPAIR_CORNER = 24;
+/** The repair mark's line weight before the line weight scales it. */
+const REPAIR_STROKE = 6;
 /** Fixed authored objects keep named authorship beneath each visible work. */
 export function RecognitionObjects({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const lineWidth = scales.stroke(tokens.stroke.default);
   return (
     <g>
       {input.contributions.map((item, index) => {
@@ -20,47 +34,62 @@ export function RecognitionObjects({
           <g
             key={item.id}
             data-contribution-id={item.id}
-            opacity={ramp(frame, 16 + index * 2, 12)}
+            opacity={motion.reveal(frame, 16 + index * motion.stagger.list)}
           >
             <g data-contribution-caption={item.id}>
               <LabelSlots labels={[[item.label, x - 10, 145, 180, 16, 4]]} />
             </g>
-            <rect
+            <StockRect
               data-focused-object={focused ? item.id : undefined}
               x={x}
               y={230}
               width={160}
               height={100}
-              rx={item.artifact === "repair" ? 24 : 4}
-              stroke={focused ? accent : STOCK.line}
-              strokeWidth={2}
-              fill={STOCK.surface}
+              rx={scales.corner(
+                item.artifact === "repair" ? REPAIR_CORNER : tokens.corner.chip,
+              )}
+              stroke={focused ? accent : tokens.color.line}
+              strokeWidth={lineWidth}
+              fill={tokens.color.surface}
             />
             {item.artifact === "guide" ? (
-              <path
-                d={`M${x + 22} 250 h110 M${x + 22} 270 h95 M${x + 22} 290 h105`}
-                stroke={STOCK.muted}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${x + 22} 250 h110 M${x + 22} 270 h95 M${x + 22} 290 h105`,
+                }}
+                profile={tokens.sketch.shape}
+                stroke={tokens.color.inactive}
                 fill="none"
               />
             ) : item.artifact === "repair" ? (
-              <path
-                d={`M${x + 35} 280 h90 M${x + 75} 250 v60 M${x + 85} 250 v60`}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${x + 35} 280 h90 M${x + 75} 250 v60 M${x + 85} 250 v60`,
+                }}
+                profile={tokens.sketch.shape}
                 stroke={accent}
-                strokeWidth={6}
+                strokeWidth={scales.stroke(REPAIR_STROKE)}
                 fill="none"
               />
             ) : (
-              <path
-                d={`M${x + 25} 305 l45 -50 l60 50 Z M${x + 70} 255 v50`}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${x + 25} 305 l45 -50 l60 50 Z M${x + 70} 255 v50`,
+                }}
+                profile={tokens.sketch.shape}
                 stroke={accent}
-                strokeWidth={2}
+                strokeWidth={lineWidth}
                 fill="none"
               />
             )}
             {input.showAuthorshipTab ? (
               <g data-authorship-tab={item.id}>
-                <path
-                  d={`M${x + 4} 330 v14 h150`}
+                <SketchedShape
+                  shape={{ kind: "path", d: `M${x + 4} 330 v14 h150` }}
+                  profile={tokens.sketch.shape}
                   fill="none"
                   stroke={accent}
                 />

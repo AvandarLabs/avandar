@@ -1,7 +1,8 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DrillParentCompartment } from "./DrillParentCompartment";
 import { DrillSelectionWindow } from "./DrillSelectionWindow";
+import { CHILD_CUE, getParentFromFrame, PARENT_CUE } from "./drillTiming";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,7 @@ export function DrillCompartments({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const groups = [
     ...new Set(
       input.records.map((record) => {
@@ -19,11 +21,11 @@ export function DrillCompartments({
       }),
     ),
   ];
-  const progress = ramp(frame, 40, 34);
+  const progress = getParentFromFrame(frame, motion);
   return (
     <g>
       <FitText
-        text={frame < 74 ? input.dimensions[0] : input.labels.context}
+        text={frame < CHILD_CUE ? input.dimensions[0] : input.labels.context}
         x={44}
         y={154}
         width={872}
@@ -45,7 +47,7 @@ export function DrillCompartments({
           />
         );
       })}
-      {frame >= 40 ? (
+      {frame >= PARENT_CUE ? (
         <g opacity={progress}>
           <FitText
             text={input.labels.detail}

@@ -1,13 +1,13 @@
 .contentFeedbackError {
-  color: #a73135;
-  font-size: 12px;
+  color: var(--atlas-color-danger);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.5;
-  margin: 5px 0;
+  margin: var(--atlas-space-5) 0;
   overflow-wrap: anywhere;
 }
 
 .contentFeedbackStatus {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.5;
 }

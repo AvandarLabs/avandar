@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -10,7 +10,8 @@ type Props = {
   y: number;
   opacity?: number;
   color?: string;
-  fontSize?: 12 | 14;
+  /** A smaller sublabel inside a row, rather than a lane heading. */
+  isSublabel?: boolean;
 };
 /** A supplied label stays attached to the value lane it actually describes. */
 export function CleanupLaneHeading({
@@ -20,9 +21,10 @@ export function CleanupLaneHeading({
   x,
   y,
   opacity = 1,
-  color = STOCK.muted,
-  fontSize = 14,
+  color,
+  isSublabel = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g
       data-cleanup-label={labelRole}
@@ -34,11 +36,11 @@ export function CleanupLaneHeading({
         x={x}
         y={y}
         width={352}
-        fontSize={fontSize}
+        fontSize={isSublabel ? 12 : 14}
         maxLines={1}
         breakLongWords
         normalizeWhitespace
-        color={color}
+        color={color ?? tokens.color.textMuted}
       />
     </g>
   );

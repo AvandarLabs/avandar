@@ -1,4 +1,9 @@
-import { ramp, EASE } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AreaSiteLabels } from "./AreaSiteLabels";
 import { AreaTile } from "./AreaTile";
 import type { Input } from "./ProportionalSymbolArea.schema";
@@ -11,6 +16,13 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+const SITE_AT = 13;
+const SITE_STEP = 3;
+const SITE_FRAMES = 28;
+const MORPH_AT = 51;
+const MORPH_FRAMES = 59;
+const SYMBOL_FILL_ALPHA = 0.55;
 /** A site's total circle area derives from its unchanged integer value. */
 export function AreaSite({
   site,
@@ -19,10 +31,24 @@ export function AreaSite({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const radius = Math.sqrt((site.value * input.areaPerUnit) / Math.PI),
-    progress = ramp(frame, 51, 59, EASE.inOut);
+    progress = motion.ramp(
+      frame,
+      MORPH_AT,
+      motion.scale(MORPH_FRAMES),
+      motion.travel.easing,
+    );
   return (
-    <g opacity={ramp(frame, 13 + index * 3, 28)}>
+    <g
+      opacity={motion.ramp(
+        frame,
+        SITE_AT + index * SITE_STEP,
+        motion.scale(SITE_FRAMES),
+      )}
+    >
       {Array.from({ length: site.value }, (_, unitIndex) => {
         return (
           <AreaTile
@@ -32,16 +58,21 @@ export function AreaSite({
           />
         );
       })}
-      <circle
+      <SketchedShape
         data-symbol={site.id}
         data-area={site.value * input.areaPerUnit}
-        cx={48 + site.x * 4}
-        cy={148 + site.y * 4}
-        r={radius}
+        shape={{
+          kind: "circle",
+          cx: 48 + site.x * 4,
+          cy: 148 + site.y * 4,
+          r: radius,
+        }}
+        profile={sketch.shape}
         fill={accent}
-        fillOpacity={progress === 1 ? 0.55 : 0}
+        fillOpacity={progress === 1 ? SYMBOL_FILL_ALPHA : 0}
         stroke={accent}
         strokeOpacity={progress}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <AreaSiteLabels {...{ site, index, input, accent }} />
     </g>

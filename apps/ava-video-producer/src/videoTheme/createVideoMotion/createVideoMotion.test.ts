@@ -123,8 +123,20 @@ test("the stagger option multiplies every stagger", () => {
     }).semantic.motion,
   );
   assert.deepEqual(
-    [motion.stagger.list, motion.stagger.column, motion.rise.stagger],
-    [4, 1, 6],
+    [
+      motion.stagger.list,
+      motion.stagger.column,
+      motion.rise.stagger,
+      motion.scaleStagger(6),
+    ],
+    [4, 1, 6, 12],
+  );
+});
+
+test("a preset's own stagger follows the tempo and the stagger option", () => {
+  assert.deepEqual(
+    [_motionAtTempo(1).scaleStagger(6), _motionAtTempo(1.5).scaleStagger(6)],
+    [6, 4],
   );
 });
 

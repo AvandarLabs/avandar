@@ -1,5 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { groups: string[]; progress: number };
@@ -8,19 +9,20 @@ export function DrillSubgroupCompartments({
   groups,
   progress,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {progress < 1
         ? groups.map((group, index) => {
             return (
               <g key={group} opacity={1 - progress}>
-                <rect
+                <StockRect
                   x={44 + index * 292}
                   y={294}
                   width={284}
                   height={266}
                   fill="none"
-                  stroke={STOCK.line}
+                  stroke={tokens.color.line}
                 />
                 <LiteralDataText value={group} x={56 + index * 292} y={310} />
               </g>

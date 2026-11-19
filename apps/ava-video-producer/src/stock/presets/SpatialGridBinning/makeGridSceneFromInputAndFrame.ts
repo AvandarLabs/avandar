@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SpatialGridBinning.schema";
 /** Data for CountToken. */
 type CountTokenResult = {
@@ -10,6 +11,9 @@ type CountTokenResult = {
 };
 
 type CountToken = Input["points"][number] & CountTokenResult;
+
+const COUNT_AT = 51;
+const COUNT_FRAMES = 37;
 type CellCount = {
   index: number;
   column: number;
@@ -56,7 +60,12 @@ function _createCells({
 export function makeGridSceneFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: Pick<VideoMotion, "ramp" | "scale" | "travel" | "stagger">;
+}>): {
   points: CountToken[];
   cells: CellCount[];
 } {
@@ -67,7 +76,12 @@ export function makeGridSceneFromInputAndFrame({
     const rank = assignments.slice(0, index).filter((assigned) => {
       return assigned === cell;
     }).length;
-    const progress = ramp(frame, 51 + index * 2, 37, EASE.inOut);
+    const progress = motion.ramp(
+      frame,
+      COUNT_AT + index * motion.stagger.list,
+      motion.scale(COUNT_FRAMES),
+      motion.travel.easing,
+    );
     return {
       ...point,
       index,

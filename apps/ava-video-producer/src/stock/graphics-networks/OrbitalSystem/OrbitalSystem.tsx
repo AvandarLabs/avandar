@@ -4,9 +4,11 @@ import { Caption } from "../../graphics-common/Caption";
 import { Eyebrow } from "../../graphics-common/Eyebrow";
 import { Glyph } from "../../graphics-common/Glyph";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { getContentColorFromValue } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CENTER } from "./OrbitalSystem.constants";
@@ -28,6 +30,7 @@ export function OrbitalSystem({
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("OrbitalSystem", {});
   const tokens = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <g>
       <Eyebrow>
@@ -46,26 +49,34 @@ export function OrbitalSystem({
           />
         );
       })}
-      <circle
-        cx={CENTER.x}
-        cy={CENTER.y}
-        r={
-          style.pulseRadius + wave(frame, style.pulsePeriod) * style.pulseSwing
-        }
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: CENTER.x,
+          cy: CENTER.y,
+          r:
+            style.pulseRadius +
+            wave(frame, style.pulsePeriod) * style.pulseSwing,
+        }}
+        profile={tokens.sketch.shape}
         fill={accent}
-        fillOpacity={style.pulseAlpha}
+        fillOpacity={shapes.wash(style.pulseAlpha)}
         stroke={accent}
         strokeOpacity={style.pulseStrokeAlpha}
-        strokeWidth={style.pulseStrokeWidth}
+        strokeWidth={shapes.stroke(style.pulseStrokeWidth)}
       />
-      <circle
-        cx={CENTER.x}
-        cy={CENTER.y}
-        r={style.coreRadius}
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: CENTER.x,
+          cy: CENTER.y,
+          r: style.coreRadius,
+        }}
+        profile={tokens.sketch.shape}
         fill={tokens.color.surface}
         stroke={accent}
         strokeOpacity={style.coreStrokeAlpha}
-        strokeWidth={style.coreStrokeWidth}
+        strokeWidth={shapes.stroke(style.coreStrokeWidth)}
       />
       <Glyph d={CUBE_GLYPH} color={accent} />
       <Caption>

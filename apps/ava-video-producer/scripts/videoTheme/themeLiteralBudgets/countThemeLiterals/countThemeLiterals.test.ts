@@ -91,3 +91,32 @@ test("stage geometry lengths are structural but spacing and variable radii are j
   );
   assert.equal(counts.css, 1);
 });
+
+test("the chrome token sheet declares the chrome scale, so only that exact path is skipped", () => {
+  const sheet = `:root { --atlas-space-12: 12px; --atlas-color-white: #fff; }`;
+  assert.equal(_count(sheet, "showcase/chrome-tokens.css").css, 0);
+  assert.equal(_count(sheet, "showcase/motion.css").css, 2);
+  assert.equal(_count(sheet, "src/gallery/chrome-tokens.css").css, 2);
+});
+
+test("transitions and animations count only when a timing literal remains outside variables", () => {
+  const counts = _count(
+    `.a { transition: opacity var(--fast), transform var(--fast); }
+     .b { transition: none !important; animation: none !important; }
+     .c { transition: opacity 0.15s; }
+     .d { transition: color var(--fast) ease-in-out; }
+     .e { animation: spin 300ms linear infinite; }
+     .f { transition-timing-function: cubic-bezier(0.2, 0, 0, 1); }`,
+    "Shape.module.css",
+  );
+  assert.equal(counts.css, 5);
+});
+
+test("CSS-wide keywords never count as font literals", () => {
+  const counts = _count(
+    `.a { font-family: inherit; font-size: inherit; font-weight: unset; }
+     .b { font-family: Georgia, serif; }`,
+    "Shape.module.css",
+  );
+  assert.equal(counts.css, 1);
+});

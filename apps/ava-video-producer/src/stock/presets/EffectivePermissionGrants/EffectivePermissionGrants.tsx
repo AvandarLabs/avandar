@@ -1,5 +1,6 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
   getEffectiveRoleFromInput,
   ROLE_RANK,
@@ -12,12 +13,16 @@ import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
+
+/** Frames the verdict takes to appear once the result has risen. */
+const VERDICT_FRAMES = 1;
 /** Qualifying grants combine by maximum rank, then meet an action notch. */
 export function EffectivePermissionGrants({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const effective = getEffectiveRoleFromInput(input);
   const isAllowed = ROLE_RANK[effective] >= ROLE_RANK[input.requiredRole];
   return (
@@ -39,7 +44,14 @@ export function EffectivePermissionGrants({
           />
         );
       })}
-      <g opacity={ramp(frame, 139, 1)}>
+      <g
+        opacity={ramp(
+          frame,
+          139,
+          motion.scale(VERDICT_FRAMES),
+          motion.reveal.easing,
+        )}
+      >
         <LabelSlots
           labels={[
             [

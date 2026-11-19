@@ -1,9 +1,15 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DashboardSlotAssembly.schema";
 
 type Rect = { x: number; y: number; width: number; height: number };
 type SlotOptions = { input: Input; widgetId: string };
+
+/** Frames a panel takes to travel into its slot. */
+const DOCK_FRAMES = 24;
+/** Frames between supporting panels docking one after another. */
+const DOCK_STAGGER_FRAMES = 12;
 const LOOSE_PANELS: Rect[] = [
   { x: 24, y: 108, width: 400, height: 232 },
   { x: 472, y: 124, width: 464, height: 232 },
@@ -53,7 +59,8 @@ export function getWidgetRectFromInput({
   input,
   widgetId,
   frame,
-}: Readonly<SlotOptions & { frame: number }>): Rect {
+  motion,
+}: Readonly<SlotOptions & { frame: number; motion: VideoMotion }>): Rect {
   const slot = _getWidgetSlotFromInput({ input, widgetId });
   const featured = widgetId === input.featuredWidgetId;
   const position = input.widgets
@@ -61,14 +68,15 @@ export function getWidgetRectFromInput({
       return widget.id !== input.featuredWidgetId;
     })
     .findIndex(propEq("id", widgetId));
+  const dock = motion.scale(DOCK_FRAMES);
   const progress = ramp(
     frame,
-    featured ? 40 : 64 + position * 12,
-    24,
-    EASE.inOut,
+    featured ? 40 : 64 + position * motion.scale(DOCK_STAGGER_FRAMES),
+    dock,
+    motion.travel.easing,
   );
   const loose = _getLooseWidgetRectFromInput({ input, widgetId });
-  const staging = featured ? 0 : ramp(frame, 40, 24, EASE.inOut);
+  const staging = featured ? 0 : ramp(frame, 40, dock, motion.travel.easing);
   const initial = {
     x: mix(staging, loose.x, slot.x + 8),
     y: mix(staging, loose.y, slot.y + 4),

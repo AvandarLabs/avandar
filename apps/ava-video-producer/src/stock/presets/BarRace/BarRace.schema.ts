@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
-import { legacyColorSchema } from "../legacy/legacyColorSchema.constants";
 
 /** Strict authored content within the fixed BarRace layout. */
 export const barRaceInputSchema = z
@@ -16,7 +16,7 @@ export const barRaceInputSchema = z
           end: z.number().min(0).max(100),
           from: z.number().int().min(0).max(3),
           to: z.number().int().min(0).max(3),
-          color: legacyColorSchema,
+          color: contentColorSchema,
         }),
       )
       .min(1)

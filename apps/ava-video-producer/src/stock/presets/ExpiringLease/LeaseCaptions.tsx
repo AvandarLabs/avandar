@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { EXPIRY_CUE } from "./leaseShape";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 
@@ -38,15 +39,19 @@ const UNIT = {
   | "breakLongWords"
   | "normalizeWhitespace"
 >;
+/** The lifetime value's size, as content: no graphic text role is 14 px. */
+const VALUE_FONT_SIZE = 14;
+
 /**
  * Possession and neutral-dock copy reflect authored expiry, never a successor.
  */
 export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const captions = [
     { text: input.permissionLabel, y: 52, fontSize: 18 as const },
     { text: input.copy.dock, y: 486, fontSize: 16 as const },
     {
-      text: frame < 108 ? input.copy.held : input.copy.expired,
+      text: frame < EXPIRY_CUE ? input.copy.held : input.copy.expired,
       y: 550,
       fontSize: 16 as const,
     },
@@ -54,7 +59,7 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
       text: input.copy.example,
       y: 585,
       fontSize: 12 as const,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
   ];
   return (
@@ -62,7 +67,7 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
       {captions.map((caption) => {
         return <FitText key={caption.y} {...TEXT} {...caption} />;
       })}
-      {frame >= 108 ? (
+      {frame >= EXPIRY_CUE ? (
         <FitText {...TEXT} text={input.copy.unassigned} y={518} fontSize={14} />
       ) : undefined}
       {input.showLifetime ? (
@@ -70,9 +75,9 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
           <text
             x={52}
             y={151}
-            fontSize={14}
-            fill={STOCK.muted}
-            fontFamily="Arial, sans-serif"
+            fontSize={VALUE_FONT_SIZE}
+            fill={tokens.color.textMuted}
+            fontFamily={tokens.text.graphic.data.fontFamily}
           >
             {input.lifetime.value}
           </text>

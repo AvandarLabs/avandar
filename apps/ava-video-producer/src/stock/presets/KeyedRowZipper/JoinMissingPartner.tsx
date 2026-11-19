@@ -1,9 +1,16 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { rowKey: string; y: number; label: string; progress: number };
+
+/** The dash of an absent partner's outline. */
+const ABSENT_DASH = "5 5";
+
 /** A left join retains an explicit authored absent-partner label. */
 export function JoinMissingPartner({
   rowKey,
@@ -11,6 +18,8 @@ export function JoinMissingPartner({
   label,
   progress,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g opacity={progress} data-empty-partner={rowKey}>
       <StockRect
@@ -18,10 +27,10 @@ export function JoinMissingPartner({
         y={y}
         width={416}
         height={60}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeDasharray="5 5"
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeDasharray={ABSENT_DASH}
       />
       <FitText
         text={label}

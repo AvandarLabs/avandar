@@ -2,8 +2,10 @@ import { getStockDisplayCopyFromDescriptor } from "../../copy/getStockDisplayCop
 import { Arrive } from "../../graphics-common/Arrive";
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MERGE, MERGE_GLYPH } from "./SourceMerge.constants";
@@ -14,23 +16,29 @@ type Props = Readonly<{ frame: number; accent: string }>;
 /** The node where every source edge meets, with its glyph and label. */
 export function MergeNode({ frame, accent }: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
-  const { color } = useGraphicTokens();
+  const { color, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <Arrive frame={frame} at={24}>
-      <circle
-        cx={MERGE.x}
-        cy={MERGE.y}
-        r={style.mergeRadius}
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: MERGE.x,
+          cy: MERGE.y,
+          r: style.mergeRadius,
+        }}
+        profile={sketch.shape}
         fill={color.surface}
         stroke={accent}
         strokeOpacity={style.mergeStrokeAlpha}
-        strokeWidth={style.mergeStrokeWidth}
+        strokeWidth={shapes.stroke(style.mergeStrokeWidth)}
       />
-      <path
-        d={MERGE_GLYPH}
+      <SketchedShape
+        shape={{ kind: "path", d: MERGE_GLYPH }}
+        profile={sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={style.glyphWidth}
+        strokeWidth={shapes.stroke(style.glyphWidth)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

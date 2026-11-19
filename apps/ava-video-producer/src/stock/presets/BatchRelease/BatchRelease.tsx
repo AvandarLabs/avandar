@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BatchEnvelope } from "./BatchEnvelope";
 import { BatchHeadings } from "./BatchHeadings";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -12,8 +12,9 @@ export function BatchRelease({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <BatchHeadings input={input} />
       {input.batches.map((batch, index) => {
         return (

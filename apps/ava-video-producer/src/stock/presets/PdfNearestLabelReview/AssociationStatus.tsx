@@ -1,12 +1,14 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import {
   ambiguityMessage,
   ratioMessage,
   unresolvedMessage,
 } from "./PdfNearestLabelReview.controls";
+import { STATUS_CUE } from "./reviewTiming";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
@@ -18,9 +20,10 @@ export function AssociationStatus({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const association = getAssociationFromInput(input);
   return (
-    <g opacity={ramp(frame, 95, 8)}>
+    <g opacity={ramp(frame, STATUS_CUE, motion.whip, motion.reveal.easing)}>
       {" "}
       {input.showDistanceValues ? (
         <g data-ratio-value="true">

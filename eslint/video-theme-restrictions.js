@@ -103,7 +103,7 @@ function _restrictionFromBudget(budget) {
   return {
     files: budget.globs
       .filter((glob) => {
-        return !glob.startsWith("!");
+        return !glob.startsWith("!") && !glob.endsWith(".css");
       })
       .map(toRepoGlob),
     ignores: [
@@ -126,4 +126,7 @@ export const videoThemeRestrictions = _readBudgets()
   .filter((budget) => {
     return budget.enforceLint;
   })
-  .map(_restrictionFromBudget);
+  .map(_restrictionFromBudget)
+  .filter((restriction) => {
+    return restriction.files.length > 0;
+  });

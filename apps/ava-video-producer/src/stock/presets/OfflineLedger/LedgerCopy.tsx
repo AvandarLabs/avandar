@@ -1,11 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Captions change with connectivity while the completed work remains. */
 export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
@@ -31,7 +32,7 @@ export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
             anchor="middle"
             normalizeWhitespace
             breakLongWords
-            color={y === 580 ? STOCK.muted : STOCK.text}
+            color={y === 580 ? tokens.color.textMuted : tokens.color.text}
           />
         );
       })}

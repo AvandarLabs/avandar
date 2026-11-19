@@ -96,6 +96,18 @@ export const TEXT_TOKENS = {
       "Figure",
       "Large numerals such as a total or a count. A figure may set its own size as content.",
     ),
+    value: _graphicType(
+      "Value",
+      "A short literal value drawn on its own, such as a cell value or a step's reading.",
+    ),
+    smallCaption: _graphicType(
+      "Small caption",
+      "A small muted caption under a block or a result, without the eyebrow's tracking.",
+    ),
+    mark: _graphicType(
+      "Mark",
+      "A large single symbol, such as the question mark over an open question.",
+    ),
   },
   stage: {
     heading: _stageType("Stage heading", "The heading of a composition beat."),
@@ -161,6 +173,22 @@ export const TEXT_TOKENS = {
     appBody: _sceneType(
       "App body",
       "Body and secondary text inside the app chrome of a fixed composition.",
+    ),
+    heroFigure: _sceneType(
+      "Hero figure",
+      "The one headline number a scene builds to, such as the bar comparison's result. It fits its own size.",
+    ),
+    wordmark: _sceneType(
+      "Wordmark",
+      "The brand name beside the mark in a lockup. It fits its own size to the mark.",
+    ),
+    command: _sceneType(
+      "Command line",
+      "A typed command, such as the install command under a lockup. It fits its own size.",
+    ),
+    windowSubtitle: _sceneType(
+      "Window subtitle",
+      "The monospace line under a window headline. It fits its own size.",
     ),
   },
 } as const;

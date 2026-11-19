@@ -1,4 +1,5 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { getEvidenceFromFrame } from "./gridTiming";
 import { RuledGridEvidence } from "./RuledGridEvidence";
 import { TaggedGridEvidence } from "./TaggedGridEvidence";
 import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence";
@@ -12,8 +13,9 @@ export function GridEvidence({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 13, 42)}>
+    <g opacity={getEvidenceFromFrame(frame, motion)}>
       <TaggedGridEvidence input={input} frame={frame} accent={accent} />
       <RuledGridEvidence input={input} frame={frame} accent={accent} />
       <WhitespaceGridEvidence input={input} frame={frame} accent={accent} />

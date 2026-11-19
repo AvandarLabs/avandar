@@ -9,7 +9,8 @@
  * or calls `useVideoProps("Name"`. `sketch.profile`, `camera.presets`, and
  * `motion.easingProfiles` are menus: one member in use keeps the whole menu,
  * like an atomic scale. A token a slice budget lists as pending is skipped
- * until that slice's renderer reads it.
+ * until that slice's renderer reads it, and a token one slice hands off to
+ * others is skipped until one of them reads it.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -46,6 +47,7 @@ import {
 } from "../../../src/videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import {
   getCoveredIdsFromBudgets,
+  getHandoffTokensFromBudgets,
   getPendingTokensFromBudgets,
   listThemeLiteralBudgets,
 } from "../themeLiteralBudgets/themeLiteralBudgets";
@@ -92,6 +94,7 @@ const SCENE_VARIABLES = Object.keys(SEMANTIC_TOKENS.color.scene).map((name) => {
   };
 });
 const PENDING_TOKEN_PATHS = getPendingTokensFromBudgets();
+const HANDOFF_TOKENS = getHandoffTokensFromBudgets();
 
 const TOKEN_PATHS = listTokenDefinitions()
   .map((entry) => {
@@ -427,7 +430,9 @@ test("every token is read by a renderer or referenced by one that is", () => {
   assert.deepEqual(
     AUDITED_TOKEN_PATHS.filter((tokenPath) => {
       return (
-        !LIVE_TOKEN_PATHS.has(tokenPath) && !PENDING_TOKEN_PATHS.has(tokenPath)
+        !LIVE_TOKEN_PATHS.has(tokenPath) &&
+        !PENDING_TOKEN_PATHS.has(tokenPath) &&
+        !HANDOFF_TOKENS.has(tokenPath)
       );
     }),
     [],
@@ -451,6 +456,38 @@ test("a slice that has landed leaves no token pending", () => {
             return `${budget.slice}: ${tokenPath}`;
           })
         : [];
+    }),
+    [],
+  );
+});
+
+test("every handed-off token is a catalog token for slices that have a budget", () => {
+  const slices = new Set(
+    listThemeLiteralBudgets().map((budget) => {
+      return budget.slice;
+    }),
+  );
+  assert.deepEqual(
+    [...HANDOFF_TOKENS].flatMap(([tokenPath, readers]) => {
+      return [
+        ...(TOKEN_PATH_SET.has(tokenPath) ? [] : [tokenPath]),
+        ...readers
+          .filter((reader) => {
+            return !slices.has(reader);
+          })
+          .map((reader) => {
+            return `${tokenPath}: ${reader}`;
+          }),
+      ];
+    }),
+    [],
+  );
+});
+
+test("a handed-off token leaves the handoff list once a renderer reads it", () => {
+  assert.deepEqual(
+    [...HANDOFF_TOKENS.keys()].filter((tokenPath) => {
+      return LIVE_TOKEN_PATHS.has(tokenPath);
     }),
     [],
   );

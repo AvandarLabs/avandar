@@ -1,12 +1,12 @@
 .contentFieldBodyObject > legend {
   color: var(--ink);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--atlas-font-size-12);
+  font-weight: var(--atlas-font-weight-600);
 }
 
 .contentFieldBodyObject {
   border: 0;
-  margin: 20px 0;
+  margin: var(--atlas-space-20) 0;
   min-width: 0;
   padding: 0;
 }

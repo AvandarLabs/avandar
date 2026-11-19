@@ -1,7 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getJoinRowLayoutFromInputAndFrame } from "./getJoinRowLayoutFromInputAndFrame";
 import { JoinKeyCell } from "./JoinKeyCell";
 import { JoinMissingPartner } from "./JoinMissingPartner";
@@ -27,6 +31,9 @@ export function JoinRow({
   row,
   index,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { x, y, height, isContext, progress } =
     getJoinRowLayoutFromInputAndFrame({
       input,
@@ -34,6 +41,7 @@ export function JoinRow({
       side,
       row,
       index,
+      motion,
     });
   const hasPartner = input.rightRows.some(propEq("key", row.key));
   if (isContext && !input.showUnmatchedTray && progress === 1) {
@@ -49,9 +57,9 @@ export function JoinRow({
         y={y}
         width={416}
         height={height}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={isContext ? STOCK.line : accent}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={isContext ? tokens.color.line : accent}
       />
       {input.showKeys || progress < 1 ? (
         <JoinKeyCell value={row.key} x={x} y={y} side={side} accent={accent} />

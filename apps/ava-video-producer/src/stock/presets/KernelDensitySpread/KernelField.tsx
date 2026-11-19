@@ -1,30 +1,45 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import { KernelCones } from "./KernelCones";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+const CELL_STROKE = 0.5;
 /** Cone heights add into a fixed-scale sampled field beneath source markers. */
 export function KernelField({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { radius, cells } = getKernelSamplesFromInput({ input, frame });
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const { radius, cells } = getKernelSamplesFromInput({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       {cells.map((cell, index) => {
         return (
-          <rect
+          <StockRect
             key={index}
             data-cell-intensity={cell.intensity}
             x={180 + (cell.x - 50 / input.gridSize) * 2.8}
             y={200 + (cell.y - 50 / input.gridSize) * 2.8}
             width={280 / input.gridSize}
             height={280 / input.gridSize}
-            stroke={STOCK.line}
-            strokeWidth={0.5}
+            stroke={color.line}
+            strokeWidth={shapes.stroke(CELL_STROKE)}
             fill={accent}
             fillOpacity={cell.intensity / input.legendMaximum}
           />
@@ -33,15 +48,19 @@ export function KernelField({
       <KernelCones input={input} frame={frame} accent={accent} />
       {input.points.map((point) => {
         return (
-          <circle
+          <SketchedShape
             key={point.id}
             data-point-position={`${point.x},${point.y}`}
-            cx={180 + point.x * 2.8}
-            cy={200 + point.y * 2.8}
-            r={4}
-            fill={STOCK.text}
-            stroke={STOCK.ground}
-            strokeWidth={1}
+            shape={{
+              kind: "circle",
+              cx: 180 + point.x * 2.8,
+              cy: 200 + point.y * 2.8,
+              r: 4,
+            }}
+            profile={sketch.shape}
+            fill={color.text}
+            stroke={color.ground}
+            strokeWidth={shapes.stroke(stroke.hairline)}
           />
         );
       })}

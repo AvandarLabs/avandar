@@ -1,7 +1,11 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
+import { EXPLANATION_CUE, EXPLANATION_FRAMES } from "./cleanupTiming";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
@@ -12,12 +16,22 @@ export function CleanupEditExplanation({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   if (!input.showEditLabels) {
     return undefined;
   }
   const inline = input.comparison === "inline-ghost";
   return (
-    <g data-edit-explanation={row.id} opacity={ramp(frame, 76, 36)}>
+    <g
+      data-edit-explanation={row.id}
+      opacity={ramp(
+        frame,
+        EXPLANATION_CUE,
+        motion.scale(EXPLANATION_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
       {inline ? undefined : (
         <CleanupLaneHeading
           text={input.columnLabels.change}
@@ -25,7 +39,7 @@ export function CleanupEditExplanation({
           placement="edit"
           x={88}
           y={42}
-          fontSize={12}
+          isSublabel
         />
       )}
       <g data-edit-value={row.id}>
@@ -38,7 +52,7 @@ export function CleanupEditExplanation({
           maxLines={2}
           breakLongWords
           normalizeWhitespace
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
       </g>
     </g>

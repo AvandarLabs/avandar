@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Inputs for StandardOutcome. */
@@ -9,6 +9,7 @@ type Props = { input: Input };
  * The normal destination and path label occupy the side opposite the detour.
  */
 export function StandardOutcome({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const side = input.detourSide === "above" ? -1 : 1;
   return (
     <>
@@ -33,7 +34,7 @@ export function StandardOutcome({ input }: Readonly<Props>): ReactNode {
         fontSize={16}
         maxLines={3}
         anchor="middle"
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
         breakLongWords
         normalizeWhitespace
       />

@@ -1,9 +1,12 @@
-import { EASE, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ChartCategory } from "./ChartCategory";
 import { ChartHeadings } from "./ChartHeadings";
 import { ChartScale } from "./ChartScale";
+import { getRefinementFromFrame } from "./getRefinementFromFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
@@ -15,7 +18,9 @@ export function ChartFocusEdit({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const refinement = ramp(frame, 40, 72, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const refinement = getRefinementFromFrame(frame, motion);
   return (
     <g data-axis-maximum={input.axisMaximum}>
       <ChartHeadings input={input} frame={frame} accent={accent} />
@@ -42,7 +47,7 @@ export function ChartFocusEdit({
         breakLongWords
         normalizeWhitespace
         anchor="middle"
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
     </g>
   );

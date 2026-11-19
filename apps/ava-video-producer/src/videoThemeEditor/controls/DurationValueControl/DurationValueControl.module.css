@@ -3,18 +3,18 @@
 }
 
 .durationValueInput {
-  flex: 0 0 112px;
+  flex: 0 0 var(--atlas-size-112);
 }
 
 .durationValueReadout {
-  color: var(--muted);
-  font: 11px var(--mono);
+  color: var(--atlas-color-muted);
+  font: var(--atlas-font-size-11) var(--mono);
   white-space: nowrap;
 }
 
 /* On a phone, descriptions are 12px. */
 @media (width <= 760px) {
   .durationValueReadout {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
   }
 }

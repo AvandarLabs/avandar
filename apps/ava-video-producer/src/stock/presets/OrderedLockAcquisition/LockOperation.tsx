@@ -1,7 +1,13 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { TILE_CORNER } from "./lockShape";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +18,15 @@ type Props = {
   index: number;
   accent: string;
 };
+
+/** The cue an out-of-order request starts to lift out of its strip on. */
+const LIFT_CUE = 53;
+/** The cue the request strips start to sort on, once lifted. */
+const SORT_CUE = 61;
+/** The cue the strips are sorted and the lifted request drops back on. */
+const SORTED_CUE = 82;
+/** How faint the original request order stays beside the strips. */
+const ORIGINAL_ORDER_OPACITY = 0.45;
 /** Request strips sort geometrically before either operation acquires a key. */
 export function LockOperation({
   frame,
@@ -20,7 +35,12 @@ export function LockOperation({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const sorting = ramp(frame, 61, 21, EASE.inOut),
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const travel = motion.travel.easing;
+  // The strips sort between the lift and the drop, cue to cue.
+  const sorting = ramp(frame, SORT_CUE, SORTED_CUE - SORT_CUE, travel),
     y = 180 + index * 200;
   return (
     <g data-operation={operation.id}>
@@ -38,8 +58,8 @@ export function LockOperation({
         const arc =
           canonicalIndex !== requestIndex && requestIndex === 1
             ? 100 *
-              ramp(frame, 53, 8, EASE.inOut) *
-              (1 - ramp(frame, 82, 8, EASE.inOut))
+              ramp(frame, LIFT_CUE, SORT_CUE - LIFT_CUE, travel) *
+              (1 - ramp(frame, SORTED_CUE, motion.whip, travel))
             : 0;
         return (
           <g
@@ -47,15 +67,15 @@ export function LockOperation({
             data-request-resource={resourceId}
             data-request-operation={operation.id}
           >
-            <rect
+            <StockRect
               data-request-tile={resourceId}
               x={x}
               y={y + arc}
               width={200}
               height={94}
-              rx={6}
-              fill={STOCK.surface}
-              stroke={sorting === 1 ? accent : STOCK.line}
+              rx={scales.corner(TILE_CORNER)}
+              fill={tokens.color.surface}
+              stroke={sorting === 1 ? accent : tokens.color.line}
             />
             <LabelSlots
               labels={[[resource.label, x + 12, y + 20 + arc, 176, 14, 3]]}
@@ -66,7 +86,7 @@ export function LockOperation({
       })}
       {input.showOriginalOrder ? (
         <g
-          opacity={0.45}
+          opacity={ORIGINAL_ORDER_OPACITY}
           data-original-order={operation.requestedIds.join(",")}
         >
           {operation.requestedIds.map((resourceId, requestIndex) => {

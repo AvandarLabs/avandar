@@ -1,43 +1,43 @@
 .contentControlsEditor {
-  border-top: 1px solid var(--line);
-  margin-top: 26px;
-  padding-top: 22px;
+  border-top: var(--atlas-border-1) solid var(--line);
+  margin-top: var(--atlas-space-26);
+  padding-top: var(--atlas-space-22);
 }
 
 .contentControlsHeading {
   align-items: center;
   display: flex;
-  gap: 12px;
+  gap: var(--atlas-space-12);
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: var(--atlas-space-12);
 }
 
 .contentControlsHeading h3 {
-  font-size: 16px;
-  font-weight: 650;
+  font-size: var(--atlas-font-size-16);
+  font-weight: var(--atlas-font-weight-650);
   margin: 0;
 }
 
 .contentControlsHeading button {
   background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-4);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  padding: 6px 9px;
+  padding: var(--atlas-space-6) var(--atlas-space-9);
 }
 
 .contentControlsHelp {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.5;
-  margin: 5px 0 12px;
+  margin: var(--atlas-space-5) 0 var(--atlas-space-12);
 }
 
 .contentControlsEditor button:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+  outline: var(--atlas-border-2) solid var(--ink);
+  outline-offset: var(--atlas-space-2);
 }
 
 .contentControlsEditor button:disabled {

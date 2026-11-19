@@ -1,8 +1,12 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPickedValueFromInput } from "./getPickedValueFromInput";
 import { controls } from "./GroupedValuePicker.controls";
 import { PickerCalculation } from "./PickerCalculation";
@@ -12,6 +16,12 @@ import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
+
+/** Frames the derived result takes to slide into place. */
+const ATTACH_FRAMES = 33;
+/** The derived result card's corner before the corner style scales it. */
+const RESULT_CORNER = 6;
+
 function _getSelectLabel({
   path,
   value,
@@ -38,8 +48,16 @@ export function GroupedValuePicker({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const value = getPickedValueFromInput(input),
-    attachment = ramp(frame, 106, 33, EASE.inOut);
+    attachment = ramp(
+      frame,
+      106,
+      motion.scale(ATTACH_FRAMES),
+      motion.travel.easing,
+    );
   const rounded =
     value === null
       ? null
@@ -101,8 +119,8 @@ export function GroupedValuePicker({
           y={340}
           width={267}
           height={195}
-          rx={6}
-          fill={STOCK.elevated}
+          rx={scales.corner(RESULT_CORNER)}
+          fill={tokens.color.elevated}
           stroke={accent}
         />
         <LabelSlots

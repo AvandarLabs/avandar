@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -14,13 +14,19 @@ export function BufferSourceRow({
   location,
   index,
 }: Readonly<Props>): ReactNode {
+  const data = useGraphicTokens().text.graphic.data;
   const distance = Math.hypot(
     location.x - input.origin.x,
     location.y - input.origin.y,
   );
   return (
     <g data-distance={distance}>
-      <text x={440} y={282 + index * 48} fontSize={12} fill={STOCK.text}>
+      <text
+        x={440}
+        y={282 + index * 48}
+        fontSize={data.fontSize}
+        fill={data.color}
+      >
         {index + 1}
       </text>
       <LabelSlots
@@ -31,9 +37,9 @@ export function BufferSourceRow({
           data-distance-label={location.id}
           x={670}
           y={282 + index * 48}
-          fontSize={12}
+          fontSize={data.fontSize}
           textAnchor="end"
-          fill={STOCK.text}
+          fill={data.color}
         >
           {Number(distance.toPrecision(4))}
         </text>

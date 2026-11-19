@@ -1,19 +1,45 @@
-import { ramp, EASE } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+const RULER_AT = 13;
+const RULER_FRAMES = 37;
+const SWEEP_AT = 51;
+const SWEEP_FRAMES = 54;
+const ARM_FADE_AT = 106;
+const BUFFER_FILL_ALPHA = 0.04;
+/** The circle draws on as one normalised path length. */
+const DRAW_ON_LENGTH = 1;
+
 function _getCompassGeometry({
   input,
   frame,
-}: Readonly<Pick<Props, "input" | "frame">>) {
-  const sweep = ramp(frame, 51, 54, EASE.inOut);
+  motion,
+}: Readonly<Pick<Props, "input" | "frame"> & { motion: VideoMotion }>) {
+  const sweep = motion.ramp(
+    frame,
+    SWEEP_AT,
+    motion.scale(SWEEP_FRAMES),
+    motion.travel.easing,
+  );
   const x = 48 + input.origin.x * 3.6,
     y = 190 + input.origin.y * 3.6;
   const radius = input.radiusUnits * 3.6;
   const center = { cx: x, cy: y };
-  const ruler = { x1: x, y1: y, x2: x + radius * ramp(frame, 13, 37), y2: y };
+  const ruler = {
+    x1: x,
+    y1: y,
+    x2: x + radius * motion.ramp(frame, RULER_AT, motion.scale(RULER_FRAMES)),
+    y2: y,
+  };
   const arm = {
     x1: x,
     y1: y,
@@ -28,42 +54,52 @@ export function BufferCompass({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { sweep, radius, center, ruler, arm } = _getCompassGeometry({
     input,
     frame,
+    motion,
   });
+  const width = shapes.stroke(stroke.default);
   return (
     <g>
-      <circle
+      <SketchedShape
         data-buffer-circle=""
-        {...center}
-        r={radius}
+        shape={{ kind: "circle", ...center, r: radius }}
+        profile={sketch.shape}
         fill={accent}
-        fillOpacity={0.04 * sweep}
+        fillOpacity={shapes.wash(BUFFER_FILL_ALPHA) * sweep}
         stroke={accent}
-        strokeWidth={2}
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - sweep}
+        strokeWidth={width}
+        pathLength={DRAW_ON_LENGTH}
+        strokeDasharray={DRAW_ON_LENGTH}
+        strokeDashoffset={DRAW_ON_LENGTH * (1 - sweep)}
       />
-      <line
+      <SketchedShape
         data-radius-ruler=""
-        {...ruler}
-        stroke={STOCK.orange}
-        strokeWidth={2}
+        shape={{ kind: "line", ...ruler }}
+        profile={sketch.shape}
+        stroke={color.highlight}
+        strokeWidth={width}
       />
-      <line
+      <SketchedShape
         data-compass-arm=""
-        {...arm}
+        shape={{ kind: "line", ...arm }}
+        profile={sketch.shape}
         stroke={accent}
-        strokeWidth={2}
-        opacity={ramp(frame, 51, 9) * (1 - ramp(frame, 106, 12))}
+        strokeWidth={width}
+        opacity={
+          motion.ramp(frame, SWEEP_AT, motion.panel) *
+          (1 - motion.ramp(frame, ARM_FADE_AT, motion.reveal.duration))
+        }
       />
       <circle
         data-origin-position={`${input.origin.x},${input.origin.y}`}
         {...center}
         r={6}
-        fill={STOCK.orange}
+        fill={color.highlight}
       />
     </g>
   );

@@ -1,17 +1,32 @@
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+const GHOST_ALPHA = 0.35;
+const TOKEN_FILL_ALPHA = 0.2;
 /** Moving count tokens are painted above cell shading and ledger outlines. */
 export function GridTokens({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { points } = makeGridSceneFromInputAndFrame({ input, frame });
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const { points } = makeGridSceneFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       {input.showPointGhosts
@@ -23,8 +38,8 @@ export function GridTokens({
                 cx={point.sourceX}
                 cy={point.sourceY}
                 r={4}
-                fill={STOCK.muted}
-                opacity={0.35}
+                fill={color.inactive}
+                opacity={GHOST_ALPHA}
               />
             );
           })
@@ -32,17 +47,17 @@ export function GridTokens({
       {points.map((point) => {
         return (
           <g key={point.id}>
-            <circle
+            <SketchedShape
               data-count-token={point.id}
               data-token-cell={point.cell}
-              cx={point.x}
-              cy={point.y}
-              r={8.5}
+              shape={{ kind: "circle", cx: point.x, cy: point.y, r: 8.5 }}
+              profile={sketch.shape}
               fill={accent}
-              fillOpacity={0.2}
+              fillOpacity={TOKEN_FILL_ALPHA}
               stroke={accent}
+              strokeWidth={shapes.stroke(stroke.hairline)}
             />
-            <Text x={point.x} y={point.y + 4} size={12} anchor="middle">
+            <Text role="data" x={point.x} y={point.y + 4} anchor="middle">
               {point.index + 1}
             </Text>
           </g>

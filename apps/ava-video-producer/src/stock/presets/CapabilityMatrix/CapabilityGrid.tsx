@@ -1,16 +1,33 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CapabilityColumn } from "./CapabilityColumn";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
+
+/** The table panel's corner before the corner style scales it. */
+const PANEL_CORNER = 8;
 /** The table skeleton establishes shared row and column geometry first. */
 export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const height = input.capabilities.length * 66;
-  const panel = { x: 54, y: 176, width: 854, height, rx: 8 };
+  const panel = {
+    x: 54,
+    y: 176,
+    width: 854,
+    height,
+    rx: scales.corner(PANEL_CORNER),
+  };
   const caption = {
     text: input.caption,
     x: 480,
@@ -21,7 +38,10 @@ export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
   };
   return (
     <g>
-      <g aria-label={input.caption} opacity={ramp(frame, 12, 18)}>
+      <g
+        aria-label={input.caption}
+        opacity={ramp(frame, 12, motion.hero, motion.reveal.easing)}
+      >
         <FitText
           {...caption}
           breakLongWords
@@ -29,8 +49,12 @@ export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
           anchor="middle"
         />
       </g>
-      <g opacity={ramp(frame, 18, 18)}>
-        <StockRect {...panel} fill={STOCK.surface} stroke={STOCK.line} />
+      <g opacity={ramp(frame, 18, motion.hero, motion.reveal.easing)}>
+        <StockRect
+          {...panel}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
+        />
         {input.options.map((option, index) => {
           return (
             <CapabilityColumn
@@ -42,13 +66,17 @@ export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
         })}
         {input.capabilities.map((row, index) => {
           return (
-            <line
+            <SketchedShape
               key={row.id}
-              x1={54}
-              x2={908}
-              y1={176 + index * 66}
-              y2={176 + index * 66}
-              stroke={STOCK.line}
+              shape={{
+                kind: "line",
+                x1: 54,
+                x2: 908,
+                y1: 176 + index * 66,
+                y2: 176 + index * 66,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
             />
           );
         })}
