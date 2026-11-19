@@ -2,6 +2,7 @@ import { token } from "../defineTokensHelpers";
 import {
   createAlphaToken,
   createColorToken,
+  createEasingToken,
   createLengthToken,
   createStrokeToken,
 } from "./componentTokenHelpers";
@@ -145,6 +146,10 @@ export const SCENE_COMPONENT_TOKENS = {
       label: "Mark column stagger",
       description: "Frames between neighbouring columns of a mark rising in.",
     }),
+    flightPerspective: _perspective(
+      "Flight perspective",
+      "Perspective distance of a fly-through. Smaller values exaggerate the depth.",
+    ),
   },
   Cursor: {
     scale: token({
@@ -183,6 +188,11 @@ export const SCENE_COMPONENT_TOKENS = {
       label: "Cursor shadow",
       description: "The drop shadow under the pointer.",
     }),
+    travelEasing: createEasingToken(
+      "Cursor travel curve",
+      "How the pointer accelerates and settles between two positions.",
+      "stage",
+    ),
   },
   Orb: {
     ringWidth: createStrokeToken(

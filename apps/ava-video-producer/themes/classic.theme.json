@@ -120,7 +120,15 @@
     "8xl": "30px",
     "9xl": "32px",
     "10xl": "38px",
-    "11xl": "92px"
+    "11xl": "92px",
+    "19": "19px",
+    "34": "34px",
+    "36": "36px",
+    "44": "44px",
+    "46": "46px",
+    "76": "76px",
+    "108": "108px",
+    "140": "140px"
   },
   "lineHeights": {
     "xs": "1.12",
@@ -131,7 +139,9 @@
     "106": "1.06",
     "108": "1.08",
     "120": "1.2",
-    "122": "1.22"
+    "122": "1.22",
+    "100": "1",
+    "115": "1.15"
   },
   "radius": {
     "xs": "4px",
@@ -139,7 +149,8 @@
     "md": "10px",
     "lg": "12px",
     "xl": "18px",
-    "full": "9999px"
+    "full": "9999px",
+    "14": "14px"
   },
   "spacing": {
     "2xs": "16px",
@@ -150,7 +161,19 @@
     "xl": "64px",
     "2xl": "70px",
     "3xl": "96px",
-    "4xl": "192px"
+    "4xl": "192px",
+    "4": "4px",
+    "6": "6px",
+    "8": "8px",
+    "10": "10px",
+    "12": "12px",
+    "14": "14px",
+    "18": "18px",
+    "24": "24px",
+    "28": "28px",
+    "40": "40px",
+    "48": "48px",
+    "120": "120px"
   },
   "autoContrast": false,
   "luminanceThreshold": 0.3,
@@ -216,7 +239,10 @@
           "title": -0.02717391304347826,
           "headline": -0.02,
           "wordmark": -0.03,
-          "figure": -0.035
+          "figure": -0.035,
+          "capitals": 0.125,
+          "counter": -0.02631578947368421,
+          "largeCounter": -0.037037037037037035
         },
         "size": {},
         "strokeWidth": {
@@ -309,7 +335,9 @@
           "loose": [3, 5],
           "wide": [5, 5],
           "spaced": [4, 6],
-          "boundary": [5, 7]
+          "boundary": [5, 7],
+          "long": [6, 6],
+          "tight": [4, 3]
         },
         "curveTension": { "md": 0.45 },
         "duration": {
@@ -550,6 +578,24 @@
               "size": "$fontSizes.9xl",
               "weight": "$atomic.fontWeight.semibold",
               "color": "$color.text"
+            },
+            "value": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "smallCaption": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "mark": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.9xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
             }
           },
           "stage": {
@@ -686,6 +732,34 @@
               "size": "$fontSizes.sm",
               "weight": "$atomic.fontWeight.regular",
               "color": "$color.scene.mutedForeground"
+            },
+            "heroFigure": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.100",
+              "letterSpacing": "$atomic.letterSpacing.wordmark",
+              "color": "$color.scene.foreground"
+            },
+            "wordmark": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.11xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "letterSpacing": "$atomic.letterSpacing.wordmark",
+              "color": "$color.scene.foreground"
+            },
+            "command": {
+              "family": "$atomic.fontFamily.systemMono",
+              "size": "$fontSizes.8xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.scene.foreground"
+            },
+            "windowSubtitle": {
+              "family": "$atomic.fontFamily.systemMono",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.scene.foreground",
+              "alpha": "$atomic.opacity.45"
             }
           }
         },
@@ -709,6 +783,7 @@
           "spotlight": "$radius.lg",
           "label": "$radius.md",
           "cell": "$radius.sm",
+          "scene": "$radius.14",
           "scale": "$atomic.multiplier.identity"
         },
         "elevation": {
@@ -896,7 +971,8 @@
         },
         "dash": {
           "guide": "$atomic.dash.loose",
-          "pending": "$atomic.dash.even"
+          "pending": "$atomic.dash.even",
+          "placeholder": "$atomic.dash.wide"
         }
       }
     }
@@ -1270,7 +1346,11 @@
       }
     },
     "BrandLockup": {
-      "defaultProps": { "flightTilt": 28, "columnStagger": 1.5 }
+      "defaultProps": {
+        "flightTilt": 28,
+        "columnStagger": 1.5,
+        "flightPerspective": 1400
+      }
     },
     "Cursor": {
       "defaultProps": {
@@ -1278,7 +1358,8 @@
         "pressDepth": 0.07,
         "trailAlpha": 0.09,
         "trailLimit": 4,
-        "shadow": { "shadow": "$atomic.shadow.cursor", "color": "$black" }
+        "shadow": { "shadow": "$atomic.shadow.cursor", "color": "$black" },
+        "travelEasing": "$atomic.easing.inOutCubic"
       }
     },
     "Orb": {

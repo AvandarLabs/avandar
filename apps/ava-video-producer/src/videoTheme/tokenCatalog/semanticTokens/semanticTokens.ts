@@ -115,6 +115,10 @@ export const SEMANTIC_TOKENS = {
       "Cell corner",
       "Corner radius of table cells, slots, and other small boxes in a graphic.",
     ),
+    scene: _corner(
+      "Scene corner",
+      "Corner radius of cards, panels, captions, and media in a storyboard scene.",
+    ),
     scale: _multiplier(
       "Corner style",
       "Multiplies every corner radius, including shape-specific ones. 0 draws square corners.",
@@ -155,7 +159,13 @@ export const SEMANTIC_TOKENS = {
       kind: "dash",
       label: "Pending dash",
       description:
-        "The dash of an outline that is missing, pending, or not yet filled.",
+        "The dash of an outline still waiting on its content: a pending step or a slot about to fill.",
+    }),
+    placeholder: token({
+      kind: "dash",
+      label: "Placeholder dash",
+      description:
+        "The dash of an outline standing in for something missing or absent, such as a missing partner, an empty form, or a stencil.",
     }),
   },
   elevation: {
