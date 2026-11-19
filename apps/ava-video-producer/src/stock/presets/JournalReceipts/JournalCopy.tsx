@@ -1,18 +1,20 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { OPEN_CUE } from "./journalTiming";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Supplied state legends keep pending and acknowledged meanings explicit. */
 export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
   const captions = [
     { text: input.copy.journal, x: 480, y: 56, width: 700 },
     {
-      text: frame < 36 ? input.copy.disconnected : input.copy.reconnected,
+      text: frame < OPEN_CUE ? input.copy.disconnected : input.copy.reconnected,
       x: 480,
       y: 92,
       width: 700,
@@ -34,7 +36,7 @@ export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {
             anchor="middle"
             normalizeWhitespace
             breakLongWords
-            color={STOCK.muted}
+            color={tokens.color.textMuted}
           />
         );
       })}

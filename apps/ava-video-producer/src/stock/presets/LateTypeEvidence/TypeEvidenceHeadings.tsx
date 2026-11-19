@@ -1,5 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { TRANSFER_CUE } from "./evidenceTiming";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
 
@@ -24,7 +25,7 @@ export function TypeEvidenceHeadings({
           [input.labels.rows, 40, 558, 800, 14, 2],
         ]}
       />
-      {frame >= 101 ? (
+      {frame >= TRANSFER_CUE ? (
         <LabelSlots
           labels={[
             [
@@ -38,7 +39,7 @@ export function TypeEvidenceHeadings({
           ]}
         />
       ) : undefined}
-      <Text x={900} y={558} size={20} anchor="end">
+      <Text x={900} y={558} anchor="end">
         {input.values.length}
       </Text>
     </g>
