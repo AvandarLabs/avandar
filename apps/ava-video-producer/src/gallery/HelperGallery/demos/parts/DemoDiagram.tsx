@@ -1,4 +1,8 @@
-import { DEMO_COLORS } from "../demoTheme";
+import { SketchedShape } from "../../../../stock/primitives/SketchedShape";
+import { StockRect } from "../../../../stock/primitives/StockRect/StockRect";
+import { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
+import { useVideoTheme } from "../../../../videoTheme/useVideoTheme";
+import { useDemoColors } from "../demoTheme";
 import {
   DIAGRAM_NODE_SIZE,
   DIAGRAM_NODES,
@@ -25,25 +29,28 @@ function DiagramNode({
   y: number;
   label: string;
 }): ReactNode {
+  const { semantic, mantine, atomic } = useVideoTheme();
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
   return (
     <g
       transform={`translate(${x - DIAGRAM_NODE_SIZE.width / 2} ${y - DIAGRAM_NODE_SIZE.height / 2})`}
     >
-      <rect
+      <StockRect
         width={DIAGRAM_NODE_SIZE.width}
         height={DIAGRAM_NODE_SIZE.height}
-        rx={10}
-        fill={DEMO_COLORS.panel}
-        stroke={DEMO_COLORS.brand}
-        strokeWidth={2}
+        rx={scales.corner(semantic.corner.label)}
+        fill={colors.panel}
+        stroke={colors.brand}
+        strokeWidth={scales.stroke(semantic.stroke.default)}
       />
       <text
         x={DIAGRAM_NODE_SIZE.width / 2}
         y={DIAGRAM_NODE_SIZE.height / 2 + 7}
         textAnchor="middle"
-        fill={DEMO_COLORS.text}
-        fontSize={20}
-        fontWeight={600}
+        fill={colors.text}
+        fontSize={mantine.fontSizes["2xl"]}
+        fontWeight={atomic.fontWeight.semibold}
       >
         {label}
       </text>
@@ -56,6 +63,9 @@ function DiagramNode({
  * in the 960 by 600 coordinates those helpers default to.
  */
 export function DemoDiagram(): ReactNode {
+  const { stroke, sketch } = useVideoTheme().semantic;
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
   const labels: Record<string, string> = {
     source: "Source",
     join: "Join",
@@ -66,19 +76,17 @@ export function DemoDiagram(): ReactNode {
   };
   return (
     <g>
-      <rect width={960} height={600} fill={DEMO_COLORS.ground} />
+      <rect width={960} height={600} fill={colors.ground} />
       {EDGES.map(([from, to]) => {
         const start = findDiagramNode(from);
         const end = findDiagramNode(to);
         return (
-          <line
+          <SketchedShape
             key={`${from}-${to}`}
-            x1={start.x}
-            y1={start.y}
-            x2={end.x}
-            y2={end.y}
-            stroke={DEMO_COLORS.line}
-            strokeWidth={3}
+            shape={{ kind: "line", x1: start.x, y1: start.y, x2: end.x, y2: end.y }}
+            profile={sketch.shape}
+            stroke={colors.line}
+            strokeWidth={scales.stroke(stroke.emphasis)}
           />
         );
       })}

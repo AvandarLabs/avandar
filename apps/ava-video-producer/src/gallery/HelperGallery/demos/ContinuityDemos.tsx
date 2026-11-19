@@ -2,7 +2,10 @@ import {
   AnchoredOverlay,
   getOverlayPose,
 } from "../../../motion-components/AnchoredOverlay";
-import { getMotionProgress } from "../../../motion-components/motionSettings";
+import {
+  getMotionProgress,
+  useMotionSettingsTheme,
+} from "../../../motion-components/motionSettings";
 import { SharedElement } from "../../../motion-components/SharedElement";
 import {
   SvgObjectDeparture,
@@ -47,7 +50,15 @@ export function SharedElementDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const progress = getMotionProgress(frame, SHARE_AT, SHARE_FRAMES);
+  const settingsTheme = useMotionSettingsTheme();
+  const progress = getMotionProgress(
+    frame,
+    SHARE_AT,
+    SHARE_FRAMES,
+    undefined,
+    undefined,
+    settingsTheme,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -84,7 +95,7 @@ export function AnchoredOverlayDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const pose = getOverlayPose(frame, CUE, CELL);
+  const pose = getOverlayPose(frame, CUE, CELL, useMotionSettingsTheme());
   return (
     <HelperDemoFrame
       frame={frame}
@@ -143,7 +154,7 @@ export function ObjectDepartureDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const flight = getObjectFlight(FLIGHT, frame);
+  const flight = getObjectFlight(FLIGHT, frame, useMotionSettingsTheme());
   return (
     <HelperDemoFrame
       frame={frame}

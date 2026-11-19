@@ -18,7 +18,8 @@ function _isReducedMotionPreferred(): boolean {
 
 /**
  * The live player for a helper preview: a looping Remotion player with
- * frame controls, autoplaying unless the viewer prefers reduced motion.
+ * frame controls, autoplaying unless the viewer prefers reduced motion. It
+ * draws in the film's theme, or `classic` when the film has none.
  */
 export function HelperPlayer({
   film,
@@ -30,7 +31,7 @@ export function HelperPlayer({
       <Player
         style={PLAYER_STYLE}
         component={HelperComposition}
-        inputProps={{ helperId: film.helper }}
+        inputProps={{ helperId: film.helper, theme: film.theme }}
         compositionWidth={film.width}
         compositionHeight={film.height}
         durationInFrames={film.frames}

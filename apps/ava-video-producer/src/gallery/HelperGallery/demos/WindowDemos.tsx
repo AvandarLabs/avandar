@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { DUR, EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useWindowStage } from "../../../scenes/TiltedWindowScene/useWindowStage";
 import {
   getCarouselPoses,
   getCarouselState,
@@ -13,10 +14,8 @@ import {
 import {
   HEADLINE_BOX,
   PAIR_BOXES,
-  PAIR_TILT,
   WINDOW_BOX,
   WINDOW_BOX_TALL,
-  WINDOW_TILT,
 } from "../../../scenes/TiltedWindowScene/windowTilt";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
@@ -24,7 +23,6 @@ import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DEMO_CANVAS, DemoCanvas } from "./parts/DemoCanvas";
 import { DemoWindow } from "./parts/DemoWindow";
 import { getCanvasRect } from "./parts/getCanvasRect";
-import { RESTING_WINDOW_POSE } from "./parts/parts.constants";
 import { TiltedDemoWindow } from "./parts/TiltedDemoWindow";
 import type {
   CarouselWindow,
@@ -49,10 +47,11 @@ const WHIP_OUT = 60;
 
 /** A window whipping in from the right and out past the left edge. */
 export function WindowWhipDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const stage = useWindowStage();
   const pose =
     frame < WHIP_OUT
-      ? getWhipEntrance(frame, WHIP_IN, DEMO_CANVAS, BOX)
-      : getWhipExit(frame, WHIP_OUT, BOX);
+      ? getWhipEntrance(frame, WHIP_IN, DEMO_CANVAS, BOX, stage)
+      : getWhipExit(frame, WHIP_OUT, BOX, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -76,6 +75,7 @@ export function SideEntranceDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const stage = useWindowStage();
   const poses = PAIR.map((box, side) => {
     return getSideEntrance(
       frame,
@@ -83,6 +83,7 @@ export function SideEntranceDemo({
       side === 0 ? 0 : 1,
       DEMO_CANVAS,
       box,
+      stage,
     );
   });
   return (
@@ -105,10 +106,10 @@ export function SideEntranceDemo({
               box={box}
               pose={{
                 ...poses[side],
-                rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
+                rotateY: (side === 0 ? 1 : -1) * stage.tilt.pairRotateY,
               }}
-              perspective={PAIR_TILT.perspective}
-              rotateX={PAIR_TILT.rotateX}
+              perspective={stage.tilt.pairPerspective}
+              rotateX={stage.tilt.pairRotateX}
               rotateZ={0}
               variant={side === 0 ? 0 : 1}
             />
@@ -127,8 +128,9 @@ const CAROUSEL: CarouselWindow[] = [
 
 /** Three windows stepping through a carousel with slides. */
 export function CarouselDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const state = getCarouselState(frame, CAROUSEL);
-  const poses = getCarouselPoses(state.progress, BOX);
+  const stage = useWindowStage();
+  const state = getCarouselState(frame, CAROUSEL, stage);
+  const poses = getCarouselPoses(state.progress, BOX, stage);
   const isSliding = state.previous !== undefined;
   return (
     <HelperDemoFrame
@@ -154,7 +156,7 @@ export function CarouselDemo({ frame, frames }: HelperDemoProps): ReactNode {
         ) : null}
         <TiltedDemoWindow
           box={BOX}
-          pose={isSliding ? poses.incoming : RESTING_WINDOW_POSE}
+          pose={isSliding ? poses.incoming : getRestingPose(stage)}
           variant={state.current as 0 | 1 | 2}
         />
       </DemoCanvas>
@@ -166,7 +168,8 @@ const PULL_BACK = { kind: "pull-back", atFrame: 25 } as const;
 
 /** Full-bleed content pulling back into the window box. */
 export function PullBackDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const { rect, tilt } = getPullBack(frame, PULL_BACK, DEMO_CANVAS, BOX);
+  const stage = useWindowStage();
+  const { rect, tilt } = getPullBack(frame, PULL_BACK, DEMO_CANVAS, BOX, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -178,7 +181,7 @@ export function PullBackDemo({ frame, frames }: HelperDemoProps): ReactNode {
       ]}
     >
       <DemoCanvas>
-        <TiltedDemoWindow box={rect} pose={RESTING_WINDOW_POSE} tilt={tilt} />
+        <TiltedDemoWindow box={rect} pose={getRestingPose(stage)} tilt={tilt} />
       </DemoCanvas>
     </HelperDemoFrame>
   );
@@ -188,6 +191,7 @@ const FLIP_AT = 8;
 
 /** The pair's two windows, joined at 0 and in their own boxes at 1. */
 function SplitPair({ split }: { split: number }) {
+  const stage = useWindowStage();
   const joinedLeft = (DEMO_CANVAS.width - PAIR[0].width - PAIR[1].width) / 2;
   return PAIR.map((box, side) => {
     return (
@@ -198,12 +202,12 @@ function SplitPair({ split }: { split: number }) {
           x: mix(split, joinedLeft + side * PAIR[0].width, box.x),
         }}
         pose={{
-          ...RESTING_WINDOW_POSE,
-          rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
+          ...getRestingPose(stage),
+          rotateY: (side === 0 ? 1 : -1) * stage.tilt.pairRotateY,
         }}
         tilt={split}
-        perspective={PAIR_TILT.perspective}
-        rotateX={PAIR_TILT.rotateX}
+        perspective={stage.tilt.pairPerspective}
+        rotateX={stage.tilt.pairRotateX}
         rotateZ={0}
         variant={side === 0 ? 0 : 1}
       />
@@ -213,7 +217,8 @@ function SplitPair({ split }: { split: number }) {
 
 /** A joined card flipping in, then splitting into the pair boxes. */
 export function FlipSplitDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const flip = getFlipSplit(frame, FLIP_AT, DEMO_CANVAS.width);
+  const stage = useWindowStage();
+  const flip = getFlipSplit(frame, FLIP_AT, DEMO_CANVAS.width, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -230,7 +235,7 @@ export function FlipSplitDemo({ frame, frames }: HelperDemoProps): ReactNode {
           className={css.layer}
           style={{
             opacity: flip.opacity,
-            transform: `perspective(${PAIR_TILT.flipPerspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`,
+            transform: `perspective(${stage.tilt.flipPerspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`,
           }}
         >
           <SplitPair split={flip.split} />
@@ -250,7 +255,8 @@ export function ScrollOffsetDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const offset = getScrollOffset(frame, SCROLL_STEPS);
+  const stage = useWindowStage();
+  const offset = getScrollOffset(frame, SCROLL_STEPS, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -276,26 +282,32 @@ export function ScrollOffsetDemo({
   );
 }
 
+/** Cues of the tilt preview: into the resting tilt, then back to flat. */
+const TILT_CUES = { in: 10, out: 60 };
+
 /** A window easing from flat into the resting tilt and back. */
 export function WindowTiltDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const stage = useWindowStage();
+  const { motion } = stage;
+  const easing = motion.travel.easing;
   const tilt =
-    ramp(frame, 10, DUR.hero, EASE.inOut) *
-    (1 - ramp(frame, 60, DUR.hero, EASE.inOut));
+    motion.ramp(frame, TILT_CUES.in, motion.hero, easing) *
+    (1 - motion.ramp(frame, TILT_CUES.out, motion.hero, easing));
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`perspective(${WINDOW_TILT.perspective}px) rotateY(${WINDOW_TILT.rotateY}°) rotateX(${WINDOW_TILT.rotateX}°) rotateZ(${WINDOW_TILT.rotateZ}°)`}
+      label={`perspective(${stage.tilt.perspective}px) rotateY(${stage.tilt.rotateY}°) rotateX(${stage.tilt.rotateX}°) rotateZ(${stage.tilt.rotateZ}°)`}
       readouts={[
         { name: "tilt share", value: formatReadout(tilt) },
         {
           name: "rotateY",
-          value: `${formatReadout(WINDOW_TILT.rotateY * tilt, 1)}°`,
+          value: `${formatReadout(stage.tilt.rotateY * tilt, 1)}°`,
         },
       ]}
     >
       <DemoCanvas>
-        <TiltedDemoWindow box={BOX} pose={RESTING_WINDOW_POSE} tilt={tilt} />
+        <TiltedDemoWindow box={BOX} pose={getRestingPose(stage)} tilt={tilt} />
       </DemoCanvas>
     </HelperDemoFrame>
   );
@@ -341,6 +353,7 @@ function BoxOutlines({ activeIndex }: { activeIndex: number }) {
 
 /** Every window and headline box on the canvas, highlighted in turn. */
 export function WindowBoxesDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const stage = useWindowStage();
   const activeIndex = Math.floor(frame / 30) % NAMED_BOXES.length;
   const active = NAMED_BOXES[activeIndex];
   return (

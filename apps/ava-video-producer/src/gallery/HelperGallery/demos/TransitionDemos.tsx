@@ -4,9 +4,13 @@ import {
   HorizontalBlurFilter,
   getHorizontalBlurFilter,
 } from "../../../motion-components/HorizontalBlur";
-import { getMotionProgress } from "../../../motion-components/motionSettings";
+import {
+  getMotionProgress,
+  useMotionSettingsTheme,
+} from "../../../motion-components/motionSettings";
 import { getSceneTransitionStyle } from "../../../motion-components/SceneTransition";
 import { getShotTransitionLayers } from "../../../storyboard/StoryFilm/getShotTransitionLayers";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
@@ -42,6 +46,7 @@ function ShotBoundary(props: {
   frames: number;
 }) {
   const filterId = `shot-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const motion = useVideoMotion();
   if (props.frame < CUT_AT) {
     return <div className={clsx(css.shot, css.shotA)}>A</div>;
   }
@@ -51,6 +56,7 @@ function ShotBoundary(props: {
     previousDurationInFrames: CUT_AT,
     localFrame: props.frame - CUT_AT,
     width: SHOT_WIDTH,
+    motion,
   });
   return (
     <>
@@ -123,7 +129,15 @@ export function SceneTransitionDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const progress = getMotionProgress(frame, 15, 30);
+  const settingsTheme = useMotionSettingsTheme();
+  const progress = getMotionProgress(
+    frame,
+    15,
+    30,
+    undefined,
+    undefined,
+    settingsTheme,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -142,13 +156,13 @@ export function SceneTransitionDemo({
               <div className={clsx(css.miniFrame, css.miniFrameScene)}>
                 <div
                   className={clsx(css.shot, css.shotA)}
-                  style={getSceneTransitionStyle(progress, false, props)}
+                  style={getSceneTransitionStyle(progress, false, props, settingsTheme)}
                 >
                   A
                 </div>
                 <div
                   className={clsx(css.shot, css.shotB)}
-                  style={getSceneTransitionStyle(progress, true, props)}
+                  style={getSceneTransitionStyle(progress, true, props, settingsTheme)}
                 >
                   B
                 </div>

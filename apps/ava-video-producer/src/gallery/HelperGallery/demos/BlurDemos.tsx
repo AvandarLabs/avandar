@@ -1,31 +1,43 @@
-import { DUR, EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import {
   HorizontalBlurFilter,
   getHorizontalBlurFilter,
 } from "../../../motion-components/HorizontalBlur";
-import { getVelocityBlur } from "../../../motion-components/motionSettings";
+import {
+  getVelocityBlur,
+  useMotionSettingsTheme,
+} from "../../../motion-components/motionSettings";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
+import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCard } from "./parts/DemoCard";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
 /** How far the sliding cards travel, in pixels. */
 const TRAVEL = 600;
+/** Cues of the slide: out, then back. */
+const SLIDE_CUES = { out: 10, back: 36 };
+/** The blur radius cap, and the blur per pixel travelled in one frame. */
+const BLUR = { limit: 40, perPixel: 0.6 };
 
-/** A card sliding right, holding, then sliding back, by frame. */
-function _getSlideX(frame: number): number {
-  const out = ramp(frame, 10, DUR.sheet, EASE.inOut);
-  const back = ramp(frame, 36, DUR.sheet, EASE.inOut);
+/** A card sliding right, holding, then sliding back, on the travel curve. */
+function _getSlideX(frame: number, motion: VideoMotion): number {
+  const easing = motion.travel.easing;
+  const out = motion.ramp(frame, SLIDE_CUES.out, motion.sheet, easing);
+  const back = motion.ramp(frame, SLIDE_CUES.back, motion.sheet, easing);
   return mix(out - back, 0, TRAVEL);
 }
 
 /** Horizontal blur radius from the distance travelled since the last frame. */
-function _getBlurAmount(frame: number): number {
+function _getBlurAmount(frame: number, motion: VideoMotion): number {
   return Math.min(
-    40,
-    Math.abs(_getSlideX(frame) - _getSlideX(frame - 1)) * 0.6,
+    BLUR.limit,
+    Math.abs(_getSlideX(frame, motion) - _getSlideX(frame - 1, motion)) *
+      BLUR.perPixel,
   );
 }
 
@@ -34,8 +46,9 @@ export function HorizontalBlurDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const amount = _getBlurAmount(frame);
-  const x = _getSlideX(frame);
+  const motion = useVideoMotion();
+  const amount = _getBlurAmount(frame, motion);
+  const x = _getSlideX(frame, motion);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -76,16 +89,29 @@ export function HorizontalBlurDemo({
 }
 
 const PRESETS = ["gentle", "brisk", "whip"] as const;
+/** The move every preset row blurs: its cue, length at tempo 1, and travel. */
+const MOVE = { at: 15, frames: 24, distance: 700 };
 
 /** Velocity blur for the same move under three motion presets. */
 export function VelocityBlurDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const x = mix(ramp(frame, 15, 24, EASE.inOutCubic), 0, 700);
-  const velocity = Math.abs(
-    x - mix(ramp(frame - 1, 15, 24, EASE.inOutCubic), 0, 700),
-  );
+  const motion = useVideoMotion();
+  const settingsTheme = useMotionSettingsTheme();
+  const easing = motion.curve(useVideoTheme().atomic.easing.inOutCubic);
+  const travel = (time: number) => {
+    return mix(
+      motion.ramp(time, MOVE.at, motion.scale(MOVE.frames), easing),
+      0,
+      MOVE.distance,
+    );
+  };
+  const x = travel(frame);
+  const velocity = Math.abs(x - travel(frame - 1));
+  const blur = (preset: (typeof PRESETS)[number]) => {
+    return getVelocityBlur(velocity, { preset }, undefined, settingsTheme);
+  };
   return (
     <HelperDemoFrame
       frame={frame}
@@ -96,7 +122,7 @@ export function VelocityBlurDemo({
         ...PRESETS.map((preset) => {
           return {
             name: preset,
-            value: `${formatReadout(getVelocityBlur(velocity, { preset }))}px`,
+            value: `${formatReadout(blur(preset))}px`,
           };
         }),
       ]}
@@ -111,7 +137,7 @@ export function VelocityBlurDemo({
                   className={css.railBlock}
                   style={{
                     left: x * 0.85,
-                    filter: `blur(${getVelocityBlur(velocity, { preset }).toFixed(2)}px)`,
+                    filter: `blur(${blur(preset).toFixed(2)}px)`,
                   }}
                 />
               </div>

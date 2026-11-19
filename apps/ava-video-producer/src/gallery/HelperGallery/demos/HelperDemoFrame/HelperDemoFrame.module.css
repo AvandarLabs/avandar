@@ -11,7 +11,7 @@
 
 .header {
   align-items: center;
-  border-bottom: 1px solid var(--demo-line);
+  border-bottom: var(--demo-stroke-hairline) solid var(--demo-line);
   display: flex;
   gap: 24px;
   height: 56px;
@@ -26,7 +26,7 @@
 .label {
   color: var(--demo-accent);
   font-family: var(--demo-mono);
-  font-size: 17px;
+  font-size: var(--demo-font-size-lg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -36,7 +36,7 @@
   color: var(--demo-muted);
   flex: none;
   font-family: var(--demo-mono);
-  font-size: 15px;
+  font-size: var(--demo-font-size-sm);
   font-variant-numeric: tabular-nums;
 }
 
@@ -62,11 +62,11 @@
 .readout {
   align-items: baseline;
   background: var(--demo-panel);
-  border-radius: 6px;
+  border-radius: var(--demo-corner-span);
   display: flex;
   flex: none;
   font-family: var(--demo-mono);
-  font-size: 14px;
+  font-size: var(--demo-font-size-xs);
   gap: 8px;
   max-width: 100%;
   overflow: hidden;

@@ -1,4 +1,4 @@
-import { DEMO_COLORS } from "../demoTheme";
+import { useDemoColors } from "../demoTheme";
 import css from "./parts.module.css";
 import type { ReactNode } from "react";
 
@@ -12,12 +12,8 @@ const VARIANTS = [
 /** Stable keys of the five bars every variant draws. */
 const BAR_IDS = ["first", "second", "third", "fourth", "fifth"] as const;
 
-/** Bar colours of each window variant. */
-const VARIANT_COLORS = [
-  DEMO_COLORS.brand,
-  DEMO_COLORS.highlight,
-  DEMO_COLORS.success,
-] as const;
+/** The preview colour role each window variant's bars draw in. */
+const VARIANT_COLORS = ["brand", "highlight", "success"] as const;
 
 type Props = {
   /** Picks the body's bars and colour so neighbouring windows differ. */
@@ -30,6 +26,7 @@ type Props = {
  * place of a screenshot, so window motion reads without product content.
  */
 export function DemoWindow({ variant = 0, label }: Props): ReactNode {
+  const colors = useDemoColors();
   return (
     <div className={css.window}>
       <div className={css.titlebar}>
@@ -46,7 +43,7 @@ export function DemoWindow({ variant = 0, label }: Props): ReactNode {
               className={css.windowBar}
               style={{
                 height: `${VARIANTS[variant][index] * 70}%`,
-                background: VARIANT_COLORS[variant],
+                background: colors[VARIANT_COLORS[variant]],
               }}
             />
           );

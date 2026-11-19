@@ -1,8 +1,11 @@
+// Registers the bundled faces the theme's text roles name.
+import "../../fonts";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { AppFrame, Cursor } from "../../chrome/chrome";
 import { cursorOnTarget } from "../../cursor-motion";
-import { TYPE } from "../../fonts";
-import { DUR, EASE, countTo, mix, ramp, typed } from "../../motion";
+import { mix, typed } from "../../motion";
+import { useVideoMotion } from "../../videoTheme/useVideoMotion";
+import { useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { PromptField } from "./PromptField";
 import { PublishButton } from "./PublishButton";
 import { ResultsPanel } from "./ResultsPanel";
@@ -25,9 +28,80 @@ import {
   TYPE_AT,
   W,
 } from "./timeline";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ReactNode } from "react";
 
 export { DEMO_LEN } from "./timeline";
+
+/** Frames the app takes to fade out at the end of the clip, at tempo 1. */
+const APP_OUT_FRAMES = 20;
+/** The matched-rows figure the counter lands on before the filter. */
+const MATCHED_ALL = 1940;
+/** The matched-rows figure after the filter. */
+const MATCHED_PAID = 312;
+
+/** The counters of one frame: matched rows, the filter ramp, and the total. */
+function _counts(frame: number, motion: VideoMotion) {
+  const stateEasing = motion.reveal.easing;
+  // Two counters in sequence. The first counts up from nothing when the
+  // results land; the second travels from that value to the filtered one
+  // when the chip is clicked. A number that jumps between the two is the
+  // loudest teleport on screen, because the eye is already reading it.
+  const matched = Math.round(
+    mix(
+      motion.ramp(frame, COUNT_AT, motion.sheet, stateEasing),
+      0,
+      MATCHED_ALL,
+    ),
+  );
+  const refilter = motion.ramp(frame, REFILTER_AT, motion.sheet, stateEasing);
+  const shown =
+    frame < REFILTER_AT
+      ? matched
+      : Math.round(mix(refilter, MATCHED_ALL, MATCHED_PAID));
+
+  // The filter has to act on the thing it filters. A chip lighting up while
+  // five channels sit there untouched, Organic search among them, under a
+  // "Paid only" filter, is the clip contradicting itself, and it does it in
+  // the frame the poster gets cut from. The excluded rows dim and their bars
+  // retract; the total recounts to the paid subset.
+  const totalShown =
+    frame < REFILTER_AT
+      ? TOTAL_ALL
+      : Math.round(mix(refilter, TOTAL_ALL, TOTAL_PAID));
+  return { shown, refilter, totalShown };
+}
+
+/** The beat values of one frame: what is visible, typed, and counted. */
+function useDemoBeats(frame: number) {
+  const motion = useVideoMotion();
+  const appearEasing = motion.entrance.easing;
+  const stateEasing = motion.reveal.easing;
+
+  // The app arrives and leaves on opacity only. Never a transform on this
+  // container: it holds the whole UI, and a scale on it resamples every
+  // glyph inside. Opacity is safe: it composites.
+  const appIn = motion.ramp(frame, APP_IN, motion.sheet, appearEasing);
+  const appOut =
+    1 -
+    motion.ramp(frame, OUT_AT, motion.scale(APP_OUT_FRAMES), appearEasing);
+  const app = Math.min(appIn, appOut);
+
+  // Focus arrives on the click and leaves again on Run. A field that stays
+  // lit for the rest of the clip, caret still blinking while the pointer is
+  // across the screen pressing something else, reads as a mock-up: real
+  // software answers the pointer, and the eye knows what a focus ring means.
+  const focus =
+    motion.ramp(frame, FIELD_CLICK, motion.chip, stateEasing) *
+    (1 - motion.ramp(frame, RUN_CLICK, motion.chip, stateEasing));
+  const text = typed(frame, TYPE_AT, PROMPT, motion.typing.rate);
+  const typing = text.length > 0 && text.length < PROMPT.length;
+
+  const { shown, refilter, totalShown } = _counts(frame, motion);
+  const chipOn = motion.ramp(frame, CHIP_CLICK, motion.chip, stateEasing);
+
+  return { app, focus, text, typing, shown, refilter, totalShown, chipOn };
+}
 
 /**
  * The worked example, and the reference: to shoot a new clip, copy this
@@ -49,53 +123,24 @@ export { DEMO_LEN } from "./timeline";
  * entrance and colour change is anchored to an absolute frame, and they are
  * tuned against each other: the pointer arrives before it clicks, the panel
  * answers after the click, the counter finishes before the eye leaves it.
+ *
+ * Colour, type, and timing come from the video theme: the scene palette, the
+ * app text roles, and themed motion. Draw it inside a theme (`starter` in
+ * Remotion Studio, the film's theme in the showcase).
  */
 export function Demo(): ReactNode {
   const frame = useCurrentFrame();
-
-  // The app arrives and leaves on opacity only. Never a transform on this
-  // container: it holds the whole UI, and a scale on it resamples every
-  // glyph inside. Opacity is safe: it composites.
-  const appIn = ramp(frame, APP_IN, DUR.sheet, EASE.out);
-  const appOut = 1 - ramp(frame, OUT_AT, 20, EASE.out);
-  const app = Math.min(appIn, appOut);
-
-  // Focus arrives on the click and leaves again on Run. A field that stays
-  // lit for the rest of the clip, caret still blinking while the pointer is
-  // across the screen pressing something else, reads as a mock-up: real
-  // software answers the pointer, and the eye knows what a focus ring means.
-  const focus =
-    ramp(frame, FIELD_CLICK, DUR.chip) * (1 - ramp(frame, RUN_CLICK, DUR.chip));
-  const text = typed(frame, TYPE_AT, PROMPT);
-  const typing = text.length > 0 && text.length < PROMPT.length;
-
-  // Two counters in sequence. The first counts up from nothing when the
-  // results land; the second travels from that value to the filtered one
-  // when the chip is clicked. A number that jumps between the two is the
-  // loudest teleport on screen, because the eye is already reading it.
-  const matched = countTo(frame, COUNT_AT, 1940);
-  const refilter = ramp(frame, REFILTER_AT, DUR.sheet);
-  const shown =
-    frame < REFILTER_AT ? matched : Math.round(mix(refilter, 1940, 312));
-
-  // The filter has to act on the thing it filters. A chip lighting up while
-  // five channels sit there untouched, Organic search among them, under a
-  // "Paid only" filter, is the clip contradicting itself, and it does it in
-  // the frame the poster gets cut from. The excluded rows dim and their bars
-  // retract; the total recounts to the paid subset.
-  const totalShown =
-    frame < REFILTER_AT
-      ? TOTAL_ALL
-      : Math.round(mix(refilter, TOTAL_ALL, TOTAL_PAID));
-  const chipOn = ramp(frame, CHIP_CLICK, DUR.chip);
+  const tokens = useVideoTokens();
+  const { app, focus, text, typing, shown, refilter, totalShown, chipOn } =
+    useDemoBeats(frame);
 
   return (
-    <AbsoluteFill style={{ background: "var(--ground)" }}>
+    <AbsoluteFill style={{ background: tokens.color.scene.ground }}>
       <AbsoluteFill
         style={{
-          background: "var(--background)",
-          fontFamily: TYPE,
-          color: "var(--foreground)",
+          background: tokens.color.scene.background,
+          fontFamily: tokens.text.stage.appBody.fontFamily,
+          color: tokens.color.scene.foreground,
           opacity: app,
         }}
       >

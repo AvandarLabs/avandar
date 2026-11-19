@@ -1,5 +1,5 @@
-import { DUR, STAGGER, STAGGER_COLUMN, enter } from "../../../motion";
 import { getColumnWipeProgress } from "../../../storyboard/StoryFilm/steppedColumnWipe";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { getElapsed, START } from "./getElapsed";
@@ -11,14 +11,19 @@ import type { ReactNode } from "react";
 
 const SIBLINGS = ["first", "second", "third", "fourth", "fifth", "sixth"];
 
-/** Six siblings starting `STAGGER` frames apart, each lasting a panel. */
+/**
+ * Six siblings starting the theme's list stagger apart (`STAGGER` in
+ * `classic`), each lasting a panel.
+ */
 export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
+  const stagger = motion.stagger.list;
   const elapsed = getElapsed(frame);
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`enter(frame, ${START} + index * STAGGER)  STAGGER = ${STAGGER}`}
+      label={`enter(frame, ${START} + index * STAGGER)  STAGGER = ${formatReadout(stagger, 1)}`}
       readouts={[{ name: "elapsed", value: `${elapsed}f` }]}
     >
       <div className={css.timeline}>
@@ -27,13 +32,13 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
             <div key={name} className={css.timelineRow}>
               <span
                 className={css.timelineName}
-                style={enter(frame, START + index * STAGGER)}
+                style={motion.enter(frame, START + index * stagger)}
               >
-                {`index ${index} @ ${index * STAGGER}f`}
+                {`index ${index} @ ${formatReadout(index * stagger, 1)}f`}
               </span>
               <TimelineTrack
-                startFrame={index * STAGGER}
-                frames={DUR.panel}
+                startFrame={index * stagger}
+                frames={motion.panel}
                 elapsed={elapsed}
               />
             </div>
@@ -46,21 +51,31 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
 }
 
 const COLUMNS = 8;
+/** Stable keys of the wipe's columns. */
+const COLUMN_IDS = Array.from({ length: COLUMNS }, (_, position) => {
+  return `column-${position}`;
+});
 /** Frames the whole stepped wipe takes in this preview. */
 const WIPE_FRAMES = 12;
 
-/** Eight columns rising `STAGGER_COLUMN` frames apart, at sub-frame offsets. */
+/**
+ * Eight columns rising the theme's column stagger apart (`STAGGER_COLUMN`
+ * in `classic`), at sub-frame offsets.
+ */
 export function StaggerColumnDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
+  const stagger = motion.stagger.column;
   const progress = getColumnWipeProgress(
     Math.max(0, frame - START),
-    WIPE_FRAMES,
+    motion.scale(WIPE_FRAMES),
     {
       columns: COLUMNS,
-      staggerFrames: STAGGER_COLUMN,
+      staggerFrames: stagger,
     },
+    motion,
   );
   return (
     <HelperDemoFrame
@@ -68,7 +83,7 @@ export function StaggerColumnDemo({
       frames={frames}
       label={`getColumnWipeProgress(frame, ${WIPE_FRAMES}, { columns: ${COLUMNS}, staggerFrames: STAGGER_COLUMN })`}
       readouts={[
-        { name: "STAGGER_COLUMN", value: String(STAGGER_COLUMN) },
+        { name: "STAGGER_COLUMN", value: formatReadout(stagger) },
         { name: "first", value: formatReadout(progress[0]) },
         { name: "last", value: formatReadout(progress[COLUMNS - 1]) },
       ]}
@@ -77,7 +92,7 @@ export function StaggerColumnDemo({
         {progress.map((columnProgress, index) => {
           return (
             <div
-              key={`column-${index * STAGGER_COLUMN}`}
+              key={COLUMN_IDS[index]}
               className={css.columnCell}
             >
               <div className={css.columnTrack}>
@@ -88,7 +103,7 @@ export function StaggerColumnDemo({
               </div>
               <span
                 className={css.caption}
-              >{`${index * STAGGER_COLUMN}f`}</span>
+              >{`${formatReadout(index * stagger, 1)}f`}</span>
             </div>
           );
         })}

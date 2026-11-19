@@ -4,6 +4,7 @@ import {
   getMotionProgress,
   MOTION_PRESETS,
   resolveMotionSettings,
+  useMotionSettingsTheme,
 } from "../../../motion-components/motionSettings";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
@@ -46,6 +47,7 @@ export function MotionPresetsDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const settingsTheme = useMotionSettingsTheme();
   return (
     <HelperDemoFrame
       frame={frame}
@@ -55,14 +57,21 @@ export function MotionPresetsDemo({
     >
       <div className={css.timeline}>
         {PRESETS.map((preset) => {
-          const progress = getMotionProgress(frame, 10, AUTHORED_FRAMES, {
-            preset,
-          });
-          const settings = resolveMotionSettings({ preset });
+          const progress = getMotionProgress(
+            frame,
+            10,
+            AUTHORED_FRAMES,
+            { preset },
+            undefined,
+            settingsTheme,
+          );
+          const settings = resolveMotionSettings({ preset }, settingsTheme);
           return (
             <div key={preset} className={css.timelineRow}>
               <span className={css.timelineName}>
-                {preset} · {getMotionDuration(AUTHORED_FRAMES, { preset })}f ·{" "}
+                {preset} ·{" "}
+                {getMotionDuration(AUTHORED_FRAMES, { preset }, settingsTheme)}f
+                ·{" "}
                 {settings.shutterAngle}°
               </span>
               <div className={css.rail}>

@@ -1,25 +1,25 @@
 .card {
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 10px;
   height: 96px;
-  padding: 16px 18px;
+  padding: var(--demo-space-2xs) 18px;
   width: 240px;
 }
 
 .cardTitle {
   color: var(--demo-text);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-xl);
+  font-weight: var(--demo-font-weight-semibold);
 }
 
 .cardBar {
   background: var(--demo-line);
-  border-radius: 4px;
+  border-radius: var(--demo-corner-chip);
   height: 10px;
 }
 
@@ -32,8 +32,8 @@
 
 .window {
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@
 
 .titlebarDot {
   background: var(--demo-line);
-  border-radius: 50%;
+  border-radius: var(--demo-corner-pill);
   height: 8px;
   width: 8px;
 }
@@ -70,18 +70,20 @@
 
 .windowLabel {
   color: var(--demo-text);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-2xl);
+  font-weight: var(--demo-font-weight-semibold);
   left: 10%;
   position: absolute;
   top: 10%;
 }
 
 .windowBar {
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--demo-corner-chip) var(--demo-corner-chip) 0 0;
   flex: 1;
 }
 
+/* The plot also draws in the theme editor, outside a helper preview, where
+ * the stroke and dash fallbacks apply. */
 .plot {
   overflow: visible;
 }
@@ -89,28 +91,28 @@
 .plotAxis {
   fill: none;
   stroke: var(--demo-line);
-  stroke-width: 1.5;
+  stroke-width: var(--demo-stroke-outline, 1.5);
 }
 
 .plotGuide {
   fill: none;
   stroke: var(--demo-line);
-  stroke-dasharray: 4 6;
-  stroke-width: 1;
+  stroke-dasharray: var(--demo-dash-guide, 4 6);
+  stroke-width: var(--demo-stroke-hairline, 1);
 }
 
 .plotCurve {
   fill: none;
   stroke: var(--demo-accent);
   stroke-linecap: round;
-  stroke-width: 3;
+  stroke-width: var(--demo-stroke-emphasis, 3);
 }
 
 .plotTrail {
   fill: none;
   stroke: var(--demo-brand);
   stroke-linecap: round;
-  stroke-width: 5;
+  stroke-width: var(--demo-stroke-trail, 5);
 }
 
 .plotDot {
@@ -120,7 +122,7 @@
 .plotHandle {
   fill: none;
   stroke: var(--demo-muted);
-  stroke-width: 1.5;
+  stroke-width: var(--demo-stroke-outline, 1.5);
 }
 
 .plotHandlePoint {
@@ -130,12 +132,12 @@
 .plotText {
   fill: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 13px;
+  font-size: var(--demo-font-size-2xs);
 }
 
 .canvas {
   background: var(--demo-ground);
-  border: 1px dashed var(--demo-line);
+  border: var(--demo-stroke-hairline) dashed var(--demo-line);
   height: 400px;
   left: calc(50% - 320px);
   overflow: hidden;

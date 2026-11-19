@@ -3,15 +3,21 @@ import {
   isCameraMoving,
 } from "../../../motion-components/cameraTrack";
 import { DiagramCamera } from "../../../motion-components/DiagramCamera";
-import { getWindowCamera } from "../../../scenes/TiltedWindowScene/windowMotion";
+import { useMotionSettingsTheme } from "../../../motion-components/motionSettings";
+import { useWindowStage } from "../../../scenes/TiltedWindowScene/useWindowStage";
+import {
+  getRestingPose,
+  getWindowCamera,
+} from "../../../scenes/TiltedWindowScene/windowMotion";
 import { WINDOW_BOX } from "../../../scenes/TiltedWindowScene/windowTilt";
+import { StockRect } from "../../../stock/primitives/StockRect/StockRect";
+import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
 import css from "./demos.module.css";
-import { DEMO_COLORS, formatReadout } from "./demoTheme";
+import { formatReadout, useDemoColors } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCanvas } from "./parts/DemoCanvas";
 import { DemoDiagram } from "./parts/DemoDiagram";
 import { getCanvasRect } from "./parts/getCanvasRect";
-import { RESTING_WINDOW_POSE } from "./parts/parts.constants";
 import { TiltedDemoWindow } from "./parts/TiltedDemoWindow";
 import type { CameraKeyframe } from "../../../motion-components/cameraTrack";
 import type { WindowCameraKey } from "../../../scenes/TiltedWindowScene/windowMotion";
@@ -26,6 +32,8 @@ const TRACK: CameraKeyframe[] = [
   { at: 90, x: 470, y: 180, zoom: 2.2 },
   { at: 125, x: 480, y: 300, zoom: 1 },
 ];
+/** The viewport outline's width on the 960 by 600 overview, in pixels. */
+const VIEWPORT_STROKE = 8;
 
 /** The camera's viewBox on the 960 by 600 diagram. */
 function _getViewBox(pose: { x: number; y: number; zoom: number }): string {
@@ -36,7 +44,17 @@ function _getViewBox(pose: { x: number; y: number; zoom: number }): string {
 
 /** An overview with the camera's viewport beside what the camera sees. */
 export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const pose = getCameraPose(TRACK, frame);
+  const settingsTheme = useMotionSettingsTheme();
+  const scales = useVideoShapeScales();
+  const { highlight } = useDemoColors();
+  const pose = getCameraPose(
+    TRACK,
+    frame,
+    true,
+    undefined,
+    undefined,
+    settingsTheme,
+  );
   const viewWidth = 960 / pose.zoom;
   const viewHeight = 600 / pose.zoom;
   return (
@@ -48,20 +66,23 @@ export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
         { name: "x", value: formatReadout(pose.x, 1) },
         { name: "y", value: formatReadout(pose.y, 1) },
         { name: "zoom", value: formatReadout(pose.zoom) },
-        { name: "moving", value: String(isCameraMoving(TRACK, frame)) },
+        {
+          name: "moving",
+          value: String(isCameraMoving(TRACK, frame, undefined, settingsTheme)),
+        },
       ]}
     >
       <div className={css.row}>
         <svg viewBox="0 0 960 600" width={320} height={200} aria-hidden="true">
           <DemoDiagram />
-          <rect
+          <StockRect
             x={pose.x - viewWidth / 2}
             y={pose.y - viewHeight / 2}
             width={viewWidth}
             height={viewHeight}
             fill="none"
-            stroke={DEMO_COLORS.highlight}
-            strokeWidth={8}
+            stroke={highlight}
+            strokeWidth={scales.stroke(VIEWPORT_STROKE)}
           />
         </svg>
         <svg
@@ -82,6 +103,16 @@ export function DiagramCameraDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const settingsTheme = useMotionSettingsTheme();
+  const pose = getCameraPose(
+    TRACK,
+    frame,
+    true,
+    undefined,
+    undefined,
+    settingsTheme,
+  );
+  const isMoving = isCameraMoving(TRACK, frame, undefined, settingsTheme);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -90,11 +121,11 @@ export function DiagramCameraDemo({
       readouts={[
         {
           name: "zoom",
-          value: formatReadout(getCameraPose(TRACK, frame).zoom),
+          value: formatReadout(pose.zoom),
         },
         {
           name: "blur",
-          value: isCameraMoving(TRACK, frame) ? "shutter open" : "at rest",
+          value: isMoving ? "shutter open" : "at rest",
         },
       ]}
     >
@@ -126,8 +157,9 @@ export function WindowCameraDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const stage = useWindowStage();
   const box = getCanvasRect(WINDOW_BOX);
-  const lens = getWindowCamera(frame, WINDOW_KEYS, box);
+  const lens = getWindowCamera(frame, WINDOW_KEYS, box, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -152,7 +184,7 @@ export function WindowCameraDemo({
         >
           <TiltedDemoWindow
             box={box}
-            pose={{ ...RESTING_WINDOW_POSE, blurX: lens.blurX }}
+            pose={{ ...getRestingPose(stage), blurX: lens.blurX }}
           />
         </div>
       </DemoCanvas>
