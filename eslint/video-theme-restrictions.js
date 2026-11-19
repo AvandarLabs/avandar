@@ -126,4 +126,7 @@ export const videoThemeRestrictions = _readBudgets()
   .filter((budget) => {
     return budget.enforceLint;
   })
-  .map(_restrictionFromBudget);
+  .map(_restrictionFromBudget)
+  .filter((restriction) => {
+    return restriction.files.length > 0;
+  });
