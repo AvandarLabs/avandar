@@ -5,9 +5,9 @@
  */
 .contrastBadge {
   color: var(--ink);
-  font-size: 10px;
+  font-size: var(--atlas-font-size-10);
 }
 
 .contrastBadgeFail {
-  color: color-mix(in srgb, var(--mantine-color-red-9) 70%, var(--ink));
+  color: var(--atlas-color-danger-muted);
 }

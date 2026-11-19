@@ -1,10 +1,10 @@
 .downloadButton {
   background: var(--ava-primary-7);
   border: 0;
-  border-radius: 5px;
-  color: #fff;
+  border-radius: var(--atlas-radius-5);
+  color: var(--atlas-color-white);
   cursor: pointer;
-  padding: 12px 18px;
+  padding: var(--atlas-space-12) var(--atlas-space-18);
 }
 
 .downloadButton:disabled {

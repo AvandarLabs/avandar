@@ -2,12 +2,12 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--atlas-space-6);
 }
 
 .optionRowChip {
-  border: 1px solid var(--line);
-  border-radius: 3px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-3);
   display: inline-block;
   flex: 0 0 auto;
   height: 12px;

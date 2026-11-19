@@ -7,7 +7,7 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--atlas-space-8);
 }
 
 .themeActionsCopyJson {

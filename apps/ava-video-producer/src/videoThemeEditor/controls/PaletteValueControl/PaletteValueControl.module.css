@@ -1,5 +1,5 @@
 .paletteValueGrid {
   display: grid;
-  gap: 4px;
+  gap: var(--atlas-space-4);
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }

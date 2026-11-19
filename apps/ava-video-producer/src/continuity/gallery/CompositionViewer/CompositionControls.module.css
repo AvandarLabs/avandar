@@ -4,25 +4,25 @@
 
 .transport {
   align-items: center;
-  background: var(--paper, #fff);
-  border: 1px solid var(--line);
-  border-radius: 7px;
+  background: var(--paper, var(--atlas-color-white));
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-7);
   color: var(--ink);
   display: flex;
   flex-wrap: wrap;
-  font-size: 12px;
-  gap: 12px 18px;
-  padding: 16px;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-12) var(--atlas-space-18);
+  padding: var(--atlas-space-16);
 }
 
 .transport > button {
   background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 5px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-5);
   color: inherit;
   cursor: pointer;
   font: inherit;
-  padding: 8px 12px;
+  padding: var(--atlas-space-8) var(--atlas-space-12);
 }
 
 .transport > button:hover {
@@ -32,7 +32,7 @@
 .transport label {
   align-items: center;
   display: flex;
-  gap: 7px;
+  gap: var(--atlas-space-7);
 }
 
 .transport input {
@@ -40,44 +40,44 @@
 }
 
 .transport :focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 3px;
+  outline: var(--atlas-border-2) solid var(--ava-primary-7);
+  outline-offset: var(--atlas-space-3);
 }
 
 .help {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.5;
-  margin: -10px 0 18px;
+  margin: calc(var(--atlas-space-10) * -1) 0 var(--atlas-space-18);
 }
 
 @media (width <= 600px) {
   .transport {
-    gap: 12px;
+    gap: var(--atlas-space-12);
   }
 
   .transport label {
-    flex: 1 1 130px;
+    flex: 1 1 var(--atlas-size-130);
   }
 }
 
 :global(dialog:modal) .transport {
-  gap: 10px 14px;
-  padding: 10px;
+  gap: var(--atlas-space-10) var(--atlas-space-14);
+  padding: var(--atlas-space-10);
 }
 
 :global(dialog:modal) .transport > button {
-  padding: 6px 8px;
+  padding: var(--atlas-space-6) var(--atlas-space-8);
 }
 
 :global(dialog:modal) .help {
-  font-size: 11px;
-  margin: 0 0 10px;
+  font-size: var(--atlas-font-size-11);
+  margin: 0 0 var(--atlas-space-10);
 }
 
 @media (width <= 800px) {
   :global(dialog:modal) .transport {
-    gap: 6px 10px;
+    gap: var(--atlas-space-6) var(--atlas-space-10);
   }
 
   :global(dialog:modal) .transport label {
@@ -91,5 +91,5 @@
 
 .transport :global(.mantine-Checkbox-label) {
   color: var(--ink);
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
 }

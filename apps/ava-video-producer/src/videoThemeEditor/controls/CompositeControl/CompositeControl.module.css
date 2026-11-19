@@ -1,7 +1,7 @@
 .composite {
   border: 0;
   display: grid;
-  gap: 8px;
+  gap: var(--atlas-space-8);
   margin: 0;
   min-width: 0;
   padding: 0;

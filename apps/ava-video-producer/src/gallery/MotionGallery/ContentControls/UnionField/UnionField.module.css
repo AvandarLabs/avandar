@@ -1,13 +1,13 @@
 .unionFieldVariant {
   background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-4);
   box-sizing: border-box;
   caret-color: var(--ink);
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   min-width: 0;
-  padding: 9px;
+  padding: var(--atlas-space-9);
   width: 100%;
 }

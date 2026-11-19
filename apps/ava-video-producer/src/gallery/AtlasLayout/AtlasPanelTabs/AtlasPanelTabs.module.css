@@ -8,7 +8,7 @@
  * tab list sticks just below it.
  */
 .atlasPanelTabsRoot {
-  --atlas-panel-tabs-height: 40px;
+  --atlas-panel-tabs-height: var(--atlas-size-40);
 
   background: var(--white);
   min-block-size: 0;
@@ -29,7 +29,7 @@
   block-size: var(--atlas-panel-tabs-height);
   inset-block-start: var(--atlas-pin-offset, 0);
   position: sticky;
-  z-index: 3;
+  z-index: var(--atlas-layer-3);
 }
 
 .atlasPanelTabsTab {
@@ -39,8 +39,8 @@
 
 /* The gallery's focus ring, drawn inside the tab so the list does not clip it. */
 .atlasPanelTabsTab:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: -2px;
+  outline: var(--atlas-border-2) solid var(--ava-primary-7);
+  outline-offset: calc(var(--atlas-space-2) * -1);
 }
 
 .atlasPanelTabsPanel {
