@@ -1,6 +1,7 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { getClosedInteriorEncounterFromSegments } from "./getClosedInteriorEncounterFromSegments";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ConvoyRouteDetour.schema";
 
 type Point = { x: number; y: number };
@@ -73,7 +74,12 @@ type GetConvoyJourneyResult = {
 export function getConvoyJourneyFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetConvoyJourneyResult {
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): GetConvoyJourneyResult {
   const blocked = input.routes.find(({ role }) => {
     return role === "blocked";
   })!.points;
@@ -88,26 +94,39 @@ export function getConvoyJourneyFromInputAndFrame({
       : [...prefix.slice(1)].reverse();
   const point =
     frame < 60
-      ? _getPoint({ points: prefix, progress: ramp(frame, 22, 28, EASE.inOut) })
+      ? _getPoint({
+          points: prefix,
+          progress: motion.ramp(
+            frame,
+            22,
+            motion.scale(28),
+            motion.travel.easing,
+          ),
+        })
       : frame < 78
         ? _getPoint({
             points: returning,
-            progress: ramp(frame, 60, 18, EASE.inOut),
+            progress: motion.ramp(frame, 60, motion.hero, motion.travel.easing),
           })
         : _getPoint({
             points: detour.slice(1),
-            progress: ramp(frame, 78, 46, EASE.inOut),
+            progress: motion.ramp(
+              frame,
+              78,
+              motion.scale(46),
+              motion.travel.easing,
+            ),
           });
   const incomingHeading = _getHeading({
     points: frame < 60 ? prefix : returning,
     progress:
       frame < 60
-        ? ramp(frame, 22, 28, EASE.inOut)
-        : ramp(frame, 60, 18, EASE.inOut),
+        ? motion.ramp(frame, 22, motion.scale(28), motion.travel.easing)
+        : motion.ramp(frame, 60, motion.hero, motion.travel.easing),
   });
   const detourHeading = _getHeading({
     points: detour.slice(1),
-    progress: ramp(frame, 78, 46, EASE.inOut),
+    progress: motion.ramp(frame, 78, motion.scale(46), motion.travel.easing),
   });
   const turn =
     ((detourHeading - incomingHeading + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -115,7 +134,8 @@ export function getConvoyJourneyFromInputAndFrame({
     heading:
       frame >= 78
         ? detourHeading
-        : incomingHeading + turn * ramp(frame, 72, 6, EASE.inOut),
+        : incomingHeading +
+          turn * motion.ramp(frame, 72, motion.chip, motion.travel.easing),
     x: 80 + point.x * 800,
     y: 180 + point.y * 280,
     phase: frame < 60 ? "approach" : frame < 78 ? "reverse" : "detour",

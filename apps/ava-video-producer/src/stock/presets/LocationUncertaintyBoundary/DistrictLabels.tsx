@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -11,6 +15,9 @@ export function DistrictLabels({
   frame,
   focus,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.districts.map((district, index) => {
@@ -20,19 +27,25 @@ export function DistrictLabels({
             data-possible-district={
               focus.possible.includes(index) ? district.id : undefined
             }
-            transform={`translate(0 ${focus.possible.includes(index) ? -8 * ramp(frame, 60, 36) : 0})`}
+            transform={`translate(0 ${focus.possible.includes(index) ? -8 * motion.ramp(frame, 60, motion.scale(36)) : 0})`}
           >
-            <path
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: focus.possible.includes(index)
+                  ? `M918 ${124 + index * 40}l4 4 8-10`
+                  : `M918 ${124 + index * 40}h12`,
+              }}
+              profile={tokens.sketch.shape}
               data-possibility={district.id}
               data-is-possible={focus.possible.includes(index)}
-              d={
-                focus.possible.includes(index)
-                  ? `M918 ${124 + index * 40}l4 4 8-10`
-                  : `M918 ${124 + index * 40}h12`
-              }
               fill="none"
-              stroke={focus.possible.includes(index) ? STOCK.mint : STOCK.muted}
-              strokeWidth={2}
+              stroke={
+                focus.possible.includes(index)
+                  ? tokens.color.positive
+                  : tokens.color.inactive
+              }
+              strokeWidth={scales.stroke(tokens.stroke.default)}
             />
             <LabelSlots
               labels={[

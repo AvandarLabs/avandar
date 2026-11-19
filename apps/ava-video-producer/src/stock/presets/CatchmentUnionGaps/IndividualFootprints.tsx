@@ -1,15 +1,24 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; progress: number; accent: string };
+const FOOTPRINT_WIDTH = 1.4;
+/** Each footprint keeps its own dash so overlapping outlines stay distinct. */
+const FOOTPRINT_DASHES = ["1 0", "6 4", "2 4", "10 3 2 3"];
 /** Each original service footprint retains its authored outline toggle. */
 export function IndividualFootprints({
   input,
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const shapes = getCatchmentShapesFromInput(input);
   return (
     <g>
@@ -19,8 +28,15 @@ export function IndividualFootprints({
             <polygon
               key={shape.id}
               points={shape.points}
-              fill={[accent, STOCK.cyan, STOCK.orange, STOCK.mint][index]}
-              fillOpacity={0.25}
+              fill={
+                [
+                  accent,
+                  tokens.color.accentAlt,
+                  tokens.color.highlight,
+                  tokens.color.positive,
+                ][index]
+              }
+              fillOpacity={tokens.alpha.ghost}
             />
           );
         })}
@@ -31,13 +47,21 @@ export function IndividualFootprints({
       >
         {shapes.map((shape, index) => {
           return (
-            <polygon
+            <SketchedShape
               key={shape.id}
-              points={shape.points}
+              shape={{ kind: "path", d: `M${shape.points}Z` }}
+              profile={tokens.sketch.shape}
               fill="none"
-              stroke={[accent, STOCK.cyan, STOCK.orange, STOCK.mint][index]}
-              strokeWidth={1.4}
-              strokeDasharray={["1 0", "6 4", "2 4", "10 3 2 3"][index]}
+              stroke={
+                [
+                  accent,
+                  tokens.color.accentAlt,
+                  tokens.color.highlight,
+                  tokens.color.positive,
+                ][index]
+              }
+              strokeWidth={scales.stroke(FOOTPRINT_WIDTH)}
+              strokeDasharray={FOOTPRINT_DASHES[index]}
             />
           );
         })}

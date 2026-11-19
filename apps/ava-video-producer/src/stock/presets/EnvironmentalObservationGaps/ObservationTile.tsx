@@ -1,6 +1,11 @@
-import { ramp, mix, EASE } from "../../../motion";
+import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import { ObservationCell } from "./ObservationCell";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
@@ -17,9 +22,12 @@ export function ObservationTile({
   id,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const { cells, checks } = makeObservationLayoutFromInput(input);
-  const lift = ramp(frame, 36, 20, EASE.inOut),
-    unfold = ramp(frame, 16, 18, EASE.inOut);
+  const lift = motion.ramp(frame, 36, motion.scale(20), motion.travel.easing),
+    unfold = motion.ramp(frame, 16, motion.hero, motion.travel.easing);
   const patternId = `${id}-missing-hatch`;
   return (
     <g opacity={unfold} transform={`translate(0 ${mix(unfold, 12, 0)})`}>
@@ -30,10 +38,14 @@ export function ObservationTile({
           height={8}
           patternUnits="userSpaceOnUse"
         >
-          <path
-            d="M -2 2 L 2 -2 M 0 8 L 8 0 M 6 10 L 10 6"
-            stroke={STOCK.muted}
-            strokeWidth={1}
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: "M -2 2 L 2 -2 M 0 8 L 8 0 M 6 10 L 10 6",
+            }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.inactive}
+            strokeWidth={scales.stroke(tokens.stroke.hairline)}
           />
         </pattern>
       </defs>
@@ -58,29 +70,37 @@ export function ObservationTile({
           y={105}
           width={650}
           height={300}
-          rx={18}
-          fill={STOCK.elevated}
+          rx={scales.corner(tokens.corner.panel)}
+          fill={tokens.color.elevated}
         />
-        <path
-          d="M 285 170 Q 350 130 415 170 T 675 170 T 905 170 M 285 290 Q 350 250 415 290 T 675 290 T 905 290"
-          stroke={STOCK.muted}
-          strokeWidth={12}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: "M 285 170 Q 350 130 415 170 T 675 170 T 905 170 M 285 290 Q 350 250 415 290 T 675 290 T 905 290",
+          }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(12)}
           fill="none"
         />
       </g>
       {checks.map((check, index) => {
         return frame >= 70 + index * 18 ? (
           <g key={check.id}>
-            <circle
+            <SketchedShape
+              shape={{ kind: "circle", cx: check.x, cy: check.y, r: 5 }}
+              profile={tokens.sketch.shape}
               data-point-check={check.id}
-              cx={check.x}
-              cy={check.y}
-              r={5}
-              fill={STOCK.orange}
-              stroke={STOCK.ground}
-              strokeWidth={1}
+              fill={tokens.color.highlight}
+              stroke={tokens.color.ground}
+              strokeWidth={scales.stroke(tokens.stroke.hairline)}
             />
-            <Text x={check.x + 8} y={check.y + 4} size={12} fill={STOCK.orange}>
+            <Text
+              x={check.x + 8}
+              y={check.y + 4}
+              role="data"
+              fill={tokens.color.highlight}
+            >
               {check.key}
             </Text>
           </g>

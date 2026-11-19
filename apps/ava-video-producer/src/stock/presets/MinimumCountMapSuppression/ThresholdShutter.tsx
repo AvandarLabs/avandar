@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -21,23 +25,31 @@ export function ThresholdShutter({
   index,
   isSuppressed,
 }: Readonly<Props>): ReactNode {
-  const shutter = isSuppressed ? ramp(frame, 51 + index * 4, 34) : 0;
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const shutter = isSuppressed
+    ? motion.ramp(frame, 51 + index * 4, motion.scale(34))
+    : 0;
   return (
     <g>
-      <rect
+      <StockRect
         data-threshold-shutter={cellId}
         x={x + 174}
         y={y + 56}
         width={14}
         height={30 * shutter}
-        fill={STOCK.surface}
-        stroke={STOCK.orange}
+        fill={tokens.color.surface}
+        stroke={tokens.color.highlight}
         strokeOpacity={shutter}
       />
-      <path
-        d={`M${x + 176} ${y + 58} l10 ${26 * shutter} M${x + 186} ${y + 58} l-10 ${26 * shutter}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 176} ${y + 58} l10 ${26 * shutter} M${x + 186} ${y + 58} l-10 ${26 * shutter}`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.orange}
+        stroke={tokens.color.highlight}
         opacity={shutter}
       />
     </g>

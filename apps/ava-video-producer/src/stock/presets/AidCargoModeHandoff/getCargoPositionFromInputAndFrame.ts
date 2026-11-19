@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getCarrierPositionFromInputAndFrame } from "./getCarrierPositionFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./AidCargoModeHandoff.schema";
 /** Data for getCargoPositionFromInputAndFrame. */
 type GetCargoPositionResult = {
@@ -17,22 +18,31 @@ export function getCargoPositionFromInputAndFrame({
   frame,
   input,
   parcelIndex,
+  motion,
 }: Readonly<{
   frame: number;
   input: Input;
   parcelIndex: number;
+  motion: VideoMotion;
 }>): GetCargoPositionResult {
   const offset = (parcelIndex - (input.parcels.length - 1) / 2) * 42;
   const boundary =
     input.carriers.length === 3 && frame >= 84 + parcelIndex * 2 ? 1 : 0;
   const start = (boundary === 0 ? 36 : 84) + parcelIndex * 2;
-  const travel = ramp(frame, start, 20, EASE.inOut);
+  const travel = motion.ramp(
+    frame,
+    start,
+    motion.scale(20),
+    motion.travel.easing,
+  );
   const source = getCarrierPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     index: boundary,
   });
   const receiver = getCarrierPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     index: boundary + 1,

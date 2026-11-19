@@ -1,4 +1,4 @@
-import { EASE, ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CatchmentGeometry } from "./CatchmentGeometry";
 import { CatchmentRoster } from "./CatchmentRoster";
 import { CatchmentSummary } from "./CatchmentSummary";
@@ -17,7 +17,13 @@ export function CatchmentUnionGaps({
   id,
   input,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36, 72, EASE.inOut);
+  const motion = useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    36,
+    motion.scale(72),
+    motion.travel.easing,
+  );
   return (
     <g>
       <CatchmentGeometry

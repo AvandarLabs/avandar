@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 /** Inputs for LampObject. */
 type Props = { functioning: number; accent: string };
@@ -8,27 +13,33 @@ export function LampObject({
   functioning,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        d="M425 404 H565 M495 402 V284 L540 251 L570 281 L520 297 Z"
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeWidth={5}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M425 404 H565 M495 402 V284 L540 251 L570 281 L520 297 Z",
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(5)}
       />
       <path
         data-light="authored"
         d="M522 300 L440 388 H610 L565 295 Z"
-        fill={STOCK.orange}
+        fill={tokens.color.highlight}
         opacity={functioning * 0.35}
       />
-      <rect
+      <StockRect
         x={550}
         y={318}
         width={24}
         height={24}
-        rx={4}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
     </g>

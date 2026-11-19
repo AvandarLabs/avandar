@@ -197,7 +197,7 @@ test("coincident locations retain separate visible keys with actual map connecto
   };
   const markup = _render({ frame: 150, input: input });
   const connectors = [
-    ...markup.matchAll(/<path data-location-connector[^>]+>/g),
+    ...markup.matchAll(/<path\b[^>]*\bdata-location-connector[^>]+>/g),
   ];
   assert.equal(connectors.length, 6);
   connectors.forEach((match, index) => {
@@ -233,7 +233,7 @@ test("equal-radius records visibly own the focused explanation with either footp
       });
       const markup = _render({ frame: 150, input: input });
       const pins = [
-        ...markup.matchAll(/<circle data-nominal-pin="([^"]*)"[^>]*>/g),
+        ...markup.matchAll(/<circle\b[^>]*\bdata-nominal-pin="([^"]*)"[^>]*>/g),
       ];
       const focusedPin = pins.find((pin) => {
         return pin[1] === focusedLocationId;

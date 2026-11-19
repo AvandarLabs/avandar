@@ -1,5 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getMarketProductPositionFromInputAndFrame } from "./getMarketProductPositionFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./HouseholdMarketChoice.schema";
 /** Data for getShopperPoseFromInputAndFrame. */
 type GetShopperPoseResult = {
@@ -15,7 +16,12 @@ type GetShopperPoseResult = {
 export function getShopperPoseFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetShopperPoseResult {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetShopperPoseResult {
   const selections = input.products.flatMap((product, index) => {
     return product.chosen ? [index] : [];
   });
@@ -26,12 +32,13 @@ export function getShopperPoseFromInputAndFrame({
   const index = selections[ordinal];
   const start = 30 + ordinal * 24;
   const product = getMarketProductPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     index,
   });
-  const approach = ramp(frame, start, 4);
-  const release = ramp(frame, start + 22, 2);
+  const approach = motion.ramp(frame, start, motion.press.duration);
+  const release = motion.ramp(frame, start + 22, motion.scale(2));
   const previousX =
     ordinal === 0 ? 170 + index * 176 : 380 + (ordinal - 1) * 90;
   const bodyX = mix(Math.max(0, approach * 2 - 1), previousX, product.x + 50);
@@ -40,7 +47,7 @@ export function getShopperPoseFromInputAndFrame({
     ordinal === 0 ? 300 : 370,
     product.bodyY,
   );
-  const retreat = ramp(frame, 30 + selections.length * 24, 6);
+  const retreat = motion.ramp(frame, 30 + selections.length * 24, motion.chip);
   const x = mix(Math.max(0, retreat * 2 - 1), bodyX, 175);
   const y = mix(Math.min(1, retreat * 2), bodyY, 414);
   const grip = approach * (1 - release) * (1 - retreat);

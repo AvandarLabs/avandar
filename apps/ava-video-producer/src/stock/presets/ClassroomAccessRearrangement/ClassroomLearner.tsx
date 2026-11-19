@@ -1,6 +1,12 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
@@ -9,39 +15,94 @@ function _getPosition({
   input,
   index,
   frame,
-}: Readonly<Omit<Props, "accent">>): { x: number; y: number } {
+  motion,
+}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): {
+  x: number;
+  y: number;
+} {
   const column = index % 3;
   let x = 110 + index * 90;
-  let y = index < 3 ? mix(ramp(frame, 36, 24, EASE.inOut), 250, 225) : 250;
+  let y =
+    index < 3
+      ? mix(
+          motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
+          250,
+          225,
+        )
+      : 250;
   if (index < 3) {
-    const progress = ramp(frame, 88, 8, EASE.inOut);
+    const progress = motion.ramp(frame, 88, motion.whip, motion.travel.easing);
     x = mix(progress, x, 210 + column * 170);
     y = mix(progress, y, 280);
   } else {
     const lane = [210, 550, 600][column];
-    x = mix(ramp(frame, 80, 4, EASE.inOut), x, lane);
-    x = mix(ramp(frame, 90, 6, EASE.inOut), x, 210 + column * 170);
-    y = mix(ramp(frame, 76, 4, EASE.inOut), 250, 285);
-    y = mix(ramp(frame, 84, 6, EASE.inOut), y, 450);
+    x = mix(
+      motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
+      x,
+      lane,
+    );
+    x = mix(
+      motion.ramp(frame, 90, motion.chip, motion.travel.easing),
+      x,
+      210 + column * 170,
+    );
+    y = mix(
+      motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
+      250,
+      285,
+    );
+    y = mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450);
   }
   if (input.resolvedLayout === "open-horseshoe") {
     if (index === 0) {
-      x = mix(ramp(frame, 96, 4, EASE.inOut), x, 200);
-      x = mix(ramp(frame, 104, 4, EASE.inOut), x, 210);
+      x = mix(
+        motion.ramp(frame, 96, motion.press.duration, motion.travel.easing),
+        x,
+        200,
+      );
+      x = mix(
+        motion.ramp(frame, 104, motion.press.duration, motion.travel.easing),
+        x,
+        210,
+      );
     }
     if (index === 1) {
-      x = mix(ramp(frame, 96, 4, EASE.inOut), x, 250);
-      y = mix(ramp(frame, 100, 4, EASE.inOut), y, 365);
-      x = mix(ramp(frame, 104, 4, EASE.inOut), x, 210);
+      x = mix(
+        motion.ramp(frame, 96, motion.press.duration, motion.travel.easing),
+        x,
+        250,
+      );
+      y = mix(
+        motion.ramp(frame, 100, motion.press.duration, motion.travel.easing),
+        y,
+        365,
+      );
+      x = mix(
+        motion.ramp(frame, 104, motion.press.duration, motion.travel.easing),
+        x,
+        210,
+      );
     }
     if (index === 3) {
-      x = mix(ramp(frame, 96, 12, EASE.inOut), x, 290);
+      x = mix(
+        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
+        x,
+        290,
+      );
     }
     if (index === 4) {
-      x = mix(ramp(frame, 96, 12, EASE.inOut), x, 470);
+      x = mix(
+        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
+        x,
+        470,
+      );
     }
     if (index === 5) {
-      y = mix(ramp(frame, 96, 12, EASE.inOut), y, 365);
+      y = mix(
+        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
+        y,
+        365,
+      );
     }
   }
   return { x, y };
@@ -53,8 +114,11 @@ export function ClassroomLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const learner = input.learners[index];
-  const { x, y } = _getPosition({ input, index, frame });
+  const { x, y } = _getPosition({ input, index, frame, motion });
   return (
     <g
       data-classroom-learner={learner.id}
@@ -64,7 +128,11 @@ export function ClassroomLearner({
       {learner.movementIcon === "walking" ? (
         <PersonGlyph x={0} y={0} size={36} color={accent} />
       ) : (
-        <g stroke={accent} strokeWidth={2} fill="none">
+        <g
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+          fill="none"
+        >
           <circle cx={0} cy={-15} r={6} />
           <path d="M0 -8 V7 H12 L17 20 M0 0 H10" />
           <circle cx={-3} cy={13} r={11} />

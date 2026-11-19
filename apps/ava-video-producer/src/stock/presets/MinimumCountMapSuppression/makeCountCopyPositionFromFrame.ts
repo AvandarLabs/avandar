@@ -1,10 +1,20 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 /** Travel below adjacent count baselines and above the next row's captions. */
 export function makeCountCopyPositionFromFrame({
   frame,
   index,
-}: Readonly<{ frame: number; index: number }>): { x: number; y: number } {
-  const progress = ramp(frame, 106 + index * 2, 23, EASE.inOut);
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>): {
+  x: number;
+  y: number;
+} {
+  const progress = motion.ramp(
+    frame,
+    106 + index * 2,
+    motion.scale(23),
+    motion.travel.easing,
+  );
   const lateral = Math.max(0, Math.min(1, (progress - 0.2) / 0.6));
   const baseline = 248 + Math.floor(index / 2) * 100;
   return {

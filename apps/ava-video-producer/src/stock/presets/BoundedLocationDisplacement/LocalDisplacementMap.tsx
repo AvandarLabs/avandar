@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LocalOffsetMarker } from "./LocalOffsetMarker";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
@@ -10,15 +11,16 @@ export function LocalDisplacementMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g data-local-map="">
-      <rect
+      <StockRect
         x={50}
         y={174}
         width={350}
         height={250}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       {input.locations.map((location, index) => {
         return (

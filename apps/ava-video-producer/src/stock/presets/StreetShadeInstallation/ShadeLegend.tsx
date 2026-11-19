@@ -9,6 +9,9 @@ type Props = { input: Input };
 /** Every installation names its owning zone, including zero-area objects. */
 export function ShadeLegend({ input }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const palette = INSTALLATION_CATEGORIES.map((key) => {
+    return tokens.color.categorical[key];
+  });
   return (
     <g>
       {input.installations.map((item, index) => {
@@ -20,7 +23,7 @@ export function ShadeLegend({ input }: Readonly<Props>): ReactNode {
               y={420}
               width={14}
               height={14}
-              fill={tokens.color.categorical[INSTALLATION_CATEGORIES[index]]}
+              fill={palette[index]}
             />
             <SceneLabel
               text={item.label}

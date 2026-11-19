@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -11,6 +12,7 @@ export function CoordinationOpenRequests({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const open = input.places.flatMap((place, index) => {
     return input.teams.some(propEq("agreedPlaceId", place.id))
       ? []
@@ -20,16 +22,26 @@ export function CoordinationOpenRequests({
     <g>
       {open.map(({ place, index }, ordinal) => {
         const x = 25 + ordinal * 460,
-          color = getCoordinationPlaceColorFromIndex({ index, accent });
+          color = getCoordinationPlaceColorFromIndex({
+            index,
+            accent,
+            color: tokens.color,
+          });
         return (
           <g key={place.id} data-unassigned-caption={place.id}>
-            <circle cx={x} cy={82} r={9} fill={STOCK.surface} stroke={color} />
+            <SketchedShape
+              shape={{ kind: "circle", cx: x, cy: 82, r: 9 }}
+              profile={tokens.sketch.shape}
+              fill={tokens.color.surface}
+              stroke={color}
+            />
             <text
               data-open-place-key
               x={x}
               y={86}
               textAnchor="middle"
-              fontSize={12}
+              fontFamily={tokens.text.graphic.data.fontFamily}
+              fontSize={tokens.text.graphic.data.fontSize}
               fill={color}
             >
               {String.fromCharCode(65 + index)}

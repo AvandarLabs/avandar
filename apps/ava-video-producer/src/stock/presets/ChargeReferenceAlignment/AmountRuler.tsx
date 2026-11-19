@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
@@ -25,6 +26,7 @@ export function AmountRuler({
   precision,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const x = comparison.isMatched ? 290 : 290 + index * 320;
   const y = comparison.isMatched ? 425 + index * 39 : 425;
   const amountLabel = (total / input.money.minorUnitsPerUnit).toFixed(
@@ -38,10 +40,11 @@ export function AmountRuler({
       data-total-minor={total}
       data-currency-scale={comparison.domain}
     >
-      <path
-        d={`M${x} ${y - 9} v28 h${width}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y - 9} v28 h${width}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <rect
         data-amount-ruler={index}
@@ -53,7 +56,7 @@ export function AmountRuler({
           width *
           (comparison.isMatched ? progress : 1)
         }
-        fill={index === 0 ? accent : STOCK.cyan}
+        fill={index === 0 ? accent : tokens.color.accentAlt}
         fillOpacity={input.focus === "amounts" ? 1 : 0.7}
       />
       <LabelSlots labels={[[amountLabel, labelX, labelY, 200, 14, 1]]} />

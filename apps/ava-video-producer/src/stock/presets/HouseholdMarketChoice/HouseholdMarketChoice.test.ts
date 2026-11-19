@@ -187,8 +187,8 @@ test("shopper reaches only for chosen products, carries them by hand and release
       const before = _render({ frame: start - 2, input: input });
       const during = _render({ frame: start + 9, input: input });
       const released = _render({ frame: start + 19, input: input });
-      const hand = during.match(/<circle data-market-hand[^>]*>/);
-      const arm = during.match(/<path data-market-arm[^>]*>/);
+      const hand = during.match(/<circle\b[^>]*\bdata-market-hand[^>]*>/);
+      const arm = during.match(/<path\b[^>]*\bdata-market-arm[^>]*>/);
       const item = [
         ...during.matchAll(/<g data-product="([^"]*)"[^>]*>/g),
       ].find((match) => {
@@ -206,11 +206,11 @@ test("shopper reaches only for chosen products, carries them by hand and release
         _getProductCoordinate({ attributes: item[0], axis: "y" }),
       );
       assert.notEqual(
-        before.match(/<circle data-market-hand[^>]*>/)?.[0],
+        before.match(/<circle\b[^>]*\bdata-market-hand[^>]*>/)?.[0],
         hand[0],
       );
       assert.notEqual(
-        released.match(/<circle data-market-hand[^>]*>/)?.[0],
+        released.match(/<circle\b[^>]*\bdata-market-hand[^>]*>/)?.[0],
         hand[0],
       );
     });
@@ -224,7 +224,9 @@ registerMarketActionAssertions(_render);
 test("the shopper holds the authored tender in the free hand while choosing products", () => {
   fixtures.forEach(({ input }) => {
     const markup = _render({ frame: 43, input: input });
-    const arm = markup.match(/<path data-market-arm[^>]*d="M([^ ]+) ([^ ]+)/);
+    const arm = markup.match(
+      /<path\b(?=[^>]*\bdata-market-arm)[^>]*\sd="M([^ ]+) ([^ ]+)/,
+    );
     const tender = markup.match(
       /<g data-tender="[^"]*"[^>]*transform="translate\(([^ ]+) ([^)]+)\)"/,
     );

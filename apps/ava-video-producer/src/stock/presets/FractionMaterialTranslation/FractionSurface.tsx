@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FractionMaterial } from "./FractionMaterial";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
@@ -20,17 +24,20 @@ export function FractionSurface({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <>
       <g
         data-work-surface={representation.id}
         transform={`translate(${x} ${y})`}
       >
-        <path
-          d="M-108 58 H108 M-98 58 V79 M98 58 V79"
+        <SketchedShape
+          shape={{ kind: "path", d: "M-108 58 H108 M-98 58 V79 M98 58 V79" }}
+          profile={tokens.sketch.shape}
           fill="none"
-          stroke={STOCK.line}
-          strokeWidth={3}
+          stroke={tokens.color.line}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
         <FractionMaterial
           representation={representation}
@@ -41,11 +48,15 @@ export function FractionSurface({
         {frame >= 88 && frame < 126
           ? Array.from({ length: input.fraction.numerator }, (_, part) => {
               return (
-                <path
+                <SketchedShape
                   key={part}
-                  d={`M${-96 + ((part + 0.5) * 192) / input.fraction.denominator} 30 V46`}
+                  shape={{
+                    kind: "path",
+                    d: `M${-96 + ((part + 0.5) * 192) / input.fraction.denominator} 30 V46`,
+                  }}
+                  profile={tokens.sketch.shape}
                   stroke={accent}
-                  strokeWidth={1}
+                  strokeWidth={scales.stroke(tokens.stroke.hairline)}
                 />
               );
             })

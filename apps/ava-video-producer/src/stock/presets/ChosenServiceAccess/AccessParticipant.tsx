@@ -1,5 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getServiceFloorYFromX } from "./getServiceFloorYFromX";
 import { getServiceWheelCenterYFromWheelGeometry } from "./getServiceWheelCenterYFromWheelGeometry";
 import type { Input } from "./ChosenServiceAccess.schema";
@@ -14,13 +20,21 @@ export function AccessParticipant({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const chosenIndex = input.services.findIndex(
     propEq("id", input.chosenServiceId),
   );
   const doorX = 160 + ((chosenIndex + 0.5) * 640) / input.services.length;
-  const travel = ramp(frame, 78, 42, EASE.inOut);
-  const approach = ramp(frame, 78, 20, EASE.inOut);
-  const entry = ramp(frame, 98, 22, EASE.inOut);
+  const travel = motion.ramp(frame, 78, motion.scale(42), motion.travel.easing);
+  const approach = motion.ramp(
+    frame,
+    78,
+    motion.scale(20),
+    motion.travel.easing,
+  );
+  const entry = motion.ramp(frame, 98, motion.scale(22), motion.travel.easing);
   const x =
     frame < 98
       ? mix(approach, 60, doorX - 100)
@@ -72,28 +86,34 @@ export function AccessParticipant({
       data-x={x}
       data-y={y}
     >
-      <circle
-        cx={x}
-        cy={y - 55}
-        r={8}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y - 55, r: 8 }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
-        d={
-          input.participantMobility === "wheelchair"
-            ? `M${x} ${y - 45} V${y - 22} H${x + 20} L${x + 26} ${frontY}`
-            : `M${x} ${y - 45} V${y - 20} L${leftFootX} ${leftFootY} M${x} ${y - 20} L${rightFootX} ${rightFootY}`
-        }
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d:
+            input.participantMobility === "wheelchair"
+              ? `M${x} ${y - 45} V${y - 22} H${x + 20} L${x + 26} ${frontY}`
+              : `M${x} ${y - 45} V${y - 20} L${leftFootX} ${leftFootY} M${x} ${y - 20} L${rightFootX} ${rightFootY}`,
+        }}
+        profile={tokens.sketch.shape}
         data-participant-body
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         strokeLinecap="round"
       />
       {input.participantMobility === "wheelchair" ? (
-        <g fill="none" stroke={accent} strokeWidth={2}>
+        <g
+          fill="none"
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+        >
           <circle data-participant-wheel="rear" cx={x - 6} cy={rearY} r={20} />
           <circle
             data-participant-wheel="front"
@@ -106,13 +126,17 @@ export function AccessParticipant({
           />
         </g>
       ) : undefined}
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x} ${y - 41} L${x + (handX - x) * 0.5} ${handY + 6} L${handX} ${handY}`,
+        }}
+        profile={tokens.sketch.shape}
         data-participant-arm
         data-choice-point={choosing ? input.chosenServiceId : undefined}
-        d={`M${x} ${y - 41} L${x + (handX - x) * 0.5} ${handY + 6} L${handX} ${handY}`}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         strokeLinecap="round"
       />
       <circle data-participant-hand cx={handX} cy={handY} r={3} fill={accent} />

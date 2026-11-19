@@ -1,12 +1,20 @@
-import { ramp, EASE } from "../../../motion";
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AquiferOwnershipKey } from "./AquiferOwnershipKey";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AquiferCutaway. */
 type Props = { frame: number; accent: string; input: Input };
+const FLOW_GUIDE_DASH = "3 4";
+const REQUEST_DASH = "5 5";
+const DRAW_ON_LENGTH = 1;
 
 /** Recharge, pumping and natural outflow cross separate physical boundaries. */
 export function AquiferCutaway({
@@ -14,8 +22,16 @@ export function AquiferCutaway({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const recharge = ramp(frame, 36, 30, EASE.inOut),
-    withdraw = ramp(frame, 72, 36, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const recharge = motion.ramp(
+      frame,
+      36,
+      motion.scale(30),
+      motion.travel.easing,
+    ),
+    withdraw = motion.ramp(frame, 72, motion.scale(36), motion.travel.easing);
   const { aquifer, flows } = input;
   const peak = aquifer.initialM3 + flows.rechargeM3;
   const final = peak - flows.naturalOutflowM3 - flows.approvedWithdrawalM3;
@@ -46,7 +62,7 @@ export function AquiferCutaway({
       path: "M 620 310 V 220 H 850",
       progress: withdraw,
       value: flows.approvedWithdrawalM3,
-      color: STOCK.cyan,
+      color: tokens.color.accentAlt,
     },
     {
       key: "natural",
@@ -56,16 +72,20 @@ export function AquiferCutaway({
       path: "M 700 330 H 850",
       progress: withdraw,
       value: flows.naturalOutflowM3,
-      color: STOCK.orange,
+      color: tokens.color.highlight,
     },
   ];
   return (
     <g>
-      <path
-        d="M 280 222 Q 380 202 480 222 T 720 222 V 397 H 280 Z"
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M 280 222 Q 380 202 480 222 T 720 222 V 397 H 280 Z",
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <rect
         data-aquifer-fill="true"
@@ -74,35 +94,38 @@ export function AquiferCutaway({
         width={400}
         height={height}
         fill={accent}
-        fillOpacity={0.5}
+        fillOpacity={tokens.alpha.guide}
       />
-      <path
-        d="M 300 230 V 380 H 700 V 230"
-        stroke={STOCK.muted}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "path", d: "M 300 230 V 380 H 700 V 230" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         fill="none"
       />
       {paths.map(({ key, number, x, y, path, progress, value, color }) => {
         return (
           <g key={key}>
-            <path
+            <SketchedShape
+              shape={{ kind: "path", d: path }}
+              profile={tokens.sketch.shape}
               data-flow-guide={key}
-              d={path}
-              stroke={STOCK.muted}
-              strokeWidth={1}
-              strokeDasharray="3 4"
+              stroke={tokens.color.inactive}
+              strokeWidth={scales.stroke(tokens.stroke.hairline)}
+              strokeDasharray={FLOW_GUIDE_DASH}
               fill="none"
             />
-            <path
+            <SketchedShape
+              shape={{ kind: "path", d: path }}
+              profile={tokens.sketch.shape}
               data-flow={key}
               data-quantity={value}
-              d={path}
-              pathLength={1}
-              strokeDasharray={1}
-              strokeDashoffset={1 - progress}
+              pathLength={DRAW_ON_LENGTH}
+              strokeDasharray={DRAW_ON_LENGTH}
+              strokeDashoffset={DRAW_ON_LENGTH - progress}
               opacity={value ? 1 : 0}
               stroke={color}
-              strokeWidth={7}
+              strokeWidth={scales.stroke(7)}
               fill="none"
             />
             <g data-flow-ownership={key}>
@@ -111,15 +134,15 @@ export function AquiferCutaway({
           </g>
         );
       })}
-      <rect
+      <StockRect
         x={32}
         y={320}
         width={210}
         height={78}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
-        stroke={STOCK.muted}
-        strokeDasharray="5 5"
+        stroke={tokens.color.inactive}
+        strokeDasharray={REQUEST_DASH}
       />
       <FitText
         text={input.copy.requested}
@@ -133,7 +156,7 @@ export function AquiferCutaway({
       />
       {input.showUnallocatedRequest ? (
         <>
-          <rect
+          <StockRect
             data-unallocated="true"
             data-quantity={
               flows.requestedWithdrawalM3 - flows.approvedWithdrawalM3
@@ -149,7 +172,7 @@ export function AquiferCutaway({
             }
             height={9}
             fill="none"
-            stroke={STOCK.orange}
+            stroke={tokens.color.highlight}
           />
           <g data-flow-ownership="unallocated">
             <AquiferOwnershipKey number={4} x={18} y={405.5} />

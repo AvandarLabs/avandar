@@ -1,20 +1,30 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+const EXIT_DASH = "5 5";
 /** The common slope and outlet remain fixed through the intervention. */
 export function SlopeGround(): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        d="M80 200L750 380H910V415H80Z"
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "path", d: "M80 200L750 380H910V415H80Z" }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M750 280V420" }}
+        profile={tokens.sketch.shape}
         data-exit="boundary"
-        d="M750 280V420"
-        stroke={STOCK.muted}
-        strokeDasharray="5 5"
+        stroke={tokens.color.inactive}
+        strokeDasharray={EXIT_DASH}
       />
     </g>
   );

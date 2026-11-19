@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SourceContextCell } from "./SourceContextCell";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { CONTEXT_FIELDS } from "./CONTEXT_FIELDS.constants";
@@ -23,6 +24,7 @@ export function ContextWindow({
   registration,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const y = 130 + 42 * index;
   const isMatched = input.invoice[field] === input.reference[field];
   const referenceY = y + mix(registration, 15, isMatched ? 0 : 8);
@@ -34,21 +36,22 @@ export function ContextWindow({
         x={250}
         y={y}
         value={String(input.invoice[field])}
-        stroke={input.focus === "keys" ? accent : STOCK.line}
+        stroke={input.focus === "keys" ? accent : tokens.color.line}
       />
       <SourceContextCell
         field={field}
         x={600}
         y={referenceY}
         value={String(input.reference[field])}
-        stroke={isMatched ? STOCK.cyan : STOCK.orange}
+        stroke={isMatched ? tokens.color.accentAlt : tokens.color.highlight}
         isReference
       />
       {!isMatched ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: `M582 ${y + 3} h6 v8 h-6` }}
+          profile={tokens.sketch.shape}
           data-mismatch-notch={field}
-          d={`M582 ${y + 3} h6 v8 h-6`}
-          stroke={STOCK.orange}
+          stroke={tokens.color.highlight}
           fill="none"
         />
       ) : null}

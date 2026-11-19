@@ -1,5 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
@@ -13,7 +19,11 @@ export function CoordinationMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const { x, y, moved } = getTeamMarkerPoseFromInputAndFrame({
+    motion,
     input,
     index,
     frame,
@@ -23,6 +33,7 @@ export function CoordinationMarker({
   const color = getCoordinationPlaceColorFromIndex({
     index: input.places.findIndex(propEq("id", reference)),
     accent,
+    color: tokens.color,
   });
   return (
     <g
@@ -32,31 +43,36 @@ export function CoordinationMarker({
       data-y={y}
     >
       {input.markerStyle === "flags" ? (
-        <path
-          d={`M${x - 6} ${y + 9} V${y - 9} H${x + 7} V${y + 7} H${x - 6}`}
-          fill={STOCK.surface}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x - 6} ${y + 9} V${y - 9} H${x + 7} V${y + 7} H${x - 6}`,
+          }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
           stroke={color}
-          strokeWidth={2}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       ) : (
-        <rect
+        <StockRect
           x={x - 7}
           y={y - 9}
           width={14}
           height={18}
-          rx={4}
-          fill={STOCK.surface}
+          rx={scales.corner(tokens.corner.chip)}
+          fill={tokens.color.surface}
           stroke={color}
-          strokeWidth={2}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       )}
       <text
         data-team-key
         x={x}
         y={y + 3}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         textAnchor="middle"
-        fill={STOCK.text}
+        fill={tokens.color.text}
       >
         {index + 1}
       </text>

@@ -1,5 +1,6 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CustodyLane } from "./CustodyLane";
 import { CustodyLegend } from "./CustodyLegend";
 import { CustodyStops } from "./CustodyStops";
@@ -15,13 +16,19 @@ export function ColdChainCustody({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />
       <SceneLabel text={input.copy.schematic} x={32} y={55} width={650} />
       {input.geographyMode === "globe-and-schematic" ? (
         <g data-globe="context" transform="translate(900 50)">
-          <circle r={30} fill={STOCK.surface} stroke={STOCK.line} />
+          <SketchedShape
+            shape={{ kind: "circle", cx: 0, cy: 0, r: 30 }}
+            profile={tokens.sketch.shape}
+            fill={tokens.color.surface}
+            stroke={tokens.color.line}
+          />
           <path
             d={GlobeProjection.getLandPathFromView({
               centerLongitude: 10,
@@ -29,7 +36,7 @@ export function ColdChainCustody({
               radius: 30,
             })}
             fill={accent}
-            fillOpacity={0.5}
+            fillOpacity={tokens.alpha.guide}
           />
         </g>
       ) : undefined}

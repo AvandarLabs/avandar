@@ -2,7 +2,12 @@ import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassroomImpressions } from "./ClassroomImpressions";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
@@ -33,6 +38,8 @@ export function ClassroomDesk({
   input,
   activeIndex,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const occupied = mix(
     transition,
     Number(desk.previousState === "present"),
@@ -50,14 +57,14 @@ export function ClassroomDesk({
       data-x={desk.x}
       data-y={desk.y}
     >
-      <rect
+      <StockRect
         x={desk.x - 12}
         y={desk.y - 6}
         width={28}
         height={38}
-        rx={7}
+        rx={scales.corner(7)}
         fill="none"
-        stroke={STOCK.muted}
+        stroke={tokens.color.inactive}
         strokeDasharray={desk.state === "unknown" ? "3 3" : undefined}
       />
       <g data-learner-silhouette={desk.id} opacity={occupied}>
@@ -74,27 +81,30 @@ export function ClassroomDesk({
           <Text
             x={desk.x}
             y={desk.y - 8}
-            size={20}
             anchor="middle"
-            fill={STOCK.orange}
+            fill={tokens.color.highlight}
           >
             ?
           </Text>
         </g>
       ) : undefined}
-      <rect
+      <StockRect
         data-desk-top={desk.id}
         x={desk.x - 46}
         y={desk.y + 24}
         width={92}
         height={16}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
       />
-      <path
-        d={`M ${desk.x - 38} ${desk.y + 40} v 10 M ${desk.x + 38} ${desk.y + 40} v 10`}
-        stroke={STOCK.muted}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M ${desk.x - 38} ${desk.y + 40} v 10 M ${desk.x + 38} ${desk.y + 40} v 10`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
         fill="none"
       />
       <FitText

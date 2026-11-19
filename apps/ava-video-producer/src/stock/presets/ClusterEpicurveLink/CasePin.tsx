@@ -1,6 +1,9 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CaseKey } from "./CaseKey";
 import type { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { ReactNode } from "react";
@@ -10,6 +13,7 @@ type Props = {
   frame: number;
   accent: string;
 };
+const LEADER_OPACITY = 0.16;
 /**
  * A stable coordinate and visible roster key keep coincident records distinct.
  */
@@ -18,30 +22,32 @@ export function CasePin({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const { record, index, mapX, mapY, isInvestigated, isFocused } = position;
   return (
     <g>
-      <path
-        d={`M${mapX} ${mapY} L628 ${154 + index * 26}`}
-        stroke={STOCK.muted}
-        strokeOpacity={0.16}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${mapX} ${mapY} L628 ${154 + index * 26}` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeOpacity={LEADER_OPACITY}
       />
       <circle
         data-map-case={record.id}
         cx={mapX}
         cy={mapY}
         r={4}
-        fill={isInvestigated ? accent : STOCK.muted}
+        fill={isInvestigated ? accent : tokens.color.inactive}
       />
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: mapX, cy: mapY, r: 8 }}
+        profile={tokens.sketch.shape}
         data-focused-case={record.id}
         data-is-focused={isFocused}
-        cx={mapX}
-        cy={mapY}
-        r={8}
         fill="none"
-        stroke={STOCK.orange}
-        opacity={isFocused ? ramp(frame, 90, 18) : 0}
+        stroke={tokens.color.highlight}
+        opacity={isFocused ? motion.ramp(frame, 90, motion.hero) : 0}
       />
       <CaseKey position={position} frame={frame} accent={accent} />
       <LabelSlots

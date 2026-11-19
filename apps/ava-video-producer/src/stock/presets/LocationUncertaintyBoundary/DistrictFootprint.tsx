@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -18,27 +22,40 @@ export function DistrictFootprint({
   isPossible,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const connectorY =
-    120 + index * 40 - (isPossible ? 8 * ramp(frame, 60, 36) : 0);
+    120 +
+    index * 40 -
+    (isPossible ? 8 * motion.ramp(frame, 60, motion.scale(36)) : 0);
   return (
     <g>
-      <polygon
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${district.polygon
+            .map(([x, y]) => {
+              return `${50 + x * 3.6},${140 + y * 3.6}`;
+            })
+            .join(" ")}Z`,
+        }}
+        profile={tokens.sketch.shape}
         data-district={district.id}
-        points={district.polygon
-          .map(([x, y]) => {
-            return `${50 + x * 3.6},${140 + y * 3.6}`;
-          })
-          .join(" ")}
-        fill={index % 2 ? STOCK.cyan : accent}
-        fillOpacity={0.08}
-        stroke={STOCK.line}
+        fill={index % 2 ? tokens.color.accentAlt : accent}
+        fillOpacity={scales.wash(tokens.alpha.wash)}
+        stroke={tokens.color.line}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${50 + district.polygon[0][0] * 3.6} ${140 + district.polygon[0][1] * 3.6} L430 ${connectorY} H474`,
+        }}
+        profile={tokens.sketch.shape}
         data-district-connector={district.id}
-        d={`M${50 + district.polygon[0][0] * 3.6} ${140 + district.polygon[0][1] * 3.6} L430 ${connectorY} H474`}
         fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={0.8}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(0.8)}
       />
     </g>
   );

@@ -182,7 +182,7 @@ test("missed-and-returned accents only chronologically later records regardless 
     const markup = _render({ frame: 150, input: input });
     const marks = Array.from(
       markup.matchAll(
-        /data-record-person="[^"]*" data-record-visit="([^"]*)"[\s\S]*?<path transform="[^"]*"[^>]*stroke="([^"]*)"/g,
+        /data-record-person="[^"]*" data-record-visit="([^"]*)"[\s\S]*?<g transform="[^"]*"><path\b[^>]*\bstroke="([^"]*)"/g,
       ),
     );
     assert.deepEqual(

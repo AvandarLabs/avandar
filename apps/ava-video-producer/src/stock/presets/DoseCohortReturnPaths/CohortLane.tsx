@@ -1,9 +1,14 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CohortPerson } from "./CohortPerson";
 import { CohortRecord } from "./CohortRecord";
 import { SceneLabel } from "./SceneLabel";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 
@@ -14,17 +19,24 @@ type Props = {
   frame: number;
   accent: string;
 };
+const LANE_DASH = "3 6";
 function _getPersonPosition({
   input,
   participant,
   index,
   frame,
-}: Omit<Props, "accent">) {
+  motion,
+}: Omit<Props, "accent"> & { motion: VideoMotion }) {
   return input.visits.reduce((position, visit, visitIndex) => {
     return participant.records.find(propEq("visitId", visit.id))?.state ===
       "recorded"
       ? mix(
-          ramp(frame, 30 + visitIndex * 18 + index * 2, 18, EASE.inOut),
+          motion.ramp(
+            frame,
+            30 + visitIndex * 18 + index * 2,
+            motion.hero,
+            motion.travel.easing,
+          ),
           position,
           380 + visitIndex * 155,
         )
@@ -39,12 +51,14 @@ export function CohortLane({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const y = 185 + index * 40;
-  const x = _getPersonPosition({ input, participant, index, frame });
+  const x = _getPersonPosition({ input, participant, index, frame, motion });
   return (
     <g
       data-participant={participant.id}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * 2)}
     >
       <SceneLabel
         text={participant.label}
@@ -53,10 +67,11 @@ export function CohortLane({
         width={215}
         lines={2}
       />
-      <path
-        d={`M280 ${y + 12} H900`}
-        stroke={STOCK.line}
-        strokeDasharray="3 6"
+      <SketchedShape
+        shape={{ kind: "path", d: `M280 ${y + 12} H900` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeDasharray={LANE_DASH}
       />
       {input.visits.map((visit, visitIndex) => {
         return (

@@ -1,7 +1,12 @@
-import { mix, ramp, EASE } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for DispatchOperator. */
@@ -15,7 +20,10 @@ export function DispatchOperator({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const reach = ramp(frame, 68, 8, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const reach = motion.ramp(frame, 68, motion.whip, motion.travel.easing);
   const handX = mix(reach, 449, 480);
   const handY = mix(reach, 111, 105);
   return (
@@ -40,7 +48,13 @@ export function DispatchOperator({
         breakLongWords
         normalizeWhitespace
       />
-      <PersonGlyph x={439} y={106} size={32} role="worker" color={STOCK.cyan} />
+      <PersonGlyph
+        x={439}
+        y={106}
+        size={32}
+        role="worker"
+        color={tokens.color.accentAlt}
+      />
       <circle
         data-dispatch-button="true"
         cx={480}
@@ -49,10 +63,11 @@ export function DispatchOperator({
         fill={accent}
         fillOpacity={0.2 + 0.6 * reach}
       />
-      <path
-        d={`M 445 106 L ${handX} ${handY}`}
-        stroke={STOCK.cyan}
-        strokeWidth={2.5}
+      <SketchedShape
+        shape={{ kind: "path", d: `M 445 106 L ${handX} ${handY}` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(2.5)}
         fill="none"
       />
       <circle
@@ -60,7 +75,7 @@ export function DispatchOperator({
         cx={handX}
         cy={handY}
         r={3}
-        fill={STOCK.cyan}
+        fill={tokens.color.accentAlt}
       />
     </g>
   );

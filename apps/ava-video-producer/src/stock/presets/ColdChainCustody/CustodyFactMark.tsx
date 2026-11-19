@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { x: number; y: number; accent: string } & (
@@ -14,15 +16,16 @@ export function CustodyFactMark({
   kind,
   value,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (kind === "acknowledgement") {
     return (
-      <rect
+      <StockRect
         x={x - 4}
         y={y - 5}
         width={9}
         height={10}
         fill={value ? accent : "none"}
-        stroke={STOCK.text}
+        stroke={tokens.color.text}
         strokeDasharray={value ? undefined : "2 2"}
       />
     );
@@ -38,12 +41,18 @@ export function CustodyFactMark({
         ? "M-4 -5 l4 4 -4 2 4 4 M4 -5 l-4 4 4 2 -4 4"
         : "M0 -6 l6 6 -6 6 -6 -6 Z";
   return (
-    <path
-      transform={`translate(${x} ${y})`}
-      d={path}
-      fill="none"
-      stroke={value === "logged" || value === "intact" ? accent : STOCK.orange}
-      strokeDasharray={value === "unknown" ? "2 3" : undefined}
-    />
+    <g transform={`translate(${x} ${y})`}>
+      <SketchedShape
+        shape={{ kind: "path", d: path }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={
+          value === "logged" || value === "intact"
+            ? accent
+            : tokens.color.highlight
+        }
+        strokeDasharray={value === "unknown" ? "2 3" : undefined}
+      />
+    </g>
   );
 }

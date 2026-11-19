@@ -1,7 +1,9 @@
-import { ramp, EASE } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { QuantityBand } from "../../primitives/QuantityBand/QuantityBand";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
 /** Inputs for HabitatLandBalance. */
@@ -16,6 +18,8 @@ export function HabitatLandBalance({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const habitat = input.patches.reduce((total, patch) => {
       return total + patch.areaHa;
     }, 0),
@@ -23,7 +27,12 @@ export function HabitatLandBalance({
   const other = input.landBoundaryHa - habitat,
     afterHabitat = habitat + corridor,
     afterOther = input.landBoundaryHa - afterHabitat;
-  const progress = ramp(frame, 36, 42, EASE.inOut),
+  const progress = motion.ramp(
+      frame,
+      36,
+      motion.scale(42),
+      motion.travel.easing,
+    ),
     currentHabitat = habitat + corridor * progress;
   if (!input.showLandBalance) {
     return (
@@ -54,7 +63,7 @@ export function HabitatLandBalance({
       <QuantityBand
         values={[
           { value: habitat, color: accent },
-          { value: other, color: STOCK.line },
+          { value: other, color: tokens.color.line },
         ]}
         denominator={input.landBoundaryHa}
         x={32}
@@ -65,7 +74,10 @@ export function HabitatLandBalance({
       <QuantityBand
         values={[
           { value: currentHabitat, color: accent },
-          { value: input.landBoundaryHa - currentHabitat, color: STOCK.line },
+          {
+            value: input.landBoundaryHa - currentHabitat,
+            color: tokens.color.line,
+          },
         ]}
         denominator={input.landBoundaryHa}
         x={32}

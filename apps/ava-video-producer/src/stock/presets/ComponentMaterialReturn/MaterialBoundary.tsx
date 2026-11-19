@@ -1,5 +1,11 @@
-import { ramp, mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MaterialCaptions } from "./MaterialCaptions";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
@@ -13,24 +19,41 @@ export function MaterialBoundary({
   frame,
   assembled,
 }: Readonly<Props>): ReactNode {
-  const open = ramp(frame, 24, 12);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const open = motion.reveal(frame, 24);
   const isAppliance = input.assemblyShape === "appliance";
   return (
     <g>
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M50 290V335H320V290M50 290L${mix(open, 320, 50)} ${mix(open, 290, 240)}`,
+        }}
+        profile={tokens.sketch.shape}
         data-returned-shell="physical"
-        d={`M50 290V335H320V290M50 290L${mix(open, 320, 50)} ${mix(open, 290, 240)}`}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={3}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       {isAppliance ? (
-        <circle cx={185} cy={325} r={6} fill="none" stroke={STOCK.muted} />
+        <SketchedShape
+          shape={{ kind: "circle", cx: 185, cy: 325, r: 6 }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={tokens.color.inactive}
+        />
       ) : (
-        <path d="M65 335v8M305 335v8" stroke={STOCK.muted} strokeWidth={3} />
+        <SketchedShape
+          shape={{ kind: "path", d: "M65 335v8M305 335v8" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
       )}
       {assembled > 0 ? (
-        <rect
+        <StockRect
           data-output-shell="physical"
           x={408}
           y={288}
@@ -38,16 +61,17 @@ export function MaterialBoundary({
           height={48}
           rx={isAppliance ? 12 : 2}
           fill="none"
-          stroke={STOCK.line}
-          strokeWidth={3}
-          opacity={ramp(frame, 108, 12)}
+          stroke={tokens.color.line}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          opacity={motion.reveal(frame, 108)}
         />
       ) : undefined}
-      <path
-        d="M740 290V335H930V290M740 355V400H930V355"
+      <SketchedShape
+        shape={{ kind: "path", d: "M740 290V335H930V290M740 355V400H930V355" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <MaterialCaptions input={input} />
     </g>

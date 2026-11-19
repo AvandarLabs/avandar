@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DialogueWording } from "./DialogueWording";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
@@ -36,6 +40,9 @@ export function DialogueBubble({
   interpreted,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const turn = input.turns[turnIndex];
   const at = 24 + turnIndex * 56 + (interpreted ? 20 : 0);
   if (frame <= at) {
@@ -47,18 +54,20 @@ export function DialogueBubble({
       data-wording={interpreted ? "interpreted" : "original"}
       data-speaker={turn.speaker}
       data-turn={turn.id}
-      opacity={ramp(frame, at, 10)}
+      opacity={motion.ramp(frame, at, motion.scale(10))}
     >
-      <rect
+      <StockRect
         data-bubble={turn.id}
         x={x}
         y={y}
         width={interpreted ? 382 : 402}
         height={interpreted ? 150 : 155}
-        rx={12}
-        fill={STOCK.surface}
-        stroke={interpreted ? STOCK.cyan : accent}
-        strokeWidth={interpreted ? 1 : 2}
+        rx={scales.corner(tokens.corner.card)}
+        fill={tokens.color.surface}
+        stroke={interpreted ? tokens.color.accentAlt : accent}
+        strokeWidth={scales.stroke(
+          interpreted ? tokens.stroke.hairline : tokens.stroke.default,
+        )}
       />
       <DialogueWording
         input={input}

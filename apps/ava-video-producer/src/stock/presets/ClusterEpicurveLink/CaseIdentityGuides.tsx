@@ -1,5 +1,5 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import { TravelingCase } from "./TravelingCase";
 import type { Input } from "./ClusterEpicurveLink.schema";
@@ -14,7 +14,9 @@ export function CaseIdentityGuides({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const visibility = ramp(frame, 36, 8) * (1 - ramp(frame, 84, 12));
+  const motion = useGraphicMotion();
+  const visibility =
+    motion.ramp(frame, 36, motion.whip) * (1 - motion.reveal(frame, 84));
   return (
     <g opacity={visibility}>
       {getCasePositionsFromInput(input)

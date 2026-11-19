@@ -1,6 +1,12 @@
-import { ramp, mix, EASE } from "../../../motion";
+import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
 
@@ -14,8 +20,14 @@ type Props = {
 function _getOffsetGeometry({
   location,
   frame,
-}: Readonly<Pick<Props, "location" | "frame">>) {
-  const progress = ramp(frame, 13, 57, EASE.inOut);
+  motion,
+}: Readonly<Pick<Props, "location" | "frame"> & { motion: VideoMotion }>) {
+  const progress = motion.ramp(
+    frame,
+    13,
+    motion.scale(57),
+    motion.travel.easing,
+  );
   const source = { cx: 60 + location.x * 3.2, cy: 180 + location.y * 2.2 };
   const displaced = {
     cx: 60 + (location.x + location.offsetX) * 3.2,
@@ -37,9 +49,13 @@ export function LocalOffsetMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { progress, source, displaced, vector } = _getOffsetGeometry({
     location,
     frame,
+    motion,
   });
   return (
     <g>
@@ -48,24 +64,26 @@ export function LocalOffsetMarker({
           data-local-original={location.id}
           {...source}
           r={5}
-          fill={STOCK.orange}
+          fill={tokens.color.highlight}
         />
       ) : undefined}
-      <line
+      <SketchedShape
+        shape={{ kind: "line", ...vector }}
+        profile={tokens.sketch.shape}
         data-local-offset={location.id}
-        {...vector}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         opacity={progress}
       />
-      <circle
-        {...displaced}
-        r={7}
+      <SketchedShape
+        shape={{ kind: "circle", ...displaced, r: 7 }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
         opacity={progress}
       />
-      <Text x={displaced.cx} y={displaced.cy + 4} size={12}>
+      <Text x={displaced.cx} y={displaced.cy + 4} role="data">
         {index + 1}
       </Text>
     </g>

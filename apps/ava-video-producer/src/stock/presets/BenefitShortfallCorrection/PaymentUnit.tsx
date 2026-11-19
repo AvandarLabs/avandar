@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPaymentUnitGeometryFromPayment } from "./getPaymentUnitGeometryFromPayment";
 import { ReceivedToken } from "./ReceivedToken";
 import type { Input } from "./BenefitShortfallCorrection.schema";
@@ -11,6 +15,7 @@ type Props = {
   unitIndex: number;
   accent: string;
 };
+const GAP_DASH = "2 4";
 /**
  * Exactly one original, correction or empty position accounts for each unit.
  */
@@ -21,18 +26,25 @@ export function PaymentUnit({
   unitIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
   const { x, y, isOriginal, isCorrection, tokenY, isHandling } =
-    getPaymentUnitGeometryFromPayment({ payment, frame, index, unitIndex });
+    getPaymentUnitGeometryFromPayment({
+      motion,
+      payment,
+      frame,
+      index,
+      unitIndex,
+    });
   return (
     <g>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y + 24, r: 23 }}
+        profile={tokens.sketch.shape}
         data-stated-slot={unitIndex}
-        cx={x}
-        cy={y + 24}
-        r={23}
         fill="none"
-        stroke={STOCK.orange}
-        strokeDasharray="4 4"
+        stroke={tokens.color.highlight}
+        strokeDasharray={tokens.dash.pending.join(" ")}
       />
       {isOriginal || isCorrection ? (
         <ReceivedToken
@@ -45,14 +57,13 @@ export function PaymentUnit({
           accent={accent}
         />
       ) : (
-        <circle
+        <SketchedShape
+          shape={{ kind: "circle", cx: x, cy: y + 24, r: 18 }}
+          profile={tokens.sketch.shape}
           data-unit-kind="gap"
-          cx={x}
-          cy={y + 24}
-          r={18}
           fill="none"
-          stroke={STOCK.orange}
-          strokeDasharray="2 4"
+          stroke={tokens.color.highlight}
+          strokeDasharray={GAP_DASH}
         />
       )}
     </g>

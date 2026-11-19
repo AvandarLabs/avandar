@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -11,6 +15,7 @@ type Props = {
   isFocused: boolean;
   accent: string;
 };
+const CONNECTOR_WIDTH = 0.8;
 /**
  * A persistent ring and stronger keyed connector identify the explained record.
  */
@@ -22,23 +27,27 @@ export function LocationPin({
   isFocused,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: isFocused ? 5 : 3 }}
+        profile={tokens.sketch.shape}
         data-nominal-pin={location.id}
-        cx={x}
-        cy={y}
-        r={isFocused ? 5 : 3}
-        fill={isFocused ? accent : STOCK.text}
-        stroke={isFocused ? STOCK.text : "none"}
-        strokeWidth={isFocused ? 2 : 0}
+        fill={isFocused ? accent : tokens.color.text}
+        stroke={isFocused ? tokens.color.text : "none"}
+        strokeWidth={isFocused ? scales.stroke(tokens.stroke.default) : 0}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y} L420 ${328 + index * 31} H440` }}
+        profile={tokens.sketch.shape}
         data-location-connector={location.id}
-        d={`M${x} ${y} L420 ${328 + index * 31} H440`}
         fill="none"
-        stroke={isFocused ? accent : STOCK.muted}
-        strokeWidth={isFocused ? 2 : 0.8}
+        stroke={isFocused ? accent : tokens.color.inactive}
+        strokeWidth={scales.stroke(
+          isFocused ? tokens.stroke.default : CONNECTOR_WIDTH,
+        )}
       />
       <LabelSlots
         labels={[[String(index + 1), 444, 332 + index * 31, 24, 12, 1]]}

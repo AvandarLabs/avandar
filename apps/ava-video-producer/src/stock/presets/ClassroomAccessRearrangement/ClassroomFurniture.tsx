@@ -1,5 +1,10 @@
-import { EASE, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ApproachTrace } from "./ApproachTrace";
 import { ClassroomBoardText } from "./ClassroomBoardText";
 import { ClassroomDesks } from "./ClassroomDesks";
@@ -8,6 +13,8 @@ import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const ACTIVITY_CORNER = 45;
+const ACTIVITY_TINT = 0.04;
 /**
  * Furniture clears the approach before learners enter, with selected changes
  * only.
@@ -17,7 +24,15 @@ export function ClassroomFurniture({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36, 36, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const progress = motion.ramp(
+    frame,
+    36,
+    motion.scale(36),
+    motion.travel.easing,
+  );
   const hasTable = input.adaptations.some(({ kind }) => {
     return kind === "shared-table";
   });
@@ -27,30 +42,32 @@ export function ClassroomFurniture({
   const boardProgress = hasBoard ? progress : 0;
   return (
     <g>
-      <rect
+      <StockRect
         data-common-activity="true"
         x={155}
         y={240}
         width={450}
         height={255}
-        rx={45}
+        rx={scales.corner(ACTIVITY_CORNER)}
         fill={accent}
-        fillOpacity={0.04}
+        fillOpacity={scales.wash(ACTIVITY_TINT)}
         stroke={accent}
-        strokeOpacity={0.25}
+        strokeOpacity={tokens.alpha.ghost}
       />
       <ClassroomDesks progress={progress} />
       <ClassroomTable hasTable={hasTable} progress={progress} accent={accent} />
-      <rect
+      <StockRect
         data-board-adaptation={hasBoard}
         x={340}
         y={100}
         width={350}
         height={105}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={hasBoard ? accent : STOCK.line}
-        strokeWidth={1 + boardProgress * 2}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={hasBoard ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
+          mix(boardProgress, tokens.stroke.hairline, tokens.stroke.emphasis),
+        )}
       />
       <ClassroomBoardText input={input} frame={frame} hasBoard={hasBoard} />
       <ApproachTrace input={input} progress={progress} accent={accent} />

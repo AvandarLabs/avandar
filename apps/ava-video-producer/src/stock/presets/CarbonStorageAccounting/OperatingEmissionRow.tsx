@@ -1,6 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +15,8 @@ type Props = {
   unit: string;
   frame: number;
 };
+/** The ribbon width of 1,000 tonnes of operating emissions. */
+const RIBBON_WIDTH_PER_KILOTONNE = 16;
 /** One CO2e source enters its own accounting ribbon without invented mass. */
 export function OperatingEmissionRow({
   row,
@@ -17,6 +24,9 @@ export function OperatingEmissionRow({
   unit,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const copies: Array<[string, number, number, number, number]> = [
     [row.label, 540, 204 + index * 80, 170, 3],
     [String(row.tonnesCO2e), 730, 204 + index * 80, 180, 3],
@@ -39,12 +49,18 @@ export function OperatingEmissionRow({
           />
         );
       })}
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M540 ${264 + index * 80} H${mix(motion.ramp(frame, 60, motion.scale(48), motion.travel.easing), 540, 918)}`,
+        }}
+        profile={tokens.sketch.shape}
         data-operation-ribbon={row.id}
         data-tonnes={row.tonnesCO2e}
-        d={`M540 ${264 + index * 80} H${mix(ramp(frame, 60, 48, EASE.inOut), 540, 918)}`}
-        stroke={STOCK.orange}
-        strokeWidth={16 * (row.tonnesCO2e / 1000)}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(
+          RIBBON_WIDTH_PER_KILOTONNE * (row.tonnesCO2e / 1000),
+        )}
         fill="none"
       />
     </g>

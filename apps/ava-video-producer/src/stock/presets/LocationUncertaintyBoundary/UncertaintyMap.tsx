@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DistrictFootprint } from "./DistrictFootprint";
 import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import { UncertainLocation } from "./UncertainLocation";
@@ -13,18 +14,19 @@ export function UncertaintyMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const focus = getAssignmentsFromLocations(input).find(
     propEq("id", input.focusedLocationId),
   )!;
   return (
     <g>
-      <rect
+      <StockRect
         x={50}
         y={140}
         width={360}
         height={360}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       {input.districts.map((district, index) => {
         return (

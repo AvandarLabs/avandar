@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp, EASE } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { JobRectangle } from "./findJobRoute";
 import type { JobTransferPlan, JobTransfer } from "./makeJobTransfersFromInput";
 
@@ -36,9 +37,13 @@ export function getJobPlacementFromPlanAndFrame({
   plan,
   index,
   frame,
-}: Readonly<{ plan: JobTransferPlan; index: number; frame: number }>):
-  | JobRectangle
-  | { height: number; x: number; y: number } {
+  motion,
+}: Readonly<{
+  plan: JobTransferPlan;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>): JobRectangle | { height: number; x: number; y: number } {
   const slot = plan.slots[index];
   if (!slot.isMoving) {
     return slot.initial;
@@ -46,7 +51,9 @@ export function getJobPlacementFromPlanAndFrame({
   if (frame <= 48) {
     return {
       ...slot.initial,
-      y: slot.initial.y - 160 * ramp(frame, 36, 12, EASE.inOut),
+      y:
+        slot.initial.y -
+        160 * motion.ramp(frame, 36, motion.scale(12), motion.travel.easing),
     };
   }
   const order = plan.transfers.findIndex(propEq("index", index));
@@ -54,7 +61,9 @@ export function getJobPlacementFromPlanAndFrame({
     return sum + transfer.length;
   }, 0);
   const distance =
-    plan.totalLength * ramp(frame, 48, 60, EASE.inOut) - preceding;
+    plan.totalLength *
+      motion.ramp(frame, 48, motion.scale(60), motion.travel.easing) -
+    preceding;
   return {
     ..._getTravelPoint({ transfer: plan.transfers[order], distance }),
     height: slot.initial.height,

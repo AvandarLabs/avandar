@@ -1,4 +1,9 @@
 import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { GisLabels } from "./GisLabels";
 import { HouseholdMarker } from "./HouseholdMarker";
 import { LayerGeometry } from "./LayerGeometry";
@@ -37,6 +42,8 @@ export function GisLayerIntersectionTally({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const selected = input.households.map((household) => {
     return _isSelected({ input, household });
   });
@@ -55,12 +62,13 @@ export function GisLayerIntersectionTally({
   return (
     <g>
       <LayerGeometry input={input} frame={frame} accent={accent} />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M565 155 H555 V510 H565" }}
+        profile={tokens.sketch.shape}
         data-counting-bracket="true"
-        d="M565 155 H555 V510 H565"
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {input.households.map((household, index) => {
         return (

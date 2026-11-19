@@ -1,3 +1,9 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getOperatorGripFromInputAndFrame } from "./getOperatorGripFromInputAndFrame";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
@@ -11,23 +17,33 @@ export function MaterialOperator({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { x, y, index } = getOperatorGripFromInputAndFrame({ input, frame });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const { x, y, index } = getOperatorGripFromInputAndFrame({
+    motion,
+    input,
+    frame,
+  });
   return (
     <g>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x + 12, cy: y - 41, r: 6 }}
+        profile={tokens.sketch.shape}
         data-operator-head="physical"
-        cx={x + 12}
-        cy={y - 41}
-        r={6}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 12} ${y - 35}v18l-7 10M${x + 12} ${y - 17}l7 10M${x + 12} ${y - 29}l8 10L${x + 12} ${y}`,
+        }}
+        profile={tokens.sketch.shape}
         data-operator-body="physical"
-        d={`M${x + 12} ${y - 35}v18l-7 10M${x + 12} ${y - 17}l7 10M${x + 12} ${y - 29}l8 10L${x + 12} ${y}`}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         fill="none"
       />
       <circle

@@ -1,6 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -14,16 +19,25 @@ export function CoordinationActors({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const movingIndex = input.teams.findIndex((team) => {
     return team.initialPlaceId !== team.agreedPlaceId;
   });
   const destination = input.places.find((place) => {
     return place.id === input.teams[movingIndex].agreedPlaceId;
   })!;
-  const pointing = ramp(frame, 24, 12, EASE.inOut);
+  const pointing = motion.ramp(
+    frame,
+    24,
+    motion.scale(12),
+    motion.travel.easing,
+  );
   const handX = mix(pointing, 370, 340 + destination.x * 270);
   const handY = mix(pointing, 485, 160 + destination.y * 280);
   const marker = getTeamMarkerPoseFromInputAndFrame({
+    motion,
     input,
     index: movingIndex,
     frame,
@@ -39,30 +53,38 @@ export function CoordinationActors({
         x={350}
         y={485}
         size={40}
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         role="facilitator"
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M350 485 L${(350 + handX) / 2} ${handY + 24} L${handX} ${handY}`,
+        }}
+        profile={tokens.sketch.shape}
         data-community-arm
-        d={`M350 485 L${(350 + handX) / 2} ${handY + 24} L${handX} ${handY}`}
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={3}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <circle
         data-community-hand
         cx={handX}
         cy={handY}
         r={3}
-        fill={STOCK.orange}
+        fill={tokens.color.highlight}
       />
       <PersonGlyph x={bodyX} y={bodyY} size={36} color={accent} role="worker" />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${bodyX} ${bodyY} L${bodyX - 12} ${teamHandY + 12} L${teamHandX} ${teamHandY}`,
+        }}
+        profile={tokens.sketch.shape}
         data-team-arm
-        d={`M${bodyX} ${bodyY} L${bodyX - 12} ${teamHandY + 12} L${teamHandX} ${teamHandY}`}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <circle
         data-team-hand

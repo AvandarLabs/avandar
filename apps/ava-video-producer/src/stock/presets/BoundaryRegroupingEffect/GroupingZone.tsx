@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getGroupingFromCells } from "./getGroupingFromCells";
 import type { ReactNode } from "react";
 
@@ -9,10 +10,13 @@ type Props = {
 };
 /** Matching visible keys attach each arithmetic summary to its zone seam. */
 export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const cell = [...zone.cells].sort((first, second) => {
     return first.row - second.row || first.column - second.column;
   })[0];
-  const color = [accent, STOCK.cyan, STOCK.orange][zone.zoneIndex];
+  const color = [accent, tokens.color.accentAlt, tokens.color.highlight][
+    zone.zoneIndex
+  ];
   const summaryY = 160 + zone.zoneIndex * 108;
   const keyLabel = String(zone.zoneIndex + 1);
   return (
@@ -22,12 +26,16 @@ export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
       data-population={zone.population}
       data-value={zone.value}
     >
-      <circle
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: 70 + cell.column * 120,
+          cy: 150 + cell.row * 110,
+          r: 9,
+        }}
+        profile={tokens.sketch.shape}
         data-zone-key={zone.id}
-        cx={70 + cell.column * 120}
-        cy={150 + cell.row * 110}
-        r={9}
-        fill={STOCK.elevated}
+        fill={tokens.color.elevated}
         stroke={color}
       />
       <LabelSlots

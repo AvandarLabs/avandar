@@ -1,5 +1,10 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LampObject } from "./LampObject";
 import { LockerObject } from "./LockerObject";
 import type { Input } from "./GrievanceRemedyRetest.schema";
@@ -12,14 +17,19 @@ export function RemedyObject({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const functioning =
-    input.testResults.after === "functioning" ? ramp(frame, 98, 10) : 0;
+    input.testResults.after === "functioning"
+      ? motion.ramp(frame, 98, motion.scale(10))
+      : 0;
   const attempt =
-    8 * Math.sin(Math.PI * ramp(frame, 20, 10)) +
+    8 * Math.sin(Math.PI * motion.ramp(frame, 20, motion.scale(10))) +
     (input.testResults.after !== "not-tested"
-      ? 8 * Math.sin(Math.PI * ramp(frame, 98, 10))
+      ? 8 * Math.sin(Math.PI * motion.ramp(frame, 98, motion.scale(10)))
       : 0);
-  const replacement = ramp(frame, 56, 22);
+  const replacement = motion.ramp(frame, 56, motion.scale(22));
   const isLamp = input.object.kind === "desk-lamp";
   const objectState =
     frame >= 108 ? input.testResults.after : "not-functioning";
@@ -30,11 +40,15 @@ export function RemedyObject({
       ) : (
         <LockerObject functioning={functioning} accent={accent} />
       )}
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${mix(replacement, 560, 615)} ${mix(replacement, 322, 410)} l-10 16`,
+        }}
+        profile={tokens.sketch.shape}
         data-old-part="retained"
-        d={`M${mix(replacement, 560, 615)} ${mix(replacement, 322, 410)} l-10 16`}
-        stroke={STOCK.orange}
-        strokeWidth={6}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(6)}
       />
       <rect
         data-replacement-part="worker"
@@ -42,15 +56,19 @@ export function RemedyObject({
         y={mix(replacement, 365, 321)}
         width={24}
         height={18}
-        rx={3}
-        fill={STOCK.cyan}
-        opacity={ramp(frame, 44, 8)}
+        rx={scales.corner(3)}
+        fill={tokens.color.accentAlt}
+        opacity={motion.ramp(frame, 44, motion.whip)}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M560 330 l${isLamp ? 12 : 14} ${mix(functioning, 12, 0) - attempt}`,
+        }}
+        profile={tokens.sketch.shape}
         data-object-operation="handle"
-        d={`M560 330 l${isLamp ? 12 : 14} ${mix(functioning, 12, 0) - attempt}`}
         stroke={accent}
-        strokeWidth={4}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
     </g>
   );

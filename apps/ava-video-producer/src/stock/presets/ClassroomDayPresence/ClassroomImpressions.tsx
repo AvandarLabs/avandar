@@ -1,6 +1,8 @@
 import { propEq } from "@avandar/utils";
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 
@@ -22,6 +24,7 @@ export function ClassroomImpressions({
   y,
   activeIndex,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (!input.showDayImpressions) {
     return undefined;
   }
@@ -37,25 +40,39 @@ export function ClassroomImpressions({
             data-learner={learnerId}
             opacity={index <= activeIndex ? 1 : 0.2}
           >
-            <Text x={center - 11} y={y + 4} size={12} fill={STOCK.muted}>
+            <Text
+              x={center - 11}
+              y={y + 4}
+              role="data"
+              fill={tokens.color.textMuted}
+            >
               {index + 1}
             </Text>
             {state === "present" ? (
-              <circle cx={center + 7} cy={y} r={5} fill={STOCK.mint} />
+              <circle
+                cx={center + 7}
+                cy={y}
+                r={5}
+                fill={tokens.color.positive}
+              />
             ) : state === "absent" ? (
-              <rect
+              <StockRect
                 x={center + 2}
                 y={y - 5}
                 width={10}
                 height={10}
                 fill="none"
-                stroke={STOCK.muted}
+                stroke={tokens.color.inactive}
               />
             ) : (
-              <path
-                d={`M ${center + 7} ${y - 6} l 6 6 l -6 6 l -6 -6 Z`}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M ${center + 7} ${y - 6} l 6 6 l -6 6 l -6 -6 Z`,
+                }}
+                profile={tokens.sketch.shape}
                 fill="none"
-                stroke={STOCK.orange}
+                stroke={tokens.color.highlight}
               />
             )}
           </g>

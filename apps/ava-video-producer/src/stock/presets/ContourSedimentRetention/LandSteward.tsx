@@ -1,26 +1,36 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 /** Inputs for LandSteward. */
 type Props = { x: number; y: number; accent: string };
 
 /** The steward carries the barrier at its visible leading edge. */
 export function LandSteward({ x, y, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x - 35, cy: y - 30, r: 8 }}
+        profile={tokens.sketch.shape}
         data-steward-head="physical"
-        cx={x - 35}
-        cy={y - 30}
-        r={8}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x - 35} ${y - 22}v30l-10 20M${x - 35} ${y + 8}l10 20M${x - 35} ${y - 10}L${x - 18} ${y + 12}L${x} ${y + 12}`,
+        }}
+        profile={tokens.sketch.shape}
         data-steward-body="physical"
-        d={`M${x - 35} ${y - 22}v30l-10 20M${x - 35} ${y + 8}l10 20M${x - 35} ${y - 10}L${x - 18} ${y + 12}L${x} ${y + 12}`}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <circle data-hand="contact" cx={x} cy={y + 12} r={3} fill={accent} />
     </g>

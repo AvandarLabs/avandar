@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,17 +19,17 @@ export function HouseholdAnchor({
   covered,
   progress,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {" "}
       <circle data-home-anchor={householdId} cx={x} cy={y} r={3} fill={color} />
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: 8 }}
+        profile={tokens.sketch.shape}
         data-gap-ring={householdId}
-        cx={x}
-        cy={y}
-        r={8}
         fill="none"
-        stroke={STOCK.orange}
+        stroke={tokens.color.highlight}
         opacity={covered ? 0 : progress}
       />
     </g>

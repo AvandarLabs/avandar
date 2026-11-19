@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Authored operator cue precedes the supplied placement. */
 export function ComputeHeader({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
       <SceneLabel text={input.windowLabel} x={55} y={34} width={400} />
@@ -16,7 +17,7 @@ export function ComputeHeader({ input, frame }: Readonly<Props>): ReactNode {
         width={400}
       />
       <SceneLabel text={input.decision.actorLabel} x={55} y={70} width={350} />
-      <g opacity={ramp(frame, 24, 12)}>
+      <g opacity={motion.reveal(frame, 24)}>
         <SceneLabel
           text={input.decision.actionLabel}
           x={500}

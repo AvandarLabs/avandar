@@ -1,7 +1,13 @@
-import { mix, ramp, EASE } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
 /** Inputs for CorridorDecision. */
@@ -12,7 +18,10 @@ type Props = { frame: number; input: Input };
  * stage.
  */
 export function CorridorDecision({ frame, input }: Readonly<Props>): ReactNode {
-  const reach = ramp(frame, 28, 8, EASE.inOut),
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const reach = motion.ramp(frame, 28, motion.whip, motion.travel.easing),
     handX = mix(reach, 449, 480);
   return (
     <g>
@@ -41,21 +50,22 @@ export function CorridorDecision({ frame, input }: Readonly<Props>): ReactNode {
         y={101}
         size={32}
         role="worker"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
       />
-      <rect
+      <StockRect
         data-plan-control="true"
         x={472}
         y={95}
         width={16}
         height={16}
-        fill={STOCK.surface}
-        stroke={STOCK.orange}
+        fill={tokens.color.surface}
+        stroke={tokens.color.highlight}
       />
-      <path
-        d={`M 445 101 L ${handX} 103`}
-        stroke={STOCK.orange}
-        strokeWidth={2.5}
+      <SketchedShape
+        shape={{ kind: "path", d: `M 445 101 L ${handX} 103` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(2.5)}
         fill="none"
       />
       <circle
@@ -63,7 +73,7 @@ export function CorridorDecision({ frame, input }: Readonly<Props>): ReactNode {
         cx={handX}
         cy={103}
         r={3}
-        fill={STOCK.orange}
+        fill={tokens.color.highlight}
       />
     </g>
   );

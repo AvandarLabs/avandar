@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -17,22 +22,27 @@ export function PaymentQuantity({
   showTotals,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={48 + index * 224}
         y={187}
         width={18}
         height={18}
-        fill={index === 1 ? accent : index === 2 ? STOCK.cyan : "none"}
-        stroke={index === 3 ? STOCK.orange : STOCK.muted}
+        fill={
+          index === 1 ? accent : index === 2 ? tokens.color.accentAlt : "none"
+        }
+        stroke={index === 3 ? tokens.color.highlight : tokens.color.inactive}
         strokeDasharray={index === 3 ? "3 3" : undefined}
       />
       {index === 2 ? (
-        <path
-          d={`M${50 + index * 224} 202 l13 -12`}
-          stroke={STOCK.ground}
-          strokeWidth={3}
+        <SketchedShape
+          shape={{ kind: "path", d: `M${50 + index * 224} 202 l13 -12` }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.ground}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       ) : undefined}
       <LabelSlots labels={[[label, 76 + index * 224, 200, 192, 12, 3]]} />
@@ -41,8 +51,9 @@ export function PaymentQuantity({
           data-quantity-total={index}
           x={76 + index * 224}
           y={258}
-          fill={STOCK.text}
-          fontSize={20}
+          fill={tokens.color.text}
+          fontFamily={tokens.text.graphic.body.fontFamily}
+          fontSize={tokens.text.graphic.body.fontSize}
         >
           {total}
         </text>

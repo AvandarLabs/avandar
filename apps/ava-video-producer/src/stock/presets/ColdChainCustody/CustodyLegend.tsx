@@ -1,5 +1,7 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CustodyLegendEntry } from "./CustodyLegendEntry";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
@@ -12,8 +14,10 @@ export function CustodyLegend({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 30, 12)}>
+    <g opacity={motion.reveal(frame, 30)}>
       {[0, 1, 2].flatMap((column) => {
         return Array.from({ length: column === 1 ? 2 : 3 }, (_, row) => {
           return (
@@ -29,7 +33,10 @@ export function CustodyLegend({
         });
       })}
       {input.showLedger ? (
-        <g data-ledger="custody" opacity={ramp(frame, 116, 10)}>
+        <g
+          data-ledger="custody"
+          opacity={motion.ramp(frame, 116, motion.scale(10))}
+        >
           <SceneLabel
             text={input.copy.total}
             x={32}
@@ -37,14 +44,20 @@ export function CustodyLegend({
             width={280}
             lines={3}
           />
-          <text x={315} y={562} fill={STOCK.text} fontSize={14}>
+          <text
+            x={315}
+            y={562}
+            fill={tokens.color.text}
+            fontFamily={tokens.text.graphic.value.fontFamily}
+            fontSize={tokens.text.graphic.value.fontSize}
+          >
             {input.crates.length}
           </text>
         </g>
       ) : undefined}
       <g
         data-physical-receipt={input.crates.length}
-        opacity={ramp(frame, 116, 10)}
+        opacity={motion.ramp(frame, 116, motion.scale(10))}
       >
         <SceneLabel
           text={input.copy.arrival}
