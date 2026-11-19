@@ -4,14 +4,13 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
-/** The dash of the empty selection slot. */
-const SLOT_DASH = "4 6";
 /** A stated criterion and unchanged selection slot explain the replacement. */
 export function SelectionCriterion({
   frame,
@@ -19,6 +18,7 @@ export function SelectionCriterion({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const label = {
@@ -53,7 +53,7 @@ export function SelectionCriterion({
         {...slot}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray={SLOT_DASH}
+        strokeDasharray={atomic.dash.spaced.join(" ")}
         opacity={motion.ramp(frame, 18, motion.hero)}
       />
       {input.showCriterionLink ? (

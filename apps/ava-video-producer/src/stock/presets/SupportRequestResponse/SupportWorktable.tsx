@@ -4,16 +4,13 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-/** The dash of a form task's placeholder fields. */
-const FORM_DASH = "5 5";
-/** The dash of a document task's placeholder lines. */
-const DOCUMENT_DASH = "6 6";
 /**
  * The same visibly unfinished document or assembly remains at its owner's desk.
  */
@@ -23,6 +20,7 @@ export function SupportWorktable({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   return (
@@ -45,7 +43,7 @@ export function SupportWorktable({
           shape={{ kind: "path", d: "M350 325 h115 M350 340 h75 M480 340 h65" }}
           profile={tokens.sketch.shape}
           stroke={tokens.color.inactive}
-          strokeDasharray={DOCUMENT_DASH}
+          strokeDasharray={atomic.dash.long.join(" ")}
           fill="none"
         />
       ) : (
@@ -56,7 +54,7 @@ export function SupportWorktable({
           }}
           profile={tokens.sketch.shape}
           stroke={tokens.color.inactive}
-          strokeDasharray={FORM_DASH}
+          strokeDasharray={tokens.dash.placeholder.join(" ")}
           fill="none"
         />
       )}

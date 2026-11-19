@@ -3,13 +3,12 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { label: string; checkpoint: number; frame: number };
-/** The dash of the retry checkpoint line. */
-const CHECKPOINT_DASH = "4 6";
 /** A complete bounded caption connects to the exact acknowledged byte. */
 export function RetryCheckpoint({
   label,
@@ -17,6 +16,7 @@ export function RetryCheckpoint({
   frame,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const captionX = Math.max(84, Math.min(516, checkpoint - 180));
@@ -27,7 +27,7 @@ export function RetryCheckpoint({
         profile={tokens.sketch.shape}
         data-checkpoint-line="true"
         stroke={tokens.color.highlight}
-        strokeDasharray={CHECKPOINT_DASH}
+        strokeDasharray={atomic.dash.spaced.join(" ")}
       />
       <LabelSlots labels={[[label, captionX, 90, 360, 16, 3]]} />
       <SketchedShape

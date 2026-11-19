@@ -3,6 +3,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getVisibleReleaseIssueRowsFromInput } from "./getVisibleReleaseIssueRowsFromInput";
@@ -10,8 +11,6 @@ import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; artifactX: number };
-/** The dash of an obligation unfolding into the register. */
-const OBLIGATION_DASH = "4 6";
 /**
  * Open follow-ups unfold into keyed owner and due entries without resolution.
  */
@@ -22,6 +21,7 @@ export function RepairRegister({
   artifactX,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const followUps = getVisibleReleaseIssueRowsFromInput(input).filter(
@@ -58,7 +58,7 @@ export function RepairRegister({
                   fill="none"
                   stroke={accent}
                   strokeWidth={scales.stroke(tokens.stroke.outline)}
-                  strokeDasharray={OBLIGATION_DASH}
+                  strokeDasharray={atomic.dash.spaced.join(" ")}
                   opacity={
                     (1 - motion.ramp(frame, 88, motion.scale(3))) * unfold
                   }

@@ -12,9 +12,6 @@
   "pendingTokens": [],
   "handoffTokens": {
     "corner.scene": ["s7", "s8"],
-    "dash.placeholder": ["s3", "s4"],
-    "text.graphic.mark": ["s4"],
-    "text.graphic.smallCaption": ["s4"],
     "text.graphic.value": ["s3"],
     "text.stage.command": ["s7"],
     "text.stage.heroFigure": ["s7"],

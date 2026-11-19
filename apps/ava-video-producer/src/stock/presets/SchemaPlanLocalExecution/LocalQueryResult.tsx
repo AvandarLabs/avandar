@@ -41,7 +41,8 @@ export function LocalQueryResult({
         x={345}
         y={248}
         fill={accent}
-        fontSize={tokens.text.graphic.eyebrow.fontSize}
+        fontFamily={tokens.text.graphic.smallCaption.fontFamily}
+        fontSize={tokens.text.graphic.smallCaption.fontSize}
       >
         {"="}
       </text>

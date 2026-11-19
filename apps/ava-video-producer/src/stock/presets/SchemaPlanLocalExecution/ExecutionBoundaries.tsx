@@ -2,16 +2,16 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
-/** The dash of the network boundary. */
-const NETWORK_DASH = "6 6";
 /**
  * Stable device and planner boundaries separate retained rows from messages.
  */
 export function ExecutionBoundaries(): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   return (
     <g>
@@ -41,7 +41,7 @@ export function ExecutionBoundaries(): ReactNode {
         profile={tokens.sketch.shape}
         data-network-boundary="true"
         stroke={tokens.color.inactive}
-        strokeDasharray={NETWORK_DASH}
+        strokeDasharray={atomic.dash.long.join(" ")}
       />
     </g>
   );
