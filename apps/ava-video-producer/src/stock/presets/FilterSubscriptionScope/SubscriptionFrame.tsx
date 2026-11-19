@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +14,9 @@ type Props = {
   width: number;
   accent: string;
 };
+
+/** The dash of a connector that stops short of an unsubscribed view. */
+const UNSUBSCRIBED_DASH = "3 6";
 /** A connector stops explicitly at the independent reference view. */
 export function SubscriptionFrame({
   view,
@@ -16,29 +24,40 @@ export function SubscriptionFrame({
   width,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        data-subscription={view.id}
-        d={`M479 134 V136 H${x + width / 2} V140`}
-        fill="none"
-        stroke={view.subscribed ? accent : STOCK.muted}
-        strokeDasharray={view.subscribed ? undefined : "3 6"}
-      />
+      <g data-subscription={view.id}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M479 134 V136 H${x + width / 2} V140`,
+          }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={view.subscribed ? accent : tokens.color.inactive}
+          strokeDasharray={view.subscribed ? undefined : UNSUBSCRIBED_DASH}
+        />
+      </g>
       {view.subscribed ? undefined : (
-        <path
-          d={`M${x + width / 2 - 6} 125 l12 12 m0 -12 l-12 12`}
-          stroke={STOCK.orange}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x + width / 2 - 6} 125 l12 12 m0 -12 l-12 12`,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.highlight}
         />
       )}
-      <rect
+      <StockRect
         x={x}
         y={140}
         width={width}
         height={456}
-        rx={12}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.card)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <LabelSlots labels={[[view.label, x + 12, 162, width - 24, 14, 3]]} />
     </g>

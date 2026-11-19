@@ -1,37 +1,53 @@
-import { ramp, mix, EASE } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+
+/** Frames the category strip takes to slide into the socket. */
+const SLIDE_FRAMES = 39;
 /** The category strip moves into a fixed subscription source socket. */
 export function SubscriptionSocket({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const socket = mix(ramp(frame, 51, 39, EASE.inOut), 48, 354);
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const corner = scales.corner(tokens.corner.cell);
+  const socket = mix(
+    ramp(frame, 51, motion.scale(SLIDE_FRAMES), motion.travel.easing),
+    48,
+    354,
+  );
   return (
     <g>
-      <rect
+      <StockRect
         data-filter-socket="true"
         x={354}
         y={102}
         width={250}
         height={32}
-        rx={8}
+        rx={corner}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <g data-filter="true" data-x={socket}>
-        <rect
+        <StockRect
           x={socket}
           y={102}
           width={250}
           height={32}
-          rx={8}
-          fill={STOCK.elevated}
+          rx={corner}
+          fill={tokens.color.elevated}
           stroke={accent}
         />
         <LiteralDataText
