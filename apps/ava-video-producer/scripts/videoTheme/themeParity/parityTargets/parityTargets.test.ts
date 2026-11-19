@@ -56,3 +56,14 @@ test("unknown parity ids are rejected", () => {
     return listParityTargets(["not-a-preset"]);
   });
 });
+
+test("any Atlas motion or composition can be named before it is covered", () => {
+  assert.deepEqual(
+    listParityTargets(["person-led-support-calendar", "brand-lockup"]).map(
+      (target) => {
+        return target.filmId;
+      },
+    ),
+    ["stock-person-led-support-calendar", "brand-lockup"],
+  );
+});

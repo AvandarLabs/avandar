@@ -6,7 +6,9 @@
       {
         "rule": "layout-transition",
         "value": "*",
-        "files": ["src/components/AppShell/AppShell.module.css"],
+        "files": [
+          "src/components/AppShell/AppShell.module.css"
+        ],
         "createdAt": "2026-10-15T14:27:01.252Z",
         "reason": "pre-existing, predates this session; width is intentionally included alongside transform/top/height per the comment above (Composer mode grows the aside inline to overlay the slate), and a prefers-reduced-motion fallback already disables the transition entirely"
       },
@@ -22,28 +24,36 @@
       {
         "rule": "design-system-font",
         "value": "arial",
-        "files": ["apps/ava-video-producer/src/stock/StockGraphic.tsx"],
+        "files": [
+          "apps/ava-video-producer/src/stock/StockGraphic.tsx"
+        ],
         "createdAt": "2026-10-19T12:14:55.212Z",
         "reason": "Codex: preserve the existing generic stock typography as required by producer AGENTS. This revision changes only transparent compositing."
       },
       {
         "rule": "design-system-font",
         "value": "inter",
-        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "files": [
+          "apps/ava-video-producer/showcase/motion.css"
+        ],
         "createdAt": "2026-10-19T19:46:15.204Z",
         "reason": "Codex: existing Motion Atlas typography shown in the user reference. User requested Compositions and Sample films match this theme; this change restores shared paper and ink tokens only."
       },
       {
         "rule": "design-system-font",
         "value": "georgia",
-        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "files": [
+          "apps/ava-video-producer/showcase/motion.css"
+        ],
         "createdAt": "2026-10-19T19:46:15.225Z",
         "reason": "Codex: existing Motion Atlas editorial accent font shown in the user reference. Preserve this standalone producer theme while restoring shared paper and ink tokens."
       },
       {
         "rule": "overused-font",
         "value": "inter",
-        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "files": [
+          "apps/ava-video-producer/showcase/motion.css"
+        ],
         "createdAt": "2026-10-19T19:47:03.578Z",
         "reason": "Codex: existing Motion Atlas typography shown in the user reference. The user requested matching the existing shared design theme; replacing its font is outside this styling regression fix."
       },
@@ -52,6 +62,15 @@
         "value": "font",
         "createdAt": "2026-11-13T18:17:04.393Z",
         "reason": "agent: false positive, L174 is the editor control name string 'font' in TOKEN_CONTROLS, not a CSS font"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "arial",
+        "files": [
+          "apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/countThemeLiterals/countThemeLiterals.test.ts"
+        ],
+        "createdAt": "2026-11-19T17:51:23.450Z",
+        "reason": "Claude (S1 worker): test fixture string for the theme literal scanner, not rendered UI"
       }
     ]
   }

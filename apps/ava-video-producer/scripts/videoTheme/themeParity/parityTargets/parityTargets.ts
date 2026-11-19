@@ -1,9 +1,12 @@
+import { CONTINUITY_CATALOG } from "../../../../src/continuity/continuityCatalog";
 import {
   DEFAULT_ACCENT,
   DEFAULT_BACKGROUND,
 } from "../../../../src/gallery/palette";
+import { STOCK_IDS } from "../../../../src/stock/catalog";
 import { previewFrames } from "../../../lib/planHelpers";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
+import { getCoveredIdsFromBudgets } from "../../themeLiteralBudgets/themeLiteralBudgets";
 import type { Film } from "../../../../src/showcase/showcase.types";
 import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
 
@@ -73,37 +76,58 @@ const PARITY_ALLOWANCES: readonly ParityAllowance[] = [
   },
 ];
 
+/** Compositions with a showcase film besides the storyboard catalog. */
+const FIXED_COMPOSITION_IDS = ["title-study", "motion-lab"];
+
 /**
- * Parity targets in Atlas order, or only the named ones. Stock presets load
- * at the Atlas gallery default colours. Compositions load with their
- * authored values.
+ * The target for any Atlas motion or composition id, or undefined for an id
+ * the Atlas does not have. Stock presets load at the Atlas gallery default
+ * colours. Compositions load with their authored values.
+ */
+function _createTargetFromId(id: string): ParityTarget | undefined {
+  if ((STOCK_IDS as readonly string[]).includes(id)) {
+    return {
+      id,
+      filmId: `stock-${id}`,
+      options: { accent: DEFAULT_ACCENT, background: DEFAULT_BACKGROUND },
+    };
+  }
+  const isComposition =
+    FIXED_COMPOSITION_IDS.includes(id) ||
+    CONTINUITY_CATALOG.some((entry) => {
+      return entry.id === id;
+    });
+  return isComposition ? { id, filmId: id, options: {} } : undefined;
+}
+
+/**
+ * Parity targets for the named ids, or by default every in-scope item: the
+ * presets and compositions the design tokens cover first, in Atlas order,
+ * then the items each slice budget lists as covered. Any Atlas id may be
+ * named, so a slice can capture its items before it migrates them.
  */
 export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
-  const targets = [
-    ...PARITY_STOCK_PRESET_IDS.map((id) => {
-      return {
-        id,
-        filmId: `stock-${id}`,
-        options: { accent: DEFAULT_ACCENT, background: DEFAULT_BACKGROUND },
-      };
-    }),
-    ...PARITY_COMPOSITION_IDS.map((id) => {
-      return { id, filmId: id, options: {} };
-    }),
-  ];
-  const unknownIds = ids.filter((id) => {
-    return !targets.some((target) => {
-      return target.id === id;
-    });
+  const requestedIds = ids.length
+    ? ids
+    : [
+        ...new Set([
+          ...PARITY_STOCK_PRESET_IDS,
+          ...PARITY_COMPOSITION_IDS,
+          ...getCoveredIdsFromBudgets(),
+        ]),
+      ];
+  const targets = requestedIds.map((id) => {
+    return { id, target: _createTargetFromId(id) };
+  });
+  const unknownIds = targets.flatMap(({ id, target }) => {
+    return target ? [] : [id];
   });
   if (unknownIds.length > 0) {
     throw new Error(`Unknown parity target: ${unknownIds.join(", ")}`);
   }
-  return ids.length
-    ? targets.filter((target) => {
-        return ids.includes(target.id);
-      })
-    : targets;
+  return targets.flatMap(({ target }) => {
+    return target ? [target] : [];
+  });
 }
 
 /**

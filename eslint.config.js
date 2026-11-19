@@ -14,6 +14,7 @@ import tseslint from "typescript-eslint";
 import { denoRestrictions } from "./eslint/deno-restrictions.js";
 import { packageRestrictions } from "./eslint/package-restrictions.js";
 import { privacyChokepoint } from "./eslint/privacy-chokepoint.js";
+import { videoThemeRestrictions } from "./eslint/video-theme-restrictions.js";
 
 export default [
   {
@@ -276,6 +277,8 @@ export default [
   },
 
   ...privacyChokepoint,
+  // Video producer renderers of slices whose theme migration has landed.
+  ...videoThemeRestrictions,
   {
     // Plain JavaScript has no syntax for parameter or return types, so the
     // rule cannot be satisfied there. Such files carry their types in a

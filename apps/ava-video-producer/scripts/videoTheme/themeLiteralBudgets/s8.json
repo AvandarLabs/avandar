@@ -1,0 +1,39 @@
+{
+  "slice": "s8",
+  "title": "Fixed compositions and helper previews",
+  "globs": [
+    "src/compositions/**",
+    "src/Root.tsx",
+    "src/gallery/HelperGallery/demos/**",
+    "src/gallery/HelperGallery/HelperPlayer/**"
+  ],
+  "enforceLint": false,
+  "coveredIds": [],
+  "pendingTokens": [],
+  "literals": {
+    "src/compositions/Demo/Demo.tsx": 15,
+    "src/compositions/Demo/PromptField.tsx": 13,
+    "src/compositions/Demo/PublishButton.tsx": 7,
+    "src/compositions/Demo/ResultsPanel.tsx": 31,
+    "src/compositions/Demo/SidePanel.tsx": 30,
+    "src/compositions/MotionLab.tsx": 50,
+    "src/compositions/TitleStudy.tsx": 1,
+    "src/gallery/HelperGallery/demos/BlurDemos.tsx": 8,
+    "src/gallery/HelperGallery/demos/BuildDemos.tsx": 2,
+    "src/gallery/HelperGallery/demos/CameraDemos.tsx": 2,
+    "src/gallery/HelperGallery/demos/demos.module.css": 226,
+    "src/gallery/HelperGallery/demos/DurationDemos.tsx": 9,
+    "src/gallery/HelperGallery/demos/EntranceDemos.tsx": 4,
+    "src/gallery/HelperGallery/demos/HelperDemoFrame/HelperDemoFrame.module.css": 22,
+    "src/gallery/HelperGallery/demos/InterpolationDemos.tsx": 13,
+    "src/gallery/HelperGallery/demos/LoopDemos.tsx": 6,
+    "src/gallery/HelperGallery/demos/MaskDemos.tsx": 4,
+    "src/gallery/HelperGallery/demos/MediaDemos.tsx": 2,
+    "src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx": 7,
+    "src/gallery/HelperGallery/demos/parts/parts.module.css": 36,
+    "src/gallery/HelperGallery/demos/PointerDemos.tsx": 6,
+    "src/gallery/HelperGallery/demos/TextDemos.tsx": 1,
+    "src/gallery/HelperGallery/demos/WindowDemos.tsx": 4,
+    "src/Root.tsx": 1
+  }
+}
