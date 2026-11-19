@@ -9,13 +9,15 @@ export const APP_ROOT: string = fileURLToPath(
 );
 const BUDGET_DIRECTORY = fileURLToPath(new URL("./", import.meta.url));
 
+const sliceSchema = z.string().regex(/^s\d+$/);
 const budgetSchema = z.strictObject({
-  slice: z.string().regex(/^s\d+$/),
+  slice: sliceSchema,
   title: z.string(),
   globs: z.array(z.string()).min(1),
   enforceLint: z.boolean(),
   coveredIds: z.array(z.string()),
   pendingTokens: z.array(z.string()),
+  handoffTokens: z.record(z.string(), z.array(sliceSchema).min(1)).optional(),
   tempoPendingIds: z.array(z.string()),
   literals: z.record(z.string(), z.number().int().positive()),
 });
@@ -33,6 +35,11 @@ const budgetSchema = z.strictObject({
  *   sentinel theme test.
  * - `pendingTokens` are token paths no renderer reads until the slice lands.
  *   The reader audit skips them; the slice removes each one it starts reading.
+ * - `handoffTokens` are tokens this slice added for other slices to read,
+ *   keyed by token path, each naming the slices expected to read it. The
+ *   reader audit skips them until one is read; the slice that starts reading
+ *   a token deletes its entry here, the one edit a slice makes outside its
+ *   own budget file.
  * - `tempoPendingIds` are Atlas ids the slowest-tempo test skips because a
  *   preset the slice owns has not settled in time yet.
  * - `literals` is the most theme literals each owned file may hold. Budgets
@@ -98,6 +105,20 @@ export function getPendingTokensFromBudgets(
   return new Set(
     budgets.flatMap((budget) => {
       return budget.pendingTokens;
+    }),
+  );
+}
+
+/**
+ * Tokens one slice added for others to read, by token path, with the slices
+ * expected to read each one.
+ */
+export function getHandoffTokensFromBudgets(
+  budgets: readonly ThemeLiteralBudget[] = listThemeLiteralBudgets(),
+): Map<string, readonly string[]> {
+  return new Map(
+    budgets.flatMap((budget) => {
+      return Object.entries(budget.handoffTokens ?? {});
     }),
   );
 }
