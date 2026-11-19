@@ -1,4 +1,5 @@
 import css from "./parts.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   easing: (t: number) => number;
@@ -76,7 +77,7 @@ function PlotHandles({
  * A plotted easing curve: time on X, eased value on Y, the curve drawn in
  * full, the travelled part highlighted, and a dot at the current value.
  */
-export function CurvePlot({ easing, t, size, handles }: Props) {
+export function CurvePlot({ easing, t, size, handles }: Props): ReactNode {
   const scale = _createScale(size);
   const { toX, toY } = scale;
   return (

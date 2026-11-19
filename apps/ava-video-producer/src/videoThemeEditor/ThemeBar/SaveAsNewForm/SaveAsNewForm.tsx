@@ -1,5 +1,5 @@
 import { Button, Group, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getThemeLabelFromInput } from "../themeBarHelpers/themeBarHelpers";
 import css from "./SaveAsNewForm.module.css";
 
@@ -9,7 +9,7 @@ type Props = Readonly<{
 }>;
 
 /** The name form for saving the draft as a new theme. Escape cancels it. */
-export function SaveAsNewForm({ onSubmit, onCancel }: Props) {
+export function SaveAsNewForm({ onSubmit, onCancel }: Props): ReactNode {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const label = getThemeLabelFromInput(input);

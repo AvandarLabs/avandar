@@ -10,10 +10,15 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-/** How much better than its neighbours a frame's halves match to count as tiled, in dB. */
+/**
+ * How much better than its neighbours a frame's halves match to count as tiled,
+ * in dB.
+ */
 export const TILE_SPIKE_DB = 3;
 
-/** The largest allowed frame-to-frame change of average luma, on a 0-255 scale. */
+/**
+ * The largest allowed frame-to-frame change of average luma, on a 0-255 scale.
+ */
 export const LUMA_JUMP = 25;
 
 /**
@@ -88,7 +93,9 @@ export function parseGateArguments(argv) {
   return { file, isStandalone, declaredCuts };
 }
 
-/** The ffmpeg binary: the bundled one when installed, otherwise the PATH one. */
+/**
+ * The ffmpeg binary: the bundled one when installed, otherwise the PATH one.
+ */
 function _findFfmpeg() {
   const local = new URL(
     "../../node_modules/ffmpeg-static/ffmpeg",
@@ -108,7 +115,9 @@ function _runFfmpeg(args) {
   return `${result.stdout ?? ""}${result.stderr ?? ""}`;
 }
 
-/** Each frame's left-half against right-half PSNR in dB, a perfect match as 99. */
+/**
+ * Each frame's left-half against right-half PSNR in dB, a perfect match as 99.
+ */
 function _measureHalves(file, width, height) {
   const directory = mkdtempSync(join(tmpdir(), "checkframes-"));
   const tileLog = join(directory, "tile.log");
@@ -173,7 +182,13 @@ function _measureLuma(file) {
  * Measures a video for the gate.
  *
  * @param {string} file
- * @returns {{width: number, height: number, halves: number[], luma: number[], contrast: number[]}}
+ * @returns {{
+ *   width: number,
+ *   height: number,
+ *   halves: number[],
+ *   luma: number[],
+ *   contrast: number[]
+ * }}
  */
 export function measureFrames(file) {
   const probe = _runFfmpeg(["-hide_banner", "-i", file, "-f", "null", "-"]);

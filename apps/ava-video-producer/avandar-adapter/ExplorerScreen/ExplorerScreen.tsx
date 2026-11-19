@@ -46,8 +46,8 @@ import {
 import { useExplorerVideoTargets } from "./useExplorerVideoTargets";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ExplorerMode } from "./explorerStage";
+import type { ReactNode } from "react";
 
-export { EXPLORER_BEATS, explorerBeats } from "./explorerStage";
 export type { ExplorerMode };
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -60,8 +60,16 @@ export type Props = {
   mode?: ExplorerMode;
 };
 
-/** Real product leaves, with fixture bindings and a frame-owned controller replacing app/network state. */
-export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
+/**
+ * Real product leaves, with fixture bindings and a frame-owned controller
+ * replacing app/network state.
+ */
+export function ExplorerScreen({
+  frame,
+  width,
+  height,
+  mode = "full",
+}: Props): ReactNode {
   const stage = explorerStage(frame, mode);
   const rootRef = useExplorerVideoTargets({ frame, mode, time: stage.time });
   const filters: StructuredQuery.FilterGroup = useMemo(() => {
@@ -195,10 +203,11 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
     <ExplorerSqlEditor sql={stage.sql} isEditingSql={stage.isEditingSql} />
   );
 
-  // The drawer, toolbar and canvas below remain inline rather than further split:
-  // they share `stage`, `filters`, `manualGroups`, and `sqlEditor` from this closure
-  // in ways that would otherwise require threading most of this function's state
-  // through prop lists, without reducing the file's real complexity.
+  // The drawer, toolbar and canvas below remain inline rather than further
+  // split: they share `stage`, `filters`, `manualGroups`, and `sqlEditor` from
+  // this closure in ways that would otherwise require threading most of this
+  // function's state through prop lists, without reducing the file's real
+  // complexity.
   return (
     <div
       ref={rootRef}

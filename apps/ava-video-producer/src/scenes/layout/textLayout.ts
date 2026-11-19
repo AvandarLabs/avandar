@@ -12,7 +12,9 @@ export function formatMetric(value: number, precision = 0): string {
   }).format(Object.is(rounded, -0) ? 0 : rounded);
 }
 
-/** Conservative width estimate, used for a stable font size before rendering. */
+/**
+ * Conservative width estimate, used for a stable font size before rendering.
+ */
 export function textUnits(text: string): number {
   return Array.from(text).reduce((sum, character) => {
     return (
@@ -50,13 +52,31 @@ export function wrapText(
   return result;
 }
 
+/** Wrapped lines and the font size they fit at. */
+type FittedTextLines = { fontSize: number; lines: string[] };
+
+/** The metric stack's fitted copy, type sizes, spacing and heights. */
+type MetricContentFit = {
+  label: FittedTextLines;
+  detail: FittedTextLines | undefined;
+  numberSize: number;
+  numberHeight: number;
+  unitSize: number;
+  paddingX: number;
+  paddingY: number;
+  numberGap: number;
+  unitGap: number;
+  contentHeight: number;
+  requiredHeight: number;
+};
+
 export function fitTextLines(
   lines: string[],
   width: number,
   height: number,
   requested = 92,
   minimum = 40,
-): { fontSize: number; lines: string[] } {
+): FittedTextLines {
   assertFinite(requested, "fontSize");
   if (requested < minimum || requested > 160)
     throw new Error(`fontSize must be from ${minimum} to 160`);
@@ -76,7 +96,10 @@ export function fitTextLines(
   );
 }
 
-/** Fit the complete metric stack once, including padding, gaps and both count endpoints. */
+/**
+ * Fit the complete metric stack once, including padding, gaps and both count
+ * endpoints.
+ */
 export function fitMetricContent({
   width,
   height,
@@ -89,7 +112,7 @@ export function fitMetricContent({
 }: Pick<
   MetricSceneProps,
   "label" | "value" | "from" | "unit" | "precision" | "detail"
-> & { width: number; height: number }) {
+> & { width: number; height: number }): MetricContentFit {
   assertFinite(width, "metric width");
   assertFinite(height, "metric height");
   const paddingX = 80;
@@ -98,7 +121,8 @@ export function fitMetricContent({
     textUnits(formatMetric(from, precision)),
     textUnits(formatMetric(value, precision)),
   );
-  // Prefer the original spacious treatment; compact only when the whole stack needs it.
+  // Prefer the original spacious treatment; compact only when the whole stack
+  // needs it.
   for (let step = 0; step <= 24; step++) {
     const amount = step / 24;
     const choose = (large: number, small: number) => {

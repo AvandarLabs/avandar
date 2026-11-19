@@ -21,7 +21,9 @@ type Props = Readonly<{
   action?: ReactNode;
 }>;
 
-/** One set of effect numbers under a legend. A missing value shows its default. */
+/**
+ * One set of effect numbers under a legend. A missing value shows its default.
+ */
 export function NumberFields({
   legend,
   fields,
@@ -29,7 +31,7 @@ export function NumberFields({
   fallback,
   onChange,
   action,
-}: Props) {
+}: Props): ReactNode {
   const current = { ...fallback, ...values };
   return (
     <Fieldset

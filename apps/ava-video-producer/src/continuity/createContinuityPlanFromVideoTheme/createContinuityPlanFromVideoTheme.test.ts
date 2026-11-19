@@ -77,7 +77,10 @@ function _cameraKeys(plan: Storyboard) {
   });
 }
 
-/** Every camera pose of every stock beat, frame by frame, with the beat's options or the given ones. */
+/**
+ * Every camera pose of every stock beat, frame by frame, with the beat's
+ * options or the given ones.
+ */
 function _cameraPoses(plan: Storyboard, options?: MotionOptions) {
   return plan.shots.flatMap((shot) => {
     return shot.scene !== "continuity"

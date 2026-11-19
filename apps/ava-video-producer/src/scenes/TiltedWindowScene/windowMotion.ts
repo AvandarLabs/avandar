@@ -161,7 +161,10 @@ const SLIDE_HOLD = 0.6;
  * both half-faded windows (a luminance dip on a field much darker or
  * lighter than the window content).
  */
-export function getCarouselPoses(progress: number, box: Rect) {
+export function getCarouselPoses(
+  progress: number,
+  box: Rect,
+): { incoming: WindowPose; outgoing: WindowPose } {
   return {
     incoming: {
       ...RESTING_POSE,
@@ -222,7 +225,11 @@ export function getPullBack(
  * The pair layout's entrance: one joined card flips in on Y from edge-on
  * while travelling in from the left, then splits (0 to 1) into two windows.
  */
-export function getFlipSplit(frame: number, at: number, canvasWidth: number) {
+export function getFlipSplit(
+  frame: number,
+  at: number,
+  canvasWidth: number,
+): { rotateY: number; opacity: number; translateX: number; split: number } {
   const flip = ramp(frame, at, DUR.whip, EASE.out);
   return {
     // Not quite edge-on: at 90 degrees the near edge would pass the camera.

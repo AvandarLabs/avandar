@@ -215,7 +215,10 @@ function _assertObstacleClearance({
 
 /** Geometry assertions for participants traveling around service barriers. */
 export const ServiceParticipantAssertions = {
-  /** Both wheels touch the route, hands touch the rim, and the head clears wheels. */
+  /**
+   * Both wheels touch the route, hands touch the rim, and the head clears
+   * wheels.
+   */
   assertWheelchairContact: _assertWheelchairContact,
   /** Walking foot strokes remain in contact with the authored route. */
   assertWalkingContact: _assertWalkingContact,

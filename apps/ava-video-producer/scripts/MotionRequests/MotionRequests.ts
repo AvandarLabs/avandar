@@ -51,7 +51,10 @@ function _parseFlags(
   return Object.fromEntries(pairs);
 }
 
-/** Resolve stable CLI selections, the optional complete-input file, and the theme. */
+/**
+ * Resolve stable CLI selections, the optional complete-input file, and the
+ * theme.
+ */
 function _parseMotionArgs(args: readonly string[]): {
   command: string;
   entries: StockEntry[];
@@ -124,7 +127,10 @@ async function _makeMotionRequestsFromArgs(
 }
 /** Related MotionRequests operations. */
 export const MotionRequests = {
-  /** Resolve stable CLI selections, the optional complete-input file, and the theme. */
+  /**
+   * Resolve stable CLI selections, the optional complete-input file, and the
+   * theme.
+   */
   parseArgs: _parseMotionArgs,
   /**
    * Validate complete authored requests before starting any renderer bundle.

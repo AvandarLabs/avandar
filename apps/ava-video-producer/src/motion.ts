@@ -174,7 +174,7 @@ export const EASE = {
  * ease-in-out for travel between visible landmarks. Configurable presets
  * and bounded custom cubic Bezier curves live in motion-components. */
 
-/* -------------------------------------------------------------- durations -- */
+/* ------------------------------------------------------------- durations -- */
 
 /** Frames at 30fps. A product demo is the *explanatory* tier, where the
  *  sub-300ms ceiling for operable UI does not apply: the viewer is

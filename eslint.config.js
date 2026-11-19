@@ -277,6 +277,13 @@ export default [
 
   ...privacyChokepoint,
   {
+    // Plain JavaScript has no syntax for parameter or return types, so the
+    // rule cannot be satisfied there. Such files carry their types in a
+    // sibling `.d.ts` or in JSDoc instead.
+    files: ["**/*.js"],
+    rules: { "@typescript-eslint/explicit-module-boundary-types": "off" },
+  },
+  {
     // This config loads via Node's native ESM loader, not a bundler, so its
     // own relative imports need real extensions to resolve at all.
     files: ["eslint.config.js", "eslint/**/*.js"],

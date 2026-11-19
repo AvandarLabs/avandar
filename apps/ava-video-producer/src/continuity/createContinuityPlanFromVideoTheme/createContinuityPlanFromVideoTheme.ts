@@ -186,7 +186,8 @@ function _themeContent(options: {
             createMotionOptionsFromTheme(cameraOptions, semantic),
         }
       : {}),
-    // A flight blurs only when its motion is authored, so absent motion stays absent.
+    // A flight blurs only when its motion is authored, so absent motion stays
+    // absent.
     ...(flight?.motion
       ? {
           flight: {
@@ -198,7 +199,10 @@ function _themeContent(options: {
   };
 }
 
-/** Frames a themed camera route needs beyond the authored one, so reading holds keep their length. */
+/**
+ * Frames a themed camera route needs beyond the authored one, so reading holds
+ * keep their length.
+ */
 function _addedCameraFrames(
   authored: BeatContent,
   themed: BeatContent,

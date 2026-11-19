@@ -12,7 +12,10 @@ import type {
   VideoThemePatch,
 } from "../../videoTheme/videoTheme.types";
 
-/** A draft as the editor shows it: current values, a theme to preview, and problems. */
+/**
+ * A draft as the editor shows it: current values, a theme to preview, and
+ * problems.
+ */
 export type DraftTheme = Readonly<{
   merged: VideoThemePatch;
   theme: ResolvedVideoTheme;

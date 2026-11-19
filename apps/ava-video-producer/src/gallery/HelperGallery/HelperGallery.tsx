@@ -12,6 +12,7 @@ import { HelperDetail } from "./HelperDetail/HelperDetail";
 import css from "./HelperGallery.module.css";
 import { HelperPreview } from "./HelperPreview/HelperPreview";
 import { useHelperGallery } from "./useHelperGallery";
+import type { ReactNode } from "react";
 
 /** Each helper category with its helper count, in catalog order. */
 const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => {
@@ -29,7 +30,7 @@ const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => {
  * compositions are built from, as live thumbnail cards by category, each
  * opening its live preview and reference in the shared modal.
  */
-export function HelperGallery() {
+export function HelperGallery(): ReactNode {
   const gallery = useHelperGallery();
   const [playing, setPlaying] = useState(() => {
     return !isReducedMotionPreferred();

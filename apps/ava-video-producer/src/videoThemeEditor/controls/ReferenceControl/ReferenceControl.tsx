@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type ReactNode } from "react";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import { isTokenReference } from "../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { humanizeScaleKey } from "../../customScaleKey/customScaleKey";
@@ -29,7 +29,10 @@ export type Props = Readonly<{
   /** Empty for the token itself, or the composite field, such as `["size"]`. */
   fieldPath: readonly string[];
   kind: TokenKind;
-  /** The field's authored value: a reference, a literal, or undefined when unset. */
+  /**
+   * The field's authored value: a reference, a literal, or undefined when
+   * unset.
+   */
   value: unknown;
   /** The token's whole authored value, for writing one field of a composite. */
   tokenValue: unknown;
@@ -102,7 +105,10 @@ function _buildChipsFromOptions(
   );
 }
 
-/** The picker's items, plus a disabled one naming a reference that no longer resolves. */
+/**
+ * The picker's items, plus a disabled one naming a reference that no longer
+ * resolves.
+ */
 function _buildSelectData(
   input: Readonly<{
     options: readonly ReferenceOption[];
@@ -146,7 +152,7 @@ export function ReferenceControl({
   value,
   onChange,
   ...customValueProps
-}: Props) {
+}: Props): ReactNode {
   const toLabel = useOptionLabel();
   const options = useReferenceOptions({ kind, tokenPath, fieldPath, value });
   const hasIssue = useRowHasIssue();

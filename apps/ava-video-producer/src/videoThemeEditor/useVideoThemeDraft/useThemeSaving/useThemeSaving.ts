@@ -37,7 +37,9 @@ export type ThemeSavingState = Readonly<{
   save: () => Promise<void>;
   /** Resolves true when the new theme was created, false when it was not. */
   saveAsNew: (label: string) => Promise<boolean>;
-  /** Re-reads the active theme's file, so its current hash guards the next save. */
+  /**
+   * Re-reads the active theme's file, so its current hash guards the next save.
+   */
   reloadTheme: () => Promise<boolean>;
 }>;
 
@@ -66,7 +68,10 @@ type RunThemeRequest = (
   failureKind?: FailureKind,
 ) => Promise<boolean>;
 
-/** The save options plus the request runner and latest drafts a save hook shares. */
+/**
+ * The save options plus the request runner and latest drafts a save hook
+ * shares.
+ */
 type SaveHookOptions = SaveOptions &
   Readonly<{
     run: RunThemeRequest;

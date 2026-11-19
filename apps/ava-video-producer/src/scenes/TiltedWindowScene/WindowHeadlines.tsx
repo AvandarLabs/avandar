@@ -5,6 +5,7 @@ import { getLineRevealStyle } from "../textReveal";
 import { getActiveHeadline } from "./windowMotion";
 import { HEADLINE_BOX } from "./windowTilt";
 import type { WindowHeadline } from "../scenes.types";
+import type { ReactNode } from "react";
 
 /** Frames between headline lines fading in. */
 const LINE_STAGGER = 3;
@@ -29,7 +30,7 @@ export function WindowHeadlines({
   width,
   height,
   exitAtFrame,
-}: Props) {
+}: Props): ReactNode {
   const { index, opacity } = getActiveHeadline(frame, headlines);
   const headline = headlines[index];
   const columnWidth = width * HEADLINE_BOX.width;

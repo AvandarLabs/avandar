@@ -2,7 +2,10 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { isWorkspaceRoute } from "../capture-lib.mjs";
 
-/** Load the workspace flow map a capture run will execute, from capture-flows/avandar.mjs. */
+/**
+ * Load the workspace flow map a capture run will execute, from
+ * capture-flows/avandar.mjs.
+ */
 export async function loadFlows(root) {
   const module = await import(
     pathToFileURL(join(resolve(root), "capture-flows", "avandar.mjs")).href
@@ -12,7 +15,9 @@ export async function loadFlows(root) {
   return module.flows;
 }
 
-/** Login happens before any recording, trace, screenshot, or DOM-text artifact. */
+/**
+ * Login happens before any recording, trace, screenshot, or DOM-text artifact.
+ */
 export async function loginViaUi({
   page,
   baseUrl,

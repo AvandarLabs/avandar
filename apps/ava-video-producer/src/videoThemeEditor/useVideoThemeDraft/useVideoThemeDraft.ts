@@ -11,7 +11,10 @@ import {
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
 
-/** Everything a theme editor host needs: themes, the active theme, its draft, and saving. */
+/**
+ * Everything a theme editor host needs: themes, the active theme, its draft,
+ * and saving.
+ */
 export type VideoThemeDraftState = StoredDraftState &
   ThemeSavingState &
   Readonly<{

@@ -15,7 +15,7 @@ import {
 import { createThemeStyleFromTheme } from "./createThemeStyleFromTheme";
 import { getShotTransitionLayers } from "./getShotTransitionLayers";
 import { ShotView, type ProductSceneRenderer } from "./ShotView";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export type { ProductSceneRenderer } from "./ShotView";
 
@@ -34,7 +34,7 @@ export function StoryFilm({
   plan: Storyboard;
   productScene?: ProductSceneRenderer;
   showCaptions?: boolean;
-}) {
+}): ReactNode {
   const frame = useCurrentFrame();
   const shots = timeline(plan);
   const index = Math.max(

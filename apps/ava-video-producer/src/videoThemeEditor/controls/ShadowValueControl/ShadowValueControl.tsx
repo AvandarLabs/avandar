@@ -9,15 +9,18 @@ import type {
   ShadowValue,
 } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const MAX_SHADOW_LAYERS = 4;
 
-/** A shadow token: up to four layers, previewed in the theme's shadow colour. */
+/**
+ * A shadow token: up to four layers, previewed in the theme's shadow colour.
+ */
 export function ShadowValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const { theme } = useTokenEditor();
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
   const setLayers = (nextLayers: readonly ShadowLayer[]) => {

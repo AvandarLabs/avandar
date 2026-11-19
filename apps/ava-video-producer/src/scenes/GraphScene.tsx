@@ -14,8 +14,10 @@ import {
   textUnits,
   validateGraph,
 } from "./layout/layout";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import type { GraphNode, GraphSceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Radius of a packet travelling an edge, in pixels. */
 const PACKET_RADIUS = 6;
@@ -34,7 +36,7 @@ export function GraphScene({
   edges,
   traversal = [],
   revealAtFrame = 10,
-}: GraphSceneProps) {
+}: GraphSceneProps): ReactNode {
   validateGraph(nodes, edges, traversal);
   assertFrame(revealAtFrame, "revealAtFrame");
   const bounds = sceneBounds(width, height, Boolean(title || kicker));

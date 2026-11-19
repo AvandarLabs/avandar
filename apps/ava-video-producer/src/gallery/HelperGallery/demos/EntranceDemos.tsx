@@ -14,6 +14,7 @@ import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { CurvePlot } from "./parts/CurvePlot";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const ENTER_AT = 12;
 /** Three ways to call `enter()`, side by side. */
@@ -24,7 +25,7 @@ const ENTER_VARIANTS = [
 ] as const;
 
 /** `enter()` with its default rise, a sideways arrival and a small scale. */
-export function EnterDemo({ frame, frames }: HelperDemoProps) {
+export function EnterDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const style = enter(frame, ENTER_AT);
   return (
     <HelperDemoFrame
@@ -58,7 +59,7 @@ export function EnterDemo({ frame, frames }: HelperDemoProps) {
 const ROWS = ["first", "second", "third", "fourth", "fifth", "sixth"];
 
 /** `enterAt()` walking a list in, `STAGGER` frames apart. */
-export function EnterAtDemo({ frame, frames }: HelperDemoProps) {
+export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
@@ -95,7 +96,7 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps) {
 const LEAVE_AT = 48;
 
 /** A card entering, then `leave()` reversing the same rise. */
-export function LeaveDemo({ frame, frames }: HelperDemoProps) {
+export function LeaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const style = frame < LEAVE_AT ? enter(frame, 6) : leave(frame, LEAVE_AT);
   return (
     <HelperDemoFrame
@@ -117,7 +118,7 @@ export function LeaveDemo({ frame, frames }: HelperDemoProps) {
 const POP_AT = 15;
 
 /** A card landing on a spring, beside the spring's own curve. */
-export function PopDemo({ frame, frames }: HelperDemoProps) {
+export function PopDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const landing = pop(frame, POP_AT);
   const time = Math.min(1, Math.max(0, (frame - POP_AT) / DUR.sheet));
   return (
@@ -157,7 +158,7 @@ export function PopDemo({ frame, frames }: HelperDemoProps) {
 const PRESSES = [20, 50];
 
 /** A button answering two presses with `press()` and returning to exactly 1. */
-export function PressDemo({ frame, frames }: HelperDemoProps) {
+export function PressDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const scale = Math.min(
     ...PRESSES.map((at) => {
       return press(frame, at);

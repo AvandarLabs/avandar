@@ -162,7 +162,7 @@ export function VideoThemeEditor({
   header,
   onDraftChange,
   onScopeChange,
-}: Props) {
+}: Props): ReactNode {
   const { rows, context } = useEditorRows({
     library,
     themeId,

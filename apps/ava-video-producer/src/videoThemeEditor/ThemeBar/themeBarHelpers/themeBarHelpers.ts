@@ -6,7 +6,9 @@ export type ThemeBarInput = Readonly<{
   isBuiltIn: boolean;
   isDirty: boolean;
   hasIssues: boolean;
-  /** The changed-on-disk banner is showing, with its keep and discard actions. */
+  /**
+   * The changed-on-disk banner is showing, with its keep and discard actions.
+   */
   isChangedOnDisk: boolean;
   status: ThemeSaveStatus;
   copyStatus: ThemeCopyStatus;
@@ -14,8 +16,8 @@ export type ThemeBarInput = Readonly<{
 
 /**
  * Which sentence the theme bar's status line shows. The component writes the
- * sentence for each key, so failures are explained from their status and issues and never
- * from the server's English message.
+ * sentence for each key, so failures are explained from their status and
+ * issues and never from the server's English message.
  */
 export type ThemeBarMessage =
   | "none"
@@ -40,7 +42,9 @@ export type ThemeBarActions = Readonly<{
   canDiscard: boolean;
   /** The theme picker is open for a change. It locks while a save runs. */
   canSwitchTheme: boolean;
-  /** A save was refused because the file changed, and no banner offers a reload. */
+  /**
+   * A save was refused because the file changed, and no banner offers a reload.
+   */
   showsReload: boolean;
 }>;
 
@@ -98,8 +102,9 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
  * Save shows for custom themes only. It needs unsaved changes without issues
  * and waits while the changed-on-disk banner asks what to do with them.
  * Save as new needs no issues, Discard needs unsaved changes, and nothing
- * starts, including a switch to another theme, while a save is in flight. Reload from file shows after a conflict the
- * changed-on-disk banner is not already answering.
+ * starts, including a switch to another theme, while a save is in flight.
+ * Reload from file shows after a conflict the changed-on-disk banner is not
+ * already answering.
  */
 export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
   const isIdle = input.status.kind !== "saving";
@@ -119,7 +124,9 @@ export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
   };
 }
 
-/** A typed new theme name without surrounding spaces, or undefined when blank. */
+/**
+ * A typed new theme name without surrounding spaces, or undefined when blank.
+ */
 export function getThemeLabelFromInput(input: string): string | undefined {
   const label = input.trim();
   return label === "" ? undefined : label;

@@ -39,7 +39,9 @@ export type ParityTarget = Readonly<{
   options: Readonly<Record<string, unknown>>;
 }>;
 
-/** A deliberate `classic` change: where it may alter pixels, in design units. */
+/**
+ * A deliberate `classic` change: where it may alter pixels, in design units.
+ */
 type ParityAllowance = Readonly<{
   id: string;
   reason: string;

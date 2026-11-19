@@ -24,7 +24,10 @@ const HIGHLIGHT_CUE = 43;
 const HIGHLIGHT_STEP = 38;
 const HIGHLIGHT_FRAMES = 13;
 
-/** The fractional line the highlight sits on at `frame`, easing between authored lines. */
+/**
+ * The fractional line the highlight sits on at `frame`, easing between authored
+ * lines.
+ */
 function useHighlightLine(highlight: readonly number[], frame: number): number {
   const motion = useGraphicMotion();
   return highlight.slice(1).reduce((offset, lineIndex, index) => {

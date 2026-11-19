@@ -101,7 +101,10 @@ type RowContext = Readonly<{
   theme: ResolvedVideoTheme;
   scopePatch: VideoThemePatch;
   savedOverride: VideoThemePatch;
-  /** In theme scope, the previewed item's own settings and the theme it resolves to. */
+  /**
+   * In theme scope, the previewed item's own settings and the theme it resolves
+   * to.
+   */
   itemOwn?: Readonly<{
     patches: readonly VideoThemePatch[];
     theme: ResolvedVideoTheme;
@@ -195,7 +198,10 @@ type TokenRowsOptions = Readonly<{
   scope: ThemeEditScope;
   merged: VideoThemePatch;
   theme: ResolvedVideoTheme;
-  /** The previewed item and the theme it resolves to, so theme scope can show its own values. */
+  /**
+   * The previewed item and the theme it resolves to, so theme scope can show
+   * its own values.
+   */
   item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
 }>;
 
@@ -343,7 +349,9 @@ export function findTokenRowIssue(
   });
 }
 
-/** What a row's resolver message means, so the row can say it in plain words. */
+/**
+ * What a row's resolver message means, so the row can say it in plain words.
+ */
 export type RowIssueDescription =
   | Readonly<{ kind: "missingReference"; reference: string }>
   | Readonly<{ kind: "loop" }>

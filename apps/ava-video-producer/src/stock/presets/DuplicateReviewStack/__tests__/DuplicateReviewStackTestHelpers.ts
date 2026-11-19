@@ -20,7 +20,7 @@ const render = ({
   );
 };
 
-function _cards(markup: string) {
+function _cards(markup: string): string[] {
   return [...markup.matchAll(/<rect[^>]*data-candidate-id="[^"]*"[^>]*>/g)].map(
     (match) => {
       return match[0];
@@ -28,7 +28,13 @@ function _cards(markup: string) {
   );
 }
 
-function _texts({ markup, label }: { markup: string; label: string }) {
+function _texts({
+  markup,
+  label,
+}: {
+  markup: string;
+  label: string;
+}): string[] {
   return [...markup.matchAll(/<text\b[^>]*>[\s\S]*?<\/text>/g)]
     .map((match) => {
       return match[0];
@@ -38,7 +44,13 @@ function _texts({ markup, label }: { markup: string; label: string }) {
     });
 }
 
-function _assertPairRoles({ markup, input }: { markup: string; input: Input }) {
+function _assertPairRoles({
+  markup,
+  input,
+}: {
+  markup: string;
+  input: Input;
+}): void {
   const rects = _cards(markup);
   input.groups.forEach((group) => {
     if (group.retainedId === null) {

@@ -5,7 +5,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
 
-/** Sketches boxes at a test roughness, through an atomic step the box profile points at. */
+/**
+ * Sketches boxes at a test roughness, through an atomic step the box profile
+ * points at.
+ */
 function _withBoxRoughness(
   boxRoughness: number,
   element: ReturnType<typeof createElement>,

@@ -11,7 +11,9 @@ export type FrameComparison = Readonly<{
   differingPixels: number;
   /** Differing pixels outside every allowed region. Parity needs zero. */
   unexplainedPixels: number;
-  /** RGBA diff image: dimmed reference, amber for allowed, magenta otherwise. */
+  /**
+   * RGBA diff image: dimmed reference, amber for allowed, magenta otherwise.
+   */
   diff: Uint8Array;
 }>;
 

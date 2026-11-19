@@ -10,6 +10,7 @@ import { ImportReview } from "./ImportReview";
 import css from "./ImportScreen.module.css";
 import { SavedSource } from "./SavedSource";
 import { SourceList } from "./SourceList";
+import type { ReactNode } from "react";
 
 const _noop = () => {};
 
@@ -36,7 +37,7 @@ export function ImportScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const saved = frame >= 456;
   return (
     <div

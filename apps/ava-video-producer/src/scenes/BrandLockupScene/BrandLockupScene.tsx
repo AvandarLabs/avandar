@@ -2,7 +2,8 @@ import { Img, staticFile } from "remotion";
 import { MONO } from "../../fonts";
 import { DUR, STAGGER_COLUMN, caretOn, enter, typed } from "../../motion";
 import { safePublicPath, textUnits } from "../layout/layout";
-import { positioned, SceneShell } from "../SceneShell";
+import { positioned } from "../positioned";
+import { SceneShell } from "../SceneShell";
 import { getLineRevealStyle, getWipeExitStyle } from "../textReveal";
 import {
   MARK_BUILD_DEFAULTS,
@@ -14,6 +15,7 @@ import {
 } from "./brandLockupMotion";
 import type { Rect } from "../layout/layout";
 import type { BrandLockupSceneProps } from "../scenes.types";
+import type { ReactNode } from "react";
 
 /** Largest rotation of the flying columns, at the middle of the flight. */
 const FLIGHT_TILT_DEGREES = 28;
@@ -29,7 +31,7 @@ const COMMAND_CHARS_PER_SECOND = 30;
  * badge) can cascade in below, and the mark's columns can fly through the
  * frame to hand over to the next shot's field colour.
  */
-export function BrandLockupScene(props: BrandLockupSceneProps) {
+export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
   const { frame, width = 1600, height = 1000, wordmark, cta } = props;
   const geometry = _getLockupGeometry(props, width, height);
   const wordmarkAt =

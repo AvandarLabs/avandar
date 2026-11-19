@@ -87,7 +87,7 @@ export function AtlasDialog({
   onPrevious,
   onNext,
   children,
-}: Props) {
+}: Props): ReactNode {
   const dialog = useModalDialog();
   usePreviewKeys({ enabled: true, onPrevious, onNext, onClose, frame: dialog });
   return (

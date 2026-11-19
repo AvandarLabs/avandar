@@ -1,9 +1,10 @@
 import { useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 type Props = { id: string };
 
 /** The stage ground: a solid or gradient fill the size of the viewBox. */
-export function GroundFill({ id }: Props) {
+export function GroundFill({ id }: Props): ReactNode {
   const { color } = useGraphicTokens();
   const fill = color.groundFill;
   if (fill.type === "solid") {

@@ -1,5 +1,5 @@
 import { ColorInput, type ColorInputProps } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { parseHexDraft } from "./controlValueHelpers/controlValueHelpers";
 import {
@@ -62,7 +62,9 @@ function _createKeyDownHandler(
   };
 }
 
-/** Whether the picker is open, and the field handlers that open and close it. */
+/**
+ * Whether the picker is open, and the field handlers that open and close it.
+ */
 function useColorPopoverHandlers(
   options: Readonly<{
     field: Readonly<{
@@ -127,7 +129,7 @@ export function HexColorInput({
   onKeyDown,
   error,
   ...props
-}: Props) {
+}: Props): ReactNode {
   const hasIssue = useRowHasIssue();
   const field = useDraftValue<string, string>({
     value,

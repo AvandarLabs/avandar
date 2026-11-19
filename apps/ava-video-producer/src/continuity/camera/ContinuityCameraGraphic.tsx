@@ -6,11 +6,12 @@ import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { ContinuityGraphicObjects } from "./ContinuityGraphicObjects";
 import { getObjectFlight } from "./objectFlight";
 import type { ContinuityBeat } from "../continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = { content: Extract<ContinuityBeat["content"], { kind: "stock" }> };
 
 /** Apply the reusable vector camera to the continuity beat's stock artwork. */
-export function ContinuityCameraGraphic({ content }: Props) {
+export function ContinuityCameraGraphic({ content }: Props): ReactNode {
   const frame = useCurrentFrame();
   const { cameraMotion, motionBlur } = useContinuityAppearance();
   const flightActive = Boolean(

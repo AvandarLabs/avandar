@@ -8,7 +8,9 @@ import type {
   ResolvedTextShadow,
 } from "../videoTheme.types";
 
-/** A colour at an opacity, mixed toward transparent so any colour format works. */
+/**
+ * A colour at an opacity, mixed toward transparent so any colour format works.
+ */
 export function buildColorWithAlpha(color: string, alpha: number): string {
   if (alpha >= 1) {
     return color;

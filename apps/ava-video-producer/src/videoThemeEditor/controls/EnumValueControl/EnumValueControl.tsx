@@ -4,15 +4,19 @@ import { getOptionCopy } from "../../tokenCopy/editorCopy";
 import { getEnumSelection } from "../controlValueHelpers/controlValueHelpers";
 import { EnumMenu } from "./EnumMenu/EnumMenu";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
-/** An enum token: segments for up to three options, otherwise a menu with explanations. */
+/**
+ * An enum token: segments for up to three options, otherwise a menu with
+ * explanations.
+ */
 export function EnumValueControl({
   label,
   definition,
   value,
   onChange,
   optionKey = "",
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const hasIssue = useRowHasIssue();
   const options = (definition.options ?? []).map((option) => {
     return {

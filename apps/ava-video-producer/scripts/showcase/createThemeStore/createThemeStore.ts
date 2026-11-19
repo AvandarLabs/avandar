@@ -17,7 +17,9 @@ import {
 import { ThemeStoreError } from "../ThemeStoreError";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
-/** Largest theme file the store writes, and the largest body the routes read. */
+/**
+ * Largest theme file the store writes, and the largest body the routes read.
+ */
 export const THEME_FILE_MAX_BYTES = VIDEO_THEME_MAX_BYTES;
 const THEME_FILE_SUFFIX = ".theme.json";
 

@@ -4,9 +4,12 @@ import { AppListPane } from "@/components/layouts/AppListPane/AppListPane";
 import datasetNavCss from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar.module.css";
 import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import { NAME, SOURCE_NAMES } from "./importFixtures";
+import type { ReactNode } from "react";
 
-/** The data manager's dataset list rail, with only this film's fixture datasets. */
-export function SourceList({ saved }: { saved: boolean }) {
+/**
+ * The data manager's dataset list rail, with only this film's fixture datasets.
+ */
+export function SourceList({ saved }: { saved: boolean }): ReactNode {
   return (
     <AppListPane title="Datasets" count={SOURCE_NAMES.length}>
       <NavLinkList

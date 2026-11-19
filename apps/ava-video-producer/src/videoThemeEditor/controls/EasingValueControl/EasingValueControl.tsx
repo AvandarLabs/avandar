@@ -8,6 +8,7 @@ import css from "./EasingValueControl.module.css";
 import { PowerFields } from "./PowerFields";
 import type { EasingValue } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const DEFAULT_BEZIER = getDefaultLiteralFromKind("easing");
 const DEFAULT_POWER: EasingValue = { powerInOut: 3 };
@@ -22,7 +23,7 @@ export function EasingValueControl({
   value,
   onChange,
   isCameraCurve = false,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const issueAriaProps = useRowIssueAriaProps();
   const easing = (value ?? DEFAULT_BEZIER) as EasingValue;
   const points = "powerInOut" in easing ? undefined : easing;

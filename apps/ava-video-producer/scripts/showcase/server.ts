@@ -76,7 +76,8 @@ const themeStore = createThemeStore({
   directory: path.join(appRoot, "themes"),
 });
 let themeTimer: ReturnType<typeof setTimeout> | undefined;
-// A theme saved here or edited on disk republishes, so open galleries reload it.
+// A theme saved here or edited on disk republishes, so open galleries reload
+// it.
 const themesWatcher = watch(
   path.join(appRoot, "themes"),
   (_event, filename) => {
@@ -112,7 +113,9 @@ const requestSchema = z.strictObject({
   id: z.string().max(80),
   options: z.record(z.string(), z.unknown()).optional(),
 });
-/** An export body: the film id, its options, and a theme patch of up to 256 KB. */
+/**
+ * An export body: the film id, its options, and a theme patch of up to 256 KB.
+ */
 const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
 
 function json(res: ServerResponse, status: number, body: unknown) {

@@ -2,6 +2,7 @@ import {
   useGraphicFilter,
   useGraphicProps,
 } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 /** The theme's soft disc around a point, such as a packet's halo. */
 export function Halo({
@@ -14,7 +15,7 @@ export function Halo({
   cy: number;
   r: number;
   color: string;
-}) {
+}): ReactNode {
   const { glow } = useGraphicProps("Halo", {});
   const filter = useGraphicFilter("components.Halo.glow");
   return (

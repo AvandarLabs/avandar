@@ -43,13 +43,27 @@ interface DispatchResult {
   fulfilled?: FakeFulfillOptions;
 }
 
+/** The flow context callbacks the capture runner hands each test flow. */
+interface FakeFlowContext {
+  step: <T>(id: string, action: () => Promise<T>) => Promise<T>;
+  checkpoint: (id: string, options?: { text?: boolean }) => Promise<void>;
+  recordResource: (resource: {
+    kind: string;
+    id: string;
+    name: string;
+  }) => Promise<void>;
+}
+
 /** Minimal stand-in for a Playwright `Video`; only `saveAs`/`path` are used. */
 interface FakeVideo {
   saveAs: (path: string) => Promise<void>;
   path: () => Promise<string>;
 }
 
-/** The screenshot options the mock reads; the rest of `PageScreenshotOptions` is unused. */
+/**
+ * The screenshot options the mock reads; the rest of `PageScreenshotOptions` is
+ * unused.
+ */
 type FakeScreenshotOptions = Pick<PageScreenshotOptions, "animations"> & {
   path: string;
 };
@@ -87,7 +101,10 @@ interface FakeContext extends Pick<
   }>;
 }
 
-/** The subset of a Playwright `Browser` the capture runner receives from its caller. */
+/**
+ * The subset of a Playwright `Browser` the capture runner receives from its
+ * caller.
+ */
 interface FakeBrowser extends Pick<Browser, "version" | "close"> {
   newContext: (options?: BrowserContextOptions) => Promise<FakeContext>;
 }
@@ -235,7 +252,7 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
       assert.equal(contexts[0].options.recordVideo, undefined);
     },
     flowMap: {
-      import: async (ctx: any) => {
+      import: async (ctx: FakeFlowContext) => {
         assert.equal(
           await ctx.step("read-result", async () => {
             return 42;
@@ -292,7 +309,7 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   const { browser, contexts } = fakeBrowser();
   const endpoint =
     "https://avandar.featurebase.app/api/v1/feedback/widget/config";
-  const responses: any[] = [];
+  const responses: DispatchResult[] = [];
   const result = await runCapture({
     root,
     browser,
@@ -303,7 +320,7 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
       responses.push(await contexts[0].dispatchRequest(endpoint));
     },
     flowMap: {
-      import: async (ctx: any) => {
+      import: async (ctx: FakeFlowContext) => {
         await ctx.step("read-result", async () => {
           responses.push(await contexts[1].dispatchRequest(endpoint));
         });
@@ -316,7 +333,7 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   assert.deepEqual(result.manifest.networkPolicy.blockedRequests, []);
   assert.equal(result.manifest.networkPolicy.suppressedRequests.length, 2);
   assert.ok(
-    result.manifest.networkPolicy.suppressedRequests.every((request: any) => {
+    result.manifest.networkPolicy.suppressedRequests.every((request) => {
       return (
         request.sourceUrl === endpoint &&
         request.reason === "nonessential-feedback-widget"
@@ -342,9 +359,9 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
       "no request may leave for the feedback service",
     );
     assert.equal(response.aborted, false);
-    assert.equal(response.fulfilled.status, 200);
-    assert.equal(response.fulfilled.contentType, "application/json");
-    assert.deepEqual(JSON.parse(response.fulfilled.body), {});
+    assert.equal(response.fulfilled?.status, 200);
+    assert.equal(response.fulfilled?.contentType, "application/json");
+    assert.deepEqual(JSON.parse(String(response.fulfilled?.body)), {});
   }
   assert.equal(
     (await readFile(result.manifestPath, "utf8")).includes("[invalid source]"),
@@ -356,7 +373,7 @@ test("unknown external writes still fail capture and retain a useful source URL"
   const root = await captureFixture(t);
   const { browser, contexts } = fakeBrowser();
   const endpoint = "https://avandar.featurebase.app/api/v1/feedback/submit";
-  let response: any;
+  let response: DispatchResult | undefined;
   await assert.rejects(
     runCapture({
       root,
@@ -366,7 +383,7 @@ test("unknown external writes still fail capture and retain a useful source URL"
       flowIds: ["import"],
       login: async () => {},
       flowMap: {
-        import: async (ctx: any) => {
+        import: async (ctx: FakeFlowContext) => {
           await ctx.step("read-result", async () => {
             response = await contexts[1].dispatchRequest(
               `${endpoint}?token=hidden`,
@@ -391,15 +408,15 @@ test("unknown external writes still fail capture and retain a useful source URL"
       return true;
     },
   );
-  assert.equal(response.continued, false);
-  assert.equal(response.aborted, true);
-  assert.equal(response.fulfilled, undefined);
+  assert.equal(response?.continued, false);
+  assert.equal(response?.aborted, true);
+  assert.equal(response?.fulfilled, undefined);
 });
 
 test("swallowed action failures remain failed evidence and skip later flows while preserving artifacts", async (t) => {
   const root = await captureFixture(t);
   const { browser } = fakeBrowser();
-  let failure: any;
+  let failure: unknown;
   try {
     await runCapture({
       root,
@@ -409,7 +426,7 @@ test("swallowed action failures remain failed evidence and skip later flows whil
       flowIds: ["import", "explorer"],
       login: async () => {},
       flowMap: {
-        import: async (ctx: any) => {
+        import: async (ctx: FakeFlowContext) => {
           try {
             await ctx.step("failed-save", async () => {
               throw new Error("Save failed with capture-test-password");
@@ -429,7 +446,7 @@ test("swallowed action failures remain failed evidence and skip later flows whil
   assert.ok(failure instanceof CaptureRunError);
   assert.equal(failure.manifest.status, "failed");
   assert.deepEqual(
-    failure.manifest.features.map((feature: any) => {
+    failure.manifest.features.map((feature) => {
       return feature.status;
     }),
     ["failed", "skipped"],

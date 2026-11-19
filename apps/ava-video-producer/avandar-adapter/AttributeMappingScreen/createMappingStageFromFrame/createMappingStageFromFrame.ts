@@ -1,8 +1,25 @@
+type MappingManualFieldName =
+  | { kind: "default" }
+  | { kind: "typed"; value: string };
+
+type MappingStage = {
+  readonly isArray: boolean;
+  readonly allowManualEdit: false;
+  readonly valuePickerRuleType: "most_frequent" | "sum";
+  readonly isRuleMenuOpen: boolean;
+  readonly manualField:
+    | {
+        readonly name: MappingManualFieldName;
+        readonly allowManualEdit: false;
+        readonly isArray: false;
+        readonly isNameSelected: boolean;
+      }
+    | undefined;
+};
+
 /** Controlled dataset and manual field state for a requested body frame. */
-export function createMappingStageFromFrame(frame: number) {
-  const manualFieldName:
-    | { kind: "default" }
-    | { kind: "typed"; value: string } =
+export function createMappingStageFromFrame(frame: number): MappingStage {
+  const manualFieldName: MappingManualFieldName =
     frame < 358
       ? { kind: "default" }
       : {

@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { isTokenReference } from "../../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { getTokenDefinitionFromPath } from "../../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getCustomScaleFromReference } from "../../../customTokenValue/customTokenValue";
@@ -17,7 +17,9 @@ import type { Props as ReferenceControlProps } from "../ReferenceControl";
 type Props = ReferenceControlProps &
   Readonly<{ options: readonly ReferenceOption[] }>;
 
-/** The bounds a custom value is edited with: the token's own, or its scale's. */
+/**
+ * The bounds a custom value is edited with: the token's own, or its scale's.
+ */
 function _customDefinition(
   options: Readonly<{
     allowLiteral: boolean;
@@ -75,7 +77,7 @@ export function CustomValue({
   definition: tokenDefinition,
   onChange,
   options,
-}: Props) {
+}: Props): ReactNode {
   const write = useCustomValueWriter({
     tokenPath,
     fieldPath,

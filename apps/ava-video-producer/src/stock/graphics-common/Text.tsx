@@ -53,7 +53,7 @@ export function Text({
   mono?: boolean;
   weight?: number;
   spacing?: number;
-}) {
+}): ReactNode {
   const text = useGraphicTokens().text.graphic;
   const filter = useGraphicFilter(`text.graphic.${role}`);
   const style = text[role];

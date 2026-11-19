@@ -13,6 +13,7 @@ import { DEMO_COLORS, formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { CursorKey, CursorTarget } from "../../../cursor-motion";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Field and button centres on the preview stage. */
 const FIELD = { x: 230, y: 120 };
@@ -73,7 +74,7 @@ function Targets({ frame }: { frame: number }) {
 }
 
 /** A pointer travelling between measured targets with arrival holds. */
-export function TrackPosDemo({ frame, frames }: HelperDemoProps) {
+export function TrackPosDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const position = trackPos(frame, PATH);
   return (
     <HelperDemoFrame
@@ -93,7 +94,10 @@ export function TrackPosDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** The pointer taking the I-beam and hand shapes only on arrival. */
-export function CursorOnTargetDemo({ frame, frames }: HelperDemoProps) {
+export function CursorOnTargetDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const shape = cursorOnTarget(frame, PATH, TARGETS);
   return (
     <HelperDemoFrame
@@ -116,7 +120,10 @@ const PRESS_PATH: CursorKey[] = [
 const PRESS_CLICKS = [35, 62];
 
 /** A button held down while `downAt()` is true, the pointer dipping with it. */
-export function ClickFeedbackDemo({ frame, frames }: HelperDemoProps) {
+export function ClickFeedbackDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const isDown = downAt(frame, PRESS_CLICKS);
   const fill = mixToken(Number(isDown), "var(--brand)", "var(--demo-accent)");
   return (
@@ -168,7 +175,10 @@ const SAMPLE_NAMES = ["far", "middle", "near"] as const;
 const INSET_SCALE = 12;
 
 /** A fast pointer with its trailing shutter samples drawn enlarged. */
-export function CursorShutterDemo({ frame, frames }: HelperDemoProps) {
+export function CursorShutterDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const samples = cursorShutter(frame, FAST_PATH);
   return (
     <HelperDemoFrame

@@ -4,6 +4,7 @@ import { DEMO_COLORS, formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Width and height of the value-over-time plots beside each loop. */
 const PLOT = { width: 420, height: 160 };
@@ -91,7 +92,7 @@ function Orbits({ frame }: { frame: number }) {
 }
 
 /** Three dots orbiting with offset phases, beside one phase's sawtooth. */
-export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
+export function LoopPhaseDemo({ frame, frames }: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
@@ -121,7 +122,7 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** A halo pulsing on a smooth cosine, beside the pulse over time. */
-export function WaveDemo({ frame, frames }: HelperDemoProps) {
+export function WaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const pulse = wave(frame, 45);
   return (
     <HelperDemoFrame
@@ -159,7 +160,10 @@ export function WaveDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** A graphic revealed and returned to the ground on both loop boundaries. */
-export function LoopEnvelopeDemo({ frame, frames }: HelperDemoProps) {
+export function LoopEnvelopeDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const envelope = loopEnvelope(frame, frames);
   return (
     <HelperDemoFrame

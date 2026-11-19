@@ -4,6 +4,7 @@ import { RangeNumberInput } from "../RangeNumberInput";
 import { NumberSlider } from "./NumberSlider/NumberSlider";
 import css from "./NumberValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const SLIDER_STEP_LIMIT = 1000;
 const UNIT_SUFFIXES: Readonly<Record<string, string>> = {
@@ -31,7 +32,7 @@ export function NumberValueControl({
   definition,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const scale = definition.unit === "%" ? 100 : 1;
   const min = (definition.min ?? 0) * scale;
   const max = (definition.max ?? 100) * scale;

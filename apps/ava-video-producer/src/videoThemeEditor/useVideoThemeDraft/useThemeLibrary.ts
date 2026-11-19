@@ -18,7 +18,9 @@ type ThemeCollection = Readonly<{
   stored: ReadonlyMap<string, StoredTheme>;
 }>;
 
-/** Themes the editor knows, their files' hashes, and a library to resolve them. */
+/**
+ * Themes the editor knows, their files' hashes, and a library to resolve them.
+ */
 export type ThemeLibraryState = ThemeCollection &
   Readonly<{
     library: VideoThemeLibrary;

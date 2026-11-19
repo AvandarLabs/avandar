@@ -3,6 +3,7 @@ import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromePro
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import css from "./CompositionControls.module.css";
 import type { useCompositionAppearance } from "./useCompositionAppearance";
+import type { ReactNode } from "react";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };
 type ControlsProps = Props & {
@@ -15,7 +16,10 @@ type ControlsProps = Props & {
  * levels, and camera presets are design tokens, edited in the Design tokens
  * tab. Scene studies keep only playback.
  */
-export function CompositionControls({ appearance, isScene }: ControlsProps) {
+export function CompositionControls({
+  appearance,
+  isScene,
+}: ControlsProps): ReactNode {
   return (
     <AtlasChromeProvider>
       <div className={css.controls}>

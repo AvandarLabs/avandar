@@ -7,7 +7,10 @@ const CONDITION_FADE_FRAMES = 12;
 
 type Props = Readonly<{ frame: number; cue: number; label: string }>;
 
-/** The condition label that fades in beside the badge once the gates start closing. */
+/**
+ * The condition label that fades in beside the badge once the gates start
+ * closing.
+ */
 export function PredicateCondition({ frame, cue, label }: Props): ReactNode {
   const motion = useGraphicMotion();
   return (

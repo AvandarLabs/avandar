@@ -23,9 +23,10 @@ export function VideoThemeScope({
   patches,
   children,
   element = "none",
-}: Props) {
+}: Props): ReactNode {
   const outer = useVideoThemeContext()?.source ?? DEFAULT_VIDEO_THEME_SOURCE;
-  // Callers rebuild these arrays on every frame; the key keeps the source stable.
+  // Callers rebuild these arrays on every frame; the key keeps the source
+  // stable.
   const scopeKey = JSON.stringify({ overrideIds, patches });
   const source = useMemo(() => {
     return getScopedVideoThemeSource(outer, JSON.parse(scopeKey));

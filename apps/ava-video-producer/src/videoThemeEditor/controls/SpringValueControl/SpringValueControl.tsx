@@ -3,13 +3,17 @@ import { RangeNumberInput } from "../RangeNumberInput";
 import css from "./SpringValueControl.module.css";
 import type { SpringValue } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
-/** A spring token: damping, stiffness, and mass. A missing field shows its default. */
+/**
+ * A spring token: damping, stiffness, and mass. A missing field shows its
+ * default.
+ */
 export function SpringValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const spring: SpringValue = {
     ...getDefaultLiteralFromKind("spring"),
     ...(value as Partial<SpringValue> | undefined),

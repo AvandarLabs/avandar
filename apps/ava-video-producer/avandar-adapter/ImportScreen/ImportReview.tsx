@@ -10,7 +10,7 @@ import { UploadedFileBar } from "@/views/DataManagerApp/DataImportView/ManualUpl
 import { enter, typed } from "../../src/motion";
 import { cases, columns, DESCRIPTION, metadata, NAME } from "./importFixtures";
 import type { DatasetImportValidation } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 const _noop = () => {};
 
@@ -19,8 +19,11 @@ const validation = {
   formErrorSummaryItems: [],
 } as unknown as DatasetImportValidation;
 
-/** The real import review form: the product's dataset-detail fields and preview, typed out frame by frame. */
-export function ImportReview({ frame }: { frame: number }) {
+/**
+ * The real import review form: the product's dataset-detail fields and preview,
+ * typed out frame by frame.
+ */
+export function ImportReview({ frame }: { frame: number }): ReactNode {
   const nameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLFormElement>(null);

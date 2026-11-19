@@ -4,7 +4,10 @@ import { isWithin } from "./fsSafety.mjs";
 import { assertSafeManifest } from "./sanitize.mjs";
 import { requestPolicy, sourceUrl } from "./urlSafety.mjs";
 
-/** Validate a manifest for leaked credentials, then write it atomically with owner-only mode. */
+/**
+ * Validate a manifest for leaked credentials, then write it atomically with
+ * owner-only mode.
+ */
 export async function writeManifest(path, manifest, secrets = []) {
   assertSafeManifest(manifest, secrets);
   const temporary = `${path}.tmp`;
@@ -14,7 +17,10 @@ export async function writeManifest(path, manifest, secrets = []) {
   await rename(temporary, path);
 }
 
-/** Route every request and WebSocket through the capture network policy, reporting denials. */
+/**
+ * Route every request and WebSocket through the capture network policy,
+ * reporting denials.
+ */
 export async function installNetworkGuard(
   context,
   onBlocked,
@@ -79,7 +85,10 @@ export async function installNetworkGuard(
   });
 }
 
-/** Express an artifact path relative to the capture root, rejecting one that escapes it. */
+/**
+ * Express an artifact path relative to the capture root, rejecting one that
+ * escapes it.
+ */
 export function relativeArtifact(root, path) {
   if (!isWithin(root, path))
     throw new Error("Artifact escapes capture directory");

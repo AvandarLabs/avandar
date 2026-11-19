@@ -21,7 +21,9 @@ const _getPresetFromHash = (): Preset | undefined => {
   return _findPreset(window.location.hash.slice(1));
 };
 
-/** Catalog selection, saved references, editable content, and playback controls. */
+/**
+ * Catalog selection, saved references, editable content, and playback controls.
+ */
 export type MotionGalleryState = {
   category: string;
   selectCategory: (value: string) => void;

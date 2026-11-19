@@ -3,6 +3,7 @@ import css from "./EditorToolbar.module.css";
 import { ScopeSwitch } from "./ScopeSwitch/ScopeSwitch";
 import { UsageFilter } from "./UsageFilter/UsageFilter";
 import type { ThemeEditScope } from "../../themeDraft/themeDraft";
+import type { ReactNode } from "react";
 
 /** Which tier tab is open. */
 export type EditorTier = "component" | "semantic" | "atomic";
@@ -42,7 +43,7 @@ export function EditorToolbar({
   overrideCount,
   hasUsage,
   onScopeChange,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.editorToolbar}>
       {item ? (

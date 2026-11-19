@@ -1,6 +1,8 @@
 import { isRecord } from "./isRecord";
 
-/** A copy of a nested object with one value removed and empty parents pruned. */
+/**
+ * A copy of a nested object with one value removed and empty parents pruned.
+ */
 export function removeValueAtPath(
   options: Readonly<{
     source: Readonly<Record<string, unknown>>;

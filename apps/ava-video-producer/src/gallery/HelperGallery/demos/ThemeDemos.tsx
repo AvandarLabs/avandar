@@ -3,6 +3,7 @@ import theme from "../../theme-colors.json";
 import css from "./demos.module.css";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Two shot themes from Avandar's dark and light surfaces. */
 const THEMES = [
@@ -21,7 +22,7 @@ const THEMES = [
 ];
 
 /** A shot recoloured by its own theme tokens halfway through. */
-export function ThemeStyleDemo({ frame, frames }: HelperDemoProps) {
+export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const shotTheme = THEMES[frame < 45 ? 0 : 1];
   const style = createThemeStyleFromTheme(shotTheme);
   return (

@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 /** Stand-in for a product mark. Replace with your own. */
-export function Orb({ size = 28 }: { size?: number }) {
+export function Orb({ size = 28 }: { size?: number }): ReactNode {
   return (
     <div
       style={{

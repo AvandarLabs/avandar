@@ -1,7 +1,7 @@
 import { Player, type PlayerRef } from "@remotion/player";
 import { FilmComposition } from "./FilmComposition/FilmComposition";
 import type { Film } from "./showcase.types";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   film: Film;
@@ -14,7 +14,10 @@ type Props = Readonly<{
   initialFrame: number;
 }>;
 
-/** The embedded Remotion player for a live film, with the gallery's transport applied. */
+/**
+ * The embedded Remotion player for a live film, with the gallery's transport
+ * applied.
+ */
 export function LiveFilm({
   film,
   player,
@@ -24,7 +27,7 @@ export function LiveFilm({
   loop,
   autoPlay,
   initialFrame,
-}: Props) {
+}: Props): ReactNode {
   return (
     <Player
       ref={player}

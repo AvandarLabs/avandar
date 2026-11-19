@@ -9,6 +9,7 @@ import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
 import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
 import { TITLE_LEN, TitleCard } from "./title-card";
+import type { ReactNode } from "react";
 
 export const FPS = 30;
 
@@ -58,7 +59,7 @@ function Clip({
   );
 }
 
-export function RemotionRoot() {
+export function RemotionRoot(): ReactNode {
   return (
     <>
       <StockCompositions />

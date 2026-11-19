@@ -11,8 +11,12 @@ import { getContinuityTimeline } from "./continuityTimeline";
 import { ContinuityToken } from "./ContinuityToken";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityPlan } from "./continuitySchema";
+import type { ReactNode } from "react";
 
-/** Overlap-aware sequence of motions, product demonstrations and explanatory composites, drawn in the surrounding video theme. */
+/**
+ * Overlap-aware sequence of motions, product demonstrations and explanatory
+ * composites, drawn in the surrounding video theme.
+ */
 export function ContinuityScene({
   plan,
   frame,
@@ -21,7 +25,7 @@ export function ContinuityScene({
   plan: ContinuityPlan;
   frame: number;
   productScene?: ProductSceneRenderer;
-}) {
+}): ReactNode {
   const parentFrame = useCurrentFrame();
   const { color } = useVideoTokens();
   const bar = useVideoProps("ProgressBar", {});

@@ -12,8 +12,9 @@ const WHITESPACE_MARKS: Readonly<Record<string, string>> = {
   "\r": "␍",
 };
 /**
- * Exact data at the data role's size (12 px in classic). Callers own the full single-line width.
- * Amber underlined whitespace marks preserve whole graphemes and raw aria.
+ * Exact data at the data role's size (12 px in classic). Callers own the full
+ * single-line width. Amber underlined whitespace marks preserve whole graphemes
+ * and raw aria.
  */
 export function LiteralDataText({
   value,

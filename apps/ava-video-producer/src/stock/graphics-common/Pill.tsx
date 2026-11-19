@@ -1,6 +1,7 @@
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
 import { Text } from "./Text";
+import type { ReactNode } from "react";
 
 /** A themed pill-shaped tag in the caller's colour and width. */
 export function Pill({
@@ -15,7 +16,7 @@ export function Pill({
   text: string;
   color: string;
   width: number;
-}) {
+}): ReactNode {
   const pill = useGraphicProps("Pill", {});
   return (
     <g>

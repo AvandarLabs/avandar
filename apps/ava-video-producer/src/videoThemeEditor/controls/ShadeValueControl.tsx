@@ -1,6 +1,7 @@
 import { Group } from "@mantine/core";
 import { RangeNumberInput } from "./RangeNumberInput";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 type Shade = Readonly<{ light: number; dark: number }>;
 
@@ -9,7 +10,7 @@ export function ShadeValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const shade: Shade =
     typeof value === "number"
       ? { light: value, dark: value }

@@ -9,7 +9,7 @@ import fixtures from "../fixtures.json";
 import css from "./CasesScreen.module.css";
 import { CaseTypeDetails } from "./CaseTypeDetails";
 import { RecordDetail } from "./RecordDetail";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import "@mantine/tiptap/styles.css";
 
 const _noop = () => {
@@ -87,7 +87,9 @@ const attributes = fields.map((field, index) => {
   ComponentProps<typeof CaseTypeAttributesList>["attributes"]
 >;
 
-/** Body-local times. The movie's cursor measures these targets after rendering. */
+/**
+ * Body-local times. The movie's cursor measures these targets after rendering.
+ */
 export const CASES_BEATS = [
   { frame: 90, target: "cases-type", action: "click" },
   { frame: 250, target: "cases-view-records", action: "click" },
@@ -105,7 +107,7 @@ export function CasesScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const root = useRef<HTMLDivElement>(null);
   useLayoutEffect(
     function markCasesVideoTargets() {

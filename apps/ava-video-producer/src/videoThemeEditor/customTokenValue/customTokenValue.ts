@@ -20,7 +20,10 @@ const MANTINE_SCALES = new Set([
 ]);
 const PIXEL_SCALES = new Set(["fontSizes", "radius", "spacing"]);
 
-/** Where a custom value of a kind goes when its current reference names no scale. */
+/**
+ * Where a custom value of a kind goes when its current reference names no
+ * scale.
+ */
 const FALLBACK_SCALES: Partial<Record<TokenKind, string>> = {
   color: "atomic.swatch",
   textShadow: "atomic.textShadow",
@@ -36,7 +39,9 @@ const FALLBACK_SCALES: Partial<Record<TokenKind, string>> = {
   fontFamily: "atomic.fontFamily",
 };
 
-/** A request to give a semantic token, or one field of it, a value of its own. */
+/**
+ * A request to give a semantic token, or one field of it, a value of its own.
+ */
 export type CustomValueRequest = Readonly<{
   tokenPath: string;
   /** Empty for the token itself, or the composite field, such as `["size"]`. */
@@ -75,7 +80,10 @@ export function getCustomScaleFromReference(
   return FALLBACK_SCALES[kind];
 }
 
-/** The scale key for a custom value, such as `customColorAccent`, at most 32 characters. */
+/**
+ * The scale key for a custom value, such as `customColorAccent`, at most 32
+ * characters.
+ */
 export function buildCustomScaleKeyFromPath(path: readonly string[]): string {
   const words = path
     .flatMap((segment) => {

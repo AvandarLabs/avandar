@@ -28,7 +28,9 @@ export function getBarComparisonBeats(
 }
 
 /** Each row's bar length as a fraction of the panel's longest bar. */
-export function getBarFractions(rows: ReadonlyArray<{ value: number }>) {
+export function getBarFractions(
+  rows: ReadonlyArray<{ value: number }>,
+): number[] {
   const longest = Math.max(
     0,
     ...rows.map((row) => {

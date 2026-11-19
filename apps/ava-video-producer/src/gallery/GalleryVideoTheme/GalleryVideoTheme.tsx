@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeContext } from "../../videoTheme/useVideoTheme";
 import { buildThemeJsonFromDraft } from "../../videoThemeEditor/buildThemeJsonFromDraft/buildThemeJsonFromDraft";
@@ -15,35 +9,10 @@ import {
   type VideoThemeDraftState,
 } from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
 import { copyTextToClipboard } from "../copyText";
-import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
-import type { ThemeDraft } from "../../videoThemeEditor/themeDraft/themeDraft";
+import { GalleryVideoThemeContext } from "./GalleryVideoThemeContext";
+import type { GalleryVideoThemeValue } from "./GalleryVideoThemeContext";
 
-/** The gallery's theme state plus what previews and exports need from it. */
-export type GalleryVideoThemeValue = VideoThemeDraftState &
-  Readonly<{
-    /** The last draft whose every part resolves; previews and exports use it. */
-    validDraft: ThemeDraft;
-    /** The theme with its theme-scope draft, for gallery-wide reads such as briefs. */
-    galleryTheme: ResolvedVideoTheme;
-    hasIssues: boolean;
-    copyThemeJson: () => Promise<void>;
-  }>;
-
-const GalleryVideoThemeContext = createContext<
-  GalleryVideoThemeValue | undefined
->(undefined);
 const THEME_SCOPE = { kind: "theme" } as const;
-
-/** The gallery theme state. Throws outside `GalleryVideoTheme`. */
-export function useGalleryVideoTheme(): GalleryVideoThemeValue {
-  const value = useContext(GalleryVideoThemeContext);
-  if (!value) {
-    throw new Error(
-      "Gallery theme state needs a GalleryVideoTheme above this component",
-    );
-  }
-  return value;
-}
 
 /** Copies the active theme and its draft as the JSON a save would write. */
 function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
@@ -72,7 +41,7 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
  */
 export function GalleryVideoTheme({
   children,
-}: Readonly<{ children: ReactNode }>) {
+}: Readonly<{ children: ReactNode }>): ReactNode {
   const state = useVideoThemeDraft();
   const { library, themeId, draft } = state;
   const draftTheme = useDraftTheme({

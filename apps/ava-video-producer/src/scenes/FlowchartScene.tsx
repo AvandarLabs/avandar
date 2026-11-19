@@ -2,6 +2,7 @@ import { DUR } from "../motion";
 import { GraphScene } from "./GraphScene";
 import { assertFrame, flowNodes } from "./layout/layout";
 import type { FlowchartSceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Explicit directed connectors support linear paths and branches. */
 export function FlowchartScene({
@@ -11,7 +12,7 @@ export function FlowchartScene({
   stepAtFrames,
   revealAtFrame = 10,
   ...base
-}: FlowchartSceneProps) {
+}: FlowchartSceneProps): ReactNode {
   const nodes = flowNodes(steps);
   if (
     activeStep !== undefined &&

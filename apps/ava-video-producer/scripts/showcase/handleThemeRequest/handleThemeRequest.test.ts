@@ -170,7 +170,9 @@ test("paths outside /api/themes are left to other routes", () => {
   });
 });
 
-/** Sends a JSON body in two TCP writes cut inside the first multibyte character. */
+/**
+ * Sends a JSON body in two TCP writes cut inside the first multibyte character.
+ */
 function _postSplitMidCharacter(origin: string, body: unknown) {
   const bytes = Buffer.from(JSON.stringify(body), "utf8");
   const cut = bytes.indexOf(0xc3) + 1;

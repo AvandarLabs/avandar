@@ -7,8 +7,32 @@ import {
 } from "./motionSettings";
 import type { MotionOptions } from "./motionSettings";
 
+/** A validated route of camera keys for a canvas of a given size. */
+type CameraTrackSchema = z.ZodArray<
+  z.ZodObject<
+    {
+      at: z.ZodNumber;
+      x: z.ZodNumber;
+      y: z.ZodNumber;
+      zoom: z.ZodNumber;
+      ease: z.ZodDefault<
+        z.ZodUnion<
+          readonly [
+            typeof motionEasingSchema,
+            z.ZodEnum<{ glide: "glide"; push: "push"; whip: "whip" }>,
+          ]
+        >
+      >;
+    },
+    z.core.$strict
+  >
+>;
+
 /** Create a validated camera route for a vector canvas of any positive size. */
-export function createCameraTrackSchema(width = 960, height = 600) {
+export function createCameraTrackSchema(
+  width = 960,
+  height = 600,
+): CameraTrackSchema {
   z.number().positive().parse(width);
   z.number().positive().parse(height);
   return z
@@ -51,7 +75,9 @@ export type CameraKeyframe = z.input<typeof cameraTrackSchema>[number];
 /** Camera center and magnification, independent of render order. */
 export type CameraPose = Pick<CameraKeyframe, "x" | "y" | "zoom">;
 
-/** Stretch only travel intervals; preserve every authored reading hold exactly. */
+/**
+ * Stretch only travel intervals; preserve every authored reading hold exactly.
+ */
 export function retimeCameraTrack(
   keys: readonly CameraKeyframe[],
   options?: MotionOptions,
@@ -80,7 +106,10 @@ function getKeyEasing(key: CameraKeyframe, options?: MotionOptions) {
   return getMotionEasing(options, fallback);
 }
 
-/** Sample camera time only; callers continue rendering their content at the real frame. */
+/**
+ * Sample camera time only; callers continue rendering their content at the real
+ * frame.
+ */
 export function getCameraPose(
   keys: readonly CameraKeyframe[] | undefined,
   frame: number,

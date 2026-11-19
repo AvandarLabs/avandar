@@ -23,7 +23,10 @@ export type TokenEditorContextValue = Readonly<{
   resetToken: (tokenPath: string) => void;
 }>;
 
-/** Set by `VideoThemeEditor` for its controls; tightly coupled to `useTokenEditorValue`. */
+/**
+ * Set by `VideoThemeEditor` for its controls; tightly coupled to
+ * `useTokenEditorValue`.
+ */
 export const TokenEditorContext = createContext<
   TokenEditorContextValue | undefined
 >(undefined);

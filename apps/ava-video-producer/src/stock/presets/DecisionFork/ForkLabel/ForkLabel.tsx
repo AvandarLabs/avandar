@@ -14,7 +14,10 @@ type Props = {
   text: string;
   x: number;
   y: number;
-  /** The decision type role; `size` overrides its size, for example in width tests. */
+  /**
+   * The decision type role; `size` overrides its size, for example in width
+   * tests.
+   */
   role?: "choice" | "question";
   size?: number;
   width?: number;

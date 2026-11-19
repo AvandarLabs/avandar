@@ -2,12 +2,17 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { HELPER_DEMOS } from "../demos/helperDemoRegistry";
 import { HELPER_CATALOG } from "../helperCatalog";
 import type { HelperDemoId } from "../helperDemoIds";
+import type { ReactNode } from "react";
 
 /**
  * One helper's live preview at the player's current frame. The preview
  * calls the real helper; nothing here reimplements motion.
  */
-export function HelperComposition({ helperId }: { helperId: string }) {
+export function HelperComposition({
+  helperId,
+}: {
+  helperId: string;
+}): ReactNode {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const helper = HELPER_CATALOG.helpers.find((entry) => {

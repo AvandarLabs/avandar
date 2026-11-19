@@ -42,7 +42,8 @@ Config.setConcurrency(2);
  * The escape hatch, for a machine where the download is blocked or the
  * shell will not launch:
  *
- *   export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+ *   export CHROME_PATH=\
+ *     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
  *
  * If you use it, QUIT CHROME FIRST. Launching a second instance of a
  * browser that is already running hands off to the existing process and

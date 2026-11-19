@@ -5,7 +5,10 @@ const FORBIDDEN_KEYS =
 const TOKEN_PATTERN =
   /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g;
 
-/** Redact secrets, tokens, and credential-shaped substrings before text reaches an artifact. */
+/**
+ * Redact secrets, tokens, and credential-shaped substrings before text reaches
+ * an artifact.
+ */
 export function sanitizeText(value, secrets = [], limit = 2000) {
   let text = [...secrets]
     .filter(Boolean)
@@ -27,7 +30,10 @@ export function sanitizeText(value, secrets = [], limit = 2000) {
   return text.slice(0, limit);
 }
 
-/** Structural rejection keeps credential containers out even if redaction misses one. */
+/**
+ * Structural rejection keeps credential containers out even if redaction misses
+ * one.
+ */
 export function assertSafeManifest(value, secrets = [], path = "manifest") {
   if (typeof value === "string") {
     if (
@@ -36,7 +42,8 @@ export function assertSafeManifest(value, secrets = [], path = "manifest") {
     )
       throw new Error(`Credential-shaped value at ${path}`);
     for (const secret of secrets.filter(Boolean)) {
-      // Short demo passwords can also be legitimate product/workspace substrings.
+      // Short demo passwords can also be legitimate product/workspace
+      // substrings.
       if (value === secret || (secret.length >= 8 && value.includes(secret)))
         throw new Error(`Unredacted credential at ${path}`);
     }

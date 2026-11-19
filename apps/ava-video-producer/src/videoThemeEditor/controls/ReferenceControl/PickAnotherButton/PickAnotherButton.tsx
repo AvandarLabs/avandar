@@ -1,6 +1,6 @@
 import { Button } from "@mantine/core";
 import css from "./PickAnotherButton.module.css";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   name: string;
@@ -9,8 +9,15 @@ type Props = Readonly<{
   containerRef: RefObject<HTMLDivElement | null>;
 }>;
 
-/** Offered for a missing reference: moves focus into the picker to choose another. */
-export function PickAnotherButton({ name, isColor, containerRef }: Props) {
+/**
+ * Offered for a missing reference: moves focus into the picker to choose
+ * another.
+ */
+export function PickAnotherButton({
+  name,
+  isColor,
+  containerRef,
+}: Props): ReactNode {
   return (
     <Button
       className={css.pickAnotherButton}

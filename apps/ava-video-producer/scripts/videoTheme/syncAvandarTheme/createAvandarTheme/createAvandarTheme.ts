@@ -78,7 +78,10 @@ function _parseCssColor(
   };
 }
 
-/** A hex colour, with alpha when it is not opaque, from a CSS rgb() or rgba() colour. */
+/**
+ * A hex colour, with alpha when it is not opaque, from a CSS rgb() or rgba()
+ * colour.
+ */
 export function getHexFromCssColor(color: string): string {
   if (/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(color)) {
     return color.toLowerCase();
@@ -87,7 +90,10 @@ export function getHexFromCssColor(color: string): string {
   return alpha === 1 ? hex : `${hex}${_byte(alpha * 255)}`;
 }
 
-/** Layers and their shared colour from a CSS box-shadow such as Avandar's stacked shadows. */
+/**
+ * Layers and their shared colour from a CSS box-shadow such as Avandar's
+ * stacked shadows.
+ */
 export function getShadowFromCss(
   css: string,
 ): Readonly<{ shadow: ShadowValue; color: string }> {

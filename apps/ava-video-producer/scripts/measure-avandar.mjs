@@ -3,16 +3,20 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { chromium } from "@playwright/test";
+import playwrightTest from "@playwright/test";
 import ffmpegStatic from "ffmpeg-static";
 import { requireLicense } from "./require-license.mjs";
+
+const { chromium } = playwrightTest;
 
 requireLicense();
 const ffmpeg =
   process.env.FFMPEG_BIN ||
   (ffmpegStatic && existsSync(ffmpegStatic) ? ffmpegStatic : "ffmpeg");
 
-/** Measures cursor destinations from the running rendered product components. */
+/**
+ * Measures cursor destinations from the running rendered product components.
+ */
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
   const index = args.indexOf(name);
@@ -48,7 +52,10 @@ const fixedFrames = {
 };
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
-/** Report every pixel difference, including compositor antialiasing at rounded edges. */
+/**
+ * Report every pixel difference, including compositor antialiasing at rounded
+ * edges.
+ */
 function comparePixels(first, second) {
   if (first.equals(second))
     return { changedPixels: 0, maxChannelDelta: 0, bounds: null };
@@ -350,7 +357,8 @@ try {
     }
   }
   await mkdir(dirname(output), { recursive: true });
-  // Partial measurements remain review artifacts and cannot replace a complete cursor plan.
+  // Partial measurements remain review artifacts and cannot replace a complete
+  // cursor plan.
   if (!unresolved.length)
     await writeFile(output, `${JSON.stringify(targets, null, 2)}\n`);
   else

@@ -234,7 +234,8 @@ async function _render(requests: MotionRequest[]) {
       root: ROOT,
       sourceHash: digest,
     });
-    // Existing delivery files stay recoverable even when rerendering one preset.
+    // Existing delivery files stay recoverable even when rerendering one
+    // preset.
     const backup = await ensureDirectory(
       ROOT,
       `out/motion/backups/${entry.id}-${Date.now()}`,

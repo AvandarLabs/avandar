@@ -1,5 +1,5 @@
 import { Accordion } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getGroupName } from "../../tokenCopy/editorCopy";
 import {
@@ -49,7 +49,7 @@ export function TokenSections({
   /** Every row, for choosing a free key when a value is added. */
   allRows: readonly TokenRowModel[];
   emptyGroups: readonly string[];
-}>) {
+}>): ReactNode {
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {

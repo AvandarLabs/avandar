@@ -6,8 +6,25 @@ import {
   filterCompositionEntries,
   gallerySelectionReducer,
 } from "./gallerySelectionReducer/gallerySelectionReducer";
-import type { ContinuityFamily } from "../continuityCatalog";
+import type {
+  ContinuityCatalogEntry,
+  ContinuityFamily,
+} from "../continuityCatalog";
 import type { GallerySelection } from "./gallerySelectionReducer/gallerySelectionReducer";
+
+/** One family's selection, visible entries, open preview, and actions. */
+type CompositionGalleryState = {
+  selection: GallerySelection;
+  entries: ContinuityCatalogEntry[];
+  open: ContinuityCatalogEntry | undefined;
+  previous: ContinuityCatalogEntry | undefined;
+  next: ContinuityCatalogEntry | undefined;
+  openEntry: (id: string) => void;
+  close: () => void;
+  chooseCategory: (category: string) => void;
+  setQuery: (query: string) => void;
+  receiveOptions: (options: { id: string; captions: boolean }) => void;
+};
 
 /** The Atlas section that browses a catalog family. */
 function _toSection(family: ContinuityFamily): "films" | "compositions" {
@@ -60,7 +77,9 @@ function _replaceUrl(
  * One family's gallery: category filter, search, the open preview and its
  * neighbours, with caption state scoped to the open live player.
  */
-export function useCompositionGallery(family: ContinuityFamily) {
+export function useCompositionGallery(
+  family: ContinuityFamily,
+): CompositionGalleryState {
   const [selection, dispatch] = useReducer(
     gallerySelectionReducer,
     family,

@@ -1,5 +1,6 @@
 import css from "./HelperDetail.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
+import type { ReactNode } from "react";
 
 /** Where app-relative source paths are browsable. */
 const SOURCE_BASE_URL =
@@ -58,7 +59,11 @@ function UsedByList({ helper }: { helper: HelperEntry }) {
 }
 
 /** Exports, defaults, consumers and source of the selected helper. */
-export function HelperReference({ helper }: { helper: HelperEntry }) {
+export function HelperReference({
+  helper,
+}: {
+  helper: HelperEntry;
+}): ReactNode {
   return (
     <aside className={css.reference}>
       <h3>Exports</h3>

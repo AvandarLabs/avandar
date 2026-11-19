@@ -13,6 +13,7 @@ import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { SceneTransitionKind } from "../../../motion-components/SceneTransition";
 import type { ShotTransition } from "../../../storyboard/schema/shotTransitionSchema";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const CUT_AT = 30;
 const SHOT_WIDTH = 270;
@@ -75,7 +76,10 @@ function ShotBoundary(props: {
 }
 
 /** Shot A handing over to shot B under each declared transition. */
-export function ShotTransitionDemo({ frame, frames }: HelperDemoProps) {
+export function ShotTransitionDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
@@ -115,7 +119,10 @@ const SCENE_KINDS: SceneTransitionKind[] = [
 const STAGE = { width: 160, height: 110 };
 
 /** The scene transition kinds at the same progress, side by side. */
-export function SceneTransitionDemo({ frame, frames }: HelperDemoProps) {
+export function SceneTransitionDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const progress = getMotionProgress(frame, 15, 30);
   return (
     <HelperDemoFrame

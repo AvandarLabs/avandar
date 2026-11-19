@@ -59,7 +59,10 @@ const TOKEN_PATHS = listTokenDefinitions()
     return !isMantineTokenRoot(tokenPath.split(".")[0]);
   });
 const TOKEN_PATH_SET: ReadonlySet<string> = new Set(TOKEN_PATHS);
-/** Atomic scales are exempt: they are vocabularies a theme or the editor writes new entries into. */
+/**
+ * Atomic scales are exempt: they are vocabularies a theme or the editor writes
+ * new entries into.
+ */
 const AUDITED_TOKEN_PATHS = TOKEN_PATHS.filter((tokenPath) => {
   return !tokenPath.startsWith("atomic.");
 });
@@ -118,7 +121,10 @@ function _planBuilderReads(): string[] {
   return [...collector.getPaths()];
 }
 
-/** The text of every stage renderer file with one of the extensions, tests and gallery UI excluded. */
+/**
+ * The text of every stage renderer file with one of the extensions, tests and
+ * gallery UI excluded.
+ */
 function _readStageSources(pattern: RegExp): string {
   return STAGE_SOURCE_DIRECTORIES.flatMap((directory) => {
     const root = new URL(`../../../${directory}/`, import.meta.url);
@@ -145,7 +151,10 @@ function _kebab(segment: string): string {
     .replace(/^-/, "");
 }
 
-/** The `--video-*` name a token's variables start with, as `buildVideoCssVariables` writes them. */
+/**
+ * The `--video-*` name a token's variables start with, as
+ * `buildVideoCssVariables` writes them.
+ */
 function _variablePrefix(tokenPath: string): string {
   const [root, ...rest] = tokenPath.split(".");
   return root === "components"
@@ -237,7 +246,10 @@ function _referencedTokenPaths(value: unknown): string[] {
     : [];
 }
 
-/** A token plus, when it belongs to a menu group, every other choice in that menu. */
+/**
+ * A token plus, when it belongs to a menu group, every other choice in that
+ * menu.
+ */
 function _withPaletteSiblings(tokenPath: string): string[] {
   const group = PALETTE_GROUPS.find((prefix) => {
     return tokenPath.startsWith(`${prefix}.`);
@@ -249,7 +261,10 @@ function _withPaletteSiblings(tokenPath: string): string[] {
     : [tokenPath];
 }
 
-/** Every token read directly, plus every token a live token references in a built-in theme. */
+/**
+ * Every token read directly, plus every token a live token references in a
+ * built-in theme.
+ */
 function _liveTokenPaths(directReads: readonly string[]): Set<string> {
   const documents = [...BUILT_IN_VIDEO_THEMES.values()];
   const live = new Set<string>();

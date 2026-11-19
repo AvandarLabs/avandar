@@ -362,15 +362,20 @@ function _assertSvgPaintClearance({
   });
 }
 
+type GetVisiblePaintEnvelopesFromMarkup =
+  typeof _getSvgVisiblePaintEnvelopesFromMarkup;
+
 /** Related SvgPaintAssertions operations. */
 export const SvgPaintAssertions = {
   /**
    * Estimate visible SVG text bounds from attributes in a 960 by 600 canvas.
    * Supports inherited translate/scale, opacity, anchors, font size and scalar
-   * text/tspan coordinates. Middle/end anchored spans require absolute x resets.
+   * text/tspan coordinates. Middle/end anchored spans require absolute x
+   * resets.
    * Anchored continuation chunks and other layout features are rejected. Defs
    * are inert.
-   * Width uses reviewed per-base Arial advances and conservative grapheme floors.
+   * Width uses reviewed per-base Arial advances and conservative grapheme
+   * floors.
    * Geometry-only subtrees are ignored after checking balanced markup.
    * Complete grapheme clusters remain intact.
    * This is conservative geometry estimation, not browser font measurement,
@@ -381,17 +386,20 @@ export const SvgPaintAssertions = {
    * Extracts conservative actual text lines and rectangle interiors in paint
    * order.
    * Opacity and fill facts are explicit. Hidden/definition subtrees are absent.
-   * Rectangle stroke, rounded corners and browser rasterization are not modeled.
+   * Rectangle stroke, rounded corners and browser rasterization are not
+   * modeled.
    * Existing visible-text transform/layout guards remain enforced.
    */
   getVisiblePaintEnvelopesFromMarkup: _getSvgVisiblePaintEnvelopesFromMarkup,
   /**
-   * Checks caller-selected text against other text and later rectangle interiors.
-   * Conservative envelopes support focused regressions, not general occlusion QA.
+   * Checks caller-selected text against other text and later rectangle
+   * interiors.
+   * Conservative envelopes support focused regressions, not general occlusion
+   * QA.
    */
   assertPaintClearance: _assertSvgPaintClearance,
 } satisfies {
   assertTextCanvasBounds: typeof _assertSvgTextCanvasBounds;
-  getVisiblePaintEnvelopesFromMarkup: typeof _getSvgVisiblePaintEnvelopesFromMarkup;
+  getVisiblePaintEnvelopesFromMarkup: GetVisiblePaintEnvelopesFromMarkup;
   assertPaintClearance: typeof _assertSvgPaintClearance;
 };

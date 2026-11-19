@@ -11,12 +11,14 @@ import {
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import { DemoDiagram, getDiagramNodeRect } from "./parts/DemoDiagram";
+import { DemoDiagram } from "./parts/DemoDiagram";
+import { getDiagramNodeRect } from "./parts/getDiagramNodeRect";
 import type {
   MotionRect,
   OverlayCue,
 } from "../../../motion-components/AnchoredOverlay";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const SOURCE: MotionRect = { x: 40, y: 300, width: 200, height: 52 };
 const TARGET: MotionRect = { x: 420, y: 40, width: 440, height: 140 };
@@ -41,7 +43,10 @@ function RectOutline({ rect, label }: { rect: MotionRect; label: string }) {
 }
 
 /** One chip travelling from a list into a header as the same element. */
-export function SharedElementDemo({ frame, frames }: HelperDemoProps) {
+export function SharedElementDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const progress = getMotionProgress(frame, SHARE_AT, SHARE_FRAMES);
   return (
     <HelperDemoFrame
@@ -75,7 +80,10 @@ const CUE: OverlayCue = {
 const TABLE_ROWS = ["first", "second", "third", "fourth"];
 
 /** A callout rising from a table cell, holding, and returning to it. */
-export function AnchoredOverlayDemo({ frame, frames }: HelperDemoProps) {
+export function AnchoredOverlayDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const pose = getOverlayPose(frame, CUE, CELL);
   return (
     <HelperDemoFrame
@@ -131,7 +139,10 @@ const FLIGHT = {
 };
 
 /** One diagram node leaving on its own vector while the diagram stays. */
-export function ObjectDepartureDemo({ frame, frames }: HelperDemoProps) {
+export function ObjectDepartureDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const flight = getObjectFlight(FLIGHT, frame);
   return (
     <HelperDemoFrame

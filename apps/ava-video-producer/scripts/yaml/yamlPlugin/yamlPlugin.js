@@ -1,7 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { compileYaml } from "../compileYaml.cjs";
 
-/** Parse authored YAML for esbuild while retaining source watch dependencies. */
+/**
+ * Parse authored YAML for esbuild while retaining source watch dependencies.
+ */
 export const yamlPlugin = {
   name: "authored-yaml",
   setup(builder) {

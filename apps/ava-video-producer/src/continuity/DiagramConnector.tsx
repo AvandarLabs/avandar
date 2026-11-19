@@ -3,6 +3,7 @@ import { useVideoProps } from "../videoTheme/useVideoTheme";
 import css from "./ContinuityOverlays.module.css";
 import { getConnectorProgress, getOverlayPose } from "./overlayMotion";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   content: Extract<ContinuityBeat["content"], { kind: "composite" }>;
@@ -10,8 +11,10 @@ type Props = Readonly<{
   accent: string;
 }>;
 
-/** The spotlight around the source and the connector line to the active diagram. */
-export function DiagramConnector({ content, frame, accent }: Props) {
+/**
+ * The spotlight around the source and the connector line to the active diagram.
+ */
+export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
   const active = content.diagrams.find((diagram) => {
     return frame >= diagram.overlay.at && frame < diagram.overlay.until;
   });

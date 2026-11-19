@@ -15,12 +15,14 @@ import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
 import type { Options } from "./video.types";
 
-/** Import supplied SRT timing with exact text matching; this performs no ASR. */
+/**
+ * Import supplied SRT timing with exact text matching; this performs no ASR.
+ */
 export async function alignRecording(
   plan: Storyboard,
   options: Options,
   workspace: string,
-) {
+): Promise<string> {
   const recording = await safeInputFile(options.audio!, AUDIO_EXTENSIONS);
   const srtFile = await safeInputFile(options.srt!, [".srt"]);
   const digest = await fileHash(recording);

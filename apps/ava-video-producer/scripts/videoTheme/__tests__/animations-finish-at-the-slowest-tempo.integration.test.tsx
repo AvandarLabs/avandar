@@ -32,7 +32,10 @@ const SLOWEST_TEMPO: VideoThemePatch = {
 };
 /** The last frame of a 180-frame stock loop. */
 const LAST_LOOP_FRAME = 179;
-/** Cue frames from `ContinuityToken`: the shared object fades in at 12 and an outline starts fading 60 frames into its beat. */
+/**
+ * Cue frames from `ContinuityToken`: the shared object fades in at 12 and an
+ * outline starts fading 60 frames into its beat.
+ */
 const SHARED_OBJECT_FADE_IN_AT = 12;
 const OUTLINE_FADE_AT = 60;
 
@@ -87,7 +90,10 @@ const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
   };
 });
 
-/** The last beat-local frame before the next beat's transition starts covering this one. */
+/**
+ * The last beat-local frame before the next beat's transition starts covering
+ * this one.
+ */
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   const nextBeat = beats[index + 1];
   const outgoing = nextBeat
@@ -96,7 +102,10 @@ function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   return beats[index].duration - outgoing - 1;
 }
 
-/** One row per beat of every in-scope composition, with its shot's beats and its index in them. */
+/**
+ * One row per beat of every in-scope composition, with its shot's beats and its
+ * index in them.
+ */
 function _listBeatRows(): Array<
   Readonly<{
     id: string;
@@ -114,7 +123,9 @@ function _listBeatRows(): Array<
   });
 }
 
-/** When each tempo-scaled stage animation of a beat ends, in beat-local frames. */
+/**
+ * When each tempo-scaled stage animation of a beat ends, in beat-local frames.
+ */
 function _stageAnimationEnds(
   beats: readonly ContinuityBeat[],
   index: number,

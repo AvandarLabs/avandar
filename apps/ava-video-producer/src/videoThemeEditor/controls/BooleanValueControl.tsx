@@ -4,13 +4,14 @@ import {
   useRowIssueAriaProps,
 } from "../RowIssueContext/RowIssueContext";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 /** A switch token. */
 export function BooleanValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();
   return (

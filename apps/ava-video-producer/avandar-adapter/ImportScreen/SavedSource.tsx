@@ -24,11 +24,15 @@ import {
   source,
 } from "./importFixtures";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ReactNode } from "react";
 
 const _noop = () => {};
 
-/** The saved dataset's detail view: real DatasetMetaView markup over this film's fixture columns and preview rows. */
-export function SavedSource() {
+/**
+ * The saved dataset's detail view: real DatasetMetaView markup over this film's
+ * fixture columns and preview rows.
+ */
+export function SavedSource(): ReactNode {
   return (
     <AppView>
       <AppViewHeader

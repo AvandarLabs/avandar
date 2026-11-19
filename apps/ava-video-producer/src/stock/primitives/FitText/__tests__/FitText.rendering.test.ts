@@ -1,5 +1,6 @@
 /**
- * FitText draws wrapped labels with fixed font size and themed colour and spacing.
+ * FitText draws wrapped labels with fixed font size and themed colour and
+ * spacing.
  */
 import assert from "node:assert/strict";
 import test from "node:test";

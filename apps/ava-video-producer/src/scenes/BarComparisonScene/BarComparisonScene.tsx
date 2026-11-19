@@ -1,7 +1,8 @@
 import { DUR, EASE, STAGGER, enter, ramp } from "../../motion";
 import { getEraseMaskStyle } from "../../motion-components/eraseMask";
 import { fitTextLines, formatMetric, sceneBounds } from "../layout/layout";
-import { positioned, SceneShell } from "../SceneShell";
+import { positioned } from "../positioned";
+import { SceneShell } from "../SceneShell";
 import { getLineRevealStyle } from "../textReveal";
 import {
   BAR_GROW_FRAMES,
@@ -32,7 +33,7 @@ const ROUGH_EDGE_DEPTH = 10;
  * per-element left-to-right erase. Figures are authored data; label them as
  * fictional unless they are sourced.
  */
-export function BarComparisonScene(props: BarComparisonSceneProps) {
+export function BarComparisonScene(props: BarComparisonSceneProps): ReactNode {
   const {
     frame,
     width = 1600,

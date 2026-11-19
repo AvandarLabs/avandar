@@ -14,7 +14,10 @@ export type MotionRect = {
   width: number;
   height: number;
 };
-/** A complete trip with a stationary reading interval and a return to its source. */
+/**
+ * A complete trip with a stationary reading interval and a return to its
+ * source.
+ */
 export type OverlayCue = {
   at: number;
   until: number;
@@ -25,8 +28,21 @@ export type OverlayCue = {
   motion?: MotionOptions;
 };
 
-/** Resolve travel and fade durations, rejecting cues that cannot include a hold. */
-export function getOverlayTimings(cue: OverlayCue) {
+/** Resolved travel and fade durations of an overlay cue, in frames. */
+export type OverlayTimings = { entry: number; exit: number; fade: number };
+
+/** Where an overlay sits, how opaque it is, and its scale on one frame. */
+export type OverlayPose = {
+  x: number;
+  y: number;
+  opacity: number;
+  scale: number;
+};
+
+/**
+ * Resolve travel and fade durations, rejecting cues that cannot include a hold.
+ */
+export function getOverlayTimings(cue: OverlayCue): OverlayTimings {
   const entry = getMotionDuration(cue.entryFrames ?? 36, cue.motion);
   const exit = getMotionDuration(cue.exitFrames ?? 30, cue.motion);
   const fade = cue.fadeFrames ?? 20;
@@ -42,12 +58,15 @@ export function getOverlayTimings(cue: OverlayCue) {
   return { entry, exit, fade };
 }
 
-/** Floating artwork originates at a measured region without moving the source UI. */
+/**
+ * Floating artwork originates at a measured region without moving the source
+ * UI.
+ */
 export function getOverlayPose(
   frame: number,
   cue: OverlayCue,
   source: MotionRect,
-) {
+): OverlayPose {
   const timing = getOverlayTimings(cue);
   const departure = getMotionProgress(
     frame,
@@ -74,7 +93,10 @@ export function getOverlayPose(
   };
 }
 
-/** Single-instance overlay with numeric timing, shared presets, easing and travel blur. */
+/**
+ * Single-instance overlay with numeric timing, shared presets, easing and
+ * travel blur.
+ */
 export function AnchoredOverlay({
   children,
   frame,
@@ -91,7 +113,7 @@ export function AnchoredOverlay({
   motionBlur?: boolean;
   className?: string;
   style?: CSSProperties;
-}) {
+}): ReactNode {
   const pose = getOverlayPose(frame, cue, source);
   const prior = getOverlayPose(frame - 1, cue, source);
   const velocity = Math.hypot(pose.x - prior.x, pose.y - prior.y);

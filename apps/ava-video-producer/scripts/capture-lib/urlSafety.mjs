@@ -5,7 +5,10 @@ const ASSET_EXTENSION =
 const FEEDBACK_WIDGET_CONFIG =
   "https://avandar.featurebase.app/api/v1/feedback/widget/config";
 
-/** Reject anything but a lowercase, hyphenated slug for an id-like capture value. */
+/**
+ * Reject anything but a lowercase, hyphenated slug for an id-like capture
+ * value.
+ */
 export function validateId(value, name = "id") {
   if (
     typeof value !== "string" ||
@@ -32,7 +35,10 @@ export function isLoopbackUrl(value) {
   }
 }
 
-/** Require a bare loopback HTTP(S) origin, with no credentials, path, query, or fragment. */
+/**
+ * Require a bare loopback HTTP(S) origin, with no credentials, path, query, or
+ * fragment.
+ */
 export function validateBaseUrl(value) {
   const url = new URL(value);
   if (
@@ -51,7 +57,10 @@ export function validateBaseUrl(value) {
   return url.origin;
 }
 
-/** Check whether a URL stays on the capture base origin and inside the given workspace. */
+/**
+ * Check whether a URL stays on the capture base origin and inside the given
+ * workspace.
+ */
 export function isWorkspaceRoute(value, baseUrl, workspace) {
   try {
     const url = new URL(value);
@@ -65,7 +74,9 @@ export function isWorkspaceRoute(value, baseUrl, workspace) {
   }
 }
 
-/** Remove userinfo, queries and fragments before any URL reaches an artifact. */
+/**
+ * Remove userinfo, queries and fragments before any URL reaches an artifact.
+ */
 export function sourceUrl(value) {
   try {
     const url = new URL(value);
@@ -98,7 +109,8 @@ export function requestPolicy({
     return { allow: false, reason: "external-supabase" };
   if (["ws:", "wss:"].includes(url.protocol))
     return { allow: false, reason: "external-websocket" };
-  // Disable this automatic widget locally. It is never an allowed external write.
+  // Disable this automatic widget locally. It is never an allowed external
+  // write.
   if (
     url.href === FEEDBACK_WIDGET_CONFIG &&
     method.toUpperCase() === "POST" &&

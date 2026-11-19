@@ -13,7 +13,9 @@ export type ThemeSummary = Readonly<{
   extends?: string;
 }>;
 
-/** A theme file and the hash of its bytes, sent back as `If-Match` when saving. */
+/**
+ * A theme file and the hash of its bytes, sent back as `If-Match` when saving.
+ */
 export type StoredTheme = Readonly<{
   document: VideoThemeDocument;
   hash: string;
@@ -85,13 +87,17 @@ async function _loadAll(): Promise<{
 export const ThemeApi = {
   loadAll: _loadAll,
   read: _read,
-  create: (document: VideoThemeDocument) => {
+  create: (
+    document: VideoThemeDocument,
+  ): Promise<{ id: string; hash: string }> => {
     return _request<{ id: string; hash: string }>("/api/themes", {
       method: "POST",
       body: JSON.stringify(document),
     });
   },
-  save: (options: Readonly<{ document: VideoThemeDocument; hash: string }>) => {
+  save: (
+    options: Readonly<{ document: VideoThemeDocument; hash: string }>,
+  ): Promise<{ hash: string }> => {
     return _request<{ hash: string }>(
       `/api/themes/${encodeURIComponent(options.document.id)}`,
       {

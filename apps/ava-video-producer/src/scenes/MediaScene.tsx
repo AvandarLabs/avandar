@@ -8,9 +8,10 @@ import {
   textUnits,
 } from "./layout/layout";
 import { MediaPlane } from "./MediaPlane";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import type { MediaSceneProps } from "./scenes.types";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /** Media stays stationary. Any crop is fixed for the entire scene. */
 export function MediaScene({
@@ -26,7 +27,7 @@ export function MediaScene({
   objectPosition = { x: 0.5, y: 0.5 },
   crop = { x: 0, y: 0, width: 1, height: 1 },
   callouts = [],
-}: MediaSceneProps) {
+}: MediaSceneProps): ReactNode {
   assertFrame(trimBefore, "trimBefore");
   assertUnit(objectPosition.x, "objectPosition.x");
   assertUnit(objectPosition.y, "objectPosition.y");

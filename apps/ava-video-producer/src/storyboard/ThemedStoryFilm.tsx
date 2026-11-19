@@ -6,6 +6,7 @@ import { StoryFilm } from "./StoryFilm/StoryFilm";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Storyboard } from "./schema/schema";
 import type { ProductSceneRenderer } from "./StoryFilm/ShotView";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   plan: Storyboard;
@@ -18,7 +19,11 @@ type Props = Readonly<{
  * theme's override for that composition applies. The root of every
  * `story-film` composition the `video` CLI renders.
  */
-export function ThemedStoryFilm({ plan, theme, productScene }: Props) {
+export function ThemedStoryFilm({
+  plan,
+  theme,
+  productScene,
+}: Props): ReactNode {
   const themedPlan = useMemo(() => {
     return createContinuityPlanFromVideoThemeSnapshot(plan, theme, [plan.id]);
   }, [plan, theme]);

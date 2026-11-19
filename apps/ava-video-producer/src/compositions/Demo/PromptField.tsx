@@ -1,6 +1,7 @@
-import { abs } from "../../chrome/chrome";
+import { abs } from "../../chrome/abs";
 import { caretOn, mixToken, press } from "../../motion";
 import { FIELD, RUN_CLICK } from "./timeline";
+import type { ReactNode } from "react";
 
 /** The prompt field phase: a text field gaining focus, filling with the
  *  query, and a Run button answering the click. */
@@ -14,7 +15,7 @@ export function PromptField({
   focus: number;
   text: string;
   typing: boolean;
-}) {
+}): ReactNode {
   return (
     <div
       style={{

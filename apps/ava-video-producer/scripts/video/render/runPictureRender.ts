@@ -15,13 +15,15 @@ type Props = Readonly<{
   publicDir: string;
 }>;
 
-/** Runs the shared render script, which renders, encodes, and gates the picture. */
+/**
+ * Runs the shared render script, which renders, encodes, and gates the picture.
+ */
 export async function runPictureRender({
   plan,
   directory,
   props,
   publicDir,
-}: Props) {
+}: Props): Promise<void> {
   const last = timeline(plan).at(-1)!;
   const poster = last.startFrame + Math.floor(last.durationInFrames * 0.65);
   await run(

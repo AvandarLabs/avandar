@@ -12,7 +12,10 @@ export type ColorPair = Readonly<{ onDark: unknown; onLight: unknown }>;
 /** A text colour's WCAG level and its ratio as text, such as `4.6`. */
 export type ContrastSummary = Readonly<{ level: WcagLevel; ratio: string }>;
 
-/** Whether a colour role's authored value has a dark-ground and a light-ground side. */
+/**
+ * Whether a colour role's authored value has a dark-ground and a light-ground
+ * side.
+ */
 export function isColorPair(value: unknown): value is ColorPair {
   return (
     typeof value === "object" &&
@@ -73,7 +76,10 @@ export function getContrastSummaryFromColors(
   );
 }
 
-/** A composite token's authored fields, or none when it holds a reference or nothing. */
+/**
+ * A composite token's authored fields, or none when it holds a reference or
+ * nothing.
+ */
 export function getCompositeFieldsFromValue(
   value: unknown,
 ): Record<string, unknown> {

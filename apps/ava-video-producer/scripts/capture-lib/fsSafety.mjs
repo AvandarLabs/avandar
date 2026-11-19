@@ -19,7 +19,9 @@ const FIXTURE_EXTENSIONS = new Set([
   ".pdf",
 ]);
 
-/** Require a non-hidden relative path with no traversal or unsafe characters. */
+/**
+ * Require a non-hidden relative path with no traversal or unsafe characters.
+ */
 export function safeRelativePath(value, name = "path") {
   if (
     typeof value !== "string" ||
@@ -51,7 +53,10 @@ export async function sha256File(path) {
   return hash.digest("hex");
 }
 
-/** Resolve a path inside a root, rejecting symlinks and traversal at every segment. */
+/**
+ * Resolve a path inside a root, rejecting symlinks and traversal at every
+ * segment.
+ */
 async function inspectPlainPath(root, file, directory = false) {
   const target = resolve(root, file);
   if (!isWithin(root, target))
@@ -74,7 +79,10 @@ async function inspectPlainPath(root, file, directory = false) {
   return target;
 }
 
-/** Inventory and hash the fixture files a capture run will reference, rejecting symlinks. */
+/**
+ * Inventory and hash the fixture files a capture run will reference, rejecting
+ * symlinks.
+ */
 export async function fixtureInventory(root, fixtureDir, fixtureFiles) {
   root = await realpath(root);
   const dir = await inspectPlainPath(root, fixtureDir, true);
@@ -125,7 +133,10 @@ export async function fixtureInventory(root, fixtureDir, fixtureFiles) {
   };
 }
 
-/** Create a fresh, owned, timestamped directory for one capture run under out/captures. */
+/**
+ * Create a fresh, owned, timestamped directory for one capture run under
+ * out/captures.
+ */
 export async function createRunDirectory(root, runLabel, now = new Date()) {
   validateId(runLabel, "runLabel");
   root = await realpath(root);

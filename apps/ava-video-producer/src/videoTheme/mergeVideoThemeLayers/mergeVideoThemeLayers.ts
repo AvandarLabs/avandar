@@ -26,13 +26,13 @@ function _toPatch(document: VideoThemeDocument): VideoThemePatch {
 }
 
 /**
- * Merges a theme into one sparse patch. It follows Mantine's merge, except
- * that a value never merges into a non-object (a reference): the patch value
- * replaces it. Layers apply in this order: `classic`, then the `extends`
- * chain from its root, then the theme, then the theme's own override for each id in
- * `scope.overrideIds` in order, then `scope.patches`. Overrides declared by
- * a theme it extends are skipped: per-item art direction belongs to the
- * theme that declares it.
+ * Merges a theme into one sparse patch. It follows Mantine's merge, except that
+ * a value never merges into a non-object (a reference): the patch value
+ * replaces it. Layers apply in this order: `classic`, then the `extends` chain
+ * from its root, then the theme, then the theme's own override for each id in
+ * `scope.overrideIds` in order, then `scope.patches`. Overrides declared by a
+ * theme it extends are skipped: per-item art direction belongs to the theme
+ * that declares it.
  */
 export function mergeVideoThemeLayers(
   library: VideoThemeLibrary,

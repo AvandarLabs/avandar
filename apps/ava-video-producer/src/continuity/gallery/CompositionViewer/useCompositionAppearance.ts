@@ -1,10 +1,34 @@
-import { useCallback, useEffect, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from "react";
 import {
   continuityAppearanceSchema,
   type ContinuityAppearance,
 } from "../../continuityAppearance";
-import { getExportOptionsFromAcknowledgement } from "./compositionExportOptions";
-import { getCompositionTransportUpdates } from "./compositionTransport";
+import {
+  getExportOptionsFromAcknowledgement,
+  type CompositionExportOptions,
+} from "./compositionExportOptions";
+import {
+  getCompositionTransportUpdates,
+  type CompositionTransport,
+} from "./compositionTransport";
+
+/** The active film's appearance draft, playback, and player messaging. */
+type CompositionAppearanceState = {
+  draft: ContinuityAppearance;
+  transport: CompositionTransport;
+  setTransport: Dispatch<SetStateAction<CompositionTransport>>;
+  options: CompositionExportOptions | undefined;
+  send: (action: string, value?: unknown) => void;
+  update: (patch: Partial<ContinuityAppearance>) => void;
+  loaded: () => void;
+};
 
 /**
  * Synchronize validated options only with the active, same-origin film. A
@@ -15,7 +39,7 @@ export function useCompositionAppearance(
   id: string,
   player: RefObject<HTMLIFrameElement | null>,
   isScene: boolean,
-) {
+): CompositionAppearanceState {
   const [transport, setTransport] = useState(() => {
     try {
       const saved = JSON.parse(

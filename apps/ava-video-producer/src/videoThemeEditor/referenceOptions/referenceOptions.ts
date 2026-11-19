@@ -174,7 +174,10 @@ function _scaleOf(path: string): string {
   return path.split(".").slice(0, -1).join(".");
 }
 
-/** Options with those from the current reference's scale first, the likeliest picks. */
+/**
+ * Options with those from the current reference's scale first, the likeliest
+ * picks.
+ */
 export function orderReferenceOptions(
   options: Readonly<{
     referenceOptions: readonly ReferenceOption[];

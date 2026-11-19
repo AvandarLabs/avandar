@@ -16,6 +16,7 @@ import { HEADLINE_BOX, WINDOW_BOXES, WINDOW_TILT } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { WindowPose } from "./windowMotion";
+import type { ReactNode } from "react";
 
 /**
  * A headline on the left and captured product stills or footage in a 3D
@@ -27,7 +28,7 @@ import type { WindowPose } from "./windowMotion";
  * Only stills and footage go in the window: live product UI must never sit
  * under its lasting 3D transform.
  */
-export function TiltedWindowScene(props: TiltedWindowSceneProps) {
+export function TiltedWindowScene(props: TiltedWindowSceneProps): ReactNode {
   const { frame, width = 1600, height = 1000, headlines, exit } = props;
   return (
     <SceneShell frame={frame} width={width} height={height}>

@@ -15,7 +15,11 @@ export async function runPictureCommand({
   options,
   plan,
   workspace,
-}: Readonly<{ options: Options; plan: Storyboard; workspace: string }>) {
+}: Readonly<{
+  options: Options;
+  plan: Storyboard;
+  workspace: string;
+}>): Promise<void> {
   const theme = await loadVideoThemeSnapshot({
     id: options.theme ?? "classic",
   });

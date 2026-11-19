@@ -8,6 +8,11 @@ export type ExportStatus = {
   download?: string;
 };
 type ExportJob = ExportStatus & { key: string; filename?: string };
+type ExportJobs<T> = {
+  start: (key: string, input: T) => ExportStatus;
+  get: (id: string) => ExportStatus | undefined;
+  file: (id: string) => string | undefined;
+};
 
 /** Serialize expensive renders and make failures retryable. */
 export function createExportJobs<T>(
@@ -18,7 +23,7 @@ export function createExportJobs<T>(
       progress: (message: string) => void;
     }>,
   ) => Promise<string>,
-) {
+): ExportJobs<T> {
   const jobs = new Map<string, ExportJob>();
   let active: ExportJob | undefined;
   const get = (id: string): ExportStatus | undefined => {

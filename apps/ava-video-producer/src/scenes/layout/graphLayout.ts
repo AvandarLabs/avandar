@@ -42,7 +42,9 @@ export function validateGraph(
   });
 }
 
-/** Normalized centers map inside a safe inset so edge nodes remain on canvas. */
+/**
+ * Normalized centers map inside a safe inset so edge nodes remain on canvas.
+ */
 export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
   const width = node.width
     ? node.width * bounds.width

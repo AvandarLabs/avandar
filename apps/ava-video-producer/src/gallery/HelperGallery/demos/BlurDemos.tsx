@@ -9,6 +9,7 @@ import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** How far the sliding cards travel, in pixels. */
 const TRAVEL = 600;
@@ -29,7 +30,10 @@ function _getBlurAmount(frame: number): number {
 }
 
 /** The same slide with the X-only blur filter and with no blur. */
-export function HorizontalBlurDemo({ frame, frames }: HelperDemoProps) {
+export function HorizontalBlurDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const amount = _getBlurAmount(frame);
   const x = _getSlideX(frame);
   return (
@@ -74,7 +78,10 @@ export function HorizontalBlurDemo({ frame, frames }: HelperDemoProps) {
 const PRESETS = ["gentle", "brisk", "whip"] as const;
 
 /** Velocity blur for the same move under three motion presets. */
-export function VelocityBlurDemo({ frame, frames }: HelperDemoProps) {
+export function VelocityBlurDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const x = mix(ramp(frame, 15, 24, EASE.inOutCubic), 0, 700);
   const velocity = Math.abs(
     x - mix(ramp(frame - 1, 15, 24, EASE.inOutCubic), 0, 700),

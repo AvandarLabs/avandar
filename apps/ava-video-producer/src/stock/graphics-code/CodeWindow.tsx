@@ -9,14 +9,17 @@ import type { ReactNode } from "react";
 const DOT_COUNT = 3;
 const DOT_SPACING = 20;
 
-/** Shared terminal/editor frame. Exclusive to this directory's preset components. */
+/**
+ * Shared terminal/editor frame. Exclusive to this directory's preset
+ * components.
+ */
 export function CodeWindow({
   title,
   children,
 }: {
   title: string;
   children: ReactNode;
-}) {
+}): ReactNode {
   const style = useGraphicProps("CodeWindow", {});
   const { color } = useGraphicTokens();
   return (

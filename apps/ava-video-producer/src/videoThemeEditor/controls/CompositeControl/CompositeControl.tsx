@@ -12,6 +12,7 @@ import { CompositeReference } from "./CompositeReference/CompositeReference";
 import { CompositeSketchPreview } from "./CompositeSketchPreview";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
 import type { TokenRow } from "../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ row: TokenRow; label: string }>;
 
@@ -20,7 +21,7 @@ type Props = Readonly<{ row: TokenRow; label: string }>;
  * sketch, box, motion step, camera preset, range). A composite that points
  * at another composite, such as a sketch role, is one reference picker.
  */
-export function CompositeControl({ row, label }: Props) {
+export function CompositeControl({ row, label }: Props): ReactNode {
   if (isTokenReference(row.value)) {
     return <CompositeReference row={row} label={label} />;
   }

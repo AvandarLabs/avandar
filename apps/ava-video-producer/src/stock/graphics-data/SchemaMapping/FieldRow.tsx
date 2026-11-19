@@ -12,6 +12,7 @@ import {
   ROW_INSET,
   ROW_WIDTH,
 } from "./SchemaMapping.constants";
+import type { ReactNode } from "react";
 
 type Props = {
   x: number;
@@ -26,7 +27,14 @@ type Props = {
  * A field row's card, port dot, and name. A target row draws its port before
  * its name and a source row after it, so each keeps its legacy paint order.
  */
-export function FieldRow({ x, y, portX, color, label, isPortFirst }: Props) {
+export function FieldRow({
+  x,
+  y,
+  portX,
+  color,
+  label,
+  isPortFirst,
+}: Props): ReactNode {
   const style = useGraphicProps("SchemaMapping", {});
   const tokens = useGraphicTokens();
   const port = <circle cx={portX} cy={y} r={style.dotRadius} fill={color} />;

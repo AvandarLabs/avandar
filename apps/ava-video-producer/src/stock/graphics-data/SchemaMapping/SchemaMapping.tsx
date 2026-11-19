@@ -9,11 +9,16 @@ import { CAPTION_Y, PANEL_WIDTH } from "./SchemaMapping.constants";
 import { SchemaPanel } from "./SchemaPanel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { SchemaMappingInput } from "../../presets/SchemaMapping/SchemaMapping.schema";
+import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: SchemaMappingInput };
 
 /** Draws the bounded authored schema-mapping study at an explicit frame. */
-export function SchemaMapping({ input, frame, accent }: Readonly<Props>) {
+export function SchemaMapping({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
   const { layout } = useGraphicTokens();
   const left = layout.graphic.margin;
   const right = GRAPHIC_WIDTH - layout.graphic.margin - PANEL_WIDTH;

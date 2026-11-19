@@ -59,10 +59,19 @@ const options = {
   textFrames: [30, 90, 150],
 } satisfies PresetAssertions<Input>;
 
+/** The rendered position, size, and markup of one moving value copy. */
+type MovingCopy = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  body: string;
+};
+
 function _getMovingCopy({
   markup,
   id,
-}: Readonly<{ markup: string; id: string }>) {
+}: Readonly<{ markup: string; id: string }>): MovingCopy {
   const body = markup.match(
     new RegExp(`<g data-picker-copy="${id}"[^>]*>([\\s\\S]*?</text>)`),
   )?.[1];
@@ -99,7 +108,7 @@ function _assertCardClearance({
 }: {
   copies: readonly AssertCardClearanceCopies[];
   message: string;
-}) {
+}): void {
   copies.forEach((first, index) => {
     return copies.slice(index + 1).forEach((second) => {
       return assert.ok(
@@ -113,7 +122,9 @@ function _assertCardClearance({
   });
 }
 
-function _assertReusedColumnClearance(values: ReadonlyArray<number | null>) {
+function _assertReusedColumnClearance(
+  values: ReadonlyArray<number | null>,
+): void {
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
     nullPolicy: values.includes(null) ? "include-in-mode" : "exclude-from-mode",
@@ -152,7 +163,7 @@ function _assertReusedColumnClearance(values: ReadonlyArray<number | null>) {
   _assertModeArrival(input);
 }
 
-function _assertModeArrival(input: Input) {
+function _assertModeArrival(input: Input): void {
   const arrivedMarkup = _render({ frame: 96, input: input });
   input.observations.forEach(({ id, value }, index) => {
     const start = _getMovingCopy({
@@ -196,7 +207,9 @@ function _assertModeArrival(input: Input) {
   });
 }
 
-function _getPermutedOrders(values: ReadonlyArray<number | null>) {
+function _getPermutedOrders(
+  values: ReadonlyArray<number | null>,
+): Array<Array<number | null>> {
   return values.reduce<Array<Array<number | null>>>(
     (orders, value) => {
       return orders.flatMap((order) => {
@@ -209,7 +222,9 @@ function _getPermutedOrders(values: ReadonlyArray<number | null>) {
   );
 }
 
-function _assertPermutedCopyClearance(order: ReadonlyArray<number | null>) {
+function _assertPermutedCopyClearance(
+  order: ReadonlyArray<number | null>,
+): void {
   const input: Input = {
     ...DEFAULT_INPUT,
     nullPolicy: "include-in-mode",

@@ -25,6 +25,7 @@ import {
   TYPE_AT,
   W,
 } from "./timeline";
+import type { ReactNode } from "react";
 
 export { DEMO_LEN } from "./timeline";
 
@@ -49,7 +50,7 @@ export { DEMO_LEN } from "./timeline";
  * tuned against each other: the pointer arrives before it clicks, the panel
  * answers after the click, the counter finishes before the eye leaves it.
  */
-export function Demo() {
+export function Demo(): ReactNode {
   const frame = useCurrentFrame();
 
   // The app arrives and leaves on opacity only. Never a transform on this

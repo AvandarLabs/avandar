@@ -1,5 +1,6 @@
 import { RangeNumberInput } from "../../RangeNumberInput";
 import css from "./BezierFields.module.css";
+import type { ReactNode } from "react";
 
 type Bezier = readonly [number, number, number, number];
 
@@ -20,7 +21,11 @@ function _withPoint(points: Bezier, index: number, value: number): Bezier {
 }
 
 /** The four Bezier control values. A camera curve keeps every point in 0..1. */
-export function BezierFields({ points, isCameraCurve, onChange }: Props) {
+export function BezierFields({
+  points,
+  isCameraCurve,
+  onChange,
+}: Props): ReactNode {
   const names = ["Start x", "Start y", "End x", "End y"];
   return (
     <div className={css.bezierFields}>

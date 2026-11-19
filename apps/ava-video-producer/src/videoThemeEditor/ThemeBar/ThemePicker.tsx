@@ -1,6 +1,7 @@
 import { Badge, Group } from "@mantine/core";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   themes: readonly ThemeSummary[];
@@ -17,7 +18,7 @@ export function ThemePicker({
   isDirty,
   isDisabled,
   onSelectTheme,
-}: Props) {
+}: Props): ReactNode {
   return (
     <Group gap="xs" wrap="nowrap">
       <AtlasSelect

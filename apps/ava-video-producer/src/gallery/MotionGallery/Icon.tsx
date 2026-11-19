@@ -1,4 +1,5 @@
 import React from "react";
+import type { ReactNode } from "react";
 
 export type IconName =
   | "play"
@@ -19,7 +20,13 @@ export type IconName =
   | "chart"
   | "interface";
 
-export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
+export function Icon({
+  name,
+  size = 18,
+}: {
+  name: IconName;
+  size?: number;
+}): ReactNode {
   const paths: Record<IconName, React.ReactNode> = {
     play: <path d="m9 5 10 7-10 7Z" />,
     pause: (

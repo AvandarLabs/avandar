@@ -15,12 +15,16 @@ import {
   getThemeExportState,
   receiveThemeAcknowledgement,
   type ReceivedThemeAcknowledgement,
+  type ThemeExportState,
 } from "./themeExportStateHelpers/themeExportStateHelpers";
 
 /** About 100 ms, so dragging a slider does not flood the player. */
 const THEME_SEND_DELAY_MS = 100;
 
-/** How long the player has to acknowledge a theme before the gallery offers a retry. */
+/**
+ * How long the player has to acknowledge a theme before the gallery offers a
+ * retry.
+ */
 const ACKNOWLEDGEMENT_TIMEOUT_MS = 8000;
 
 type PlayerReplies = Readonly<{
@@ -30,6 +34,13 @@ type PlayerReplies = Readonly<{
 }>;
 
 type Player = RefObject<HTMLIFrameElement | null>;
+
+/** The live player's theme export state, read tokens, and retry action. */
+type CompositionThemeState = {
+  exportState: ThemeExportState;
+  usedTokens: readonly string[];
+  retry: () => void;
+};
 
 function _expectedTheme(snapshotKey: string, id: string) {
   if (!snapshotKey) {
@@ -188,7 +199,7 @@ export function useCompositionTheme(
     isScene: boolean;
     hasDraftIssues: boolean;
   }>,
-) {
+): CompositionThemeState {
   const { id, player, snapshot, isScene, hasDraftIssues } = options;
   const snapshotKey = snapshot ? JSON.stringify(snapshot) : "";
   const expected = useMemo(() => {

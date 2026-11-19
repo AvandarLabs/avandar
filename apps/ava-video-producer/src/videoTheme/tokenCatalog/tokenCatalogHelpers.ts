@@ -17,7 +17,9 @@ export const VIDEO_TOKEN_CATALOG = {
   components: COMPONENT_TOKENS,
 } as const;
 
-/** One catalog leaf and its token path. A scale is listed once, by its own path. */
+/**
+ * One catalog leaf and its token path. A scale is listed once, by its own path.
+ */
 export type CatalogEntry = Readonly<{
   path: string;
   definition: TokenDefinition;

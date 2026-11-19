@@ -6,13 +6,15 @@ import {
   safePublicPath,
   sceneBounds,
 } from "./layout/layout";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import {
   getLineRevealStyle,
   getStagedExitStyle,
   getTypographyRevealFrames,
 } from "./textReveal";
 import type { TypographySceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Largest font size a `caption` typography shot uses. */
 const CAPTION_FONT_SIZE = 28;
@@ -27,7 +29,7 @@ const ICON_SIZE = 160;
  * under an icon and leaving in a staged exit. A `caption` size sets one
  * small line, for example a teaser on an empty field.
  */
-export function TypographyScene(props: TypographySceneProps) {
+export function TypographyScene(props: TypographySceneProps): ReactNode {
   const {
     frame,
     width = 1600,

@@ -1,6 +1,7 @@
 import { SegmentedControl } from "@mantine/core";
 import { useRowIssueAriaProps } from "../../RowIssueContext/RowIssueContext";
 import { formatDashPattern } from "../controlValueHelpers/controlValueHelpers";
+import type { ReactNode } from "react";
 
 const DASH_PRESETS: Readonly<Record<string, readonly number[]>> = {
   solid: [],
@@ -13,8 +14,10 @@ type Props = Readonly<{
   onChange: (pattern: readonly number[]) => void;
 }>;
 
-/** Solid, dotted, and dashed presets. Shows no selection for a custom pattern. */
-export function DashPresets({ pattern, onChange }: Props) {
+/**
+ * Solid, dotted, and dashed presets. Shows no selection for a custom pattern.
+ */
+export function DashPresets({ pattern, onChange }: Props): ReactNode {
   const issueAriaProps = useRowIssueAriaProps();
   const patternText = formatDashPattern(pattern);
   const preset =

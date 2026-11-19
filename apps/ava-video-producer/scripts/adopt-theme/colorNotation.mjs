@@ -17,5 +17,7 @@ export function detectWrapper(css) {
 const BARE_TRIPLET =
   /^-?[\d.]+(deg|turn|rad)?\s+-?[\d.]+%?\s+-?[\d.]+%?(\s*\/\s*[\d.]+%?)?$/;
 
-/** Check whether a custom property's value is a bare, unwrapped channel triplet. */
+/**
+ * Check whether a custom property's value is a bare, unwrapped channel triplet.
+ */
 export const isBareChannels = (v) => BARE_TRIPLET.test(v.trim());

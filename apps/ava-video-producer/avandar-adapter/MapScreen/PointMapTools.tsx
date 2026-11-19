@@ -7,13 +7,17 @@ import { MeasureMapTool } from "@/views/GisApp/shell/MapToolCluster/MeasureMapTo
 import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
 import { PAN } from "./mapFixtures";
+import type { ReactNode } from "react";
 
 const _noop = () => {
   return undefined;
 };
 
-/** The renderer supplies point data without loading DuckDB Spatial. Reuse the product's unavailable tool slots, including its precise reason. */
-export function PointMapTools() {
+/**
+ * The renderer supplies point data without loading DuckDB Spatial. Reuse the
+ * product's unavailable tool slots, including its precise reason.
+ */
+export function PointMapTools(): ReactNode {
   return (
     <div
       className={toolCss.mapToolCluster}

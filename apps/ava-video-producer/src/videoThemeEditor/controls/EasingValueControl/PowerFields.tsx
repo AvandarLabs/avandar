@@ -1,6 +1,7 @@
 import { Text } from "@mantine/core";
 import { RangeNumberInput } from "../RangeNumberInput";
 import type { EasingValue } from "../../../videoTheme/videoTheme.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   power: number;
@@ -9,7 +10,11 @@ type Props = Readonly<{
 }>;
 
 /** The power curve exponent. A camera supports only the cubic in-out curve. */
-export function PowerFields({ power, isCameraCurve, onChange }: Props) {
+export function PowerFields({
+  power,
+  isCameraCurve,
+  onChange,
+}: Props): ReactNode {
   if (isCameraCurve) {
     return (
       <Text size="xs" c="dimmed">

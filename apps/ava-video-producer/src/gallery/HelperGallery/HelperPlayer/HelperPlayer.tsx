@@ -1,6 +1,7 @@
 import { Player } from "@remotion/player";
 import { HelperComposition } from "./HelperComposition";
 import type { Film } from "../../../showcase/showcase.types";
+import type { ReactNode } from "react";
 
 /**
  * The Remotion player sizes itself through inline styles, so the full-width
@@ -23,7 +24,7 @@ export function HelperPlayer({
   film,
 }: {
   film: Extract<Film, { kind: "helper" }>;
-}) {
+}): ReactNode {
   return (
     <div className="liveFilm">
       <Player

@@ -21,7 +21,9 @@ import {
 } from "../src/storyboard/schema/schema";
 import type { z } from "zod";
 
-/** The pre-parse shape `storyboardSchema` accepts, before defaults are applied. */
+/**
+ * The pre-parse shape `storyboardSchema` accepts, before defaults are applied.
+ */
 type StoryboardInput = z.input<typeof storyboardSchema>;
 
 function fixture(): StoryboardInput {

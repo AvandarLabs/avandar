@@ -13,6 +13,7 @@ import { absoluteCues } from "../../storyboard/schema/schema";
 import { StoryFilm } from "../../storyboard/StoryFilm/StoryFilm";
 import { TitleCard, TITLE_LEN } from "../../title-card";
 import type { Film } from "../showcase.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   film: Film;
@@ -20,7 +21,7 @@ type Props = Readonly<{
 }>;
 
 /** The film's picture, drawn inside its theme by `FilmComposition`. */
-export function FilmPicture({ film, withAudio = true }: Props) {
+export function FilmPicture({ film, withAudio = true }: Props): ReactNode {
   const frame = useCurrentFrame();
   if (film.kind === "stock" && film.preset) {
     return (

@@ -33,7 +33,9 @@ type ResolutionContext = Readonly<{
   components: unknown;
   mantine: MantineTheme;
   isDarkGround: boolean;
-  /** True while resolving the ground itself, which cannot depend on the ground. */
+  /**
+   * True while resolving the ground itself, which cannot depend on the ground.
+   */
   forbidColorPairs: boolean;
   issues: VideoThemeIssue[];
 }>;

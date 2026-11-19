@@ -5,6 +5,7 @@ import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityScene.module.css";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   content: Extract<ContinuityBeat["content"], { kind: "thesis" }>;
@@ -15,7 +16,7 @@ type Props = {
 const UNDERLINE_CUE = 95;
 
 /** Staggered statement with a single deterministic teaching underline. */
-export function ContinuityThesis({ content, frame, accent }: Props) {
+export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
   const { annotations } = useContinuityAppearance();
   const { sketch } = useVideoTokens();
   const thesis = useVideoProps("Thesis", {});

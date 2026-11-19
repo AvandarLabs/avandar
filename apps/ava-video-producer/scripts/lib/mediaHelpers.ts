@@ -17,12 +17,14 @@ export const ffprobe = process.env.FFPROBE_BIN || "ffprobe";
 
 type RunOptions = { cwd?: string; quiet?: boolean; env?: NodeJS.ProcessEnv };
 
-/** Execute argument arrays without a shell; retain diagnostic stderr separately. */
+/**
+ * Execute argument arrays without a shell; retain diagnostic stderr separately.
+ */
 export async function runProcess(
   command: string,
   args: string[],
   options: RunOptions = {},
-) {
+): Promise<{ stdout: string; stderr: string }> {
   return await new Promise<{ stdout: string; stderr: string }>(
     (resolve, reject) => {
       const child = spawn(command, args, {
@@ -54,7 +56,9 @@ export async function runProcess(
   );
 }
 
-/** Run without a shell so filenames and narration text cannot become commands. */
+/**
+ * Run without a shell so filenames and narration text cannot become commands.
+ */
 export async function run(
   command: string,
   args: string[],
@@ -75,7 +79,9 @@ export type MediaStream = {
 };
 
 /** Probe the actual media container, independent of its filename extension. */
-export async function probe(filename: string) {
+export async function probe(
+  filename: string,
+): Promise<{ duration: number; streams: MediaStream[] }> {
   const result = JSON.parse(
     await run(
       ffprobe,
@@ -89,8 +95,13 @@ export async function probe(filename: string) {
   };
 }
 
-/** Check timing before rendering so no speech or effects are silently cut off. */
-export async function validateMedia(plan: Storyboard, root: string) {
+/**
+ * Check timing before rendering so no speech or effects are silently cut off.
+ */
+export async function validateMedia(
+  plan: Storyboard,
+  root: string,
+): Promise<void> {
   const cache = new Map<string, Awaited<ReturnType<typeof probe>>>();
   const inspect = async (asset: string) => {
     if (!cache.has(asset))
@@ -159,7 +170,9 @@ export async function validateMedia(plan: Storyboard, root: string) {
   }
 }
 
-/** Hash encoded video packets to prove audio assembly did not re-encode picture. */
+/**
+ * Hash encoded video packets to prove audio assembly did not re-encode picture.
+ */
 export async function videoHash(filename: string): Promise<string> {
   return (
     await run(
@@ -218,7 +231,10 @@ async function _assertPictureDuration(plan: Storyboard, picture: string) {
   }
 }
 
-/** Mix approved tracks, then assert duration, signal and unchanged video packets. */
+/**
+ * Mix approved tracks, then assert duration, signal and unchanged video
+ * packets.
+ */
 export async function mixAudio(
   plan: Storyboard,
   root: string,

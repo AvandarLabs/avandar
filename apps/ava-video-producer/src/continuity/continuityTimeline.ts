@@ -9,8 +9,12 @@ export type TimedBeat = {
   transition: { frames: number; motion?: MotionOptions };
 };
 
-/** Resolve beat positions while retaining a readable interval between overlaps. */
-export function getContinuityTimeline(beats: readonly TimedBeat[]) {
+/**
+ * Resolve beat positions while retaining a readable interval between overlaps.
+ */
+export function getContinuityTimeline(
+  beats: readonly TimedBeat[],
+): Array<{ start: number; end: number }> {
   let end = 0;
   return beats.map((beat, index) => {
     const overlap =
@@ -30,8 +34,10 @@ export function getContinuityTimeline(beats: readonly TimedBeat[]) {
   });
 }
 
-/** Sample one stock reveal, then hold its resolved pose before the loop reset. */
-export function sampleStockFrame(frame: number, settleFrame = 150) {
+/**
+ * Sample one stock reveal, then hold its resolved pose before the loop reset.
+ */
+export function sampleStockFrame(frame: number, settleFrame = 150): number {
   return Math.min(settleFrame, 12 + Math.max(0, frame) * 0.85);
 }
 
@@ -39,7 +45,7 @@ export function sampleStockFrame(frame: number, settleFrame = 150) {
 export function getProductFrame(
   frame: number,
   segment: { fromFrame: number; toFrame: number; leadIn: number },
-) {
+): number {
   return Math.min(
     segment.toFrame,
     segment.fromFrame + Math.max(0, frame - segment.leadIn),

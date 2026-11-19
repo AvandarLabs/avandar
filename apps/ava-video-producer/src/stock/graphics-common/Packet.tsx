@@ -6,6 +6,7 @@ import {
 import { cubicPoint } from "./cubicPoint";
 import { Halo } from "./Halo";
 import type { Point } from "./graphicCommon.types";
+import type { ReactNode } from "react";
 
 const PACKET_FADE_IN_AT = 34;
 const PACKET_EDGE_FADE = 10;
@@ -32,7 +33,7 @@ export function Packet({
   /** A content override that out-of-scope presets may pass. */
   radius?: number;
   bend?: number;
-}) {
+}): ReactNode {
   const packet = useGraphicProps("Packet", { period });
   const motion = useGraphicMotion();
   const r = radius ?? (size === "sm" ? packet.radiusSm : packet.radius);

@@ -81,10 +81,18 @@ const ASSERTIONS = {
   textFrames: [24, 72, 150],
 } satisfies PresetAssertions<Input>;
 
+/** The left, right, top, and bottom edges of a painted region. */
+type ClearanceBox = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
 function _getLabelLineBoxes({
   markup,
   label,
-}: Readonly<{ markup: string; label: string }>) {
+}: Readonly<{ markup: string; label: string }>): ClearanceBox[] {
   const element = markup
     .match(/<text\b[^>]*>[\s\S]*?<\/text>/g)
     ?.find((text) => {
@@ -122,7 +130,7 @@ function _getLabelLineBoxes({
   return boxes;
 }
 
-function _getOpenVehicleEnvelope(markup: string) {
+function _getOpenVehicleEnvelope(markup: string): ClearanceBox {
   const vehicle = _attributes({
     markup,
     attribute: "data-clinic",
@@ -150,7 +158,7 @@ function _assertClearance({
   box: ReturnType<typeof _getOpenVehicleEnvelope>;
   other: ReturnType<typeof _getOpenVehicleEnvelope>;
   label: string;
-}) {
+}): void {
   assert.ok(
     box.right + 6 <= other.left ||
       other.right + 6 <= box.left ||
@@ -166,7 +174,7 @@ function _assertSiteLabelClearance({
 }: {
   input: Input;
   markup: string;
-}) {
+}): void {
   const envelope = _getOpenVehicleEnvelope(markup);
   const neighboringCopy = [
     input.sceneLabel,
@@ -275,7 +283,7 @@ function _assertBookingClearsLabels({
   path: string;
   boxes: ReturnType<typeof _getLabelLineBoxes>;
   clearance?: number;
-}) {
+}): Point[] {
   const dash = path.match(/stroke-dasharray="([\d.]+) ([\d.]+)"/);
   assert.ok(dash, "Booking remains a painted dashed connection.");
   assert.equal(

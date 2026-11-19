@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Icon } from "../../MotionGallery/Icon";
 import css from "./HelperDetail.module.css";
+import type { ReactNode } from "react";
 
 /** How long the copy button reports success before resetting. */
 const COPIED_MILLISECONDS = 1600;
@@ -12,7 +13,7 @@ export function CodeBlock({
 }: {
   code: string;
   isCopyable?: boolean;
-}) {
+}): ReactNode {
   const [isCopied, setIsCopied] = useState(false);
   useEffect(() => {
     if (!isCopied) {

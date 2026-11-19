@@ -69,7 +69,8 @@ async function runExport({ request, onStatus }) {
 
 /**
  * Render and download a film using the selected preview options.
- * Calls onStatus with job progress and rejects failures so the caller can retry.
+ * Calls onStatus with job progress and rejects failures so the caller can
+ * retry.
  * Concurrent identical requests share the active export and download.
  */
 export async function downloadFilm({ id, options = {}, onStatus = () => {} }) {
@@ -87,7 +88,9 @@ export async function downloadFilm({ id, options = {}, onStatus = () => {} }) {
   return pending;
 }
 
-/** Defer source refresh until every pending browser download has been started. */
+/**
+ * Defer source refresh until every pending browser download has been started.
+ */
 export function afterDownloads(callback) {
   let cancelled = false;
   const waitForDownloads = async () => {

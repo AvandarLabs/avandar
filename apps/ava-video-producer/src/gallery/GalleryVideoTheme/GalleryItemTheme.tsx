@@ -4,7 +4,7 @@ import {
   createVideoThemeSourceFromDraft,
   isThemeDraftEmpty,
 } from "../../videoThemeEditor/themeDraft/themeDraft";
-import { useGalleryVideoTheme } from "./GalleryVideoTheme";
+import { useGalleryVideoTheme } from "./useGalleryVideoTheme";
 import type { VideoThemeSource } from "../../videoTheme/videoTheme.types";
 
 /**
@@ -18,7 +18,7 @@ import type { VideoThemeSource } from "../../videoTheme/videoTheme.types";
 export function GalleryItemTheme({
   itemId,
   children,
-}: Readonly<{ itemId: string; children: ReactNode }>) {
+}: Readonly<{ itemId: string; children: ReactNode }>): ReactNode {
   const { library, themeId, validDraft } = useGalleryVideoTheme();
   const themeInputs = useMemo(() => {
     return { library, themeId, draft: validDraft };

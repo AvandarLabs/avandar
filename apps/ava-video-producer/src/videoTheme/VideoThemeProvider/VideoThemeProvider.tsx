@@ -8,7 +8,10 @@ import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 type Props = Readonly<{
   source: VideoThemeSource;
   children: ReactNode;
-  /** `none` renders no wrapper, for use inside an SVG; CSS variables are then unset. */
+  /**
+   * `none` renders no wrapper, for use inside an SVG; CSS variables are then
+   * unset.
+   */
   element?: "div" | "none";
 }>;
 
@@ -39,7 +42,7 @@ export function VideoThemeProvider({
   source,
   children,
   element = "div",
-}: Props) {
+}: Props): ReactNode {
   const theme = useMemo(() => {
     return makeResolvedVideoThemeFromSource(source);
   }, [source]);

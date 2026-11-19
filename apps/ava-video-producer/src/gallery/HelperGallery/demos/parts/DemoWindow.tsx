@@ -1,5 +1,6 @@
 import { DEMO_COLORS } from "../demoTheme";
 import css from "./parts.module.css";
+import type { ReactNode } from "react";
 
 /** Bar heights of each window variant, as fractions of the body. */
 const VARIANTS = [
@@ -28,7 +29,7 @@ type Props = {
  * An abstract window: a titlebar and a small bar chart. Previews use it in
  * place of a screenshot, so window motion reads without product content.
  */
-export function DemoWindow({ variant = 0, label }: Props) {
+export function DemoWindow({ variant = 0, label }: Props): ReactNode {
   return (
     <div className={css.window}>
       <div className={css.titlebar}>

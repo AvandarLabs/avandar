@@ -102,7 +102,15 @@ function _overlaps({
   );
 }
 
-function _getBracketStrokes(markup: string) {
+/** The padded bounds of one painted bracket stroke segment. */
+type BracketStroke = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+
+function _getBracketStrokes(markup: string): BracketStroke[] {
   return _tags({ markup, attribute: "data-review-bracket" }).flatMap((tag) => {
     if (Number(_values({ markup: tag, attribute: "opacity" })[0] ?? 1) === 0) {
       return [];

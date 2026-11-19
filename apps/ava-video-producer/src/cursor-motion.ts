@@ -15,8 +15,13 @@ export type CursorTarget = {
   cursor: CursorKind;
 };
 
-/** Subpixel travel, clamped at both ends. Equal-position keys create a dwell. */
-export function trackPos(frame: number, keys: readonly CursorKey[]) {
+/**
+ * Subpixel travel, clamped at both ends. Equal-position keys create a dwell.
+ */
+export function trackPos(
+  frame: number,
+  keys: readonly CursorKey[],
+): { x: number; y: number } {
   if (!keys.length) throw new Error("Cursor paths need at least one key");
   let i = 0;
   while (i < keys.length - 1 && frame >= keys[i + 1].at) i += 1;
@@ -27,13 +32,13 @@ export function trackPos(frame: number, keys: readonly CursorKey[]) {
 }
 
 /** Kept for consumers that need a button-down state; Cursor uses press(). */
-export function downAt(frame: number, beats: readonly number[]) {
+export function downAt(frame: number, beats: readonly number[]): boolean {
   return beats.some((b) => {
     return frame >= b && frame < b + 6;
   });
 }
 
-export function cursorScale(frame: number, clicks: readonly number[]) {
+export function cursorScale(frame: number, clicks: readonly number[]): number {
   return clicks.reduce((scale, at) => {
     return Math.min(scale, press(frame, at, 0.07));
   }, 1);
@@ -64,7 +69,10 @@ export function cursorOnTarget(
 }
 
 /** Short shutter samples, capped at 4px. No blur on a held click target. */
-export function cursorShutter(frame: number, path: readonly CursorKey[]) {
+export function cursorShutter(
+  frame: number,
+  path: readonly CursorKey[],
+): Array<{ x: number; y: number; opacity: number }> {
   const current = trackPos(frame, path);
   return [0.45, 0.3, 0.15].map((offset) => {
     const previous = trackPos(frame - offset, path);

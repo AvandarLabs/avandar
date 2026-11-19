@@ -60,7 +60,9 @@ export const productSegmentSchema = z
         message: "Only Explorer has partial modes",
       });
   });
-/** Geometry in the validated 1600 by 840 stage, measured or authored explicitly. */
+/**
+ * Geometry in the validated 1600 by 840 stage, measured or authored explicitly.
+ */
 export const anchorSchema = z
   .object({
     x: z.number().min(0).max(1600),
@@ -208,7 +210,9 @@ export const continuityBeatSchema = z
 /** Why a continuity plan cannot set its own palette or sketch. */
 const THEMED_FIELD_MESSAGE =
   "Colours and sketch roughness come from the video theme. Set them in the theme's overrides for this composition (themes/<theme>.theme.json, overrides.<composition id>).";
-/** Strict film-use grammar shared by long explainers and isolated atlas studies. */
+/**
+ * Strict film-use grammar shared by long explainers and isolated atlas studies.
+ */
 export const continuitySchema = z
   .object({
     title: copy,

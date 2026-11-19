@@ -5,7 +5,7 @@ import {
 } from "../themeBarHelpers/themeBarHelpers";
 import { ThemeActionGroup } from "./ThemeActionGroup/ThemeActionGroup";
 import css from "./ThemeActions.module.css";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = ThemeBarInput &
   Readonly<{
@@ -26,7 +26,7 @@ export function ThemeActions({
   onReloadTheme,
   onCopyJson,
   ...input
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.themeActions}>
       <ThemeActionGroup

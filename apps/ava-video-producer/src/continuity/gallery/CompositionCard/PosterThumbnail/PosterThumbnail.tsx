@@ -1,5 +1,6 @@
 import { useState } from "react";
 import css from "./PosterThumbnail.module.css";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   id: string;
@@ -11,7 +12,7 @@ type Props = Readonly<{
  * badge, then a placeholder when neither loads. `key={poster}` remounts the
  * image when it falls back, so the fallback gets its own load and error events.
  */
-export function PosterThumbnail({ id, themeId }: Props) {
+export function PosterThumbnail({ id, themeId }: Props): ReactNode {
   const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(
     () => {
       return new Set();

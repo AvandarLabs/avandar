@@ -5,7 +5,21 @@ import {
   filterHelpers,
   getHelperSelectionFromSearch,
 } from "./helperSelection/helperSelection";
+import type { HelperEntry } from "./helperCatalog.types";
 import type { HelperSelection } from "./helperSelection/helperSelection";
+
+/** The helper gallery's selection, its filtered helpers and its actions. */
+type HelperGalleryState = {
+  selection: HelperSelection;
+  entries: HelperEntry[];
+  open: HelperEntry | undefined;
+  previous: HelperEntry | undefined;
+  next: HelperEntry | undefined;
+  openHelper: (helperId: string) => void;
+  close: () => void;
+  chooseCategory: (category: string) => void;
+  setQuery: (query: string) => void;
+};
 
 /** Keeps the deep link in step with the open helper and category filter. */
 function _replaceUrl(selection: HelperSelection): void {
@@ -13,7 +27,7 @@ function _replaceUrl(selection: HelperSelection): void {
 }
 
 /** Helper filters, the open preview and its neighbours, deep linked. */
-export function useHelperGallery() {
+export function useHelperGallery(): HelperGalleryState {
   const [selection, setSelection] = useState(() => {
     return getHelperSelectionFromSearch(location.search, HELPER_CATALOG);
   });

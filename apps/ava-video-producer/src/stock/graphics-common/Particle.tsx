@@ -1,5 +1,6 @@
 import { wave } from "../../motion";
 import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 /** A themed, twinkling ambient particle with an optional halo. */
 export function Particle({
@@ -18,7 +19,7 @@ export function Particle({
   color: string;
   haloColor: string;
   isLarge: boolean;
-}) {
+}): ReactNode {
   const particle = useGraphicProps("Particle", {});
   const floor = particle.twinkleFloor;
   return (

@@ -4,12 +4,14 @@ import {
   createMappingFormFromFrame,
   MAPPING_CONCEPT_ID,
 } from "./createMappingFormFromFrame";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type Props = { frame: number };
 
-/** Unchanged mapping leaves consuming the checked frame-owned form projection. */
-export function MappingFields({ frame }: Props) {
+/**
+ * Unchanged mapping leaves consuming the checked frame-owned form projection.
+ */
+export function MappingFields({ frame }: Props): ReactNode {
   const projection = createMappingFormFromFrame({
     frame,
     defaultManualFieldName: "New field",

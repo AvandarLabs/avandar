@@ -3,13 +3,14 @@ import { HexColorInput } from "./HexColorInput";
 import { RangeNumberInput } from "./RangeNumberInput";
 import type { GradientValue } from "../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 /** A gradient token: two colours and an angle. */
 export function GradientValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const gradient = value as GradientValue;
   const colorField = (side: "from" | "to", name: string) => {
     return (

@@ -3,6 +3,7 @@ import { AppFrame, Cursor } from "../chrome/chrome";
 import { MOTION_LAB_LEN } from "../composition-timing";
 import { TYPE } from "../fonts";
 import { countTo, enterAt, mixToken, press, ramp, typed } from "../motion";
+import type { ReactNode } from "react";
 
 export { MOTION_LAB_LEN } from "../composition-timing";
 
@@ -27,7 +28,7 @@ const POINTER = [
   { at: MOTION_LAB_LEN, x: 1260, y: 861 },
 ];
 
-export function MotionLab() {
+export function MotionLab(): ReactNode {
   const frame = useCurrentFrame();
   const visibility = Math.min(
     ramp(frame, APP_IN, 14),

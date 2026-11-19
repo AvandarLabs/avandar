@@ -1,7 +1,7 @@
 import { AtlasCategoryNav } from "../../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../../../gallery/AtlasLayout/AtlasCollection/AtlasCollection";
 import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialog";
-import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
+import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/useGalleryVideoTheme";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
 import { categoryLabel } from "../categoryLabel";
@@ -9,6 +9,7 @@ import { CompositionCard } from "../CompositionCard/CompositionCard";
 import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import { countCompositionCategories } from "../gallerySelectionReducer/gallerySelectionReducer";
 import { useCompositionGallery } from "../useCompositionGallery";
+import type { ReactNode } from "react";
 
 type Props = {
   section: "compositions" | "films";
@@ -51,7 +52,7 @@ function _sectionCopy(section: Props["section"]) {
  * The Compositions and Sample films sections: a category sidebar, a poster
  * card per entry, and the live player in the shared preview modal.
  */
-export function CompositionGallery({ section }: Props) {
+export function CompositionGallery({ section }: Props): ReactNode {
   const copy = _sectionCopy(section);
   const { themeId } = useGalleryVideoTheme();
   const gallery = useCompositionGallery(

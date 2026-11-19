@@ -33,6 +33,7 @@ import {
 import css from "./MapScreen.module.css";
 import { PointInspector } from "./PointInspector";
 import { PointMapTools } from "./PointMapTools";
+import type { ReactNode } from "react";
 
 export { MAP_BEATS, MAP_DURATION };
 
@@ -40,7 +41,9 @@ const _noop = () => {
   return undefined;
 };
 
-/** Native MapLibre canvas and product map panels, driven solely by film time. */
+/**
+ * Native MapLibre canvas and product map panels, driven solely by film time.
+ */
 export function MapScreen({
   frame,
   width,
@@ -49,7 +52,7 @@ export function MapScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const root = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const pointTarget = useRef<HTMLSpanElement>(null);
@@ -94,8 +97,9 @@ export function MapScreen({
     const map = mapInstance.mapRef.current;
     if (!map) return;
     const complete = () => {
-      // Idle alone is insufficient if a provider returned an empty/failed style.
-      // Require the actual vector source, loaded tiles and rendered geography.
+      // Idle alone is insufficient if a provider returned an empty/failed
+      // style. Require the actual vector source, loaded tiles and rendered
+      // geography.
       const basemapLayers = (map.getStyle().layers ?? [])
         .filter((layer) => {
           return "source" in layer && layer.source === "openmaptiles";

@@ -5,6 +5,7 @@ import {
 } from "../effectControls.constants";
 import { NumberFields } from "../NumberFields/NumberFields";
 import type { ShadowLayer } from "../../../videoTheme/videoTheme.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   layers: readonly ShadowLayer[];
@@ -12,7 +13,7 @@ type Props = Readonly<{
 }>;
 
 /** The editable layers of a shadow, each with its own remove action. */
-export function ShadowLayers({ layers, onChange }: Props) {
+export function ShadowLayers({ layers, onChange }: Props): ReactNode {
   return layers.map((layer, index) => {
     const layerNumber = index + 1;
     return (

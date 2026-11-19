@@ -9,6 +9,7 @@ import {
 } from "./windowMotion";
 import { PAIR_BOXES, PAIR_TILT } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
+import type { ReactNode } from "react";
 
 type Props = TiltedWindowSceneProps & {
   pair: [RaceColumn, RaceColumn];
@@ -21,7 +22,7 @@ type Props = TiltedWindowSceneProps & {
  * below, for a race between two runs of the same task. The pair can enter
  * as one card that flips in and splits apart.
  */
-export function RacePair(props: Props) {
+export function RacePair(props: Props): ReactNode {
   const { frame, pair, width, height, enter: entrance, exit } = props;
   const at = entrance?.atFrame ?? 1;
   const isFlip = (entrance?.kind ?? "flip-split") === "flip-split";

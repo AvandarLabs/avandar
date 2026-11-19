@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import css from "./ThemeActionGroup.module.css";
 import type { ThemeBarActions } from "../../themeBarHelpers/themeBarHelpers";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   actions: ThemeBarActions;
@@ -12,7 +12,10 @@ type Props = Readonly<{
   onReloadTheme: () => void;
 }>;
 
-/** The theme's own actions: Save, Save as new theme, Discard, and Reload from file. */
+/**
+ * The theme's own actions: Save, Save as new theme, Discard, and Reload from
+ * file.
+ */
 export function ThemeActionGroup({
   actions,
   saveAsNewRef,
@@ -20,7 +23,7 @@ export function ThemeActionGroup({
   onStartNaming,
   onDiscard,
   onReloadTheme,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.themeActionGroup}>
       {actions.showsSave ? (

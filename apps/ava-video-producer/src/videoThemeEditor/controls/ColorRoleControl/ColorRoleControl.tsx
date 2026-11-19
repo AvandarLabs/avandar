@@ -14,6 +14,7 @@ import {
 import { ColorPairFields } from "./ColorPairFields";
 import css from "./ColorRoleControl.module.css";
 import type { TokenRow } from "../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 const TEXT_COLOR_PATHS = new Set(["color.text", "color.textMuted"]);
 
@@ -23,7 +24,7 @@ type Props = Readonly<{ row: TokenRow; label: string }>;
  * A colour role: one reference, or one for dark grounds and one for light
  * grounds. Text colours show their contrast against the ground.
  */
-export function ColorRoleControl({ row, label }: Props) {
+export function ColorRoleControl({ row, label }: Props): ReactNode {
   const editor = useTokenEditor();
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();

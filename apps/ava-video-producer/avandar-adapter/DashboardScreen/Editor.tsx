@@ -10,6 +10,7 @@ import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/Vi
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
+import type { ReactNode } from "react";
 
 const _noop = () => {};
 
@@ -20,8 +21,16 @@ type Props = {
   height: number;
 };
 
-/** The compact Puck editor surface, with the product's exact save/share/view/delete header actions. */
-export function Editor({ config, data, dashboardId, height }: Props) {
+/**
+ * The compact Puck editor surface, with the product's exact
+ * save/share/view/delete header actions.
+ */
+export function Editor({
+  config,
+  data,
+  dashboardId,
+  height,
+}: Props): ReactNode {
   const { onAction, PuckOverride } = useFullWidthCanvasViewport();
   const rootRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(function markEditorViewButtonVideoTarget() {
@@ -50,8 +59,9 @@ export function Editor({ config, data, dashboardId, height }: Props) {
             return (
               <>
                 <SaveDashboardButton onSave={_noop} />
-                {/* Exact visible draft button markup from DashboardShareButton and
-            DeleteDashboardButton; neither action is activated in this film. */}
+                {/* Exact visible draft button markup from DashboardShareButton
+            and DeleteDashboardButton; neither action is activated in this
+            film. */}
                 <Button
                   size="compact-sm"
                   variant="default"

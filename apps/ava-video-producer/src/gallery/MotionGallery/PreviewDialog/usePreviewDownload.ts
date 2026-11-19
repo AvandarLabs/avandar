@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { downloadFilm } from "../../../../showcase/download.js";
 import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
-import { useGalleryVideoTheme } from "../../GalleryVideoTheme/GalleryVideoTheme";
+import { useGalleryVideoTheme } from "../../GalleryVideoTheme/useGalleryVideoTheme";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
 
 /**

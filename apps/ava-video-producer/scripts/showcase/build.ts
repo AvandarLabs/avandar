@@ -5,8 +5,12 @@ import { requireLicense } from "../require-license.mjs";
 import { yamlPlugin } from "../yaml/yamlPlugin/yamlPlugin";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 
-/** Watch product source and build the iframe bundle without serving the repo. */
-export async function buildLivePlayers(onBuilt: () => Promise<void>) {
+/**
+ * Watch product source and build the iframe bundle without serving the repo.
+ */
+export async function buildLivePlayers(
+  onBuilt: () => Promise<void>,
+): Promise<{ output: string; dispose: () => Promise<void> }> {
   requireLicense();
   const output = path.join(appRoot, "out/showcase/browser");
   const product = path.join(output, "product");

@@ -10,7 +10,8 @@ const _noop = () => {
 };
 export const PAN = { type: "pan" } as const;
 // Resolve the product's own Avandar style through its unchanged BasemapStyle.
-// Real basemap geography supplies context; the overlaid records remain fictional.
+// Real basemap geography supplies context; the overlaid records remain
+// fictional.
 export const BASEMAP = { type: "builtIn", style: "avandar" } as const;
 export const BASEMAP_ATTRIBUTION =
   "OpenFreeMap · © OpenMapTiles · Data from OpenStreetMap";
@@ -22,7 +23,10 @@ type PointLayerOptions = {
   radius: number;
 };
 
-/** Builds a product `MapLayer.Standard` circle layer bound to latitude/longitude columns. */
+/**
+ * Builds a product `MapLayer.Standard` circle layer bound to latitude/longitude
+ * columns.
+ */
 function _createPointLayer({ name, id, color, radius }: PointLayerOptions) {
   const layer = MapLayer.makeEmpty(name);
   return {
@@ -81,7 +85,9 @@ export const selectedFacility = facilityPoints.featureCollection.features[2]!;
 export const selectedCoordinates = (selectedFacility.geometry as GeoJSON.Point)
   .coordinates as [number, number];
 
-/** A ready, error-free view state for a layer with `count` rendered features. */
+/**
+ * A ready, error-free view state for a layer with `count` rendered features.
+ */
 function _createViewState(count: number): MapLayerViewState {
   return {
     status: "ready",
@@ -116,7 +122,10 @@ export const MAP_BEATS = [
 ] as const;
 export const MAP_DURATION = 720;
 
-/** Builds the native MapLibre spec for the given layers, disabling paint transitions for deterministic seeks. */
+/**
+ * Builds the native MapLibre spec for the given layers, disabling paint
+ * transitions for deterministic seeks.
+ */
 export function _createSpec(layers: readonly MapLayer.T[]): MapSpec {
   const specs = layers.map((layer) => {
     return makeLayerSpecFromMapLayer({
@@ -142,8 +151,9 @@ export function _createSpec(layers: readonly MapLayer.T[]): MapSpec {
       .map((layer) => {
         return {
           ...layer,
-          // A render seek must never leave native MapLibre paint in a wall-clock
-          // transition. Colors/radii themselves remain the source layer output.
+          // A render seek must never leave native MapLibre paint in a
+          // wall-clock transition. Colors/radii themselves remain the source
+          // layer output.
           paint: {
             ...layer.paint,
             "circle-opacity-transition": { duration: 0, delay: 0 },

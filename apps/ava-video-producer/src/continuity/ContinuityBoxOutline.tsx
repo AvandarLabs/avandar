@@ -1,9 +1,13 @@
 import { Box } from "@remotion/rough-notation";
 import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import css from "./ContinuityOverlays.module.css";
+import type { ReactNode } from "react";
 
-/** A stationary sketch border for the enclosing editorial card or token, in the theme's box sketch profile. */
-export function ContinuityBoxOutline() {
+/**
+ * A stationary sketch border for the enclosing editorial card or token, in the
+ * theme's box sketch profile.
+ */
+export function ContinuityBoxOutline(): ReactNode {
   const { sketch, stroke } = useVideoTokens();
   const profile = sketch.box;
   if (profile.roughness === 0) {

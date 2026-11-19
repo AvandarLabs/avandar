@@ -4,7 +4,9 @@ import type { Film } from "../../../src/showcase/showcase.types";
 
 type CaptionFilm = Pick<Film, "id" | "plan" | "theme">;
 
-/** A caption download's film and files, or the status to answer with instead. */
+/**
+ * A caption download's film and files, or the status to answer with instead.
+ */
 export type CaptionFilesResult<FilmValue extends CaptionFilm> =
   | Readonly<{
       status: 200;

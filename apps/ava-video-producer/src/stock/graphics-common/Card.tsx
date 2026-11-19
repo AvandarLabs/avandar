@@ -17,7 +17,7 @@ export function Card({
   height: number;
   color: string;
   children?: ReactNode;
-}) {
+}): ReactNode {
   const card = useGraphicProps("Card", {});
   return (
     <g>

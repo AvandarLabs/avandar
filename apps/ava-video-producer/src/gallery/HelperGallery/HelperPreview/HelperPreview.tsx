@@ -4,7 +4,7 @@ import { watchFilms } from "../../../../showcase/watch-films.js";
 import { buildHelperFilmId } from "../helperCatalog";
 import css from "./HelperPreview.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   helper: HelperEntry;
@@ -37,7 +37,7 @@ function useSourceWatch(
  * The open helper's live, looping preview. The Atlas preview modal around it
  * owns the title and the previous and next buttons.
  */
-export function HelperPreview({ helper }: Props) {
+export function HelperPreview({ helper }: Props): ReactNode {
   const player = useRef<HTMLIFrameElement>(null);
   useSourceWatch(helper.id, player);
   const title = helper.title;

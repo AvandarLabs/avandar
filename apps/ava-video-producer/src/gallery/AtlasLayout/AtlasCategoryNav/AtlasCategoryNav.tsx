@@ -39,7 +39,7 @@ export function AtlasCategoryNav({
   selected,
   onSelect,
   children,
-}: Props) {
+}: Props): ReactNode {
   return (
     <aside className="sidebar" aria-label={label}>
       <div className="sidebar-top">

@@ -1,6 +1,7 @@
 import { Alert, Button, type ButtonProps } from "@mantine/core";
 import css from "./ChangedOnDiskBanner.module.css";
 import { Choice } from "./Choice/Choice";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   onKeep: () => void;
@@ -48,7 +49,11 @@ function _buildChoices({
  * keep them on top of the new file, discard them, or read the file again in
  * case it changed once more. Saving waits until one is chosen.
  */
-export function ChangedOnDiskBanner({ onKeep, onDiscard, onReload }: Props) {
+export function ChangedOnDiskBanner({
+  onKeep,
+  onDiscard,
+  onReload,
+}: Props): ReactNode {
   const choices = _buildChoices({ onKeep, onDiscard, onReload });
   return (
     <Alert

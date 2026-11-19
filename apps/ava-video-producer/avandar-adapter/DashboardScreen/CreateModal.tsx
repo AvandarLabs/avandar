@@ -3,11 +3,15 @@ import { useLayoutEffect, useRef } from "react";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { enter, ramp, typed } from "../../src/motion";
 import { DASHBOARD_NAME } from "../shims/import-dashboard/DashboardFixtureContext";
+import type { ReactNode } from "react";
 
 const _noop = () => {};
 
-/** The real "Save to dashboard" create form, typed out letter-by-letter from the dashboard's default name. */
-export function CreateModal({ frame }: { frame: number }) {
+/**
+ * The real "Save to dashboard" create form, typed out letter-by-letter from the
+ * dashboard's default name.
+ */
+export function CreateModal({ frame }: { frame: number }): ReactNode {
   const rootRef = useRef<HTMLDivElement>(null);
   const name = typed(frame, 148, DASHBOARD_NAME, 27);
   useLayoutEffect(function markCreateModalVideoTargets() {

@@ -100,7 +100,9 @@ export function isThemeDraftValid(input: DraftInput): boolean {
   });
 }
 
-/** The most recent draft of a theme that resolved, and the theme it belongs to. */
+/**
+ * The most recent draft of a theme that resolved, and the theme it belongs to.
+ */
 export type LastValidDraft = Readonly<{ themeId: string; draft: ThemeDraft }>;
 
 /**

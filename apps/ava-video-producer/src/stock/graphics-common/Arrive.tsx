@@ -13,7 +13,7 @@ export function Arrive({
   at?: number;
   index?: number;
   children: ReactNode;
-}) {
+}): ReactNode {
   const motion = useGraphicMotion();
   const t = ramp(
     frame,

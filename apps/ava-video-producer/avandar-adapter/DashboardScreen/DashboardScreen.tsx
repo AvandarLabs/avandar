@@ -18,6 +18,7 @@ import { Editor } from "./Editor";
 import { SourceChart } from "./SourceChart";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactNode } from "react";
 
 export const DASHBOARD_DURATION = 720;
 export const DASHBOARD_BEATS = [
@@ -97,7 +98,7 @@ export function DashboardScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const context = useMemo(() => {
     return { frame, chartAt: 328 };
   }, [frame]);

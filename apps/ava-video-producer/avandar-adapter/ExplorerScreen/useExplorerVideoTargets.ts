@@ -18,7 +18,8 @@ export function useExplorerVideoTargets({
 }>): RefObject<HTMLDivElement | null> {
   const rootRef = useRef<HTMLDivElement>(null);
   // Attribute-only instrumentation preserves the product DOM and styles.
-  // Targets come from the actual rendered leaves, never estimated CSS coordinates.
+  // Targets come from the actual rendered leaves, never estimated CSS
+  // coordinates.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;

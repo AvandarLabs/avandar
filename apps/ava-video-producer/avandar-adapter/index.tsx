@@ -32,10 +32,8 @@ import {
   DashboardScreen,
   DASHBOARD_BEATS,
 } from "./DashboardScreen/DashboardScreen";
-import {
-  ExplorerScreen,
-  EXPLORER_BEATS,
-} from "./ExplorerScreen/ExplorerScreen";
+import { ExplorerScreen } from "./ExplorerScreen/ExplorerScreen";
+import { EXPLORER_BEATS } from "./ExplorerScreen/explorerStage";
 import { ImportScreen, IMPORT_BEATS } from "./ImportScreen/ImportScreen";
 import { MapScreen, MAP_BEATS } from "./MapScreen/MapScreen";
 import {
@@ -45,6 +43,8 @@ import {
 import { ProductThemeRoot } from "./ProductThemeRoot/ProductThemeRoot";
 import { VideoRouteContext } from "./shims/router";
 import "./stage.css";
+import type { ExplorerMode } from "./ExplorerScreen/explorerStage";
+import type { ReactNode } from "react";
 
 i18n.setMessagesCompiler(compileMessage);
 i18n.loadAndActivate({ locale: "en", messages: {} });
@@ -85,7 +85,10 @@ export const FEATURE_BEATS = {
   "attribute-mapping": ATTRIBUTE_MAPPING_BEATS,
 };
 
-/** Actual source components and CSS, with frame-controlled fixtures replacing app services. */
+/**
+ * Actual source components and CSS, with frame-controlled fixtures replacing
+ * app services.
+ */
 export function AvandarStage({
   feature,
   frame,
@@ -97,8 +100,8 @@ export function AvandarStage({
   frame: number;
   width?: number;
   height?: number;
-  mode?: string;
-}) {
+  mode?: ExplorerMode;
+}): ReactNode {
   const contentWidth = width - 240;
   const contentHeight = height - 82;
   const [initialHandle] = useState(() => {
@@ -202,7 +205,7 @@ export function AvandarStage({
                     frame={frame}
                     width={contentWidth}
                     height={contentHeight}
-                    mode={mode as any}
+                    mode={mode}
                   />
                 ) : null}
                 {feature === "dashboards" ? (

@@ -6,10 +6,14 @@ import {
   formatMetric,
   sceneBounds,
 } from "./layout/layout";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import type { MetricSceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
-/** A single headline metric that counts from an initial value up to its target. */
+/**
+ * A single headline metric that counts from an initial value up to its target.
+ */
 export function MetricScene({
   frame,
   width = 1600,
@@ -25,7 +29,7 @@ export function MetricScene({
   detail,
   countAtFrame = 18,
   countDurationInFrames = 36,
-}: MetricSceneProps) {
+}: MetricSceneProps): ReactNode {
   assertFinite(from, "metric from");
   assertFrame(countAtFrame, "countAtFrame");
   assertFrame(countDurationInFrames, "countDurationInFrames");

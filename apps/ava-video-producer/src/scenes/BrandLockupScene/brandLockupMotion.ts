@@ -126,11 +126,21 @@ export type LockupCta = {
   commandCharsPerSecond?: number;
 };
 
+/** The frame each CTA line arrives, and the frame the typed command ends. */
+type CtaBeats = {
+  subtitleAt: number;
+  urlAt: number;
+  promptAt: number;
+  typingAt: number;
+  typingEnd: number;
+  badgeAt: number;
+};
+
 /**
  * When each CTA line arrives: subtitle, URL, the typed command (with the
  * frame its last character lands) and the badge after it.
  */
-export function getCtaBeats(cta: LockupCta, charsPerSecond: number) {
+export function getCtaBeats(cta: LockupCta, charsPerSecond: number): CtaBeats {
   const subtitleAt = cta.atFrame;
   const urlAt = subtitleAt + DUR.word;
   const promptAt = urlAt + DUR.hero * 2 - 3;

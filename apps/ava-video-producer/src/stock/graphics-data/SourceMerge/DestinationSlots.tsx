@@ -1,10 +1,11 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { useGraphicProps } from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ x: number; accent: string }>;
 
 /** The three empty slots along the bottom of the destination panel. */
-export function DestinationSlots({ x, accent }: Props) {
+export function DestinationSlots({ x, accent }: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
   return [0, 1, 2].map((slot) => {
     return (

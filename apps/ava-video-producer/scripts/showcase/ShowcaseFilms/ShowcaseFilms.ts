@@ -252,7 +252,9 @@ function _loadStockFilm({
   return film;
 }
 
-/** The title study or the motion lab, sized from the current composition timing. */
+/**
+ * The title study or the motion lab, sized from the current composition timing.
+ */
 async function _loadCompositionFilm({
   base,
   id,

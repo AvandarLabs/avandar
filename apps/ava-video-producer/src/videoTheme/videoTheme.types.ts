@@ -8,13 +8,18 @@ import type { VideoFontId } from "./videoFontRegistry/videoFontRegistryHelpers";
  */
 import type { MantineTheme } from "@mantine/core";
 
-/** A `$path` reference from one token to another, such as `$atomic.strokeWidth.sm`. */
+/**
+ * A `$path` reference from one token to another, such as
+ * `$atomic.strokeWidth.sm`.
+ */
 export type TokenReference = `$${string}`;
 
 /** Where a theme problem is, by token path, and what it is. */
 export type VideoThemeIssue = Readonly<{ path: string; message: string }>;
 
-/** Cubic Bezier control points `[x1, y1, x2, y2]`, or a symmetric power curve. */
+/**
+ * Cubic Bezier control points `[x1, y1, x2, y2]`, or a symmetric power curve.
+ */
 export type EasingValue =
   | readonly [number, number, number, number]
   | Readonly<{ powerInOut: number }>;
@@ -187,7 +192,9 @@ export type VideoThemeDocument = VideoThemePatch &
   }>;
 export type VideoThemeLibrary = ReadonlyMap<string, VideoThemeDocument>;
 
-/** Which per-item overrides and extra patches apply, lowest precedence first. */
+/**
+ * Which per-item overrides and extra patches apply, lowest precedence first.
+ */
 export type VideoThemeScope = Readonly<{
   overrideIds?: readonly string[];
   patches?: readonly VideoThemePatch[];

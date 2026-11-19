@@ -2,11 +2,12 @@ import { CONTINUITY_CATALOG, isSceneEntry } from "../../../continuityCatalog";
 import { VocabularyControl } from "./VocabularyControl";
 import css from "./VocabularyGuide.module.css";
 import type { ContinuityVocabularyEntry } from "../../../continuityCatalog";
+import type { ReactNode } from "react";
 
 type Props = { entry: ContinuityVocabularyEntry };
 
 /** Practical reuse guidance linked to the study's complete source argument. */
-export function VocabularyGuide({ entry }: Props) {
+export function VocabularyGuide({ entry }: Props): ReactNode {
   const source = CONTINUITY_CATALOG.find((film) => {
     return film.family === "films" && film.id === entry.sourceFilm;
   });

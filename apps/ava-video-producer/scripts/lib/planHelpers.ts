@@ -24,7 +24,10 @@ export async function readPlan(filename: string): Promise<Storyboard> {
   );
 }
 
-/** Resolve public assets without following a symlink outside the public directory. */
+/**
+ * Resolve public assets without following a symlink outside the public
+ * directory.
+ */
 export async function publicAsset(
   root: string,
   asset: string,
@@ -118,7 +121,10 @@ function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
   return [];
 }
 
-/** Millisecond conversion uses rounded frame boundaries consistently for SRT and VTT. */
+/**
+ * Millisecond conversion uses rounded frame boundaries consistently for SRT and
+ * VTT.
+ */
 export function timestamp(frame: number, fps: number, separator = ","): string {
   const milliseconds = Math.round((frame * 1000) / fps);
   const hours = Math.floor(milliseconds / 3600000);
@@ -128,7 +134,11 @@ export function timestamp(frame: number, fps: number, separator = ","): string {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}${separator}${String(fraction).padStart(3, "0")}`;
 }
 
-export function captionFiles(plan: Storyboard) {
+export function captionFiles(plan: Storyboard): {
+  srt: string;
+  vtt: string;
+  transcript: string;
+} {
   const cues = absoluteCues(plan);
   const srt = cues
     .map((cue, index) => {
@@ -175,7 +185,10 @@ export function shotList(plan: Storyboard): string {
     .join("\n")}\n`;
 }
 
-/** Import manually aligned SRT cues without pretending to perform speech recognition. */
+/**
+ * Import manually aligned SRT cues without pretending to perform speech
+ * recognition.
+ */
 export function applySrt(
   plan: Storyboard,
   srt: string,
@@ -256,7 +269,10 @@ export async function safeInputFile(
   return resolved;
 }
 
-/** Create owned output directories one segment at a time, never through symlinks. */
+/**
+ * Create owned output directories one segment at a time, never through
+ * symlinks.
+ */
 export async function ensureDirectory(
   root: string,
   relative: string,
@@ -325,7 +341,9 @@ async function _rendererFiles(
   return files;
 }
 
-/** Hash renderer sources and every referenced media asset, not only the JSON. */
+/**
+ * Hash renderer sources and every referenced media asset, not only the JSON.
+ */
 export async function fingerprintPlan(
   root: string,
   filename: string,
@@ -418,7 +436,9 @@ export async function requireMatchingPreview(
   }
 }
 
-/** Sample complete-film frames, including dissolves and scene-specific beats. */
+/**
+ * Sample complete-film frames, including dissolves and scene-specific beats.
+ */
 export function previewFrames(plan: Storyboard): number[] {
   const frames = new Set<number>();
   const add = (value: number) => {

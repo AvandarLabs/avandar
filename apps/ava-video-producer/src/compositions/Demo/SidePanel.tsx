@@ -1,4 +1,5 @@
-import { abs, Orb } from "../../chrome/chrome";
+import { abs } from "../../chrome/abs";
+import { Orb } from "../../chrome/chrome";
 import {
   DUR,
   enter,
@@ -32,7 +33,7 @@ export function SidePanel({
   shown: number;
   refilter: number;
   chipOn: number;
-}) {
+}): ReactNode {
   return (
     <div
       style={{

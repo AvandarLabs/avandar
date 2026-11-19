@@ -3,7 +3,7 @@ import {
   type SketchShape,
 } from "../../videoTheme/sketchShape/sketchShape";
 import type { ResolvedSketchProfile } from "../../videoTheme/videoTheme.types";
-import type { SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 type PathAttributes = Pick<
   SVGProps<SVGPathElement>,
@@ -71,7 +71,7 @@ function _plainShape({ shape, profile: _profile, ...attributes }: Props) {
  * SVG element, or as seeded hand-drawn paths when the profile is rough. Path
  * attributes such as a draw-on dash apply to every sketched path.
  */
-export function SketchedShape(props: Props) {
+export function SketchedShape(props: Props): ReactNode {
   const {
     shape,
     profile,

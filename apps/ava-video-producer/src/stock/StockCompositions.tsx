@@ -3,8 +3,11 @@ import { STOCK_CATALOG, STOCK_FPS, STOCK_LOOP_FRAMES } from "./catalog";
 import { stockRequestSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
 import { StockClip } from "./StockClip";
 
-/** Media-free registration shared by Studio and the isolated stock render entry. */
-export function StockCompositions() {
+/**
+ * Media-free registration shared by Studio and the isolated stock render
+ * entry.
+ */
+export function StockCompositions(): React.JSX.Element {
   return (
     <>
       {STOCK_CATALOG.map((entry) => {

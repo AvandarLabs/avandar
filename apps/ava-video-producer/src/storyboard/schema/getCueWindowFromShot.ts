@@ -6,8 +6,13 @@ type Shot = z.infer<typeof shotSchema>;
 
 type Options = { shot: Shot | undefined; beatId?: string };
 
-/** Resolve a narration window from a shot or one overlap-aware continuity beat. */
-export function getCueWindowFromShot({ shot, beatId }: Options) {
+/**
+ * Resolve a narration window from a shot or one overlap-aware continuity beat.
+ */
+export function getCueWindowFromShot({ shot, beatId }: Options): {
+  start: number;
+  duration: number;
+} {
   if (!shot) throw new Error("Narration references an unknown shot");
   if (!beatId) return { start: 0, duration: shot.durationInFrames };
   if (shot.scene !== "continuity")

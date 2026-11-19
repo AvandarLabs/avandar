@@ -24,7 +24,7 @@ export function HelperDemoFrame({
   label,
   readouts = [],
   children,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.root} style={DEMO_THEME_STYLE}>
       <header className={css.header}>

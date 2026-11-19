@@ -13,7 +13,7 @@ const ATLAS_CHROME_THEME = {
  */
 export function AtlasChromeProvider({
   children,
-}: Readonly<{ children: ReactNode }>) {
+}: Readonly<{ children: ReactNode }>): ReactNode {
   return (
     <MantineProvider theme={ATLAS_CHROME_THEME}>{children}</MantineProvider>
   );

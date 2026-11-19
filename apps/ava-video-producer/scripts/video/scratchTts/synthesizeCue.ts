@@ -3,7 +3,19 @@ import path from "node:path";
 import { ffmpeg, probe, run } from "../../lib/mediaHelpers";
 import type { Options } from "../video.types";
 
-/** Keep generated speech within its cue using bounded tempo, never truncation. */
+/** The timing a synthesized cue was generated and fitted with. */
+type SynthesizedCue = {
+  cueId: string;
+  rate: number;
+  tempo: number;
+  originalSeconds: number;
+  seconds: number;
+  allowedSeconds: number;
+};
+
+/**
+ * Keep generated speech within its cue using bounded tempo, never truncation.
+ */
 export async function synthesizeCue(
   text: string,
   directory: string,
@@ -11,7 +23,7 @@ export async function synthesizeCue(
   destination: string,
   seconds: number,
   options: Pick<Options, "voice" | "rate">,
-) {
+): Promise<SynthesizedCue> {
   const textFile = path.join(directory, `${cueId}.txt`);
   const raw = path.join(directory, `${cueId}.aiff`);
   await fs.writeFile(textFile, text + "\n", { flag: "wx" });

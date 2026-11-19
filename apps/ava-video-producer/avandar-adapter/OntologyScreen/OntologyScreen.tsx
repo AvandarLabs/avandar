@@ -15,6 +15,7 @@ import type {
   OntologyHydrationProjection,
   OntologyAttributeProjection,
 } from "./OntologyScreen.types";
+import type { ReactNode } from "react";
 
 export {
   ONTOLOGY_BEATS,
@@ -32,7 +33,7 @@ const DATASET_IDS = {
 type Props = { frame: number; width: number; height: number };
 
 /** Actual concept and attribute inspection, with fixture hydration only. */
-export function OntologyScreen({ frame, width, height }: Props) {
+export function OntologyScreen({ frame, width, height }: Props): ReactNode {
   const root = useRef<HTMLDivElement>(null);
   const stage = createOntologyStageFromFrame(frame);
   const fixture = useOntologyFixture(stage);

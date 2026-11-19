@@ -136,6 +136,9 @@ function _getServiceObstaclesFromMarkup(markup: string): ServiceObstacle[] {
   });
 }
 
+type GetServiceParticipantGeometryFromMarkup =
+  typeof _getServiceParticipantGeometryFromMarkup;
+
 /** Related service svg geometry operations. */
 export const ServiceSvgGeometry = {
   /** Read straight SVG commands, preserving subpaths and closed polygons. */
@@ -146,6 +149,6 @@ export const ServiceSvgGeometry = {
   getObstaclesFromMarkup: _getServiceObstaclesFromMarkup,
 } satisfies {
   getPathSegmentsFromTag: typeof _getServicePathSegmentsFromTag;
-  getParticipantGeometryFromMarkup: typeof _getServiceParticipantGeometryFromMarkup;
+  getParticipantGeometryFromMarkup: GetServiceParticipantGeometryFromMarkup;
   getObstaclesFromMarkup: typeof _getServiceObstaclesFromMarkup;
 };

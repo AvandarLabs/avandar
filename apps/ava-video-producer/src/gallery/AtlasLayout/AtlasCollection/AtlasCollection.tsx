@@ -40,7 +40,7 @@ export function AtlasCollection({
   onReset,
   resetLabel,
   children,
-}: Props) {
+}: Props): ReactNode {
   return (
     <main className="library-main" id="library" tabIndex={-1}>
       <section className="library-intro" aria-labelledby="page-title">

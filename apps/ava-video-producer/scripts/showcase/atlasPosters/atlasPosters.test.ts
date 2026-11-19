@@ -6,7 +6,10 @@ import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { appRoot } from "../ShowcaseFilms/ShowcaseFilms";
 
 const POSTERS = path.join(appRoot, "showcase/assets/atlas");
-/** Themes with tracked posters. A card in any other theme falls back to `classic`. */
+/**
+ * Themes with tracked posters. A card in any other theme falls back to
+ * `classic`.
+ */
 const POSTER_THEME_IDS = ["classic", "avandar"] as const;
 
 async function _readPosterNames(themeId: string): Promise<readonly string[]> {

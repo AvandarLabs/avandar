@@ -15,7 +15,7 @@ export function usePreviewKeys({
   onNext,
   onClose,
   frame,
-}: Props) {
+}: Props): void {
   useEffect(() => {
     if (!enabled) {
       return;
