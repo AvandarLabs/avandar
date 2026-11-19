@@ -88,7 +88,7 @@ function Results({
   frame: number;
   totalShown: number;
 }): ReactNode {
-  const { semantic, mantine, atomic } = useVideoTheme();
+  const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
@@ -125,22 +125,38 @@ function Results({
        * arrives last, after the rows it is summing: a total that
        * appears before its own operands is a small lie the eye
        * catches without being able to name. */}
-      <div
-        style={{
-          marginTop: mantine.spacing["30"],
-          paddingTop: mantine.spacing.xs,
-          borderTop: hairline,
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: mantine.fontSizes["19"],
-          ...motion.enter(frame, ROWS_AT + CUES.total, { y: RISE.total }),
-        }}
-      >
-        <span style={{ color: scene.mutedForeground }}>Total</span>
-        <span style={{ fontWeight: atomic.fontWeight.semibold }}>
-          {totalShown.toLocaleString("en-US")}
-        </span>
-      </div>
+      <ResultsTotal frame={frame} totalShown={totalShown} rule={hairline} />
+    </div>
+  );
+}
+
+function ResultsTotal({
+  frame,
+  totalShown,
+  rule,
+}: {
+  frame: number;
+  totalShown: number;
+  rule: string;
+}): ReactNode {
+  const { semantic, mantine, atomic } = useVideoTheme();
+  const motion = useVideoMotion();
+  return (
+    <div
+      style={{
+        marginTop: mantine.spacing["30"],
+        paddingTop: mantine.spacing.xs,
+        borderTop: rule,
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: mantine.fontSizes["19"],
+        ...motion.enter(frame, ROWS_AT + CUES.total, { y: RISE.total }),
+      }}
+    >
+      <span style={{ color: semantic.color.scene.mutedForeground }}>Total</span>
+      <span style={{ fontWeight: atomic.fontWeight.semibold }}>
+        {totalShown.toLocaleString("en-US")}
+      </span>
     </div>
   );
 }
@@ -181,14 +197,11 @@ function ResultRow({
   index,
 }: {
   frame: number;
-  row: (typeof ROWS)[number];
+  row: ResultRowData;
   index: number;
 }): ReactNode {
-  const { semantic, mantine, atomic } = useVideoTheme();
+  const { mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
-  const scales = useVideoShapeScales();
-  const scene = semantic.color.scene;
-  const pill = scales.corner(semantic.corner.pill);
   // Nothing enters as a group. Two frames between siblings is the minimum
   // that reads as a list assembling rather than as a block being pasted in.
   const { grow, cut } = _rowProgress(frame, index, row.paid, motion);
@@ -207,40 +220,66 @@ function ResultRow({
           (entrance.opacity as number) * mix(cut, 1, atomic.opacity["26"]),
       }}
     >
+      <ResultRowLabel row={row} />
+      <ResultRowBar row={row} grow={grow} cut={cut} />
+    </div>
+  );
+}
+
+type ResultRowData = (typeof ROWS)[number];
+
+function ResultRowLabel({ row }: { row: ResultRowData }): ReactNode {
+  const { semantic, mantine } = useVideoTheme();
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: mantine.fontSizes["19"],
+        marginBottom: mantine.spacing["9"],
+      }}
+    >
+      <span>{row.label}</span>
+      <span style={{ color: semantic.color.scene.mutedForeground }}>
+        {row.n.toLocaleString("en-US")}
+      </span>
+    </div>
+  );
+}
+
+function ResultRowBar({
+  row,
+  grow,
+  cut,
+}: {
+  row: ResultRowData;
+  grow: number;
+  cut: number;
+}): ReactNode {
+  const { semantic } = useVideoTheme();
+  const scales = useVideoShapeScales();
+  const pill = scales.corner(semantic.corner.pill);
+  return (
+    <div
+      style={{
+        height: 10,
+        borderRadius: pill,
+        background: semantic.color.scene.muted,
+        overflow: "hidden",
+      }}
+    >
+      {/* scaleX, not width. Width relayouts every frame; a transform
+       * composites and cannot shimmer the row. */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: mantine.fontSizes["19"],
-          marginBottom: mantine.spacing["9"],
-        }}
-      >
-        <span>{row.label}</span>
-        <span style={{ color: scene.mutedForeground }}>
-          {row.n.toLocaleString("en-US")}
-        </span>
-      </div>
-      <div
-        style={{
-          height: 10,
+          height: "100%",
+          width: `${row.bar * 100}%`,
           borderRadius: pill,
-          background: semantic.color.scene.muted,
-          overflow: "hidden",
+          background: semantic.color.scene.brand,
+          transformOrigin: "left center",
+          transform: `scaleX(${(grow * mix(cut, 1, 0)).toFixed(4)})`,
         }}
-      >
-        {/* scaleX, not width. Width relayouts every frame; a transform
-         * composites and cannot shimmer the row. */}
-        <div
-          style={{
-            height: "100%",
-            width: `${row.bar * 100}%`,
-            borderRadius: pill,
-            background: scene.brand,
-            transformOrigin: "left center",
-            transform: `scaleX(${(grow * mix(cut, 1, 0)).toFixed(4)})`,
-          }}
-        />
-      </div>
+      />
     </div>
   );
 }

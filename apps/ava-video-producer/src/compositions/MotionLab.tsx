@@ -122,10 +122,9 @@ export function MotionLab(): ReactNode {
 }
 
 function BuildingBlocks({ frame }: { frame: number }): ReactNode {
-  const { semantic, mantine, atomic } = useVideoTheme();
+  const { mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const panel = usePanelStyle();
-  const scene = semantic.color.scene;
   return ITEMS.map(([number, title, detail], index) => {
     return (
       <div
@@ -146,36 +145,55 @@ function BuildingBlocks({ frame }: { frame: number }): ReactNode {
           }),
         }}
       >
-        <span
-          style={{
-            fontSize: mantine.fontSizes["6xl"],
-            color: scene.brandStrong,
-          }}
-        >
-          {number}
-        </span>
-        <div>
-          <div
-            style={{
-              fontSize: mantine.fontSizes["7xl"],
-              fontWeight: atomic.fontWeight.semibold,
-              marginBottom: mantine.spacing["10"],
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              fontSize: mantine.fontSizes.xl,
-              color: scene.mutedForeground,
-            }}
-          >
-            {detail}
-          </div>
-        </div>
+        <BuildingBlockText number={number} title={title} detail={detail} />
       </div>
     );
   });
+}
+
+/** One building block's number beside its title and detail. */
+function BuildingBlockText({
+  number,
+  title,
+  detail,
+}: {
+  number: string;
+  title: string;
+  detail: string;
+}): ReactNode {
+  const { semantic, mantine, atomic } = useVideoTheme();
+  const scene = semantic.color.scene;
+  return (
+    <>
+      <span
+        style={{
+          fontSize: mantine.fontSizes["6xl"],
+          color: scene.brandStrong,
+        }}
+      >
+        {number}
+      </span>
+      <div>
+        <div
+          style={{
+            fontSize: mantine.fontSizes["7xl"],
+            fontWeight: atomic.fontWeight.semibold,
+            marginBottom: mantine.spacing["10"],
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            fontSize: mantine.fontSizes.xl,
+            color: scene.mutedForeground,
+          }}
+        >
+          {detail}
+        </div>
+      </div>
+    </>
+  );
 }
 
 function TypedCard({ frame }: { frame: number }): ReactNode {
@@ -212,12 +230,9 @@ function TypedCard({ frame }: { frame: number }): ReactNode {
 }
 
 function CounterCard({ frame }: { frame: number }): ReactNode {
-  const { semantic, atomic, mantine } = useVideoTheme();
+  const { atomic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
-  const scales = useVideoShapeScales();
   const panel = usePanelStyle();
-  const scene = semantic.color.scene;
-  const pill = scales.corner(semantic.corner.pill);
   const progress = motion.ramp(
     frame,
     COUNT_AT,
@@ -248,31 +263,39 @@ function CounterCard({ frame }: { frame: number }): ReactNode {
       >
         {Math.round(mix(progress, 0, COUNT_TO)).toLocaleString("en-US")}
       </div>
+      <CounterProgressBar progress={progress} />
+    </div>
+  );
+}
+
+function CounterProgressBar({ progress }: { progress: number }): ReactNode {
+  const { semantic, mantine } = useVideoTheme();
+  const scales = useVideoShapeScales();
+  const pill = scales.corner(semantic.corner.pill);
+  return (
+    <div
+      style={{
+        marginTop: mantine.spacing["22"],
+        height: 5,
+        background: semantic.color.scene.muted,
+        borderRadius: pill,
+      }}
+    >
       <div
         style={{
-          marginTop: mantine.spacing["22"],
           height: 5,
-          background: semantic.color.scene.muted,
+          width: `${progress * 100}%`,
+          background: semantic.color.scene.brand,
           borderRadius: pill,
         }}
-      >
-        <div
-          style={{
-            height: 5,
-            width: `${progress * 100}%`,
-            background: scene.brand,
-            borderRadius: pill,
-          }}
-        />
-      </div>
+      />
     </div>
   );
 }
 
 function ClickStudy({ frame }: { frame: number }): ReactNode {
-  const { semantic, mantine, atomic } = useVideoTheme();
+  const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
-  const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
   const active = motion.ramp(
     frame,
@@ -293,26 +316,7 @@ function ClickStudy({ frame }: { frame: number }): ReactNode {
       >
         A click gets a visible response.
       </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 1110,
-          top: 824,
-          width: 340,
-          height: 74,
-          borderRadius: scales.corner(semantic.corner.card),
-          background: mixToken(active, scene.brand, scene.brandSoft),
-          border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.brand}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: mantine.fontSizes["7xl"],
-          fontWeight: atomic.fontWeight.semibold,
-          transform: `scale(${motion.press(frame, CLICK_AT)})`,
-        }}
-      >
-        Preview motion
-      </div>
+      <PreviewMotionButton frame={frame} active={active} />
       <div
         style={{
           position: "absolute",
@@ -326,5 +330,41 @@ function ClickStudy({ frame }: { frame: number }): ReactNode {
         ✓ Motion previewed
       </div>
     </>
+  );
+}
+
+/** The button the click study presses, softening to its brand once active. */
+function PreviewMotionButton({
+  frame,
+  active,
+}: {
+  frame: number;
+  active: number;
+}): ReactNode {
+  const { semantic, mantine, atomic } = useVideoTheme();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const scene = semantic.color.scene;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 1110,
+        top: 824,
+        width: 340,
+        height: 74,
+        borderRadius: scales.corner(semantic.corner.card),
+        background: mixToken(active, scene.brand, scene.brandSoft),
+        border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.brand}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: mantine.fontSizes["7xl"],
+        fontWeight: atomic.fontWeight.semibold,
+        transform: `scale(${motion.press(frame, CLICK_AT)})`,
+      }}
+    >
+      Preview motion
+    </div>
   );
 }

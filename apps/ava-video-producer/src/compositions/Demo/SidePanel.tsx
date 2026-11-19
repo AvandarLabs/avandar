@@ -94,10 +94,8 @@ function FilterChips({
   frame: number;
   chipOn: number;
 }): ReactNode {
-  const { semantic, mantine } = useVideoTheme();
+  const { mantine } = useVideoTheme();
   const motion = useVideoMotion();
-  const scales = useVideoShapeScales();
-  const scene = semantic.color.scene;
   const chipPress = motion.press(
     frame,
     CHIP_CLICK,
@@ -119,23 +117,69 @@ function FilterChips({
         // no real UI ever shows.
         const lit = index === 0 ? 1 - chipOn : index === LIT_CHIP ? chipOn : 0;
         return (
-          <div
+          <FilterChip
             key={chip}
-            style={{
-              padding: `${mantine.spacing["10"]} ${mantine.spacing["18"]}`,
-              borderRadius: scales.corner(semantic.corner.pill),
-              fontSize: mantine.fontSizes.lg,
-              border: `${scales.stroke(semantic.stroke.hairline)}px solid ${mixToken(lit, scene.border, scene.brand)}`,
-              background: mixToken(lit, "transparent", scene.brandSoft),
-              color: mixToken(lit, scene.mutedForeground, scene.brandStrong),
-              transform: `scale(${(index === LIT_CHIP ? chipPress : 1).toFixed(4)})`,
-            }}
-          >
-            {chip}
-          </div>
+            chip={chip}
+            lit={lit}
+            scale={index === LIT_CHIP ? chipPress : 1}
+          />
         );
       })}
     </div>
+  );
+}
+
+/** One filter chip, lit from 0 to 1, at its press scale. */
+function FilterChip({
+  chip,
+  lit,
+  scale,
+}: {
+  chip: string;
+  lit: number;
+  scale: number;
+}): ReactNode {
+  const { semantic, mantine } = useVideoTheme();
+  const scales = useVideoShapeScales();
+  const scene = semantic.color.scene;
+  return (
+    <div
+      style={{
+        padding: `${mantine.spacing["10"]} ${mantine.spacing["18"]}`,
+        borderRadius: scales.corner(semantic.corner.pill),
+        fontSize: mantine.fontSizes.lg,
+        border: `${scales.stroke(semantic.stroke.hairline)}px solid ${mixToken(lit, scene.border, scene.brand)}`,
+        background: mixToken(lit, "transparent", scene.brandSoft),
+        color: mixToken(lit, scene.mutedForeground, scene.brandStrong),
+        transform: `scale(${scale.toFixed(4)})`,
+      }}
+    >
+      {chip}
+    </div>
+  );
+}
+
+/**
+ * Text cannot tween, so the two states cross-fade in place rather than
+ * swapping on a single frame. The incoming label is an absolutely-positioned
+ * overlay: opacity only, nothing here can reflow the row it sits in.
+ */
+function TopChannelValue({ refilter }: { refilter: number }): ReactNode {
+  return (
+    <span style={{ position: "relative", display: "inline-block" }}>
+      <span style={{ opacity: 1 - refilter }}>Organic search</span>
+      <span
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          whiteSpace: "nowrap",
+          opacity: refilter,
+        }}
+      >
+        Paid social
+      </span>
+    </span>
   );
 }
 
@@ -151,27 +195,7 @@ function Facts({
   const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
   const facts: Array<[string, ReactNode]> = [
-    [
-      "Top channel",
-      // Text cannot tween, so the two states cross-fade in place rather
-      // than swapping on a single frame. The incoming label is an
-      // absolutely-positioned overlay: opacity only, nothing here can
-      // reflow the row it sits in.
-      <span style={{ position: "relative", display: "inline-block" }}>
-        <span style={{ opacity: 1 - refilter }}>Organic search</span>
-        <span
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            whiteSpace: "nowrap",
-            opacity: refilter,
-          }}
-        >
-          Paid social
-        </span>
-      </span>,
-    ],
+    ["Top channel", <TopChannelValue refilter={refilter} />],
     ["Period", "Q3 2026"],
   ];
   return facts.map(([name, value], index) => {
@@ -203,7 +227,7 @@ function Facts({
  * slot rather than travelling.
  */
 function PublishedToast({ frame }: { frame: number }): ReactNode {
-  const { semantic, mantine, atomic } = useVideoTheme();
+  const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
@@ -228,23 +252,30 @@ function PublishedToast({ frame }: { frame: number }): ReactNode {
       }}
     >
       <Orb size={22} />
-      <div>
-        <div
-          style={{
-            fontSize: mantine.fontSizes.xl,
-            fontWeight: atomic.fontWeight.semibold,
-          }}
-        >
-          Report published
-        </div>
-        <div
-          style={{
-            fontSize: mantine.fontSizes.sm,
-            color: scene.mutedForeground,
-          }}
-        >
-          Shared with 4 people
-        </div>
+      <PublishedToastText />
+    </div>
+  );
+}
+
+function PublishedToastText(): ReactNode {
+  const { semantic, mantine, atomic } = useVideoTheme();
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: mantine.fontSizes.xl,
+          fontWeight: atomic.fontWeight.semibold,
+        }}
+      >
+        Report published
+      </div>
+      <div
+        style={{
+          fontSize: mantine.fontSizes.sm,
+          color: semantic.color.scene.mutedForeground,
+        }}
+      >
+        Shared with 4 people
       </div>
     </div>
   );
