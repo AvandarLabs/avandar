@@ -1,10 +1,13 @@
-import { EASE, STAGGER_COLUMN, ramp } from "../../motion";
+import { getClassicStageMotion } from "../../scenes/stageTheme/stageTheme";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { CSSProperties } from "react";
 
-/** Defaults a `stepped-column-wipe` shot transition uses for omitted fields. */
+/**
+ * Defaults a `stepped-column-wipe` shot transition uses for omitted fields.
+ * The stagger between columns defaults to the theme's `motion.stagger.column`.
+ */
 export const STEPPED_COLUMN_WIPE_DEFAULTS = {
   columns: 8,
-  staggerFrames: STAGGER_COLUMN,
   from: "bottom",
   order: "left-to-right",
 } as const;
@@ -19,24 +22,30 @@ export type SteppedColumnWipeOptions = {
 
 /**
  * How far each column has crossed the frame, 0 to 1, in screen order from
- * left to right. `StoryFilm` uses it through `getSteppedColumnWipeStyle`;
- * tests use it to check order and sub-frame staggering.
+ * left to right, each rising on `motion.rise`. `StoryFilm` uses it through
+ * `getSteppedColumnWipeStyle`; tests use it to check order and sub-frame
+ * staggering.
  */
 export function getColumnWipeProgress(
   frame: number,
   durationInFrames: number,
   options: SteppedColumnWipeOptions,
+  motion: VideoMotion = getClassicStageMotion(),
 ): number[] {
   const columns = options.columns ?? STEPPED_COLUMN_WIPE_DEFAULTS.columns;
-  const stagger =
-    options.staggerFrames ?? STEPPED_COLUMN_WIPE_DEFAULTS.staggerFrames;
+  const stagger = options.staggerFrames ?? motion.stagger.column;
   // Every column travels for the same time, so the last one lands exactly
   // when the transition ends.
   const columnFrames = Math.max(1, durationInFrames - stagger * (columns - 1));
   const isReversed = options.order === "right-to-left";
   return Array.from({ length: columns }, (_, screenIndex) => {
     const orderIndex = isReversed ? columns - 1 - screenIndex : screenIndex;
-    return ramp(frame, orderIndex * stagger, columnFrames, EASE.word);
+    return motion.ramp(
+      frame,
+      orderIndex * stagger,
+      columnFrames,
+      motion.rise.easing,
+    );
   });
 }
 
@@ -49,11 +58,17 @@ export function getSteppedColumnWipeStyle(
   frame: number,
   durationInFrames: number,
   options: SteppedColumnWipeOptions,
+  motion: VideoMotion = getClassicStageMotion(),
 ): CSSProperties {
   if (frame >= durationInFrames) {
     return {};
   }
-  const progress = getColumnWipeProgress(frame, durationInFrames, options);
+  const progress = getColumnWipeProgress(
+    frame,
+    durationInFrames,
+    options,
+    motion,
+  );
   const isFromTop = options.from === "top";
   const edge = isFromTop ? 0 : 100;
   const steps = progress.flatMap((columnProgress, index) => {

@@ -1,5 +1,7 @@
-import { EASE, mix, ramp } from "../../motion";
+import { mix } from "../../motion";
+import { getClassicStageMotion } from "../../scenes/stageTheme/stageTheme";
 import { getSteppedColumnWipeStyle } from "./steppedColumnWipe";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ShotTransition } from "../schema/shotTransitionSchema";
 import type { CSSProperties } from "react";
 
@@ -21,6 +23,8 @@ type Options = {
   /** The incoming shot's local frame. */
   localFrame: number;
   width: number;
+  /** The theme's motion. Defaults to `classic`. */
+  motion?: VideoMotion;
 };
 
 /**
@@ -36,6 +40,7 @@ export function getShotTransitionLayers({
   previousDurationInFrames,
   localFrame,
   width,
+  motion = getClassicStageMotion(),
 }: Options): { outgoing?: OutgoingShotLayer; incoming: CSSProperties } {
   if (
     previousDurationInFrames === undefined ||
@@ -53,12 +58,22 @@ export function getShotTransitionLayers({
     return {
       outgoing: { frame, offsetX: 0, blurX: 0 },
       incoming: {
-        opacity: ramp(localFrame, 0, transitionInFrames, EASE.inOut),
+        opacity: motion.ramp(
+          localFrame,
+          0,
+          transitionInFrames,
+          motion.dissolve.easing,
+        ),
       },
     };
   }
   // The outgoing layer accelerates away while the columns cover it.
-  const drift = ramp(localFrame, 0, transitionInFrames, EASE.in);
+  const drift = motion.ramp(
+    localFrame,
+    0,
+    transitionInFrames,
+    motion.depart.easing,
+  );
   return {
     outgoing: {
       frame,
@@ -69,6 +84,7 @@ export function getShotTransitionLayers({
       localFrame,
       transitionInFrames,
       transition,
+      motion,
     ),
   };
 }

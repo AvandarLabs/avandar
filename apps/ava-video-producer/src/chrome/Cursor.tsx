@@ -1,29 +1,51 @@
 import { MacOSCursor } from "@remotion/mac-cursors";
+import { useMemo } from "react";
 import {
+  createCursorMotion,
   cursorScale,
   cursorShutter,
   trackPos,
   type CursorKey,
   type CursorKind,
 } from "../cursor-motion";
+import { StageThemeBoundary } from "../scenes/stageTheme/StageThemeBoundary";
+import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
-/** Native assets keep their own hotspot correction; the parent scales around
- * the measured target, so clicking never moves the arrow tip or I-beam
- * center. */
-export function Cursor({
-  frame,
-  path,
-  clicks = [],
-  cursor = "default",
-}: {
+type Props = {
   frame: number;
   path: readonly CursorKey[];
   clicks?: readonly number[];
   cursor?: CursorKind;
-}): ReactNode {
-  const position = trackPos(frame, path);
-  const scale = 1.4 * cursorScale(frame, clicks);
+};
+
+/** Native assets keep their own hotspot correction; the parent scales around
+ * the measured target, so clicking never moves the arrow tip or I-beam
+ * center. Size, press, trail, and shadow come from `components.Cursor`. */
+export function Cursor(props: Props): ReactNode {
+  return (
+    <StageThemeBoundary>
+      <_Cursor {...props} />
+    </StageThemeBoundary>
+  );
+}
+
+function _Cursor({
+  frame,
+  path,
+  clicks = [],
+  cursor = "default",
+}: Props): ReactNode {
+  const theme = useVideoProps("Cursor", {});
+  const tokens = useVideoTokens();
+  const videoMotion = useVideoMotion();
+  const motion = useMemo(() => {
+    return createCursorMotion(videoMotion, tokens, theme);
+  }, [videoMotion, tokens, theme]);
+  const position = trackPos(frame, path, motion);
+  const scale = theme.scale * cursorScale(frame, clicks, motion);
   return (
     <div
       aria-hidden="true"
@@ -38,7 +60,7 @@ export function Cursor({
         pointerEvents: "none",
       }}
     >
-      {cursorShutter(frame, path).map((sample, index) => {
+      {cursorShutter(frame, path, motion).map((sample, index) => {
         return sample.opacity > 0 ? (
           <MacOSCursor
             key={index}
@@ -58,7 +80,7 @@ export function Cursor({
         style={{
           left: 0,
           top: 0,
-          filter: "drop-shadow(0 1px 1px rgb(0 0 0 / 0.16))",
+          filter: elevationToDropShadowFilter(theme.shadow),
         }}
       />
     </div>

@@ -1,16 +1,30 @@
 import { AbsoluteFill } from "remotion";
 import { TITLE_LEN } from "./composition-timing";
-import { TYPE } from "./fonts";
-import { DUR, EASE, mix, ramp } from "./motion";
+import { mix } from "./motion";
+import {
+  getStageTextStyle,
+  type StageTextField,
+} from "./scenes/stageTheme/stageTheme";
+import { StageThemeBoundary } from "./scenes/stageTheme/StageThemeBoundary";
+import { useVideoMotion } from "./videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "./videoTheme/useVideoShapeScales";
+import { useVideoTokens } from "./videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 export { TITLE_LEN } from "./composition-timing";
 
 const WORD_IN = 6;
-const WORD_STAGGER = 3;
 const KICKER_IN = 22;
 const RULE_IN = 26;
-const OUT_AT = TITLE_LEN - 12;
+/** How far the kicker rises as it arrives, in pixels. */
+const KICKER_RISE = 10;
+/** The title words take their face and colour from the card. */
+const WORD_FIELDS: readonly StageTextField[] = [
+  "fontSize",
+  "fontWeight",
+  "letterSpacing",
+  "color",
+];
 
 /**
  * The cold open. Full rationale:
@@ -27,30 +41,60 @@ const OUT_AT = TITLE_LEN - 12;
  * mechanism, not a title. Boxing each glyph also destroys kerning, which at
  * 92px is visible on every diagonal pair. Per-letter is permitted only for
  * a four or five glyph wordmark where you can set the kerning by hand.
+ *
+ * Type comes from the `text.stage.title` and `text.stage.kicker` roles, the
+ * ground and rule from the scene palette, and timing from `motion.rise`, so
+ * the card follows the video theme (`classic` outside any provider).
  */
-export function TitleCard({
-  name,
-  kicker,
-  frame,
-}: {
+export function TitleCard(props: TitleCardProps): ReactNode {
+  return (
+    <StageThemeBoundary>
+      <_TitleCard {...props} />
+    </StageThemeBoundary>
+  );
+}
+
+type TitleCardProps = {
   name: string;
   kicker: string;
   frame: number;
-}): ReactNode {
+};
+
+function _TitleCard({ name, kicker, frame }: TitleCardProps): ReactNode {
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const titleRole = tokens.text.stage.title;
+  const kickerRole = tokens.text.stage.kicker;
   const words = name.split(" ");
+  // The card fades out over the reveal, ending on the card's last frame.
+  const fadeOut = motion.reveal;
+  const kickerIn = motion.ramp(
+    frame,
+    KICKER_IN,
+    motion.sheet,
+    motion.entrance.easing,
+  );
 
   // The whole card leaves together, onto the same dark field the app
   // arrives on, so the handover is a dissolve between two states of one
   // ground rather than a cut between two lit frames. This is also what
   // makes the loop seam free: the card and the app composition both end on
   // this same dark ground, so there is no luminance jump at the cut.
-  const out = 1 - ramp(frame, OUT_AT, 12, EASE.out);
+  const out =
+    1 -
+    motion.ramp(
+      frame,
+      TITLE_LEN - fadeOut.duration,
+      fadeOut.duration,
+      fadeOut.easing,
+    );
 
   return (
     <AbsoluteFill
       style={{
-        background: "var(--ground)",
-        fontFamily: TYPE,
+        background: tokens.color.scene.ground,
+        fontFamily: titleRole.fontFamily,
         alignItems: "center",
         justifyContent: "center",
         opacity: out,
@@ -65,11 +109,11 @@ export function TitleCard({
       >
         <div style={{ display: "flex", gap: 22 }}>
           {words.map((word, i) => {
-            const t = ramp(
+            const t = motion.ramp(
               frame,
-              WORD_IN + i * WORD_STAGGER,
-              DUR.word,
-              EASE.word,
+              WORD_IN + i * motion.rise.stagger,
+              motion.rise.duration,
+              motion.rise.easing,
             );
             return (
               // One mask per word, never one mask around several lines. The
@@ -81,20 +125,17 @@ export function TitleCard({
                 style={{
                   display: "inline-block",
                   overflow: "hidden",
-                  lineHeight: 1.06,
+                  lineHeight: titleRole.lineHeight,
                   paddingBottom: 6,
                 }}
               >
                 <span
                   style={{
                     display: "inline-block",
-                    fontSize: 92,
-                    fontWeight: 700,
                     // Negative tracking is what makes a title look set
                     // rather than typed. At 92px, default tracking reads
                     // loose and webby.
-                    letterSpacing: -2.5,
-                    color: "white",
+                    ...getStageTextStyle(titleRole, WORD_FIELDS),
                     // translateY only. Scaling a headline is the one thing
                     // that must never happen here: it bites hardest on a
                     // title, where type is the whole frame.
@@ -120,29 +161,25 @@ export function TitleCard({
           style={{
             width: 120,
             height: 3,
-            borderRadius: 99,
+            borderRadius: scales.corner(tokens.corner.pill),
             marginTop: 26,
-            background: "var(--brand)",
+            background: tokens.color.scene.brand,
             transformOrigin: "center",
-            transform: `scaleX(${ramp(frame, RULE_IN, DUR.sheet, EASE.out).toFixed(3)})`,
+            transform: `scaleX(${motion
+              .ramp(frame, RULE_IN, motion.sheet, motion.entrance.easing)
+              .toFixed(3)})`,
           }}
         />
 
         {/* The kicker follows the name: two type elements arriving
-            together have no hierarchy. Reduced opacity, not a second grey
-            token. */}
+            together have no hierarchy. The kicker role's alpha, not a
+            second grey token. */}
         <div
           style={{
             marginTop: 22,
-            fontSize: 22,
-            fontWeight: 500,
-            color: "white",
-            opacity: ramp(frame, KICKER_IN, DUR.sheet, EASE.out) * 0.68,
-            transform: `translateY(${mix(
-              ramp(frame, KICKER_IN, DUR.sheet, EASE.out),
-              10,
-              0,
-            ).toFixed(2)}px)`,
+            ...getStageTextStyle(kickerRole),
+            opacity: kickerIn,
+            transform: `translateY(${mix(kickerIn, KICKER_RISE, 0).toFixed(2)}px)`,
           }}
         >
           {kicker}

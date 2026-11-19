@@ -1,11 +1,18 @@
-import { TYPE } from "../fonts";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import { assertFinite, fitTextLines } from "./layout/layout";
+import { getStageTextStyle } from "./stageTheme/stageTheme";
 import { getHeadingRevealStyles } from "./textReveal";
 import type { SceneBase } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
 
+/** The smallest a scene title shrinks to while fitting, in pixels. */
+const TITLE_MIN_FONT_SIZE = 32;
+
 /**
  * Shared chrome for a scene: the ground, title/kicker header, and content area.
+ * The title is `text.stage.sceneHeading` fitted to the header, the kicker
+ * `text.stage.sceneBody` in the muted foreground, on the scene palette.
  */
 export function SceneShell({
   frame,
@@ -17,14 +24,24 @@ export function SceneShell({
   children,
 }: SceneBase & { children: ReactNode }): ReactNode {
   assertFinite(frame, "scene frame");
-  const reveal = getHeadingRevealStyles(frame, headingReveal);
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const heading = tokens.text.stage.sceneHeading;
+  const body = tokens.text.stage.sceneBody;
+  const reveal = getHeadingRevealStyles(frame, headingReveal, motion);
   // A wipe clips to the text's own width, not to the header's full width.
   const lineBox: CSSProperties = {
     display: headingReveal?.mode === "wipe" ? "inline-block" : "block",
   };
   const titleSize = title
-    ? fitTextLines([title], width * 0.88, 74, 48, 32).fontSize
-    : 48;
+    ? fitTextLines(
+        [title],
+        width * 0.88,
+        74,
+        heading.fontSize,
+        TITLE_MIN_FONT_SIZE,
+      ).fontSize
+    : heading.fontSize;
   return (
     <div
       style={{
@@ -33,9 +50,9 @@ export function SceneShell({
         width,
         height,
         overflow: "hidden",
-        background: "var(--ground)",
-        color: "var(--foreground)",
-        fontFamily: TYPE,
+        background: tokens.color.scene.ground,
+        color: tokens.color.scene.foreground,
+        fontFamily: heading.fontFamily,
       }}
     >
       {title || kicker ? (
@@ -46,10 +63,11 @@ export function SceneShell({
             <h1
               style={{
                 margin: 0,
+                ...getStageTextStyle(heading, ["fontWeight", "lineHeight"]),
                 fontSize: titleSize,
-                lineHeight: 1.12,
-                letterSpacing: -1.2,
-                fontWeight: 600,
+                // The role's tracking at the role's own size, so a fitted
+                // title keeps the same tracking in pixels at any size.
+                letterSpacing: (heading.letterSpacing ?? 0) * heading.fontSize,
               }}
             >
               <span style={{ ...lineBox, ...reveal.title }}>{title}</span>
@@ -60,9 +78,8 @@ export function SceneShell({
               style={{
                 margin: "16px 0 0",
                 maxWidth: "100%",
-                fontSize: 24,
-                lineHeight: 1.35,
-                color: "var(--muted-foreground)",
+                ...getStageTextStyle(body, ["fontSize", "lineHeight"]),
+                color: tokens.color.scene.mutedForeground,
               }}
             >
               <span style={{ ...lineBox, ...reveal.kicker }}>{kicker}</span>

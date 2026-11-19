@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import { captionBand } from "../../scenes/layout/layout";
+import { getClassicStageMotion } from "../../scenes/stageTheme/stageTheme";
 import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../StoryFilm/steppedColumnWipe";
 import { getCueWindowFromShot } from "./getCueWindowFromShot";
 import { assetPathSchema, frame, id, positiveFrames, text } from "./primitives";
@@ -335,8 +336,9 @@ function _checkShotTransition(
   }
   if (transition.kind === "stepped-column-wipe") {
     const columns = transition.columns ?? STEPPED_COLUMN_WIPE_DEFAULTS.columns;
+    // An omitted stagger is the theme's; plans are checked against `classic`.
     const stagger =
-      transition.staggerFrames ?? STEPPED_COLUMN_WIPE_DEFAULTS.staggerFrames;
+      transition.staggerFrames ?? getClassicStageMotion().stagger.column;
     if (stagger * (columns - 1) >= shot.transitionInFrames) {
       return [
         `${shot.id}: the last wipe column starts after the transition ends; lower columns or staggerFrames`,

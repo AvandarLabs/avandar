@@ -1,6 +1,7 @@
 import { Cursor } from "../chrome/chrome";
 import "./generated/product.css";
 import { cursorOnTarget, type CursorKind } from "../cursor-motion";
+import { useVideoProps } from "../videoTheme/useVideoTheme";
 import { measuredPath } from "./choreography";
 import targets from "./cursor-targets.json";
 import { AvandarStage } from "./generated/product.js";
@@ -77,15 +78,7 @@ export function AvandarScene({
     });
   const cursor = cursorOnTarget(productFrame, keys, beats);
   return (
-    <div
-      style={{
-        width,
-        height,
-        position: "relative",
-        background: "#eaeef2",
-        overflow: "hidden",
-      }}
-    >
+    <_ProductBackdrop width={width} height={height}>
       <AvandarStage
         feature={feature}
         frame={productFrame}
@@ -110,6 +103,35 @@ export function AvandarScene({
           />
         )}
       </div>
+    </_ProductBackdrop>
+  );
+}
+
+/**
+ * The product stage's box, painted with `components.ProductFrame.backdrop`
+ * behind the product UI.
+ */
+function _ProductBackdrop({
+  width,
+  height,
+  children,
+}: {
+  width: number;
+  height: number;
+  children: ReactNode;
+}): ReactNode {
+  const { backdrop } = useVideoProps("ProductFrame", {});
+  return (
+    <div
+      style={{
+        width,
+        height,
+        position: "relative",
+        background: backdrop,
+        overflow: "hidden",
+      }}
+    >
+      {children}
     </div>
   );
 }
