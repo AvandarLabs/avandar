@@ -36,7 +36,19 @@
   ],
   "enforceLint": false,
   "coveredIds": [],
-  "pendingTokens": [],
+  "pendingTokens": [
+    "color.categorical.1",
+    "color.categorical.2",
+    "color.categorical.3",
+    "color.categorical.4",
+    "color.categorical.5",
+    "color.categorical.6",
+    "color.categorical.7",
+    "color.categorical.8",
+    "color.categorical.9",
+    "color.onAccent"
+  ],
+  "tempoPendingIds": [],
   "literals": {
     "src/stock/presets/AidCargoModeHandoff/AidCargoModeHandoff.tsx": 2,
     "src/stock/presets/AidCargoModeHandoff/CargoCarrier.tsx": 2,

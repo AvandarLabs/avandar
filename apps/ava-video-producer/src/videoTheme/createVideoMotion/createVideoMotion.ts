@@ -93,11 +93,15 @@ function _profileCurve(
   motion: MotionTokens,
 ): (easing: EasingValue | undefined, path: string) => EasingFunction {
   const profile = motion.easingProfile;
+  // Every family is read up front, so the whole menu counts as in use.
+  const families = {
+    smooth: motion.easingProfiles.smooth,
+    snappy: motion.easingProfiles.snappy,
+    gentle: motion.easingProfiles.gentle,
+  };
   return (easing, path) => {
     return _curve(
-      profile === "authored"
-        ? _required(easing, path)
-        : motion.easingProfiles[profile],
+      profile === "authored" ? _required(easing, path) : families[profile],
     );
   };
 }

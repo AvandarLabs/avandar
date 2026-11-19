@@ -39,6 +39,7 @@
   "enforceLint": false,
   "coveredIds": [],
   "pendingTokens": [],
+  "tempoPendingIds": [],
   "literals": {
     "src/stock/presets/MissedVisitReconnect/BookingTab.tsx": 6,
     "src/stock/presets/MissedVisitReconnect/CaseHome.tsx": 4,

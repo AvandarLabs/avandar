@@ -63,8 +63,12 @@ export type TokenRowFilter = Readonly<{
 }>;
 
 /**
- * The handful of tokens that change a look the most. The editor shows them
- * first, above the tiers, in this order.
+ * The handful of tokens that change a look the most: the Look and feel
+ * rows. The editor shows them first, above the tiers, in this order. Each
+ * global option (line weight, corner style, shadow intensity, tint
+ * strength, easing family, stagger, entrance style, loop fade) sits beside
+ * the token it adjusts and starts at its identity value, so it changes
+ * nothing until a producer moves it.
  */
 export const ESSENTIAL_TOKEN_PATHS = [
   "color.accent",
@@ -72,9 +76,28 @@ export const ESSENTIAL_TOKEN_PATHS = [
   "color.text",
   "atomic.fontFamily.figtree",
   "stroke.default",
+  "stroke.scale",
   "corner.panel",
+  "corner.scale",
+  "elevation.strength",
+  "alpha.washScale",
   "motion.tempo",
+  "motion.easingProfile",
+  "motion.staggerScale",
+  "motion.entranceStyle",
+  "motion.loopFade.graphic",
   "sketch.box",
+  "sketch.shape",
+  "sketch.annotation",
+  "color.categorical.1",
+  "color.categorical.2",
+  "color.categorical.3",
+  "color.categorical.4",
+  "color.categorical.5",
+  "color.categorical.6",
+  "color.categorical.7",
+  "color.categorical.8",
+  "color.categorical.9",
 ] as const;
 
 const MANTINE_GROUPS: Readonly<Record<string, string>> = {

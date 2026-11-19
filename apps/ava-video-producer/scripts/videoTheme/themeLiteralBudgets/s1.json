@@ -10,5 +10,6 @@
   "enforceLint": true,
   "coveredIds": [],
   "pendingTokens": [],
+  "tempoPendingIds": [],
   "literals": {}
 }

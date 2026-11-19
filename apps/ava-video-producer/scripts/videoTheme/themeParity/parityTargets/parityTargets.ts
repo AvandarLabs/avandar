@@ -101,6 +101,15 @@ function _createTargetFromId(id: string): ParityTarget | undefined {
 }
 
 /**
+ * How far a composition pixel may move now that `VideoThemeProvider` emits
+ * the starter palette (`--brand`, `--ground`, ...) as hex measured from
+ * rendered frames instead of the `oklch()` values in `theme.css`. Solid
+ * fills match exactly; anti-aliased edges blended from an unrounded colour
+ * can differ by one level. Anything larger is still a failure.
+ */
+const STARTER_HEX_ROUNDING = 1;
+
+/**
  * Parity targets for the named ids, or by default every in-scope item: the
  * presets and compositions the design tokens cover first, in Atlas order,
  * then the items each slice budget lists as covered. Any Atlas id may be
@@ -149,10 +158,10 @@ export function getParityFramesFromFilm(
  */
 export function getAllowedRegionsFromFilm(
   id: string,
-  film: Pick<Film, "kind" | "width">,
+  film: Pick<Film, "kind" | "width" | "height">,
 ): ParityRegion[] {
   const scale = film.kind === "stock" ? film.width / STOCK_VIEWBOX_WIDTH : 1;
-  return PARITY_ALLOWANCES.filter((allowance) => {
+  const regions = PARITY_ALLOWANCES.filter((allowance) => {
     return allowance.id === id;
   }).map(({ region }) => {
     return {
@@ -162,4 +171,16 @@ export function getAllowedRegionsFromFilm(
       height: Math.ceil(region.height * scale),
     };
   });
+  return film.kind === "stock"
+    ? regions
+    : [
+        ...regions,
+        {
+          x: 0,
+          y: 0,
+          width: film.width,
+          height: film.height,
+          maxChannelDelta: STARTER_HEX_ROUNDING,
+        },
+      ];
 }

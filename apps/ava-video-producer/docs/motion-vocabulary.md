@@ -73,6 +73,40 @@ These are all the exported functions in [src/motion.ts](../src/motion.ts), inclu
 
 `enter()` and `leave()` return complete `transform` strings. A later `transform` property in the same style object replaces them; explicitly combine transforms or use a suitable inner element when another motion must coexist.
 
+## Themed motion
+
+Renderers read motion from the [video theme](video-theme.md), not from the `motion.ts` constants, so tempo, the easing curves, and the Look and feel options reach them. `useGraphicMotion()` (stock shapes) and `useVideoMotion()` (the stage) return `VideoMotion`, built by `createVideoMotion` from the theme's `motion.*` tokens. Its durations and staggers are already divided by the tempo; cue frames and loop lengths stay as authored.
+
+| `VideoMotion` member | What it is | `classic` value |
+| --- | --- | --- |
+| `panel`, `chip`, `whip`, `sheet`, `word`, `hero` | The duration ladder, tempo-scaled | `DUR` |
+| `entrance`, `exit`, `drawOn`, `travel`, `emphasis` | Steps with a tempo-scaled duration, a curve function, and a distance or spring | `EASE.out` entrances and exits, `EASE.inOut` travel and draw-on |
+| `reveal` | A function `reveal(frame, at)` that fades in on its cue, with `reveal.duration` and `reveal.easing` | 12 frames, `EASE.out`: the stock `opacity={ramp(frame, cue, 12)}` idiom |
+| `rise` | Duration, curve, and stagger of words, lines, bars, and columns rising in | `DUR.word`, `EASE.word`, 3 frames |
+| `depart`, `surge`, `dissolve` | An accelerating departure, a fly-through surge, and a shot or loop dissolve | `EASE.in` over `DUR.whip`, `EASE.surge`, `EASE.inOut` |
+| `loopFade` | `graphic` and `film` loop fade lengths. Tempo never changes them | 12 and 18 frames |
+| `pressDepth`, `caret.halfPeriod`, `entranceStyle` | Press dip, caret blink, and what `enter()` animates besides opacity | 0.04, 15 frames, `rise` |
+| `stagger.list`, `stagger.edge`, `stagger.column` | Staggers, tempo-scaled and multiplied by the stagger option | `STAGGER`, `STAGGER`, `STAGGER_COLUMN` |
+| `scale(frames)` | Divides an authored length by the tempo. Never use it on a cue frame | |
+| `curve(easing)` | An easing token as a function | |
+
+`VideoMotion` also carries the `motion.ts` helpers with the theme's values as their defaults. Each takes the same arguments as its namesake, so `classic` draws exactly what `motion.ts` draws (`createVideoMotion.test.ts` holds them equal frame by frame):
+
+| Themed helper | Defaults it takes from the theme |
+| --- | --- |
+| `motion.ramp(frame, at, dur?, easing?)` | `dur = motion.panel`, `easing = motion.reveal.easing`. Pass a literal duration through `motion.scale()` |
+| `motion.reveal(frame, at)` | `motion.reveal.duration` and `motion.reveal.easing` |
+| `motion.enter(frame, at, opts?)`, `motion.enterAt(frame, at, index, opts?)` | Entrance duration, distance, and curve; the list stagger; the entrance style (`rise`, `fade`, `scale` from 0.96, or `none`, which shows the element on its cue) |
+| `motion.leave(frame, at, opts?)` | Exit duration, distance, and curve |
+| `motion.pop(frame, at, dur?)` | The emphasis spring and duration |
+| `motion.press(frame, at, depth?)` | `motion.pressDepth`, over twice `motion.press.duration` |
+| `motion.caretOn(frame)` | `motion.caret.halfPeriod` |
+| `motion.loopEnvelope(frame, duration, fadeFrames?)` | `motion.loopFade.graphic` on the dissolve curve. `StockCanvas` fades every stock loop with it |
+
+Three Look and feel options change motion globally, each at an identity default: **Easing family** (`motion.easingProfile`: `authored`, or `smooth`, `snappy`, `gentle`, whose curve from `motion.easingProfiles` replaces the entrance, exit, travel, rise, and reveal curves), **Stagger** (`motion.staggerScale`), and **Entrance style** (`motion.entranceStyle`).
+
+Line weight, corner style, and tint strength are not motion, but renderers apply them the same way: `useGraphicShapeScales()` and `useVideoShapeScales()` return `stroke(width)`, `corner(radius)`, and `wash(alpha)`, which multiply by `stroke.scale`, `corner.scale`, and `alpha.washScale`. Pass token reads and a preset's own named constants through them, for example `scales.corner(STAMP_CORNER)`.
+
 ## Pointer and click vocabulary
 
 The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). [src/chrome.tsx](../src/chrome/chrome.tsx) renders the shared `Cursor`.
@@ -159,7 +193,7 @@ the plan's duration must leave time after each final action or word reveal.
 | --- | --- | --- |
 | `loopPhase(frame, period, offset = 0)` | Normalized 0 to less than 1 cycle, with positive modulo for negative frames/offsets | Finite inputs and positive period; the phase itself resets at the cycle boundary |
 | `wave(frame, period, offset = 0)` | Smooth cosine pulse from 0 to 1 and back to 0 | Same input limits; useful for subtle halos and proximity emphasis |
-| `loopEnvelope(frame, duration, fadeFrames = 12)` | Existing `EASE.inOut` ramps reveal a graphic and return to ground exactly at `duration - 1` | Duration must exceed twice the positive fade length; does not repeat by itself |
+| `loopEnvelope(frame, duration, fadeFrames = 12)` | Existing `EASE.inOut` ramps reveal a graphic and return to ground exactly at `duration - 1` | Duration must exceed twice the positive fade length; does not repeat by itself. Renderers use the themed `motion.loopEnvelope`, whose fade is `motion.loopFade.graphic` |
 
 `StockGraphic` uses a 180-frame, 30 fps loop. Authored particles follow seeded
 deterministic positions and periodic paths; edges reveal with SVG dash progress;
@@ -205,7 +239,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer ESLint restrictions enforce this for every slice that has finished its theme migration.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.

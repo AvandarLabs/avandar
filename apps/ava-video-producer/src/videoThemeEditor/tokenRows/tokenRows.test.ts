@@ -222,10 +222,44 @@ test("Essentials come out in their fixed order", () => {
       "color.text",
       "atomic.fontFamily.figtree",
       "stroke.default",
+      "stroke.scale",
       "corner.panel",
+      "corner.scale",
+      "elevation.strength",
+      "alpha.washScale",
       "motion.tempo",
+      "motion.easingProfile",
+      "motion.staggerScale",
+      "motion.entranceStyle",
+      "motion.loopFade.graphic",
       "sketch.box",
+      "sketch.shape",
+      "sketch.annotation",
+      ...Array.from({ length: 9 }, (_, index) => {
+        return `color.categorical.${index + 1}`;
+      }),
     ],
+  );
+});
+
+test("every Look and feel option starts at its identity value", () => {
+  const rows = _rows({ kind: "theme" });
+  const resolvedAt = (path: string) => {
+    return rows.find((row) => {
+      return row.path === path;
+    })?.resolved;
+  };
+  assert.deepEqual(
+    [
+      "stroke.scale",
+      "corner.scale",
+      "elevation.strength",
+      "alpha.washScale",
+      "motion.staggerScale",
+      "motion.easingProfile",
+      "motion.entranceStyle",
+    ].map(resolvedAt),
+    [1, 1, 1, 1, 1, "authored", "rise"],
   );
 });
 

@@ -13,6 +13,7 @@
   "enforceLint": false,
   "coveredIds": [],
   "pendingTokens": [],
+  "tempoPendingIds": [],
   "literals": {
     "showcase/motion.css": 891,
     "showcase/productions.css": 98,

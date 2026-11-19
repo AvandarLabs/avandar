@@ -39,14 +39,22 @@ test("stock targets render at the Atlas gallery default colours", () => {
 
 test("caption allowances scale from the stock viewBox to the rendered frame", () => {
   assert.deepEqual(
-    getAllowedRegionsFromFilm("node-traversal", { kind: "stock", width: 1280 }),
+    getAllowedRegionsFromFilm("node-traversal", {
+      kind: "stock",
+      width: 1280,
+      height: 800,
+    }),
     [{ x: 0, y: 693, width: 1280, height: 94 }],
   );
 });
 
 test("a target without a listed consolidation has no allowed regions", () => {
   assert.deepEqual(
-    getAllowedRegionsFromFilm("network-graph", { kind: "stock", width: 1280 }),
+    getAllowedRegionsFromFilm("network-graph", {
+      kind: "stock",
+      width: 1280,
+      height: 800,
+    }),
     [],
   );
 });
@@ -65,5 +73,16 @@ test("any Atlas motion or composition can be named before it is covered", () => 
       },
     ),
     ["stock-person-led-support-calendar", "brand-lockup"],
+  );
+});
+
+test("a composition may differ by one level anywhere and by no more", () => {
+  assert.deepEqual(
+    getAllowedRegionsFromFilm("brand-lockup", {
+      kind: "storyboard",
+      width: 1600,
+      height: 1000,
+    }),
+    [{ x: 0, y: 0, width: 1600, height: 1000, maxChannelDelta: 1 }],
   );
 });

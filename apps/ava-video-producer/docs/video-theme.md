@@ -11,7 +11,28 @@ Every visual and animation value a motion or composition draws comes from a vide
 | Semantic | `other.video.semantic` | References only, named by meaning | `"accent": "$primary"`, `"caption": { "size": "$fontSizes.lg", ... }` |
 | Component | `components.<Name>.defaultProps` | A reference, or a deliberate one-off literal, per themed shape | `"ProgressBar": { "defaultProps": { "height": 3 } }` |
 
-The token catalog in `src/videoTheme/tokenCatalog/` lists every token with its label, description, unit, bounds, and editor control. A token exists only when a renderer reads it: `scripts/videoTheme/__tests__/every-token-has-a-reader.integration.test.tsx` fails on a token nothing reads.
+The token catalog in `src/videoTheme/tokenCatalog/` lists every token with its label, description, unit, bounds, and editor control. A token exists only when a renderer reads it: `scripts/videoTheme/__tests__/every-token-has-a-reader.integration.test.tsx` fails on a token nothing reads, unless a slice budget lists it as pending (see [Checks](#checks)).
+
+## Token groups
+
+| Group | Tokens | What reads them |
+| --- | --- | --- |
+| Colour roles | `color.ground`, `surface`, `elevated`, `line`, `text`, `textMuted`, `inactive`, `accent`, `accentAlt`, `highlight`, `positive`, `scrim`, `productBackdrop`, `shadowColor` | Stock shapes and the continuity stage. `positive` is the default colour of the person, object, route, cell, fragment, and membership primitives |
+| Categories | `color.categorical.1` to `.9` (mint, cyan, orange, rose, lavender, sand, teal, olive, pink in `classic`) | Keys and series that give each category one colour |
+| Text on the accent | `color.onAccent` | Labels drawn on an accent fill. Its `{ onDark, onLight }` pair is picked by the accent's luminance against its own threshold, 0.179, not by the ground |
+| Scene palette | `color.scene.background`, `foreground`, `card`, `muted`, `mutedForeground`, `border`, `brand`, `brandSoft`, `brandStrong`, `ground`, `shadow` | Storyboard scenes, the title card, the app chrome, and the fixed compositions, through CSS names (below) |
+| Text roles | `text.graphic.*` (graphic surface, measured fonts only) and `text.stage.*` (stage surface) | `Text` in graphics; the stage reads `--video-text-*` variables or the resolved role. Scene roles (`title`, `kicker`, `caption`, `sceneHeading`, `sceneBody`, `cardTitle`, `figure`, `windowHeadline`, `barLabel`, `badge`, `appTitle`, `appBody`) are checked for contrast against the scene ground |
+| Line and shape | `stroke.*` (`hairline` 1 to `heavy` 4), `corner.*` (`chip` 4, `cell` 8, `card` 12, `panel` 18, `pill`), `alpha.wash`, `tint`, `ghost`, `dimmed`, `guide`, `dash.guide`, `dash.pending` | Stock shapes. Opacity roles follow meaning, not a value: a wash behind an active row, a ghost of a removed item |
+| Options | `stroke.scale`, `corner.scale`, `alpha.washScale`, `elevation.strength`, `motionBlur.strength`, `motion.staggerScale` (all 1 in `classic`), `motion.easingProfile` (`authored`), `motion.entranceStyle` (`rise`) | The Look and feel rows. Each starts at its identity value, so it changes nothing until a producer moves it |
+| Elevation | `elevation.flat`, `floating` (shadow geometry plus colour), `elevation.window` (the tilted window's shadow geometry) | Panels, floating labels, the tilted window. `elevation.strength` scales every shadow's opacity when the theme resolves |
+| Motion | `motion.*`, `camera.*`, `motionBlur.*` | Renderers through the [themed motion](motion-vocabulary.md#themed-motion) |
+| Components | `components.<Name>`, including `WindowTilt`, `WindowMotion`, `BrandLockup`, `Cursor`, and `Orb` for the scenes and chrome | The one shape each belongs to |
+
+### The scene palette as CSS names
+
+Scenes read `var(--brand)`, `var(--ground)`, and the other storyboard theme names. `VideoThemeProvider` emits each `color.scene.*` token under that name: `brand` as `--brand`, `mutedForeground` as `--muted-foreground`, and so on. A storyboard's plan theme or shot theme is set inside the provider, so it still overrides a name for its own film or shot. `color.scene.shadow` is optional and unset in `classic`, so no `--shadow` is emitted and the tilted window keeps its fallback (60% of the scene background).
+
+In `classic` the scene palette points at the `starter*` swatches, which reproduce `src/theme.css`. Theme colours are hex only, so each swatch is the hex Chrome renders for the `oklch()` value in `theme.css`, measured from a rendered pixel. Solid fills match exactly; an anti-aliased edge can differ by one level, which the parity gate allows for compositions and nothing more.
 
 ## References
 
@@ -39,6 +60,7 @@ A colour may be `{ "onDark": "$...", "onLight": "$..." }`. The ground is dark wh
 }
 ```
 
+- A token whose definition is `isOptional` may be left out even by a complete theme; renderers then use their own fallback.
 - An `id` is 1 to 48 lowercase letters, digits, or hyphens, and matches the file name `themes/<id>.theme.json`. A file is limited to 256 KB.
 - A theme that names `extends` may be sparse. One without it must define every token.
 - `overrides` holds per-item art direction keyed by Atlas id. It applies to the theme that declares it and is not inherited by themes that extend it.
@@ -51,7 +73,7 @@ A colour may be `{ "onDark": "$...", "onLight": "$..." }`. The ground is dark wh
 Start the showcase with `pnpm showcase` and open `http://localhost:4173/motion.html`.
 
 1. Open a motion or composition, then the **Design tokens** tab.
-2. Edit **Look and feel** first. Its rows, in order, are **Accent**, **Ground**, **Text**, **Font face · figtree** (the face the stage text uses), **Default stroke**, **Panel corner**, **Tempo**, and **Box sketch**. The player updates as you edit, and so do motion thumbnails.
+2. Edit **Look and feel** first. Its rows, in order, are **Accent**, **Ground**, **Text**, **Font face · figtree** (the face the stage text uses), **Default stroke**, **Line weight**, **Panel corner**, **Corner style**, **Shadow intensity**, **Tint strength**, **Tempo**, **Easing family**, **Stagger**, **Entrance style**, **Graphic loop fade**, **Box sketch**, **Shape sketch**, **Annotation sketch**, and **Category 1** to **Category 9**. The global options (line weight, corner style, shadow intensity, tint strength, easing family, stagger, entrance style, loop fade) start at their identity values. They reach a renderer once it reads them, so items still waiting for their theme migration ignore them. The player updates as you edit, and so do motion thumbnails.
 3. Switch the scope from **Whole theme** to **This motion only** or **This composition only** for art direction that belongs to one item. A dot marks an edited token: it is filled differently for a saved item override. An unsaved edit also gets a reset arrow on its row.
 4. Drafts are kept in your browser (local storage) across reloads. **Save as new theme** asks for a name and writes `themes/<id>.theme.json`, with the id made from the name. **Save** updates a custom theme in place and is not offered for built-in themes, which are read-only. **Discard** drops the draft.
 
@@ -94,5 +116,22 @@ An edit made while a save runs is kept on top of the saved theme. A successful s
 
 ## Checks
 
-- `pnpm theme:parity capture` records reference frames in `out/theme-parity/`, and `pnpm theme:parity compare` renders current frames and fails on any pixel difference outside the allowed regions. Both take `--theme <id>`. Capture before a renderer change, then compare, to prove `classic` still renders today's pixels.
-- `src/videoTheme/textContrastHelpers/textContrastHelpers.test.ts` holds every `classic` and `avandar` text role to AA on dark and light grounds.
+- `pnpm theme:parity capture` records reference frames in `out/theme-parity/`, and `pnpm theme:parity compare` renders current frames and fails on any pixel difference outside the allowed regions. Both take `--theme <id>`. Capture before a renderer change, then compare, to prove `classic` still renders today's pixels. With no ids, they run every covered item (below); any Atlas motion or composition id can also be named, so items can be captured before they migrate.
+- `src/videoTheme/textContrastHelpers/textContrastHelpers.test.ts` holds every `classic` and `avandar` text role to AA on dark and light grounds, each measured against what it is drawn on: the ground, or the colour its `contrastGround` names.
+- `scripts/videoTheme/__tests__/renderers-draw-no-literals.integration.test.ts` scans every renderer file for theme literals (palette reads, hex and colour functions, starter `var(--…)` names, numeric type, stroke, corner, opacity, and dash values, shadows, `EASE`, `DUR`, `STAGGER`, literal `ramp()` durations, `ramp()` without a curve, stroked raw SVG shapes, and stylesheet values) and compares each file with its slice budget.
+- `scripts/videoTheme/__tests__/renderers-follow-a-sentinel-theme.integration.test.tsx` renders the primitives and every covered stock preset under a theme that moves every swatch, stroke, radius, and multiplier to an improbable value, and fails if the markup still holds a `classic` value. It catches literals routed through constants, which the scan cannot see.
+- `scripts/videoTheme/__tests__/animations-finish-at-the-slowest-tempo.integration.test.tsx` holds every stock preset and every continuity composition to finishing its animations at tempo 0.8.
+- ESLint (`eslint/video-theme-restrictions.js`) bans `STOCK`, `EASE`, `DUR`, `STAGGER`, `STAGGER_COLUMN`, `TYPE`, `MONO`, and the gallery defaults in renderers, along with `ramp()` without a curve and numeric literals on `strokeWidth`, `rx`, `ry`, the opacities, `fontSize`, `fontWeight`, and `strokeDasharray` (fitted `FitText` sizes excepted).
+
+### Slice budgets
+
+The theme coverage work is split into slices that own disjoint renderer files ([the review](theme-coverage/review.md), section 8). Each slice has one budget file, `scripts/videoTheme/themeLiteralBudgets/<slice>.json`, and edits only its own:
+
+| Field | Meaning |
+| --- | --- |
+| `globs` | The renderer files the slice owns. A glob starting with `!` removes files |
+| `literals` | The most theme literals each owned file may hold. Lower it with `node --import tsx scripts/videoTheme/themeLiteralBudgets/lowerThemeLiteralBudgets.ts <slice>`, which never raises a budget. The target is an empty object |
+| `coveredIds` | Atlas ids the slice has made theme-driven. They join the parity gate's default run, the reader audit, and the sentinel test |
+| `pendingTokens` | Tokens no renderer reads until the slice lands. Remove each one when its renderer starts reading it |
+| `tempoPendingIds` | Compositions the slowest-tempo test skips until a preset the slice owns settles in time |
+| `enforceLint` | Turns the ESLint restrictions on for `globs`. A slice with it on must have no pending tokens or skipped compositions |

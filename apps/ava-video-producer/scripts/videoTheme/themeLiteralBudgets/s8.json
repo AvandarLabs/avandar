@@ -9,7 +9,8 @@
   ],
   "enforceLint": false,
   "coveredIds": [],
-  "pendingTokens": [],
+  "pendingTokens": ["motion.caret.halfPeriod"],
+  "tempoPendingIds": [],
   "literals": {
     "src/compositions/Demo/Demo.tsx": 15,
     "src/compositions/Demo/PromptField.tsx": 13,

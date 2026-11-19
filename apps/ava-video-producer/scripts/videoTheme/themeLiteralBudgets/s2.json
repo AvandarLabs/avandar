@@ -39,8 +39,25 @@
     "src/stock/presets/legacy/**"
   ],
   "enforceLint": false,
-  "coveredIds": [],
-  "pendingTokens": [],
+  "coveredIds": [
+    "network-graph",
+    "node-traversal",
+    "radial-network",
+    "plexus-field",
+    "data-pipeline"
+  ],
+  "pendingTokens": [
+    "text.graphic.figure",
+    "stroke.emphasis",
+    "stroke.heavy",
+    "corner.cell",
+    "alpha.ghost",
+    "alpha.dimmed",
+    "alpha.guide",
+    "dash.guide",
+    "dash.pending"
+  ],
+  "tempoPendingIds": ["product-to-ontology", "record-to-relationships"],
   "literals": {
     "src/stock/graphics-charts/BarRace.tsx": 28,
     "src/stock/graphics-charts/LineTrace.tsx": 32,

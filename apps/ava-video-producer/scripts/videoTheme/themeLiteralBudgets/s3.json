@@ -45,6 +45,7 @@
   "enforceLint": false,
   "coveredIds": [],
   "pendingTokens": [],
+  "tempoPendingIds": [],
   "literals": {
     "src/stock/presets/ActorAttributionSplit/ActorAttributionSplit.tsx": 3,
     "src/stock/presets/ActorAttributionSplit/AttributionActors.tsx": 6,

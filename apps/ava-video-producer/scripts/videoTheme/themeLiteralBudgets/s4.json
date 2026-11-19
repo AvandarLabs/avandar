@@ -44,6 +44,7 @@
   "enforceLint": false,
   "coveredIds": [],
   "pendingTokens": [],
+  "tempoPendingIds": [],
   "literals": {
     "src/stock/presets/PluginCapabilityInstall/CategoryTallies.tsx": 2,
     "src/stock/presets/PluginCapabilityInstall/CategoryTally.tsx": 7,

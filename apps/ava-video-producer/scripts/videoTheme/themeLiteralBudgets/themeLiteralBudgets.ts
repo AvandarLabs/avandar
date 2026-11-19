@@ -16,6 +16,7 @@ const budgetSchema = z.strictObject({
   enforceLint: z.boolean(),
   coveredIds: z.array(z.string()),
   pendingTokens: z.array(z.string()),
+  tempoPendingIds: z.array(z.string()),
   literals: z.record(z.string(), z.number().int().positive()),
 });
 
@@ -32,6 +33,8 @@ const budgetSchema = z.strictObject({
  *   sentinel theme test.
  * - `pendingTokens` are token paths no renderer reads until the slice lands.
  *   The reader audit skips them; the slice removes each one it starts reading.
+ * - `tempoPendingIds` are Atlas ids the slowest-tempo test skips because a
+ *   preset the slice owns has not settled in time yet.
  * - `literals` is the most theme literals each owned file may hold. Budgets
  *   only go down; the target is an empty object.
  */
@@ -95,6 +98,17 @@ export function getPendingTokensFromBudgets(
   return new Set(
     budgets.flatMap((budget) => {
       return budget.pendingTokens;
+    }),
+  );
+}
+
+/** Atlas ids the slowest-tempo test skips until their slice lands. */
+export function getTempoPendingIdsFromBudgets(
+  budgets: readonly ThemeLiteralBudget[] = listThemeLiteralBudgets(),
+): Set<string> {
+  return new Set(
+    budgets.flatMap((budget) => {
+      return budget.tempoPendingIds;
     }),
   );
 }

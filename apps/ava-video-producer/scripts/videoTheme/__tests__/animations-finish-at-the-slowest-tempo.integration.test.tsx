@@ -1,10 +1,10 @@
 /** @jsxRuntime automatic */
 /*
- * At the slowest tempo (0.8) every in-scope animation still finishes
- * before its stock loop or continuity beat ends. Tempo stretches only
- * one-shot animations, never cue frames or repeating motion, so a stock
- * graphic has finished when its picture at the slowest tempo equals its
- * picture at tempo 1.
+ * At the slowest tempo (0.8) every animation still finishes before its
+ * stock loop or continuity beat ends: every stock preset, and every
+ * continuity composition. Tempo stretches only one-shot animations, never
+ * cue frames or repeating motion, so a stock graphic has finished when its
+ * picture at the slowest tempo equals its picture at tempo 1.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -13,6 +13,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { sampleStockFrame } from "../../../src/continuity/continuityTimeline";
 import { getMotionDuration } from "../../../src/motion-components/motionSettings";
+import { STOCK_IDS } from "../../../src/stock/catalog";
 import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
@@ -20,9 +21,9 @@ import { createVideoMotion } from "../../../src/videoTheme/createVideoMotion/cre
 import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
 import {
-  PARITY_COMPOSITION_IDS,
-  PARITY_STOCK_PRESET_IDS,
-} from "../themeParity/parityTargets/parityTargets";
+  getTempoPendingIdsFromBudgets,
+  listThemeLiteralBudgets,
+} from "../themeLiteralBudgets/themeLiteralBudgets";
 import type { ContinuityBeat } from "../../../src/continuity/continuitySchema";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
@@ -83,11 +84,13 @@ function _readContinuityShots(
   });
 }
 
-const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
+const COMPOSITIONS = CONTINUITY_CATALOG.map(({ id }) => {
   return {
     id,
     shots: _readContinuityShots(id),
   };
+}).filter(({ shots }) => {
+  return shots.length > 0;
 });
 
 /**
@@ -103,8 +106,8 @@ function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
 }
 
 /**
- * One row per beat of every in-scope composition, with its shot's beats and its
- * index in them.
+ * One row per beat of every continuity composition, with its shot's beats
+ * and its index in them.
  */
 function _listBeatRows(): Array<
   Readonly<{
@@ -148,17 +151,20 @@ function _stageAnimationEnds(
   };
 }
 
-test("every in-scope stock loop finishes its animations before the loop ends", () => {
-  PARITY_STOCK_PRESET_IDS.forEach((preset) => {
+test("every stock loop finishes its animations before the loop ends", () => {
+  STOCK_IDS.forEach((preset) => {
+    // TypeScript cannot narrow a request over 170 preset ids to the
+    // preset-discriminated union, though every preset has a default input.
+    const request = { preset } as StockRequest;
     assert.equal(
-      _picture({ preset }, LAST_LOOP_FRAME, true),
-      _picture({ preset }, LAST_LOOP_FRAME, false),
+      _picture(request, LAST_LOOP_FRAME, true),
+      _picture(request, LAST_LOOP_FRAME, false),
       preset,
     );
   });
 });
 
-test("every in-scope composition's stage animations finish inside their beats", () => {
+test("every continuity composition's stage animations finish inside their beats", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const readableEnd = _readableEnd(beats, index);
     Object.entries(_stageAnimationEnds(beats, index)).forEach(([name, end]) => {
@@ -171,9 +177,10 @@ test("every in-scope composition's stage animations finish inside their beats", 
 });
 
 test("every nested stock graphic has settled before its beat stops being readable", () => {
+  const pendingIds = getTempoPendingIdsFromBudgets();
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const content = beat.content;
-    if (content.kind === "stock") {
+    if (content.kind === "stock" && !pendingIds.has(id)) {
       const frame = sampleStockFrame(
         _readableEnd(beats, index),
         content.settleFrame,
@@ -185,4 +192,13 @@ test("every nested stock graphic has settled before its beat stops being readabl
       );
     }
   });
+});
+
+test("a slice that has landed skips no composition at the slowest tempo", () => {
+  assert.deepEqual(
+    listThemeLiteralBudgets().flatMap((budget) => {
+      return budget.enforceLint ? budget.tempoPendingIds : [];
+    }),
+    [],
+  );
 });
