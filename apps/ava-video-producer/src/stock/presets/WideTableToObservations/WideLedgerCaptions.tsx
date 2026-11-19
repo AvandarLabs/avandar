@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
   ledgerMessage,
   headingMessages,
@@ -16,6 +16,7 @@ export function WideLedgerCaptions({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const omitted =
     input.missingPolicy === "omit-with-ledger"
       ? input.subjects.reduce((total, subject) => {
@@ -37,7 +38,7 @@ export function WideLedgerCaptions({
           [resultHeading, 52, 96, 856, 14, 2],
         ]}
       />
-      <g opacity={ramp(frame, 111, 10)}>
+      <g opacity={motion.ramp(frame, 111, motion.scale(10))}>
         <LabelSlots
           labels={Object.values(headingMessages).map((message, index) => {
             return [

@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +10,8 @@ type Props = {
   accent: string;
   id: string;
 };
+/** How strongly the protected slot's hatch pattern shows. */
+const PATTERN_OPACITY = 0.2;
 /** Fixed equal block shape retains a non-color cue for protected time. */
 export function ProtectedSlotBody({
   slot,
@@ -17,17 +20,18 @@ export function ProtectedSlotBody({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-slot-body={slot.id}
         x={x}
         y={210}
         width={width}
         height={300}
-        fill={STOCK.surface}
-        stroke={slot.kind === "work" ? STOCK.line : accent}
+        fill={tokens.color.surface}
+        stroke={slot.kind === "work" ? tokens.color.line : accent}
       />
       {slot.kind !== "work" ? (
         <rect
@@ -36,7 +40,7 @@ export function ProtectedSlotBody({
           width={width - 4}
           height={296}
           fill={`url(#${id}-protected)`}
-          opacity={0.2}
+          opacity={PATTERN_OPACITY}
         />
       ) : undefined}
     </g>

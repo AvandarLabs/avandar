@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RefreshRecord } from "./RefreshRecord";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StatePreservingSourceRefresh.schema";
@@ -12,6 +16,8 @@ export function StatePreservingSourceRefresh({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const writes = input.records.filter((record) => {
     return (
       input.sourceRows.find(({ id }) => {
@@ -50,11 +56,12 @@ export function StatePreservingSourceRefresh({
       })}
       {input.showWriteCount ? (
         <g data-write-count={frame >= 139 ? writes : 0}>
-          <path
-            d="M720 559 l12 -12 l5 5 l-12 12 l-7 2 Z"
+          <SketchedShape
+            shape={{ kind: "path", d: "M720 559 l12 -12 l5 5 l-12 12 l-7 2 Z" }}
+            profile={tokens.sketch.shape}
             fill="none"
-            stroke={STOCK.cyan}
-            strokeWidth={2}
+            stroke={tokens.color.accentAlt}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
           />
           <LabelSlots
             labels={[[String(frame >= 139 ? writes : 0), 755, 566, 145, 16, 1]]}

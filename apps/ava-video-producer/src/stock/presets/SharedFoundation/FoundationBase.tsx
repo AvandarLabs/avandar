@@ -1,4 +1,9 @@
-import { EASE, ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FoundationCopy } from "./FoundationCopy";
 import { FoundationSlabs } from "./FoundationSlabs";
 import { FoundationSupports } from "./FoundationSupports";
@@ -12,8 +17,16 @@ export function FoundationBase({
   id,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
-  const joining = ramp(frame, 72, 36, EASE.inOut);
-  const reveal = ramp(frame, 48, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const joining = motion.ramp(
+    frame,
+    72,
+    motion.scale(36),
+    motion.travel.easing,
+  );
+  const reveal = motion.ramp(frame, 48, motion.scale(24));
   const clipId = `${id}-foundation-reveal`;
   return (
     <g>
@@ -38,10 +51,11 @@ export function FoundationBase({
         <g clipPath={`url(#${clipId})`}>
           <FoundationCopy input={input} />
         </g>
-        <path
-          d="M80 550 H880"
+        <SketchedShape
+          shape={{ kind: "path", d: "M80 550 H880" }}
+          profile={tokens.sketch.shape}
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           opacity={joining}
         />
       </g>

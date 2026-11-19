@@ -1,5 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getQueueItemScheduleFromInput } from "./getQueueItemScheduleFromInput";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./QueueRelief.schema";
 /** Data for getQueueItemLayoutFromInputAndFrame. */
 type GetQueueItemLayoutResult = {
@@ -17,14 +18,20 @@ export function getQueueItemLayoutFromInputAndFrame({
   input,
   index,
   frame,
+  motion,
 }: Readonly<{
   input: Input;
   index: number;
   frame: number;
+  motion: VideoMotion;
 }>): GetQueueItemLayoutResult {
   const schedule = getQueueItemScheduleFromInput({ input, index });
-  const enter = ramp(frame, schedule.start, schedule.enterDuration);
-  const exit = ramp(frame, schedule.leave, schedule.finish - schedule.leave);
+  const enter = motion.ramp(frame, schedule.start, schedule.enterDuration);
+  const exit = motion.ramp(
+    frame,
+    schedule.leave,
+    schedule.finish - schedule.leave,
+  );
   const waitY = 166 + schedule.waitingIndex * 50;
   const serviceY = 196 + schedule.slotIndex * 100;
   const state =
@@ -47,6 +54,6 @@ export function getQueueItemLayoutFromInputAndFrame({
       state === "entering" || state === "service"
         ? schedule.slot.id
         : undefined,
-    opacity: ramp(frame, 12 + index * 4, 8),
+    opacity: motion.ramp(frame, 12 + index * 4, motion.whip),
   };
 }

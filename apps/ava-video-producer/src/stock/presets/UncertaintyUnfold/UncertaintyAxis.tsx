@@ -1,11 +1,17 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 /** Authored context and labels for the fixed uncertainty ruler. */
 export type Props = { input: Input };
 /** Renders static context and finite ruler endpoints. */
 export function UncertaintyAxis({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <>
       <FitText
@@ -17,7 +23,7 @@ export function UncertaintyAxis({ input }: Readonly<Props>): ReactNode {
         maxLines={2}
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
       <FitText
         text={input.estimate.label}
@@ -29,10 +35,11 @@ export function UncertaintyAxis({ input }: Readonly<Props>): ReactNode {
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d="M100 300 H860 M100 288 V312 M860 288 V312"
-        stroke={STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "path", d: "M100 300 H860 M100 288 V312 M860 288 V312" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={String(input.axis.min)}
@@ -43,7 +50,7 @@ export function UncertaintyAxis({ input }: Readonly<Props>): ReactNode {
         maxLines={2}
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
       <FitText
         text={String(input.axis.max)}
@@ -55,7 +62,7 @@ export function UncertaintyAxis({ input }: Readonly<Props>): ReactNode {
         anchor="end"
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
     </>
   );

@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ProtectedSlotBody } from "./ProtectedSlotBody";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
@@ -21,6 +21,7 @@ export function ProtectedSlot({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const width = 860 / input.slots.length,
     x = 50 + index * width;
   return (
@@ -28,7 +29,7 @@ export function ProtectedSlot({
       data-slot={slot.id}
       data-kind={slot.kind}
       data-commitment={slot.workLabel ?? ""}
-      opacity={ramp(frame, 12, 26)}
+      opacity={motion.ramp(frame, 12, motion.scale(26))}
     >
       <ProtectedSlotBody
         slot={slot}

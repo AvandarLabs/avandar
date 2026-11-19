@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 
@@ -14,32 +19,46 @@ export function JigMakingTool({
   pattern,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 20, 28, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const progress = motion.ramp(
+    frame,
+    20,
+    motion.scale(28),
+    motion.travel.easing,
+  );
   const x =
     pattern === "two-holes"
-      ? mix(ramp(frame, 32, 4, EASE.inOut), 110, 150)
+      ? mix(
+          motion.ramp(frame, 32, motion.press.duration, motion.travel.easing),
+          110,
+          150,
+        )
       : 80 + 22 * progress;
   const y = pattern === "two-holes" ? 382 : 350 + 22 * progress;
   return (
     <g>
-      <path
-        d={`M80 440 L40 315 L${x} ${y - 30}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M80 440 L40 315 L${x} ${y - 30}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={3}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y - 30} V${y}` }}
+        profile={tokens.sketch.shape}
         data-making-tool="true"
-        d={`M${x} ${y - 30} V${y}`}
         stroke={accent}
-        strokeWidth={4}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
       <circle
         data-making-hand="true"
         cx={x}
         cy={y - 30}
         r={5}
-        fill={STOCK.orange}
+        fill={tokens.color.highlight}
       />
     </g>
   );

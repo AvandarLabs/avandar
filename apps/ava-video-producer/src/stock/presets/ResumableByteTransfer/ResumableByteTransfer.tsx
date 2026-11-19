@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ByteChunk } from "./ByteChunk";
 import { ByteCounters } from "./ByteCounters";
 import { getByteTransferFromFrame } from "./getByteTransferFromFrame";
@@ -17,7 +21,9 @@ export function ResumableByteTransfer({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transfer = getByteTransferFromFrame({ input, frame });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const transfer = getByteTransferFromFrame({ motion, input, frame });
   const checkpoint =
     84 + (input.acknowledgedBytes / input.file.sizeBytes) * 792;
   return (
@@ -28,9 +34,10 @@ export function ResumableByteTransfer({
         checkpoint={checkpoint}
         frame={frame}
       />
-      <path
-        d="M900 207 V407 l-5 -8 m5 8 l5 -8"
-        stroke={STOCK.muted}
+      <SketchedShape
+        shape={{ kind: "path", d: "M900 207 V407 l-5 -8 m5 8 l5 -8" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
         fill="none"
       />
       {transfer.chunks.map((chunk) => {

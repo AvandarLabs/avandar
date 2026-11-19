@@ -1,5 +1,10 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ProvenanceSource } from "./ProvenanceSource";
 import { ProvenanceSummary } from "./ProvenanceSummary";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,6 +18,9 @@ export function ProvenancePeelback({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const selected = input.sources.find(propEq("id", input.selectedSourceId))!;
   const remaining = input.sources.filter(
     propNotEq("id", input.selectedSourceId),
@@ -38,14 +46,15 @@ export function ProvenancePeelback({
         data-source-id={selected.id}
         data-excerpt={selected.excerpt}
         data-locator={input.showLocators ? selected.locator : undefined}
-        opacity={ramp(frame, 82, 22)}
+        opacity={motion.ramp(frame, 82, motion.scale(22))}
       >
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: "M464 330H480V192H512" }}
+          profile={tokens.sketch.shape}
           data-citation-link="selected-passage"
-          d="M464 330H480V192H512"
           fill="none"
           stroke={accent}
-          strokeWidth={1}
+          strokeWidth={scales.stroke(tokens.stroke.hairline)}
         />
       </g>
     </g>

@@ -1,5 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,8 +16,15 @@ export function FoundationSlab({
   piece,
   isMask,
 }: Readonly<Props>): ReactNode {
-  const joining = ramp(frame, 72, 36, EASE.inOut);
-  const reveal = ramp(frame, 48, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const joining = motion.ramp(
+    frame,
+    72,
+    motion.scale(36),
+    motion.travel.easing,
+  );
+  const reveal = motion.ramp(frame, 48, motion.scale(24));
   const geometry = {
     left: { x: 80, y: 390, width: mix(joining, 350, 400), height: 160 },
     right: {
@@ -38,7 +48,7 @@ export function FoundationSlab({
         !isMask && piece === "continuous" ? true : undefined
       }
       {...geometry}
-      fill={isMask ? undefined : STOCK.elevated}
+      fill={isMask ? undefined : tokens.color.elevated}
     />
   );
 }

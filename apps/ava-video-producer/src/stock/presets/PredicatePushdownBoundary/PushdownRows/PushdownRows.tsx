@@ -45,7 +45,7 @@ export function PushdownRows({
     motion.travel.easing,
   );
   return (
-    <g opacity={ramp(frame, ROWS_CUE, motion.scale(ROWS_FADE_FRAMES))}>
+    <g opacity={motion.ramp(frame, ROWS_CUE, motion.scale(ROWS_FADE_FRAMES))}>
       {matches.map((row, index) => {
         return (
           <PushdownRow
@@ -58,7 +58,11 @@ export function PushdownRows({
               246 + index * 32,
             )}
             source={false}
-            opacity={ramp(frame, TRAVEL_CUE, motion.scale(COPY_FADE_FRAMES))}
+            opacity={motion.ramp(
+              frame,
+              TRAVEL_CUE,
+              motion.scale(COPY_FADE_FRAMES),
+            )}
             accent={accent}
           />
         );

@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { x: number; y: number; margins: number };
@@ -9,15 +10,16 @@ export function ReportHeaderPaper({
   y,
   margins,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
-    <rect
+    <StockRect
       data-header-paper="first-page"
       x={x - 16}
       y={14}
       width={mix(margins, 740, 800)}
       height={y - 22}
-      fill={STOCK.surface}
-      stroke={STOCK.line}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
     />
   );
 }

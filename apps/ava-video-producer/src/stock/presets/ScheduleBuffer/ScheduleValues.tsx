@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { value: number; unitLabel: string; x: number; slotWidth: number };
@@ -10,6 +10,7 @@ export function ScheduleValues({
   x,
   slotWidth,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <FitText
@@ -30,7 +31,7 @@ export function ScheduleValues({
         fontSize={12}
         normalizeWhitespace
         breakLongWords
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
     </g>
   );

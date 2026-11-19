@@ -1,11 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Routing information is intentionally visible on the closed envelope. */
 export function ExteriorAddress({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (
     !input.showLabels ||
     frame < 66 ||
@@ -30,7 +31,7 @@ export function ExteriorAddress({ frame, input }: Readonly<Props>): ReactNode {
               y={y - 16}
               width={480}
               height={40}
-              fill={STOCK.elevated}
+              fill={tokens.color.elevated}
             />
             <FitText
               {...{ text, y }}
@@ -41,7 +42,7 @@ export function ExteriorAddress({ frame, input }: Readonly<Props>): ReactNode {
               anchor="middle"
               normalizeWhitespace
               breakLongWords
-              color={STOCK.muted}
+              color={tokens.color.textMuted}
             />
           </g>
         );

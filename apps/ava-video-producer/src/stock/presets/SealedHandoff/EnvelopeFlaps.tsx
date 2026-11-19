@@ -1,5 +1,9 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { EnvelopeCover } from "./EnvelopeCover";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
@@ -11,37 +15,58 @@ export function EnvelopeFlaps({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const lower = ramp(frame, 36, 12);
-  const sides = ramp(frame, 44, 12);
-  const final = ramp(frame, 56, 10);
-  const opening = input.revealRule === "recipient" ? ramp(frame, 120, 16) : 0;
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const lower = motion.reveal(frame, 36);
+  const sides = motion.reveal(frame, 44);
+  const final = motion.ramp(frame, 56, motion.scale(10));
+  const opening =
+    input.revealRule === "recipient"
+      ? motion.ramp(frame, 120, motion.scale(16))
+      : 0;
   const coverProgress = frame < 66 ? final : 1 - opening;
   return (
     <g data-cover-progress={coverProgress}>
-      <path
-        d={`M0 266 L268 ${mix(lower * (1 - opening), 350, 134)} L536 266 z`}
-        fill={STOCK.elevated}
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M0 266 L268 ${mix(lower * (1 - opening), 350, 134)} L536 266 z`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.elevated}
+        stroke={tokens.color.line}
       />
-      <path
-        d={`M0 0 L${mix(sides * (1 - opening), -36, 268)} 133 L0 266 z M536 0 L${mix(sides * (1 - opening), 572, 268)} 133 L536 266 z`}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M0 0 L${mix(sides * (1 - opening), -36, 268)} 133 L0 266 z M536 0 L${mix(sides * (1 - opening), 572, 268)} 133 L536 266 z`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       {frame >= 66 ? <EnvelopeCover opening={opening} /> : undefined}
       {frame >= 56 ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M0 0 L268 ${mix(final * (1 - opening), -84, 134)} L536 0 z`,
+          }}
+          profile={tokens.sketch.shape}
           data-final-flap="opaque"
-          d={`M0 0 L268 ${mix(final * (1 - opening), -84, 134)} L536 0 z`}
-          fill={STOCK.surface}
+          fill={tokens.color.surface}
           stroke={accent}
         />
       ) : undefined}
       {frame >= 66 && opening === 0 ? (
-        <path
-          d="M0 266 L268 134 L536 266 M0 0 L268 134 L536 0"
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: "M0 266 L268 134 L536 266 M0 0 L268 134 L536 0",
+          }}
+          profile={tokens.sketch.shape}
           fill="none"
-          stroke={STOCK.line}
+          stroke={tokens.color.line}
         />
       ) : undefined}
     </g>

@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 /** Inputs for TableFieldHeadings. */
@@ -12,8 +12,9 @@ export function TableFieldHeadings({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 106, 12)}>
+    <g opacity={motion.reveal(frame, 106)}>
       <LabelSlots labels={[[input.copy.result, 300, 145, 608, 14, 2]]} />
       {input.fields.map((field, index) => {
         return (

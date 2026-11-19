@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RetryBackoff.schema";
 /** Data for getBackoffStateFromInputAndFrame. */
 type GetBackoffStateMarkers = {
@@ -17,7 +18,8 @@ type GetBackoffStateMarkers = {
 export function getBackoffStateFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): {
+  motion,
+}: Readonly<{ frame: number; input: Input; motion: VideoMotion }>): {
   markers: GetBackoffStateMarkers[];
   tokenX: number;
   tokenY: number;
@@ -45,13 +47,16 @@ export function getBackoffStateFromInputAndFrame({
     [...markers].reverse().find((marker) => {
       return frame >= marker.at;
     }) ?? markers[0];
-  const excursion = Math.sin(Math.PI * ramp(frame, active.at, 12, EASE.inOut));
+  const excursion = Math.sin(
+    Math.PI *
+      motion.ramp(frame, active.at, motion.scale(12), motion.travel.easing),
+  );
   const travel = active.attempt.delayAfter
-    ? ramp(
+    ? motion.ramp(
         frame,
         active.at + 12,
         (waitFrames * active.attempt.delayAfter) / totalDelay,
-        EASE.inOut,
+        motion.travel.easing,
       )
     : 0;
   return {

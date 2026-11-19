@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,7 @@ export function SnapshotColumnHeading({
   frame,
   index,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const column = input.table.columns[index],
     selectedIndex = input.selection.columnIds.indexOf(column.id);
   const sourceWidth = 400 / input.table.columns.length,
@@ -33,13 +35,17 @@ export function SnapshotColumnHeading({
         />
       ) : undefined}
       {selectedIndex >= 0 ? (
-        <g opacity={ramp(frame, 56, 1)}>
+        <g opacity={motion.ramp(frame, 56, motion.scale(1))}>
           <LabelSlots
             labels={[
               [
                 column.label,
                 516 + selectedIndex * destinationWidth,
-                mix(ramp(frame, 92, 3, EASE.inOut), 156, 176),
+                mix(
+                  motion.ramp(frame, 92, motion.scale(3), motion.travel.easing),
+                  156,
+                  176,
+                ),
                 destinationWidth - 16,
                 12,
                 4,

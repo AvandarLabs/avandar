@@ -1,6 +1,12 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { TradeoffPoints } from "./TradeoffPoints";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
@@ -20,18 +26,21 @@ export function TradeoffLeaf({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const isGain = side === "gain";
   const isFirst = isGain === (input.revealOrder === "gain-first");
-  const entrance = ramp(
+  const entrance = motion.ramp(
     frame,
     isFirst ? 36 : 72,
-    isFirst ? 30 : 36,
-    EASE.inOut,
+    motion.scale(isFirst ? 30 : 36),
+    motion.travel.easing,
   );
   const angle = (isGain ? -7 : 7) * (1 - entrance);
   const x = isGain ? 54 : 498;
-  const color = isGain ? accent : STOCK.orange;
-  const panel = { x, y: 170, width: 408, height: 328, rx: 16 };
+  const color = isGain ? accent : tokens.color.highlight;
+  const panel = { x, y: 170, width: 408, height: 328, rx: scales.corner(16) };
   const label = {
     text: input.sideLabels[side],
     x: x + 204,
@@ -46,11 +55,16 @@ export function TradeoffLeaf({
       opacity={entrance}
       transform={`translate(480 170) rotate(${angle}) scale(${mix(entrance, 0.06, 1)} 1) translate(-480 -170)`}
     >
-      <rect {...panel} fill={STOCK.surface} stroke={STOCK.line} />
-      <path
-        d={isGain ? "M462 184 H480" : "M480 184 H498"}
+      <StockRect
+        {...panel}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: isGain ? "M462 184 H480" : "M480 184 H498" }}
+        profile={tokens.sketch.shape}
         stroke={color}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <g aria-label={label.text}>
         <FitText

@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 /** Data for getRequestPositionFromInputAndFrame. */
 type GetRequestPositionResult = {
@@ -15,7 +16,12 @@ type GetRequestPositionResult = {
 export function getRequestPositionFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetRequestPositionResult {
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): GetRequestPositionResult {
   const width = 860 / input.slots.length - 4;
   const requested =
     50 +
@@ -35,10 +41,15 @@ export function getRequestPositionFromInputAndFrame({
           860) /
           input.slots.length +
         2;
-  const approach = ramp(frame, 39, 21, EASE.inOut),
-    lift = ramp(frame, 60, 16, EASE.inOut);
-  const travel = ramp(frame, 77, 28, EASE.inOut),
-    land = ramp(frame, 105, 25, EASE.inOut);
+  const approach = motion.ramp(
+      frame,
+      39,
+      motion.scale(21),
+      motion.travel.easing,
+    ),
+    lift = motion.ramp(frame, 60, motion.scale(16), motion.travel.easing);
+  const travel = motion.ramp(frame, 77, motion.scale(28), motion.travel.easing),
+    land = motion.ramp(frame, 105, motion.scale(25), motion.travel.easing);
   return {
     x: mix(travel, mix(approach, 270, requested), destination),
     y: mix(

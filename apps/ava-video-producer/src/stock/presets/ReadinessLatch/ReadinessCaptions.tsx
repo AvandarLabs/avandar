@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
 
@@ -26,6 +26,7 @@ export function ReadinessCaptions({
   frame,
   allReady,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const captions = [
     {
       text: allReady && frame >= 122 ? input.copy.released : input.copy.held,
@@ -36,7 +37,7 @@ export function ReadinessCaptions({
       text: input.copy.example,
       y: 596,
       fontSize: 12 as const,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
   ];
   return (

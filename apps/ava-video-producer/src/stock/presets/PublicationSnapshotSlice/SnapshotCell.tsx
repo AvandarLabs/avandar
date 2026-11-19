@@ -1,5 +1,10 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
 import { SnapshotCellText } from "./SnapshotCellText";
 import type { Input } from "./PublicationSnapshotSlice.schema";
@@ -24,7 +29,11 @@ export function SnapshotCell({
   columnIndex,
   snapshot,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const scene = getSnapshotCellFromFrame({
+    motion,
     input,
     frame,
     rowIndex,
@@ -37,7 +46,7 @@ export function SnapshotCell({
   const identity = `${scene.row.id}:${scene.column.id}`;
   return (
     <g opacity={snapshot ? scene.copyOpacity : 1}>
-      <rect
+      <StockRect
         data-snapshot-cell={snapshot ? identity : undefined}
         data-live-cell={!snapshot ? identity : undefined}
         data-value={scene.value}
@@ -47,13 +56,21 @@ export function SnapshotCell({
         y={scene.y}
         width={scene.width}
         height={72}
-        fill={STOCK.surface}
-        stroke={scene.selected ? accent : STOCK.line}
-        strokeWidth={
+        fill={tokens.color.surface}
+        stroke={scene.selected ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
           scene.selected
-            ? 1 + ramp(frame, 13 + rowIndex * 2 + columnIndex * 2, 22)
-            : 1
-        }
+            ? mix(
+                motion.ramp(
+                  frame,
+                  13 + (rowIndex + columnIndex) * motion.stagger.list,
+                  motion.scale(22),
+                ),
+                tokens.stroke.hairline,
+                tokens.stroke.default,
+              )
+            : tokens.stroke.hairline,
+        )}
       />
       <SnapshotCellText scene={scene} frame={frame} />
     </g>

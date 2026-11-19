@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ProseMeasurementLedger.schema";
 
 const ROLES: readonly [
@@ -34,10 +35,12 @@ export function getObservationSlotFromFrame({
   input,
   frame,
   index,
+  motion,
 }: Readonly<{
   input: Input;
   frame: number;
   index: number;
+  motion: VideoMotion;
 }>): GetObservationSlotFromFrameResult {
   const role = ROLES[index],
     fragment = input.fragments.find(propEq("role", role))!;
@@ -50,9 +53,24 @@ export function getObservationSlotFromFrame({
     return glyph.end > start;
   })!;
   const departure = 56 + ((index + 3) % 6) * 8.5;
-  const progress = ramp(frame, departure, 8, EASE.inOut),
-    alignment = ramp(frame, departure, 3, EASE.inOut),
-    descent = ramp(frame, departure + 3, 5, EASE.inOut);
+  const progress = motion.ramp(
+      frame,
+      departure,
+      motion.whip,
+      motion.travel.easing,
+    ),
+    alignment = motion.ramp(
+      frame,
+      departure,
+      motion.scale(3),
+      motion.travel.easing,
+    ),
+    descent = motion.ramp(
+      frame,
+      departure + 3,
+      motion.scale(5),
+      motion.travel.easing,
+    );
   const slotX = 52 + (index % 3) * 294,
     slotY = 315 + Math.floor(index / 3) * 110;
   return {
@@ -61,9 +79,10 @@ export function getObservationSlotFromFrame({
     slotX,
     slotY,
     departure,
-    opacity: ramp(frame, departure, 1),
-    captionOpacity: ramp(frame, departure + 8, 2),
-    movingCaptionOpacity: 1 - ramp(frame, departure + 7, 1),
+    opacity: motion.ramp(frame, departure, motion.scale(1)),
+    captionOpacity: motion.ramp(frame, departure + 8, motion.scale(2)),
+    movingCaptionOpacity:
+      1 - motion.ramp(frame, departure + 7, motion.scale(1)),
     x: mix(alignment, Math.min(origin.x, 664), slotX + 12),
     y: mix(descent, 238, slotY + 49),
     value: fragment.text

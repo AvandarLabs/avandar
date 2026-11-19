@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleBackdrop } from "./ScheduleBackdrop";
 import { ScheduledTask } from "./ScheduledTask";
@@ -15,10 +15,11 @@ export function ScheduleBuffer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const state = getScheduleGeometryFromInputAndFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const state = getScheduleGeometryFromInputAndFrame({ motion, frame, input });
   const numSlots = input.tasks.length + 2;
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <ScheduleBackdrop input={input} />
       {state.tasks.map((task, index) => {
         return (

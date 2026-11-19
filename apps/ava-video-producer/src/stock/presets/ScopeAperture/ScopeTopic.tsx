@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ScopeTopicCopy } from "./ScopeTopicCopy";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
@@ -20,7 +21,13 @@ export function ScopeTopic({
   membershipIndex,
   showExcluded,
 }: Readonly<Props>): ReactNode {
-  const contraction = ramp(frame, 36, 72, EASE.inOut);
+  const motion = useGraphicMotion();
+  const contraction = motion.ramp(
+    frame,
+    36,
+    motion.scale(72),
+    motion.travel.easing,
+  );
   const initialX = index % 2 === 0 ? 260 : 700;
   const initialY = 215 + Math.floor(index / 2) * 120;
   const finalX = topic.included ? 480 : membershipIndex % 2 === 0 ? 130 : 830;
@@ -30,8 +37,10 @@ export function ScopeTopic({
   const x = mix(contraction, initialX, finalX);
   const y = mix(contraction, initialY, finalY);
   const opacity =
-    ramp(frame, 12 + index * 2, 12) *
-    (topic.included || showExcluded ? 1 : 1 - ramp(frame, 96, 24));
+    motion.reveal(frame, 12 + index * motion.stagger.list) *
+    (topic.included || showExcluded
+      ? 1
+      : 1 - motion.ramp(frame, 96, motion.scale(24)));
   return (
     <g
       data-topic={topic.id}

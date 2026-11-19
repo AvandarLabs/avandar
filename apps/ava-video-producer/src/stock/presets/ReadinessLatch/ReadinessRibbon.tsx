@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReadinessRibbonLabels } from "./ReadinessRibbonLabels";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
@@ -13,12 +18,8 @@ type Props = {
   input: Input;
   accent: string;
 };
-const PIN: { stroke: "#f0ba83"; strokeWidth: number; strokeLinecap: "round" } =
-  {
-    stroke: STOCK.orange,
-    strokeWidth: 6,
-    strokeLinecap: "round" as const,
-  };
+/** The retractable pin's line weight, before the theme's line weight scale. */
+const PIN_WIDTH = 6;
 /** A stable branch owns one progressing ribbon and one retractable pin. */
 export function ReadinessRibbon({
   participant,
@@ -29,14 +30,20 @@ export function ReadinessRibbon({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const horizontal = input.orientation === "horizontal";
   const position = (index * 280) / (numParticipants - 1);
   const x = horizontal ? 300 : 300 + (index * 584) / (numParticipants - 1);
   const y = horizontal ? 135 + position : 300;
   const duration = (88 * participant.workUnits) / maxWork;
   const progress =
-    ramp(frame, 24, duration, EASE.inOut) * (participant.ready ? 1 : 0.72);
-  const withdrawal = participant.ready ? ramp(frame, 24 + duration, 8) : 0;
+    motion.ramp(frame, 24, duration, motion.travel.easing) *
+    (participant.ready ? 1 : 0.72);
+  const withdrawal = participant.ready
+    ? motion.ramp(frame, 24 + duration, motion.whip)
+    : 0;
   const state =
     participant.ready && frame >= 24 + duration
       ? input.copy.ready
@@ -60,10 +67,32 @@ export function ReadinessRibbon({
   };
   const labels = { participant, input, state, horizontal, x, y };
   return (
-    <g opacity={ramp(frame, 12 + index * 2, 10)}>
-      <rect {...track} rx={4} fill={STOCK.line} />
-      <rect data-ribbon={participant.id} {...ribbon} rx={4} fill={accent} />
-      <line data-pin={participant.id} {...pin} {...PIN} />
+    <g
+      opacity={motion.ramp(
+        frame,
+        12 + index * motion.stagger.list,
+        motion.scale(10),
+      )}
+    >
+      <rect
+        {...track}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.line}
+      />
+      <rect
+        data-ribbon={participant.id}
+        {...ribbon}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={accent}
+      />
+      <SketchedShape
+        data-pin={participant.id}
+        shape={{ kind: "line", ...pin }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(PIN_WIDTH)}
+        strokeLinecap="round"
+      />
       {input.showLabels ? <ReadinessRibbonLabels {...labels} /> : undefined}
     </g>
   );

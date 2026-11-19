@@ -1,5 +1,10 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 
@@ -10,8 +15,11 @@ export function DraftReview({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
-    <g opacity={ramp(frame, 106, 29)}>
+    <g opacity={motion.ramp(frame, 106, motion.scale(29))}>
       <LabelSlots
         labels={[
           [input.review.reviewerLabel, 60, 515, 400, 12, 3],
@@ -29,12 +37,13 @@ export function DraftReview({
         ]}
       />
       {input.review.outcome === "accept" ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: "M875 560 L883 568 L901 548" }}
+          profile={tokens.sketch.shape}
           data-acceptance="true"
-          d="M875 560 L883 568 L901 548"
           fill="none"
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       ) : undefined}
     </g>

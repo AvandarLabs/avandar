@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ReserveHatching } from "./ReserveHatching";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
@@ -16,18 +17,19 @@ export function ScheduleReserve({
   input,
   numSlots,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
-      <rect
+      <StockRect
         data-reserve-segment="true"
         data-remaining-reserve={Number(state.remaining.toFixed(5))}
         x={state.reserveX}
         y={310}
         width={state.reserveWidth}
         height={60}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeDasharray="4 4"
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeDasharray={tokens.dash.pending.join(" ")}
       />
       <ReserveHatching x={state.reserveX} width={state.reserveWidth} />
       <ScheduleLabelSlot
@@ -37,7 +39,7 @@ export function ScheduleReserve({
         unitLabel={input.unitLabel}
         showValues={input.showValues}
         targetX={state.reserveX + state.reserveWidth / 2}
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
         numSlots={numSlots}
       />
     </g>

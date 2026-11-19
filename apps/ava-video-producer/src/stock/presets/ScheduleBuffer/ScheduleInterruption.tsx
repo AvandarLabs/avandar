@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
 import type { Input } from "./ScheduleBuffer.schema";
@@ -11,6 +15,8 @@ type Props = {
   numSlots: number;
   frame: number;
 };
+/** The tint of the interruption segment, before the theme's tint strength. */
+const INTERRUPTION_TINT = 0.3;
 /** The delay descends into the gap opened after its named task. */
 export function ScheduleInterruption({
   state,
@@ -18,18 +24,21 @@ export function ScheduleInterruption({
   numSlots,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
-    <g opacity={ramp(frame, 44, 30)}>
-      <rect
+    <g opacity={motion.ramp(frame, 44, motion.scale(30))}>
+      <StockRect
         data-interruption-segment="true"
         x={state.delayX}
         y={state.delayY}
         width={state.delayWidth}
         height={60}
-        fill={STOCK.orange}
-        fillOpacity={0.3}
-        stroke={STOCK.orange}
-        strokeWidth={2}
+        fill={tokens.color.highlight}
+        fillOpacity={scales.wash(INTERRUPTION_TINT)}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <ScheduleLabelSlot
         index={input.tasks.length + 1}
@@ -38,7 +47,7 @@ export function ScheduleInterruption({
         unitLabel={input.unitLabel}
         showValues={input.showValues}
         targetX={state.delayX + state.delayWidth / 2}
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         numSlots={numSlots}
       />
     </g>
