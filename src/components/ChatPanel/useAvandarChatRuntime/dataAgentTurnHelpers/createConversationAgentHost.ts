@@ -68,6 +68,32 @@ async function _showQuestionCard(
 }
 
 /**
+ * Shows the agent's query where the turn's page sends it, first noting it as
+ * the turn's last shown query: `data_explorer` when it goes to the Data
+ * Explorer, the turn's app otherwise. The SQL is already restored.
+ */
+function _showQuery(
+  state: AgentConversationState,
+  request: Parameters<DataAgentHost["showQuery"]>[0],
+): ReturnType<DataAgentHost["showQuery"]> {
+  const turn = state.turnRef.current;
+  const isOnExplorer = _isOnDataExplorer(turn);
+  state.lastShownQuery = {
+    sql: request.sql,
+    app: isOnExplorer ? "data_explorer" : turn.analyticsApp,
+  };
+  if (isOnExplorer) {
+    return createExplorerShowQuery(turn)(request);
+  }
+  return showQueryInChat({
+    workspaceId: turn.workspaceId,
+    title: getTurnQuestionLabel(turn),
+    results: state.results,
+    request,
+  });
+}
+
+/**
  * The browser host for one conversation's agent. Each call reads the
  * current turn, so a follow-up sent from another page shows its result
  * there: in the Data Explorer when the user is on it, in the chat otherwise.
@@ -83,16 +109,7 @@ export function createConversationAgentHost(
     workspaceId: firstTurn.workspaceId,
     userId: firstTurn.currentUser?.id,
     showQuery: (request) => {
-      const turn = state.turnRef.current;
-      if (_isOnDataExplorer(turn)) {
-        return createExplorerShowQuery(turn)(request);
-      }
-      return showQueryInChat({
-        workspaceId: turn.workspaceId,
-        title: getTurnQuestionLabel(turn),
-        results: state.results,
-        request,
-      });
+      return _showQuery(state, request);
     },
     checkQuery: (sql) => {
       return checkQueryOnDevice({

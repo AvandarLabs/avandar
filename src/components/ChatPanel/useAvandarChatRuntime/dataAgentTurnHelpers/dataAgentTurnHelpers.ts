@@ -7,6 +7,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
+import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
 import {
   createAgentAskRecord,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { hideEarlierPlaceholders } from "@/lib/agent/dataAgent/pagePrivacy/hideEarlierPlaceholders/hideEarlierPlaceholders";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { loadColumnCodes } from "@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
@@ -244,12 +246,14 @@ function _dropOtherChats(
 /**
  * Stops a run still in progress (a message sent before the last reply
  * finished) and waits for it to settle, so its turn keeps its results and
- * the agent is free for the next message.
+ * the agent is free for the next message. The stopped run's shown query is
+ * forgotten, so its turn logs no `chat.sql_generated`.
  */
 async function _stopAsk(
   conversation: DataAgentConversation,
   activeAsk: Promise<unknown>,
 ): Promise<void> {
+  conversation.lastShownQuery = undefined;
   conversation.dataAgent.agent.abort();
   await activeAsk.catch(() => {
     // The stopped turn reports its own failure.
@@ -533,8 +537,9 @@ async function _resolveTurnConversation(
 
 /**
  * Points the conversation at the turn. Each turn gets fresh lists, so a
- * stopped run's late results and cards land in its own, and the last
- * turn's question card is cleared.
+ * stopped run's late results and cards land in its own, the last turn's
+ * question card is cleared, and no query an earlier turn showed is logged
+ * again.
  */
 function _startTurn(
   options: Readonly<{
@@ -552,6 +557,7 @@ function _startTurn(
   conversation.results = results;
   conversation.resultsByTurn.push(results);
   conversation.dashboardCards = dashboardCards;
+  conversation.lastShownQuery = undefined;
   turn.chatPanelDispatch.setPendingClarification(undefined);
   return { results, dashboardCards };
 }
@@ -589,6 +595,31 @@ async function _recordAsk<Reply>(
     record(false);
     throw error;
   }
+}
+
+/**
+ * Logs one `chat.sql_generated` for a kept answer that showed a query, with
+ * the last query it showed. An answer whose turn went stale, or is no longer
+ * the conversation's current turn, logs nothing.
+ */
+function _logShownQuery(
+  conversation: DataAgentConversation,
+  turn: Readonly<DataAgentTurnOptions>,
+): void {
+  const shownQuery = conversation.lastShownQuery;
+  if (
+    shownQuery === undefined ||
+    turn.isStale?.() ||
+    conversation.turnRef.current !== turn
+  ) {
+    return;
+  }
+  void AnalyticsClient.logEvent({
+    event: "chat.sql_generated",
+    workspaceId: turn.workspaceId,
+    app: shownQuery.app,
+    payload: ChatAnalyticsPayloads.fromSql(shownQuery.sql),
+  });
 }
 
 /**
@@ -637,6 +668,7 @@ export async function askConversationDataAgent(
     },
   });
   _reportReplyIfKept(turn, inputs);
+  _logShownQuery(conversation, turn);
   return _toRunResult({
     replyText: _replyTextOf(reply, turn),
     inputs,

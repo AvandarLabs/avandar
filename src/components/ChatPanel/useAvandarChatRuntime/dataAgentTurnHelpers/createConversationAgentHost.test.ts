@@ -525,3 +525,41 @@ describe("createConversationAgentHost question cards", () => {
     );
   });
 });
+
+describe("createConversationAgentHost shown queries", () => {
+  const KINGS_SQL = `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`;
+  const RESTORED_SQL = `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`;
+
+  it("notes the restored SQL as sent to the Data Explorer on that page", async () => {
+    const state = _stateWithKings(_turn("data-explorer"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: KINGS_SQL,
+      summary: "s",
+    });
+
+    expect(state.lastShownQuery).toEqual({
+      sql: RESTORED_SQL,
+      app: "data_explorer",
+    });
+  });
+
+  it("notes the turn's app for a query shown in the chat", async () => {
+    const state = _state(_turn("dashboard", { analyticsApp: "dashboards" }));
+
+    await createConversationAgentHost(state).showQuery(REQUEST);
+
+    expect(state.lastShownQuery).toEqual({
+      sql: REQUEST.sql,
+      app: "dashboards",
+    });
+  });
+
+  it("notes the Data Explorer for an offline turn with no page", async () => {
+    const state = _state(_turn(undefined, { isOffline: true }));
+
+    await createConversationAgentHost(state).showQuery(REQUEST);
+
+    expect(state.lastShownQuery?.app).toBe("data_explorer");
+  });
+});

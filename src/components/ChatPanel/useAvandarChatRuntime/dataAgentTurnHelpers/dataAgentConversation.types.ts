@@ -134,6 +134,12 @@ export type AgentConversationState = {
   sqlVault: SqlPlaceholderVault;
   /** Dashboard cards this turn added to the chat. Reset every turn. */
   dashboardCards: AgentDashboardBlockData[];
+  /**
+   * The last query this turn showed, and where it went, for the turn's one
+   * `chat.sql_generated`. Reset every turn, and cleared when a newer message
+   * stops the run.
+   */
+  lastShownQuery?: { sql: string; app: AnalyticsApp | undefined };
 };
 
 /**

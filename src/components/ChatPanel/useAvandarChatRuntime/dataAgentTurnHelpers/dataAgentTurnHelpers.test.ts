@@ -8,6 +8,7 @@ import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDash
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { createAgentAskRecord } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
 import {
   askConversationDataAgent,
@@ -25,6 +26,10 @@ const { loadColumnCodesMock } = vi.hoisted(() => {
 
 vi.mock("@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes", () => {
   return { loadColumnCodes: loadColumnCodesMock };
+});
+
+vi.mock("@/lib/analytics/AnalyticsClient", () => {
+  return { AnalyticsClient: { logEvent: vi.fn() } };
 });
 
 vi.mock(
@@ -1235,6 +1240,147 @@ describe("askConversationDataAgent", () => {
         expect(conversations.get(KEY)).toBe(conversation);
         expect(conversation.asked.at(-1)).toBe(`${TRY_AGAIN_LINE}\n\nSecond?`);
       });
+    });
+  });
+
+  describe("the chat.sql_generated event", () => {
+    /** A conversation whose ask shows each query in turn, as the host would. */
+    function _showing(
+      sqls: readonly string[],
+      app: "data_explorer" | "dashboards" = "data_explorer",
+    ): FakeConversation {
+      const conversation = _fakeConversation(async () => {
+        sqls.forEach((sql) => {
+          conversation.lastShownQuery = { sql, app };
+        });
+        return { text: "Here it is." };
+      });
+      return conversation;
+    }
+
+    beforeEach(() => {
+      vi.mocked(AnalyticsClient.logEvent).mockClear();
+    });
+
+    it("logs one event with the shown query's length", async () => {
+      await _ask(
+        new Map([["workspace-1:0", _showing(["SELECT 1"])]]),
+        _turn("How many?"),
+      );
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith({
+        event: "chat.sql_generated",
+        workspaceId: "workspace-1",
+        app: "data_explorer",
+        payload: { sqlChars: 8 },
+      });
+    });
+
+    it("logs one event for three queries, with the last one's length", async () => {
+      await _ask(
+        new Map([
+          ["workspace-1:0", _showing(["SELECT 1", "SELECT 22", "SELECT 333"])],
+        ]),
+        _turn("How many?"),
+      );
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ payload: { sqlChars: 10 } }),
+      );
+    });
+
+    it("names the app the host noted", async () => {
+      await _ask(
+        new Map([["workspace-1:0", _showing(["SELECT 1"], "dashboards")]]),
+        _turn("How many?"),
+      );
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ app: "dashboards" }),
+      );
+    });
+
+    it("logs nothing for an answer that showed no query", async () => {
+      await _ask(
+        new Map([["workspace-1:0", _showing([])]]),
+        _turn("How many?"),
+      );
+
+      expect(AnalyticsClient.logEvent).not.toHaveBeenCalled();
+    });
+
+    it("logs nothing when the ask rejects after showing a query", async () => {
+      const conversation = _fakeConversation(async () => {
+        conversation.lastShownQuery = { sql: "SELECT 1", app: "data_explorer" };
+        throw new Error("model down");
+      });
+
+      await expect(
+        _ask(new Map([["workspace-1:0", conversation]]), _turn("How many?")),
+      ).rejects.toThrow("model down");
+
+      expect(AnalyticsClient.logEvent).not.toHaveBeenCalled();
+    });
+
+    it("logs nothing for a turn that went stale", async () => {
+      await _ask(new Map([["workspace-1:0", _showing(["SELECT 1"])]]), {
+        ..._turn("How many?"),
+        isStale: () => {
+          return true;
+        },
+      });
+
+      expect(AnalyticsClient.logEvent).not.toHaveBeenCalled();
+    });
+
+    it("does not log an earlier turn's query again", async () => {
+      const conversation = _showing(["SELECT 1"]);
+      const conversations = new Map([["workspace-1:0", conversation]]);
+      await _ask(conversations, _turn("How many?"));
+      vi.mocked(conversation.dataAgent.ask).mockResolvedValueOnce({
+        text: "Hello.",
+      } as never);
+
+      await _ask(conversations, _turn(["How many?", "Here it is.", "Thanks!"]));
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+    });
+
+    it("logs only the newer turn's query when a newer message stops a run", async () => {
+      let finishFirstRun: (() => void) | undefined;
+      const conversation = _fakeConversation(async (text) => {
+        if (text === "First?") {
+          conversation.lastShownQuery = {
+            sql: "SELECT 1",
+            app: "data_explorer",
+          };
+          await new Promise<void>((resolve) => {
+            finishFirstRun = resolve;
+          });
+          return { text: "Stopped." };
+        }
+        conversation.lastShownQuery = { sql: "SELECT 22", app: "dashboards" };
+        return { text: "Second." };
+      });
+      vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+        finishFirstRun?.();
+      });
+      const conversations = new Map([["workspace-1:0", conversation]]);
+
+      await Promise.all([
+        _ask(conversations, _turn("First?")),
+        _ask(conversations, _turn(["First?", "Stopped.", "Second?"])),
+      ]);
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          app: "dashboards",
+          payload: { sqlChars: 9 },
+        }),
+      );
     });
   });
 });
