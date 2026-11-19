@@ -1,7 +1,6 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
-import { chatMessagesKey } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import { getAgentTurnKind } from "./getAgentTurnKind";
+import { createAgentAskRecord, getAgentTurnKind } from "./getAgentTurnKind";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { AgentAskRecord } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 
@@ -15,12 +14,17 @@ function _thread(contents: readonly string[]): ChatClientMessage.T[] {
   });
 }
 
+/** A thread with each message's role given, for two user messages in a row. */
+function _threadWithRoles(
+  messages: ReadonlyArray<readonly [ChatClientMessage.T["role"], string]>,
+): ChatClientMessage.T[] {
+  return messages.map(([role, content]) => {
+    return Model.make("ChatClientMessage", { role, content });
+  });
+}
+
 function _record(messages: readonly ChatClientMessage.T[]): AgentAskRecord {
-  return {
-    threadKey: chatMessagesKey(messages),
-    messageCount: messages.length,
-    isKept: true,
-  };
+  return createAgentAskRecord({ apiMessages: messages, isKept: true });
 }
 
 const ASKED = _thread(["How many?", "Forty-two.", "And deaths?"]);
@@ -64,7 +68,7 @@ describe("getAgentTurnKind", () => {
     ],
     [
       "a longer thread whose start differs",
-      ["How many?", "Forty-three.", "And deaths?", "Seven.", "And cases?"],
+      ["How many cases?", "Forty-two.", "And deaths?", "Seven.", "And cases?"],
     ],
   ])("calls %s rewound", (_label, contents) => {
     expect(
@@ -73,5 +77,40 @@ describe("getAgentTurnKind", () => {
         apiMessages: _thread(contents),
       }),
     ).toBe("rewound");
+  });
+});
+
+describe("getAgentTurnKind after a newer message stopped a run", () => {
+  // The newer turn was asked before the stopped run's reply landed, so its
+  // thread holds two user messages in a row.
+  const NEWER_ASK = _record(
+    _threadWithRoles([
+      ["user", "First?"],
+      ["user", "Second?"],
+    ]),
+  );
+
+  it("calls a follow-up a continuation once the stopped run's reply lands", () => {
+    expect(
+      getAgentTurnKind({
+        lastAsk: NEWER_ASK,
+        apiMessages: _thread([
+          "First?",
+          "Stopped.",
+          "Second?",
+          "Second.",
+          "Third?",
+        ]),
+      }),
+    ).toBe("continues");
+  });
+
+  it("calls a Try again of the newer answer the same thread", () => {
+    expect(
+      getAgentTurnKind({
+        lastAsk: NEWER_ASK,
+        apiMessages: _thread(["First?", "Stopped.", "Second?"]),
+      }),
+    ).toBe("same_thread");
   });
 });

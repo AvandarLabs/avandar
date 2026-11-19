@@ -236,6 +236,50 @@ describe("agent Try again", () => {
     expect(_askedText(3)).not.toContain(TRY_AGAIN_LINE);
   });
 
+  it("keeps a follow-up on the same agent after a newer message stopped a run", async () => {
+    const adapter = _createAdapter();
+    let finishFirstRun: (() => void) | undefined;
+    createDataAgentMock.mockImplementation(() => {
+      return {
+        agent: {
+          abort: vi.fn(() => {
+            finishFirstRun?.();
+          }),
+          state: { messages: [] },
+        },
+        ask: askMock,
+      };
+    });
+    askMock.mockImplementation(async (text: string) => {
+      if (text.endsWith("First?")) {
+        await new Promise<void>((resolve) => {
+          finishFirstRun = resolve;
+        });
+        return { text: "Stopped." };
+      }
+      return { text: "Answered." };
+    });
+
+    const firstRun = _run(adapter, [_user("First?")]);
+    await vi.waitFor(() => {
+      expect(askMock).toHaveBeenCalledTimes(1);
+    });
+    // The stopped reply is still empty when the newer message is sent.
+    await _run(adapter, [_user("First?"), _assistant(""), _user("Second?")]);
+    await firstRun;
+    await _run(adapter, [
+      _user("First?"),
+      _assistant("Stopped."),
+      _user("Second?"),
+      _assistant("Answered."),
+      _user("Third?"),
+    ]);
+
+    expect(createDataAgentMock).toHaveBeenCalledTimes(1);
+    expect(_askedText(2)).not.toContain("Earlier in this conversation");
+    expect(_askedText(2).endsWith("Third?")).toBe(true);
+  });
+
   it("still posts today's retry context with the agent switched off", async () => {
     isAgentEnabledMock.mockReturnValue(false);
     apiPostMock.mockResolvedValue(

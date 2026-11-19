@@ -7,9 +7,11 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
-import { chatMessagesKey } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
-import { getAgentTurnKind } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind";
+import {
+  createAgentAskRecord,
+  getAgentTurnKind,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
   readAppliedSqlResult,
@@ -475,7 +477,9 @@ type TurnConversation = {
 
 /**
  * Stops a conversation's agent and removes it from the map, so the next
- * lookup starts a new conversation from the thread's recap.
+ * lookup starts a new conversation from the thread's recap. The map entry is
+ * removed only while it still holds this conversation, so a newer one that
+ * another turn already put there stays.
  */
 function _dropConversation(
   options: Readonly<{
@@ -484,8 +488,12 @@ function _dropConversation(
     conversation: DataAgentConversation;
   }>,
 ): void {
-  options.conversation.dataAgent.agent.abort();
-  options.conversations.delete(buildConversationKey(options.turn));
+  const { conversations, conversation } = options;
+  const key = buildConversationKey(options.turn);
+  conversation.dataAgent.agent.abort();
+  if (conversations.get(key) === conversation) {
+    conversations.delete(key);
+  }
 }
 
 /**
@@ -552,8 +560,10 @@ function _startTurn(
  * Runs the ask, then records the thread it was given and whether its reply
  * is kept: the ask resolved and the turn is not stale. A rejected ask is
  * recorded as not kept and rethrown. Only the conversation's current turn
- * writes, so a run a newer message stopped never overwrites the newer
- * turn's record.
+ * writes: a run that settles after a newer turn has started leaves that
+ * turn's record alone. A run a newer message stops usually settles before
+ * the newer turn starts, so it writes its own record first, and the newer
+ * turn's record replaces it once that turn's ask settles.
  */
 async function _recordAsk<Reply>(
   options: Readonly<{
@@ -565,11 +575,10 @@ async function _recordAsk<Reply>(
   const { conversation, turn } = options;
   const record = (isKept: boolean): void => {
     if (conversation.turnRef.current === turn) {
-      conversation.lastAsk = {
-        threadKey: chatMessagesKey(turn.apiMessages),
-        messageCount: turn.apiMessages.length,
+      conversation.lastAsk = createAgentAskRecord({
+        apiMessages: turn.apiMessages,
         isKept,
-      };
+      });
     }
   };
   try {

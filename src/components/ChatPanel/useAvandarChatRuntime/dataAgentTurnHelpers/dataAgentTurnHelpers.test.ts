@@ -7,7 +7,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
-import { chatMessagesKey } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import { createAgentAskRecord } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
 import {
   askConversationDataAgent,
@@ -301,6 +301,18 @@ describe("askConversationDataAgent", () => {
       }),
       chatPanelDispatch: { setPendingClarification: vi.fn() },
     } as unknown as DataAgentTurnOptions;
+  }
+
+  /** A turn with each message's role given, for two user messages in a row. */
+  function _turnWithRoles(
+    messages: ReadonlyArray<readonly ["user" | "assistant", string]>,
+  ): DataAgentTurnOptions {
+    return {
+      ..._turn([]),
+      apiMessages: messages.map(([role, content]) => {
+        return Model.make("ChatClientMessage", { role, content });
+      }),
+    };
   }
 
   function _ask(
@@ -1146,12 +1158,83 @@ describe("askConversationDataAgent", () => {
       const secondReply = _ask(conversations, secondTurn);
       await Promise.all([firstReply, secondReply]);
 
-      expect(conversation.lastAsk).toEqual({
-        threadKey: chatMessagesKey(secondTurn.apiMessages),
-        messageCount: 3,
-        isKept: true,
-      });
+      expect(conversation.lastAsk).toEqual(
+        createAgentAskRecord({
+          apiMessages: secondTurn.apiMessages,
+          isKept: true,
+        }),
+      );
       expect(conversation.asked).toEqual(["First?", "Second?"]);
+    });
+
+    describe("after a newer message stopped a run", () => {
+      /**
+       * Asks "First?", then stops it with "Second?" before its reply lands,
+       * so the newer turn's thread holds two user messages in a row, as the
+       * chat sends it while the stopped reply is still empty.
+       */
+      async function _askStoppedThenNewer() {
+        let finishFirstRun: (() => void) | undefined;
+        const conversation = _fakeConversation(async (text) => {
+          if (text === "First?") {
+            await new Promise<void>((resolve) => {
+              finishFirstRun = resolve;
+            });
+            return { text: "Stopped." };
+          }
+          return { text: "Answered." };
+        });
+        vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+          finishFirstRun?.();
+        });
+        const conversations = new Map<string, DataAgentConversation>([
+          [KEY, conversation],
+        ]);
+        const createConversation = vi.fn(async () => {
+          return _fakeConversation();
+        });
+        const askTurn = (turn: DataAgentTurnOptions) => {
+          return askConversationDataAgent({
+            conversations,
+            turn,
+            createConversation,
+          });
+        };
+        await Promise.all([
+          askTurn(_turn("First?")),
+          askTurn(
+            _turnWithRoles([
+              ["user", "First?"],
+              ["user", "Second?"],
+            ]),
+          ),
+        ]);
+        return { conversation, conversations, createConversation, askTurn };
+      }
+
+      it("asks a follow-up on the same conversation once the stopped reply lands", async () => {
+        const { conversation, conversations, createConversation, askTurn } =
+          await _askStoppedThenNewer();
+
+        await askTurn(
+          _turn(["First?", "Stopped.", "Second?", "Answered.", "Third?"]),
+        );
+
+        expect(createConversation).not.toHaveBeenCalled();
+        expect(conversations.get(KEY)).toBe(conversation);
+        expect(conversation.asked.at(-1)).toBe("Third?");
+      });
+
+      it("sends the Try again line when the newer answer is retried", async () => {
+        const { conversation, conversations, createConversation, askTurn } =
+          await _askStoppedThenNewer();
+
+        await askTurn(_turn(["First?", "Stopped.", "Second?"]));
+
+        expect(createConversation).not.toHaveBeenCalled();
+        expect(conversations.get(KEY)).toBe(conversation);
+        expect(conversation.asked.at(-1)).toBe(`${TRY_AGAIN_LINE}\n\nSecond?`);
+      });
     });
   });
 });

@@ -124,11 +124,17 @@ export type AgentConversationState = {
   dashboardCards: AgentDashboardBlockData[];
 };
 
-/** The thread one ask was given, and how the ask ended. */
+/**
+ * The user messages of the thread one ask was given, and how the ask ended.
+ * `askConversationDataAgent` writes it once an ask settles, through
+ * `createAgentAskRecord`, and `getAgentTurnKind` reads it to classify the
+ * next turn. Assistant messages are left out: a run a newer message stopped
+ * can fill in its reply after the newer turn was sent without it.
+ */
 export type AgentAskRecord = {
-  /** `chatMessagesKey` of the turn's `apiMessages`. */
+  /** `chatMessagesKey` of the user messages in the turn's `apiMessages`. */
   threadKey: string;
-  /** How many messages that thread held. */
+  /** How many user messages that thread held. */
   messageCount: number;
   /** The ask resolved and its turn was not stale. */
   isKept: boolean;
