@@ -56,11 +56,13 @@ describe("recordClarificationShown", () => {
       "[chat] LLM clarification trips bias detector; passing through:",
       ["Gender generalization"],
     );
-    expect(auditId).toEqual(expect.any(String));
+    expect(await AvaDexie.DB.ClarificationAuditEntry.toArray()).toEqual([
+      expect.objectContaining({ id: auditId }),
+    ]);
   });
 
   it("returns an id when the audit write fails", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.spyOn(AvaDexie.DB.ClarificationAuditEntry, "add").mockRejectedValueOnce(
       new Error("write failed"),
     );
@@ -70,6 +72,11 @@ describe("recordClarificationShown", () => {
       clarification: CLARIFICATION,
     });
 
+    expect(warn).toHaveBeenCalledWith(
+      "[privacy] clarification audit write failed:",
+      expect.any(Error),
+    );
+    expect(await AvaDexie.DB.ClarificationAuditEntry.toArray()).toEqual([]);
     expect(auditId).toEqual(expect.any(String));
   });
 });
