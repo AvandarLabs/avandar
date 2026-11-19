@@ -1,5 +1,9 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { ReactNode } from "react";
@@ -11,6 +15,8 @@ type Props = {
   at: number;
   duration: number;
 };
+
+const CHORD_DASH = "5 5";
 /** Current chord and perpendicular guide expose the evaluated recursion. */
 export function ActiveDeviation({
   input,
@@ -19,21 +25,28 @@ export function ActiveDeviation({
   at,
   duration,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   const start = input.vertices[event.start];
   const end = input.vertices[event.end];
   const farthest = input.vertices[event.farthest];
   return (
     <g>
-      <line
+      <SketchedShape
         data-recursion-chord="active"
         data-active-segment={`${event.start}:${event.end}`}
         data-farthest-index={event.farthest}
-        x1={60 + start[0] * 3.6}
-        y1={160 + start[1] * 3.6}
-        x2={60 + end[0] * 3.6}
-        y2={160 + end[1] * 3.6}
-        stroke={STOCK.orange}
-        strokeDasharray="5 5"
+        shape={{
+          kind: "line",
+          x1: 60 + start[0] * 3.6,
+          y1: 160 + start[1] * 3.6,
+          x2: 60 + end[0] * 3.6,
+          y2: 160 + end[1] * 3.6,
+        }}
+        profile={sketch.shape}
+        stroke={color.highlight}
+        strokeDasharray={CHORD_DASH}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       {input.showDeviationGuides ? (
         <DrawPath
@@ -41,8 +54,8 @@ export function ActiveDeviation({
           frame={frame}
           at={at}
           duration={duration}
-          color={STOCK.orange}
-          width={2}
+          color={color.highlight}
+          width={stroke.default}
         />
       ) : undefined}
     </g>

@@ -1,5 +1,7 @@
-import { ramp, EASE } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getBufferTransferPointFromLocation } from "./getBufferTransferPointFromLocation";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
@@ -12,6 +14,11 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+const CLASSIFY_AT = 106;
+const CLASSIFY_FRAMES = 23;
+/** The frame every qualifying token is counted as in the ledger. */
+const INCLUDED_AT = 139;
 /**
  * Only qualifying tokens enter the ledger and display their stable source key.
  */
@@ -23,7 +30,14 @@ export function BufferClassificationToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 106 + index * 2, 23, EASE.inOut);
+  const { color, text } = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    CLASSIFY_AT + index * motion.stagger.list,
+    motion.scale(CLASSIFY_FRAMES),
+    motion.travel.easing,
+  );
   const point = getBufferTransferPointFromLocation({
     location,
     ledgerIndex,
@@ -36,7 +50,7 @@ export function BufferClassificationToken({
     <g>
       <circle
         data-ledger-token={location.id}
-        data-included-id={frame >= 139 ? location.id : undefined}
+        data-included-id={frame >= INCLUDED_AT ? location.id : undefined}
         cx={point.x}
         cy={point.y}
         r={8}
@@ -46,9 +60,9 @@ export function BufferClassificationToken({
         <text
           x={point.x}
           y={point.y + 4}
-          fontSize={12}
+          fontSize={text.graphic.data.fontSize}
           textAnchor="middle"
-          fill={STOCK.ground}
+          fill={color.ground}
         >
           {index + 1}
         </text>

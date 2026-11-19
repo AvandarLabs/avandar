@@ -1,9 +1,17 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import { RegistrationReferences } from "./RegistrationReferences";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+const LANDMARK_FILL_ALPHA = 0.6;
 /**
  * Target rings are fixed physical references. Only coordinate copies register.
  */
@@ -12,23 +20,35 @@ export function RegistrationPoints({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const points = makeRegisteredLandmarksFromInputAndFrame({ input, frame });
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const points = makeRegisteredLandmarksFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       <RegistrationReferences input={input} frame={frame} />
       {points.map((point) => {
         return (
-          <circle
+          <SketchedShape
             key={point.id}
             data-landmark={point.id}
             data-target-x={point.targetX}
             data-target-y={point.targetY}
-            cx={point.canvasX}
-            cy={point.canvasY}
-            r={5}
+            shape={{
+              kind: "circle",
+              cx: point.canvasX,
+              cy: point.canvasY,
+              r: 5,
+            }}
+            profile={sketch.shape}
             fill={accent}
-            fillOpacity={0.6}
+            fillOpacity={LANDMARK_FILL_ALPHA}
             stroke={accent}
+            strokeWidth={shapes.stroke(stroke.hairline)}
           />
         );
       })}

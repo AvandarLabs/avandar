@@ -1,6 +1,8 @@
 import { Text } from "../../../graphics-common/Text";
+import { SketchedShape } from "../../../primitives/SketchedShape";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
@@ -16,16 +18,16 @@ type Props = Readonly<{
 export function BodyMarker({ x, y, label, color }: Props): ReactNode {
   const style = useGraphicProps("OrbitalSystem", {});
   const tokens = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <>
-      <circle
-        cx={x}
-        cy={y}
-        r={style.bodyRadius}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: style.bodyRadius }}
+        profile={tokens.sketch.shape}
         fill={tokens.color.ground}
         stroke={color}
         strokeOpacity={style.bodyAlpha}
-        strokeWidth={style.bodyStrokeWidth}
+        strokeWidth={shapes.stroke(style.bodyStrokeWidth)}
       />
       <circle cx={x} cy={y} r={style.bodyCoreRadius} fill={color} />
       <Text

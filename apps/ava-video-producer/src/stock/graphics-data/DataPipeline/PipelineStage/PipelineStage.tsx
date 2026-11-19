@@ -2,7 +2,10 @@ import { Arrive } from "../../../graphics-common/Arrive";
 import { Panel } from "../../../graphics-common/Panel";
 import { Text } from "../../../graphics-common/Text";
 import { StockRect } from "../../../primitives/StockRect/StockRect";
-import { useGraphicProps } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicShapeScales,
+} from "../../../theme/useGraphicTheme/useGraphicTheme";
 import {
   ICON_OFFSET_X,
   STAGE_CUE,
@@ -35,6 +38,7 @@ export function PipelineStage({
 }: Props): ReactNode {
   const style = useGraphicProps("DataPipeline", {});
   const panel = useGraphicProps("Panel", {});
+  const shapes = useGraphicShapeScales();
   const iconX = stage.x + ICON_OFFSET_X;
   return (
     <Arrive frame={frame} index={index} at={STAGE_CUE}>
@@ -49,12 +53,12 @@ export function PipelineStage({
           y={STAGE_TOP}
           width={STAGE_WIDTH}
           height={STAGE_HEIGHT}
-          rx={panel.radius}
+          rx={shapes.corner(panel.radius)}
           fill={accent}
-          fillOpacity={active * style.activeTintAlpha}
+          fillOpacity={active * shapes.wash(style.activeTintAlpha)}
           stroke={accent}
           strokeOpacity={active * style.activeStrokeAlpha}
-          strokeWidth={style.activeStrokeWidth}
+          strokeWidth={shapes.stroke(style.activeStrokeWidth)}
         />
         <Text role="pill" x={stage.x + 22} y={239}>
           0{index + 1}

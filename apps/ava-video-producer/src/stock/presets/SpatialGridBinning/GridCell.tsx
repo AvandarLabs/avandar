@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
@@ -10,22 +14,29 @@ type Props = {
   cell: ReturnType<typeof makeGridSceneFromInputAndFrame>["cells"][number];
   frame: number;
 };
+
+const OUTLINE_AT = 13;
+const OUTLINE_FRAMES = 37;
 /**
  * One ledger retains a separate header and twelve non-overlapping token slots.
  */
 export function GridCell({ input, cell, frame }: Readonly<Props>): ReactNode {
+  const { color, stroke } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { columns, rows } = input.grid;
   return (
     <g>
-      <rect
+      <StockRect
         data-cell-count={cell.arrived}
         x={450 + (cell.column * 420) / columns}
         y={164 + (cell.row * 300) / rows}
         width={420 / columns}
         height={300 / rows}
         fill="none"
-        stroke={STOCK.line}
-        opacity={ramp(frame, 13, 37)}
+        stroke={color.line}
+        strokeWidth={shapes.stroke(stroke.hairline)}
+        opacity={motion.ramp(frame, OUTLINE_AT, motion.scale(OUTLINE_FRAMES))}
       />
       <LabelSlots
         labels={[

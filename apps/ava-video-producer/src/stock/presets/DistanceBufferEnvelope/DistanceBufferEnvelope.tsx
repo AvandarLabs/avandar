@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BufferCompass } from "./BufferCompass";
 import { BufferHeadings } from "./BufferHeadings";
 import { BufferLocations } from "./BufferLocations";
@@ -15,15 +19,18 @@ export function DistanceBufferEnvelope({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={40}
         y={182}
         width={376}
         height={376}
         fill="none"
-        stroke={STOCK.line}
+        stroke={color.line}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <BufferCompass input={input} frame={frame} accent={accent} />
       <BufferLocations input={input} frame={frame} accent={accent} />

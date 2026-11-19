@@ -5,6 +5,7 @@ import { Text } from "../../graphics-common/Text";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DestinationSlots } from "./DestinationSlots";
@@ -22,6 +23,7 @@ type Props = Readonly<{
 export function Destination({ input, frame, accent }: Props): ReactNode {
   const style = useGraphicProps("SourceMerge", {});
   const { layout } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   const x = GRAPHIC_WIDTH - layout.graphic.margin - DESTINATION.width;
   const center = x + DESTINATION.width / 2;
   return (
@@ -38,7 +40,7 @@ export function Destination({ input, frame, accent }: Props): ReactNode {
           y={252}
           width={194}
           height={style.barHeight}
-          rx={style.barHeight / 2}
+          rx={shapes.corner(style.barHeight / 2)}
           fill={accent}
           fillOpacity={style.barAlpha}
         />

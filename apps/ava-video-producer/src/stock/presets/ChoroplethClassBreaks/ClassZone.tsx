@@ -1,6 +1,16 @@
-import { ramp, mix } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  HIGH_CLASS_FILL_ALPHA,
+  MISSING_DASH,
+  QUIET_CLASS_FILL_ALPHA,
+} from "./ChoroplethClassBreaks.constants";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
@@ -12,25 +22,34 @@ type Props = {
   accent: string;
   noDataLabel: string;
 };
+
+const ZONE_AT = 13;
+const ZONE_FRAMES = 25;
+
 function _getZoneState({
   zone,
   index,
   threshold,
-  frame,
   accent,
-}: Readonly<Omit<Props, "noDataLabel">>) {
+  colors,
+  arrival,
+  rise,
+}: Readonly<
+  Omit<Props, "noDataLabel" | "frame"> & {
+    colors: Readonly<{ inactive: string; accentAlt: string }>;
+    arrival: number;
+    rise: number;
+  }
+>) {
   const category =
     zone.value === null ? "missing" : zone.value < threshold ? "low" : "high";
   const x = 48 + (index % 3) * 152,
-    y =
-      154 +
-      Math.floor(index / 3) * 156 +
-      mix(ramp(frame, 13 + index * 2, 25), 12, 0);
+    y = 154 + Math.floor(index / 3) * 156 + mix(arrival, rise, 0);
   const color =
     category === "missing"
-      ? STOCK.muted
+      ? colors.inactive
       : category === "low"
-        ? STOCK.cyan
+        ? colors.accentAlt
         : accent;
   return { category, x, y, color };
 }
@@ -43,29 +62,42 @@ export function ClassZone({
   accent,
   noDataLabel,
 }: Readonly<Props>): ReactNode {
+  const { color: colors, stroke } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const arrival = motion.ramp(
+    frame,
+    ZONE_AT + index * motion.stagger.list,
+    motion.scale(ZONE_FRAMES),
+  );
   const { category, x, y, color } = _getZoneState({
     zone,
     index,
     threshold,
-    frame,
     accent,
+    colors,
+    arrival,
+    rise: motion.entrance.distance,
   });
   return (
     <g
       data-zone={zone.id}
       data-value={zone.value === null ? "null" : zone.value}
       data-class={category}
-      opacity={ramp(frame, 13 + index * 2, 25)}
+      opacity={arrival}
     >
-      <rect
+      <StockRect
         x={x}
         y={y}
         width={136}
         height={140}
         fill={color}
-        fillOpacity={category === "high" ? 0.45 : 0.15}
+        fillOpacity={
+          category === "high" ? HIGH_CLASS_FILL_ALPHA : QUIET_CLASS_FILL_ALPHA
+        }
         stroke={color}
-        strokeDasharray={category === "missing" ? "4 5" : undefined}
+        strokeDasharray={category === "missing" ? MISSING_DASH : undefined}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <LabelSlots
         labels={[

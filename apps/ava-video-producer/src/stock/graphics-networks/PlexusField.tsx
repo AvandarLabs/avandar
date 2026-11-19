@@ -6,9 +6,11 @@ import { Particle } from "../graphics-common/Particle";
 import { Rule } from "../graphics-common/Rule";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { SketchedShape } from "../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
@@ -30,7 +32,8 @@ export function PlexusField({
   accent,
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("PlexusField", {});
-  const { color, layout } = useGraphicTokens();
+  const { color, layout, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const margin = layout.graphic.margin;
   const right = GRAPHIC_WIDTH - margin;
@@ -64,17 +67,15 @@ export function PlexusField({
             return points.slice(i + 1).map((b, j) => {
               const distance = Math.hypot(a.x - b.x, a.y - b.y);
               return distance < style.linkDistance ? (
-                <line
+                <SketchedShape
                   key={`${i}-${j}`}
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
+                  shape={{ kind: "line", x1: a.x, y1: a.y, x2: b.x, y2: b.y }}
+                  profile={sketch.shape}
                   stroke={(i + j) % 4 === 0 ? color.accentAlt : accent}
                   opacity={
                     (1 - distance / style.linkDistance) * style.linkAlpha
                   }
-                  strokeWidth={style.linkWidth}
+                  strokeWidth={shapes.stroke(style.linkWidth)}
                 />
               ) : null;
             });

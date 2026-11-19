@@ -1,4 +1,9 @@
-import { useGraphicProps } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../../primitives/SketchedShape";
+import {
+  useGraphicProps,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../../theme/useGraphicTheme/useGraphicTheme";
 import { CENTER } from "../OrbitalSystem.constants";
 import type { ReactNode } from "react";
 
@@ -12,17 +17,18 @@ type Props = Readonly<{
 /** The tilted ellipse a body travels along. */
 export function BodyOrbit({ rx, ry, angle, color }: Props): ReactNode {
   const style = useGraphicProps("OrbitalSystem", {});
+  const { sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
-    <ellipse
-      cx={CENTER.x}
-      cy={CENTER.y}
-      rx={rx}
-      ry={ry}
-      fill="none"
-      stroke={color}
-      strokeOpacity={style.orbitAlpha}
-      strokeWidth={style.orbitWidth}
-      transform={`rotate(${angle} ${CENTER.x} ${CENTER.y})`}
-    />
+    <g transform={`rotate(${angle} ${CENTER.x} ${CENTER.y})`}>
+      <SketchedShape
+        shape={{ kind: "ellipse", cx: CENTER.x, cy: CENTER.y, rx, ry }}
+        profile={sketch.shape}
+        fill="none"
+        stroke={color}
+        strokeOpacity={style.orbitAlpha}
+        strokeWidth={shapes.stroke(style.orbitWidth)}
+      />
+    </g>
   );
 }

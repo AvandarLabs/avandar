@@ -1,4 +1,9 @@
 import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +15,8 @@ type Props = {
   accent: string;
   areaPerUnit: number;
 };
+
+const TILE_STROKE_ALPHA = 0.7;
 function _getBoundaryPoint(step: number) {
   const distance = step * 4,
     side = Math.floor(distance),
@@ -31,6 +38,8 @@ export function AreaTile({
   accent,
   areaPerUnit,
 }: Readonly<Props>): ReactNode {
+  const { stroke, alpha, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   const side = Math.sqrt(areaPerUnit),
     columns = Math.ceil(Math.sqrt(site.value)),
     rows = Math.ceil(site.value / columns);
@@ -53,13 +62,15 @@ export function AreaTile({
     return `${originX + mix(progress, sourceX, sectorX)} ${originY + mix(progress, sourceY, sectorY)}`;
   });
   return (
-    <path
+    <SketchedShape
       data-unit-tile={`${site.id}:${unitIndex}`}
-      d={`M${points.join(" L")} Z`}
+      shape={{ kind: "path", d: `M${points.join(" L")} Z` }}
+      profile={sketch.shape}
       fill={accent}
-      fillOpacity={progress === 1 ? 0 : 0.4}
+      fillOpacity={progress === 1 ? 0 : alpha.dimmed}
       stroke={accent}
-      strokeOpacity={progress === 1 ? 0 : 0.7}
+      strokeOpacity={progress === 1 ? 0 : TILE_STROKE_ALPHA}
+      strokeWidth={shapes.stroke(stroke.hairline)}
     />
   );
 }
