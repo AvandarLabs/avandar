@@ -245,6 +245,25 @@ export const ATOMIC_TOKENS = {
     label: "Zoom",
     description: "A camera zoom limit.",
   }),
+  multiplier: scale({
+    kind: "number",
+    unit: "×",
+    min: 0,
+    max: 3,
+    step: 0.05,
+    label: "Multiplier",
+    description:
+      "A factor a global option scales by, such as line weight or corner style. 1 leaves values as authored.",
+  }),
+  pressDepth: scale({
+    kind: "number",
+    min: 0,
+    max: 0.2,
+    step: 0.005,
+    label: "Press depth",
+    description:
+      "How far a pressed element shrinks, as a fraction of its size.",
+  }),
   velocityBlur: scale({
     kind: "number",
     min: 0,

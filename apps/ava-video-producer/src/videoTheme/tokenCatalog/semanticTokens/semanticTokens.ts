@@ -28,6 +28,26 @@ function _corner(label: string, description: string) {
   });
 }
 
+function _multiplier(
+  label: string,
+  description: string,
+  range: Readonly<{ min: number; max: number; step: number }>,
+) {
+  return token({ kind: "number", unit: "×", ...range, label, description });
+}
+
+function _alpha(label: string, description: string) {
+  return token({
+    kind: "opacity",
+    unit: "%",
+    min: 0,
+    max: 1,
+    step: 0.01,
+    label,
+    description,
+  });
+}
+
 function _sketch(label: string, description: string) {
   return token({ kind: "sketchProfile", label, description });
 }
@@ -57,6 +77,19 @@ export const SEMANTIC_TOKENS = {
       "Hand-drawn underlines and annotations.",
     ),
     route: _stroke("Route stroke", "A highlighted route through a diagram."),
+    emphasis: _stroke(
+      "Emphasis stroke",
+      "Outlines and paths that carry the point: the active box, the chosen route.",
+    ),
+    heavy: _stroke(
+      "Heavy stroke",
+      "The thickest line role, for bold rules, ticks, and marks.",
+    ),
+    scale: _multiplier(
+      "Line weight",
+      "Multiplies every stroke a graphic draws, including shape-specific widths. 1 draws them as authored.",
+      { min: 0.25, max: 3, step: 0.05 },
+    ),
   },
   corner: {
     panel: _corner("Panel corner", "Corner radius of panels inside a graphic."),
@@ -78,6 +111,52 @@ export const SEMANTIC_TOKENS = {
       "Corner radius of a spotlight cut-out.",
     ),
     label: _corner("Label corner", "Corner radius of a floating label."),
+    cell: _corner(
+      "Cell corner",
+      "Corner radius of table cells, slots, and other small boxes in a graphic.",
+    ),
+    scale: _multiplier(
+      "Corner style",
+      "Multiplies every corner radius, including shape-specific ones. 0 draws square corners.",
+      { min: 0, max: 3, step: 0.05 },
+    ),
+  },
+  alpha: {
+    wash: _alpha(
+      "Wash",
+      "The faint accent fill behind an active row, cell, or region.",
+    ),
+    tint: _alpha(
+      "Tint",
+      "A stronger accent fill, such as the head of a glyph or a selected chip.",
+    ),
+    ghost: _alpha(
+      "Ghost",
+      "Shapes that remain as a trace: a removed item, a past position.",
+    ),
+    dimmed: _alpha("Dimmed", "Shapes stepped back while another is the point."),
+    guide: _alpha(
+      "Guide",
+      "Construction marks and guides that should read under the content.",
+    ),
+    washScale: _multiplier(
+      "Tint strength",
+      "Multiplies wash and tint fills behind active items. 1 draws them as authored.",
+      { min: 0, max: 2, step: 0.05 },
+    ),
+  },
+  dash: {
+    guide: token({
+      kind: "dash",
+      label: "Guide dash",
+      description: "The dash of guides, boundaries, and construction lines.",
+    }),
+    pending: token({
+      kind: "dash",
+      label: "Pending dash",
+      description:
+        "The dash of an outline that is missing, pending, or not yet filled.",
+    }),
   },
   elevation: {
     flat: token({
@@ -91,6 +170,18 @@ export const SEMANTIC_TOKENS = {
       description:
         "Surfaces that hover over the stage, such as floating labels and lifted diagrams.",
     }),
+    window: token({
+      kind: "shadow",
+      surface: "stage",
+      label: "Window shadow",
+      description:
+        "The cast shadow under a tilted window. Its colour is the scene shadow, or the scene background at 60% when that is unset.",
+    }),
+    strength: _multiplier(
+      "Shadow intensity",
+      "Multiplies the opacity of every shadow. 0 removes shadows and 1 draws them as authored.",
+      { min: 0, max: 2, step: 0.05 },
+    ),
   },
   effect: {
     halo: token({
@@ -223,5 +314,10 @@ export const SEMANTIC_TOKENS = {
       description:
         "Peak blur of a spatial transition at full strength and a 180 degree shutter.",
     }),
+    strength: _multiplier(
+      "Motion blur strength",
+      "Multiplies camera and transition motion blur. 0 turns it off.",
+      { min: 0, max: 2, step: 0.05 },
+    ),
   },
 } as const;

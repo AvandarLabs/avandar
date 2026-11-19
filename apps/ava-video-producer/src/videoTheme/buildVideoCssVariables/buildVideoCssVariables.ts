@@ -140,11 +140,27 @@ function _isSkippedPath(path: string, isScale: boolean): boolean {
 }
 
 /**
+ * The scene palette under the names storyboard scenes read, such as
+ * `--brand` for `color.scene.brand` and `--muted-foreground` for
+ * `color.scene.mutedForeground`. An unset optional colour emits nothing, so
+ * the scene's own fallback applies.
+ */
+function _sceneVariables(theme: ResolvedVideoTheme): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(theme.semantic.color.scene).flatMap(([name, color]) => {
+      return color === undefined ? [] : [[`--${_kebab(name)}`, color]];
+    }),
+  );
+}
+
+/**
  * CSS custom properties for every styled semantic and component token, such
- * as `--video-color-ground` and `--video-text-stage-heading-font-size`.
- * `VideoThemeProvider` sets them on its container so CSS modules (the
- * continuity stage and overlays) read the theme without JavaScript. Motion,
- * camera, and sketch tokens have no CSS meaning and are skipped.
+ * as `--video-color-ground` and `--video-text-stage-heading-font-size`, plus
+ * the scene palette under its storyboard names (`--brand`, `--ground`, ...).
+ * `VideoThemeProvider` sets them on its container so CSS modules and scene
+ * styles read the theme without JavaScript; a storyboard theme set inside
+ * still overrides the scene names. Motion, camera, and sketch tokens have no
+ * CSS meaning and are skipped.
  */
 export function buildVideoCssVariables(
   theme: ResolvedVideoTheme,
@@ -165,9 +181,10 @@ export function buildVideoCssVariables(
             ),
           ];
     });
-  return Object.fromEntries(
-    variableSets.flatMap((variables) => {
+  return Object.fromEntries([
+    ...variableSets.flatMap((variables) => {
       return Object.entries(variables);
     }),
-  );
+    ...Object.entries(_sceneVariables(theme)),
+  ]);
 }

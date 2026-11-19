@@ -48,20 +48,23 @@ export function getWcagLevelFromContrast(
 }
 
 /**
- * The contrast of every text role (semantic and component) against the
- * theme's ground. Use it to badge text colours in the editor or to check a
- * generated theme before saving it.
+ * The contrast of every text role (semantic and component) against what it
+ * is drawn on: the theme's ground, or the colour its `contrastGround` names,
+ * such as the scene ground for scene text. Use it to badge text colours in
+ * the editor or to check a generated theme before saving it.
  */
 export function listTextContrastFromTheme(
   theme: ResolvedVideoTheme,
 ): TextContrast[] {
-  const ground = theme.semantic.color.ground;
   return listTokenDefinitions()
     .filter(({ definition }) => {
       return definition.kind === "typeStyle";
     })
-    .map(({ path }) => {
+    .map(({ path, definition }) => {
       const style = getResolvedTokenValue(theme, path) as ResolvedTypeStyle;
+      const ground = definition.contrastGround
+        ? String(getResolvedTokenValue(theme, definition.contrastGround))
+        : theme.semantic.color.ground;
       const ratio = getContrastRatioFromColors(style.color, ground);
       return {
         path,

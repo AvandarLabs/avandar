@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { COMPONENT_TOKENS } from "./componentTokens/componentTokens";
 import {
   isTokenDefinition,
   isTokenScale,
@@ -93,15 +94,23 @@ test("semantic groups never share a name with a Mantine theme key", () => {
   }
 });
 
-test("no catalog group uses a key reserved for token definitions", () => {
+test("no catalog group can be mistaken for a token or a scale", () => {
   const visit = (node: CatalogNode, path: string): void => {
     if (isTokenDefinition(node) || isTokenScale(node)) {
       return;
     }
+    const keys = Object.keys(node);
     for (const [key, child] of Object.entries(node)) {
-      assert.ok(key !== "kind" && key !== "scale", `${path}.${key}`);
+      assert.ok(key !== "kind", `${path}.${key}`);
+      assert.ok(key !== "scale" || keys.length > 1, `${path}.${key}`);
       visit(child, `${path}.${key}`);
     }
   };
   visit(SEMANTIC_TOKENS, "semantic");
+  visit(COMPONENT_TOKENS, "components");
+});
+
+test("a group may hold a token named scale beside other tokens", () => {
+  assert.deepEqual(getTokenDefinitionFromPath("stroke.scale")?.unit, "×");
+  assert.equal(isTokenScale(SEMANTIC_TOKENS.stroke), false);
 });

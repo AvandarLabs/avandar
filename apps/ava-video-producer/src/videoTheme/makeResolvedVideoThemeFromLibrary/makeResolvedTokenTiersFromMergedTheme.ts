@@ -21,6 +21,7 @@ import {
 import type {
   CatalogNode,
   GlowValue,
+  TokenDefinition,
   TextShadowValue,
   TokenReference,
   VideoThemeIssue,
@@ -237,6 +238,53 @@ function _buildCompositeFromFields(
   return kind === "elevation" ? _finishElevation(resolved) : resolved;
 }
 
+/**
+ * The pair value a colour token picks by another colour's luminance, such as
+ * text on the accent, instead of by the ground's.
+ */
+function _pickPairByContrastColor(
+  context: ResolutionContext,
+  definition: TokenDefinition,
+  raw: Readonly<{ onDark: unknown; onLight: unknown }>,
+  path: string,
+): unknown {
+  const contrastPath = definition.contrastWith ?? "";
+  const contrastColor = _buildValueFromRaw(
+    context,
+    getValueAtPath(context.semantic, contrastPath.split(".")),
+    { kind: "color" },
+    contrastPath,
+    [path],
+  );
+  if (typeof contrastColor !== "string") {
+    return undefined;
+  }
+  return luminance(contrastColor) > (definition.contrastThreshold ?? 0.5)
+    ? raw.onLight
+    : raw.onDark;
+}
+
+function _buildTokenFromDefinition(
+  context: ResolutionContext,
+  definition: TokenDefinition,
+  raw: unknown,
+  path: string,
+): unknown {
+  if (raw === undefined) {
+    if (!definition.isOptional) {
+      context.issues.push({ path, message: "Missing token" });
+    }
+    return undefined;
+  }
+  if (definition.contrastWith !== undefined && _isColorPair(raw)) {
+    const picked = _pickPairByContrastColor(context, definition, raw, path);
+    return picked === undefined
+      ? undefined
+      : _buildValueFromRaw(context, picked, definition, path, []);
+  }
+  return _buildValueFromRaw(context, raw, definition, path, []);
+}
+
 function _buildNodeFromCatalog(
   context: ResolutionContext,
   node: CatalogNode,
@@ -244,11 +292,7 @@ function _buildNodeFromCatalog(
   path: string,
 ): unknown {
   if (isTokenDefinition(node)) {
-    if (raw === undefined) {
-      context.issues.push({ path, message: "Missing token" });
-      return undefined;
-    }
-    return _buildValueFromRaw(context, raw, node, path, []);
+    return _buildTokenFromDefinition(context, node, raw, path);
   }
   if (isTokenScale(node)) {
     const entries = _isRecord(raw) ? Object.entries(raw) : [];
@@ -292,6 +336,50 @@ function _buildComponentsFromCatalog(context: ResolutionContext): unknown {
   );
 }
 
+/**
+ * Every resolved shadow and elevation under a catalog node with its layer
+ * opacities multiplied by `strength`, so `elevation.strength` reaches every
+ * shadow a renderer reads. Values come back unchanged at strength 1.
+ */
+function _scaleShadows(
+  node: CatalogNode,
+  value: unknown,
+  strength: number,
+): unknown {
+  if (isTokenScale(node) || !_isRecord(value)) {
+    return value;
+  }
+  if (isTokenDefinition(node)) {
+    if (
+      (node.kind !== "elevation" && node.kind !== "shadow") ||
+      !Array.isArray(value.layers)
+    ) {
+      return value;
+    }
+    const layers: ReadonlyArray<Readonly<{ alpha: number }>> = value.layers;
+    return {
+      ...value,
+      layers: layers.map((layer) => {
+        return { ...layer, alpha: Math.min(1, layer.alpha * strength) };
+      }),
+    };
+  }
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => {
+      const childNode = node[key];
+      return [
+        key,
+        childNode ? _scaleShadows(childNode, child, strength) : child,
+      ];
+    }),
+  );
+}
+
+function _getShadowStrength(semantic: unknown): number {
+  const strength = getValueAtPath(semantic, ["elevation", "strength"]);
+  return typeof strength === "number" ? strength : 1;
+}
+
 function _isGroundDark(groundContext: ResolutionContext): boolean {
   const ground = _buildValueFromRaw(
     groundContext,
@@ -307,9 +395,11 @@ function _isGroundDark(groundContext: ResolutionContext): boolean {
 
 /**
  * Resolves every catalog token of a merged theme: follows `$` references,
- * picks `{ onDark, onLight }` colours by the ground's luminance, fills
- * composite tokens, and converts Mantine CSS strings to numbers. Collects
- * issues instead of throwing so one pass reports every problem.
+ * picks `{ onDark, onLight }` colours by the ground's luminance (or by the
+ * colour a token names in `contrastWith`), fills composite tokens, converts
+ * Mantine CSS strings to numbers, and applies `elevation.strength` to every
+ * shadow. Collects issues instead of throwing so one pass reports every
+ * problem.
  */
 export function makeResolvedTokenTiersFromMergedTheme(
   options: Readonly<{ merged: VideoThemePatch; mantine: MantineTheme }>,
@@ -331,6 +421,14 @@ export function makeResolvedTokenTiersFromMergedTheme(
     isDarkGround,
     forbidColorPairs: false,
   };
+  const semantic = _buildNodeFromCatalog(
+    context,
+    VIDEO_TOKEN_CATALOG.semantic,
+    context.semantic,
+    "",
+  );
+  const components = _buildComponentsFromCatalog(context);
+  const strength = _getShadowStrength(semantic);
   return {
     atomic: _buildNodeFromCatalog(
       context,
@@ -338,13 +436,14 @@ export function makeResolvedTokenTiersFromMergedTheme(
       context.atomic,
       "atomic",
     ),
-    semantic: _buildNodeFromCatalog(
-      context,
-      VIDEO_TOKEN_CATALOG.semantic,
-      context.semantic,
-      "",
-    ),
-    components: _buildComponentsFromCatalog(context),
+    semantic:
+      strength === 1
+        ? semantic
+        : _scaleShadows(VIDEO_TOKEN_CATALOG.semantic, semantic, strength),
+    components:
+      strength === 1
+        ? components
+        : _scaleShadows(VIDEO_TOKEN_CATALOG.components, components, strength),
     isDarkGround,
     issues,
   };

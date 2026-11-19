@@ -1,23 +1,31 @@
 import { z } from "zod";
-import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
+import { getValueAtPath } from "../../../videoTheme/getValueAtPath";
+import { listTokenDefinitions } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { legacyColorSchema } from "../../presets/legacy/legacyColorSchema.constants";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 
-const COLOR_ROLES = Object.entries(SEMANTIC_TOKENS.color)
-  .filter(([, definition]) => {
-    return definition.kind === "color";
-  })
-  .map(([role]) => {
-    return role;
-  });
+/**
+ * Every colour role a content colour may name, by its path under `color`,
+ * such as `accentAlt` or `categorical.3`.
+ */
+const COLOR_ROLES = listTokenDefinitions().flatMap(({ path, definition }) => {
+  return path.startsWith("color.") && definition.kind === "color"
+    ? [path.slice("color.".length)]
+    : [];
+});
 
-/** A content colour that follows the theme, such as `$color.accentAlt`. */
-export const contentColorRoleSchema = z
-  .string()
-  .regex(
-    new RegExp(`^\\$color\\.(?:${COLOR_ROLES.join("|")})$`),
-    "Expected a colour role such as $color.accent",
-  );
+/**
+ * A content colour that follows the theme, such as `$color.accentAlt` or
+ * `$color.categorical.3`.
+ */
+export const contentColorRoleSchema = z.string().regex(
+  new RegExp(
+    `^\\$color\\.(?:${COLOR_ROLES.map((role) => {
+      return role.replaceAll(".", "\\.");
+    }).join("|")})$`,
+  ),
+  "Expected a colour role such as $color.accent",
+);
 
 /**
  * A colour field in stock content: a semantic colour role that follows the
@@ -40,10 +48,10 @@ export function getContentColorFromValue(
   if (value === "accent") {
     return options.accent;
   }
-  const role = /^\$color\.([A-Za-z]+)$/.exec(value)?.[1];
+  const role = /^\$color\.([A-Za-z0-9.]+)$/.exec(value)?.[1];
   const color =
     role && COLOR_ROLES.includes(role)
-      ? (options.tokens.color as Readonly<Record<string, unknown>>)[role]
+      ? getValueAtPath(options.tokens.color, role.split("."))
       : undefined;
   return typeof color === "string" ? color : value;
 }

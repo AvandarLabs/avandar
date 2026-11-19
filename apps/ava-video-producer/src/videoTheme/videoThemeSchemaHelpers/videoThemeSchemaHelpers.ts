@@ -144,7 +144,9 @@ function _shape(group: CatalogGroup, tier: SchemaTier, isComplete: boolean) {
   return Object.fromEntries(
     Object.entries(group).map(([key, child]) => {
       const schema = _nodeSchema(child, tier, isComplete);
-      return [key, isComplete ? schema : schema.optional()];
+      const isRequired =
+        isComplete && !(isTokenDefinition(child) && child.isOptional);
+      return [key, isRequired ? schema : schema.optional()];
     }),
   );
 }

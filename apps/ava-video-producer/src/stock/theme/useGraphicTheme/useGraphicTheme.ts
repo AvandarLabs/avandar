@@ -5,6 +5,10 @@ import {
   createVideoMotion,
   type VideoMotion,
 } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import {
+  createVideoShapeScales,
+  type VideoShapeScales,
+} from "../../../videoTheme/createVideoShapeScales/createVideoShapeScales";
 import { makeResolvedVideoThemeFromSource } from "../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import {
@@ -92,6 +96,18 @@ export function useGraphicMotion(): VideoMotion {
   return useMemo(() => {
     return createVideoMotion(motion);
   }, [motion]);
+}
+
+/**
+ * Line weight, corner style, and tint strength for a stock shape, for
+ * example to draw a preset's own 5 px corner at the theme's corner style.
+ * See `VideoShapeScales`.
+ */
+export function useGraphicShapeScales(): VideoShapeScales {
+  const { stroke, corner, alpha } = useGraphicTokens();
+  return useMemo(() => {
+    return createVideoShapeScales({ stroke, corner, alpha });
+  }, [stroke, corner, alpha]);
 }
 
 /**

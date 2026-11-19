@@ -1,4 +1,8 @@
 import { createEasingFromToken } from "../createEasingFromToken/createEasingFromToken";
+import {
+  createThemedMotionHelpers,
+  type ThemedMotionHelpers,
+} from "./createThemedMotionHelpers";
 import type {
   EasingValue,
   ResolvedVideoSemantic,
@@ -7,11 +11,15 @@ import type {
 
 type EasingFunction = (progress: number) => number;
 type MotionTokens = ResolvedVideoSemantic["motion"];
+type TimedStep = Readonly<{ duration: number; easing: EasingFunction }>;
 
 /**
  * Motion a renderer can use directly: durations and staggers already divided
- * by the tempo, easing tokens turned into functions. Cue frames and loop
- * periods stay as authored, so a stock loop stays seamless at any tempo.
+ * by the tempo, easing tokens turned into functions, and the `motion.ts`
+ * helpers (`ramp`, `enter`, `leave`, `pop`, `press`, `reveal`, `caretOn`,
+ * `loopEnvelope`) with the theme's defaults in place of their literals. Cue
+ * frames and loop periods stay as authored, so a stock loop stays seamless
+ * at any tempo.
  */
 export type VideoMotion = Readonly<{
   tempo: number;
@@ -21,7 +29,6 @@ export type VideoMotion = Readonly<{
    */
   scale: (frames: number) => number;
   curve: (easing: EasingValue) => EasingFunction;
-  press: number;
   chip: number;
   whip: number;
   panel: number;
@@ -38,15 +45,25 @@ export type VideoMotion = Readonly<{
     easing: EasingFunction;
     distance: number;
   }>;
-  drawOn: Readonly<{ duration: number; easing: EasingFunction }>;
+  drawOn: TimedStep;
   travel: Readonly<{ easing: EasingFunction }>;
   emphasis: Readonly<{ duration: number; spring: SpringValue }>;
+  rise: TimedStep & Readonly<{ stagger: number }>;
+  depart: TimedStep;
+  surge: Readonly<{ easing: EasingFunction }>;
+  dissolve: Readonly<{ easing: EasingFunction }>;
+  /** Loop fades bound a loop, so tempo never changes them. */
+  loopFade: Readonly<{ graphic: number; film: number }>;
+  pressDepth: number;
+  caret: Readonly<{ halfPeriod: number }>;
+  entranceStyle: MotionTokens["entranceStyle"];
   pulse: Readonly<{ period: number }>;
   drift: Readonly<{ distance: number }>;
   packetFlow: Readonly<{ period: number }>;
   typing: Readonly<{ rate: number }>;
   stagger: Readonly<{ list: number; edge: number; column: number }>;
-}>;
+}> &
+  ThemedMotionHelpers;
 
 const CURVES = new Map<string, EasingFunction>();
 
@@ -68,18 +85,34 @@ function _required<Value>(value: Value | undefined, path: string): Value {
   return value;
 }
 
+/**
+ * The curve a step eases on: its own, or the easing family's curve when
+ * `motion.easingProfile` picks one.
+ */
+function _profileCurve(
+  motion: MotionTokens,
+): (easing: EasingValue | undefined, path: string) => EasingFunction {
+  const profile = motion.easingProfile;
+  return (easing, path) => {
+    return _curve(
+      profile === "authored"
+        ? _required(easing, path)
+        : motion.easingProfiles[profile],
+    );
+  };
+}
+
 function _steps(motion: MotionTokens, scale: (frames: number) => number) {
+  const profileCurve = _profileCurve(motion);
   return {
     entrance: {
       duration: scale(motion.entrance.duration ?? motion.panel),
-      easing: _curve(
-        _required(motion.entrance.easing, "motion.entrance.easing"),
-      ),
+      easing: profileCurve(motion.entrance.easing, "motion.entrance.easing"),
       distance: _required(motion.entrance.distance, "motion.entrance.distance"),
     },
     exit: {
       duration: scale(motion.exit.duration ?? motion.chip),
-      easing: _curve(_required(motion.exit.easing, "motion.exit.easing")),
+      easing: profileCurve(motion.exit.easing, "motion.exit.easing"),
       distance: _required(motion.exit.distance, "motion.exit.distance"),
     },
     drawOn: {
@@ -87,12 +120,61 @@ function _steps(motion: MotionTokens, scale: (frames: number) => number) {
       easing: _curve(_required(motion.drawOn.easing, "motion.drawOn.easing")),
     },
     travel: {
-      easing: _curve(_required(motion.travel.easing, "motion.travel.easing")),
+      easing: profileCurve(motion.travel.easing, "motion.travel.easing"),
     },
     emphasis: {
       duration: scale(motion.emphasis.duration ?? motion.sheet),
       spring: _required(motion.emphasis.spring, "motion.emphasis.spring"),
     },
+  };
+}
+
+function _timingSteps(motion: MotionTokens, scale: (frames: number) => number) {
+  const profileCurve = _profileCurve(motion);
+  return {
+    reveal: {
+      duration: scale(motion.reveal.duration ?? motion.panel),
+      easing: profileCurve(motion.reveal.easing, "motion.reveal.easing"),
+    },
+    rise: {
+      duration: scale(motion.rise.duration ?? motion.word),
+      easing: profileCurve(motion.rise.easing, "motion.rise.easing"),
+      stagger: scale(
+        _required(motion.rise.stagger, "motion.rise.stagger") *
+          motion.staggerScale,
+      ),
+    },
+    depart: {
+      duration: scale(motion.depart.duration ?? motion.whip),
+      easing: _curve(_required(motion.depart.easing, "motion.depart.easing")),
+    },
+    surge: {
+      easing: _curve(_required(motion.surge.easing, "motion.surge.easing")),
+    },
+    dissolve: {
+      easing: _curve(
+        _required(motion.dissolve.easing, "motion.dissolve.easing"),
+      ),
+    },
+  };
+}
+
+function _cycles(motion: MotionTokens) {
+  return {
+    pulse: { period: _required(motion.pulse.period, "motion.pulse.period") },
+    drift: {
+      distance: _required(motion.drift.distance, "motion.drift.distance"),
+    },
+    packetFlow: {
+      period: _required(motion.packetFlow.period, "motion.packetFlow.period"),
+    },
+    typing: {
+      rate: _required(motion.typing.rate, "motion.typing.rate") * motion.tempo,
+    },
+    loopFade: motion.loopFade,
+    pressDepth: motion.pressDepth,
+    caret: motion.caret,
+    entranceStyle: motion.entranceStyle,
   };
 }
 
@@ -104,7 +186,10 @@ export function createVideoMotion(motion: MotionTokens): VideoMotion {
   const scale = (frames: number) => {
     return frames / motion.tempo;
   };
-  return {
+  const staggerScale = (frames: number) => {
+    return scale(frames * motion.staggerScale);
+  };
+  const values = {
     tempo: motion.tempo,
     scale,
     curve: _curve,
@@ -116,20 +201,13 @@ export function createVideoMotion(motion: MotionTokens): VideoMotion {
     word: scale(motion.word),
     hero: scale(motion.hero),
     ..._steps(motion, scale),
-    pulse: { period: _required(motion.pulse.period, "motion.pulse.period") },
-    drift: {
-      distance: _required(motion.drift.distance, "motion.drift.distance"),
-    },
-    packetFlow: {
-      period: _required(motion.packetFlow.period, "motion.packetFlow.period"),
-    },
-    typing: {
-      rate: _required(motion.typing.rate, "motion.typing.rate") * motion.tempo,
-    },
+    ..._timingSteps(motion, scale),
+    ..._cycles(motion),
     stagger: {
-      list: scale(motion.stagger.list),
-      edge: scale(motion.stagger.edge),
-      column: scale(motion.stagger.column),
+      list: staggerScale(motion.stagger.list),
+      edge: staggerScale(motion.stagger.edge),
+      column: staggerScale(motion.stagger.column),
     },
   };
+  return { ...values, ...createThemedMotionHelpers(values) };
 }
