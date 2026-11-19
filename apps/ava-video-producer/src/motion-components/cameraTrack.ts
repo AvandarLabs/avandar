@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { EASE, mix } from "../motion";
+import { mix } from "../motion";
 import {
+  getClassicMotionSettingsTheme,
   getMotionDuration,
   getMotionEasing,
   motionEasingSchema,
 } from "./motionSettings";
-import type { MotionOptions } from "./motionSettings";
+import type { MotionOptions, MotionSettingsTheme } from "./motionSettings";
 
 /** A validated route of camera keys for a canvas of a given size. */
 type CameraTrackSchema = z.ZodArray<
@@ -81,6 +82,7 @@ export type CameraPose = Pick<CameraKeyframe, "x" | "y" | "zoom">;
 export function retimeCameraTrack(
   keys: readonly CameraKeyframe[],
   options?: MotionOptions,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): CameraKeyframe[] {
   let at = 0;
   return keys.map((key, index) => {
@@ -91,24 +93,36 @@ export function retimeCameraTrack(
       key.x === previous.x &&
       key.y === previous.y &&
       key.zoom === previous.zoom;
-    at += isHold ? duration : getMotionDuration(duration, options);
+    at += isHold ? duration : getMotionDuration(duration, options, theme);
     return { ...key, at };
   });
 }
 
-function getKeyEasing(key: CameraKeyframe, options?: MotionOptions) {
+/** A key's named camera ease is the theme's `camera.easing` of that name. */
+function getKeyEasing(
+  key: CameraKeyframe,
+  options: MotionOptions | undefined,
+  theme: MotionSettingsTheme,
+) {
   const ease = key.ease ?? "glide";
-  const legacy =
-    ease === "push" ? EASE.out : ease === "whip" ? EASE.inOutCubic : EASE.inOut;
-  const fallback = ["glide", "push", "whip"].includes(String(ease))
-    ? legacy
-    : getMotionEasing({ easing: ease as z.infer<typeof motionEasingSchema> });
-  return getMotionEasing(options, fallback);
+  const named =
+    ease === "push" || ease === "whip" || ease === "glide"
+      ? theme.motion.curve(theme.camera.easing[ease])
+      : undefined;
+  const fallback =
+    named ??
+    getMotionEasing(
+      { easing: ease as z.infer<typeof motionEasingSchema> },
+      undefined,
+      theme,
+    );
+  return getMotionEasing(options, fallback, theme);
 }
 
 /**
  * Sample camera time only; callers continue rendering their content at the real
- * frame.
+ * frame. Named eases and omitted settings come from the theme (`classic`
+ * unless one is given).
  */
 export function getCameraPose(
   keys: readonly CameraKeyframe[] | undefined,
@@ -116,10 +130,11 @@ export function getCameraPose(
   enabled = true,
   options?: MotionOptions,
   viewport = { width: 960, height: 600 },
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): CameraPose {
   if (!enabled || !keys?.length)
     return { x: viewport.width / 2, y: viewport.height / 2, zoom: 1 };
-  const route = retimeCameraTrack(keys, options);
+  const route = retimeCameraTrack(keys, options, theme);
   const destinationIndex = route.findIndex((key) => {
     return key.at > frame;
   });
@@ -139,7 +154,7 @@ export function getCameraPose(
           0,
           Math.min(1, (frame - origin.at) / (destination.at - origin.at)),
         );
-  const progress = getKeyEasing(destination, options)(fraction);
+  const progress = getKeyEasing(destination, options, theme)(fraction);
   return {
     x: mix(progress, origin.x, destination.x),
     y: mix(progress, origin.y, destination.y),
@@ -152,9 +167,25 @@ export function isCameraMoving(
   keys: readonly CameraKeyframe[] | undefined,
   frame: number,
   options?: MotionOptions,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): boolean {
-  const before = getCameraPose(keys, frame - 0.3, true, options);
-  const after = getCameraPose(keys, frame + 0.3, true, options);
+  const viewport = { width: 960, height: 600 };
+  const before = getCameraPose(
+    keys,
+    frame - 0.3,
+    true,
+    options,
+    viewport,
+    theme,
+  );
+  const after = getCameraPose(
+    keys,
+    frame + 0.3,
+    true,
+    options,
+    viewport,
+    theme,
+  );
   return (
     Math.abs(before.x - after.x) +
       Math.abs(before.y - after.y) +

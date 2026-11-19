@@ -1,6 +1,9 @@
+import { SketchedShape } from "../stock/primitives/SketchedShape";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { useVideoProps } from "../videoTheme/useVideoTheme";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
+import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import css from "./ContinuityOverlays.module.css";
+import { CONTINUITY_STAGE } from "./continuityStage";
 import { getConnectorProgress, getOverlayPose } from "./overlayMotion";
 import type { ContinuityBeat } from "./continuitySchema";
 import type { ReactNode } from "react";
@@ -12,7 +15,9 @@ type Props = Readonly<{
 }>;
 
 /**
- * The spotlight around the source and the connector line to the active diagram.
+ * The spotlight around the source and the connector line to the active
+ * diagram. The spotlight dims everything around it with the theme's scrim;
+ * the connector draws through the theme's shape sketch.
  */
 export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
   const active = content.diagrams.find((diagram) => {
@@ -25,6 +30,9 @@ export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
   const spotlight = useVideoProps("Spotlight", {});
   const connector = useVideoProps("Connector", {});
   const motion = useVideoMotion();
+  const tokens = useVideoTokens();
+  const scales = useVideoShapeScales();
+  const scrim = `0 0 0 ${spotlight.scrimSpread}px ${tokens.color.scrim}`;
   const signal = getConnectorProgress(frame, content.effect, content.signalAt, {
     duration: motion.scale(connector.drawIn),
     easing: motion.curve(connector.easing),
@@ -38,17 +46,27 @@ export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
           top: source.y - spotlight.padding,
           width: source.width + spotlight.padding * 2,
           height: source.height + spotlight.padding * 2,
+          borderRadius: scales.corner(tokens.corner.spotlight),
+          boxShadow: scrim,
           opacity,
         }}
       />
       {active && signal > 0 && (
         <svg
           className={css.connector}
-          viewBox="0 0 1600 840"
-          style={{ opacity: opacity * signal }}
+          viewBox={`0 0 ${CONTINUITY_STAGE.width} ${CONTINUITY_STAGE.height}`}
+          style={{
+            width: CONTINUITY_STAGE.width,
+            height: CONTINUITY_STAGE.height,
+            opacity: opacity * signal,
+          }}
         >
-          <path
-            d={`M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${active.overlay.target.x} ${source.y + source.height / 2} ${active.overlay.target.x + connector.bend} ${active.overlay.target.y + connector.drop}`}
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${active.overlay.target.x} ${source.y + source.height / 2} ${active.overlay.target.x + connector.bend} ${active.overlay.target.y + connector.drop}`,
+            }}
+            profile={tokens.sketch.shape}
             fill="none"
             stroke={accent}
             strokeWidth={connector.strokeWidth}

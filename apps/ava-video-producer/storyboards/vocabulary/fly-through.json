@@ -51,11 +51,11 @@
       },
       "theme": {
         "ground": "var(--brand)",
-        "foreground": "#0b0f17",
-        "muted-foreground": "#1e293b",
-        "background": "#0b0f17",
-        "card": "#1e293b",
-        "border": "#334155"
+        "foreground": "$atomic.swatch.slateInk",
+        "muted-foreground": "$atomic.swatch.slate800",
+        "background": "$atomic.swatch.slateInk",
+        "card": "$atomic.swatch.slate800",
+        "border": "$atomic.swatch.slate700"
       },
       "props": {
         "headlines": [

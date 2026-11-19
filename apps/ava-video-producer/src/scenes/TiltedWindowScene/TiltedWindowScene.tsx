@@ -1,21 +1,23 @@
-import { DUR, EASE, ramp } from "../../motion";
+import { useVideoTheme } from "../../videoTheme/useVideoTheme";
 import { SceneShell } from "../SceneShell";
 import { RacePair } from "./RacePair";
+import { useWindowStage } from "./useWindowStage";
 import { WindowCard } from "./WindowCard";
 import { WindowHeadlines } from "./WindowHeadlines";
 import {
   getCarouselPoses,
   getCarouselState,
   getPullBack,
+  getRestingPose,
   getWhipEntrance,
   getWhipExit,
   getWindowCamera,
   getWindowRevealStyle,
 } from "./windowMotion";
-import { HEADLINE_BOX, WINDOW_BOXES, WINDOW_TILT } from "./windowTilt";
+import { HEADLINE_BOX, WINDOW_BOXES } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { TiltedWindowSceneProps } from "../scenes.types";
-import type { WindowPose } from "./windowMotion";
+import type { WindowPose, WindowStage } from "./windowMotion";
 import type { ReactNode } from "react";
 
 /**
@@ -44,37 +46,39 @@ export function TiltedWindowScene(props: TiltedWindowSceneProps): ReactNode {
       {props.layout === "pair" && props.pair ? (
         <RacePair {...props} pair={props.pair} width={width} height={height} />
       ) : (
-        <_SingleWindow {...props} width={width} height={height} />
+        <SingleWindow {...props} width={width} height={height} />
       )}
       {props.footnote ? (
-        <_Footnote frame={frame} text={props.footnote} exit={exit} />
+        <WindowFootnote frame={frame} text={props.footnote} exit={exit} />
       ) : null}
     </SceneShell>
   );
 }
 
 /** The primary window, its carousel and camera, and the secondary window. */
-function _SingleWindow(
+function SingleWindow(
   props: TiltedWindowSceneProps & { width: number; height: number },
 ) {
   const { frame, width, height, windows = [], exit, camera, secondary } = props;
+  const stage = useWindowStage();
   const canvas = { width, height };
   const box = _toPixels(WINDOW_BOXES[props.windowBox ?? "default"], canvas);
-  const base = _getBasePose(props, box);
+  const base = _getBasePose(props, box, stage);
   const pullBack =
     props.enter?.kind === "pull-back"
-      ? getPullBack(frame, props.enter, canvas, box)
+      ? getPullBack(frame, props.enter, canvas, box, stage)
       : undefined;
   const rect = pullBack?.rect ?? box;
-  const carousel = getCarouselState(frame, windows);
-  const slide = getCarouselPoses(carousel.progress, box);
-  const lens = camera ? getWindowCamera(frame, camera, box) : undefined;
+  const carousel = getCarouselState(frame, windows, stage);
+  const slide = getCarouselPoses(carousel.progress, box, stage);
+  const lens = camera ? getWindowCamera(frame, camera, box, stage) : undefined;
   const reveal =
     props.enter?.kind === "whip"
       ? getWindowRevealStyle(
           frame,
           props.enter.atFrame ?? 1,
           props.enter.reveal,
+          stage,
         ).clipPath
       : undefined;
   const card = (index: number, pose: WindowPose) => {
@@ -113,7 +117,9 @@ function _SingleWindow(
         {windows.length
           ? card(
               carousel.current,
-              carousel.previous !== undefined ? slide.incoming : _RESTING,
+              carousel.previous !== undefined
+                ? slide.incoming
+                : getRestingPose(stage),
             )
           : null}
       </div>
@@ -128,12 +134,15 @@ function _SingleWindow(
                   exit.atFrame,
                   _toPixels(secondary.box, canvas),
                   exit.durationInFrames,
+                  stage,
                 )
               : getWhipEntrance(
                   frame,
                   secondary.atFrame,
                   canvas,
                   _toPixels(secondary.box, canvas),
+                  undefined,
+                  stage,
                 )
           }
           source={secondary}
@@ -145,22 +154,15 @@ function _SingleWindow(
   );
 }
 
-const _RESTING: WindowPose = {
-  translateX: 0,
-  translateZ: 0,
-  rotateY: WINDOW_TILT.rotateY,
-  opacity: 1,
-  blurX: 0,
-};
-
 /** The whole window's entrance or exit pose at this frame. */
 function _getBasePose(
   props: TiltedWindowSceneProps & { width: number },
   box: Rect,
+  stage: WindowStage,
 ): WindowPose {
   const { frame, exit, enter } = props;
   if (exit && frame >= exit.atFrame) {
-    return getWhipExit(frame, exit.atFrame, box, exit.durationInFrames);
+    return getWhipExit(frame, exit.atFrame, box, exit.durationInFrames, stage);
   }
   if (enter === undefined || enter.kind === "whip") {
     return getWhipEntrance(
@@ -169,9 +171,10 @@ function _getBasePose(
       { width: props.width },
       box,
       enter?.durationInFrames,
+      stage,
     );
   }
-  return _RESTING;
+  return getRestingPose(stage);
 }
 
 /** Layers a carousel slide over the whole window's entrance or exit. */
@@ -202,7 +205,7 @@ function _toPixels(
 }
 
 /** A small muted note at the bottom left that fades out with the exit. */
-function _Footnote({
+function WindowFootnote({
   frame,
   text,
   exit,
@@ -211,10 +214,13 @@ function _Footnote({
   text: string;
   exit: TiltedWindowSceneProps["exit"];
 }) {
+  const theme = useVideoTheme();
+  const { motion } = useWindowStage();
   const fade = exit
-    ? 1 - ramp(frame, exit.atFrame + 1, DUR.chip, EASE.inOut)
+    ? 1 -
+      motion.ramp(frame, exit.atFrame + 1, motion.chip, motion.dissolve.easing)
     : 1;
-  const arrive = ramp(frame, 1, DUR.panel, EASE.out);
+  const arrive = motion.ramp(frame, 1, motion.panel, motion.entrance.easing);
   return (
     <p
       style={{
@@ -222,8 +228,8 @@ function _Footnote({
         left: `${HEADLINE_BOX.x * 100}%`,
         bottom: 40,
         margin: 0,
-        fontSize: 18,
-        color: "var(--muted-foreground)",
+        fontSize: theme.mantine.fontSizes.xl,
+        color: theme.semantic.color.scene.mutedForeground,
         opacity: arrive * fade,
       }}
     >

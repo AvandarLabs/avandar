@@ -1,7 +1,10 @@
 import { useCurrentFrame } from "remotion";
 import { isCameraMoving } from "../../motion-components/cameraTrack";
 import { DiagramCamera } from "../../motion-components/DiagramCamera";
-import { resolveMotionSettings } from "../../motion-components/motionSettings";
+import {
+  resolveMotionSettings,
+  useMotionSettingsTheme,
+} from "../../motion-components/motionSettings";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { ContinuityGraphicObjects } from "./ContinuityGraphicObjects";
 import { getObjectFlight } from "./objectFlight";
@@ -14,15 +17,17 @@ type Props = { content: Extract<ContinuityBeat["content"], { kind: "stock" }> };
 export function ContinuityCameraGraphic({ content }: Props): ReactNode {
   const frame = useCurrentFrame();
   const { cameraMotion, motionBlur } = useContinuityAppearance();
+  const theme = useMotionSettingsTheme();
   const flightActive = Boolean(
-    content.flight && getObjectFlight(content.flight, frame).active,
+    content.flight && getObjectFlight(content.flight, frame, theme).active,
   );
   const useFlightBlur =
     flightActive &&
     content.flight?.motion &&
-    !isCameraMoving(content.camera, frame, content.cameraOptions);
+    !isCameraMoving(content.camera, frame, content.cameraOptions, theme);
   const { shutterAngle, samples, blurStrength } = resolveMotionSettings(
     content.flight?.motion,
+    theme,
   );
   return (
     <DiagramCamera

@@ -1,5 +1,7 @@
 import { Img, staticFile } from "remotion";
-import { DUR, EASE, mix, ramp } from "../motion";
+import { mix } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   assertFrame,
   fitTextLines,
@@ -45,6 +47,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
     size = "display",
   } = props;
   _validate(props);
+  const motion = useVideoMotion();
   const bounds = sceneBounds(width, height, Boolean(title || kicker));
   const iconSize = icon ? (icon.size ?? ICON_SIZE) : 0;
   const isCaption = size === "caption";
@@ -59,6 +62,7 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
   const { iconAt = revealAtFrame, linesAt } = getTypographyRevealFrames(
     revealAtFrame,
     icon,
+    motion,
   );
   const wordStarts = _countWordsBefore(fitted.lines);
   return (
@@ -78,7 +82,12 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
           <div
             style={{
               marginBottom: 48,
-              ...getStagedExitStyle(frame, props.exit, fitted.lines.length),
+              ...getStagedExitStyle(
+                frame,
+                props.exit,
+                fitted.lines.length,
+                motion,
+              ),
             }}
           >
             <Img
@@ -88,9 +97,13 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
                 display: "block",
                 height: iconSize,
                 width: "auto",
-                ...getLineRevealStyle(frame, iconAt, "line-fade", {
-                  rise: 0,
-                }),
+                ...getLineRevealStyle(
+                  frame,
+                  iconAt,
+                  "line-fade",
+                  { rise: 0 },
+                  motion,
+                ),
               }}
             />
           </div>
@@ -101,10 +114,10 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
               key={row}
               style={{
                 maxWidth: "100%",
-                ...getStagedExitStyle(frame, props.exit, row),
+                ...getStagedExitStyle(frame, props.exit, row, motion),
               }}
             >
-              <_TypographyLine
+              <TypographyLine
                 {...props}
                 line={line}
                 fontSize={fitted.fontSize}
@@ -114,7 +127,8 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
                   props.revealMode === undefined ||
                   props.revealMode === "word-mask"
                     ? linesAt + wordStarts[row] * wordStaggerFrames
-                    : linesAt + row * (props.lineStaggerFrames ?? 3)
+                    : linesAt +
+                      row * (props.lineStaggerFrames ?? motion.rise.stagger)
                 }
               />
             </div>
@@ -125,8 +139,13 @@ export function TypographyScene(props: TypographySceneProps): ReactNode {
   );
 }
 
-/** One fitted line, in the scene's reveal mode. */
-function _TypographyLine({
+/**
+ * One fitted line, in the scene's reveal mode. Display lines take the
+ * `text.stage.sceneHeading` weight and tracking at their fitted size,
+ * captions the `text.stage.sceneBody` weight; emphasised words are the
+ * scene's strong brand colour.
+ */
+function TypographyLine({
   frame,
   line,
   fontSize,
@@ -143,15 +162,23 @@ function _TypographyLine({
   isCentered: boolean;
   revealAt: number;
 }) {
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const lineHeight = useVideoTheme().mantine.lineHeights["108"];
+  const heading = tokens.text.stage.sceneHeading;
+  const role = isCaption ? tokens.text.stage.sceneBody : heading;
   const wordStyle = (word: string) => {
     return {
       display: "inline-block",
       fontSize,
-      fontWeight: isCaption ? 400 : 600,
-      letterSpacing: isCaption ? 0 : -fontSize * 0.025,
+      fontWeight: role.fontWeight,
+      letterSpacing:
+        isCaption || heading.letterSpacing === undefined
+          ? undefined
+          : `${heading.letterSpacing}em`,
       color: emphasis.includes(word)
-        ? "var(--brand-strong)"
-        : "var(--foreground)",
+        ? tokens.color.scene.brandStrong
+        : tokens.color.scene.foreground,
     };
   };
   const words = line.split(/\s+/);
@@ -162,9 +189,9 @@ function _TypographyLine({
           display: "flex",
           justifyContent: isCentered ? "center" : "flex-start",
           gap: fontSize * 0.3,
-          lineHeight: 1.08,
+          lineHeight,
           paddingBottom: fontSize * 0.07,
-          ...getLineRevealStyle(frame, revealAt, revealMode),
+          ...getLineRevealStyle(frame, revealAt, revealMode, {}, motion),
         }}
       >
         {words.map((word, index) => {
@@ -187,11 +214,11 @@ function _TypographyLine({
       }}
     >
       {words.map((word, index) => {
-        const progress = ramp(
+        const progress = motion.ramp(
           frame,
           revealAt + index * wordStaggerFrames,
-          DUR.word,
-          EASE.word,
+          motion.rise.duration,
+          motion.rise.easing,
         );
         return (
           <span
@@ -200,7 +227,7 @@ function _TypographyLine({
               display: "inline-block",
               overflow: "hidden",
               paddingBottom: fontSize * 0.07,
-              lineHeight: 1.08,
+              lineHeight,
             }}
           >
             <span

@@ -1,14 +1,14 @@
-import { MONO } from "../../fonts";
-import { DUR, EASE, ramp } from "../../motion";
+import { buildColorWithAlpha } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { VIDEO_FONT_REGISTRY } from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import { fitTextLines } from "../layout/layout";
+import { getStageTextStyle } from "../stageTheme/stageTheme";
 import { getLineRevealStyle } from "../textReveal";
+import { useWindowStage } from "./useWindowStage";
 import { getActiveHeadline } from "./windowMotion";
 import { HEADLINE_BOX } from "./windowTilt";
 import type { WindowHeadline } from "../scenes.types";
 import type { ReactNode } from "react";
-
-/** Frames between headline lines fading in. */
-const LINE_STAGGER = 3;
 
 type Props = {
   frame: number;
@@ -20,9 +20,11 @@ type Props = {
 };
 
 /**
- * The headline column beside a tilted window: lines fade in a few frames
+ * The headline column beside a tilted window: lines fade in a rise stagger
  * apart, a later headline replaces the earlier one, and on exit the copy
- * fades where it stands while the window leaves.
+ * fades where it stands while the window leaves. Lines are
+ * `text.stage.windowHeadline` at their fitted size; the subtitle is a
+ * monospace line in the faded foreground.
  */
 export function WindowHeadlines({
   frame,
@@ -31,7 +33,12 @@ export function WindowHeadlines({
   height,
   exitAtFrame,
 }: Props): ReactNode {
-  const { index, opacity } = getActiveHeadline(frame, headlines);
+  const theme = useVideoTheme();
+  const stage = useWindowStage();
+  const { motion } = stage;
+  const scene = theme.semantic.color.scene;
+  const lineStagger = motion.rise.stagger;
+  const { index, opacity } = getActiveHeadline(frame, headlines, stage);
   const headline = headlines[index];
   const columnWidth = width * HEADLINE_BOX.width;
   const fitted = fitTextLines(
@@ -44,7 +51,13 @@ export function WindowHeadlines({
   const exitOpacity =
     exitAtFrame === undefined
       ? 1
-      : 1 - ramp(frame, exitAtFrame + 1, DUR.chip, EASE.inOut);
+      : 1 -
+        motion.ramp(
+          frame,
+          exitAtFrame + 1,
+          motion.chip,
+          motion.dissolve.easing,
+        );
   return (
     <div
       style={{
@@ -60,15 +73,19 @@ export function WindowHeadlines({
           <div
             key={`${headline.atFrame}-${row}`}
             style={{
+              ...getStageTextStyle(theme.semantic.text.stage.windowHeadline, [
+                "lineHeight",
+                "fontWeight",
+                "letterSpacing",
+              ]),
               fontSize: fitted.fontSize,
-              lineHeight: 1.25,
-              fontWeight: 600,
-              letterSpacing: -fitted.fontSize * 0.02,
-              color: "var(--foreground)",
+              color: scene.foreground,
               ...getLineRevealStyle(
                 frame,
-                headline.atFrame + row * LINE_STAGGER,
+                headline.atFrame + row * lineStagger,
                 "line-fade",
+                {},
+                motion,
               ),
             }}
           >
@@ -80,13 +97,19 @@ export function WindowHeadlines({
         <div
           style={{
             marginTop: height * 0.02,
-            fontFamily: MONO,
+            fontFamily:
+              VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
             fontSize: Math.round(height * 0.024),
-            color: "color-mix(in oklab, var(--foreground) 45%, transparent)",
+            color: buildColorWithAlpha(
+              scene.foreground,
+              theme.atomic.opacity["45"],
+            ),
             ...getLineRevealStyle(
               frame,
-              headline.atFrame + fitted.lines.length * LINE_STAGGER,
+              headline.atFrame + fitted.lines.length * lineStagger,
               "line-fade",
+              {},
+              motion,
             ),
           }}
         >

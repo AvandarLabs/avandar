@@ -1,12 +1,15 @@
 import { TransitionSeries } from "@remotion/transitions";
 import { Fragment } from "react";
 import { Sequence, useCurrentFrame } from "remotion";
+import { useMotionSettingsTheme } from "../motion-components/motionSettings";
 import { createSceneTransition } from "../motion-components/SceneTransition";
 import { buildColorWithAlpha } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityAppearanceContext } from "./ContinuityAppearanceContext";
 import { ContinuityBeatView } from "./ContinuityBeatView";
 import css from "./ContinuityScene.module.css";
+import { CONTINUITY_STAGE } from "./continuityStage";
 import { getContinuityTimeline } from "./continuityTimeline";
 import { ContinuityToken } from "./ContinuityToken";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
@@ -27,7 +30,11 @@ export function ContinuityScene({
   productScene?: ProductSceneRenderer;
 }): ReactNode {
   const parentFrame = useCurrentFrame();
-  const { color } = useVideoTokens();
+  const tokens = useVideoTokens();
+  const { color } = tokens;
+  const scales = useVideoShapeScales();
+  const settings = useMotionSettingsTheme();
+  const evidenceChip = { borderRadius: scales.corner(tokens.corner.chip) };
   const bar = useVideoProps("ProgressBar", {});
   const morph = useVideoProps("Morph", {});
   const aperture = useVideoProps("Aperture", {});
@@ -35,7 +42,13 @@ export function ContinuityScene({
   const duration = timing[timing.length - 1].end;
   return (
     <ContinuityAppearanceContext.Provider value={plan}>
-      <div className={css.continuityStage}>
+      <div
+        className={css.continuityStage}
+        style={{
+          width: CONTINUITY_STAGE.width,
+          height: CONTINUITY_STAGE.height,
+        }}
+      >
         <Sequence from={parentFrame - frame}>
           <TransitionSeries>
             {plan.beats.map((beat, index) => {
@@ -43,17 +56,20 @@ export function ContinuityScene({
                 <Fragment key={beat.id}>
                   {index > 0 && beat.transition.frames > 0 && (
                     <TransitionSeries.Transition
-                      {...createSceneTransition({
-                        durationInFrames: beat.transition.frames,
-                        kind: beat.transition.kind,
-                        motion: beat.transition.motion,
-                        origin: beat.transition.origin,
-                        anchor: plan.beats[index - 1]?.token?.anchor,
-                        cameraMotion: plan.cameraMotion,
-                        motionBlur: plan.motionBlur,
-                        morphRadius: morph.startRadius,
-                        apertureOverscan: aperture.overscan,
-                      })}
+                      {...createSceneTransition(
+                        {
+                          durationInFrames: beat.transition.frames,
+                          kind: beat.transition.kind,
+                          motion: beat.transition.motion,
+                          origin: beat.transition.origin,
+                          anchor: plan.beats[index - 1]?.token?.anchor,
+                          cameraMotion: plan.cameraMotion,
+                          motionBlur: plan.motionBlur,
+                          morphRadius: morph.startRadius,
+                          apertureOverscan: aperture.overscan,
+                        },
+                        settings,
+                      )}
                     />
                   )}
                   <TransitionSeries.Sequence
@@ -73,8 +89,8 @@ export function ContinuityScene({
         </Sequence>
         <ContinuityToken plan={plan} frame={frame} />
         <div className={css.continuityEvidence}>
-          <span>{plan.evidence}</span>
-          <span>{plan.title}</span>
+          <span style={evidenceChip}>{plan.evidence}</span>
+          <span style={evidenceChip}>{plan.title}</span>
         </div>
         <div
           className={css.continuityProgress}

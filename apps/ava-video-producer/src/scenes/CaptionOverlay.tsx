@@ -1,27 +1,44 @@
-import { TYPE } from "../fonts";
-import { DUR, ramp } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   activeCaption,
   captionGeometry,
   validateCaptions,
 } from "./layout/layout";
+import { getStageTextStyle } from "./stageTheme/stageTheme";
 import type { CaptionOverlayProps } from "./scenes.types";
 import type { ReactNode } from "react";
 
-/** Whole-cue captions. Alignment comes from authored or imported cue times. */
+/**
+ * Whole-cue captions. Alignment comes from authored or imported cue times.
+ * Type is `text.stage.caption`, its size the default the fit starts from,
+ * on a box in the scene palette.
+ */
 export function CaptionOverlay({
   frame,
   cues,
   width = 1600,
   height = 1000,
   bottom = 48,
-  fontSize = 38,
+  fontSize,
 }: CaptionOverlayProps): ReactNode {
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const caption = tokens.text.stage.caption;
   validateCaptions(cues);
   const cue = activeCaption(frame, cues);
   if (!cue) return null;
-  const geometry = captionGeometry(cue.text, width, height, fontSize, bottom);
-  const fadeDuration = Math.min(DUR.chip, (cue.endFrame - cue.startFrame) / 3);
+  const geometry = captionGeometry(
+    cue.text,
+    width,
+    height,
+    fontSize ?? caption.fontSize,
+    bottom,
+  );
+  const fadeDuration = Math.min(
+    motion.chip,
+    (cue.endFrame - cue.startFrame) / 3,
+  );
   return (
     <div
       aria-label={cue.text}
@@ -35,16 +52,20 @@ export function CaptionOverlay({
         height: geometry.boxHeight,
         boxSizing: "border-box",
         padding: `${geometry.paddingY}px ${geometry.paddingX}px`,
-        border: `${geometry.borderWidth}px solid var(--border)`,
+        border: `${geometry.borderWidth}px solid ${tokens.color.scene.border}`,
+        // No corner token holds the starter 14 px radius yet.
         borderRadius: "var(--radius)",
-        background: "var(--ground)",
-        color: "var(--foreground)",
-        fontFamily: TYPE,
+        background: tokens.color.scene.ground,
+        ...getStageTextStyle(caption, ["fontFamily", "fontWeight", "color"]),
         fontSize: geometry.fontSize,
-        fontWeight: 500,
         lineHeight: geometry.lineHeight,
         textAlign: "center",
-        opacity: ramp(frame, cue.startFrame, fadeDuration),
+        opacity: motion.ramp(
+          frame,
+          cue.startFrame,
+          fadeDuration,
+          motion.entrance.easing,
+        ),
         pointerEvents: "none",
       }}
     >

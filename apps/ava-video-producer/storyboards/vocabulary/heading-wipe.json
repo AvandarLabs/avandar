@@ -23,12 +23,12 @@
       "durationInFrames": 100,
       "transitionInFrames": 0,
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#cbd5e1",
-        "card": "#ffffff",
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate300",
+        "card": "$white",
         "brand-strong": "var(--brand)"
       },
       "props": {
@@ -55,12 +55,12 @@
         "kind": "cut"
       },
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#cbd5e1",
-        "card": "#ffffff",
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate300",
+        "card": "$white",
         "brand-strong": "var(--brand)"
       },
       "props": {
@@ -86,12 +86,12 @@
         "kind": "cut"
       },
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#cbd5e1",
-        "card": "#ffffff",
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate300",
+        "card": "$white",
         "brand-strong": "var(--brand)"
       },
       "props": {

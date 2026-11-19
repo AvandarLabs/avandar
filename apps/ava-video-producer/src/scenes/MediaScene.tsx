@@ -1,4 +1,6 @@
-import { DUR, enter, ramp } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
+import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   assertFrame,
   assertRect,
@@ -10,10 +12,21 @@ import {
 import { MediaPlane } from "./MediaPlane";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
+import { getStageTextStyle } from "./stageTheme/stageTheme";
 import type { MediaSceneProps } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
 
-/** Media stays stationary. Any crop is fixed for the entire scene. */
+/** How far the heading rises as it arrives, in pixels. */
+const HEADING_RISE = 6;
+/** How far the subtitle rises as it arrives, in pixels. */
+const SUBTITLE_RISE = 4;
+
+/**
+ * Media stays stationary. Any crop is fixed for the entire scene. The
+ * heading is `text.stage.cardTitle` at its fitted size, callouts are
+ * `text.stage.caption` labels with emphasis outlines in the strong brand
+ * colour.
+ */
 export function MediaScene({
   frame,
   width = 1600,
@@ -37,6 +50,13 @@ export function MediaScene({
   if (fit !== "contain" && fit !== "cover")
     throw new Error("Media fit must be contain or cover");
   sceneBounds(width, height); // Apply the shared minimum-size checks.
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const scene = tokens.color.scene;
+  const cardTitle = tokens.text.stage.cardTitle;
+  const caption = tokens.text.stage.caption;
+  const captionLineHeight = caption.lineHeight ?? 1;
   const top = title || kicker ? 92 : 24;
   const bounds = {
     x: 24,
@@ -91,9 +111,11 @@ export function MediaScene({
               style={{
                 margin: 0,
                 fontSize: heading.fontSize,
-                lineHeight: 1.22,
-                fontWeight: 600,
-                ...enter(frame, 0, { y: 6, dur: DUR.sheet }),
+                ...getStageTextStyle(cardTitle, ["lineHeight", "fontWeight"]),
+                ...motion.enter(frame, 0, {
+                  y: HEADING_RISE,
+                  dur: motion.sheet,
+                }),
               }}
             >
               {heading.lines.map((line, i) => {
@@ -106,10 +128,10 @@ export function MediaScene({
               style={{
                 margin: 0,
                 fontSize: subtitle.fontSize,
-                lineHeight: 1.22,
+                lineHeight: cardTitle.lineHeight,
                 textAlign: "right",
-                color: "var(--muted-foreground)",
-                ...enter(frame, DUR.panel, { y: 4 }),
+                color: scene.mutedForeground,
+                ...motion.enter(frame, motion.panel, { y: SUBTITLE_RISE }),
               }}
             >
               {subtitle.lines.map((line, i) => {
@@ -127,11 +149,12 @@ export function MediaScene({
         style={{
           ...positioned(bounds),
           margin: 0,
-          border: "1px solid var(--border)",
+          border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
+          // No corner token holds the starter 14 px radius yet.
           borderRadius: "var(--radius)",
-          background: "var(--background)",
+          background: scene.background,
           overflow: "hidden",
-          ...enter(frame, 0, { y: 0, dur: DUR.sheet }),
+          ...motion.enter(frame, 0, { y: 0, dur: motion.sheet }),
         }}
       >
         <div
@@ -156,12 +179,14 @@ export function MediaScene({
           if (frame < callout.startFrame || frame >= callout.endFrame)
             return null;
           const duration = Math.min(
-            DUR.chip,
+            motion.chip,
             (callout.endFrame - callout.startFrame) / 3,
           );
+          const fade = motion.reveal.easing;
           const opacity =
-            ramp(frame, callout.startFrame, duration) *
-            (1 - ramp(frame, callout.endFrame - duration, duration));
+            motion.ramp(frame, callout.startFrame, duration, fade) *
+            (1 -
+              motion.ramp(frame, callout.endFrame - duration, duration, fade));
           const labelWidth = Math.min(
             bounds.width - 32,
             Math.max(160, Math.min(460, textUnits(callout.label) * 22 + 32)),
@@ -173,7 +198,8 @@ export function MediaScene({
             22,
             18,
           );
-          const labelHeight = label.lines.length * label.fontSize * 1.22 + 20;
+          const labelHeight =
+            label.lines.length * label.fontSize * captionLineHeight + 20;
           const labelX = Math.max(
             8,
             Math.min(bounds.width - labelWidth - 8, callout.x * bounds.width),
@@ -195,8 +221,8 @@ export function MediaScene({
                   top: `${callout.y * 100}%`,
                   width: `${callout.width * 100}%`,
                   height: `${callout.height * 100}%`,
-                  border: "3px solid var(--brand-strong)",
-                  borderRadius: 8,
+                  border: `${scales.stroke(tokens.stroke.emphasis)}px solid ${scene.brandStrong}`,
+                  borderRadius: scales.corner(tokens.corner.cell),
                   boxSizing: "border-box",
                 }}
               />
@@ -208,12 +234,11 @@ export function MediaScene({
                   width: labelWidth,
                   padding: "10px 16px",
                   fontSize: label.fontSize,
-                  lineHeight: 1.22,
-                  fontWeight: 500,
-                  color: "var(--foreground)",
-                  background: "var(--ground)",
-                  border: "1px solid var(--brand-strong)",
-                  borderRadius: 8,
+                  ...getStageTextStyle(caption, ["lineHeight", "fontWeight"]),
+                  color: scene.foreground,
+                  background: scene.ground,
+                  border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.brandStrong}`,
+                  borderRadius: scales.corner(tokens.corner.cell),
                 }}
               >
                 {label.lines.map((line, i) => {

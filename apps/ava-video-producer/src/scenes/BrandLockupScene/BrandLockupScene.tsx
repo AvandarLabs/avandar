@@ -1,9 +1,17 @@
 import { Img, staticFile } from "remotion";
-import { MONO } from "../../fonts";
-import { DUR, STAGGER_COLUMN, caretOn, enter, typed } from "../../motion";
+import { typed } from "../../motion";
+import { useVideoMotion } from "../../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
+import {
+  useVideoProps,
+  useVideoTheme,
+  useVideoTokens,
+} from "../../videoTheme/useVideoTheme";
+import { VIDEO_FONT_REGISTRY } from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
 import { safePublicPath, textUnits } from "../layout/layout";
 import { positioned } from "../positioned";
 import { SceneShell } from "../SceneShell";
+import { getStageTextStyle } from "../stageTheme/stageTheme";
 import { getLineRevealStyle, getWipeExitStyle } from "../textReveal";
 import {
   MARK_BUILD_DEFAULTS,
@@ -13,12 +21,12 @@ import {
   getMarkBuildEndFrame,
   getMarkBuildProgress,
 } from "./brandLockupMotion";
+import type { ThemeTokenName } from "../../storyboard/schema/themeSchema";
+import type { ResolvedVideoSemantic } from "../../videoTheme/videoTheme.types";
 import type { Rect } from "../layout/layout";
 import type { BrandLockupSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
 
-/** Largest rotation of the flying columns, at the middle of the flight. */
-const FLIGHT_TILT_DEGREES = 28;
 /** Perspective distance of the fly-through, in pixels. */
 const FLIGHT_PERSPECTIVE = 1400;
 /** Default command typing speed, about one character per frame. */
@@ -29,22 +37,33 @@ const COMMAND_CHARS_PER_SECOND = 30;
  * opening or closing card. The mark can build through column masks, the
  * wordmark wipes in beside it, a CTA stack (subtitle, URL, typed command,
  * badge) can cascade in below, and the mark's columns can fly through the
- * frame to hand over to the next shot's field colour.
+ * frame to hand over to the next shot's field colour. The build and flight
+ * read `components.BrandLockup`, colours the scene palette.
  */
 export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
   const { frame, width = 1600, height = 1000, wordmark, cta } = props;
+  const theme = useVideoTheme();
+  const motion = useVideoMotion();
+  const { columnStagger } = useVideoProps("BrandLockup", {});
+  const buildMotion = { motion, columnStagger };
   const geometry = _getLockupGeometry(props, width, height);
   const wordmarkAt =
-    props.wordmarkAtFrame ?? getMarkBuildEndFrame(props.build) + DUR.sheet;
+    props.wordmarkAtFrame ??
+    getMarkBuildEndFrame(props.build, buildMotion) + motion.sheet;
   return (
     <SceneShell frame={frame} width={width} height={height}>
-      <_Mark {...props} mark={geometry.mark} width={width} height={height} />
+      <LockupMark
+        {...props}
+        mark={geometry.mark}
+        width={width}
+        height={height}
+      />
       {wordmark && geometry.wordmark ? (
         <div
           style={{
             ...positioned(geometry.wordmark),
             ...(props.exit
-              ? getWipeExitStyle(frame, props.exit.atFrame, DUR.chip)
+              ? getWipeExitStyle(frame, props.exit.atFrame, motion.chip, motion)
               : {}),
           }}
         >
@@ -52,10 +71,10 @@ export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
             style={{
               fontSize: geometry.wordmarkFontSize,
               lineHeight: `${geometry.wordmark.height}px`,
-              fontWeight: 600,
-              letterSpacing: -geometry.wordmarkFontSize * 0.03,
+              fontWeight: theme.atomic.fontWeight.semibold,
+              letterSpacing: `${theme.atomic.letterSpacing.wordmark}em`,
               whiteSpace: "nowrap",
-              ...getLineRevealStyle(frame, wordmarkAt, "wipe"),
+              ...getLineRevealStyle(frame, wordmarkAt, "wipe", {}, motion),
             }}
           >
             {wordmark}
@@ -63,7 +82,7 @@ export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
         </div>
       ) : null}
       {cta ? (
-        <_LockupCta frame={frame} cta={cta} width={width} height={height} />
+        <LockupCta frame={frame} cta={cta} width={width} height={height} />
       ) : null}
     </SceneShell>
   );
@@ -105,8 +124,20 @@ function _getLockupGeometry(
   };
 }
 
+/** A storyboard theme name as its scene palette colour, `brand-soft` as
+ *  `color.scene.brandSoft`. */
+function _sceneColorFromName(
+  tokens: ResolvedVideoSemantic,
+  name: ThemeTokenName,
+): string | undefined {
+  const key = name.replace(/-([a-z])/g, (_, letter: string) => {
+    return letter.toUpperCase();
+  }) as keyof ResolvedVideoSemantic["color"]["scene"];
+  return tokens.color.scene[key];
+}
+
 /** The mark: whole at rest, as column masks while building or flying. */
-function _Mark({
+function LockupMark({
   frame,
   logo,
   build,
@@ -115,10 +146,14 @@ function _Mark({
   width,
   height,
 }: BrandLockupSceneProps & { mark: Rect; width: number; height: number }) {
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const { flightTilt, columnStagger } = useVideoProps("BrandLockup", {});
+  const buildMotion = { motion, columnStagger };
   const src = staticFile(safePublicPath(logo.src));
   const columns = build?.columns ?? MARK_BUILD_DEFAULTS.columns;
-  const isBuilt = frame >= getMarkBuildEndFrame(build);
-  const isFlying = getFlightProgress(frame, exit).flight > 0;
+  const isBuilt = frame >= getMarkBuildEndFrame(build, buildMotion);
+  const isFlying = getFlightProgress(frame, exit, motion).flight > 0;
   if (isBuilt && !isFlying) {
     return (
       <Img
@@ -128,16 +163,22 @@ function _Mark({
       />
     );
   }
-  const rise = getMarkBuildProgress(frame, build, columns);
+  const rise = getMarkBuildProgress(frame, build, columns, buildMotion);
   const flights = rise.map((_, index) => {
-    return getFlightProgress(frame - index * STAGGER_COLUMN, exit).flight;
+    return getFlightProgress(
+      frame - index * motion.stagger.column,
+      exit,
+      motion,
+    ).flight;
   });
   const meanFlight =
     flights.reduce((sum, value) => {
       return sum + value;
     }, 0) / columns;
-  const tilt = FLIGHT_TILT_DEGREES * Math.sin(Math.PI * meanFlight);
-  const cover = getFlightProgress(frame, exit).cover;
+  // The columns turn most at the middle of the flight.
+  const tilt = flightTilt * Math.sin(Math.PI * meanFlight);
+  const cover = getFlightProgress(frame, exit, motion).cover;
+  const coverColor = _sceneColorFromName(tokens, exit?.color ?? "brand");
   return (
     <div
       style={{
@@ -185,7 +226,7 @@ function _Mark({
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: `var(--${exit?.color ?? "brand"})`,
+                  background: coverColor,
                   opacity: cover,
                 }}
               />
@@ -198,7 +239,7 @@ function _Mark({
 }
 
 /** Subtitle, URL, typed command and badge, cascading in below the mark. */
-function _LockupCta({
+function LockupCta({
   frame,
   cta,
   width,
@@ -209,8 +250,14 @@ function _LockupCta({
   width: number;
   height: number;
 }) {
+  const theme = useVideoTheme();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const tokens = theme.semantic;
+  const scene = tokens.color.scene;
+  const badge = tokens.text.stage.badge;
   const cps = cta.commandCharsPerSecond ?? COMMAND_CHARS_PER_SECOND;
-  const beats = getCtaBeats(cta, cps);
+  const beats = getCtaBeats(cta, cps, motion);
   const line = (top: number, fontSize: number) => {
     return {
       position: "absolute" as const,
@@ -219,7 +266,7 @@ function _LockupCta({
       top: height * top,
       textAlign: "center" as const,
       fontSize,
-      lineHeight: 1.2,
+      lineHeight: badge.lineHeight,
       whiteSpace: "nowrap" as const,
     };
   };
@@ -230,8 +277,8 @@ function _LockupCta({
         <div
           style={{
             ...line(0.43, height * 0.042),
-            color: "var(--muted-foreground)",
-            ...enter(frame, beats.subtitleAt, { y: 0 }),
+            color: scene.mutedForeground,
+            ...motion.enter(frame, beats.subtitleAt, { y: 0 }),
           }}
         >
           {cta.subtitle}
@@ -241,8 +288,8 @@ function _LockupCta({
         <div
           style={{
             ...line(0.54, height * 0.09),
-            fontWeight: 700,
-            ...enter(frame, beats.urlAt, { y: 0 }),
+            ...getStageTextStyle(badge, ["fontWeight"]),
+            ...motion.enter(frame, beats.urlAt, { y: 0 }),
           }}
         >
           {cta.url}
@@ -252,11 +299,12 @@ function _LockupCta({
         <div
           style={{
             ...line(0.735, height * 0.03),
-            fontFamily: MONO,
+            fontFamily:
+              VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
             opacity: frame >= beats.promptAt ? 1 : 0,
           }}
         >
-          <span style={{ color: "var(--muted-foreground)" }}>$ </span>
+          <span style={{ color: scene.mutedForeground }}>$ </span>
           {typed(frame, beats.typingAt, cta.command, cps)}
           <span
             style={{
@@ -264,8 +312,8 @@ function _LockupCta({
               width: "0.6em",
               height: "1.1em",
               verticalAlign: "-0.2em",
-              background: "var(--brand)",
-              opacity: isTyping || caretOn(frame) ? 1 : 0,
+              background: scene.brand,
+              opacity: isTyping || motion.caretOn(frame) ? 1 : 0,
             }}
           />
         </div>
@@ -274,15 +322,15 @@ function _LockupCta({
         <div
           style={{
             ...line(0.86, height * 0.022),
-            ...enter(frame, beats.badgeAt, { y: 0 }),
+            ...motion.enter(frame, beats.badgeAt, { y: 0 }),
           }}
         >
           <span
             style={{
               padding: "0.35em 0.9em",
-              border: "1px solid var(--border)",
-              borderRadius: 999,
-              color: "var(--muted-foreground)",
+              border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
+              borderRadius: scales.corner(tokens.corner.pill),
+              color: scene.mutedForeground,
             }}
           >
             {cta.badge}

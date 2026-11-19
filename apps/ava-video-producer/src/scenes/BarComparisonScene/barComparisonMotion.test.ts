@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createVideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
+import { getClassicStageTheme } from "../stageTheme/stageTheme";
 import {
   getBarComparisonBeats,
   getBarFractions,
@@ -67,4 +69,17 @@ test("a rough bar edge stays within its depth and repeats for the same row", () 
 test("a row value without display text keeps the panel's decimal places", () => {
   assert.equal(getRowValueLabel({ value: 4.2 }, 1), "4.2");
   assert.equal(getRowValueLabel({ value: 4.2, display: "4.2 s" }, 1), "4.2 s");
+});
+
+test("a panel's staging stretches with the theme's tempo", () => {
+  const motion = getClassicStageTheme().semantic.motion;
+  const slowest = createVideoMotion({ ...motion, tempo: 0.8 });
+  const classic = getBarComparisonBeats(10, 0, 3);
+  const slow = getBarComparisonBeats(10, 0, 3, slowest);
+  assert.equal(slow.heroAt, classic.heroAt);
+  assert.equal(slow.labelsAt - slow.heroAt, slowest.panel);
+  assert.equal(
+    slow.valuesAt - slow.barsAt,
+    slowest.sheet + slowest.stagger.list,
+  );
 });

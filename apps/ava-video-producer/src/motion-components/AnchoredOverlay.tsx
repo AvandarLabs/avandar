@@ -1,10 +1,12 @@
-import { mix, ramp } from "../motion";
+import { mix } from "../motion";
 import {
+  getClassicMotionSettingsTheme,
   getMotionDuration,
   getMotionProgress,
   getVelocityBlur,
+  useMotionSettingsTheme,
 } from "./motionSettings";
-import type { MotionOptions } from "./motionSettings";
+import type { MotionOptions, MotionSettingsTheme } from "./motionSettings";
 import type { CSSProperties, ReactNode } from "react";
 
 /** Measured geometry in the enclosing composition's coordinate system. */
@@ -42,9 +44,12 @@ export type OverlayPose = {
 /**
  * Resolve travel and fade durations, rejecting cues that cannot include a hold.
  */
-export function getOverlayTimings(cue: OverlayCue): OverlayTimings {
-  const entry = getMotionDuration(cue.entryFrames ?? 36, cue.motion);
-  const exit = getMotionDuration(cue.exitFrames ?? 30, cue.motion);
+export function getOverlayTimings(
+  cue: OverlayCue,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
+): OverlayTimings {
+  const entry = getMotionDuration(cue.entryFrames ?? 36, cue.motion, theme);
+  const exit = getMotionDuration(cue.exitFrames ?? 30, cue.motion, theme);
   const fade = cue.fadeFrames ?? 20;
   if (
     entry < 1 ||
@@ -60,26 +65,33 @@ export function getOverlayTimings(cue: OverlayCue): OverlayTimings {
 
 /**
  * Floating artwork originates at a measured region without moving the source
- * UI.
+ * UI, fading in and out on the theme's reveal curve.
  */
 export function getOverlayPose(
   frame: number,
   cue: OverlayCue,
   source: MotionRect,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): OverlayPose {
-  const timing = getOverlayTimings(cue);
+  const timing = getOverlayTimings(cue, theme);
   const departure = getMotionProgress(
     frame,
     cue.at,
     cue.entryFrames ?? 36,
     cue.motion,
+    undefined,
+    theme,
   );
   const arrival = getMotionProgress(
     frame,
     cue.until - timing.exit,
     cue.exitFrames ?? 30,
     cue.motion,
+    undefined,
+    theme,
   );
+  const { motion } = theme;
+  const fade = motion.reveal.easing;
   const travel = departure * (1 - arrival);
   const originX = source.x + source.width / 2 - cue.target.width / 2;
   const originY = source.y + source.height / 2 - cue.target.height / 2;
@@ -87,8 +99,8 @@ export function getOverlayPose(
     x: mix(travel, originX, cue.target.x),
     y: mix(travel, originY, cue.target.y),
     opacity:
-      ramp(frame, cue.at, timing.fade) *
-      (1 - ramp(frame, cue.until - timing.fade, timing.fade)),
+      motion.ramp(frame, cue.at, timing.fade, fade) *
+      (1 - motion.ramp(frame, cue.until - timing.fade, timing.fade, fade)),
     scale: mix(travel, 0.88, 1),
   };
 }
@@ -114,8 +126,9 @@ export function AnchoredOverlay({
   className?: string;
   style?: CSSProperties;
 }): ReactNode {
-  const pose = getOverlayPose(frame, cue, source);
-  const prior = getOverlayPose(frame - 1, cue, source);
+  const theme = useMotionSettingsTheme();
+  const pose = getOverlayPose(frame, cue, source, theme);
+  const prior = getOverlayPose(frame - 1, cue, source, theme);
   const velocity = Math.hypot(pose.x - prior.x, pose.y - prior.y);
   return (
     <div
@@ -129,7 +142,7 @@ export function AnchoredOverlay({
         height: cue.target.height,
         opacity: pose.opacity,
         transform: `scale(${pose.scale})`,
-        filter: `${style?.filter ?? ""} blur(${motionBlur ? getVelocityBlur(velocity, cue.motion) : 0}px)`,
+        filter: `${style?.filter ?? ""} blur(${motionBlur ? getVelocityBlur(velocity, cue.motion, undefined, theme) : 0}px)`,
       }}
     >
       {children}

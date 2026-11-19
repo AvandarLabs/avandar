@@ -7,7 +7,10 @@ import {
   isCameraMoving,
 } from "./cameraTrack";
 import css from "./MotionComponents.module.css";
-import { resolveMotionSettings } from "./motionSettings";
+import {
+  resolveMotionSettings,
+  useMotionSettingsTheme,
+} from "./motionSettings";
 import type { CameraKeyframe } from "./cameraTrack";
 import type { MotionOptions } from "./motionSettings";
 import type { ReactNode } from "react";
@@ -50,7 +53,15 @@ function CameraSample({
   motion,
 }: CameraSampleProps) {
   const frame = useCurrentFrame();
-  const pose = getCameraPose(track, frame, enabled, motion, { width, height });
+  const theme = useMotionSettingsTheme();
+  const pose = getCameraPose(
+    track,
+    frame,
+    enabled,
+    motion,
+    { width, height },
+    theme,
+  );
   const visibleWidth = width / pose.zoom;
   const visibleHeight = height / pose.zoom;
   return (
@@ -103,7 +114,8 @@ export function DiagramCamera({
   const validatedTrack = useMemo(() => {
     return track && createCameraTrackSchema(width, height).parse(track);
   }, [track, width, height]);
-  const settings = resolveMotionSettings({ ...motion, ...blurOptions });
+  const theme = useMotionSettingsTheme();
+  const settings = resolveMotionSettings({ ...motion, ...blurOptions }, theme);
   const shutterAngle = Math.min(
     360,
     settings.shutterAngle * settings.blurStrength,
@@ -112,7 +124,7 @@ export function DiagramCamera({
     enabled &&
     motionBlur &&
     shutterAngle > 0 &&
-    (blurActive || isCameraMoving(validatedTrack, frame, motion));
+    (blurActive || isCameraMoving(validatedTrack, frame, motion, theme));
   const sample = (
     <CameraSample
       track={validatedTrack}

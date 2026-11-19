@@ -1,17 +1,38 @@
-import { DUR, EASE, mix, ramp } from "../../motion";
+import { mix } from "../../motion";
+import {
+  getClassicStageMotion,
+  getClassicStageTheme,
+} from "../stageTheme/stageTheme";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Rect } from "../layout/layout";
 
 /** Storyboards are fixed at 30 fps by their schema; `typed()` assumes it. */
 const FRAMES_PER_SECOND = 30;
 
-/** Defaults for a lockup's column-mask build when the plan omits them. */
+/**
+ * Defaults for a lockup's column-mask build when the plan omits them. The
+ * stagger between columns is `components.BrandLockup.columnStagger` and each
+ * column rises over the theme's whip duration.
+ */
 export const MARK_BUILD_DEFAULTS = {
   atFrame: 5,
   columns: 8,
-  /** Frames between neighbouring columns starting to rise. */
-  staggerFrames: 1.5,
-  durationInFrames: DUR.whip,
 } as const;
+
+/** The theme values a mark build reads. */
+export type MarkBuildMotion = Readonly<{
+  motion: VideoMotion;
+  /** Frames between neighbouring columns starting to rise. */
+  columnStagger: number;
+}>;
+
+/** `classic`'s mark build, the default of the build helpers. */
+function _getClassicMarkBuildMotion(): MarkBuildMotion {
+  return {
+    motion: getClassicStageMotion(),
+    columnStagger: getClassicStageTheme().components.BrandLockup.columnStagger,
+  };
+}
 
 /** How a lockup's mark is built: N columns rising one after another. */
 export type MarkBuild = {
@@ -25,41 +46,51 @@ export type MarkBuild = {
 export type MarkFlyThrough = {
   kind: "fly-through";
   atFrame: number;
-  /** Frames the columns take to fill the frame. Default `DUR.hero`. */
+  /** Frames the columns take to fill the frame. Default the hero duration. */
   durationInFrames?: number;
 };
 
 /**
- * How far each column of the mark has risen, 0 to 1, left to right. With no
- * build every column is already complete, so a lockup can open on a still.
+ * How far each column of the mark has risen, 0 to 1, left to right, on the
+ * rise curve. With no build every column is already complete, so a lockup
+ * can open on a still.
  */
 export function getMarkBuildProgress(
   frame: number,
   build: MarkBuild | undefined,
   columns = build?.columns ?? MARK_BUILD_DEFAULTS.columns,
+  buildMotion: MarkBuildMotion = _getClassicMarkBuildMotion(),
 ): number[] {
   if (!build) {
     return new Array(columns).fill(1);
   }
+  const { motion, columnStagger } = buildMotion;
   const at = build.atFrame ?? MARK_BUILD_DEFAULTS.atFrame;
-  const stagger = build.staggerFrames ?? MARK_BUILD_DEFAULTS.staggerFrames;
-  const duration =
-    build.durationInFrames ?? MARK_BUILD_DEFAULTS.durationInFrames;
+  const stagger = build.staggerFrames ?? columnStagger;
+  const duration = build.durationInFrames ?? motion.whip;
   return Array.from({ length: columns }, (_, index) => {
-    return ramp(frame, at + index * stagger, duration, EASE.word);
+    return motion.ramp(
+      frame,
+      at + index * stagger,
+      duration,
+      motion.rise.easing,
+    );
   });
 }
 
 /** The frame the last column of a build finishes rising. */
-export function getMarkBuildEndFrame(build: MarkBuild | undefined): number {
+export function getMarkBuildEndFrame(
+  build: MarkBuild | undefined,
+  buildMotion: MarkBuildMotion = _getClassicMarkBuildMotion(),
+): number {
   if (!build) {
     return 0;
   }
   const columns = build.columns ?? MARK_BUILD_DEFAULTS.columns;
   return (
     (build.atFrame ?? MARK_BUILD_DEFAULTS.atFrame) +
-    (columns - 1) * (build.staggerFrames ?? MARK_BUILD_DEFAULTS.staggerFrames) +
-    (build.durationInFrames ?? MARK_BUILD_DEFAULTS.durationInFrames)
+    (columns - 1) * (build.staggerFrames ?? buildMotion.columnStagger) +
+    (build.durationInFrames ?? buildMotion.motion.whip)
   );
 }
 
@@ -97,22 +128,34 @@ export function getFlightColumnRect(
 
 /**
  * The three phases of a fly-through at one frame: the wordmark retracting,
- * the columns flying, and the columns' fill colour covering the mark.
+ * the columns flying on the theme's surge, and the columns' fill colour
+ * covering the mark.
  */
 export function getFlightProgress(
   frame: number,
   exit: MarkFlyThrough | undefined,
+  motion: VideoMotion = getClassicStageMotion(),
 ): { retract: number; flight: number; cover: number } {
   if (!exit) {
     return { retract: 0, flight: 0, cover: 0 };
   }
-  const flightAt = exit.atFrame + DUR.press;
-  const flightFrames = exit.durationInFrames ?? DUR.hero;
+  const flightAt = exit.atFrame + motion.press.duration;
+  const flightFrames = exit.durationInFrames ?? motion.hero;
   return {
-    retract: ramp(frame, exit.atFrame, DUR.chip, EASE.inOut),
-    flight: ramp(frame, flightAt, flightFrames, EASE.surge),
+    retract: motion.ramp(
+      frame,
+      exit.atFrame,
+      motion.chip,
+      motion.travel.easing,
+    ),
+    flight: motion.ramp(frame, flightAt, flightFrames, motion.surge.easing),
     // The colour lands before the columns stop, so the cut is seamless.
-    cover: ramp(frame, flightAt, flightFrames * 0.75, EASE.inOut),
+    cover: motion.ramp(
+      frame,
+      flightAt,
+      flightFrames * 0.75,
+      motion.dissolve.easing,
+    ),
   };
 }
 
@@ -138,12 +181,17 @@ type CtaBeats = {
 
 /**
  * When each CTA line arrives: subtitle, URL, the typed command (with the
- * frame its last character lands) and the badge after it.
+ * frame its last character lands) and the badge after it. Gaps are the
+ * theme's durations, so they follow its tempo.
  */
-export function getCtaBeats(cta: LockupCta, charsPerSecond: number): CtaBeats {
+export function getCtaBeats(
+  cta: LockupCta,
+  charsPerSecond: number,
+  motion: VideoMotion = getClassicStageMotion(),
+): CtaBeats {
   const subtitleAt = cta.atFrame;
-  const urlAt = subtitleAt + DUR.word;
-  const promptAt = urlAt + DUR.hero * 2 - 3;
+  const urlAt = subtitleAt + motion.word;
+  const promptAt = urlAt + motion.hero * 2 - 3;
   const typingAt = promptAt + 3;
   const typingFrames = Math.ceil(
     ((cta.command?.length ?? 0) / charsPerSecond) * FRAMES_PER_SECOND,
@@ -155,6 +203,6 @@ export function getCtaBeats(cta: LockupCta, charsPerSecond: number): CtaBeats {
     promptAt,
     typingAt,
     typingEnd,
-    badgeAt: typingEnd + DUR.panel,
+    badgeAt: typingEnd + motion.panel,
   };
 }
