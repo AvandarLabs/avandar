@@ -57,6 +57,11 @@ export type EvalAnswer = {
   latencyMs: number;
   /** Blocks added to dashboards while answering, in order. */
   dashboardWrites?: EvalDashboardWrite[];
+  /**
+   * On a Try again question, the first attempt. The answer itself is the
+   * second attempt's.
+   */
+  firstAttempt?: Omit<EvalAnswer, "result" | "firstAttempt">;
 };
 
 /** One conversation: follow-up questions see the earlier turns. */
