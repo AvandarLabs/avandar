@@ -21,6 +21,7 @@ How `demo/measles` becomes the `alpha` branch and takes over
 | `ava release` | On `alpha`: version bump, tag, and GitHub release only. No merge. On `develop`: today's mainline release (`develop` into `main`). On any other branch, `main` included: fail. |
 | Demo user data | Not migrated. Only the open data catalog tables and the prebuilt Parquet copies move to production. |
 | Production users | All 333 accounts and their data are kept. Back up before migrating. |
+| Mainline test URL | `main`'s test URL uses the staging Supabase project, the same database as `develop`. `main` never runs migrations of its own: `develop`'s CI applies them, and `main` is always an exact copy of a `develop` commit. |
 | Rehearsal | Restore a production dump into a local switched stack. Approved: production holds no sensitive data yet. |
 | Who touches production | Pablo only. The agent writes runbooks and never writes to production. |
 | Test gate | Alpha deploys only after lint, type-check, and `test-quick` pass. Same gates as production today. |
@@ -98,12 +99,7 @@ partial rollback, because `main`'s code does not match the migrated schema.
 
 ## Open questions
 
-1. **What backs the mainline test URL?** Recommended: the staging Supabase
-   project, at no cost. It matches `main` exactly right after a release,
-   which is when it is tested, and drifts as `develop` moves on. The
-   alternative is a dedicated Supabase branch, billed like the demo branch
-   was.
-2. **`--include-all` on alpha.** Two-way merging brings in migrations with
+1. **`--include-all` on alpha.** Two-way merging brings in migrations with
    timestamps older than ones production already ran, so alpha needs
    `--include-all`, as staging uses today. The risk is an older migration
    that assumes a schema production has moved past. Guardrail 2.2 covers it.
