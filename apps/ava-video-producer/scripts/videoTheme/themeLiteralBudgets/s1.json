@@ -11,13 +11,8 @@
   "coveredIds": [],
   "pendingTokens": [],
   "handoffTokens": {
-    "corner.scene": ["s7", "s8"],
     "text.graphic.mark": ["s4"],
-    "text.graphic.smallCaption": ["s4"],
-    "text.stage.command": ["s7"],
-    "text.stage.heroFigure": ["s7"],
-    "text.stage.windowSubtitle": ["s7"],
-    "text.stage.wordmark": ["s7"]
+    "text.graphic.smallCaption": ["s4"]
   },
   "tempoPendingIds": [],
   "literals": {}

@@ -11,7 +11,7 @@ import {
 import { StageThemeBoundary } from "../scenes/stageTheme/StageThemeBoundary";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoProps } from "../videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -39,11 +39,10 @@ function CursorContent({
   cursor = "default",
 }: Props): ReactNode {
   const theme = useVideoProps("Cursor", {});
-  const tokens = useVideoTokens();
   const videoMotion = useVideoMotion();
   const motion = useMemo(() => {
-    return createCursorMotion(videoMotion, tokens, theme);
-  }, [videoMotion, tokens, theme]);
+    return createCursorMotion(videoMotion, theme);
+  }, [videoMotion, theme]);
   const position = trackPos(frame, path, motion);
   const scale = theme.scale * cursorScale(frame, clicks, motion);
   return (

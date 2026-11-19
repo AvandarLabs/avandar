@@ -229,8 +229,7 @@ export function GraphScene({
                 node.frame === "ticks"
                   ? "none"
                   : `${nodeBorderWidth}px solid ${mixToken(active, scene.border, scene.brandStrong)}`,
-              // No corner token holds the starter 14 px radius yet.
-              borderRadius: "var(--radius)",
+              borderRadius: scales.corner(tokens.corner.scene),
               background:
                 node.frame === "ticks"
                   ? "transparent"

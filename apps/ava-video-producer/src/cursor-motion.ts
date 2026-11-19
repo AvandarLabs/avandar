@@ -4,10 +4,7 @@ import {
   getClassicStageTheme,
 } from "./scenes/stageTheme/stageTheme";
 import type { VideoMotion } from "./videoTheme/createVideoMotion/createVideoMotion";
-import type {
-  ResolvedVideoComponents,
-  ResolvedVideoSemantic,
-} from "./videoTheme/videoTheme.types";
+import type { ResolvedVideoComponents } from "./videoTheme/videoTheme.types";
 
 export type CursorKey = { at: number; x: number; y: number };
 export type CursorKind =
@@ -37,18 +34,17 @@ export type CursorMotion = Readonly<{
 }>;
 
 /**
- * The pointer's motion from a theme: it travels on the camera's whip curve
- * (the same cubic in-out a camera whip uses), dips by
+ * The pointer's motion from a theme: it travels on
+ * `components.Cursor.travelEasing`, dips by
  * `components.Cursor.pressDepth` over the press duration, and trails by
  * `components.Cursor.trailAlpha` up to `trailLimit` pixels.
  */
 export function createCursorMotion(
   motion: VideoMotion,
-  tokens: ResolvedVideoSemantic,
   cursor: ResolvedVideoComponents["Cursor"],
 ): CursorMotion {
   return {
-    travel: motion.curve(tokens.camera.easing.whip),
+    travel: motion.curve(cursor.travelEasing),
     press: motion.press,
     pressDepth: cursor.pressDepth,
     trailAlpha: cursor.trailAlpha,
@@ -60,11 +56,9 @@ let classicCursorMotion: CursorMotion | undefined;
 
 /** `classic`'s pointer motion, the default of every pointer helper. */
 function _getClassicCursorMotion(): CursorMotion {
-  const theme = getClassicStageTheme();
   classicCursorMotion ??= createCursorMotion(
     getClassicStageMotion(),
-    theme.semantic,
-    theme.components.Cursor,
+    getClassicStageTheme().components.Cursor,
   );
   return classicCursorMotion;
 }
