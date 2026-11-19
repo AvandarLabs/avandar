@@ -1,4 +1,3 @@
-import { ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { Caption } from "../graphics-common/Caption";
 import { CircleNode } from "../graphics-common/CircleNode";
@@ -19,6 +18,12 @@ type Props = GraphicProps & { input: NodeTraversalInput };
 
 const ROUTE_CUE = 24;
 const ROUTE_DRAW_FRAMES = 106;
+/**
+ * Compositions hold a nested stock graphic on frame 150, so the route is
+ * complete by then at any tempo, even where a slow tempo would stretch it
+ * further.
+ */
+const ROUTE_SETTLED_AT = 150;
 const EDGE_CUE = 14;
 const ROUTE_LINE_CUE = 25;
 const CAPTION_CUE = 80;
@@ -37,10 +42,10 @@ export function NodeTraversal({
   const motion = useGraphicMotion();
   const { nodes, edges, route } = input;
   const progress =
-    ramp(
+    motion.ramp(
       frame,
       ROUTE_CUE,
-      motion.scale(ROUTE_DRAW_FRAMES),
+      Math.min(motion.scale(ROUTE_DRAW_FRAMES), ROUTE_SETTLED_AT - ROUTE_CUE),
       motion.travel.easing,
     ) *
     (route.length - 1);

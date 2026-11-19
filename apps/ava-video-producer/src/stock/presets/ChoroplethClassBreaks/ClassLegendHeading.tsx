@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
@@ -14,16 +18,19 @@ export function ClassLegendHeading({
   offset,
   unitLabel,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, corner } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={542}
         y={130 + offset}
         width={370}
         height={216}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={shapes.corner(corner.cell)}
+        fill={color.surface}
+        stroke={color.line}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <LabelSlots
         labels={[

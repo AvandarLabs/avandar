@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassLegendHeading } from "./ClassLegendHeading";
 import { ClassRange } from "./ClassRange";
 import { MissingClassKey } from "./MissingClassKey";
@@ -20,6 +20,7 @@ export function ClassLegend({
   unitLabel,
   noDataLabel,
 }: Readonly<Props>): ReactNode {
+  const { color } = useGraphicTokens();
   const offset = index * 224;
   return (
     <g data-class-legend-index={index}>
@@ -28,7 +29,7 @@ export function ClassLegend({
         lower={scheme.breaks[0]}
         upper={scheme.breaks[1]}
         y={244 + offset}
-        color={STOCK.cyan}
+        color={color.accentAlt}
         isFinal={false}
       />
       <ClassRange

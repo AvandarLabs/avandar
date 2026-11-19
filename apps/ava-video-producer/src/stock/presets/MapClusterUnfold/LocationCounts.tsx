@@ -1,5 +1,9 @@
 import { propEq, prop } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getClusterPointPositionFromPoint } from "./getClusterPointPositionFromPoint";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
@@ -36,6 +40,8 @@ export function LocationCounts({
   grouping,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, sketch, text } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <g>
       {_getLocations({ input, grouping })
@@ -49,19 +55,24 @@ export function LocationCounts({
         .map((location, index) => {
           return (
             <g key={index} data-location-count={location.numMembers}>
-              <circle
-                cx={location.x}
-                cy={location.y}
-                r={14}
-                fill={STOCK.elevated}
+              <SketchedShape
+                shape={{
+                  kind: "circle",
+                  cx: location.x,
+                  cy: location.y,
+                  r: 14,
+                }}
+                profile={sketch.shape}
+                fill={color.elevated}
                 stroke={accent}
+                strokeWidth={shapes.stroke(stroke.hairline)}
               />
               <text
                 x={location.x}
                 y={location.y + 4}
                 textAnchor="middle"
-                fontSize={12}
-                fill={STOCK.text}
+                fontSize={text.graphic.data.fontSize}
+                fill={text.graphic.data.color}
               >
                 {location.numMembers}
               </text>

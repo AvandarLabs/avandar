@@ -1,4 +1,9 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ActiveDeviation } from "./ActiveDeviation";
 import { makeCompletedDetailPathFromInputAndFrame } from "./makeCompletedDetailPathFromInputAndFrame";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
@@ -7,6 +12,8 @@ import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+const RECURSION_AT = 51;
 /**
  * Recursive splits retain their completed trace through the final highlight.
  */
@@ -15,6 +22,9 @@ export function DetailRecursion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { events } = makeDetailSimplificationFromInput(input);
   const span = 60 / events.length;
   const activeIndex = Math.min(
@@ -28,13 +38,14 @@ export function DetailRecursion({
   const path = makeCompletedDetailPathFromInputAndFrame({ input, frame });
   return (
     <g>
-      <path
+      <SketchedShape
         data-recursive-trace="retained"
-        d={path}
+        shape={{ kind: "path", d: path }}
+        profile={sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
-        opacity={ramp(frame, 51, 6)}
+        strokeWidth={shapes.stroke(stroke.default)}
+        opacity={motion.ramp(frame, RECURSION_AT, motion.chip)}
       />
       {frame < 111 ? (
         <ActiveDeviation
