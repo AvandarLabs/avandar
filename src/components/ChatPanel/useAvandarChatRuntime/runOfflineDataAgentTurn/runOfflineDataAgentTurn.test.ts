@@ -1,6 +1,8 @@
+import "fake-indexeddb/auto";
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { runOfflineDataAgentTurn } from "./runOfflineDataAgentTurn";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -283,6 +285,30 @@ describe("runOfflineDataAgentTurn", () => {
     expect(askMock.mock.calls[1]![0]).toContain("Query on screen:");
     expect(askMock.mock.calls[2]![0]).toContain(
       "<current_page>Unchanged since the last message.</current_page>",
+    );
+  });
+
+  it("records an offline card and gives it its row's audit id", async () => {
+    await AvaDexie.DB.ClarificationAuditEntry.clear();
+    const turn = _createTurnOptions({ chatGeneration: 11 });
+    await runOfflineDataAgentTurn(turn);
+
+    await _lastAgentOptions().host.askUser({
+      question: "Which state?",
+      options: ["Georgia", "Texas"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    const rows = await AvaDexie.DB.ClarificationAuditEntry.toArray();
+    expect(rows).toHaveLength(1);
+    expect(
+      turn.chatPanelDispatch.setPendingClarification,
+    ).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        question: "Which state?",
+        auditId: rows[0]!.id,
+      }),
     );
   });
 });

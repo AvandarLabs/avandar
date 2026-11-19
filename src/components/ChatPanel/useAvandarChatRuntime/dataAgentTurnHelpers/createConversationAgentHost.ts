@@ -1,3 +1,4 @@
+import { recordClarificationShown } from "@/components/ChatPanel/recordClarificationShown/recordClarificationShown";
 import { addAgentDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock";
 import {
   createExplorerShowQuery,
@@ -7,10 +8,12 @@ import {
   checkQueryOnDevice,
   showQueryInChat,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
+import { buildClarificationTurnNumber } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { ChatClarifyRequest } from "$/types/chat.types";
 import type {
   AgentConversationState,
   DataAgentConversation,
@@ -30,6 +33,35 @@ function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
     turn.pageContext?.app === "data-explorer" ||
     (turn.isOffline === true && turn.pageContext === undefined)
   );
+}
+
+/**
+ * Bias-checks and records a question card the agent shows, then sets it in
+ * the current turn's chat panel with its audit id. The turn number counts
+ * the turn's card answers. A card whose turn went stale, or stopped being
+ * the conversation's current turn, while its row was written is not set.
+ * The row stays.
+ */
+async function _showQuestionCard(
+  state: AgentConversationState,
+  card: Omit<ChatClarifyRequest, "turnNumber">,
+): Promise<void> {
+  const turn = state.turnRef.current;
+  const clarification: ChatClarifyRequest = {
+    ...card,
+    turnNumber: buildClarificationTurnNumber(turn.apiMessages),
+  };
+  const auditId = await recordClarificationShown({
+    workspaceId: turn.workspaceId,
+    clarification,
+  });
+  if (turn.isStale?.() || state.turnRef.current !== turn) {
+    return;
+  }
+  turn.chatPanelDispatch.setPendingClarification({
+    ...clarification,
+    auditId,
+  });
 }
 
 /**
@@ -72,10 +104,8 @@ export function createConversationAgentHost(
         request,
       });
     },
-    showQuestionCard: (clarification) => {
-      state.turnRef.current.chatPanelDispatch.setPendingClarification(
-        clarification,
-      );
+    showQuestionCard: (card) => {
+      return _showQuestionCard(state, card);
     },
   });
   return createPlaceholderRestoringHost(browserHost, state.sqlVault);

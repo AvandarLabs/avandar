@@ -20,8 +20,10 @@ const {
   runQueryMock,
   checkQueryOnDeviceMock,
   addAgentDashboardBlockMock,
+  recordClarificationShownMock,
 } = vi.hoisted(() => {
   return {
+    recordClarificationShownMock: vi.fn().mockResolvedValue("audit-1"),
     runQueryMock: vi.fn(),
     checkQueryOnDeviceMock: vi.fn(),
     addAgentDashboardBlockMock: vi.fn(),
@@ -45,6 +47,13 @@ vi.mock(
       showQueryInChat: showQueryInChatMock,
       checkQueryOnDevice: checkQueryOnDeviceMock,
     };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/recordClarificationShown/recordClarificationShown",
+  () => {
+    return { recordClarificationShown: recordClarificationShownMock };
   },
 );
 
@@ -397,5 +406,127 @@ describe("createAgentConversation", () => {
     });
 
     expect(conversation.dashboardCards).toEqual([{ cardId: "card-1" }]);
+  });
+});
+
+describe("createConversationAgentHost question cards", () => {
+  const CHOICE = {
+    question: "Which?",
+    options: ["A", "B"],
+    isMulti: false,
+    kind: "choice",
+  } as const;
+
+  it("sets an ask_user card with the audit id its row got", async () => {
+    const turn = _turn("dashboard");
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({ question: "Which?", auditId: "audit-1" }),
+    );
+  });
+
+  it("records a value card and sets it with the audit id its row got", async () => {
+    const turn = _turn("dashboard");
+
+    await createConversationAgentHost(_state(turn)).askUser({
+      question: "Which county?",
+      options: ["Kings"],
+      isMulti: false,
+      kind: "values",
+      lookup: {
+        listQuery: "SELECT DISTINCT x FROM t",
+        column: "x",
+        candidateValues: ["Kings"],
+      },
+    });
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      clarification: expect.objectContaining({
+        responseShape: expect.objectContaining({ kind: "discovery" }),
+      }),
+    });
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({ auditId: "audit-1" }),
+    );
+  });
+
+  it("numbers a card after two card answers as the third", async () => {
+    const turn = _turn("dashboard", {
+      apiMessages: [
+        { role: "user", content: "show me deaths in georgia" },
+        { role: "assistant", content: "Which Georgia?" },
+        { role: "user", content: "[Clarification answer: The US state]" },
+        { role: "assistant", content: "Which year?" },
+        { role: "user", content: "[Clarification answer: 2022]" },
+      ],
+    } as unknown as Partial<DataAgentTurnOptions>);
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clarification: expect.objectContaining({ turnNumber: 3 }),
+      }),
+    );
+  });
+
+  it("sets no card when the turn went stale while its row was written", async () => {
+    let isStale = false;
+    const turn = _turn("dashboard", {
+      isStale: () => {
+        return isStale;
+      },
+    });
+    recordClarificationShownMock.mockImplementationOnce(async () => {
+      isStale = true;
+      return "audit-1";
+    });
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(
+      turn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("sets no card when a newer turn took the conversation while its row was written", async () => {
+    const turn = _turn("dashboard");
+    const state = _state(turn);
+    const newerTurn = _turn("dashboard");
+    recordClarificationShownMock.mockImplementationOnce(async () => {
+      state.turnRef.current = newerTurn;
+      return "audit-1";
+    });
+
+    await createConversationAgentHost(state).askUser(CHOICE);
+
+    expect(
+      turn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+    expect(
+      newerTurn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("bias-checks the question the user reads, with real values restored", async () => {
+    await createConversationAgentHost(
+      _stateWithKings(_turn("dashboard")),
+    ).askUser({
+      question: "Did you mean <value 1>?",
+      options: ["<value 1>", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clarification: expect.objectContaining({
+          question: "Did you mean Kings?",
+        }),
+      }),
+    );
   });
 });
