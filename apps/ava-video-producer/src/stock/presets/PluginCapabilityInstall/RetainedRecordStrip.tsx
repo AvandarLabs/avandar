@@ -9,8 +9,6 @@ import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string; frame: number };
-/** The dash of the counting stencil. */
-const STENCIL_DASH = "5 5";
 /** Stable rows retain IDs and exact category ownership under the stencil. */
 export function RetainedRecordStrip({
   input,
@@ -40,7 +38,7 @@ export function RetainedRecordStrip({
           rx={scales.corner(tokens.corner.cell)}
           fill="none"
           stroke={accent}
-          strokeDasharray={STENCIL_DASH}
+          strokeDasharray={tokens.dash.placeholder.join(" ")}
           opacity={motion.ramp(frame, 56, motion.scale(34))}
         />
       ) : null}

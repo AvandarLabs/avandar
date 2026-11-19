@@ -5,6 +5,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReleaseArtifact } from "./ReleaseArtifact";
@@ -15,8 +16,6 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
 
-/** The dash of the empty recipient bay. */
-const BAY_DASH = "6 6";
 /**
  * A physical release gate preserves every unresolved limitation and commitment.
  */
@@ -26,6 +25,7 @@ export function ReleaseRepairObligations({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const isHeld = input.issues.some((issue) => {
@@ -48,7 +48,7 @@ export function ReleaseRepairObligations({
           rx={scales.corner(tokens.corner.card)}
           fill="none"
           stroke={tokens.color.line}
-          strokeDasharray={BAY_DASH}
+          strokeDasharray={atomic.dash.long.join(" ")}
         />
         <LabelSlots labels={[[input.recipientLabel, 550, 35, 350, 16, 3]]} />
       </g>

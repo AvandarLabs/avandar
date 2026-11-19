@@ -10,10 +10,7 @@
   "enforceLint": true,
   "coveredIds": [],
   "pendingTokens": [],
-  "handoffTokens": {
-    "text.graphic.mark": ["s4"],
-    "text.graphic.smallCaption": ["s4"]
-  },
+  "handoffTokens": {},
   "tempoPendingIds": [],
   "literals": {}
 }
