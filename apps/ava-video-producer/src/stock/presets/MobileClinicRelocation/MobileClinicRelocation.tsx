@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClinicLedger } from "./ClinicLedger";
 import { ClinicMap } from "./ClinicMap";
 import { ClinicPeople } from "./ClinicPeople";
@@ -17,8 +17,9 @@ export function MobileClinicRelocation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 18)}>
+    <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
       <FitText
         text={input.sceneLabel}
         x={50}

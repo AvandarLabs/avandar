@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
 
@@ -10,31 +15,41 @@ export function PracticeStrip({
   learnerX,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {" "}
       {input.showPracticeStrip ? (
         <g data-practice-strip="">
-          <path
-            d={`M${learnerX - 8} 395 L${learnerX - 20} 430`}
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${learnerX - 8} 395 L${learnerX - 20} 430`,
+            }}
+            profile={tokens.sketch.shape}
             stroke={accent}
-            strokeWidth={3}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           />
-          <rect
+          <StockRect
             x={learnerX - 160}
             y={430}
             width={320}
             height={100}
-            rx={5}
-            fill={STOCK.surface}
+            rx={scales.corner(5)}
+            fill={tokens.color.surface}
             stroke={accent}
           />
-          <line
-            x1={learnerX}
-            x2={learnerX}
-            y1={436}
-            y2={520}
-            stroke={STOCK.line}
+          <SketchedShape
+            shape={{
+              kind: "line",
+              x1: learnerX,
+              y1: 436,
+              x2: learnerX,
+              y2: 520,
+            }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.line}
           />
           <LabelSlots
             labels={input.stops.map((stop, index) => {

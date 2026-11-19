@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 
 type Point = { x: number; y: number };
@@ -9,19 +10,29 @@ type Travel = {
   duration: number;
   from: Point;
   to: Point;
+  motion: VideoMotion;
 };
-function _travel({ frame, at, duration, from, to }: Readonly<Travel>): Point {
-  const progress = ramp(frame, at, duration, EASE.inOut);
+function _travel({
+  frame,
+  at,
+  duration,
+  from,
+  to,
+  motion,
+}: Readonly<Travel>): Point {
+  const progress = motion.ramp(frame, at, duration, motion.travel.easing);
   return { x: mix(progress, from.x, to.x), y: mix(progress, from.y, to.y) };
 }
 function _getSowingHand({
   scene,
   frame,
   lossEnd,
+  motion,
 }: Readonly<{
   scene: ReturnType<typeof getSeedSceneFromFrame>;
   frame: number;
   lossEnd: Point;
+  motion: VideoMotion;
 }>): Hand {
   const { sown, remaining, scale } = scene;
   if (sown === 0) {
@@ -34,10 +45,17 @@ function _getSowingHand({
       duration: 8,
       from: lossEnd,
       to: { x: 738, y: 399 },
+      motion,
     });
   }
   if (frame <= 116) {
-    return { x: 738 + 180 * ramp(frame, 108, 8), y: 399, action: "furrow" };
+    return {
+      x:
+        738 +
+        180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
+      y: 399,
+      action: "furrow",
+    };
   }
   if (frame < 124) {
     return _travel({
@@ -46,6 +64,7 @@ function _getSowingHand({
       duration: 8,
       from: { x: 918, y: 399 },
       to: { x: 288 + (remaining + sown / 2) * scale, y: 385 },
+      motion,
     });
   }
   return {
@@ -60,9 +79,11 @@ function _getSowingHand({
 export function getCultivatorHandFromFrame({
   scene,
   frame,
+  motion,
 }: Readonly<{
   scene: ReturnType<typeof getSeedSceneFromFrame>;
   frame: number;
+  motion: VideoMotion;
 }>): Hand {
   const { reserve, loss, sown, remaining, scale } = scene;
   if (reserve === 0) {
@@ -83,6 +104,7 @@ export function getCultivatorHandFromFrame({
       duration: 12,
       from: { x: 280, y: 330 },
       to: reserveHand,
+      motion,
     });
   }
   if (frame <= 48) {
@@ -95,6 +117,7 @@ export function getCultivatorHandFromFrame({
       duration: 6,
       from: reserveEnd,
       to: loss > 0 ? lossStart : reserveEnd,
+      motion,
     });
   }
   if (frame <= 100 && loss > 0) {
@@ -104,5 +127,5 @@ export function getCultivatorHandFromFrame({
       action: "loss",
     };
   }
-  return _getSowingHand({ scene, frame, lossEnd });
+  return _getSowingHand({ scene, frame, lossEnd, motion });
 }

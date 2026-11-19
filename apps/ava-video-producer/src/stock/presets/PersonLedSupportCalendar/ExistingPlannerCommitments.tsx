@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AppointmentGeometry } from "./AppointmentGeometry";
 import { PlannerBooking } from "./PlannerBooking";
 import { PlannerBookingLabel } from "./PlannerBookingLabel";
@@ -13,6 +13,7 @@ export function ExistingPlannerCommitments({
   input,
   labelsOnly = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.commitments
@@ -29,14 +30,14 @@ export function ExistingPlannerCommitments({
               label={commitment.label}
               bookingId={commitment.id}
               {...cell}
-              accent={STOCK.cyan}
+              accent={tokens.color.accentAlt}
             />
           ) : (
             <PlannerBooking
               key={commitment.id}
               commitment={commitment}
               {...cell}
-              accent={STOCK.cyan}
+              accent={tokens.color.accentAlt}
               showLabel={false}
             />
           );

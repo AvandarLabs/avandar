@@ -1,7 +1,12 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClinicVehicle } from "./ClinicVehicle";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
@@ -13,6 +18,9 @@ export function ClinicMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const sites = input.sites.map((site) => {
     return {
       ...site,
@@ -20,48 +28,73 @@ export function ClinicMap({
       y: 125 + site.y * 200,
     };
   });
-  const progress = ramp(frame, 50, 46, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    50,
+    motion.scale(46),
+    motion.travel.easing,
+  );
   const x = mix(progress, sites[0].x, sites[1].x);
   const y = mix(progress, sites[0].y, sites[1].y);
-  const awning = 1 - ramp(frame, 41, 9) + ramp(frame, 96, 17);
+  const awning =
+    1 -
+    motion.ramp(frame, 41, motion.panel, motion.exit.easing) +
+    motion.ramp(frame, 96, motion.scale(17), motion.entrance.easing);
   return (
     <g>
       {input.view === "globe-to-local" ? (
-        <g transform="translate(565 136)" opacity={1 - ramp(frame, 36, 24)}>
-          <circle r={35} fill={STOCK.surface} stroke={STOCK.line} />
+        <g
+          transform="translate(565 136)"
+          opacity={
+            1 - motion.ramp(frame, 36, motion.scale(24), motion.exit.easing)
+          }
+        >
+          <circle
+            r={35}
+            fill={tokens.color.surface}
+            stroke={tokens.color.line}
+          />
           <path
             d={GlobeProjection.getLandPathFromView({
               centerLongitude: 20,
               centerLatitude: 0,
               radius: 35,
             })}
-            fill={STOCK.muted}
+            fill={tokens.color.inactive}
           />
         </g>
       ) : undefined}
-      <path
-        d={`M${sites[0].x} ${sites[0].y} L${sites[1].x} ${sites[1].y}`}
-        stroke={STOCK.line}
-        strokeWidth={18}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${sites[0].x} ${sites[0].y} L${sites[1].x} ${sites[1].y}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(18)}
         strokeLinecap="round"
       />
-      <path
-        d={`M${sites[0].x} ${sites[0].y} L${sites[1].x} ${sites[1].y}`}
-        stroke={STOCK.muted}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${sites[0].x} ${sites[0].y} L${sites[1].x} ${sites[1].y}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
         strokeDasharray="5 10"
         fill="none"
       />
       {sites.map((site, index) => {
         return (
           <g key={site.id}>
-            <circle
-              data-site-id={site.id}
-              cx={site.x}
-              cy={site.y}
-              r={9}
-              fill={STOCK.surface}
-              stroke={accent}
-            />
+            <g data-site-id={site.id}>
+              <SketchedShape
+                shape={{ kind: "circle", cx: site.x, cy: site.y, r: 9 }}
+                profile={tokens.sketch.shape}
+                fill={tokens.color.surface}
+                stroke={accent}
+              />
+            </g>
             <FitText
               text={site.label}
               x={500}
@@ -72,9 +105,13 @@ export function ClinicMap({
               breakLongWords
               normalizeWhitespace
             />
-            <path
-              d={`M490 ${190 + index * 70} L${site.x} ${site.y}`}
-              stroke={STOCK.line}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M490 ${190 + index * 70} L${site.x} ${site.y}`,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
             />
           </g>
         );

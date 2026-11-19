@@ -1,6 +1,9 @@
-import { ramp } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
@@ -20,12 +23,16 @@ export function DestinationMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const reached = node.cost <= input.budgetMinutes;
   const active = reached
-    ? ramp(
+    ? motion.ramp(
         frame,
         node.cost === 0 ? 0 : 46 + (58 * node.cost) / input.budgetMinutes,
-        6,
+        motion.chip,
+        motion.entrance.easing,
       )
     : 0;
   const center = { cx: 48 + node.x * 4, cy: 150 + node.y * 3.4 };
@@ -35,9 +42,9 @@ export function DestinationMarker({
         data-reachable={reached}
         {...center}
         r={10}
-        fill={STOCK.surface}
-        stroke={reached ? accent : STOCK.orange}
-        strokeWidth={2}
+        fill={tokens.color.surface}
+        stroke={reached ? accent : tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <circle {...center} r={7} fill={accent} fillOpacity={active} />
       <Text x={center.cx} y={center.cy + 4} size={12} anchor="middle">

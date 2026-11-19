@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AliquotCaption } from "./AliquotCaption";
 import { AliquotEquation } from "./AliquotEquation";
 import { AliquotLedger } from "./AliquotLedger";
@@ -16,11 +16,21 @@ export function SpecimenAliquotBalance({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const transferred = input.aliquots.reduce((total, aliquot, index) => {
-    return total + aliquot.volume * ramp(frame, 36 + index * 12, 24);
+    return (
+      total +
+      aliquot.volume *
+        motion.ramp(
+          frame,
+          36 + index * 12,
+          motion.scale(24),
+          motion.entrance.easing,
+        )
+    );
   }, 0);
   return (
-    <g opacity={ramp(frame, 12, 18)}>
+    <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
       <AliquotCaption input={input} />
       <AliquotTube
         tube={input.parent}
@@ -37,7 +47,15 @@ export function SpecimenAliquotBalance({
             tube={aliquot}
             parentId={input.parent.id}
             x={250 + index * 130}
-            volume={aliquot.volume * ramp(frame, 36 + index * 12, 24)}
+            volume={
+              aliquot.volume *
+              motion.ramp(
+                frame,
+                36 + index * 12,
+                motion.scale(24),
+                motion.entrance.easing,
+              )
+            }
             showIdentity={input.showLineage}
             accent={accent}
             isChild

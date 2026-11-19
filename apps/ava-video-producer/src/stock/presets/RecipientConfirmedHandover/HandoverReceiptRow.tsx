@@ -1,4 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
@@ -14,6 +15,7 @@ export function HandoverReceiptRow({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const content = input.contents[index];
   const received = Array.from(
     { length: content.selectedUnits },
@@ -23,6 +25,7 @@ export function HandoverReceiptRow({
         frame,
         contentIndex: index,
         unitIndex,
+        motion,
       });
     },
   ).filter(({ travel }) => {

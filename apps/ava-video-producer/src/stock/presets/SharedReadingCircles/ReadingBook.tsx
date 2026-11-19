@@ -1,5 +1,10 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReadingGeometryFromInput } from "./getReadingGeometryFromInput";
 import { PhysicalReadingBook } from "./PhysicalReadingBook";
 import { ReadingBookLabels } from "./ReadingBookLabels";
@@ -19,23 +24,25 @@ export function ReadingBook({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const group = input.readingGroups[groupIndex];
   const book = input.books.find(propEq("id", group.bookId))!;
   const { tableX, bookX, bookY } = getReadingGeometryFromInput({
     input,
     frame,
     groupIndex,
+    motion,
   });
   return (
     <g>
-      <ellipse
-        cx={tableX}
-        cy={330}
-        rx={94}
-        ry={48}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "ellipse", cx: tableX, cy: 330, rx: 94, ry: 48 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <PhysicalReadingBook
         bookId={book.id}

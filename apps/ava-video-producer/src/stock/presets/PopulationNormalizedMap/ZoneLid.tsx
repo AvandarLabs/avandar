@@ -1,3 +1,6 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getZoneShadeFromInputAndFrame } from "./getZoneShadeFromInputAndFrame";
 import { ZoneGround } from "./ZoneGround";
 import { ZoneSurface } from "./ZoneSurface";
@@ -23,6 +26,8 @@ export function ZoneLid({
   accent,
   lift,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
   const points = zone.polygon
     .map(([x, y]) => {
       return `${55 + x * 5},${180 + y * 2.5}`;
@@ -33,6 +38,7 @@ export function ZoneLid({
     zone,
     input,
     frame,
+    motion,
   });
   return (
     <g
@@ -56,10 +62,14 @@ export function ZoneLid({
         accent={accent}
         opacity={opacity}
       />
-      <path
-        d={`M${55 + first[0] * 5} ${180 + first[1] * 2.5} v${-lift}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${55 + first[0] * 5} ${180 + first[1] * 2.5} v${-lift}`,
+        }}
+        profile={tokens.sketch.shape}
         stroke={accent}
-        strokeOpacity={0.5}
+        strokeOpacity={tokens.alpha.guide}
       />
     </g>
   );

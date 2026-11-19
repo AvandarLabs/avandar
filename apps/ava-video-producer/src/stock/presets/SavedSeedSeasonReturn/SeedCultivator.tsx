@@ -1,5 +1,10 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCultivatorHandFromFrame } from "./getCultivatorHandFromFrame";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
@@ -20,23 +25,31 @@ export function SeedCultivator({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const hand = getCultivatorHandFromFrame({ scene, frame });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const hand = getCultivatorHandFromFrame({ scene, frame, motion });
   return (
     <g data-cultivator={input.cultivator.mode}>
       <PersonGlyph x={hand.x - 28} y={hand.y - 40} color={accent} />
       {input.cultivator.mode === "cooperative" ? (
-        <PersonGlyph x={65} y={295} color={STOCK.cyan} />
+        <PersonGlyph x={65} y={295} color={tokens.color.accentAlt} />
       ) : undefined}
       {hand.action ? (
-        <line
-          data-seed-hand={hand.action}
-          x1={hand.x - 28}
-          y1={hand.y - 40}
-          x2={hand.x}
-          y2={hand.y}
-          stroke={accent}
-          strokeWidth={3}
-        />
+        <g data-seed-hand={hand.action}>
+          <SketchedShape
+            shape={{
+              kind: "line",
+              x1: hand.x - 28,
+              y1: hand.y - 40,
+              x2: hand.x,
+              y2: hand.y,
+            }}
+            profile={tokens.sketch.shape}
+            stroke={accent}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          />
+        </g>
       ) : undefined}
     </g>
   );

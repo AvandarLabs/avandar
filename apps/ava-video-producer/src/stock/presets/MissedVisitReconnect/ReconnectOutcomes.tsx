@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReconnectOutcomeMark } from "./ReconnectOutcomeMark";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -14,6 +14,7 @@ const OUTCOMES: readonly ["unreached", "contacted", "booked", "attended"] = [
 ] as const;
 /** Exclusive outcomes are counted against the original missed-visit group. */
 export function ReconnectOutcomes({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.showOutcomeLedger
@@ -25,12 +26,12 @@ export function ReconnectOutcomes({ input }: Readonly<Props>): ReactNode {
                   x={30 + index * 230}
                   y={480}
                   frame={150}
-                  accent={STOCK.text}
+                  accent={tokens.color.text}
                 />
                 <text
                   x={55 + index * 230}
                   y={480}
-                  fill={STOCK.text}
+                  fill={tokens.color.text}
                   fontSize={18}
                 >
                   {input.cases.filter(propEq("outcome", outcome)).length}/

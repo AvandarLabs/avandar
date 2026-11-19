@@ -1,4 +1,9 @@
-import { ramp, EASE } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { WATER_DESTINATIONS } from "./waterDestinationKeys";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
@@ -6,21 +11,29 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Infiltration and controlled discharge occupy separate physical outlets. */
 export function WaterOutlets({ input, frame }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 48, 36, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const progress = motion.ramp(
+    frame,
+    48,
+    motion.scale(36),
+    motion.travel.easing,
+  );
   const outlets = [
     {
       id: "infiltration",
       amount: input.event.infiltratedM3,
       path: "M390 380V403H200",
       x: 130,
-      color: WATER_DESTINATIONS.infiltration.color,
+      color: tokens.color.categorical[WATER_DESTINATIONS.infiltration.category],
     },
     {
       id: "discharge",
       amount: input.event.dischargedM3,
       path: "M620 360H720V400",
       x: 650,
-      color: WATER_DESTINATIONS.discharge.color,
+      color: tokens.color.categorical[WATER_DESTINATIONS.discharge.category],
     },
   ];
   return (
@@ -28,14 +41,16 @@ export function WaterOutlets({ input, frame }: Readonly<Props>): ReactNode {
       {outlets.map((outlet) => {
         return (
           <g key={outlet.id}>
-            <path
-              data-outlet={outlet.id}
-              d={outlet.path}
-              fill="none"
-              stroke={outlet.color}
-              strokeWidth={3}
-              opacity={outlet.amount > 0 ? progress : 0}
-            />
+            <g data-outlet={outlet.id}>
+              <SketchedShape
+                shape={{ kind: "path", d: outlet.path }}
+                profile={tokens.sketch.shape}
+                fill="none"
+                stroke={outlet.color}
+                strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+                opacity={outlet.amount > 0 ? progress : 0}
+              />
+            </g>
             <rect
               data-water-pool={outlet.id}
               x={outlet.x}

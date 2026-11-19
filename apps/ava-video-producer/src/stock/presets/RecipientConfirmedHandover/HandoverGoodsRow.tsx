@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HandoverUnit } from "./HandoverUnit";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
@@ -12,6 +16,8 @@ export function HandoverGoodsRow({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const content = input.contents[index];
   return (
     <g>
@@ -25,13 +31,19 @@ export function HandoverGoodsRow({
         normalizeWhitespace
         breakLongWords
       />
-      <path
-        d={`M190 ${210 + index * 80} H335`}
-        stroke={STOCK.line}
-        strokeWidth={3}
+      <SketchedShape
+        shape={{ kind: "path", d: `M190 ${210 + index * 80} H335` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       {input.showQuantityList ? (
-        <text x={40} y={239 + index * 80} fill={STOCK.muted} fontSize={12}>
+        <text
+          x={40}
+          y={239 + index * 80}
+          fill={tokens.color.textMuted}
+          fontSize={12}
+        >
           {content.offeredUnits} → {content.selectedUnits}
         </text>
       ) : undefined}

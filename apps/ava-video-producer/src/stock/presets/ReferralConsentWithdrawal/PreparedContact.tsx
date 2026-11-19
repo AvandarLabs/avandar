@@ -1,5 +1,8 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
@@ -24,7 +27,17 @@ export function PreparedContact({
   order,
   permissionTurn,
 }: Readonly<Props>): ReactNode {
-  const progress = order < 0 ? 0 : ramp(frame, 60 + order * 16, 16);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const progress =
+    order < 0
+      ? 0
+      : motion.ramp(
+          frame,
+          60 + order * 16,
+          motion.scale(16),
+          motion.entrance.easing,
+        );
   const x = mix(progress, 520, 560);
   const y = 194 + index * 102 - 20 * Math.sin(progress * Math.PI);
   const isHandling =
@@ -51,7 +64,7 @@ export function PreparedContact({
               : labels.withdrawn
             : labels.permitted
         }
-        color={order >= 0 ? STOCK.orange : accent}
+        color={order >= 0 ? tokens.color.highlight : accent}
       />
     </g>
   );

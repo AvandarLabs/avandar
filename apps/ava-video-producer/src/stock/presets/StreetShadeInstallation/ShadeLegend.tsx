@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { INSTALLATION_COLORS } from "./installationColors";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { INSTALLATION_CATEGORIES } from "./installationColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
@@ -7,6 +8,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Every installation names its owning zone, including zero-area objects. */
 export function ShadeLegend({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.installations.map((item, index) => {
@@ -18,7 +20,7 @@ export function ShadeLegend({ input }: Readonly<Props>): ReactNode {
               y={420}
               width={14}
               height={14}
-              fill={INSTALLATION_COLORS[index]}
+              fill={tokens.color.categorical[INSTALLATION_CATEGORIES[index]]}
             />
             <SceneLabel
               text={item.label}

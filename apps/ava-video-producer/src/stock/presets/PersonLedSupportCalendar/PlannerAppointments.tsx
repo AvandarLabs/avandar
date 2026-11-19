@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AppointmentGeometry } from "./AppointmentGeometry";
 import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerBooking } from "./PlannerBooking";
@@ -12,7 +13,9 @@ export function PlannerAppointments({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const appointment = AppointmentGeometry.fromInput({ input, frame });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const appointment = AppointmentGeometry.fromInput({ input, frame, motion });
   return (
     <g>
       <ExistingPlannerCommitments input={input} />
@@ -21,8 +24,8 @@ export function PlannerAppointments({
           data-proposal-ghost={appointment.commitment.id}
           {...appointment.initial}
           fill="none"
-          stroke={STOCK.orange}
-          strokeDasharray="4 4"
+          stroke={tokens.color.highlight}
+          strokeDasharray={tokens.dash.pending.join(" ")}
         />
       ) : undefined}
       <PlannerBooking

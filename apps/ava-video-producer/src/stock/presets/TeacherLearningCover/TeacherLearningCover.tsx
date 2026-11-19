@@ -1,3 +1,9 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassroomLearners } from "./ClassroomLearners";
 import { CoverStaff } from "./CoverStaff";
 import { getCoverPositionsFromFrame } from "./getCoverPositionsFromFrame";
@@ -14,7 +20,10 @@ export function TeacherLearningCover({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const positions = getCoverPositionsFromFrame(frame);
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const positions = getCoverPositionsFromFrame(frame, motion);
   const responsibleX =
     frame >= 42 && frame < 124 ? positions.coverX : positions.teacherX;
   return (
@@ -35,13 +44,15 @@ export function TeacherLearningCover({
       })}
       <ClassroomLearners input={input} />
       {input.showClassroomResponsibility ? (
-        <path
-          data-responsibility="true"
-          d={`M${responsibleX} 282 V299 H305 V307`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={2}
-        />
+        <g data-responsibility="true">
+          <SketchedShape
+            shape={{ kind: "path", d: `M${responsibleX} 282 V299 H305 V307` }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
       ) : undefined}
       <MentorBoard input={input} frame={frame} />
     </g>

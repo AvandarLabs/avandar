@@ -1,4 +1,9 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +23,9 @@ export function StratumBoundary({
   frame,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const [firstX, firstY] = stratum.polygon[0];
   return (
     <g>
@@ -29,16 +37,29 @@ export function StratumBoundary({
           })
           .join(" ")}
         fill={color}
-        fillOpacity={0.06 * ramp(frame, 18, 18)}
+        fillOpacity={
+          0.06 * motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
+        }
         stroke={color}
-        strokeOpacity={ramp(frame, 18, 18)}
-        strokeWidth={1.5}
+        strokeOpacity={motion.ramp(
+          frame,
+          18,
+          motion.hero,
+          motion.reveal.easing,
+        )}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
-      <path
-        d={`M${70 + firstX * 4.8} ${170 + firstY * 2.7} L${70 + index * 120} 456`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${70 + firstX * 4.8} ${170 + firstY * 2.7} L${70 + index * 120} 456`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={0.3 * ramp(frame, 18, 18)}
+        strokeOpacity={
+          0.3 * motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
+        }
       />
       <text
         x={70 + index * 120}

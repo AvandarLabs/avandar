@@ -1,6 +1,10 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
 
@@ -19,6 +23,9 @@ export function DoseToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const peers = input.units.filter((item) => {
     return (
       item.outcome === unit.outcome &&
@@ -40,7 +47,12 @@ export function DoseToken({
         Math.floor(position / 6) * 19
       : (unit.outcome === "remaining" ? 220 : 400) +
         Math.floor(position / 6) * 30;
-  const progress = ramp(frame, 36 + index * 2, 50, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    36 + index * motion.stagger.list,
+    motion.scale(50),
+    motion.travel.easing,
+  );
   return (
     <rect
       data-dose={unit.id}
@@ -50,9 +62,9 @@ export function DoseToken({
       y={mix(progress, 225 + Math.floor(index / 4) * 60, destinationY)}
       width={11}
       height={16}
-      rx={3}
-      fill={unit.outcome === "discarded" ? STOCK.orange : accent}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      rx={scales.corner(3)}
+      fill={unit.outcome === "discarded" ? tokens.color.highlight : accent}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     />
   );
 }

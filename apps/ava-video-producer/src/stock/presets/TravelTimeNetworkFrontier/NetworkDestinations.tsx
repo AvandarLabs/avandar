@@ -1,6 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DestinationMarker } from "./DestinationMarker";
 import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
@@ -13,6 +13,7 @@ export function NetworkDestinations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {getTravelCostsFromInput(input).map((node, index) => {
@@ -33,7 +34,11 @@ export function NetworkDestinations({
               x={540}
               y={156 + index * 54}
               size={14}
-              fill={node.cost <= input.budgetMinutes ? accent : STOCK.orange}
+              fill={
+                node.cost <= input.budgetMinutes
+                  ? accent
+                  : tokens.color.highlight
+              }
             >
               {index + 1}·
             </Text>
@@ -45,7 +50,7 @@ export function NetworkDestinations({
                 data-cost-label={node.id}
                 x={890}
                 y={156 + index * 54}
-                fill={STOCK.text}
+                fill={tokens.color.text}
                 textAnchor="end"
                 fontSize={16}
               >

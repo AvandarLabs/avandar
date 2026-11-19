@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HandoverAcknowledgement } from "./HandoverAcknowledgement";
 import { HandoverReceiptRow } from "./HandoverReceiptRow";
 import type { Input } from "./RecipientConfirmedHandover.schema";
@@ -14,16 +18,18 @@ export function HandoverReceipt({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={704}
         y={90}
         width={226}
         height={467}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(5)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={input.receiptLabels.heading}

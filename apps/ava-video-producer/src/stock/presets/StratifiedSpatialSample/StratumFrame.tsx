@@ -1,4 +1,7 @@
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { StratumRegion } from "./StratumRegion";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
@@ -10,6 +13,8 @@ export function StratumFrame({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <rect
@@ -17,8 +22,8 @@ export function StratumFrame({
         y={160}
         width={500}
         height={290}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
       />
       {input.strata.map((stratum, index) => {
         return (

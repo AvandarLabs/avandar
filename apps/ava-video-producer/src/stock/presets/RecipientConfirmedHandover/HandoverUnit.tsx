@@ -1,4 +1,10 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
@@ -24,12 +30,16 @@ export function HandoverUnit({
   unitIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const content = input.contents[contentIndex];
   const { x, y, travel } = getHandoverPositionFromInputAndFrame({
     input,
     frame,
     contentIndex,
     unitIndex,
+    motion,
   });
   return (
     <g
@@ -40,17 +50,22 @@ export function HandoverUnit({
       data-y={y}
       transform={`translate(${x} ${y})`}
     >
-      <rect
+      <StockRect
         x={-12}
         y={-14}
         width={24}
         height={28}
-        rx={4}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
-      <path d={SYMBOLS[content.symbol]} stroke={accent} fill="none" />
+      <SketchedShape
+        shape={{ kind: "path", d: SYMBOLS[content.symbol] }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        fill="none"
+      />
     </g>
   );
 }

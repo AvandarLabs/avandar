@@ -1,5 +1,7 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReconnectOutcomes } from "./ReconnectOutcomes";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -8,11 +10,15 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Unique people, attempts and exclusive outcomes retain separate totals. */
 export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const numAttempts = input.cases.reduce((sum, item) => {
     return sum + item.attempts;
   }, 0);
   return (
-    <g opacity={ramp(frame, 115, 10)}>
+    <g
+      opacity={motion.ramp(frame, 115, motion.scale(10), motion.reveal.easing)}
+    >
       <ReconnectOutcomes input={input} />
       <SceneLabel
         text={input.copy.group}
@@ -25,7 +31,7 @@ export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
         data-group-total={input.cases.length}
         x={440}
         y={562}
-        fill={STOCK.text}
+        fill={tokens.color.text}
         fontSize={18}
       >
         {input.cases.length}
@@ -43,7 +49,7 @@ export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
             data-attempt-total={numAttempts}
             x={900}
             y={562}
-            fill={STOCK.text}
+            fill={tokens.color.text}
             fontSize={18}
           >
             {numAttempts}

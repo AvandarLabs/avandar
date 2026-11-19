@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ProjectTally } from "./ProjectTally";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
@@ -7,7 +7,9 @@ type Props = { input: Input; frame: number };
 
 /** Choices and abstentions own distinct columns regardless of concentration. */
 export function ProjectDisplay({ input, frame }: Readonly<Props>): ReactNode {
-  const offset = 256 * (1 - ramp(frame, 84, 24));
+  const motion = useGraphicMotion();
+  const offset =
+    256 * (1 - motion.ramp(frame, 84, motion.scale(24), motion.exit.easing));
   const columnWidth = 864 / (input.projects.length + 1);
   return (
     <g>

@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
@@ -15,20 +19,22 @@ export function FundingPool({
   tokens,
   accent,
 }: Readonly<Props>): ReactNode {
+  const graphicTokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const remaining = tokens.filter(({ owner }) => {
     return owner === "pool";
   }).length;
   return (
     <g>
-      <rect
+      <StockRect
         x={248}
         y={232}
         width={655}
         height={104}
-        rx={12}
+        rx={scales.corner(graphicTokens.corner.card)}
         fill={accent}
         fillOpacity={0.025}
-        stroke={STOCK.muted}
+        stroke={graphicTokens.color.inactive}
       />
       {input.showAllocationTotals ? (
         <text

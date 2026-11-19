@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LunchLabels } from "./LunchLabels";
 import { LunchTray } from "./LunchTray";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,17 +17,19 @@ export function SchoolLunchTrayComposition({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={30}
         y={208}
         width={900}
         height={304}
-        rx={20}
-        fill={STOCK.surface}
+        rx={scales.corner(20)}
+        fill={tokens.color.surface}
         fillOpacity={0.35}
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <LunchLabels input={input} accent={accent} frame={frame} />
       {input.learners.map((learner, index) => {

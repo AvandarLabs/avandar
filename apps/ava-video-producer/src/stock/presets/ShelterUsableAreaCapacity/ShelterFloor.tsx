@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { buildFloorOutlineFromTiles } from "./buildFloorOutlineFromTiles";
 import { ShelterTile } from "./ShelterTile";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
@@ -11,16 +15,23 @@ export function ShelterFloor({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.keepGrossOutline || frame < 36 ? (
-        <path
-          data-gross-outline=""
-          d={buildFloorOutlineFromTiles(input.floorTiles)}
-          fill="none"
-          stroke={STOCK.text}
-          strokeWidth={2}
-        />
+        <g data-gross-outline="">
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: buildFloorOutlineFromTiles(input.floorTiles),
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.text}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
       ) : undefined}
       {input.floorTiles.map((tile) => {
         return (

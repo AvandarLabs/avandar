@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { StratumBoundary } from "./StratumBoundary";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
@@ -22,11 +22,17 @@ export function StratumRegion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const eligible = input.sites.filter(propEq("stratumId", stratum.id));
   const selected = eligible.filter((site) => {
     return input.selectedSiteIds.includes(site.id);
   });
-  const color = [accent, STOCK.cyan, STOCK.orange, STOCK.mint][index];
+  const color = [
+    accent,
+    tokens.color.accentAlt,
+    tokens.color.highlight,
+    tokens.color.positive,
+  ][index];
   return (
     <g
       data-stratum={stratum.id}

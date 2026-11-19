@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
 
@@ -16,6 +16,7 @@ export function AliquotTubeLabels({
   volume,
   showIdentity,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <FitText
@@ -48,7 +49,7 @@ export function AliquotTubeLabels({
           maxLines={3}
           breakLongWords
           normalizeWhitespace
-          color={STOCK.cyan}
+          color={tokens.color.accentAlt}
         />
       ) : undefined}
     </g>

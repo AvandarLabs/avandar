@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SchoolLocker } from "./SchoolLocker";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
@@ -20,20 +24,28 @@ export function PracticeInterior({
   accent,
   finalStep,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        d="M48 410 H912 M48 410 V200 M912 410 V200"
+      <SketchedShape
+        shape={{ kind: "path", d: "M48 410 H912 M48 410 V200 M912 410 V200" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <SchoolLocker input={input} doorWidth={doorWidth} accent={accent} />{" "}
-      <path
-        data-classroom={input.stops[1].id}
-        d="M710 410 V235 H830 V410 M718 410 V243 H822 V410"
-        stroke={accent}
-        fill="none"
-      />
+      <g data-classroom={input.stops[1].id}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: "M710 410 V235 H830 V410 M718 410 V243 H822 V410",
+          }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          fill="none"
+        />
+      </g>
       {input.showFootprints ? (
         <g opacity={0.25 * finalStep} fill={accent}>
           {Array.from({ length: 7 }, (_, index) => {
@@ -42,8 +54,8 @@ export function PracticeInterior({
                 key={index}
                 cx={410 + index * 45}
                 cy={420 + (index % 2) * 7}
-                rx={7}
-                ry={3}
+                rx={scales.corner(7)}
+                ry={scales.corner(3)}
               />
             );
           })}

@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BallotResident } from "./BallotResident";
 import { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
@@ -10,6 +11,7 @@ export function BallotPapers({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
       {input.ballots.map((ballot, index) => {
@@ -23,6 +25,7 @@ export function BallotPapers({
               input,
               frame,
               index,
+              motion,
             })}
             isRows={input.tallyArrangement === "rows"}
             accent={accent}

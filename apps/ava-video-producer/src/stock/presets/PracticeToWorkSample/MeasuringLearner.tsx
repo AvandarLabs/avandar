@@ -1,6 +1,7 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MeasuringTools } from "./MeasuringTools";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
@@ -14,13 +15,28 @@ export function MeasuringLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transfer = ramp(frame, 56, 22, EASE.inOut);
+  const motion = useGraphicMotion();
+  const transfer = motion.ramp(
+    frame,
+    56,
+    motion.scale(22),
+    motion.travel.easing,
+  );
   const x = mix(transfer, 330, 550);
   const isApplication = frame >= 78;
   const at = isApplication ? 82 : 24;
-  const rulerY = mix(ramp(frame, at, 8, EASE.inOut), 275, 330);
+  const rulerY = mix(
+    motion.ramp(frame, at, motion.whip, motion.travel.easing),
+    275,
+    330,
+  );
   const origin = isApplication ? 620 : 400;
-  const progress = ramp(frame, at + 8, 18, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    at + 8,
+    motion.hero,
+    motion.travel.easing,
+  );
   const pencilX = origin + input.task.value * 12 * progress;
   const isMeasuring =
     (frame >= 24 && frame <= 54) || (frame >= 82 && frame <= 112);

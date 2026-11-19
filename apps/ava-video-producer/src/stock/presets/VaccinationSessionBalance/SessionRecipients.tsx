@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
@@ -11,6 +11,7 @@ export function SessionRecipients({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
       {input.recipients.map((recipient, index) => {
@@ -18,7 +19,12 @@ export function SessionRecipients({
           <g
             key={recipient.id}
             data-recipient={recipient.id}
-            opacity={ramp(frame, 70 + index * 2, 15)}
+            opacity={motion.ramp(
+              frame,
+              70 + index * motion.stagger.list,
+              motion.word,
+              motion.reveal.easing,
+            )}
           >
             <PersonGlyph
               x={310 + (index % 2) * 185}

@@ -1,6 +1,7 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -13,6 +14,7 @@ export function HouseholdMap({
   completed,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.households.map((household, index) => {
@@ -30,8 +32,8 @@ export function HouseholdMap({
           state === "contacted"
             ? accent
             : state === "no-contact"
-              ? STOCK.orange
-              : STOCK.muted;
+              ? tokens.color.highlight
+              : tokens.color.inactive;
         return (
           <g
             key={household.id}
@@ -41,18 +43,27 @@ export function HouseholdMap({
             data-events={events.length}
             data-state={state}
           >
-            <path
-              d={`M${x + 19} ${y} L600 ${112 + index * 38} H620`}
-              stroke={STOCK.line}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${x + 19} ${y} L600 ${112 + index * 38} H620`,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
               fill="none"
             />
-            <path
-              data-home-outline={household.id}
-              d={`M${x - 18} ${y - 3} L${x} ${y - 20} L${x + 18} ${y - 3} V${y + 20} H${x - 18} Z`}
-              fill={STOCK.surface}
-              stroke={color}
-              strokeWidth={state === "contacted" ? 3 : 1.5}
-            />
+            <g data-home-outline={household.id}>
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${x - 18} ${y - 3} L${x} ${y - 20} L${x + 18} ${y - 3} V${y + 20} H${x - 18} Z`,
+                }}
+                profile={tokens.sketch.shape}
+                fill={tokens.color.surface}
+                stroke={color}
+                strokeWidth={state === "contacted" ? 3 : 1.5}
+              />
+            </g>
             <FitText
               text={String(index + 1)}
               x={x}
@@ -92,7 +103,7 @@ export function HouseholdMap({
                       cx={x - 10 + eventIndex * 10}
                       cy={y + 14}
                       r={3}
-                      fill={event.contacted ? accent : STOCK.orange}
+                      fill={event.contacted ? accent : tokens.color.highlight}
                     />
                   );
                 })

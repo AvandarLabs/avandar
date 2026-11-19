@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SharedReadingCircles.schema";
 import type { ReactNode } from "react";
@@ -9,11 +9,12 @@ export function ReadingRosterEntry({
   learner,
   index,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <>
       <SceneText
         text={String(index + 1)}
-        color={STOCK.cyan}
+        color={tokens.color.accentAlt}
         slot={[
           36 + (index % 4) * 230,
           125 + Math.floor(index / 4) * 45,

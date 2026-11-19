@@ -1,12 +1,14 @@
-import { countTo, ramp, STAGGER } from "../../../motion";
+import { countTo, STAGGER } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
 /** Captions and aggregate quantities retain the eligible sampling frame. */
 export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const selectedCount = input.selectedSiteIds.length;
   const eligibleCount = input.sites.length;
   return (
@@ -23,7 +25,15 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
         (quantity, index) => {
           return (
-            <g key={index} opacity={ramp(frame, 108 + index * STAGGER)}>
+            <g
+              key={index}
+              opacity={motion.ramp(
+                frame,
+                108 + index * STAGGER,
+                motion.panel,
+                motion.reveal.easing,
+              )}
+            >
               <Text x={40 + index * 310} y={552} size={24}>
                 {countTo(frame, 108 + index * STAGGER, quantity, 28)}
               </Text>

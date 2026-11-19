@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
@@ -7,6 +7,7 @@ type Props = { input: Input; frame: number };
 
 /** All supplied inflow remains in the four explicit destinations. */
 export function WaterEquation({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const { incomingM3, infiltratedM3, dischargedM3 } = input.event;
   const remainder = incomingM3 - (infiltratedM3 + dischargedM3);
   const detained = Math.min(input.detentionCapacityM3, remainder);
@@ -16,7 +17,7 @@ export function WaterEquation({ input, frame }: Readonly<Props>): ReactNode {
       <g
         data-overflow="quantity"
         data-quantity={overflow}
-        opacity={ramp(frame, 108, 12)}
+        opacity={motion.reveal(frame, 108)}
       >
         {input.showBalance ? (
           <SceneLabel

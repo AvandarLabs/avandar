@@ -1,4 +1,9 @@
-import { EASE, ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DimensionTicks } from "./DimensionTicks";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
@@ -12,7 +17,15 @@ export function StructureFootprint({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const placement = ramp(frame, 84, 24, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const placement = motion.ramp(
+    frame,
+    84,
+    motion.scale(24),
+    motion.travel.easing,
+  );
   const x = 70 + (input.placement.centerX - input.structure.width / 2) * 4.8;
   const y =
     160 +
@@ -21,8 +34,8 @@ export function StructureFootprint({
   const width = input.structure.width * 4.8;
   const height = input.structure.height * 2.8;
   return (
-    <g opacity={ramp(frame, 78, 6)}>
-      <rect
+    <g opacity={motion.ramp(frame, 78, motion.chip, motion.reveal.easing)}>
+      <StockRect
         data-structure-footprint=""
         x={x}
         y={y}
@@ -31,7 +44,7 @@ export function StructureFootprint({
         fill={accent}
         fillOpacity={0.32}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {input.showDimensions ? (
         <DimensionTicks

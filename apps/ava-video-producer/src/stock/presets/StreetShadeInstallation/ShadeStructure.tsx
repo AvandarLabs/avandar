@@ -1,3 +1,5 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
@@ -22,20 +24,25 @@ export function ShadeStructure({
   isInstalled,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (width === 0) {
     return undefined;
   }
   return (
-    <path
-      data-structure={index}
-      d={
-        kind === "awning"
-          ? `M${x} ${y + 18}V${y}H${x + width}V${y + 18}M${x + width / 2} ${y}V${y + 18}`
-          : `M${x} ${y + 18}Q${x + width / 2} ${y - 16} ${x + width} ${y + 18}Q${x + width / 2} ${y + 40} ${x} ${y + 18}`
-      }
-      fill={isInstalled ? color : "none"}
-      fillOpacity={0.3}
-      stroke={color}
-    />
+    <g data-structure={index}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d:
+            kind === "awning"
+              ? `M${x} ${y + 18}V${y}H${x + width}V${y + 18}M${x + width / 2} ${y}V${y + 18}`
+              : `M${x} ${y + 18}Q${x + width / 2} ${y - 16} ${x + width} ${y + 18}Q${x + width / 2} ${y + 40} ${x} ${y + 18}`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={isInstalled ? color : "none"}
+        fillOpacity={0.3}
+        stroke={color}
+      />
+    </g>
   );
 }

@@ -1,3 +1,7 @@
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,6 +22,8 @@ export function ZoneSurface({
   accent,
   opacity,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g data-lifted-zone={zoneId} transform={`translate(0 ${-lift})`}>
       <polygon
@@ -26,7 +32,7 @@ export function ZoneSurface({
         fill={accent}
         fillOpacity={opacity}
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
     </g>
   );

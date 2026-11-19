@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -25,6 +26,7 @@ export function BackfillBar({
   showPrior,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const x = 68 + index * width + 12;
   return (
     <g data-bin={id} data-prior={prior} data-revised={revised}>
@@ -38,14 +40,14 @@ export function BackfillBar({
         fillOpacity={0.18}
       />
       {showPrior ? (
-        <rect
+        <StockRect
           data-prior-outline={id}
           x={x}
           y={480 - prior * 18}
           width={width - 24}
           height={prior * 18}
           fill="none"
-          stroke={STOCK.orange}
+          stroke={tokens.color.highlight}
           strokeDasharray="5 3"
         />
       ) : undefined}
