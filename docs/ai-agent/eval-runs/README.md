@@ -362,3 +362,15 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-19T18-39-44](2026-11-19T18-39-44-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00301 | 5.3 s / 6.4 s | none |
 | [2026-11-19T18-40-03](2026-11-19T18-40-03-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00292 | 4.6 s / 5.0 s | none |
 | [2026-11-19T18-40-23](2026-11-19T18-40-23-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 0 | 0 | $0.00280 | 4.6 s / 4.8 s | none |
+| [2026-11-19T20-08-14](2026-11-19T20-08-14-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 4/6 | 1 | 0 | $0.00096 | 3.2 s / 4.1 s | T02 T05 |
+| [2026-11-19T20-08-27](2026-11-19T20-08-27-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 5/6 | 0 | 0 | $0.00046 | 2.1 s / 3.0 s | T02 |
+| [2026-11-19T20-08-36](2026-11-19T20-08-36-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 6/6 | 1 | 0 | $0.00047 | 2.1 s / 3.7 s | none |
+| [2026-11-19T20-10-57](2026-11-19T20-10-57-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 6/6 | 0 | 0 | $0.00052 | 2.8 s / 3.6 s | none |
+| [2026-11-19T20-11-06](2026-11-19T20-11-06-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 5/6 | 0 | 0 | $0.00046 | 1.9 s / 2.5 s | T05 |
+| [2026-11-19T20-11-15](2026-11-19T20-11-15-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 4/6 | 0 | 0 | $0.00046 | 1.8 s / 3.0 s | T03 T05 |
+| [2026-11-19T20-11-59](2026-11-19T20-11-59-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00075 | 2.9 s / 2.9 s | none |
+| [2026-11-19T20-12-07](2026-11-19T20-12-07-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00069 | 2.4 s / 2.4 s | none |
+| [2026-11-19T20-12-15](2026-11-19T20-12-15-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00069 | 2.5 s / 2.5 s | none |
+| [2026-11-19T20-18-44](2026-11-19T20-18-44-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00098 | 2.3 s / 3.2 s | none |
+| [2026-11-19T20-18-53](2026-11-19T20-18-53-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00053 | 2.4 s / 2.8 s | none |
+| [2026-11-19T20-19-02](2026-11-19T20-19-02-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00048 | 2.1 s / 2.8 s | none |
