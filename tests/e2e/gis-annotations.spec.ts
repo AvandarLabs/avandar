@@ -8,6 +8,7 @@ import {
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
+import type { FillLayerSpecification } from "maplibre-gl";
 
 const MAP_NAME = "E2E GIS annotations";
 const ANNOTATION_TEXT = "E2E note";
@@ -15,7 +16,7 @@ const ANNOTATION_TEXT = "E2E note";
 type AnnotationSnapshot = {
   featureCount: number;
   kinds: string[];
-  fillVisibility: unknown;
+  fillVisibility: NonNullable<FillLayerSpecification["layout"]>["visibility"];
 };
 
 /** Clicks a canvas fraction so annotation tools miss the empty-map overlay. */
