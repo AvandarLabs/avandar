@@ -1,5 +1,4 @@
 import { Underline } from "@remotion/rough-notation";
-import { enter, ramp } from "../motion";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
@@ -29,7 +28,7 @@ export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
           <div
             className={css.continuityThesisLine}
             key={line}
-            style={enter(frame, index * motion.scale(thesis.lineStagger), {
+            style={motion.enter(frame, index * motion.scale(thesis.lineStagger), {
               y: thesis.lineDistance,
               dur: motion.scale(thesis.lineDuration),
               easing: motion.curve(thesis.lineEasing),
@@ -42,7 +41,12 @@ export function ContinuityThesis({ content, frame, accent }: Props): ReactNode {
       <div className={css.continuityEmphasis}>
         <Underline
           disabled={!annotations}
-          progress={ramp(frame, UNDERLINE_CUE, motion.scale(underline.drawIn))}
+          progress={motion.ramp(
+            frame,
+            UNDERLINE_CUE,
+            motion.scale(underline.drawIn),
+            motion.reveal.easing,
+          )}
           color={accent}
           roughness={sketch.annotation.roughness}
           seed={underline.seed}

@@ -38,11 +38,10 @@ export function ContinuityAnnotation({
   const motion = useVideoMotion();
   if (!appearance.annotations) return null;
   return annotations.map((cue, index) => {
-    const progress = getAnnotationProgress(
-      frame,
-      cue,
-      motion.scale(annotation.drawIn),
-    );
+    const progress = getAnnotationProgress(frame, cue, {
+      duration: motion.scale(annotation.drawIn),
+      easing: motion.reveal.easing,
+    });
     if (progress <= 0) return null;
     const Annotation = notation[cue.kind];
     return (

@@ -67,6 +67,7 @@ export function WindowCard({
       scene.shadow ??
       buildColorWithAlpha(scene.background, WINDOW_SHADOW_FALLBACK_ALPHA),
   });
+  const boxShadow = tilt > 0 && !clipPath ? shadow : undefined;
   const titlebar =
     chrome === "titlebar"
       ? canvasHeight * windowTilt.titlebarHeight * tilt
@@ -92,7 +93,7 @@ export function WindowCard({
           borderRadius: scales.corner(windowTilt.chromeRadius) * tilt,
           overflow: "hidden",
           background: scene.background,
-          boxShadow: tilt > 0 && !clipPath ? shadow : undefined,
+          boxShadow,
           clipPath,
         }}
       >

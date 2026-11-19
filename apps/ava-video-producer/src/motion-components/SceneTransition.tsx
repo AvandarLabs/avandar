@@ -1,12 +1,14 @@
 import { linearTiming } from "@remotion/transitions";
 import { AbsoluteFill } from "remotion";
 import {
+  getClassicMotionSettingsTheme,
   getMotionDuration,
   getMotionEasing,
   resolveMotionSettings,
+  useMotionSettingsTheme,
 } from "./motionSettings";
 import type { MotionRect } from "./AnchoredOverlay";
-import type { MotionOptions } from "./motionSettings";
+import type { MotionOptions, MotionSettingsTheme } from "./motionSettings";
 import type {
   TransitionPresentationComponentProps,
   TransitionTiming,
@@ -48,6 +50,7 @@ export function getSceneTransitionStyle(
   progress: number,
   entering: boolean,
   props: SceneTransitionProps,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): CSSProperties {
   const {
     width = 1600,
@@ -65,7 +68,7 @@ export function getSceneTransitionStyle(
     width: width * 0.15,
     height: height / 14,
   };
-  const settings = resolveMotionSettings(props.motion);
+  const settings = resolveMotionSettings(props.motion, theme);
   const clipPath = !entering
     ? undefined
     : kind === "aperture"
@@ -99,12 +102,14 @@ export function SceneTransition({
   presentationProgress,
   passedProps,
 }: TransitionPresentationComponentProps<SceneTransitionProps>): ReactNode {
+  const theme = useMotionSettingsTheme();
   return (
     <AbsoluteFill
       style={getSceneTransitionStyle(
         presentationProgress,
         presentationDirection === "entering",
         passedProps,
+        theme,
       )}
     >
       {children}
@@ -125,19 +130,22 @@ type SceneTransitionSpec = {
  * Matching timing and presentation for TransitionSeries. Cuts need no
  * Transition element.
  */
-export function createSceneTransition({
-  durationInFrames,
-  ...props
-}: SceneTransitionProps & {
-  durationInFrames: number;
-}): SceneTransitionSpec {
-  const duration = getMotionDuration(durationInFrames, props.motion);
+export function createSceneTransition(
+  {
+    durationInFrames,
+    ...props
+  }: SceneTransitionProps & {
+    durationInFrames: number;
+  },
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
+): SceneTransitionSpec {
+  const duration = getMotionDuration(durationInFrames, props.motion, theme);
   if (duration < 1 || props.kind === "cut")
     throw new Error("Cuts use adjacent sequences without a Transition element");
   return {
     timing: linearTiming({
       durationInFrames: duration,
-      easing: getMotionEasing(props.motion),
+      easing: getMotionEasing(props.motion, undefined, theme),
     }),
     presentation: { component: SceneTransition, props },
   };

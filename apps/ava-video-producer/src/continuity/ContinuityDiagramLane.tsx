@@ -2,6 +2,7 @@ import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
@@ -25,6 +26,7 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
   const clipId = `overlay-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const appearance = useContinuityAppearance();
   const tokens = useVideoTokens();
+  const scales = useVideoShapeScales();
   const floating = useVideoProps("FloatingDiagram", {});
   const isSketched = tokens.sketch.box.roughness > 0;
   const cue = diagram.overlay;
@@ -43,7 +45,7 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
         className={css.label}
         style={{
           borderColor: isSketched ? "transparent" : undefined,
-          borderRadius: isSketched ? 0 : undefined,
+          borderRadius: isSketched ? 0 : scales.corner(tokens.corner.label),
         }}
       >
         <ContinuityBoxOutline />

@@ -27,6 +27,11 @@ import type { ReactNode } from "react";
 
 /** Radius of a packet travelling an edge, in pixels. */
 const PACKET_RADIUS = 6;
+/**
+ * An edge's normalised length. Its dash is the whole edge, so the dash
+ * offset draws it on.
+ */
+const EDGE_LENGTH = 1;
 /** Arm length of a `ticks` node's corner ticks, in pixels. */
 const TICK_ARM = 18;
 /** How far a node rises as it arrives, in pixels. */
@@ -128,9 +133,9 @@ export function GraphScene({
                 fill="none"
                 stroke={scene.border}
                 strokeWidth={edgeWidth}
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1 - reveal}
+                pathLength={EDGE_LENGTH}
+                strokeDasharray={EDGE_LENGTH}
+                strokeDashoffset={EDGE_LENGTH - reveal}
               />
               {edge.arrow === false ? null : (
                 // The arrowhead alone: markers draw without a stroke, scaled
@@ -149,9 +154,9 @@ export function GraphScene({
                 fill="none"
                 stroke={scene.brandStrong}
                 strokeWidth={edgeWidth}
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1 - highlight}
+                pathLength={EDGE_LENGTH}
+                strokeDasharray={EDGE_LENGTH}
+                strokeDashoffset={EDGE_LENGTH - highlight}
                 opacity={highlight > 0 ? 1 : 0}
               />
               {getPacketPositions(

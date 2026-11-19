@@ -1,4 +1,4 @@
-import { DUR } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { GraphScene } from "./GraphScene";
 import { assertFrame, flowNodes } from "./layout/layout";
 import type { FlowchartSceneProps } from "./scenes.types";
@@ -13,6 +13,7 @@ export function FlowchartScene({
   revealAtFrame = 10,
   ...base
 }: FlowchartSceneProps): ReactNode {
+  const motion = useVideoMotion();
   const nodes = flowNodes(steps);
   if (
     activeStep !== undefined &&
@@ -28,7 +29,7 @@ export function FlowchartScene({
   const times =
     stepAtFrames ??
     steps.map((_, index) => {
-      return revealAtFrame + DUR.sheet + index * 60;
+      return revealAtFrame + motion.sheet + index * 60;
     });
   times.forEach((time, index) => {
     assertFrame(time, "stepAtFrames");

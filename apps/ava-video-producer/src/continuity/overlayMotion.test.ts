@@ -5,6 +5,12 @@ import {
   getAnnotationProgress,
   getConnectorProgress,
 } from "./overlayMotion";
+import { getClassicStageMotion } from "../scenes/stageTheme/stageTheme";
+
+const motion = getClassicStageMotion();
+/** The draw timings the continuity stage passes in `classic`. */
+const ANNOTATION = { duration: 18, easing: motion.reveal.easing };
+const CONNECTOR = { duration: 30, easing: motion.travel.easing };
 
 test("floating explanation leaves its measured source, settles safely, then returns", () => {
   const source = { x: 387, y: 279, width: 153, height: 323 };
@@ -25,10 +31,10 @@ test("floating explanation leaves its measured source, settles safely, then retu
 
 test("notation draws after its cue and disappears at its authored end", () => {
   const cue = { at: 100, until: 200 };
-  assert.equal(getAnnotationProgress(99, cue), 0);
-  assert.ok(getAnnotationProgress(109, cue) > 0);
-  assert.equal(getAnnotationProgress(150, cue), 1);
-  assert.equal(getAnnotationProgress(200, cue), 0);
+  assert.equal(getAnnotationProgress(99, cue, ANNOTATION), 0);
+  assert.ok(getAnnotationProgress(109, cue, ANNOTATION) > 0);
+  assert.equal(getAnnotationProgress(150, cue, ANNOTATION), 1);
+  assert.equal(getAnnotationProgress(200, cue, ANNOTATION), 0);
 });
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -67,15 +73,15 @@ test("all authored overlays stay in safe stage space and clear their measured so
 });
 
 test("focus and bracket treatments never emit a causal connector", () => {
-  assert.equal(getConnectorProgress(300, "focus", 100), 0);
-  assert.equal(getConnectorProgress(300, "bracket", 100), 0);
+  assert.equal(getConnectorProgress(300, "focus", 100, CONNECTOR), 0);
+  assert.equal(getConnectorProgress(300, "bracket", 100, CONNECTOR), 0);
 });
 
 test("causal connector starts only at its authored signal cue", () => {
-  assert.equal(getConnectorProgress(99, "signal", 100), 0);
-  assert.equal(getConnectorProgress(100, "signal", 100), 0);
-  assert.ok(getConnectorProgress(115, "signal", 100) > 0);
-  assert.equal(getConnectorProgress(130, "signal", 100), 1);
+  assert.equal(getConnectorProgress(99, "signal", 100, CONNECTOR), 0);
+  assert.equal(getConnectorProgress(100, "signal", 100, CONNECTOR), 0);
+  assert.ok(getConnectorProgress(115, "signal", 100, CONNECTOR) > 0);
+  assert.equal(getConnectorProgress(130, "signal", 100, CONNECTOR), 1);
 });
 
 test("composites reject diagrams with no visible overlay placement", () => {
@@ -116,7 +122,8 @@ test("slower overlay travel reaches the target later and keeps its end cue", () 
 test("a longer themed draw-in slows an annotation's arrival", () => {
   const cue = { at: 0, until: 200 };
   assert.ok(
-    getAnnotationProgress(9, cue, 36) < getAnnotationProgress(9, cue, 18),
+    getAnnotationProgress(9, cue, { ...ANNOTATION, duration: 36 }) <
+      getAnnotationProgress(9, cue, ANNOTATION),
   );
 });
 

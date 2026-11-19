@@ -2,12 +2,10 @@
   background: var(--video-color-ground-fill);
   color: var(--video-color-text);
   font-family: var(--video-text-stage-heading-font-family);
-  height: 840px;
   left: 0;
   overflow: hidden;
   position: absolute;
   top: 0;
-  width: 1600px;
 }
 
 .continuityBeat {
@@ -69,7 +67,6 @@
 
 .continuityEvidence span {
   background: var(--video-color-ground);
-  border-radius: var(--video-corner-chip);
   padding: var(--video-component-evidence-chip-padding-y)
     var(--video-component-evidence-chip-padding-x);
 }
@@ -78,7 +75,6 @@
   align-items: center;
   background: var(--video-component-shared-object-fill);
   border: var(--video-component-shared-object-border-width) solid currentcolor;
-  border-radius: var(--video-corner-shared-object);
   box-sizing: border-box;
   color: var(--video-text-stage-shared-object-color);
   display: flex;

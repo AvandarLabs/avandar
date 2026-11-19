@@ -1,8 +1,12 @@
 import { useId } from "react";
-import { EASE, ramp } from "../motion";
-import { getMotionDuration, getMotionProgress } from "./motionSettings";
+import {
+  getClassicMotionSettingsTheme,
+  getMotionDuration,
+  getMotionProgress,
+  useMotionSettingsTheme,
+} from "./motionSettings";
 import type { MotionRect } from "./AnchoredOverlay";
-import type { MotionOptions } from "./motionSettings";
+import type { MotionOptions, MotionSettingsTheme } from "./motionSettings";
 import type { ReactNode } from "react";
 
 /**
@@ -25,27 +29,42 @@ export type ObjectFlightPose = {
   active: boolean;
 };
 
+/** Luminance mask fills: white keeps the scene, black cuts the object out. */
+const MASK_KEEP = "white";
+const MASK_CUT = "black";
+
 /**
- * Deterministic departure geometry. Its active flag can drive DiagramCamera
+ * Deterministic departure geometry, travelling on the theme's cubic in-out
+ * unless the flight names a curve. Its active flag can drive DiagramCamera
  * blurActive.
  */
 export function getObjectFlight(
   flight: ObjectFlight,
   frame: number,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): ObjectFlightPose {
   if (frame < flight.at) return { x: 0, y: 0, opacity: 1, active: false };
-  const duration = getMotionDuration(flight.duration, flight.motion);
+  const { motion } = theme;
+  const duration = getMotionDuration(flight.duration, flight.motion, theme);
   const progress = getMotionProgress(
     frame,
     flight.at,
     flight.duration,
     flight.motion,
-    EASE.inOutCubic,
+    motion.curve(theme.easing.inOutCubic),
+    theme,
   );
   return {
     x: progress * flight.dx,
     y: progress * flight.dy,
-    opacity: 1 - ramp(frame, flight.at + duration * 0.55, duration * 0.45),
+    opacity:
+      1 -
+      motion.ramp(
+        frame,
+        flight.at + duration * 0.55,
+        duration * 0.45,
+        motion.reveal.easing,
+      ),
     active: frame < flight.at + duration,
   };
 }
@@ -68,14 +87,15 @@ export function SvgObjectDeparture({
   height?: number;
 }): ReactNode {
   const identity = `departure-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const theme = useMotionSettingsTheme();
   if (frame < flight.at) return children;
-  const pose = getObjectFlight(flight, frame);
+  const pose = getObjectFlight(flight, frame, theme);
   return (
     <>
       <defs>
         <mask id={`${identity}-rest`}>
-          <rect width={width} height={height} fill="white" />
-          <rect {...flight.rect} fill="black" />
+          <rect width={width} height={height} fill={MASK_KEEP} />
+          <rect {...flight.rect} fill={MASK_CUT} />
         </mask>
         <clipPath id={`${identity}-object`}>
           <rect {...flight.rect} />
