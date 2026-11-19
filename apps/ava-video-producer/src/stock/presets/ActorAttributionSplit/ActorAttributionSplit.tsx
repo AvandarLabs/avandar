@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AttributionActors } from "./AttributionActors";
 import { AttributionEvent } from "./AttributionEvent";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,6 +17,8 @@ export function ActorAttributionSplit({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <LabelSlots
@@ -25,14 +31,14 @@ export function ActorAttributionSplit({
           [input.copy.example, 45, 575, 870, 12, 2],
         ]}
       />
-      <rect
+      <StockRect
         x={555}
         y={110}
         width={360}
         height={365}
-        rx={12}
+        rx={scales.corner(tokens.corner.card)}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <AttributionActors frame={frame} input={input} accent={accent} />
       {input.events.map((event, index) => {

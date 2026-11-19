@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 /** Inputs for PremiseStrip. */
@@ -17,16 +21,18 @@ export function PremiseStrip({
   center,
   slotWidth,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <>
-      <rect
+      <StockRect
         x={x + 4}
         y={410}
         width={slotWidth - 8}
         height={142}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={premise.text}

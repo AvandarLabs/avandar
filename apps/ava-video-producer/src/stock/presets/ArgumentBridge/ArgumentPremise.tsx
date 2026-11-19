@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PremiseStrip } from "./PremiseStrip";
 import { PremiseSupport } from "./PremiseSupport";
 import type { Input } from "./ArgumentBridge.schema";
@@ -13,6 +14,13 @@ type Props = {
   showSupport: boolean;
   relationship: Input["relationship"];
 };
+
+/** Frames between neighbouring premises arriving. */
+const ARRIVAL_STAGGER_FRAMES = 6;
+/** Frames between neighbouring premises joining the deck. */
+const JOIN_STAGGER_FRAMES = 4;
+/** Frames a premise's arms take to reach the deck. */
+const JOIN_FRAMES = 28;
 /** Each reason remains readable below its own joining section of the deck. */
 export function ArgumentPremise({
   frame,
@@ -23,11 +31,22 @@ export function ArgumentPremise({
   showSupport,
   relationship,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const slotWidth = 900 / count;
   const x = 30 + index * slotWidth;
   const center = x + slotWidth / 2;
-  const arrival = ramp(frame, 12 + index * 6, 18);
-  const joining = ramp(frame, 48 + index * 4, 28, EASE.inOut);
+  const arrival = ramp(
+    frame,
+    12 + index * motion.scale(ARRIVAL_STAGGER_FRAMES),
+    motion.hero,
+    motion.entrance.easing,
+  );
+  const joining = ramp(
+    frame,
+    48 + index * motion.scale(JOIN_STAGGER_FRAMES),
+    motion.scale(JOIN_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <g
       data-premise={premise.id}
