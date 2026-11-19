@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getByteLabelFromBytes } from "./getByteLabelFromBytes";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
@@ -17,11 +18,13 @@ export function VolumeScale({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
-      <path
-        d={`M440 ${y + 27} V${y + 160} H900`}
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{ kind: "path", d: `M440 ${y + 27} V${y + 160} H900` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
         fill="none"
       />
       <LabelSlots
@@ -41,12 +44,17 @@ export function VolumeScale({
         ]}
       />
       {input.showCountGuides ? (
-        <path
-          data-count-guide={group.id}
-          d={`M420 ${y + 45} v${group.items.length * 39}`}
-          stroke={accent}
-          strokeDasharray="3 5"
-        />
+        <g data-count-guide={group.id}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M420 ${y + 45} v${group.items.length * 39}`,
+            }}
+            profile={tokens.sketch.shape}
+            stroke={accent}
+            strokeDasharray={tokens.dash.guide.join(" ")}
+          />
+        </g>
       ) : null}
     </g>
   );

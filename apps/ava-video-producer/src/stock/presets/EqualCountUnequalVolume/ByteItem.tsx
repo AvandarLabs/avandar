@@ -1,5 +1,11 @@
-import { ramp, EASE } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ByteItemLabels } from "./ByteItemLabels";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
@@ -12,6 +18,11 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+/** Frames each byte strip takes to unfold to its measured width. */
+const UNFOLD_FRAMES = 61;
+/** A count tab's corner before the corner style scales it. */
+const TAB_CORNER = 5;
 /** Zero-byte items retain their identity tab and count despite zero width. */
 export function ByteItem({
   item,
@@ -21,18 +32,26 @@ export function ByteItem({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const unfolding = ramp(frame, 49, 61, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const unfolding = ramp(
+    frame,
+    49,
+    motion.scale(UNFOLD_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <g data-item-id={item.id} data-item-bytes={item.bytes}>
-      <rect
+      <StockRect
         data-count-tab={item.id}
         x={x}
         y={y - 15}
         width={365}
         height={34}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(TAB_CORNER)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <ByteItemLabels {...{ input, item, x, y }} />
       <rect
@@ -45,8 +64,9 @@ export function ByteItem({
         }
         fill={accent}
       />
-      <path
-        d={`M${x + 365} ${y} H440`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x + 365} ${y} H440` }}
+        profile={tokens.sketch.shape}
         stroke={accent}
         strokeOpacity={unfolding}
       />
