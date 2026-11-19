@@ -1,40 +1,34 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix, ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
+import { EXPIRY_CUE } from "./leaseShape";
 import { LeaseSocket } from "./LeaseSocket";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpiringLease.schema";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-const DOCK = {
-  cx: 480,
-  cy: 430,
-  r: 34,
-  fill: STOCK.surface,
-  stroke: STOCK.line,
-  strokeWidth: 3,
-} satisfies Pick<
-  ComponentProps<"circle">,
-  "cx" | "cy" | "r" | "fill" | "stroke" | "strokeWidth"
->;
-const ROUTE = {
-  fill: "none",
-  stroke: STOCK.line,
-  strokeWidth: 2,
-  strokeDasharray: "4 8",
-} satisfies Pick<
-  ComponentProps<"path">,
-  "fill" | "stroke" | "strokeWidth" | "strokeDasharray"
->;
+const DOCK = { kind: "circle", cx: 480, cy: 430, r: 34 } as const;
+/** The dash of the route back to the dock. */
+const ROUTE_DASH = "4 8";
+/** Frames the token takes to return to the dock. */
+const RETURN_FRAMES = 28;
 /** One token expires into neutral custody without inferring a successor. */
 export function ExpiringLease({
   frame,
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const holderIndex = input.participants.findIndex(
     propEq("id", input.holderId),
   );
@@ -42,28 +36,42 @@ export function ExpiringLease({
     index: holderIndex,
     numParticipants: input.participants.length,
   });
-  const returning = ramp(frame, 108, 28, EASE.inOut);
-  const route = {
-    d: `M${holder.x} ${holder.y} L480 430`,
-    ...ROUTE,
-    opacity: ramp(frame, 24, 12),
-  };
+  const returning = ramp(
+    frame,
+    EXPIRY_CUE,
+    motion.scale(RETURN_FRAMES),
+    motion.travel.easing,
+  );
+
   const token = {
     cx: mix(returning, holder.x, 480),
     cy: mix(returning, holder.y, 430),
     r: 12,
     fill: accent,
-    opacity: ramp(frame, 18, 12),
+    opacity: motion.reveal(frame, 18),
   };
   const socketProps = { input, frame, accent };
   return (
     <g>
-      <circle
-        data-neutral-dock="pool"
-        {...DOCK}
-        opacity={ramp(frame, 12, 12)}
+      <g data-neutral-dock="pool">
+        <SketchedShape
+          shape={DOCK}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          opacity={motion.reveal(frame, 12)}
+        />
+      </g>
+      <SketchedShape
+        shape={{ kind: "path", d: `M${holder.x} ${holder.y} L480 430` }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeDasharray={ROUTE_DASH}
+        opacity={motion.reveal(frame, 24)}
       />
-      <path {...route} />
       {input.participants.map((participant, index) => {
         return (
           <LeaseSocket

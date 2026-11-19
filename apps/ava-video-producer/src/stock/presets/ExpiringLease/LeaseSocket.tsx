@@ -1,8 +1,14 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCollar } from "./LeaseCollar";
+import { EXPIRY_CUE } from "./leaseShape";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 
@@ -31,6 +37,13 @@ const LABEL = {
   | "breakLongWords"
   | "normalizeWhitespace"
 >;
+/** Frames the holder's socket takes to open at expiry. */
+const OPEN_FRAMES = 8;
+/** The share of the socket's outline that opens. */
+const OPEN_GAP = 0.3;
+/** The socket's normalized path length, which its dash spans. */
+const SOCKET_LENGTH = 1;
+
 /** Expiry opens a socket while preserving its previous empty location. */
 export function LeaseSocket({
   participant,
@@ -39,31 +52,37 @@ export function LeaseSocket({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { x, y } = getSocketPointFromIndex({
     index,
     numParticipants: input.participants.length,
   });
   const isHolder = participant.id === input.holderId;
-  const opening = isHolder ? ramp(frame, 108, 8) : 0;
-  const socket = {
-    cx: x,
-    cy: y,
-    r: 32,
-    fill: STOCK.surface,
-    stroke: STOCK.cyan,
-    strokeWidth: 3,
-    pathLength: 1,
-    strokeDasharray: 1,
-    strokeDashoffset: opening * 0.3,
-  };
+  const opening = isHolder
+    ? ramp(frame, EXPIRY_CUE, motion.scale(OPEN_FRAMES), motion.exit.easing)
+    : 0;
   const collarProps = { input, frame, x, y, accent };
   return (
-    <g opacity={ramp(frame, 14 + index * 2, 12)}>
-      <circle
+    <g opacity={motion.reveal(frame, 14 + index * motion.stagger.list)}>
+      <g
         data-socket={participant.id}
-        data-socket-owner={isHolder && frame < 108 ? participant.id : undefined}
-        {...socket}
-      />
+        data-socket-owner={
+          isHolder && frame < EXPIRY_CUE ? participant.id : undefined
+        }
+      >
+        <SketchedShape
+          shape={{ kind: "circle", cx: x, cy: y, r: 32 }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={tokens.color.accentAlt}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          pathLength={SOCKET_LENGTH}
+          strokeDasharray={SOCKET_LENGTH}
+          strokeDashoffset={SOCKET_LENGTH * opening * OPEN_GAP}
+        />
+      </g>
       {isHolder && input.showLifetime ? (
         <LeaseCollar {...collarProps} />
       ) : undefined}

@@ -1,5 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ExpectedSheet } from "./ExpectedSheet";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
@@ -12,6 +13,9 @@ type Props = {
   state: string;
   accent: string;
 };
+
+/** The dash of an empty slot with no observed value. */
+const MISSING_DASH = "5 5";
 /**
  * Aligned sheets preserve complete literal values and an empty missing slot.
  */
@@ -23,18 +27,19 @@ export function StationSheets({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-observed-slot={item.id}
         x={510}
         y={y + 22}
         width={390}
         height={35}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeDasharray={item.observed === null ? "5 5" : undefined}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeDasharray={item.observed === null ? MISSING_DASH : undefined}
       />
       {item.observed !== null ? (
         <LiteralDataText value={item.observed} x={525} y={y + 44} />
