@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -17,27 +18,26 @@ export function SiteKey({
   accent,
   selected,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
-      <line
-        x1={638}
-        x2={638}
-        y1={railY + 8}
-        y2={railY}
-        stroke={selected ? accent : STOCK.muted}
+      <SketchedShape
+        shape={{ kind: "line", x1: 638, y1: railY + 8, x2: 638, y2: railY }}
+        profile={tokens.sketch.shape}
+        stroke={selected ? accent : tokens.color.inactive}
       />
-      <circle
-        cx={638}
-        cy={railY}
-        r={9}
-        fill={STOCK.surface}
-        stroke={selected ? accent : STOCK.muted}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 638, cy: railY, r: 9 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={selected ? accent : tokens.color.inactive}
       />
       <text
         x={638}
         y={railY + 4}
-        fill={STOCK.text}
-        fontSize={12}
+        fill={tokens.color.text}
+        fontSize={tokens.text.graphic.data.fontSize}
+        fontFamily={tokens.text.graphic.data.fontFamily}
         textAnchor="middle"
       >
         {index + 1}

@@ -1,6 +1,9 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReferralLane } from "./ReferralLane";
 import { ReferralLedger } from "./ReferralLedger";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,8 +17,10 @@ export function ReferralReturnAcknowledgement({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 18)}>
+    <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
       <FitText
         text={input.sceneLabel}
         x={50}
@@ -26,9 +31,13 @@ export function ReferralReturnAcknowledgement({
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d="M70 138 V74 H325 V138 M570 138 V74 H890 V138"
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M70 138 V74 H325 V138 M570 138 V74 H890 V138",
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
         fill="none"
       />
       <FitText

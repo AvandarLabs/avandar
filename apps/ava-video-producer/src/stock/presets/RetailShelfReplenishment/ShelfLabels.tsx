@@ -1,4 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
@@ -8,6 +9,7 @@ export function ShelfLabels({
   input,
   shelfQuantities,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.goods.map((good, index) => {
@@ -28,7 +30,8 @@ export function ShelfLabels({
                 data-quantity={good.id}
                 x={42}
                 y={252 + index * 105}
-                fontSize={16}
+                fontSize={tokens.text.graphic.secondary.fontSize}
+                fontFamily={tokens.text.graphic.secondary.fontFamily}
                 fill="currentColor"
               >
                 {shelfQuantities[index]}

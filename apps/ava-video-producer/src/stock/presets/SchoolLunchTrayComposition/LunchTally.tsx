@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 
@@ -23,12 +23,15 @@ export function LunchTally({
   frame,
   complete,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const slots: Slot[] = [
     [`${complete} / ${input.trays.length}`, 48, 550, 110, 24, 1],
     [input.labels.matchesPlan, 180, 532, 230, 14, 3],
     [input.labels.plannedTrays, 440, 532, 220, 14, 3],
     ...(input.emphasizeMissingComponents
-      ? ([[input.labels.missing, 690, 532, 220, 14, 3, STOCK.orange]] as Slot[])
+      ? ([
+          [input.labels.missing, 690, 532, 220, 14, 3, tokens.color.highlight],
+        ] as Slot[])
       : []),
   ];
   return (

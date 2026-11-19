@@ -1,10 +1,15 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
+/** The dash of a person's path to a booked slot. */
+const BOOKING_DASH = "4 5";
 type Props = { input: Input; frame: number; accent: string };
 
 /**
@@ -31,6 +36,8 @@ export function ClinicPeople({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <g>
       {input.people.map((person, index) => {
@@ -45,23 +52,33 @@ export function ClinicPeople({
             data-person-id={person.id}
             data-slot-reference={person.slotId ?? undefined}
             data-unbooked={person.slotId === null}
-            opacity={ramp(frame, 12 + index * 2, 12)}
+            opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
           >
             {person.slotId !== null ? (
-              <path
-                data-booking={person.slotId}
-                d={_buildBookingPath({ x, personIndex: index, slotIndex })}
-                stroke={accent}
-                fill="none"
-                opacity={ramp(frame, 96 + index, 10)}
-                strokeDasharray="4 5"
-              />
+              <g data-booking={person.slotId}>
+                <SketchedShape
+                  shape={{
+                    kind: "path",
+                    d: _buildBookingPath({ x, personIndex: index, slotIndex }),
+                  }}
+                  profile={tokens.sketch.shape}
+                  stroke={accent}
+                  fill="none"
+                  opacity={motion.ramp(
+                    frame,
+                    96 + index,
+                    motion.scale(10),
+                    motion.reveal.easing,
+                  )}
+                  strokeDasharray={BOOKING_DASH}
+                />
+              </g>
             ) : undefined}
             <PersonGlyph
               x={x}
               y={y}
               size={25}
-              color={person.slotId === null ? STOCK.orange : accent}
+              color={person.slotId === null ? tokens.color.highlight : accent}
             />
             <FitText
               text={person.label}

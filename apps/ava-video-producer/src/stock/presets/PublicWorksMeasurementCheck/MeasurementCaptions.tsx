@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 
@@ -11,6 +11,7 @@ export function MeasurementCaptions({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const difference = Number(
     (input.observation.length - input.specification.length).toPrecision(12),
   );
@@ -32,7 +33,7 @@ export function MeasurementCaptions({
         ]}
       />
       {input.showDifference ? (
-        <g opacity={ramp(frame, 108, 12)}>
+        <g opacity={motion.reveal(frame, 108)}>
           <LabelSlots
             labels={[
               [input.labels.difference, 48, 556, 410, 14, 3],

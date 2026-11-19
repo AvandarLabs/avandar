@@ -1,4 +1,9 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,6 +23,8 @@ export function ShelfActor({
   handY,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <PersonGlyph
@@ -27,15 +34,22 @@ export function ShelfActor({
         color={accent}
         role={role === "retailer" ? "worker" : "participant"}
       />
-      <path
+      <g
         data-retailer-arm={role === "retailer" ? "" : undefined}
         data-shopper-arm={role === "shopper" ? "" : undefined}
-        d={`M${x} ${y} L${(x + handX) / 2} ${handY + 16} L${handX} ${handY}`}
-        stroke={accent}
-        strokeWidth={3}
-        fill="none"
-        strokeLinecap="round"
-      />
+      >
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x} ${y} L${(x + handX) / 2} ${handY + 16} L${handX} ${handY}`,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          fill="none"
+          strokeLinecap="round"
+        />
+      </g>
       <circle
         data-retailer-hand={role === "retailer" ? "" : undefined}
         data-shopper-hand={role === "shopper" ? "" : undefined}

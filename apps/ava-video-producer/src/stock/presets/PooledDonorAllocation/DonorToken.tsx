@@ -1,8 +1,14 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { ReactNode } from "react";
 
+/** The size of the request ordinal printed on an earmark tag. */
+const REQUEST_ORDINAL_SIZE = 10;
 type Props = {
   token: ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
   requestOrdinal: number;
@@ -14,6 +20,8 @@ export function DonorToken({
   requestOrdinal,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g
       data-token={`${token.donorIndex}:${token.unitIndex}`}
@@ -26,31 +34,31 @@ export function DonorToken({
       data-y={token.y}
       transform={`translate(${token.x} ${token.y})`}
     >
-      <circle
-        cx={0}
-        cy={0}
-        r={17}
-        fill={STOCK.surface}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 0, cy: 0, r: 17 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
       <LiteralDataText
         value={token.donor.mark}
         x={-12}
         y={3}
-        color={STOCK.text}
+        color={tokens.color.text}
       />
       {token.donor.earmarkedRequestId === null ? (
-        <path d="M0 9 L4 13 L0 17 L-4 13 Z" fill={STOCK.cyan} />
+        <path d="M0 9 L4 13 L0 17 L-4 13 Z" fill={tokens.color.accentAlt} />
       ) : (
         <>
-          <path d="M-7 8 H7 V20 L0 17 L-7 20 Z" fill={STOCK.orange} />
+          <path d="M-7 8 H7 V20 L0 17 L-7 20 Z" fill={tokens.color.highlight} />
           <text
             x={0}
             y={17}
             textAnchor="middle"
-            fontSize={10}
-            fill={STOCK.ground}
+            fontSize={REQUEST_ORDINAL_SIZE}
+            fontFamily={tokens.text.graphic.data.fontFamily}
+            fill={tokens.color.ground}
           >
             {requestOrdinal}
           </text>

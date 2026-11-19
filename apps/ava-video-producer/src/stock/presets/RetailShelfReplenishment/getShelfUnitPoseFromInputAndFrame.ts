@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RetailShelfReplenishment.schema";
 
 type Unit = {
@@ -8,6 +9,7 @@ type Unit = {
   selectedIndex: number;
   input: Input;
   frame: number;
+  motion: VideoMotion;
 };
 /** One conserved physical unit's position, owner and handling actor. */
 export function getShelfUnitPoseFromInputAndFrame({
@@ -17,16 +19,27 @@ export function getShelfUnitPoseFromInputAndFrame({
   selectedIndex,
   input,
   frame,
+  motion,
 }: Readonly<Unit>): { owner: string; x: number; y: number } {
   const good = input.goods[goodIndex];
   const shelf = { x: 180 + unitIndex * 56, y: 200 + goodIndex * 105 };
-  const arrival = ramp(frame, 38, 18, EASE.inOut);
+  const arrival = motion.ramp(frame, 38, motion.hero, motion.travel.easing);
   const trolley = {
     x: 698 + (incomingIndex % 3) * 36 + mix(arrival, 100, 0),
     y: 370 + Math.floor(incomingIndex / 3) * 36,
   };
-  const load = ramp(frame, 58 + incomingIndex * 5, 5, EASE.inOut);
-  const purchase = ramp(frame, 96 + selectedIndex * 8, 8, EASE.inOut);
+  const load = motion.ramp(
+    frame,
+    58 + incomingIndex * 5,
+    motion.scale(5),
+    motion.travel.easing,
+  );
+  const purchase = motion.ramp(
+    frame,
+    96 + selectedIndex * 8,
+    motion.whip,
+    motion.travel.easing,
+  );
   const isIncoming = unitIndex >= good.openingUnits;
   const isSelected = unitIndex < good.selectedUnits;
   const restocked = isIncoming

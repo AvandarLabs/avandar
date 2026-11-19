@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MeasuredArtifact } from "./MeasuredArtifact";
 import { WorkshopBench } from "./WorkshopBench";
 import type { Input } from "./PracticeToWorkSample.schema";
@@ -14,7 +19,15 @@ export function PracticeFurniture({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transfer = ramp(frame, 56, 22, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const transfer = motion.ramp(
+    frame,
+    56,
+    motion.scale(22),
+    motion.travel.easing,
+  );
   const practiceX = mix(transfer, 370, 100);
   const practiceY = mix(transfer, 270, 320);
   return (
@@ -23,10 +36,11 @@ export function PracticeFurniture({
         data-practice-desk="true"
         transform={`translate(${practiceX - 20} ${practiceY + 118})`}
       >
-        <path
-          d="M0 0 H260 M20 0 V55 M240 0 V55"
-          stroke={STOCK.line}
-          strokeWidth={6}
+        <SketchedShape
+          shape={{ kind: "path", d: "M0 0 H260 M20 0 V55 M240 0 V55" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.line}
+          strokeWidth={scales.stroke(6)}
         />
       </g>
       <WorkshopBench transfer={transfer} />
@@ -35,7 +49,7 @@ export function PracticeFurniture({
           input={input}
           x={practiceX}
           y={practiceY}
-          progress={ramp(frame, 32, 18, EASE.inOut)}
+          progress={motion.ramp(frame, 32, motion.hero, motion.travel.easing)}
           isPractice
           accent={accent}
         />
@@ -45,7 +59,7 @@ export function PracticeFurniture({
           input={input}
           x={590}
           y={270}
-          progress={ramp(frame, 90, 18, EASE.inOut)}
+          progress={motion.ramp(frame, 90, motion.hero, motion.travel.easing)}
           isPractice={false}
           accent={accent}
         />

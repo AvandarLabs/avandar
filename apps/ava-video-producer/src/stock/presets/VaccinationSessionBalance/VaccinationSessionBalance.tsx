@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DoseToken } from "./DoseToken";
 import { SessionCarrier } from "./SessionCarrier";
 import { SessionHeadings } from "./SessionHeadings";
@@ -15,23 +20,29 @@ export function VaccinationSessionBalance({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <SessionHeadings input={input} />
       <SessionCarrier frame={frame} accent={accent} />
-      <rect
+      <StockRect
         x={280}
         y={180}
         width={375}
         height={290}
-        rx={24}
+        rx={scales.corner(24)}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
-      <path
-        d="M690 205 V280 H930 V205 M690 385 V460 H930 V385"
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M690 205 V280 H930 V205 M690 385 V460 H930 V385",
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <SessionRecipients input={input} frame={frame} accent={accent} />
       {input.units.map((unit, index) => {

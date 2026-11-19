@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SeedPlot } from "./SeedPlot";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { ReactNode } from "react";
@@ -17,36 +21,44 @@ export function SeedContainers({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        data-harvest-mat=""
-        d="M48 400 H238 M48 405 H238"
-        stroke={STOCK.muted}
-        strokeWidth={3}
-      />
-      <path
-        data-seed-jar=""
-        d="M278 290 V410 H478 V290"
-        fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={3}
-      />
+      <g data-harvest-mat="">
+        <SketchedShape
+          shape={{ kind: "path", d: "M48 400 H238 M48 405 H238" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
+      <g data-seed-jar="">
+        <SketchedShape
+          shape={{ kind: "path", d: "M278 290 V410 H478 V290" }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       <rect
         data-jar-lid=""
         x={278}
         y={286 - scene.lidOpen * 36}
         width={200}
         height={5}
-        fill={STOCK.muted}
+        fill={tokens.color.inactive}
       />
-      <path
-        data-loss-tray=""
-        d="M508 390 V410 H708 V390"
-        fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={3}
-      />
+      <g data-loss-tray="">
+        <SketchedShape
+          shape={{ kind: "path", d: "M508 390 V410 H708 V390" }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       <SeedPlot scene={scene} frame={frame} accent={accent} />
     </g>
   );

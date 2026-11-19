@@ -1,3 +1,8 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
@@ -16,14 +21,18 @@ export function PredictionDrop({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return frame >= 66 ? (
-    <path
-      data-prediction-drop={learner.id}
-      d={`M${targetX} ${y + 24} V500`}
-      stroke={accent}
-      strokeOpacity={0.25}
-      strokeWidth={1}
-      strokeDasharray="3 5"
-    />
+    <g data-prediction-drop={learner.id}>
+      <SketchedShape
+        shape={{ kind: "path", d: `M${targetX} ${y + 24} V500` }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeOpacity={tokens.alpha.ghost}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+        strokeDasharray={tokens.dash.guide.join(" ")}
+      />
+    </g>
   ) : undefined;
 }

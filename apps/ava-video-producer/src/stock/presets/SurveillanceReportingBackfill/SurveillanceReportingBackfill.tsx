@@ -1,6 +1,12 @@
 import { propEq } from "@avandar/utils";
-import { ramp, mix } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BackfillChart } from "./BackfillChart";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
@@ -16,6 +22,9 @@ export function SurveillanceReportingBackfill({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const earlier = input.records.filter(propEq("firstSnapshot", 0)).length;
   return (
     <g data-earlier-total={earlier} data-revised-total={input.records.length}>
@@ -33,12 +42,17 @@ export function SurveillanceReportingBackfill({
           [input.copy.unit, 670, 548, 230, 12, 4],
         ]}
       />
-      <path
-        data-reporting-tab=""
-        d={`M${mix(ramp(frame, 36, 36), 60, 500)} 198h380`}
-        stroke={accent}
-        strokeWidth={3}
-      />
+      <g data-reporting-tab="">
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${mix(motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing), 60, 500)} 198h380`,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       <BackfillChart input={input} frame={frame} accent={accent} />
       {input.records.map((record, index) => {
         return (

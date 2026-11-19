@@ -1,6 +1,7 @@
 import { propEq, prop } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PooledDonorAllocation.schema";
 
 type Token = ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
@@ -21,16 +22,18 @@ function _getPreviousScoop({
   input,
   index,
   batch,
+  motion,
 }: Readonly<{
   input: Input;
   index: number;
   batch: ReturnType<typeof _getBatchBounds>;
+  motion: VideoMotion;
 }>) {
   if (index === 0) {
     return { ...batch, right: 893, bottom: 355 };
   }
   const previous = _getBatchBounds({
-    tokens: getAllocationTokensFromInputAndFrame({ input, frame: 150 }),
+    tokens: getAllocationTokensFromInputAndFrame({ input, frame: 150, motion }),
     requestId: input.requests[index - 1].id,
   });
   return { ...previous, bottom: previous.bottom + 26 };
@@ -55,10 +58,12 @@ export function getAllocationHandlingFromTokens({
   input,
   frame,
   tokens,
+  motion,
 }: Readonly<{
   input: Input;
   frame: number;
   tokens: readonly Token[];
+  motion: VideoMotion;
 }>): GetAllocationHandlingResult {
   const index = Math.max(
     0,
@@ -69,13 +74,33 @@ export function getAllocationHandlingFromTokens({
     tokens,
     requestId: input.requests[index].id,
   });
-  const pickup = ramp(frame, start, 1);
-  const lift = ramp(frame, start + 1, 1);
-  const release = ramp(frame, start + 16, 4);
-  const previous = _getPreviousScoop({ input, index, batch });
+  const pickup = motion.ramp(
+    frame,
+    start,
+    motion.scale(1),
+    motion.entrance.easing,
+  );
+  const lift = motion.ramp(
+    frame,
+    start + 1,
+    motion.scale(1),
+    motion.entrance.easing,
+  );
+  const release = motion.ramp(
+    frame,
+    start + 16,
+    motion.press.duration,
+    motion.entrance.easing,
+  );
+  const previous = _getPreviousScoop({ input, index, batch, motion });
   const handX = mix(pickup, previous.right, batch.right);
   const handY = mix(lift, previous.bottom, batch.bottom + release * 26);
-  const retreat = ramp(frame, 62 + input.requests.length * 20, 10);
+  const retreat = motion.ramp(
+    frame,
+    62 + input.requests.length * 20,
+    motion.scale(10),
+    motion.entrance.easing,
+  );
   return {
     left: handX - mix(pickup, previous.width, batch.width),
     right: handX,
@@ -85,6 +110,8 @@ export function getAllocationHandlingFromTokens({
     bodyY: mix(retreat, Math.max(352, handY - 32), 345),
     handX: mix(retreat, handX, 913),
     handY: mix(retreat, handY, 355),
-    opacity: (1 - retreat) * ramp(frame, 60, 2),
+    opacity:
+      (1 - retreat) *
+      motion.ramp(frame, 60, motion.scale(2), motion.entrance.easing),
   };
 }

@@ -1,6 +1,11 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
@@ -22,30 +27,43 @@ export function BallotPaper({
   isRows,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const { x, y, width, height, unfold } = geometry;
-  const color = ballot.projectId === null ? STOCK.orange : accent;
+  const color = ballot.projectId === null ? tokens.color.highlight : accent;
   return (
     <g
       data-ballot={ballot.id}
       data-choice={ballot.projectId === null ? "abstained" : "cast"}
     >
-      <rect
+      <StockRect
         data-paper={ballot.id}
         x={x}
         y={y}
         width={width}
         height={height}
-        rx={3}
-        fill={STOCK.surface}
+        rx={scales.corner(3)}
+        fill={tokens.color.surface}
         stroke={color}
       />
-      <path
-        data-ballot-mark={ballot.id}
-        d={`M${x + 6} ${y + 8} l4 4 l6 -7`}
-        fill="none"
-        stroke={color}
-        opacity={ramp(frame, 18 + index * 2, 4) * (1 - unfold)}
-      />
+      <g data-ballot-mark={ballot.id}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x + 6} ${y + 8} l4 4 l6 -7` }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={color}
+          opacity={
+            motion.ramp(
+              frame,
+              18 + index * motion.stagger.list,
+              motion.press.duration,
+              motion.entrance.easing,
+            ) *
+            (1 - unfold)
+          }
+        />
+      </g>
       {unfold === 1 ? (
         <LabelSlots
           labels={[[ballot.id, x + 7, y + 12, width - 14, 12, isRows ? 3 : 2]]}

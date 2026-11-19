@@ -1,4 +1,4 @@
-import { EASE, ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MeasuredStructure } from "./MeasuredStructure";
 import { MeasurementCaptions } from "./MeasurementCaptions";
 import { TapeObservers } from "./TapeObservers";
@@ -13,8 +13,12 @@ export function PublicWorksMeasurementCheck({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const endX =
-    200 + input.observation.length * 65 * ramp(frame, 36, 72, EASE.inOut);
+    200 +
+    input.observation.length *
+      65 *
+      motion.ramp(frame, 36, motion.scale(72), motion.travel.easing);
   return (
     <g>
       <MeasuredStructure input={input} accent={accent} />

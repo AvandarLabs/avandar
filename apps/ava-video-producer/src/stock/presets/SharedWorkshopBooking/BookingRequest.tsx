@@ -1,4 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AgreementTab } from "./AgreementTab";
 import { BookingParticipant } from "./BookingParticipant";
 import { getBookingFromFrame } from "./getBookingFromFrame";
@@ -16,12 +22,15 @@ export function BookingRequest({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const request = input.requests[index];
-  const scene = getBookingFromFrame({ input, frame, index });
+  const scene = getBookingFromFrame({ input, frame, index, motion });
   return (
     <g>
       <OriginalRequest input={input} scene={scene} index={index} />
-      <rect
+      <StockRect
         data-request={request.id}
         x={scene.x}
         y={scene.y}
@@ -29,7 +38,7 @@ export function BookingRequest({
         height={40}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <LabelSlots
         labels={[

@@ -1,5 +1,8 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -22,21 +25,32 @@ export function ZoneGround({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <g>
-      <polygon
-        points={points}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeDasharray="4 4"
+      <SketchedShape
+        shape={{ kind: "path", d: `M${points} Z` }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeDasharray={tokens.dash.pending.join(" ")}
       />
-      <path
-        data-denominator-connector={zoneId}
-        d={`M${55 + first[0] * 5} ${180 + first[1] * 2.5} L590 ${178 + index * 80} L627 ${178 + index * 80}`}
-        fill="none"
-        stroke={accent}
-        strokeOpacity={0.4 * ramp(frame, 36, 36)}
-      />
+      <g data-denominator-connector={zoneId}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${55 + first[0] * 5} ${180 + first[1] * 2.5} L590 ${178 + index * 80} L627 ${178 + index * 80}`,
+          }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+          strokeOpacity={
+            tokens.alpha.dimmed *
+            motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing)
+          }
+        />
+      </g>
     </g>
   );
 }

@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
@@ -20,16 +24,18 @@ export function ContactCard({
   status,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g data-contact={contact.id} data-state={isHeld ? "held" : "prepared"}>
-      <rect
+      <StockRect
         data-contact-card={contact.id}
         x={x}
         y={y}
         width={350}
         height={100}
-        rx={5}
-        fill={STOCK.surface}
+        rx={scales.corner(5)}
+        fill={tokens.color.surface}
         stroke={color}
       />
       <LabelSlots

@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getFloorTileGeometryFromInputAndFrame } from "./getFloorTileGeometryFromInputAndFrame";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
@@ -17,11 +22,14 @@ export function ShelterTile({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
   const { x, y, width, height, lift, isSleeping } =
     getFloorTileGeometryFromInputAndFrame({
       input,
       tile,
       frame,
+      motion,
     });
   const roleKey = String(
     ["sleeping", "circulation", "storage", "closed"].indexOf(tile.role) + 1,
@@ -29,13 +37,14 @@ export function ShelterTile({
   return (
     <g>
       {!isSleeping ? (
-        <path
-          d={`M${x} ${y + height}v${lift}h82v${-lift}`}
-          fill={STOCK.surface}
-          stroke={STOCK.line}
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x} ${y + height}v${lift}h82v${-lift}` }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
         />
       ) : undefined}
-      <rect
+      <StockRect
         data-floor-tile={tile.id}
         data-role={tile.role}
         data-usable-area={isSleeping ? input.areaPerTile : 0}
@@ -43,9 +52,9 @@ export function ShelterTile({
         y={y}
         width={width}
         height={height}
-        fill={isSleeping ? accent : STOCK.surface}
-        fillOpacity={isSleeping ? 0.4 : 1}
-        stroke={isSleeping ? accent : STOCK.orange}
+        fill={isSleeping ? accent : tokens.color.surface}
+        fillOpacity={isSleeping ? tokens.alpha.dimmed : 1}
+        stroke={isSleeping ? accent : tokens.color.highlight}
       />
       {!isSleeping ? (
         <LabelSlots labels={[[roleKey, x + 32, y + 36, 30, 16, 1]]} />

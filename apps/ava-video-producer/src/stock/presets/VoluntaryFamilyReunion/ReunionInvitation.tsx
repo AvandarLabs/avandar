@@ -1,5 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
 
@@ -16,18 +21,20 @@ export function ReunionInvitation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const x = groupIndex === 0 ? 60 : 680;
   const accepted = frame >= 36 + groupIndex * 18;
   return (
     <g data-invitation={input.groups[groupIndex].id} data-accepted={accepted}>
-      <rect
+      <StockRect
         x={x}
         y={194}
         width={220}
         height={116}
-        rx={6}
-        fill={STOCK.surface}
-        stroke={accepted ? accent : STOCK.line}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
+        stroke={accepted ? accent : tokens.color.line}
       />
       <FitText
         text={input.invitationLabels.heading}
@@ -51,13 +58,15 @@ export function ReunionInvitation({
             breakLongWords
             normalizeWhitespace
           />
-          <path
-            data-acceptance-mark
-            d={`M${x + 180} 282 l6 6 l12 -17`}
-            fill="none"
-            stroke={accent}
-            strokeWidth={3}
-          />
+          <g data-acceptance-mark>
+            <SketchedShape
+              shape={{ kind: "path", d: `M${x + 180} 282 l6 6 l12 -17` }}
+              profile={tokens.sketch.shape}
+              fill="none"
+              stroke={accent}
+              strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+            />
+          </g>
         </g>
       ) : undefined}
     </g>

@@ -1,7 +1,10 @@
-import { mix, ramp, EASE } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
 
@@ -18,15 +21,19 @@ export function ConversationPerson({
   waitingOpacity,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const isSupporter = person.role === "supporter";
-  const travel = ramp(frame, 44, 40, EASE.inOut);
+  const travel = motion.ramp(frame, 44, motion.scale(40), motion.travel.easing);
   const x = isSupporter
     ? mix(travel, 330, 780)
     : person.role === "participant"
       ? 220
       : 460;
   const y = isSupporter
-    ? 410 - 12 * ramp(frame, 36, 8) + 12 * ramp(frame, 84, 8)
+    ? 410 -
+      12 * motion.ramp(frame, 36, motion.whip, motion.entrance.easing) +
+      12 * motion.ramp(frame, 84, motion.whip, motion.entrance.easing)
     : 290;
   const posture =
     isSupporter && frame >= 36 && frame < 92 ? "walking" : "seated";
@@ -41,7 +48,7 @@ export function ConversationPerson({
         y={y}
         posture={posture}
         role={person.role === "worker" ? "worker" : "participant"}
-        color={isSupporter ? STOCK.orange : accent}
+        color={isSupporter ? tokens.color.highlight : accent}
       />
       <circle data-person-anchor={person.id} cx={x} cy={y} r={0} fill="none" />
       <LabelSlots

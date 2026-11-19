@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LunchLegend } from "./LunchLegend";
 import { LunchTally } from "./LunchTally";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
@@ -12,6 +12,7 @@ export function LunchLabels({
   accent,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const complete = input.trays.filter((tray) => {
     return tray.componentIds.length === input.plannedComponents.length;
   }).length;
@@ -36,7 +37,7 @@ export function LunchLabels({
         width={864}
         fontSize={12}
         maxLines={1}
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
         breakLongWords
         normalizeWhitespace
       />

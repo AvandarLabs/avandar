@@ -1,6 +1,13 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { getBookingFromFrame } from "./getBookingFromFrame";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
@@ -12,13 +19,26 @@ type Props = {
   index: number;
   accent: string;
 };
+/**
+ * Frames of one repeated hand stroke while a participant works. A cycle
+ * length, so tempo never changes it.
+ */
+const STROKE_PERIOD = 6;
 function _getHand({
   input,
   scene,
   frame,
-}: Readonly<Pick<Props, "input" | "scene" | "frame">>) {
+  motion,
+}: Readonly<
+  Pick<Props, "input" | "scene" | "frame"> & { motion: VideoMotion }
+>) {
+  const phase = frame % STROKE_PERIOD;
+  const halfPeriod = STROKE_PERIOD / 2;
   const stroke =
-    scene.use === 1 ? ramp(frame % 6, 0, 3) * (1 - ramp(frame % 6, 3, 3)) : 0;
+    scene.use === 1
+      ? motion.ramp(phase, 0, halfPeriod, motion.entrance.easing) *
+        (1 - motion.ramp(phase, halfPeriod, halfPeriod, motion.exit.easing))
+      : 0;
   const handX = mix(
     scene.use,
     scene.x + scene.width / 2,
@@ -42,10 +62,13 @@ export function BookingParticipant({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const request = input.requests[index];
   const personX = mix(scene.use, scene.x + scene.width / 2, 210);
   const personY = mix(scene.use, scene.y - 28, 380);
-  const { handX, handY } = _getHand({ input, scene, frame });
+  const { handX, handY } = _getHand({ input, scene, frame, motion });
   return (
     <g data-participant={request.id}>
       <PersonGlyph
@@ -57,15 +80,20 @@ export function BookingParticipant({
       <LabelSlots
         labels={[[String(index + 1), personX - 28, personY - 18, 20, 12, 1]]}
       />
-      <line
-        data-request-hand={request.id}
-        x1={personX}
-        y1={personY}
-        x2={handX}
-        y2={handY}
-        stroke={accent}
-        strokeWidth={3}
-      />
+      <g data-request-hand={request.id}>
+        <SketchedShape
+          shape={{
+            kind: "line",
+            x1: personX,
+            y1: personY,
+            x2: handX,
+            y2: handY,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       {scene.use === 1 ? (
         <circle
           data-use-person={request.id}

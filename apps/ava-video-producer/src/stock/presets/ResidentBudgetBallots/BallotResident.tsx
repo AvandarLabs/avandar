@@ -1,5 +1,10 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BallotPaper } from "./BallotPaper";
 import type { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
@@ -24,19 +29,31 @@ export function BallotResident({
   isRows,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const { x, y, sourceX, cast } = geometry;
   const isHandling = frame >= 16 + index * 2 && frame <= 54 + index * 3;
   return (
     <g>
-      <PersonGlyph x={sourceX - 10} y={136} size={28} color={STOCK.muted} />
+      <PersonGlyph
+        x={sourceX - 10}
+        y={136}
+        size={28}
+        color={tokens.color.textMuted}
+      />
       {isHandling ? (
-        <path
-          data-ballot-hand={ballot.id}
-          d={`M${sourceX - 10} 136 L${x + 14} ${y + 16}`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={3}
-        />
+        <g data-ballot-hand={ballot.id}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${sourceX - 10} 136 L${x + 14} ${y + 16}`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          />
+        </g>
       ) : undefined}
       <BallotPaper
         ballot={ballot}
@@ -47,14 +64,14 @@ export function BallotResident({
         accent={accent}
       />
       {cast === 0 && frame < 40 + index * 3 ? (
-        <rect
+        <StockRect
           data-privacy-screen={ballot.id}
           x={sourceX - 2}
           y={118}
           width={42}
           height={46}
-          fill={STOCK.surface}
-          stroke={STOCK.line}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
         />
       ) : undefined}
     </g>

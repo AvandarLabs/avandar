@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getRecordPlacementsFromInputAndFrame } from "./getRecordPlacementsFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -9,18 +13,20 @@ type Props = {
 };
 /** A visible key follows its unique record through receipt and placement. */
 export function ReceiptToken({ record, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-record-token={record.id}
         data-event-bin={record.eventBinId}
         x={record.x - 13}
         y={record.y - 12}
         width={26}
         height={16}
-        rx={3}
-        fill={STOCK.surface}
-        stroke={record.firstSnapshot === 1 ? accent : STOCK.cyan}
+        rx={scales.corner(3)}
+        fill={tokens.color.surface}
+        stroke={record.firstSnapshot === 1 ? accent : tokens.color.accentAlt}
       />
       <LabelSlots
         labels={[[String(record.key), record.x - 9, record.y, 20, 12, 1]]}

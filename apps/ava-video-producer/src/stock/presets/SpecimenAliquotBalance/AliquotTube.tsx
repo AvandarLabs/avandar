@@ -1,8 +1,14 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AliquotTubeLabels } from "./AliquotTubeLabels";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
 
+/** How strongly the liquid in a tube shows. */
+const LIQUID_OPACITY = 0.7;
 type Props = {
   tube: Input["parent"];
   parentId: string;
@@ -24,21 +30,29 @@ export function AliquotTube({
   accent,
   isChild = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {showIdentity && isChild ? (
-        <path
-          data-lineage={tube.id}
-          d={`M110 148 V126 H${x} V148`}
-          stroke={STOCK.line}
-          fill="none"
-        />
+        <g data-lineage={tube.id}>
+          <SketchedShape
+            shape={{ kind: "path", d: `M110 148 V126 H${x} V148` }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.line}
+            fill="none"
+          />
+        </g>
       ) : undefined}
-      <path
-        d={`M${x - 25} 148 V262 Q${x - 25} 278 ${x} 278 Q${x + 25} 278 ${x + 25} 262 V148 Z`}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x - 25} 148 V262 Q${x - 25} 278 ${x} 278 Q${x + 25} 278 ${x + 25} 262 V148 Z`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <rect
         data-liquid-id={tube.id}
@@ -48,12 +62,13 @@ export function AliquotTube({
         width={40}
         height={volume * 9}
         fill={accent}
-        opacity={0.7}
+        opacity={LIQUID_OPACITY}
       />
-      <path
-        d={`M${x - 29} 146 H${x + 29}`}
-        stroke={STOCK.cyan}
-        strokeWidth={7}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x - 29} 146 H${x + 29}` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(7)}
       />
       <AliquotTubeLabels
         tube={tube}
