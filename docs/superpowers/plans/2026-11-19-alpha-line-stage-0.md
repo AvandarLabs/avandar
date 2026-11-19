@@ -4,7 +4,7 @@
 
 **Goal:** Build everything the alpha line needs before cutover: a two-line `ava release`, the `alpha-dev` and `alpha` CI/CD workflows, the mainline lock-out from production, and the catalog export scripts, without touching production.
 
-**Architecture:** `ava release` gains a `ReleaseLine` value (mainline or alpha) resolved from the current branch, and every hard-coded `develop`/`main`/`-dev`/`staging.yaml` reference reads from it instead. CI/CD gets two new workflows modeled on `demo.yaml` (Supabase branch + explicit Vercel deploy) and `production.yaml` (gates + production migrate). Spec: `docs/measles-demo/alpha-launch-plan.md`.
+**Architecture:** `ava release` gains a `ReleaseLine` value (mainline or alpha) resolved from the current branch, and every hard-coded `develop`/`main`/`-dev`/`staging.yaml` reference reads from it instead. CI/CD gets two new workflows: `alpha-dev.yaml` (the alpha line's staging, replacing `demo.yaml`: gates, then a persistent Supabase branch and an explicit Vercel deploy to alpha.avandarlabs.com) and `alpha.yaml` (production: the same gates, then production migrate and deploy, reached only through `ava release` on `alpha-dev`). Spec: `docs/measles-demo/alpha-launch-plan.md`.
 
 **Tech Stack:** TypeScript, Vitest, Acclimate CLI, GitHub Actions, Supabase CLI 2.114.0, Vercel CLI 64.7.0, bash.
 
@@ -686,9 +686,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
           supabase db push --include-all
 ```
 
-   Then copy, from `demo.yaml`, the steps "Set edge function secrets", "Deploy edge functions", "Pull the Vercel ... environment", and "Build and deploy to Vercel", with these changes:
-   - Secrets file values: `SB_SECRET_KEY=${{ secrets.PRODUCTION_SB_SECRET_KEY }}`, `SB_PUBLISHABLE_KEY=${{ vars.PRODUCTION_SB_PUBLISHABLE_KEY }}`, `MODE=production`, `VITE_APP_URL=$PRODUCTION_APP_URL`, `GOOGLE_REDIRECT_URI=${{ vars.PRODUCTION_SUPABASE_URL }}/functions/v1/google-auth-callback`, `POLAR_SERVER_TYPE=production`. Every other secret reads from the `production` environment under the same name as in `demo.yaml`.
-   - `--project-ref "$SUPABASE_PROJECT_ID"` in place of `$DEMO_SUPABASE_REF`.
+   Then copy, from the `deploy` job of `alpha-dev.yaml` (Task 7 deleted `demo.yaml`, so copy from its replacement), the steps "Set edge function secrets", "Deploy edge functions", "Pull the Vercel ... environment", and "Build and deploy to Vercel", with these changes:
+   - Secrets file values: `SB_SECRET_KEY=${{ secrets.PRODUCTION_SB_SECRET_KEY }}`, `SB_PUBLISHABLE_KEY=${{ vars.PRODUCTION_SB_PUBLISHABLE_KEY }}`, `MODE=production`, `VITE_APP_URL=$PRODUCTION_APP_URL`, `GOOGLE_REDIRECT_URI=${{ vars.PRODUCTION_SUPABASE_URL }}/functions/v1/google-auth-callback`, `POLAR_SERVER_TYPE=production`. Every other secret reads from the `production` environment under the same name as in `alpha-dev.yaml`. No `ALPHA_DEV_*` value may remain.
+   - `--project-ref "$SUPABASE_PROJECT_ID"` in place of `$ALPHA_DEV_SUPABASE_REF`.
    - No "Point Supabase Auth" step: production's auth URL is already app.avandarlabs.com.
    - Vercel pull uses `--environment=production`. Instead of failing on `VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL`, delete those lines from the pulled file with `sed -i -E '/^(VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL)=/d'`, since the build sets them from GitHub.
    - Build env: `VITE_SUPABASE_API_URL: ${{ vars.PRODUCTION_SUPABASE_URL }}`, `VITE_SUPABASE_ANON_KEY: ${{ vars.PRODUCTION_SB_PUBLISHABLE_KEY }}`, `VITE_APP_URL: ${{ env.PRODUCTION_APP_URL }}`, plus the Google Picker values.
@@ -701,7 +701,7 @@ Expected: no findings.
 
 - [ ] **Step 3: Check that no staging or demo value reaches the deploy job**
 
-Run: `awk '/^  deploy:/,0' .github/workflows/alpha.yaml | grep -nE "STAGING|staging|DEMO|sandbox"`
+Run: `awk '/^  deploy:/,0' .github/workflows/alpha.yaml | grep -nE "STAGING|staging|DEMO|ALPHA_DEV|sandbox"`
 Expected: no output.
 
 - [ ] **Step 4: List every secret and variable the workflow reads**
