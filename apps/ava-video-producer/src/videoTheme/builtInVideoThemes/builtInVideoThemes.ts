@@ -9,7 +9,11 @@ import type {
 } from "../videoTheme.types";
 
 /** Ids of the themes bundled with the producer. They are read-only. */
-export const BUILT_IN_VIDEO_THEME_IDS = ["classic", "avandar", "starter"] as const;
+export const BUILT_IN_VIDEO_THEME_IDS = [
+  "classic",
+  "avandar",
+  "starter",
+] as const;
 
 /**
  * Bundled built-in themes by id, validated at load. Every render can resolve
