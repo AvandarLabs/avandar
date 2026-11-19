@@ -1,4 +1,4 @@
-import { DUR, EASE, loopPhase, ramp } from "../../motion";
+import { loopPhase } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { Check } from "../graphics-common/Check";
 import { Eyebrow } from "../graphics-common/Eyebrow";
@@ -6,12 +6,29 @@ import { Panel } from "../graphics-common/Panel";
 import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { STOCK } from "../stockPalette";
+import { SketchedShape } from "../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StatusCycleInput } from "../presets/StatusCycle/StatusCycle.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: StatusCycleInput };
+
+/** Frames the progress bar waits after processing starts and before done. */
+const PROGRESS_INSET = 3;
+const SPINNER_PERIOD = 45;
+const SPINNER_DASH = "0.28 0.72";
+const SPINNER_STROKE = 2.5;
+const DIAL_FILL_ALPHA = 0.035;
+const PROCESSING_RING_ALPHA = 0.18;
+const STATE_SIZE = 37;
+const TRACK_CORNER = 3;
+const STEP_ALPHA_FLOOR = 0.2;
+const STEP_ALPHA_SWING = 0.8;
 
 /** Draws the bounded authored status-cycle study at an explicit frame. */
 export function StatusCycle({
@@ -19,16 +36,19 @@ export function StatusCycle({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const states = input.states;
   const processing =
-    ramp(frame, states[1].at, DUR.chip) *
-    (1 - ramp(frame, states.at(-1)!.at, DUR.chip));
-  const complete = ramp(frame, states.at(-1)!.at, DUR.chip);
-  const progress = ramp(
+    motion.ramp(frame, states[1].at, motion.chip) *
+    (1 - motion.ramp(frame, states.at(-1)!.at, motion.chip));
+  const complete = motion.ramp(frame, states.at(-1)!.at, motion.chip);
+  const progress = motion.ramp(
     frame,
-    states[1].at + 3,
-    Math.max(1, states.at(-1)!.at - states[1].at - 6),
-    EASE.inOut,
+    states[1].at + PROGRESS_INSET,
+    Math.max(1, states.at(-1)!.at - states[1].at - PROGRESS_INSET * 2),
+    motion.travel.easing,
   );
   return (
     <g>
@@ -47,69 +67,66 @@ export function StatusCycle({
         color={accent}
       />
       <Panel x={174} y={157} width={612} height={293}>
-        <Text x={212} y={201} size={14} mono fill={STOCK.muted}>
+        <Text role="footnote" x={212} y={201}>
           {getStockDisplayCopyFromDescriptor({
             descriptor: LEGACY_DISPLAY_COPY["status-cycle"].runStatus,
           })}
         </Text>
-        <circle
-          cx={267}
-          cy={281}
-          r={42}
+        <SketchedShape
+          shape={{ kind: "circle", cx: 267, cy: 281, r: 42 }}
+          profile={sketch.shape}
           fill={accent}
-          fillOpacity={0.035}
-          stroke={STOCK.line}
-          strokeWidth={1.5}
+          fillOpacity={shapes.wash(DIAL_FILL_ALPHA)}
+          stroke={color.line}
+          strokeWidth={shapes.stroke(stroke.outline)}
         />
-        <circle
-          cx={267}
-          cy={281}
-          r={30}
+        <SketchedShape
+          shape={{ kind: "circle", cx: 267, cy: 281, r: 30 }}
+          profile={sketch.shape}
           fill="none"
           stroke={accent}
-          strokeOpacity={processing * 0.18}
-          strokeWidth={2}
+          strokeOpacity={processing * PROCESSING_RING_ALPHA}
+          strokeWidth={shapes.stroke(stroke.default)}
         />
-        <circle
-          cx={267}
-          cy={281}
-          r={30}
+        <SketchedShape
+          shape={{ kind: "circle", cx: 267, cy: 281, r: 30 }}
+          profile={sketch.shape}
           fill="none"
           stroke={accent}
-          strokeWidth={2.5}
+          strokeWidth={shapes.stroke(SPINNER_STROKE)}
           pathLength={1}
-          strokeDasharray="0.28 0.72"
-          strokeDashoffset={-loopPhase(frame, 45)}
+          strokeDasharray={SPINNER_DASH}
+          strokeDashoffset={-loopPhase(frame, SPINNER_PERIOD)}
           opacity={processing}
         />
         <circle
           cx={267}
           cy={281}
           r={7}
-          fill={STOCK.muted}
-          opacity={1 - ramp(frame, states[1].at, DUR.chip)}
+          fill={color.inactive}
+          opacity={1 - motion.ramp(frame, states[1].at, motion.chip)}
         />
         <g opacity={complete}>
           <Check x={267} y={281} size={30} color={accent} />
         </g>
         {states.map((state, i) => {
           const opacity =
-            ramp(frame, state.at, DUR.chip) *
+            motion.ramp(frame, state.at, motion.chip) *
             (i < states.length - 1
-              ? 1 - ramp(frame, states[i + 1].at, DUR.chip)
+              ? 1 - motion.ramp(frame, states[i + 1].at, motion.chip)
               : 1);
           return (
             <g key={state.label} opacity={opacity}>
               <Text
+                role="title"
                 x={338}
                 y={277}
-                size={37}
-                weight={600}
-                fill={i === states.length - 1 ? accent : STOCK.text}
+                size={STATE_SIZE}
+                fill={i === states.length - 1 ? accent : color.text}
               >
                 {state.label}
               </Text>
-              <Text x={338} y={310} size={18} fill={STOCK.muted}>
+              <Text role="label" x={338} y={310} fill={color.textMuted}>
                 {state.detail}
               </Text>
             </g>
@@ -122,25 +139,25 @@ export function StatusCycle({
               y={363}
               width={536}
               height={6}
-              rx={3}
-              fill={STOCK.line}
+              rx={shapes.corner(TRACK_CORNER)}
+              fill={color.line}
             />
             <rect
               x={212}
               y={363}
               width={Math.max(0.01, 536 * progress)}
               height={6}
-              rx={3}
+              rx={shapes.corner(TRACK_CORNER)}
               fill={accent}
             />
           </>
         ) : null}
-        <Text x={212} y={408} size={14} mono fill={STOCK.muted}>
+        <Text role="footnote" x={212} y={408}>
           {getStockDisplayCopyFromDescriptor({
             descriptor: LEGACY_DISPLAY_COPY["status-cycle"].sampleTask,
           })}
         </Text>
-        <Text x={748} y={408} size={14} mono anchor="end" fill={accent}>
+        <Text role="footnote" x={748} y={408} anchor="end" fill={accent}>
           {Math.round(progress * 100)}%
         </Text>
       </Panel>
@@ -152,13 +169,21 @@ export function StatusCycle({
               cy={511}
               r={4}
               fill={accent}
-              fillOpacity={0.2 + ramp(frame, state.at, DUR.chip) * 0.8}
+              fillOpacity={
+                STEP_ALPHA_FLOOR +
+                motion.ramp(frame, state.at, motion.chip) * STEP_ALPHA_SWING
+              }
             />
-            <Text x={268 + i * 230} y={516} size={16} fill={STOCK.muted}>
+            <Text role="secondary" x={268 + i * 230} y={516}>
               {state.label}
             </Text>
             {i < states.length - 1 ? (
-              <path d={`M${352 + i * 230} 511 h90`} stroke={STOCK.line} />
+              <SketchedShape
+                shape={{ kind: "path", d: `M${352 + i * 230} 511 h90` }}
+                profile={sketch.shape}
+                stroke={color.line}
+                strokeWidth={shapes.stroke(stroke.hairline)}
+              />
             ) : null}
           </g>
         );

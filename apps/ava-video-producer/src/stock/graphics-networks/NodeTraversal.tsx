@@ -98,7 +98,7 @@ export function NodeTraversal({
           />
         );
       })}
-      <g opacity={ramp(frame, CAPTION_CUE, motion.sheet)}>
+      <g opacity={motion.ramp(frame, CAPTION_CUE, motion.sheet)}>
         <Caption>
           {getStockDisplayCopyFromDescriptor({
             descriptor:

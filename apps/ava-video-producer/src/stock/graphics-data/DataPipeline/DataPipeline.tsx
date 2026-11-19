@@ -5,10 +5,12 @@ import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Packet } from "../../graphics-common/Packet";
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PipelineStage } from "./PipelineStage/PipelineStage";
@@ -37,6 +39,7 @@ export function DataPipeline({
   const style = useGraphicProps("DataPipeline", {});
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
+  const shapes = useGraphicShapeScales();
   const margin = tokens.layout.graphic.margin;
   const trackWidth = GRAPHIC_WIDTH - margin * 2;
   const stages = input.stages.map((stage, index) => {
@@ -65,10 +68,14 @@ export function DataPipeline({
       {stages.slice(0, -1).map((stage, i) => {
         return (
           <g key={stage.label}>
-            <path
-              d={`M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`,
+              }}
+              profile={tokens.sketch.shape}
               stroke={tokens.color.line}
-              strokeWidth={tokens.stroke.default}
+              strokeWidth={shapes.stroke(tokens.stroke.default)}
             />
             <Packet
               frame={frame}
@@ -100,7 +107,7 @@ export function DataPipeline({
             y={TRACK_Y}
             width={trackWidth}
             height={style.trackHeight}
-            rx={style.trackHeight / 2}
+            rx={shapes.corner(style.trackHeight / 2)}
             fill={tokens.color.line}
           />
           <StockRect
@@ -108,7 +115,7 @@ export function DataPipeline({
             y={TRACK_Y}
             width={trackWidth * Math.min(1, progress / stages.length)}
             height={style.trackHeight}
-            rx={style.trackHeight / 2}
+            rx={shapes.corner(style.trackHeight / 2)}
             fill={accent}
           />
         </>

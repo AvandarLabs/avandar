@@ -23,8 +23,8 @@ export function RadialNetwork({
     const angle = -Math.PI / 2 + (i * Math.PI * 2) / spokes.length;
     return {
       label,
-      x: CENTER.x + Math.cos(angle) * ORBIT.rx,
-      y: CENTER.y + Math.sin(angle) * ORBIT.ry,
+      x: CENTER.x + Math.cos(angle) * ORBIT.radiusX,
+      y: CENTER.y + Math.sin(angle) * ORBIT.radiusY,
     };
   });
   return (
@@ -35,7 +35,12 @@ export function RadialNetwork({
         })}
       </Eyebrow>
       {input.showOrbit ? (
-        <Guide cx={CENTER.x} cy={CENTER.y} rx={ORBIT.rx} ry={ORBIT.ry} />
+        <Guide
+          cx={CENTER.x}
+          cy={CENTER.y}
+          rx={ORBIT.radiusX}
+          ry={ORBIT.radiusY}
+        />
       ) : null}
       {nodes.map((node, i) => {
         return (
