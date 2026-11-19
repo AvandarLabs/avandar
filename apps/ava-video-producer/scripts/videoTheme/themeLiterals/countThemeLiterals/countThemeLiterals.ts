@@ -597,7 +597,7 @@ function _countCss(source: string): number {
  * Counts the theme literals in one renderer source file by area. TS and
  * TSX are parsed, so comments never count and a `fontSize` is judged by
  * the element it sits on; CSS is scanned declaration by declaration. The
- * literal budget test compares the total with the file's slice budget.
+ * literal scan test fails on any file whose total is above zero.
  */
 export function countThemeLiteralsFromSource(
   fileName: string,

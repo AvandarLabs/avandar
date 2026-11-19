@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { getClassicStageTheme } from "../stageTheme/stageTheme";
 import {
   getActiveHeadline,
   getCarouselPoses,
@@ -13,7 +14,7 @@ import {
   getWhipExit,
   getWindowCamera,
 } from "./windowMotion";
-import { WINDOW_BOXES, WINDOW_TILT } from "./windowTilt";
+import { WINDOW_BOXES } from "./windowTilt";
 
 const canvas = { width: 1920, height: 1080 };
 const box = { x: 678, y: 188, width: 1158, height: 724 };
@@ -24,7 +25,10 @@ test("a whip entrance starts beyond the right edge and settles at the resting ti
   assert.ok(start.blurX > 0);
   const settled = getWhipEntrance(40, 1, canvas, box);
   assert.equal(settled.translateX, 0);
-  assert.equal(settled.rotateY, WINDOW_TILT.rotateY);
+  assert.equal(
+    settled.rotateY,
+    getClassicStageTheme().components.WindowTilt.rotateY,
+  );
   assert.equal(settled.blurX, 0);
 });
 

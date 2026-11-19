@@ -7,7 +7,7 @@
 categories:
   - id: curves
     title: "Curves and durations"
-    description: "Easing curves, the duration scale and stagger tokens every helper builds on."
+    description: "Easing curves, the duration scale and stagger tokens every helper builds on. Renderers read the same steps from the theme's motion, whose classic values these are."
   - id: interpolation
     title: "Interpolation"
     description: "Turn a frame into progress, a number, a colour or a count."
@@ -91,8 +91,6 @@ modules:
     excluded:
       - name: getClassicWindowStage
         reason: "The classic theme values the window helpers default to; plumbing, not motion."
-      - name: getRestingPose
-        reason: "A window's resting pose in the theme's tilt; a value, previewed through the window helpers."
   - path: src/scenes/TiltedWindowScene/windowTilt.ts
     excluded: []
   - path: src/storyboard/StoryFilm/steppedColumnWipe.ts
@@ -1055,7 +1053,7 @@ helpers:
     usage: |
       const { rotateY, translateX, split } = getFlipSplit(frame, 0, width);
     goodFor: "Introducing a before and after pair."
-    avoid: "Shorter lenses than PAIR_TILT.flipPerspective; the near edge magnifies past the frame."
+    avoid: "Shorter lenses than components.WindowTilt.flipPerspective; the near edge magnifies past the frame."
     usedBy:
       - src/scenes/TiltedWindowScene/RacePair.tsx
     demo: { id: flip-split, frames: 75 }
@@ -1079,22 +1077,24 @@ helpers:
   - id: window-tilt
     title: "Window plane and chrome"
     category: windows
-    description: "Design tokens for the tilted window's resting 3D plane, the pair's mirrored tilt, its corner radius, titlebar and cast shadow."
-    source: src/scenes/TiltedWindowScene/windowTilt.ts
-    exports: [WINDOW_TILT, PAIR_TILT, WINDOW_CHROME, WINDOW_SHADOW]
-    signature: "WINDOW_TILT = { perspective, rotateY, rotateX, rotateZ, entryRotateY }"
+    description: 'The tilted window''s resting 3D plane, the pair''s mirrored tilt, its corner radius and titlebar are the theme''s components.WindowTilt. Read them with useVideoProps("WindowTilt"), and pose a window at rest with getRestingPose.'
+    source: src/scenes/TiltedWindowScene/windowMotion.ts
+    exports: [getRestingPose]
+    signature: "getRestingPose(stage?: WindowStage): { translateX, translateZ, rotateY, opacity, blurX }"
     defaults:
-      - name: WINDOW_TILT
-        value: "perspective 1400, rotateY -13°, rotateX 3°, rotateZ -1°, entry -24°"
-      - name: PAIR_TILT
-        value: "perspective 1600, rotateY ±8°, rotateX 2°, flip 3200"
-      - name: WINDOW_CHROME
-        value: "radius 10, titlebar 3.5% of the height"
+      - name: components.WindowTilt
+        value: "classic: perspective 1400, rotateY -13°, rotateX 3°, rotateZ -1°, entry -24°"
+      - name: pair
+        value: "classic: perspective 1600, rotateY ±8°, rotateX 2°, flip 3200"
+      - name: chrome
+        value: "classic: radius md, titlebar 3.5% of the height"
     usage: |
-      const transform = `perspective(${WINDOW_TILT.perspective}px) rotateY(${WINDOW_TILT.rotateY}deg) rotateX(${WINDOW_TILT.rotateX}deg)`;
+      const tilt = useVideoProps("WindowTilt", {});
+      const transform = `perspective(${tilt.perspective}px) rotateY(${tilt.rotateY}deg) rotateX(${tilt.rotateX}deg)`;
     goodFor: "Keeping every window shot of a film in the same plane."
-    avoid: "Inline angles per shot; add new geometry here."
-    usedBy: []
+    avoid: "Inline angles per shot; set them in the theme's components.WindowTilt."
+    usedBy:
+      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
     demo: { id: window-tilt, frames: 90 }
 
   - id: window-boxes
@@ -1469,11 +1469,11 @@ helpers:
     category: builds
     description: "When a bar panel's hero number, labels, bars and values start, and each bar's length relative to the longest."
     source: src/scenes/BarComparisonScene/barComparisonMotion.ts
-    exports: [getBarComparisonBeats, getBarFractions, BAR_GROW_FRAMES]
+    exports: [getBarComparisonBeats, getBarFractions]
     signature: "getBarComparisonBeats(revealAtFrame, panelIndex, panelStaggerFrames): { heroAt, labelsAt, barsAt, valuesAt } · getBarFractions(rows): number[]"
     defaults:
-      - name: BAR_GROW_FRAMES
-        value: "DUR.sheet (13)"
+      - name: bars grow
+        value: "over motion.sheet (13 in classic)"
       - name: labels
         value: "DUR.panel after the hero"
       - name: bars

@@ -1,7 +1,5 @@
 import { MacOSCursor } from "@remotion/mac-cursors";
-import { useMemo } from "react";
 import {
-  createCursorMotion,
   cursorScale,
   cursorShutter,
   trackPos,
@@ -10,8 +8,8 @@ import {
 } from "../cursor-motion";
 import { StageThemeBoundary } from "../scenes/stageTheme/StageThemeBoundary";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
-import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoProps } from "../videoTheme/useVideoTheme";
+import { useCursorMotion } from "./useCursorMotion";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -39,10 +37,7 @@ function CursorContent({
   cursor = "default",
 }: Props): ReactNode {
   const theme = useVideoProps("Cursor", {});
-  const videoMotion = useVideoMotion();
-  const motion = useMemo(() => {
-    return createCursorMotion(videoMotion, theme);
-  }, [videoMotion, theme]);
+  const motion = useCursorMotion();
   const position = trackPos(frame, path, motion);
   const scale = theme.scale * cursorScale(frame, clicks, motion);
   return (

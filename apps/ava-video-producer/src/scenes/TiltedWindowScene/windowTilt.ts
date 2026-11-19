@@ -1,9 +1,3 @@
-import {
-  buildColorWithAlpha,
-  elevationToBoxShadow,
-} from "../../videoTheme/cssValueHelpers/cssValueHelpers";
-import { getClassicStageTheme } from "../stageTheme/stageTheme";
-
 /*
  * The tilted window's boxes on the canvas. Its 3D plane, chrome, and blur
  * are the theme's `components.WindowTilt` and `components.WindowMotion`,
@@ -14,34 +8,6 @@ import { getClassicStageTheme } from "../stageTheme/stageTheme";
  * product UI must never sit inside it: a lasting transform resamples every
  * glyph of the interface.
  */
-
-const CLASSIC = getClassicStageTheme();
-const CLASSIC_TILT = CLASSIC.components.WindowTilt;
-
-/**
- * The single window's resting plane in `classic`, for callers without a
- * theme. `rotateY` is negative to bring the right edge toward the camera,
- * and `entryRotateY` is the steeper angle a window enters at.
- */
-export const WINDOW_TILT = {
-  perspective: CLASSIC_TILT.perspective,
-  rotateY: CLASSIC_TILT.rotateY,
-  rotateX: CLASSIC_TILT.rotateX,
-  rotateZ: CLASSIC_TILT.rotateZ,
-  entryRotateY: CLASSIC_TILT.entryRotateY,
-} as const;
-
-/**
- * The mirrored, flatter tilt of the two `pair` windows in `classic`, for
- * callers without a theme. The joined card flips in through the longer
- * `flipPerspective` lens.
- */
-export const PAIR_TILT = {
-  perspective: CLASSIC_TILT.pairPerspective,
-  rotateY: CLASSIC_TILT.pairRotateY,
-  rotateX: CLASSIC_TILT.pairRotateX,
-  flipPerspective: CLASSIC_TILT.flipPerspective,
-} as const;
 
 /**
  * The single window's box, as fractions of the canvas, before the tilt.
@@ -81,24 +47,3 @@ export const PAIR_BOXES = [
 
 /** The headline column, as fractions of the canvas. */
 export const HEADLINE_BOX = { x: 0.062, y: 0.115, width: 0.27 };
-
-/**
- * Window chrome in `classic`, for callers without a theme: corner radius in
- * pixels and titlebar height in canvas fractions.
- */
-export const WINDOW_CHROME = {
-  radius: CLASSIC_TILT.chromeRadius,
-  titlebarHeight: CLASSIC_TILT.titlebarHeight,
-};
-
-/**
- * The window's cast shadow in `classic`, for callers without a theme:
- * `elevation.window` in a 60% mix of the scene background.
- */
-export const WINDOW_SHADOW = elevationToBoxShadow({
-  layers: CLASSIC.semantic.elevation.window.layers,
-  color: buildColorWithAlpha(
-    CLASSIC.semantic.color.scene.background,
-    CLASSIC.atomic.opacity["60"],
-  ),
-});

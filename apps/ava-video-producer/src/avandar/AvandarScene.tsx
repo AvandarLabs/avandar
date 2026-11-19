@@ -1,4 +1,5 @@
 import { Cursor } from "../chrome/chrome";
+import { useCursorMotion } from "../chrome/useCursorMotion";
 import "./generated/product.css";
 import { cursorOnTarget, type CursorKind } from "../cursor-motion";
 import { useVideoProps } from "../videoTheme/useVideoTheme";
@@ -42,6 +43,7 @@ export function AvandarScene({
   height,
 }: AvandarSceneProps): ReactNode {
   const productFrame = frame + fromFrame;
+  const cursorMotion = useCursorMotion();
   const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
   const beats = (
     (targets as Partial<Record<string, MeasuredBeat[]>>)[feature] ?? []
@@ -76,7 +78,7 @@ export function AvandarScene({
     .map((b) => {
       return b.frame;
     });
-  const cursor = cursorOnTarget(productFrame, keys, beats);
+  const cursor = cursorOnTarget(productFrame, keys, beats, cursorMotion);
   return (
     <ProductBackdrop width={width} height={height}>
       <AvandarStage

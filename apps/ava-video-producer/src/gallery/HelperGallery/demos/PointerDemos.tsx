@@ -1,8 +1,7 @@
 import clsx from "clsx";
-import { useMemo } from "react";
 import { Cursor } from "../../../chrome/Cursor";
+import { useCursorMotion } from "../../../chrome/useCursorMotion";
 import {
-  createCursorMotion,
   cursorOnTarget,
   cursorScale,
   cursorShutter,
@@ -14,7 +13,6 @@ import { SketchedShape } from "../../../stock/primitives/SketchedShape";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
 import {
-  useVideoProps,
   useVideoTheme,
   useVideoTokens,
 } from "../../../videoTheme/useVideoTheme";
@@ -49,15 +47,6 @@ const TARGETS: CursorTarget[] = [
 
 /** Frames of the route the faint trail samples. */
 const TRAIL_FRAMES = 105;
-
-/** The theme's pointer motion: travel curve, press dip, and trail. */
-function useCursorMotion(): CursorMotion {
-  const motion = useVideoMotion();
-  const cursor = useVideoProps("Cursor", {});
-  return useMemo(() => {
-    return createCursorMotion(motion, cursor);
-  }, [motion, cursor]);
-}
 
 /** The whole route, sampled once a frame, as an SVG path. */
 function _buildTrailPath(cursorMotion: CursorMotion): string {

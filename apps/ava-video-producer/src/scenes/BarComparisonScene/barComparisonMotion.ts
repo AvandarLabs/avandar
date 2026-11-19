@@ -3,12 +3,6 @@ import { getClassicStageMotion } from "../stageTheme/stageTheme";
 import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 
 /**
- * Frames a bar takes to grow to its length in `classic`. The scene grows
- * bars over its theme's `motion.sheet`; this is for callers without one.
- */
-export const BAR_GROW_FRAMES = getClassicStageMotion().sheet;
-
-/**
  * When each layer of one `BarComparisonScene` panel starts: the hero number,
  * the row labels, the bars and the row values. Panels after the first start
  * `panelStaggerFrames` later each, so two charts read left to right. Gaps

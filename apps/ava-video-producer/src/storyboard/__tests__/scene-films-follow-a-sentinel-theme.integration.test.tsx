@@ -1,10 +1,12 @@
 /** @jsxRuntime automatic */
 /*
- * Storyboard scene films draw every colour from the video theme: each scene
- * study and scene film in the catalog renders under a theme that moves every
- * swatch, palette shade, white, and black to an improbable colour, and its
- * markup must then hold no `classic` colour. Plan and shot field colours
- * name theme swatches, so they move too.
+ * Storyboard scene films draw from the video theme: each scene study and
+ * scene film in the catalog renders under the shared sentinel theme
+ * (`tests/helpers/sentinelVideoTheme.ts`), and its markup must then hold no
+ * `classic` value. Plan and shot field colours name theme swatches, so they
+ * move too. Every film is checked as authored and again with its appearance
+ * options off, which draws the branches camera motion, motion blur, and
+ * annotations otherwise hide.
  */
 import "../../../tests/helpers/registerRemotionTestHooks";
 import assert from "node:assert/strict";
@@ -29,6 +31,8 @@ const { VideoThemeScope } =
 const { storyboardSchema, timeline } = await import("../schema/schema");
 const { makeResolvedVideoThemeFromLibrary } =
   await import("../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary");
+const { createContinuityPlanFromOptions } =
+  await import("../../continuity/continuityAppearance");
 const { createContinuityPlanFromVideoTheme } =
   await import("../../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme");
 const { StoryFilmPicture } = await import("../StoryFilm/StoryFilm");
@@ -79,30 +83,63 @@ test("the catalog has every Atlas composition and sample film to check", () => {
   assert.ok(SCENE_FILMS.length >= 36);
 });
 
+/** The classic values a themed plan draws over its sample frames. */
+function _filmFindings(
+  id: string,
+  themedPlan: Storyboard,
+  frames: readonly number[],
+): string[] {
+  return findClassicValuesAcrossFrames({
+    frames,
+    render: (frame) => {
+      (globalThis as { __testFrame?: number }).__testFrame = frame;
+      return renderToStaticMarkup(
+        <VideoThemeScope
+          overrideIds={[id]}
+          patches={[SENTINEL_THEME]}
+          element="div"
+        >
+          <StoryFilmPicture
+            plan={themedPlan}
+            frame={frame}
+            productScene={ProductPlaceholder}
+          />
+        </VideoThemeScope>,
+      );
+    },
+  });
+}
+
 test("compositions and sample films draw no classic value under the sentinel theme", () => {
   assert.deepEqual(
     SCENE_FILMS.flatMap(({ id, plan }) => {
       const themedPlan = _createThemedPlan(id, plan);
-      return findClassicValuesAcrossFrames({
-        frames: _sampleFrames(themedPlan),
-        render: (frame) => {
-          (globalThis as { __testFrame?: number }).__testFrame = frame;
-          return renderToStaticMarkup(
-            <VideoThemeScope
-              overrideIds={[id]}
-              patches={[SENTINEL_THEME]}
-              element="div"
-            >
-              <StoryFilmPicture
-                plan={themedPlan}
-                frame={frame}
-                productScene={ProductPlaceholder}
-              />
-            </VideoThemeScope>,
-          );
+      return _filmFindings(id, themedPlan, _sampleFrames(themedPlan)).map(
+        (value) => {
+          return `${id}: ${value}`;
         },
-      }).map((value) => {
-        return `${id}: ${value}`;
+      );
+    }),
+    [],
+  );
+});
+
+test("compositions and sample films with their appearance options off draw no classic value", () => {
+  assert.deepEqual(
+    SCENE_FILMS.flatMap(({ id, plan }) => {
+      const themedPlan = _createThemedPlan(
+        id,
+        createContinuityPlanFromOptions(plan, {
+          cameraMotion: false,
+          motionBlur: false,
+          annotations: false,
+        }),
+      );
+      const middles = timeline(themedPlan).map((shot) => {
+        return shot.startFrame + Math.floor(shot.durationInFrames / 2);
+      });
+      return _filmFindings(id, themedPlan, middles).map((value) => {
+        return `${id} (options off): ${value}`;
       });
     }),
     [],

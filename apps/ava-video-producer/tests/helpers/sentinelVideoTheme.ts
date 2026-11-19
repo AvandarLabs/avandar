@@ -173,10 +173,11 @@ const CLASSIC_FONT_WEIGHTS: ReadonlySet<string> = new Set(
   Object.values(_record([...ATOMIC, "fontWeight"])).map(String),
 );
 /** Tracking steps other than none, as em in CSS. */
-const CLASSIC_TRACKING = Object.values(_record([...ATOMIC, "letterSpacing"]))
-  .filter((value): value is number => {
-    return typeof value === "number" && value !== 0;
-  });
+const CLASSIC_TRACKING = Object.values(
+  _record([...ATOMIC, "letterSpacing"]),
+).filter((value): value is number => {
+  return typeof value === "number" && value !== 0;
+});
 /**
  * Tracking in pixels as SVG text draws it: a classic tracking step at a
  * classic type size.

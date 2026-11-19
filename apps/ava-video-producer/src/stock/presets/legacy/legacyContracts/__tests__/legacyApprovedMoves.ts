@@ -7,7 +7,9 @@ import type { LEGACY_IDS } from "../../../../../../tests/fixtures/legacyStockIds
  * - halo glows consolidated to the shared 0.03 opacity;
  * - 1 px hairlines that now pass an explicit `stroke-width="1"`, which draws
  *   the same pixels as the SVG default;
- * - rotated orbits whose rotation moved from the ellipse to a wrapping group.
+ * - rotated orbits whose rotation moved from the ellipse to a wrapping group;
+ * - code lines that now pass their role's `font-weight="400"`, which draws
+ *   the same glyphs as the SVG default.
  */
 const APPROVED_MARKUP_MOVES: Partial<
   Record<
@@ -21,6 +23,13 @@ const APPROVED_MARKUP_MOVES: Partial<
       return {
         from: `<path d="${path}" stroke="#2a404e"></path>`,
         to: `<path d="${path}" stroke="#2a404e" stroke-width="1"></path>`,
+      };
+    }),
+    // Each of the six code lines gains the code role's regular weight.
+    ...Array.from({ length: 6 }, () => {
+      return {
+        from: `font-size="21" font-family="&#x27;Courier New&#x27;, monospace" xml:space`,
+        to: `font-size="21" font-weight="400" font-family="&#x27;Courier New&#x27;, monospace" xml:space`,
       };
     }),
   ],

@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
+import { STARTER_VIDEO_THEME_ID } from "../../../src/compositions/StarterVideoTheme/createStarterVideoThemeSource";
 import { createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
@@ -189,7 +190,9 @@ async function _loadBaseFilm({
   id,
   options,
 }: Readonly<{ id: string; options: FilmOptions }>) {
-  const defaultThemeId = STARTER_FILM_IDS.includes(id) ? "starter" : "classic";
+  const defaultThemeId = STARTER_FILM_IDS.includes(id)
+    ? STARTER_VIDEO_THEME_ID
+    : "classic";
   return {
     theme: await loadVideoThemeSnapshot(
       options.theme ?? { id: defaultThemeId },

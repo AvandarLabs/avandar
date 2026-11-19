@@ -2,6 +2,7 @@
 import "../../fonts";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { AppFrame, Cursor } from "../../chrome/chrome";
+import { useCursorMotion } from "../../chrome/useCursorMotion";
 import { cursorOnTarget } from "../../cursor-motion";
 import { mix, typed } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
@@ -130,6 +131,7 @@ function useDemoBeats(frame: number) {
 export function Demo(): ReactNode {
   const frame = useCurrentFrame();
   const tokens = useVideoTokens();
+  const cursorMotion = useCursorMotion();
   const { app, focus, text, typing, shown, refilter, totalShown, chipOn } =
     useDemoBeats(frame);
 
@@ -164,12 +166,17 @@ export function Demo(): ReactNode {
           frame={frame}
           path={POINTER}
           clicks={CLICKS}
-          cursor={cursorOnTarget(frame, POINTER, [
-            { frame: FIELD_CLICK, x: 420, y: 194, cursor: "text" },
-            { frame: RUN_CLICK, x: 1484, y: 194, cursor: "pointer" },
-            { frame: CHIP_CLICK, x: 1285, y: 465, cursor: "pointer" },
-            { frame: PUBLISH_CLICK, x: 1305, y: 917, cursor: "pointer" },
-          ])}
+          cursor={cursorOnTarget(
+            frame,
+            POINTER,
+            [
+              { frame: FIELD_CLICK, x: 420, y: 194, cursor: "text" },
+              { frame: RUN_CLICK, x: 1484, y: 194, cursor: "pointer" },
+              { frame: CHIP_CLICK, x: 1285, y: 465, cursor: "pointer" },
+              { frame: PUBLISH_CLICK, x: 1305, y: 917, cursor: "pointer" },
+            ],
+            cursorMotion,
+          )}
         />
       </AbsoluteFill>
     </AbsoluteFill>

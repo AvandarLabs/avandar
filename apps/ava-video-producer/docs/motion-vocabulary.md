@@ -93,17 +93,17 @@ Renderers read motion from the [video theme](video-theme.md), not from the `moti
 
 `VideoMotion` also carries the `motion.ts` helpers with the theme's values as their defaults. Each takes the same arguments as its namesake, so `classic` draws exactly what `motion.ts` draws (`createVideoMotion.test.ts` holds them equal frame by frame):
 
-| Themed helper                                                               | Defaults it takes from the theme                                                                                                                                |
-| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `motion.ramp(frame, at, dur?, easing?)`                                     | `dur = motion.panel`, `easing = motion.reveal.easing`. Pass a literal duration through `motion.scale()`                                                         |
-| `motion.reveal(frame, at)`                                                  | `motion.reveal.duration` and `motion.reveal.easing`                                                                                                             |
-| `motion.enter(frame, at, opts?)`, `motion.enterAt(frame, at, index, opts?)` | Entrance duration, distance, and curve; the list stagger; the entrance style (`rise`, `fade`, `scale` from 0.96, or `none`, which shows the element on its cue) |
-| `motion.leave(frame, at, opts?)`                                            | Exit duration, distance, and curve                                                                                                                              |
-| `motion.pop(frame, at, dur?)`                                               | The emphasis spring and duration                                                                                                                                |
-| `motion.press(frame, at, depth?)`                                           | `motion.pressDepth`, over twice `motion.press.duration`                                                                                                         |
-| `motion.count(frame, at, to, dur?)`                                         | `dur = motion.sheet` on the entrance curve, rounded to a whole number. `classic` counts like `countTo`                                                          |
-| `motion.caretOn(frame)`                                                     | `motion.caret.halfPeriod`                                                                                                                                       |
-| `motion.loopEnvelope(frame, duration, fadeFrames?)`                         | `motion.loopFade.graphic` on the dissolve curve. `StockCanvas` fades every stock loop with it                                                                   |
+| Themed helper                                                               | Defaults it takes from the theme                                                                                                                                                                     |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `motion.ramp(frame, at, dur?, easing?)`                                     | `dur = motion.panel`, `easing = motion.reveal.easing`. Pass a literal duration through `motion.scale()`                                                                                              |
+| `motion.reveal(frame, at)`                                                  | `motion.reveal.duration` and `motion.reveal.easing`                                                                                                                                                  |
+| `motion.enter(frame, at, opts?)`, `motion.enterAt(frame, at, index, opts?)` | Entrance duration, distance, and curve; the list stagger; the entrance style (`rise`, `fade`, `scale` from `motion.entranceScale`, 0.96 in `classic`, or `none`, which shows the element on its cue) |
+| `motion.leave(frame, at, opts?)`                                            | Exit duration, distance, and curve                                                                                                                                                                   |
+| `motion.pop(frame, at, dur?)`                                               | The emphasis spring and duration                                                                                                                                                                     |
+| `motion.press(frame, at, depth?)`                                           | `motion.pressDepth`, over twice `motion.press.duration`                                                                                                                                              |
+| `motion.count(frame, at, to, dur?)`                                         | `dur = motion.sheet` on the entrance curve, rounded to a whole number. `classic` counts like `countTo`                                                                                               |
+| `motion.caretOn(frame)`                                                     | `motion.caret.halfPeriod`                                                                                                                                                                            |
+| `motion.loopEnvelope(frame, duration, fadeFrames?)`                         | `motion.loopFade.graphic` on the dissolve curve. `StockCanvas` fades every stock loop with it                                                                                                        |
 
 Three Look and feel options change motion globally, each at an identity default: **Easing family** (`motion.easingProfile`: `authored`, or `smooth`, `snappy`, `gentle`, whose curve from `motion.easingProfiles` replaces the entrance, exit, travel, rise, and reveal curves), **Stagger** (`motion.staggerScale`), and **Entrance style** (`motion.entranceStyle`).
 
@@ -162,6 +162,13 @@ These are implemented combinations of the upstream vocabulary, not new exports
 from `motion.ts`. Content and timing props are documented in the
 [scene API](scene-api.md); reusable boundaries are in the
 [scene inventory](shared-scene-library.md).
+
+The table names timing by its `motion.ts` name, which is its `classic` value.
+Every scene reads the step from the [themed motion](#themed-motion) instead:
+`DUR.<step>` is `motion.<step>`, tempo-scaled; `EASE.<name>` is the theme's
+curve of that name (`atomic.easing.<name>`, through the step that uses it,
+such as `motion.entrance.easing`); `STAGGER` is `motion.stagger.list` and
+`STAGGER_COLUMN` is `motion.stagger.column`.
 
 | Scene / renderer             | Implemented motion                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Timing and limits                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -346,6 +353,12 @@ Open it at `motion.html?section=helpers`; an open helper deep links as
 Each entry's detail view shows its API signature, defaults, a copyable usage
 snippet, what it is good for and what to avoid, the files that import it, and
 a link to its source.
+
+The curve, duration, and stagger entries document the portable `motion.ts`
+vocabulary, so their snippets read `EASE`, `DUR`, and `STAGGER` and no
+renderer imports them. A renderer reads the same steps from the themed
+motion (`useVideoMotion()` or `useGraphicMotion()`), whose `classic` values
+they are; ESLint bans the `motion.ts` constants in renderer directories.
 
 ### How it is built
 
