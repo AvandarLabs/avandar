@@ -1,5 +1,7 @@
 # Atlas theme coverage: spec and implementation plan
 
+**Status: done.** S1 to S9, the S1b token follow-up, and the cleanup pass have all merged into `chore/atlas-theme-coverage`. Every slice budget is empty and landed, and the guards cover every Atlas item. [The summary](README.md) describes the final state and the known exceptions.
+
 This plan turns [the review](review.md) into work. Section 4 (new tokens), section 5 (toggleable options), section 6 (guards) and section 8 (slices) of the review are the spec. This file records the decisions, the order, and the rules every slice follows.
 
 ## Decisions
@@ -20,7 +22,8 @@ Every new token defaults to today's literal, so `classic` output stays pixel-ide
 1. **S1 Foundation** lands first on `chore/atlas-theme-coverage`. It alone edits shared theme files (see review section 8).
 2. **S2 to S9** run in parallel, each in its own child worktree and branch `chore/atlas-theme-s<n>` based on the S1 result. Each owns a disjoint file set and its own budget file. A slice that needs a new token or a shared-file change reports it to the controller instead of editing shared files.
 3. The controller merges each slice branch into `chore/atlas-theme-coverage` and resolves conflicts (expected only in docs).
-4. Final branch review, then the full test, lint and parity run.
+4. A cleanup pass closes what the slices left open: the last pending tokens, the remaining token requests, hidden dash and opacity constants, the Helpers section and helper films, the stock palette's removal, and guards widened to every item.
+5. Final branch review, then the full test, lint and parity run.
 
 ## Rules for every slice
 

@@ -101,6 +101,7 @@ Renderers read motion from the [video theme](video-theme.md), not from the `moti
 | `motion.leave(frame, at, opts?)`                                            | Exit duration, distance, and curve                                                                                                                              |
 | `motion.pop(frame, at, dur?)`                                               | The emphasis spring and duration                                                                                                                                |
 | `motion.press(frame, at, depth?)`                                           | `motion.pressDepth`, over twice `motion.press.duration`                                                                                                         |
+| `motion.count(frame, at, to, dur?)`                                         | `dur = motion.sheet` on the entrance curve, rounded to a whole number. `classic` counts like `countTo`                                                          |
 | `motion.caretOn(frame)`                                                     | `motion.caret.halfPeriod`                                                                                                                                       |
 | `motion.loopEnvelope(frame, duration, fadeFrames?)`                         | `motion.loopFade.graphic` on the dissolve curve. `StockCanvas` fades every stock loop with it                                                                   |
 
@@ -240,7 +241,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer ESLint restrictions enforce this for every slice that has finished its theme migration.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer ESLint restrictions enforce this in every renderer directory.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.

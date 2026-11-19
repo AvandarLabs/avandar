@@ -1,5 +1,7 @@
 # Atlas theme coverage review
 
+> This is the audit as of the starting point, before any slice landed. Counts, statuses, and "today" describe that state. For where the work ended, read [the summary](README.md).
+
 Audit date: 2026-11-19. Branch: `chore/atlas-theme-coverage`. Read-only: no
 source file changed with this review.
 
