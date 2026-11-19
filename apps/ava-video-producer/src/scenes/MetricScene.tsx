@@ -6,10 +6,14 @@ import {
   formatMetric,
   sceneBounds,
 } from "./layout/layout";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import type { MetricSceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
-/** A single headline metric that counts from an initial value up to its target. */
+/**
+ * A single headline metric that counts from an initial value up to its target.
+ */
 export function MetricScene({
   frame,
   width = 1600,
@@ -25,7 +29,7 @@ export function MetricScene({
   detail,
   countAtFrame = 18,
   countDurationInFrames = 36,
-}: MetricSceneProps) {
+}: MetricSceneProps): ReactNode {
   assertFinite(from, "metric from");
   assertFrame(countAtFrame, "countAtFrame");
   assertFrame(countDurationInFrames, "countDurationInFrames");
@@ -73,9 +77,9 @@ export function MetricScene({
             color: "var(--muted-foreground)",
           }}
         >
-          {layout.label.lines.map((line, i) => (
-            <div key={i}>{line}</div>
-          ))}
+          {layout.label.lines.map((line, i) => {
+            return <div key={i}>{line}</div>;
+          })}
         </div>
         <div
           style={{
@@ -125,9 +129,9 @@ export function MetricScene({
               ...enter(frame, countAtFrame + countDurationInFrames, { y: 8 }),
             }}
           >
-            {layout.detail.lines.map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+            {layout.detail.lines.map((line, i) => {
+              return <div key={i}>{line}</div>;
+            })}
           </div>
         ) : null}
       </section>

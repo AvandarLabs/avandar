@@ -61,7 +61,9 @@ test("unequal final chunks and every accepted checkpoint partition the file exac
     const final = _render({ frame: 150, input: input });
     assert.match(final, /data-chunk-end="1100"/);
     assert.match(final, /data-chunk-bytes="300"/);
-    Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) => {
+    Array.from({ length: 180 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const attributes = SvgAttributes.fromMarker({
         markup,
@@ -77,7 +79,9 @@ test("unequal final chunks and every accepted checkpoint partition the file exac
       });
       assert.equal(confirmed + remaining, 1100);
       const starts = [...markup.matchAll(/data-received-chunk="(\d+)"/g)].map(
-        ([, value]) => value,
+        ([, value]) => {
+          return value;
+        },
       );
       assert.equal(new Set(starts).size, starts.length);
     });
@@ -133,7 +137,9 @@ test("a one-byte final chunk retains positive exact geometry and is confirmed on
   const hold = _render({ frame: 150, input: input });
   const rectangles = [
     ...hold.matchAll(/<rect[^>]*data-received-chunk="([^"]*)"[^>]*>/g),
-  ].map(([tag]) => tag);
+  ].map(([tag]) => {
+    return tag;
+  });
   assert.equal(rectangles.length, 2);
   const last = rectangles[1];
   assert.ok(
@@ -149,36 +155,36 @@ test("a one-byte final chunk retains positive exact geometry and is confirmed on
   assert.match(hold, /data-confirmed-bytes="100000"/);
 });
 test("every dense chunk boundary resumes without moving any already received prefix", () => {
-  Array.from({ length: 6 }, (_, index) => index * 10).forEach(
-    (acknowledgedBytes) => {
-      const input = {
-        ...DEFAULT_INPUT,
-        file: { label: "Dense chunks", sizeBytes: 60, chunkBytes: 10 },
-        acknowledgedBytes,
-      };
-      assert.deepEqual(inputSchema.parse(input), input);
-      const pause = _render({ frame: 80, input: input }),
-        hold = _render({ frame: 150, input: input });
-      assert.match(
-        pause,
-        new RegExp(`data-confirmed-bytes="${acknowledgedBytes}"`),
-      );
-      assert.equal((hold.match(/data-received-chunk=/g) ?? []).length, 6);
-      [80, 91, 100, 120, 139].forEach((frame) => {
-        const markup = _render({ frame: frame, input: input });
-        [
-          ...markup.matchAll(/<rect[^>]*data-received-chunk="(\d+)"[^>]*>/g),
-        ].forEach(([tag, start]) => {
-          if (Number(start) < acknowledgedBytes) {
-            assert.equal(
-              SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "y" }),
-              380,
-            );
-          }
-        });
+  Array.from({ length: 6 }, (_, index) => {
+    return index * 10;
+  }).forEach((acknowledgedBytes) => {
+    const input = {
+      ...DEFAULT_INPUT,
+      file: { label: "Dense chunks", sizeBytes: 60, chunkBytes: 10 },
+      acknowledgedBytes,
+    };
+    assert.deepEqual(inputSchema.parse(input), input);
+    const pause = _render({ frame: 80, input: input }),
+      hold = _render({ frame: 150, input: input });
+    assert.match(
+      pause,
+      new RegExp(`data-confirmed-bytes="${acknowledgedBytes}"`),
+    );
+    assert.equal((hold.match(/data-received-chunk=/g) ?? []).length, 6);
+    [80, 91, 100, 120, 139].forEach((frame) => {
+      const markup = _render({ frame: frame, input: input });
+      [
+        ...markup.matchAll(/<rect[^>]*data-received-chunk="(\d+)"[^>]*>/g),
+      ].forEach(([tag, start]) => {
+        if (Number(start) < acknowledgedBytes) {
+          assert.equal(
+            SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "y" }),
+            380,
+          );
+        }
       });
-    },
-  );
+    });
+  });
 });
 test("the full retry caption identifies every exact checkpoint with offsets shown or hidden", () => {
   [
@@ -188,7 +194,9 @@ test("the full retry caption identifies every exact checkpoint with offsets show
   ].forEach((file) => {
     Array.from(
       { length: Math.ceil(file.sizeBytes / file.chunkBytes) },
-      (_, index) => index * file.chunkBytes,
+      (_, index) => {
+        return index * file.chunkBytes;
+      },
     ).forEach((acknowledgedBytes) => {
       [false, true].forEach((showOffsets) => {
         [
@@ -206,10 +214,12 @@ test("the full retry caption identifies every exact checkpoint with offsets show
           [56, 66, 80, 100, 139, 150].forEach((frame) => {
             const markup = _render({ frame: frame, input: input });
             const caption = [...markup.matchAll(/<text[^>]+>/g)]
-              .map(([tag]) => tag)
-              .find((tag) =>
-                tag.includes(`aria-label="${input.labels.retry}"`),
-              );
+              .map(([tag]) => {
+                return tag;
+              })
+              .find((tag) => {
+                return tag.includes(`aria-label="${input.labels.retry}"`);
+              });
             assert.ok(caption);
             const x = SvgAttributes.getNumberFromMarkup({
                 attributes: caption,
@@ -236,8 +246,12 @@ test("the full retry caption identifies every exact checkpoint with offsets show
             });
             const checkpoint = 84 + (acknowledgedBytes / file.sizeBytes) * 792;
             const link = [...markup.matchAll(/<path[^>]+>/g)]
-              .map(([tag]) => tag)
-              .find((tag) => tag.includes("data-retry-caption-link="));
+              .map(([tag]) => {
+                return tag;
+              })
+              .find((tag) => {
+                return tag.includes("data-retry-caption-link=");
+              });
             if (!link) {
               assert.ok(
                 checkpoint >= x && checkpoint <= right,

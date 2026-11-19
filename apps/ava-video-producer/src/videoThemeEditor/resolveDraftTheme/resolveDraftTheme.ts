@@ -40,10 +40,12 @@ function _schemaIssues(patches: readonly VideoThemePatch[]): VideoThemeIssue[] {
     const result = videoThemePatchSchema.safeParse(patch);
     return result.success
       ? []
-      : result.error.issues.map((issue) => ({
-          path: getTokenPathFromDocumentPath(issue.path),
-          message: issue.message,
-        }));
+      : result.error.issues.map((issue) => {
+          return {
+            path: getTokenPathFromDocumentPath(issue.path),
+            message: issue.message,
+          };
+        });
   });
 }
 
@@ -90,13 +92,17 @@ export function makeDraftThemeResultFromDraft(
 export function isThemeDraftValid(input: DraftInput): boolean {
   return [
     { kind: "theme" } as const,
-    ...Object.keys(input.draft.overrides).map(
-      (itemId) => ({ kind: "item", itemId }) as const,
-    ),
-  ].every((scope) => makeDraftThemeResultFromDraft({ ...input, scope }).ok);
+    ...Object.keys(input.draft.overrides).map((itemId) => {
+      return { kind: "item", itemId } as const;
+    }),
+  ].every((scope) => {
+    return makeDraftThemeResultFromDraft({ ...input, scope }).ok;
+  });
 }
 
-/** The most recent draft of a theme that resolved, and the theme it belongs to. */
+/**
+ * The most recent draft of a theme that resolved, and the theme it belongs to.
+ */
 export type LastValidDraft = Readonly<{ themeId: string; draft: ThemeDraft }>;
 
 /**

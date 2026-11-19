@@ -34,16 +34,18 @@ export function DuplicateReviewStack({
         breakLongWords
         normalizeWhitespace
       />
-      {input.groups.map((group, groupIndex) => (
-        <DuplicateGroup
-          key={group.id}
-          frame={frame}
-          input={input}
-          group={group}
-          groupIndex={groupIndex}
-          accent={accent}
-        />
-      ))}
+      {input.groups.map((group, groupIndex) => {
+        return (
+          <DuplicateGroup
+            key={group.id}
+            frame={frame}
+            input={input}
+            group={group}
+            groupIndex={groupIndex}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

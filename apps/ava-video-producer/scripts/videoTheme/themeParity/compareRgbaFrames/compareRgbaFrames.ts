@@ -11,7 +11,9 @@ export type FrameComparison = Readonly<{
   differingPixels: number;
   /** Differing pixels outside every allowed region. Parity needs zero. */
   unexplainedPixels: number;
-  /** RGBA diff image: dimmed reference, amber for allowed, magenta otherwise. */
+  /**
+   * RGBA diff image: dimmed reference, amber for allowed, magenta otherwise.
+   */
   diff: Uint8Array;
 }>;
 
@@ -19,13 +21,14 @@ const ALLOWED_COLOR = [255, 191, 0, 255] as const;
 const UNEXPLAINED_COLOR = [255, 0, 255, 255] as const;
 
 function _isInside(regions: readonly ParityRegion[], x: number, y: number) {
-  return regions.some(
-    (region) =>
+  return regions.some((region) => {
+    return (
       x >= region.x &&
       x < region.x + region.width &&
       y >= region.y &&
-      y < region.y + region.height,
-  );
+      y < region.y + region.height
+    );
+  });
 }
 
 /**
@@ -51,9 +54,9 @@ export function compareRgbaFrames(
   let differingPixels = 0;
   let unexplainedPixels = 0;
   for (let offset = 0; offset < length; offset += 4) {
-    const isSame = [0, 1, 2, 3].every(
-      (channel) => reference[offset + channel] === current[offset + channel],
-    );
+    const isSame = [0, 1, 2, 3].every((channel) => {
+      return reference[offset + channel] === current[offset + channel];
+    });
     if (isSame) {
       const gray = Math.round(
         (reference[offset] * 0.2126 +

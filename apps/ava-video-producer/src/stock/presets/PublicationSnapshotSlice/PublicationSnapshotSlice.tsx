@@ -36,30 +36,34 @@ export function PublicationSnapshotSlice({
         opacity={ramp(frame, 56, 39)}
       />
       <SnapshotHeadings input={input} frame={frame} />
-      {input.selection.rowIds.map((rowId, selectedRow) => (
-        <SnapshotRowGuide
-          key={rowId}
-          input={input}
-          frame={frame}
-          accent={accent}
-          selectedRow={selectedRow}
-        />
-      ))}
-      {[false, true].flatMap((snapshot) =>
-        input.table.rows.flatMap((row, rowIndex) =>
-          input.table.columns.map((column, columnIndex) => (
-            <SnapshotCell
-              key={`${snapshot}:${rowIndex}:${columnIndex}`}
-              input={input}
-              frame={frame}
-              accent={accent}
-              rowIndex={rowIndex}
-              columnIndex={columnIndex}
-              snapshot={snapshot}
-            />
-          )),
-        ),
-      )}
+      {input.selection.rowIds.map((rowId, selectedRow) => {
+        return (
+          <SnapshotRowGuide
+            key={rowId}
+            input={input}
+            frame={frame}
+            accent={accent}
+            selectedRow={selectedRow}
+          />
+        );
+      })}
+      {[false, true].flatMap((snapshot) => {
+        return input.table.rows.flatMap((row, rowIndex) => {
+          return input.table.columns.map((column, columnIndex) => {
+            return (
+              <SnapshotCell
+                key={`${snapshot}:${rowIndex}:${columnIndex}`}
+                input={input}
+                frame={frame}
+                accent={accent}
+                rowIndex={rowIndex}
+                columnIndex={columnIndex}
+                snapshot={snapshot}
+              />
+            );
+          });
+        });
+      })}
     </g>
   );
 }

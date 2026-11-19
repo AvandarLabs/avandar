@@ -3,7 +3,9 @@ import { resolve } from "node:path";
 import { pick } from "./aliases.mjs";
 import { detectWrapper, isBareChannels } from "./colorNotation.mjs";
 
-/** Fallback palette used for any kit token the source stylesheet never defines. */
+/**
+ * Fallback palette used for any kit token the source stylesheet never defines.
+ */
 export const PLACEHOLDER = {
   "--background": "oklch(0.145 0.02 265)",
   "--foreground": "oklch(0.985 0.003 248)",
@@ -56,8 +58,8 @@ export function resolveTokens(primary, raw) {
   }
 
   /* Derived rather than invented. A product almost never ships soft/strong
-     variants of its accent, and a placeholder purple next to a real brand colour
-     is worse than a mix of the real one. */
+     variants of its accent, and a placeholder purple next to a real brand
+     colour is worse than a mix of the real one. */
   if (!resolved["--brand-soft"] && resolved["--brand"]) {
     resolved["--brand-soft"] =
       `color-mix(in oklab, ${resolved["--brand"]} 30%, ${resolved["--background"] ?? PLACEHOLDER["--background"]})`;
@@ -82,7 +84,9 @@ export function resolveTokens(primary, raw) {
   return { resolved, report, wrapper, wrapped };
 }
 
-/** Pull cubic-bezier easings from named custom properties in the source palette. */
+/**
+ * Pull cubic-bezier easings from named custom properties in the source palette.
+ */
 export function findEasings(primary) {
   return Object.entries(primary).flatMap(([k, v]) => {
     const m = /cubic-bezier\(([^)]+)\)/.exec(v);
@@ -154,7 +158,9 @@ export function writeCurves({ dryRun, easings }) {
   return written;
 }
 
-/** Print the source, palette, token, easing and typeface report to the console. */
+/**
+ * Print the source, palette, token, easing and typeface report to the console.
+ */
 export function printReport({
   rel,
   mode,

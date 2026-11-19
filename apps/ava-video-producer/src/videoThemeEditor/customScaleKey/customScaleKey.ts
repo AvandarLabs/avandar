@@ -23,7 +23,9 @@ export function isCustomScaleEntryPath(tokenPath: string): boolean {
   return segments.length >= 2 && isCustomScaleKey(segments.at(-1));
 }
 
-/** A camelCase scale key as lowercase words, such as `text dark` for `textDark`. */
+/**
+ * A camelCase scale key as lowercase words, such as `text dark` for `textDark`.
+ */
 export function humanizeScaleKey(key: string): string {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
 }

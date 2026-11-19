@@ -13,6 +13,7 @@ import { absoluteCues } from "../../storyboard/schema/schema";
 import { StoryFilm } from "../../storyboard/StoryFilm/StoryFilm";
 import { TitleCard, TITLE_LEN } from "../../title-card";
 import type { Film } from "../showcase.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   film: Film;
@@ -20,7 +21,7 @@ type Props = Readonly<{
 }>;
 
 /** The film's picture, drawn inside its theme by `FilmComposition`. */
-export function FilmPicture({ film, withAudio = true }: Props) {
+export function FilmPicture({ film, withAudio = true }: Props): ReactNode {
   const frame = useCurrentFrame();
   if (film.kind === "stock" && film.preset) {
     return (
@@ -62,8 +63,8 @@ export function FilmPicture({ film, withAudio = true }: Props) {
         showCaptions={film.showCaptions}
       />
       {withAudio
-        ? absoluteCues(film.plan).map((cue) =>
-            cue.audio ? (
+        ? absoluteCues(film.plan).map((cue) => {
+            return cue.audio ? (
               <Sequence
                 key={cue.id}
                 from={cue.startFrame}
@@ -71,8 +72,8 @@ export function FilmPicture({ film, withAudio = true }: Props) {
               >
                 <Audio src={staticFile(cue.audio)} />
               </Sequence>
-            ) : null,
-          )
+            ) : null;
+          })
         : null}
       {withAudio && film.plan.narrationTrack ? (
         <Sequence from={film.plan.narrationTrack.startFrame}>
@@ -83,11 +84,13 @@ export function FilmPicture({ film, withAudio = true }: Props) {
         </Sequence>
       ) : null}
       {withAudio
-        ? film.plan.soundEffects.map((sound) => (
-            <Sequence key={sound.id} from={sound.atFrame}>
-              <Audio src={staticFile(sound.src)} volume={sound.volume} />
-            </Sequence>
-          ))
+        ? film.plan.soundEffects.map((sound) => {
+            return (
+              <Sequence key={sound.id} from={sound.atFrame}>
+                <Audio src={staticFile(sound.src)} volume={sound.volume} />
+              </Sequence>
+            );
+          })
         : null}
     </>
   );

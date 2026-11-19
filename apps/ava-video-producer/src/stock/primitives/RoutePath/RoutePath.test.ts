@@ -31,17 +31,15 @@ test("start, segment transition and exact end follow arc length", () => {
     { x: 0.75, y: 0.125 },
   );
   const progressValues = [0, 0.25, 0.5, 0.75, 1];
-  const forwardPositions = progressValues.map((progress) =>
-    getRoutePointFromProgress({ points: POINTS, progress }),
-  );
-  [...progressValues]
-    .reverse()
-    .forEach((progress, index) =>
-      assert.deepEqual(
-        getRoutePointFromProgress({ points: POINTS, progress }),
-        forwardPositions[forwardPositions.length - index - 1],
-      ),
+  const forwardPositions = progressValues.map((progress) => {
+    return getRoutePointFromProgress({ points: POINTS, progress });
+  });
+  [...progressValues].reverse().forEach((progress, index) => {
+    return assert.deepEqual(
+      getRoutePointFromProgress({ points: POINTS, progress }),
+      forwardPositions[forwardPositions.length - index - 1],
     );
+  });
 });
 test("invalid, degenerate and out-of-bounds paths fail explicitly", () => {
   [
@@ -53,14 +51,16 @@ test("invalid, degenerate and out-of-bounds paths fail explicitly", () => {
       { x: 0, y: 0 },
       { x: 0, y: 0 },
     ],
-  ].forEach((points) =>
-    assert.throws(() => getRoutePointFromProgress({ points, progress: 0.5 })),
-  );
-  [NaN, Infinity, -0.1, 1.01].forEach((progress) =>
-    assert.throws(() =>
-      getRoutePointFromProgress({ points: POINTS, progress }),
-    ),
-  );
+  ].forEach((points) => {
+    return assert.throws(() => {
+      return getRoutePointFromProgress({ points, progress: 0.5 });
+    });
+  });
+  [NaN, Infinity, -0.1, 1.01].forEach((progress) => {
+    return assert.throws(() => {
+      return getRoutePointFromProgress({ points: POINTS, progress });
+    });
+  });
 });
 test("SVG route preserves every supplied vertex and scales the marker", () => {
   const markup = renderToStaticMarkup(

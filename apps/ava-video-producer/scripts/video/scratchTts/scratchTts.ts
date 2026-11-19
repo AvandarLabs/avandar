@@ -16,7 +16,7 @@ export async function scratchTts(
   options: Pick<Options, "filename" | "voice" | "rate">,
   workspace: string,
   relativeDirectory?: string,
-) {
+): Promise<string> {
   if (!plan.narration.length)
     throw new Error("The storyboard has no narration cues");
   if (process.platform !== "darwin")

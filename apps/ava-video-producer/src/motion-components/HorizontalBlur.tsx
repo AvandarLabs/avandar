@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /** Blur radii below this are invisible at delivery size, so no filter runs. */
 const MIN_VISIBLE_BLUR = 0.25;
 
@@ -14,7 +16,7 @@ type Props = {
  * under a wipe. CSS `blur()` is isotropic and would also smear the layer's
  * horizontal edges. Pair it with `getHorizontalBlurFilter`.
  */
-export function HorizontalBlurFilter({ id, amount }: Props) {
+export function HorizontalBlurFilter({ id, amount }: Props): ReactNode {
   if (amount < MIN_VISIBLE_BLUR) {
     return null;
   }

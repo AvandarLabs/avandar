@@ -26,9 +26,9 @@ export function LockOperation({
     <g data-operation={operation.id}>
       <LabelSlots labels={[[operation.label, 50, y + 10, 245, 18, 3]]} />
       {operation.requestedIds.map((resourceId, requestIndex) => {
-        const canonicalIndex = input.resources.findIndex(
-            ({ id }) => id === resourceId,
-          ),
+        const canonicalIndex = input.resources.findIndex(({ id }) => {
+            return id === resourceId;
+          }),
           resource = input.resources[canonicalIndex];
         const x = mix(
           sorting,
@@ -69,14 +69,16 @@ export function LockOperation({
           opacity={0.45}
           data-original-order={operation.requestedIds.join(",")}
         >
-          {operation.requestedIds.map((resourceId, requestIndex) => (
-            <LiteralDataText
-              key={resourceId}
-              value={resourceId}
-              x={50}
-              y={y + 100 + requestIndex * 26}
-            />
-          ))}
+          {operation.requestedIds.map((resourceId, requestIndex) => {
+            return (
+              <LiteralDataText
+                key={resourceId}
+                value={resourceId}
+                x={50}
+                y={y + 100 + requestIndex * 26}
+              />
+            );
+          })}
         </g>
       ) : null}
     </g>

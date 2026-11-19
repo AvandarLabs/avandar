@@ -41,12 +41,14 @@ const BOUNDS: Array<[number | null, number | null]> = [
 ];
 const dense: Input = {
   ...DEFAULT_INPUT,
-  records: BOUNDS.map(([start, end], index) => ({
-    id: `p${index}`,
-    label: "界".repeat(18),
-    start,
-    end,
-  })),
+  records: BOUNDS.map(([start, end], index) => {
+    return {
+      id: `p${index}`,
+      label: "界".repeat(18),
+      start,
+      end,
+    };
+  }),
   investigationWindow: {
     ...DEFAULT_INPUT.investigationWindow,
     label: "界".repeat(28),
@@ -58,7 +60,9 @@ const dense: Input = {
   },
   sceneLabel: "界".repeat(40),
   copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
+    Object.keys(DEFAULT_INPUT.copy).map((key) => {
+      return [key, "界".repeat(42)];
+    }),
   ) as Input["copy"],
 };
 const changed: Input = {
@@ -83,13 +87,15 @@ export const invalidInputs: unknown[] = [
     [null, 4],
     [4, 4],
     [0, 11],
-  ].map(([start, end]) => ({
-    ...DEFAULT_INPUT,
-    records: [
-      { ...DEFAULT_INPUT.records[0], start, end },
-      DEFAULT_INPUT.records[1],
-    ],
-  })),
+  ].map(([start, end]) => {
+    return {
+      ...DEFAULT_INPUT,
+      records: [
+        { ...DEFAULT_INPUT.records[0], start, end },
+        DEFAULT_INPUT.records[1],
+      ],
+    };
+  }),
 ];
 /** Accepted minimum, dense, changed and disabled-display examples. */
 export const fixtures: Array<{ id: string; input: Input }> = [

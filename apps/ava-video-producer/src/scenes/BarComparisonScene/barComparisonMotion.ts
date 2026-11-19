@@ -28,9 +28,18 @@ export function getBarComparisonBeats(
 }
 
 /** Each row's bar length as a fraction of the panel's longest bar. */
-export function getBarFractions(rows: ReadonlyArray<{ value: number }>) {
-  const longest = Math.max(0, ...rows.map((row) => row.value));
-  return rows.map((row) => (longest > 0 ? row.value / longest : 0));
+export function getBarFractions(
+  rows: ReadonlyArray<{ value: number }>,
+): number[] {
+  const longest = Math.max(
+    0,
+    ...rows.map((row) => {
+      return row.value;
+    }),
+  );
+  return rows.map((row) => {
+    return longest > 0 ? row.value / longest : 0;
+  });
 }
 
 /**
@@ -49,15 +58,13 @@ export function getEraseStartFrames({
   staggerFrames: number;
   panelStaggerFrames: number;
 }): number[][] {
-  return elementCounts.map((count, panelIndex) =>
-    Array.from(
-      { length: count },
-      (_, elementIndex) =>
-        atFrame +
-        panelIndex * panelStaggerFrames +
-        elementIndex * staggerFrames,
-    ),
-  );
+  return elementCounts.map((count, panelIndex) => {
+    return Array.from({ length: count }, (_, elementIndex) => {
+      return (
+        atFrame + panelIndex * panelStaggerFrames + elementIndex * staggerFrames
+      );
+    });
+  });
 }
 
 /** Points along the right edge of a rough bar. */

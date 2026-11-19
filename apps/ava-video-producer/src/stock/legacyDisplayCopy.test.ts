@@ -10,13 +10,17 @@ import type { StockContract } from "./contracts/StockContract.types";
 test("fixed legacy display units keep their authored English copy", () => {
   const contracts: Record<string, StockContract<unknown>> = stockContracts;
   const messages = Object.fromEntries(
-    Object.values(contracts).flatMap((contract) =>
-      Object.values(contract.displayCopy ?? {}).map(
-        ({ id, message }) => [id, message] as const,
-      ),
-    ),
+    Object.values(contracts).flatMap((contract) => {
+      return Object.values(contract.displayCopy ?? {}).map(
+        ({ id, message }) => {
+          return [id, message] as const;
+        },
+      );
+    }),
   );
-  copy.forEach(({ id, message }) => assert.equal(messages[id], message, id));
+  copy.forEach(({ id, message }) => {
+    return assert.equal(messages[id], message, id);
+  });
 });
 test("the shared accessible description names the preset", () => {
   const markup = renderToStaticMarkup(

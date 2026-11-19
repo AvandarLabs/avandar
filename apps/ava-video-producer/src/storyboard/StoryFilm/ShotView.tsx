@@ -35,7 +35,7 @@ export function ShotView({
   width: number;
   height: number;
   productScene?: ProductSceneRenderer;
-}) {
+}): ReactNode {
   const common = { frame, width, height };
   switch (shot.scene) {
     case "continuity":

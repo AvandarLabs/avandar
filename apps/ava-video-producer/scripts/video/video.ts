@@ -20,7 +20,7 @@ import { validate } from "./validate";
 import { HELP, ROOT } from "./video.constants";
 
 /** Dispatch local pipeline stages; source plans are never edited in place. */
-export async function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2)): Promise<void> {
   requireLicense();
   if (argv.length === 1 && ["--help", "-h"].includes(argv[0])) {
     console.log(HELP);

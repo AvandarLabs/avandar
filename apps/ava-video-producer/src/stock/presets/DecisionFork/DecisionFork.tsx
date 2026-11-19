@@ -27,18 +27,20 @@ export function DecisionFork({ frame, accent, input }: Props): ReactNode {
     <g>
       <DecisionHeading frame={frame} input={input} />
       <DrawPath d="M480 174 L480 235" frame={frame} at={16} color={accent} />
-      {input.branches.map((branch, index) => (
-        <DecisionBranch
-          key={branch.id}
-          branch={branch}
-          x={40 + branchSpacing * (index + 0.5)}
-          frame={frame}
-          index={index}
-          accent={accent}
-          isSelected={branch.id === input.selectedBranchId}
-          showUnchosenOutcomes={input.showUnchosenOutcomes}
-        />
-      ))}
+      {input.branches.map((branch, index) => {
+        return (
+          <DecisionBranch
+            key={branch.id}
+            branch={branch}
+            x={40 + branchSpacing * (index + 0.5)}
+            frame={frame}
+            index={index}
+            accent={accent}
+            isSelected={branch.id === input.selectedBranchId}
+            showUnchosenOutcomes={input.showUnchosenOutcomes}
+          />
+        );
+      })}
       <DecisionMarker
         frame={frame}
         x={selectedX}

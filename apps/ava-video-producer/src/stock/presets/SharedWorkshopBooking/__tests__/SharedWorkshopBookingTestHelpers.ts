@@ -217,38 +217,50 @@ function _assertAgreementClearance({
 }): void {
   const markup = _render({ frame: frame, input: input });
   const texts = [...markup.matchAll(/<text[^>]*>.*?<\/text>/g)].map(
-    ([text]) => text,
+    ([text]) => {
+      return text;
+    },
   );
-  const caption = texts.find((text) =>
-    text.includes(`aria-label="${_escape(input.labels.agreed)}"`),
-  );
+  const caption = texts.find((text) => {
+    return text.includes(`aria-label="${_escape(input.labels.agreed)}"`);
+  });
   assert.ok(caption, "the complete authored agreement caption is present");
   const obstacles = [
     ...[
       ...markup.matchAll(/<rect data-(?:original-)?request="[^"]*"[^>]*>/g),
-    ].map(([rect]) => _rectBounds(rect)),
+    ].map(([rect]) => {
+      return _rectBounds(rect);
+    }),
     ...[...markup.matchAll(/<line data-request-hand="[^"]*"[^>]*>/g)].map(
-      ([line]) => _lineBounds(line),
+      ([line]) => {
+        return _lineBounds(line);
+      },
     ),
     ..._actorBounds(markup),
-    ...texts.filter((text) => text !== caption).flatMap(_textBounds),
+    ...texts
+      .filter((text) => {
+        return text !== caption;
+      })
+      .flatMap(_textBounds),
     ...[
       ...markup
         .slice(markup.indexOf("<g data-machine="))
         .split("</g>")[0]
         .matchAll(/<path[^>]*>/g),
-    ].map(([path]) => _pathBounds({ path, x: 0, y: 0, padding: 2.5 })),
+    ].map(([path]) => {
+      return _pathBounds({ path, x: 0, y: 0, padding: 2.5 });
+    }),
   ];
   assert.equal(_actorBounds(markup).length, input.requests.length * 2);
-  _textBounds(caption).forEach((line) =>
-    obstacles.forEach((obstacle) =>
-      _assertClear({
+  _textBounds(caption).forEach((line) => {
+    return obstacles.forEach((obstacle) => {
+      return _assertClear({
         first: line,
         second: obstacle,
         context: `agreement at frame ${frame}`,
-      }),
-    ),
-  );
+      });
+    });
+  });
 }
 export {
   _render,

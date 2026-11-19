@@ -50,9 +50,9 @@ export function getJobPlacementFromPlanAndFrame({
     };
   }
   const order = plan.transfers.findIndex(propEq("index", index));
-  const preceding = plan.transfers
-    .slice(0, order)
-    .reduce((sum, transfer) => sum + transfer.length, 0);
+  const preceding = plan.transfers.slice(0, order).reduce((sum, transfer) => {
+    return sum + transfer.length;
+  }, 0);
   const distance =
     plan.totalLength * ramp(frame, 48, 60, EASE.inOut) - preceding;
   return {

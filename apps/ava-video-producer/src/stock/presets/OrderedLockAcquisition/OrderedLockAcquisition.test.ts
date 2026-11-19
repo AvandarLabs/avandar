@@ -43,10 +43,11 @@ test("first turn swaps while resource-array order remains canonical", () => {
   );
 });
 test("keys physically return to their tray before the waiting operation reuses them", () => {
-  const key = (frame: number, resource: string) =>
-    _render({ frame: frame, input: DEFAULT_INPUT }).match(
+  const key = (frame: number, resource: string) => {
+    return _render({ frame: frame, input: DEFAULT_INPUT }).match(
       new RegExp(`<circle data-lock-key="${resource}"[^>]*>`),
     )![0];
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: key(108, "a"),
@@ -152,13 +153,15 @@ registerStockDefaultTextAssertions({
 
 test("request cards exchange positions without covering one another", () => {
   FIXTURES.forEach(({ input }) => {
-    Array.from({ length: 149 }, (_, index) => 53 + index / 4).forEach(
-      (frame) => {
-        const cards = [
-          ..._render({ frame: frame, input: input }).matchAll(
-            /<rect data-request-tile="([^"]*)"[^>]*>/g,
-          ),
-        ].map(([attributes, id]) => ({
+    Array.from({ length: 149 }, (_, index) => {
+      return 53 + index / 4;
+    }).forEach((frame) => {
+      const cards = [
+        ..._render({ frame: frame, input: input }).matchAll(
+          /<rect data-request-tile="([^"]*)"[^>]*>/g,
+        ),
+      ].map(([attributes, id]) => {
+        return {
           id,
           x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
           y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
@@ -170,37 +173,35 @@ test("request cards exchange positions without covering one another", () => {
             attributes,
             name: "height",
           }),
-        }));
-        assert.deepEqual(
-          cards.map(prop("id")),
-          input.operations.flatMap(prop("requestedIds")),
-        );
-        cards.forEach((first, index) =>
-          cards
-            .slice(index + 1)
-            .forEach((second) =>
-              assert.ok(
-                first.x + first.width + 1 <= second.x ||
-                  second.x + second.width + 1 <= first.x ||
-                  first.y + first.height + 1 <= second.y ||
-                  second.y + second.height + 1 <= first.y,
-              ),
-            ),
-        );
-      },
-    );
+        };
+      });
+      assert.deepEqual(
+        cards.map(prop("id")),
+        input.operations.flatMap(prop("requestedIds")),
+      );
+      cards.forEach((first, index) => {
+        return cards.slice(index + 1).forEach((second) => {
+          return assert.ok(
+            first.x + first.width + 1 <= second.x ||
+              second.x + second.width + 1 <= first.x ||
+              first.y + first.height + 1 <= second.y ||
+              second.y + second.height + 1 <= first.y,
+          );
+        });
+      });
+    });
   });
 });
 test("canonical sorting moves actual authored resource labels before any grant", () => {
-  const positions = (frame: number) =>
-    [
+  const positions = (frame: number) => {
+    return [
       ..._render({ frame: frame, input: DEFAULT_INPUT }).matchAll(
         /<rect data-request-tile="([^"]*)"([^>]*)>/g,
       ),
-    ].map(([, id, attributes]) => [
-      id,
-      SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-    ]);
+    ].map(([, id, attributes]) => {
+      return [id, SvgAttributes.getNumberFromMarkup({ attributes, name: "x" })];
+    });
+  };
   assert.deepEqual(positions(40), [
     ["a", 340],
     ["b", 600],
@@ -213,16 +214,18 @@ test("canonical sorting moves actual authored resource labels before any grant",
     ["b", 600],
     ["a", 340],
   ]);
-  [0, 40, 53, 70, 90].forEach((frame) =>
-    assert.equal(
+  [0, 40, 53, 70, 90].forEach((frame) => {
+    return assert.equal(
       [
         ..._render({ frame: frame, input: DEFAULT_INPUT }).matchAll(
           /data-key-owner="([^"]*)"/g,
         ),
-      ].filter(([, owner]) => owner !== "").length,
+      ].filter(([, owner]) => {
+        return owner !== "";
+      }).length,
       0,
-    ),
-  );
+    );
+  });
   assert.doesNotMatch(
     _render({
       frame: 90,

@@ -6,6 +6,7 @@ import {
   validateCaptions,
 } from "./layout/layout";
 import type { CaptionOverlayProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Whole-cue captions. Alignment comes from authored or imported cue times. */
 export function CaptionOverlay({
@@ -15,7 +16,7 @@ export function CaptionOverlay({
   height = 1000,
   bottom = 48,
   fontSize = 38,
-}: CaptionOverlayProps) {
+}: CaptionOverlayProps): ReactNode {
   validateCaptions(cues);
   const cue = activeCaption(frame, cues);
   if (!cue) return null;
@@ -47,9 +48,9 @@ export function CaptionOverlay({
         pointerEvents: "none",
       }}
     >
-      {geometry.lines.map((line, index) => (
-        <div key={index}>{line}</div>
-      ))}
+      {geometry.lines.map((line, index) => {
+        return <div key={index}>{line}</div>;
+      })}
     </div>
   );
 }

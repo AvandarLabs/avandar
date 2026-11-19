@@ -19,8 +19,8 @@ import { inputSchema, type Input } from "./PredicatePushdownBoundary.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -32,10 +32,13 @@ const render = ({
       }),
     ),
   );
+};
 function _marks({ markup, name }: { markup: string; name: string }): string[] {
   return [
     ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 function _attribute({
   markup,
@@ -54,9 +57,9 @@ function _number({ markup, name }: { markup: string; name: string }): number {
 test("only matching copies cross the boundary while source originals persist", () => {
   const markup = render({ frame: 150 });
   assert.deepEqual(
-    _marks({ markup, name: "transfer-row" }).map((mark) =>
-      _attribute({ markup: mark, name: "data-transfer-row" }),
-    ),
+    _marks({ markup, name: "transfer-row" }).map((mark) => {
+      return _attribute({ markup: mark, name: "data-transfer-row" });
+    }),
     ["b", "d"],
   );
   assert.equal(_marks({ markup, name: "source-row" }).length, 4);
@@ -79,23 +82,25 @@ test("only matching copies cross the boundary while source originals persist", (
   });
 });
 test("inclusive equality and extreme thresholds preserve exact membership", () => {
-  ([">=", "<="] as const).forEach((operator) =>
-    [-100, 2, 7, 100].forEach((threshold) => {
+  ([">=", "<="] as const).forEach((operator) => {
+    return [-100, 2, 7, 100].forEach((threshold) => {
       const input: Input = {
         ...DEFAULT_INPUT,
         predicate: { operator, threshold },
         showTotals: false,
       };
-      const expected = input.rows.filter((row: Input["rows"][number]) =>
-        operator === ">=" ? row.value >= threshold : row.value <= threshold,
-      );
+      const expected = input.rows.filter((row: Input["rows"][number]) => {
+        return operator === ">="
+          ? row.value >= threshold
+          : row.value <= threshold;
+      });
       assert.deepEqual(
         _marks({
           markup: render({ frame: 150, input: input }),
           name: "transfer-row",
-        }).map((mark) =>
-          _attribute({ markup: mark, name: "data-transfer-row" }),
-        ),
+        }).map((mark) => {
+          return _attribute({ markup: mark, name: "data-transfer-row" });
+        }),
         expected.map(prop("id")),
       );
       assert.equal(
@@ -105,31 +110,33 @@ test("inclusive equality and extreme thresholds preserve exact membership", () =
         }).length,
         input.rows.length,
       );
-    }),
-  );
+    });
+  });
 });
 test("fixtures retain exact input while schemas reject invalid documents", () => {
-  fixtures.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  fixtures.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  input.labels.source,
-  input.labels.destination,
-  ...(frame >= 50 ? [input.labels.condition] : []),
-  ...(frame >= 95 ? [input.labels.retained] : []),
-  ...(frame >= 139 ? [input.labels.transferred] : []),
-  input.metric.label,
-  input.metric.unit,
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    input.labels.source,
+    input.labels.destination,
+    ...(frame >= 50 ? [input.labels.condition] : []),
+    ...(frame >= 95 ? [input.labels.retained] : []),
+    ...(frame >= 139 ? [input.labels.transferred] : []),
+    input.metric.label,
+    input.metric.unit,
+  ];
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -181,9 +188,9 @@ test("signed decimal rows, maximum labels and hidden totals retain the same tran
     name: "transfer-row",
   });
   assert.deepEqual(
-    visible.map((mark) =>
-      _attribute({ markup: mark, name: "data-transfer-row" }),
-    ),
+    visible.map((mark) => {
+      return _attribute({ markup: mark, name: "data-transfer-row" });
+    }),
     [""],
   );
   assert.deepEqual(
@@ -223,11 +230,12 @@ test("row copies clear the source before compacting destination rows", () => {
     sources = _marks({ markup, name: "source-row" }),
     copies = _marks({ markup, name: "transfer-row" });
   copies.forEach((copy) => {
-    const source = sources.find(
-      (row) =>
+    const source = sources.find((row) => {
+      return (
         _attribute({ markup: row, name: "data-source-row" }) ===
-        _attribute({ markup: copy, name: "data-transfer-row" }),
-    )!;
+        _attribute({ markup: copy, name: "data-transfer-row" })
+      );
+    })!;
     assert.equal(
       _number({ markup: copy, name: "data-y" }),
       _number({ markup: source, name: "data-y" }),
@@ -241,7 +249,9 @@ test("row copies clear the source before compacting destination rows", () => {
 function _accounting(markup: string): Array<{ kind: string; content: string }> {
   return [
     ...markup.matchAll(/<g data-accounting="([^"]+)"[^>]*>(.*?)<\/g><\/g>/g),
-  ].map(([, kind, content]) => ({ kind, content }));
+  ].map(([, kind, content]) => {
+    return { kind, content };
+  });
 }
 test("visible transfer accounting waits for arrival and distinguishes each denominator", () => {
   [
@@ -255,9 +265,9 @@ test("visible transfer accounting waits for arrival and distinguishes each denom
       predicate: { operator: ">=" as const, threshold: 100 },
     },
   ].forEach((input) => {
-    const numSelected = input.rows.filter(
-      (row) => row.value >= input.predicate.threshold,
-    ).length;
+    const numSelected = input.rows.filter((row) => {
+      return row.value >= input.predicate.threshold;
+    }).length;
     [36, 90, 95, 118, 138, 139, 150].forEach((frame) => {
       if (frame < 139) {
         assert.ok(
@@ -319,9 +329,9 @@ test("visible transfer accounting waits for arrival and distinguishes each denom
       frame: 150,
       input: { ...input, showTotals: false },
     });
-    _accounting(hidden).forEach((group) =>
-      assert.ok(!group.content.includes(input.metric.rowUnit)),
-    );
+    _accounting(hidden).forEach((group) => {
+      return assert.ok(!group.content.includes(input.metric.rowUnit));
+    });
     assert.deepEqual(
       _marks({ markup: hidden, name: "transfer-row" }),
       _marks({

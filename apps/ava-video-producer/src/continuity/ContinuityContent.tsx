@@ -6,6 +6,7 @@ import { ContinuityThesis } from "./ContinuityThesis";
 import { getProductFrame } from "./continuityTimeline";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   content: ContinuityBeat["content"];
@@ -20,7 +21,7 @@ export function ContinuityContent({
   frame,
   accent,
   productScene,
-}: Props) {
+}: Props): ReactNode {
   switch (content.kind) {
     case "stock":
       return (

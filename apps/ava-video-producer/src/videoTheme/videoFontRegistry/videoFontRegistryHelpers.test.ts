@@ -14,20 +14,26 @@ const PUBLIC_DIRECTORY = fileURLToPath(
 
 test("every bundled font file exists in public/fonts", async () => {
   await Promise.all(
-    listBundledVideoFonts().map((font) =>
-      fs.access(path.join(PUBLIC_DIRECTORY, font.file)),
-    ),
+    listBundledVideoFonts().map((font) => {
+      return fs.access(path.join(PUBLIC_DIRECTORY, font.file));
+    }),
   );
 });
 
 test("every font file in public/fonts is registered", async () => {
   const files = (await fs.readdir(path.join(PUBLIC_DIRECTORY, "fonts")))
-    .filter((name) => name.endsWith(".woff2"))
-    .map((name) => `fonts/${name}`);
+    .filter((name) => {
+      return name.endsWith(".woff2");
+    })
+    .map((name) => {
+      return `fonts/${name}`;
+    });
   assert.deepEqual(
     files.sort(),
     listBundledVideoFonts()
-      .map((font) => font.file)
+      .map((font) => {
+        return font.file;
+      })
       .sort(),
   );
 });

@@ -23,9 +23,9 @@ export function ReceiptHalf({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const entryIndex = input.entries.findIndex(
-    ({ id }) => id === receipt.entryId,
-  );
+  const entryIndex = input.entries.findIndex(({ id }) => {
+    return id === receipt.entryId;
+  });
   const { receiptX, receiptY } = getJournalGeometryFromFrame({
     index: entryIndex,
     frame,

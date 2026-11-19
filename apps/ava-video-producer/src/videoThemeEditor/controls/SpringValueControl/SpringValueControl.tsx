@@ -3,13 +3,17 @@ import { RangeNumberInput } from "../RangeNumberInput";
 import css from "./SpringValueControl.module.css";
 import type { SpringValue } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
-/** A spring token: damping, stiffness, and mass. A missing field shows its default. */
+/**
+ * A spring token: damping, stiffness, and mass. A missing field shows its
+ * default.
+ */
 export function SpringValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const spring: SpringValue = {
     ...getDefaultLiteralFromKind("spring"),
     ...(value as Partial<SpringValue> | undefined),
@@ -21,21 +25,23 @@ export function SpringValueControl({
   ] as const;
   return (
     <div className={css.springValueFields} role="group" aria-label={label}>
-      {fields.map((field) => (
-        <RangeNumberInput
-          key={field.key}
-          size="xs"
-          label={field.name}
-          min={field.min}
-          max={field.max}
-          step={field.step}
-          decimalScale={2}
-          value={spring[field.key]}
-          onChange={(fieldValue) =>
-            onChange({ ...spring, [field.key]: fieldValue })
-          }
-        />
-      ))}
+      {fields.map((field) => {
+        return (
+          <RangeNumberInput
+            key={field.key}
+            size="xs"
+            label={field.name}
+            min={field.min}
+            max={field.max}
+            step={field.step}
+            decimalScale={2}
+            value={spring[field.key]}
+            onChange={(fieldValue) => {
+              return onChange({ ...spring, [field.key]: fieldValue });
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

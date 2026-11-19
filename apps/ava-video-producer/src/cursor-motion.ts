@@ -15,8 +15,13 @@ export type CursorTarget = {
   cursor: CursorKind;
 };
 
-/** Subpixel travel, clamped at both ends. Equal-position keys create a dwell. */
-export function trackPos(frame: number, keys: readonly CursorKey[]) {
+/**
+ * Subpixel travel, clamped at both ends. Equal-position keys create a dwell.
+ */
+export function trackPos(
+  frame: number,
+  keys: readonly CursorKey[],
+): { x: number; y: number } {
   if (!keys.length) throw new Error("Cursor paths need at least one key");
   let i = 0;
   while (i < keys.length - 1 && frame >= keys[i + 1].at) i += 1;
@@ -27,15 +32,16 @@ export function trackPos(frame: number, keys: readonly CursorKey[]) {
 }
 
 /** Kept for consumers that need a button-down state; Cursor uses press(). */
-export function downAt(frame: number, beats: readonly number[]) {
-  return beats.some((b) => frame >= b && frame < b + 6);
+export function downAt(frame: number, beats: readonly number[]): boolean {
+  return beats.some((b) => {
+    return frame >= b && frame < b + 6;
+  });
 }
 
-export function cursorScale(frame: number, clicks: readonly number[]) {
-  return clicks.reduce(
-    (scale, at) => Math.min(scale, press(frame, at, 0.07)),
-    1,
-  );
+export function cursorScale(frame: number, clicks: readonly number[]): number {
+  return clicks.reduce((scale, at) => {
+    return Math.min(scale, press(frame, at, 0.07));
+  }, 1);
 }
 
 /** Switch shape only on arrival, never while crossing unrelated controls. */
@@ -46,24 +52,27 @@ export function cursorOnTarget(
 ): CursorKind {
   const p = trackPos(frame, path);
   return (
-    targets.find(
-      (target) =>
+    targets.find((target) => {
+      return (
         frame <= target.frame + 8 &&
-        Math.hypot(p.x - target.x, p.y - target.y) < 0.01,
-    )?.cursor ??
-    [...targets]
-      .reverse()
-      .find(
-        (target) =>
-          frame > target.frame &&
-          Math.hypot(p.x - target.x, p.y - target.y) < 0.01,
-      )?.cursor ??
+        Math.hypot(p.x - target.x, p.y - target.y) < 0.01
+      );
+    })?.cursor ??
+    [...targets].reverse().find((target) => {
+      return (
+        frame > target.frame &&
+        Math.hypot(p.x - target.x, p.y - target.y) < 0.01
+      );
+    })?.cursor ??
     "default"
   );
 }
 
 /** Short shutter samples, capped at 4px. No blur on a held click target. */
-export function cursorShutter(frame: number, path: readonly CursorKey[]) {
+export function cursorShutter(
+  frame: number,
+  path: readonly CursorKey[],
+): Array<{ x: number; y: number; opacity: number }> {
   const current = trackPos(frame, path);
   return [0.45, 0.3, 0.15].map((offset) => {
     const previous = trackPos(frame - offset, path);

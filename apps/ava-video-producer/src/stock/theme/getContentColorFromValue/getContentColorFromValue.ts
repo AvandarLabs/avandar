@@ -4,8 +4,12 @@ import { legacyColorSchema } from "../../presets/legacy/legacyColorSchema.consta
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 
 const COLOR_ROLES = Object.entries(SEMANTIC_TOKENS.color)
-  .filter(([, definition]) => definition.kind === "color")
-  .map(([role]) => role);
+  .filter(([, definition]) => {
+    return definition.kind === "color";
+  })
+  .map(([role]) => {
+    return role;
+  });
 
 /** A content colour that follows the theme, such as `$color.accentAlt`. */
 export const contentColorRoleSchema = z

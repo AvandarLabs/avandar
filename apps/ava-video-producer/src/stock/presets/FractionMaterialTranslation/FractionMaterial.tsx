@@ -30,16 +30,18 @@ export function FractionMaterial({
           stroke={STOCK.text}
         />
       ) : undefined}
-      {Array.from({ length: fraction.denominator }, (_, index) => (
-        <FractionUnit
-          key={index}
-          representation={representation}
-          fraction={fraction}
-          index={index}
-          progress={progress}
-          accent={accent}
-        />
-      ))}
+      {Array.from({ length: fraction.denominator }, (_, index) => {
+        return (
+          <FractionUnit
+            key={index}
+            representation={representation}
+            fraction={fraction}
+            index={index}
+            progress={progress}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

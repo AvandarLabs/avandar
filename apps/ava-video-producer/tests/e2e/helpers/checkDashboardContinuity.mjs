@@ -1,4 +1,7 @@
-/** Exercise the composition's real transport and inspect chart continuity during playback. */
+/**
+ * Exercise the composition's real transport and inspect chart continuity during
+ * playback.
+ */
 export async function checkDashboardContinuity(page, baseURL) {
   await page.goto(`${baseURL}/compositions.html?film=qetl-composite`);
   await page.frameLocator("iframe").locator(".liveFilm").waitFor();

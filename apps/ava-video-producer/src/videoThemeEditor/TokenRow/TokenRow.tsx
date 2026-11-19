@@ -11,6 +11,7 @@ import css from "./TokenRow.module.css";
 import { TokenRowHeader } from "./TokenRowHeader/TokenRowHeader";
 import { TokenRowIssue } from "./TokenRowIssue/TokenRowIssue";
 import { useTokenRowLabel } from "./useTokenRowLabel";
+import type { ReactNode } from "react";
 
 /**
  * One token: its name and state, its control, its path and description, and
@@ -18,7 +19,7 @@ import { useTokenRowLabel } from "./useTokenRowLabel";
  * "Same as the theme" tag, and its chips and previews dim. A problem puts the
  * control's inputs in Mantine's error state and adds an alert line.
  */
-export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
+export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>): ReactNode {
   const editor = useTokenEditor();
   const label = useTokenRowLabel()(row);
   const issue = findTokenRowIssue({

@@ -2,6 +2,7 @@ import { AbsoluteFill } from "remotion";
 import { TITLE_LEN } from "./composition-timing";
 import { TYPE } from "./fonts";
 import { DUR, EASE, mix, ramp } from "./motion";
+import type { ReactNode } from "react";
 
 export { TITLE_LEN } from "./composition-timing";
 
@@ -12,7 +13,8 @@ const RULE_IN = 26;
 const OUT_AT = TITLE_LEN - 12;
 
 /**
- * The cold open. Full rationale: .claude/skills/product-demo/references/titles.md
+ * The cold open. Full rationale:
+ * .claude/skills/product-demo/references/titles.md
  *
  * Words rise out of their own mask boxes, staggered, then the card holds
  * still long enough to be read and dissolves into the same dark ground the
@@ -34,7 +36,7 @@ export function TitleCard({
   name: string;
   kicker: string;
   frame: number;
-}) {
+}): ReactNode {
   const words = name.split(" ");
 
   // The whole card leaves together, onto the same dark field the app

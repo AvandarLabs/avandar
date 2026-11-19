@@ -62,7 +62,9 @@ registerStockPresetAssertions({
     },
     {
       ...DEFAULT_INPUT,
-      tasks: DEFAULT_INPUT.tasks.map((task) => ({ ...task, id: "same" })),
+      tasks: DEFAULT_INPUT.tasks.map((task) => {
+        return { ...task, id: "same" };
+      }),
     },
   ],
 });
@@ -101,10 +103,13 @@ test("interruption consumes its exact width while later task widths and deadline
     SvgAttributes.fromMarker({ markup: before, marker: "deadline-pin" }),
     SvgAttributes.fromMarker({ markup: after, marker: "deadline-pin" }),
   );
-  const tasks = (markup: string) =>
-    [...markup.matchAll(/<rect[^>]*data-task-id="[^"]*"[^>]*>/g)].map(
-      ([value]) => value,
+  const tasks = (markup: string) => {
+    return [...markup.matchAll(/<rect[^>]*data-task-id="[^"]*"[^>]*>/g)].map(
+      ([value]) => {
+        return value;
+      },
     );
+  };
   tasks(before).forEach((task, index) => {
     assert.equal(
       SvgAttributes.getNumberFromMarkup({ attributes: task, name: "width" }),
@@ -128,10 +133,12 @@ test("interruption consumes its exact width while later task widths and deadline
 test("fully consumed reserve is zero without squeezing maximum task quantities", () => {
   const input: Input = {
     ...FIXTURES[2].input,
-    tasks: FIXTURES[2].input.tasks.map((task, index) => ({
-      ...task,
-      duration: [4, 4, 4, 1][index],
-    })),
+    tasks: FIXTURES[2].input.tasks.map((task, index) => {
+      return {
+        ...task,
+        duration: [4, 4, 4, 1][index],
+      };
+    }),
     reserveUnits: 1,
     interruption: { ...FIXTURES[2].input.interruption, duration: 1 },
   };

@@ -40,15 +40,17 @@ export function SurveillanceReportingBackfill({
         strokeWidth={3}
       />
       <BackfillChart input={input} frame={frame} accent={accent} />
-      {input.records.map((record, index) => (
-        <LabelSlots
-          key={record.id}
-          labels={[
-            [String(index + 1), 600, 190 + index * 28, 24, 12, 1],
-            [record.label, 630, 190 + index * 28, 280, 12, 1],
-          ]}
-        />
-      ))}
+      {input.records.map((record, index) => {
+        return (
+          <LabelSlots
+            key={record.id}
+            labels={[
+              [String(index + 1), 600, 190 + index * 28, 24, 12, 1],
+              [record.label, 630, 190 + index * 28, 280, 12, 1],
+            ]}
+          />
+        );
+      })}
     </g>
   );
 }

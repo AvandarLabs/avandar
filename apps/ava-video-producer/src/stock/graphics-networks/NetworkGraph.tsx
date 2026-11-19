@@ -52,46 +52,52 @@ export function NetworkGraph({
         })}
         color={accent}
       />
-      {input.edges.map(([a, b], i) => (
-        <g key={i}>
-          <DrawPath
-            curve={{ from: nodes[a], to: nodes[b] }}
+      {input.edges.map(([a, b], i) => {
+        return (
+          <g key={i}>
+            <DrawPath
+              curve={{ from: nodes[a], to: nodes[b] }}
+              frame={frame}
+              at={EDGE_CUE + i * motion.stagger.edge}
+              color={i < HIGHLIGHTED_EDGES ? accent : color.line}
+              opacity={
+                i < HIGHLIGHTED_EDGES
+                  ? style.highlightEdgeAlpha
+                  : style.edgeAlpha
+              }
+            />
+            {input.showPackets ? (
+              <Packet
+                frame={frame}
+                from={nodes[a]}
+                to={nodes[b]}
+                delay={i * PACKET_PHASE_STEP}
+                color={i % 3 === 0 ? color.accentAlt : accent}
+                size={i < HIGHLIGHTED_EDGES ? "md" : "sm"}
+              />
+            ) : null}
+          </g>
+        );
+      })}
+      {nodes.map((node, i) => {
+        return (
+          <CircleNode
+            key={node.label}
+            {...node}
             frame={frame}
-            at={EDGE_CUE + i * motion.stagger.edge}
-            color={i < HIGHLIGHTED_EDGES ? accent : color.line}
-            opacity={
-              i < HIGHLIGHTED_EDGES ? style.highlightEdgeAlpha : style.edgeAlpha
+            index={i}
+            accent={accent}
+            size={i === 0 ? "xl" : "sm"}
+            active={
+              i === 0
+                ? style.hubPulseFloor +
+                  wave(frame, style.hubPulsePeriod) * style.hubPulseSwing
+                : wave(frame, style.nodePulsePeriod, i * NODE_PHASE_STEP) *
+                  style.nodePulseSwing
             }
           />
-          {input.showPackets ? (
-            <Packet
-              frame={frame}
-              from={nodes[a]}
-              to={nodes[b]}
-              delay={i * PACKET_PHASE_STEP}
-              color={i % 3 === 0 ? color.accentAlt : accent}
-              size={i < HIGHLIGHTED_EDGES ? "md" : "sm"}
-            />
-          ) : null}
-        </g>
-      ))}
-      {nodes.map((node, i) => (
-        <CircleNode
-          key={node.label}
-          {...node}
-          frame={frame}
-          index={i}
-          accent={accent}
-          size={i === 0 ? "xl" : "sm"}
-          active={
-            i === 0
-              ? style.hubPulseFloor +
-                wave(frame, style.hubPulsePeriod) * style.hubPulseSwing
-              : wave(frame, style.nodePulsePeriod, i * NODE_PHASE_STEP) *
-                style.nodePulseSwing
-          }
-        />
-      ))}
+        );
+      })}
     </g>
   );
 }

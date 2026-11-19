@@ -9,9 +9,9 @@ test("ten full films cover four motion stories and two of every product relation
     "../../../storyboards/explainers/",
     import.meta.url,
   );
-  const files = (await fs.readdir(directory)).filter((name) =>
-    name.startsWith("film-"),
-  );
+  const files = (await fs.readdir(directory)).filter((name) => {
+    return name.startsWith("film-");
+  });
   assert.equal(files.length, 10);
   const categories: Record<string, number> = {};
   const productSegments: string[] = [];

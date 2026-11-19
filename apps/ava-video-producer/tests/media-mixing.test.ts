@@ -12,8 +12,8 @@ import {
 } from "../scripts/lib/mediaHelpers";
 import { fixture, temporary } from "./pipeline-test-helpers";
 
-test("audio mix preserves video packets and duration while retaining separate narration and SFX windows", async () =>
-  temporary(async (root) => {
+test("audio mix preserves video packets and duration while retaining separate narration and SFX windows", async () => {
+  return temporary(async (root) => {
     const picture = path.join(root, "picture.mp4");
     await run(
       ffmpeg,
@@ -58,12 +58,13 @@ test("audio mix preserves video packets and duration while retaining separate na
     const final = path.join(root, "final.mp4");
     assert.equal(await mixAudio(plan, root, picture, final), true);
     assert.equal(await videoHash(final), await videoHash(picture));
-    const frameHash = (filename: string) =>
-      run(
+    const frameHash = (filename: string) => {
+      return run(
         ffmpeg,
         ["-v", "error", "-i", filename, "-map", "0:v:0", "-f", "framemd5", "-"],
         { quiet: true },
       );
+    };
     assert.equal(await frameHash(final), await frameHash(picture));
     assert.ok(Math.abs((await probe(final)).duration - 2) < 0.08);
     assert.ok((await audioPeak(final, 0.2, 0.2)) > -50, "narration survived");
@@ -87,4 +88,5 @@ test("audio mix preserves video packets and duration while retaining separate na
       mixAudio(wrongDuration, root, picture, path.join(root, "wrong.mp4")),
       /duration/i,
     );
-  }));
+  });
+});

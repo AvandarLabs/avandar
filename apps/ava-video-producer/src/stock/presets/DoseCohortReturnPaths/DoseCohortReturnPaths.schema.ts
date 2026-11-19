@@ -59,7 +59,9 @@ export const inputSchema = z
       if (
         ids.size !== input.visits.length ||
         participant.records.length !== input.visits.length ||
-        input.visits.some((visit) => !ids.has(visit.id))
+        input.visits.some((visit) => {
+          return !ids.has(visit.id);
+        })
       ) {
         context.addIssue({
           code: "custom",

@@ -17,15 +17,16 @@ registerStockPresetAssertions({
   defaultInput: DEFAULT_INPUT,
   fixtures,
   contract: readinessLatchContract,
-  render: ({ frame, input }) =>
-    `${_render({ frame, input })}${_render({
+  render: ({ frame, input }) => {
+    return `${_render({ frame, input })}${_render({
       frame,
       input: {
         ...input,
         orientation:
           input.orientation === "horizontal" ? "vertical" : "horizontal",
       },
-    })}`,
+    })}`;
+  },
   excludedTextFields: ["id", "orientation"],
   getVisibleTexts: _getVisibleTextsFromInput,
   textFrames: [24, 80, 150],
@@ -42,10 +43,12 @@ registerStockPresetAssertions({
     },
     {
       ...DEFAULT_INPUT,
-      participants: DEFAULT_INPUT.participants.map((participant) => ({
-        ...participant,
-        workUnits: 0,
-      })),
+      participants: DEFAULT_INPUT.participants.map((participant) => {
+        return {
+          ...participant,
+          workUnits: 0,
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
@@ -142,8 +145,8 @@ test("dense branch geometry stays on canvas through each orientation and complet
         const markup = _render({ frame, input });
         input.participants.forEach(({ id }) => {
           const pin = _getAttributesFromMarkup({ markup, id, kind: "pin" });
-          ["x1", "x2"].forEach((attribute) =>
-            assert.ok(
+          ["x1", "x2"].forEach((attribute) => {
+            return assert.ok(
               SvgAttributes.getNumberFromMarkup({
                 attributes: pin,
                 name: attribute,
@@ -152,10 +155,10 @@ test("dense branch geometry stays on canvas through each orientation and complet
                   attributes: pin,
                   name: attribute,
                 }) <= 960,
-            ),
-          );
-          ["y1", "y2"].forEach((attribute) =>
-            assert.ok(
+            );
+          });
+          ["y1", "y2"].forEach((attribute) => {
+            return assert.ok(
               SvgAttributes.getNumberFromMarkup({
                 attributes: pin,
                 name: attribute,
@@ -164,8 +167,8 @@ test("dense branch geometry stays on canvas through each orientation and complet
                   attributes: pin,
                   name: attribute,
                 }) <= 600,
-            ),
-          );
+            );
+          });
         });
       },
     );

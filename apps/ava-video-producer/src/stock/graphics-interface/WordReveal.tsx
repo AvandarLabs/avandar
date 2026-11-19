@@ -17,50 +17,56 @@ export function WordReveal({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const words = input.words.map((word, index) => ({
-    ...word,
-    ...[
-      { x: 76, y: 263, size: 91, width: 232, at: 15 },
-      { x: 329, y: 263, size: 91, width: 236, at: 23 },
-      { x: 72, y: 417, size: 137, width: 414, at: 36 },
-    ][index],
-  }));
+  const words = input.words.map((word, index) => {
+    return {
+      ...word,
+      ...[
+        { x: 76, y: 263, size: 91, width: 232, at: 15 },
+        { x: 329, y: 263, size: 91, width: 236, at: 23 },
+        { x: 72, y: 417, size: 137, width: 414, at: 36 },
+      ][index],
+    };
+  });
   return (
     <g>
       <defs>
-        {words.map((word, i) => (
-          <clipPath id={`${id}-word-${i}`} key={word.word}>
-            <rect
-              x={word.x - 2}
-              y={word.y - word.size}
-              width={word.width}
-              height={word.size + 8}
-            />
-          </clipPath>
-        ))}
+        {words.map((word, i) => {
+          return (
+            <clipPath id={`${id}-word-${i}`} key={word.word}>
+              <rect
+                x={word.x - 2}
+                y={word.y - word.size}
+                width={word.width}
+                height={word.size + 8}
+              />
+            </clipPath>
+          );
+        })}
       </defs>
       <Eyebrow x={80}>
         {getStockDisplayCopyFromDescriptor({
           descriptor: LEGACY_DISPLAY_COPY["word-reveal"].maskedWordReveal,
         })}
       </Eyebrow>
-      {words.map((word, i) => (
-        <g key={word.word} clipPath={`url(#${id}-word-${i})`}>
-          <g
-            transform={`translate(0 ${mix(ramp(frame, word.at, DUR.word, EASE.word), word.size * 1.12, 0)})`}
-          >
-            <Text
-              x={word.x}
-              y={word.y}
-              size={word.size}
-              fill={word.accented ? accent : STOCK.text}
-              weight={600}
+      {words.map((word, i) => {
+        return (
+          <g key={word.word} clipPath={`url(#${id}-word-${i})`}>
+            <g
+              transform={`translate(0 ${mix(ramp(frame, word.at, DUR.word, EASE.word), word.size * 1.12, 0)})`}
             >
-              {word.word}
-            </Text>
+              <Text
+                x={word.x}
+                y={word.y}
+                size={word.size}
+                fill={word.accented ? accent : STOCK.text}
+                weight={600}
+              >
+                {word.word}
+              </Text>
+            </g>
           </g>
-        </g>
-      ))}
+        );
+      })}
       {input.showArrow ? (
         <g opacity={ramp(frame, 51, DUR.sheet)}>
           <path

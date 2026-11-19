@@ -56,7 +56,9 @@ function _render({
 }
 function _cells(markup: string): string[] {
   return [...markup.matchAll(/data-cell="([^"]+)" data-state="([^"]+)"/g)].map(
-    (match) => `${match[1]}:${match[2]}`,
+    (match) => {
+      return `${match[1]}:${match[2]}`;
+    },
   );
 }
 
@@ -65,8 +67,22 @@ test("four capability states retain four distinct glyph shapes including unknown
   const paths = [
     ...markup.matchAll(/data-state-glyph="([^"]+)"[^>]*><path d="([^"]+)"/g),
   ];
-  assert.equal(new Set(paths.map((match) => match[1])).size, 4);
-  assert.equal(new Set(paths.map((match) => match[2])).size, 4);
+  assert.equal(
+    new Set(
+      paths.map((match) => {
+        return match[1];
+      }),
+    ).size,
+    4,
+  );
+  assert.equal(
+    new Set(
+      paths.map((match) => {
+        return match[2];
+      }),
+    ).size,
+    4,
+  );
   assert.ok(markup.includes('data-cell="refill:desk" data-state="unknown"'));
   assert.ok(markup.includes('data-cell="ruler:pocket" data-state="absent"'));
 });
@@ -93,7 +109,9 @@ test("row and column emphasis preserve every explicit capability value", () => {
 });
 
 test("local querying, remote invitations and optional sync retain independently authored availability", () => {
-  const input = fixtures.find(({ id }) => id === "changed")!.input;
+  const input = fixtures.find(({ id }) => {
+    return id === "changed";
+  })!.input;
   const markup = _render({ frame: 150, input });
   assert.ok(markup.includes('data-cell="query:local" data-state="included"'));
   assert.ok(markup.includes('data-cell="invite:local" data-state="absent"'));
@@ -113,12 +131,15 @@ test("default, minimum, dense and changed fixtures remain complete during backwa
   fixtures.forEach(({ input }) => {
     assert.deepEqual(inputSchema.parse(input), input);
     const frames = [0, 36, 90, 150, 179];
-    const samples = frames.map((frame) => _render({ frame, input }));
-    [...frames]
-      .reverse()
-      .forEach((frame) =>
-        assert.equal(_render({ frame, input }), samples[frames.indexOf(frame)]),
+    const samples = frames.map((frame) => {
+      return _render({ frame, input });
+    });
+    [...frames].reverse().forEach((frame) => {
+      return assert.equal(
+        _render({ frame, input }),
+        samples[frames.indexOf(frame)],
       );
+    });
     assert.equal(
       _cells(_render({ frame: 150, input })).length,
       input.capabilities.length * input.options.length,
@@ -127,9 +148,9 @@ test("default, minimum, dense and changed fixtures remain complete during backwa
 });
 
 test("strict cells reject incomplete coverage, foreign IDs, duplicate cells and impossible focus", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse({}).success, false);
   assert.equal(
     inputSchema.safeParse({ ...DEFAULT_INPUT, caption: "Q".repeat(49) })
@@ -145,9 +166,9 @@ test("the complete contract exposes nested cell controls and valid bindings", ()
     capabilityMatrixContract.controls.map(prop("path")),
     Object.keys(DEFAULT_INPUT),
   );
-  capabilityMatrixContract.bindingExamples.forEach(({ input }) =>
-    assert.equal(inputSchema.safeParse(input).success, true),
-  );
+  capabilityMatrixContract.bindingExamples.forEach(({ input }) => {
+    return assert.equal(inputSchema.safeParse(input).success, true);
+  });
 });
 
 test("accepted spaced row labels and hard breaks retain authored copy in rendered cells", async () => {

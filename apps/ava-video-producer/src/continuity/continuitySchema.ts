@@ -60,7 +60,9 @@ export const productSegmentSchema = z
         message: "Only Explorer has partial modes",
       });
   });
-/** Geometry in the validated 1600 by 840 stage, measured or authored explicitly. */
+/**
+ * Geometry in the validated 1600 by 840 stage, measured or authored explicitly.
+ */
 export const anchorSchema = z
   .object({
     x: z.number().min(0).max(1600),
@@ -69,10 +71,9 @@ export const anchorSchema = z
     height: z.number().positive().max(840),
   })
   .strict()
-  .refine(
-    (box) => box.x + box.width <= 1600 && box.y + box.height <= 840,
-    "Anchor must fit the stage",
-  );
+  .refine((box) => {
+    return box.x + box.width <= 1600 && box.y + box.height <= 840;
+  }, "Anchor must fit the stage");
 /** Frame-authored notation attached to a measured native product rectangle. */
 export const productAnnotationSchema = z
   .object({
@@ -83,7 +84,9 @@ export const productAnnotationSchema = z
     seed: z.number().int().nonnegative().default(7),
   })
   .strict()
-  .refine((cue) => cue.until > cue.at + 36, "Notation needs a reading hold");
+  .refine((cue) => {
+    return cue.until > cue.at + 36;
+  }, "Notation needs a reading hold");
 const annotations = z.array(productAnnotationSchema).max(12).optional();
 const overlay = z
   .object({
@@ -160,11 +163,11 @@ const composite = z
                 height: z.number().min(120),
               })
               .strict()
-              .refine(
-                (rect) =>
-                  rect.x + rect.width <= 960 && rect.y + rect.height <= 600,
-                "Diagram detail must fit the stock stage",
-              )
+              .refine((rect) => {
+                return (
+                  rect.x + rect.width <= 960 && rect.y + rect.height <= 600
+                );
+              }, "Diagram detail must fit the stock stage")
               .optional(),
           })
           .strict(),
@@ -207,7 +210,9 @@ export const continuityBeatSchema = z
 /** Why a continuity plan cannot set its own palette or sketch. */
 const THEMED_FIELD_MESSAGE =
   "Colours and sketch roughness come from the video theme. Set them in the theme's overrides for this composition (themes/<theme>.theme.json, overrides.<composition id>).";
-/** Strict film-use grammar shared by long explainers and isolated atlas studies. */
+/**
+ * Strict film-use grammar shared by long explainers and isolated atlas studies.
+ */
 export const continuitySchema = z
   .object({
     title: copy,
@@ -229,9 +234,16 @@ export const continuitySchema = z
   })
   .strict()
   .superRefine((plan, context) => {
-    const issue = (message: string) =>
-      context.addIssue({ code: "custom", message });
-    if (new Set(plan.beats.map((beat) => beat.id)).size !== plan.beats.length)
+    const issue = (message: string) => {
+      return context.addIssue({ code: "custom", message });
+    };
+    if (
+      new Set(
+        plan.beats.map((beat) => {
+          return beat.id;
+        }),
+      ).size !== plan.beats.length
+    )
       issue("Beat IDs must be unique");
     if (plan.beats[0].transition.frames !== 0)
       issue("The first beat has no incoming overlap");
@@ -248,7 +260,9 @@ export const continuitySchema = z
           retimeCameraTrack(
             beat.content.camera,
             beat.content.cameraOptions,
-          ).some((key) => key.at >= beat.duration)
+          ).some((key) => {
+            return key.at >= beat.duration;
+          })
         )
           issue("Camera cues must stay within their beat");
         if (
@@ -271,7 +285,11 @@ export const continuitySchema = z
         beat.content.kind === "product" ||
         beat.content.kind === "composite"
       ) {
-        if (beat.content.annotations?.some((cue) => cue.until >= beat.duration))
+        if (
+          beat.content.annotations?.some((cue) => {
+            return cue.until >= beat.duration;
+          })
+        )
           issue("Product notation must finish within its beat");
         const segment = beat.content.segment;
         if (
@@ -294,15 +312,20 @@ export const continuitySchema = z
         issue("Handoffs require the same identified object on both sides");
       if (beat.content.kind === "composite") {
         const { diagrams, signalAt } = beat.content;
-        if (diagrams.some((diagram) => diagram.overlay.until >= beat.duration))
+        if (
+          diagrams.some((diagram) => {
+            return diagram.overlay.until >= beat.duration;
+          })
+        )
           issue("Floating explanations must finish within their beat");
         if (
           diagrams[0].at !== 0 ||
-          diagrams.some(
-            (diagram, position) =>
+          diagrams.some((diagram, position) => {
+            return (
               diagram.at >= beat.duration ||
-              (position > 0 && diagram.at <= diagrams[position - 1].at),
-          )
+              (position > 0 && diagram.at <= diagrams[position - 1].at)
+            );
+          })
         )
           issue("Diagram cues must start at zero and increase within the beat");
         if (signalAt + 45 >= beat.duration)

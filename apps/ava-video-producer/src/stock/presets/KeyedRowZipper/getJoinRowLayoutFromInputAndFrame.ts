@@ -26,17 +26,17 @@ export function getJoinRowLayoutFromInputAndFrame({
   row,
   index,
 }: Readonly<Options>): GetJoinRowLayoutResult {
-  const results = input.leftRows.filter(
-    (left) =>
-      input.joinType === "left" ||
-      input.rightRows.some(propEq("key", left.key)),
-  );
+  const results = input.leftRows.filter((left) => {
+    return (
+      input.joinType === "left" || input.rightRows.some(propEq("key", left.key))
+    );
+  });
   const resultIndex = results.findIndex(propEq("key", row.key));
   const isContext = resultIndex < 0;
   const sourceRows = side === "left" ? input.leftRows : input.rightRows;
-  const contexts = sourceRows.filter(
-    (candidate) => !results.some(propEq("key", candidate.key)),
-  );
+  const contexts = sourceRows.filter((candidate) => {
+    return !results.some(propEq("key", candidate.key));
+  });
   const targetY = isContext
     ? 450 + contexts.findIndex(propEq("key", row.key)) * 44
     : 154 + resultIndex * 66;

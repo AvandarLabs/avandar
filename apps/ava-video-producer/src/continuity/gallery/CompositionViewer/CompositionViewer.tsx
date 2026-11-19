@@ -10,6 +10,7 @@ import { useCompositionAppearance } from "./useCompositionAppearance";
 import { useCompositionPlayer } from "./useCompositionPlayer";
 import { VocabularyGuide } from "./VocabularyGuide/VocabularyGuide";
 import type { ContinuityCatalogEntry } from "../../continuityCatalog";
+import type { ReactNode } from "react";
 
 type Props = {
   selected: ContinuityCatalogEntry;
@@ -17,8 +18,15 @@ type Props = {
   onOptions: (options: { id: string; captions: boolean }) => void;
 };
 
-/** One live composition with matching exports, its design tokens, and reusable study guidance. */
-export function CompositionViewer({ selected, captions, onOptions }: Props) {
+/**
+ * One live composition with matching exports, its design tokens, and reusable
+ * study guidance.
+ */
+export function CompositionViewer({
+  selected,
+  captions,
+  onOptions,
+}: Props): ReactNode {
   const player = useRef<HTMLIFrameElement>(null);
   const isScene = isSceneEntry(selected);
   const appearance = useCompositionAppearance(selected.id, player, isScene);

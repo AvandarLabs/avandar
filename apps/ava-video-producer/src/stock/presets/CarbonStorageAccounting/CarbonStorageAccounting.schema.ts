@@ -42,8 +42,9 @@ export const inputSchema = z
     }),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     if (input.capture.releasedTonnesCO2 > input.capture.capturedTonnesCO2) {
       issue("capture", "Released cannot exceed captured CO2.");
     }

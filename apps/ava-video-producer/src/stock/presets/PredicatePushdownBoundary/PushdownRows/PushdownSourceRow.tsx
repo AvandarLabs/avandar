@@ -19,7 +19,10 @@ type Props = Readonly<{
   accent: string;
 }>;
 
-/** An original row, with a gate closing in front of it when the predicate rejects it. */
+/**
+ * An original row, with a gate closing in front of it when the predicate
+ * rejects it.
+ */
 export function PushdownSourceRow({
   frame,
   row,

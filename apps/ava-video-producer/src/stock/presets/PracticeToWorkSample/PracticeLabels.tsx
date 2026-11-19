@@ -31,14 +31,16 @@ export function PracticeLabels({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => (
-        <FitText
-          key={index}
-          {...{ text, x, y, width, fontSize, maxLines, color }}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => {
+        return (
+          <FitText
+            key={index}
+            {...{ text, x, y, width, fontSize, maxLines, color }}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

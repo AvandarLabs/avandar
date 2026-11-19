@@ -14,27 +14,31 @@ export function getJobSlotFromInput({
   }
 >): GetJobSlotResult {
   const job = input.jobs[index];
-  const hostIndex = input.hosts.findIndex(({ id }) => id === job[placement]);
+  const hostIndex = input.hosts.findIndex(({ id }) => {
+    return id === job[placement];
+  });
   const maxCapacity = Math.max(...input.hosts.map(prop("capacityCpuHours")));
-  const unchanged = input.jobs.filter(
-    (item) =>
+  const unchanged = input.jobs.filter((item) => {
+    return (
       item.initialHostId === item.finalHostId &&
-      item[placement] === job[placement],
-  );
+      item[placement] === job[placement]
+    );
+  });
   const before =
     job.initialHostId === job.finalHostId
       ? unchanged.slice(0, unchanged.indexOf(job))
       : [
           ...unchanged,
-          ...input.jobs
-            .slice(0, index)
-            .filter(
-              (item) =>
-                item.initialHostId !== item.finalHostId &&
-                item[placement] === job[placement],
-            ),
+          ...input.jobs.slice(0, index).filter((item) => {
+            return (
+              item.initialHostId !== item.finalHostId &&
+              item[placement] === job[placement]
+            );
+          }),
         ];
-  const used = before.reduce((sum, item) => sum + item.cpuHours, 0);
+  const used = before.reduce((sum, item) => {
+    return sum + item.cpuHours;
+  }, 0);
   return {
     width: 80,
     x: 75 + hostIndex * 215,

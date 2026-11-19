@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import css from "./parts.module.css";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   title: string;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 /** An abstract card: a title and two placeholder text bars. */
-export function DemoCard({ title, style, className }: Props) {
+export function DemoCard({ title, style, className }: Props): ReactNode {
   return (
     <div className={clsx(css.card, className)} style={style}>
       <span className={css.cardTitle}>{title}</span>

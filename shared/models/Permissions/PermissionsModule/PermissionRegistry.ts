@@ -124,7 +124,6 @@ export const PermissionRegistry = {
       "settings__can_manage_workspace_users",
       "settings__can_manage_roles_and_tags",
       "settings__can_manage_billing",
-      "settings__can_manage_plugins",
     ] as const,
   },
 } as const satisfies PermissionRegistryType;

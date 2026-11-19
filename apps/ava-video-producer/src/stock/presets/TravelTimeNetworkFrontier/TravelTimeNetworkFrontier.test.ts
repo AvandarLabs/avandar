@@ -215,9 +215,9 @@ test("network labels and road ledger retain clear paint at maximum density", () 
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -226,14 +226,18 @@ test("maximum, empty and exact Unicode references preserve IDs and reject oversi
   assert.deepEqual(inputSchema.parse(input), input);
   const renamed = {
     ...input,
-    nodes: input.nodes.map((node, index) => ({
-      ...node,
-      id: index === 2 ? "界".repeat(12) : node.id,
-    })),
-    roads: input.roads.map((road) => ({
-      ...road,
-      toId: road.toId === "界" ? "界".repeat(12) : road.toId,
-    })),
+    nodes: input.nodes.map((node, index) => {
+      return {
+        ...node,
+        id: index === 2 ? "界".repeat(12) : node.id,
+      };
+    }),
+    roads: input.roads.map((road) => {
+      return {
+        ...road,
+        toId: road.toId === "界" ? "界".repeat(12) : road.toId,
+      };
+    }),
   };
   assert.deepEqual(
     _values({
@@ -269,12 +273,17 @@ function _getReachedRoadGeometry({
     attribute: "data-frontier-road",
   });
   return matches.tags
-    .filter((_, index) => matches.values[index] === roadId)
-    .map((tag) =>
-      ["x1", "y1", "x2", "y2"].map((attribute) =>
-        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: attribute }),
-      ),
-    );
+    .filter((_, index) => {
+      return matches.values[index] === roadId;
+    })
+    .map((tag) => {
+      return ["x1", "y1", "x2", "y2"].map((attribute) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: attribute,
+        });
+      });
+    });
 }
 test("cyclic roads propagate actual reached intervals from both endpoints without changing shortest costs", () => {
   const input = inputSchema.parse({
@@ -344,15 +353,15 @@ test("equal-cost endpoint frontiers merge meeting and overlapping intervals into
       [360, 218, 408, 218],
     ],
   );
-  [6, 7, 40].forEach((budgetMinutes) =>
-    assert.deepEqual(
+  [6, 7, 40].forEach((budgetMinutes) => {
+    return assert.deepEqual(
       _getReachedRoadGeometry({
         markup: _render({ frame: 150, input: { ...input, budgetMinutes } }),
         roadId: "ab",
       }),
       [[168, 218, 408, 218]],
-    ),
-  );
+    );
+  });
   assert.deepEqual(
     _values({
       markup: _render({ frame: 150, input: input }),

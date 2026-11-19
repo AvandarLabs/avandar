@@ -12,16 +12,18 @@ export function CoordinationPlaceConnections({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.places.map((place, index) => (
-        <path
-          key={place.id}
-          data-place-connector={place.id}
-          d={`M322 ${120 + 108 * index} L330 ${120 + 108 * index} L${340 + place.x * 270} ${160 + place.y * 280}`}
-          fill="none"
-          stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
-          strokeWidth={1.5}
-        />
-      ))}
+      {input.places.map((place, index) => {
+        return (
+          <path
+            key={place.id}
+            data-place-connector={place.id}
+            d={`M322 ${120 + 108 * index} L330 ${120 + 108 * index} L${340 + place.x * 270} ${160 + place.y * 280}`}
+            fill="none"
+            stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+            strokeWidth={1.5}
+          />
+        );
+      })}
     </g>
   );
 }

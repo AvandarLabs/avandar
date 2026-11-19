@@ -14,7 +14,11 @@ export function OutreachLedger({
 }: Readonly<Props>): ReactNode {
   const visited = new Set(completed.map(prop("householdId")));
   const contactedHouseholds = new Set(
-    completed.filter(({ contacted }) => contacted).map(prop("householdId")),
+    completed
+      .filter(({ contacted }) => {
+        return contacted;
+      })
+      .map(prop("householdId")),
   );
   const rows = [
     {
@@ -56,8 +60,8 @@ export function OutreachLedger({
   ];
   return (
     <g>
-      {rows.map((row, index) =>
-        row.visible ? (
+      {rows.map((row, index) => {
+        return row.visible ? (
           <g key={index}>
             <FitText
               text={String(row.value)}
@@ -81,8 +85,8 @@ export function OutreachLedger({
               normalizeWhitespace
             />
           </g>
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

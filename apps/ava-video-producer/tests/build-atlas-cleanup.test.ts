@@ -34,7 +34,8 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
       await fs.copyFile(filename, destination);
     }),
   );
-  // Isolate esbuild's real context lifecycle from palette and theme input refreshing.
+  // Isolate esbuild's real context lifecycle from palette and theme input
+  // refreshing.
   await fs.writeFile(
     path.join(root, "scripts/buildAtlas/createGalleryPlugin.mjs"),
     'export function createGalleryPlugin() { return { name: "fixture", setup() {} }; }',

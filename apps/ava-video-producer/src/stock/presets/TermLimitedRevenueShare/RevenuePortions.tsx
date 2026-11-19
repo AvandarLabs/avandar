@@ -22,7 +22,9 @@ export function RevenuePortions({
     <g>
       {amounts.map((amount, portion) => {
         const offset =
-          (amounts.slice(0, portion).reduce((sum, value) => sum + value, 0) *
+          (amounts.slice(0, portion).reduce((sum, value) => {
+            return sum + value;
+          }, 0) *
             340) /
           receipts;
         const color = [STOCK.cyan, STOCK.orange, accent][portion];

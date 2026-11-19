@@ -21,13 +21,15 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
         ]}
       />
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
-        (quantity, index) => (
-          <g key={index} opacity={ramp(frame, 108 + index * STAGGER)}>
-            <Text x={40 + index * 310} y={552} size={24}>
-              {countTo(frame, 108 + index * STAGGER, quantity, 28)}
-            </Text>
-          </g>
-        ),
+        (quantity, index) => {
+          return (
+            <g key={index} opacity={ramp(frame, 108 + index * STAGGER)}>
+              <Text x={40 + index * 310} y={552} size={24}>
+                {countTo(frame, 108 + index * STAGGER, quantity, 28)}
+              </Text>
+            </g>
+          );
+        },
       )}
     </g>
   );

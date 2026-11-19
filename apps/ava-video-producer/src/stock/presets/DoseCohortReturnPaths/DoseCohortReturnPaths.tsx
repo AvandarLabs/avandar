@@ -21,26 +21,30 @@ export function DoseCohortReturnPaths({
       <text x={415} y={60} fill={STOCK.text} fontSize={18}>
         {input.participants.length}
       </text>
-      {input.visits.map((visit, index) => (
-        <VisitHeader
-          key={visit.id}
-          input={input}
-          visit={visit}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
-      {input.participants.map((participant, index) => (
-        <CohortLane
-          key={participant.id}
-          input={input}
-          participant={participant}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.visits.map((visit, index) => {
+        return (
+          <VisitHeader
+            key={visit.id}
+            input={input}
+            visit={visit}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      {input.participants.map((participant, index) => {
+        return (
+          <CohortLane
+            key={participant.id}
+            input={input}
+            participant={participant}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <CohortLegend input={input} />
     </g>
   );

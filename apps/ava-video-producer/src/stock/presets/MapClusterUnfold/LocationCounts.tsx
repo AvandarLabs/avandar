@@ -11,16 +11,17 @@ function _getLocations({ input, grouping }: Readonly<Omit<Props, "accent">>) {
     return getClusterPointPositionFromPoint({ point, cluster, grouping });
   });
   return positions
-    .filter(
-      (position, index) =>
-        positions.findIndex(
-          (other) => other.x === position.x && other.y === position.y,
-        ) === index,
-    )
-    .map((position) => {
-      const members = positions.filter(
-        (other) => other.x === position.x && other.y === position.y,
+    .filter((position, index) => {
+      return (
+        positions.findIndex((other) => {
+          return other.x === position.x && other.y === position.y;
+        }) === index
       );
+    })
+    .map((position) => {
+      const members = positions.filter((other) => {
+        return other.x === position.x && other.y === position.y;
+      });
       return {
         x: position.x,
         y: position.y,
@@ -38,32 +39,35 @@ export function LocationCounts({
   return (
     <g>
       {_getLocations({ input, grouping })
-        .filter(
-          (location) =>
+        .filter((location) => {
+          return (
             grouping === 0 ||
             grouping === 1 ||
-            (location.hasStationaryMember && location.numMembers > 1),
-        )
-        .map((location, index) => (
-          <g key={index} data-location-count={location.numMembers}>
-            <circle
-              cx={location.x}
-              cy={location.y}
-              r={14}
-              fill={STOCK.elevated}
-              stroke={accent}
-            />
-            <text
-              x={location.x}
-              y={location.y + 4}
-              textAnchor="middle"
-              fontSize={12}
-              fill={STOCK.text}
-            >
-              {location.numMembers}
-            </text>
-          </g>
-        ))}
+            (location.hasStationaryMember && location.numMembers > 1)
+          );
+        })
+        .map((location, index) => {
+          return (
+            <g key={index} data-location-count={location.numMembers}>
+              <circle
+                cx={location.x}
+                cy={location.y}
+                r={14}
+                fill={STOCK.elevated}
+                stroke={accent}
+              />
+              <text
+                x={location.x}
+                y={location.y + 4}
+                textAnchor="middle"
+                fontSize={12}
+                fill={STOCK.text}
+              >
+                {location.numMembers}
+              </text>
+            </g>
+          );
+        })}
     </g>
   );
 }

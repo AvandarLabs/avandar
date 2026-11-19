@@ -20,20 +20,22 @@ export function TallyMarks({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {records.map((record, index) => (
-        <path
-          key={record.id}
-          data-tally-record={record.id}
-          d={`M${768 + index * 16.875} ${y - 7} v14`}
-          stroke={accent}
-          strokeWidth={2}
-          opacity={ramp(
-            frame,
-            91 + input.records.findIndex(propEq("id", record.id)) * 3,
-            20,
-          )}
-        />
-      ))}
+      {records.map((record, index) => {
+        return (
+          <path
+            key={record.id}
+            data-tally-record={record.id}
+            d={`M${768 + index * 16.875} ${y - 7} v14`}
+            stroke={accent}
+            strokeWidth={2}
+            opacity={ramp(
+              frame,
+              91 + input.records.findIndex(propEq("id", record.id)) * 3,
+              20,
+            )}
+          />
+        );
+      })}
     </g>
   );
 }

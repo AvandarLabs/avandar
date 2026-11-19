@@ -49,13 +49,13 @@ test("a changed pixel inside an allowed region counts as differing but explained
 });
 
 test("frames of different sizes are rejected", () => {
-  assert.throws(() =>
-    compareRgbaFrames({
+  assert.throws(() => {
+    return compareRgbaFrames({
       reference: _frame(),
       current: Uint8Array.from([0, 0, 0, 255]),
       width: 2,
       height: 1,
       allowedRegions: [],
-    }),
-  );
+    });
+  });
 });

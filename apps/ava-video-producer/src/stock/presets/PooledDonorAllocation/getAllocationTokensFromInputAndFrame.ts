@@ -31,18 +31,19 @@ function _getPlacement({
   const token = identities[index];
   const destinations = [...input.requests.map(prop("id")), null];
   const groupIndex = destinations.indexOf(token.requestId);
-  const counts = destinations.map(
-    (id) => identities.filter(({ requestId }) => requestId === id).length,
-  );
+  const counts = destinations.map((id) => {
+    return identities.filter(({ requestId }) => {
+      return requestId === id;
+    }).length;
+  });
   const precedingColumns = counts
     .slice(0, groupIndex)
-    .reduce(
-      (sum, numDestinationTokens) => sum + Math.min(7, numDestinationTokens),
-      0,
-    );
-  const ordinal = identities
-    .slice(0, index)
-    .filter(({ requestId }) => requestId === token.requestId).length;
+    .reduce((sum, numDestinationTokens) => {
+      return sum + Math.min(7, numDestinationTokens);
+    }, 0);
+  const ordinal = identities.slice(0, index).filter(({ requestId }) => {
+    return requestId === token.requestId;
+  }).length;
   const column = ordinal % 7;
   const row = Math.floor(ordinal / 7);
   const fanOffset =

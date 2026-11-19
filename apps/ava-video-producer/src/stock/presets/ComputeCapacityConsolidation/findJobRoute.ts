@@ -14,15 +14,16 @@ function _isClear({ from, to, height, obstacles }: Readonly<Options>): boolean {
     top = Math.min(from.y, to.y);
   const right = Math.max(from.x, to.x) + 80,
     bottom = Math.max(from.y, to.y) + height;
-  return obstacles.every(
-    (rectangle) =>
+  return obstacles.every((rectangle) => {
+    return (
       Math.min(right, rectangle.x + rectangle.width) -
         Math.max(left, rectangle.x) <=
         1e-9 ||
       Math.min(bottom, rectangle.y + rectangle.height) -
         Math.max(top, rectangle.y) <=
-        1e-9,
-  );
+        1e-9
+    );
+  });
 }
 function _createGrid({ from, to, height, obstacles }: Readonly<Options>): Grid {
   const columns = [
@@ -30,28 +31,34 @@ function _createGrid({ from, to, height, obstacles }: Readonly<Options>): Grid {
     825,
     from.x,
     to.x,
-    ...obstacles.flatMap((rectangle) => [
-      rectangle.x - 80,
-      rectangle.x + rectangle.width,
-    ]),
+    ...obstacles.flatMap((rectangle) => {
+      return [rectangle.x - 80, rectangle.x + rectangle.width];
+    }),
   ];
   const rows = [
     100,
     370 - height,
     from.y,
     to.y,
-    ...obstacles.flatMap((rectangle) => [
-      rectangle.y - height,
-      rectangle.y + rectangle.height,
-    ]),
+    ...obstacles.flatMap((rectangle) => {
+      return [rectangle.y - height, rectangle.y + rectangle.height];
+    }),
   ];
   return {
     columns: [...new Set(columns)]
-      .filter((x) => x >= 55 && x <= 825)
-      .sort((a, b) => a - b),
+      .filter((x) => {
+        return x >= 55 && x <= 825;
+      })
+      .sort((a, b) => {
+        return a - b;
+      }),
     rows: [...new Set(rows)]
-      .filter((y) => y >= 100 && y <= 370 - height)
-      .sort((a, b) => a - b),
+      .filter((y) => {
+        return y >= 100 && y <= 370 - height;
+      })
+      .sort((a, b) => {
+        return a - b;
+      }),
   };
 }
 function _getIndex({
@@ -86,11 +93,14 @@ function _getNeighbors({
     [column - 1, row],
     [column, row - 1],
   ]
-    .filter(
-      ([x, y]) =>
-        x >= 0 && x < grid.columns.length && y >= 0 && y < grid.rows.length,
-    )
-    .map(([x, y]) => x * grid.rows.length + y);
+    .filter(([x, y]) => {
+      return (
+        x >= 0 && x < grid.columns.length && y >= 0 && y < grid.rows.length
+      );
+    })
+    .map(([x, y]) => {
+      return x * grid.rows.length + y;
+    });
 }
 function _createPoints({
   grid,
@@ -108,15 +118,16 @@ function _createPoints({
     current = parents.get(current)!;
   }
   const points = reversed.reverse();
-  return points.filter(
-    (point, index) =>
+  return points.filter((point, index) => {
+    return (
       index === 0 ||
       index === points.length - 1 ||
       !(
         (points[index - 1].x === point.x && point.x === points[index + 1].x) ||
         (points[index - 1].y === point.y && point.y === points[index + 1].y)
-      ),
-  );
+      )
+    );
+  });
 }
 /**
  * Finds an axis-aligned route whose entire swept rectangle clears every job.

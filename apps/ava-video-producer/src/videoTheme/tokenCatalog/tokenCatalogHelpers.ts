@@ -17,7 +17,9 @@ export const VIDEO_TOKEN_CATALOG = {
   components: COMPONENT_TOKENS,
 } as const;
 
-/** One catalog leaf and its token path. A scale is listed once, by its own path. */
+/**
+ * One catalog leaf and its token path. A scale is listed once, by its own path.
+ */
 export type CatalogEntry = Readonly<{
   path: string;
   definition: TokenDefinition;
@@ -36,9 +38,9 @@ function _listNode(node: CatalogNode, path: readonly string[]): CatalogEntry[] {
   if (isTokenScale(node)) {
     return [{ path: path.join("."), definition: node.scale, isScale: true }];
   }
-  return Object.entries(node).flatMap(([key, child]) =>
-    _listNode(child, [...path, key]),
-  );
+  return Object.entries(node).flatMap(([key, child]) => {
+    return _listNode(child, [...path, key]);
+  });
 }
 
 /**

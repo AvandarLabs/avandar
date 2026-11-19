@@ -38,9 +38,9 @@ export function getPickerCopyFromFrame({
   const laneRank =
     isMode && groups.length > 3
       ? [...destinations]
-          .sort(
-            (first, second) => first.y - second.y || first.index - second.index,
-          )
+          .sort((first, second) => {
+            return first.y - second.y || first.index - second.index;
+          })
           .findIndex(propEq("index", index))
       : index;
   const sourceX =

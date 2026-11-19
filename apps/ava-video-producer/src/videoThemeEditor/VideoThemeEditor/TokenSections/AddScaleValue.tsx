@@ -7,6 +7,7 @@ import {
   type TokenRow as TokenRowModel,
   type TokenRowGroup,
 } from "../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 type Props = TokenRowGroup &
   Readonly<{
@@ -15,7 +16,7 @@ type Props = TokenRowGroup &
   }>;
 
 /** Adds a new value to an atomic scale, starting from its kind's default. */
-export function AddScaleValue({ group, allRows }: Props) {
+export function AddScaleValue({ group, allRows }: Props): ReactNode {
   const editor = useTokenEditor();
   const scalePath = `atomic.${group.split(":")[1]}`;
   const kind = getTokenDefinitionFromPath(`${scalePath}.entry`)?.kind;
@@ -26,12 +27,12 @@ export function AddScaleValue({ group, allRows }: Props) {
     <Button
       size="compact-xs"
       variant="subtle"
-      onClick={() =>
-        editor.setToken(
+      onClick={() => {
+        return editor.setToken(
           `${scalePath}.${buildNextCustomScaleKey({ rows: allRows, group })}`,
           getDefaultLiteralFromKind(kind),
-        )
-      }
+        );
+      }}
     >
       {"Add value"}
     </Button>

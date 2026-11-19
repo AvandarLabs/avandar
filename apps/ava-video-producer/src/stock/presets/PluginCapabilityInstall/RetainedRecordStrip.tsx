@@ -12,9 +12,14 @@ export function RetainedRecordStrip({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.records.map((record, index) => (
-        <RetainedRecord key={record.id} {...{ record, index, input, accent }} />
-      ))}
+      {input.records.map((record, index) => {
+        return (
+          <RetainedRecord
+            key={record.id}
+            {...{ record, index, input, accent }}
+          />
+        );
+      })}
       {input.installation.choice === "install" ? (
         <rect
           data-counting-stencil=""

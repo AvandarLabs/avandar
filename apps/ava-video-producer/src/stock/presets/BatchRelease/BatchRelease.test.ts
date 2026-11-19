@@ -33,10 +33,12 @@ function _texts({ input }: Readonly<{ input: Input }>): string[] {
     input.boundaryLabel,
     input.destinationLabel,
     input.releaseLabel,
-    ...input.batches.flatMap((batch) => [
-      batch.label,
-      ...(input.showItemLabels ? batch.items.map(prop("label")) : []),
-    ]),
+    ...input.batches.flatMap((batch) => {
+      return [
+        batch.label,
+        ...(input.showItemLabels ? batch.items.map(prop("label")) : []),
+      ];
+    }),
   ];
 }
 registerStockPresetAssertions({
@@ -109,12 +111,12 @@ test("each released envelope preserves every member and separate groups never co
     ...markup.matchAll(/<rect[^>]*data-batch-envelope="[^"]*"[^>]*>/g),
   ];
   assert.equal(envelopes.length, 2);
-  envelopes.forEach(([envelope]) =>
-    assert.ok(
+  envelopes.forEach(([envelope]) => {
+    return assert.ok(
       SvgAttributes.getNumberFromMarkup({ attributes: envelope, name: "x" }) >
         500,
-    ),
-  );
+    );
+  });
   input.batches.forEach((batch) => {
     batch.items.forEach((item) => {
       assert.ok(
@@ -126,8 +128,8 @@ test("each released envelope preserves every member and separate groups never co
   });
   assert.equal([...markup.matchAll(/data-item-id=/g)].length, 6);
   const tokens = [...markup.matchAll(/<rect[^>]*data-item-id="[^"]*"[^>]*>/g)];
-  tokens.forEach(([token]) =>
-    assert.ok(
+  tokens.forEach(([token]) => {
+    return assert.ok(
       SvgAttributes.getNumberFromMarkup({ attributes: token, name: "x" }) >
         500 &&
         SvgAttributes.getNumberFromMarkup({ attributes: token, name: "x" }) +
@@ -136,11 +138,13 @@ test("each released envelope preserves every member and separate groups never co
             name: "width",
           }) <=
           920,
-    ),
-  );
+    );
+  });
 });
 test("maximum-density item tokens stay within the canvas through each staggered arrival", () => {
-  Array.from({ length: 151 }, (_, frame) => frame).forEach((frame) => {
+  Array.from({ length: 151 }, (_, frame) => {
+    return frame;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: FIXTURES[2].input });
     [...markup.matchAll(/<rect[^>]*data-item-id="[^"]*"[^>]*>/g)].forEach(
       ([token]) => {

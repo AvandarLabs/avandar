@@ -30,28 +30,34 @@ export function OrderedLockAcquisition({
           [input.copy.context, 50, 595, 850, 14, 1],
         ]}
       />
-      {input.resources.map((resource, index) => (
-        <g key={resource.id}>
-          <rect
-            x={340 + index * 260}
-            y={55}
-            width={240}
-            height={84}
-            rx={6}
-            fill={STOCK.elevated}
-            stroke={STOCK.line}
-          />
-          <LabelSlots
-            labels={[[resource.label, 350 + index * 260, 72, 190, 14, 3]]}
-          />
-          <LiteralDataText value={resource.id} x={350 + index * 260} y={128} />
-        </g>
-      ))}
+      {input.resources.map((resource, index) => {
+        return (
+          <g key={resource.id}>
+            <rect
+              x={340 + index * 260}
+              y={55}
+              width={240}
+              height={84}
+              rx={6}
+              fill={STOCK.elevated}
+              stroke={STOCK.line}
+            />
+            <LabelSlots
+              labels={[[resource.label, 350 + index * 260, 72, 190, 14, 3]]}
+            />
+            <LiteralDataText
+              value={resource.id}
+              x={350 + index * 260}
+              y={128}
+            />
+          </g>
+        );
+      })}
       {frame < 53
         ? input.operations.map((operation, index) => {
-            const resourceIndex = input.resources.findIndex(
-              ({ id }) => id === operation.requestedIds[0],
-            );
+            const resourceIndex = input.resources.findIndex(({ id }) => {
+              return id === operation.requestedIds[0];
+            });
             return (
               <path
                 key={operation.id}
@@ -65,16 +71,18 @@ export function OrderedLockAcquisition({
             );
           })
         : null}
-      {input.operations.map((operation, index) => (
-        <LockOperation
-          key={operation.id}
-          frame={frame}
-          input={input}
-          operation={operation}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.operations.map((operation, index) => {
+        return (
+          <LockOperation
+            key={operation.id}
+            frame={frame}
+            input={input}
+            operation={operation}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
       {input.resources.map((resource, resourceIndex) => {
         const state = getLockStateFromFrame({ frame, input, resourceIndex });
         return (

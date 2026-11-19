@@ -15,8 +15,9 @@ import type { ContinuityVocabularyEntry } from "../../continuityCatalog";
 
 // Scene studies name shot fields instead; sceneStudies.test.ts checks them.
 const CONTINUITY_STUDIES = CONTINUITY_CATALOG.filter(
-  (entry): entry is ContinuityVocabularyEntry =>
-    entry.family === "vocabulary" && !isSceneEntry(entry),
+  (entry): entry is ContinuityVocabularyEntry => {
+    return entry.family === "vocabulary" && !isSceneEntry(entry);
+  },
 );
 const INITIAL_STATE = {
   family: "films" as const,
@@ -58,12 +59,12 @@ test("reopening the active entry retains its current live caption choice", () =>
 });
 
 test("unknown or other-section entries leave the open preview unchanged", () => {
-  ["missing-film", "shared-object-handoff"].forEach((id) =>
-    assert.deepEqual(
+  ["missing-film", "shared-object-handoff"].forEach((id) => {
+    return assert.deepEqual(
       gallerySelectionReducer(INITIAL_STATE, { type: "open", id }),
       INITIAL_STATE,
-    ),
-  );
+    );
+  });
 });
 
 test("closing the preview forgets its caption state", () => {
@@ -81,59 +82,79 @@ test("the visible entries are the section's family, in the chosen category, matc
     category: "transitions",
   });
   assert.ok(transitions.length > 0);
-  assert.ok(transitions.every((entry) => entry.category === "transitions"));
+  assert.ok(
+    transitions.every((entry) => {
+      return entry.category === "transitions";
+    }),
+  );
   assert.deepEqual(
     filterCompositionEntries({ ...studies, query: "UNDERLINE" }).map(
-      (entry) => entry.id,
+      (entry) => {
+        return entry.id;
+      },
     ),
     ["teaching-underline"],
   );
   assert.ok(
-    filterCompositionEntries(INITIAL_STATE).every(
-      (entry) => entry.family === "films",
-    ),
+    filterCompositionEntries(INITIAL_STATE).every((entry) => {
+      return entry.family === "films";
+    }),
   );
 });
 
 test("each category counts only its own section's entries", () => {
   const counts = countCompositionCategories("vocabulary");
   assert.equal(
-    counts.reduce((total, category) => total + category.count, 0),
-    CONTINUITY_CATALOG.filter((entry) => entry.family === "vocabulary").length,
+    counts.reduce((total, category) => {
+      return total + category.count;
+    }, 0),
+    CONTINUITY_CATALOG.filter((entry) => {
+      return entry.family === "vocabulary";
+    }).length,
   );
-  assert.ok(counts.every((category) => category.count > 0));
+  assert.ok(
+    counts.every((category) => {
+      return category.count > 0;
+    }),
+  );
 });
 
 test("vocabulary links resolve to full films and controls name actual beat schema fields", () => {
   const fields = new Set([
     "beats[].duration",
-    ...continuityBeatSchema.shape.transition
-      .keyof()
-      .options.map((key) => `beats[].transition.${key}`),
+    ...continuityBeatSchema.shape.transition.keyof().options.map((key) => {
+      return `beats[].transition.${key}`;
+    }),
     ...continuityBeatSchema.shape.token
       .unwrap()
       .keyof()
-      .options.map((key) => `beats[].token.${key}`),
-    ...continuityBeatSchema.shape.content.options.flatMap((variant) =>
-      variant.keyof().options.map((key) => `beats[].content.${key}`),
-    ),
-    ...continuityBeatSchema.shape.content.options.flatMap((variant) =>
-      "diagrams" in variant.shape
-        ? variant.shape.diagrams.element
-            .keyof()
-            .options.map((key) => `beats[].content.diagrams[].${key}`)
-        : [],
-    ),
+      .options.map((key) => {
+        return `beats[].token.${key}`;
+      }),
+    ...continuityBeatSchema.shape.content.options.flatMap((variant) => {
+      return variant.keyof().options.map((key) => {
+        return `beats[].content.${key}`;
+      });
+    }),
+    ...continuityBeatSchema.shape.content.options.flatMap((variant) => {
+      return "diagrams" in variant.shape
+        ? variant.shape.diagrams.element.keyof().options.map((key) => {
+            return `beats[].content.diagrams[].${key}`;
+          })
+        : [];
+    }),
   ]);
   CONTINUITY_STUDIES.forEach((entry) => {
     assert.equal(
-      CONTINUITY_CATALOG.find((film) => film.id === entry.sourceFilm)?.family,
+      CONTINUITY_CATALOG.find((film) => {
+        return film.id === entry.sourceFilm;
+      })?.family,
       "films",
     );
     assert.ok(entry.controls.length > 0, entry.id);
-    entry.controls.forEach((control) =>
-      assert.ok(fields.has(control.path), control.path),
-    );
+    entry.controls.forEach((control) => {
+      return assert.ok(fields.has(control.path), control.path);
+    });
   });
 });
 
@@ -153,12 +174,12 @@ test("each reusable control applies to its study's actual authored beat content"
       if (shot.scene !== "continuity") {
         return;
       }
-      entry.controls.forEach((control) =>
-        assert.ok(
+      entry.controls.forEach((control) => {
+        return assert.ok(
           hasControlPath(shot.props, control.path.split(".")),
           `${entry.id}: ${control.path}`,
-        ),
-      );
+        );
+      });
     }),
   );
 });

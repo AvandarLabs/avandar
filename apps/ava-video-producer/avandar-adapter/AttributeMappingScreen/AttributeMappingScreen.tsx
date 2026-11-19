@@ -4,6 +4,7 @@ import { ConceptCreatorStore } from "../../../../src/views/OntologyDesignerApp/C
 import css from "./AttributeMappingScreen.module.css";
 import { createMappingStageFromFrame } from "./createMappingStageFromFrame/createMappingStageFromFrame";
 import { MappingFields } from "./MappingFields";
+import type { ReactNode } from "react";
 
 type Props = { frame: number; width: number; height: number };
 
@@ -13,7 +14,11 @@ export {
 } from "./createMappingStageFromFrame/createMappingStageFromFrame";
 
 /** Original dataset mapping and manual field leaves with frame-owned values. */
-export function AttributeMappingScreen({ frame, width, height }: Props) {
+export function AttributeMappingScreen({
+  frame,
+  width,
+  height,
+}: Props): ReactNode {
   const root = useRef<HTMLDivElement>(null);
   useMappingTargets(root, frame);
   return (
@@ -86,7 +91,9 @@ function useMappingTargets(
       ?.setAttribute("data-video-target", "mapping-value-rule");
     root.current
       ?.querySelectorAll('[data-video-target="mapping-add-manual"]')
-      .forEach((button) => button.removeAttribute("data-video-target"));
+      .forEach((button) => {
+        return button.removeAttribute("data-video-target");
+      });
     const manualButtons = root.current?.querySelectorAll(
       '[data-video-target="mapping-manual-controls"] button',
     );

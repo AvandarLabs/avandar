@@ -31,7 +31,9 @@ export function ContentControls({
       <div className={styles.contentControlsHeading}>
         <h3 id="content-heading">Content</h3>
         <button
-          onClick={() => onChange(ContentDraftModule.resetFromPreset(preset))}
+          onClick={() => {
+            return onChange(ContentDraftModule.resetFromPreset(preset));
+          }}
         >
           Reset content
         </button>
@@ -40,17 +42,19 @@ export function ContentControls({
         Edit this preset for the current visit. Preview, copied JSON, and
         download use the same validated content.
       </p>
-      {stockContracts[preset].controls.map((control) => (
-        <ContentField
-          key={control.path}
-          control={control}
-          parentPath={[]}
-          itemPath={[]}
-          preset={preset}
-          state={state}
-          onChange={onChange}
-        />
-      ))}
+      {stockContracts[preset].controls.map((control) => {
+        return (
+          <ContentField
+            key={control.path}
+            control={control}
+            parentPath={[]}
+            itemPath={[]}
+            preset={preset}
+            state={state}
+            onChange={onChange}
+          />
+        );
+      })}
       <ContentFeedback state={state} />
     </section>
   );

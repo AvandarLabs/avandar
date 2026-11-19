@@ -19,10 +19,12 @@ export function PacketStream({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const lanes = input.lanes.map((lane, index) => ({
-    ...lane,
-    y: 208 + index * 102,
-  }));
+  const lanes = input.lanes.map((lane, index) => {
+    return {
+      ...lane,
+      y: 208 + index * 102,
+    };
+  });
   return (
     <g>
       <defs>
@@ -51,10 +53,9 @@ export function PacketStream({
               strokeWidth={1.5}
             />
             <g clipPath={`url(#${id}-stream)`}>
-              {Array.from(
-                { length: input.packetsPerLane },
-                (_, index) => index,
-              ).map((p) => {
+              {Array.from({ length: input.packetsPerLane }, (_, index) => {
+                return index;
+              }).map((p) => {
                 const t = loopPhase(
                   frame,
                   130,

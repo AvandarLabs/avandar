@@ -16,7 +16,9 @@ export function CatchmentGeometry({
   id,
 }: Readonly<Props>): ReactNode {
   const definitionId = `catchment-${Array.from(id)
-    .map((character) => character.codePointAt(0)?.toString(16))
+    .map((character) => {
+      return character.codePointAt(0)?.toString(16);
+    })
     .join("-")}`;
   return (
     <g>

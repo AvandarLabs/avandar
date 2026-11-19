@@ -32,16 +32,16 @@ const render: ({
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
 test("all authored fixtures are accepted and every rejection fixture fails", () => {
-  FIXTURES.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(
+  FIXTURES.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(
       inputSchema.safeParse(input).success,
       false,
       JSON.stringify(input),
-    ),
-  );
+    );
+  });
 });
 test("each artifact retains its original and one same-ID copy without pending success", () => {
   ["accepted", "awaiting-open"].forEach((transferState) => {
@@ -190,7 +190,9 @@ test("the complete loaded folio moves rigidly with the owner's contacting hand",
     return x;
   });
   assert.ok(
-    positions.every((x, index) => index === 0 || x > positions[index - 1]),
+    positions.every((x, index) => {
+      return index === 0 || x > positions[index - 1];
+    }),
   );
 });
 test("pending copy labels remain visible on a closed cover with no accepted caption", () => {

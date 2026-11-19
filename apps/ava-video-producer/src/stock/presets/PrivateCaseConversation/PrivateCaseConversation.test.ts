@@ -34,12 +34,12 @@ test("supporter exits before partition closure while both meeting seats remain",
   assert.match(exited, /data-person="s"[^>]*data-space="waiting"/);
   assert.match(exited, /data-partition="screen"[^>]*data-closed="false"/);
   assert.match(hold, /data-partition="screen"[^>]*data-closed="true"/);
-  ["p", "w"].forEach((id) =>
-    assert.match(
+  ["p", "w"].forEach((id) => {
+    return assert.match(
       hold,
       new RegExp(`data-person="${id}"[^>]*data-space="meeting"`),
-    ),
-  );
+    );
+  });
 });
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
@@ -70,12 +70,13 @@ function _visible({
     input.roomLabels.meeting,
     input.copy.hold,
     ...input.people
-      .filter(
-        (person) =>
+      .filter((person) => {
+        return (
           person.role !== "supporter" ||
           input.showWaitingSupporter ||
-          frame < 96,
-      )
+          frame < 96
+        );
+      })
       .map(prop("label")),
     ...(input.showWaitingSupporter || frame < 96
       ? [input.roomLabels.waiting, input.copy.acknowledgement]
@@ -98,8 +99,9 @@ registerStockPresetAssertions({
   invalidInputs: INVALID_INPUTS,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
 });
 registerStockTextLayoutAssertions({
   inputSchema,
@@ -110,8 +112,8 @@ registerStockTextLayoutAssertions({
 });
 
 test("both partitions close behind the fully exited supporter with either inset choice", () => {
-  (["door", "screen"] as const).forEach((partition) =>
-    [true, false].forEach((showWaitingSupporter) => {
+  (["door", "screen"] as const).forEach((partition) => {
+    return [true, false].forEach((showWaitingSupporter) => {
       const input = { ...DEFAULT_INPUT, partition, showWaitingSupporter };
       [20, 44, 64, 84, 86, 97, 108, 150].forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
@@ -154,6 +156,6 @@ test("both partitions close behind the fully exited supporter with either inset 
           `data-person="s"[^>]*opacity="${showWaitingSupporter ? 1 : 0}"`,
         ),
       );
-    }),
-  );
+    });
+  });
 });

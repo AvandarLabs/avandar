@@ -6,13 +6,15 @@ import {
   safePublicPath,
   sceneBounds,
 } from "./layout/layout";
-import { positioned, SceneShell } from "./SceneShell";
+import { positioned } from "./positioned";
+import { SceneShell } from "./SceneShell";
 import {
   getLineRevealStyle,
   getStagedExitStyle,
   getTypographyRevealFrames,
 } from "./textReveal";
 import type { TypographySceneProps } from "./scenes.types";
+import type { ReactNode } from "react";
 
 /** Largest font size a `caption` typography shot uses. */
 const CAPTION_FONT_SIZE = 28;
@@ -27,7 +29,7 @@ const ICON_SIZE = 160;
  * under an icon and leaving in a staged exit. A `caption` size sets one
  * small line, for example a teaser on an empty field.
  */
-export function TypographyScene(props: TypographySceneProps) {
+export function TypographyScene(props: TypographySceneProps): ReactNode {
   const {
     frame,
     width = 1600,
@@ -93,29 +95,31 @@ export function TypographyScene(props: TypographySceneProps) {
             />
           </div>
         ) : null}
-        {fitted.lines.map((line, row) => (
-          <div
-            key={row}
-            style={{
-              maxWidth: "100%",
-              ...getStagedExitStyle(frame, props.exit, row),
-            }}
-          >
-            <_TypographyLine
-              {...props}
-              line={line}
-              fontSize={fitted.fontSize}
-              isCaption={isCaption}
-              isCentered={isCentered}
-              revealAt={
-                props.revealMode === undefined ||
-                props.revealMode === "word-mask"
-                  ? linesAt + wordStarts[row] * wordStaggerFrames
-                  : linesAt + row * (props.lineStaggerFrames ?? 3)
-              }
-            />
-          </div>
-        ))}
+        {fitted.lines.map((line, row) => {
+          return (
+            <div
+              key={row}
+              style={{
+                maxWidth: "100%",
+                ...getStagedExitStyle(frame, props.exit, row),
+              }}
+            >
+              <_TypographyLine
+                {...props}
+                line={line}
+                fontSize={fitted.fontSize}
+                isCaption={isCaption}
+                isCentered={isCentered}
+                revealAt={
+                  props.revealMode === undefined ||
+                  props.revealMode === "word-mask"
+                    ? linesAt + wordStarts[row] * wordStaggerFrames
+                    : linesAt + row * (props.lineStaggerFrames ?? 3)
+                }
+              />
+            </div>
+          );
+        })}
       </div>
     </SceneShell>
   );
@@ -139,15 +143,17 @@ function _TypographyLine({
   isCentered: boolean;
   revealAt: number;
 }) {
-  const wordStyle = (word: string) => ({
-    display: "inline-block",
-    fontSize,
-    fontWeight: isCaption ? 400 : 600,
-    letterSpacing: isCaption ? 0 : -fontSize * 0.025,
-    color: emphasis.includes(word)
-      ? "var(--brand-strong)"
-      : "var(--foreground)",
-  });
+  const wordStyle = (word: string) => {
+    return {
+      display: "inline-block",
+      fontSize,
+      fontWeight: isCaption ? 400 : 600,
+      letterSpacing: isCaption ? 0 : -fontSize * 0.025,
+      color: emphasis.includes(word)
+        ? "var(--brand-strong)"
+        : "var(--foreground)",
+    };
+  };
   const words = line.split(/\s+/);
   if (revealMode !== "word-mask") {
     return (
@@ -161,11 +167,13 @@ function _TypographyLine({
           ...getLineRevealStyle(frame, revealAt, revealMode),
         }}
       >
-        {words.map((word, index) => (
-          <span key={`${index}-${word}`} style={wordStyle(word)}>
-            {word}
-          </span>
-        ))}
+        {words.map((word, index) => {
+          return (
+            <span key={`${index}-${word}`} style={wordStyle(word)}>
+              {word}
+            </span>
+          );
+        })}
       </div>
     );
   }
@@ -212,11 +220,11 @@ function _TypographyLine({
 
 /** The index of each line's first word across all lines. */
 function _countWordsBefore(lines: string[]): number[] {
-  return lines.map((_, row) =>
-    lines
-      .slice(0, row)
-      .reduce((count, line) => count + line.split(/\s+/).length, 0),
-  );
+  return lines.map((_, row) => {
+    return lines.slice(0, row).reduce((count, line) => {
+      return count + line.split(/\s+/).length;
+    }, 0);
+  });
 }
 
 function _validate({
@@ -226,7 +234,13 @@ function _validate({
   size,
   fontSize,
 }: TypographySceneProps): void {
-  if (!lines.length || lines.length > 6 || lines.some((line) => !line.trim())) {
+  if (
+    !lines.length ||
+    lines.length > 6 ||
+    lines.some((line) => {
+      return !line.trim();
+    })
+  ) {
     throw new Error("TypographyScene needs 1 to 6 nonempty lines");
   }
   assertFrame(revealAtFrame, "revealAtFrame");

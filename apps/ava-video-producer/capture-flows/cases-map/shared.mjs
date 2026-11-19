@@ -1,11 +1,16 @@
-import { expect } from "@playwright/test";
+import playwrightTest from "@playwright/test";
 import { ensureDataset } from "../avandar.mjs";
+
+const { expect } = playwrightTest;
 
 export const WAIT = 30000;
 export const UUID =
   "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 
-/** These flows mutate only an authenticated local development workspace through its UI. */
+/**
+ * These flows mutate only an authenticated local development workspace through
+ * its UI.
+ */
 export function localRoute(ctx, suffix) {
   const origin = new URL(ctx.baseUrl);
   if (!["localhost", "127.0.0.1", "[::1]"].includes(origin.hostname)) {
@@ -33,7 +38,10 @@ export async function closeChat(page) {
     await chat.click();
 }
 
-/** Choose an option from a combobox-style input, skipping the UI if it already matches. */
+/**
+ * Choose an option from a combobox-style input, skipping the UI if it already
+ * matches.
+ */
 export async function selectOption(page, input, value) {
   await expect(input).toBeEnabled({ timeout: WAIT });
   if ((await input.inputValue()) === value) return;
@@ -47,7 +55,10 @@ export async function selectOption(page, input, value) {
   await expect(page.getByRole("listbox")).toBeHidden();
 }
 
-/** Record a resource created or reused by a flow, for later cleanup and provenance. */
+/**
+ * Record a resource created or reused by a flow, for later cleanup and
+ * provenance.
+ */
 export async function resource(ctx, kind, item) {
   await ctx.recordResource?.({ kind, id: item.id, name: item.name });
 }
@@ -64,7 +75,10 @@ export function idFromRoute(page, segment) {
   return match[1];
 }
 
-/** Fetch or create the fixture-backed dataset a flow needs, caching it on ctx.state. */
+/**
+ * Fetch or create the fixture-backed dataset a flow needs, caching it on
+ * ctx.state.
+ */
 export async function dataset(ctx, key) {
   return ctx.state.datasets?.[key] ?? ensureDataset(ctx, key);
 }

@@ -33,18 +33,20 @@ export function WorkspaceCapacityExtension({
         <LabelSlots labels={[[input.choice.label, 60, 158, 840, 16, 1]]} />
       </g>
       <CapacityTray input={input} frame={frame} accent={accent} />
-      {input.existingResources.map((resource, index) => (
-        <ResourceTab
-          key={resource.id}
-          resource={resource}
-          x={90 + index * 86}
-          y={240}
-          index={index}
-          accent={accent}
-          showLabel={input.showResourceLabels}
-          isExisting
-        />
-      ))}
+      {input.existingResources.map((resource, index) => {
+        return (
+          <ResourceTab
+            key={resource.id}
+            resource={resource}
+            x={90 + index * 86}
+            y={240}
+            index={index}
+            accent={accent}
+            showLabel={input.showResourceLabels}
+            isExisting
+          />
+        );
+      })}
       <PendingResources input={input} frame={frame} accent={accent} />
     </g>
   );

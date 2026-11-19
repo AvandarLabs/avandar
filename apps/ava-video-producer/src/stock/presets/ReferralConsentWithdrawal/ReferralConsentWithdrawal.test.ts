@@ -62,24 +62,27 @@ function _visible({
   return [
     input.labels.example,
     ...Object.values(input.people),
-    ...input.permissions.flatMap((permission) => [
-      permission.recipient,
-      ...(input.showPurpose ? [permission.purpose] : []),
-      permission.withdrawn &&
-      frame >=
-        40 + input.permissions.filter(prop("withdrawn")).indexOf(permission) * 8
-        ? input.labels.withdrawn
-        : input.labels.permitted,
-    ]),
-    ...input.plannedContacts.flatMap((contact) => [contact.label]),
+    ...input.permissions.flatMap((permission) => {
+      return [
+        permission.recipient,
+        ...(input.showPurpose ? [permission.purpose] : []),
+        permission.withdrawn &&
+        frame >=
+          40 +
+            input.permissions.filter(prop("withdrawn")).indexOf(permission) * 8
+          ? input.labels.withdrawn
+          : input.labels.permitted,
+      ];
+    }),
+    ...input.plannedContacts.flatMap((contact) => {
+      return [contact.label];
+    }),
     ...(input.priorRecords.length
       ? [
           input.labels.history,
-          ...input.priorRecords.flatMap((record) => [
-            record.recipient,
-            record.dateLabel,
-            record.summary,
-          ]),
+          ...input.priorRecords.flatMap((record) => {
+            return [record.recipient, record.dateLabel, record.summary];
+          }),
         ]
       : []),
   ];
@@ -100,8 +103,9 @@ registerStockPresetAssertions({
   invalidInputs,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
 });
 registerStockTextLayoutAssertions({
   inputSchema,
@@ -114,19 +118,21 @@ registerStockTextLayoutAssertions({
 test("all-blocked preparations omit nonexistent ready and history beats", () => {
   const input = {
     ...fixtures[2].input,
-    permissions: fixtures[2].input.permissions.map((permission) => ({
-      ...permission,
-      withdrawn: true,
-    })),
+    permissions: fixtures[2].input.permissions.map((permission) => {
+      return {
+        ...permission,
+        withdrawn: true,
+      };
+    }),
     priorRecords: [],
     showPurpose: false,
   };
   const hold = _render({ frame: 150, input: input });
   assert.equal((hold.match(/data-state="held"/g) || []).length, 3);
   assert.doesNotMatch(hold, /data-history=|data-state="prepared"/);
-  input.permissions.forEach((permission) =>
-    assert.ok(!hold.includes(`aria-label="${permission.purpose}"`)),
-  );
+  input.permissions.forEach((permission) => {
+    return assert.ok(!hold.includes(`aria-label="${permission.purpose}"`));
+  });
 });
 test("the turning hand and the worker touch their actual moving objects", () => {
   [36, 38, 40, 42].forEach((frame) => {
@@ -174,8 +180,9 @@ test("the turning hand and the worker touch their actual moving objects", () => 
       marker: "contact-card",
     }),
   );
-  const history = (frame: number) =>
-    _render({ frame: frame }).split('data-history="retained"')[1];
+  const history = (frame: number) => {
+    return _render({ frame: frame }).split('data-history="retained"')[1];
+  };
   assert.equal(history(20), history(150));
 });
 
@@ -188,12 +195,14 @@ function _statusInput(withReady: boolean): Input {
       withdrawn: "Recalled",
       held: "On hold",
     },
-    permissions: ["first", "second", "third"].map((id) => ({
-      id,
-      recipient: id,
-      purpose: "Contact",
-      withdrawn: !withReady || id !== "third",
-    })),
+    permissions: ["first", "second", "third"].map((id) => {
+      return {
+        id,
+        recipient: id,
+        purpose: "Contact",
+        withdrawn: !withReady || id !== "third",
+      };
+    }),
     plannedContacts: [
       {
         id: "late",
@@ -254,30 +263,32 @@ function _assertStatuses({
 test("contact captions follow referenced permission turns despite reordered and repeated contacts", () => {
   const input = _statusInput(false);
   assert.ok(inputSchema.safeParse(input).success);
-  [35, 36].forEach((frame) =>
-    _assertStatuses({
+  [35, 36].forEach((frame) => {
+    return _assertStatuses({
       input,
       frame,
       statuses: ["Granted", "Granted", "Granted"],
-    }),
-  );
-  [40, 44, 48, 52].forEach((frame) =>
-    _assertStatuses({
+    });
+  });
+  [40, 44, 48, 52].forEach((frame) => {
+    return _assertStatuses({
       input,
       frame,
       statuses: ["Granted", "Recalled", "Granted"],
-    }),
-  );
-  [56, 60, 70].forEach((frame) =>
-    _assertStatuses({
+    });
+  });
+  [56, 60, 70].forEach((frame) => {
+    return _assertStatuses({
       input,
       frame,
       statuses: ["Recalled", "Recalled", "Recalled"],
-    }),
-  );
+    });
+  });
   Array.from(
     { length: Math.max(0, Math.floor((60 - 36) / 1) + 1) },
-    (_, sampleIndex) => 36 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 36 + sampleIndex * 1;
+    },
   ).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     const statuses = input.plannedContacts.map((contact) => {
@@ -306,13 +317,13 @@ test("contact captions follow referenced permission turns despite reordered and 
   });
   const withReady = _statusInput(true);
   assert.ok(inputSchema.safeParse(withReady).success);
-  [36, 40, 44].forEach((frame) =>
-    _assertStatuses({
+  [36, 40, 44].forEach((frame) => {
+    return _assertStatuses({
       input: withReady,
       frame,
       statuses: ["Granted", "Granted", "Granted"],
-    }),
-  );
+    });
+  });
   _assertStatuses({
     input: withReady,
     frame: 48,

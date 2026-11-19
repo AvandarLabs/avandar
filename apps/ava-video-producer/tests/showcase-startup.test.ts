@@ -44,7 +44,9 @@ test("an occupied showcase port exits with actionable guidance and no build erro
   child.stderr.on("data", (chunk) => {
     output += chunk;
   });
-  const timeout = setTimeout(() => child.kill("SIGKILL"), 30_000);
+  const timeout = setTimeout(() => {
+    return child.kill("SIGKILL");
+  }, 30_000);
   try {
     const [code, signal] = await once(child, "close");
     assert.equal(signal, null, output);
@@ -57,11 +59,12 @@ test("an occupied showcase port exits with actionable guidance and no build erro
     const appRoot = fileURLToPath(new URL("../", import.meta.url));
     const bundles = await Promise.all(
       ["live-player.js", "motion-gallery.js", "product/product.js"].map(
-        (filename) =>
-          readFile(
+        (filename) => {
+          return readFile(
             path.join(appRoot, "out/showcase/browser", filename),
             "utf8",
-          ),
+          );
+        },
       ),
     );
     [...bundles, output].forEach((text) => {
@@ -77,7 +80,11 @@ test("an occupied showcase port exits with actionable guidance and no build erro
   } finally {
     clearTimeout(timeout);
     child.kill("SIGKILL");
-    await new Promise<void>((resolve) => occupied.close(() => resolve()));
+    await new Promise<void>((resolve) => {
+      return occupied.close(() => {
+        return resolve();
+      });
+    });
     await rm(directory, { recursive: true, force: true });
   }
 });

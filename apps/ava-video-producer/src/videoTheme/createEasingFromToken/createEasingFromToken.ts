@@ -11,10 +11,11 @@ export function createEasingFromToken(
 ): (progress: number) => number {
   if ("powerInOut" in easing) {
     const exponent = easing.powerInOut;
-    return (progress) =>
-      progress < 0.5
+    return (progress) => {
+      return progress < 0.5
         ? 2 ** (exponent - 1) * progress ** exponent
         : 1 - (-2 * progress + 2) ** exponent / 2;
+    };
   }
   const [x1, y1, x2, y2] = easing;
   return bezier(x1, y1, x2, y2);

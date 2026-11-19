@@ -34,9 +34,9 @@ export function CatchmentFootprints({
         filter={`url(#${definitionId}-edge)`}
         opacity={progress}
       >
-        {getCatchmentShapesFromInput(input).map((shape) => (
-          <polygon key={shape.id} points={shape.points} fill={accent} />
-        ))}
+        {getCatchmentShapesFromInput(input).map((shape) => {
+          return <polygon key={shape.id} points={shape.points} fill={accent} />;
+        })}
       </g>
     </g>
   );

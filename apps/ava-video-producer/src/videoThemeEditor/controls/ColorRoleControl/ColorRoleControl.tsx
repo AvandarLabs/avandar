@@ -14,6 +14,7 @@ import {
 import { ColorPairFields } from "./ColorPairFields";
 import css from "./ColorRoleControl.module.css";
 import type { TokenRow } from "../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 const TEXT_COLOR_PATHS = new Set(["color.text", "color.textMuted"]);
 
@@ -23,7 +24,7 @@ type Props = Readonly<{ row: TokenRow; label: string }>;
  * A colour role: one reference, or one for dark grounds and one for light
  * grounds. Text colours show their contrast against the ground.
  */
-export function ColorRoleControl({ row, label }: Props) {
+export function ColorRoleControl({ row, label }: Props): ReactNode {
   const editor = useTokenEditor();
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();
@@ -39,12 +40,12 @@ export function ColorRoleControl({ row, label }: Props) {
         checked={pair !== undefined}
         disabled={!canPair}
         description={canPair ? undefined : "Pick a colour first."}
-        onChange={(event) =>
-          editor.setToken(
+        onChange={(event) => {
+          return editor.setToken(
             row.path,
             setColorPairing(row.value, event.currentTarget.checked),
-          )
-        }
+          );
+        }}
       />
       {pair ? (
         <ColorPairFields row={row} label={label} pair={pair} />
@@ -58,7 +59,9 @@ export function ColorRoleControl({ row, label }: Props) {
           tokenValue={row.value}
           allowLiteral={row.tier === "component"}
           definition={row.definition}
-          onChange={(reference) => editor.setToken(row.path, reference)}
+          onChange={(reference) => {
+            return editor.setToken(row.path, reference);
+          }}
         />
       )}
       {TEXT_COLOR_PATHS.has(row.path) && typeof row.resolved === "string" ? (

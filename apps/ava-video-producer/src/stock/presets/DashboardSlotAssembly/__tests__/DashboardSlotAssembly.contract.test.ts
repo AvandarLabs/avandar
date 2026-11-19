@@ -19,15 +19,16 @@ registerStockPresetAssertions({
   defaultInput: DEFAULT_INPUT,
   fixtures,
   contract: dashboardSlotAssemblyContract,
-  render: ({ frame, input }) =>
-    `${_render({ frame, input })}${_render({
+  render: ({ frame, input }) => {
+    return `${_render({ frame, input })}${_render({
       frame,
       input: {
         ...input,
         layout:
           input.layout === "feature-left" ? "feature-top" : "feature-left",
       },
-    })}`,
+    })}`;
+  },
   excludedTextFields: ["id", "kind", "featuredWidgetId", "layout"],
   getVisibleTexts: _getVisibleTextsFromInput,
   textFrames: [36, 80, 150],
@@ -157,24 +158,26 @@ test("all collection sizes stay on canvas and finish with nonoverlapping slots",
         [12, 14, 16, 18, 36, 40, 52, 64, 76, 88, 100, 112, 150, 166].forEach(
           (frame) => {
             const rects = _getPanelsFromMarkup(_render({ frame, input })).map(
-              (element) => ({
-                x: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "x",
-                }),
-                y: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "y",
-                }),
-                width: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "width",
-                }),
-                height: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "height",
-                }),
-              }),
+              (element) => {
+                return {
+                  x: SvgAttributes.getNumberFromMarkup({
+                    attributes: element,
+                    name: "x",
+                  }),
+                  y: SvgAttributes.getNumberFromMarkup({
+                    attributes: element,
+                    name: "y",
+                  }),
+                  width: SvgAttributes.getNumberFromMarkup({
+                    attributes: element,
+                    name: "width",
+                  }),
+                  height: SvgAttributes.getNumberFromMarkup({
+                    attributes: element,
+                    name: "height",
+                  }),
+                };
+              },
             );
             assert.equal(rects.length, numWidgets);
             rects.forEach((rect, index) => {
@@ -183,16 +186,14 @@ test("all collection sizes stay on canvas and finish with nonoverlapping slots",
               if (frame < 112) {
                 return;
               }
-              rects
-                .slice(index + 1)
-                .forEach((other) =>
-                  assert.ok(
-                    rect.x + rect.width <= other.x ||
-                      other.x + other.width <= rect.x ||
-                      rect.y + rect.height <= other.y ||
-                      other.y + other.height <= rect.y,
-                  ),
+              rects.slice(index + 1).forEach((other) => {
+                return assert.ok(
+                  rect.x + rect.width <= other.x ||
+                    other.x + other.width <= rect.x ||
+                    rect.y + rect.height <= other.y ||
+                    other.y + other.height <= rect.y,
                 );
+              });
             });
           },
         );
@@ -274,9 +275,12 @@ test("loose setup uses distinct readable panels independent of final layout and 
           frame,
           input: { ...input, layout, featuredWidgetId },
         });
-        input.widgets.forEach(({ id }, index) =>
-          assert.deepEqual(_getRectFromPanel({ markup, id }), expected[index]),
-        );
+        input.widgets.forEach(({ id }, index) => {
+          return assert.deepEqual(
+            _getRectFromPanel({ markup, id }),
+            expected[index],
+          );
+        });
       });
     });
   });

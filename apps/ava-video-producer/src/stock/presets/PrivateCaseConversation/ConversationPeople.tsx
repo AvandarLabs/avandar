@@ -15,15 +15,17 @@ export function ConversationPeople({
   return (
     <g>
       <WaitingSpace input={input} opacity={opacity} />
-      {input.people.map((person) => (
-        <ConversationPerson
-          key={person.id}
-          person={person}
-          frame={frame}
-          waitingOpacity={opacity}
-          accent={accent}
-        />
-      ))}
+      {input.people.map((person) => {
+        return (
+          <ConversationPerson
+            key={person.id}
+            person={person}
+            frame={frame}
+            waitingOpacity={opacity}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

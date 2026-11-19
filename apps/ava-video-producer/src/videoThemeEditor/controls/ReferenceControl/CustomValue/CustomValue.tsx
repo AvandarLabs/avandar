@@ -1,5 +1,5 @@
 import { Button } from "@mantine/core";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { isTokenReference } from "../../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
 import { getTokenDefinitionFromPath } from "../../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getCustomScaleFromReference } from "../../../customTokenValue/customTokenValue";
@@ -17,7 +17,9 @@ import type { Props as ReferenceControlProps } from "../ReferenceControl";
 type Props = ReferenceControlProps &
   Readonly<{ options: readonly ReferenceOption[] }>;
 
-/** The bounds a custom value is edited with: the token's own, or its scale's. */
+/**
+ * The bounds a custom value is edited with: the token's own, or its scale's.
+ */
 function _customDefinition(
   options: Readonly<{
     allowLiteral: boolean;
@@ -49,8 +51,8 @@ function useCustomValueWriter(
   >,
 ): (literal: unknown) => void {
   const editor = useTokenEditor();
-  return (literal: unknown) =>
-    reference.allowLiteral
+  return (literal: unknown) => {
+    return reference.allowLiteral
       ? reference.onChange(literal)
       : editor.setCustomValue({
           tokenPath: reference.tokenPath,
@@ -60,6 +62,7 @@ function useCustomValueWriter(
           kind: reference.kind,
           literal,
         });
+  };
 }
 
 /** The toggle and editor for a custom value in place of a reference. */
@@ -74,7 +77,7 @@ export function CustomValue({
   definition: tokenDefinition,
   onChange,
   options,
-}: Props) {
+}: Props): ReactNode {
   const write = useCustomValueWriter({
     tokenPath,
     fieldPath,
@@ -101,7 +104,9 @@ export function CustomValue({
     scale,
   });
   const current = isReference
-    ? options.find((option) => option.reference === value)?.value
+    ? options.find((option) => {
+        return option.reference === value;
+      })?.value
     : value;
   return (
     <div className={css.customValue}>
@@ -111,7 +116,9 @@ export function CustomValue({
         variant="subtle"
         aria-label={`Custom value for ${label}`}
         aria-expanded={isOpen}
-        onClick={() => setOpen(!isOpen)}
+        onClick={() => {
+          return setOpen(!isOpen);
+        }}
       >
         {"Custom value"}
       </Button>

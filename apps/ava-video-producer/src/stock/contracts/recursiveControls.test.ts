@@ -38,31 +38,37 @@ function _flatten({
         : control.kind === "collection"
           ? _flatten({ controls: control.itemControls, prefix: `${path}.*` })
           : new Map<string, StockControl>();
-    nested.forEach((child, key) => result.set(key, child));
+    nested.forEach((child, key) => {
+      return result.set(key, child);
+    });
     if (control.kind === "union") {
-      control.variants.forEach((variant) =>
-        _flatten({
+      control.variants.forEach((variant) => {
+        return _flatten({
           controls: [variant.control],
           prefix: `${path}:${variant.valueType}`,
-        }).forEach((child, key) => result.set(key, child)),
-      );
+        }).forEach((child, key) => {
+          return result.set(key, child);
+        });
+      });
     }
   });
   return result;
 }
 
 test("every nested editor control and authored option has readable copy", () => {
-  const failures = Object.values(stockContracts).flatMap((contract) =>
-    [..._flatten({ controls: contract.controls })].flatMap(([path, control]) =>
-      _getControlMessages(control).flatMap((descriptor) => {
-        return !descriptor.message.trim() ||
-          descriptor.message === descriptor.id ||
-          /(^|\.)PLACE(\.|$)/i.test(descriptor.id)
-          ? [{ preset: contract.id, path, ...descriptor }]
-          : [];
-      }),
-    ),
-  );
+  const failures = Object.values(stockContracts).flatMap((contract) => {
+    return [..._flatten({ controls: contract.controls })].flatMap(
+      ([path, control]) => {
+        return _getControlMessages(control).flatMap((descriptor) => {
+          return !descriptor.message.trim() ||
+            descriptor.message === descriptor.id ||
+            /(^|\.)PLACE(\.|$)/i.test(descriptor.id)
+            ? [{ preset: contract.id, path, ...descriptor }]
+            : [];
+        });
+      },
+    );
+  });
   assert.deepEqual(failures, []);
 });
 
@@ -82,8 +88,10 @@ test("coordinate triage exposes complete nullable numeric and literal string edi
     }
     assert.deepEqual(
       Object.fromEntries(
-        Object.entries(controls.get(`rows.*.${axis}:number`)!).filter(([key]) =>
-          ["kind", "path", "min", "max"].includes(key),
+        Object.entries(controls.get(`rows.*.${axis}:number`)!).filter(
+          ([key]) => {
+            return ["kind", "path", "min", "max"].includes(key);
+          },
         ),
       ),
       { path: "", kind: "number", min: -360, max: 360 },

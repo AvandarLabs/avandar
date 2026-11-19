@@ -86,14 +86,16 @@ const dense: Input = {
     { id: "a".repeat(12), label: "W".repeat(18), unit: "W".repeat(12) },
     { id: "b".repeat(12), label: "W".repeat(18), unit: "X".repeat(12) },
   ],
-  subjects: ["a", "b"].map((id) => ({
-    id: id.repeat(12),
-    label: "W".repeat(18),
-    values: [
-      { measureId: "b".repeat(12), value: -10000 },
-      { measureId: "a".repeat(12), value: 10000 },
-    ],
-  })),
+  subjects: ["a", "b"].map((id) => {
+    return {
+      id: id.repeat(12),
+      label: "W".repeat(18),
+      values: [
+        { measureId: "b".repeat(12), value: -10000 },
+        { measureId: "a".repeat(12), value: 10000 },
+      ],
+    };
+  }),
   copy: {
     context: "W".repeat(34),
     source: "W".repeat(34),
@@ -102,10 +104,12 @@ const dense: Input = {
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
-  subjects: DEFAULT_INPUT.subjects.map((s) => ({
-    ...s,
-    values: [...s.values].reverse(),
-  })),
+  subjects: DEFAULT_INPUT.subjects.map((s) => {
+    return {
+      ...s,
+      values: [...s.values].reverse(),
+    };
+  }),
   missingPolicy: "omit-with-ledger",
   showSourceGuides: false,
 };
@@ -132,24 +136,36 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    subjects: DEFAULT_INPUT.subjects.map((s) => ({ ...s, values: [] })),
+    subjects: DEFAULT_INPUT.subjects.map((s) => {
+      return { ...s, values: [] };
+    }),
   },
-  ...[NaN, Infinity, -10001, 10001].map((value) => ({
-    ...DEFAULT_INPUT,
-    subjects: DEFAULT_INPUT.subjects.map((s) => ({
-      ...s,
-      values: s.values.map((v) => ({ ...v, value })),
-    })),
-  })),
+  ...[NaN, Infinity, -10001, 10001].map((value) => {
+    return {
+      ...DEFAULT_INPUT,
+      subjects: DEFAULT_INPUT.subjects.map((s) => {
+        return {
+          ...s,
+          values: s.values.map((v) => {
+            return { ...v, value };
+          }),
+        };
+      }),
+    };
+  }),
   {
     ...DEFAULT_INPUT,
-    subjects: DEFAULT_INPUT.subjects.map((s) => ({ ...s, id: "x".repeat(13) })),
+    subjects: DEFAULT_INPUT.subjects.map((s) => {
+      return { ...s, id: "x".repeat(13) };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    subjects: DEFAULT_INPUT.subjects.map((s) => ({
-      ...s,
-      values: [{ measureId: "ghost", value: 0 }, s.values[1]],
-    })),
+    subjects: DEFAULT_INPUT.subjects.map((s) => {
+      return {
+        ...s,
+        values: [{ measureId: "ghost", value: 0 }, s.values[1]],
+      };
+    }),
   },
 ];

@@ -1,5 +1,6 @@
 import { useTokenEditor } from "../../TokenEditorContext";
 import css from "./ItemOverrideNote.module.css";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ label: string }>;
 
@@ -7,7 +8,7 @@ type Props = Readonly<{ label: string }>;
  * In theme scope, says the previewed item has its own value, so the control
  * below edits the theme's value and not the one the preview shows.
  */
-export function ItemOverrideNote({ label }: Props) {
+export function ItemOverrideNote({ label }: Props): ReactNode {
   const { item } = useTokenEditor();
   if (!item) {
     return null;

@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 
-// One browser clock serves all visible previews. The renderer receives only frames.
+// One browser clock serves all visible previews. The renderer receives only
+// frames.
 const clockListeners = new Set<(elapsed: number) => void>();
 let clockRequest = 0;
 let lastTick = 0;
 function clockTick(time: number) {
   const elapsed = lastTick ? Math.min(time - lastTick, 100) : 0;
   lastTick = time;
-  if (!document.hidden) clockListeners.forEach((listener) => listener(elapsed));
+  if (!document.hidden)
+    clockListeners.forEach((listener) => {
+      return listener(elapsed);
+    });
   clockRequest = requestAnimationFrame(clockTick);
 }
 function subscribeClock(listener: (elapsed: number) => void) {
@@ -25,8 +30,14 @@ function subscribeClock(listener: (elapsed: number) => void) {
   };
 }
 
-/** Advances a loop frame counter from the shared clock while `active` is true. */
-export function useFrames(active: boolean, length: number, initial = 45) {
+/**
+ * Advances a loop frame counter from the shared clock while `active` is true.
+ */
+export function useFrames(
+  active: boolean,
+  length: number,
+  initial = 45,
+): readonly [number, (value: number) => void] {
   const [frame, updateFrame] = useState(initial);
   const current = useRef(initial);
   const remainder = useRef(0);
@@ -55,18 +66,27 @@ export function useFrames(active: boolean, length: number, initial = 45) {
   return [frame, setFrame] as const;
 }
 
-/** Tracks whether the element a ref is attached to is intersecting the viewport. */
-export function useVisible() {
+/**
+ * Tracks whether the element a ref is attached to is intersecting the viewport.
+ */
+export function useVisible(): readonly [
+  RefObject<HTMLButtonElement | null>,
+  boolean,
+] {
   const element = useRef<HTMLButtonElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(function observeCardVisibility() {
     if (!element.current) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
+      ([entry]) => {
+        return setVisible(entry.isIntersecting);
+      },
       { threshold: 0.05 },
     );
     observer.observe(element.current);
-    return () => observer.disconnect();
+    return () => {
+      return observer.disconnect();
+    };
   }, []);
   return [element, visible] as const;
 }

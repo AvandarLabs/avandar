@@ -52,7 +52,9 @@ export function getSvgAttributeMatchesFromMarkup({
     const attributes = Array.from(
       tag.matchAll(/(?:^|\s)([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g),
     );
-    const match = attributes.find((item) => item[1] === attribute);
+    const match = attributes.find((item) => {
+      return item[1] === attribute;
+    });
     return match
       ? [{ tag, value: _decodeAttributeValue(match[2] ?? match[3]) }]
       : [];

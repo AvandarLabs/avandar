@@ -12,14 +12,20 @@ test("physical destination keys never cover an unrelated positive-volume pool", 
       ...markup.matchAll(
         /<rect[^>]*(?:data-water-pool|data-overflow-pool|data-water)="[^"]+"[^>]*>/g,
       ),
-    ].map(([attributes]) => attributes);
+    ].map(([attributes]) => {
+      return attributes;
+    });
     const keys = [
       ...markup.matchAll(
         /<g data-water-key="physical-[^"]+"[^>]*><circle[^>]*>/g,
       ),
-    ].map(([attributes]) => attributes);
+    ].map(([attributes]) => {
+      return attributes;
+    });
     assert.deepEqual(
-      keys.map((key) => key.match(/data-water-key="([^"]*)"/)![1]),
+      keys.map((key) => {
+        return key.match(/data-water-key="([^"]*)"/)![1];
+      }),
       [
         "physical-infiltration",
         "physical-discharge",
@@ -29,12 +35,11 @@ test("physical destination keys never cover an unrelated positive-volume pool", 
     );
     assert.deepEqual(
       pools
-        .map(
-          (pool) =>
-            pool.match(
-              /(?:data-water-pool|data-overflow-pool|data-water)="[^"]+"/,
-            )![0],
-        )
+        .map((pool) => {
+          return pool.match(
+            /(?:data-water-pool|data-overflow-pool|data-water)="[^"]+"/,
+          )![0];
+        })
         .sort(),
       [
         'data-water-pool="infiltration"',
@@ -43,8 +48,8 @@ test("physical destination keys never cover an unrelated positive-volume pool", 
         'data-overflow-pool="physical"',
       ].sort(),
     );
-    keys.forEach((key) =>
-      pools.forEach((pool) => {
+    keys.forEach((key) => {
+      return pools.forEach((pool) => {
         const width = SvgAttributes.getNumberFromMarkup({
             attributes: pool,
             name: "width",
@@ -79,8 +84,8 @@ test("physical destination keys never cover an unrelated positive-volume pool", 
             cy - 8 >= y + height,
           "a physical key covers conserved water",
         );
-      }),
-    );
+      });
+    });
   });
 });
 
@@ -126,9 +131,11 @@ test("destination keys clear the complete visible overflow crest", () => {
         ...markup.matchAll(
           /<g data-water-key="physical-[^"]+"[^>]*><circle[^>]*>/g,
         ),
-      ].map(([attributes]) => attributes);
-      keys.forEach((key) =>
-        segments.forEach((segment) => {
+      ].map(([attributes]) => {
+        return attributes;
+      });
+      keys.forEach((key) => {
+        return segments.forEach((segment) => {
           const cx = SvgAttributes.getNumberFromMarkup({
               attributes: key,
               name: "cx",
@@ -144,8 +151,8 @@ test("destination keys clear the complete visible overflow crest", () => {
               cy - 8 >= segment.bottom,
             "a destination key covers the overflow crest",
           );
-        }),
-      );
+        });
+      });
     });
   });
 });

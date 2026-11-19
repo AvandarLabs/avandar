@@ -35,15 +35,17 @@ export function RecipientConfirmedHandover({
         stroke={accent}
         strokeWidth={2}
       />
-      {input.contents.map((content, index) => (
-        <HandoverGoodsRow
-          key={content.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.contents.map((content, index) => {
+        return (
+          <HandoverGoodsRow
+            key={content.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <HandoverRecipient input={input} frame={frame} accent={accent} />
       <HandoverReceipt input={input} frame={frame} accent={accent} />
     </g>

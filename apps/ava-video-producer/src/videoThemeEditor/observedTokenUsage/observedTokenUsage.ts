@@ -1,6 +1,8 @@
 import type { TokenUsageReporter } from "../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 
-/** A usage collector that renders can report into and React can subscribe to. */
+/**
+ * A usage collector that renders can report into and React can subscribe to.
+ */
 export type ObservedTokenUsage = Readonly<{
   report: TokenUsageReporter;
   getPaths: () => readonly string[];

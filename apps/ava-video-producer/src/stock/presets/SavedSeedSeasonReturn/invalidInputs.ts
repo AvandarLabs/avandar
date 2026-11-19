@@ -4,38 +4,44 @@ export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "crop"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "crop";
+    }),
   ),
   { ...DEFAULT_INPUT, crop: { ...DEFAULT_INPUT.crop, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "cultivator"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "cultivator";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
     cultivator: { ...DEFAULT_INPUT.cultivator, extra: true },
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "seasons"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "seasons";
+    }),
   ),
   { ...DEFAULT_INPUT, seasons: { ...DEFAULT_INPUT.seasons, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "balanceLabels",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "balanceLabels";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
     balanceLabels: { ...DEFAULT_INPUT.balanceLabels, extra: true },
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "evidenceLabel",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "evidenceLabel";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showQuantities",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showQuantities";
+    }),
   ),
   {
     ...DEFAULT_INPUT,

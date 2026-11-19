@@ -29,7 +29,9 @@ function _issuesOf(run: () => unknown): string {
   } catch (error) {
     if (error instanceof VideoThemeError) {
       return error.issues
-        .map((issue) => `${issue.path}: ${issue.message}`)
+        .map((issue) => {
+          return `${issue.path}: ${issue.message}`;
+        })
         .join("\n");
     }
     throw error;
@@ -84,7 +86,9 @@ test("a reference to a missing token is reported with its path", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => makeResolvedVideoThemeFromLibrary(library, "broken")),
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary(library, "broken");
+    }),
     /^color\.accent: .*nope/m,
   );
 });
@@ -99,7 +103,9 @@ test("a reference cycle is reported", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() => makeResolvedVideoThemeFromLibrary(library, "loop")),
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary(library, "loop");
+    }),
     /Reference cycle/,
   );
 });
@@ -114,9 +120,9 @@ test("graphic text rejects a font without measured widths", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() =>
-      makeResolvedVideoThemeFromLibrary(library, "figtree-labels"),
-    ),
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary(library, "figtree-labels");
+    }),
     /^text\.graphic\.label: /m,
   );
 });
@@ -197,9 +203,9 @@ test("a camera curve that overshoots its framings is rejected", () => {
     ),
   ]);
   assert.match(
-    _issuesOf(() =>
-      makeResolvedVideoThemeFromLibrary(library, "bouncy-camera"),
-    ),
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary(library, "bouncy-camera");
+    }),
     /^camera\.easing\.push: /m,
   );
 });

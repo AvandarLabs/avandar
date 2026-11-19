@@ -24,10 +24,9 @@ function BarProbe({ height }: { height?: number }) {
 }
 
 test("reading tokens outside a provider fails loudly", () => {
-  assert.throws(
-    () => renderToStaticMarkup(<TokenProbe />),
-    /VideoThemeProvider/,
-  );
+  assert.throws(() => {
+    return renderToStaticMarkup(<TokenProbe />);
+  }, /VideoThemeProvider/);
 });
 
 test("the provider sets video CSS variables on its wrapper", () => {

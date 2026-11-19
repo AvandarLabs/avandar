@@ -80,7 +80,10 @@ const NODE_TOKENS = {
   ),
 } as const;
 
-/** Tokens of the parts shared by many graphics: nodes, edges, routes, packets, panels, cards, and more. */
+/**
+ * Tokens of the parts shared by many graphics: nodes, edges, routes, packets,
+ * panels, cards, and more.
+ */
 export const SHARED_GRAPHIC_TOKENS = {
   Node: NODE_TOKENS,
   Edge: {

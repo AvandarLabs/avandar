@@ -36,7 +36,9 @@ export function getDuplicateCardLayoutFromGroupAndFrame({
   const isRetained = group.retainedId === record.id;
   const isPair = input.finalView === "comparison-pair";
   const alternativeIndex = group.records
-    .filter((candidate) => candidate.id !== group.retainedId)
+    .filter((candidate) => {
+      return candidate.id !== group.retainedId;
+    })
     .findIndex(propEq("id", record.id));
   const stackOffset = isRetained ? 0 : (alternativeIndex + 1) * 28;
   const sourceX = 44 + groupIndex * 456;

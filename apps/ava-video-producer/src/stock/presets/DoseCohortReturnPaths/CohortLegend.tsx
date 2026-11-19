@@ -14,25 +14,27 @@ export function CohortLegend({ input }: Readonly<Props>): ReactNode {
         input.copy.missed,
         input.copy.notDue,
         input.copy.unknown,
-      ].map((label, index) => (
-        <g key={index}>
-          <VisitMark
-            state={
-              (["recorded", "missed", "not-due", "unknown"] as const)[index]
-            }
-            x={30 + index * 230}
-            y={485}
-            color={STOCK.text}
-          />
-          <SceneLabel
-            text={label}
-            x={22 + index * 230}
-            y={510}
-            width={215}
-            lines={4}
-          />
-        </g>
-      ))}
+      ].map((label, index) => {
+        return (
+          <g key={index}>
+            <VisitMark
+              state={
+                (["recorded", "missed", "not-due", "unknown"] as const)[index]
+              }
+              x={30 + index * 230}
+              y={485}
+              color={STOCK.text}
+            />
+            <SceneLabel
+              text={label}
+              x={22 + index * 230}
+              y={510}
+              width={215}
+              lines={4}
+            />
+          </g>
+        );
+      })}
       {input.showFractions ? (
         <SceneLabel
           text={input.copy.retained}

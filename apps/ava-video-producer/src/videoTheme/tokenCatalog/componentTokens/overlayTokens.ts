@@ -8,7 +8,10 @@ import {
   createStrokeToken,
 } from "./componentTokenHelpers";
 
-/** Tokens of the overlays drawn over a scene: thesis, underline, annotation, spotlight, connector, and floating pieces. */
+/**
+ * Tokens of the overlays drawn over a scene: thesis, underline, annotation,
+ * spotlight, connector, and floating pieces.
+ */
 export const OVERLAY_TOKENS = {
   Thesis: {
     gap: createLengthToken(

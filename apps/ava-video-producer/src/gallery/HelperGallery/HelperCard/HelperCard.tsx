@@ -69,7 +69,9 @@ export const HelperCard = memo(function HelperCard({
           />
         ) : null
       }
-      onOpen={() => onOpen(helper.id)}
+      onOpen={() => {
+        return onOpen(helper.id);
+      }}
     />
   );
 });

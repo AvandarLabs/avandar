@@ -11,6 +11,7 @@ import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityOverlays.module.css";
 import { getAnnotationProgress } from "./overlayMotion";
 import type { ProductAnnotation } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   annotations?: ProductAnnotation[];
@@ -30,7 +31,7 @@ export function ContinuityAnnotation({
   annotations = [],
   frame,
   accent,
-}: Props) {
+}: Props): ReactNode {
   const appearance = useContinuityAppearance();
   const { sketch } = useVideoTokens();
   const annotation = useVideoProps("Annotation", {});

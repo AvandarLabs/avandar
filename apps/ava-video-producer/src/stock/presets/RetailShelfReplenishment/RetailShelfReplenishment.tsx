@@ -21,11 +21,11 @@ export function RetailShelfReplenishment({
   input = DEFAULT_INPUT,
 }: Readonly<Props>): ReactNode {
   const units = getShelfUnitsFromInputAndFrame({ input, frame });
-  const shelfQuantities = input.goods.map(
-    (good) =>
-      units.filter((unit) => unit.good.id === good.id && unit.owner === "shelf")
-        .length,
-  );
+  const shelfQuantities = input.goods.map((good) => {
+    return units.filter((unit) => {
+      return unit.good.id === good.id && unit.owner === "shelf";
+    }).length;
+  });
   return (
     <g color={STOCK.text}>
       <ShelfStructure input={input} />
@@ -37,13 +37,15 @@ export function RetailShelfReplenishment({
         strokeWidth={2}
       />
       <ShelfOrder input={input} frame={frame} />
-      {units.map((unit) => (
-        <ShelfUnit
-          key={`${unit.good.id}:${unit.unitIndex}`}
-          {...unit}
-          accent={accent}
-        />
-      ))}
+      {units.map((unit) => {
+        return (
+          <ShelfUnit
+            key={`${unit.good.id}:${unit.unitIndex}`}
+            {...unit}
+            accent={accent}
+          />
+        );
+      })}
       <ShelfActors input={input} frame={frame} accent={accent} />
       <ShelfLabels input={input} shelfQuantities={shelfQuantities} />
     </g>

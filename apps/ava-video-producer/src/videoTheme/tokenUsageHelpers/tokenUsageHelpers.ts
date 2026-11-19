@@ -35,8 +35,12 @@ export function createTokenUsageCollector(): TokenUsageCollector {
     report: (path) => {
       paths.add(path);
     },
-    getPaths: () => [...paths].sort(),
-    clear: () => paths.clear(),
+    getPaths: () => {
+      return [...paths].sort();
+    },
+    clear: () => {
+      return paths.clear();
+    },
   };
 }
 

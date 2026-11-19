@@ -21,11 +21,13 @@ export function EntitySpineRow({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const rows = input.observations.filter(
-    ({ entityId }) => entityId === entity.id,
-  );
+  const rows = input.observations.filter(({ entityId }) => {
+    return entityId === entity.id;
+  });
   const value = rows.length
-    ? rows.reduce((sum, row) => sum + row.value, 0)
+    ? rows.reduce((sum, row) => {
+        return sum + row.value;
+      }, 0)
     : null;
   const y = 120 + index * 100,
     attachment = ramp(frame, 106, 33, EASE.inOut);

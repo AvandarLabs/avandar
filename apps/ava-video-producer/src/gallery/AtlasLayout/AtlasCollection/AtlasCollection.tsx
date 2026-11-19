@@ -40,7 +40,7 @@ export function AtlasCollection({
   onReset,
   resetLabel,
   children,
-}: Props) {
+}: Props): ReactNode {
   return (
     <main className="library-main" id="library" tabIndex={-1}>
       <section className="library-intro" aria-labelledby="page-title">
@@ -70,13 +70,17 @@ export function AtlasCollection({
                 type="search"
                 placeholder={searchPlaceholder}
                 value={query}
-                onChange={(event) => onQueryChange(event.target.value)}
+                onChange={(event) => {
+                  return onQueryChange(event.target.value);
+                }}
                 autoComplete="off"
               />
               {query ? (
                 <button
                   type="button"
-                  onClick={() => onQueryChange("")}
+                  onClick={() => {
+                    return onQueryChange("");
+                  }}
                   aria-label="Clear search"
                 >
                   <Icon name="close" size={14} />

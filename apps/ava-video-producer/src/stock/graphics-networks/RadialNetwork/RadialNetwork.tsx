@@ -37,15 +37,17 @@ export function RadialNetwork({
       {input.showOrbit ? (
         <Guide cx={CENTER.x} cy={CENTER.y} rx={ORBIT.rx} ry={ORBIT.ry} />
       ) : null}
-      {nodes.map((node, i) => (
-        <RadialSpoke
-          key={node.label}
-          node={node}
-          index={i}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {nodes.map((node, i) => {
+        return (
+          <RadialSpoke
+            key={node.label}
+            node={node}
+            index={i}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <RadialHub input={input} frame={frame} accent={accent} />
       <Caption>
         {getStockDisplayCopyFromDescriptor({

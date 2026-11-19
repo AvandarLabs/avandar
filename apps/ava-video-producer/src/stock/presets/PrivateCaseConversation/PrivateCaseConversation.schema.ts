@@ -27,14 +27,20 @@ export const inputSchema = z
     }),
   })
   .refine(
-    (input) =>
-      new Set(input.people.map(prop("id"))).size === input.people.length,
+    (input) => {
+      return new Set(input.people.map(prop("id"))).size === input.people.length;
+    },
     { path: ["people"], message: "Person IDs must be unique." },
   )
-  .refine((input) => new Set(input.people.map(prop("role"))).size === 3, {
-    path: ["people"],
-    message: "One person per role is required.",
-  }) satisfies z.ZodType;
+  .refine(
+    (input) => {
+      return new Set(input.people.map(prop("role"))).size === 3;
+    },
+    {
+      path: ["people"],
+      message: "One person per role is required.",
+    },
+  ) satisfies z.ZodType;
 /** Schema-inferred scene input. */
 export type Input = z.infer<typeof inputSchema>;
 

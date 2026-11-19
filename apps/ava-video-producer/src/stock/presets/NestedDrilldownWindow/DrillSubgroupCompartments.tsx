@@ -11,19 +11,21 @@ export function DrillSubgroupCompartments({
   return (
     <g>
       {progress < 1
-        ? groups.map((group, index) => (
-            <g key={group} opacity={1 - progress}>
-              <rect
-                x={44 + index * 292}
-                y={294}
-                width={284}
-                height={266}
-                fill="none"
-                stroke={STOCK.line}
-              />
-              <LiteralDataText value={group} x={56 + index * 292} y={310} />
-            </g>
-          ))
+        ? groups.map((group, index) => {
+            return (
+              <g key={group} opacity={1 - progress}>
+                <rect
+                  x={44 + index * 292}
+                  y={294}
+                  width={284}
+                  height={266}
+                  fill="none"
+                  stroke={STOCK.line}
+                />
+                <LiteralDataText value={group} x={56 + index * 292} y={310} />
+              </g>
+            );
+          })
         : undefined}
     </g>
   );

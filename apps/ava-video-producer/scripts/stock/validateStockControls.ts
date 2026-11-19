@@ -50,27 +50,25 @@ function _getPath({
   nodes: readonly StockJsonSchema[];
   path: string;
 }): StockJsonSchema[] {
-  return (path ? path.split(".") : []).reduce(
-    (parents, segment) =>
-      _branches(
-        parents.flatMap((node) => {
-          const property = node.properties?.[segment];
-          if (property !== undefined) {
-            return [property];
-          }
-          if (node.type === "array" && /^(0|[1-9][0-9]*)$/.test(segment)) {
-            const child = node.prefixItems?.[Number(segment)] ?? node.items;
-            return child === undefined
-              ? []
-              : Array.isArray(child)
-                ? child
-                : [child];
-          }
-          return [];
-        }),
-      ),
-    _branches(nodes),
-  );
+  return (path ? path.split(".") : []).reduce((parents, segment) => {
+    return _branches(
+      parents.flatMap((node) => {
+        const property = node.properties?.[segment];
+        if (property !== undefined) {
+          return [property];
+        }
+        if (node.type === "array" && /^(0|[1-9][0-9]*)$/.test(segment)) {
+          const child = node.prefixItems?.[Number(segment)] ?? node.items;
+          return child === undefined
+            ? []
+            : Array.isArray(child)
+              ? child
+              : [child];
+        }
+        return [];
+      }),
+    );
+  }, _branches(nodes));
 }
 function _requirePath({
   nodes,
@@ -134,9 +132,9 @@ function _validateChildren({
 }): void {
   match(control)
     .with({ kind: "object" }, (matchedControl) => {
-      matchedControl.controls.forEach((child) =>
-        _validateControl({ control: child, context }),
-      );
+      matchedControl.controls.forEach((child) => {
+        return _validateControl({ control: child, context });
+      });
     })
     .with({ kind: "collection" }, (matchedControl) => {
       const items = _items(context.current);
@@ -163,9 +161,9 @@ function _validateChildren({
     })
     .with({ kind: "union" }, (matchedControl) => {
       matchedControl.variants.forEach((variant) => {
-        const current = context.current.filter((node) =>
-          _hasType({ node, type: variant.valueType }),
-        );
+        const current = context.current.filter((node) => {
+          return _hasType({ node, type: variant.valueType });
+        });
         _validateControl({
           control: variant.control,
           context: { ...context, current },
@@ -177,7 +175,9 @@ function _validateChildren({
         _validateChoices({ control: matchedControl, context });
       }
     })
-    .with({ kind: P.union("text", "number", "boolean") }, () => undefined)
+    .with({ kind: P.union("text", "number", "boolean") }, () => {
+      return undefined;
+    })
     .exhaustive();
 }
 function _validateControl({
@@ -195,7 +195,9 @@ function _validateControl({
   const location = [context.location, control.path].filter(Boolean).join(".");
   if (
     control.nullable &&
-    !current.some((node) => _hasType({ node, type: "null" }))
+    !current.some((node) => {
+      return _hasType({ node, type: "null" });
+    })
   ) {
     throw new Error(
       `Stock control is nullable but its schema is not: ${location}`,
@@ -209,7 +211,11 @@ function _validateControl({
   } as const;
   if (control.kind in expected) {
     const type = expected[control.kind as keyof typeof expected];
-    if (!current.some((node) => _hasType({ node, type }))) {
+    if (
+      !current.some((node) => {
+        return _hasType({ node, type });
+      })
+    ) {
       throw new Error(`Stock control kind does not match schema: ${location}`);
     }
   }
@@ -228,8 +234,8 @@ export function validateStockControls({
   schema: StockJsonSchema;
   controls: StockControl[];
 }>): void {
-  controls.forEach((control) =>
-    _validateControl({
+  controls.forEach((control) => {
+    return _validateControl({
       control,
       context: {
         root: [schema],
@@ -237,6 +243,6 @@ export function validateStockControls({
         item: [],
         location: id,
       },
-    }),
-  );
+    });
+  });
 }

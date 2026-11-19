@@ -6,8 +6,12 @@ import type { Input } from "./GroupedValuePicker.schema";
  */
 export function getPickedValueFromInput(input: Readonly<Input>): number | null {
   const values = input.observations.map(prop("value"));
-  const numeric = values.filter((value): value is number => value !== null);
-  const sum = numeric.reduce((total, value) => total + value, 0);
+  const numeric = values.filter((value): value is number => {
+    return value !== null;
+  });
+  const sum = numeric.reduce((total, value) => {
+    return total + value;
+  }, 0);
   return match(input)
     .with({ rule: "first" }, () => {
       return values[0];
@@ -35,8 +39,12 @@ export function getPickedValueFromInput(input: Readonly<Input>): number | null {
       ];
       return candidates.sort((first, second) => {
         const countDifference =
-          values.filter((value) => value === second).length -
-          values.filter((value) => value === first).length;
+          values.filter((value) => {
+            return value === second;
+          }).length -
+          values.filter((value) => {
+            return value === first;
+          }).length;
         return (
           countDifference ||
           (first === null ? 1 : second === null ? -1 : first - second)

@@ -1,5 +1,7 @@
 import path from "node:path";
-import { expect } from "@playwright/test";
+import playwrightTest from "@playwright/test";
+
+const { expect } = playwrightTest;
 
 const fixtureNames = {
   cases: "Video - Harborfield cases",
@@ -34,7 +36,8 @@ async function sourceList(ctx, showImport = false) {
     .waitFor();
   if (showImport)
     await page.getByRole("tabpanel", { name: "Upload", exact: true }).waitFor();
-  // The visible count is absent while loading, including when cached requests do not fire.
+  // The visible count is absent while loading, including when cached requests
+  // do not fire.
   const count = page
     .getByRole("heading", { name: "Datasets", exact: true })
     .locator("..")
@@ -48,7 +51,10 @@ async function sourceList(ctx, showImport = false) {
   await closeChat(page);
 }
 
-/** Reuses this bundle's datasets and never deletes or edits unrelated local data. */
+/**
+ * Reuses this bundle's datasets and never deletes or edits unrelated local
+ * data.
+ */
 export async function ensureDataset(ctx, key, { demonstrate = false } = {}) {
   const { page, workspace, fixtureDir, state, step, checkpoint } = ctx;
   state.datasets ??= {};
@@ -333,7 +339,10 @@ async function dashboards(ctx) {
   await checkpoint("dashboard-preview");
 }
 
-/** Flow names are stable CLI identifiers, not product feature availability claims. */
+/**
+ * Flow names are stable CLI identifiers, not product feature availability
+ * claims.
+ */
 const productFlows = {
   import: importFlow,
   explorer,
@@ -342,7 +351,10 @@ const productFlows = {
   map: async (ctx) => (await import("./cases-map.mjs")).map(ctx),
 };
 
-/** Failed runs retain the actual screen and redacted visible text for selector diagnosis. */
+/**
+ * Failed runs retain the actual screen and redacted visible text for selector
+ * diagnosis.
+ */
 export const flows = Object.fromEntries(
   Object.entries(productFlows).map(([id, flow]) => [
     id,

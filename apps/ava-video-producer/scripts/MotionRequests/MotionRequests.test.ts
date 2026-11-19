@@ -9,7 +9,9 @@ import { MotionRequests } from "./MotionRequests";
 
 test("motion CLI resolves stable presets and rejects unrecognized commands or selections", () => {
   assert.deepEqual(
-    MotionRequests.parseArgs(["list"]).entries.map(({ id }) => id),
+    MotionRequests.parseArgs(["list"]).entries.map(({ id }) => {
+      return id;
+    }),
     [...STOCK_IDS],
   );
   for (const command of ["preview", "render"]) {
@@ -19,7 +21,9 @@ test("motion CLI resolves stable presets and rejects unrecognized commands or se
     );
     assert.deepEqual(
       MotionRequests.parseArgs([command, "network-graph"]).entries.map(
-        ({ id }) => id,
+        ({ id }) => {
+          return id;
+        },
       ),
       ["network-graph"],
     );
@@ -31,10 +35,9 @@ test("motion CLI resolves stable presets and rejects unrecognized commands or se
     ["render", "../outside"],
     ["preview", "all", "extra"],
   ]) {
-    assert.throws(
-      () => MotionRequests.parseArgs(args),
-      /Usage|Unknown stock motion preset/,
-    );
+    assert.throws(() => {
+      return MotionRequests.parseArgs(args);
+    }, /Usage|Unknown stock motion preset/);
   }
 });
 
@@ -62,9 +65,11 @@ test("motion CLI accepts one input file only for a selected preset", () => {
     ["render", "all", "--input", "authored.json"],
     ["list", "decision-fork", "--input", "authored.json"],
     ["preview", "decision-fork", "--input"],
-  ].forEach((args) =>
-    assert.throws(() => MotionRequests.parseArgs(args), /Usage|input/),
-  );
+  ].forEach((args) => {
+    return assert.throws(() => {
+      return MotionRequests.parseArgs(args);
+    }, /Usage|input/);
+  });
 });
 
 test("motion input files reject mismatched presets, null documents and partial input before bundling", async () => {
@@ -153,10 +158,9 @@ test("motion CLI accepts one theme for any selection", () => {
 });
 
 test("motion CLI refuses a theme when listing", () => {
-  assert.throws(
-    () => MotionRequests.parseArgs(["list", "all", "--theme", "avandar"]),
-    /Usage/,
-  );
+  assert.throws(() => {
+    return MotionRequests.parseArgs(["list", "all", "--theme", "avandar"]);
+  }, /Usage/);
 });
 
 test("default motion requests carry no colours so the theme decides", async () => {

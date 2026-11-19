@@ -4,11 +4,15 @@ export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "people"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "people";
+    }),
   ),
   { ...DEFAULT_INPUT, people: { ...DEFAULT_INPUT.people, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "stops"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "stops";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
@@ -49,23 +53,25 @@ export const invalidInputs: unknown[] = [
     stops: [{ ...DEFAULT_INPUT.stops[0], extra: true }, DEFAULT_INPUT.stops[1]],
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "finalStepSupport",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "finalStepSupport";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showPracticeStrip",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showPracticeStrip";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "labels"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "labels";
+    }),
   ),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showFootprints",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showFootprints";
+    }),
   ),
   {
     ...DEFAULT_INPUT,

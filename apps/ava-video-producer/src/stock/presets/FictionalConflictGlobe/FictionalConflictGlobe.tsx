@@ -27,17 +27,19 @@ export function FictionalConflictGlobe({
     >
       <GlobeCopy input={input} />
       <GlobeSurface longitude={longitude} showGraticule={input.showGraticule} />
-      {input.incidents.map((incident, index) => (
-        <GlobeIncident
-          key={incident.id}
-          incident={incident}
-          incidents={input.incidents}
-          index={index}
-          longitude={longitude}
-          showLabel={input.showLabels}
-          accent={accent}
-        />
-      ))}
+      {input.incidents.map((incident, index) => {
+        return (
+          <GlobeIncident
+            key={incident.id}
+            incident={incident}
+            incidents={input.incidents}
+            index={index}
+            longitude={longitude}
+            showLabel={input.showLabels}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

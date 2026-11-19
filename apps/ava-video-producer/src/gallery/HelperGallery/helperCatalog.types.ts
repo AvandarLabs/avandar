@@ -1,4 +1,6 @@
-/** A browsing group in the Helpers section, for example "Curves and durations". */
+/**
+ * A browsing group in the Helpers section, for example "Curves and durations".
+ */
 export type HelperCategory = {
   id: string;
   title: string;

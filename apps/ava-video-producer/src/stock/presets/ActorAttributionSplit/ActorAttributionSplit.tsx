@@ -35,16 +35,18 @@ export function ActorAttributionSplit({
         stroke={STOCK.line}
       />
       <AttributionActors frame={frame} input={input} accent={accent} />
-      {input.events.map((event, index) => (
-        <AttributionEvent
-          key={event.id}
-          frame={frame}
-          input={input}
-          event={event}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.events.map((event, index) => {
+        return (
+          <AttributionEvent
+            key={event.id}
+            frame={frame}
+            input={input}
+            event={event}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

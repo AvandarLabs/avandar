@@ -24,12 +24,14 @@ export function FilterSubscriptionScope({
         ]}
       />
       <SubscriptionSocket {...{ frame, input, accent }} />
-      {input.views.map((view, index) => (
-        <SubscriptionView
-          key={view.id}
-          {...{ view, index, input, frame, accent }}
-        />
-      ))}
+      {input.views.map((view, index) => {
+        return (
+          <SubscriptionView
+            key={view.id}
+            {...{ view, index, input, frame, accent }}
+          />
+        );
+      })}
     </g>
   );
 }

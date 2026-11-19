@@ -16,6 +16,6 @@ export function Curve({
   to: Point;
   bend?: number;
   tension?: number;
-}) {
+}): string {
   return `M${from.x},${from.y} C${mix(tension, from.x, to.x)},${from.y + bend} ${mix(1 - tension, from.x, to.x)},${to.y + bend} ${to.x},${to.y}`;
 }

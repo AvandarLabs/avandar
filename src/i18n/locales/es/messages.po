@@ -155,10 +155,6 @@ msgstr "Esta consulta no está escrita correctamente, por lo que no se pudo "
 msgid "Save the current view"
 msgstr "Guardar la vista actual"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Review new permissions"
-msgstr "Revisar nuevos permisos"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
 msgstr "Tamaño de celda (metros)"
@@ -346,18 +342,9 @@ msgstr "El {chartName} no se puede mostrar."
 msgid "Select {0}"
 msgstr "Seleccione {0}"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
-msgid "A query result's rows, only when you run one of its tools on that result"
-msgstr "Las filas del resultado de una consulta, solo cuando ejecutas una de "
-"sus herramientas sobre ese resultado"
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Permitir sincronización en línea"
-
-#: src/lib/plugins/PluginErrorBoundary/PluginErrorBoundary.tsx
-msgid "Something went wrong in this plugin. Close this panel and try again."
-msgstr "Algo salió mal en este plugin. Cierre este panel e inténtelo de nuevo."
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Works without an internet connection."
@@ -372,7 +359,6 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT no es compatible con el formulario."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Configuraciones del gráfico"
@@ -392,10 +378,6 @@ msgstr "Necesita acceso de edición de Tipos de caso para cambiar estos estados.
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
 msgstr "Reordenar {statusName}"
-
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "This chart needs the {pluginId} plugin, which is not available."
-msgstr "Este gráfico necesita el plugin {pluginId}, que no está disponible."
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -429,10 +411,6 @@ msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
 msgstr "Ingresa tu pregunta o instrucciones en lenguaje natural para generar "
 "una consulta SQL"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
-msgid "Could not update {pluginName}"
-msgstr "No se pudo actualizar {pluginName}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
@@ -503,10 +481,6 @@ msgstr "Avandar"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't download from a private or local address."
 msgstr "Avandar no puede descargar desde una dirección privada o local."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
-msgid "Needs review"
-msgstr "Requiere revisión"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Disputed values"
@@ -791,10 +765,6 @@ msgstr "Ordenar conjuntos de datos por"
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "Fuentes de datos"
-
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader.tsx
-msgid "Loading chart"
-msgstr "Cargando gráfico"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
@@ -1244,12 +1214,6 @@ msgstr "{shareClause} perderá el acceso."
 msgid "Orange"
 msgstr "Naranja"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
-msgid "Plugins add features to this workspace. Installing or removing a plugin "
-"affects every member."
-msgstr "Los plugins agregan funciones a este espacio de trabajo. Instalar o "
-"eliminar un plugin afecta a todos los miembros."
-
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 msgstr "La cláusula JOIN ON usa \"{operator}\": solo se asignan JOIN con "
@@ -1472,10 +1436,6 @@ msgid "However, we are not allowing new registrations at the moment."
 msgstr "Sin embargo, no estamos permitiendo nuevas inscripciones en este "
 "momento."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
-msgid "Not installed"
-msgstr "No instalado"
-
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
 msgstr "Abierto y en proceso."
@@ -1495,10 +1455,6 @@ msgstr "Este campo no puede estar vacío"
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "\"{value}\" no es una fecha. Use AAAA-MM-DD."
-
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "Plugin not available"
-msgstr "Plugin no disponible"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1623,7 +1579,6 @@ msgstr "Mostrar menos"
 msgid "Metadata"
 msgstr "Metadatos"
 
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Retry"
@@ -1939,11 +1894,6 @@ msgstr "Nombre de usuario"
 msgid "Column name in SQL"
 msgstr "Nombre de la columna en SQL"
 
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "This chart's saved settings are not valid, so it cannot be displayed."
-msgstr "La configuración guardada de este gráfico no es válida, por lo que no "
-"se puede mostrar."
-
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
 msgstr "Agregue un campo, p. ej., Notas de revisión"
@@ -1989,11 +1939,6 @@ msgstr "Solicite al propietario del panel que lo comparta con usted."
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Algunos datos deben provenir de conjuntos de datos existentes"
-
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "The plugin may be out of date. Ask an admin to check Settings → Plugins."
-msgstr "Es posible que el plugin esté desactualizado. Pida a un administrador "
-"que revise Configuración → Plugins."
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
@@ -2124,7 +2069,7 @@ msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {Mover # registro a} other {Mover # registros "
 "a}}"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
 msgstr "Columna de nombre seleccionada no válida"
 
@@ -2379,7 +2324,6 @@ msgid "Boundary disclaimer (Always included)"
 msgstr "Aviso sobre los límites (Siempre incluido)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
 msgstr "Deshacer"
 
@@ -2390,10 +2334,6 @@ msgstr "Un conjunto de datos corresponde a una pestaña."
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Label each ring with"
 msgstr "Etiquetar cada anillo con"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
-msgid "Data it can read"
-msgstr "Datos que puede leer"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -2557,10 +2497,6 @@ msgstr "Incluya los marcadores de posición z, x e y donde el servidor espera el
 #: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 msgid "(Blank)"
 msgstr "(En blanco)"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
-msgid "Data Explorer toolbar: {toolbarCommands}"
-msgstr "Barra de herramientas del Explorador de datos: {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2876,10 +2812,6 @@ msgstr "Abrir en pantalla completa"
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Sesgo detectado:"
-
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "The {pluginId} plugin ran into an error while drawing this chart."
-msgstr "El plugin {pluginId} encontró un error al dibujar este gráfico."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
@@ -3204,10 +3136,6 @@ msgid "Two statuses have the same name. Give each one its own name."
 msgstr "Dos estados tienen el mismo nombre. Asigne un nombre distinto a cada "
 "uno."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Its features are removed from this workspace."
-msgstr "Sus funciones se eliminaron de este espacio de trabajo."
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Última actualización"
@@ -3244,10 +3172,6 @@ msgid "For public places only. The search goes to an outside service, so never "
 msgstr "Solo para lugares públicos. La búsqueda se realiza mediante un servicio "
 "externo, por lo que nunca debe escribir la dirección de la casa de una "
 "persona."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Uninstall {pluginName}?"
-msgstr "¿Desinstalar {pluginName}?"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
@@ -3448,7 +3372,6 @@ msgstr "Su espacio de trabajo tiene el plan Free, que le permite compartir o "
 "compartir tantos dashboards como quiera."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable"
 msgstr "Deshabilitar"
 
@@ -3476,17 +3399,9 @@ msgstr "PDF descargado."
 msgid "Workspace ID"
 msgstr "ID del espacio de trabajo"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
-msgid "What it adds"
-msgstr "Lo que agrega"
-
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The longitude must be between -180 and 180."
 msgstr "La longitud debe estar entre -180 y 180."
-
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
-msgid "You haven't chosen: {settingLabel}"
-msgstr "No ha elegido: {settingLabel}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -3703,10 +3618,6 @@ msgstr "{usedSeats} de {maxSeats} asientos utilizados · {remainingSeats} "
 msgid "Statuses"
 msgstr "Estados"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
-msgid "{pluginName} uninstalled"
-msgstr "{pluginName} desinstalado"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "Ingrese un nombre para este conjunto de datos"
@@ -3793,7 +3704,6 @@ msgstr "El soporte de geometría se está descargando. Puede tardar un momento "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActionButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -3938,7 +3848,7 @@ msgstr "{0} áreas suprimidas"
 msgid "Annotation text:"
 msgstr "Texto de anotación:"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
 msgstr "No has elegido un eje X"
 
@@ -4047,10 +3957,6 @@ msgstr "Nombre de la hoja"
 msgid "{layerName} returned no rows"
 msgstr "{layerName} no devolvió ninguna fila"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
-msgid "Disabled"
-msgstr "Deshabilitado"
-
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
 msgstr "es como máximo"
@@ -4142,7 +4048,6 @@ msgstr "Solo alguien que pueda editar el mapa \"{mapName}\" puede publicarlo. "
 msgid "Link to the source record"
 msgstr "Enlace al registro de origen"
 
-#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -4312,10 +4217,6 @@ msgstr "Mostrar puntos"
 msgid "Try asking"
 msgstr "Prueba a preguntar"
 
-#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
-msgid "Columns added"
-msgstr "Columnas agregadas"
-
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Edit"
@@ -4334,10 +4235,6 @@ msgstr "No se pudieron crear esos tipos de caso"
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
 msgstr "Identidad"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
-msgid "Installed"
-msgstr "Instalado"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
@@ -4399,18 +4296,13 @@ msgstr "Filtros locales (editables por el espectador, solo este gráfico)"
 msgid "Press Enter to use it."
 msgstr "Presione Enter para usarla."
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid X axis selected"
 msgstr "Eje X seleccionado no válido"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
 msgstr "Máximo del eje X"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "{pluginName} will be available to every member of this workspace."
-msgstr "{pluginName} estará disponible para todos los miembros de este espacio "
-"de trabajo."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
@@ -4608,10 +4500,6 @@ msgstr "Mantenga la dirección por debajo de 500 caracteres."
 msgid "Fix the fields above, then save."
 msgstr "Corrija los campos anteriores y luego guarde."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Uninstall"
-msgstr "Desinstalar"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "Volver al editor"
@@ -4716,12 +4604,6 @@ msgstr "Se requiere una conexión segura"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "Intervalo de marcas del eje X"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
-msgid "You do not have permission to manage plugins. Ask a workspace admin to "
-"make changes."
-msgstr "No tiene permiso para administrar plugins. Pida a un administrador del "
-"espacio de trabajo que realice los cambios."
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -5308,10 +5190,6 @@ msgstr "Geometría esperada"
 msgid "Untitled map"
 msgstr "Mapa sin título"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Approve new permissions for {pluginName}?"
-msgstr "¿Aprobar nuevos permisos para {pluginName}?"
-
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "That region is not on a page we read. Kept the rule-based results."
 msgstr "Esa región no está en una página que hayamos leído. Se conservaron los "
@@ -5333,10 +5211,6 @@ msgstr "El archivo de origen no está en un formato que Avandar pueda leer como 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "Imagen"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
-msgid "Uses no workspace data."
-msgstr "No usa datos del espacio de trabajo."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "No organizations"
@@ -5490,10 +5364,6 @@ msgstr "No se pudieron cargar algunos conjuntos de datos publicados. Por favor, 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
 msgstr "Primer punto"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Enable {pluginName}?"
-msgstr "¿Habilitar {pluginName}?"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -5784,10 +5654,6 @@ msgstr "cobertura"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "Respuesta de aclaración"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
-msgid "Chart types: {chartTypes}"
-msgstr "Tipos de gráficos: {chartTypes}"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
@@ -6098,12 +5964,6 @@ msgstr "La cláusula WHERE compara \"{columnName}\" con una expresión que no es
 msgid "WKB"
 msgstr "WKB"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
-msgid "The plugin behind this chart is not available, so its settings cannot be "
-"shown."
-msgstr "El plugin detrás de este gráfico no está disponible, por lo que no se "
-"puede mostrar su configuración."
-
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
 msgstr "\"{value}\" no es una expresión regular válida."
@@ -6199,7 +6059,6 @@ msgid "Start with a spreadsheet"
 msgstr "Comience con una hoja de cálculo"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Unavailable"
 msgstr "No disponible"
 
@@ -6335,10 +6194,6 @@ msgstr "Etiqueta del eje Y"
 msgid "Quantile"
 msgstr "Cuantil"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
-msgid "No plugins are available in this deployment."
-msgstr "No hay plugins disponibles en esta implementación."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "Seleccionar columna"
@@ -6415,12 +6270,6 @@ msgstr "Puedes ver este conjunto de datos porque se compartió contigo."
 msgid "Break {0} of {1}, {value}"
 msgstr "Separador {0} de {1}, {value}"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
-msgid "Add calculated columns to a Data Explorer query when you run one of its "
-"tools"
-msgstr "Agregue columnas calculadas a una consulta de Data Explorer al ejecutar "
-"una de sus herramientas"
-
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
 msgstr "Ver registros"
@@ -6491,10 +6340,6 @@ msgstr "no es"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "Insertar"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
-msgid "Nothing yet."
-msgstr "Aún no hay nada."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class {classNumber}"
@@ -6604,12 +6449,6 @@ msgstr "<0>Enter</0> enlazar"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "Dejar que la IA decida (heredado)"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "This version asks for permissions listed on its card. It stays hidden "
-"until you approve them."
-msgstr "Esta versión solicita los permisos que se indican en su tarjeta. "
-"Permanecerá oculta hasta que los apruebe."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -7131,10 +6970,6 @@ msgstr "Orientación"
 msgid "Dashboard deleted successfully!"
 msgstr "¡Panel eliminado con éxito!"
 
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "The {pluginId} plugin's chart code didn't load."
-msgstr "No se cargó el código del gráfico del plugin {pluginId}."
-
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "El nombre que deseas que otros miembros del equipo vean."
@@ -7193,10 +7028,6 @@ msgstr "No tienes conexión a Internet, por lo que el chat se ejecuta en esta "
 msgid "What does this case type represent?"
 msgstr "¿Qué representa este tipo de caso?"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary.tsx
-msgid "{publisher} · version {version}"
-msgstr "{publisher} · versión {version}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "Columna 4"
@@ -7235,10 +7066,6 @@ msgstr "Leyenda"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Show the layer {layerName}"
 msgstr "Mostrar la capa {layerName}"
-
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "{pluginName}: the command failed"
-msgstr "{pluginName}: el comando falló"
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -7765,7 +7592,7 @@ msgstr "Pregunta sobre tus datos"
 msgid "Enter values; press Enter after each"
 msgstr "Ingrese valores; presione Enter después de cada uno"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't added any series"
 msgstr "No has agregado ninguna serie"
 
@@ -7788,10 +7615,6 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "Partes de este SQL no pudieron ser representadas en la forma Manual. La "
 "forma muestra una aproximación de mejor esfuerzo; el SQL anterior es lo "
 "que realmente se ejecuta."
-
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "This chart couldn't render"
-msgstr "No se pudo renderizar este gráfico"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
@@ -7925,13 +7748,6 @@ msgstr "No se pudieron cargar estos registros"
 msgid "No fields have been configured yet"
 msgstr "No se han configurado campos aún"
 
-#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-#: src/lib/plugins/PluginMenuSlot/PluginOverflowMenu.tsx
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-msgid "Plugins"
-msgstr "Plugins"
-
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not contain"
 msgstr "no contiene"
@@ -8063,7 +7879,6 @@ msgstr "Seleccionar columnas para consultar"
 msgid "Donut style"
 msgstr "Estilo de dona"
 
-#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -8104,11 +7919,6 @@ msgstr "Obtener un promedio de los valores"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM north zone {0}"
 msgstr "{code} - zona UTM norte {0}"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
-msgid "Some plugins could not be loaded. Reload the page to try again."
-msgstr "No se pudieron cargar algunos plugins. Vuelva a cargar la página para "
-"intentarlo de nuevo."
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -8216,10 +8026,6 @@ msgstr "Sin mapa base"
 msgid "Sign in again"
 msgstr "Iniciar sesión nuevamente"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Enable"
-msgstr "Habilitar"
-
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
 msgstr "El primer valor no puede ser mayor que el segundo."
@@ -8283,10 +8089,6 @@ msgstr "Su sesión ha expirado"
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "The feature list could not load."
 msgstr "No se pudo cargar la lista de entidades."
-
-#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
-msgid "The query changed after the columns were added."
-msgstr "La consulta cambió después de agregar las columnas."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
@@ -8463,11 +8265,6 @@ msgstr "Algunas partes del SQL no se pueden representar en el formulario "
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Dark"
 msgstr "Oscuro"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
-msgid "Could not load this workspace's plugins. Reload to try again."
-msgstr "No se pudieron cargar los plugins de este espacio de trabajo. Vuelva a "
-"cargar para intentarlo de nuevo."
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -8690,10 +8487,6 @@ msgid "Only workspace settings administrators can open workspace settings."
 msgstr "Solo los administradores de configuraciones del espacio de trabajo "
 "pueden abrir la configuración del espacio de trabajo."
 
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "Could not load {pluginName}"
-msgstr "No se pudo cargar {pluginName}"
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
 msgstr "Elija qué filtros globales se aplican a esta visualización."
@@ -8846,16 +8639,12 @@ msgstr "Facturación"
 msgid "This dataset now reflects the current contents of the sheet."
 msgstr "Este conjunto de datos ahora refleja el contenido actual de la hoja."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Install {pluginName}?"
-msgstr "¿Instalar {pluginName}?"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
 msgstr "Filas de este texto"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-#: src/views/DashboardApp/AvaPage/pfields/VizTypePField/useVizTypePFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "Tipo de visualización"
 
@@ -9052,11 +8841,6 @@ msgstr "Intervalos manuales"
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Line"
 msgstr "Línea"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Its features disappear for every member until you enable it again."
-msgstr "Sus funciones desaparecerán para todos los miembros hasta que vuelva a "
-"habilitarlo."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/GeoapifyAttribution.tsx
 msgid "Powered by Geoapify"
@@ -9385,19 +9169,9 @@ msgstr "Este espacio de trabajo no tiene una suscripción válida."
 msgid "Dataset"
 msgstr "Conjunto de datos"
 
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "Try again. If it keeps failing, contact the plugin's publisher."
-msgstr "Inténtelo de nuevo. Si sigue fallando, comuníquese con el editor del "
-"plugin."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "Todas las decisiones"
-
-#. js-lingui-explicit-id
-#: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
-msgid "series.cases"
-msgstr "series.cases"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
 msgid "Loading count"
@@ -9527,7 +9301,7 @@ msgstr "Porcentaje"
 msgid "Each case type is a kind of record you manage."
 msgstr "Cada tipo de caso es una clase de registro que administra."
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "bar chart"
 msgstr "gráfico de barras"
 
@@ -9608,10 +9382,6 @@ msgstr "Servicio"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
 msgid "Loading author"
 msgstr "Cargando autor"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Disable {pluginName}?"
-msgstr "¿Deshabilitar {pluginName}?"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Ask a question about your data. Type @ to point me at a dashboard, "
@@ -9796,10 +9566,6 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 msgstr "La capa obtiene exactamente estos campos, por lo que agregar uno "
 "también lo hace disponible para filtrar."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Install"
-msgstr "Instalar"
-
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
 msgstr "Require"
@@ -9819,10 +9585,6 @@ msgstr "Valor predeterminado"
 msgid "{0} areas have no data"
 msgstr "{0} áreas no tienen datos"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
-msgid "Its charts see only the rows of the chart they draw"
-msgstr "Sus gráficos solo ven las filas del gráfico que representan"
-
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution.tsx
 msgid "© OpenStreetMap contributors"
 msgstr "© Colaboradores de OpenStreetMap"
@@ -9835,7 +9597,7 @@ msgstr "Obligatorio"
 msgid "No numeric columns available to add to this series."
 msgstr "No hay columnas numéricas disponibles para agregar a esta serie."
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a name column"
 msgstr "No ha elegido una columna de nombres"
 
@@ -9881,11 +9643,6 @@ msgstr "Solo usted tiene acceso a este {resource}."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at least"
 msgstr "es al menos"
-
-#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
-#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-msgid "Plugin chart"
-msgstr "Gráfico del complemento"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -10126,7 +9883,7 @@ msgstr "Datos no disponibles"
 msgid "The map's saved view"
 msgstr "La vista guardada del mapa"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
 msgstr "No ha elegido una columna de valores"
 
@@ -10247,10 +10004,6 @@ msgstr "Este {resource} es accesible para cualquier persona con permiso {app} "
 msgid "Edit place"
 msgstr "Editar lugar"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
-msgid "See less"
-msgstr "Ver menos"
-
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "Ámbar"
@@ -10274,13 +10027,6 @@ msgstr "Ocultar el tutorial"
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 msgid "Move place"
 msgstr "Mover lugar"
-
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
-msgid "{rowCount, plural, one {Built from the first row of the result.} other "
-"{Built from the first # rows of the result.}}"
-msgstr "{rowCount, plural, one {Creado a partir de la primera fila del "
-"resultado.} other {Creado a partir de las primeras # filas del "
-"resultado.}}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -10346,17 +10092,13 @@ msgstr "Cargando funciones"
 msgid "This dataset will be offline-only"
 msgstr "Este conjunto de datos será solo offline"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y / Size series"
 msgstr "Agrega al menos una serie de X / Y / Tamaño"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar"
 msgstr "Barra lateral"
-
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "{pluginName}: this command is not available"
-msgstr "{pluginName}: este comando no está disponible"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -10407,10 +10149,6 @@ msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 msgstr "Esa pestaña ya no está en esta hoja de cálculo. Es posible que se haya "
 "cambiado su nombre o eliminado. Seleccione nuevamente la hoja y elija "
 "una pestaña."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
-msgid "See more"
-msgstr "Ver más"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -10464,10 +10202,6 @@ msgstr "Este es el último paso. Publique el dashboard para que cualquier "
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "Agregar filtro"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
-msgid "Loading plugins"
-msgstr "Cargando complementos"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -10831,11 +10565,6 @@ msgstr "Distribución de valores"
 msgid "Could not read file"
 msgstr "No se pudo leer el archivo"
 
-#: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
-msgid "Check your connection and click the button again to retry."
-msgstr "Verifique su conexión y haga clic nuevamente en el botón para "
-"reintentar."
-
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "This layer's features cannot be listed."
 msgstr "No se pueden listar las entidades de esta capa."
@@ -10894,10 +10623,6 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Actualiza a "
 "nuestro plan Starter o Impact para aumentar el número de conjuntos de "
 "datos que puedes agregar a tu espacio de trabajo."
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Its features come back for every member."
-msgstr "Sus funciones vuelven a estar disponibles para cada miembro."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
@@ -11016,10 +10741,6 @@ msgstr "Indexado por"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Select all"
 msgstr "Seleccionar todo"
-
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "Invalid chart settings"
-msgstr "Configuración de gráfico no válida"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
@@ -11234,7 +10955,7 @@ msgstr "Leer como"
 msgid "Nothing is assigned to you."
 msgstr "No tienes nada asignado."
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
 msgstr "Columna de valor seleccionada inválida"
 
@@ -11337,10 +11058,6 @@ msgstr "Se agotó el tiempo de espera de la conexión"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
 msgstr "De menor a mayor"
-
-#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-msgid "Bar gap"
-msgstr "Espacio entre barras"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -11469,10 +11186,6 @@ msgstr "Cada miembro del espacio de trabajo que pueda abrir la aplicación {app}
 "obtiene este rol en este {resource}, además de lo que aparezca a "
 "continuación."
 
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "{title} couldn't render"
-msgstr "No se pudo renderizar {title}"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/asiento"
@@ -11503,12 +11216,6 @@ msgstr "Explora tus datos"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Mention a teammate"
 msgstr "Mencionar a un compañero de equipo"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
-msgid "No longer included in this deployment. Uninstall to remove it from this "
-"workspace."
-msgstr "Ya no está incluido en esta implementación. Desinstálelo para "
-"eliminarlo de este espacio de trabajo."
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -11811,10 +11518,6 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Los valores que seleccionaste pueden contener información personal. El "
 "proveedor de IA los recibirá y puede registrar la solicitud."
 
-#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
-msgid "Nothing to undo"
-msgstr "Nada que deshacer"
-
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
 msgstr "Eliminar este conjunto de datos"
@@ -11983,8 +11686,6 @@ msgstr "es mayor que"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
-#: src/lib/plugins/makePluginApi/makePluginApi.tsx
-#: src/lib/plugins/PluginDrawerHost/PluginDrawerHost.tsx
 #: src/views/GisApp/MapViewer/MapViewerPopupCard.tsx
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Close"
@@ -12065,10 +11766,6 @@ msgstr "No informado"
 #: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
 msgid "Anyone"
 msgstr "Cualquiera"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
-msgid "Approve"
-msgstr "Aprobar"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -12217,10 +11914,6 @@ msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
 msgstr "Solo las primeras {MAX_DESCRIBED_MENTIONS} menciones se describen al "
 "asistente."
 
-#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
-msgid "Loading chart settings"
-msgstr "Cargando la configuración del gráfico"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
 msgstr "Columna de clave de datos"
@@ -12271,10 +11964,6 @@ msgstr "ORDER BY hace referencia a la columna \"{columnName}\", que no está en 
 msgid "Blue"
 msgstr "Azul"
 
-#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
-msgid "This chart couldn't load"
-msgstr "No se pudo cargar este gráfico"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
 msgstr "Incluir conjuntos de datos que no se pueden cargar"
@@ -12312,10 +12001,6 @@ msgstr "S"
 msgid "https://example.org"
 msgstr "https://example.org"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
-msgid "{pluginName} installed"
-msgstr "{pluginName} instalado"
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The assistant could not answer that. Try again in a moment."
 msgstr "El asistente no pudo responder a eso. Intenta de nuevo en un momento."
@@ -12335,10 +12020,6 @@ msgstr "Desde la columna: <0>{columnName}</0>"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr "Inferior"
-
-#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
-msgid "Added {columnList}"
-msgstr "Se agregaron {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
@@ -12368,7 +12049,7 @@ msgstr "Distancia ({unitLabel})"
 msgid "Download PNG"
 msgstr "Descargar PNG"
 
-#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y series"
 msgstr "Agrega al menos una serie de X / Y"
 

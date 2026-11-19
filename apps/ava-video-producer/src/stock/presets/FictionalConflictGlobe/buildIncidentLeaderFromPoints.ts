@@ -29,13 +29,17 @@ function _getShortestRoute({
   points: readonly Point[];
   blockers: readonly Point[];
 }): Point[] {
-  const nodes: RouteNode[] = points.map((point, index) => ({
-    ...point,
-    index,
-    distance: index ? Infinity : 0,
-    visited: false,
-  }));
-  nodes.forEach(() => _visitClosestNode({ nodes, blockers }));
+  const nodes: RouteNode[] = points.map((point, index) => {
+    return {
+      ...point,
+      index,
+      distance: index ? Infinity : 0,
+      visited: false,
+    };
+  });
+  nodes.forEach(() => {
+    return _visitClosestNode({ nodes, blockers });
+  });
   if (!Number.isFinite(nodes[1].distance)) {
     // Overlapping geographic footprints may leave no distinct routing corridor.
     return [points[0], points[1]];
@@ -76,18 +80,22 @@ export function buildIncidentLeaderFromPoints(
   const points = [
     start,
     { x: 604, y: labelY - 5 },
-    ...blockers.flatMap((marker) =>
-      [-24, 24].flatMap((offsetX) =>
-        [-24, 24].map((offsetY) => ({
-          x: marker.x + offsetX,
-          y: marker.y + offsetY,
-        })),
-      ),
-    ),
+    ...blockers.flatMap((marker) => {
+      return [-24, 24].flatMap((offsetX) => {
+        return [-24, 24].map((offsetY) => {
+          return {
+            x: marker.x + offsetX,
+            y: marker.y + offsetY,
+          };
+        });
+      });
+    }),
   ];
   const route = _getShortestRoute({ points, blockers });
   return `${route
-    .map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`)
+    .map((point, index) => {
+      return `${index ? "L" : "M"}${point.x} ${point.y}`;
+    })
     .join(" ")} H608`;
 }
 
@@ -99,8 +107,12 @@ function _visitClosestNode({
   blockers: readonly Point[];
 }): void {
   const closest = nodes
-    .filter((node) => !node.visited)
-    .sort((first, second) => first.distance - second.distance)[0];
+    .filter((node) => {
+      return !node.visited;
+    })
+    .sort((first, second) => {
+      return first.distance - second.distance;
+    })[0];
   if (!closest || !Number.isFinite(closest.distance)) {
     return;
   }

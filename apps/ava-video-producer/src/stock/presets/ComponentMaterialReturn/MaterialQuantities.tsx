@@ -24,16 +24,18 @@ export function MaterialQuantities({
   ];
   return (
     <g opacity={ramp(frame, 108, 12)}>
-      {values.map(({ value, x, y, width }, index) => (
-        <SceneLabel
-          key={index}
-          text={`${value} ${input.copy.unit}`}
-          x={x}
-          y={y}
-          width={width}
-          lines={3}
-        />
-      ))}
+      {values.map(({ value, x, y, width }, index) => {
+        return (
+          <SceneLabel
+            key={index}
+            text={`${value} ${input.copy.unit}`}
+            x={x}
+            y={y}
+            width={width}
+            lines={3}
+          />
+        );
+      })}
     </g>
   );
 }

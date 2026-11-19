@@ -13,18 +13,22 @@ type GetTravelCostsFromInputResult = {
 export function getTravelCostsFromInput(
   input: Readonly<Input>,
 ): GetTravelCostsFromInputResult[] {
-  const costs = new Map(input.nodes.map((node) => [node.id, Infinity]));
+  const costs = new Map(
+    input.nodes.map((node) => {
+      return [node.id, Infinity];
+    }),
+  );
   const predecessors = new Map<string, string>();
   const settled = new Set<string>();
   costs.set(input.originId, 0);
   input.nodes.forEach(() => {
     const current = input.nodes
-      .filter((node) => !settled.has(node.id))
-      .reduce<(typeof input.nodes)[number] | undefined>(
-        (best, node) =>
-          !best || costs.get(node.id)! < costs.get(best.id)! ? node : best,
-        undefined,
-      );
+      .filter((node) => {
+        return !settled.has(node.id);
+      })
+      .reduce<(typeof input.nodes)[number] | undefined>((best, node) => {
+        return !best || costs.get(node.id)! < costs.get(best.id)! ? node : best;
+      }, undefined);
     if (!current) {
       return;
     }
@@ -46,9 +50,11 @@ export function getTravelCostsFromInput(
       }
     });
   });
-  return input.nodes.map((node) => ({
-    ...node,
-    cost: costs.get(node.id)!,
-    predecessor: predecessors.get(node.id),
-  }));
+  return input.nodes.map((node) => {
+    return {
+      ...node,
+      cost: costs.get(node.id)!,
+      predecessor: predecessors.get(node.id),
+    };
+  });
 }

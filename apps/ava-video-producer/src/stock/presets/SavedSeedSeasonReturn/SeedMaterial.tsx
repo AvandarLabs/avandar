@@ -52,15 +52,17 @@ export function SeedMaterial({
   return (
     <g>
       {_getPortions({ scene, frame, accent }).map(
-        ([destination, position, width, color]) => (
-          <SeedPortion
-            key={destination}
-            destination={destination}
-            position={position}
-            width={width}
-            color={color}
-          />
-        ),
+        ([destination, position, width, color]) => {
+          return (
+            <SeedPortion
+              key={destination}
+              destination={destination}
+              position={position}
+              width={width}
+              color={color}
+            />
+          );
+        },
       )}
     </g>
   );

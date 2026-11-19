@@ -19,12 +19,12 @@ export function DoseToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const peers = input.units.filter(
-    (item) =>
+  const peers = input.units.filter((item) => {
+    return (
       item.outcome === unit.outcome &&
-      (unit.outcome !== "administered" ||
-        item.recipientId === unit.recipientId),
-  );
+      (unit.outcome !== "administered" || item.recipientId === unit.recipientId)
+    );
+  });
   const position = peers.findIndex(propEq("id", unit.id));
   const recipientIndex = input.recipients.findIndex(
     propEq<{ id: unknown }, "id", unknown>("id", unit.recipientId),

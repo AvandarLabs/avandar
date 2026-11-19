@@ -14,22 +14,28 @@ test("held and stationary location badges paint readable counts over their actua
   [
     {
       input: DEFAULT_INPUT,
-      frames: Array.from({ length: 18 }, (_, index) => 82 + index),
+      frames: Array.from({ length: 18 }, (_, index) => {
+        return 82 + index;
+      }),
       counts: [2, 2],
     },
     {
       input: fixtures[2].input,
-      frames: Array.from({ length: 87 }, (_, index) => 53 + index),
+      frames: Array.from({ length: 87 }, (_, index) => {
+        return 53 + index;
+      }),
       counts: [8],
     },
-  ].forEach(({ input, frames, counts }) =>
-    frames.forEach((frame) => {
+  ].forEach(({ input, frames, counts }) => {
+    return frames.forEach((frame) => {
       const markup = render({ frame: frame, input: input }),
         badges = [
           ...markup.matchAll(/<g data-location-count="(\d+)">(.*?)<\/g>/g),
         ];
       assert.deepEqual(
-        badges.map(([, value]) => Number(value)),
+        badges.map(([, value]) => {
+          return Number(value);
+        }),
         counts,
       );
       badges.forEach(([, value, content]) => {
@@ -52,8 +58,8 @@ test("held and stationary location badges paint readable counts over their actua
           /opacity="0"|visibility="hidden"|display="none"/,
         );
       });
-    }),
-  );
+    });
+  });
 });
 
 test("mixed trajectories retain the occupied stationary badge when moving members join", () => {
@@ -73,7 +79,9 @@ test("mixed trajectories retain the occupied stationary badge when moving member
   [input, { ...input, points: [...input.points].reverse() }].forEach(
     (authored) => {
       [
-        ...Array.from({ length: 87 }, (_, index) => 53 + index),
+        ...Array.from({ length: 87 }, (_, index) => {
+          return 53 + index;
+        }),
         67.5,
         118.5,
         119.5,
@@ -83,17 +91,16 @@ test("mixed trajectories retain the occupied stationary badge when moving member
         assert.equal(points.length, 3);
         assert.equal(
           new Set(
-            points.map((point) =>
-              _attribute({ markup: point, name: "data-point" }),
-            ),
+            points.map((point) => {
+              return _attribute({ markup: point, name: "data-point" });
+            }),
           ).size,
           3,
         );
         points
-          .filter(
-            (point) =>
-              _attribute({ markup: point, name: "data-point" }) !== "m",
-          )
+          .filter((point) => {
+            return _attribute({ markup: point, name: "data-point" }) !== "m";
+          })
           .forEach((point) => {
             assert.equal(_number({ markup: point, name: "cx" }), 288);
             assert.equal(_number({ markup: point, name: "cy" }), 320);
@@ -130,14 +137,15 @@ test("mixed trajectories retain the occupied stationary badge when moving member
         _marks({
           markup: render({ frame: 139, input: authored }),
           name: "point",
-        }).map((point) => [
-          _number({ markup: point, name: "cx" }),
-          _number({ markup: point, name: "cy" }),
-        ]),
-        authored.points.map((point) => [
-          48 + point.x * 4.8,
-          140 + point.y * 3.6,
-        ]),
+        }).map((point) => {
+          return [
+            _number({ markup: point, name: "cx" }),
+            _number({ markup: point, name: "cy" }),
+          ];
+        }),
+        authored.points.map((point) => {
+          return [48 + point.x * 4.8, 140 + point.y * 3.6];
+        }),
       );
     },
   );

@@ -18,8 +18,8 @@ import { inputSchema, type Input } from "./WorkDecomposition.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -31,16 +31,19 @@ const render = ({
       }),
     ),
   );
+};
 function _pieces({ frame, input }: { frame: number; input: Input }) {
   return [
     ...render({ frame: frame, input: input }).matchAll(
       /<rect[^>]*data-piece-id="[^"]*"[^>]*>/g,
     ),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 test("piece geometry conserves the original slab area and supplied effort in both partition layouts", () => {
-  fixtures.forEach(({ input }) =>
-    ["strips", "alternating-cuts"].forEach((layout) => {
+  fixtures.forEach(({ input }) => {
+    return ["strips", "alternating-cuts"].forEach((layout) => {
       const document = {
         ...input,
         partitionLayout: layout as Input["partitionLayout"],
@@ -54,7 +57,9 @@ test("piece geometry conserves the original slab area and supplied effort in bot
         SvgAttributes.getNumberFromMarkup({ attributes: slab, name: "height" });
       const pieces = _pieces({ frame: 150, input: document });
       assert.equal(pieces.length, input.workItems.length);
-      const total = input.workItems.reduce((sum, item) => sum + item.effort, 0);
+      const total = input.workItems.reduce((sum, item) => {
+        return sum + item.effort;
+      }, 0);
       let summedArea = 0;
       pieces.forEach((piece, index) => {
         const pieceArea =
@@ -74,8 +79,8 @@ test("piece geometry conserves the original slab area and supplied effort in bot
         assert.ok(piece.includes(`data-parent="${input.parentLabel}"`));
       });
       assert.ok(Math.abs(summedArea - area) < 1e-7);
-    }),
-  );
+    });
+  });
 });
 test("partition orientation changes cuts while equal-gap separation leaves nonoverlapping pieces", () => {
   assert.notDeepEqual(
@@ -97,9 +102,9 @@ test("partition orientation changes cuts while equal-gap separation leaves nonov
       },
     });
     assert.equal(pieces.length, 6);
-    pieces.forEach((piece, index) =>
-      pieces.slice(index + 1).forEach((other) =>
-        assert.ok(
+    pieces.forEach((piece, index) => {
+      return pieces.slice(index + 1).forEach((other) => {
+        return assert.ok(
           SvgAttributes.getNumberFromMarkup({
             attributes: piece,
             name: "x",
@@ -148,15 +153,16 @@ test("partition orientation changes cuts while equal-gap separation leaves nonov
                 attributes: piece,
                 name: "y",
               }),
-        ),
-      ),
-    );
+        );
+      });
+    });
   });
 });
-test("invalid duplicate identities and impossible effort weights are rejected", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("invalid duplicate identities and impossible effort weights are rejected", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 
 registerStockPresetAssertions({
   inputSchema,
@@ -166,21 +172,26 @@ registerStockPresetAssertions({
   contract,
   render,
   excludedTextFields: ["id", "insertBeforeId", "kind", "partitionLayout"],
-  getVisibleTexts: ({ input }) => [
-    input.parentLabel,
-    input.unitLabel,
-    input.groupingLabel,
-    ...input.workItems.map(prop("label")),
-  ],
+  getVisibleTexts: ({ input }) => {
+    return [
+      input.parentLabel,
+      input.unitLabel,
+      input.groupingLabel,
+      ...input.workItems.map(prop("label")),
+    ];
+  },
   textFrames: [150],
 });
 test("ruled cut lines travel across the continuous slab before pieces separate", () => {
-  const cuts = (frame: number) =>
-    [
+  const cuts = (frame: number) => {
+    return [
       ...render({ frame: frame }).matchAll(
         /<line[^>]*data-cut-index="[^"]*"[^>]*>/g,
       ),
-    ].map((match) => match[0]);
+    ].map((match) => {
+      return match[0];
+    });
+  };
   const before = cuts(38),
     after = cuts(86);
   assert.equal(before.length, DEFAULT_INPUT.workItems.length - 1);
@@ -219,8 +230,10 @@ test("maximum-density pieces remain inside the reserved bracket throughout separ
       ...fixtures[2].input,
       partitionLayout: layout as Input["partitionLayout"],
     };
-    Array.from({ length: 87 }, (_, index) => 38 + index).forEach((frame) =>
-      _pieces({ frame, input }).forEach((piece) => {
+    Array.from({ length: 87 }, (_, index) => {
+      return 38 + index;
+    }).forEach((frame) => {
+      return _pieces({ frame, input }).forEach((piece) => {
         const x = SvgAttributes.getNumberFromMarkup({
             attributes: piece,
             name: "x",
@@ -247,7 +260,7 @@ test("maximum-density pieces remain inside the reserved bracket throughout separ
               }) <=
               524,
         );
-      }),
-    );
+      });
+    });
   });
 });

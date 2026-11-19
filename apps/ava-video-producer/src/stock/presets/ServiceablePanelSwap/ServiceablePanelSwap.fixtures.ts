@@ -148,27 +148,27 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, showConnectorGuide: "true" },
   {
     ...DEFAULT_INPUT,
-    modules: DEFAULT_INPUT.modules.map((item, index) =>
-      index === 0 ? { ...item, id: "" } : item,
-    ),
+    modules: DEFAULT_INPUT.modules.map((item, index) => {
+      return index === 0 ? { ...item, id: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    modules: DEFAULT_INPUT.modules.map((item, index) =>
-      index === 0 ? { ...item, id: "W".repeat(21) } : item,
-    ),
+    modules: DEFAULT_INPUT.modules.map((item, index) => {
+      return index === 0 ? { ...item, id: "W".repeat(21) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    modules: DEFAULT_INPUT.modules.map((item, index) =>
-      index === 0 ? { ...item, label: "" } : item,
-    ),
+    modules: DEFAULT_INPUT.modules.map((item, index) => {
+      return index === 0 ? { ...item, label: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    modules: DEFAULT_INPUT.modules.map((item, index) =>
-      index === 0 ? { ...item, label: "W".repeat(23) } : item,
-    ),
+    modules: DEFAULT_INPUT.modules.map((item, index) => {
+      return index === 0 ? { ...item, label: "W".repeat(23) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -223,9 +223,9 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    modules: DEFAULT_INPUT.modules.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    modules: DEFAULT_INPUT.modules.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,

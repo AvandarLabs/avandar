@@ -33,13 +33,6 @@ export type AvaBarChartVizConfig = {
    */
   layout: "group" | "stack" | "percent";
 
-  /**
-   * Space between bar categories. `"none"` draws neighboring bars touching,
-   * as an epicurve or a histogram needs. Unset draws the renderer's default
-   * gap.
-   */
-  barGap?: "default" | "none";
-
   /** Show the chart legend when `true`. */
   withLegend: boolean;
 

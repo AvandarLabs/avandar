@@ -45,14 +45,16 @@ export function CustodyObject({
       {input.showLabels ? (
         <g>
           <FitText {...label} />
-          {input.object.details.map((text, index) => (
-            <FitText
-              key={index}
-              {...DETAILS}
-              text={text}
-              y={260 + index * 35}
-            />
-          ))}
+          {input.object.details.map((text, index) => {
+            return (
+              <FitText
+                key={index}
+                {...DETAILS}
+                text={text}
+                y={260 + index * 35}
+              />
+            );
+          })}
         </g>
       ) : undefined}
     </g>

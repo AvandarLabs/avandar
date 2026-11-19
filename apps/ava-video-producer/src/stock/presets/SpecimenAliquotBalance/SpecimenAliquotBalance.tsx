@@ -16,11 +16,9 @@ export function SpecimenAliquotBalance({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transferred = input.aliquots.reduce(
-    (total, aliquot, index) =>
-      total + aliquot.volume * ramp(frame, 36 + index * 12, 24),
-    0,
-  );
+  const transferred = input.aliquots.reduce((total, aliquot, index) => {
+    return total + aliquot.volume * ramp(frame, 36 + index * 12, 24);
+  }, 0);
   return (
     <g opacity={ramp(frame, 12, 18)}>
       <AliquotCaption input={input} />
@@ -32,18 +30,20 @@ export function SpecimenAliquotBalance({
         showIdentity={input.showLineage}
         accent={accent}
       />
-      {input.aliquots.map((aliquot, index) => (
-        <AliquotTube
-          key={aliquot.id}
-          tube={aliquot}
-          parentId={input.parent.id}
-          x={250 + index * 130}
-          volume={aliquot.volume * ramp(frame, 36 + index * 12, 24)}
-          showIdentity={input.showLineage}
-          accent={accent}
-          isChild
-        />
-      ))}
+      {input.aliquots.map((aliquot, index) => {
+        return (
+          <AliquotTube
+            key={aliquot.id}
+            tube={aliquot}
+            parentId={input.parent.id}
+            x={250 + index * 130}
+            volume={aliquot.volume * ramp(frame, 36 + index * 12, 24)}
+            showIdentity={input.showLineage}
+            accent={accent}
+            isChild
+          />
+        );
+      })}
       <AliquotLedger input={input} transferred={transferred} />
       {input.showEquation && frame >= 108 ? (
         <AliquotEquation input={input} />

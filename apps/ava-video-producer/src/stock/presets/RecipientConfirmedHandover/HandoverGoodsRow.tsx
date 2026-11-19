@@ -35,16 +35,18 @@ export function HandoverGoodsRow({
           {content.offeredUnits} → {content.selectedUnits}
         </text>
       ) : undefined}
-      {Array.from({ length: content.offeredUnits }, (_, unitIndex) => (
-        <HandoverUnit
-          key={unitIndex}
-          input={input}
-          frame={frame}
-          contentIndex={index}
-          unitIndex={unitIndex}
-          accent={accent}
-        />
-      ))}
+      {Array.from({ length: content.offeredUnits }, (_, unitIndex) => {
+        return (
+          <HandoverUnit
+            key={unitIndex}
+            input={input}
+            frame={frame}
+            contentIndex={index}
+            unitIndex={unitIndex}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

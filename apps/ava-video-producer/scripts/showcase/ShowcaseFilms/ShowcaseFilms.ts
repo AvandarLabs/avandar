@@ -38,7 +38,9 @@ export const appRoot: string = fileURLToPath(
 /** Only these authored plans may be served or rendered by the showcase. */
 export const PLANS: Record<string, string> = {
   ...Object.fromEntries(
-    CONTINUITY_CATALOG.map((entry) => [entry.id, entry.path]),
+    CONTINUITY_CATALOG.map((entry) => {
+      return [entry.id, entry.path];
+    }),
   ),
   "avandar-home": "home",
   "scene-library": "library",
@@ -97,7 +99,9 @@ const optionsSchema = z.strictObject({
 
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
-    Object.values(value).forEach((child) => _freezeSnapshot(child));
+    Object.values(value).forEach((child) => {
+      return _freezeSnapshot(child);
+    });
     Object.freeze(value);
   }
   return value;
@@ -154,7 +158,9 @@ function _renderOptions(
   const { captions, cameraMotion, motionBlur, annotations } = options;
   return Object.fromEntries(
     Object.entries({ captions, cameraMotion, motionBlur, annotations }).filter(
-      (entry): entry is [string, boolean] => entry[1] !== undefined,
+      (entry): entry is [string, boolean] => {
+        return entry[1] !== undefined;
+      },
     ),
   );
 }
@@ -193,7 +199,9 @@ function _assertOptionsFit({
   if (
     !isStock &&
     !isContinuity &&
-    Object.keys(options).some((key) => key !== "captions" && key !== "theme")
+    Object.keys(options).some((key) => {
+      return key !== "captions" && key !== "theme";
+    })
   ) {
     throw new Error("Stock options require an Atlas preset");
   }
@@ -228,10 +236,9 @@ function _loadStockFilm({
     ...stockRequestSchema.parse({
       preset: stock.id,
       ...Object.fromEntries(
-        Object.entries(options).filter(
-          ([key, value]) =>
-            key !== "captions" && key !== "theme" && value !== undefined,
-        ),
+        Object.entries(options).filter(([key, value]) => {
+          return key !== "captions" && key !== "theme" && value !== undefined;
+        }),
       ),
     }),
     frames: stock.loopFrames,
@@ -245,7 +252,9 @@ function _loadStockFilm({
   return film;
 }
 
-/** The title study or the motion lab, sized from the current composition timing. */
+/**
+ * The title study or the motion lab, sized from the current composition timing.
+ */
 async function _loadCompositionFilm({
   base,
   id,
@@ -319,10 +328,12 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
     return helperFilm;
   }
   const contracts = await buildStockContracts(appRoot);
-  const stock = contracts.STOCK_CATALOG.find(
-    (entry) => `stock-${entry.id}` === id,
-  );
-  const isContinuity = CONTINUITY_CATALOG.some((entry) => entry.id === id);
+  const stock = contracts.STOCK_CATALOG.find((entry) => {
+    return `stock-${entry.id}` === id;
+  });
+  const isContinuity = CONTINUITY_CATALOG.some((entry) => {
+    return entry.id === id;
+  });
   _assertOptionsFit({ options, isStock: Boolean(stock), isContinuity });
   const base = await _loadBaseFilm({ id, options });
   if (stock) {

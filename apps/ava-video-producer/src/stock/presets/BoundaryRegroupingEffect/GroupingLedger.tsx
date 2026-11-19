@@ -17,9 +17,9 @@ export function GroupingLedger({
       <LabelSlots
         labels={[[input.groupings[index].label, 60, 90, 360, 16, 3]]}
       />
-      {getGroupingFromCells({ input, index }).map((zone) => (
-        <GroupingZone key={zone.id} zone={zone} accent={accent} />
-      ))}
+      {getGroupingFromCells({ input, index }).map((zone) => {
+        return <GroupingZone key={zone.id} zone={zone} accent={accent} />;
+      })}
     </g>
   );
 }

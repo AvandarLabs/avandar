@@ -127,5 +127,7 @@ test("premise joining arms reach the common deck when central supports are hidde
   });
   const arms = [...markup.matchAll(/data-premise-join="[^"]+" d="([^"]+)"/g)];
   assert.equal(arms.length, 3);
-  arms.forEach(([, path]) => assert.match(path, /V350/));
+  arms.forEach(([, path]) => {
+    return assert.match(path, /V350/);
+  });
 });

@@ -29,13 +29,15 @@ export function ChoroplethClassBreaks({
           [input.copy.after, 542, 72, 370, 14, 3],
         ]}
       />
-      {input.zones.map((zone, index) => (
-        <ClassZone
-          key={zone.id}
-          {...{ zone, index, threshold, frame, accent }}
-          noDataLabel={input.noDataLabel}
-        />
-      ))}
+      {input.zones.map((zone, index) => {
+        return (
+          <ClassZone
+            key={zone.id}
+            {...{ zone, index, threshold, frame, accent }}
+            noDataLabel={input.noDataLabel}
+          />
+        );
+      })}
       <ClassLegends {...{ input, accent }} />
       <ClassRuler {...{ input, threshold }} />
     </g>

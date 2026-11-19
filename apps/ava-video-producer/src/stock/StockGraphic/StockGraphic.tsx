@@ -4,6 +4,7 @@ import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScop
 import { stockRequestEnvelopeSchema } from "../contracts/stockRequestSchema/stockRequestSchema";
 import { StockCanvas } from "./StockCanvas";
 import type { StockRequest } from "../contracts/StockContract.types";
+import type { ReactNode } from "react";
 
 /** Preset-discriminated content with explicit local frame and display size. */
 export type Props = StockRequest & {
@@ -11,7 +12,9 @@ export type Props = StockRequest & {
   frame: number;
   width?: number;
   height?: number;
-  /** Omit the stage ground when compositing the diagram above another surface. */
+  /**
+   * Omit the stage ground when compositing the diagram above another surface.
+   */
   transparent?: boolean;
 };
 
@@ -29,7 +32,7 @@ export function StockGraphic({
   background,
   schemaVersion,
   ...canvas
-}: Props) {
+}: Props): ReactNode {
   const id = `stock-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   stockRequestEnvelopeSchema.parse({
     preset: canvas.preset,

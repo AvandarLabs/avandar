@@ -37,23 +37,22 @@ function _collectRowKeys({
   if (!value || typeof value !== "object") {
     return {};
   }
-  const nested = Object.entries(value).flatMap(([key, item]) =>
-    Object.entries(
+  const nested = Object.entries(value).flatMap(([key, item]) => {
+    return Object.entries(
       _collectRowKeys({
         value: item,
         path: [...path, Array.isArray(value) ? Number(key) : key],
         existing,
       }),
-    ),
-  );
+    );
+  });
   return {
     ...Object.fromEntries(nested),
     ...(Array.isArray(value)
       ? {
-          [JSON.stringify(path)]: value.map(
-            (_, index) =>
-              existing[JSON.stringify(path)]?.[index] ?? _newRowKey(),
-          ),
+          [JSON.stringify(path)]: value.map((_, index) => {
+            return existing[JSON.stringify(path)]?.[index] ?? _newRowKey();
+          }),
         }
       : {}),
   };
@@ -80,12 +79,14 @@ function _validate({
     isValid: parsed.success,
     issues: parsed.success
       ? []
-      : parsed.error.issues.map((issue) => ({
-          path: issue.path.map((key) =>
-            typeof key === "number" ? key : String(key),
-          ),
-          code: issue.code,
-        })),
+      : parsed.error.issues.map((issue) => {
+          return {
+            path: issue.path.map((key) => {
+              return typeof key === "number" ? key : String(key);
+            }),
+            code: issue.code,
+          };
+        }),
   };
 }
 function _setValue({
@@ -102,11 +103,11 @@ function _setValue({
   }
   const [key, ...remainder] = path;
   if (Array.isArray(value)) {
-    return value.map((item, index) =>
-      index === key
+    return value.map((item, index) => {
+      return index === key
         ? _setValue({ value: item, path: remainder, replacement })
-        : item,
-    );
+        : item;
+    });
   }
   if (!value || typeof value !== "object") {
     throw new Error("Invalid draft field path");
@@ -165,28 +166,31 @@ function _getBlankValueFromSchema(
 ): StockJsonValue {
   if (schema.type === "object") {
     return Object.fromEntries(
-      Object.entries(schema.properties ?? {}).map(([key, child]) => [
-        key,
-        typeof child === "object" ? _getBlankValueFromSchema(child) : "",
-      ]),
+      Object.entries(schema.properties ?? {}).map(([key, child]) => {
+        return [
+          key,
+          typeof child === "object" ? _getBlankValueFromSchema(child) : "",
+        ];
+      }),
     );
   }
   if (schema.prefixItems) {
-    return schema.prefixItems.map((child) =>
-      typeof child === "object" ? _getBlankValueFromSchema(child) : "",
-    );
+    return schema.prefixItems.map((child) => {
+      return typeof child === "object" ? _getBlankValueFromSchema(child) : "";
+    });
   }
   if (schema.type === "array") {
     return Array.from(
       {
         length: schema.minItems ?? 0,
       },
-      () =>
-        schema.items &&
-        typeof schema.items === "object" &&
-        !Array.isArray(schema.items)
+      () => {
+        return schema.items &&
+          typeof schema.items === "object" &&
+          !Array.isArray(schema.items)
           ? _getBlankValueFromSchema(schema.items)
-          : "",
+          : "";
+      },
     );
   }
   if (schema.type === "boolean") {
@@ -228,11 +232,11 @@ function _addDraftItem({
       schema.properties?.id
     ) {
       const ids = new Set(
-        items.map((value: unknown) =>
-          value && typeof value === "object"
+        items.map((value: unknown) => {
+          return value && typeof value === "object"
             ? Reflect.get(value, "id")
-            : undefined,
-        ),
+            : undefined;
+        }),
       );
       let contentId = `item-${++itemSequence}`;
       while (ids.has(contentId)) contentId = `item-${++itemSequence}`;
@@ -285,11 +289,20 @@ function _removeDraftItem({
     Object.entries(state.rowKeys).flatMap(([key, keys]) => {
       const keyPath: InputPath = JSON.parse(key);
       if (key === JSON.stringify(path)) {
-        return [[key, keys.filter((_, position) => position !== index)]];
+        return [
+          [
+            key,
+            keys.filter((_, position) => {
+              return position !== index;
+            }),
+          ],
+        ];
       }
       if (
         keyPath.length > path.length &&
-        path.every((segment, position) => segment === keyPath[position])
+        path.every((segment, position) => {
+          return segment === keyPath[position];
+        })
       ) {
         const position = Number(keyPath[path.length]);
         if (position === index) {
@@ -308,7 +321,9 @@ function _removeDraftItem({
     draft: _setValue({
       value: state.draft,
       path,
-      replacement: items.filter((_, position) => position !== index),
+      replacement: items.filter((_, position) => {
+        return position !== index;
+      }),
     }),
     rowKeys,
   });

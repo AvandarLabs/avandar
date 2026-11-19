@@ -16,9 +16,9 @@ export function getShopperPoseFromInputAndFrame({
   input,
   frame,
 }: Readonly<{ input: Input; frame: number }>): GetShopperPoseResult {
-  const selections = input.products.flatMap((product, index) =>
-    product.chosen ? [index] : [],
-  );
+  const selections = input.products.flatMap((product, index) => {
+    return product.chosen ? [index] : [];
+  });
   const ordinal = Math.max(
     0,
     Math.min(selections.length - 1, Math.floor((frame - 30) / 24)),

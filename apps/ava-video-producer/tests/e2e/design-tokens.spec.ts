@@ -158,7 +158,9 @@ test("a download waits for the player to acknowledge the theme, then carries it"
   await expect(download).toBeEnabled({ timeout: 20_000 });
   await download.click();
   await expect
-    .poll(() => exportPayload)
+    .poll(() => {
+      return exportPayload;
+    })
     .toMatchObject({
       id: "shared-object-handoff",
       options: {
@@ -266,7 +268,9 @@ test("save as new theme writes a theme file, and saving it in place then editing
   // Writing the theme file republishes the showcase, which reloads open
   // pages. Holding the reload stream back keeps this page, and the draft
   // state under test, steady.
-  await page.route("**/events", (route) => route.abort());
+  await page.route("**/events", (route) => {
+    return route.abort();
+  });
   try {
     const dialog = await _openFirstMotionTokens(page);
     await _setEssentialColor(dialog, ACCENT_TOKEN, "#123456");
@@ -274,12 +278,16 @@ test("save as new theme writes a theme file, and saving it in place then editing
     await dialog.getByRole("textbox", { name: "New theme name" }).fill(label);
     await dialog.getByRole("button", { name: "Create theme" }).click();
     await expect
-      .poll(() =>
-        fs.access(file).then(
-          () => true,
-          () => false,
-        ),
-      )
+      .poll(() => {
+        return fs.access(file).then(
+          () => {
+            return true;
+          },
+          () => {
+            return false;
+          },
+        );
+      })
       .toBe(true);
     expect(JSON.parse(await fs.readFile(file, "utf8"))).toMatchObject({
       extends: "classic",

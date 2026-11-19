@@ -42,7 +42,9 @@ export function validateGraph(
   });
 }
 
-/** Normalized centers map inside a safe inset so edge nodes remain on canvas. */
+/**
+ * Normalized centers map inside a safe inset so edge nodes remain on canvas.
+ */
 export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
   const width = node.width
     ? node.width * bounds.width
@@ -123,11 +125,13 @@ export function offsetEdgeEndpoints(
   // Perpendicular to the centre line, so the shift never changes its length.
   const shiftX = (-(b.y - a.y) / length) * reach;
   const shiftY = ((b.x - a.x) / length) * reach;
-  const shift = (rect: Rect) => ({
-    ...rect,
-    x: rect.x + shiftX,
-    y: rect.y + shiftY,
-  });
+  const shift = (rect: Rect) => {
+    return {
+      ...rect,
+      x: rect.x + shiftX,
+      y: rect.y + shiftY,
+    };
+  };
   return edgeEndpoints(shift(from), shift(to));
 }
 
@@ -149,11 +153,12 @@ export function getPacketPositions(
   end: Point,
 ): Point[] {
   return packets
-    .filter(
-      (packet) =>
+    .filter((packet) => {
+      return (
         frame > packet.atFrame &&
-        frame < packet.atFrame + packet.durationInFrames,
-    )
+        frame < packet.atFrame + packet.durationInFrames
+      );
+    })
     .map((packet) => {
       const travel = ramp(
         frame,
@@ -190,14 +195,14 @@ export function nodeHighlight(
 ): number {
   return Math.max(
     0,
-    ...traversal.map((beat, index) =>
-      beat.nodeId !== nodeId
+    ...traversal.map((beat, index) => {
+      return beat.nodeId !== nodeId
         ? 0
         : ramp(frame, beat.atFrame, DUR.chip) *
-          (index + 1 === traversal.length
-            ? 1
-            : 1 - ramp(frame, traversal[index + 1].atFrame, DUR.chip)),
-    ),
+            (index + 1 === traversal.length
+              ? 1
+              : 1 - ramp(frame, traversal[index + 1].atFrame, DUR.chip));
+    }),
   );
 }
 

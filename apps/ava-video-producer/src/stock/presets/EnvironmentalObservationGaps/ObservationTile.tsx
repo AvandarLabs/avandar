@@ -37,15 +37,17 @@ export function ObservationTile({
           />
         </pattern>
       </defs>
-      {cells.map((cell) => (
-        <ObservationCell
-          key={cell.id}
-          cell={cell}
-          metric={input.metric}
-          accent={accent}
-          patternId={patternId}
-        />
-      ))}
+      {cells.map((cell) => {
+        return (
+          <ObservationCell
+            key={cell.id}
+            cell={cell}
+            metric={input.metric}
+            accent={accent}
+            patternId={patternId}
+          />
+        );
+      })}
       <g
         data-cloud-layer="true"
         opacity={1 - lift}
@@ -66,8 +68,8 @@ export function ObservationTile({
           fill="none"
         />
       </g>
-      {checks.map((check, index) =>
-        frame >= 70 + index * 18 ? (
+      {checks.map((check, index) => {
+        return frame >= 70 + index * 18 ? (
           <g key={check.id}>
             <circle
               data-point-check={check.id}
@@ -82,8 +84,8 @@ export function ObservationTile({
               {check.key}
             </Text>
           </g>
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

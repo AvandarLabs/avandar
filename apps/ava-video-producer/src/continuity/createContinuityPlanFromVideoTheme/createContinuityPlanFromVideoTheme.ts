@@ -145,13 +145,18 @@ function _themeCompositeContent(
 ): BeatContent {
   return {
     ...content,
-    diagrams: content.diagrams.map((diagram) => ({
-      ...diagram,
-      overlay: {
-        ...diagram.overlay,
-        motion: createMotionOptionsFromTheme(diagram.overlay.motion, semantic),
-      },
-    })),
+    diagrams: content.diagrams.map((diagram) => {
+      return {
+        ...diagram,
+        overlay: {
+          ...diagram.overlay,
+          motion: createMotionOptionsFromTheme(
+            diagram.overlay.motion,
+            semantic,
+          ),
+        },
+      };
+    }),
   };
 }
 
@@ -173,13 +178,16 @@ function _themeContent(options: {
     ...content,
     ...(keys
       ? {
-          camera: keys.map((key) => _themeCameraKey(key, camera)),
+          camera: keys.map((key) => {
+            return _themeCameraKey(key, camera);
+          }),
           cameraOptions:
             presetOptions ??
             createMotionOptionsFromTheme(cameraOptions, semantic),
         }
       : {}),
-    // A flight blurs only when its motion is authored, so absent motion stays absent.
+    // A flight blurs only when its motion is authored, so absent motion stays
+    // absent.
     ...(flight?.motion
       ? {
           flight: {
@@ -191,7 +199,10 @@ function _themeContent(options: {
   };
 }
 
-/** Frames a themed camera route needs beyond the authored one, so reading holds keep their length. */
+/**
+ * Frames a themed camera route needs beyond the authored one, so reading holds
+ * keep their length.
+ */
 function _addedCameraFrames(
   authored: BeatContent,
   themed: BeatContent,
@@ -241,12 +252,12 @@ function _themeShot(
   const presetOptions = shot.props.cameraMotion
     ? camera.presetOptions
     : undefined;
-  const beats = shot.props.beats.map((beat) =>
-    _themeBeat({ beat, semantic, camera, presetOptions }),
-  );
-  const isRetimed = beats.some(
-    (beat, index) => beat.duration !== shot.props.beats[index].duration,
-  );
+  const beats = shot.props.beats.map((beat) => {
+    return _themeBeat({ beat, semantic, camera, presetOptions });
+  });
+  const isRetimed = beats.some((beat, index) => {
+    return beat.duration !== shot.props.beats[index].duration;
+  });
   if (!isRetimed) {
     return { ...shot, props: { ...shot.props, beats } };
   }
@@ -275,9 +286,11 @@ export function createContinuityPlanFromVideoTheme(
   const camera = _cameraTheme(semantic);
   return {
     ...plan,
-    shots: plan.shots.map((shot) =>
-      shot.scene === "continuity" ? _themeShot(shot, semantic, camera) : shot,
-    ),
+    shots: plan.shots.map((shot) => {
+      return shot.scene === "continuity"
+        ? _themeShot(shot, semantic, camera)
+        : shot;
+    }),
   };
 }
 

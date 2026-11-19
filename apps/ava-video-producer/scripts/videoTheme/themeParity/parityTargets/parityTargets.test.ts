@@ -4,7 +4,9 @@ import { getAllowedRegionsFromFilm, listParityTargets } from "./parityTargets";
 
 test("every in-scope preset and composition is a parity target", () => {
   assert.deepEqual(
-    listParityTargets().map((target) => target.filmId),
+    listParityTargets().map((target) => {
+      return target.filmId;
+    }),
     [
       "stock-network-graph",
       "stock-node-traversal",
@@ -50,5 +52,7 @@ test("a target without a listed consolidation has no allowed regions", () => {
 });
 
 test("unknown parity ids are rejected", () => {
-  assert.throws(() => listParityTargets(["not-a-preset"]));
+  assert.throws(() => {
+    return listParityTargets(["not-a-preset"]);
+  });
 });

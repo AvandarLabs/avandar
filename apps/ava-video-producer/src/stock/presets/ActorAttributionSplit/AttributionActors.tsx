@@ -17,16 +17,18 @@ export function AttributionActors({
   const shared = input.accounts.find(propEq("id", input.sharedAccountId))!;
   return (
     <g>
-      {input.collaborators.map((person, index) => (
-        <AttributionCollaborator
-          key={person.id}
-          person={person}
-          index={index}
-          input={input}
-          separation={separation}
-          accent={accent}
-        />
-      ))}
+      {input.collaborators.map((person, index) => {
+        return (
+          <AttributionCollaborator
+            key={person.id}
+            person={person}
+            index={index}
+            input={input}
+            separation={separation}
+            accent={accent}
+          />
+        );
+      })}
       <g
         data-shared-stamp="true"
         transform={`translate(300 ${mix(separation, 245, 490)})`}

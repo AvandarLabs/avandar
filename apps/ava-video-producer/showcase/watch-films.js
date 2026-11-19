@@ -20,9 +20,9 @@ function createReloadController(players) {
       event.data?.type !== "film-reloading"
     )
       return;
-    const player = players.find(
-      (candidate) => candidate.contentWindow === event.source,
-    );
+    const player = players.find((candidate) => {
+      return candidate.contentWindow === event.source;
+    });
     if (player && pending.get(player)?.requestId === event.data.requestId)
       cancel(player);
   };
@@ -43,7 +43,9 @@ function createReloadController(players) {
       );
     },
     dispose() {
-      pending.forEach(({ timer }) => clearTimeout(timer));
+      pending.forEach(({ timer }) => {
+        return clearTimeout(timer);
+      });
       pending.clear();
       window.removeEventListener("message", acknowledge);
     },
@@ -63,7 +65,9 @@ export function watchFilms(players, onReload) {
     const hasChanged = generation !== undefined && event.data !== generation;
     generation = event.data;
     if (!hasChanged) return;
-    players.forEach((player) => reloads.request(player));
+    players.forEach((player) => {
+      return reloads.request(player);
+    });
     if (onReload) {
       clearTimeout(galleryTimer);
       galleryTimer = setTimeout(onReload, 1100);

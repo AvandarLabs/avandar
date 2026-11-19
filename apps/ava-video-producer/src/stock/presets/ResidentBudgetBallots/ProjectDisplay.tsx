@@ -11,16 +11,18 @@ export function ProjectDisplay({ input, frame }: Readonly<Props>): ReactNode {
   const columnWidth = 864 / (input.projects.length + 1);
   return (
     <g>
-      {input.projects.map((project, index) => (
-        <ProjectTally
-          key={project.id}
-          input={input}
-          project={project}
-          index={index}
-          columnWidth={columnWidth}
-          offset={offset}
-        />
-      ))}
+      {input.projects.map((project, index) => {
+        return (
+          <ProjectTally
+            key={project.id}
+            input={input}
+            project={project}
+            index={index}
+            columnWidth={columnWidth}
+            offset={offset}
+          />
+        );
+      })}
       <ProjectTally
         input={input}
         project={null}

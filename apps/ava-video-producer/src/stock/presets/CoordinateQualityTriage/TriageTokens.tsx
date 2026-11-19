@@ -17,25 +17,31 @@ export function TriageTokens({
   const { rows } = makeCoordinateTriageFromInputAndFrame({ input, frame });
   return (
     <g>
-      {rows.map((row) => (
-        <g key={row.id}>
-          {row.reason === "plotted" ? (
-            <g>
-              <PlottedRowAssociation row={row} frame={frame} accent={accent} />
-              <circle
-                data-plotted-point={row.id}
-                cx={row.targetX}
-                cy={row.targetY}
-                r={5}
-                fill="none"
-                stroke={accent}
-                opacity={ramp(frame, 51 + row.index * 3, 39)}
-              />
-            </g>
-          ) : undefined}
-          <TriageRowToken row={row} frame={frame} accent={accent} />
-        </g>
-      ))}
+      {rows.map((row) => {
+        return (
+          <g key={row.id}>
+            {row.reason === "plotted" ? (
+              <g>
+                <PlottedRowAssociation
+                  row={row}
+                  frame={frame}
+                  accent={accent}
+                />
+                <circle
+                  data-plotted-point={row.id}
+                  cx={row.targetX}
+                  cy={row.targetY}
+                  r={5}
+                  fill="none"
+                  stroke={accent}
+                  opacity={ramp(frame, 51 + row.index * 3, 39)}
+                />
+              </g>
+            ) : undefined}
+            <TriageRowToken row={row} frame={frame} accent={accent} />
+          </g>
+        );
+      })}
     </g>
   );
 }

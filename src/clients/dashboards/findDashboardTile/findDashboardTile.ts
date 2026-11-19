@@ -9,11 +9,6 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 export type DashboardTileSummary = {
   id: string;
   prompt: string | undefined;
-
-  /**
-   * A built-in viz type, `"plugin"` for any plugin chart, or undefined when
-   * this build knows no viz type of that name.
-   */
   vizType: AvaVizConfig.Type | undefined;
 };
 
@@ -25,14 +20,8 @@ function _readPrompt(nlQuery: unknown): string | undefined {
   return isString(prompt) && prompt.trim() !== "" ? prompt : undefined;
 }
 
-/**
- * The viz type a stored value names, or undefined when this build has none.
- * Every plugin chart reads as `"plugin"`.
- */
+/** The viz type a stored value names, or undefined when this build has none. */
 function _readVizType(vizType: unknown): AvaVizConfig.Type | undefined {
-  if (vizType === "plugin") {
-    return "plugin";
-  }
   return VizTypes.find((knownType) => {
     return knownType === vizType;
   });

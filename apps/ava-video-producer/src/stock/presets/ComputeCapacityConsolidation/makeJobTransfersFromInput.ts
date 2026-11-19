@@ -28,7 +28,11 @@ function _findTransfers({
   failed,
   captions,
 }: FindTransfersOptions): JobTransfer[] | undefined {
-  if (slots.every((slot, index) => !slot.isMoving || mask & (1 << index))) {
+  if (
+    slots.every((slot, index) => {
+      return !slot.isMoving || mask & (1 << index);
+    })
+  ) {
     return [];
   }
   if (failed.has(mask)) {
@@ -42,11 +46,11 @@ function _findTransfers({
       if (!slot.isMoving || mask & (1 << index)) {
         return undefined;
       }
-      const obstacles = slots.flatMap((other, otherIndex) =>
-        otherIndex === index
+      const obstacles = slots.flatMap((other, otherIndex) => {
+        return otherIndex === index
           ? []
-          : [mask & (1 << otherIndex) ? other.final : _getRaised(other)],
-      );
+          : [mask & (1 << otherIndex) ? other.final : _getRaised(other)];
+      });
       const points = findJobRoute({
         from: _getRaised(slot),
         to: slot.final,
@@ -63,15 +67,13 @@ function _findTransfers({
         captions,
       });
       if (remaining) {
-        const length = points
-          .slice(1)
-          .reduce(
-            (sum, point, pointIndex) =>
-              sum +
-              Math.abs(point.x - points[pointIndex].x) +
-              Math.abs(point.y - points[pointIndex].y),
-            0,
+        const length = points.slice(1).reduce((sum, point, pointIndex) => {
+          return (
+            sum +
+            Math.abs(point.x - points[pointIndex].x) +
+            Math.abs(point.y - points[pointIndex].y)
           );
+        }, 0);
         return [{ index, points, length }, ...remaining];
       }
       return undefined;
@@ -88,17 +90,25 @@ function _findTransfers({
 export function makeJobTransfersFromInput(
   input: Readonly<Input>,
 ): JobTransferPlan {
-  const slots = input.jobs.map((job, index) => ({
-    initial: getJobSlotFromInput({ input, index, placement: "initialHostId" }),
-    final: getJobSlotFromInput({ input, index, placement: "finalHostId" }),
-    isMoving: job.initialHostId !== job.finalHostId,
-  }));
-  const captions = input.hosts.map((_, index) => ({
-    x: 165 + index * 215,
-    y: 354,
-    width: 65,
-    height: 32,
-  }));
+  const slots = input.jobs.map((job, index) => {
+    return {
+      initial: getJobSlotFromInput({
+        input,
+        index,
+        placement: "initialHostId",
+      }),
+      final: getJobSlotFromInput({ input, index, placement: "finalHostId" }),
+      isMoving: job.initialHostId !== job.finalHostId,
+    };
+  });
+  const captions = input.hosts.map((_, index) => {
+    return {
+      x: 165 + index * 215,
+      y: 354,
+      width: 65,
+      height: 32,
+    };
+  });
   const transfers = _findTransfers({
     slots,
     mask: 0,
@@ -111,6 +121,8 @@ export function makeJobTransfersFromInput(
   return {
     slots,
     transfers,
-    totalLength: transfers.reduce((sum, transfer) => sum + transfer.length, 0),
+    totalLength: transfers.reduce((sum, transfer) => {
+      return sum + transfer.length;
+    }, 0),
   };
 }

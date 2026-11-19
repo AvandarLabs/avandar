@@ -9,9 +9,9 @@ type Props = {
 };
 /** Matching visible keys attach each arithmetic summary to its zone seam. */
 export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
-  const cell = [...zone.cells].sort(
-    (first, second) => first.row - second.row || first.column - second.column,
-  )[0];
+  const cell = [...zone.cells].sort((first, second) => {
+    return first.row - second.row || first.column - second.column;
+  })[0];
   const color = [accent, STOCK.cyan, STOCK.orange][zone.zoneIndex];
   const summaryY = 160 + zone.zoneIndex * 108;
   const keyLabel = String(zone.zoneIndex + 1);

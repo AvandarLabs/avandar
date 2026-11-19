@@ -28,14 +28,16 @@ export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {
       >
         <tspan>{input.rows.length}</tspan>
       </text>
-      {counts.map((outcome, index) => (
-        <TriageOutcome
-          key={outcome.reason}
-          outcome={outcome}
-          index={index}
-          labels={input.labels}
-        />
-      ))}
+      {counts.map((outcome, index) => {
+        return (
+          <TriageOutcome
+            key={outcome.reason}
+            outcome={outcome}
+            index={index}
+            labels={input.labels}
+          />
+        );
+      })}
     </g>
   );
 }

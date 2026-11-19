@@ -37,7 +37,9 @@ export function getTextRelevantTokenIndicesFromTokens({
       ].includes(tag)
     ) {
       relevant.add(index);
-      stack.forEach((ancestor) => relevant.add(ancestor.index));
+      stack.forEach((ancestor) => {
+        return relevant.add(ancestor.index);
+      });
     }
     if (!token.endsWith("/>")) {
       stack.push({ tag, index, isInert });

@@ -9,7 +9,9 @@ const SETUP_MESSAGE =
   "environment). Producer commands copy that file to " +
   "apps/ava-video-producer/.env.local. Use your own Remotion Automators keys.";
 
-/** Read only the license pair without exposing dotenv values to browser code. */
+/**
+ * Read only the license pair without exposing dotenv values to browser code.
+ */
 export function readLicense(appRoot, environment = process.env) {
   const filename = path.resolve(
     appRoot,

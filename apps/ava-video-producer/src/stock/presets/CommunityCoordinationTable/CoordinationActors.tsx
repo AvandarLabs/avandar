@@ -14,12 +14,12 @@ export function CoordinationActors({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const movingIndex = input.teams.findIndex(
-    (team) => team.initialPlaceId !== team.agreedPlaceId,
-  );
-  const destination = input.places.find(
-    (place) => place.id === input.teams[movingIndex].agreedPlaceId,
-  )!;
+  const movingIndex = input.teams.findIndex((team) => {
+    return team.initialPlaceId !== team.agreedPlaceId;
+  });
+  const destination = input.places.find((place) => {
+    return place.id === input.teams[movingIndex].agreedPlaceId;
+  })!;
   const pointing = ramp(frame, 24, 12, EASE.inOut);
   const handX = mix(pointing, 370, 340 + destination.x * 270);
   const handY = mix(pointing, 485, 160 + destination.y * 280);

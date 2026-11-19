@@ -56,9 +56,9 @@ export const inputSchema = z
     }
     if (
       corridor.fromPatchId === corridor.toPatchId ||
-      ![corridor.fromPatchId, corridor.toPatchId].every((id) =>
-        patches.some(propEq("id", id)),
-      )
+      ![corridor.fromPatchId, corridor.toPatchId].every((id) => {
+        return patches.some(propEq("id", id));
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -67,7 +67,9 @@ export const inputSchema = z
       });
     }
     if (
-      patches.reduce((total, patch) => total + patch.areaHa, 0) +
+      patches.reduce((total, patch) => {
+        return total + patch.areaHa;
+      }, 0) +
         (corridor.lengthM * corridor.widthM) / 10000 >
       landBoundaryHa
     ) {

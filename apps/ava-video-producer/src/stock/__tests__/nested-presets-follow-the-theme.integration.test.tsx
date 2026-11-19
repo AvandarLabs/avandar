@@ -10,7 +10,9 @@ import { StockGraphic } from "../StockGraphic/StockGraphic";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { StockRequest } from "../contracts/StockContract.types";
 
-/** Renders a stock request at frame 120 with one component's defaults patched. */
+/**
+ * Renders a stock request at frame 120 with one component's defaults patched.
+ */
 function _renderPresetWithComponentPatch(
   request: StockRequest,
   name: string,

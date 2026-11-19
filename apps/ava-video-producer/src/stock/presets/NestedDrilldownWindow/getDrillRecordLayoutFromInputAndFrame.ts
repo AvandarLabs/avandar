@@ -24,20 +24,34 @@ export function getDrillRecordLayoutFromInputAndFrame({
   input: Input;
   record: Input["records"][number];
 }>): GetDrillRecordLayoutResult {
-  const groups = [...new Set(input.records.map((item) => item.groups[0]))];
-  const siblings = input.records.filter(
-    (item) => item.groups[0] === record.groups[0],
-  );
-  const parents = input.records.filter(
-    (item) => item.groups[0] === input.selectionPath[0],
-  );
-  const details = parents.filter((item) =>
-    input.selectionPath.every((value, index) => item.groups[index] === value),
-  );
-  const subgroups = [...new Set(parents.map((item) => item.groups[1]))];
-  const subgroupRecords = parents.filter(
-    (item) => item.groups[1] === record.groups[1],
-  );
+  const groups = [
+    ...new Set(
+      input.records.map((item) => {
+        return item.groups[0];
+      }),
+    ),
+  ];
+  const siblings = input.records.filter((item) => {
+    return item.groups[0] === record.groups[0];
+  });
+  const parents = input.records.filter((item) => {
+    return item.groups[0] === input.selectionPath[0];
+  });
+  const details = parents.filter((item) => {
+    return input.selectionPath.every((value, index) => {
+      return item.groups[index] === value;
+    });
+  });
+  const subgroups = [
+    ...new Set(
+      parents.map((item) => {
+        return item.groups[1];
+      }),
+    ),
+  ];
+  const subgroupRecords = parents.filter((item) => {
+    return item.groups[1] === record.groups[1];
+  });
   const isParent = record.groups[0] === input.selectionPath[0];
   const detailIndex = details.findIndex(propEq("id", record.id));
   const isDetail = detailIndex >= 0;

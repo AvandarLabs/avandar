@@ -4,6 +4,7 @@ import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThe
 import { createVideoThemeSourceFromSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { FilmPicture } from "./FilmPicture";
 import type { Film } from "../showcase.types";
+import type { ReactNode } from "react";
 
 /**
  * Shared picture for browser playback and serial frame rendering, themed
@@ -16,23 +17,21 @@ export function FilmComposition({
 }: {
   film: Film;
   withAudio?: boolean;
-}) {
+}): ReactNode {
   // The picture and its audio cues follow the themed plan, the same plan the
   // film's frame count came from.
-  const themedFilm = useMemo(
-    () =>
-      film.plan
-        ? {
-            ...film,
-            plan: createContinuityPlanFromVideoThemeSnapshot(
-              film.plan,
-              film.theme,
-              [film.id],
-            ),
-          }
-        : film,
-    [film],
-  );
+  const themedFilm = useMemo(() => {
+    return film.plan
+      ? {
+          ...film,
+          plan: createContinuityPlanFromVideoThemeSnapshot(
+            film.plan,
+            film.theme,
+            [film.id],
+          ),
+        }
+      : film;
+  }, [film]);
   return (
     <VideoThemeProvider
       source={createVideoThemeSourceFromSnapshot(film.theme, [film.id])}

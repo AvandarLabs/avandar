@@ -57,8 +57,10 @@ test("both tradeoff sides retain every authored point and the priority at the ho
   const markup = _render({ frame: 150 });
   assert.equal(_leaf({ markup, side: "gain" })?.[1], "1");
   assert.equal(_leaf({ markup, side: "concession" })?.[1], "1");
-  [...DEFAULT_INPUT.gains, ...DEFAULT_INPUT.concessions].forEach(({ label }) =>
-    assert.ok(markup.includes(label)),
+  [...DEFAULT_INPUT.gains, ...DEFAULT_INPUT.concessions].forEach(
+    ({ label }) => {
+      return assert.ok(markup.includes(label));
+    },
   );
   assert.ok(markup.includes(DEFAULT_INPUT.priorityStatement));
 });
@@ -124,29 +126,32 @@ test("default, minimum, dense and changed tradeoffs retain exact text during bac
   fixtures.forEach(({ input }) => {
     assert.deepEqual(inputSchema.parse(input), input);
     const frames = [0, 36, 66, 90, 150, 179];
-    const samples = frames.map((frame) => _render({ frame, input }));
-    [...frames]
-      .reverse()
-      .forEach((frame) =>
-        assert.equal(_render({ frame, input }), samples[frames.indexOf(frame)]),
+    const samples = frames.map((frame) => {
+      return _render({ frame, input });
+    });
+    [...frames].reverse().forEach((frame) => {
+      return assert.equal(
+        _render({ frame, input }),
+        samples[frames.indexOf(frame)],
       );
+    });
     [
       input.approach,
       input.priorityStatement,
       ...input.gains.map(prop("label")),
       ...input.concessions.map(prop("label")),
-    ].forEach((text) =>
-      assert.ok(
+    ].forEach((text) => {
+      return assert.ok(
         _render({ frame: 150, input }).includes(`aria-label="${text}"`),
-      ),
-    );
+      );
+    });
   });
 });
 
 test("strict tradeoffs reject empty sides, duplicate IDs, extra keys and oversized copy", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse({}).success, false);
 });
 
@@ -157,9 +162,9 @@ test("the complete contract keeps separate bounded gain and concession collectio
     tradeoffPivotContract.controls.map(prop("path")),
     Object.keys(DEFAULT_INPUT),
   );
-  tradeoffPivotContract.bindingExamples.forEach(({ input }) =>
-    assert.equal(inputSchema.safeParse(input).success, true),
-  );
+  tradeoffPivotContract.bindingExamples.forEach(({ input }) => {
+    return assert.equal(inputSchema.safeParse(input).success, true);
+  });
 });
 
 test("accepted hard breaks in every tradeoff label remain authored while the display fits", () => {
@@ -167,11 +172,15 @@ test("accepted hard breaks in every tradeoff label remain authored while the dis
   const input = {
     ...DEFAULT_INPUT,
     approach: text,
-    gains: DEFAULT_INPUT.gains.map((point) => ({ ...point, label: text })),
-    concessions: DEFAULT_INPUT.concessions.map((point) => ({
-      ...point,
-      label: text,
-    })),
+    gains: DEFAULT_INPUT.gains.map((point) => {
+      return { ...point, label: text };
+    }),
+    concessions: DEFAULT_INPUT.concessions.map((point) => {
+      return {
+        ...point,
+        label: text,
+      };
+    }),
     sideLabels: { gain: text, concession: text },
     priorityStatement: text,
   };

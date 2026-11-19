@@ -14,7 +14,9 @@ export function CapabilityFocus({
   const height = input.capabilities.length * 66;
   const isRow = input.focus.kind === "row";
   const focusIndex = (isRow ? input.capabilities : input.options).findIndex(
-    ({ id }) => id === input.focus.id,
+    ({ id }) => {
+      return id === input.focus.id;
+    },
   );
   const focus = ramp(frame, 108, 12);
   const y = 176 + height * ramp(frame, 36, 72, EASE.inOut);

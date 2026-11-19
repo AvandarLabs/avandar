@@ -6,9 +6,11 @@ import {
   type CursorKey,
   type CursorKind,
 } from "../cursor-motion";
+import type { ReactNode } from "react";
 
 /** Native assets keep their own hotspot correction; the parent scales around
- * the measured target, so clicking never moves the arrow tip or I-beam center. */
+ * the measured target, so clicking never moves the arrow tip or I-beam
+ * center. */
 export function Cursor({
   frame,
   path,
@@ -19,7 +21,7 @@ export function Cursor({
   path: readonly CursorKey[];
   clicks?: readonly number[];
   cursor?: CursorKind;
-}) {
+}): ReactNode {
   const position = trackPos(frame, path);
   const scale = 1.4 * cursorScale(frame, clicks);
   return (
@@ -36,8 +38,8 @@ export function Cursor({
         pointerEvents: "none",
       }}
     >
-      {cursorShutter(frame, path).map((sample, index) =>
-        sample.opacity > 0 ? (
+      {cursorShutter(frame, path).map((sample, index) => {
+        return sample.opacity > 0 ? (
           <MacOSCursor
             key={index}
             cursor={cursor}
@@ -48,8 +50,8 @@ export function Cursor({
               opacity: sample.opacity,
             }}
           />
-        ) : null,
-      )}
+        ) : null;
+      })}
       <MacOSCursor
         cursor={cursor}
         showInTimeline={false}

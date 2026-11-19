@@ -14,7 +14,9 @@ type Props = Readonly<{
   showOrbit: boolean;
 }>;
 
-/** One body on its orbit at `frame`: the optional orbit ellipse and the body. */
+/**
+ * One body on its orbit at `frame`: the optional orbit ellipse and the body.
+ */
 export function OrbitingBody({
   orbit,
   frame,

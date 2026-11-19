@@ -19,9 +19,9 @@ export function ExpertiseRoleExchange({
 }: Readonly<Props>): ReactNode {
   const topicIndex = frame < 83 ? 0 : 1;
   const topic = input.topics[topicIndex];
-  const firstExpert = input.people.findIndex(
-    (person) => person.id === input.topics[0].expertId,
-  );
+  const firstExpert = input.people.findIndex((person) => {
+    return person.id === input.topics[0].expertId;
+  });
   const secondExpert = 1 - firstExpert;
   const passage = ramp(frame, 83, 20, EASE.inOut);
   const toolX = mix(
@@ -48,24 +48,33 @@ export function ExpertiseRoleExchange({
         <LabelSlots labels={[[topic.label, 380, 245, 200, 14, 4]]} />
       </g>
       <g opacity={ramp(frame, 131, 8)}>
-        {input.topics.map((item, index) => (
-          <g key={item.id} data-topic-attribution={item.id}>
-            <LabelSlots
-              labels={[
-                [item.label, 60, 445 + index * 65, 270, 14, 3],
-                [
-                  input.people.find(propEq("id", item.expertId))!.label,
-                  390,
-                  445 + index * 65,
-                  210,
-                  14,
-                  3,
-                ],
-                [input.labels.demonstrates, 650, 445 + index * 65, 250, 14, 3],
-              ]}
-            />
-          </g>
-        ))}
+        {input.topics.map((item, index) => {
+          return (
+            <g key={item.id} data-topic-attribution={item.id}>
+              <LabelSlots
+                labels={[
+                  [item.label, 60, 445 + index * 65, 270, 14, 3],
+                  [
+                    input.people.find(propEq("id", item.expertId))!.label,
+                    390,
+                    445 + index * 65,
+                    210,
+                    14,
+                    3,
+                  ],
+                  [
+                    input.labels.demonstrates,
+                    650,
+                    445 + index * 65,
+                    250,
+                    14,
+                    3,
+                  ],
+                ]}
+              />
+            </g>
+          );
+        })}
       </g>
       <g opacity={ramp(frame, 137, 10)}>
         <LabelSlots labels={[[input.closingLabel, 60, 580, 840, 14, 1]]} />

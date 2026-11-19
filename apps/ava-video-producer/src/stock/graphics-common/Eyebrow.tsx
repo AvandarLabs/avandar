@@ -13,7 +13,7 @@ export function Eyebrow({
   x?: number;
   y?: number;
   fill?: string;
-}) {
+}): ReactNode {
   const origin = useGraphicTokens().layout.graphic.eyebrowOrigin;
   return (
     <Text

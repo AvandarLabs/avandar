@@ -38,18 +38,20 @@ export function DuplicateGroup({
         progress={progress}
         accent={accent}
       />
-      {records.map((record) => (
-        <DuplicateCandidate
-          key={record.id}
-          frame={frame}
-          input={input}
-          group={group}
-          groupIndex={groupIndex}
-          record={record}
-          index={group.records.indexOf(record)}
-          accent={accent}
-        />
-      ))}
+      {records.map((record) => {
+        return (
+          <DuplicateCandidate
+            key={record.id}
+            frame={frame}
+            input={input}
+            group={group}
+            groupIndex={groupIndex}
+            record={record}
+            index={group.records.indexOf(record)}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

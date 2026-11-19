@@ -8,15 +8,15 @@ import { WINDOW_BOX } from "../../../scenes/TiltedWindowScene/windowTilt";
 import css from "./demos.module.css";
 import { DEMO_COLORS, formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import { DemoCanvas, getCanvasRect } from "./parts/DemoCanvas";
+import { DemoCanvas } from "./parts/DemoCanvas";
 import { DemoDiagram } from "./parts/DemoDiagram";
-import {
-  RESTING_WINDOW_POSE,
-  TiltedDemoWindow,
-} from "./parts/TiltedDemoWindow";
+import { getCanvasRect } from "./parts/getCanvasRect";
+import { RESTING_WINDOW_POSE } from "./parts/parts.constants";
+import { TiltedDemoWindow } from "./parts/TiltedDemoWindow";
 import type { CameraKeyframe } from "../../../motion-components/cameraTrack";
 import type { WindowCameraKey } from "../../../scenes/TiltedWindowScene/windowMotion";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Push into the filter node, read it, and pull back out. */
 const TRACK: CameraKeyframe[] = [
@@ -35,7 +35,7 @@ function _getViewBox(pose: { x: number; y: number; zoom: number }): string {
 }
 
 /** An overview with the camera's viewport beside what the camera sees. */
-export function CameraTrackDemo({ frame, frames }: HelperDemoProps) {
+export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const pose = getCameraPose(TRACK, frame);
   const viewWidth = 960 / pose.zoom;
   const viewHeight = 600 / pose.zoom;
@@ -78,7 +78,10 @@ export function CameraTrackDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** The same route through the camera component, with travel-only blur. */
-export function DiagramCameraDemo({ frame, frames }: HelperDemoProps) {
+export function DiagramCameraDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
@@ -100,7 +103,9 @@ export function DiagramCameraDemo({ frame, frames }: HelperDemoProps) {
           <DiagramCamera
             track={TRACK}
             preset="balanced"
-            render={() => <DemoDiagram />}
+            render={() => {
+              return <DemoDiagram />;
+            }}
           />
         </div>
       </div>
@@ -117,7 +122,10 @@ const WINDOW_KEYS: WindowCameraKey[] = [
 ];
 
 /** A push into one area of the window, scaling only the window layer. */
-export function WindowCameraDemo({ frame, frames }: HelperDemoProps) {
+export function WindowCameraDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const box = getCanvasRect(WINDOW_BOX);
   const lens = getWindowCamera(frame, WINDOW_KEYS, box);
   return (

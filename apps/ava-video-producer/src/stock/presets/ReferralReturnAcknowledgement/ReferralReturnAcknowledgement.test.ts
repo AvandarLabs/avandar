@@ -46,16 +46,16 @@ function _attributes({
   attribute: string;
   value: string;
 }): string {
-  const element = markup
-    .match(/<[^>]+>/g)
-    ?.find((tag) => tag.includes(`${attribute}="${value}"`));
+  const element = markup.match(/<[^>]+>/g)?.find((tag) => {
+    return tag.includes(`${attribute}="${value}"`);
+  });
   assert.ok(element, `${attribute}=${value}`);
   return element;
 }
 test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("people cross independently from the physical acknowledgement that returns", () => {
   const before = _render({ frame: 30, input: DEFAULT_INPUT });
@@ -148,13 +148,13 @@ function _getVisibleTexts({
   input,
   frame,
 }: Readonly<{ input: Input; frame: number }>): string[] {
-  const states = input.referrals.map((referral, index) =>
-    referral.acknowledged && frame >= 105 + index * 2
+  const states = input.referrals.map((referral, index) => {
+    return referral.acknowledged && frame >= 105 + index * 2
       ? input.copy.closed
       : referral.attended && frame >= 77 + index * 2
         ? input.copy.attendedOpen
-        : input.copy.waiting,
-  );
+        : input.copy.waiting;
+  });
   return [
     input.sceneLabel,
     ...Object.values(input.services),
@@ -216,11 +216,14 @@ test("serialized contract exposes referral identity validation", () => {
     JSON.stringify(referralReturnAcknowledgementContract.semanticRules),
   ) as typeof referralReturnAcknowledgementContract.semanticRules;
   const paths = ["referrals.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique/i);
 });
@@ -230,11 +233,14 @@ test("serialized contract exposes acknowledgement implication validation", () =>
     JSON.stringify(referralReturnAcknowledgementContract.semanticRules),
   ) as typeof referralReturnAcknowledgementContract.semanticRules;
   const paths = ["referrals.*.acknowledged", "referrals.*.attended"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /acknowledged=true requires attended=true/i);
 });

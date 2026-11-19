@@ -10,31 +10,33 @@ export function ShelfLabels({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.goods.map((good, index) => (
-        <g key={good.id}>
-          <FitText
-            text={good.label}
-            x={42}
-            y={170 + index * 105}
-            width={108}
-            fontSize={12}
-            maxLines={5}
-            breakLongWords
-            normalizeWhitespace
-          />
-          {input.showQuantityLabels ? (
-            <text
-              data-quantity={good.id}
+      {input.goods.map((good, index) => {
+        return (
+          <g key={good.id}>
+            <FitText
+              text={good.label}
               x={42}
-              y={252 + index * 105}
-              fontSize={16}
-              fill="currentColor"
-            >
-              {shelfQuantities[index]}
-            </text>
-          ) : undefined}
-        </g>
-      ))}
+              y={170 + index * 105}
+              width={108}
+              fontSize={12}
+              maxLines={5}
+              breakLongWords
+              normalizeWhitespace
+            />
+            {input.showQuantityLabels ? (
+              <text
+                data-quantity={good.id}
+                x={42}
+                y={252 + index * 105}
+                fontSize={16}
+                fill="currentColor"
+              >
+                {shelfQuantities[index]}
+              </text>
+            ) : undefined}
+          </g>
+        );
+      })}
       <FitText
         text={input.labels.retailer}
         x={570}

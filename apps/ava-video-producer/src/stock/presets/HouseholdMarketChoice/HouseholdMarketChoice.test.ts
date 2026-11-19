@@ -41,9 +41,9 @@ function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
     ...input.products.map(prop("label")),
-    ...Object.entries(input.labels).flatMap(([key, label]) =>
-      key === "remaining" && !input.showRemainingBalance ? [] : [label],
-    ),
+    ...Object.entries(input.labels).flatMap(([key, label]) => {
+      return key === "remaining" && !input.showRemainingBalance ? [] : [label];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "symbol", "tender"];
@@ -67,12 +67,16 @@ registerStockTextLayoutAssertions({
 
 test("only chosen physical products leave the shelf and their journey clears participant labels", () => {
   fixtures.forEach(({ input }) => {
-    Array.from({ length: 180 }, (_, index) => index * 1).forEach((frame) => {
+    Array.from({ length: 180 }, (_, index) => {
+      return index * 1;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const products = [...markup.matchAll(/<g data-product="([^"]*)"[^>]*>/g)];
       assert.equal(products.length, input.products.length);
       products.forEach(([attributes, productId], index) => {
-        const product = input.products.find(({ id }) => id === productId)!;
+        const product = input.products.find(({ id }) => {
+          return id === productId;
+        })!;
         const x = _getProductCoordinate({ attributes, axis: "x" });
         const y = _getProductCoordinate({ attributes, axis: "y" });
         if (!product.chosen) {
@@ -94,9 +98,9 @@ test("only chosen physical products leave the shelf and their journey clears par
         }
       });
     });
-    const price = input.products
-      .filter(prop("chosen"))
-      .reduce((sum, item) => sum + item.price, 0);
+    const price = input.products.filter(prop("chosen")).reduce((sum, item) => {
+      return sum + item.price;
+    }, 0);
     const final = _render({ frame: 150, input: input });
     assert.match(final, new RegExp(`data-total="${price}"`));
     if (input.showRemainingBalance) {
@@ -117,7 +121,9 @@ test("exact spending and thirty available credits remain valid while unaffordabl
   assert.equal(
     inputSchema.safeParse({
       ...DENSE_INPUT,
-      products: DENSE_INPUT.products.map((item) => ({ ...item, chosen: true })),
+      products: DENSE_INPUT.products.map((item) => {
+        return { ...item, chosen: true };
+      }),
     }).success,
     false,
   );
@@ -148,23 +154,29 @@ test("unselected and duplicate-ID baskets, fractional prices and extra label key
   [
     {
       ...DEFAULT_INPUT,
-      products: DEFAULT_INPUT.products.map((item) => ({
-        ...item,
-        chosen: false,
-      })),
+      products: DEFAULT_INPUT.products.map((item) => {
+        return {
+          ...item,
+          chosen: false,
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      products: DEFAULT_INPUT.products.map((item) => ({ ...item, id: "" })),
+      products: DEFAULT_INPUT.products.map((item) => {
+        return { ...item, id: "" };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      products: DEFAULT_INPUT.products.map((item) => ({ ...item, price: 1.5 })),
+      products: DEFAULT_INPUT.products.map((item) => {
+        return { ...item, price: 1.5 };
+      }),
     },
     { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("shopper reaches only for chosen products, carries them by hand and releases them", () => {
@@ -179,7 +191,9 @@ test("shopper reaches only for chosen products, carries them by hand and release
       const arm = during.match(/<path data-market-arm[^>]*>/);
       const item = [
         ...during.matchAll(/<g data-product="([^"]*)"[^>]*>/g),
-      ].find((match) => match[1] === product.id);
+      ].find((match) => {
+        return match[1] === product.id;
+      });
       assert.ok(hand, "the shopper must visibly hold each chosen product");
       assert.ok(arm && /d="M[^"]+ L[^"]+ L/.test(arm[0]));
       assert.ok(item);

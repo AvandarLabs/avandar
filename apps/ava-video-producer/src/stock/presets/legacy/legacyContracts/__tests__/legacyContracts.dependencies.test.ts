@@ -26,17 +26,26 @@ test("content contracts have no transitive renderer or JSX runtime dependency", 
   });
   const modules = Object.keys(bundled.metafile!.inputs);
   assert.deepEqual(
-    modules.filter((module) => /\.tsx$/.test(module)),
+    modules.filter((module) => {
+      return /\.tsx$/.test(module);
+    }),
     [],
   );
   const runtimePackages = Object.values(bundled.metafile!.inputs).flatMap(
-    ({ imports }) =>
-      imports.filter(({ external }) => external).map(({ path }) => path),
+    ({ imports }) => {
+      return imports
+        .filter(({ external }) => {
+          return external;
+        })
+        .map(({ path }) => {
+          return path;
+        });
+    },
   );
   assert.deepEqual(
-    runtimePackages.filter((specifier) =>
-      /^(?:react|react-dom|remotion|@remotion)(?:\/|$)/.test(specifier),
-    ),
+    runtimePackages.filter((specifier) => {
+      return /^(?:react|react-dom|remotion|@remotion)(?:\/|$)/.test(specifier);
+    }),
     [],
   );
 });

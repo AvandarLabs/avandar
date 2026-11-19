@@ -17,14 +17,17 @@ export function HandoverReceiptRow({
   const content = input.contents[index];
   const received = Array.from(
     { length: content.selectedUnits },
-    (_, unitIndex) =>
-      getHandoverPositionFromInputAndFrame({
+    (_, unitIndex) => {
+      return getHandoverPositionFromInputAndFrame({
         input,
         frame,
         contentIndex: index,
         unitIndex,
-      }),
-  ).filter(({ travel }) => travel === 1).length;
+      });
+    },
+  ).filter(({ travel }) => {
+    return travel === 1;
+  }).length;
   return (
     <g data-receipt={content.id} data-selected={received}>
       <FitText

@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import playwrightTest from "@playwright/test";
 import {
   UUID,
   WAIT,
@@ -9,6 +9,8 @@ import {
   localRoute,
   resource,
 } from "./shared.mjs";
+
+const { expect } = playwrightTest;
 
 function layerRow(page, name) {
   return page
@@ -33,7 +35,8 @@ async function openOrCreateMap(ctx) {
     await page.goto(localRoute(ctx, `map/${state.map.id}`));
     await resource(ctx, "map", state.map);
   } else {
-    // Observe the app's list request so an initially empty render cannot create a duplicate.
+    // Observe the app's list request so an initially empty render cannot create
+    // a duplicate.
     const loaded = page.waitForResponse(
       (response) => {
         return (
@@ -160,7 +163,10 @@ async function zoomToLayer(page, name) {
     .click();
 }
 
-/** Captures the verified point-layer story. WKT geometry currently fails in product QETL. */
+/**
+ * Captures the verified point-layer story. WKT geometry currently fails in
+ * product QETL.
+ */
 export async function map(ctx) {
   localRoute(ctx, "map");
   ctx.state ??= {};
@@ -171,8 +177,9 @@ export async function map(ctx) {
     await openOrCreateMap(ctx);
   });
   await ctx.step("map-remove-failed-fixture-layer", async () => {
-    // Only the exact task-owned district layer is removed. Its failure is recorded
-    // in the rehearsal report; unrelated layers and imported datasets remain intact.
+    // Only the exact task-owned district layer is removed. Its failure is
+    // recorded in the rehearsal report; unrelated layers and imported datasets
+    // remain intact.
     const name = "Video - Harborfield districts";
     if (await layerRow(ctx.page, name).count()) {
       await ctx.page

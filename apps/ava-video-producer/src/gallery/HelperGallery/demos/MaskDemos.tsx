@@ -13,12 +13,12 @@ import {
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import { DemoCanvas, getCanvasRect } from "./parts/DemoCanvas";
-import {
-  RESTING_WINDOW_POSE,
-  TiltedDemoWindow,
-} from "./parts/TiltedDemoWindow";
+import { DemoCanvas } from "./parts/DemoCanvas";
+import { getCanvasRect } from "./parts/getCanvasRect";
+import { RESTING_WINDOW_POSE } from "./parts/parts.constants";
+import { TiltedDemoWindow } from "./parts/TiltedDemoWindow";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const ROWS = ["first", "second", "third", "fourth"];
 const ERASE_AT = 40;
@@ -43,7 +43,7 @@ function ErasedRow(props: { frame: number; index: number; eraseAt: number }) {
 }
 
 /** Rows erased left to right behind a soft edge, one after another. */
-export function EraseMaskDemo({ frame, frames }: HelperDemoProps) {
+export function EraseMaskDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const progress = ramp(frame, ERASE_AT, ERASE_FRAMES, EASE.inOut);
   return (
     <HelperDemoFrame
@@ -56,14 +56,16 @@ export function EraseMaskDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.list}>
-        {ROWS.map((row, index) => (
-          <ErasedRow
-            key={row}
-            frame={frame}
-            index={index}
-            eraseAt={ERASE_AT + index * 3}
-          />
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <ErasedRow
+              key={row}
+              frame={frame}
+              index={index}
+              eraseAt={ERASE_AT + index * 3}
+            />
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -78,30 +80,43 @@ const SCHEDULE = getEraseStartFrames({
 });
 
 /** Two panels erasing in reading order, panel by panel. */
-export function EraseScheduleDemo({ frame, frames }: HelperDemoProps) {
+export function EraseScheduleDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
       label="getEraseStartFrames({ atFrame: 40, elementCounts: [4, 4], staggerFrames: 1.5, panelStaggerFrames: 6 })"
-      readouts={SCHEDULE.map((starts, panel) => ({
-        name: `panel ${panel}`,
-        value: starts.map((start) => `${start}f`).join(" "),
-      }))}
+      readouts={SCHEDULE.map((starts, panel) => {
+        return {
+          name: `panel ${panel}`,
+          value: starts
+            .map((start) => {
+              return `${start}f`;
+            })
+            .join(" "),
+        };
+      })}
     >
       <div className={css.cards}>
-        {SCHEDULE.map((starts, panel) => (
-          <div key={`panel-${starts[0]}`} className={css.list}>
-            {starts.map((start, index) => (
-              <ErasedRow
-                key={start}
-                frame={frame}
-                index={index + panel}
-                eraseAt={start}
-              />
-            ))}
-          </div>
-        ))}
+        {SCHEDULE.map((starts, panel) => {
+          return (
+            <div key={`panel-${starts[0]}`} className={css.list}>
+              {starts.map((start, index) => {
+                return (
+                  <ErasedRow
+                    key={start}
+                    frame={frame}
+                    index={index + panel}
+                    eraseAt={start}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -109,7 +124,9 @@ export function EraseScheduleDemo({ frame, frames }: HelperDemoProps) {
 
 const WIPE_AT = 15;
 const WIPE_FRAMES = 18;
-/** The two stepped wipes compared: the shot transition default and a variant. */
+/**
+ * The two stepped wipes compared: the shot transition default and a variant.
+ */
 const WIPES = [
   { code: "{ columns: 8 }", options: { columns: 8 } },
   {
@@ -124,7 +141,10 @@ const WIPES = [
 ] as const;
 
 /** The stepped column wipe revealing shot B over shot A. */
-export function SteppedColumnWipeDemo({ frame, frames }: HelperDemoProps) {
+export function SteppedColumnWipeDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const local = Math.max(0, frame - WIPE_AT);
   const progress = getColumnWipeProgress(local, WIPE_FRAMES, WIPES[0].options);
   return (
@@ -138,26 +158,28 @@ export function SteppedColumnWipeDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={`${css.miniStages} ${css.twoUp}`}>
-        {WIPES.map((wipe) => (
-          <div key={wipe.code} className={css.miniStage}>
-            <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
-              <div className={`${css.shot} ${css.shotA}`}>A</div>
-              {frame >= WIPE_AT ? (
-                <div
-                  className={`${css.shot} ${css.shotB}`}
-                  style={getSteppedColumnWipeStyle(
-                    local,
-                    WIPE_FRAMES,
-                    wipe.options,
-                  )}
-                >
-                  B
-                </div>
-              ) : null}
+        {WIPES.map((wipe) => {
+          return (
+            <div key={wipe.code} className={css.miniStage}>
+              <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
+                <div className={`${css.shot} ${css.shotA}`}>A</div>
+                {frame >= WIPE_AT ? (
+                  <div
+                    className={`${css.shot} ${css.shotB}`}
+                    style={getSteppedColumnWipeStyle(
+                      local,
+                      WIPE_FRAMES,
+                      wipe.options,
+                    )}
+                  >
+                    B
+                  </div>
+                ) : null}
+              </div>
+              <span className={css.caption}>{wipe.code}</span>
             </div>
-            <span className={css.caption}>{wipe.code}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -166,7 +188,10 @@ export function SteppedColumnWipeDemo({ frame, frames }: HelperDemoProps) {
 const REVEAL = { durationInFrames: 14 };
 
 /** A window rising into the tilted plane through four columns. */
-export function WindowRevealDemo({ frame, frames }: HelperDemoProps) {
+export function WindowRevealDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const style = getWindowRevealStyle(frame, 10, REVEAL);
   return (
     <HelperDemoFrame
@@ -194,7 +219,7 @@ const BAR_VALUES = [0.92, 0.7, 0.55, 0.38];
 const EDGE_DEPTH = 10;
 
 /** Bars growing with a seeded, brush-like right edge. */
-export function RoughEdgeDemo({ frame, frames }: HelperDemoProps) {
+export function RoughEdgeDemo({ frame, frames }: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
@@ -206,20 +231,22 @@ export function RoughEdgeDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.timeline}>
-        {BAR_VALUES.map((value, index) => (
-          <div key={value} className={css.row}>
-            <div
-              className={css.bar}
-              style={{
-                width:
-                  ramp(frame, 10 + index * 2, DUR.sheet, EASE.word) *
-                  value *
-                  760,
-                clipPath: getRoughEdgeClipPath(index, EDGE_DEPTH),
-              }}
-            />
-          </div>
-        ))}
+        {BAR_VALUES.map((value, index) => {
+          return (
+            <div key={value} className={css.row}>
+              <div
+                className={css.bar}
+                style={{
+                  width:
+                    ramp(frame, 10 + index * 2, DUR.sheet, EASE.word) *
+                    value *
+                    760,
+                  clipPath: getRoughEdgeClipPath(index, EDGE_DEPTH),
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

@@ -1,6 +1,8 @@
-import { abs, Orb } from "../../chrome/chrome";
+import { abs } from "../../chrome/abs";
+import { Orb } from "../../chrome/chrome";
 import { DUR, EASE, enter, enterAt, mix, ramp } from "../../motion";
 import { APP_IN, REFILTER_AT, RESULTS, ROWS, ROWS_AT, SIDE } from "./timeline";
+import type { ReactNode } from "react";
 
 /** The results phase: an empty state that dissolves into the channel
  *  breakdown once the query runs, then dims the rows the active filter
@@ -11,7 +13,7 @@ export function ResultsPanel({
 }: {
   frame: number;
   totalShown: number;
-}) {
+}): ReactNode {
   return (
     <>
       {/* Without this the clip spends three seconds on a near-black frame

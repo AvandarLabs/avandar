@@ -17,14 +17,14 @@ export function OutreachWorker({
     input.visits.length - 1,
     Math.max(0, Math.floor((frame - 36) / duration)),
   );
-  const household = input.households.find(
-    ({ id }) => id === input.visits[eventIndex].householdId,
-  );
+  const household = input.households.find(({ id }) => {
+    return id === input.visits[eventIndex].householdId;
+  });
   const previous =
     eventIndex > 0
-      ? input.households.find(
-          ({ id }) => id === input.visits[eventIndex - 1].householdId,
-        )
+      ? input.households.find(({ id }) => {
+          return id === input.visits[eventIndex - 1].householdId;
+        })
       : undefined;
   if (!household || (eventIndex > 0 && !previous)) {
     throw new Error("Visit references must resolve to supplied households.");

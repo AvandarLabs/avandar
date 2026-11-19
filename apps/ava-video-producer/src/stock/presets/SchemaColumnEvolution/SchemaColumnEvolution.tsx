@@ -25,18 +25,20 @@ export function SchemaColumnEvolution({
         expansion={expansion}
         accent={accent}
       />
-      {input.earlierRecords.map((record, index) => (
-        <EvolutionRow
-          key={record.id}
-          record={record}
-          x={x}
-          y={220 + index * 65}
-          accent={accent}
-          expansion={expansion}
-          missingLabel={input.fields.missingLabel}
-          missingOpacity={ramp(frame, 49 + index * 6, 31)}
-        />
-      ))}
+      {input.earlierRecords.map((record, index) => {
+        return (
+          <EvolutionRow
+            key={record.id}
+            record={record}
+            x={x}
+            y={220 + index * 65}
+            accent={accent}
+            expansion={expansion}
+            missingLabel={input.fields.missingLabel}
+            missingOpacity={ramp(frame, 49 + index * 6, 31)}
+          />
+        );
+      })}
       <LaterEvolutionRow {...{ input, frame, x, accent, expansion }} />
     </g>
   );

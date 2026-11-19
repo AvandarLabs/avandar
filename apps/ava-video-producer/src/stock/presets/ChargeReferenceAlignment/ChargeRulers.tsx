@@ -21,21 +21,23 @@ export function ChargeRulers({
   const precision = input.money.minorUnitsPerUnit === 100 ? 2 : 0;
   return (
     <g>
-      {amounts.map((total, index) => (
-        <AmountRuler
-          key={index}
-          {...{
-            input,
-            total,
-            index,
-            comparison,
-            progress,
-            width,
-            precision,
-            accent,
-          }}
-        />
-      ))}
+      {amounts.map((total, index) => {
+        return (
+          <AmountRuler
+            key={index}
+            {...{
+              input,
+              total,
+              index,
+              comparison,
+              progress,
+              width,
+              precision,
+              accent,
+            }}
+          />
+        );
+      })}
       {comparison.isMatched && input.showDifference && frame >= 71 ? (
         <DifferenceBracket
           {...{ input, comparison, progress, precision, accent }}

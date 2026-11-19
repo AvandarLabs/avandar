@@ -21,15 +21,15 @@ function _acceptsArray({
   ) {
     return false;
   }
-  return value.every((item, index) =>
-    _accepts({
+  return value.every((item, index) => {
+    return _accepts({
       schema:
         schema.prefixItems?.[index] ??
         (schema.items as StockJsonSchema | boolean) ??
         true,
       value: item,
-    }),
-  );
+    });
+  });
 }
 
 // Evaluate the JSON Schema keywords these tuple witnesses exercise. Importing
@@ -45,7 +45,9 @@ function _accepts({
     return schema;
   }
   if (schema.anyOf) {
-    return schema.anyOf.some((branch) => _accepts({ schema: branch, value }));
+    return schema.anyOf.some((branch) => {
+      return _accepts({ schema: branch, value });
+    });
   }
   if (schema.type === "array") {
     return _acceptsArray({ schema, value });
@@ -56,12 +58,15 @@ function _accepts({
     }
     const record = value as Record<string, unknown>;
     return (
-      (schema.required ?? []).every((key) => Object.hasOwn(record, key)) &&
-      Object.entries(schema.properties ?? {}).every(
-        ([key, child]) =>
+      (schema.required ?? []).every((key) => {
+        return Object.hasOwn(record, key);
+      }) &&
+      Object.entries(schema.properties ?? {}).every(([key, child]) => {
+        return (
           !Object.hasOwn(record, key) ||
-          _accepts({ schema: child, value: record[key] }),
-      )
+          _accepts({ schema: child, value: record[key] })
+        );
+      })
     );
   }
   if (schema.type === "null") {
@@ -128,13 +133,13 @@ const CASES = [
 CASES.forEach(({ name, schema, values }) => {
   test(`structural ${name} tuples preserve JSON input acceptance`, () => {
     const structural = makeStockJsonSchemaFromZodSchema(schema);
-    values.forEach((value) =>
-      assert.equal(
+    values.forEach((value) => {
+      return assert.equal(
         _accepts({ schema: structural, value }),
         schema.safeParse(value).success,
         JSON.stringify(value),
-      ),
-    );
+      );
+    });
   });
 });
 
@@ -157,10 +162,9 @@ test("empty-prefix rest tuples omit prefixItems while retaining typed items", ()
 });
 
 test("unrepresentable transforms fail instead of emitting permissive schemas", () => {
-  assert.throws(
-    () => makeStockJsonSchemaFromZodSchema(z.string().transform(Number)),
-    /transform/i,
-  );
+  assert.throws(() => {
+    return makeStockJsonSchemaFromZodSchema(z.string().transform(Number));
+  }, /transform/i);
 });
 
 test("registry tuple dimensions and coordinates reject missing or extra members", () => {
@@ -201,7 +205,9 @@ test("registry tuple dimensions and coordinates reject missing or extra members"
 
 test("editor coordinate item schemas reject missing and extra coordinates", () => {
   const control = stockContracts["geometry-detail-budget"].controls.find(
-    ({ path }) => path === "vertices",
+    ({ path }) => {
+      return path === "vertices";
+    },
   );
   assert.ok(control?.kind === "collection");
   const structural = control.itemSchema;

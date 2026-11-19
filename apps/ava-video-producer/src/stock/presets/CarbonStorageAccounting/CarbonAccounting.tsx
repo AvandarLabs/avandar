@@ -15,10 +15,9 @@ export function CarbonAccounting({
 }: Readonly<Props>): ReactNode {
   const retained =
     input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-  const emissions = input.operatingEmissions.reduce(
-    (sum, row) => sum + row.tonnesCO2e,
-    0,
-  );
+  const emissions = input.operatingEmissions.reduce((sum, row) => {
+    return sum + row.tonnesCO2e;
+  }, 0);
   return (
     <g data-emissions={emissions}>
       <FitText
@@ -31,15 +30,17 @@ export function CarbonAccounting({
         breakLongWords
         normalizeWhitespace
       />
-      {input.operatingEmissions.map((row, index) => (
-        <OperatingEmissionRow
-          key={row.id}
-          row={row}
-          index={index}
-          unit={input.copy.accountingUnit}
-          frame={frame}
-        />
-      ))}
+      {input.operatingEmissions.map((row, index) => {
+        return (
+          <OperatingEmissionRow
+            key={row.id}
+            row={row}
+            index={index}
+            unit={input.copy.accountingUnit}
+            frame={frame}
+          />
+        );
+      })}
       {input.showNetAccounting && frame >= 108 ? (
         <CarbonNetAccounting
           input={input}

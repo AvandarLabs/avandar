@@ -69,23 +69,25 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, replacement: { label: "B", reason: "R".repeat(43) } },
 ];
 
-const _spacedReason: string = Array.from({ length: 5 }, () =>
-  "界".repeat(7),
-).join(" ");
+const _spacedReason: string = Array.from({ length: 5 }, () => {
+  return "界".repeat(7);
+}).join(" ");
 /** Both rationale positions retain accepted spaced words and hard breaks. */
 export const textRegressionInputs: Array<{
   id: string;
   input: Input;
   text: string;
 }> = [
-  ...(["rejected", "replacement"] as const).map((field) => ({
-    id: `${field}-spaced`,
-    text: _spacedReason,
-    input: {
-      ...DEFAULT_INPUT,
-      [field]: { ...DEFAULT_INPUT[field], reason: _spacedReason },
-    },
-  })),
+  ...(["rejected", "replacement"] as const).map((field) => {
+    return {
+      id: `${field}-spaced`,
+      text: _spacedReason,
+      input: {
+        ...DEFAULT_INPUT,
+        [field]: { ...DEFAULT_INPUT[field], reason: _spacedReason },
+      },
+    };
+  }),
   {
     id: "all-label-breaks",
     text: "A\nB\tC\nD\nE",

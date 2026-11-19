@@ -39,12 +39,12 @@ const dom: { window: Window; close?: () => void } = new JSDOM(
   "Node",
   "Event",
   "MouseEvent",
-].forEach((key) =>
-  Object.defineProperty(globalThis, key, {
+].forEach((key) => {
+  return Object.defineProperty(globalThis, key, {
     configurable: true,
     value: key === "window" ? dom.window : Reflect.get(dom.window, key),
-  }),
-);
+  });
+});
 
 Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
 
@@ -79,10 +79,12 @@ await build({
           {
             filter: /\.css$/,
           },
-          () => ({
-            contents: "export default {}",
-            loader: "js",
-          }),
+          () => {
+            return {
+              contents: "export default {}",
+              loader: "js",
+            };
+          },
         );
       },
     },
@@ -93,18 +95,22 @@ const { Harness } = await import(
   pathToFileURL(path.join(directory, "harness.mjs")).href
 );
 
-const label = (message: string): StockMessageDescriptor => ({
-  id: `test.${message}`,
-  message,
-});
+const label = (message: string): StockMessageDescriptor => {
+  return {
+    id: `test.${message}`,
+    message,
+  };
+};
 
-const text = (name: string, inputPath = name): StockControl => ({
-  kind: "text",
-  path: inputPath,
-  label: label(name),
-  minLength: 0,
-  maxLength: 20,
-});
+const text = (name: string, inputPath = name): StockControl => {
+  return {
+    kind: "text",
+    path: inputPath,
+    label: label(name),
+    minLength: 0,
+    maxLength: 20,
+  };
+};
 
 function read(view: ReturnType<typeof render>): Record<string, unknown> {
   const parsed: unknown = JSON.parse(

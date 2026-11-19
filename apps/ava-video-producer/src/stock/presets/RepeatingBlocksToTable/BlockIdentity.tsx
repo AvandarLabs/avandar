@@ -35,16 +35,18 @@ export function BlockIdentity({
   ];
   return (
     <g data-output-block={input.blocks[index].id}>
-      {poses.map((pose, poseIndex) => (
-        <BlockCaption
-          key={poseIndex}
-          {...pose}
-          heading={input.blocks[index].heading}
-          index={index}
-          showBlockNumbers={input.showBlockNumbers}
-          accent={color}
-        />
-      ))}
+      {poses.map((pose, poseIndex) => {
+        return (
+          <BlockCaption
+            key={poseIndex}
+            {...pose}
+            heading={input.blocks[index].heading}
+            index={index}
+            showBlockNumbers={input.showBlockNumbers}
+            accent={color}
+          />
+        );
+      })}
     </g>
   );
 }

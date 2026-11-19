@@ -16,37 +16,47 @@ const APPROVED_MARKUP_MOVES: Partial<
 > = {
   "code-focus": [
     // The title-bar and footer dividers gain the explicit hairline.
-    ...["M70 164 H890", "M84 478 H876"].map((path) => ({
-      from: `<path d="${path}" stroke="#2a404e"></path>`,
-      to: `<path d="${path}" stroke="#2a404e" stroke-width="1"></path>`,
-    })),
+    ...["M70 164 H890", "M84 478 H876"].map((path) => {
+      return {
+        from: `<path d="${path}" stroke="#2a404e"></path>`,
+        to: `<path d="${path}" stroke="#2a404e" stroke-width="1"></path>`,
+      };
+    }),
   ],
   "data-pipeline": [
     // Each stage's accent outline gains the explicit hairline, matched by the
     // stage number that follows it because its opacity moves with progress.
-    ...[86, 306, 526, 746].map((x) => ({
-      from: `"></rect><text x="${x}" y="239"`,
-      to: `" stroke-width="1"></rect><text x="${x}" y="239"`,
-    })),
+    ...[86, 306, 526, 746].map((x) => {
+      return {
+        from: `"></rect><text x="${x}" y="239"`,
+        to: `" stroke-width="1"></rect><text x="${x}" y="239"`,
+      };
+    }),
     // Each stage icon's rim gains the explicit hairline once, in drawing order.
-    ...[0, 1, 2, 3].map(() => ({
-      from: 'stroke-opacity="0.35"></circle>',
-      to: 'stroke-opacity="0.35" stroke-width="1"></circle>',
-    })),
+    ...[0, 1, 2, 3].map(() => {
+      return {
+        from: 'stroke-opacity="0.35"></circle>',
+        to: 'stroke-opacity="0.35" stroke-width="1"></circle>',
+      };
+    }),
   ],
   "node-traversal": [
     { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
   ],
   "orbital-system": [
-    ...["#9fefca", "#82c8f2", "#f0ba83"].map((color) => ({
-      from: `text-anchor="middle" fill="${color}" font-size="12" font-family`,
-      to: `fill="${color}" font-size="12" font-weight="400" text-anchor="middle" font-family`,
-    })),
+    ...["#9fefca", "#82c8f2", "#f0ba83"].map((color) => {
+      return {
+        from: `text-anchor="middle" fill="${color}" font-size="12" font-family`,
+        to: `fill="${color}" font-size="12" font-weight="400" text-anchor="middle" font-family`,
+      };
+    }),
     // Each body shell gains the explicit hairline once, in drawing order.
-    ...[0, 1, 2].map(() => ({
-      from: 'stroke-opacity="0.24">',
-      to: 'stroke-opacity="0.24" stroke-width="1">',
-    })),
+    ...[0, 1, 2].map(() => {
+      return {
+        from: 'stroke-opacity="0.24">',
+        to: 'stroke-opacity="0.24" stroke-width="1">',
+      };
+    }),
     {
       from: 'fill-opacity="0.025" stroke="#9fefca" stroke-opacity="0.1">',
       to: 'fill-opacity="0.03" stroke="#9fefca" stroke-opacity="0.1" stroke-width="1">',
@@ -86,23 +96,29 @@ const APPROVED_MARKUP_MOVES: Partial<
   ],
   "schema-mapping": [
     // Each panel's title divider gains the explicit hairline.
-    ...["64", "598"].map((x1) => ({
-      from: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e"></line>`,
-      to: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e" stroke-width="1"></line>`,
-    })),
+    ...["64", "598"].map((x1) => {
+      return {
+        from: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e"></line>`,
+        to: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e" stroke-width="1"></line>`,
+      };
+    }),
     // Each match ring gains the explicit hairline once, in drawing order.
-    ...[0, 1, 2, 3].map(() => ({
-      from: 'stroke-opacity="0.6"></circle>',
-      to: 'stroke-opacity="0.6" stroke-width="1"></circle>',
-    })),
+    ...[0, 1, 2, 3].map(() => {
+      return {
+        from: 'stroke-opacity="0.6"></circle>',
+        to: 'stroke-opacity="0.6" stroke-width="1"></circle>',
+      };
+    }),
   ],
   "source-merge": [
     // Each source chip's outline gains the explicit hairline once, in drawing
     // order.
-    ...[0, 1, 2].map(() => ({
-      from: 'stroke-opacity="0.3"></rect>',
-      to: 'stroke-opacity="0.3" stroke-width="1"></rect>',
-    })),
+    ...[0, 1, 2].map(() => {
+      return {
+        from: 'stroke-opacity="0.3"></rect>',
+        to: 'stroke-opacity="0.3" stroke-width="1"></rect>',
+      };
+    }),
     // The merge node's rim gains the explicit hairline.
     {
       from: 'stroke-opacity="0.65"></circle>',
@@ -122,8 +138,8 @@ const APPROVED_MARKUP_MOVES: Partial<
 export const applyApprovedMoves = (
   preset: (typeof LEGACY_IDS)[number],
   markup: string,
-): string =>
-  (APPROVED_MARKUP_MOVES[preset] ?? []).reduce(
-    (moved, { from, to }) => moved.replace(from, to),
-    markup,
-  );
+): string => {
+  return (APPROVED_MARKUP_MOVES[preset] ?? []).reduce((moved, { from, to }) => {
+    return moved.replace(from, to);
+  }, markup);
+};

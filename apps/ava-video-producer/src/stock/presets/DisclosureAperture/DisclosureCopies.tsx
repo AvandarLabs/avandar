@@ -15,16 +15,16 @@ export function DisclosureCopies({
   let numSharedFields = 0;
   return (
     <g>
-      {input.fields.map((field, index) =>
-        field.disclosure === "share" ? (
+      {input.fields.map((field, index) => {
+        return field.disclosure === "share" ? (
           <DisclosureField
             key={field.id}
             {...{ field, index, frame, input, accent }}
             shareIndex={numSharedFields++}
             isCopy
           />
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

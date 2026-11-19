@@ -19,6 +19,8 @@ export function hasControlPath(
   const child: unknown = Reflect.get(value, key);
   return head.endsWith("[]")
     ? Array.isArray(child) &&
-        child.some((item: unknown) => hasControlPath(item, tail))
+        child.some((item: unknown) => {
+          return hasControlPath(item, tail);
+        })
     : key in value && hasControlPath(child, tail);
 }

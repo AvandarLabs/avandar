@@ -1,3 +1,5 @@
+import type { CursorKey } from "../cursor-motion";
+
 export type PointerBeat = {
   frame: number;
   x: number;
@@ -32,7 +34,11 @@ function _coalesceSameTarget(beats: PointerBeat[]): PointerBeat[] {
 }
 
 /** Preserve a real dwell even when adjacent clicks are only 16 frames apart. */
-export function measuredPath(beats: PointerBeat[], width = 1600, height = 840) {
+export function measuredPath(
+  beats: PointerBeat[],
+  width = 1600,
+  height = 840,
+): CursorKey[] {
   const targets = _coalesceSameTarget(beats);
   const keys = [{ at: 0, x: width * 0.42, y: height * 0.47 }];
   let previousHold = 0;

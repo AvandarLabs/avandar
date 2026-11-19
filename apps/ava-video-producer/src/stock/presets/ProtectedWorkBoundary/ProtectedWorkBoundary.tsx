@@ -39,17 +39,19 @@ export function ProtectedWorkBoundary({
         ]}
       />
       <BoundaryWorker frame={frame} input={input} accent={accent} />
-      {input.slots.map((slot, index) => (
-        <ProtectedSlot
-          key={slot.id}
-          slot={slot}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-          id={id}
-        />
-      ))}
+      {input.slots.map((slot, index) => {
+        return (
+          <ProtectedSlot
+            key={slot.id}
+            slot={slot}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+            id={id}
+          />
+        );
+      })}
       <BoundaryRequest frame={frame} input={input} accent={accent} />
     </g>
   );

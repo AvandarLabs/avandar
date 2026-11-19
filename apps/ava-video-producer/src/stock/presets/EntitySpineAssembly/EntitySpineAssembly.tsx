@@ -13,11 +13,16 @@ export function EntitySpineAssembly({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const observations = [...input.observations].sort(
-    (first, second) =>
-      input.entities.findIndex(({ id }) => id === first.entityId) -
-      input.entities.findIndex(({ id }) => id === second.entityId),
-  );
+  const observations = [...input.observations].sort((first, second) => {
+    return (
+      input.entities.findIndex(({ id }) => {
+        return id === first.entityId;
+      }) -
+      input.entities.findIndex(({ id }) => {
+        return id === second.entityId;
+      })
+    );
+  });
   return (
     <g>
       <LabelSlots
@@ -36,27 +41,31 @@ export function EntitySpineAssembly({
         ]}
       />
       {input.showSourceRows
-        ? observations.map((observation, index) => (
-            <SpineObservation
-              key={observation.id}
-              input={input}
-              observation={observation}
-              index={index}
-              frame={frame}
-              accent={accent}
-            />
-          ))
+        ? observations.map((observation, index) => {
+            return (
+              <SpineObservation
+                key={observation.id}
+                input={input}
+                observation={observation}
+                index={index}
+                frame={frame}
+                accent={accent}
+              />
+            );
+          })
         : null}
-      {input.entities.map((entity, index) => (
-        <EntitySpineRow
-          key={entity.id}
-          input={input}
-          entity={entity}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.entities.map((entity, index) => {
+        return (
+          <EntitySpineRow
+            key={entity.id}
+            input={input}
+            entity={entity}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <SpineContributions
         input={input}
         observations={observations}

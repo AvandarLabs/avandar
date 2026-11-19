@@ -15,11 +15,12 @@ export function makeCompletedDetailPathFromInputAndFrame({
       completed.add(candidate.farthest);
     }
   });
-  const indices = [...completed].sort((left, right) => left - right);
+  const indices = [...completed].sort((left, right) => {
+    return left - right;
+  });
   return indices
-    .map(
-      (index, position) =>
-        `${position ? "L" : "M"}${60 + input.vertices[index][0] * 3.6} ${160 + input.vertices[index][1] * 3.6}`,
-    )
+    .map((index, position) => {
+      return `${position ? "L" : "M"}${60 + input.vertices[index][0] * 3.6} ${160 + input.vertices[index][1] * 3.6}`;
+    })
     .join(" ");
 }

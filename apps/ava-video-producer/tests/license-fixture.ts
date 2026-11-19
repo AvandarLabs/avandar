@@ -9,8 +9,8 @@ export const LICENSE_FIXTURE = {
 export function licenseTestEnvironment(filename: string): NodeJS.ProcessEnv {
   return {
     ...Object.fromEntries(
-      Object.entries(process.env).filter(([name]) =>
-        [
+      Object.entries(process.env).filter(([name]) => {
+        return [
           "PATH",
           "HOME",
           "TMPDIR",
@@ -20,8 +20,8 @@ export function licenseTestEnvironment(filename: string): NodeJS.ProcessEnv {
           "PATHEXT",
           "LANG",
           "LC_ALL",
-        ].includes(name),
-      ),
+        ].includes(name);
+      }),
     ),
     NO_COLOR: "1",
     REMOTION_KEYS_FILE: filename,

@@ -20,16 +20,18 @@ export function ChartFocusEdit({
     <g data-axis-maximum={input.axisMaximum}>
       <ChartHeadings input={input} frame={frame} accent={accent} />
       <ChartScale axisMaximum={input.axisMaximum} refinement={refinement} />
-      {input.categories.map((category, index) => (
-        <ChartCategory
-          key={category.id}
-          category={category}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.categories.map((category, index) => {
+        return (
+          <ChartCategory
+            key={category.id}
+            category={category}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <FitText
         text={input.unitLabel}
         x={544}

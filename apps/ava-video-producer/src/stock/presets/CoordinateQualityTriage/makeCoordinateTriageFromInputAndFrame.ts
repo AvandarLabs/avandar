@@ -38,11 +38,12 @@ function _getRepresentativeIndex({
   index: number;
 }>): number {
   return _getReason(row) === "plotted"
-    ? input.rows.findIndex(
-        (candidate) =>
+    ? input.rows.findIndex((candidate) => {
+        return (
           candidate.latitude === row.latitude &&
-          candidate.longitude === row.longitude,
-      )
+          candidate.longitude === row.longitude
+        );
+      })
     : index;
 }
 /**
@@ -58,9 +59,9 @@ export function makeCoordinateTriageFromInputAndFrame({
   const reasons = input.rows.map(_getReason);
   const rows = input.rows.map((row, index) => {
     const reason = reasons[index];
-    const rank = reasons
-      .slice(0, index)
-      .filter((item) => item === reason).length;
+    const rank = reasons.slice(0, index).filter((item) => {
+      return item === reason;
+    }).length;
     const tray = ["missing", "nonNumeric", "range"].indexOf(reason);
     const targetX =
       reason === "plotted" && typeof row.longitude === "number"
@@ -83,12 +84,14 @@ export function makeCoordinateTriageFromInputAndFrame({
     };
   });
   const counts = (["plotted", "missing", "nonNumeric", "range"] as const).map(
-    (reason) => ({
-      reason,
-      count: reasons.filter(
-        (item, index) => item === reason && frame >= 90 + index * 3,
-      ).length,
-    }),
+    (reason) => {
+      return {
+        reason,
+        count: reasons.filter((item, index) => {
+          return item === reason && frame >= 90 + index * 3;
+        }).length,
+      };
+    },
   );
   return { rows, counts };
 }

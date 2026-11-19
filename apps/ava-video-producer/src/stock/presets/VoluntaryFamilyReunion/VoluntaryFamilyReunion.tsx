@@ -16,10 +16,9 @@ export function VoluntaryFamilyReunion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const numMembers = input.groups.reduce(
-    (sum, group) => sum + group.members.length,
-    0,
-  );
+  const numMembers = input.groups.reduce((sum, group) => {
+    return sum + group.members.length;
+  }, 0);
   const halfWidth = (numMembers - 1) * 45 + 35;
   return (
     <g>
@@ -40,37 +39,41 @@ export function VoluntaryFamilyReunion({
         breakLongWords
         normalizeWhitespace
       />
-      {input.groups.map((group, groupIndex) => (
-        <g key={group.id}>
-          <FitText
-            text={group.label}
-            x={groupIndex === 0 ? 60 : 580}
-            y={132}
-            width={320}
-            fontSize={14}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <ReunionInvitation
-            input={input}
-            groupIndex={groupIndex}
-            frame={frame}
-            accent={groupIndex === 0 ? accent : STOCK.orange}
-          />
-          {group.members.map((member, index) => (
-            <ReunionMember
-              key={member.id}
-              member={member}
-              index={index}
-              groupIndex={groupIndex}
+      {input.groups.map((group, groupIndex) => {
+        return (
+          <g key={group.id}>
+            <FitText
+              text={group.label}
+              x={groupIndex === 0 ? 60 : 580}
+              y={132}
+              width={320}
+              fontSize={14}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <ReunionInvitation
               input={input}
+              groupIndex={groupIndex}
               frame={frame}
               accent={groupIndex === 0 ? accent : STOCK.orange}
             />
-          ))}
-        </g>
-      ))}
+            {group.members.map((member, index) => {
+              return (
+                <ReunionMember
+                  key={member.id}
+                  member={member}
+                  index={index}
+                  groupIndex={groupIndex}
+                  input={input}
+                  frame={frame}
+                  accent={groupIndex === 0 ? accent : STOCK.orange}
+                />
+              );
+            })}
+          </g>
+        );
+      })}
       <FitText
         text={input.scenarioCaption}
         x={50}

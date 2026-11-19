@@ -28,19 +28,21 @@ export function CarbonNetAccounting({
         stroke={STOCK.line}
         strokeWidth={2}
       />
-      {[retained, emissions, retained - emissions].map((value, index) => (
-        <FitText
-          key={index}
-          text={String(value)}
-          x={540 + index * 135}
-          y={510}
-          width={110}
-          fontSize={12}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {[retained, emissions, retained - emissions].map((value, index) => {
+        return (
+          <FitText
+            key={index}
+            text={String(value)}
+            x={540 + index * 135}
+            y={510}
+            width={110}
+            fontSize={12}
+            maxLines={3}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       <text x={658} y={515} fill={STOCK.text} fontSize={16}>
         −
       </text>

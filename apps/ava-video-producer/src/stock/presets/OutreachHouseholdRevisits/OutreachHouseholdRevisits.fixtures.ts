@@ -87,16 +87,20 @@ const minimumInput: Input = {
 };
 const denseInput: Input = {
   ...DEFAULT_INPUT,
-  households: Array.from({ length: 8 }, (_, index) => ({
-    id: `home ${index}`,
-    label: "W".repeat(16),
-    x: 0.1 + (index % 4) * 0.24,
-    y: index < 4 ? 0.1 : 0.9,
-  })),
-  visits: Array.from({ length: 8 }, (_, index) => ({
-    householdId: `home ${Math.floor(index / 3)}`,
-    contacted: index % 3 === 1,
-  })),
+  households: Array.from({ length: 8 }, (_, index) => {
+    return {
+      id: `home ${index}`,
+      label: "W".repeat(16),
+      x: 0.1 + (index % 4) * 0.24,
+      y: index < 4 ? 0.1 : 0.9,
+    };
+  }),
+  visits: Array.from({ length: 8 }, (_, index) => {
+    return {
+      householdId: `home ${Math.floor(index / 3)}`,
+      contacted: index % 3 === 1,
+    };
+  }),
   sceneLabel: "W".repeat(40),
   copy: {
     map: "W".repeat(42),
@@ -132,10 +136,12 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, visits: [{ householdId: "missing", contacted: true }] },
   {
     ...DEFAULT_INPUT,
-    visits: Array.from({ length: 4 }, () => ({
-      householdId: "h1",
-      contacted: false,
-    })),
+    visits: Array.from({ length: 4 }, () => {
+      return {
+        householdId: "h1",
+        contacted: false,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -147,18 +153,22 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    households: DEFAULT_INPUT.households.map((household) => ({
-      ...household,
-      x: 0.1,
-      y: 0.1,
-    })),
+    households: DEFAULT_INPUT.households.map((household) => {
+      return {
+        ...household,
+        x: 0.1,
+        y: 0.1,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    households: DEFAULT_INPUT.households.map((household) => ({
-      ...household,
-      x: 0,
-    })),
+    households: DEFAULT_INPUT.households.map((household) => {
+      return {
+        ...household,
+        x: 0,
+      };
+    }),
   },
   { ...DEFAULT_INPUT, copy: { ...DEFAULT_INPUT.copy, extra: "invalid" } },
 ];

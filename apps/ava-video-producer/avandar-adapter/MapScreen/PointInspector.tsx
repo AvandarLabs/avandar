@@ -11,17 +11,23 @@ import symbologyCss from "@/views/GisApp/panels/LayerInspector/StyleSection/Symb
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import { viewStates } from "./mapFixtures";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ReactNode } from "react";
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 
-/** The real layer inspector panel: product data/style/sensitivity sections over an immutable fixture layer. */
+/**
+ * The real layer inspector panel: product data/style/sensitivity sections over
+ * an immutable fixture layer.
+ */
 export function PointInspector({
   layer,
   frame,
 }: {
   layer: MapLayer.T;
   frame: number;
-}) {
+}): ReactNode {
   const isDataOpen = frame < 208;
   const symbology = layer.symbology as Extract<
     MapLayer.Symbology,
@@ -115,7 +121,9 @@ export function PointInspector({
                 cluster: "Cluster",
                 heatmap: "Heat",
               }}
-              isOptionAvailable={() => true}
+              isOptionAvailable={() => {
+                return true;
+              }}
               onTypeChange={_noop}
             />
           </div>

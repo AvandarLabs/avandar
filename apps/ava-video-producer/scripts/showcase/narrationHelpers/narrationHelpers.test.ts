@@ -71,7 +71,9 @@ const _syntheticSpeech: typeof scratchTts = async (
   await fs.writeFile(path.join(root, "public", asset), plan.narration[0].text);
   const derived = {
     ...plan,
-    narration: plan.narration.map((cue) => ({ ...cue, audio: asset })),
+    narration: plan.narration.map((cue) => {
+      return { ...cue, audio: asset };
+    }),
   };
   const filename = path.join(directory, "storyboard.json");
   await fs.writeFile(filename, JSON.stringify(derived), { flag: "wx" });

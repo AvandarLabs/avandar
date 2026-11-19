@@ -13,7 +13,6 @@ import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBil
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceDangerZone } from "./WorkspaceDangerZone";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";
-import { WorkspacePluginsTab } from "./WorkspacePluginsTab/WorkspacePluginsTab";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
@@ -29,7 +28,6 @@ const OWNER_TAB_IDS = [
   "roles",
   "tags",
   "language",
-  "plugins",
   "privacy",
   "billing",
 ] as const;
@@ -44,7 +42,6 @@ const NON_OWNER_TAB_IDS = [
   "roles",
   "tags",
   "language",
-  "plugins",
   "privacy",
 ] as const;
 
@@ -151,7 +148,6 @@ export function WorkspaceSettingsPage(): JSX.Element {
     roles: t`Roles & Permissions`,
     tags: t`User groups`,
     language: t`Language`,
-    plugins: t`Plugins`,
     privacy: t`Privacy log`,
     billing: t`Billing`,
   };
@@ -181,7 +177,6 @@ export function WorkspaceSettingsPage(): JSX.Element {
               roles: tabHeaders.roles,
               tags: tabHeaders.tags,
               language: tabHeaders.language,
-              plugins: tabHeaders.plugins,
               privacy: tabHeaders.privacy,
               billing: tabHeaders.billing,
             }}
@@ -198,9 +193,6 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
               language: () => {
                 return <WorkspaceLanguageTab />;
-              },
-              plugins: () => {
-                return <WorkspacePluginsTab />;
               },
               privacy: () => {
                 return <PrivacyLogTab />;
@@ -221,7 +213,6 @@ export function WorkspaceSettingsPage(): JSX.Element {
               roles: tabHeaders.roles,
               tags: tabHeaders.tags,
               language: tabHeaders.language,
-              plugins: tabHeaders.plugins,
               privacy: tabHeaders.privacy,
             }}
             renderTabPanel={{
@@ -237,9 +228,6 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
               language: () => {
                 return <WorkspaceLanguageTab />;
-              },
-              plugins: () => {
-                return <WorkspacePluginsTab />;
               },
               privacy: () => {
                 return <PrivacyLogTab />;

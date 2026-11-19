@@ -17,10 +17,9 @@ export const objectFlightSchema = z
         height: z.number().positive().max(400),
       })
       .strict()
-      .refine(
-        (box) => box.x + box.width <= 960 && box.y + box.height <= 600,
-        "Flying object must fit inside the diagram",
-      ),
+      .refine((box) => {
+        return box.x + box.width <= 960 && box.y + box.height <= 600;
+      }, "Flying object must fit inside the diagram"),
   })
   .strict();
 

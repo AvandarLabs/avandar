@@ -43,9 +43,9 @@ export function PreviewDetails({
         <p>{preset.useWhen}</p>
       </div>
       <div className="keyword-list" aria-label="Keywords">
-        {preset.tags.map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
+        {preset.tags.map((tag) => {
+          return <span key={tag}>{tag}</span>;
+        })}
       </div>
       <div className="brief-excerpt">
         <h3>Creative direction</h3>
@@ -55,8 +55,8 @@ export function PreviewDetails({
         <button
           className="button"
           disabled={!contentState.isValid}
-          onClick={() =>
-            onCopy(
+          onClick={() => {
+            return onCopy(
               JSON.stringify(
                 makeStockRequestFromConfiguration({
                   preset,
@@ -68,27 +68,29 @@ export function PreviewDetails({
                 2,
               ),
               "Configured JSON copied",
-            )
-          }
+            );
+          }}
         >
           <Icon name="copy" size={16} />
           Copy configured JSON
         </button>
         <button
           className="button button-primary"
-          onClick={() =>
-            onCopy(
+          onClick={() => {
+            return onCopy(
               buildReferenceBrief({ preset, accent, background }),
               "Creative brief copied",
-            )
-          }
+            );
+          }}
         >
           <Icon name="copy" size={16} />
           Copy creative brief
         </button>
         <button
           className={clsx("button", { "button-saved": saved })}
-          onClick={() => onSave(preset.id)}
+          onClick={() => {
+            return onSave(preset.id);
+          }}
           aria-pressed={saved}
         >
           <Icon name={saved ? "check" : "bookmark"} size={16} />
@@ -97,12 +99,12 @@ export function PreviewDetails({
       </div>
       <div className="detail-links">
         <button
-          onClick={() =>
-            onCopy(
+          onClick={() => {
+            return onCopy(
               `${preset.name} (${preset.id})\n${getReferenceUrlFromPreset(preset)}`,
               "Reference link copied",
-            )
-          }
+            );
+          }}
         >
           <Icon name="copy" size={14} />
           Copy link

@@ -25,64 +25,59 @@ test("supported fixed sizes wrap deterministically at the declared line bound", 
 });
 
 test("unbreakable and excess-line content fail explicitly", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "W".repeat(30),
-        width: 220,
-        fontSize: 24,
-        maxLines: 3,
-      }),
-    /fit/i,
-  );
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "one\ntwo\nthree",
-        width: 220,
-        fontSize: 24,
-        maxLines: 2,
-      }),
-    /fit/i,
-  );
-  [0, NaN, Infinity, -1].forEach((width) =>
-    assert.throws(() =>
-      wrapTextToLines({ text: "label", width, fontSize: 24, maxLines: 2 }),
-    ),
-  );
-  assert.throws(
-    () =>
-      wrapTextToLines({
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "W".repeat(30),
+      width: 220,
+      fontSize: 24,
+      maxLines: 3,
+    });
+  }, /fit/i);
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "one\ntwo\nthree",
+      width: 220,
+      fontSize: 24,
+      maxLines: 2,
+    });
+  }, /fit/i);
+  [0, NaN, Infinity, -1].forEach((width) => {
+    return assert.throws(() => {
+      return wrapTextToLines({
         text: "label",
-        width: 220,
-        fontSize: 17 as 24,
+        width,
+        fontSize: 24,
         maxLines: 2,
-      }),
-    /size/i,
-  );
+      });
+    });
+  });
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "label",
+      width: 220,
+      fontSize: 17 as 24,
+      maxLines: 2,
+    });
+  }, /size/i);
 });
 
 test("lowercase wide glyphs cannot pass a narrower single-line width", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "mmmmmmmmmm",
-        width: 120,
-        fontSize: 16,
-        maxLines: 1,
-      }),
-    /fit/,
-  );
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "m".repeat(16),
-        width: 180,
-        fontSize: 16,
-        maxLines: 2,
-      }),
-    /fit/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "mmmmmmmmmm",
+      width: 120,
+      fontSize: 16,
+      maxLines: 1,
+    });
+  }, /fit/);
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "m".repeat(16),
+      width: 180,
+      fontSize: 16,
+      maxLines: 2,
+    });
+  }, /fit/);
   assert.deepEqual(
     wrapTextToLines({
       text: "mmmm mmmm",
@@ -95,16 +90,14 @@ test("lowercase wide glyphs cannot pass a narrower single-line width", () => {
 });
 
 test("mixed-case widths cover the supported regular and bold Arial advances", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "mmWmmWmm",
-        width: 110,
-        fontSize: 16,
-        maxLines: 1,
-      }),
-    /fit/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "mmWmmWmm",
+      width: 110,
+      fontSize: 16,
+      maxLines: 1,
+    });
+  }, /fit/);
   assert.deepEqual(
     wrapTextToLines({
       text: "mmWmmWmm",
@@ -138,28 +131,24 @@ test("opt-in oversized-token wrapping preserves fitting words and complete wide 
 });
 
 test("opt-in wrapping still rejects exhausted line capacity and a too-wide glyph", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "界".repeat(34),
-        width: 100,
-        fontSize: 18,
-        maxLines: 2,
-        breakLongWords: true,
-      }),
-    /fit/,
-  );
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "界",
-        width: 1,
-        fontSize: 18,
-        maxLines: 4,
-        breakLongWords: true,
-      }),
-    /fit/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "界".repeat(34),
+      width: 100,
+      fontSize: 18,
+      maxLines: 2,
+      breakLongWords: true,
+    });
+  }, /fit/);
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "界",
+      width: 1,
+      fontSize: 18,
+      maxLines: 4,
+      breakLongWords: true,
+    });
+  }, /fit/);
 });
 
 test("oversized wrapping keeps each combining letter and joined emoji in one grapheme", () => {
@@ -196,35 +185,33 @@ test("oversized wrapping keeps each combining letter and joined emoji in one gra
 });
 
 test("a whole grapheme wider than its slot fails instead of separating emoji parts", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "👩🏽‍💻",
-        width: 20,
-        fontSize: 14,
-        maxLines: 4,
-        breakLongWords: true,
-      }),
-    /grapheme.*fit/i,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "👩🏽‍💻",
+      width: 20,
+      fontSize: 14,
+      maxLines: 4,
+      breakLongWords: true,
+    });
+  }, /grapheme.*fit/i);
 });
 
 test("keycap emoji retain a whole fallback glyph advance after marks are removed", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: "1️⃣",
-        width: 12,
-        fontSize: 14,
-        maxLines: 4,
-        breakLongWords: true,
-      }),
-    /grapheme.*fit/i,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "1️⃣",
+      width: 12,
+      fontSize: 14,
+      maxLines: 4,
+      breakLongWords: true,
+    });
+  }, /grapheme.*fit/i);
 });
 
 test("oversized tokens fill residual line capacity while fitting words and graphemes stay intact", () => {
-  const wide = (length: number) => "界".repeat(length);
+  const wide = (length: number) => {
+    return "界".repeat(length);
+  };
   const emoji = "👩🏽‍💻";
   const accent = "e\u0301";
   const cases = [
@@ -285,32 +272,31 @@ test("oversized tokens fill residual line capacity while fitting words and graph
     assert.deepEqual(actual, lines, text);
     assert.equal(actual.join("").replace(/\s/g, ""), text.replace(/\s/g, ""));
   });
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: `${wide(1)} ${wide(4)}`,
-        width: 60,
-        fontSize: 14,
-        maxLines: 4,
-      }),
-    /unbreakable/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: `${wide(1)} ${wide(4)}`,
+      width: 60,
+      fontSize: 14,
+      maxLines: 4,
+    });
+  }, /unbreakable/);
 });
 
 test("nine-line capacity and content beyond eight lines still fail explicitly", () => {
-  assert.throws(
-    () =>
-      wrapTextToLines({ text: "One", width: 368, fontSize: 14, maxLines: 9 }),
-    /one to eight lines/,
-  );
-  assert.throws(
-    () =>
-      wrapTextToLines({
-        text: Array(9).fill("Line").join("\n"),
-        width: 368,
-        fontSize: 14,
-        maxLines: 8,
-      }),
-    /line count/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: "One",
+      width: 368,
+      fontSize: 14,
+      maxLines: 9,
+    });
+  }, /one to eight lines/);
+  assert.throws(() => {
+    return wrapTextToLines({
+      text: Array(9).fill("Line").join("\n"),
+      width: 368,
+      fontSize: 14,
+      maxLines: 8,
+    });
+  }, /line count/);
 });

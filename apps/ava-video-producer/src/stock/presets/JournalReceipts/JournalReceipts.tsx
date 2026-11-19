@@ -26,18 +26,22 @@ export function JournalReceipts({
       <path d={pocketPath} fill={STOCK.surface} stroke={STOCK.line} />
       <circle cx={70} cy={128} r={5} fill={STOCK.orange} />
       <circle cx={520} cy={128} r={5} fill={accent} />
-      {input.entries.map((entry, index) => (
-        <JournalTab
-          key={entry.id}
-          {...{ entry, index, input, frame, accent }}
-        />
-      ))}
-      {input.receipts.map((receipt, index) => (
-        <ReceiptHalf
-          key={receipt.entryId}
-          {...{ receipt, index, input, frame, accent }}
-        />
-      ))}
+      {input.entries.map((entry, index) => {
+        return (
+          <JournalTab
+            key={entry.id}
+            {...{ entry, index, input, frame, accent }}
+          />
+        );
+      })}
+      {input.receipts.map((receipt, index) => {
+        return (
+          <ReceiptHalf
+            key={receipt.entryId}
+            {...{ receipt, index, input, frame, accent }}
+          />
+        );
+      })}
       <JournalCopy {...{ frame, input }} />
     </g>
   );

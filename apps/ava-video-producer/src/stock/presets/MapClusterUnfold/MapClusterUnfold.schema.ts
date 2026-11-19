@@ -53,12 +53,12 @@ export const inputSchema = baseSchema.superRefine((input, context) => {
     });
   }
   if (
-    input.points.some(
-      (point) => !input.clusters.some(propEq("id", point.clusterId)),
-    ) ||
-    input.clusters.some(
-      (cluster) => !input.points.some(propEq("clusterId", cluster.id)),
-    )
+    input.points.some((point) => {
+      return !input.clusters.some(propEq("id", point.clusterId));
+    }) ||
+    input.clusters.some((cluster) => {
+      return !input.points.some(propEq("clusterId", cluster.id));
+    })
   ) {
     context.addIssue({
       code: "custom",

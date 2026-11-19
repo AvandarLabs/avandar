@@ -73,11 +73,12 @@ test("null remains unresolved while an empty reviewed ID accepts its actual labe
   assert.match(hold, /data-distance-ratio="1"/);
 });
 test("distance guides extend from actual anchors before the selected row travels", () => {
-  const figure = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const figure = (frame: number) => {
+    return SvgAttributes.fromMarker({
       markup: _render({ frame: frame }),
       marker: "source-figure",
     });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: figure(50), name: "cx" }),
     250,
@@ -86,11 +87,12 @@ test("distance guides extend from actual anchors before the selected row travels
     SvgAttributes.getNumberFromMarkup({ attributes: figure(50), name: "cy" }),
     320,
   );
-  const guide = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const guide = (frame: number) => {
+    return SvgAttributes.fromMarker({
       markup: _render({ frame: frame }),
       marker: "distance-guide",
     });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: guide(51), name: "x2" }),
     250,
@@ -105,11 +107,12 @@ test("distance guides extend from actual anchors before the selected row travels
     SvgAttributes.getNumberFromMarkup({ attributes: guide(95), name: "x2" }),
     205,
   );
-  const row = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const row = (frame: number) => {
+    return SvgAttributes.fromMarker({
       markup: _render({ frame: frame }),
       marker: "extracted-row",
     });
+  };
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: row(115), name: "x" }) <
       588 &&
@@ -200,13 +203,21 @@ test("coincident candidate anchors retain separate keyed rails and positive near
   assert.match(hold, /data-candidate-label="a"/);
   assert.match(hold, /data-candidate-label="b"/);
   const values = [...hold.matchAll(/data-literal-value="≈ ([\d.e+-]+)"/g)].map(
-    ([, value]) => Number(value),
+    ([, value]) => {
+      return Number(value);
+    },
   );
   assert.equal(values.length, 3);
-  assert.ok(values.every((value) => value > 0));
+  assert.ok(
+    values.every((value) => {
+      return value > 0;
+    }),
+  );
   assert.ok(values[0] < 1e-12 && values[1] < 1e-12);
   const guides = [...hold.matchAll(/<line[^>]+data-distance-guide[^>]+>/g)].map(
-    ([tag]) => tag,
+    ([tag]) => {
+      return tag;
+    },
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: guides[0], name: "x2" }),
@@ -223,8 +234,8 @@ test("corner extraction rows keep complete text clear of source anchors guides a
     [95, 95],
     [5, 95],
     [95, 5],
-  ].forEach(([x, y]) =>
-    [true, false].forEach((showDistanceValues) => {
+  ].forEach(([x, y]) => {
+    return [true, false].forEach((showDistanceValues) => {
       const input = {
         ...DEFAULT_INPUT,
         figure: { text: "界".repeat(12), x, y },
@@ -279,7 +290,9 @@ test("corner extraction rows keep complete text clear of source anchors guides a
           .split("data-review-choice=")[0];
         const texts = [
           ...rowMarkup.matchAll(/<text[^>]*>[\s\S]*?<\/text>/g),
-        ].map(([text]) => text);
+        ].map(([text]) => {
+          return text;
+        });
         assert.equal(texts.length, 3);
         SvgPaintAssertions.assertTextCanvasBounds({
           markup: `<g transform="translate(${-left} ${-top})">${texts.join("")}</g>`,
@@ -306,7 +319,9 @@ test("corner extraction rows keep complete text clear of source anchors guides a
           const ratio = markup.slice(markup.indexOf("data-ratio-value="));
           const ratioTexts = [...ratio.matchAll(/<text[^>]*>[\s\S]*?<\/text>/g)]
             .slice(0, 2)
-            .map(([text]) => text);
+            .map(([text]) => {
+              return text;
+            });
           assert.equal(ratioTexts.length, 2);
           SvgPaintAssertions.assertTextCanvasBounds({
             markup: `<g transform="translate(-60 -490)">${ratioTexts.join("")}</g>`,
@@ -317,9 +332,9 @@ test("corner extraction rows keep complete text clear of source anchors guides a
         }
         const title = [
           ...markup.matchAll(/(<text[^>]*>)[\s\S]*?<\/text>/g),
-        ].find(([block]) =>
-          block.includes(`aria-label="${input.copy.result}"`),
-        );
+        ].find(([block]) => {
+          return block.includes(`aria-label="${input.copy.result}"`);
+        });
         assert.ok(title);
         SvgPaintAssertions.assertTextCanvasBounds({
           markup: `<g transform="translate(-540 -377)">${title[0]}</g>`,
@@ -347,6 +362,6 @@ test("corner extraction rows keep complete text clear of source anchors guides a
         assert.equal(Number(route[4]), bottom);
         assert.equal(Number(route[5]), left);
       });
-    }),
-  );
+    });
+  });
 });

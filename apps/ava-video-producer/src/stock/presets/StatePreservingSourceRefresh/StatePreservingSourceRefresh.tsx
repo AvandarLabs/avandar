@@ -12,11 +12,13 @@ export function StatePreservingSourceRefresh({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const writes = input.records.filter(
-    (record) =>
-      input.sourceRows.find(({ id }) => id === record.id)?.label !==
-      record.label,
-  ).length;
+  const writes = input.records.filter((record) => {
+    return (
+      input.sourceRows.find(({ id }) => {
+        return id === record.id;
+      })?.label !== record.label
+    );
+  }).length;
   return (
     <g>
       <LabelSlots
@@ -34,16 +36,18 @@ export function StatePreservingSourceRefresh({
           [input.labels.human, 610, 58, 290, 14, 3],
         ]}
       />
-      {input.records.map((record, index) => (
-        <RefreshRecord
-          key={record.id}
-          input={input}
-          record={record}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.records.map((record, index) => {
+        return (
+          <RefreshRecord
+            key={record.id}
+            input={input}
+            record={record}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       {input.showWriteCount ? (
         <g data-write-count={frame >= 139 ? writes : 0}>
           <path

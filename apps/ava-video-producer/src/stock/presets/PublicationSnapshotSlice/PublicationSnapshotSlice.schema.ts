@@ -55,9 +55,15 @@ export const inputSchema = z
       !_unique(columnIds) ||
       !_unique(selected.rowIds) ||
       !_unique(selected.columnIds) ||
-      input.table.rows.some(({ cells }) => cells.length !== columnIds.length) ||
-      selected.rowIds.some((id) => !rowIds.includes(id)) ||
-      selected.columnIds.some((id) => !columnIds.includes(id))
+      input.table.rows.some(({ cells }) => {
+        return cells.length !== columnIds.length;
+      }) ||
+      selected.rowIds.some((id) => {
+        return !rowIds.includes(id);
+      }) ||
+      selected.columnIds.some((id) => {
+        return !columnIds.includes(id);
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -66,7 +72,9 @@ export const inputSchema = z
           "Unique source IDs, complete cell rows and unique nonempty exact subsets are required.",
       });
     }
-    const row = input.table.rows.find(({ id }) => id === input.liveEdit.rowId),
+    const row = input.table.rows.find(({ id }) => {
+        return id === input.liveEdit.rowId;
+      }),
       columnIndex = columnIds.indexOf(input.liveEdit.columnId);
     if (
       !selected.rowIds.includes(input.liveEdit.rowId) ||

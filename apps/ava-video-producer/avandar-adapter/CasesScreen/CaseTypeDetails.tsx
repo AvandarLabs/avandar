@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IconArrowRight, IconBlocks } from "@tabler/icons-react";
 import { CaseTypeAttributesList } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type Props = {
   caseType: { id: string; name: string; description: string };
@@ -26,7 +26,11 @@ type Props = {
  * The layout is the product's ConceptMetaView. Only its data hooks and
  * mutating action callbacks are replaced by the approved fixture binding.
  */
-export function CaseTypeDetails({ caseType, attributes, datasets }: Props) {
+export function CaseTypeDetails({
+  caseType,
+  attributes,
+  datasets,
+}: Props): ReactNode {
   return (
     <Container py="md">
       <Stack gap="lg" maw={720}>

@@ -21,28 +21,30 @@ function _width(value: string): number {
 /** Exact literal data wraps at whole graphemes inside an 84px cell interior. */
 export function GridLiteralCell({ value, x, y }: Readonly<Props>): ReactNode {
   const lines = [{ value: "", width: 0 }];
-  Array.from(GRAPHEMES.segment(value), ({ segment }) => segment).forEach(
-    (segment) => {
-      const width = _width(segment);
-      const line = lines[lines.length - 1];
-      if (line.width + width > 84) {
-        lines.push({ value: segment, width });
-      } else {
-        line.value += segment;
-        line.width += width;
-      }
-    },
-  );
+  Array.from(GRAPHEMES.segment(value), ({ segment }) => {
+    return segment;
+  }).forEach((segment) => {
+    const width = _width(segment);
+    const line = lines[lines.length - 1];
+    if (line.width + width > 84) {
+      lines.push({ value: segment, width });
+    } else {
+      line.value += segment;
+      line.width += width;
+    }
+  });
   return (
     <g data-raw-grid-value={value} aria-label={value}>
-      {lines.map((line, index) => (
-        <LiteralDataText
-          key={index}
-          value={line.value}
-          x={x}
-          y={y + index * 16}
-        />
-      ))}
+      {lines.map((line, index) => {
+        return (
+          <LiteralDataText
+            key={index}
+            value={line.value}
+            x={x}
+            y={y + index * 16}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -78,9 +78,9 @@ function _getVisibleTexts({
     input.copy.mobilized,
     input.copy.retained,
     input.copy.exported,
-    ...[incoming, retained, exported].map(
-      (value) => `${value} ${input.copy.unit}`,
-    ),
+    ...[incoming, retained, exported].map((value) => {
+      return `${value} ${input.copy.unit}`;
+    }),
     `${incoming} = ${retained} + ${exported} ${input.copy.unit}`,
     input.copy.disclaimer,
   ];
@@ -113,7 +113,9 @@ registerStockTextLayoutAssertions(options);
 test("the steward stays in contact with the treatment throughout placement", () => {
   Array.from(
     { length: Math.max(0, Math.floor((108 - 24) / 0.25) + 1) },
-    (_, sampleIndex) => 24 + sampleIndex * 0.25,
+    (_, sampleIndex) => {
+      return 24 + sampleIndex * 0.25;
+    },
   ).forEach((frame) => {
     const markup = _render({ frame: frame });
     const treatment = SvgAttributes.fromMarker({ markup, marker: "treatment" });
@@ -216,10 +218,9 @@ test("the complete intervention caption clears the slope and quantity captions",
   const baseline = Number(label[1]);
   const bottom =
     baseline +
-    [...label[2].matchAll(/dy="([^"]+)"/g)].reduce(
-      (sum, match) => sum + Number(match[1]),
-      0,
-    ) +
+    [...label[2].matchAll(/dy="([^"]+)"/g)].reduce((sum, match) => {
+      return sum + Number(match[1]);
+    }, 0) +
     3.6;
   assert.ok(baseline - 12 > 415);
   assert.ok(bottom < 470 - 12);
@@ -229,7 +230,9 @@ test("the entire exported ribbon clears the placed treatment while retained mate
   Array.from(fixtures).forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((108 - 60) / 0.25) + 1) },
-      (_, sampleIndex) => 60 + sampleIndex * 0.25,
+      (_, sampleIndex) => {
+        return 60 + sampleIndex * 0.25;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const ribbon = SvgAttributes.fromMarker({

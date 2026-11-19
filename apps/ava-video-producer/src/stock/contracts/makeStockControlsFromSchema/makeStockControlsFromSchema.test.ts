@@ -102,15 +102,16 @@ const expected: StockControl[] = [
     optionsFrom: { path: "people", valueKey: "id", labelKey: "label" },
   },
 ];
-test("supported recursive shapes retain exact bounds, relative paths and stable message identities", () =>
-  assert.deepEqual(
+test("supported recursive shapes retain exact bounds, relative paths and stable message identities", () => {
+  return assert.deepEqual(
     makeStockControlsFromSchema({
       schema,
       messageNamespace: "fixture",
       referenceSelects: REFERENCE_SELECTS,
     }),
     expected,
-  ));
+  );
+});
 test("exact nested reference overrides preserve their root or item scope", () => {
   const controls = makeStockControlsFromSchema({
     schema,
@@ -173,34 +174,30 @@ test("unsupported scalar, union, text constraints and unbounded or primitive col
     },
     { type: "boolean", const: true },
   ];
-  unsupported.forEach((node) =>
-    assert.throws(
-      () =>
-        makeStockControlsFromSchema({
-          schema: {
-            type: "object",
-            additionalProperties: false,
-            properties: { value: node },
-            required: ["value"],
-          },
-          messageNamespace: "fixture",
-        }),
-      /Unsupported stock controls schema/,
-    ),
-  );
+  unsupported.forEach((node) => {
+    return assert.throws(() => {
+      return makeStockControlsFromSchema({
+        schema: {
+          type: "object",
+          additionalProperties: false,
+          properties: { value: node },
+          required: ["value"],
+        },
+        messageNamespace: "fixture",
+      });
+    }, /Unsupported stock controls schema/);
+  });
 });
 test("unknown or incompatible reference override paths fail explicitly", () => {
-  ["unknown", "enabled", "mode"].forEach((path) =>
-    assert.throws(
-      () =>
-        makeStockControlsFromSchema({
-          schema,
-          messageNamespace: "fixture",
-          referenceSelects: { [path]: REFERENCE_SELECTS.focus },
-        }),
-      /Unsupported stock controls schema/,
-    ),
-  );
+  ["unknown", "enabled", "mode"].forEach((path) => {
+    return assert.throws(() => {
+      return makeStockControlsFromSchema({
+        schema,
+        messageNamespace: "fixture",
+        referenceSelects: { [path]: REFERENCE_SELECTS.focus },
+      });
+    }, /Unsupported stock controls schema/);
+  });
 });
 test("conversion preserves the complete source schema and reference descriptors", () => {
   const before = structuredClone({

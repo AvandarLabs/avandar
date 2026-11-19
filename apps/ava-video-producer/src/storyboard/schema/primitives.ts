@@ -11,7 +11,9 @@ export const unit = z.number().min(0).max(1);
 export const label = text.max(60);
 export const detail = text.max(100);
 
-/** Assets are relative to public/; credentials and remote URLs are never assets. */
+/**
+ * Assets are relative to public/; credentials and remote URLs are never assets.
+ */
 export const assetPathSchema = text.max(240).refine((value) => {
   return (
     !value.startsWith("/") &&
@@ -20,14 +22,13 @@ export const assetPathSchema = text.max(240).refine((value) => {
     !value.includes("?") &&
     !value.includes("#") &&
     !value.includes("%") &&
-    value
-      .split("/")
-      .every(
-        (part) =>
-          part !== ".." &&
-          part !== "." &&
-          !part.startsWith(".") &&
-          part.length > 0,
-      )
+    value.split("/").every((part) => {
+      return (
+        part !== ".." &&
+        part !== "." &&
+        !part.startsWith(".") &&
+        part.length > 0
+      );
+    })
   );
 }, "Use a public-relative asset path without hidden files, URLs, or traversal");

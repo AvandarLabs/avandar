@@ -15,16 +15,18 @@ export function QueueRelief({
   return (
     <g opacity={ramp(frame, 0, 12)}>
       <QueueStructure frame={frame} input={input} accent={accent} />
-      {input.items.map((item, index) => (
-        <QueueItem
-          key={item.id}
-          frame={frame}
-          input={input}
-          item={item}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.items.map((item, index) => {
+        return (
+          <QueueItem
+            key={item.id}
+            frame={frame}
+            input={input}
+            item={item}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

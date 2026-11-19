@@ -50,8 +50,8 @@ export async function renderPreviewStill({
     logLevel: "error",
     licenseKey: requireLicense().privateKey,
   });
-  const shot = timeline(plan).find(
-    (item) => frame >= item.startFrame && frame < item.endFrame,
-  )!;
+  const shot = timeline(plan).find((item) => {
+    return frame >= item.startFrame && frame < item.endFrame;
+  })!;
   return { frame, file, shot: shot.id };
 }

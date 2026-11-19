@@ -38,8 +38,12 @@ function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
     ...Object.values(input.boundary),
     ...Object.values(input.decision),
     ...Object.entries(input.copy)
-      .filter(([key]) => key !== "unallocated" || input.showUnallocatedRequest)
-      .map(([, value]) => value),
+      .filter(([key]) => {
+        return key !== "unallocated" || input.showUnallocatedRequest;
+      })
+      .map(([, value]) => {
+        return value;
+      }),
   ];
 }
 
@@ -172,7 +176,9 @@ function _assertOwner({
   const budget = _getOwnershipGroup({ markup, marker: "budget-term", owner });
   const labels = Array.from(
     budget.matchAll(/<text aria-label="([^"]*)"/g),
-    ([, text]) => text,
+    ([, text]) => {
+      return text;
+    },
   );
   assert.deepEqual(labels, [String(number), label, String(quantity)]);
   assert.match(local, new RegExp(`<tspan[^>]*>${number}</tspan>`));
@@ -186,9 +192,9 @@ function _assertOwner({
       texts = _getTextBounds(group);
     assert.ok(texts[0].left > badge.left && texts[0].right < badge.right);
     assert.ok(texts[0].top > badge.top && texts[0].bottom < badge.bottom);
-    texts
-      .slice(1)
-      .forEach((bounds) => _assertSeparate({ first: badge, second: bounds }));
+    texts.slice(1).forEach((bounds) => {
+      return _assertSeparate({ first: badge, second: bounds });
+    });
   });
 }
 
@@ -236,9 +242,9 @@ function _assertRouteOwnership({
     ) <= 20,
   );
   _assertSeparate({ first: _getCircleBounds(circle), second: bounds });
-  _getTextBounds(markup).forEach((text) =>
-    _assertSeparate({ first: text, second: bounds }),
-  );
+  _getTextBounds(markup).forEach((text) => {
+    return _assertSeparate({ first: text, second: bounds });
+  });
   const guide = markup.match(
     new RegExp(`<path[^>]*data-flow-guide="${owner}"[^>]*>`),
   );
@@ -252,14 +258,16 @@ function _assertRouteOwnership({
 
 function _assertOwnershipClearance(markup: string): void {
   const texts = _getTextBounds(markup);
-  texts.forEach((text, index) =>
-    texts
-      .slice(index + 1)
-      .forEach((other) => _assertSeparate({ first: text, second: other })),
-  );
+  texts.forEach((text, index) => {
+    return texts.slice(index + 1).forEach((other) => {
+      return _assertSeparate({ first: text, second: other });
+    });
+  });
   const badges = Array.from(
     markup.matchAll(/<circle[^>]*data-ownership-key[^>]*>/g),
-    ([circle]) => _getCircleBounds(circle),
+    ([circle]) => {
+      return _getCircleBounds(circle);
+    },
   );
   const rectangles = Array.from(
     markup.matchAll(/<rect[^>]*>/g),
@@ -294,23 +302,24 @@ function _assertOwnershipClearance(markup: string): void {
     },
   );
   badges.forEach((badge, index) => {
-    badges
-      .slice(index + 1)
-      .forEach((other) => _assertSeparate({ first: badge, second: other }));
-    rectangles.forEach((rectangle) =>
-      _assertSeparate({ first: badge, second: rectangle }),
-    );
+    badges.slice(index + 1).forEach((other) => {
+      return _assertSeparate({ first: badge, second: other });
+    });
+    rectangles.forEach((rectangle) => {
+      return _assertSeparate({ first: badge, second: rectangle });
+    });
     texts
-      .filter(
-        (text) =>
-          !(
-            text.left > badge.left &&
-            text.right < badge.right &&
-            text.top > badge.top &&
-            text.bottom < badge.bottom
-          ),
-      )
-      .forEach((text) => _assertSeparate({ first: badge, second: text }));
+      .filter((text) => {
+        return !(
+          text.left > badge.left &&
+          text.right < badge.right &&
+          text.top > badge.top &&
+          text.bottom < badge.bottom
+        );
+      })
+      .forEach((text) => {
+        return _assertSeparate({ first: badge, second: text });
+      });
   });
 }
 export {

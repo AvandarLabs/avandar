@@ -17,11 +17,11 @@ const SETTLE_FRAMES = 15;
 
 /** The authored rows that satisfy the predicate, in authored order. */
 function _matchingRows(input: Input): Input["rows"] {
-  return input.rows.filter((row) =>
-    input.predicate.operator === ">="
+  return input.rows.filter((row) => {
+    return input.predicate.operator === ">="
       ? row.value >= input.predicate.threshold
-      : row.value <= input.predicate.threshold,
-  );
+      : row.value <= input.predicate.threshold;
+  });
 }
 
 /** All originals remain visible while matching copies move as complete rows. */
@@ -46,27 +46,35 @@ export function PushdownRows({
   );
   return (
     <g opacity={ramp(frame, ROWS_CUE, motion.scale(ROWS_FADE_FRAMES))}>
-      {matches.map((row, index) => (
-        <PushdownRow
-          key={row.id}
-          row={row}
-          x={mix(travel, 64, 580)}
-          y={mix(settle, 246 + input.rows.indexOf(row) * 32, 246 + index * 32)}
-          source={false}
-          opacity={ramp(frame, TRAVEL_CUE, motion.scale(COPY_FADE_FRAMES))}
-          accent={accent}
-        />
-      ))}
-      {input.rows.map((row, index) => (
-        <PushdownSourceRow
-          key={row.id}
-          frame={frame}
-          row={row}
-          index={index}
-          isRejected={!matches.includes(row)}
-          accent={accent}
-        />
-      ))}
+      {matches.map((row, index) => {
+        return (
+          <PushdownRow
+            key={row.id}
+            row={row}
+            x={mix(travel, 64, 580)}
+            y={mix(
+              settle,
+              246 + input.rows.indexOf(row) * 32,
+              246 + index * 32,
+            )}
+            source={false}
+            opacity={ramp(frame, TRAVEL_CUE, motion.scale(COPY_FADE_FRAMES))}
+            accent={accent}
+          />
+        );
+      })}
+      {input.rows.map((row, index) => {
+        return (
+          <PushdownSourceRow
+            key={row.id}
+            frame={frame}
+            row={row}
+            index={index}
+            isRejected={!matches.includes(row)}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

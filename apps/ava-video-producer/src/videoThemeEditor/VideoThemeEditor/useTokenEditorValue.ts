@@ -30,31 +30,35 @@ export function useTokenEditorValue(
   options: TokenEditorValueOptions,
 ): TokenEditorContextValue {
   const { draft, scope, rows, theme, issues, item, onDraftChange } = options;
-  const swatches = useMemo(
-    () =>
-      [
-        ...new Set([
-          ...Object.values(theme.atomic.swatch),
-          ...(theme.mantine.colors.primary ?? []),
-        ]),
-      ].filter((color) => OPAQUE_HEX_COLOR.test(color)),
-    [theme],
-  );
-  return useMemo(
-    () => ({
+  const swatches = useMemo(() => {
+    return [
+      ...new Set([
+        ...Object.values(theme.atomic.swatch),
+        ...(theme.mantine.colors.primary ?? []),
+      ]),
+    ].filter((color) => {
+      return OPAQUE_HEX_COLOR.test(color);
+    });
+  }, [theme]);
+  return useMemo(() => {
+    return {
       scope,
       rows,
       theme,
       issues,
       swatches,
       item,
-      setToken: (tokenPath, value) =>
-        onDraftChange(setTokenInDraft({ draft, scope, tokenPath, value })),
-      setCustomValue: (request) =>
-        onDraftChange(setCustomValueInDraft({ draft, scope, request })),
-      resetToken: (tokenPath) =>
-        onDraftChange(resetTokenInDraft({ draft, scope, tokenPath })),
-    }),
-    [draft, scope, rows, theme, issues, swatches, item, onDraftChange],
-  );
+      setToken: (tokenPath, value) => {
+        return onDraftChange(
+          setTokenInDraft({ draft, scope, tokenPath, value }),
+        );
+      },
+      setCustomValue: (request) => {
+        return onDraftChange(setCustomValueInDraft({ draft, scope, request }));
+      },
+      resetToken: (tokenPath) => {
+        return onDraftChange(resetTokenInDraft({ draft, scope, tokenPath }));
+      },
+    };
+  }, [draft, scope, rows, theme, issues, swatches, item, onDraftChange]);
 }

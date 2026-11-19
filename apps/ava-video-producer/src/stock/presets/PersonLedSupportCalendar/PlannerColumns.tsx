@@ -8,34 +8,38 @@ type Props = { input: Input };
 export function PlannerColumns({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.days.map((day, column) => (
-        <g key={day.id}>
-          <LabelSlots
-            labels={[
-              [
-                day.label,
-                248 + (column * 540) / input.days.length,
-                134,
-                540 / input.days.length - 16,
-                12,
-                4,
-              ],
-            ]}
-          />
-          {input.timeBands.map((band, row) => (
-            <rect
-              key={band.id}
-              data-planner-cell={`${column},${row}`}
-              x={240 + (column * 540) / input.days.length}
-              y={214 + (row * 228) / input.timeBands.length}
-              width={540 / input.days.length}
-              height={228 / input.timeBands.length}
-              fill="none"
-              stroke={STOCK.line}
+      {input.days.map((day, column) => {
+        return (
+          <g key={day.id}>
+            <LabelSlots
+              labels={[
+                [
+                  day.label,
+                  248 + (column * 540) / input.days.length,
+                  134,
+                  540 / input.days.length - 16,
+                  12,
+                  4,
+                ],
+              ]}
             />
-          ))}
-        </g>
-      ))}
+            {input.timeBands.map((band, row) => {
+              return (
+                <rect
+                  key={band.id}
+                  data-planner-cell={`${column},${row}`}
+                  x={240 + (column * 540) / input.days.length}
+                  y={214 + (row * 228) / input.timeBands.length}
+                  width={540 / input.days.length}
+                  height={228 / input.timeBands.length}
+                  fill="none"
+                  stroke={STOCK.line}
+                />
+              );
+            })}
+          </g>
+        );
+      })}
     </g>
   );
 }

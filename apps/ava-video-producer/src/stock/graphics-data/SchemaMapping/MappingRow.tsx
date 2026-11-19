@@ -22,6 +22,7 @@ import {
   TYPE_BASELINE,
   TYPE_INSET,
 } from "./SchemaMapping.constants";
+import type { ReactNode } from "react";
 
 type Props = {
   label: string;
@@ -35,7 +36,10 @@ type Props = {
   showChecks: boolean;
 };
 
-/** One mapping: the source field, the connecting edge, the match ring, and the target field. */
+/**
+ * One mapping: the source field, the connecting edge, the match ring, and the
+ * target field.
+ */
 export function MappingRow({
   index,
   frame,
@@ -43,7 +47,7 @@ export function MappingRow({
   left,
   right,
   ...row
-}: Props) {
+}: Props): ReactNode {
   const style = useGraphicProps("SchemaMapping", {});
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();

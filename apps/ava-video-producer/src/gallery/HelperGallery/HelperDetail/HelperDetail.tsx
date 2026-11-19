@@ -3,12 +3,13 @@ import { CodeBlock } from "./CodeBlock";
 import css from "./HelperDetail.module.css";
 import { HelperReference } from "./HelperReference";
 import type { HelperEntry } from "../helperCatalog.types";
+import type { ReactNode } from "react";
 
 /** The selected helper's purpose, API, usage and guidance. */
-export function HelperDetail({ helper }: { helper: HelperEntry }) {
-  const category = HELPER_CATALOG.categories.find(
-    (item) => item.id === helper.category,
-  );
+export function HelperDetail({ helper }: { helper: HelperEntry }): ReactNode {
+  const category = HELPER_CATALOG.categories.find((item) => {
+    return item.id === helper.category;
+  });
   return (
     <article className={css.detail} aria-labelledby="helper-detail-title">
       <header className={css.summary}>

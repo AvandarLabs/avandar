@@ -162,8 +162,9 @@ function _componentsSchema(isComplete: boolean): z.ZodType {
 }
 
 function _themeShape(isComplete: boolean) {
-  const optional = (schema: z.ZodType) =>
-    isComplete ? schema : schema.optional();
+  const optional = (schema: z.ZodType) => {
+    return isComplete ? schema : schema.optional();
+  };
   const video = z.strictObject({
     atomic: optional(
       _nodeSchema(VIDEO_TOKEN_CATALOG.atomic, "atomic", isComplete),

@@ -305,9 +305,9 @@ test("continuity appearance options preserve the timeline", async () => {
   });
   assert.equal(film.frames, original.frames);
   assert.deepEqual(film.plan?.narration, original.plan?.narration);
-  const shot = film.plan?.shots.find(
-    (candidate) => candidate.scene === "continuity",
-  );
+  const shot = film.plan?.shots.find((candidate) => {
+    return candidate.scene === "continuity";
+  });
   assert.equal(shot?.scene === "continuity" && "accent" in shot.props, false);
   assert.equal(shot?.scene === "continuity" && shot.props.cameraMotion, false);
   const theme = makeResolvedVideoThemeFromSnapshot(film.theme, [film.id]);
@@ -335,7 +335,9 @@ test("camera preset exports include the complete extended timeline", async () =>
   );
   assert.equal(
     adjusted.frames,
-    drawn.shots.reduce((total, shot) => total + shot.durationInFrames, 0),
+    drawn.shots.reduce((total, shot) => {
+      return total + shot.durationInFrames;
+    }, 0),
   );
   const shot = drawn.shots[0];
   assert.equal(
@@ -381,7 +383,9 @@ test("a draft on a built-in theme renders as the unsaved theme that extends it",
   });
   assert.equal(film.theme?.themeId, DRAFT_THEME_ID);
   assert.deepEqual(
-    film.theme?.documents.map((document) => document.extends),
+    film.theme?.documents.map((document) => {
+      return document.extends;
+    }),
     ["avandar"],
   );
   assert.deepEqual(film.theme?.patches, [patch]);

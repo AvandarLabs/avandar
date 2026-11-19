@@ -4,26 +4,32 @@ export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "structure"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "structure";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "specification",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "specification";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
     specification: { ...DEFAULT_INPUT.specification, extra: true },
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "observation"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "observation";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
     observation: { ...DEFAULT_INPUT.observation, extra: true },
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "observers"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "observers";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
@@ -59,12 +65,14 @@ export const invalidInputs: unknown[] = [
     ],
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showDifference",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showDifference";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "labels"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "labels";
+    }),
   ),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
   { ...DEFAULT_INPUT, structure: "invalid" },

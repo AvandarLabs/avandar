@@ -11,31 +11,34 @@ export function ConvoyMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const points = input.routes.find(({ role }) => role === "blocked")!.points;
+  const points = input.routes.find(({ role }) => {
+    return role === "blocked";
+  })!.points;
   const start = points[input.obstruction.segmentIndex];
   const end = points[input.obstruction.segmentIndex + 1];
   return (
     <g>
-      {input.routes.map((route, index) => (
-        <path
-          key={route.role}
-          data-road={route.role}
-          data-route-id={route.id}
-          d={route.points
-            .map(
-              (point, pointIndex) =>
-                `${pointIndex ? "L" : "M"}${80 + point.x * 800} ${180 + point.y * 280}`,
-            )
-            .join(" ")}
-          fill="none"
-          stroke={route.role === "detour" ? accent : STOCK.muted}
-          strokeWidth={
-            route.role === "detour" ? 3 + 2 * ramp(frame, 60, 18) : 4
-          }
-          strokeOpacity={ramp(frame, 10 + index * 3, 15)}
-          strokeLinejoin="round"
-        />
-      ))}
+      {input.routes.map((route, index) => {
+        return (
+          <path
+            key={route.role}
+            data-road={route.role}
+            data-route-id={route.id}
+            d={route.points
+              .map((point, pointIndex) => {
+                return `${pointIndex ? "L" : "M"}${80 + point.x * 800} ${180 + point.y * 280}`;
+              })
+              .join(" ")}
+            fill="none"
+            stroke={route.role === "detour" ? accent : STOCK.muted}
+            strokeWidth={
+              route.role === "detour" ? 3 + 2 * ramp(frame, 60, 18) : 4
+            }
+            strokeOpacity={ramp(frame, 10 + index * 3, 15)}
+            strokeLinejoin="round"
+          />
+        );
+      })}
       <g
         data-obstruction={input.obstruction.kind}
         transform={`translate(${80 + (start.x + end.x) * 400} ${180 + (start.y + end.y) * 140})`}

@@ -17,12 +17,6 @@ type Props = XYChartProps & {
    * (mixed `renderAs`) ignore this prop and always group.
    */
   layout?: "group" | "stack" | "percent";
-
-  /**
-   * Space between bar categories. `"none"` draws neighboring bars touching.
-   * Unset or `"default"` keeps Recharts' default gap.
-   */
-  barGap?: "default" | "none";
 };
 
 const BAR_LAYOUT_TO_MANTINE: Record<
@@ -45,7 +39,6 @@ export function BarChart({
   withLegend = false,
   chartStyle,
   layout = "group",
-  barGap,
 }: Props): JSX.Element {
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
 
@@ -98,7 +91,6 @@ export function BarChart({
       styleProps,
       valueFormatter,
       chartStyle,
-      barGap,
     });
   }
 
@@ -150,7 +142,6 @@ export function BarChart({
           left: hasYLabel ? 10 : undefined,
           right: hasYLabel ? 5 : undefined,
         },
-        ...(barGap === "none" ? { barCategoryGap: 0 } : {}),
       }}
       xAxisProps={{
         ...xAxisProps,

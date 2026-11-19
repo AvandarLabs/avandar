@@ -39,24 +39,26 @@ test("historical values survive the added field and one later null remains visib
   assert.equal((after.match(/data-earlier-record=/g) ?? []).length, 2);
   assert.equal((after.match(/data-later-record=/g) ?? []).length, 1);
   assert.equal((after.match(/data-missing-value=/g) ?? []).length, 2);
-  ["North", "South", "East", "In person"].forEach((value) =>
-    assert.ok(after.includes(`aria-label="${value}"`)),
-  );
+  ["North", "South", "East", "In person"].forEach((value) => {
+    return assert.ok(after.includes(`aria-label="${value}"`));
+  });
   const missing = _render({ frame: 150, input: CHANGED_INPUT });
   assert.equal((missing.match(/data-missing-value=/g) ?? []).length, 3);
   assert.doesNotMatch(missing, /In person/);
 });
 
 test("complete fixture set includes minimum, dense and changed inputs before behavior", () => {
-  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach((input) =>
-    assert.deepEqual(inputSchema.parse(input), input),
+  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach(
+    (input) => {
+      return assert.deepEqual(inputSchema.parse(input), input);
+    },
   );
   assert.equal(fixtures.length, 4);
 });
 test("invalid structure and cross-field values are rejected", () => {
-  INVALID_INPUTS.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  INVALID_INPUTS.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
@@ -71,11 +73,9 @@ function _getVisibleTexts({
   return [
     input.evidenceLabel,
     input.fields.existingLabel,
-    ...input.earlierRecords.flatMap((row) => [
-      row.label,
-      row.recordedValue,
-      row.id,
-    ]),
+    ...input.earlierRecords.flatMap((row) => {
+      return [row.label, row.recordedValue, row.id];
+    }),
     ...(frame >= 49 ? [input.fields.missingLabel] : []),
     ...(frame >= 12 ? [input.fields.addedLabel] : []),
     ...(input.showVersionLabels
@@ -167,9 +167,9 @@ test("all three old values stay exact and a hidden-version later null stays miss
   };
   [49, 72, 92, 108, 132, 150, 167].forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
-    input.earlierRecords.forEach((record) =>
-      assert.ok(markup.includes(`data-earlier-record="${record.id}"`)),
-    );
+    input.earlierRecords.forEach((record) => {
+      return assert.ok(markup.includes(`data-earlier-record="${record.id}"`));
+    });
     assert.equal((markup.match(/data-earlier-record=/g) ?? []).length, 3);
     if (frame >= 93) {
       assert.equal((markup.match(/data-missing-value=/g) ?? []).length, 4);
@@ -182,11 +182,13 @@ import { getTextEnvelopesFromMarkup } from "./getTextEnvelopesFromMarkup";
 test("wrapped old and added values stay inside each physical row", () => {
   const input = {
     ...DENSE_INPUT,
-    earlierRecords: DENSE_INPUT.earlierRecords.map((row) => ({
-      ...row,
-      label: "界".repeat(22),
-      recordedValue: "界".repeat(18),
-    })),
+    earlierRecords: DENSE_INPUT.earlierRecords.map((row) => {
+      return {
+        ...row,
+        label: "界".repeat(22),
+        recordedValue: "界".repeat(18),
+      };
+    }),
     fields: { ...DENSE_INPUT.fields, missingLabel: "界".repeat(20) },
   };
   const markup = _render({ frame: 150, input: input });
@@ -194,7 +196,9 @@ test("wrapped old and added values stay inside each physical row", () => {
   const bodies = [...markup.matchAll(/<rect data-record-body[^>]*>/g)];
   const records = [...input.earlierRecords, input.laterRecord];
   assert.deepEqual(
-    bodies.map(([body]) => body.match(/data-record-body="([^"]*)"/)![1]),
+    bodies.map(([body]) => {
+      return body.match(/data-record-body="([^"]*)"/)![1];
+    }),
     records.map(prop("id")),
   );
   bodies.forEach((body, index) => {
@@ -205,7 +209,9 @@ test("wrapped old and added values stay inside each physical row", () => {
     const right =
       SvgAttributes.getNumberFromMarkup({ attributes: body[0], name: "x" }) +
       SvgAttributes.getNumberFromMarkup({ attributes: body[0], name: "width" });
-    const rowTexts = texts.filter((text) => text.y >= y && text.y < y + 60);
+    const rowTexts = texts.filter((text) => {
+      return text.y >= y && text.y < y + 60;
+    });
     const record = records[index];
     assert.deepEqual(
       rowTexts.map(prop("label")).sort(),
@@ -230,13 +236,13 @@ test("the later-generation caption waits until the entering row has cleared its 
     ...DENSE_INPUT,
     phaseLabels: { ...DENSE_INPUT.phaseLabels, later: `L${"W".repeat(29)}` },
   };
-  [94, 100, 115, 131].forEach((frame) =>
-    assert.ok(
+  [94, 100, 115, 131].forEach((frame) => {
+    return assert.ok(
       !_render({ frame: frame, input: input }).includes(
         `aria-label="${input.phaseLabels.later}"`,
       ),
-    ),
-  );
+    );
+  });
   assert.ok(
     _render({ frame: 145, input: input }).includes(
       `aria-label="${input.phaseLabels.later}"`,

@@ -1,7 +1,7 @@
 import { ChangedOnDiskBanner } from "../../videoThemeEditor/ThemeBar/ChangedOnDiskBanner/ChangedOnDiskBanner";
 import { ThemeBar } from "../../videoThemeEditor/ThemeBar/ThemeBar";
-import type { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
-import type { RefObject } from "react";
+import type { useGalleryVideoTheme } from "../GalleryVideoTheme/useGalleryVideoTheme";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   gallery: ReturnType<typeof useGalleryVideoTheme>;
@@ -9,8 +9,15 @@ type Props = Readonly<{
   onReloadTheme: () => void;
 }>;
 
-/** The theme bar, and the changed-on-disk banner when the theme file changed under the draft. */
-export function ThemePanelHeader({ gallery, barRef, onReloadTheme }: Props) {
+/**
+ * The theme bar, and the changed-on-disk banner when the theme file changed
+ * under the draft.
+ */
+export function ThemePanelHeader({
+  gallery,
+  barRef,
+  onReloadTheme,
+}: Props): ReactNode {
   return (
     <>
       <ThemeBar
@@ -23,12 +30,16 @@ export function ThemePanelHeader({ gallery, barRef, onReloadTheme }: Props) {
         status={gallery.status}
         copyStatus={gallery.copyStatus}
         onSelectTheme={gallery.selectTheme}
-        onSave={() => void gallery.save()}
+        onSave={() => {
+          return void gallery.save();
+        }}
         onSaveAsNew={gallery.saveAsNew}
         onDiscard={gallery.discard}
         onReloadTheme={onReloadTheme}
         barRef={barRef}
-        onCopyJson={() => void gallery.copyThemeJson()}
+        onCopyJson={() => {
+          return void gallery.copyThemeJson();
+        }}
       />
       {gallery.isChangedOnDisk ? (
         <ChangedOnDiskBanner

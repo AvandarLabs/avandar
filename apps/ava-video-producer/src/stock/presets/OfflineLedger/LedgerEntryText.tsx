@@ -20,16 +20,18 @@ export function LedgerEntryText({
   ];
   return showLabels ? (
     <g>
-      {labels.map(({ text, x, width }) => (
-        <FitText
-          key={x}
-          {...{ text, x, width, y }}
-          fontSize={14}
-          maxLines={2}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map(({ text, x, width }) => {
+        return (
+          <FitText
+            key={x}
+            {...{ text, x, width, y }}
+            fontSize={14}
+            maxLines={2}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   ) : (
     <path

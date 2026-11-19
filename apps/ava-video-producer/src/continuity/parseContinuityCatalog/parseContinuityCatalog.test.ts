@@ -32,34 +32,40 @@ test("preserves authored film and study metadata without rewriting prose", () =>
 });
 
 test("rejects nonnumeric frame counts in authored metadata", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([{ ...FILM, frames: "300" }], [STUDY]),
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog([{ ...FILM, frames: "300" }], [STUDY]);
+  });
 });
 
 test("rejects missing creative direction in a study", () => {
   const { creativeDirection: _creativeDirection, ...incompleteStudy } = STUDY;
-  assert.throws(() => parseContinuityCatalog([FILM], [incompleteStudy]));
+  assert.throws(() => {
+    return parseContinuityCatalog([FILM], [incompleteStudy]);
+  });
 });
 
 test("rejects duplicate catalog ids across families", () => {
-  assert.throws(
-    () => parseContinuityCatalog([FILM], [{ ...STUDY, id: FILM.id }]),
-    /Duplicate continuity catalog id/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog([FILM], [{ ...STUDY, id: FILM.id }]);
+  }, /Duplicate continuity catalog id/);
 });
 
 test("rejects a study whose source film is not registered", () => {
-  assert.throws(
-    () => parseContinuityCatalog([FILM], [{ ...STUDY, sourceFilm: "missing" }]),
-    /Unknown source film/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog(
+      [FILM],
+      [{ ...STUDY, sourceFilm: "missing" }],
+    );
+  }, /Unknown source film/);
 });
 
 test("rejects unknown metadata fields instead of silently dropping authored copy", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([FILM], [{ ...STUDY, creativeDirections: "Typo" }]),
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog(
+      [FILM],
+      [{ ...STUDY, creativeDirections: "Typo" }],
+    );
+  });
 });
 
 const SCENE_FILM = {
@@ -87,18 +93,16 @@ test("accepts storyboard-scene films and studies and keeps their kind", () => {
 });
 
 test("rejects a scene study whose plan is outside storyboards/vocabulary", () => {
-  assert.throws(
-    () =>
-      parseContinuityCatalog(
-        [SCENE_FILM],
-        [{ ...SCENE_STUDY, path: "explainers/scene-study" }],
-      ),
-    /storyboards\/vocabulary/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog(
+      [SCENE_FILM],
+      [{ ...SCENE_STUDY, path: "explainers/scene-study" }],
+    );
+  }, /storyboards\/vocabulary/);
 });
 
 test("rejects unknown study kinds", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([FILM], [{ ...STUDY, kind: "stock" }]),
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog([FILM], [{ ...STUDY, kind: "stock" }]);
+  });
 });

@@ -25,8 +25,8 @@ export function ClassRuler({ input, threshold }: Readonly<Props>): ReactNode {
         strokeWidth={3}
       />
       {input.showValueRuler
-        ? input.zones.map((zone, index) =>
-            zone.value === null ? undefined : (
+        ? input.zones.map((zone, index) => {
+            return zone.value === null ? undefined : (
               <circle
                 key={zone.id}
                 data-value-tick={zone.id}
@@ -38,8 +38,8 @@ export function ClassRuler({ input, threshold }: Readonly<Props>): ReactNode {
                 r={4 + (index % 2)}
                 fill={STOCK.text}
               />
-            ),
-          )
+            );
+          })
         : undefined}
     </g>
   );

@@ -35,24 +35,25 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(48),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
 
     if (
       new Set(input.contents.map(prop("id"))).size !== input.contents.length
     ) {
       issue("contents", "Content IDs must be unique.");
     }
-    const offered = input.contents.reduce(
-      (sum, item) => sum + item.offeredUnits,
-      0,
-    );
-    const selected = input.contents.reduce(
-      (sum, item) => sum + item.selectedUnits,
-      0,
-    );
+    const offered = input.contents.reduce((sum, item) => {
+      return sum + item.offeredUnits;
+    }, 0);
+    const selected = input.contents.reduce((sum, item) => {
+      return sum + item.selectedUnits;
+    }, 0);
     if (
-      input.contents.some((item) => item.selectedUnits > item.offeredUnits) ||
+      input.contents.some((item) => {
+        return item.selectedUnits > item.offeredUnits;
+      }) ||
       offered < 2 ||
       offered > 10 ||
       selected < 1 ||

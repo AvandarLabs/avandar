@@ -13,16 +13,18 @@ export function ZoneFractions({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.zones.map((zone, index) => (
-        <ZoneFraction
-          key={zone.id}
-          zone={zone}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.zones.map((zone, index) => {
+        return (
+          <ZoneFraction
+            key={zone.id}
+            zone={zone}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

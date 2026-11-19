@@ -12,6 +12,9 @@ export type ValueControlProps = Readonly<{
   onChange: (value: unknown) => void;
   /** Key for enum option names: the token path or the composite field name. */
   optionKey?: string;
-  /** A camera curve: control points stay in 0..1 and the only power curve is the cubic in-out (`isCameraSafeEasing`). */
+  /**
+   * A camera curve: control points stay in 0..1 and the only power curve is the
+   * cubic in-out (`isCameraSafeEasing`).
+   */
   isCameraCurve?: boolean;
 }>;

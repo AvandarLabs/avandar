@@ -18,9 +18,9 @@ export function HouseholdMap({
       {input.households.map((household, index) => {
         const x = 80 + household.x * 480;
         const y = 120 + household.y * 270;
-        const events = completed.filter(
-          ({ householdId }) => householdId === household.id,
-        );
+        const events = completed.filter(({ householdId }) => {
+          return householdId === household.id;
+        });
         const state = events.some(prop("contacted"))
           ? "contacted"
           : events.length
@@ -84,16 +84,18 @@ export function HouseholdMap({
               normalizeWhitespace
             />
             {input.showVisitStamps
-              ? events.map((event, eventIndex) => (
-                  <circle
-                    key={eventIndex}
-                    data-visit-stamp={household.id}
-                    cx={x - 10 + eventIndex * 10}
-                    cy={y + 14}
-                    r={3}
-                    fill={event.contacted ? accent : STOCK.orange}
-                  />
-                ))
+              ? events.map((event, eventIndex) => {
+                  return (
+                    <circle
+                      key={eventIndex}
+                      data-visit-stamp={household.id}
+                      cx={x - 10 + eventIndex * 10}
+                      cy={y + 14}
+                      r={3}
+                      fill={event.contacted ? accent : STOCK.orange}
+                    />
+                  );
+                })
               : undefined}
           </g>
         );

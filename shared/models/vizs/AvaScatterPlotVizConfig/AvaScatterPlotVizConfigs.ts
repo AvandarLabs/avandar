@@ -17,7 +17,7 @@ import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizCon
 import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfig.types.ts";
 import type {
   AvaVizConfigType,
-  BuiltInVizType,
+  VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 import type {
@@ -86,7 +86,7 @@ export const AvaScatterPlotVizConfigs = {
   /**
    * Convert a scatter config to any other viz type.
    */
-  convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
+  convertVizConfig: <K extends VizType = VizType>(
     vizConfig: AvaScatterPlotVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K> => {
@@ -105,7 +105,7 @@ export const AvaScatterPlotVizConfigs = {
       return [{ renderAs, key: yAxisKey }];
     };
 
-    return match<BuiltInVizType>(newVizType)
+    return match<VizType>(newVizType)
       .with("table", (vizType): AvaTableVizConfig => {
         return { vizType };
       })

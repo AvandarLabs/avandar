@@ -3,10 +3,14 @@ import { useState } from "react";
 type DraftValueOptions<Value, Draft> = Readonly<{
   /** The value the field shows when nobody is typing. */
   value: Value;
-  /** A stable text key for a value, so equal arrays or objects compare equal. */
+  /**
+   * A stable text key for a value, so equal arrays or objects compare equal.
+   */
   toKey: (value: Value) => string;
   toDraft: (value: Value) => Draft;
-  /** The value a draft names, or `undefined` while it is incomplete or invalid. */
+  /**
+   * The value a draft names, or `undefined` while it is incomplete or invalid.
+   */
   parse: (draft: Draft) => Value | undefined;
   onChange: (value: Value) => void;
 }>;
@@ -36,7 +40,9 @@ export function useDraftValue<Value, Draft>({
   onChange,
 }: DraftValueOptions<Value, Draft>): DraftValue<Draft> {
   const valueKey = toKey(value);
-  const [draft, setDraft] = useState(() => toDraft(value));
+  const [draft, setDraft] = useState(() => {
+    return toDraft(value);
+  });
   const [syncedKey, setSyncedKey] = useState(valueKey);
   if (syncedKey !== valueKey) {
     setSyncedKey(valueKey);
@@ -50,6 +56,8 @@ export function useDraftValue<Value, Draft>({
       onChange(parsed);
     }
   };
-  const revert = () => setDraft(toDraft(value));
+  const revert = () => {
+    return setDraft(toDraft(value));
+  };
   return { draft, isValid: parse(draft) !== undefined, change, revert };
 }

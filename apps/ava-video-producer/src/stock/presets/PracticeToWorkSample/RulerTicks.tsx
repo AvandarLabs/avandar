@@ -9,11 +9,13 @@ export function RulerTicks({
   origin,
   rulerY,
 }: Readonly<Props>): ReactNode {
-  return Array.from({ length: input.task.value + 1 }, (_, index) => (
-    <path
-      key={index}
-      d={`M${origin + index * 12} ${rulerY + 6} v7`}
-      stroke={STOCK.orange}
-    />
-  ));
+  return Array.from({ length: input.task.value + 1 }, (_, index) => {
+    return (
+      <path
+        key={index}
+        d={`M${origin + index * 12} ${rulerY + 6} v7`}
+        stroke={STOCK.orange}
+      />
+    );
+  });
 }

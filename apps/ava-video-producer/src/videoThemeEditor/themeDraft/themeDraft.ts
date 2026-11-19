@@ -83,9 +83,9 @@ function _withScopePatch(
     return { ...draft, patch };
   }
   const others = Object.fromEntries(
-    Object.entries(draft.overrides).filter(
-      ([itemId]) => itemId !== scope.itemId,
-    ),
+    Object.entries(draft.overrides).filter(([itemId]) => {
+      return itemId !== scope.itemId;
+    }),
   );
   return {
     ...draft,
@@ -152,7 +152,9 @@ export function listTokenPathsFromPatch(
       return [];
     }
     return isScale && isRecord(value)
-      ? Object.keys(value).map((key) => `${path}.${key}`)
+      ? Object.keys(value).map((key) => {
+          return `${path}.${key}`;
+        })
       : [path];
   });
 }
@@ -184,7 +186,9 @@ export function countItemOverrides(
     [
       ...listTokenPathsFromPatch(saved),
       ...listTokenPathsFromPatch(target.draft.overrides[target.itemId] ?? {}),
-    ].filter((tokenPath) => !isCustomScaleEntryPath(tokenPath)),
+    ].filter((tokenPath) => {
+      return !isCustomScaleEntryPath(tokenPath);
+    }),
   ).size;
 }
 
@@ -213,10 +217,9 @@ export function createSavedDocumentFromDraft(
   const overrides = {
     ...document.overrides,
     ...Object.fromEntries(
-      Object.entries(draft.overrides).map(([itemId, patch]) => [
-        itemId,
-        _applyPatch(document.overrides?.[itemId] ?? {}, patch),
-      ]),
+      Object.entries(draft.overrides).map(([itemId, patch]) => {
+        return [itemId, _applyPatch(document.overrides?.[itemId] ?? {}, patch)];
+      }),
     ),
   };
   return {
@@ -243,10 +246,9 @@ export function createNewThemeDocument(
     return { ...createSavedDocumentFromDraft(base, draft), id, label };
   }
   const overrides = Object.fromEntries(
-    Object.entries(draft.overrides).map(([itemId, patch]) => [
-      itemId,
-      _applyPatch({}, patch),
-    ]),
+    Object.entries(draft.overrides).map(([itemId, patch]) => {
+      return [itemId, _applyPatch({}, patch)];
+    }),
   );
   return {
     schemaVersion: 1,
@@ -278,17 +280,18 @@ export function createDraftPatchesForItem(
           itemId
         ] ?? {});
   const themePatch = listTokenPathsFromPatch(saved).reduce(
-    (patch, tokenPath) =>
-      removeValueAtPath({
+    (patch, tokenPath) => {
+      return removeValueAtPath({
         source: patch,
         path: getDocumentPathFromTokenPath(tokenPath),
-      }),
+      });
+    },
     draft.patch,
   );
   const itemPatch = itemId === undefined ? {} : (draft.overrides[itemId] ?? {});
-  return [themePatch, itemPatch].filter(
-    (patch) => Object.keys(patch).length > 0,
-  );
+  return [themePatch, itemPatch].filter((patch) => {
+    return Object.keys(patch).length > 0;
+  });
 }
 
 /**

@@ -15,21 +15,27 @@ export function registerRecipientActionAssertions(
     fixtures.forEach(({ input }) => {
       Array.from(
         { length: Math.max(0, Math.ceil((180 - 0) / 1)) },
-        (_, sampleIndex) => 0 + sampleIndex * 1,
+        (_, sampleIndex) => {
+          return 0 + sampleIndex * 1;
+        },
       ).forEach((frame) => {
         const markup = render({ frame: frame, input: input });
         const hand = markup.match(/<circle data-recipient-hand[^>]*>/);
         const arm = markup.match(/<path data-recipient-arm[^>]*d="([^"]+)"/);
         assert.ok(hand && arm);
         const points = [...arm[1].matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map(
-          (match) => [Number(match[1]), Number(match[2])],
+          (match) => {
+            return [Number(match[1]), Number(match[2])];
+          },
         );
-        points.forEach(([x, y]) =>
-          assert.ok(x >= 193 && x <= 693 && y >= 125 && y <= 490),
-        );
+        points.forEach(([x, y]) => {
+          return assert.ok(x >= 193 && x <= 693 && y >= 125 && y <= 490);
+        });
         const moving = [
           ...markup.matchAll(/<g data-good="[^"]*" data-unit="[^"]*"[^>]*>/g),
-        ].filter(([attributes]) => attributes.includes('data-owner="mat"'));
+        ].filter(([attributes]) => {
+          return attributes.includes('data-owner="mat"');
+        });
         assert.ok(moving.length <= 1);
         moving.forEach(([attributes]) => {
           const point = attributes.match(/translate\(([^ ]+) ([^)]+)\)/);

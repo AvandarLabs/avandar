@@ -40,7 +40,10 @@ export type ContinuityVocabularyEntry = ContinuityCatalogBase & {
   controls: readonly ContinuityControl[];
 };
 
-/** Searchable film or reusable-study metadata, preserving family-specific fields. */
+/**
+ * Searchable film or reusable-study metadata, preserving family-specific
+ * fields.
+ */
 export type ContinuityCatalogEntry =
   | ContinuityFilmEntry
   | ContinuityVocabularyEntry;
@@ -51,5 +54,7 @@ export function isSceneEntry(
   return entry.kind === "scene";
 }
 
-/** A single allowlist for the gallery, live players and downloadable pictures. */
+/**
+ * A single allowlist for the gallery, live players and downloadable pictures.
+ */
 export const CONTINUITY_CATALOG = parseContinuityCatalog(films, studies);

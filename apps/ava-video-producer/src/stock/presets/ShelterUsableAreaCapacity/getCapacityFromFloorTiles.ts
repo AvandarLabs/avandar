@@ -40,12 +40,14 @@ export function getCapacityFromFloorTiles(
     sleeping,
     roleAreas: Object.fromEntries(
       (["sleeping", "circulation", "storage", "closed"] as const).map(
-        (role) => [
-          role,
-          (input.floorTiles.filter(propEq("role", role)).length *
-            tileHundredths) /
-            100,
-        ],
+        (role) => {
+          return [
+            role,
+            (input.floorTiles.filter(propEq("role", role)).length *
+              tileHundredths) /
+              100,
+          ];
+        },
       ),
     ),
   };

@@ -14,6 +14,7 @@ import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { CurvePlot } from "./parts/CurvePlot";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const ENTER_AT = 12;
 /** Three ways to call `enter()`, side by side. */
@@ -24,7 +25,7 @@ const ENTER_VARIANTS = [
 ] as const;
 
 /** `enter()` with its default rise, a sideways arrival and a small scale. */
-export function EnterDemo({ frame, frames }: HelperDemoProps) {
+export function EnterDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const style = enter(frame, ENTER_AT);
   return (
     <HelperDemoFrame
@@ -38,15 +39,17 @@ export function EnterDemo({ frame, frames }: HelperDemoProps) {
     >
       <div className={css.centered}>
         <div className={css.cards}>
-          {ENTER_VARIANTS.map((variant) => (
-            <div key={variant.code} className={css.cardColumn}>
-              <DemoCard
-                title="Saved view"
-                style={enter(frame, ENTER_AT, variant.options)}
-              />
-              <span className={css.caption}>{variant.code}</span>
-            </div>
-          ))}
+          {ENTER_VARIANTS.map((variant) => {
+            return (
+              <div key={variant.code} className={css.cardColumn}>
+                <DemoCard
+                  title="Saved view"
+                  style={enter(frame, ENTER_AT, variant.options)}
+                />
+                <span className={css.caption}>{variant.code}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </HelperDemoFrame>
@@ -56,28 +59,35 @@ export function EnterDemo({ frame, frames }: HelperDemoProps) {
 const ROWS = ["first", "second", "third", "fourth", "fifth", "sixth"];
 
 /** `enterAt()` walking a list in, `STAGGER` frames apart. */
-export function EnterAtDemo({ frame, frames }: HelperDemoProps) {
+export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
       label="enterAt(frame, 12, index)"
-      readouts={ROWS.slice(0, 3).map((row, index) => ({
-        name: `row ${index}`,
-        value: formatReadout(Number(enterAt(frame, 12, index).opacity)),
-      }))}
+      readouts={ROWS.slice(0, 3).map((row, index) => {
+        return {
+          name: `row ${index}`,
+          value: formatReadout(Number(enterAt(frame, 12, index).opacity)),
+        };
+      })}
     >
       <div className={css.list}>
-        {ROWS.map((row, index) => (
-          <div
-            key={row}
-            className={css.listRow}
-            style={enterAt(frame, 12, index)}
-          >
-            <span className={css.listDot} />
-            <span className={css.listBar} style={{ width: 120 + index * 30 }} />
-          </div>
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <div
+              key={row}
+              className={css.listRow}
+              style={enterAt(frame, 12, index)}
+            >
+              <span className={css.listDot} />
+              <span
+                className={css.listBar}
+                style={{ width: 120 + index * 30 }}
+              />
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -86,7 +96,7 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps) {
 const LEAVE_AT = 48;
 
 /** A card entering, then `leave()` reversing the same rise. */
-export function LeaveDemo({ frame, frames }: HelperDemoProps) {
+export function LeaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const style = frame < LEAVE_AT ? enter(frame, 6) : leave(frame, LEAVE_AT);
   return (
     <HelperDemoFrame
@@ -108,7 +118,7 @@ export function LeaveDemo({ frame, frames }: HelperDemoProps) {
 const POP_AT = 15;
 
 /** A card landing on a spring, beside the spring's own curve. */
-export function PopDemo({ frame, frames }: HelperDemoProps) {
+export function PopDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const landing = pop(frame, POP_AT);
   const time = Math.min(1, Math.max(0, (frame - POP_AT) / DUR.sheet));
   return (
@@ -124,7 +134,9 @@ export function PopDemo({ frame, frames }: HelperDemoProps) {
       <div className={css.split}>
         <div className={css.plotCell}>
           <CurvePlot
-            easing={(value) => pop(value * DUR.sheet, 0)}
+            easing={(value) => {
+              return pop(value * DUR.sheet, 0);
+            }}
             t={time}
             size={300}
           />
@@ -146,8 +158,12 @@ export function PopDemo({ frame, frames }: HelperDemoProps) {
 const PRESSES = [20, 50];
 
 /** A button answering two presses with `press()` and returning to exactly 1. */
-export function PressDemo({ frame, frames }: HelperDemoProps) {
-  const scale = Math.min(...PRESSES.map((at) => press(frame, at)));
+export function PressDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const scale = Math.min(
+    ...PRESSES.map((at) => {
+      return press(frame, at);
+    }),
+  );
   return (
     <HelperDemoFrame
       frame={frame}

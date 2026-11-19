@@ -4,15 +4,17 @@ import { wordRevealInputSchema } from "./WordReveal.schema";
 
 test("four words produce an ordinary length error without throwing", () => {
   const result = wordRevealInputSchema.safeParse({
-    words: Array.from({ length: 4 }, () => ({ word: "A", accented: false })),
+    words: Array.from({ length: 4 }, () => {
+      return { word: "A", accented: false };
+    }),
     showArrow: true,
   });
   assert.equal(result.success, false);
   if (!result.success) {
     assert.ok(
-      result.error.issues.some(
-        ({ code, path }) => code === "too_big" && path.join(".") === "words",
-      ),
+      result.error.issues.some(({ code, path }) => {
+        return code === "too_big" && path.join(".") === "words";
+      }),
     );
   }
 });

@@ -58,14 +58,16 @@ export function JournalEntryText({
   const labels = _createLabelsFromEntry({ entry, input });
   return (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={label.x + label.y}
-          {...label}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={label.x + label.y}
+            {...label}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

@@ -20,18 +20,20 @@ export function DisclosureFieldText({
   ];
   return input.showLabels ? (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={label.y}
-          {...label}
-          x={34}
-          width={304}
-          fontSize={12}
-          maxLines={2}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={label.y}
+            {...label}
+            x={34}
+            width={304}
+            fontSize={12}
+            maxLines={2}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   ) : (
     <path d="M34 18 h284 M34 42 h236" stroke={STOCK.muted} strokeWidth={2} />

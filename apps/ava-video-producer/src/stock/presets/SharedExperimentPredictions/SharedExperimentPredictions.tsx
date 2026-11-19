@@ -18,15 +18,17 @@ export function SharedExperimentPredictions({
   return (
     <g>
       <ExperimentTrack input={input} frame={frame} accent={accent} />
-      {input.learners.map((learner, index) => (
-        <PredictionParticipant
-          key={learner.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.learners.map((learner, index) => {
+        return (
+          <PredictionParticipant
+            key={learner.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ExperimentLabels input={input} frame={frame} />
     </g>
   );

@@ -42,26 +42,30 @@ export function GisLabels({
       16,
       1,
     ],
-    ...input.layers.map((layer, index): Slot => [
-      layer.label,
-      40 + index * 270,
-      119,
-      250,
-      14,
-      3,
-      index ? STOCK.mint : STOCK.cyan,
-    ]),
+    ...input.layers.map((layer, index): Slot => {
+      return [
+        layer.label,
+        40 + index * 270,
+        119,
+        250,
+        14,
+        3,
+        index ? STOCK.mint : STOCK.cyan,
+      ];
+    }),
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => (
-        <FitText
-          key={index}
-          {...{ text, x, y, width, fontSize, maxLines, color }}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => {
+        return (
+          <FitText
+            key={index}
+            {...{ text, x, y, width, fontSize, maxLines, color }}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       <GisTally {...{ input, frame, selectedQuantity, totalQuantity }} />
     </g>
   );

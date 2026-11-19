@@ -18,12 +18,11 @@ function _valuePresentation({
   showWhitespace: boolean;
 }): string {
   return showWhitespace
-    ? value.replace(
-        /[ \t\n\r]/g,
-        (character) =>
-          ({ " ": "·", "\t": "⇥", "\n": "↵", "\r": "␍" })[character] ??
-          character,
-      )
+    ? value.replace(/[ \t\n\r]/g, (character) => {
+        return (
+          { " ": "·", "\t": "⇥", "\n": "↵", "\r": "␍" }[character] ?? character
+        );
+      })
     : value;
 }
 /**

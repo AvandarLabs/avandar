@@ -72,8 +72,9 @@ function _getUnionVariantFromValue({
   value: unknown;
 }>): Extract<StockControl, { kind: "union" }>["variants"][number] {
   return (
-    control.variants.find((variant) => variant.valueType === typeof value) ??
-    control.variants[0]
+    control.variants.find((variant) => {
+      return variant.valueType === typeof value;
+    }) ?? control.variants[0]
   );
 }
 /**
@@ -86,10 +87,12 @@ function _getBlankValueFromControl(
   return match(control)
     .with({ kind: "object" }, (matchedControl) => {
       return Object.fromEntries(
-        matchedControl.controls.map((child) => [
-          child.path,
-          child.nullable ? null : _getBlankValueFromControl(child),
-        ]),
+        matchedControl.controls.map((child) => {
+          return [
+            child.path,
+            child.nullable ? null : _getBlankValueFromControl(child),
+          ];
+        }),
       );
     })
     .with({ kind: "boolean" }, () => {

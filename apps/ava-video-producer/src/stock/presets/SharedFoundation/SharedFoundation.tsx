@@ -29,13 +29,15 @@ export function SharedFoundation({
           normalizeWhitespace
         />
       </g>
-      {input.approaches.map((approach, index) => (
-        <FoundationApproach
-          key={approach.id}
-          {...{ approach, index, frame, accent }}
-          showTrait={input.showDistinctTraits}
-        />
-      ))}
+      {input.approaches.map((approach, index) => {
+        return (
+          <FoundationApproach
+            key={approach.id}
+            {...{ approach, index, frame, accent }}
+            showTrait={input.showDistinctTraits}
+          />
+        );
+      })}
       <FoundationBase {...{ ...remainingProps, input, frame, accent }} />
     </g>
   );

@@ -35,16 +35,16 @@ export function ShadeZone({
         fill={STOCK.cyan}
         fillOpacity={0.3}
       />
-      {input.installations.map((item, itemIndex) =>
-        item.zoneId === zone.id ? (
+      {input.installations.map((item, itemIndex) => {
+        return item.zoneId === zone.id ? (
           <ShadeFootprint
             key={item.id}
             input={input}
             index={itemIndex}
             frame={frame}
           />
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

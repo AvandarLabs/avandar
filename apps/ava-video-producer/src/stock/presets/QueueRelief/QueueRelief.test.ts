@@ -13,13 +13,16 @@ import { inputSchema, type Input } from "./QueueRelief.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(QueueRelief, { frame, input, accent: "#72d5bd", id: "test" }),
   );
+};
 function _items(markup: string) {
   return [...markup.matchAll(/<rect[^>]*data-item-id="[^"]*"[^>]*>/g)].map(
-    (match) => match[0],
+    (match) => {
+      return match[0];
+    },
   );
 }
 registerStockPresetAssertions({
@@ -30,48 +33,57 @@ registerStockPresetAssertions({
   contract,
   render,
   excludedTextFields: ["id"],
-  getVisibleTexts: ({ input }) => [
-    input.queueLabel,
-    input.completionLabel,
-    input.capacityChangeLabel,
-    ...input.serviceSlots.map(prop("label")),
-    ...(input.showItemLabels ? input.items.map(prop("label")) : []),
-  ],
+  getVisibleTexts: ({ input }) => {
+    return [
+      input.queueLabel,
+      input.completionLabel,
+      input.capacityChangeLabel,
+      ...input.serviceSlots.map(prop("label")),
+      ...(input.showItemLabels ? input.items.map(prop("label")) : []),
+    ];
+  },
 });
 test("closed bays accept no work and the backlog persists until expansion", () => {
-  fixtures.forEach(({ input }) =>
-    [36, 54, 72, 89].forEach((frame) => {
+  fixtures.forEach(({ input }) => {
+    return [36, 54, 72, 89].forEach((frame) => {
       const rects = _items(render({ frame: frame, input: input }));
       assert.equal(rects.length, input.items.length);
       input.serviceSlots
-        .filter((slot) => !slot.initiallyOpen)
-        .forEach((slot) =>
-          assert.ok(
-            rects.every(
-              (rect) => !rect.includes(`data-service-slot="${slot.id}"`),
-            ),
-          ),
-        );
+        .filter((slot) => {
+          return !slot.initiallyOpen;
+        })
+        .forEach((slot) => {
+          return assert.ok(
+            rects.every((rect) => {
+              return !rect.includes(`data-service-slot="${slot.id}"`);
+            }),
+          );
+        });
       if (frame >= 54) {
         assert.equal(
-          rects.filter((rect) => rect.includes('data-state="queued"')).length,
+          rects.filter((rect) => {
+            return rect.includes('data-state="queued"');
+          }).length,
           input.items.length -
             input.serviceSlots.filter(prop("initiallyOpen")).length,
         );
         assert.equal(
-          rects.filter((rect) => rect.includes('data-state="completed"'))
-            .length,
+          rects.filter((rect) => {
+            return rect.includes('data-state="completed"');
+          }).length,
           0,
         );
       }
-    }),
-  );
+    });
+  });
 });
 test("waiting work enters newly opened slots in original order and every completion survives", () => {
   fixtures.forEach(({ input }) => {
     const initial = input.serviceSlots.filter(prop("initiallyOpen")).length;
     const starts = new Map<string, number>();
-    Array.from({ length: 49 }, (_, index) => 90 + index).forEach((frame) => {
+    Array.from({ length: 49 }, (_, index) => {
+      return 90 + index;
+    }).forEach((frame) => {
       const rects = _items(render({ frame: frame, input: input }));
       assert.equal(rects.length, input.items.length);
       rects.forEach((rect) => {
@@ -90,72 +102,81 @@ test("waiting work enters newly opened slots in original order and every complet
     });
     const completed = _items(render({ frame: 138, input: input }));
     assert.equal(
-      completed.filter((rect) => rect.includes('data-state="completed"'))
-        .length,
+      completed.filter((rect) => {
+        return rect.includes('data-state="completed"');
+      }).length,
       input.items.length,
     );
-    input.items.forEach((item) =>
-      assert.ok(
-        completed.some((rect) => rect.includes(`data-item-id="${item.id}"`)),
-      ),
-    );
-    const first = _items(render({ frame: 94, input: input })).find((rect) =>
-      rect.includes(`data-item-id="${waiting[0].id}"`),
-    )!;
+    input.items.forEach((item) => {
+      return assert.ok(
+        completed.some((rect) => {
+          return rect.includes(`data-item-id="${item.id}"`);
+        }),
+      );
+    });
+    const first = _items(render({ frame: 94, input: input })).find((rect) => {
+      return rect.includes(`data-item-id="${waiting[0].id}"`);
+    })!;
     assert.ok(
-      input.serviceSlots.some(
-        (slot) =>
+      input.serviceSlots.some((slot) => {
+        return (
           !slot.initiallyOpen &&
-          first.includes(`data-service-slot="${slot.id}"`),
-      ),
+          first.includes(`data-service-slot="${slot.id}"`)
+        );
+      }),
     );
   });
 });
 test("actual bay outlines unfold and all dense item bounds fit setup travel and final trays", () => {
   const input = fixtures[2].input;
-  const bay = (frame: number) =>
-    render({ frame: frame, input: input }).match(
+  const bay = (frame: number) => {
+    return render({ frame: frame, input: input }).match(
       /<rect[^>]*data-slot-id="slot 1"[^>]*>/,
     )![0];
+  };
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: bay(54), name: "width" }) <
       SvgAttributes.getNumberFromMarkup({ attributes: bay(90), name: "width" }),
   );
-  [fixtures[2].input, fixtures[4].input].forEach((document) =>
-    Array.from({ length: 139 }, (_, frame) => frame).forEach((frame) =>
-      _items(render({ frame: frame, input: document })).forEach((rect) => {
-        const x = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "x",
-          }),
-          y = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "y",
-          });
-        assert.ok(
-          x >= 0 &&
-            x +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "width",
-              }) <=
-              960,
-        );
-        assert.ok(
-          y >= 0 &&
-            y +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "height",
-              }) <=
-              600,
-        );
-      }),
-    ),
-  );
+  [fixtures[2].input, fixtures[4].input].forEach((document) => {
+    return Array.from({ length: 139 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
+      return _items(render({ frame: frame, input: document })).forEach(
+        (rect) => {
+          const x = SvgAttributes.getNumberFromMarkup({
+              attributes: rect,
+              name: "x",
+            }),
+            y = SvgAttributes.getNumberFromMarkup({
+              attributes: rect,
+              name: "y",
+            });
+          assert.ok(
+            x >= 0 &&
+              x +
+                SvgAttributes.getNumberFromMarkup({
+                  attributes: rect,
+                  name: "width",
+                }) <=
+                960,
+          );
+          assert.ok(
+            y >= 0 &&
+              y +
+                SvgAttributes.getNumberFromMarkup({
+                  attributes: rect,
+                  name: "height",
+                }) <=
+                600,
+          );
+        },
+      );
+    });
+  });
   const final = _items(render({ frame: 150, input: fixtures[4].input }));
-  final.slice(1).forEach((rect, index) =>
-    assert.ok(
+  final.slice(1).forEach((rect, index) => {
+    return assert.ok(
       SvgAttributes.getNumberFromMarkup({
         attributes: final[index],
         name: "y",
@@ -165,6 +186,6 @@ test("actual bay outlines unfold and all dense item bounds fit setup travel and 
           name: "height",
         }) <
         SvgAttributes.getNumberFromMarkup({ attributes: rect, name: "y" }),
-    ),
-  );
+    );
+  });
 });

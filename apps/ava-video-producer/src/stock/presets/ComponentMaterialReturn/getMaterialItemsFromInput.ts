@@ -24,11 +24,15 @@ export function getMaterialItemsFromInput(
   input: Readonly<Input>,
 ): Array<GetMaterialItemsResult | ReplacementMaterialItem> {
   return [
-    ...input.parts.map((part) => ({ ...part, origin: "returned" as const })),
-    ...input.replacementInputs.map((part) => ({
-      ...part,
-      route: "replacement" as const,
-      origin: "replacement" as const,
-    })),
+    ...input.parts.map((part) => {
+      return { ...part, origin: "returned" as const };
+    }),
+    ...input.replacementInputs.map((part) => {
+      return {
+        ...part,
+        route: "replacement" as const,
+        origin: "replacement" as const,
+      };
+    }),
   ];
 }

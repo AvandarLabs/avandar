@@ -81,7 +81,9 @@ registerStockTextLayoutAssertions(options);
 
 function _selected(markup: string): string[] {
   return [...markup.matchAll(/data-selected-household="([^"]*)"/g)].map(
-    (match) => match[1],
+    (match) => {
+      return match[1];
+    },
   );
 }
 test("changing measure preserves selected identities including twelve coincident homes", () => {
@@ -156,8 +158,8 @@ test("concavity winding and disjoint containing identical layers retain ordered 
     [square, square, ["", "b", "c"], []],
     [square, disjoint, [], ["", "b", "c"]],
   ];
-  cases.forEach(([first, second, intersection, difference]) =>
-    [false, true].forEach((reverse) => {
+  cases.forEach(([first, second, intersection, difference]) => {
+    return [false, true].forEach((reverse) => {
       const layers = [
         {
           id: "",
@@ -193,16 +195,19 @@ test("concavity winding and disjoint containing identical layers retain ordered 
           assert.match(markup, /mask="url\(#[^)]+-outside\)"/);
         }
       });
-    }),
-  );
+    });
+  });
 });
 test("map anchors never move and every lifted record owns its visible caption key", () => {
-  const mapPoints = (markup: string) =>
-    [
+  const mapPoints = (markup: string) => {
+    return [
       ...markup.matchAll(
         /data-map-household="([^"]*)" cx="([-.\d]+)" cy="([-.\d]+)"/g,
       ),
-    ].map((match) => match.slice(1));
+    ].map((match) => {
+      return match.slice(1);
+    });
+  };
   [
     minimumInput,
     denseInput,
@@ -224,14 +229,14 @@ test("map anchors never move and every lifted record owns its visible caption ke
           ...markup.matchAll(
             /data-household-marker="[^"]*"[^>]*transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
           ),
-        ].forEach(([, x, y]) =>
-          assert.ok(
+        ].forEach(([, x, y]) => {
+          return assert.ok(
             Number(x) - 12 >= 40 &&
               Number(x) + 12 <= 592 &&
               Number(y) - 12 >= 155 &&
               Number(y) + 12 < 500,
-          ),
-        );
+          );
+        });
       },
     );
   });
@@ -244,8 +249,8 @@ test("edge and vertex households are rejected without excluding near-boundary lo
     [40, 40],
   ]
     .slice(0, 3)
-    .forEach(([x, y]) =>
-      assert.equal(
+    .forEach(([x, y]) => {
+      return assert.equal(
         inputSchema.safeParse({
           ...DEFAULT_INPUT,
           households: [
@@ -254,8 +259,8 @@ test("edge and vertex households are rejected without excluding near-boundary lo
           ],
         }).success,
         false,
-      ),
-    );
+      );
+    });
   assert.equal(
     inputSchema.safeParse({
       ...DEFAULT_INPUT,
@@ -266,12 +271,12 @@ test("edge and vertex households are rejected without excluding near-boundary lo
     }).success,
     true,
   );
-  [[], [DEFAULT_INPUT.layers[0]]].forEach((layers) =>
-    assert.equal(
+  [[], [DEFAULT_INPUT.layers[0]]].forEach((layers) => {
+    return assert.equal(
       inputSchema.safeParse({ ...DEFAULT_INPUT, layers }).success,
       false,
-    ),
-  );
+    );
+  });
   assert.equal(
     inputSchema.safeParse({
       ...DEFAULT_INPUT,

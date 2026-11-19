@@ -6,6 +6,7 @@ import {
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import { Curve } from "./Curve";
 import type { Point } from "./graphicCommon.types";
+import type { ReactNode } from "react";
 
 /**
  * A themed edge that draws itself in. Give `d`, or `curve` to curve with the
@@ -31,7 +32,7 @@ export function DrawPath({
   width?: number;
   opacity?: number;
   dashed?: boolean;
-}) {
+}): ReactNode {
   const edge = useGraphicProps("Edge", { color, strokeWidth: width });
   const motion = useGraphicMotion();
   const path =

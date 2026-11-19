@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { expect } from "@playwright/test";
+import playwrightTest from "@playwright/test";
 import {
   UUID,
   WAIT,
@@ -12,6 +12,8 @@ import {
   selectOption,
 } from "./shared.mjs";
 
+const { expect } = playwrightTest;
+
 async function addCaseField(page, source, column) {
   await page.getByRole("button", { name: source.name, exact: true }).click();
   const sourceGroup = page
@@ -21,7 +23,8 @@ async function addCaseField(page, source, column) {
   await page
     .getByRole("button", { name: "Add column as a field", exact: true })
     .click();
-  // A selected source column disappears from the source picker and becomes a field.
+  // A selected source column disappears from the source picker and becomes a
+  // field.
   await expect(
     sourceGroup.getByRole("radio", { name: column, exact: true }),
   ).toHaveCount(0);
@@ -42,7 +45,8 @@ async function configureCaseFields(ctx, sources) {
     await addCaseField(page, sources.cases, column);
   }
   await addCaseField(page, sources.visits, "supply_kits_delivered");
-  // Mantine's segmented-control label is the visible target for its radio input.
+  // Mantine's segmented-control label is the visible target for its radio
+  // input.
   const kitsRadio = page
     .getByRole("radio", { name: "supply_kits_delivered", exact: true })
     .last();
@@ -108,7 +112,8 @@ async function openOrCreateCaseType(ctx, sources) {
     await resource(ctx, "case-type", state.caseType);
     return false;
   }
-  // The visible new-type card starts AI chat. This existing manual route is intentional.
+  // The visible new-type card starts AI chat. This existing manual route is
+  // intentional.
   await page.goto(localRoute(ctx, "ontology-designer/concept-creator"));
   await page
     .getByRole("textbox", { name: "Case type name", exact: true })
@@ -148,7 +153,8 @@ function recordLinks(page, caseTypeId) {
 
 async function fixtureRows(ctx, key) {
   const csv = await readFile(path.join(ctx.fixtureDir, `${key}.csv`), "utf8");
-  // These two generated fixtures contain no quoted fields or embedded delimiters.
+  // These two generated fixtures contain no quoted fields or embedded
+  // delimiters.
   if (csv.includes('"'))
     throw new Error(
       `Update the fixture reader for quoted fields in ${key}.csv.`,
@@ -205,7 +211,8 @@ async function verifyRecordCount(ctx, expectedRows) {
   );
   ctx.state.caseType.observedRecordCount = records.size;
   // The current product repeats pagination boundary keys in its virtual list.
-  // Reload the same records route after proving unique labels, restoring a clean view.
+  // Reload the same records route after proving unique labels, restoring a
+  // clean view.
   await ctx.page.reload();
   await expect(
     links.filter({ hasText: expectedRows[0].case_label }).first(),
@@ -225,7 +232,8 @@ async function openCaseRecords(ctx, isNew) {
     shouldSync = await empty.isVisible();
   }
   if (shouldSync) {
-    // Sync resets record IDs and assignments. Never repeat it for populated records.
+    // Sync resets record IDs and assignments. Never repeat it for populated
+    // records.
     if (!isNew)
       await page.goto(
         localRoute(ctx, `ontology-designer/${state.caseType.id}`),
@@ -246,7 +254,10 @@ async function openCaseRecords(ctx, isNew) {
   await recordLinks(page, state.caseType.id).first().waitFor({ timeout: WAIT });
 }
 
-/** Creates or reuses a dataset-backed case type, syncs only empty records, and captures real fields. */
+/**
+ * Creates or reuses a dataset-backed case type, syncs only empty records, and
+ * captures real fields.
+ */
 export async function cases(ctx) {
   localRoute(ctx, "ontology-designer");
   ctx.state ??= {};

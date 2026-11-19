@@ -20,7 +20,9 @@ const COLORS: string[] = [
 ];
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
-  const plan = useMemo(() => makeJobTransfersFromInput(input), [input]);
+  const plan = useMemo(() => {
+    return makeJobTransfersFromInput(input);
+  }, [input]);
   return (
     <g>
       {input.jobs.map((job, index) => {

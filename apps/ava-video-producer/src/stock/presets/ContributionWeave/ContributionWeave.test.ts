@@ -75,9 +75,9 @@ function _getMarkedElementsFromMarkup({
   markup: string;
   field: string;
 }): string[] {
-  return (markup.match(/<[^>]+>/g) ?? []).filter((element) =>
-    element.includes(`data-${field}=`),
-  );
+  return (markup.match(/<[^>]+>/g) ?? []).filter((element) => {
+    return element.includes(`data-${field}=`);
+  });
 }
 test("every contributor retains one identifiable end through the completed fabric", () => {
   const input = fixtures[2].input;
@@ -86,13 +86,14 @@ test("every contributor retains one identifiable end through the completed fabri
     field: "contributor-end",
   });
   assert.equal(ends.length, 6);
-  [...input.warp, ...input.weft].forEach(({ id }) =>
-    assert.equal(
-      ends.filter((element) => element.includes(`data-contributor-end="${id}"`))
-        .length,
+  [...input.warp, ...input.weft].forEach(({ id }) => {
+    return assert.equal(
+      ends.filter((element) => {
+        return element.includes(`data-contributor-end="${id}"`);
+      }).length,
       1,
-    ),
-  );
+    );
+  });
   assert.equal(
     _getMarkedElementsFromMarkup({
       markup: _render({
@@ -117,12 +118,12 @@ test("alternating crossing patches change their visible owner when weaveStart re
     field: "crossing",
   });
   assert.equal(over.length, 4);
-  ["words", "facts", "structure", "layout"].forEach((owner, index) =>
-    assert.ok(over[index].includes(`data-over="${owner}"`)),
-  );
-  ["structure", "words", "layout", "facts"].forEach((owner, index) =>
-    assert.ok(under[index].includes(`data-over="${owner}"`)),
-  );
+  ["words", "facts", "structure", "layout"].forEach((owner, index) => {
+    return assert.ok(over[index].includes(`data-over="${owner}"`));
+  });
+  ["structure", "words", "layout", "facts"].forEach((owner, index) => {
+    return assert.ok(under[index].includes(`data-over="${owner}"`));
+  });
   assert.notEqual(
     over[0].match(/fill="([^"]+)"/)?.[1],
     under[0].match(/fill="([^"]+)"/)?.[1],
@@ -187,15 +188,15 @@ test("warp tension precedes every shuttle while hidden labels preserve the fabri
   _getMarkedElementsFromMarkup({
     markup: _render({ frame: 36 }),
     field: "warp-band",
-  }).forEach((element) =>
-    assert.equal(
+  }).forEach((element) => {
+    return assert.equal(
       SvgAttributes.getNumberFromMarkup({
         attributes: element,
         name: "height",
       }),
       300,
-    ),
-  );
+    );
+  });
   const hidden = _render({
     frame: 150,
     input: { ...DEFAULT_INPUT, showLabels: false },
@@ -241,29 +242,34 @@ test("two render namespaces retain valid unique fragments with empty and Unicode
     createElement(
       "svg",
       {},
-      ...["instance-a", "instance-b"].map((id) =>
-        createElement(ContributionWeave, {
+      ...["instance-a", "instance-b"].map((id) => {
+        return createElement(ContributionWeave, {
           key: id,
           id,
           input,
           frame: 150,
           accent: "#9fefca",
-        }),
-      ),
+        });
+      }),
     ),
   );
-  const fragmentIds = [...markup.matchAll(/\sid="([^"]+)"/g)].map(
-    (match) => match[1],
-  );
+  const fragmentIds = [...markup.matchAll(/\sid="([^"]+)"/g)].map((match) => {
+    return match[1];
+  });
   assert.equal(fragmentIds.length, 12);
   assert.equal(new Set(fragmentIds).size, 12);
-  fragmentIds.forEach((id) =>
-    assert.match(id, /^instance-[ab]-(band|shuttle)-\d$/),
-  );
-  [...markup.matchAll(/url\(#([^)]+)\)/g)].forEach(([, reference]) =>
-    assert.equal(fragmentIds.filter((id) => id === reference).length, 1),
-  );
-  ["", "space Ω", "字 phrase", "👩‍🔬"].forEach((id) =>
-    assert.ok(markup.includes(`data-contributor-end="${id}"`)),
-  );
+  fragmentIds.forEach((id) => {
+    return assert.match(id, /^instance-[ab]-(band|shuttle)-\d$/);
+  });
+  [...markup.matchAll(/url\(#([^)]+)\)/g)].forEach(([, reference]) => {
+    return assert.equal(
+      fragmentIds.filter((id) => {
+        return id === reference;
+      }).length,
+      1,
+    );
+  });
+  ["", "space Ω", "字 phrase", "👩‍🔬"].forEach((id) => {
+    return assert.ok(markup.includes(`data-contributor-end="${id}"`));
+  });
 });

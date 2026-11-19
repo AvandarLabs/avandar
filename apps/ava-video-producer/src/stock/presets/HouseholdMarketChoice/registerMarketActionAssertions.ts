@@ -5,10 +5,9 @@ import { fixtures } from "./HouseholdMarketChoice.fixtures";
 import type { Input } from "./HouseholdMarketChoice.schema";
 
 function _assertArmClearance(path: string): void {
-  const points = [...path.matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map((match) => [
-    Number(match[1]),
-    Number(match[2]),
-  ]);
+  const points = [...path.matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map((match) => {
+    return [Number(match[1]), Number(match[2])];
+  });
   const [bodyX, bodyY] = points[0];
   if (bodyY + 18 >= 324 && bodyY - 15 <= 388) {
     assert.ok(bodyX - 9 >= 275 && bodyX + 9 <= 700);
@@ -44,7 +43,9 @@ export function registerMarketActionAssertions(
     fixtures.forEach(({ input }) => {
       Array.from(
         { length: Math.max(0, Math.ceil((180 - 0) / 1)) },
-        (_, sampleIndex) => 0 + sampleIndex * 1,
+        (_, sampleIndex) => {
+          return 0 + sampleIndex * 1;
+        },
       ).forEach((frame) => {
         const markup = render({ frame: frame, input: input });
         const arm = markup.match(/<path data-market-arm[^>]*d="([^"]+)"/);
@@ -53,7 +54,9 @@ export function registerMarketActionAssertions(
         _assertArmClearance(arm[1]);
         const moving = [
           ...markup.matchAll(/<g data-product="[^"]*"[^>]*>/g),
-        ].filter(([attributes]) => attributes.includes('data-owner="shopper"'));
+        ].filter(([attributes]) => {
+          return attributes.includes('data-owner="shopper"');
+        });
         assert.ok(
           moving.length <= 1,
           "one shopper carries one product at a time",

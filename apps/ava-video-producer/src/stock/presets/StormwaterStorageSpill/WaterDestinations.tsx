@@ -27,15 +27,17 @@ export function WaterDestinations({
       : ["infiltration", "detained", "discharge", "overflow"];
   return (
     <g>
-      {order.map((key, index) => (
-        <WaterDestinationCaption
-          key={key}
-          destination={key}
-          input={input}
-          index={index}
-          amount={amounts[key]}
-        />
-      ))}
+      {order.map((key, index) => {
+        return (
+          <WaterDestinationCaption
+            key={key}
+            destination={key}
+            input={input}
+            index={index}
+            amount={amounts[key]}
+          />
+        );
+      })}
       <WaterEquation input={input} frame={frame} />
       <SceneLabel
         text={input.copy.disclaimer}

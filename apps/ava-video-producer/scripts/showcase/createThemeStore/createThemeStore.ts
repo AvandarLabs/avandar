@@ -17,7 +17,9 @@ import {
 import { ThemeStoreError } from "../ThemeStoreError";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
-/** Largest theme file the store writes, and the largest body the routes read. */
+/**
+ * Largest theme file the store writes, and the largest body the routes read.
+ */
 export const THEME_FILE_MAX_BYTES = VIDEO_THEME_MAX_BYTES;
 const THEME_FILE_SUFFIX = ".theme.json";
 
@@ -74,10 +76,12 @@ function _parse(value: unknown): VideoThemeDocument {
       throw new ThemeStoreError(
         400,
         "The theme does not match the theme schema",
-        error.issues.map((issue) => ({
-          path: issue.path.join("."),
-          message: issue.message,
-        })),
+        error.issues.map((issue) => {
+          return {
+            path: issue.path.join("."),
+            message: issue.message,
+          };
+        }),
       );
     }
     throw error;
@@ -89,7 +93,9 @@ function _assertResolves(
   others: readonly VideoThemeDocument[],
 ) {
   const library = createVideoThemeLibrary([
-    ...others.filter((other) => other.id !== document.id),
+    ...others.filter((other) => {
+      return other.id !== document.id;
+    }),
     document,
   ]);
   try {
@@ -198,23 +204,27 @@ async function _readTheme(directory: string, id: string): Promise<StoredTheme> {
 async function _readAllThemes(
   directory: string,
 ): Promise<VideoThemeDocument[]> {
-  const names = (await fs.readdir(directory)).filter(
-    (name) =>
+  const names = (await fs.readdir(directory)).filter((name) => {
+    return (
       name.endsWith(THEME_FILE_SUFFIX) &&
       !name.startsWith(".") &&
-      name !== `${DRAFT_THEME_ID}${THEME_FILE_SUFFIX}`,
-  );
+      name !== `${DRAFT_THEME_ID}${THEME_FILE_SUFFIX}`
+    );
+  });
   const results = await Promise.all(
-    names.map((name) =>
-      _readTheme(directory, name.slice(0, -THEME_FILE_SUFFIX.length)).catch(
-        (error: unknown) => {
-          console.error(`Skipping invalid theme ${name}:`, error);
-          return undefined;
-        },
-      ),
-    ),
+    names.map((name) => {
+      return _readTheme(
+        directory,
+        name.slice(0, -THEME_FILE_SUFFIX.length),
+      ).catch((error: unknown) => {
+        console.error(`Skipping invalid theme ${name}:`, error);
+        return undefined;
+      });
+    }),
   );
-  return results.flatMap((result) => (result ? [result.document] : []));
+  return results.flatMap((result) => {
+    return result ? [result.document] : [];
+  });
 }
 
 async function _writeTheme({
@@ -259,8 +269,12 @@ function _createWriteQueue() {
   ): Promise<Result> {
     const result = (tails.get(id) ?? Promise.resolve()).then(task);
     const tail = result.then(
-      () => undefined,
-      () => undefined,
+      () => {
+        return undefined;
+      },
+      () => {
+        return undefined;
+      },
     );
     tails.set(id, tail);
     void tail.then(() => {
@@ -330,15 +344,19 @@ export function createThemeStore(
   const { directory } = options;
   const runExclusively = _createWriteQueue();
   return {
-    list: async () =>
-      (await _readAllThemes(directory))
+    list: async () => {
+      return (await _readAllThemes(directory))
         .map(_documentToSummary)
-        .sort(
-          (left, right) =>
+        .sort((left, right) => {
+          return (
             Number(right.builtIn) - Number(left.builtIn) ||
-            left.label.localeCompare(right.label),
-        ),
-    read: (id) => _readTheme(directory, id),
+            left.label.localeCompare(right.label)
+          );
+        });
+    },
+    read: (id) => {
+      return _readTheme(directory, id);
+    },
     create: async (value) => {
       const document = _parse(value);
       _assertNotReserved(document.id);
@@ -347,8 +365,12 @@ export function createThemeStore(
         const isTaken = await fs
           .access(_fileFromId(directory, document.id))
           .then(
-            () => true,
-            () => false,
+            () => {
+              return true;
+            },
+            () => {
+              return false;
+            },
           );
         if (isTaken) {
           throw new ThemeStoreError(
@@ -360,7 +382,10 @@ export function createThemeStore(
         return _writeTheme({ directory, document, text, mode: "create" });
       });
     },
-    save: (id, value, ifMatch) =>
-      runExclusively(id, () => _saveTheme({ directory, id, value, ifMatch })),
+    save: (id, value, ifMatch) => {
+      return runExclusively(id, () => {
+        return _saveTheme({ directory, id, value, ifMatch });
+      });
+    },
   };
 }

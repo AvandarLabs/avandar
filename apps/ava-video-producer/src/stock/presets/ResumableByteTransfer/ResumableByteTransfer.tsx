@@ -33,15 +33,17 @@ export function ResumableByteTransfer({
         stroke={STOCK.muted}
         fill="none"
       />
-      {transfer.chunks.map((chunk) => (
-        <ByteChunk
-          key={chunk.start}
-          chunk={chunk}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {transfer.chunks.map((chunk) => {
+        return (
+          <ByteChunk
+            key={chunk.start}
+            chunk={chunk}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ByteCounters
         input={input}
         confirmed={transfer.confirmed}

@@ -8,22 +8,7 @@ import type { ReactNode } from "react";
  */
 export const DEMO_CANVAS = { width: 640, height: 400 } as const;
 
-/** A rect on the mini canvas from fractions of it, as windowTilt boxes are. */
-export function getCanvasRect(fractions: {
-  x: number;
-  y: number;
-  width: number;
-  height?: number;
-}) {
-  return {
-    x: fractions.x * DEMO_CANVAS.width,
-    y: fractions.y * DEMO_CANVAS.height,
-    width: fractions.width * DEMO_CANVAS.width,
-    height: (fractions.height ?? 0) * DEMO_CANVAS.height,
-  };
-}
-
 /** The mini film frame, centred on the preview stage. */
-export function DemoCanvas({ children }: { children: ReactNode }) {
+export function DemoCanvas({ children }: { children: ReactNode }): ReactNode {
   return <div className={css.canvas}>{children}</div>;
 }

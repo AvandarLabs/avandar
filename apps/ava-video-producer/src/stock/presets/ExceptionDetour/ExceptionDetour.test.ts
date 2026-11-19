@@ -173,16 +173,16 @@ test("the complete exception-route label clears the uninterrupted detour curve o
           }),
         ),
       );
-      const labelLines = paint.filter(
-        (item) => item.kind === "text" && item.left > 350,
-      );
+      const labelLines = paint.filter((item) => {
+        return item.kind === "text" && item.left > 350;
+      });
       assert.ok(labelLines.length > 0);
-      labelLines.forEach((line) =>
-        assert.ok(
+      labelLines.forEach((line) => {
+        return assert.ok(
           detourSide === "above" ? line.bottom < 178 : line.top > 422,
           "The complete route label clears the curve's full vertical extent",
-        ),
-      );
+        );
+      });
       assert.equal(
         paint.filter(propEq("kind", "rect")).length,
         0,

@@ -3,6 +3,7 @@ import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
 import { Arrive } from "./Arrive";
 import { Text } from "./Text";
 import type { NodeSize } from "./graphicCommon.types";
+import type { ReactNode } from "react";
 
 const NODE_RADIUS_KEYS = {
   xs: "radiusXs",
@@ -39,7 +40,7 @@ export function CircleNode({
   active?: number;
   size?: NodeSize;
   radius?: number;
-}) {
+}): ReactNode {
   const node = useGraphicProps("Node", {});
   const r = radius ?? node[NODE_RADIUS_KEYS[size]];
   return (

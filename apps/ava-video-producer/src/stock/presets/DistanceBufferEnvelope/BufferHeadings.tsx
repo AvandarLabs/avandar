@@ -8,11 +8,12 @@ type Props = { input: Input; accent: string };
  * Captions distinguish complete sources, qualifying results and distance units.
  */
 export function BufferHeadings({ input, accent }: Readonly<Props>): ReactNode {
-  const numIncluded = input.locations.filter(
-    (location) =>
+  const numIncluded = input.locations.filter((location) => {
+    return (
       Math.hypot(location.x - input.origin.x, location.y - input.origin.y) <=
-      input.radiusUnits,
-  ).length;
+      input.radiusUnits
+    );
+  }).length;
   return (
     <g>
       <LabelSlots

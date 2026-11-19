@@ -7,8 +7,11 @@ import {
 } from "./motionSettings";
 import type { MotionRect } from "./AnchoredOverlay";
 import type { MotionOptions } from "./motionSettings";
-import type { TransitionPresentationComponentProps } from "@remotion/transitions";
-import type { CSSProperties } from "react";
+import type {
+  TransitionPresentationComponentProps,
+  TransitionTiming,
+} from "@remotion/transitions";
+import type { CSSProperties, ReactNode } from "react";
 
 /** Reveal and continuity treatments available to any TransitionSeries. */
 export type SceneTransitionKind =
@@ -31,11 +34,16 @@ export type SceneTransitionProps = {
   motion?: MotionOptions;
   /** Corner radius a morph starts from, in stage pixels. 12 when unthemed. */
   morphRadius?: number;
-  /** How far past the frame's diagonal an aperture opens. 1.05 when unthemed. */
+  /**
+   * How far past the frame's diagonal an aperture opens. 1.05 when unthemed.
+   */
   apertureOverscan?: number;
 };
 
-/** Scene geometry is independent of playback history and uses one native UI instance per scene. */
+/**
+ * Scene geometry is independent of playback history and uses one native UI
+ * instance per scene.
+ */
 export function getSceneTransitionStyle(
   progress: number,
   entering: boolean,
@@ -81,13 +89,16 @@ export function getSceneTransitionStyle(
   };
 }
 
-/** Remotion presentation. CSS blur keeps stateful product children single-instance. */
+/**
+ * Remotion presentation. CSS blur keeps stateful product children
+ * single-instance.
+ */
 export function SceneTransition({
   children,
   presentationDirection,
   presentationProgress,
   passedProps,
-}: TransitionPresentationComponentProps<SceneTransitionProps>) {
+}: TransitionPresentationComponentProps<SceneTransitionProps>): ReactNode {
   return (
     <AbsoluteFill
       style={getSceneTransitionStyle(
@@ -101,11 +112,25 @@ export function SceneTransition({
   );
 }
 
-/** Matching timing and presentation for TransitionSeries. Cuts need no Transition element. */
+/** The timing and presentation a `TransitionSeries.Transition` takes. */
+type SceneTransitionSpec = {
+  timing: TransitionTiming;
+  presentation: {
+    component: typeof SceneTransition;
+    props: SceneTransitionProps;
+  };
+};
+
+/**
+ * Matching timing and presentation for TransitionSeries. Cuts need no
+ * Transition element.
+ */
 export function createSceneTransition({
   durationInFrames,
   ...props
-}: SceneTransitionProps & { durationInFrames: number }) {
+}: SceneTransitionProps & {
+  durationInFrames: number;
+}): SceneTransitionSpec {
   const duration = getMotionDuration(durationInFrames, props.motion);
   if (duration < 1 || props.kind === "cut")
     throw new Error("Cuts use adjacent sequences without a Transition element");

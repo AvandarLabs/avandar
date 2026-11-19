@@ -14,7 +14,10 @@ type Props = {
   text: string;
   x: number;
   y: number;
-  /** The decision type role; `size` overrides its size, for example in width tests. */
+  /**
+   * The decision type role; `size` overrides its size, for example in width
+   * tests.
+   */
   role?: "choice" | "question";
   size?: number;
   width?: number;
@@ -44,8 +47,14 @@ function _wrap({
       fontSize,
     }) > width
       ? Array.from(GRAPHEME_SEGMENTER.segment(token)).reduce(
-          (chunks, { segment }) =>
-            _append({ lines: chunks, text: segment, width, size: fontSize }),
+          (chunks, { segment }) => {
+            return _append({
+              lines: chunks,
+              text: segment,
+              width,
+              size: fontSize,
+            });
+          },
           result,
         )
       : _append({ lines: result, text: token, width, size: fontSize });
@@ -68,19 +77,21 @@ export function ForkLabel({
   const lines = _wrap({ text, width, fontSize });
   return (
     <g aria-label={text}>
-      {lines.map((line, index) => (
-        <Text
-          key={index}
-          role={role}
-          x={x}
-          y={y + index * (fontSize + lineGap)}
-          size={fontSize}
-          anchor="middle"
-          fill={fill}
-        >
-          {line}
-        </Text>
-      ))}
+      {lines.map((line, index) => {
+        return (
+          <Text
+            key={index}
+            role={role}
+            x={x}
+            y={y + index * (fontSize + lineGap)}
+            size={fontSize}
+            anchor="middle"
+            fill={fill}
+          >
+            {line}
+          </Text>
+        );
+      })}
     </g>
   );
 }

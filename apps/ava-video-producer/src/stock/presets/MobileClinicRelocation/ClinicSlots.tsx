@@ -14,7 +14,9 @@ export function ClinicSlots({
   return (
     <g>
       {input.slots.map((slot, index) => {
-        const occupied = input.people.some(({ slotId }) => slotId === slot.id);
+        const occupied = input.people.some(({ slotId }) => {
+          return slotId === slot.id;
+        });
         return (
           <g key={slot.id} opacity={ramp(frame, 14 + index * 2, 12)}>
             <rect

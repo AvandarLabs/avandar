@@ -56,12 +56,14 @@ const minimum: Input = {
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  cases: Array.from({ length: 6 }, (_, index) => ({
-    ...DEFAULT_INPUT.cases[index % 4],
-    id: `case ${index}界`,
-    label: "界".repeat(18),
-    attempts: 3,
-  })),
+  cases: Array.from({ length: 6 }, (_, index) => {
+    return {
+      ...DEFAULT_INPUT.cases[index % 4],
+      id: `case ${index}界`,
+      label: "界".repeat(18),
+      attempts: 3,
+    };
+  }),
   places: {
     homeLabel: "界".repeat(24),
     clinicLabel: "界".repeat(24),
@@ -69,7 +71,9 @@ const dense: Input = {
   },
   sceneLabel: "界".repeat(40),
   copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
+    Object.keys(DEFAULT_INPUT.copy).map((key) => {
+      return [key, "界".repeat(42)];
+    }),
   ) as Input["copy"],
 };
 const OUTCOMES: readonly ["booked", "attended", "unreached", "contacted"] = [
@@ -80,10 +84,12 @@ const OUTCOMES: readonly ["booked", "attended", "unreached", "contacted"] = [
 ] as const;
 const changed: Input = {
   ...DEFAULT_INPUT,
-  cases: DEFAULT_INPUT.cases.map((item, index) => ({
-    ...item,
-    outcome: OUTCOMES[index],
-  })),
+  cases: DEFAULT_INPUT.cases.map((item, index) => {
+    return {
+      ...item,
+      outcome: OUTCOMES[index],
+    };
+  }),
 };
 const toggles: Input = {
   ...changed,

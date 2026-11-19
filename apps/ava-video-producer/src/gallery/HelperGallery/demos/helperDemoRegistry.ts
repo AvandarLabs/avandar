@@ -15,12 +15,11 @@ import {
   ObjectDepartureDemo,
   SharedElementDemo,
 } from "./ContinuityDemos";
-import { BezierDemo, MotionPresetsDemo, createCurveDemo } from "./CurveDemos";
-import {
-  StaggerColumnDemo,
-  StaggerDemo,
-  createDurationDemo,
-} from "./DurationDemos";
+import { createCurveDemo } from "./createCurveDemo";
+import { createDurationDemo } from "./createDurationDemo";
+import { createLineRevealDemo } from "./createLineRevealDemo";
+import { BezierDemo, MotionPresetsDemo } from "./CurveDemos";
+import { StaggerColumnDemo, StaggerDemo } from "./DurationDemos";
 import {
   EnterAtDemo,
   EnterDemo,
@@ -50,7 +49,6 @@ import {
   StagedExitDemo,
   TypedDemo,
   WipeExitDemo,
-  createLineRevealDemo,
 } from "./TextDemos";
 import { ThemeStyleDemo } from "./ThemeDemos";
 import { SceneTransitionDemo, ShotTransitionDemo } from "./TransitionDemos";

@@ -19,8 +19,12 @@ function _topicAttributes({
   id: string;
 }): string {
   const element = [...markup.matchAll(/<g\b[^>]*>/g)]
-    .map(([tag]) => tag)
-    .find((tag) => tag.includes(`data-topic-position="${id}"`));
+    .map(([tag]) => {
+      return tag;
+    })
+    .find((tag) => {
+      return tag.includes(`data-topic-position="${id}"`);
+    });
   assert.ok(element, id);
   return element;
 }
@@ -91,13 +95,15 @@ test("only authored included topics finish inside the contracted aperture", () =
     input: { ...DEFAULT_INPUT, showExcludedTopics: false },
   });
   DEFAULT_INPUT.topics
-    .filter((topic) => !topic.included)
-    .forEach((topic) =>
-      assert.match(
+    .filter((topic) => {
+      return !topic.included;
+    })
+    .forEach((topic) => {
+      return assert.match(
         _topicAttributes({ markup: hidden, id: topic.id }),
         /opacity="0"/,
-      ),
-    );
+      );
+    });
   assert.match(
     SvgAttributes.fromMarker({ markup: held, marker: "outside-caption" }),
     /opacity="1"/,
@@ -115,22 +121,28 @@ test("topic rule strokes stay above every line of a wrapped excluded label", () 
   const markup = _render({ frame: 150, input: fixtures[2].input });
   const rules = [...markup.matchAll(/<path d="M-38 ([^"]+) H38"/g)];
   assert.equal(rules.length, 6);
-  rules.forEach(([, y]) => assert.ok(Number(y) < -16));
+  rules.forEach(([, y]) => {
+    return assert.ok(Number(y) < -16);
+  });
 });
 
 test("five excluded topics retain separate positions outside one included topic", () => {
   const input = {
     ...fixtures[2].input,
-    topics: fixtures[2].input.topics.map((topic, index) => ({
-      ...topic,
-      included: index === 0,
-    })),
+    topics: fixtures[2].input.topics.map((topic, index) => {
+      return {
+        ...topic,
+        included: index === 0,
+      };
+    }),
   };
   assert.deepEqual(inputSchema.parse(input), input);
   const markup = _render({ frame: 150, input: input });
   const positions = new Set<string>();
   input.topics
-    .filter((topic) => !topic.included)
+    .filter((topic) => {
+      return !topic.included;
+    })
     .forEach((topic) => {
       const attributes = _topicAttributes({ markup, id: topic.id });
       const x = SvgAttributes.getNumberFromMarkup({

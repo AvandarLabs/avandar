@@ -57,22 +57,24 @@ export function MetricCounter({
           />
         </g>
         {input.showBars
-          ? bars.map((height, i) => (
-              <Arrive frame={frame} at={29} index={i} key={i}>
-                <rect
-                  x={172 + i * 50}
-                  y={437 - height * 54 * ramp(frame, 34 + i * 2, DUR.hero)}
-                  width={34}
-                  height={Math.max(
-                    1,
-                    height * 54 * ramp(frame, 34 + i * 2, DUR.hero),
-                  )}
-                  rx={4}
-                  fill={accent}
-                  fillOpacity={0.18 + i / 18}
-                />
-              </Arrive>
-            ))
+          ? bars.map((height, i) => {
+              return (
+                <Arrive frame={frame} at={29} index={i} key={i}>
+                  <rect
+                    x={172 + i * 50}
+                    y={437 - height * 54 * ramp(frame, 34 + i * 2, DUR.hero)}
+                    width={34}
+                    height={Math.max(
+                      1,
+                      height * 54 * ramp(frame, 34 + i * 2, DUR.hero),
+                    )}
+                    rx={4}
+                    fill={accent}
+                    fillOpacity={0.18 + i / 18}
+                  />
+                </Arrive>
+              );
+            })
           : null}
       </Panel>
       <Text x={480} y={550} size={16} fill={STOCK.muted} anchor="middle">

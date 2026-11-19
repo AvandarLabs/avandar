@@ -47,7 +47,9 @@ export function parseDashDraft(text: string): number[] | undefined {
   const parts = trimmed ? trimmed.split(/[\s,]+/).map(Number) : [];
   const isValid =
     parts.length <= MAX_DASH_LENGTHS &&
-    parts.every((part) => Number.isFinite(part) && part >= 0);
+    parts.every((part) => {
+      return Number.isFinite(part) && part >= 0;
+    });
   return isValid ? parts : undefined;
 }
 

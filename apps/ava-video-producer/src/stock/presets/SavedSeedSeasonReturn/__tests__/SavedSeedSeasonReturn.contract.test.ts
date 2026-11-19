@@ -83,8 +83,9 @@ registerStockPresetAssertions({
   contract,
   render: _render,
   excludedTextFields,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
   textFrames: [24, 72, 150],
 });
 
@@ -164,12 +165,12 @@ test("zero reserve loss and sowing edges conserve exact decimal material without
         assert.ok(Math.abs(width - (expected[index] / 8.03) * 180) < 1e-10);
       });
       if (crop.sownQuantity === 0) {
-        [120, 130, 140].forEach((frame) =>
-          assert.doesNotMatch(
+        [120, 130, 140].forEach((frame) => {
+          return assert.doesNotMatch(
             _render({ frame: frame, input: input }),
             /data-seed-hand="sowing"|data-furrow=/,
-          ),
-        );
+          );
+        });
       }
     });
     assert.ok(
@@ -182,14 +183,16 @@ test("zero reserve loss and sowing edges conserve exact decimal material without
 
 test("opaque material bands remain disjoint and visible across fractional transfers", () => {
   fixtures.forEach(({ input }) => {
-    Array.from({ length: 270 }, (_, index) => 12 + index / 2).forEach(
-      (frame) => {
-        const markup = _render({ frame: frame, input: input });
-        const bands = [
-          ...markup.matchAll(
-            /<rect data-seed-(?:current|remaining|loss|sown)=""[^>]*>/g,
-          ),
-        ].map(([r]) => ({
+    Array.from({ length: 270 }, (_, index) => {
+      return 12 + index / 2;
+    }).forEach((frame) => {
+      const markup = _render({ frame: frame, input: input });
+      const bands = [
+        ...markup.matchAll(
+          /<rect data-seed-(?:current|remaining|loss|sown)=""[^>]*>/g,
+        ),
+      ].map(([r]) => {
+        return {
           x: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "x" }),
           y: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "y" }),
           w: SvgAttributes.getNumberFromMarkup({
@@ -200,47 +203,51 @@ test("opaque material bands remain disjoint and visible across fractional transf
             attributes: r,
             name: "height",
           }),
-        }));
-        assert.ok(
-          Math.abs(bands.reduce((sum, band) => sum + band.w, 0) - 180) < 1e-9,
-        );
-        bands
-          .filter((band) => band.w > 0)
-          .forEach((a, index, nonempty) => {
-            assert.ok(
-              a.x >= 48 && a.x + a.w <= 928 && a.y >= 250 && a.y + a.h <= 410,
+        };
+      });
+      assert.ok(
+        Math.abs(
+          bands.reduce((sum, band) => {
+            return sum + band.w;
+          }, 0) - 180,
+        ) < 1e-9,
+      );
+      bands
+        .filter((band) => {
+          return band.w > 0;
+        })
+        .forEach((a, index, nonempty) => {
+          assert.ok(
+            a.x >= 48 && a.x + a.w <= 928 && a.y >= 250 && a.y + a.h <= 410,
+          );
+          nonempty.slice(index + 1).forEach((b) => {
+            return assert.ok(
+              a.x + a.w <= b.x + 1e-9 ||
+                b.x + b.w <= a.x + 1e-9 ||
+                a.y + a.h <= b.y + 1e-9 ||
+                b.y + b.h <= a.y + 1e-9,
             );
-            nonempty
-              .slice(index + 1)
-              .forEach((b) =>
-                assert.ok(
-                  a.x + a.w <= b.x + 1e-9 ||
-                    b.x + b.w <= a.x + 1e-9 ||
-                    a.y + a.h <= b.y + 1e-9 ||
-                    b.y + b.h <= a.y + 1e-9,
-                ),
-              );
           });
-        const lid = SvgAttributes.fromMarker({ markup, marker: "jar-lid" });
-        bands.forEach((band) => {
-          if (
-            band.y < 290 &&
-            band.x < 478 &&
-            band.x + band.w > 278 &&
-            band.w > 0
-          ) {
-            assert.ok(
-              SvgAttributes.getNumberFromMarkup({
-                attributes: lid,
-                name: "y",
-              }) +
-                5 <=
-                band.y,
-            );
-          }
         });
-      },
-    );
+      const lid = SvgAttributes.fromMarker({ markup, marker: "jar-lid" });
+      bands.forEach((band) => {
+        if (
+          band.y < 290 &&
+          band.x < 478 &&
+          band.x + band.w > 278 &&
+          band.w > 0
+        ) {
+          assert.ok(
+            SvgAttributes.getNumberFromMarkup({
+              attributes: lid,
+              name: "y",
+            }) +
+              5 <=
+              band.y,
+          );
+        }
+      });
+    });
   });
 });
 
@@ -283,15 +290,15 @@ test("cultivator hands touch the actual transferred lot after the jar opening", 
       });
       const widths =
         frame < 49
-          ? ["remaining", "sown", "loss"].map((id) =>
-              SvgAttributes.getNumberFromMarkup({
+          ? ["remaining", "sown", "loss"].map((id) => {
+              return SvgAttributes.getNumberFromMarkup({
                 attributes: SvgAttributes.fromMarker({
                   markup: markup,
                   marker: `seed-${id}`,
                 }),
                 name: "width",
-              }),
-            )
+              });
+            })
           : [
               SvgAttributes.getNumberFromMarkup({
                 attributes: band,
@@ -305,7 +312,10 @@ test("cultivator hands touch the actual transferred lot after the jar opening", 
               attributes: band,
               name: "x",
             }) +
-              widths.reduce((sum, width) => sum + width, 0) / 2),
+              widths.reduce((sum, width) => {
+                return sum + width;
+              }, 0) /
+                2),
         ) < 1e-9,
       );
       assert.equal(

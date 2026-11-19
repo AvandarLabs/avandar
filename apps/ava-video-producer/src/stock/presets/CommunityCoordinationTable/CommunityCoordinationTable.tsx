@@ -36,34 +36,38 @@ export function CommunityCoordinationTable({
         stroke={STOCK.line}
         strokeDasharray="5 8"
       />
-      {input.places.map((place, index) => (
-        <g key={place.id}>
-          <circle
-            cx={340 + place.x * 270}
-            cy={160 + place.y * 280}
-            r={25}
-            fill="none"
-            stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
-          />
-          <path
-            data-request-tag={place.id}
-            d={`M${340 + place.x * 270 - 7} ${160 + place.y * 280 - 5} h${frame >= 108 ? 14 : 3} v10 h${frame >= 108 ? -14 : -3} Z`}
-            fill={STOCK.surface}
-            stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
-          />
-        </g>
-      ))}
+      {input.places.map((place, index) => {
+        return (
+          <g key={place.id}>
+            <circle
+              cx={340 + place.x * 270}
+              cy={160 + place.y * 280}
+              r={25}
+              fill="none"
+              stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+            />
+            <path
+              data-request-tag={place.id}
+              d={`M${340 + place.x * 270 - 7} ${160 + place.y * 280 - 5} h${frame >= 108 ? 14 : 3} v10 h${frame >= 108 ? -14 : -3} Z`}
+              fill={STOCK.surface}
+              stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
+            />
+          </g>
+        );
+      })}
       <CoordinationPlaceConnections input={input} accent={accent} />
       <CoordinationActors input={input} frame={frame} accent={accent} />
-      {input.teams.map((team, index) => (
-        <CoordinationMarker
-          key={team.id}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.teams.map((team, index) => {
+        return (
+          <CoordinationMarker
+            key={team.id}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <CoordinationLabels input={input} frame={frame} accent={accent} />
     </g>
   );

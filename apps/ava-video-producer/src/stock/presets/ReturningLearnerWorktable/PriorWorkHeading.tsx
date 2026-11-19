@@ -23,20 +23,22 @@ export function PriorWorkHeading({
         anchor="middle"
         slot={[480, 82, 850, 14, 1]}
       />
-      {input.priorWork.map((work, index) => (
-        <g key={work.id}>
-          <SceneText
-            text={String(index + 1)}
-            color={accent}
-            slot={[42 + index * 300, 123, 24, 14, 1]}
-          />
-          <SceneText
-            text={work.label}
-            anchor="middle"
-            slot={[180 + index * 300, 123, 245, 14, 3]}
-          />
-        </g>
-      ))}
+      {input.priorWork.map((work, index) => {
+        return (
+          <g key={work.id}>
+            <SceneText
+              text={String(index + 1)}
+              color={accent}
+              slot={[42 + index * 300, 123, 24, 14, 1]}
+            />
+            <SceneText
+              text={work.label}
+              anchor="middle"
+              slot={[180 + index * 300, 123, 245, 14, 3]}
+            />
+          </g>
+        );
+      })}
     </>
   );
 }
