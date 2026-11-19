@@ -1,4 +1,10 @@
 import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -11,6 +17,11 @@ type Props = {
   completeAt: number;
   accent: string;
 };
+
+/** The faint wash inside an envelope before the tint strength scales it. */
+const ENVELOPE_WASH = 0.035;
+/** Frames the seal takes to close, ending as the batch completes. */
+const SEAL_FRAMES = 2;
 /** The handling boundary seals after the final member reaches its slot. */
 export function BatchFrame({
   batchId,
@@ -22,6 +33,11 @@ export function BatchFrame({
   completeAt,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const seal = motion.scale(SEAL_FRAMES);
+  const lineWidth = scales.stroke(tokens.stroke.default);
   return (
     <g>
       <rect
@@ -31,26 +47,38 @@ export function BatchFrame({
         y={y}
         width={width}
         height={130}
-        rx={12}
+        rx={scales.corner(tokens.corner.card)}
         fill={accent}
-        fillOpacity={0.035}
+        fillOpacity={scales.wash(ENVELOPE_WASH)}
         stroke="none"
       />
-      <path
-        d={`M${x} ${y + 20} V${y + 130} H${x + width} V${y + 20}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x} ${y + 20} V${y + 130} H${x + width} V${y + 20}`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={lineWidth}
       />
-      <path
-        data-envelope-seal={batchId}
-        d={`M${x} ${y + 20} V${y} H${x + width} V${y + 20}`}
-        fill="none"
-        stroke={accent}
-        strokeWidth={2}
-        strokeDasharray={width + 40}
-        strokeDashoffset={(width + 40) * (1 - ramp(frame, completeAt - 2, 2))}
-      />
+      <g data-envelope-seal={batchId}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x} ${y + 20} V${y} H${x + width} V${y + 20}`,
+          }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+          strokeWidth={lineWidth}
+          strokeDasharray={width + 40}
+          strokeDashoffset={
+            (width + 40) *
+            (1 - ramp(frame, completeAt - seal, seal, motion.reveal.easing))
+          }
+        />
+      </g>
     </g>
   );
 }
