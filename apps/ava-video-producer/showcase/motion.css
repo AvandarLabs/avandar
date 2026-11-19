@@ -1,6 +1,9 @@
 /* Mantine's layer comes after the showcase resets, so it wins over them. */
 @layer showcase-reset, mantine;
 
+/* The Atlas chrome scale. Every value below reads it. */
+@import url("chrome-tokens.css");
+
 :root {
   background: var(--paper);
   color: var(--ink);
@@ -10,16 +13,16 @@
   font-synthesis: none;
 
   /* Brand-derived surfaces: a cool paper tinted toward Avandar blue. */
-  --paper: color-mix(in oklab, var(--ava-primary-0) 45%, var(--ava-neutral-0));
-  --white: #fff;
+  --paper: var(--atlas-color-paper);
+  --white: var(--atlas-color-white);
   --ink: var(--ava-neutral-9);
-  --muted: var(--ava-neutral-6);
-  --line: color-mix(in oklab, var(--ava-primary-1) 35%, var(--ava-neutral-1));
+  --muted: var(--atlas-color-muted);
+  --line: var(--atlas-color-line);
   --accent-soft: var(--ava-primary-2);
   --accent: var(--ava-primary-7);
   --dark: var(--ava-neutral-9);
   --mono: ui-monospace, sfmono-regular, menlo, monaco, consolas, monospace;
-  --header: 76px;
+  --header: var(--atlas-size-76);
 }
 
 * {
@@ -72,8 +75,8 @@ body {
   button:focus-visible,
   a:focus-visible,
   input:focus-visible {
-    outline: 2px solid var(--ava-primary-7);
-    outline-offset: 4px;
+    outline: var(--atlas-border-2) solid var(--ava-primary-7);
+    outline-offset: var(--atlas-space-4);
   }
 
   button:disabled {
@@ -101,7 +104,7 @@ p {
   border: 0;
   clip: rect(0, 0, 0, 0);
   height: 1px;
-  margin: -1px;
+  margin: calc(var(--atlas-space-1) * -1);
   overflow: hidden;
   padding: 0;
   position: absolute;
@@ -111,14 +114,14 @@ p {
 
 .skip-link {
   background: var(--ink);
-  border-radius: 5px;
+  border-radius: var(--atlas-radius-5);
   color: white;
   left: 10px;
-  padding: 12px 20px;
+  padding: var(--atlas-space-12) var(--atlas-space-20);
   position: fixed;
   top: 10px;
   transform: translateY(-160%);
-  z-index: 20;
+  z-index: var(--atlas-layer-20);
 }
 
 .skip-link:focus {
@@ -126,50 +129,50 @@ p {
 }
 
 .no-script {
-  margin: 80px auto;
+  margin: var(--atlas-space-80) auto;
   max-width: 800px;
-  padding: 30px;
+  padding: var(--atlas-space-30);
 }
 
 .no-script p {
-  margin: 20px 0;
+  margin: var(--atlas-space-20) 0;
 }
 
 .site-header {
   align-items: center;
-  backdrop-filter: blur(14px);
-  background: color-mix(in srgb, var(--paper) 96%, transparent);
-  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(var(--atlas-blur-14));
+  background: var(--atlas-color-header-surface);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   display: flex;
-  gap: 44px;
+  gap: var(--atlas-space-44);
   height: var(--header);
-  padding: 0 38px;
+  padding: 0 var(--atlas-space-38);
   position: sticky;
   top: 0;
-  z-index: 5;
+  z-index: var(--atlas-layer-5);
 }
 
 .brand {
   align-items: center;
   display: flex;
-  font-size: 22px;
-  font-weight: 640;
-  gap: 13px;
-  letter-spacing: -0.7px;
+  font-size: var(--atlas-font-size-22);
+  font-weight: var(--atlas-font-weight-640);
+  gap: var(--atlas-space-13);
+  letter-spacing: var(--atlas-tracking-tight-0-7);
   white-space: nowrap;
 }
 
 .brand-divider {
   color: var(--ava-neutral-6);
-  font-size: 18px;
-  font-weight: 350;
-  margin: 0 13px;
+  font-size: var(--atlas-font-size-18);
+  font-weight: var(--atlas-font-weight-350);
+  margin: 0 var(--atlas-space-13);
 }
 
 .brand-room {
-  font-size: 14px;
-  font-weight: 470;
-  letter-spacing: -0.2px;
+  font-size: var(--atlas-font-size-14);
+  font-weight: var(--atlas-font-weight-470);
+  letter-spacing: var(--atlas-tracking-tight-0-2);
 }
 
 /* The logo PNG carries its own padding, so the box runs a little large. */
@@ -177,7 +180,8 @@ p {
   display: block;
   flex-shrink: 0;
   height: 40px;
-  margin: -6px -6px -6px -8px;
+  margin: calc(var(--atlas-space-6) * -1) calc(var(--atlas-space-6) * -1)
+    calc(var(--atlas-space-6) * -1) calc(var(--atlas-space-8) * -1);
   width: 40px;
 }
 
@@ -185,15 +189,15 @@ p {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 12px;
-  gap: 26px;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-26);
   margin-left: auto;
 }
 
 .site-header nav a {
   align-items: center;
   display: flex;
-  gap: 8px;
+  gap: var(--atlas-space-8);
 }
 
 .site-header nav a:hover {
@@ -202,17 +206,17 @@ p {
 
 .header-edition {
   align-items: center;
-  border-left: 1px solid var(--line);
+  border-left: var(--atlas-border-1) solid var(--line);
   display: flex;
-  font: 9px var(--mono);
-  gap: 14px;
-  letter-spacing: 1px;
-  padding-left: 28px;
+  font: var(--atlas-font-size-9) var(--mono);
+  gap: var(--atlas-space-14);
+  letter-spacing: var(--atlas-tracking-wide-1);
+  padding-left: var(--atlas-space-28);
 }
 
 .tiny-dot {
   background: var(--ava-primary-7);
-  border-radius: 50%;
+  border-radius: var(--atlas-radius-round);
   display: inline-block;
   flex-shrink: 0;
   height: 6px;
@@ -227,43 +231,44 @@ p {
 }
 
 .sidebar {
-  border-right: 1px solid var(--line);
+  border-right: var(--atlas-border-1) solid var(--line);
   display: flex;
   flex-direction: column;
   height: calc(100dvh - var(--header));
   overflow-y: auto;
-  padding: 34px 22px 20px 24px;
+  padding: var(--atlas-space-34) var(--atlas-space-22) var(--atlas-space-20)
+    var(--atlas-space-24);
   position: sticky;
   top: var(--header);
 }
 
 .eyebrow {
-  font: 9px var(--mono);
-  font-weight: 450;
-  letter-spacing: 1.3px;
+  font: var(--atlas-font-size-9) var(--mono);
+  font-weight: var(--atlas-font-weight-450);
+  letter-spacing: var(--atlas-tracking-wide-1-3);
   line-height: 1.6;
 }
 
 .sidebar-top > .eyebrow {
   color: var(--ava-neutral-6);
-  font-size: 8px;
-  letter-spacing: 1.1px;
-  margin: 0 0 22px 12px;
+  font-size: var(--atlas-font-size-8);
+  letter-spacing: var(--atlas-tracking-wide-1-1);
+  margin: 0 0 var(--atlas-space-22) var(--atlas-space-12);
 }
 
 .category-button {
   align-items: center;
-  border-radius: 6px;
+  border-radius: var(--atlas-radius-6);
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 12px;
-  gap: 12px;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-12);
   min-height: 44px;
-  padding: 0 11px;
+  padding: 0 var(--atlas-space-11);
   text-align: left;
   transition:
-    background 0.15s,
-    color 0.15s;
+    background var(--atlas-duration-150),
+    color var(--atlas-duration-150);
   width: 100%;
 }
 
@@ -281,13 +286,13 @@ p {
 .category-button.active {
   background: var(--ava-primary-0);
   color: var(--ava-primary-7);
-  font-weight: 600;
+  font-weight: var(--atlas-font-weight-600);
 }
 
 .category-count {
   color: var(--ava-neutral-6);
-  font: 10px var(--mono);
-  font-weight: 400;
+  font: var(--atlas-font-size-10) var(--mono);
+  font-weight: var(--atlas-font-weight-400);
   margin-left: auto;
 }
 
@@ -298,69 +303,69 @@ p {
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-top: 16px;
+  gap: var(--atlas-space-5);
+  margin-top: var(--atlas-space-16);
 }
 
 .saved-nav {
-  border-top: 1px solid var(--line);
-  margin-top: 23px;
-  padding-top: 17px;
+  border-top: var(--atlas-border-1) solid var(--line);
+  margin-top: var(--atlas-space-23);
+  padding-top: var(--atlas-space-17);
 }
 
 .sidebar-note {
   background: var(--ava-primary-0);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 7px;
-  margin: 42px 0 22px;
-  padding: 21px 17px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-7);
+  margin: var(--atlas-space-42) 0 var(--atlas-space-22);
+  padding: var(--atlas-space-21) var(--atlas-space-17);
 }
 
 .note-symbol {
   color: var(--ava-primary-7);
   display: block;
-  font-size: 35px;
+  font-size: var(--atlas-font-size-35);
   line-height: 1;
-  margin-bottom: 18px;
+  margin-bottom: var(--atlas-space-18);
 }
 
 .sidebar-note h2 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
+  font-family: var(--atlas-font-family-serif);
+  font-size: var(--atlas-font-size-20);
+  font-weight: var(--atlas-font-weight-400);
+  letter-spacing: var(--atlas-tracking-tight-0-5);
   line-height: 1.25;
 }
 
 .sidebar-note p {
   color: var(--ava-neutral-6);
-  font-size: 11px;
+  font-size: var(--atlas-font-size-11);
   line-height: 1.8;
-  margin-top: 14px;
+  margin-top: var(--atlas-space-14);
 }
 
 .note-rule {
   background: var(--ava-primary-1);
   height: 1px;
-  margin: 20px 0 13px;
+  margin: var(--atlas-space-20) 0 var(--atlas-space-13);
   width: 26px;
 }
 
 .sidebar-note > span:last-child {
   color: var(--ava-neutral-6);
-  font: 8px/1.9 var(--mono);
-  letter-spacing: 0.7px;
+  font: var(--atlas-font-size-8)/1.9 var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-0-7);
 }
 
 .sidebar-bottom {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font: 7px var(--mono);
-  gap: 7px;
-  letter-spacing: 0.4px;
+  font: var(--atlas-font-size-7) var(--mono);
+  gap: var(--atlas-space-7);
+  letter-spacing: var(--atlas-tracking-wide-0-4);
   margin-top: auto;
-  padding: 10px 4px 0;
+  padding: var(--atlas-space-10) var(--atlas-space-4) 0;
 }
 
 .sidebar-bottom .tiny-dot {
@@ -374,7 +379,7 @@ p {
 
 .library-main {
   min-width: 0;
-  padding: 0 40px 86px;
+  padding: 0 var(--atlas-space-40) var(--atlas-space-86);
 }
 
 .library-main:focus {
@@ -383,147 +388,147 @@ p {
 
 .library-intro {
   align-items: center;
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   display: flex;
-  gap: 36px;
+  gap: var(--atlas-space-36);
   justify-content: space-between;
-  padding: 46px 0 38px;
+  padding: var(--atlas-space-46) 0 var(--atlas-space-38);
 }
 
 .intro-copy > .eyebrow {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 8px;
-  gap: 9px;
-  letter-spacing: 1.4px;
+  font-size: var(--atlas-font-size-8);
+  gap: var(--atlas-space-9);
+  letter-spacing: var(--atlas-tracking-wide-1-4);
 }
 
 .intro-copy h1 {
-  font-size: clamp(38px, 3.5vw, 58px);
-  font-weight: 450;
-  letter-spacing: -2.5px;
+  font-size: var(--atlas-font-size-atlas-title);
+  font-weight: var(--atlas-font-weight-450);
+  letter-spacing: var(--atlas-tracking-tight-2-5);
   line-height: 1.1;
-  margin: 18px 0;
+  margin: var(--atlas-space-18) 0;
 }
 
 .intro-copy h1 em {
   color: var(--ava-primary-7);
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  letter-spacing: -2.3px;
+  font-family: var(--atlas-font-family-serif);
+  font-weight: var(--atlas-font-weight-400);
+  letter-spacing: var(--atlas-tracking-tight-2-3);
 }
 
 .intro-copy > p:last-child {
   color: var(--ava-neutral-6);
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   line-height: 1.75;
   max-width: 480px;
 }
 
 .collection-stamp {
   align-self: center;
-  border-left: 1px solid var(--line);
+  border-left: var(--atlas-border-1) solid var(--line);
   min-width: 151px;
-  padding: 14px 0 8px 24px;
+  padding: var(--atlas-space-14) 0 var(--atlas-space-8) var(--atlas-space-24);
   width: 151px;
 }
 
 .stamp-top {
   color: var(--ava-neutral-6);
-  font: 7px var(--mono);
-  letter-spacing: 1px;
+  font: var(--atlas-font-size-7) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-1);
 }
 
 .collection-stamp > strong {
   align-items: baseline;
   display: flex;
-  font: 500 63px/1.2 var(--mono);
-  letter-spacing: -5px;
-  margin-top: 6px;
+  font: var(--atlas-font-weight-500) var(--atlas-font-size-63)/1.2 var(--mono);
+  letter-spacing: var(--atlas-tracking-tight-5);
+  margin-top: var(--atlas-space-6);
 }
 
 .collection-stamp > strong > span {
   color: var(--ava-primary-2);
-  font-size: 32px;
-  font-weight: 200;
-  margin-left: 11px;
+  font-size: var(--atlas-font-size-32);
+  font-weight: var(--atlas-font-weight-200);
+  margin-left: var(--atlas-space-11);
 }
 
 .collection-stamp > div {
   color: var(--ava-neutral-6);
   display: flex;
   flex-direction: column;
-  font: 7px var(--mono);
-  gap: 7px;
-  letter-spacing: 1.2px;
-  margin-top: 7px;
+  font: var(--atlas-font-size-7) var(--mono);
+  gap: var(--atlas-space-7);
+  letter-spacing: var(--atlas-tracking-wide-1-2);
+  margin-top: var(--atlas-space-7);
 }
 
 .collection-toolbar {
   align-items: center;
-  backdrop-filter: blur(12px);
-  background: color-mix(in srgb, var(--paper) 97%, transparent);
+  backdrop-filter: blur(var(--atlas-blur-12));
+  background: var(--atlas-color-toolbar-surface);
   display: flex;
-  gap: 20px;
+  gap: var(--atlas-space-20);
   justify-content: space-between;
-  padding: 25px 0 17px;
+  padding: var(--atlas-space-25) 0 var(--atlas-space-17);
   position: sticky;
   top: var(--header);
-  z-index: 4;
+  z-index: var(--atlas-layer-4);
 }
 
 .collection-heading {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--atlas-space-10);
   min-width: 0;
 }
 
 .collection-heading h2 {
-  font-size: 17px;
-  font-weight: 520;
-  letter-spacing: -0.45px;
+  font-size: var(--atlas-font-size-17);
+  font-weight: var(--atlas-font-weight-520);
+  letter-spacing: var(--atlas-tracking-tight-0-45);
 }
 
 .result-count {
   background: var(--ava-primary-0);
-  border: 1px solid var(--ava-primary-0);
-  border-radius: 4px;
+  border: var(--atlas-border-1) solid var(--ava-primary-0);
+  border-radius: var(--atlas-radius-4);
   color: var(--ava-neutral-6);
-  font: 10px var(--mono);
-  padding: 4px 7px;
+  font: var(--atlas-font-size-10) var(--mono);
+  padding: var(--atlas-space-4) var(--atlas-space-7);
 }
 
 .toolbar-tools {
   align-items: center;
   display: flex;
-  gap: 12px;
+  gap: var(--atlas-space-12);
 }
 
 .search-field {
   align-items: center;
   background: var(--white);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 5px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-5);
   color: var(--ava-neutral-6);
   display: flex;
-  gap: 9px;
+  gap: var(--atlas-space-9);
   height: 36px;
-  padding: 0 12px;
+  padding: 0 var(--atlas-space-12);
   width: 240px;
 }
 
 .search-field:focus-within {
   border-color: var(--ava-primary-7);
-  box-shadow: 0 0 0 2px var(--ava-primary-0);
+  box-shadow: var(--atlas-shadow-focus-ring);
 }
 
 .search-field input {
   background: none;
   border: 0;
   color: var(--ink);
-  font-size: 11px;
+  font-size: var(--atlas-font-size-11);
   min-width: 0;
   outline: 0;
   width: 100%;
@@ -549,15 +554,15 @@ p {
 .play-all {
   align-items: center;
   background: var(--ava-primary-0);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 5px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-5);
   display: flex;
-  font-size: 10px;
-  font-weight: 550;
-  gap: 7px;
+  font-size: var(--atlas-font-size-10);
+  font-weight: var(--atlas-font-weight-550);
+  gap: var(--atlas-space-7);
   height: 36px;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 var(--atlas-space-12);
   white-space: nowrap;
 }
 
@@ -569,50 +574,49 @@ p {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 10px;
-  gap: 12px;
+  font-size: var(--atlas-font-size-10);
+  gap: var(--atlas-space-12);
   justify-content: space-between;
-  margin: 2px 0 22px;
+  margin: var(--atlas-space-2) 0 var(--atlas-space-22);
 }
 
 .loop-spec {
-  font: 7px var(--mono);
-  letter-spacing: 0.65px;
+  font: var(--atlas-font-size-7) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-0-65);
   white-space: nowrap;
 }
 
 .loop-spec > span {
   color: var(--ava-primary-2);
-  padding: 0 6px;
+  padding: 0 var(--atlas-space-6);
 }
 
 .motion-grid {
   display: grid;
-  gap: 26px 22px;
+  gap: var(--atlas-space-26) var(--atlas-space-22);
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .motion-card {
   background: var(--white);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 8px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-8);
   min-width: 0;
   overflow: hidden;
   transition:
-    border-color 0.18s,
-    box-shadow 0.18s;
+    border-color var(--atlas-duration-180),
+    box-shadow var(--atlas-duration-180);
 }
 
 .motion-card:has(button:hover) {
   border-color: var(--ava-primary-2);
-  box-shadow: 0 4px 17px
-    color-mix(in srgb, var(--ava-neutral-9) 3%, transparent);
+  box-shadow: var(--atlas-shadow-card-hover);
 }
 
 .card-preview {
   aspect-ratio: 8/5;
   background: var(--dark);
-  border-bottom: 1px solid var(--ava-neutral-9);
+  border-bottom: var(--atlas-border-1) solid var(--ava-neutral-9);
   color: var(--ava-primary-1);
   display: block;
   overflow: hidden;
@@ -631,9 +635,9 @@ p {
 
 .preview-number {
   color: var(--ava-neutral-6);
-  font: 8px var(--mono);
+  font: var(--atlas-font-size-8) var(--mono);
   left: 14px;
-  letter-spacing: 0.5px;
+  letter-spacing: var(--atlas-tracking-wide-0-5);
   position: absolute;
   top: 13px;
 }
@@ -642,9 +646,9 @@ p {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font: 6px var(--mono);
-  gap: 5px;
-  letter-spacing: 1px;
+  font: var(--atlas-font-size-6) var(--mono);
+  gap: var(--atlas-space-5);
+  letter-spacing: var(--atlas-tracking-wide-1);
   position: absolute;
   right: 14px;
   top: 13px;
@@ -652,7 +656,7 @@ p {
 
 .preview-state > span {
   background: var(--ava-neutral-6);
-  border-radius: 50%;
+  border-radius: var(--atlas-radius-round);
   height: 3px;
   width: 3px;
 }
@@ -668,17 +672,17 @@ p {
 .preview-duration {
   bottom: 12px;
   color: var(--ava-neutral-6);
-  font: 6px var(--mono);
+  font: var(--atlas-font-size-6) var(--mono);
   left: 14px;
-  letter-spacing: 0.8px;
+  letter-spacing: var(--atlas-tracking-wide-0-8);
   position: absolute;
 }
 
 .preview-open {
   align-items: center;
-  background: color-mix(in srgb, var(--ava-neutral-9) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ava-neutral-9) 27%, transparent);
-  border-radius: 50%;
+  background: var(--atlas-color-ink-70);
+  border: var(--atlas-border-1) solid var(--atlas-color-ink-27);
+  border-radius: var(--atlas-radius-round);
   bottom: 10px;
   color: var(--ava-primary-1);
   display: flex;
@@ -687,10 +691,10 @@ p {
   opacity: 0;
   position: absolute;
   right: 11px;
-  transform: translateX(-4px);
+  transform: translateX(calc(var(--atlas-space-4) * -1));
   transition:
-    opacity 0.15s,
-    transform 0.15s;
+    opacity var(--atlas-duration-150),
+    transform var(--atlas-duration-150);
   width: 27px;
 }
 
@@ -701,28 +705,28 @@ p {
 }
 
 .card-copy {
-  padding: 18px 18px 0;
+  padding: var(--atlas-space-18) var(--atlas-space-18) 0;
 }
 
 .card-category {
   color: var(--ava-neutral-6);
-  font: 7px var(--mono);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  font: var(--atlas-font-size-7) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-1);
+  margin-bottom: var(--atlas-space-8);
   text-transform: uppercase;
 }
 
 .card-heading {
   align-items: center;
   display: flex;
-  gap: 6px;
+  gap: var(--atlas-space-6);
   justify-content: space-between;
 }
 
 .card-title {
-  font-size: 18px;
-  font-weight: 520;
-  letter-spacing: -0.6px;
+  font-size: var(--atlas-font-size-18);
+  font-weight: var(--atlas-font-weight-520);
+  letter-spacing: var(--atlas-tracking-tight-0-6);
   line-height: 1.25;
   text-align: left;
 }
@@ -733,7 +737,7 @@ p {
 
 .save-button {
   align-items: center;
-  border-radius: 4px;
+  border-radius: var(--atlas-radius-4);
   color: var(--ava-neutral-6);
   display: flex;
   flex-shrink: 0;
@@ -754,33 +758,33 @@ p {
 
 .card-copy > p {
   color: var(--ava-neutral-6);
-  font-size: 11px;
+  font-size: var(--atlas-font-size-11);
   line-height: 1.65;
-  margin-top: 8px;
+  margin-top: var(--atlas-space-8);
   min-height: 37px;
 }
 
 .card-foot {
   align-items: center;
-  border-top: 1px solid var(--ava-primary-0);
+  border-top: var(--atlas-border-1) solid var(--ava-primary-0);
   display: flex;
-  gap: 5px;
+  gap: var(--atlas-space-5);
   justify-content: space-between;
-  margin-top: 15px;
-  padding: 14px 0;
+  margin-top: var(--atlas-space-15);
+  padding: var(--atlas-space-14) 0;
 }
 
 .card-foot code {
   color: var(--ava-neutral-6);
-  font: 8px var(--mono);
+  font: var(--atlas-font-size-8) var(--mono);
 }
 
 .card-foot > button {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 9px;
-  gap: 7px;
+  font-size: var(--atlas-font-size-9);
+  gap: var(--atlas-space-7);
 }
 
 .card-foot > button:hover {
@@ -789,49 +793,49 @@ p {
 
 .library-footer {
   align-items: center;
-  border-top: 1px solid var(--line);
+  border-top: var(--atlas-border-1) solid var(--line);
   color: var(--ava-neutral-6);
   display: flex;
-  gap: 20px;
+  gap: var(--atlas-space-20);
   justify-content: space-between;
-  margin-top: 50px;
-  padding-top: 24px;
+  margin-top: var(--atlas-space-50);
+  padding-top: var(--atlas-space-24);
 }
 
 .library-footer p {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
+  font-family: var(--atlas-font-family-serif);
+  font-size: var(--atlas-font-size-15);
   font-style: italic;
 }
 
 .library-footer > span {
-  font: 7px var(--mono);
-  letter-spacing: 0.8px;
+  font: var(--atlas-font-size-7) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-0-8);
 }
 
 .empty-state {
-  border: 1px dashed var(--ava-primary-1);
-  border-radius: 8px;
+  border: var(--atlas-border-1) dashed var(--ava-primary-1);
+  border-radius: var(--atlas-radius-8);
   color: var(--ava-neutral-6);
-  padding: 90px 20px;
+  padding: var(--atlas-space-90) var(--atlas-space-20);
   text-align: center;
 }
 
 .empty-state > svg {
-  margin-bottom: 20px;
+  margin-bottom: var(--atlas-space-20);
 }
 
 .empty-state h3 {
   color: var(--ink);
-  font-size: 23px;
-  font-weight: 450;
-  letter-spacing: -0.7px;
+  font-size: var(--atlas-font-size-23);
+  font-weight: var(--atlas-font-weight-450);
+  letter-spacing: var(--atlas-tracking-tight-0-7);
 }
 
 .empty-state p {
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   line-height: 1.7;
-  margin: 13px 0 24px;
+  margin: var(--atlas-space-13) 0 var(--atlas-space-24);
 }
 
 .empty-state > .button {
@@ -841,17 +845,17 @@ p {
 .button {
   align-items: center;
   background: var(--white);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 5px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-5);
   display: flex;
-  font-size: 11px;
-  font-weight: 500;
-  gap: 9px;
+  font-size: var(--atlas-font-size-11);
+  font-weight: var(--atlas-font-weight-500);
+  gap: var(--atlas-space-9);
   justify-content: center;
   line-height: 1.3;
   min-height: 39px;
-  padding: 10px 15px;
-  transition: background 0.15s;
+  padding: var(--atlas-space-10) var(--atlas-space-15);
+  transition: background var(--atlas-duration-150);
 }
 
 .button:hover {
@@ -877,80 +881,78 @@ p {
 .reference-tray {
   align-items: center;
   background: var(--white);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 9px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-9);
   bottom: 23px;
-  box-shadow:
-    0 10px 40px color-mix(in srgb, var(--ava-neutral-9) 12%, transparent),
-    0 1px 5px color-mix(in srgb, var(--ava-neutral-9) 3%, transparent);
+  box-shadow: var(--atlas-shadow-tray);
   display: flex;
-  gap: 21px;
+  gap: var(--atlas-space-21);
   left: calc(50% + 119px);
   max-width: calc(100vw - 32px);
-  padding: 9px 10px 9px 19px;
+  padding: var(--atlas-space-9) var(--atlas-space-10) var(--atlas-space-9)
+    var(--atlas-space-19);
   position: fixed;
   transform: translateX(-50%);
   white-space: nowrap;
-  z-index: 6;
+  z-index: var(--atlas-layer-6);
 }
 
 .tray-count {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 11px;
-  gap: 8px;
+  font-size: var(--atlas-font-size-11);
+  gap: var(--atlas-space-8);
 }
 
 .tray-count strong {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: var(--atlas-font-weight-600);
 }
 
 .tray-count > svg {
-  margin-right: 3px;
+  margin-right: var(--atlas-space-3);
 }
 
 .tray-clear {
   color: var(--ava-neutral-6);
-  font-size: 10px;
+  font-size: var(--atlas-font-size-10);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: var(--atlas-space-3);
 }
 
 .reference-tray .button {
-  font-size: 10px;
+  font-size: var(--atlas-font-size-10);
   min-height: 35px;
-  padding: 9px 12px;
+  padding: var(--atlas-space-9) var(--atlas-space-12);
 }
 
 .reference-tray .button > svg:last-child {
-  margin-left: 9px;
+  margin-left: var(--atlas-space-9);
 }
 
 .toast {
   align-items: center;
   background: var(--ava-primary-7);
-  border: 1px solid var(--ava-primary-7);
-  border-radius: 6px;
+  border: var(--atlas-border-1) solid var(--ava-primary-7);
+  border-radius: var(--atlas-radius-6);
   bottom: 95px;
-  box-shadow: 0 4px 24px
-    color-mix(in srgb, var(--ava-neutral-9) 8%, transparent);
+  box-shadow: var(--atlas-shadow-toast);
   color: var(--ava-primary-0);
   display: flex;
-  font-size: 11px;
-  gap: 9px;
+  font-size: var(--atlas-font-size-11);
+  gap: var(--atlas-space-9);
   left: calc(50% + 119px);
   max-width: calc(100vw - 30px);
   opacity: 0;
-  padding: 12px 18px;
+  padding: var(--atlas-space-12) var(--atlas-space-18);
   pointer-events: none;
   position: fixed;
-  transform: translate(-50%, 10px);
+  transform: translate(-50%, var(--atlas-space-10));
   transition:
-    opacity 0.15s,
-    transform 0.15s;
-  z-index: 7;
+    opacity var(--atlas-duration-150),
+    transform var(--atlas-duration-150);
+  z-index: var(--atlas-layer-7);
 }
 
 .toast.is-visible {
@@ -960,10 +962,9 @@ p {
 
 .preview-dialog {
   background: var(--paper);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 12px;
-  box-shadow: 0 24px 100px
-    color-mix(in srgb, var(--ava-neutral-9) 29%, transparent);
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-12);
+  box-shadow: var(--atlas-shadow-dialog);
   color: var(--ink);
   max-height: calc(100dvh - 48px);
   max-width: none;
@@ -973,32 +974,32 @@ p {
 }
 
 .preview-dialog::backdrop {
-  backdrop-filter: blur(7px);
-  background: color-mix(in srgb, var(--ava-neutral-9) 72%, transparent);
+  backdrop-filter: blur(var(--atlas-blur-7));
+  background: var(--atlas-color-ink-72);
 }
 
 .dialog-header {
   align-items: center;
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   display: flex;
   height: 60px;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 var(--atlas-space-24);
 }
 
 .dialog-header > .eyebrow {
   color: var(--ava-neutral-6);
-  font-size: 8px;
+  font-size: var(--atlas-font-size-8);
 }
 
 .slash {
   color: var(--ava-primary-2);
-  padding: 0 9px;
+  padding: 0 var(--atlas-space-9);
 }
 
 .icon-button {
   align-items: center;
-  border-radius: 5px;
+  border-radius: var(--atlas-radius-5);
   color: var(--ava-neutral-6);
   display: flex;
   height: 30px;
@@ -1017,15 +1018,16 @@ p {
 }
 
 .dialog-player {
-  border-right: 1px solid var(--line);
+  border-right: var(--atlas-border-1) solid var(--line);
   min-width: 0;
-  padding: 24px;
+  padding: var(--atlas-space-24);
 }
 
 .dialog-canvas {
   aspect-ratio: 8/5;
   background: var(--dark);
-  border-radius: 7px 7px 0 0;
+  border-radius: var(--atlas-radius-7) var(--atlas-radius-7)
+    var(--atlas-radius-none) var(--atlas-radius-none);
   overflow: hidden;
   position: relative;
 }
@@ -1033,32 +1035,33 @@ p {
 .canvas-caption {
   bottom: 15px;
   color: var(--ava-neutral-6);
-  font: 7px var(--mono);
+  font: var(--atlas-font-size-7) var(--mono);
   left: 18px;
-  letter-spacing: 1.1px;
+  letter-spacing: var(--atlas-tracking-wide-1-1);
   position: absolute;
 }
 
 .player-controls {
   background: var(--ava-primary-0);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 0 0 7px 7px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-none) var(--atlas-radius-none)
+    var(--atlas-radius-7) var(--atlas-radius-7);
   border-top: 0;
-  padding: 13px 18px 15px;
+  padding: var(--atlas-space-13) var(--atlas-space-18) var(--atlas-space-15);
 }
 
 .transport-row {
   align-items: center;
   display: flex;
-  gap: 8px;
+  gap: var(--atlas-space-8);
 }
 
 .transport-button {
   align-items: center;
   color: var(--ava-primary-7);
   display: flex;
-  font-size: 10px;
-  gap: 7px;
+  font-size: var(--atlas-font-size-10);
+  gap: var(--atlas-space-7);
   min-width: 62px;
 }
 
@@ -1074,7 +1077,7 @@ p {
 
 .time-code {
   color: var(--ava-primary-7);
-  font: 10px var(--mono);
+  font: var(--atlas-font-size-10) var(--mono);
   margin-left: auto;
 }
 
@@ -1083,11 +1086,11 @@ p {
 }
 
 .frame-rate {
-  border-left: 1px solid var(--ava-primary-1);
+  border-left: var(--atlas-border-1) solid var(--ava-primary-1);
   color: var(--ava-neutral-6);
-  font: 7px var(--mono);
-  margin-left: 12px;
-  padding-left: 14px;
+  font: var(--atlas-font-size-7) var(--mono);
+  margin-left: var(--atlas-space-12);
+  padding-left: var(--atlas-space-14);
 }
 
 .frame-scrubber {
@@ -1095,111 +1098,111 @@ p {
   background: transparent;
   cursor: pointer;
   height: 18px;
-  margin: 12px 0 4px;
+  margin: var(--atlas-space-12) 0 var(--atlas-space-4);
   width: 100%;
 }
 
 .scrubber-labels {
   color: var(--ava-neutral-6);
   display: flex;
-  font: 6px var(--mono);
-  gap: 8px;
+  font: var(--atlas-font-size-6) var(--mono);
+  gap: var(--atlas-space-8);
   justify-content: space-between;
-  letter-spacing: 0.7px;
+  letter-spacing: var(--atlas-tracking-wide-0-7);
 }
 
 .dialog-details {
   min-width: 0;
-  padding: 27px 26px 21px;
+  padding: var(--atlas-space-27) var(--atlas-space-26) var(--atlas-space-21);
 }
 
 .preset-id {
   color: var(--ava-neutral-6);
-  font: 8px var(--mono);
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  font: var(--atlas-font-size-8) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-0-5);
+  margin-bottom: var(--atlas-space-12);
 }
 
 .dialog-details h2 {
-  font-size: 31px;
-  font-weight: 470;
-  letter-spacing: -1.2px;
+  font-size: var(--atlas-font-size-31);
+  font-weight: var(--atlas-font-weight-470);
+  letter-spacing: var(--atlas-tracking-tight-1-2);
   line-height: 1.1;
 }
 
 .dialog-description {
   color: var(--ava-neutral-6);
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   line-height: 1.75;
-  margin-top: 14px;
+  margin-top: var(--atlas-space-14);
 }
 
 .detail-section {
-  margin-top: 24px;
+  margin-top: var(--atlas-space-24);
 }
 
 .detail-section h3 {
   color: var(--ava-primary-7);
-  font: 8px var(--mono);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  font: var(--atlas-font-size-8) var(--mono);
+  letter-spacing: var(--atlas-tracking-wide-1);
+  margin-bottom: var(--atlas-space-8);
   text-transform: uppercase;
 }
 
 .detail-section p {
   color: var(--ava-neutral-6);
-  font-size: 11px;
+  font-size: var(--atlas-font-size-11);
   line-height: 1.7;
 }
 
 .keyword-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 15px;
+  gap: var(--atlas-space-5);
+  margin-top: var(--atlas-space-15);
 }
 
 .keyword-list > span {
   background: var(--ava-primary-0);
-  border: 1px solid var(--ava-primary-1);
-  border-radius: 3px;
+  border: var(--atlas-border-1) solid var(--ava-primary-1);
+  border-radius: var(--atlas-radius-3);
   color: var(--ava-neutral-6);
-  font: 8px var(--mono);
-  padding: 5px 7px;
+  font: var(--atlas-font-size-8) var(--mono);
+  padding: var(--atlas-space-5) var(--atlas-space-7);
 }
 
 .brief-excerpt {
-  border-left: 2px solid var(--ava-primary-2);
-  margin-top: 22px;
-  padding-left: 13px;
+  border-left: var(--atlas-border-2) solid var(--ava-primary-2);
+  margin-top: var(--atlas-space-22);
+  padding-left: var(--atlas-space-13);
 }
 
 .brief-excerpt .eyebrow {
   color: var(--ava-neutral-6);
-  font-size: 7px;
-  letter-spacing: 1px;
+  font-size: var(--atlas-font-size-7);
+  letter-spacing: var(--atlas-tracking-wide-1);
 }
 
 .brief-excerpt p {
   color: var(--ava-neutral-6);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
+  font-family: var(--atlas-font-family-serif);
+  font-size: var(--atlas-font-size-13);
   line-height: 1.7;
-  margin-top: 7px;
+  margin-top: var(--atlas-space-7);
 }
 
 .dialog-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 24px;
+  gap: var(--atlas-space-8);
+  margin-top: var(--atlas-space-24);
 }
 
 .detail-links {
   align-items: center;
   display: flex;
-  gap: 20px;
-  margin-top: 17px;
+  gap: var(--atlas-space-20);
+  margin-top: var(--atlas-space-17);
 }
 
 .detail-links button,
@@ -1207,8 +1210,8 @@ p {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 9px;
-  gap: 6px;
+  font-size: var(--atlas-font-size-9);
+  gap: var(--atlas-space-6);
 }
 
 .detail-links button:hover,
@@ -1218,9 +1221,9 @@ p {
 
 .dialog-notice {
   color: var(--ava-neutral-6);
-  font-size: 8px;
+  font-size: var(--atlas-font-size-8);
   line-height: 1.7;
-  margin-top: 18px;
+  margin-top: var(--atlas-space-18);
   min-height: 14px;
 }
 
@@ -1230,42 +1233,42 @@ p {
   }
 
   .sidebar {
-    padding-left: 30px;
-    padding-right: 28px;
+    padding-left: var(--atlas-space-30);
+    padding-right: var(--atlas-space-28);
   }
 
   .library-main {
-    padding-left: 54px;
-    padding-right: 54px;
+    padding-left: var(--atlas-space-54);
+    padding-right: var(--atlas-space-54);
   }
 
   .motion-grid {
-    gap: 30px;
+    gap: var(--atlas-space-30);
   }
 
   .library-intro {
-    padding-bottom: 44px;
-    padding-top: 54px;
+    padding-bottom: var(--atlas-space-44);
+    padding-top: var(--atlas-space-54);
   }
 
   .card-copy {
-    padding: 22px 22px 0;
+    padding: var(--atlas-space-22) var(--atlas-space-22) 0;
   }
 
   .card-title {
-    font-size: 20px;
+    font-size: var(--atlas-font-size-20);
   }
 
   .card-copy > p {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
   }
 
   .card-category {
-    font-size: 8px;
+    font-size: var(--atlas-font-size-8);
   }
 
   .card-foot code {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .reference-tray,
@@ -1276,8 +1279,8 @@ p {
 
 @media (width <= 1250px) {
   .site-header {
-    gap: 28px;
-    padding: 0 26px;
+    gap: var(--atlas-space-28);
+    padding: 0 var(--atlas-space-26);
   }
 
   .header-edition {
@@ -1289,37 +1292,37 @@ p {
   }
 
   .sidebar {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: var(--atlas-space-15);
+    padding-right: var(--atlas-space-15);
   }
 
   .library-main {
-    padding-left: 28px;
-    padding-right: 28px;
+    padding-left: var(--atlas-space-28);
+    padding-right: var(--atlas-space-28);
   }
 
   .motion-grid {
-    gap: 23px;
+    gap: var(--atlas-space-23);
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .intro-copy h1 {
-    font-size: 43px;
+    font-size: var(--atlas-font-size-43);
   }
 
   .collection-stamp {
     min-width: 125px;
-    padding-left: 20px;
+    padding-left: var(--atlas-space-20);
     width: 125px;
   }
 
   .collection-subline {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .loop-spec {
-    font-size: 6px;
-    letter-spacing: 0.2px;
+    font-size: var(--atlas-font-size-6);
+    letter-spacing: var(--atlas-tracking-wide-0-2);
   }
 
   .search-field {
@@ -1338,19 +1341,19 @@ p {
   }
 
   .sidebar {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: var(--atlas-space-10);
+    padding-right: var(--atlas-space-10);
   }
 
   .sidebar-top > .eyebrow {
-    font-size: 6.5px;
-    letter-spacing: 0.6px;
+    font-size: var(--atlas-font-size-6-5);
+    letter-spacing: var(--atlas-tracking-wide-0-6);
   }
 
   .category-button {
-    font-size: 10px;
-    gap: 9px;
-    padding: 0 9px;
+    font-size: var(--atlas-font-size-10);
+    gap: var(--atlas-space-9);
+    padding: 0 var(--atlas-space-9);
   }
 
   .category-button > svg {
@@ -1358,30 +1361,30 @@ p {
   }
 
   .sidebar-note {
-    padding: 18px 12px;
+    padding: var(--atlas-space-18) var(--atlas-space-12);
   }
 
   .sidebar-note h2 {
-    font-size: 18px;
+    font-size: var(--atlas-font-size-18);
   }
 
   .sidebar-note p {
-    font-size: 10px;
+    font-size: var(--atlas-font-size-10);
   }
 
   .sidebar-bottom {
-    font-size: 6px;
-    gap: 5px;
+    font-size: var(--atlas-font-size-6);
+    gap: var(--atlas-space-5);
   }
 
   .library-main {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: var(--atlas-space-24);
+    padding-right: var(--atlas-space-24);
   }
 
   .library-intro {
-    padding-bottom: 30px;
-    padding-top: 36px;
+    padding-bottom: var(--atlas-space-30);
+    padding-top: var(--atlas-space-36);
   }
 
   .collection-stamp {
@@ -1389,11 +1392,11 @@ p {
   }
 
   .intro-copy h1 {
-    font-size: 43px;
+    font-size: var(--atlas-font-size-43);
   }
 
   .toolbar-tools {
-    gap: 8px;
+    gap: var(--atlas-space-8);
   }
 
   .search-field {
@@ -1401,16 +1404,16 @@ p {
   }
 
   .play-all {
-    font-size: 9px;
-    padding: 0 10px;
+    font-size: var(--atlas-font-size-9);
+    padding: 0 var(--atlas-space-10);
   }
 
   .collection-heading h2 {
-    font-size: 15px;
+    font-size: var(--atlas-font-size-15);
   }
 
   .collection-toolbar {
-    gap: 10px;
+    gap: var(--atlas-space-10);
   }
 
   .collection-subline .loop-spec {
@@ -1418,30 +1421,30 @@ p {
   }
 
   .motion-grid {
-    gap: 19px;
+    gap: var(--atlas-space-19);
   }
 
   .card-copy {
-    padding: 16px 15px 0;
+    padding: var(--atlas-space-16) var(--atlas-space-15) 0;
   }
 
   .card-title {
-    font-size: 17px;
+    font-size: var(--atlas-font-size-17);
   }
 
   .card-copy > p {
-    font-size: 10px;
+    font-size: var(--atlas-font-size-10);
     min-height: 34px;
   }
 
   .card-foot {
-    margin-top: 12px;
+    margin-top: var(--atlas-space-12);
   }
 
   .library-footer {
     align-items: flex-start;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--atlas-space-12);
   }
 
   .reference-tray,
@@ -1454,19 +1457,19 @@ p {
   }
 
   .dialog-player {
-    padding: 18px;
+    padding: var(--atlas-space-18);
   }
 
   .dialog-details {
-    padding: 23px 20px;
+    padding: var(--atlas-space-23) var(--atlas-space-20);
   }
 
   .dialog-details h2 {
-    font-size: 27px;
+    font-size: var(--atlas-font-size-27);
   }
 
   .dialog-description {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .frame-rate {
@@ -1474,36 +1477,36 @@ p {
   }
 
   .scrubber-labels {
-    font-size: 5px;
-    letter-spacing: 0.2px;
+    font-size: var(--atlas-font-size-5);
+    letter-spacing: var(--atlas-tracking-wide-0-2);
   }
 
   .detail-links {
-    gap: 15px;
+    gap: var(--atlas-space-15);
   }
 }
 
 @media (width <= 760px) {
   :root {
-    --header: 64px;
+    --header: var(--atlas-size-64);
   }
 
   .site-header {
-    gap: 15px;
-    padding: 0 20px;
+    gap: var(--atlas-space-15);
+    padding: 0 var(--atlas-space-20);
   }
 
   .brand {
-    font-size: 20px;
-    gap: 10px;
+    font-size: var(--atlas-font-size-20);
+    gap: var(--atlas-space-10);
   }
 
   .brand-room {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
   }
 
   .brand-divider {
-    margin: 0 10px;
+    margin: 0 var(--atlas-space-10);
   }
 
   .brand-mark {
@@ -1517,8 +1520,8 @@ p {
   }
 
   .site-header nav {
-    font-size: 10px;
-    gap: 14px;
+    font-size: var(--atlas-font-size-10);
+    gap: var(--atlas-space-14);
   }
 
   .site-header nav a:first-child {
@@ -1538,17 +1541,17 @@ p {
     display: block;
     height: auto;
     overflow: visible;
-    padding: 20px 20px 0;
+    padding: var(--atlas-space-20) var(--atlas-space-20) 0;
     position: relative;
     top: 0;
   }
 
   .sidebar-top {
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--atlas-border-1) solid var(--line);
     display: flex;
-    gap: 7px;
+    gap: var(--atlas-space-7);
     overflow-x: auto;
-    padding-bottom: 15px;
+    padding-bottom: var(--atlas-space-15);
     scrollbar-width: none;
   }
 
@@ -1561,12 +1564,12 @@ p {
   }
 
   .category-button {
-    border: 1px solid var(--ava-primary-1);
+    border: var(--atlas-border-1) solid var(--ava-primary-1);
     flex-shrink: 0;
-    font-size: 10px;
-    gap: 7px;
+    font-size: var(--atlas-font-size-10);
+    gap: var(--atlas-space-7);
     min-height: 33px;
-    padding: 0 11px;
+    padding: 0 var(--atlas-space-11);
     white-space: nowrap;
     width: auto;
   }
@@ -1581,8 +1584,8 @@ p {
   }
 
   .category-count {
-    font-size: 8px;
-    margin-left: 3px;
+    font-size: var(--atlas-font-size-8);
+    margin-left: var(--atlas-space-3);
   }
 
   .category-list {
@@ -1599,44 +1602,44 @@ p {
   }
 
   .library-main {
-    padding: 0 20px 110px;
+    padding: 0 var(--atlas-space-20) var(--atlas-space-110);
   }
 
   .library-intro {
-    padding: 30px 0 27px;
+    padding: var(--atlas-space-30) 0 var(--atlas-space-27);
   }
 
   .intro-copy > .eyebrow {
-    font-size: 7px;
-    letter-spacing: 1px;
+    font-size: var(--atlas-font-size-7);
+    letter-spacing: var(--atlas-tracking-wide-1);
   }
 
   .intro-copy h1 {
-    font-size: 43px;
-    letter-spacing: -2.2px;
-    margin: 15px 0;
+    font-size: var(--atlas-font-size-43);
+    letter-spacing: var(--atlas-tracking-tight-2-2);
+    margin: var(--atlas-space-15) 0;
   }
 
   .intro-copy h1 em {
-    letter-spacing: -2px;
+    letter-spacing: var(--atlas-tracking-tight-2);
   }
 
   .intro-copy > p:last-child {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
     max-width: 420px;
   }
 
   .collection-toolbar {
-    padding: 18px 0 13px;
+    padding: var(--atlas-space-18) 0 var(--atlas-space-13);
   }
 
   .collection-heading h2 {
-    font-size: 15px;
+    font-size: var(--atlas-font-size-15);
   }
 
   .result-count {
-    font-size: 9px;
-    padding: 3px 6px;
+    font-size: var(--atlas-font-size-9);
+    padding: var(--atlas-space-3) var(--atlas-space-6);
   }
 
   .search-field {
@@ -1649,37 +1652,37 @@ p {
   }
 
   .collection-subline {
-    font-size: 9px;
-    margin-bottom: 19px;
+    font-size: var(--atlas-font-size-9);
+    margin-bottom: var(--atlas-space-19);
   }
 
   .motion-grid {
-    gap: 20px 16px;
+    gap: var(--atlas-space-20) var(--atlas-space-16);
   }
 
   .card-title {
-    font-size: 17px;
+    font-size: var(--atlas-font-size-17);
   }
 
   .card-category {
-    font-size: 6px;
+    font-size: var(--atlas-font-size-6);
   }
 
   .card-copy > p {
-    font-size: 10px;
+    font-size: var(--atlas-font-size-10);
   }
 
   .card-copy {
-    padding: 16px 14px 0;
+    padding: var(--atlas-space-16) var(--atlas-space-14) 0;
   }
 
   .card-foot code {
-    font-size: 7px;
+    font-size: var(--atlas-font-size-7);
   }
 
   .card-foot > button {
-    font-size: 8px;
-    gap: 4px;
+    font-size: var(--atlas-font-size-8);
+    gap: var(--atlas-space-4);
   }
 
   .preview-open {
@@ -1700,19 +1703,19 @@ p {
 
   .reference-tray {
     bottom: 18px;
-    gap: 16px;
-    padding-left: 15px;
+    gap: var(--atlas-space-16);
+    padding-left: var(--atlas-space-15);
   }
 
   .preview-dialog {
-    border-radius: 9px;
+    border-radius: var(--atlas-radius-9);
     max-height: calc(100dvh - 28px);
     width: calc(100vw - 28px);
   }
 
   .dialog-header {
     height: 51px;
-    padding: 0 18px;
+    padding: 0 var(--atlas-space-18);
   }
 
   .dialog-layout {
@@ -1720,13 +1723,13 @@ p {
   }
 
   .dialog-player {
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--atlas-border-1) solid var(--line);
     border-right: 0;
-    padding: 17px;
+    padding: var(--atlas-space-17);
   }
 
   .dialog-details {
-    padding: 22px;
+    padding: var(--atlas-space-22);
   }
 
   .dialog-canvas {
@@ -1735,49 +1738,49 @@ p {
   }
 
   .dialog-details h2 {
-    font-size: 30px;
+    font-size: var(--atlas-font-size-30);
   }
 
   .dialog-description {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
   }
 
   .detail-section {
-    margin-top: 18px;
+    margin-top: var(--atlas-space-18);
   }
 
   .brief-excerpt {
-    margin-top: 18px;
+    margin-top: var(--atlas-space-18);
   }
 
   .dialog-actions {
     flex-direction: row;
-    margin-top: 20px;
+    margin-top: var(--atlas-space-20);
   }
 
   .dialog-actions > .button {
     flex: 1;
-    font-size: 10px;
-    padding: 10px;
+    font-size: var(--atlas-font-size-10);
+    padding: var(--atlas-space-10);
   }
 
   .dialog-notice {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .detail-links {
-    gap: 24px;
-    margin-top: 18px;
+    gap: var(--atlas-space-24);
+    margin-top: var(--atlas-space-18);
   }
 
   .detail-links button,
   .detail-links a {
-    font-size: 10px;
+    font-size: var(--atlas-font-size-10);
   }
 
   .scrubber-labels {
-    font-size: 6px;
-    letter-spacing: 0.4px;
+    font-size: var(--atlas-font-size-6);
+    letter-spacing: var(--atlas-tracking-wide-0-4);
   }
 
   .frame-rate {
@@ -1788,25 +1791,25 @@ p {
     background: var(--paper);
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: var(--atlas-layer-1);
   }
 }
 
 @media (width <= 520px) {
   .site-header {
-    padding: 0 16px;
+    padding: 0 var(--atlas-space-16);
   }
 
   .brand-divider {
-    margin: 0 8px;
+    margin: 0 var(--atlas-space-8);
   }
 
   .brand-room {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .brand {
-    font-size: 18px;
+    font-size: var(--atlas-font-size-18);
   }
 
   .brand-mark {
@@ -1815,44 +1818,44 @@ p {
   }
 
   .site-header nav {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .sidebar {
-    padding: 16px 16px 0;
+    padding: var(--atlas-space-16) var(--atlas-space-16) 0;
   }
 
   .library-main {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--atlas-space-16);
+    padding-right: var(--atlas-space-16);
   }
 
   .library-intro {
-    padding: 27px 0;
+    padding: var(--atlas-space-27) 0;
   }
 
   .intro-copy h1 {
-    font-size: 37px;
-    letter-spacing: -1.9px;
+    font-size: var(--atlas-font-size-37);
+    letter-spacing: var(--atlas-tracking-tight-1-9);
   }
 
   .intro-copy h1 em {
-    letter-spacing: -1.7px;
+    letter-spacing: var(--atlas-tracking-tight-1-7);
   }
 
   .intro-copy > p:last-child {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
     line-height: 1.8;
   }
 
   .intro-copy > .eyebrow {
-    font-size: 6px;
-    letter-spacing: 1px;
+    font-size: var(--atlas-font-size-6);
+    letter-spacing: var(--atlas-tracking-wide-1);
   }
 
   .collection-toolbar {
     flex-wrap: wrap;
-    row-gap: 13px;
+    row-gap: var(--atlas-space-13);
   }
 
   .collection-heading {
@@ -1875,68 +1878,68 @@ p {
   }
 
   .search-field input {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .collection-subline {
-    font-size: 8px;
-    margin-top: 1px;
+    font-size: var(--atlas-font-size-8);
+    margin-top: var(--atlas-space-1);
   }
 
   .motion-grid {
-    gap: 22px;
+    gap: var(--atlas-space-22);
     grid-template-columns: 1fr;
   }
 
   .card-copy {
-    padding: 20px 20px 0;
+    padding: var(--atlas-space-20) var(--atlas-space-20) 0;
   }
 
   .card-title {
-    font-size: 22px;
+    font-size: var(--atlas-font-size-22);
   }
 
   .card-category {
-    font-size: 8px;
-    margin-bottom: 9px;
+    font-size: var(--atlas-font-size-8);
+    margin-bottom: var(--atlas-space-9);
   }
 
   .card-copy > p {
-    font-size: 12px;
+    font-size: var(--atlas-font-size-12);
     line-height: 1.7;
-    margin-top: 9px;
+    margin-top: var(--atlas-space-9);
     min-height: 0;
   }
 
   .card-foot {
-    margin-top: 18px;
-    padding: 16px 0;
+    margin-top: var(--atlas-space-18);
+    padding: var(--atlas-space-16) 0;
   }
 
   .card-foot code {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .card-foot > button {
-    font-size: 10px;
-    gap: 7px;
+    font-size: var(--atlas-font-size-10);
+    gap: var(--atlas-space-7);
   }
 
   .preview-number {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
     left: 17px;
     top: 16px;
   }
 
   .preview-state {
-    font-size: 7px;
+    font-size: var(--atlas-font-size-7);
     right: 17px;
     top: 17px;
   }
 
   .preview-duration {
     bottom: 16px;
-    font-size: 7px;
+    font-size: var(--atlas-font-size-7);
     left: 17px;
   }
 
@@ -1953,29 +1956,30 @@ p {
   }
 
   .library-footer {
-    margin-top: 35px;
+    margin-top: var(--atlas-space-35);
   }
 
   .reference-tray {
     bottom: 13px;
-    gap: 12px;
-    padding: 8px 8px 8px 13px;
+    gap: var(--atlas-space-12);
+    padding: var(--atlas-space-8) var(--atlas-space-8) var(--atlas-space-8)
+      var(--atlas-space-13);
   }
 
   .tray-count {
-    font-size: 10px;
-    gap: 5px;
+    font-size: var(--atlas-font-size-10);
+    gap: var(--atlas-space-5);
   }
 
   .tray-count > svg {
-    margin-right: 2px;
+    margin-right: var(--atlas-space-2);
     width: 14px;
   }
 
   .reference-tray .button {
-    font-size: 9px;
-    gap: 6px;
-    padding: 9px 10px;
+    font-size: var(--atlas-font-size-9);
+    gap: var(--atlas-space-6);
+    padding: var(--atlas-space-9) var(--atlas-space-10);
   }
 
   .reference-tray .button > svg:last-child {
@@ -1983,7 +1987,7 @@ p {
   }
 
   .tray-clear {
-    font-size: 9px;
+    font-size: var(--atlas-font-size-9);
   }
 
   .dialog-actions {
@@ -1991,19 +1995,19 @@ p {
   }
 
   .dialog-actions > .button {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .dialog-details {
-    padding: 20px;
+    padding: var(--atlas-space-20);
   }
 
   .dialog-player {
-    padding: 13px;
+    padding: var(--atlas-space-13);
   }
 
   .dialog-header {
-    padding: 0 14px;
+    padding: 0 var(--atlas-space-14);
   }
 
   .dialog-canvas {
@@ -2011,15 +2015,15 @@ p {
   }
 
   .dialog-description {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .detail-section p {
-    font-size: 11px;
+    font-size: var(--atlas-font-size-11);
   }
 
   .dialog-notice {
-    font-size: 8px;
+    font-size: var(--atlas-font-size-8);
   }
 }
 
@@ -2037,7 +2041,7 @@ p {
 .card-category {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--atlas-space-10);
   justify-content: space-between;
 }
 
@@ -2045,14 +2049,14 @@ p {
   align-items: center;
   color: var(--ava-neutral-6);
   display: flex;
-  font-size: 6px;
-  gap: 4px;
-  letter-spacing: 0.6px;
+  font-size: var(--atlas-font-size-6);
+  gap: var(--atlas-space-4);
+  letter-spacing: var(--atlas-tracking-wide-0-6);
 }
 
 .card-state > i {
   background: var(--ava-primary-2);
-  border-radius: 50%;
+  border-radius: var(--atlas-radius-round);
   height: 3px;
   width: 3px;
 }
@@ -2066,8 +2070,8 @@ p {
 }
 
 .preview-open {
-  backdrop-filter: blur(4px);
-  background: color-mix(in srgb, var(--ava-neutral-9) 86%, transparent);
+  backdrop-filter: blur(var(--atlas-blur-4));
+  background: var(--atlas-color-ink-86);
   inset: 50% auto auto 50%;
   height: 38px;
   transform: translate(-50%, -50%);
@@ -2091,9 +2095,9 @@ p {
 
 /* The animation owns the viewport. Reference material scrolls in its own rail. */
 .preview-dialog {
-  border: 1px solid var(--ava-neutral-2);
-  border-radius: 12px;
-  box-shadow: 0 24px 72px #102a4340;
+  border: var(--atlas-border-1) solid var(--ava-neutral-2);
+  border-radius: var(--atlas-radius-12);
+  box-shadow: var(--atlas-shadow-preview-dialog);
   height: calc(100dvh - 32px);
   margin: auto;
   max-height: none;
@@ -2107,33 +2111,33 @@ p {
 }
 
 .preview-dialog::backdrop {
-  backdrop-filter: blur(6px);
-  background: #102a43b8;
+  backdrop-filter: blur(var(--atlas-blur-6));
+  background: var(--atlas-color-dialog-backdrop);
 }
 
 .dialog-header {
   background: var(--white);
   height: auto;
-  padding: 0 22px;
+  padding: 0 var(--atlas-space-22);
 }
 
 .dialog-heading {
   align-items: baseline;
   display: flex;
-  gap: 16px;
+  gap: var(--atlas-space-16);
   min-width: 0;
 }
 
 .dialog-heading h2 {
-  font-size: 23px;
-  font-weight: 520;
+  font-size: var(--atlas-font-size-23);
+  font-weight: var(--atlas-font-weight-520);
   letter-spacing: -0.025em;
   line-height: 1.2;
 }
 
 .dialog-heading > span {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
 }
 
 .dialog-header > .icon-button {
@@ -2159,13 +2163,13 @@ p {
   display: grid;
   flex: 1;
   min-height: 0;
-  padding: 16px;
+  padding: var(--atlas-space-16);
   place-items: center;
 }
 
 .dialog-canvas {
   aspect-ratio: 8/5;
-  border-radius: 0;
+  border-radius: var(--atlas-radius-none);
   max-height: none;
   max-width: calc((100dvh - 244px) * 1.6);
   overflow: hidden;
@@ -2180,20 +2184,20 @@ p {
 .player-controls {
   background: var(--ava-neutral-9);
   border: 0;
-  border-radius: 0;
-  border-top: 1px solid var(--ava-neutral-7);
+  border-radius: var(--atlas-radius-none);
+  border-top: var(--atlas-border-1) solid var(--ava-neutral-7);
   color: var(--ava-primary-1);
   flex: 0 0 auto;
-  padding: 12px 24px 16px;
+  padding: var(--atlas-space-12) var(--atlas-space-24) var(--atlas-space-16);
 }
 
 .transport-row {
-  gap: 12px;
+  gap: var(--atlas-space-12);
 }
 
 .transport-button {
   color: var(--ava-primary-1);
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   min-height: 36px;
   min-width: 82px;
 }
@@ -2215,7 +2219,7 @@ p {
 
 .time-code {
   color: var(--ava-primary-1);
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
 }
 
 .time-code > span {
@@ -2226,17 +2230,17 @@ p {
   border-color: var(--ava-neutral-7);
   color: var(--ava-primary-2);
   display: block;
-  font-size: 10px;
+  font-size: var(--atlas-font-size-10);
 }
 
 .frame-scrubber {
   accent-color: var(--ava-primary-4);
-  margin-top: 6px;
+  margin-top: var(--atlas-space-6);
 }
 
 .scrubber-labels {
   color: var(--ava-primary-2);
-  font-size: 9px;
+  font-size: var(--atlas-font-size-9);
   letter-spacing: 0.04em;
 }
 
@@ -2244,36 +2248,36 @@ p {
   background: var(--white);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 24px 22px;
+  padding: var(--atlas-space-24) var(--atlas-space-22);
   scrollbar-color: var(--ava-neutral-3) transparent;
   scrollbar-width: thin;
 }
 
 .dialog-description {
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   line-height: 1.65;
   margin: 0;
 }
 
 .detail-section {
-  margin-top: 22px;
+  margin-top: var(--atlas-space-22);
 }
 
 .detail-section h3,
 .brief-excerpt h3 {
   color: var(--ink);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--atlas-font-size-13);
+  font-weight: var(--atlas-font-weight-600);
   letter-spacing: 0;
-  margin: 0 0 8px;
+  margin: 0 0 var(--atlas-space-8);
   text-transform: none;
 }
 
 .detail-section p {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.65;
 }
 
@@ -2281,37 +2285,37 @@ p {
   background: var(--ava-primary-0);
   border: 0;
   color: var(--ava-primary-8);
-  font-size: 10px;
+  font-size: var(--atlas-font-size-10);
   line-height: 1.4;
 }
 
 .brief-excerpt {
   border: 0;
-  margin-top: 24px;
+  margin-top: var(--atlas-space-24);
   padding: 0;
 }
 
 .brief-excerpt p {
   color: var(--ink);
-  font-size: 14px;
+  font-size: var(--atlas-font-size-14);
   line-height: 1.6;
   margin-top: 0;
 }
 
 .dialog-actions {
-  gap: 10px;
-  margin-top: 24px;
+  gap: var(--atlas-space-10);
+  margin-top: var(--atlas-space-24);
 }
 
 .dialog-actions > .button {
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   min-height: 42px;
 }
 
 .button-primary {
   background: var(--ava-primary-6);
   border-color: var(--ava-primary-6);
-  color: #fff;
+  color: var(--atlas-color-white);
 }
 
 .button-primary:hover {
@@ -2321,20 +2325,20 @@ p {
 
 .detail-links {
   flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 18px;
+  gap: var(--atlas-space-16);
+  margin-top: var(--atlas-space-18);
 }
 
 .detail-links button,
 .detail-links a {
   color: var(--ava-primary-7);
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   min-height: 32px;
 }
 
 .dialog-notice {
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
   min-height: 0;
 }
 
@@ -2359,15 +2363,15 @@ p {
   }
 
   .dialog-details {
-    padding: 20px 18px;
+    padding: var(--atlas-space-20) var(--atlas-space-18);
   }
 
   .dialog-stage {
-    padding: 10px;
+    padding: var(--atlas-space-10);
   }
 
   .player-controls {
-    padding: 12px 18px;
+    padding: var(--atlas-space-12) var(--atlas-space-18);
   }
 
   .frame-rate {
@@ -2378,7 +2382,7 @@ p {
 @media (width <= 760px) {
   .preview-dialog {
     border: 0;
-    border-radius: 0;
+    border-radius: var(--atlas-radius-none);
     height: 100dvh;
     max-height: 100dvh;
     overflow-y: auto;
@@ -2391,10 +2395,10 @@ p {
 
   .dialog-header {
     height: 64px;
-    padding: 0 16px;
+    padding: 0 var(--atlas-space-16);
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: var(--atlas-layer-2);
   }
 
   .dialog-heading {
@@ -2402,13 +2406,13 @@ p {
   }
 
   .dialog-heading h2 {
-    font-size: 20px;
+    font-size: var(--atlas-font-size-20);
   }
 
   .dialog-heading > span {
     display: block;
-    font-size: 11px;
-    margin-top: 4px;
+    font-size: var(--atlas-font-size-11);
+    margin-top: var(--atlas-space-4);
   }
 
   .dialog-layout {
@@ -2424,16 +2428,16 @@ p {
   }
 
   .player-controls {
-    padding: 10px 16px 14px;
+    padding: var(--atlas-space-10) var(--atlas-space-16) var(--atlas-space-14);
   }
 
   .scrubber-labels {
-    font-size: 8px;
+    font-size: var(--atlas-font-size-8);
   }
 
   .dialog-details {
     overflow: visible;
-    padding: 24px;
+    padding: var(--atlas-space-24);
   }
 
   .dialog-actions {
@@ -2453,12 +2457,12 @@ p {
 
 .collection-filter {
   max-width: 240px;
-  padding: 9px 10px;
+  padding: var(--atlas-space-9) var(--atlas-space-10);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-4);
   background: var(--paper);
 }
 .card-still {
@@ -2466,10 +2470,10 @@ p {
   width: 100%;
   aspect-ratio: 8 / 5;
   place-items: center;
-  color: #8b9aa2;
-  background: #101a21;
+  color: var(--atlas-color-still-placeholder-text);
+  background: var(--atlas-color-still-placeholder);
 }
-@media (max-width: 700px) {
+@media (width <= 700px) {
   .toolbar-tools {
     flex-wrap: wrap;
   }
@@ -2499,8 +2503,8 @@ p {
  */
 @media (width <= 760px) {
   :root {
-    --atlas-header-height: 64px;
-    --atlas-strip-height: calc(14dvh + 48px);
+    --atlas-header-height: var(--atlas-size-64);
+    --atlas-strip-height: calc(14dvh + var(--atlas-size-48));
   }
 
   .dialog-layout.is-token-panel {
@@ -2513,7 +2517,7 @@ p {
     height: var(--atlas-strip-height);
     inset-block-start: var(--atlas-header-height);
     position: sticky;
-    z-index: 4;
+    z-index: var(--atlas-layer-4);
   }
 
   .is-token-panel .dialog-stage {
@@ -2528,7 +2532,7 @@ p {
   }
 
   .is-token-panel .player-controls {
-    padding: 6px 16px;
+    padding: var(--atlas-space-6) var(--atlas-space-16);
   }
 
   .is-token-panel .frame-scrubber,

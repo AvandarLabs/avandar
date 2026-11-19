@@ -1,6 +1,6 @@
 .compositionStage {
   background: var(--ava-neutral-9);
-  border-radius: 6px;
+  border-radius: var(--atlas-radius-6);
   grid-area: stage;
   min-height: 0;
   min-width: 0;
@@ -8,9 +8,9 @@
 
 .compositionStagePlayer {
   aspect-ratio: 1.6;
-  background: #0b1219;
+  background: var(--atlas-color-stage-ground);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--atlas-radius-6);
   display: block;
   margin: 0 auto;
   max-width: calc((100dvh - 150px) * 1.6);
@@ -25,15 +25,15 @@
  */
 @media (width <= 760px) {
   .compositionStageIsTokenPanel {
-    border-radius: 0;
+    border-radius: var(--atlas-radius-none);
     display: grid;
     grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     height: var(--atlas-strip-height, calc(14dvh + 48px));
     inset-block-start: var(--atlas-header-height, 64px);
-    margin: -10px -10px 0;
+    margin: calc(var(--atlas-space-10) * -1) calc(var(--atlas-space-10) * -1) 0;
     place-items: center;
     position: sticky;
-    z-index: 4;
+    z-index: var(--atlas-layer-4);
   }
 
   .compositionStageIsTokenPanel .compositionStagePlayer {

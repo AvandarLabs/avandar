@@ -1,16 +1,16 @@
 .sections {
   background: var(--paper);
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   display: flex;
-  gap: 24px;
-  padding: 0 32px;
+  gap: var(--atlas-space-24);
+  padding: 0 var(--atlas-space-32);
 }
 
 .section {
-  border-bottom: 2px solid transparent;
-  color: var(--muted);
-  font-size: 14px;
-  padding: 16px 0;
+  border-bottom: var(--atlas-border-2) solid transparent;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-14);
+  padding: var(--atlas-space-16) 0;
   text-decoration: none;
 }
 

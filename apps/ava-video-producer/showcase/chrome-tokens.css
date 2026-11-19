@@ -1,0 +1,315 @@
+/*
+ * Atlas chrome tokens.
+ *
+ * The one place the Motion Atlas and showcase chrome declare their type,
+ * spacing, radius, colour, shadow, layer, and motion values. Every other
+ * chrome stylesheet reads them with var(): `showcase/motion.css` and
+ * `showcase/style.css` import this sheet, the gallery CSS modules render on
+ * the page that loads `motion.css`, and `src/showcase/player.css` imports it
+ * through the bundler.
+ *
+ * These are chrome tokens, not video tokens. The chrome never follows the
+ * video theme (see `src/gallery/AtlasLayout/AtlasChromeProvider.tsx`), and
+ * no renderer may read an `--atlas-*` value.
+ *
+ * Naming: `--atlas-<scale>-<step>`. Steps on the length scales name their
+ * pixel value (`--atlas-space-12` is 12px, `--atlas-font-size-6-5` is 6.5px),
+ * so a reader can check a value at a glance and the scales stay
+ * pixel-identical to the literals they replaced. Colours and shadows are
+ * named by role. Pick an existing step before adding one; add a step here,
+ * never a literal in a chrome stylesheet. `docs/theme-coverage/chrome-tokens.md`
+ * lists the scales.
+ *
+ * Structural geometry stays literal where it is used: width, height, their
+ * min and max, top, right, bottom, left, inset, grid templates, and
+ * flex-basis place or size a box rather than style it. Media query
+ * breakpoints stay literal too, since var() cannot be read there.
+ */
+
+:root {
+  /* Colour. Light surfaces mix the --ava-* palette. Dark ones are fixed. */
+  --atlas-color-danger: #a73135;
+  --atlas-color-danger-muted: color-mix(
+    in srgb,
+    var(--mantine-color-red-9) 70%,
+    var(--ink)
+  );
+  --atlas-color-dark-hover: #ffffff06;
+  --atlas-color-dark-line: #ffffff15;
+  --atlas-color-dark-line-faint: #ffffff12;
+  --atlas-color-dialog-backdrop: #102a43b8;
+  --atlas-color-header-surface: color-mix(
+    in srgb,
+    var(--paper) 96%,
+    transparent
+  );
+  --atlas-color-ink-3: color-mix(in srgb, var(--ava-neutral-9) 3%, transparent);
+  --atlas-color-ink-8: color-mix(in srgb, var(--ava-neutral-9) 8%, transparent);
+  --atlas-color-ink-12: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 12%,
+    transparent
+  );
+  --atlas-color-ink-27: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 27%,
+    transparent
+  );
+  --atlas-color-ink-29: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 29%,
+    transparent
+  );
+  --atlas-color-ink-70: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 70%,
+    transparent
+  );
+  --atlas-color-ink-72: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 72%,
+    transparent
+  );
+  --atlas-color-ink-86: color-mix(
+    in srgb,
+    var(--ava-neutral-9) 86%,
+    transparent
+  );
+  --atlas-color-line: color-mix(
+    in oklab,
+    var(--ava-primary-1) 35%,
+    var(--ava-neutral-1)
+  );
+  --atlas-color-muted: var(--ava-neutral-6);
+  --atlas-color-paper: color-mix(
+    in oklab,
+    var(--ava-primary-0) 45%,
+    var(--ava-neutral-0)
+  );
+  --atlas-color-player-accent: #1563fe;
+  --atlas-color-player-control: #101820e8;
+  --atlas-color-player-ground: #080b12;
+  --atlas-color-screening-viewer: #080b10;
+  --atlas-color-stage-ground: #0b1219;
+  --atlas-color-still-placeholder: #101a21;
+  --atlas-color-still-placeholder-text: #8b9aa2;
+  --atlas-color-tint: color-mix(
+    in oklab,
+    var(--ava-primary-1) 40%,
+    var(--ava-neutral-1)
+  );
+  --atlas-color-toolbar-surface: color-mix(
+    in srgb,
+    var(--paper) 97%,
+    transparent
+  );
+  --atlas-color-white: #fff;
+
+  /* Shadows. */
+  --atlas-shadow-card-hover: 0 4px 17px var(--atlas-color-ink-3);
+  --atlas-shadow-dialog: 0 24px 100px var(--atlas-color-ink-29);
+  --atlas-shadow-focus-ring: 0 0 0 2px var(--ava-primary-0);
+  --atlas-shadow-preview-dialog: 0 24px 72px #102a4340;
+  --atlas-shadow-screening-room: 0 15px 35px #102a4310;
+  --atlas-shadow-toast: 0 4px 24px var(--atlas-color-ink-8);
+  --atlas-shadow-tray:
+    0 10px 40px var(--atlas-color-ink-12), 0 1px 5px var(--atlas-color-ink-3);
+
+  /* Type. Families beside --ava-font and --mono. */
+  --atlas-font-size-5: 5px;
+  --atlas-font-size-6: 6px;
+  --atlas-font-size-6-5: 6.5px;
+  --atlas-font-size-7: 7px;
+  --atlas-font-size-8: 8px;
+  --atlas-font-size-9: 9px;
+  --atlas-font-size-10: 10px;
+  --atlas-font-size-11: 11px;
+  --atlas-font-size-12: 12px;
+  --atlas-font-size-13: 13px;
+  --atlas-font-size-14: 14px;
+  --atlas-font-size-15: 15px;
+  --atlas-font-size-16: 16px;
+  --atlas-font-size-17: 17px;
+  --atlas-font-size-18: 18px;
+  --atlas-font-size-19: 19px;
+  --atlas-font-size-20: 20px;
+  --atlas-font-size-21: 21px;
+  --atlas-font-size-22: 22px;
+  --atlas-font-size-23: 23px;
+  --atlas-font-size-25: 25px;
+  --atlas-font-size-26: 26px;
+  --atlas-font-size-27: 27px;
+  --atlas-font-size-29: 29px;
+  --atlas-font-size-30: 30px;
+  --atlas-font-size-31: 31px;
+  --atlas-font-size-32: 32px;
+  --atlas-font-size-33: 33px;
+  --atlas-font-size-35: 35px;
+  --atlas-font-size-36: 36px;
+  --atlas-font-size-37: 37px;
+  --atlas-font-size-40: 40px;
+  --atlas-font-size-43: 43px;
+  --atlas-font-size-46: 46px;
+  --atlas-font-size-52: 52px;
+  --atlas-font-size-63: 63px;
+  --atlas-font-size-70: 70px;
+  --atlas-font-size-atlas-title: clamp(38px, 3.5vw, 58px);
+  --atlas-font-size-productions-title: clamp(42px, 4.5vw, 65px);
+  --atlas-font-size-productions-title-narrow: clamp(38px, 8.8vw, 58px);
+  --atlas-font-size-showcase-title: clamp(46px, 5.1vw, 74px);
+  --atlas-font-weight-200: 200;
+  --atlas-font-weight-300: 300;
+  --atlas-font-weight-350: 350;
+  --atlas-font-weight-400: 400;
+  --atlas-font-weight-450: 450;
+  --atlas-font-weight-470: 470;
+  --atlas-font-weight-500: 500;
+  --atlas-font-weight-520: 520;
+  --atlas-font-weight-550: 550;
+  --atlas-font-weight-600: 600;
+  --atlas-font-weight-640: 640;
+  --atlas-font-weight-650: 650;
+  --atlas-font-family-mono-system: ui-monospace, SFMono-Regular, monospace;
+  --atlas-font-family-serif: Georgia, "Times New Roman", serif;
+  --atlas-font-family-system: system-ui, sans-serif;
+
+  /* Letter spacing: tight-* is negative, wide-* positive. */
+  --atlas-tracking-tight-5: -5px;
+  --atlas-tracking-tight-3-4: -3.4px;
+  --atlas-tracking-tight-3: -3px;
+  --atlas-tracking-tight-2-8: -2.8px;
+  --atlas-tracking-tight-2-5: -2.5px;
+  --atlas-tracking-tight-2-3: -2.3px;
+  --atlas-tracking-tight-2-2: -2.2px;
+  --atlas-tracking-tight-2: -2px;
+  --atlas-tracking-tight-1-9: -1.9px;
+  --atlas-tracking-tight-1-7: -1.7px;
+  --atlas-tracking-tight-1-2: -1.2px;
+  --atlas-tracking-tight-1: -1px;
+  --atlas-tracking-tight-0-7: -0.7px;
+  --atlas-tracking-tight-0-6: -0.6px;
+  --atlas-tracking-tight-0-5: -0.5px;
+  --atlas-tracking-tight-0-45: -0.45px;
+  --atlas-tracking-tight-0-3: -0.3px;
+  --atlas-tracking-tight-0-2: -0.2px;
+  --atlas-tracking-wide-0-2: 0.2px;
+  --atlas-tracking-wide-0-4: 0.4px;
+  --atlas-tracking-wide-0-5: 0.5px;
+  --atlas-tracking-wide-0-6: 0.6px;
+  --atlas-tracking-wide-0-65: 0.65px;
+  --atlas-tracking-wide-0-7: 0.7px;
+  --atlas-tracking-wide-0-75: 0.75px;
+  --atlas-tracking-wide-0-8: 0.8px;
+  --atlas-tracking-wide-1: 1px;
+  --atlas-tracking-wide-1-1: 1.1px;
+  --atlas-tracking-wide-1-2: 1.2px;
+  --atlas-tracking-wide-1-3: 1.3px;
+  --atlas-tracking-wide-1-4: 1.4px;
+  --atlas-tracking-wide-1-7: 1.7px;
+  --atlas-tracking-wide-1-8: 1.8px;
+
+  /* Spacing: padding, margin, gap, offsets, translations. */
+  --atlas-space-1: 1px;
+  --atlas-space-2: 2px;
+  --atlas-space-3: 3px;
+  --atlas-space-4: 4px;
+  --atlas-space-5: 5px;
+  --atlas-space-6: 6px;
+  --atlas-space-7: 7px;
+  --atlas-space-8: 8px;
+  --atlas-space-9: 9px;
+  --atlas-space-10: 10px;
+  --atlas-space-11: 11px;
+  --atlas-space-12: 12px;
+  --atlas-space-13: 13px;
+  --atlas-space-14: 14px;
+  --atlas-space-15: 15px;
+  --atlas-space-16: 16px;
+  --atlas-space-17: 17px;
+  --atlas-space-18: 18px;
+  --atlas-space-19: 19px;
+  --atlas-space-20: 20px;
+  --atlas-space-21: 21px;
+  --atlas-space-22: 22px;
+  --atlas-space-23: 23px;
+  --atlas-space-24: 24px;
+  --atlas-space-25: 25px;
+  --atlas-space-26: 26px;
+  --atlas-space-27: 27px;
+  --atlas-space-28: 28px;
+  --atlas-space-29: 29px;
+  --atlas-space-30: 30px;
+  --atlas-space-32: 32px;
+  --atlas-space-34: 34px;
+  --atlas-space-35: 35px;
+  --atlas-space-36: 36px;
+  --atlas-space-37: 37px;
+  --atlas-space-38: 38px;
+  --atlas-space-40: 40px;
+  --atlas-space-42: 42px;
+  --atlas-space-43: 43px;
+  --atlas-space-44: 44px;
+  --atlas-space-46: 46px;
+  --atlas-space-48: 48px;
+  --atlas-space-50: 50px;
+  --atlas-space-54: 54px;
+  --atlas-space-60: 60px;
+  --atlas-space-62: 62px;
+  --atlas-space-64: 64px;
+  --atlas-space-68: 68px;
+  --atlas-space-72: 72px;
+  --atlas-space-80: 80px;
+  --atlas-space-86: 86px;
+  --atlas-space-90: 90px;
+  --atlas-space-96: 96px;
+  --atlas-space-110: 110px;
+
+  /* Geometry in custom properties and flex shorthands. */
+  --atlas-size-32: 32px;
+  --atlas-size-40: 40px;
+  --atlas-size-48: 48px;
+  --atlas-size-64: 64px;
+  --atlas-size-76: 76px;
+  --atlas-size-112: 112px;
+  --atlas-size-130: 130px;
+  --atlas-size-200: 200px;
+
+  /* Border and outline widths. */
+  --atlas-border-1: 1px;
+  --atlas-border-2: 2px;
+
+  /* Corner radii. */
+  --atlas-radius-none: 0;
+  --atlas-radius-2: 2px;
+  --atlas-radius-3: 3px;
+  --atlas-radius-4: 4px;
+  --atlas-radius-5: 5px;
+  --atlas-radius-6: 6px;
+  --atlas-radius-7: 7px;
+  --atlas-radius-8: 8px;
+  --atlas-radius-9: 9px;
+  --atlas-radius-12: 12px;
+  --atlas-radius-round: 50%;
+
+  /* Backdrop blur radii. */
+  --atlas-blur-4: 4px;
+  --atlas-blur-6: 6px;
+  --atlas-blur-7: 7px;
+  --atlas-blur-12: 12px;
+  --atlas-blur-14: 14px;
+
+  /* Stacking layers (z-index). */
+  --atlas-layer-1: 1;
+  --atlas-layer-2: 2;
+  --atlas-layer-3: 3;
+  --atlas-layer-4: 4;
+  --atlas-layer-5: 5;
+  --atlas-layer-6: 6;
+  --atlas-layer-7: 7;
+  --atlas-layer-20: 20;
+  --atlas-layer-20000: 20000;
+
+  /* Motion: transition durations. */
+  --atlas-duration-150: 0.15s;
+  --atlas-duration-180: 0.18s;
+}

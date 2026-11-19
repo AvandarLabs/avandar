@@ -1,7 +1,7 @@
 .overrideDot {
   background: var(--ava-primary-6);
-  border: 2px solid var(--ava-primary-6);
-  border-radius: 50%;
+  border: var(--atlas-border-2) solid var(--ava-primary-6);
+  border-radius: var(--atlas-radius-round);
   flex: 0 0 auto;
   height: 8px;
   width: 8px;
