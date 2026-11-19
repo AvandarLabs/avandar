@@ -1,6 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPickerCopyFromFrame } from "./getPickerCopyFromFrame";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
@@ -13,6 +17,10 @@ type Props = {
   accent: string;
   groups: readonly PickerValueGroup[];
 };
+
+/** A value copy's corner before the corner style scales it. */
+const COPY_CORNER = 3;
+
 /** A complete source value becomes a readable stack or calculation operand. */
 export function PickerValueCopy({
   input,
@@ -21,7 +29,16 @@ export function PickerValueCopy({
   accent,
   groups,
 }: Readonly<Props>): ReactNode {
-  const copy = getPickerCopyFromFrame({ input, index, frame, groups });
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const copy = getPickerCopyFromFrame({
+    input,
+    index,
+    frame,
+    groups,
+    motion,
+  });
   if (!copy) {
     return null;
   }
@@ -33,8 +50,8 @@ export function PickerValueCopy({
         y={copy.y - 14}
         width={copy.text === "∅" ? 20 : 134}
         height={copy.height}
-        rx={3}
-        fill={STOCK.elevated}
+        rx={scales.corner(COPY_CORNER)}
+        fill={tokens.color.elevated}
         stroke={accent}
       />
       <LabelSlots labels={[[copy.text, copy.x, copy.y, 128, 12, 2]]} />
