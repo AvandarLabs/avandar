@@ -228,7 +228,7 @@ export async function applyChatModelTurnResponse(
         }
         const payload = ChatAnalyticsPayloads.fromDashboardBlock({
           block,
-          pageContext: options.currentPageContext,
+          dashboardId: options.currentPageContext.dashboardId,
           editorState: options.dashboardEditorStateRef.current,
         });
         options.dashboardEditorDispatch.queuePendingBlock({
