@@ -2,8 +2,9 @@
 /*
  * No dead tokens: every semantic and component token is read by a renderer,
  * or referenced by a token that is. Readers are found four ways: stock
- * shapes report reads while every stock preset renders, the continuity plan
- * builder reports reads through a usage proxy, stage CSS modules name
+ * shapes report reads while all 170 stock presets render, the continuity
+ * plan builder reports reads through a usage proxy for all 36 compositions
+ * and sample films, stage CSS modules name
  * `--video-*` variables or the scene palette names `VideoThemeProvider`
  * emits (`--brand` for `color.scene.brand`), and stage TSX names token paths
  * or calls `useVideoProps("Name"`. `sketch.profile`, `camera.presets`, and
@@ -46,12 +47,10 @@ import {
   VideoTokenUsageContext,
 } from "../../../src/videoTheme/tokenUsageHelpers/tokenUsageHelpers";
 import {
-  getCoveredIdsFromBudgets,
   getHandoffTokensFromBudgets,
   getPendingTokensFromBudgets,
   listThemeLiteralBudgets,
 } from "../themeLiteralBudgets/themeLiteralBudgets";
-import { PARITY_COMPOSITION_IDS } from "../themeParity/parityTargets/parityTargets";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
@@ -73,6 +72,9 @@ const STAGE_SOURCE_PATHS = [
   "src/compositions",
   "src/title-card.tsx",
   "src/cursor-motion.ts",
+  "src/Root.tsx",
+  "src/gallery/HelperGallery/demos",
+  "src/gallery/HelperGallery/HelperPlayer",
 ];
 const PALETTE_GROUPS = [
   "sketch.profile",
@@ -112,16 +114,9 @@ const AUDITED_TOKEN_PATHS = TOKEN_PATHS.filter((tokenPath) => {
   return !tokenPath.startsWith("atomic.");
 });
 
-/**
- * Compositions the reader audit runs through the plan builder: the ones the
- * tokens first covered, plus every continuity composition a slice covers.
- */
-const READER_COMPOSITION_IDS = [
-  ...new Set([...PARITY_COMPOSITION_IDS, ...getCoveredIdsFromBudgets()]),
-].filter((id) => {
-  return CONTINUITY_CATALOG.some((entry) => {
-    return entry.id === id;
-  });
+/** Every Atlas composition and sample film runs through the plan builder. */
+const READER_COMPOSITION_IDS = CONTINUITY_CATALOG.map((entry) => {
+  return entry.id;
 });
 
 function _stockReads(): string[] {

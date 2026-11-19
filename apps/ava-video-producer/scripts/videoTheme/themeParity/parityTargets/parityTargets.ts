@@ -6,7 +6,6 @@ import {
 import { STOCK_IDS } from "../../../../src/stock/catalog";
 import { previewFrames } from "../../../lib/planHelpers";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
-import { getCoveredIdsFromBudgets } from "../../themeLiteralBudgets/themeLiteralBudgets";
 import type { Film } from "../../../../src/showcase/showcase.types";
 import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
 
@@ -124,23 +123,8 @@ const STARTER_HEX_ROUNDING: Readonly<Record<string, number>> = {
   "heading-wipe": 3,
 };
 
-/**
- * Parity targets for the named ids, or by default every in-scope item: the
- * presets and compositions the design tokens cover first, in Atlas order,
- * then the items each slice budget lists as covered. Any Atlas id may be
- * named, so a slice can capture its items before it migrates them.
- */
-export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
-  const requestedIds = ids.length
-    ? ids
-    : [
-        ...new Set([
-          ...PARITY_STOCK_PRESET_IDS,
-          ...PARITY_COMPOSITION_IDS,
-          ...getCoveredIdsFromBudgets(),
-        ]),
-      ];
-  const targets = requestedIds.map((id) => {
+function _createTargetsFromIds(ids: readonly string[]): ParityTarget[] {
+  const targets = ids.map((id) => {
     return { id, target: _createTargetFromId(id) };
   });
   const unknownIds = targets.flatMap(({ id, target }) => {
@@ -152,6 +136,33 @@ export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
   return targets.flatMap(({ target }) => {
     return target ? [target] : [];
   });
+}
+
+/**
+ * Parity targets for the named ids, or by default the fast base list: the
+ * presets and compositions the design tokens first covered, in Atlas order.
+ * Any Atlas id may be named. `listAllParityTargets` covers every item.
+ */
+export function listParityTargets(ids: readonly string[] = []): ParityTarget[] {
+  return _createTargetsFromIds(
+    ids.length ? ids : [...PARITY_STOCK_PRESET_IDS, ...PARITY_COMPOSITION_IDS],
+  );
+}
+
+/**
+ * Every Atlas item the parity gate can render: all stock presets, every
+ * composition and sample film, and the two fixed films. `pnpm theme:parity
+ * <capture|compare> --all` runs them; it takes far longer than the default
+ * list, so run it before a release or after a change to shared theme code.
+ */
+export function listAllParityTargets(): ParityTarget[] {
+  return _createTargetsFromIds([
+    ...STOCK_IDS,
+    ...CONTINUITY_CATALOG.map((entry) => {
+      return entry.id;
+    }),
+    ...FIXED_COMPOSITION_IDS,
+  ]);
 }
 
 /**

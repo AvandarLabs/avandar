@@ -34,9 +34,10 @@ const budgetSchema = z.strictObject({
  *   then refuse pending tokens, tempo-pending ids, and literals for it. The
  *   renderer ESLint restrictions apply to every budget's `globs` and to
  *   `rendererGlobs.json` whatever this flag says.
- * - `coveredIds` are Atlas ids the slice has made theme-driven. They join
- *   the parity gate, the slowest-tempo test, the token reader audit, and the
- *   sentinel theme test.
+ * - `coveredIds` are the Atlas ids the slice migrated, a record of who owns
+ *   which items. The guards no longer read it: the parity `--all` list, the
+ *   slowest-tempo tests, the reader audit, and the sentinel tests cover
+ *   every Atlas item.
  * - `pendingTokens` are token paths no renderer reads until the slice lands.
  *   The reader audit skips them; the slice removes each one it starts reading.
  * - `handoffTokens` are tokens this slice added for other slices to read,
@@ -83,23 +84,6 @@ export function isFileOwnedByBudget(
     }
     return isOwned || path.matchesGlob(file, glob);
   }, false);
-}
-
-/**
- * Atlas ids every slice has made theme-driven, in slice order. The parity
- * gate, the tempo test, the reader audit, and the sentinel test add them to
- * their own fixed lists.
- */
-export function getCoveredIdsFromBudgets(
-  budgets: readonly ThemeLiteralBudget[] = listThemeLiteralBudgets(),
-): string[] {
-  return [
-    ...new Set(
-      budgets.flatMap((budget) => {
-        return budget.coveredIds;
-      }),
-    ),
-  ];
 }
 
 /** Token paths that wait for a later slice's renderer to read them. */
@@ -170,13 +154,14 @@ const SOURCE_EXTENSION = /\.(?:tsx?|css)$/;
 const EXCLUDED_FILE =
   /(?:^|\/)__tests__\/|\.test\.|TestHelpers|\.(?:schema|fixtures|metadata|contract|controls|types)\.ts$/;
 
-/**
- * Every app-relative source file the literal budget test scans: renderer
- * files in the renderer directories, plus any file a slice budget owns.
- */
-export function listScannedFiles(
-  budgets: readonly ThemeLiteralBudget[] = listThemeLiteralBudgets(),
-): string[] {
+/** Every app-relative renderer source file in the renderer directories. */
+export function listRendererFiles(): string[] {
+  return _listSourceFiles().filter((file) => {
+    return isFileOwnedByBudget({ globs: RENDERER_GLOBS }, file);
+  });
+}
+
+function _listSourceFiles(): string[] {
   return SOURCE_DIRECTORIES.flatMap((directory) => {
     return fs
       .readdirSync(path.join(APP_ROOT, directory), {
@@ -190,13 +175,22 @@ export function listScannedFiles(
     .filter((file) => {
       return SOURCE_EXTENSION.test(file) && !EXCLUDED_FILE.test(file);
     })
-    .filter((file) => {
-      return (
-        isFileOwnedByBudget({ globs: RENDERER_GLOBS }, file) ||
-        budgets.some((budget) => {
-          return isFileOwnedByBudget(budget, file);
-        })
-      );
-    })
     .sort();
+}
+
+/**
+ * Every app-relative source file the literal budget test scans: renderer
+ * files in the renderer directories, plus any file a slice budget owns.
+ */
+export function listScannedFiles(
+  budgets: readonly ThemeLiteralBudget[] = listThemeLiteralBudgets(),
+): string[] {
+  return _listSourceFiles().filter((file) => {
+    return (
+      isFileOwnedByBudget({ globs: RENDERER_GLOBS }, file) ||
+      budgets.some((budget) => {
+        return isFileOwnedByBudget(budget, file);
+      })
+    );
+  });
 }

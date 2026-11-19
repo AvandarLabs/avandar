@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getAllowedRegionsFromFilm, listParityTargets } from "./parityTargets";
+import { CONTINUITY_CATALOG } from "../../../../src/continuity/continuityCatalog";
+import { STOCK_IDS } from "../../../../src/stock/catalog";
+import {
+  getAllowedRegionsFromFilm,
+  listAllParityTargets,
+  listParityTargets,
+} from "./parityTargets";
 
-test("the base in-scope presets and compositions are parity targets", () => {
+test("the default parity targets are the fast base list", () => {
   assert.deepEqual(
-    listParityTargets()
-      .map((target) => {
-        return target.filmId;
-      })
-      .slice(0, 17),
+    listParityTargets().map((target) => {
+      return target.filmId;
+    }),
     [
       "stock-network-graph",
       "stock-node-traversal",
@@ -97,5 +101,25 @@ test("a composition with no starter allowance must match exactly", () => {
       height: 1000,
     }),
     [],
+  );
+});
+
+test("--all covers every Atlas motion, composition, sample film, and fixed film", () => {
+  const filmIds = listAllParityTargets().map((target) => {
+    return target.filmId;
+  });
+  assert.equal(new Set(filmIds).size, filmIds.length);
+  assert.deepEqual(
+    [...filmIds].sort(),
+    [
+      ...STOCK_IDS.map((id) => {
+        return `stock-${id}`;
+      }),
+      ...CONTINUITY_CATALOG.map((entry) => {
+        return entry.id;
+      }),
+      "title-study",
+      "motion-lab",
+    ].sort(),
   );
 });

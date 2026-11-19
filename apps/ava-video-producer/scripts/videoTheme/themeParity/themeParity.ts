@@ -19,6 +19,7 @@ import { compareRgbaFrames } from "./compareRgbaFrames/compareRgbaFrames";
 import {
   getAllowedRegionsFromFilm,
   getParityFramesFromFilm,
+  listAllParityTargets,
   listParityTargets,
   type ParityTarget,
 } from "./parityTargets/parityTargets";
@@ -60,7 +61,7 @@ async function _loadTargets(
   themeId: string,
 ): Promise<LoadedTarget[]> {
   return Promise.all(
-    listParityTargets(ids).map(async (target) => {
+    (ids.includes("--all") ? listAllParityTargets() : listParityTargets(ids)).map(async (target) => {
       const film = await ShowcaseFilms.load(target.filmId, {
         ...target.options,
         theme: { id: themeId },
@@ -261,7 +262,7 @@ if ((mode === "capture" || mode === "compare") && themeId) {
   await _runThemeParity({ mode, ids, themeId });
 } else {
   console.error(
-    "Usage: pnpm theme:parity <capture|compare> [target ids...] [--theme id]",
+    "Usage: pnpm theme:parity <capture|compare> [target ids... | --all] [--theme id]",
   );
   process.exitCode = 2;
 }

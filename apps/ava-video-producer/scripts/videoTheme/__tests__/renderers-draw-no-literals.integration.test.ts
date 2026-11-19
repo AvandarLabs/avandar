@@ -4,7 +4,9 @@
  * motion, implicit easing, sketch bypass, stylesheet values) and compared
  * with its slice budget in `scripts/videoTheme/themeLiteralBudgets/`. A count
  * above budget fails, and so does any literal in a file no budget lists.
- * Budgets only go down: lower them with `lowerThemeLiteralBudgets.ts`.
+ * Budgets only go down: lower them with `lowerThemeLiteralBudgets.ts`. Every
+ * slice has landed, so every budget must stay empty, and the retired stock
+ * palette module must not come back.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -89,4 +91,41 @@ test("every budgeted file exists and is owned by the budget that lists it", () =
       });
   });
   assert.deepEqual(stale, []);
+});
+
+test("every slice has landed: no literal, pending token, or tempo exception is left", () => {
+  assert.deepEqual(
+    BUDGETS.flatMap((budget) => {
+      return [
+        ...(budget.enforceLint ? [] : [`${budget.slice}: enforceLint off`]),
+        ...Object.keys(budget.literals).map((file) => {
+          return `${budget.slice}: literals in ${file}`;
+        }),
+        ...budget.pendingTokens.map((token) => {
+          return `${budget.slice}: pending ${token}`;
+        }),
+        ...budget.tempoPendingIds.map((id) => {
+          return `${budget.slice}: tempo-pending ${id}`;
+        }),
+        ...Object.keys(budget.handoffTokens ?? {}).map((token) => {
+          return `${budget.slice}: handoff ${token}`;
+        }),
+      ];
+    }),
+    [],
+  );
+});
+
+test("the stock palette module stays retired", () => {
+  assert.deepEqual(
+    fs
+      .readdirSync(path.join(APP_ROOT, "src"), {
+        recursive: true,
+        encoding: "utf8",
+      })
+      .filter((file) => {
+        return /(?:^|\/)stockPalette\.[jt]sx?$/.test(file);
+      }),
+    [],
+  );
 });
