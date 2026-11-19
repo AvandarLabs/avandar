@@ -10,7 +10,7 @@
     "src/videoThemeEditor/**/*.css",
     "src/showcase/player.css"
   ],
-  "enforceLint": false,
+  "enforceLint": true,
   "coveredIds": [],
   "pendingTokens": [],
   "tempoPendingIds": [],
