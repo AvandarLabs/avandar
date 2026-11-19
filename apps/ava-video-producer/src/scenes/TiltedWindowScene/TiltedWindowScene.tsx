@@ -18,7 +18,7 @@ import { HEADLINE_BOX, WINDOW_BOXES } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { WindowPose, WindowStage } from "./windowMotion";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /**
  * A headline on the left and captured product stills or footage in a 3D
@@ -55,11 +55,22 @@ export function TiltedWindowScene(props: TiltedWindowSceneProps): ReactNode {
   );
 }
 
+type SizedProps = TiltedWindowSceneProps & { width: number; height: number };
+
 /** The primary window, its carousel and camera, and the secondary window. */
-function SingleWindow(
-  props: TiltedWindowSceneProps & { width: number; height: number },
-) {
-  const { frame, width, height, windows = [], exit, camera, secondary } = props;
+function SingleWindow(props: SizedProps) {
+  const { secondary } = props;
+  return (
+    <>
+      <PrimaryWindow {...props} />
+      {secondary ? <SecondaryWindow {...props} secondary={secondary} /> : null}
+    </>
+  );
+}
+
+/** The primary window: its entrance, carousel slides, and camera push. */
+function PrimaryWindow(props: SizedProps) {
+  const { frame, width, height, windows = [], camera } = props;
   const stage = useWindowStage();
   const canvas = { width, height };
   const box = _toPixels(WINDOW_BOXES[props.windowBox ?? "default"], canvas);
@@ -68,89 +79,106 @@ function SingleWindow(
     props.enter?.kind === "pull-back"
       ? getPullBack(frame, props.enter, canvas, box, stage)
       : undefined;
-  const rect = pullBack?.rect ?? box;
   const carousel = getCarouselState(frame, windows, stage);
   const slide = getCarouselPoses(carousel.progress, box, stage);
   const lens = camera ? getWindowCamera(frame, camera, box, stage) : undefined;
-  const reveal =
-    props.enter?.kind === "whip"
-      ? getWindowRevealStyle(
-          frame,
-          props.enter.atFrame ?? 1,
-          props.enter.reveal,
-          stage,
-        ).clipPath
-      : undefined;
   const card = (index: number, pose: WindowPose) => {
     return (
       <WindowCard
         key={`window-${index}-${windows[index].src}`}
         frame={frame}
-        rect={rect}
+        rect={pullBack?.rect ?? box}
         pose={_combinePoses(base, pose, lens?.blurX ?? 0)}
         source={windows[index]}
         canvasHeight={height}
         tilt={pullBack?.tilt ?? 1}
         chrome={props.chrome}
-        clipPath={reveal}
+        clipPath={_getWhipRevealClipPath(props, stage)}
       />
     );
   };
   return (
-    <>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transformOrigin: lens
-            ? `${box.x + lens.originX * box.width}px ${box.y + lens.originY * box.height}px`
-            : undefined,
-          transform:
-            lens && lens.scale !== 1
-              ? `scale(${lens.scale.toFixed(4)})`
-              : undefined,
-        }}
-      >
-        {carousel.previous !== undefined
-          ? card(carousel.previous, slide.outgoing)
-          : null}
-        {windows.length
-          ? card(
-              carousel.current,
-              carousel.previous !== undefined
-                ? slide.incoming
-                : getRestingPose(stage),
+    <div style={_buildLensStyle(lens, box)}>
+      {carousel.previous !== undefined
+        ? card(carousel.previous, slide.outgoing)
+        : null}
+      {windows.length
+        ? card(
+            carousel.current,
+            carousel.previous !== undefined
+              ? slide.incoming
+              : getRestingPose(stage),
+          )
+        : null}
+    </div>
+  );
+}
+
+/** The clip a whip entrance reveals the window through, if it has one. */
+function _getWhipRevealClipPath(
+  props: TiltedWindowSceneProps,
+  stage: WindowStage,
+): string | undefined {
+  return props.enter?.kind === "whip"
+    ? getWindowRevealStyle(
+        props.frame,
+        props.enter.atFrame ?? 1,
+        props.enter.reveal,
+        stage,
+      ).clipPath
+    : undefined;
+}
+
+/** The full-frame layer the camera scales about its origin in the window. */
+function _buildLensStyle(
+  lens: ReturnType<typeof getWindowCamera> | undefined,
+  box: Rect,
+): CSSProperties {
+  return {
+    position: "absolute",
+    inset: 0,
+    transformOrigin: lens
+      ? `${box.x + lens.originX * box.width}px ${box.y + lens.originY * box.height}px`
+      : undefined,
+    transform:
+      lens && lens.scale !== 1 ? `scale(${lens.scale.toFixed(4)})` : undefined,
+  };
+}
+
+/** The small second window, whipping in on its cue and out on the exit. */
+function SecondaryWindow({
+  frame,
+  width,
+  height,
+  exit,
+  secondary,
+  chrome,
+}: SizedProps & {
+  secondary: NonNullable<TiltedWindowSceneProps["secondary"]>;
+}) {
+  const stage = useWindowStage();
+  const canvas = { width, height };
+  const rect = _toPixels(secondary.box, canvas);
+  return (
+    <WindowCard
+      frame={frame}
+      rect={rect}
+      pose={
+        exit && frame >= exit.atFrame
+          ? getWhipExit(frame, exit.atFrame, rect, exit.durationInFrames, stage)
+          : getWhipEntrance(
+              frame,
+              secondary.atFrame,
+              canvas,
+              rect,
+              undefined,
+              stage,
             )
-          : null}
-      </div>
-      {secondary ? (
-        <WindowCard
-          frame={frame}
-          rect={_toPixels(secondary.box, canvas)}
-          pose={
-            exit && frame >= exit.atFrame
-              ? getWhipExit(
-                  frame,
-                  exit.atFrame,
-                  _toPixels(secondary.box, canvas),
-                  exit.durationInFrames,
-                  stage,
-                )
-              : getWhipEntrance(
-                  frame,
-                  secondary.atFrame,
-                  canvas,
-                  _toPixels(secondary.box, canvas),
-                  undefined,
-                  stage,
-                )
-          }
-          source={secondary}
-          canvasHeight={height}
-          chrome={props.chrome}
-        />
-      ) : null}
-    </>
+      }
+      source={secondary}
+      canvasHeight={height}
+      chrome={chrome}
+    />
   );
 }
 

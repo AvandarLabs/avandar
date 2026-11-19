@@ -23,7 +23,7 @@ import { SceneShell } from "./SceneShell";
 import { getStageTextStyle } from "./stageTheme/stageTheme";
 import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphNode, GraphSceneProps } from "./scenes.types";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /** Radius of a packet travelling an edge, in pixels. */
 const PACKET_RADIUS = 6;
@@ -282,6 +282,12 @@ export function GraphScene({
   );
 }
 
+const ITEM_LIST_STYLE: CSSProperties = {
+  margin: `${GRAPH_ITEM_GAP}px 0 0`,
+  padding: 0,
+  listStyle: "none",
+};
+
 /** A node's list items, cascading in two list staggers apart under its
  *  label. */
 function _NodeItems({
@@ -301,13 +307,7 @@ function _NodeItems({
     return null;
   }
   return (
-    <ul
-      style={{
-        margin: `${GRAPH_ITEM_GAP}px 0 0`,
-        padding: 0,
-        listStyle: "none",
-      }}
-    >
+    <ul style={ITEM_LIST_STYLE}>
       {node.items.map((item, index) => {
         return (
           <li

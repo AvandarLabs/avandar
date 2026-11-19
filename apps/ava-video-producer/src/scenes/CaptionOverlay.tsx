@@ -7,8 +7,59 @@ import {
   validateCaptions,
 } from "./layout/layout";
 import { getStageTextStyle } from "./stageTheme/stageTheme";
+import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
 import type { CaptionOverlayProps } from "./scenes.types";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+
+/**
+ * The caption box, hung from the bottom centre of the canvas and sized by
+ * its fitted geometry, through its line height.
+ */
+function _buildCaptionBoxStyle(
+  geometry: ReturnType<typeof captionGeometry>,
+  tokens: ReturnType<typeof useVideoTokens>,
+  toCorner: (radius: number) => number,
+): CSSProperties {
+  return {
+    position: "absolute",
+    left: "50%",
+    bottom: geometry.bottom,
+    transform: "translateX(-50%)",
+    width: "max-content",
+    maxWidth: geometry.maxWidth,
+    height: geometry.boxHeight,
+    boxSizing: "border-box",
+    padding: `${geometry.paddingY}px ${geometry.paddingX}px`,
+    border: `${geometry.borderWidth}px solid ${tokens.color.scene.border}`,
+    borderRadius: toCorner(tokens.corner.scene),
+    background: tokens.color.scene.ground,
+    ...getStageTextStyle(tokens.text.stage.caption, [
+      "fontFamily",
+      "fontWeight",
+      "color",
+    ]),
+    fontSize: geometry.fontSize,
+    lineHeight: geometry.lineHeight,
+  };
+}
+
+/** A cue's fade in, never longer than a third of the cue. */
+function _getCueFadeIn(
+  frame: number,
+  cue: Readonly<{ startFrame: number; endFrame: number }>,
+  motion: VideoMotion,
+): number {
+  const fadeDuration = Math.min(
+    motion.chip,
+    (cue.endFrame - cue.startFrame) / 3,
+  );
+  return motion.ramp(
+    frame,
+    cue.startFrame,
+    fadeDuration,
+    motion.entrance.easing,
+  );
+}
 
 /**
  * Whole-cue captions. Alignment comes from authored or imported cue times.
@@ -38,36 +89,13 @@ export function CaptionOverlay({
     bottom,
     scales.stroke(tokens.stroke.hairline),
   );
-  const fadeDuration = Math.min(
-    motion.chip,
-    (cue.endFrame - cue.startFrame) / 3,
-  );
   return (
     <div
       aria-label={cue.text}
       style={{
-        position: "absolute",
-        left: "50%",
-        bottom: geometry.bottom,
-        transform: "translateX(-50%)",
-        width: "max-content",
-        maxWidth: geometry.maxWidth,
-        height: geometry.boxHeight,
-        boxSizing: "border-box",
-        padding: `${geometry.paddingY}px ${geometry.paddingX}px`,
-        border: `${geometry.borderWidth}px solid ${tokens.color.scene.border}`,
-        borderRadius: scales.corner(tokens.corner.scene),
-        background: tokens.color.scene.ground,
-        ...getStageTextStyle(caption, ["fontFamily", "fontWeight", "color"]),
-        fontSize: geometry.fontSize,
-        lineHeight: geometry.lineHeight,
+        ..._buildCaptionBoxStyle(geometry, tokens, scales.corner),
         textAlign: "center",
-        opacity: motion.ramp(
-          frame,
-          cue.startFrame,
-          fadeDuration,
-          motion.entrance.easing,
-        ),
+        opacity: _getCueFadeIn(frame, cue, motion),
         pointerEvents: "none",
       }}
     >

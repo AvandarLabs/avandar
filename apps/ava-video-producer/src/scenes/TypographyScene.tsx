@@ -16,7 +16,8 @@ import {
   getTypographyRevealFrames,
 } from "./textReveal";
 import type { TypographySceneProps } from "./scenes.types";
-import type { ReactNode } from "react";
+import type { TextRevealMode } from "./textReveal";
+import type { CSSProperties, ReactNode } from "react";
 
 /** Largest font size a `caption` typography shot uses. */
 const CAPTION_FONT_SIZE = 28;
@@ -163,12 +164,49 @@ function TypographyLine({
   isCentered: boolean;
   revealAt: number;
 }) {
+  const getWordStyle = useWordStyle(fontSize, isCaption, emphasis);
+  const words = line.split(/\s+/);
+  const lineProps = { frame, words, fontSize, isCentered, revealAt };
+  if (revealMode !== "word-mask") {
+    return (
+      <RevealedLine
+        {...lineProps}
+        revealMode={revealMode}
+        getWordStyle={getWordStyle}
+      />
+    );
+  }
+  return (
+    <WordMaskedLine
+      {...lineProps}
+      wordStaggerFrames={wordStaggerFrames}
+      getWordStyle={getWordStyle}
+    />
+  );
+}
+
+type LineProps = Readonly<{
+  frame: number;
+  words: readonly string[];
+  fontSize: number;
+  isCentered: boolean;
+  revealAt: number;
+  getWordStyle: (word: string) => CSSProperties;
+}>;
+
+/**
+ * Each word's type: the caption body or the scene heading role, with
+ * emphasised words in the strong brand colour.
+ */
+function useWordStyle(
+  fontSize: number,
+  isCaption: boolean,
+  emphasis: readonly string[],
+): (word: string) => CSSProperties {
   const tokens = useVideoTokens();
-  const motion = useVideoMotion();
-  const lineHeight = useVideoTheme().mantine.lineHeights["108"];
   const heading = tokens.text.stage.sceneHeading;
   const role = isCaption ? tokens.text.stage.sceneBody : heading;
-  const wordStyle = (word: string) => {
+  return (word: string) => {
     return {
       display: "inline-block",
       fontSize,
@@ -182,29 +220,55 @@ function TypographyLine({
         : tokens.color.scene.foreground,
     };
   };
-  const words = line.split(/\s+/);
-  if (revealMode !== "word-mask") {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: isCentered ? "center" : "flex-start",
-          gap: fontSize * 0.3,
-          lineHeight,
-          paddingBottom: fontSize * 0.07,
-          ...getLineRevealStyle(frame, revealAt, revealMode, {}, motion),
-        }}
-      >
-        {words.map((word, index) => {
-          return (
-            <span key={`${index}-${word}`} style={wordStyle(word)}>
-              {word}
-            </span>
-          );
-        })}
-      </div>
-    );
-  }
+}
+
+/** The whole line revealed at once by a line reveal style. */
+function RevealedLine({
+  frame,
+  words,
+  fontSize,
+  isCentered,
+  revealAt,
+  revealMode,
+  getWordStyle,
+}: LineProps & {
+  revealMode: Exclude<TextRevealMode, "word-mask">;
+}) {
+  const motion = useVideoMotion();
+  const lineHeight = useVideoTheme().mantine.lineHeights["108"];
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: isCentered ? "center" : "flex-start",
+        gap: fontSize * 0.3,
+        lineHeight,
+        paddingBottom: fontSize * 0.07,
+        ...getLineRevealStyle(frame, revealAt, revealMode, {}, motion),
+      }}
+    >
+      {words.map((word, index) => {
+        return (
+          <span key={`${index}-${word}`} style={getWordStyle(word)}>
+            {word}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Each word rising out from behind its own mask, staggered. */
+function WordMaskedLine({
+  frame,
+  words,
+  fontSize,
+  isCentered,
+  revealAt,
+  wordStaggerFrames,
+  getWordStyle,
+}: LineProps & { wordStaggerFrames: number }) {
+  const motion = useVideoMotion();
   return (
     <div
       style={{
@@ -222,27 +286,50 @@ function TypographyLine({
           motion.rise.easing,
         );
         return (
-          <span
+          <MaskedWord
             key={`${index}-${word}`}
-            style={{
-              display: "inline-block",
-              overflow: "hidden",
-              paddingBottom: fontSize * 0.07,
-              lineHeight,
-            }}
+            fontSize={fontSize}
+            progress={progress}
+            style={getWordStyle(word)}
           >
-            <span
-              style={{
-                ...wordStyle(word),
-                transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
-              }}
-            >
-              {word}
-            </span>
-          </span>
+            {word}
+          </MaskedWord>
         );
       })}
     </div>
+  );
+}
+
+function MaskedWord({
+  fontSize,
+  progress,
+  style,
+  children,
+}: Readonly<{
+  fontSize: number;
+  progress: number;
+  style: CSSProperties;
+  children: string;
+}>) {
+  const lineHeight = useVideoTheme().mantine.lineHeights["108"];
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        overflow: "hidden",
+        paddingBottom: fontSize * 0.07,
+        lineHeight,
+      }}
+    >
+      <span
+        style={{
+          ...style,
+          transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
+        }}
+      >
+        {children}
+      </span>
+    </span>
   );
 }
 

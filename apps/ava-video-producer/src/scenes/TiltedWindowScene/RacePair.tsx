@@ -1,6 +1,5 @@
-import { mix, mixToken } from "../../motion";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
-import { formatMetric } from "../layout/layout";
+import { mix } from "../../motion";
+import { RaceStats } from "./RaceStats";
 import { useWindowStage } from "./useWindowStage";
 import { WindowCard } from "./WindowCard";
 import {
@@ -8,7 +7,6 @@ import {
   getSideEntrance,
   getWhipEntrance,
   getWhipExit,
-  type WindowStage,
 } from "./windowMotion";
 import { PAIR_BOXES } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
@@ -125,118 +123,5 @@ export function RacePair(props: Props): ReactNode {
         );
       })}
     </>
-  );
-}
-
-/**
- * One column's label, counter and stat, outside the flipping card, in the
- * `text.stage.windowHeadline` weight. The counter turns from the foreground
- * to the brand colour as it finishes.
- */
-function RaceStats({
-  frame,
-  column,
-  side,
-  width,
-  height,
-  badge,
-  labelsAt,
-  exit,
-  stage,
-}: Props & {
-  column: RaceColumn;
-  side: number;
-  labelsAt: number;
-  stage: WindowStage;
-}) {
-  const tokens = useVideoTokens();
-  const { motion } = stage;
-  const scene = tokens.color.scene;
-  const fontWeight = tokens.text.stage.windowHeadline.fontWeight;
-  const left = PAIR_BOXES[side].x * width + width * 0.027;
-  const { counter } = column;
-  const elapsed = motion.ramp(
-    frame,
-    counter.startFrame,
-    counter.endFrame - counter.startFrame,
-    (t) => {
-      return t;
-    },
-  );
-  const done = motion.ramp(
-    frame,
-    counter.endFrame,
-    motion.chip,
-    motion.entrance.easing,
-  );
-  const fade = exit
-    ? 1 -
-      motion.ramp(frame, exit.atFrame + 1, motion.chip, motion.dissolve.easing)
-    : 1;
-  const arrive = motion.enter(frame, labelsAt, { y: 0 });
-  return (
-    <div style={{ position: "absolute", inset: 0, opacity: fade }}>
-      <div
-        style={{
-          position: "absolute",
-          left,
-          top: height * 0.085,
-          fontSize: height * 0.05,
-          fontWeight,
-          ...arrive,
-        }}
-      >
-        {column.label}
-      </div>
-      {badge && side === 1 ? (
-        <div
-          style={{
-            position: "absolute",
-            right: width * 0.04,
-            top: height * 0.095,
-            fontSize: height * 0.026,
-            fontWeight,
-            color: scene.brand,
-            ...arrive,
-          }}
-        >
-          {badge}
-        </div>
-      ) : null}
-      <div
-        style={{
-          position: "absolute",
-          left,
-          top: height * 0.825,
-          fontSize: height * 0.1,
-          fontWeight,
-          fontVariantNumeric: "tabular-nums",
-          color: mixToken(done, scene.foreground, scene.brand),
-          ...arrive,
-        }}
-      >
-        {formatMetric(
-          mix(elapsed, counter.from ?? 0, counter.to),
-          counter.precision ?? 1,
-        )}
-        {counter.unit ?? ""}
-      </div>
-      {column.stat ? (
-        <div
-          style={{
-            position: "absolute",
-            right:
-              width * (1 - PAIR_BOXES[side].x - PAIR_BOXES[side].width) +
-              width * 0.01,
-            top: height * 0.885,
-            fontSize: height * 0.026,
-            color: scene.mutedForeground,
-            ...arrive,
-          }}
-        >
-          {column.stat}
-        </div>
-      ) : null}
-    </div>
   );
 }
