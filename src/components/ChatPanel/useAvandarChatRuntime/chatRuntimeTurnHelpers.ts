@@ -68,9 +68,10 @@ export type RetryContextSource = {
 };
 
 /**
- * Maps a previously-returned `ChatResponse` to the compact retry
- * context shape the backend wants. Returns `undefined` when the
- * previous turn produced nothing worth telling the model about.
+ * Maps a previously-returned response (any `RetryContextSource`, such as a
+ * `ChatResponse.T`) to the compact retry context shape the backend wants.
+ * Returns `undefined` when the previous turn produced nothing worth telling
+ * the model about.
  */
 export function buildRetryContext(
   response: Readonly<RetryContextSource>,
