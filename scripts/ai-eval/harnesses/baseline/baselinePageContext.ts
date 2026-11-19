@@ -43,8 +43,9 @@ function _toExplorerContext(
 
 /**
  * Today's chat page context for a question's screen. The Data Explorer
- * sends its dataset and query. A dashboard question elsewhere sends the
- * dashboards app with the open editor's id, or `other`, as the app does.
+ * sends its dataset and query. A dashboard question elsewhere, or a Try
+ * again of one, sends the dashboards app with the open editor's id, or
+ * `other`, as the app does.
  * Other questions on other screens return undefined and keep the context
  * the conversation built, so archived page runs stay comparable: today's
  * chat sees no tiles, maps, or case types.
@@ -56,7 +57,9 @@ export function toBaselinePageContext(
   if (pageContext?.app === "data-explorer") {
     return _toExplorerContext(pageContext);
   }
-  if (question.category !== "dashboards") {
+  // A Try again copy of a dashboard question keeps its dashboards, so it
+  // reads as a dashboard question here too.
+  if (question.category !== "dashboards" && question.dashboards === undefined) {
     return undefined;
   }
   if (question.openEditorDashboardId) {

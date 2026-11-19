@@ -73,6 +73,22 @@ describe("toBaselinePageContext", () => {
 
     expect(context).toBeUndefined();
   });
+
+  it("names the open editor's dashboard for a Try again of a dashboard question", () => {
+    const context = toBaselinePageContext(
+      _question({
+        category: "try_again",
+        dashboards: [],
+        pageContext: {
+          app: "dashboard",
+          dashboard: { id: DASHBOARD_ID, name: "COVID 2022", tiles: [] },
+        },
+        openEditorDashboardId: DASHBOARD_ID,
+      }),
+    );
+
+    expect(context).toEqual({ app: "dashboards", dashboardId: DASHBOARD_ID });
+  });
 });
 
 describe("getBaselineBlockOutcome", () => {
