@@ -288,7 +288,7 @@ describe("runOfflineDataAgentTurn", () => {
     );
   });
 
-  it("records an offline card and gives it its row's audit id", async () => {
+  it("gives an offline card the audit id of the row it wrote", async () => {
     await AvaDexie.DB.ClarificationAuditEntry.clear();
     const turn = _createTurnOptions({ chatGeneration: 11 });
     await runOfflineDataAgentTurn(turn);

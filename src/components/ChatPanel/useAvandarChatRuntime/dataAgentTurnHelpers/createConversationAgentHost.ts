@@ -43,9 +43,12 @@ function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
  * The row stays.
  */
 async function _showQuestionCard(
-  state: AgentConversationState,
-  card: Omit<ChatClarifyRequest, "turnNumber">,
+  options: Readonly<{
+    state: AgentConversationState;
+    card: Omit<ChatClarifyRequest, "turnNumber">;
+  }>,
 ): Promise<void> {
+  const { state, card } = options;
   const turn = state.turnRef.current;
   const clarification: ChatClarifyRequest = {
     ...card,
@@ -105,7 +108,7 @@ export function createConversationAgentHost(
       });
     },
     showQuestionCard: (card) => {
-      return _showQuestionCard(state, card);
+      return _showQuestionCard({ state, card });
     },
   });
   return createPlaceholderRestoringHost(browserHost, state.sqlVault);

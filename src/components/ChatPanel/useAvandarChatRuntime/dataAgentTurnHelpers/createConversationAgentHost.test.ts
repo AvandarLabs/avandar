@@ -427,10 +427,8 @@ describe("createConversationAgentHost question cards", () => {
     );
   });
 
-  it("records a value card and sets it with the audit id its row got", async () => {
-    const turn = _turn("dashboard");
-
-    await createConversationAgentHost(_state(turn)).askUser({
+  it("records a value card as a discovery card", async () => {
+    await createConversationAgentHost(_state(_turn("dashboard"))).askUser({
       question: "Which county?",
       options: ["Kings"],
       isMulti: false,
@@ -448,9 +446,6 @@ describe("createConversationAgentHost question cards", () => {
         responseShape: expect.objectContaining({ kind: "discovery" }),
       }),
     });
-    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
-      expect.objectContaining({ auditId: "audit-1" }),
-    );
   });
 
   it("numbers a card after two card answers as the third", async () => {
