@@ -1,7 +1,12 @@
 import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DuplicateDecisionLabels } from "./DuplicateDecisionLabels";
+import { ALIGN_CUE, FOLD_CUE } from "./duplicateTiming";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
 
@@ -26,12 +31,18 @@ export function DuplicateGroupHeading({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <g>
-      <path
-        d={`M${x - 6} ${y - 65}v-8h${mix(isPair ? progress : 0, 432, 904)}v8`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x - 6} ${y - 65}v-8h${mix(isPair ? progress : 0, 432, 904)}v8`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <FitText
         text={group.label}
@@ -52,13 +63,18 @@ export function DuplicateGroupHeading({
         isPair={isPair}
         progress={progress}
       />
-      <path
-        data-comparison-ruler={group.id}
-        d={`M${x + 4} ${y}v${isPair ? 112 : 360}`}
-        fill="none"
-        stroke={accent}
-        opacity={ramp(frame, 42, 28) * (1 - progress)}
-      />
+      <g data-comparison-ruler={group.id}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x + 4} ${y}v${isPair ? 112 : 360}` }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+          opacity={
+            ramp(frame, ALIGN_CUE, FOLD_CUE - ALIGN_CUE, motion.reveal.easing) *
+            (1 - progress)
+          }
+        />
+      </g>
     </g>
   );
 }

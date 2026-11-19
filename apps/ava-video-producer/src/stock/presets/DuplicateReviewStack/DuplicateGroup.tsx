@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DuplicateCandidate } from "./DuplicateCandidate";
 import { DuplicateGroupHeading } from "./DuplicateGroupHeading";
 import { getDuplicateGroupLayoutFromGroupAndFrame } from "./getDuplicateGroupLayoutFromGroupAndFrame";
@@ -19,12 +20,14 @@ export function DuplicateGroup({
   groupIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const { x, y, isPair, progress, records } =
     getDuplicateGroupLayoutFromGroupAndFrame({
       frame,
       input,
       group,
       groupIndex,
+      motion,
     });
   return (
     <g data-unresolved-group={group.retainedId === null ? group.id : undefined}>

@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AperturePanel } from "./AperturePanel";
 import { DisclosureCopies } from "./DisclosureCopies";
 import { DisclosureCopy } from "./DisclosureCopy";
@@ -17,31 +22,34 @@ export function DisclosureAperture({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const destinationX = input.direction === "left-to-right" ? 540 : 60;
   return (
     <g data-disclosure-direction={input.direction}>
-      <rect
+      <StockRect
         x={60}
         y={156}
         width={360}
         height={360}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <rect
+      <StockRect
         x={540}
         y={156}
         width={360}
         height={360}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
-        d={`M${destinationX} 156 l180 42 l180 -42`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${destinationX} 156 l180 42 l180 -42` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <AperturePanel {...{ frame, input, accent }} />
       {input.fields.map((field, index) => {
