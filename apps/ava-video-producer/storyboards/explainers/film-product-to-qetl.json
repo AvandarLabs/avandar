@@ -75,17 +75,17 @@
                     {
                       "name": "Cases",
                       "kind": "CSV",
-                      "color": "#82c8f2"
+                      "color": "$color.accentAlt"
                     },
                     {
                       "name": "Visits",
                       "kind": "API",
-                      "color": "#9fefca"
+                      "color": "$color.accent"
                     },
                     {
                       "name": "Facilities",
                       "kind": "DB",
-                      "color": "#f0ba83"
+                      "color": "$color.highlight"
                     }
                   ],
                   "destination": {

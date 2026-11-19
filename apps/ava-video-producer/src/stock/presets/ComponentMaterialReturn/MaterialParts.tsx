@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getMaterialItemsFromInput } from "./getMaterialItemsFromInput";
 import { getMaterialPlacementFromInputAndFrame } from "./getMaterialPlacementFromInputAndFrame";
 import { ROUTE_CATEGORY_KEYS } from "./routeColors";
@@ -14,9 +10,9 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 const REPLACEMENT_CORNER = 6;
 const SOURCE_CORNER = 2;
-const PART_TINT = 0.22;
 /** Stable numbered components retain source identity in all destinations. */
 export function MaterialParts({ input, frame }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
@@ -48,7 +44,7 @@ export function MaterialParts({ input, frame }: Readonly<Props>): ReactNode {
                   : SOURCE_CORNER,
               )}
               fill={color}
-              fillOpacity={scales.wash(PART_TINT)}
+              fillOpacity={scales.wash(atomic.opacity["22"])}
               stroke={color}
             />
             <SceneLabel

@@ -1,15 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 /** A bin bar's tint, before the theme's tint strength. */
 const BAR_TINT = 0.18;
-/** The dash of the count a bin held before backfill. */
-const PRIOR_DASH = "5 3";
 type Props = {
   id: string;
   label: string;
@@ -33,6 +28,7 @@ export function BackfillBar({
   showPrior,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const x = 68 + index * width + 12;
@@ -56,7 +52,7 @@ export function BackfillBar({
           height={prior * 18}
           fill="none"
           stroke={tokens.color.highlight}
-          strokeDasharray={PRIOR_DASH}
+          strokeDasharray={atomic.dash.stitch.join(" ")}
         />
       ) : undefined}
       <LabelSlots

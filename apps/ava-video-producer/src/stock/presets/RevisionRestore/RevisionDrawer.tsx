@@ -1,15 +1,11 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { hasDrawer: boolean };
-/** The dash of the empty storage recess. */
-const RECESS_DASH = "4 5";
 /** Saved impressions sit in a local drawer or a labeled margin recess. */
 export function RevisionDrawer({ hasDrawer }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -30,7 +26,7 @@ export function RevisionDrawer({ hasDrawer }: Readonly<Props>): ReactNode {
           data-storage-recess="true"
           fill="none"
           stroke={tokens.color.line}
-          strokeDasharray={RECESS_DASH}
+          strokeDasharray={atomic.dash.medium.join(" ")}
         />
       )}
     </g>

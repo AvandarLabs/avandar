@@ -1,12 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
-/** How strongly the folding awning shows. */
-const AWNING_OPACITY = 0.55;
 type Props = { x: number; y: number; awning: number; accent: string };
 /** One persistent vehicle folds and unfolds its awning around the drive. */
 export function ClinicVehicle({
@@ -15,6 +10,7 @@ export function ClinicVehicle({
   awning,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -54,7 +50,7 @@ export function ClinicVehicle({
         data-awning="clinic"
         d={`M-42 -22 H20 L${20 + awning * 10} ${-22 - awning * 22} H${-42 - awning * 10} Z`}
         fill={accent}
-        opacity={AWNING_OPACITY}
+        opacity={atomic.opacity["55"]}
       />
     </g>
   );

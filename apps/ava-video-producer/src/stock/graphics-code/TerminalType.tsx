@@ -5,11 +5,7 @@ import { Check } from "../graphics-common/Check";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import { CodeWindow } from "./CodeWindow";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";
@@ -25,7 +21,6 @@ const PROMPT_SIZE = 22;
 const STEP_DETAIL_SIZE = 16;
 const RESPONSE_SIZE = 20;
 const CARET_CORNER = 1;
-const RESPONSE_FILL_ALPHA = 0.06;
 
 /** Draws the bounded authored terminal-type study at an explicit frame. */
 export function TerminalType({
@@ -33,6 +28,7 @@ export function TerminalType({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { corner } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -96,7 +92,7 @@ export function TerminalType({
             height={55}
             rx={shapes.corner(corner.cell)}
             fill={accent}
-            fillOpacity={shapes.wash(RESPONSE_FILL_ALPHA)}
+            fillOpacity={shapes.wash(atomic.opacity["6"])}
           />
           <Text role="field" x={114} y={463} size={RESPONSE_SIZE} fill={accent}>
             {input.response}

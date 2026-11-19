@@ -3,13 +3,14 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { OutboxCommitMarks } from "./OutboxCommitMarks";
 import { OutboxDurableState } from "./OutboxDurableState";
 import { OutboxOutcome } from "./OutboxOutcome";
 import { OutboxProposal } from "./OutboxProposal";
-import { DIVIDER_DASH, UNMOUNT_CUE } from "./outboxShape";
+import { UNMOUNT_CUE } from "./outboxShape";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
@@ -22,6 +23,7 @@ export function AtomicOutboxCommit({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   return (
     <g>
@@ -46,7 +48,7 @@ export function AtomicOutboxCommit({
         shape={{ kind: "path", d: "M480 155 V470" }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
-        strokeDasharray={DIVIDER_DASH}
+        strokeDasharray={atomic.dash.boundary.join(" ")}
       />
       <OutboxDurableState input={input} frame={frame} accent={accent} />
       {frame < UNMOUNT_CUE

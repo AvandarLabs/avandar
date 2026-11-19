@@ -1,10 +1,7 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HandoverGoodsRow } from "./HandoverGoodsRow";
 import { HandoverLabels } from "./HandoverLabels";
 import { HandoverReceipt } from "./HandoverReceipt";
@@ -12,8 +9,6 @@ import { HandoverRecipient } from "./HandoverRecipient";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
-/** The dash of the handover zone between giver and recipient. */
-const HANDOVER_ZONE_DASH = "4 6";
 /** Complete authored handover and shared frame controls. */
 export type Props = GraphicProps & { input: Input };
 /** Physical recipient selection precedes the quantity acknowledgement. */
@@ -22,6 +17,7 @@ export function RecipientConfirmedHandover({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -42,7 +38,7 @@ export function RecipientConfirmedHandover({
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.elevated}
         stroke={tokens.color.line}
-        strokeDasharray={HANDOVER_ZONE_DASH}
+        strokeDasharray={atomic.dash.spaced.join(" ")}
       />
       <SketchedShape
         shape={{

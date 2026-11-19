@@ -3,11 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 
@@ -17,10 +13,6 @@ type Props = { input: Input; frame: number; accent: string; focusedX: number };
 const ARM_FRAMES = 24;
 /** Frames the acknowledgment anchor and the acknowledgment take to appear. */
 const ACKNOWLEDGE_FRAMES = 20;
-/** How strong the dashed acknowledgment anchor gets. */
-const ANCHOR_OPACITY = 0.6;
-/** The dash of the acknowledgment anchor. */
-const ANCHOR_DASH = "4 6";
 /** A spoken acknowledgment's corner before the corner style scales it. */
 const SPOKEN_CORNER = 20;
 /** A written acknowledgment's corner before the corner style scales it. */
@@ -32,6 +24,7 @@ export function RecognitionExchange({
   accent,
   focusedX,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -68,10 +61,10 @@ export function RecognitionExchange({
           shape={{ kind: "line", x1: focusedX + 80, y1: 330, x2: 165, y2: 340 }}
           profile={tokens.sketch.shape}
           opacity={
-            ramp(frame, 67, acknowledge, motion.reveal.easing) * ANCHOR_OPACITY
+            ramp(frame, 67, acknowledge, motion.reveal.easing) * atomic.opacity["60"]
           }
           stroke={accent}
-          strokeDasharray={ANCHOR_DASH}
+          strokeDasharray={atomic.dash.spaced.join(" ")}
         />
       </g>
       <g opacity={ramp(frame, 89, acknowledge, motion.reveal.easing)}>

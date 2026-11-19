@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import { RegistrationReferences } from "./RegistrationReferences";
 import type { Input } from "./CoordinateFrameRegistration.schema";
@@ -11,7 +7,6 @@ import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
 
-const LANDMARK_FILL_ALPHA = 0.6;
 /**
  * Target rings are fixed physical references. Only coordinate copies register.
  */
@@ -20,6 +15,7 @@ export function RegistrationPoints({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -46,7 +42,7 @@ export function RegistrationPoints({
             }}
             profile={sketch.shape}
             fill={accent}
-            fillOpacity={LANDMARK_FILL_ALPHA}
+            fillOpacity={atomic.opacity["60"]}
             stroke={accent}
             strokeWidth={shapes.stroke(stroke.hairline)}
           />

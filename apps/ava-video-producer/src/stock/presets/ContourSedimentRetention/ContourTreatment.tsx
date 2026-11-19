@@ -1,23 +1,19 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LandSteward } from "./LandSteward";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const TREATMENT_TINT = 0.35;
 /** A steward carries the selected barrier into contact with the slope. */
 export function ContourTreatment({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -37,7 +33,7 @@ export function ContourTreatment({
             ? tokens.color.inactive
             : accent
         }
-        fillOpacity={scales.wash(TREATMENT_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["35"])}
         stroke={accent}
       />
       {input.intervention.kind === "vegetated-strip" ? (

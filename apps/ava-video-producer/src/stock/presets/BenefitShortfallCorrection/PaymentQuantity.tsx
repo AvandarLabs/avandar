@@ -3,6 +3,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
@@ -23,6 +24,7 @@ export function PaymentQuantity({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   return (
     <g>
@@ -35,7 +37,7 @@ export function PaymentQuantity({
           index === 1 ? accent : index === 2 ? tokens.color.accentAlt : "none"
         }
         stroke={index === 3 ? tokens.color.highlight : tokens.color.inactive}
-        strokeDasharray={index === 3 ? "3 3" : undefined}
+        strokeDasharray={index === 3 ? atomic.dash.dense.join(" ") : undefined}
       />
       {index === 2 ? (
         <SketchedShape

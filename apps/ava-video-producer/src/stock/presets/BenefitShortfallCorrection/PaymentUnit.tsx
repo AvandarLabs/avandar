@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPaymentUnitGeometryFromPayment } from "./getPaymentUnitGeometryFromPayment";
 import { ReceivedToken } from "./ReceivedToken";
 import type { Input } from "./BenefitShortfallCorrection.schema";
@@ -15,7 +12,6 @@ type Props = {
   unitIndex: number;
   accent: string;
 };
-const GAP_DASH = "2 4";
 /**
  * Exactly one original, correction or empty position accounts for each unit.
  */
@@ -26,6 +22,7 @@ export function PaymentUnit({
   unitIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
   const { x, y, isOriginal, isCorrection, tokenY, isHandling } =
@@ -63,7 +60,7 @@ export function PaymentUnit({
           data-unit-kind="gap"
           fill="none"
           stroke={tokens.color.highlight}
-          strokeDasharray={GAP_DASH}
+          strokeDasharray={atomic.dash.dotted.join(" ")}
         />
       )}
     </g>

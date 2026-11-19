@@ -32,7 +32,7 @@ export function ZoneSurface({
           shape={{ kind: "path", d: `M${points} Z` }}
           profile={tokens.sketch.shape}
           fill={accent}
-          fillOpacity={opacity}
+          fillOpacity={scales.wash(opacity)}
           stroke={accent}
           strokeWidth={scales.stroke(tokens.stroke.outline)}
         />

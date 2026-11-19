@@ -1,22 +1,18 @@
 import { mix } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const STENCIL_TINT = 0.06;
 /** The supplied window lowers onto the same axis as each presence ribbon. */
 export function InvestigationStencil({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -48,7 +44,7 @@ export function InvestigationStencil({
       width={end - start}
       height={270}
       fill={accent}
-      fillOpacity={scales.wash(STENCIL_TINT)}
+      fillOpacity={scales.wash(atomic.opacity["6"])}
       stroke={accent}
       strokeDasharray={tokens.dash.pending.join(" ")}
       opacity={motion.reveal(frame, 36)}

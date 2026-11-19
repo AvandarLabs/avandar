@@ -2,6 +2,7 @@ import { prop } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
@@ -12,13 +13,17 @@ import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const PATTERNS: Record<string, string> = {
+/**
+ * Each span role keeps its own guide dash. The qualifier reads the theme's
+ * dotted step; the other patterns encode their role and have no step.
+ */
+const PATTERNS: Record<string, string | undefined> = {
   subject: "1 0",
   metric: "5 2",
   value: "1 2",
   unit: "8 3",
   period: "3 2 1 2",
-  qualifier: "2 4",
+  qualifier: undefined,
 };
 /** Original sentence stays intact while exact authored spans gain guides. */
 export function SentenceSpans({
@@ -27,6 +32,7 @@ export function SentenceSpans({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   let offset = 0;
   const spans = input.fragments.map((fragment) => {
@@ -65,7 +71,10 @@ export function SentenceSpans({
                 profile={tokens.sketch.shape}
                 data-source-span={spans[spanIndex].role}
                 stroke={accent}
-                strokeDasharray={PATTERNS[spans[spanIndex].role]}
+                strokeDasharray={
+                  PATTERNS[spans[spanIndex].role] ??
+                  atomic.dash.dotted.join(" ")
+                }
                 opacity={motion.ramp(frame, 13 + spanIndex * 3, motion.hero)}
               />
             ) : undefined}

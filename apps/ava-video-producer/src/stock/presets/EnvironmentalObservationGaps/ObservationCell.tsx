@@ -1,7 +1,10 @@
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Data for Props. */
@@ -18,6 +21,11 @@ type Props = {
   accent: string;
   patternId: string;
 };
+/** The tint of an observed cell with the weakest reading. */
+const OBSERVED_TINT_FLOOR = 0.12;
+/** How much the tint grows from the weakest to the strongest reading. */
+const OBSERVED_TINT_RANGE = 0.36;
+
 /** Unknown values keep their hatch, independently of all point observations. */
 export function ObservationCell({
   cell,
@@ -26,6 +34,7 @@ export function ObservationCell({
   patternId,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const value = cell.value;
   const strength =
     value === null
@@ -44,7 +53,11 @@ export function ObservationCell({
         width={cell.width}
         height={cell.height}
         fill={value === null ? `url(#${patternId})` : accent}
-        fillOpacity={value === null ? 1 : 0.12 + strength * 0.36}
+        fillOpacity={
+          value === null
+            ? 1
+            : scales.wash(OBSERVED_TINT_FLOOR + strength * OBSERVED_TINT_RANGE)
+        }
         stroke={tokens.color.line}
       />
       <FitText

@@ -2,11 +2,7 @@ import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for DispatchOperator. */
@@ -20,6 +16,7 @@ export function DispatchOperator({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -61,7 +58,7 @@ export function DispatchOperator({
         cy={105}
         r={9}
         fill={accent}
-        fillOpacity={0.2 + 0.6 * reach}
+        fillOpacity={atomic.opacity["20"] + atomic.opacity["60"] * reach}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M 445 106 L ${handX} ${handY}` }}

@@ -1,6 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CellLiteralValue } from "./CellLiteralValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
@@ -14,10 +14,6 @@ type Props = {
 
 /** Extra letter spacing the original value loosens from as it is replaced. */
 const BEFORE_SPACING = 1;
-/** The edit brackets' extra opacity at the middle of the edit. */
-const BRACKET_PEAK = 0.7;
-/** The edit brackets' opacity once the edit settles. */
-const BRACKET_REST = 0.3;
 /** Only explicitly different pairs get an authored replacement and brackets. */
 export function CleanupCells({
   row,
@@ -25,6 +21,7 @@ export function CleanupCells({
   showWhitespace,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const changed = row.before !== row.after;
   const bounds = { x: 88, y: 22, showWhitespace };
@@ -48,7 +45,7 @@ export function CleanupCells({
               fill="none"
               stroke={accent}
               opacity={
-                Math.sin(edit * Math.PI) * BRACKET_PEAK + edit * BRACKET_REST
+                Math.sin(edit * Math.PI) * atomic.opacity["70"] + edit * atomic.opacity["30"]
               }
             />
           </g>

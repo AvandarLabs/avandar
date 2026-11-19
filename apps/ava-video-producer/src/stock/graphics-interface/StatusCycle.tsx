@@ -7,11 +7,7 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StatusCycleInput } from "../presets/StatusCycle/StatusCycle.schema";
 import type { ReactNode } from "react";
@@ -27,8 +23,6 @@ const DIAL_FILL_ALPHA = 0.035;
 const PROCESSING_RING_ALPHA = 0.18;
 const STATE_SIZE = 37;
 const TRACK_CORNER = 3;
-const STEP_ALPHA_FLOOR = 0.2;
-const STEP_ALPHA_SWING = 0.8;
 
 /** Draws the bounded authored status-cycle study at an explicit frame. */
 export function StatusCycle({
@@ -36,6 +30,7 @@ export function StatusCycle({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -170,8 +165,8 @@ export function StatusCycle({
               r={4}
               fill={accent}
               fillOpacity={
-                STEP_ALPHA_FLOOR +
-                motion.ramp(frame, state.at, motion.chip) * STEP_ALPHA_SWING
+                atomic.opacity["20"] +
+                motion.ramp(frame, state.at, motion.chip) * atomic.opacity["80"]
               }
             />
             <Text role="secondary" x={268 + i * 230} y={516}>

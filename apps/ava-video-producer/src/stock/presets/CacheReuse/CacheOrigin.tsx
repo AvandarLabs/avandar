@@ -1,18 +1,13 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string; originActive: number };
 
-/** The origin's outline opacity while no lookup reaches it. */
-const IDLE_OUTLINE_OPACITY = 0.2;
 
 /** The distant source holds the supplied result and lights only on a miss. */
 export function CacheOrigin({
@@ -20,6 +15,7 @@ export function CacheOrigin({
   accent,
   originActive,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -35,7 +31,7 @@ export function CacheOrigin({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
         strokeOpacity={
-          IDLE_OUTLINE_OPACITY + originActive * (1 - IDLE_OUTLINE_OPACITY)
+          atomic.opacity["20"] + originActive * (1 - atomic.opacity["20"])
         }
       />
       <FitText

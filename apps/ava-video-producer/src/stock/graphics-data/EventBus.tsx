@@ -8,10 +8,7 @@ import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { StockRect } from "../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { EventBusInput } from "../presets/EventBus/EventBus.schema";
 import type { ReactNode } from "react";
@@ -20,12 +17,11 @@ type Props = GraphicProps & { input: EventBusInput };
 
 const BUS_CORNER = 29;
 const BUS_FILL_ALPHA = 0.045;
-const BUS_STROKE_ALPHA = 0.35;
-const SUBSCRIBER_EDGE_ALPHA = 0.45;
 const ENDPOINT_NUMBER_SIZE = 11;
 
 /** Draws the bounded authored event-bus study at an explicit frame. */
 export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, alpha, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const producers = input.producers;
@@ -42,7 +38,7 @@ export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {
         fill={accent}
         fillOpacity={shapes.wash(BUS_FILL_ALPHA)}
         stroke={accent}
-        strokeOpacity={BUS_STROKE_ALPHA}
+        strokeOpacity={atomic.opacity["35"]}
         strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <SketchedShape
@@ -126,7 +122,7 @@ export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {
               frame={frame}
               at={35 + i * 4}
               color={color.highlight}
-              opacity={SUBSCRIBER_EDGE_ALPHA}
+              opacity={atomic.opacity["45"]}
             />
             {input.showPackets ? (
               <Packet

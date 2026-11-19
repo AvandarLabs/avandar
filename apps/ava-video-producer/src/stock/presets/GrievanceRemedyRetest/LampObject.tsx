@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 /** Inputs for LampObject. */
 type Props = { functioning: number; accent: string };
@@ -13,6 +10,7 @@ export function LampObject({
   functioning,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -31,7 +29,7 @@ export function LampObject({
         data-light="authored"
         d="M522 300 L440 388 H610 L565 295 Z"
         fill={tokens.color.highlight}
-        opacity={functioning * 0.35}
+        opacity={functioning * atomic.opacity["35"]}
       />
       <StockRect
         x={550}

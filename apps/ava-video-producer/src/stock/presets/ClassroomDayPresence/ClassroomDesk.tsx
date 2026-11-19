@@ -6,6 +6,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassroomImpressions } from "./ClassroomImpressions";
@@ -39,6 +40,7 @@ export function ClassroomDesk({
   activeIndex,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   const occupied = mix(
     transition,
@@ -65,7 +67,9 @@ export function ClassroomDesk({
         rx={scales.corner(7)}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray={desk.state === "unknown" ? "3 3" : undefined}
+        strokeDasharray={
+          desk.state === "unknown" ? atomic.dash.dense.join(" ") : undefined
+        }
       />
       <g data-learner-silhouette={desk.id} opacity={occupied}>
         <PersonGlyph

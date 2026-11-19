@@ -2,17 +2,12 @@ import { propEq, prop } from "@avandar/utils";
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HostLabels } from "./HostLabels";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; index: number; frame: number; accent: string };
-const CAPACITY_GUIDE_DASH = "3 4";
 /** A common capacity scale persists while truly empty hosts fold. */
 export function HostBay({
   input,
@@ -20,6 +15,7 @@ export function HostBay({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -42,7 +38,9 @@ export function HostBay({
         fill={tokens.color.surface}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray={isEmpty && frame >= 120 ? "4 4" : undefined}
+        strokeDasharray={
+          isEmpty && frame >= 120 ? atomic.dash.even.join(" ") : undefined
+        }
       />
       {input.showCapacityGuides ? (
         <SketchedShape
@@ -50,7 +48,7 @@ export function HostBay({
           profile={tokens.sketch.shape}
           data-guide={index}
           stroke={tokens.color.inactive}
-          strokeDasharray={CAPACITY_GUIDE_DASH}
+          strokeDasharray={atomic.dash.short.join(" ")}
         />
       ) : undefined}
       <HostLabels input={input} index={index} frame={frame} />

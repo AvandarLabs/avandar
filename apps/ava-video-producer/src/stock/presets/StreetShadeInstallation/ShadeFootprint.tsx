@@ -1,21 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { INSTALLATION_CATEGORIES } from "./installationColors";
 import { ShadeStructure } from "./ShadeStructure";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
-/** The dash of a footprint that is planned but not installed. */
-const PLANNED_DASH = "3 3";
-/** An installed footprint's tint, before the theme's tint strength. */
-const INSTALLED_TINT = 0.34;
-/** A planned footprint's tint, before the theme's tint strength. */
-const PLANNED_TINT = 0.06;
 type Props = { input: Input; index: number; frame: number };
 /** One authored object retains its distinct footprint and visible key. */
 export function ShadeFootprint({
@@ -23,6 +13,7 @@ export function ShadeFootprint({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -52,10 +43,10 @@ export function ShadeFootprint({
         width={width}
         height={36}
         fill={color}
-        fillOpacity={scales.wash(isInstalled ? INSTALLED_TINT : PLANNED_TINT)}
+        fillOpacity={scales.wash(isInstalled ? atomic.opacity["34"] : atomic.opacity["6"])}
         stroke={width > 0 ? color : undefined}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray={isInstalled ? undefined : PLANNED_DASH}
+        strokeDasharray={isInstalled ? undefined : tokens.dash.planned.join(" ")}
       />
       <ShadeStructure
         kind={item.kind}

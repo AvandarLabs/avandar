@@ -36,6 +36,7 @@ export function CaptionOverlay({
     height,
     fontSize ?? caption.fontSize,
     bottom,
+    scales.stroke(tokens.stroke.hairline),
   );
   const fadeDuration = Math.min(
     motion.chip,

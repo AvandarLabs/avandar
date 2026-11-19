@@ -1,14 +1,10 @@
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const INVESTIGATED_START_ALPHA = 0.45;
 
 /**
  * Every case supplies exactly one numbered segment, including unknown onset.
@@ -18,6 +14,7 @@ export function HistogramSegments({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   return (
@@ -45,7 +42,7 @@ export function HistogramSegments({
                   isInvestigated
                     ? mix(
                         motion.ramp(frame, 36, motion.scale(48)),
-                        INVESTIGATED_START_ALPHA,
+                        atomic.opacity["45"],
                         1,
                       )
                     : tokens.alpha.dimmed

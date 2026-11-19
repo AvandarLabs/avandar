@@ -1,20 +1,14 @@
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryVessel. */
 type Props = { frame: number; accent: string; input: Input };
 const DRAW_ON_LENGTH = 1;
-const CHARGE_FILL_OPACITY = 0.65;
 const CHANNEL_WIDTH = 8;
 const LOSS_CHANNEL_WIDTH = 5;
-const EMPTY_CHANNEL_OPACITY = 0.2;
 
 /**
  * Charge and dispatch paths have distinct boundaries and separately timed
@@ -25,6 +19,7 @@ export function BatteryVessel({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -84,7 +79,7 @@ export function BatteryVessel({
         width={144}
         height={fillHeight}
         fill={accent}
-        fillOpacity={CHARGE_FILL_OPACITY}
+        fillOpacity={atomic.opacity["65"]}
       />
       <SketchedShape
         shape={{ kind: "path", d: paths.charge }}
@@ -97,7 +92,7 @@ export function BatteryVessel({
         strokeWidth={scales.stroke(
           cycle.chargeInputKwh ? CHANNEL_WIDTH : tokens.stroke.hairline,
         )}
-        opacity={cycle.chargeInputKwh ? 1 : EMPTY_CHANNEL_OPACITY}
+        opacity={cycle.chargeInputKwh ? 1 : atomic.opacity["20"]}
         fill="none"
       />
       <SketchedShape
@@ -111,7 +106,7 @@ export function BatteryVessel({
         strokeWidth={scales.stroke(
           cycle.deliveredKwh ? CHANNEL_WIDTH : tokens.stroke.hairline,
         )}
-        opacity={cycle.deliveredKwh ? 1 : EMPTY_CHANNEL_OPACITY}
+        opacity={cycle.deliveredKwh ? 1 : atomic.opacity["20"]}
         fill="none"
       />
       {input.showLossChannels ? (

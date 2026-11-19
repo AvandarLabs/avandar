@@ -1,18 +1,14 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
-/** The dash of the portfolio trail across the worktables. */
-const PORTFOLIO_TRAIL_DASH = "3 7";
 type Props = { showPortfolioTrail: boolean; accent: string };
 /** Two work surfaces retain the portfolio through its visible journey. */
 export function ReturnWorktables({
   showPortfolioTrail,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -34,7 +30,7 @@ export function ReturnWorktables({
             profile={tokens.sketch.shape}
             fill="none"
             stroke={accent}
-            strokeDasharray={PORTFOLIO_TRAIL_DASH}
+            strokeDasharray={atomic.dash.trail.join(" ")}
             opacity={tokens.alpha.guide}
           />
         </g>

@@ -7,11 +7,7 @@ import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { PacketStreamInput } from "../presets/PacketStream/PacketStream.schema";
 import type { ReactNode } from "react";
@@ -20,11 +16,8 @@ type Props = GraphicProps & { input: PacketStreamInput };
 
 const STREAM_PERIOD = 130;
 const PACKET_PHASE_STEP = 20;
-const PACKET_ALPHA_FLOOR = 0.5;
-const PACKET_ALPHA_SWING = 0.5;
 const PACKET_CORNER = 6;
 const PACKET_FILL_ALPHA = 0.13;
-const PACKET_STROKE_ALPHA = 0.65;
 const HEADING_SIZE = 29;
 const LANE_LABEL_SIZE = 16;
 
@@ -35,6 +28,7 @@ export function PacketStream({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const { color, stroke, alpha, sketch } = tokens;
   const shapes = useGraphicShapeScales();
@@ -97,9 +91,9 @@ export function PacketStream({
                   <g
                     key={p}
                     opacity={
-                      PACKET_ALPHA_FLOOR +
+                      atomic.opacity["50"] +
                       wave(frame, motion.pulse.period, p * PACKET_PHASE_STEP) *
-                        PACKET_ALPHA_SWING
+                        atomic.opacity["50"]
                     }
                   >
                     <StockRect
@@ -111,7 +105,7 @@ export function PacketStream({
                       fill={laneColor}
                       fillOpacity={shapes.wash(PACKET_FILL_ALPHA)}
                       stroke={laneColor}
-                      strokeOpacity={PACKET_STROKE_ALPHA}
+                      strokeOpacity={atomic.opacity["65"]}
                       strokeWidth={hairline}
                     />
                     <SketchedShape

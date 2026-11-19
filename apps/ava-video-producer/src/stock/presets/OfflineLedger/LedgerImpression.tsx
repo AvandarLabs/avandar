@@ -1,10 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -19,8 +15,6 @@ type Props = {
 const FIRST_IMPRESSION_CUE = 44;
 /** Frames between impressions, matching the writing cadence. */
 const CADENCE_FRAMES = 16;
-/** How faint an impression's engraved outline is. */
-const OUTLINE_OPACITY = 0.55;
 /**
  * A shallow engraved impression remains after its matching entry is written.
  */
@@ -31,6 +25,7 @@ export function LedgerImpression({
   accent,
   isVisible,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -50,7 +45,7 @@ export function LedgerImpression({
         profile={tokens.sketch.shape}
         fill={tokens.color.elevated}
         stroke={accent}
-        strokeOpacity={OUTLINE_OPACITY}
+        strokeOpacity={atomic.opacity["55"]}
       />
       <SketchedShape
         shape={{ kind: "path", d: "M12 8 h82 M12 14 h56" }}

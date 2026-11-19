@@ -1,15 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RulerTicks } from "./RulerTicks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
-/** The ruler's tint, before the theme's tint strength. */
-const RULER_TINT = 0.2;
 type Props = {
   input: Input;
   isMeasuring: boolean;
@@ -31,6 +26,7 @@ export function MeasuringTools({
   pencilX,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return isMeasuring ? (
@@ -54,7 +50,7 @@ export function MeasuringTools({
         width={input.task.value * 12 + 28}
         height={16}
         fill={tokens.color.highlight}
-        fillOpacity={scales.wash(RULER_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["20"])}
         stroke={tokens.color.highlight}
       />
       <RulerTicks input={input} origin={origin} rulerY={rulerY} />

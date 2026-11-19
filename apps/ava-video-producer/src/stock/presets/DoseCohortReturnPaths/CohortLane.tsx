@@ -1,10 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CohortPerson } from "./CohortPerson";
 import { CohortRecord } from "./CohortRecord";
 import { SceneLabel } from "./SceneLabel";
@@ -19,7 +16,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-const LANE_DASH = "3 6";
 function _getPersonPosition({
   input,
   participant,
@@ -51,6 +47,7 @@ export function CohortLane({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const y = 185 + index * 40;
@@ -71,7 +68,7 @@ export function CohortLane({
         shape={{ kind: "path", d: `M280 ${y + 12} H900` }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
-        strokeDasharray={LANE_DASH}
+        strokeDasharray={atomic.dash.sparse.join(" ")}
       />
       {input.visits.map((visit, visitIndex) => {
         return (

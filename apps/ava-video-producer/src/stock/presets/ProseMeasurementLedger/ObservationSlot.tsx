@@ -1,8 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
 import { ObservationFrame } from "./ObservationFrame";
 import { roleMessages } from "./ProseMeasurementLedger.controls";
@@ -10,8 +7,6 @@ import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; index: number };
-/** How opaque a filled observation slot becomes. */
-const SLOT_FILL_OPACITY = 0.7;
 /** Exact selected text travels through a clear rail into one role slot. */
 export function ObservationSlot({
   input,
@@ -19,6 +14,7 @@ export function ObservationSlot({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
   const scene = getObservationSlotFromFrame({ motion, input, frame, index });
@@ -39,7 +35,7 @@ export function ObservationSlot({
           width={244}
           height={70}
           fill={tokens.color.surface}
-          fillOpacity={scene.progress * SLOT_FILL_OPACITY}
+          fillOpacity={scene.progress * atomic.opacity["70"]}
         />
         <g opacity={scene.movingCaptionOpacity}>
           <LabelSlots

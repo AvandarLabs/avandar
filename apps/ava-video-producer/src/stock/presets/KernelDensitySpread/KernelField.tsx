@@ -41,7 +41,7 @@ export function KernelField({
             stroke={color.line}
             strokeWidth={shapes.stroke(CELL_STROKE)}
             fill={accent}
-            fillOpacity={cell.intensity / input.legendMaximum}
+            fillOpacity={shapes.wash(cell.intensity / input.legendMaximum)}
           />
         );
       })}

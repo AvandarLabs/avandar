@@ -1,27 +1,23 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { axisMaximum: number; refinement: number };
 
-/** The minor grid's opacity once the refinement has faded it back. */
-const FADED_GRID_OPACITY = 0.06;
 /** Grid refinement retains a common zero baseline and both scale endpoints. */
 export function ChartScale({
   axisMaximum,
   refinement,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
     <g>
       <g
         data-minor-grid="plot"
-        opacity={mix(refinement, tokens.alpha.guide, FADED_GRID_OPACITY)}
+        opacity={mix(refinement, tokens.alpha.guide, atomic.opacity["6"])}
       >
         {[1, 2, 3, 4].map((index) => {
           return (

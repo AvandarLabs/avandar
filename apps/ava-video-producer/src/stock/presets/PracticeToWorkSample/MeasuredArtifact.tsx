@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AlignmentGuides } from "./AlignmentGuides";
 import { MeasurementMark } from "./MeasurementMark";
 import type { Input } from "./PracticeToWorkSample.schema";
@@ -13,8 +10,6 @@ import type { ReactNode } from "react";
 const FABRIC_CORNER = 14;
 /** A sheet workpiece's corner, before the theme's corner style. */
 const SHEET_CORNER = 2;
-/** How strongly the practice piece's rough edges show. */
-const EDGE_GUIDE_OPACITY = 0.3;
 type Props = {
   input: Input;
   x: number;
@@ -32,6 +27,7 @@ export function MeasuredArtifact({
   isPractice,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const material = isPractice ? "sheet" : input.workpieces.material;
@@ -54,7 +50,7 @@ export function MeasuredArtifact({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={tokens.color.highlight}
-          strokeOpacity={EDGE_GUIDE_OPACITY}
+          strokeOpacity={atomic.opacity["30"]}
         />
       ) : undefined}
       {material === "fabric" ? (

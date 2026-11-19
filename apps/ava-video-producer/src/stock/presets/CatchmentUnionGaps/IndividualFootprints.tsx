@@ -1,16 +1,36 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import type { Input } from "./CatchmentUnionGaps.schema";
+import type { ResolvedVideoAtomic } from "../../../videoTheme/videoTheme.types";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; progress: number; accent: string };
 const FOOTPRINT_WIDTH = 1.4;
-/** Each footprint keeps its own dash so overlapping outlines stay distinct. */
-const FOOTPRINT_DASHES = ["1 0", "6 4", "2 4", "10 3 2 3"];
+/** A solid outline, written as a dash so every footprint draws the same way. */
+const SOLID_DASH = "1 0";
+/** The dash-dot outline of the fourth footprint; no theme step draws it. */
+const DASH_DOT = "10 3 2 3";
+
+/**
+ * Each footprint keeps its own dash so overlapping outlines stay distinct.
+ * The legend swatches use the same dashes.
+ */
+export function getFootprintDashFromIndex(
+  atomic: ResolvedVideoAtomic,
+  index: number,
+): string | undefined {
+  return [
+    SOLID_DASH,
+    atomic.dash.bold.join(" "),
+    atomic.dash.dotted.join(" "),
+    DASH_DOT,
+  ][index];
+}
 /** Each original service footprint retains its authored outline toggle. */
 export function IndividualFootprints({
   input,
@@ -18,6 +38,7 @@ export function IndividualFootprints({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   const shapes = getCatchmentShapesFromInput(input);
   return (
@@ -61,7 +82,7 @@ export function IndividualFootprints({
                 ][index]
               }
               strokeWidth={scales.stroke(FOOTPRINT_WIDTH)}
-              strokeDasharray={FOOTPRINT_DASHES[index]}
+              strokeDasharray={getFootprintDashFromIndex(atomic, index)}
             />
           );
         })}

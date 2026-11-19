@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -12,8 +9,6 @@ type Props = {
   slotWidth: number;
   color: string;
 };
-/** How strongly a label's leader line shows. */
-const LEADER_OPACITY = 0.55;
 /** A leader connects each external label slot to its own segment. */
 export function ScheduleLabelBackdrop({
   targetX,
@@ -22,6 +17,7 @@ export function ScheduleLabelBackdrop({
   slotWidth,
   color,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -34,7 +30,7 @@ export function ScheduleLabelBackdrop({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={LEADER_OPACITY}
+        strokeOpacity={atomic.opacity["55"]}
       />
       <rect
         data-label-slot={index}

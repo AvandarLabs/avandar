@@ -2,10 +2,7 @@ import { ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { evaluateAffineRule } from "./evaluateAffineRule";
 import { RehearsalRuler } from "./RehearsalRuler";
 import type { Input } from "./LinkedParameterRehearsal.schema";
@@ -27,8 +24,6 @@ type Props = {
 const LANE_STAGGER_FRAMES = 3;
 /** Frames an output lane takes to fade in. */
 const LANE_FRAMES = 16;
-/** How faint a coupling line between source and output stays. */
-const COUPLING_OPACITY = 0.24;
 /**
  * A pointer follows its direct affine rule with a coupling only when
  * dependent.
@@ -44,6 +39,7 @@ export function RehearsalOutput({
   showRules,
   showBaselineMarkers,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const computed = evaluateAffineRule({
@@ -93,7 +89,7 @@ export function RehearsalOutput({
             profile={tokens.sketch.shape}
             fill="none"
             stroke={accent}
-            strokeOpacity={COUPLING_OPACITY}
+            strokeOpacity={atomic.opacity["24"]}
           />
         </g>
       ) : undefined}

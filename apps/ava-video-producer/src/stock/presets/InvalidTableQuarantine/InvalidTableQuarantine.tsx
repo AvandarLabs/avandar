@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { QuarantinedRows } from "./QuarantinedRows";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InvalidTableQuarantine.schema";
@@ -28,14 +24,13 @@ const OPEN_FRAMES = 26;
 const SEE_THROUGH_SHUTTER = 0.87;
 /** The shutter slat's line weight before the line weight scales it. */
 const SLAT_STROKE = 8;
-/** The dash of the read path while reads are blocked. */
-const BLOCKED_DASH = "6 6";
 /** Invalidation closes reads until a whole replacement precedes reopening. */
 export function InvalidTableQuarantine({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -167,7 +162,7 @@ export function InvalidTableQuarantine({
           fill="none"
           stroke={readable ? accent : tokens.color.highlight}
           strokeWidth={scales.stroke(tokens.stroke.default)}
-          strokeDasharray={readable ? undefined : BLOCKED_DASH}
+          strokeDasharray={readable ? undefined : atomic.dash.long.join(" ")}
         />
       </g>
     </g>

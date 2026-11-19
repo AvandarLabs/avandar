@@ -2,12 +2,9 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import {
-  MISSING_DASH,
-  QUIET_CLASS_FILL_ALPHA,
-} from "./ChoroplethClassBreaks.constants";
 import type { ReactNode } from "react";
 
 type Props = { text: string; y: number };
@@ -16,6 +13,7 @@ type Props = { text: string; y: number };
  */
 export function MissingClassKey({ text, y }: Readonly<Props>): ReactNode {
   const { color, stroke } = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const shapes = useGraphicShapeScales();
   return (
     <g>
@@ -26,9 +24,9 @@ export function MissingClassKey({ text, y }: Readonly<Props>): ReactNode {
         width={14}
         height={14}
         fill={color.inactive}
-        fillOpacity={QUIET_CLASS_FILL_ALPHA}
+        fillOpacity={atomic.opacity["15"]}
         stroke={color.inactive}
-        strokeDasharray={MISSING_DASH}
+        strokeDasharray={atomic.dash.medium.join(" ")}
         strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <LabelSlots labels={[[text, 578, y, 322, 12, 2]]} />

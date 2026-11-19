@@ -1,15 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DimensionTicks } from "./DimensionTicks";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
 
-/** The structure footprint's tint, before the theme's tint strength. */
-const FOOTPRINT_TINT = 0.32;
 type Props = { input: Input; frame: number; accent: string };
 /**
  * The whole authored footprint lowers without rotation or automatic resizing.
@@ -19,6 +13,7 @@ export function StructureFootprint({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -44,7 +39,7 @@ export function StructureFootprint({
         width={width}
         height={height}
         fill={accent}
-        fillOpacity={scales.wash(FOOTPRINT_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["32"])}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />

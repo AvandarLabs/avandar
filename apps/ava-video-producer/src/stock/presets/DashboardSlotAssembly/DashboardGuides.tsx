@@ -1,10 +1,6 @@
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -12,14 +8,13 @@ type Props = { layout: Input["layout"]; frame: number; accent: string };
 
 /** Frames the alignment guide takes to extend across the board. */
 const EXTEND_FRAMES = 16;
-/** The dash of the temporary alignment guide. */
-const GUIDE_DASH = "5 7";
 /** Alignment extends from the featured slot, then withdraws after docking. */
 export function DashboardGuides({
   layout,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -43,7 +38,7 @@ export function DashboardGuides({
         profile={tokens.sketch.shape}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray={GUIDE_DASH}
+        strokeDasharray={atomic.dash.boundary.join(" ")}
       />
     </g>
   );

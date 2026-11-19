@@ -1,9 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { ReactNode } from "react";
 
@@ -13,7 +10,6 @@ type Props = {
   accent: string;
   showGuide: boolean;
 };
-const GUIDE_OPACITY = 0.45;
 /**
  * A numbered copy rises along its identity guide without implying transmission.
  */
@@ -23,6 +19,7 @@ export function TravelingCase({
   accent,
   showGuide,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const { record, index, mapX, mapY, histogramX, histogramY } = position;
@@ -49,7 +46,7 @@ export function TravelingCase({
           profile={tokens.sketch.shape}
           data-identity-guide={record.id}
           stroke={accent}
-          strokeOpacity={GUIDE_OPACITY}
+          strokeOpacity={atomic.opacity["45"]}
           strokeDasharray={tokens.dash.guide.join(" ")}
         />
       ) : undefined}

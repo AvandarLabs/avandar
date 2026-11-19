@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { TILE_CORNER } from "./lockShape";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
@@ -25,8 +21,6 @@ const LIFT_CUE = 53;
 const SORT_CUE = 61;
 /** The cue the strips are sorted and the lifted request drops back on. */
 const SORTED_CUE = 82;
-/** How faint the original request order stays beside the strips. */
-const ORIGINAL_ORDER_OPACITY = 0.45;
 /** Request strips sort geometrically before either operation acquires a key. */
 export function LockOperation({
   frame,
@@ -35,6 +29,7 @@ export function LockOperation({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -86,7 +81,7 @@ export function LockOperation({
       })}
       {input.showOriginalOrder ? (
         <g
-          opacity={ORIGINAL_ORDER_OPACITY}
+          opacity={atomic.opacity["45"]}
           data-original-order={operation.requestedIds.join(",")}
         >
           {operation.requestedIds.map((resourceId, requestIndex) => {

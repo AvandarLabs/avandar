@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 
@@ -22,8 +18,6 @@ type Props = {
 const DETACH_FRAMES = 16;
 /** A note's corner before the corner style scales it. */
 const NOTE_CORNER = 6;
-/** A detached note's outline opacity in the trail. */
-const TRAIL_OUTLINE_OPACITY = 0.4;
 /** A returned feedback tab detaches into its own reserved trail slot. */
 export function FeedbackNote({
   frame,
@@ -32,6 +26,7 @@ export function FeedbackNote({
   numRounds,
   showReviewTrail,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -76,7 +71,7 @@ export function FeedbackNote({
         rx={scales.corner(NOTE_CORNER)}
         fill={tokens.color.elevated}
         stroke={tokens.color.highlight}
-        strokeOpacity={mix(detach, 1, TRAIL_OUTLINE_OPACITY)}
+        strokeOpacity={mix(detach, 1, atomic.opacity["40"])}
       />
       <FitText
         text={round.feedback}

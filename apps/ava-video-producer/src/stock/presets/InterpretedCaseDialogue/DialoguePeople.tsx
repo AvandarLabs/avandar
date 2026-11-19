@@ -1,22 +1,19 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DialogueGestures } from "./DialogueGestures";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const LINK_DASH = "4 6";
 /** Direct participant-worker orientation keeps interpretation to one side. */
 export function DialoguePeople({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -33,7 +30,7 @@ export function DialoguePeople({
           profile={tokens.sketch.shape}
           data-sightline=""
           stroke={tokens.color.inactive}
-          strokeDasharray={LINK_DASH}
+          strokeDasharray={atomic.dash.spaced.join(" ")}
         />
       ) : undefined}
       <PersonGlyph x={210} y={485} posture="seated" color={accent} />

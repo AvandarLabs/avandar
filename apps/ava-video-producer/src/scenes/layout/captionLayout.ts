@@ -18,6 +18,12 @@ type CaptionGeometry = {
 };
 
 /**
+ * The caption border the reserved band is measured with when no theme is at
+ * hand: `classic`'s hairline. The drawn caption passes the theme's own.
+ */
+const DEFAULT_BORDER_WIDTH = 1;
+
+/**
  * One geometry calculation controls both the caption box and its reserved
  * band.
  */
@@ -27,6 +33,7 @@ export function captionGeometry(
   height: number,
   fontSize = 38,
   bottom = 48,
+  borderWidth = DEFAULT_BORDER_WIDTH,
 ): CaptionGeometry {
   assertFinite(width, "caption width");
   assertFinite(height, "caption height");
@@ -40,7 +47,6 @@ export function captionGeometry(
   const maxWidth = width * 0.84;
   const paddingX = 32;
   const paddingY = 18;
-  const borderWidth = 1;
   const lineHeight = 1.22;
   const clearance = 8;
   const fitted = fitTextLines(

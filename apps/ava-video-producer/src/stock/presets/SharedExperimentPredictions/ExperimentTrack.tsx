@@ -1,17 +1,11 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { TrackLabels } from "./TrackLabels";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
-/** The experiment track's tint, before the theme's tint strength. */
-const TRACK_TINT = 0.3;
 type Props = { input: Input; frame: number; accent: string };
 /**
  * A single released ball stops at the supplied observation after all flags
@@ -22,6 +16,7 @@ export function ExperimentTrack({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -44,7 +39,7 @@ export function ExperimentTrack({
         height={390}
         rx={scales.corner(15)}
         fill={tokens.color.surface}
-        fillOpacity={scales.wash(TRACK_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["30"])}
         stroke={tokens.color.line}
       />
       <SketchedShape

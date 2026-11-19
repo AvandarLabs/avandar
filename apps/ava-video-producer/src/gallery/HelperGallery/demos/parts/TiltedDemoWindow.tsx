@@ -4,13 +4,15 @@ import {
   getHorizontalBlurFilter,
 } from "../../../../motion-components/HorizontalBlur";
 import { useWindowStage } from "../../../../scenes/TiltedWindowScene/useWindowStage";
-import { WINDOW_SHADOW_FALLBACK_ALPHA } from "../../../../scenes/TiltedWindowScene/windowTilt";
 import {
   buildColorWithAlpha,
   elevationToBoxShadow,
 } from "../../../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../../../../videoTheme/useVideoTheme";
+import {
+  useVideoTheme,
+  useVideoTokens,
+} from "../../../../videoTheme/useVideoTheme";
 import { DemoWindow } from "./DemoWindow";
 import css from "./parts.module.css";
 import type { WindowPose } from "../../../../scenes/TiltedWindowScene/windowMotion";
@@ -68,6 +70,7 @@ export function TiltedDemoWindow(props: Props): ReactNode {
   const filterId = `demo-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const { tilt } = useWindowStage();
   const tokens = useVideoTokens();
+  const { atomic } = useVideoTheme();
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
   const transform = _buildTiltTransform(props, tilt);
@@ -75,7 +78,7 @@ export function TiltedDemoWindow(props: Props): ReactNode {
     layers: tokens.elevation.window.layers,
     color:
       scene.shadow ??
-      buildColorWithAlpha(scene.background, WINDOW_SHADOW_FALLBACK_ALPHA),
+      buildColorWithAlpha(scene.background, atomic.opacity["60"]),
   });
   return (
     <>

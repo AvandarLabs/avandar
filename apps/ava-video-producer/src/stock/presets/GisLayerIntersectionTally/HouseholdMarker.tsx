@@ -1,9 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdBadge } from "./HouseholdBadge";
 import { HouseholdCaption } from "./HouseholdCaption";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -16,7 +13,6 @@ type Props = {
   isSelected: boolean;
   accent: string;
 };
-const LEADER_OPACITY = 0.35;
 /**
  * Separate keyed records retain exact map anchors, even for coincident homes.
  */
@@ -27,6 +23,7 @@ export function HouseholdMarker({
   isSelected,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const progress = isSelected
@@ -50,7 +47,7 @@ export function HouseholdMarker({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={isSelected ? accent : tokens.color.inactive}
-        strokeOpacity={LEADER_OPACITY}
+        strokeOpacity={atomic.opacity["35"]}
       />
       <HouseholdBadge
         household={household}

@@ -1,10 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
@@ -15,8 +12,6 @@ type Props = {
   accent: string;
 };
 
-/** The dash of a connector that stops short of an unsubscribed view. */
-const UNSUBSCRIBED_DASH = "3 6";
 /** A connector stops explicitly at the independent reference view. */
 export function SubscriptionFrame({
   view,
@@ -24,6 +19,7 @@ export function SubscriptionFrame({
   width,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -37,7 +33,7 @@ export function SubscriptionFrame({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={view.subscribed ? accent : tokens.color.inactive}
-          strokeDasharray={view.subscribed ? undefined : UNSUBSCRIBED_DASH}
+          strokeDasharray={view.subscribed ? undefined : atomic.dash.sparse.join(" ")}
         />
       </g>
       {view.subscribed ? undefined : (

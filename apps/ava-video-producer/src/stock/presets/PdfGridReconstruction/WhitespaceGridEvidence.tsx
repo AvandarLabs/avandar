@@ -1,21 +1,16 @@
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getEvidenceFromFrame } from "./gridTiming";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
 
-/** A whitespace corridor's tint before the tint strength scales it. */
-const CORRIDOR_TINT = 0.25;
 /** Selected structural evidence derives from the supplied grid geometry. */
 export function WhitespaceGridEvidence({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -39,7 +34,7 @@ export function WhitespaceGridEvidence({
                   width={8}
                   height={height * progress}
                   fill={tokens.color.highlight}
-                  fillOpacity={scales.wash(CORRIDOR_TINT)}
+                  fillOpacity={scales.wash(atomic.opacity["25"])}
                 />
               );
             },
@@ -54,7 +49,7 @@ export function WhitespaceGridEvidence({
                 width={400 * progress}
                 height={8}
                 fill={tokens.color.highlight}
-                fillOpacity={scales.wash(CORRIDOR_TINT)}
+                fillOpacity={scales.wash(atomic.opacity["25"])}
               />
             );
           })}

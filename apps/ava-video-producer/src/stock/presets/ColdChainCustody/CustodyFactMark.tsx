@@ -1,7 +1,13 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+/** The dash of an acknowledgement box left unticked; no theme step draws it. */
+const UNACKNOWLEDGED_DASH = "2 2";
 
 type Props = { x: number; y: number; accent: string } & (
   | { kind: "monitoring"; value: "logged" | "review" | "missing" }
@@ -17,6 +23,7 @@ export function CustodyFactMark({
   value,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   if (kind === "acknowledgement") {
     return (
       <StockRect
@@ -26,7 +33,7 @@ export function CustodyFactMark({
         height={10}
         fill={value ? accent : "none"}
         stroke={tokens.color.text}
-        strokeDasharray={value ? undefined : "2 2"}
+        strokeDasharray={value ? undefined : UNACKNOWLEDGED_DASH}
       />
     );
   }
@@ -51,7 +58,9 @@ export function CustodyFactMark({
             ? accent
             : tokens.color.highlight
         }
-        strokeDasharray={value === "unknown" ? "2 3" : undefined}
+        strokeDasharray={
+          value === "unknown" ? atomic.dash.dot.join(" ") : undefined
+        }
       />
     </g>
   );

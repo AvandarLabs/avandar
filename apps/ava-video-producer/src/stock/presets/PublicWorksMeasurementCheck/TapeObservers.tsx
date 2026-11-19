@@ -1,14 +1,9 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 
-/** How strongly an observer's leader line to the tape shows. */
-const LEADER_OPACITY = 0.35;
 type Props = { input: Input; endX: number; accent: string };
 /** Two named observers hold the moving tape ends with attached hands. */
 export function TapeObservers({
@@ -16,6 +11,7 @@ export function TapeObservers({
   endX,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -56,7 +52,7 @@ export function TapeObservers({
               }}
               profile={tokens.sketch.shape}
               stroke={accent}
-              opacity={LEADER_OPACITY}
+              opacity={atomic.opacity["35"]}
               fill="none"
             />
           </g>

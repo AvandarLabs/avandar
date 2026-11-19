@@ -1,17 +1,12 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ActivityPaper } from "./ActivityPaper";
 import { ReturnActivityLabels } from "./ReturnActivityLabels";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
 
-/** The dash linking an activity back to the prior work it resumes. */
-const PRIOR_LINK_DASH = "3 4";
 type Props = {
   activity: Input["returnActivities"][number];
   index: number;
@@ -29,6 +24,7 @@ export function ReturnActivity({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const progress = motion.ramp(
@@ -54,7 +50,7 @@ export function ReturnActivity({
             profile={tokens.sketch.shape}
             fill="none"
             stroke={tokens.color.accentAlt}
-            strokeDasharray={PRIOR_LINK_DASH}
+            strokeDasharray={atomic.dash.short.join(" ")}
           />
         </g>
       ) : undefined}

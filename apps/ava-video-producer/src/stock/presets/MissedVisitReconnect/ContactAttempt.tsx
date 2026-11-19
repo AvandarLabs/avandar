@@ -1,13 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
-/** The dash of a contact attempt that did not reach the person. */
-const UNREACHED_DASH = "2 3";
 type Props = {
   item: Input["cases"][number];
   index: number;
@@ -25,6 +20,7 @@ export function ContactAttempt({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const contact = motion.ramp(
@@ -52,7 +48,7 @@ export function ContactAttempt({
         profile={tokens.sketch.shape}
         stroke={accent}
         strokeDasharray={
-          item.outcome === "unreached" ? UNREACHED_DASH : undefined
+          item.outcome === "unreached" ? atomic.dash.dot.join(" ") : undefined
         }
       />
     </g>

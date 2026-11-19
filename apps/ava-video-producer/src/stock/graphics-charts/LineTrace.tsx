@@ -5,11 +5,7 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
 import type { ReactNode } from "react";
@@ -20,13 +16,7 @@ const TRACE_AT = 23;
 const TRACE_FRAMES = 94;
 const HEADING_SIZE = 29;
 const SAMPLE_NOTE_SIZE = 13;
-const CHART_FILL_ALPHA = 0.15;
-const GRID_ALPHA = 0.6;
 const REFERENCE_ALPHA = 0.38;
-const REFERENCE_DASH = "5 7";
-const HEAD_GUIDE_ALPHA = 0.22;
-const HEAD_HALO_ALPHA = 0.1;
-const REFERENCE_KEY_ALPHA = 0.5;
 
 /** Draws the bounded authored line-trace study at an explicit frame. */
 export function LineTrace({
@@ -35,6 +25,7 @@ export function LineTrace({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, dash, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -83,7 +74,7 @@ export function LineTrace({
           <stop
             offset="0"
             stopColor={accent}
-            stopOpacity={shapes.wash(CHART_FILL_ALPHA)}
+            stopOpacity={shapes.wash(atomic.opacity["15"])}
           />
           <stop offset="1" stopColor={accent} stopOpacity="0" />
         </linearGradient>
@@ -120,7 +111,7 @@ export function LineTrace({
               shape={{ kind: "path", d: `M121 ${458 - value * 3.1} H839` }}
               profile={sketch.shape}
               stroke={color.line}
-              strokeOpacity={GRID_ALPHA}
+              strokeOpacity={atomic.opacity["60"]}
               strokeWidth={shapes.stroke(stroke.hairline)}
             />
             <Text role="pill" x={99} y={463 - value * 3.1} anchor="end">
@@ -137,7 +128,7 @@ export function LineTrace({
           stroke={color.accentAlt}
           strokeOpacity={REFERENCE_ALPHA}
           strokeWidth={shapes.stroke(stroke.default)}
-          strokeDasharray={REFERENCE_DASH}
+          strokeDasharray={atomic.dash.boundary.join(" ")}
         />
       ) : null}
       <g clipPath={`url(#${id}-chart-clip)`}>
@@ -170,7 +161,7 @@ export function LineTrace({
         shape={{ kind: "path", d: `M${head.x} ${head.y} V458` }}
         profile={sketch.shape}
         stroke={accent}
-        strokeOpacity={HEAD_GUIDE_ALPHA}
+        strokeOpacity={atomic.opacity["22"]}
         strokeWidth={shapes.stroke(stroke.hairline)}
         strokeDasharray={dash.guide.join(" ")}
       />
@@ -179,7 +170,7 @@ export function LineTrace({
         cy={head.y}
         r={12}
         fill={accent}
-        fillOpacity={shapes.wash(HEAD_HALO_ALPHA)}
+        fillOpacity={shapes.wash(atomic.opacity["10"])}
       />
       <circle cx={head.x} cy={head.y} r={5.5} fill={accent} />
       <Text role="footnote" x={121} y={491}>
@@ -199,7 +190,7 @@ export function LineTrace({
             cy={543}
             r={4}
             fill={color.accentAlt}
-            fillOpacity={REFERENCE_KEY_ALPHA}
+            fillOpacity={atomic.opacity["50"]}
           />
           <Text role="note" x={276} y={548}>
             {input.referenceLabel}

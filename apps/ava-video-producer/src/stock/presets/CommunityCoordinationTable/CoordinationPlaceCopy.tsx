@@ -1,10 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -22,6 +19,7 @@ export function CoordinationPlaceCopy({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const color = getCoordinationPlaceColorFromIndex({
@@ -68,7 +66,9 @@ export function CoordinationPlaceCopy({
         rx={scales.corner(tokens.corner.chip)}
         fill="none"
         stroke={color}
-        strokeOpacity={frame >= 108 ? 0.8 : 0.3}
+        strokeOpacity={
+          frame >= 108 ? atomic.opacity["80"] : atomic.opacity["30"]
+        }
       />
       <FitText
         text={place.requestLabel}

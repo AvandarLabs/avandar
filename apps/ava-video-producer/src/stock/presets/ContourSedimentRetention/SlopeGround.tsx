@@ -1,13 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
-const EXIT_DASH = "5 5";
 /** The common slope and outlet remain fixed through the intervention. */
 export function SlopeGround(): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -24,7 +21,7 @@ export function SlopeGround(): ReactNode {
         profile={tokens.sketch.shape}
         data-exit="boundary"
         stroke={tokens.color.inactive}
-        strokeDasharray={EXIT_DASH}
+        strokeDasharray={atomic.dash.wide.join(" ")}
       />
     </g>
   );

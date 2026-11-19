@@ -44,10 +44,11 @@ export function GridCells({
               width={330 / columns}
               height={330 / rows}
               fill={accent}
-              fillOpacity={
+              fillOpacity={shapes.wash(
                 motion.ramp(frame, SHADE_AT, motion.scale(SHADE_FRAMES)) *
-                (SHADE_FLOOR + (cell.count / input.points.length) * SHADE_RANGE)
-              }
+                  (SHADE_FLOOR +
+                    (cell.count / input.points.length) * SHADE_RANGE),
+              )}
               stroke={color.line}
               strokeOpacity={motion.ramp(
                 frame,

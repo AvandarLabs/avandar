@@ -1,11 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import type { ReactNode } from "react";
 
@@ -17,8 +13,6 @@ type Props = {
   parentLabel: string;
   showEffortValues: boolean;
 };
-/** How strongly a piece's leader line to its label shows. */
-const LEADER_OPACITY = 0.45;
 /** The tint of a work piece, before the theme's tint strength. */
 const PIECE_TINT = 0.16;
 /** Preserve piece area while separating cuts and attaching external labels. */
@@ -30,6 +24,7 @@ export function WorkPiece({
   parentLabel,
   showEffortValues,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -61,7 +56,7 @@ export function WorkPiece({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={color}
-          strokeOpacity={LEADER_OPACITY}
+          strokeOpacity={atomic.opacity["45"]}
         />
         <circle
           cx={x + piece.width / 2}

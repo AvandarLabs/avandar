@@ -9,11 +9,7 @@ import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StaggerCardsInput } from "../presets/StaggerCards/StaggerCards.schema";
 import type { ReactNode } from "react";
@@ -28,7 +24,6 @@ const HEADING_SIZE = 31;
 const CARD_LABEL_SIZE = 26;
 const ICON_CORNER = 10;
 const ICON_FILL_ALPHA = 0.075;
-const ICON_STROKE_ALPHA = 0.28;
 const GLYPH_STROKE = 1.7;
 
 /** Draws the bounded authored stagger-cards study at an explicit frame. */
@@ -37,6 +32,7 @@ export function StaggerCards({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const { color, stroke, alpha, sketch } = tokens;
   const shapes = useGraphicShapeScales();
@@ -78,7 +74,7 @@ export function StaggerCards({
                 fill={cardColor}
                 fillOpacity={shapes.wash(ICON_FILL_ALPHA)}
                 stroke={cardColor}
-                strokeOpacity={ICON_STROKE_ALPHA}
+                strokeOpacity={atomic.opacity["28"]}
                 strokeWidth={hairline}
               />
               <SketchedShape

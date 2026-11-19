@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
@@ -15,7 +11,6 @@ const CONE_FRAMES = 34;
 /** The frame the cones give way to the field unless they stay shown. */
 const CONES_HIDE_AT = 106;
 const CONE_HEIGHT_PER_WEIGHT = 12;
-const BOUNDARY_ALPHA = 0.32;
 const CONE_FILL_ALPHA = 0.04;
 /** Weighted cones rise over fixed observations and change radius together. */
 export function KernelCones({
@@ -23,6 +18,7 @@ export function KernelCones({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { stroke, alpha, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -50,7 +46,7 @@ export function KernelCones({
               profile={sketch.shape}
               fill="none"
               stroke={accent}
-              strokeOpacity={BOUNDARY_ALPHA}
+              strokeOpacity={atomic.opacity["32"]}
               strokeWidth={hairline}
             />
             <SketchedShape

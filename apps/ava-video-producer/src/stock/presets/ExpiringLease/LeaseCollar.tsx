@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 
@@ -16,8 +13,6 @@ type Props = {
 
 /** The collar's line weight before the line weight scales it. */
 const COLLAR_STROKE = 5;
-/** How faint a spent collar segment stays. */
-const SPENT_OPACITY = 0.12;
 /** A finite collar drops one authored segment at each evenly spaced beat. */
 export function LeaseCollar({
   input,
@@ -26,6 +21,7 @@ export function LeaseCollar({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const elapsed = Math.min(
@@ -51,7 +47,7 @@ export function LeaseCollar({
               fill="none"
               stroke={accent}
               strokeWidth={scales.stroke(COLLAR_STROKE)}
-              strokeOpacity={segment >= elapsed ? 1 : SPENT_OPACITY}
+              strokeOpacity={segment >= elapsed ? 1 : atomic.opacity["12"]}
               strokeLinecap="round"
             />
           </g>

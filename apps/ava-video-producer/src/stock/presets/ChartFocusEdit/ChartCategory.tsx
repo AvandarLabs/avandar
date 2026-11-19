@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CategoryContext } from "./CategoryContext";
 import { CategoryLabel } from "./CategoryLabel";
 import { getRefinementFromFrame } from "./getRefinementFromFrame";
@@ -19,8 +15,6 @@ type Props = {
   accent: string;
 };
 
-/** The opacity a bar out of focus dims to. */
-const UNFOCUSED_OPACITY = 0.35;
 /** A bar's corner before the corner style scales it. */
 const BAR_CORNER = 2;
 /**
@@ -33,6 +27,7 @@ export function ChartCategory({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -56,7 +51,7 @@ export function ChartCategory({
       ) : undefined}
       <g
         data-bar-emphasis={category.id}
-        opacity={emphasized ? mix(refinement, 1, UNFOCUSED_OPACITY) : 1}
+        opacity={emphasized ? mix(refinement, 1, atomic.opacity["35"]) : 1}
       >
         <rect
           data-chart-bar={category.id}

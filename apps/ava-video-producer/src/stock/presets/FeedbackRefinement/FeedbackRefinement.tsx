@@ -1,10 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FeedbackDraft } from "./FeedbackDraft";
 import { FeedbackNote } from "./FeedbackNote";
 import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
@@ -16,8 +13,6 @@ type Props = GraphicProps & { input: Input };
 
 /** Frames the whole study takes to fade in. */
 const INTRO_FRAMES = 20;
-/** The dash of the route between author and reviewer. */
-const ROUTE_DASH = "4 8";
 /**
  * Authored feedback travels with a changing draft through sequential
  * reviews.
@@ -28,6 +23,7 @@ export function FeedbackRefinement({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const state = getFeedbackStateFromInputAndFrame({ frame, input, motion });
@@ -54,7 +50,7 @@ export function FeedbackRefinement({
         shape={{ kind: "path", d: "M100 330 H860" }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
-        strokeDasharray={ROUTE_DASH}
+        strokeDasharray={atomic.dash.airy.join(" ")}
       />
       {[input.roleLabels.author, input.roleLabels.reviewer].map(
         (label, index) => {

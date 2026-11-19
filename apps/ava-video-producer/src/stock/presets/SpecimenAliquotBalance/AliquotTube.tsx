@@ -1,14 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AliquotTubeLabels } from "./AliquotTubeLabels";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
 
-/** How strongly the liquid in a tube shows. */
-const LIQUID_OPACITY = 0.7;
 type Props = {
   tube: Input["parent"];
   parentId: string;
@@ -30,6 +25,7 @@ export function AliquotTube({
   accent,
   isChild = false,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -62,7 +58,7 @@ export function AliquotTube({
         width={40}
         height={volume * 9}
         fill={accent}
-        opacity={LIQUID_OPACITY}
+        opacity={atomic.opacity["70"]}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M${x - 29} 146 H${x + 29}` }}

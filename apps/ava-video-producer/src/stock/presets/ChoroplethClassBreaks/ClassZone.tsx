@@ -4,13 +4,9 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import {
-  HIGH_CLASS_FILL_ALPHA,
-  MISSING_DASH,
-  QUIET_CLASS_FILL_ALPHA,
-} from "./ChoroplethClassBreaks.constants";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
@@ -63,6 +59,7 @@ export function ClassZone({
   noDataLabel,
 }: Readonly<Props>): ReactNode {
   const { color: colors, stroke } = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const arrival = motion.ramp(
@@ -93,10 +90,10 @@ export function ClassZone({
         height={140}
         fill={color}
         fillOpacity={
-          category === "high" ? HIGH_CLASS_FILL_ALPHA : QUIET_CLASS_FILL_ALPHA
+          category === "high" ? atomic.opacity["45"] : atomic.opacity["15"]
         }
         stroke={color}
-        strokeDasharray={category === "missing" ? MISSING_DASH : undefined}
+        strokeDasharray={category === "missing" ? atomic.dash.medium.join(" ") : undefined}
         strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <LabelSlots

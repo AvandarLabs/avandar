@@ -2,18 +2,12 @@ import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/int
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AquiferOwnershipKey } from "./AquiferOwnershipKey";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AquiferCutaway. */
 type Props = { frame: number; accent: string; input: Input };
-const FLOW_GUIDE_DASH = "3 4";
-const REQUEST_DASH = "5 5";
 const DRAW_ON_LENGTH = 1;
 
 /** Recharge, pumping and natural outflow cross separate physical boundaries. */
@@ -22,6 +16,7 @@ export function AquiferCutaway({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -112,7 +107,7 @@ export function AquiferCutaway({
               data-flow-guide={key}
               stroke={tokens.color.inactive}
               strokeWidth={scales.stroke(tokens.stroke.hairline)}
-              strokeDasharray={FLOW_GUIDE_DASH}
+              strokeDasharray={atomic.dash.short.join(" ")}
               fill="none"
             />
             <SketchedShape
@@ -142,7 +137,7 @@ export function AquiferCutaway({
         rx={scales.corner(tokens.corner.cell)}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeDasharray={REQUEST_DASH}
+        strokeDasharray={atomic.dash.wide.join(" ")}
       />
       <FitText
         text={input.copy.requested}

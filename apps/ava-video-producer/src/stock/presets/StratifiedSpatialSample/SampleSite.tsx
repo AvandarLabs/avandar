@@ -1,16 +1,11 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SiteAnchor } from "./SiteAnchor";
 import { SiteKey } from "./SiteKey";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
-/** How strongly a site's leader line to the sample rail shows. */
-const LEADER_OPACITY = 0.2;
 type Props = {
   site: Input["sites"][number];
   index: number;
@@ -28,6 +23,7 @@ export function SampleSite({
   selected,
   showLabel,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const lift = selected
@@ -43,7 +39,7 @@ export function SampleSite({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.inactive}
-        strokeOpacity={LEADER_OPACITY}
+        strokeOpacity={atomic.opacity["20"]}
       />
       <SiteAnchor
         siteId={site.id}

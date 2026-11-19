@@ -1,19 +1,16 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; progress: number; accent: string };
-const TRACE_DASH = "5 7";
 /** Approach Trace for the authored scene. */
 export function ApproachTrace({
   input,
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return input.showApproachTrace ? (
@@ -24,7 +21,7 @@ export function ApproachTrace({
       fill="none"
       stroke={accent}
       strokeWidth={scales.stroke(tokens.stroke.default)}
-      strokeDasharray={TRACE_DASH}
+      strokeDasharray={atomic.dash.boundary.join(" ")}
       opacity={progress * tokens.alpha.guide}
     />
   ) : undefined;

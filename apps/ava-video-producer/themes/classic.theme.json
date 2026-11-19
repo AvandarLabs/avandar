@@ -280,6 +280,7 @@
           "65": 0.65,
           "68": 0.68,
           "70": 0.7,
+          "80": 0.8,
           "100": 1
         },
         "shadow": {
@@ -337,7 +338,18 @@
           "spaced": [4, 6],
           "boundary": [5, 7],
           "long": [6, 6],
-          "tight": [4, 3]
+          "tight": [4, 3],
+          "dense": [3, 3],
+          "dot": [2, 3],
+          "dotted": [2, 4],
+          "medium": [4, 5],
+          "sparse": [3, 6],
+          "trail": [3, 7],
+          "airy": [4, 8],
+          "open": [5, 8],
+          "stitch": [5, 3],
+          "notch": [6, 3],
+          "bold": [6, 4]
         },
         "curveTension": { "md": 0.45 },
         "duration": {
@@ -972,7 +984,8 @@
         "dash": {
           "guide": "$atomic.dash.loose",
           "pending": "$atomic.dash.even",
-          "placeholder": "$atomic.dash.wide"
+          "placeholder": "$atomic.dash.wide",
+          "planned": "$atomic.dash.dense"
         }
       }
     }
@@ -1035,7 +1048,7 @@
         "haloRadius": 14,
         "haloAlpha": "$atomic.opacity.6",
         "twinklePeriod": "$motion.pulse.period",
-        "twinkleFloor": 0.45
+        "twinkleFloor": "$atomic.opacity.45"
       }
     },
     "Guide": {
@@ -1094,17 +1107,17 @@
         "highlightEdgeAlpha": "$atomic.opacity.34",
         "edgeAlpha": "$atomic.opacity.65",
         "hubPulsePeriod": "$motion.pulse.period",
-        "hubPulseFloor": 0.65,
-        "hubPulseSwing": 0.3,
+        "hubPulseFloor": "$atomic.opacity.65",
+        "hubPulseSwing": "$atomic.opacity.30",
         "nodePulsePeriod": "$atomic.period.lg",
-        "nodePulseSwing": 0.5
+        "nodePulseSwing": "$atomic.opacity.50"
       }
     },
     "RadialNetwork": {
       "defaultProps": {
         "spokeAlpha": "$atomic.opacity.30",
         "spokePulsePeriod": "$motion.pulse.period",
-        "spokePulseSwing": 0.6,
+        "spokePulseSwing": "$atomic.opacity.60",
         "hubRadius": 70,
         "hubStrokeAlpha": "$atomic.opacity.40",
         "hubStrokeWidth": "$stroke.hairline",
@@ -1144,11 +1157,11 @@
     "DataPipeline": {
       "defaultProps": {
         "activeTintAlpha": 0.04,
-        "activeStrokeAlpha": 0.6,
+        "activeStrokeAlpha": "$atomic.opacity.60",
         "activeStrokeWidth": "$stroke.hairline",
         "iconRadius": 25,
         "iconFillAlpha": "$atomic.opacity.8",
-        "iconStrokeAlpha": 0.35,
+        "iconStrokeAlpha": "$atomic.opacity.35",
         "iconStrokeWidth": "$stroke.hairline",
         "checkSize": 19,
         "dotRadius": 5,
@@ -1159,7 +1172,7 @@
     "PredicatePushdownBoundary": {
       "defaultProps": {
         "boundaryWidth": "$stroke.default",
-        "boundaryDash": [5, 7],
+        "boundaryDash": "$atomic.dash.boundary",
         "predicateRadius": 10,
         "predicateStrokeWidth": "$stroke.hairline",
         "rowRadius": 5,
@@ -1172,7 +1185,7 @@
         "radius": 19,
         "dividerWidth": "$stroke.hairline",
         "dotRadius": 4.5,
-        "dotAlpha": 0.45
+        "dotAlpha": "$atomic.opacity.45"
       }
     },
     "CodeFocus": {
@@ -1191,7 +1204,7 @@
         "dotRadius": 5,
         "edgeAlpha": "$atomic.opacity.70",
         "ringRadius": 13,
-        "ringAlpha": 0.6,
+        "ringAlpha": "$atomic.opacity.60",
         "ringStrokeWidth": "$stroke.hairline",
         "checkSize": 10
       }
@@ -1201,7 +1214,7 @@
         "tableRadius": 5,
         "tableStrokeWidth": "$stroke.default",
         "gridStrokeWidth": "$stroke.hairline",
-        "missingDash": [5, 3],
+        "missingDash": "$atomic.dash.stitch",
         "missingStrokeWidth": "$stroke.hairline",
         "cardRadius": 10,
         "cardStrokeWidth": "$stroke.hairline",
@@ -1217,7 +1230,7 @@
         "chipFillAlpha": 0.07,
         "chipStrokeAlpha": "$atomic.opacity.30",
         "chipStrokeWidth": "$stroke.hairline",
-        "outEdgeAlpha": 0.5,
+        "outEdgeAlpha": "$atomic.opacity.50",
         "outEdgeWidth": "$atomic.strokeWidth.lg",
         "outPacketPeriod": 60,
         "mergeRadius": 39,
@@ -1225,10 +1238,10 @@
         "mergeStrokeWidth": "$stroke.hairline",
         "glyphWidth": "$atomic.strokeWidth.md",
         "barHeight": 6,
-        "barAlpha": 0.8,
+        "barAlpha": "$atomic.opacity.80",
         "slotRadius": 5,
-        "slotFillAlpha": 0.12,
-        "slotStrokeAlpha": 0.6,
+        "slotFillAlpha": "$atomic.opacity.12",
+        "slotStrokeAlpha": "$atomic.opacity.60",
         "slotStrokeWidth": "$stroke.default"
       }
     },
@@ -1242,7 +1255,7 @@
         "gateWidth": "$stroke.default",
         "gateSpread": 9,
         "markerRadius": 13,
-        "markerAlpha": 0.12,
+        "markerAlpha": "$atomic.opacity.12",
         "markerCoreRadius": 5,
         "lineGap": 4
       }
@@ -1356,7 +1369,7 @@
       "defaultProps": {
         "scale": 1.4,
         "pressDepth": 0.07,
-        "trailAlpha": 0.09,
+        "trailAlpha": "$atomic.opacity.9",
         "trailLimit": 4,
         "shadow": { "shadow": "$atomic.shadow.cursor", "color": "$black" },
         "travelEasing": "$atomic.easing.inOutCubic"

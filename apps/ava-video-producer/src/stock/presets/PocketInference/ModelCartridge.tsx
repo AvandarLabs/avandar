@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CartridgeText } from "./CartridgeText";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
@@ -13,10 +9,6 @@ import type { ReactNode } from "react";
 type Props = { frame: number; input: Input; accent: string };
 /** The closed cartridge's corner, before the theme's corner style. */
 const CARTRIDGE_CORNER = 16;
-/** The dash of the cartridge's cutaway outline. */
-const CUTAWAY_DASH = "4 5";
-/** The peak opacity of the inference ripple. */
-const RIPPLE_OPACITY = 0.3;
 /**
  * The resident model seats entirely inside the casing before the single
  * inference ripple.
@@ -26,6 +18,7 @@ export function ModelCartridge({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -44,7 +37,7 @@ export function ModelCartridge({
         )}
         fill={tokens.color.ground}
         stroke={tokens.color.line}
-        strokeDasharray={input.showCutaway ? CUTAWAY_DASH : undefined}
+        strokeDasharray={input.showCutaway ? atomic.dash.medium.join(" ") : undefined}
       />
       <g
         data-cartridge-installation="local"
@@ -75,7 +68,7 @@ export function ModelCartridge({
             width={6}
             height={48}
             fill={accent}
-            fillOpacity={RIPPLE_OPACITY * Math.sin(ripple * Math.PI)}
+            fillOpacity={atomic.opacity["30"] * Math.sin(ripple * Math.PI)}
           />
         ) : undefined}
       </g>

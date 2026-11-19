@@ -3,11 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getLockStateFromFrame } from "./getLockStateFromFrame";
 import { LockOperation } from "./LockOperation";
 import { TILE_CORNER } from "./lockShape";
@@ -17,16 +13,13 @@ import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
 
-/** The dash of an operation's first reach toward a key. */
-const REACH_DASH = "5 7";
-/** How faint the first reaches are. */
-const REACH_OPACITY = 0.65;
 /** Opposite request strips become a single exclusive acquisition sequence. */
 export function OrderedLockAcquisition({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -83,8 +76,8 @@ export function OrderedLockAcquisition({
                   profile={tokens.sketch.shape}
                   fill="none"
                   stroke={tokens.color.highlight}
-                  strokeDasharray={REACH_DASH}
-                  opacity={REACH_OPACITY}
+                  strokeDasharray={atomic.dash.boundary.join(" ")}
+                  opacity={atomic.opacity["65"]}
                 />
               </g>
             );

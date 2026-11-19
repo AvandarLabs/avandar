@@ -1,10 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getClusterPointPositionFromPoint } from "./getClusterPointPositionFromPoint";
 import { LocationCounts } from "./LocationCounts";
 import type { Input } from "./MapClusterUnfold.schema";
@@ -14,7 +10,6 @@ type Props = { input: Input; frame: number; grouping: number; accent: string };
 
 const POINTS_AT = 13;
 const POINTS_FRAMES = 39;
-const POINT_FILL_ALPHA = 0.5;
 /**
  * Every identity follows its own authored source and referenced cluster
  * center.
@@ -25,6 +20,7 @@ export function ClusterPoints({
   grouping,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, alpha, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -55,7 +51,7 @@ export function ClusterPoints({
               shape={{ kind: "circle", cx: x, cy: y, r: 6 }}
               profile={sketch.shape}
               fill={accent}
-              fillOpacity={POINT_FILL_ALPHA}
+              fillOpacity={atomic.opacity["50"]}
               stroke={color.text}
               strokeWidth={hairline}
             />

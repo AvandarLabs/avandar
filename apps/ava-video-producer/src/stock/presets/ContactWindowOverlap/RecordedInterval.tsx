@@ -1,19 +1,16 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 
 type Props = { record: Input["records"][number]; axisEnd: number; y: number };
-const INTERVAL_TINT = 0.35;
 /** Missing times receive a question mark, never an invented duration. */
 export function RecordedInterval({
   record,
   axisEnd,
   y,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return record.start !== null && record.end !== null ? (
@@ -25,7 +22,7 @@ export function RecordedInterval({
       height={14}
       rx={scales.corner(tokens.corner.chip)}
       fill={tokens.color.inactive}
-      fillOpacity={scales.wash(INTERVAL_TINT)}
+      fillOpacity={scales.wash(atomic.opacity["35"])}
     />
   ) : (
     <SketchedShape

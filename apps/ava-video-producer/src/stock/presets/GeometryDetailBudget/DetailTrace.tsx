@@ -1,8 +1,5 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import { RemovedDeviationGuides } from "./RemovedDeviationGuides";
 import { SourceVertices } from "./SourceVertices";
@@ -15,14 +12,13 @@ const ORIGINAL_AT = 13;
 const ORIGINAL_FRAMES = 37;
 const SIMPLIFIED_AT = 111;
 const SIMPLIFIED_FRAMES = 28;
-/** How much of the original trace fades once the simplified one draws. */
-const ORIGINAL_FADE = 0.7;
 /** Original and retained traces share fixed source-vertex coordinates. */
 export function DetailTrace({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke } = useGraphicTokens();
   const motion = useGraphicMotion();
   const { keptIndices } = makeDetailSimplificationFromInput(input);
@@ -48,7 +44,7 @@ export function DetailTrace({
         opacity={
           1 -
           motion.ramp(frame, SIMPLIFIED_AT, motion.scale(SIMPLIFIED_FRAMES)) *
-            ORIGINAL_FADE
+            atomic.opacity["70"]
         }
       />
       {input.showDeviationGuides ? (

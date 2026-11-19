@@ -1,8 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import { MeasurementStripLabels } from "./MeasurementStripLabels";
 import type { Input } from "./WideTableToObservations.schema";
@@ -15,8 +12,6 @@ type Props = {
   subjectIndex: number;
   measureIndex: number;
 };
-/** How opaque a measurement strip's surface is over the table behind it. */
-const STRIP_FILL_OPACITY = 0.8;
 /** Each measurement peels away carrying its subject, measure and unit. */
 export function MeasurementStrip({
   input,
@@ -25,6 +20,7 @@ export function MeasurementStrip({
   subjectIndex,
   measureIndex,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
   const scene = getMeasurementStripFromFrame({
@@ -52,7 +48,7 @@ export function MeasurementStrip({
         width={scene.width}
         height={76}
         fill={tokens.color.surface}
-        fillOpacity={STRIP_FILL_OPACITY}
+        fillOpacity={atomic.opacity["80"]}
         stroke={accent}
       />
       <MeasurementStripLabels

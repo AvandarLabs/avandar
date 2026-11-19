@@ -2,10 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { JigPattern } from "./JigPattern";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -22,8 +19,6 @@ type Props = {
 const FABRIC_CORNER = 16;
 /** A card workpiece's corner, before the theme's corner style. */
 const CARD_CORNER = 2;
-/** The stitched dash of a fabric workpiece. */
-const FABRIC_DASH = "5 3";
 /** A retained existing workpiece receives one matching application. */
 export function JigStation({
   collaborator,
@@ -33,6 +28,7 @@ export function JigStation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -56,7 +52,7 @@ export function JigStation({
         fill={tokens.color.surface}
         stroke={tokens.color.line}
         strokeDasharray={
-          input.workpieceMaterial === "fabric" ? FABRIC_DASH : undefined
+          input.workpieceMaterial === "fabric" ? atomic.dash.stitch.join(" ") : undefined
         }
       />
       {hasApplication ? (

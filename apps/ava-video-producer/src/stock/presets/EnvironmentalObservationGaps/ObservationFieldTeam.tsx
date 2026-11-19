@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
@@ -61,7 +57,6 @@ function _getTeamPosition({
 }
 /** Inputs for ObservationFieldTeam. */
 type Props = { frame: number; input: Input };
-const REACH_TINT = 0.3;
 
 /**
  * One team member places each point, travelling only along reserved sampling
@@ -71,6 +66,7 @@ export function ObservationFieldTeam({
   frame,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -114,7 +110,7 @@ export function ObservationFieldTeam({
           cy={y}
           r={4 * reach}
           fill={tokens.color.highlight}
-          fillOpacity={scales.wash(REACH_TINT)}
+          fillOpacity={scales.wash(atomic.opacity["30"])}
         />
       ) : undefined}
     </g>

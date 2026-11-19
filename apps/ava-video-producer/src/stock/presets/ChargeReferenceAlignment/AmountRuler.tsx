@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
@@ -26,6 +26,7 @@ export function AmountRuler({
   precision,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const x = comparison.isMatched ? 290 : 290 + index * 320;
   const y = comparison.isMatched ? 425 + index * 39 : 425;
@@ -57,7 +58,7 @@ export function AmountRuler({
           (comparison.isMatched ? progress : 1)
         }
         fill={index === 0 ? accent : tokens.color.accentAlt}
-        fillOpacity={input.focus === "amounts" ? 1 : 0.7}
+        fillOpacity={input.focus === "amounts" ? 1 : atomic.opacity["70"]}
       />
       <LabelSlots labels={[[amountLabel, labelX, labelY, 200, 14, 1]]} />
     </g>

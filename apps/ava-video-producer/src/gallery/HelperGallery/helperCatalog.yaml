@@ -92,9 +92,7 @@ modules:
       - name: getRestingPose
         reason: "A window's resting pose in the theme's tilt; a value, previewed through the window helpers."
   - path: src/scenes/TiltedWindowScene/windowTilt.ts
-    excluded:
-      - name: WINDOW_SHADOW_FALLBACK_ALPHA
-        reason: "The share of the scene background the window shadow uses when the theme sets no shadow colour; a fallback, not motion."
+    excluded: []
   - path: src/storyboard/StoryFilm/steppedColumnWipe.ts
     excluded: []
   - path: src/storyboard/StoryFilm/getShotTransitionLayers.ts

@@ -9,12 +9,11 @@ import {
   elevationToBoxShadow,
 } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { MediaPlane } from "../MediaPlane";
 import { positioned } from "../positioned";
 import { useWindowStage } from "./useWindowStage";
 import { getScrollOffset } from "./windowMotion";
-import { WINDOW_SHADOW_FALLBACK_ALPHA } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { WindowSource } from "../scenes.types";
 import type { WindowPose, WindowStage } from "./windowMotion";
@@ -61,6 +60,7 @@ export function WindowCard({
   const filterId = `window-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const stage = useWindowStage();
   const tokens = useVideoTokens();
+  const { atomic } = useVideoTheme();
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
   const windowTilt = stage.tilt;
@@ -68,7 +68,7 @@ export function WindowCard({
     layers: tokens.elevation.window.layers,
     color:
       tokens.color.scene.shadow ??
-      buildColorWithAlpha(scene.background, WINDOW_SHADOW_FALLBACK_ALPHA),
+      buildColorWithAlpha(scene.background, atomic.opacity["60"]),
   });
   const boxShadow = tilt > 0 && !clipPath ? shadow : undefined;
   const titlebar =

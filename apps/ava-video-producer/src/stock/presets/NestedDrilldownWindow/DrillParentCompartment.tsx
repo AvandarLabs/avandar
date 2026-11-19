@@ -1,10 +1,7 @@
 import { mix } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -16,8 +13,6 @@ type Props = {
   accent: string;
 };
 
-/** How faint the other parent groups stay when context is retained. */
-const CONTEXT_OPACITY = 0.45;
 /** A parent group's corner before the corner style scales it. */
 const GROUP_CORNER = 6;
 /** Parent groups shrink into a context strip without changing membership. */
@@ -29,6 +24,7 @@ export function DrillParentCompartment({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   if (!retainContext && !isSelected && progress === 1) {
@@ -37,7 +33,7 @@ export function DrillParentCompartment({
   return (
     <g
       opacity={
-        isSelected ? 1 : mix(progress, 1, retainContext ? CONTEXT_OPACITY : 0)
+        isSelected ? 1 : mix(progress, 1, retainContext ? atomic.opacity["45"] : 0)
       }
       data-parent-context={retainContext && progress === 1 ? group : undefined}
     >

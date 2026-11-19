@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
@@ -24,8 +20,6 @@ type Props = {
 const REGISTER_FRAMES = 45;
 /** Frames a mismatching sheet takes to lift away from its slot. */
 const SEPARATE_FRAMES = 19;
-/** The expected sheet's faint wash before the tint strength scales it. */
-const SHEET_WASH = 0.06;
 /** The expected sheet's corner before the corner style scales it. */
 const SHEET_CORNER = 2;
 
@@ -70,6 +64,7 @@ export function ExpectedSheet({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -92,7 +87,7 @@ export function ExpectedSheet({
             height={39}
             rx={scales.corner(SHEET_CORNER)}
             fill={accent}
-            fillOpacity={scales.wash(SHEET_WASH)}
+            fillOpacity={scales.wash(atomic.opacity["6"])}
             stroke={accent}
             strokeWidth={scales.stroke(tokens.stroke.default)}
           />

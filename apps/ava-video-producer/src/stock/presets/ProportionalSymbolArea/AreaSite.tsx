@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AreaSiteLabels } from "./AreaSiteLabels";
 import { AreaTile } from "./AreaTile";
 import type { Input } from "./ProportionalSymbolArea.schema";
@@ -22,7 +18,6 @@ const SITE_STEP = 3;
 const SITE_FRAMES = 28;
 const MORPH_AT = 51;
 const MORPH_FRAMES = 59;
-const SYMBOL_FILL_ALPHA = 0.55;
 /** A site's total circle area derives from its unchanged integer value. */
 export function AreaSite({
   site,
@@ -31,6 +26,7 @@ export function AreaSite({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -69,7 +65,7 @@ export function AreaSite({
         }}
         profile={sketch.shape}
         fill={accent}
-        fillOpacity={progress === 1 ? SYMBOL_FILL_ALPHA : 0}
+        fillOpacity={progress === 1 ? atomic.opacity["55"] : 0}
         stroke={accent}
         strokeOpacity={progress}
         strokeWidth={shapes.stroke(stroke.hairline)}

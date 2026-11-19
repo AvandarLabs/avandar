@@ -1,15 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
-/** The dash of a person's path to a booked slot. */
-const BOOKING_DASH = "4 5";
 type Props = { input: Input; frame: number; accent: string };
 
 /**
@@ -36,6 +31,7 @@ export function ClinicPeople({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   return (
@@ -70,7 +66,7 @@ export function ClinicPeople({
                     motion.scale(10),
                     motion.reveal.easing,
                   )}
-                  strokeDasharray={BOOKING_DASH}
+                  strokeDasharray={atomic.dash.medium.join(" ")}
                 />
               </g>
             ) : undefined}

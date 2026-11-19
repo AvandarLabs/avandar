@@ -1,16 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
-/** A stratum's tint, before the theme's tint strength. */
-const STRATUM_TINT = 0.06;
-/** How strongly a stratum's callout leader shows. */
-const LEADER_OPACITY = 0.3;
 type Props = {
   stratum: Input["strata"][number];
   index: number;
@@ -27,6 +19,7 @@ export function StratumBoundary({
   frame,
   color,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -44,7 +37,7 @@ export function StratumBoundary({
           profile={tokens.sketch.shape}
           fill={color}
           fillOpacity={
-            scales.wash(STRATUM_TINT) *
+            scales.wash(atomic.opacity["6"]) *
             motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
           }
           stroke={color}
@@ -66,7 +59,7 @@ export function StratumBoundary({
         fill="none"
         stroke={color}
         strokeOpacity={
-          LEADER_OPACITY *
+          atomic.opacity["30"] *
           motion.ramp(frame, 18, motion.hero, motion.entrance.easing)
         }
       />

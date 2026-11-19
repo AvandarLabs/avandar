@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 
@@ -24,6 +24,7 @@ export function ClassroomImpressions({
   y,
   activeIndex,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   if (!input.showDayImpressions) {
     return undefined;
@@ -38,7 +39,7 @@ export function ClassroomImpressions({
             key={day.id}
             data-day-impression={day.id}
             data-learner={learnerId}
-            opacity={index <= activeIndex ? 1 : 0.2}
+            opacity={index <= activeIndex ? 1 : atomic.opacity["20"]}
           >
             <Text
               x={center - 11}

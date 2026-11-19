@@ -18,9 +18,6 @@ import { getClassicStageTheme } from "../stageTheme/stageTheme";
 const CLASSIC = getClassicStageTheme();
 const CLASSIC_TILT = CLASSIC.components.WindowTilt;
 
-/** Share of the scene background a window's fallback shadow takes. */
-export const WINDOW_SHADOW_FALLBACK_ALPHA = 0.6;
-
 /**
  * The single window's resting plane in `classic`, for callers without a
  * theme. `rotateY` is negative to bring the right edge toward the camera,
@@ -96,12 +93,12 @@ export const WINDOW_CHROME = {
 
 /**
  * The window's cast shadow in `classic`, for callers without a theme:
- * `elevation.window` in a mix of the scene background.
+ * `elevation.window` in a 60% mix of the scene background.
  */
 export const WINDOW_SHADOW = elevationToBoxShadow({
   layers: CLASSIC.semantic.elevation.window.layers,
   color: buildColorWithAlpha(
     CLASSIC.semantic.color.scene.background,
-    WINDOW_SHADOW_FALLBACK_ALPHA,
+    CLASSIC.atomic.opacity["60"],
   ),
 });

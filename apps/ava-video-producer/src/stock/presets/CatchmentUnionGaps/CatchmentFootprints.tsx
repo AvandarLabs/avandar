@@ -1,3 +1,4 @@
+import { useGraphicTheme } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import { IndividualFootprints } from "./IndividualFootprints";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -16,6 +17,7 @@ export function CatchmentFootprints({
   accent,
   definitionId,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   return (
     <g>
       <IndividualFootprints input={input} progress={progress} accent={accent} />
@@ -27,7 +29,7 @@ export function CatchmentFootprints({
         height={320}
         mask={`url(#${definitionId}-union)`}
         fill={accent}
-        opacity={0.25 * progress}
+        opacity={atomic.opacity["25"] * progress}
       />
       <g
         data-union-boundary=""

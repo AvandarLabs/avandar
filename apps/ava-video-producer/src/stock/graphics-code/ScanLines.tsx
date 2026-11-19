@@ -7,11 +7,7 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { ScanLinesInput } from "../presets/ScanLines/ScanLines.schema";
 import type { ReactNode } from "react";
@@ -22,13 +18,7 @@ const SCAN_AT = 23;
 const SCAN_FRAMES = 110;
 /** Pixels of scan travel over which a row turns from waiting to passed. */
 const ROW_PASS_SPAN = 28;
-const SCAN_FILL_ALPHA = 0.12;
-const PLACEHOLDER_ALPHA = 0.28;
 const PLACEHOLDER_STROKE = 5;
-const RING_FILL_ALPHA = 0.12;
-const RING_ALPHA_FLOOR = 0.15;
-const RING_ALPHA_SWING = 0.6;
-const DIVIDER_ALPHA = 0.6;
 const HANDLE_CORNER = 5;
 const FIELD_SIZE = 18;
 
@@ -39,6 +29,7 @@ export function ScanLines({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, corner, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -59,7 +50,7 @@ export function ScanLines({
           <stop
             offset="1"
             stopColor={accent}
-            stopOpacity={shapes.wash(SCAN_FILL_ALPHA)}
+            stopOpacity={shapes.wash(atomic.opacity["12"])}
           />
         </linearGradient>
         <clipPath id={`${id}-scan-clip`}>
@@ -102,7 +93,7 @@ export function ScanLines({
               }}
               profile={sketch.shape}
               stroke={color.inactive}
-              strokeOpacity={PLACEHOLDER_ALPHA}
+              strokeOpacity={atomic.opacity["28"]}
               strokeWidth={shapes.stroke(PLACEHOLDER_STROKE)}
               strokeLinecap="round"
             />
@@ -110,9 +101,9 @@ export function ScanLines({
               shape={{ kind: "circle", cx: 795, cy: y + 2, r: 11 }}
               profile={sketch.shape}
               fill={accent}
-              fillOpacity={passed * shapes.wash(RING_FILL_ALPHA)}
+              fillOpacity={passed * shapes.wash(atomic.opacity["12"])}
               stroke={accent}
-              strokeOpacity={RING_ALPHA_FLOOR + passed * RING_ALPHA_SWING}
+              strokeOpacity={atomic.opacity["15"] + passed * atomic.opacity["60"]}
               strokeWidth={hairline}
             />
             <g opacity={passed}>
@@ -125,7 +116,7 @@ export function ScanLines({
                 shape={{ kind: "path", d: `M176 ${y + 29} H821` }}
                 profile={sketch.shape}
                 stroke={color.line}
-                strokeOpacity={DIVIDER_ALPHA}
+                strokeOpacity={atomic.opacity["60"]}
                 strokeWidth={hairline}
               />
             ) : null}

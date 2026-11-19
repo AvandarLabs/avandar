@@ -1,11 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeCorridorRouteFromInputAndFrame } from "./makeCorridorRouteFromInputAndFrame";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
@@ -19,7 +15,6 @@ type Props = {
 const ROAD_LINE_DASH = "7 5";
 const PATCH_RADIUS_X = 100;
 const PATCH_RADIUS_Y = 62;
-const PATCH_TINT = 0.22;
 
 /**
  * The complete outline or solid route crosses the road before optional
@@ -31,6 +26,7 @@ export function HabitatPlan({
   background: backgroundColor,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -72,7 +68,7 @@ export function HabitatPlan({
               profile={tokens.sketch.shape}
               data-habitat-patch={patch.id}
               fill={accent}
-              fillOpacity={scales.wash(PATCH_TINT)}
+              fillOpacity={scales.wash(atomic.opacity["22"])}
               stroke={accent}
             />
             <FitText

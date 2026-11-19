@@ -3,27 +3,20 @@ import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PriorityQueueItem } from "./PriorityQueueItem";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PriorityInsertion.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-/** The dash of the priority item's insertion route. */
-const INSERTION_DASH = "5 8";
-/** The dash of a vacated queue slot. */
-const SLOT_DASH = "3 6";
 /** Open exactly one queue slot and insert authored work from a side spur. */
 export function PriorityInsertion({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -84,7 +77,7 @@ export function PriorityInsertion({
                   rx={scales.corner(tokens.corner.cell)}
                   fill="none"
                   stroke={tokens.color.line}
-                  strokeDasharray={SLOT_DASH}
+                  strokeDasharray={atomic.dash.sparse.join(" ")}
                 />
               ) : undefined}
             </g>
@@ -97,7 +90,7 @@ export function PriorityInsertion({
           profile={tokens.sketch.shape}
           stroke={tokens.color.highlight}
           fill="none"
-          strokeDasharray={INSERTION_DASH}
+          strokeDasharray={atomic.dash.open.join(" ")}
         />
         <FitText
           text={input.priorityLabel}

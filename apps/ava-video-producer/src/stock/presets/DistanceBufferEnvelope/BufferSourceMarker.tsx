@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -12,13 +9,13 @@ type Props = {
   accent: string;
 };
 
-const DISTANCE_DASH = "3 4";
 /** Source geometry remains fixed regardless of the chosen radius. */
 export function BufferSourceMarker({
   input,
   location,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const hairline = shapes.stroke(stroke.hairline);
@@ -40,7 +37,7 @@ export function BufferSourceMarker({
           }}
           profile={sketch.shape}
           stroke={color.line}
-          strokeDasharray={DISTANCE_DASH}
+          strokeDasharray={atomic.dash.short.join(" ")}
           strokeWidth={hairline}
         />
       ) : undefined}

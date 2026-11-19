@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -9,8 +9,6 @@ type Props = {
   requestY: number;
   accent: string;
 };
-/** How strongly the pending caption's link shows. */
-const LINK_OPACITY = 0.65;
 /**
  * Pending copy stays below the tray and connects to the moving request group.
  */
@@ -20,6 +18,7 @@ export function PendingCaption({
   requestY,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   return (
     <g>
@@ -33,7 +32,7 @@ export function PendingCaption({
         data-pending-link=""
         fill="none"
         stroke={accent}
-        strokeOpacity={LINK_OPACITY}
+        strokeOpacity={atomic.opacity["65"]}
       />
     </g>
   );

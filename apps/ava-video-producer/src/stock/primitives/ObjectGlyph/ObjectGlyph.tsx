@@ -1,11 +1,6 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
-/** The faint fill inside an object's outline, scaled by tint strength. */
-const OBJECT_WASH = 0.06;
 
 type Props = {
   kind: keyof typeof OBJECT_PATHS;
@@ -42,6 +37,7 @@ export function ObjectGlyph({
   size = 48,
   color,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   if (
@@ -57,7 +53,7 @@ export function ObjectGlyph({
     <g
       transform={`translate(${x} ${y}) scale(${size / 48})`}
       fill={ink}
-      fillOpacity={scales.wash(OBJECT_WASH)}
+      fillOpacity={scales.wash(atomic.opacity["6"])}
       stroke={ink}
       strokeWidth={scales.stroke(tokens.stroke.default)}
       strokeLinecap="round"

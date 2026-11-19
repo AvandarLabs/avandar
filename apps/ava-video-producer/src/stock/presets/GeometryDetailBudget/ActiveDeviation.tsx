@@ -1,9 +1,6 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { ReactNode } from "react";
@@ -16,7 +13,6 @@ type Props = {
   duration: number;
 };
 
-const CHORD_DASH = "5 5";
 /** Current chord and perpendicular guide expose the evaluated recursion. */
 export function ActiveDeviation({
   input,
@@ -25,6 +21,7 @@ export function ActiveDeviation({
   at,
   duration,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const start = input.vertices[event.start];
@@ -45,7 +42,7 @@ export function ActiveDeviation({
         }}
         profile={sketch.shape}
         stroke={color.highlight}
-        strokeDasharray={CHORD_DASH}
+        strokeDasharray={atomic.dash.wide.join(" ")}
         strokeWidth={shapes.stroke(stroke.hairline)}
       />
       {input.showDeviationGuides ? (

@@ -1,16 +1,12 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
-/** The dash of the alignment guides. */
-const ALIGNMENT_DASH = "3 4";
 type Props = { input: Input };
 /** Alignment Guides for the authored scene. */
 export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return input.showAlignmentGuides ? (
@@ -23,7 +19,7 @@ export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray={ALIGNMENT_DASH}
+        strokeDasharray={atomic.dash.short.join(" ")}
       />
     </g>
   ) : undefined;

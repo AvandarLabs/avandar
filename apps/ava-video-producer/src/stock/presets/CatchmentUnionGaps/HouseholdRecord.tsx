@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdAnchor } from "./HouseholdAnchor";
 import { HouseholdGlyph } from "./HouseholdGlyph";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -14,7 +14,6 @@ type Props = {
   gapEmphasis: Input["gapEmphasis"];
   covered: boolean;
 };
-const LEADER_OPACITY = 0.22;
 /**
  * One fixed anchor and one clear keyed glyph belong to each supplied household.
  */
@@ -26,6 +25,7 @@ export function HouseholdRecord({
   gapEmphasis,
   covered,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const x = 70 + household.x * 4.8;
   const y = 160 + household.y * 2.8;
@@ -38,7 +38,7 @@ export function HouseholdRecord({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={LEADER_OPACITY}
+        strokeOpacity={atomic.opacity["22"]}
       />
       <HouseholdAnchor
         householdId={household.id}

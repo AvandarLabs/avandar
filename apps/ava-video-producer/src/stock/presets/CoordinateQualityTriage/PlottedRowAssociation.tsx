@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -13,13 +9,13 @@ type Props = {
   accent: string;
 };
 
-const ASSOCIATION_ALPHA = 0.45;
 /** Coincident coordinates retain one visible connection to every source key. */
 export function PlottedRowAssociation({
   row,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -34,7 +30,7 @@ export function PlottedRowAssociation({
       profile={sketch.shape}
       fill="none"
       stroke={accent}
-      strokeOpacity={ASSOCIATION_ALPHA}
+      strokeOpacity={atomic.opacity["45"]}
       strokeWidth={shapes.stroke(stroke.hairline)}
       opacity={motion.ramp(frame, row.arrivedAt, motion.chip)}
     />

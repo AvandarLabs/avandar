@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CarbonOperator } from "./CarbonOperator";
 import { CarbonPhysicalLabels } from "./CarbonPhysicalLabels";
 import type { Input } from "./CarbonStorageAccounting.schema";
@@ -14,14 +10,18 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number; accent: string };
 /** The ribbon width of the whole captured quantity. */
 const RIBBON_WIDTH = 24;
-const GROUND_DASH = "5 7";
-const STORAGE_BAND_TINT = 0.22;
+/** The vessel's tint before any carbon is stored. */
+const VESSEL_TINT_FLOOR = 0.04;
+/** How much the vessel's tint grows with the share of carbon it retains. */
+const VESSEL_TINT_RANGE = 0.12;
+
 /** An operator cues separate retained and released physical CO2 ribbons. */
 export function CarbonPhysical({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -41,7 +41,7 @@ export function CarbonPhysical({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray={GROUND_DASH}
+        strokeDasharray={atomic.dash.boundary.join(" ")}
       />
       <StockRect
         x={205}
@@ -62,7 +62,7 @@ export function CarbonPhysical({
         profile={tokens.sketch.shape}
         stroke={accent}
         strokeWidth={scales.stroke(24)}
-        strokeOpacity={scales.wash(STORAGE_BAND_TINT)}
+        strokeOpacity={scales.wash(atomic.opacity["22"])}
         fill="none"
       />
       <SketchedShape
@@ -114,7 +114,9 @@ export function CarbonPhysical({
         height={82}
         rx={scales.corner(22)}
         fill={accent}
-        fillOpacity={0.04 + 0.12 * transfer * retainedShare}
+        fillOpacity={scales.wash(
+          VESSEL_TINT_FLOOR + VESSEL_TINT_RANGE * transfer * retainedShare,
+        )}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />

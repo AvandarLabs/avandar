@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
 import type { Input } from "./ScheduleBuffer.schema";
@@ -15,8 +11,6 @@ type Props = {
   numSlots: number;
   frame: number;
 };
-/** The tint of the interruption segment, before the theme's tint strength. */
-const INTERRUPTION_TINT = 0.3;
 /** The delay descends into the gap opened after its named task. */
 export function ScheduleInterruption({
   state,
@@ -24,6 +18,7 @@ export function ScheduleInterruption({
   numSlots,
   frame,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
@@ -36,7 +31,7 @@ export function ScheduleInterruption({
         width={state.delayWidth}
         height={60}
         fill={tokens.color.highlight}
-        fillOpacity={scales.wash(INTERRUPTION_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["30"])}
         stroke={tokens.color.highlight}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />

@@ -6,11 +6,7 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { DotMatrixInput } from "../presets/DotMatrix/DotMatrix.schema";
 import type { ReactNode } from "react";
@@ -20,7 +16,6 @@ type Props = GraphicProps & { input: DotMatrixInput };
 const FILL_AT = 18;
 const HEADING_SIZE = 31;
 const COUNT_SIZE = 79;
-const INACTIVE_DOT_ALPHA = 0.3;
 
 /** Draws the bounded authored dot-matrix study at an explicit frame. */
 export function DotMatrix({
@@ -28,6 +23,7 @@ export function DotMatrix({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, alpha, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -87,7 +83,7 @@ export function DotMatrix({
               cy={dot.y}
               r={8}
               fill={color.inactive}
-              fillOpacity={INACTIVE_DOT_ALPHA}
+              fillOpacity={atomic.opacity["30"]}
             />
             {dot.selected ? (
               <circle cx={dot.x} cy={dot.y} r={8} fill={accent} opacity={t} />

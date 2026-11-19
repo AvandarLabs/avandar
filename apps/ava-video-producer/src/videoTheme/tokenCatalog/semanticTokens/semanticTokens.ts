@@ -167,6 +167,12 @@ export const SEMANTIC_TOKENS = {
       description:
         "The dash of an outline standing in for something missing or absent, such as a missing partner, an empty form, or a stencil.",
     }),
+    planned: token({
+      kind: "dash",
+      label: "Planned dash",
+      description:
+        "The dash of an outline for something planned but not there yet: an empty visit slot or a planned shade footprint.",
+    }),
   },
   elevation: {
     flat: token({

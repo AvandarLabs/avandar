@@ -1,17 +1,11 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
 
-const LEADER_DASH = "3 4";
-const SOURCE_GHOST_ALPHA = 0.3;
 /**
  * Fixed target rings and source ghosts preserve the physical reference sites.
  */
@@ -19,6 +13,7 @@ export function RegistrationReferences({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -41,7 +36,7 @@ export function RegistrationReferences({
               }}
               profile={sketch.shape}
               stroke={color.line}
-              strokeDasharray={LEADER_DASH}
+              strokeDasharray={atomic.dash.short.join(" ")}
               fill="none"
               strokeWidth={hairline}
             />
@@ -63,7 +58,7 @@ export function RegistrationReferences({
               cy={185 + point.y * 2.4}
               r={5}
               fill={color.inactive}
-              fillOpacity={SOURCE_GHOST_ALPHA}
+              fillOpacity={atomic.opacity["30"]}
             />
           </g>
         );

@@ -1,11 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
 import { EXPIRY_CUE } from "./leaseShape";
@@ -16,8 +12,6 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
 const DOCK = { kind: "circle", cx: 480, cy: 430, r: 34 } as const;
-/** The dash of the route back to the dock. */
-const ROUTE_DASH = "4 8";
 /** Frames the token takes to return to the dock. */
 const RETURN_FRAMES = 28;
 /** One token expires into neutral custody without inferring a successor. */
@@ -26,6 +20,7 @@ export function ExpiringLease({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -69,7 +64,7 @@ export function ExpiringLease({
         fill="none"
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.default)}
-        strokeDasharray={ROUTE_DASH}
+        strokeDasharray={atomic.dash.airy.join(" ")}
         opacity={motion.reveal(frame, 24)}
       />
       {input.participants.map((participant, index) => {

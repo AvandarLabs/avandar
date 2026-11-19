@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DEFAULT_INPUT } from "./CommunityCoordinationTable.fixtures";
 import { CoordinationActors } from "./CoordinationActors";
 import { CoordinationLabels } from "./CoordinationLabels";
@@ -15,7 +12,6 @@ import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-const ROUTE_DASH = "5 8";
 /**
  * One authored reallocation responds to community input on a schematic table.
  */
@@ -24,6 +20,7 @@ export function CommunityCoordinationTable({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -46,7 +43,7 @@ export function CommunityCoordinationTable({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray={ROUTE_DASH}
+        strokeDasharray={atomic.dash.open.join(" ")}
       />
       {input.places.map((place, index) => {
         return (

@@ -1,24 +1,19 @@
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
 
-const GHOST_ALPHA = 0.35;
-const TOKEN_FILL_ALPHA = 0.2;
 /** Moving count tokens are painted above cell shading and ledger outlines. */
 export function GridTokens({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -39,7 +34,7 @@ export function GridTokens({
                 cy={point.sourceY}
                 r={4}
                 fill={color.inactive}
-                opacity={GHOST_ALPHA}
+                opacity={atomic.opacity["35"]}
               />
             );
           })
@@ -53,7 +48,7 @@ export function GridTokens({
               shape={{ kind: "circle", cx: point.x, cy: point.y, r: 8.5 }}
               profile={sketch.shape}
               fill={accent}
-              fillOpacity={TOKEN_FILL_ALPHA}
+              fillOpacity={atomic.opacity["20"]}
               stroke={accent}
               strokeWidth={shapes.stroke(stroke.hairline)}
             />

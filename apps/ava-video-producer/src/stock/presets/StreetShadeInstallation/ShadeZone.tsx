@@ -1,15 +1,10 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import { ShadeFootprint } from "./ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
-/** The existing shade's tint, before the theme's tint strength. */
-const EXISTING_SHADE_TINT = 0.3;
 type Props = { input: Input; index: number; frame: number; accent: string };
 /** Zone-owned footprints preserve the complete supplied ground area. */
 export function ShadeZone({
@@ -18,6 +13,7 @@ export function ShadeZone({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const zone = input.zones[index];
@@ -41,7 +37,7 @@ export function ShadeZone({
         width={(zone.existingShadeM2 / zone.areaM2) * 600}
         height={36}
         fill={tokens.color.accentAlt}
-        fillOpacity={scales.wash(EXISTING_SHADE_TINT)}
+        fillOpacity={scales.wash(atomic.opacity["30"])}
       />
       {input.installations.map((item, itemIndex) => {
         return item.zoneId === zone.id ? (

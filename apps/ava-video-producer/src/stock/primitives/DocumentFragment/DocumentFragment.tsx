@@ -1,15 +1,10 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FitText } from "../FitText/FitText";
 import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
 
 /** The fragment box's own corner, scaled by the theme's corner style. */
 const FRAGMENT_CORNER = 5;
-/** The accent wash of an emphasized fragment, scaled by tint strength. */
-const EMPHASIS_WASH = 0.09;
 
 type Props = {
   x: number;
@@ -32,6 +27,7 @@ export function DocumentFragment({
   emphasized = false,
   color,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
@@ -49,7 +45,7 @@ export function DocumentFragment({
         height={64}
         rx={scales.corner(FRAGMENT_CORNER)}
         fill={emphasized ? accent : tokens.color.surface}
-        fillOpacity={emphasized ? scales.wash(EMPHASIS_WASH) : 1}
+        fillOpacity={emphasized ? scales.wash(atomic.opacity["9"]) : 1}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M${x} ${y + 64} H${x + width}` }}
