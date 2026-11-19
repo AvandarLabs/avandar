@@ -17,6 +17,7 @@ import { DECISION_FORK_DENSE_INPUT } from "../src/stock/presets/DecisionFork/Dec
 import { StockCompositions } from "../src/stock/StockCompositions";
 import { StockGraphic } from "../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../src/storyboard/schema/schema";
+import { VideoThemeScope } from "../src/videoTheme/VideoThemeScope/VideoThemeScope";
 
 const { ShotView } = await import("../src/storyboard/StoryFilm/ShotView");
 import { LEGACY_IDS } from "./fixtures/legacyStockIds";
@@ -296,12 +297,15 @@ test("storyboard rendering preserves configured content, heading space and cycle
     }),
   );
   const render = ({ frame }: Readonly<{ frame: number }>) => {
+    // StoryFilm supplies the theme scenes read; a bare shot needs its own.
     return renderToStaticMarkup(
-      createElement(ShotView, {
-        shot: plan.shots[0],
-        frame,
-        width: 1280,
-        height: 800,
+      createElement(VideoThemeScope, {
+        children: createElement(ShotView, {
+          shot: plan.shots[0],
+          frame,
+          width: 1280,
+          height: 800,
+        }),
       }),
     );
   };
