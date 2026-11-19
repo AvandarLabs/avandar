@@ -4,23 +4,10 @@ import {
   useGraphicTheme,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
+import { getLetterSpacingFromTypeStyle } from "./getLetterSpacingFromTypeStyle";
 import type { ResolvedTypeStyle } from "../../videoTheme/videoTheme.types";
 import type { GraphicTextRole } from "./graphicCommon.types";
 import type { CSSProperties, ReactNode } from "react";
-
-/**
- * A text role's tracking in pixels at a font size, for SVG `letterSpacing`
- * on text drawn in that role, such as `Text` and `FitText`. Undefined when
- * the role sets no tracking.
- */
-export function getLetterSpacingFromTypeStyle(
-  style: Pick<ResolvedTypeStyle, "letterSpacing">,
-  fontSize: number,
-): number | undefined {
-  return style.letterSpacing === undefined
-    ? undefined
-    : Number((style.letterSpacing * fontSize).toFixed(4));
-}
 
 function _textStyle(style: ResolvedTypeStyle): CSSProperties | undefined {
   if (!style.textTransform && !style.fontVariantNumeric) {

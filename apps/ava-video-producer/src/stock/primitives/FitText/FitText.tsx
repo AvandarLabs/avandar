@@ -1,4 +1,4 @@
-import { getLetterSpacingFromTypeStyle } from "../../graphics-common/Text";
+import { getLetterSpacingFromTypeStyle } from "../../graphics-common/getLetterSpacingFromTypeStyle";
 import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { type TextBounds, wrapTextToLines } from "./wrapTextToLines";
 import type { ReactNode } from "react";
