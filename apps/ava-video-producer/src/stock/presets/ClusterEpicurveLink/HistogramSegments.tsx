@@ -1,5 +1,9 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";

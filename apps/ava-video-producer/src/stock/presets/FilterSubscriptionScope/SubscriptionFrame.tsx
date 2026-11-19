@@ -1,7 +1,11 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
@@ -33,7 +37,9 @@ export function SubscriptionFrame({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={view.subscribed ? accent : tokens.color.inactive}
-          strokeDasharray={view.subscribed ? undefined : atomic.dash.sparse.join(" ")}
+          strokeDasharray={
+            view.subscribed ? undefined : atomic.dash.sparse.join(" ")
+          }
         />
       </g>
       {view.subscribed ? undefined : (

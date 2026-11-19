@@ -1,5 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LocalAggregateCell } from "./LocalAggregateCell";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";

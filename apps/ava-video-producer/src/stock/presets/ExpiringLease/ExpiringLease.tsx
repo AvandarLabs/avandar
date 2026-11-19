@@ -1,7 +1,12 @@
 import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
 import { EXPIRY_CUE } from "./leaseShape";

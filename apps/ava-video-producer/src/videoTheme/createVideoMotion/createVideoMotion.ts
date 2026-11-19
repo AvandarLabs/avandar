@@ -17,9 +17,9 @@ type TimedStep = Readonly<{ duration: number; easing: EasingFunction }>;
  * Motion a renderer can use directly: durations and staggers already divided
  * by the tempo, easing tokens turned into functions, and the `motion.ts`
  * helpers (`ramp`, `enter`, `leave`, `pop`, `press`, `reveal`, `count`,
- * `caretOn`, `loopEnvelope`) with the theme's defaults in place of their literals. Cue
- * frames and loop periods stay as authored, so a stock loop stays seamless
- * at any tempo.
+ * `caretOn`, `loopEnvelope`) with the theme's defaults in place of their
+ * literals. Cue frames and loop periods stay as authored, so a stock loop
+ * stays seamless at any tempo.
  */
 export type VideoMotion = Readonly<{
   tempo: number;

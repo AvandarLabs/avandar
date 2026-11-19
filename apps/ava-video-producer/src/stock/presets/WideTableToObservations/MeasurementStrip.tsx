@@ -1,5 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import { MeasurementStripLabels } from "./MeasurementStripLabels";
 import type { Input } from "./WideTableToObservations.schema";

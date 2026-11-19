@@ -1,6 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getExclusionFromFrame } from "./getExclusionFromFrame";
 import { SubscriptionMask } from "./SubscriptionMask";
 import type { Input } from "./FilterSubscriptionScope.schema";

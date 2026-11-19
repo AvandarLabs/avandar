@@ -8,14 +8,14 @@
  * step, and no starter palette `var(--…)` read.
  */
 import "../../../tests/helpers/registerRemotionTestHooks";
-import {
-  findClassicValuesInMarkup,
-  SENTINEL_THEME,
-} from "../../../tests/helpers/sentinelVideoTheme";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import {
+  findClassicValuesInMarkup,
+  SENTINEL_THEME,
+} from "../../../tests/helpers/sentinelVideoTheme";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
 import { createStarterVideoThemeSource } from "../StarterVideoTheme/createStarterVideoThemeSource";

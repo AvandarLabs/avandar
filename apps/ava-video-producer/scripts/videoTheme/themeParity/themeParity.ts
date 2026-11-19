@@ -61,7 +61,10 @@ async function _loadTargets(
   themeId: string,
 ): Promise<LoadedTarget[]> {
   return Promise.all(
-    (ids.includes("--all") ? listAllParityTargets() : listParityTargets(ids)).map(async (target) => {
+    (ids.includes("--all")
+      ? listAllParityTargets()
+      : listParityTargets(ids)
+    ).map(async (target) => {
       const film = await ShowcaseFilms.load(target.filmId, {
         ...target.options,
         theme: { id: themeId },

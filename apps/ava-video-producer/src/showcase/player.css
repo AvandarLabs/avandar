@@ -1,5 +1,5 @@
 /* The Atlas chrome scale, shared with the showcase pages. */
-@import "../../showcase/chrome-tokens.css";
+@import url("../../showcase/chrome-tokens.css");
 
 html,
 body,

@@ -1,7 +1,10 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationContext. */

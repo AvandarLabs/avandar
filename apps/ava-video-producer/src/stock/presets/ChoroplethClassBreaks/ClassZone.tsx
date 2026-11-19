@@ -93,7 +93,9 @@ export function ClassZone({
           category === "high" ? atomic.opacity["45"] : atomic.opacity["15"]
         }
         stroke={color}
-        strokeDasharray={category === "missing" ? atomic.dash.medium.join(" ") : undefined}
+        strokeDasharray={
+          category === "missing" ? atomic.dash.medium.join(" ") : undefined
+        }
         strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <LabelSlots

@@ -1,5 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 

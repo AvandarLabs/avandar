@@ -1,13 +1,16 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string; originActive: number };
-
 
 /** The distant source holds the supplied result and lights only on a miss. */
 export function CacheOrigin({

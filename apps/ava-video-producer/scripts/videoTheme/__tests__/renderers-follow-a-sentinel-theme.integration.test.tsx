@@ -138,7 +138,8 @@ test("the sentinel theme moves the values the test looks for", () => {
 test("stock and graphic primitives draw no classic value under the sentinel theme", () => {
   assert.deepEqual(
     Object.entries(PRIMITIVES).flatMap(([name, element]) => {
-      return findClassicValuesInMarkup(_renderSentinel(element)).map((value) => {
+      const markup = _renderSentinel(element);
+      return findClassicValuesInMarkup(markup).map((value) => {
         return `${name}: ${value}`;
       });
     }),

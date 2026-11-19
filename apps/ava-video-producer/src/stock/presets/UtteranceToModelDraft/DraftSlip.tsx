@@ -1,6 +1,10 @@
 import { propEq } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
 import { PhraseCopy } from "./PhraseCopy";
 import { PhraseSocket } from "./PhraseSocket";

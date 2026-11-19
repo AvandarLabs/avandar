@@ -3,7 +3,12 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 
@@ -61,7 +66,8 @@ export function RecognitionExchange({
           shape={{ kind: "line", x1: focusedX + 80, y1: 330, x2: 165, y2: 340 }}
           profile={tokens.sketch.shape}
           opacity={
-            ramp(frame, 67, acknowledge, motion.reveal.easing) * atomic.opacity["60"]
+            ramp(frame, 67, acknowledge, motion.reveal.easing) *
+            atomic.opacity["60"]
           }
           stroke={accent}
           strokeDasharray={atomic.dash.spaced.join(" ")}

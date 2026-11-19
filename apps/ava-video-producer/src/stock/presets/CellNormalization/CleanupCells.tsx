@@ -1,6 +1,9 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CellLiteralValue } from "./CellLiteralValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
@@ -45,7 +48,8 @@ export function CleanupCells({
               fill="none"
               stroke={accent}
               opacity={
-                Math.sin(edit * Math.PI) * atomic.opacity["70"] + edit * atomic.opacity["30"]
+                Math.sin(edit * Math.PI) * atomic.opacity["70"] +
+                edit * atomic.opacity["30"]
               }
             />
           </g>

@@ -1,5 +1,9 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import { RemovedDeviationGuides } from "./RemovedDeviationGuides";
 import { SourceVertices } from "./SourceVertices";

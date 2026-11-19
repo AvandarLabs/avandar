@@ -1,5 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPaymentUnitGeometryFromPayment } from "./getPaymentUnitGeometryFromPayment";
 import { ReceivedToken } from "./ReceivedToken";
 import type { Input } from "./BenefitShortfallCorrection.schema";

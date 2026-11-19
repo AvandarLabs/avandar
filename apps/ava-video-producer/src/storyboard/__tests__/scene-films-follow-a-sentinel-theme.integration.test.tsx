@@ -7,20 +7,21 @@
  * name theme swatches, so they move too.
  */
 import "../../../tests/helpers/registerRemotionTestHooks";
-import {
-  findClassicValuesAcrossFrames,
-  SENTINEL_THEME,
-} from "../../../tests/helpers/sentinelVideoTheme";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import {
+  findClassicValuesAcrossFrames,
+  SENTINEL_THEME,
+} from "../../../tests/helpers/sentinelVideoTheme";
 import type { Storyboard } from "../schema/schema";
 import type { ReactNode } from "react";
 
 // Loaded after the hooks register: static imports load before any module
 // runs, so a renderer reached through one would get the real Remotion.
-const { CONTINUITY_CATALOG } = await import("../../continuity/continuityCatalog");
+const { CONTINUITY_CATALOG } =
+  await import("../../continuity/continuityCatalog");
 const { BUILT_IN_VIDEO_THEMES } =
   await import("../../videoTheme/builtInVideoThemes/builtInVideoThemes");
 const { VideoThemeScope } =

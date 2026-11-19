@@ -5,7 +5,7 @@ import {
   useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getFootprintDashFromIndex } from "./IndividualFootprints";
+import { getFootprintDashFromIndex } from "./getFootprintDashFromIndex";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for CatchmentNames. */

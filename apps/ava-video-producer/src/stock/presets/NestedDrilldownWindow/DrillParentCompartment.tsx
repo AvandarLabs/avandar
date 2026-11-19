@@ -1,7 +1,11 @@
 import { mix } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -33,7 +37,9 @@ export function DrillParentCompartment({
   return (
     <g
       opacity={
-        isSelected ? 1 : mix(progress, 1, retainContext ? atomic.opacity["45"] : 0)
+        isSelected
+          ? 1
+          : mix(progress, 1, retainContext ? atomic.opacity["45"] : 0)
       }
       data-parent-context={retainContext && progress === 1 ? group : undefined}
     >

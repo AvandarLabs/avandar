@@ -1,5 +1,8 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
 

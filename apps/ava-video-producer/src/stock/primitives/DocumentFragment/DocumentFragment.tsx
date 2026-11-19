@@ -1,4 +1,8 @@
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FitText } from "../FitText/FitText";
 import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";

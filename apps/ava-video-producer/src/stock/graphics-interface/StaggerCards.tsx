@@ -9,7 +9,12 @@ import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StaggerCardsInput } from "../presets/StaggerCards/StaggerCards.schema";
 import type { ReactNode } from "react";

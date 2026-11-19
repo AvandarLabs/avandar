@@ -230,11 +230,11 @@ test("coincident candidate anchors retain separate keyed rails and positive near
     }),
   );
   assert.ok(values[0] < 1e-12 && values[1] < 1e-12);
-  const guides = [...hold.matchAll(/<g data-distance-guide[^>]*><line[^>]+>/g)].map(
-    ([tag]) => {
-      return tag;
-    },
-  );
+  const guides = [
+    ...hold.matchAll(/<g data-distance-guide[^>]*><line[^>]+>/g),
+  ].map(([tag]) => {
+    return tag;
+  });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: guides[0], name: "x2" }),
     385,

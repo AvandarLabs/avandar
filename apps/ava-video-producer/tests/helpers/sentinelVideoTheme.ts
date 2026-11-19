@@ -184,15 +184,30 @@ export function findClassicValuesInMarkup(
       ..._matches(markup, /\brx="([\d.]+)"/g, CLASSIC_RADII, (v) => {
         return `rx ${v}`;
       }),
-      ..._matches(markup, /border-radius:([\d.]+)px/g, CLASSIC_RADII, (_, m) => {
-        return m;
-      }),
-      ..._matches(markup, /border(?:-\w+)?:([\d.]+)px/g, CLASSIC_STROKES, (_, m) => {
-        return m;
-      }),
-      ..._matches(markup, /stroke-dasharray="([^"]+)"/g, CLASSIC_DASHES, (v) => {
-        return `dash ${v}`;
-      }),
+      ..._matches(
+        markup,
+        /border-radius:([\d.]+)px/g,
+        CLASSIC_RADII,
+        (_, m) => {
+          return m;
+        },
+      ),
+      ..._matches(
+        markup,
+        /border(?:-\w+)?:([\d.]+)px/g,
+        CLASSIC_STROKES,
+        (_, m) => {
+          return m;
+        },
+      ),
+      ..._matches(
+        markup,
+        /stroke-dasharray="([^"]+)"/g,
+        CLASSIC_DASHES,
+        (v) => {
+          return `dash ${v}`;
+        },
+      ),
       ..._matches(
         markup,
         /\b((?:fill-|stroke-)?opacity)(?:="|:)([\d.]+)/g,

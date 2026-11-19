@@ -1,6 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BackoffAttempt } from "./BackoffAttempt";
 import { getBackoffStateFromInputAndFrame } from "./getBackoffStateFromInputAndFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

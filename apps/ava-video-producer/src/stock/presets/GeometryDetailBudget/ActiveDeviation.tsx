@@ -1,6 +1,10 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { ReactNode } from "react";

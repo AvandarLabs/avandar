@@ -1,5 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import { ShadeFootprint } from "./ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";

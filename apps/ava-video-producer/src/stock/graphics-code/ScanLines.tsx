@@ -7,7 +7,12 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { ScanLinesInput } from "../presets/ScanLines/ScanLines.schema";
 import type { ReactNode } from "react";
@@ -103,7 +108,9 @@ export function ScanLines({
               fill={accent}
               fillOpacity={passed * shapes.wash(atomic.opacity["12"])}
               stroke={accent}
-              strokeOpacity={atomic.opacity["15"] + passed * atomic.opacity["60"]}
+              strokeOpacity={
+                atomic.opacity["15"] + passed * atomic.opacity["60"]
+              }
               strokeWidth={hairline}
             />
             <g opacity={passed}>

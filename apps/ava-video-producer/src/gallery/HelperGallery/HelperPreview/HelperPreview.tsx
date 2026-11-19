@@ -68,8 +68,9 @@ function useThemePost(
 }
 
 /**
- * The open helper's live, looping preview, drawn in the gallery's theme. The Atlas preview modal around it
- * owns the title and the previous and next buttons.
+ * The open helper's live, looping preview, drawn in the gallery's theme. The
+ * Atlas preview modal around it owns the title and the previous and next
+ * buttons.
  */
 export function HelperPreview({ helper }: Props): ReactNode {
   const player = useRef<HTMLIFrameElement>(null);

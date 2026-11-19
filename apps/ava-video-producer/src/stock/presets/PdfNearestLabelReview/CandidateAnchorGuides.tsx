@@ -1,6 +1,11 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCandidateFromFrame, getMeasureFromFrame } from "./reviewTiming";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
@@ -40,7 +45,9 @@ export function CandidateAnchorGuides({
           profile={tokens.sketch.shape}
           stroke={color}
           strokeWidth={scales.stroke(tokens.stroke.default)}
-          strokeDasharray={index === 0 ? undefined : atomic.dash.tight.join(" ")}
+          strokeDasharray={
+            index === 0 ? undefined : atomic.dash.tight.join(" ")
+          }
         />
       </g>
       <g data-label-anchor={label.id}>

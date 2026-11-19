@@ -1,5 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LunchLabels } from "./LunchLabels";
 import { LunchTray } from "./LunchTray";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

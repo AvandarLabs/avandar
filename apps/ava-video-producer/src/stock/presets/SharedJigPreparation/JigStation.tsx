@@ -2,7 +2,11 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { JigPattern } from "./JigPattern";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -52,7 +56,9 @@ export function JigStation({
         fill={tokens.color.surface}
         stroke={tokens.color.line}
         strokeDasharray={
-          input.workpieceMaterial === "fabric" ? atomic.dash.stitch.join(" ") : undefined
+          input.workpieceMaterial === "fabric"
+            ? atomic.dash.stitch.join(" ")
+            : undefined
         }
       />
       {hasApplication ? (

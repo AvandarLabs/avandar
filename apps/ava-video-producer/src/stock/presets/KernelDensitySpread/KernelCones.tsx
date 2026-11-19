@@ -1,5 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";

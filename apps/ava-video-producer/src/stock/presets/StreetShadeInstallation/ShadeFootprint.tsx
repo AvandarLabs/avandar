@@ -1,6 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { INSTALLATION_CATEGORIES } from "./installationColors";
 import { ShadeStructure } from "./ShadeStructure";
 import type { Input } from "./StreetShadeInstallation.schema";
@@ -43,10 +48,14 @@ export function ShadeFootprint({
         width={width}
         height={36}
         fill={color}
-        fillOpacity={scales.wash(isInstalled ? atomic.opacity["34"] : atomic.opacity["6"])}
+        fillOpacity={scales.wash(
+          isInstalled ? atomic.opacity["34"] : atomic.opacity["6"],
+        )}
         stroke={width > 0 ? color : undefined}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        strokeDasharray={isInstalled ? undefined : tokens.dash.planned.join(" ")}
+        strokeDasharray={
+          isInstalled ? undefined : tokens.dash.planned.join(" ")
+        }
       />
       <ShadeStructure
         kind={item.kind}

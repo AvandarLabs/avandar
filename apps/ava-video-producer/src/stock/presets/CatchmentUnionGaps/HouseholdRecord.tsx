@@ -1,6 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdAnchor } from "./HouseholdAnchor";
 import { HouseholdGlyph } from "./HouseholdGlyph";
 import type { Input } from "./CatchmentUnionGaps.schema";

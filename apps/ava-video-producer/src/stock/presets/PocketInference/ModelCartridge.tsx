@@ -1,7 +1,12 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CartridgeText } from "./CartridgeText";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
@@ -37,7 +42,9 @@ export function ModelCartridge({
         )}
         fill={tokens.color.ground}
         stroke={tokens.color.line}
-        strokeDasharray={input.showCutaway ? atomic.dash.medium.join(" ") : undefined}
+        strokeDasharray={
+          input.showCutaway ? atomic.dash.medium.join(" ") : undefined
+        }
       />
       <g
         data-cartridge-installation="local"

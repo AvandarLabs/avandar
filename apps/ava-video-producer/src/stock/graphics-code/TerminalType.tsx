@@ -5,7 +5,12 @@ import { Check } from "../graphics-common/Check";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import { CodeWindow } from "./CodeWindow";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";

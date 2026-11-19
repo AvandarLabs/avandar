@@ -6,9 +6,9 @@ import fs from "node:fs";
  * (apps/ava-video-producer/docs/video-theme.md). These restrictions ban the
  * literal sources a renderer could still reach for.
  *
- * They apply to every renderer directory in
- * apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/rendererGlobs.json
- * and to the globs of every slice budget beside it, so a new renderer file
+ * They apply to every renderer directory in `rendererGlobs.json`, under
+ * apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/, and to
+ * the globs of every slice budget beside it, so a new renderer file
  * is covered without editing this file. The stock palette module is gone:
  * importing it from anywhere in the app is an error, so it cannot come back.
  */

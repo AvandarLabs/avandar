@@ -1,6 +1,10 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdBadge } from "./HouseholdBadge";
 import { HouseholdCaption } from "./HouseholdCaption";
 import type { Input } from "./GisLayerIntersectionTally.schema";

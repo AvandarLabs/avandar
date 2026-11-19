@@ -1,5 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AreaSiteLabels } from "./AreaSiteLabels";
 import { AreaTile } from "./AreaTile";
 import type { Input } from "./ProportionalSymbolArea.schema";

@@ -1,5 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 /** The common slope and outlet remain fixed through the intervention. */

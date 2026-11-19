@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
 import { ObservationFrame } from "./ObservationFrame";
 import { roleMessages } from "./ProseMeasurementLedger.controls";

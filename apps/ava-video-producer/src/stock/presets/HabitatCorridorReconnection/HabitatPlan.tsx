@@ -1,7 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeCorridorRouteFromInputAndFrame } from "./makeCorridorRouteFromInputAndFrame";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
