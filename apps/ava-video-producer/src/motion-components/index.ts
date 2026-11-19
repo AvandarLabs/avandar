@@ -18,7 +18,7 @@ export { getObjectFlight } from "./getObjectFlight";
 export type { ObjectFlight } from "./getObjectFlight";
 export { SharedElement } from "./SharedElement";
 export { HorizontalBlurFilter } from "./HorizontalBlur";
-export { getHorizontalBlurFilter } from "./getHorizontalBlurFilter";
+export { getHorizontalBlurFilter } from "./getHorizontalBlurFilter/getHorizontalBlurFilter";
 export type { SharedElementProps } from "./SharedElement";
 export { SceneTransition } from "./SceneTransition";
 export { createSceneTransition } from "./createSceneTransition";

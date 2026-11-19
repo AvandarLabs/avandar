@@ -28,8 +28,8 @@ function _resolveExport(
 }
 
 /** The helper's primary source followed by its related sources. */
-function _helperSources(helper: HelperEntry): readonly string[] {
-  return [helper.source, ...(helper.relatedSources ?? [])];
+function _helperSources(helper: HelperEntry): string[] {
+  return [helper.source, ...helper.relatedSources];
 }
 
 function _catalogedNames(source: string): Set<string> {

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useId } from "react";
-import { getHorizontalBlurFilter } from "../../../motion-components/getHorizontalBlurFilter";
+import { getHorizontalBlurFilter } from "../../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
 import { getSceneTransitionStyle } from "../../../motion-components/getSceneTransitionStyle";
 import { HorizontalBlurFilter } from "../../../motion-components/HorizontalBlur";
 import { getMotionProgress } from "../../../motion-components/motionSettings";

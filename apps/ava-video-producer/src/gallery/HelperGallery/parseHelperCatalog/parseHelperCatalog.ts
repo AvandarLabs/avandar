@@ -74,7 +74,7 @@ function _assertReferences(catalog: HelperCatalog): void {
         `Unlisted source module "${helper.source}" for "${helper.id}"`,
       );
     }
-    (helper.relatedSources ?? []).forEach((relatedSource) => {
+    helper.relatedSources.forEach((relatedSource) => {
       if (!modules.has(relatedSource)) {
         throw new Error(
           `Unlisted related source module "${relatedSource}" for "${helper.id}"`,

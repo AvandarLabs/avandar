@@ -51,7 +51,7 @@ export type HelperEntry = {
    * whose functions live beside its component rather than in `source`.
    * Empty when `source` holds every export.
    */
-  relatedSources?: readonly string[];
+  relatedSources: readonly string[];
   /** Exported names, dotted for members such as `EASE.out`. */
   exports: readonly string[];
   signature: string;

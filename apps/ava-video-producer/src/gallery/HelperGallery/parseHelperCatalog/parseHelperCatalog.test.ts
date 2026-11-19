@@ -100,7 +100,7 @@ test("rejects an empty related source path", () => {
     return parseHelperCatalog(
       createCatalog({ helpers: [{ ...HELPER, relatedSources: [""] }] }),
     );
-  });
+  }, /relatedSources/);
 });
 
 test("rejects a declared category with no helpers", () => {

@@ -31,9 +31,7 @@ type VideoLinkComponent = ForwardRefExoticComponent<
  * Builds a product-shaped link component whose `data-status` reflects
  * `VideoRouteContext`, with no real navigation.
  */
-export const createLink = (
-  Component: React.ElementType,
-): VideoLinkComponent => {
+export function createLink(Component: ElementType): VideoLinkComponent {
   return forwardRef(
     (
       {
@@ -49,18 +47,18 @@ export const createLink = (
       }: ComponentPropsWithoutRef<typeof Component> & LinkRouterProps,
       ref: Ref<HTMLElement>,
     ) => {
-      const active = useContext(VideoRouteContext);
+      const activeRoutePath = useContext(VideoRouteContext);
       return (
         <Component
           {...rest}
           ref={ref}
           href="#"
-          data-status={active === to ? "active" : undefined}
-          onClick={(e: MouseEvent) => {
-            return e.preventDefault();
+          data-status={activeRoutePath === to ? "active" : undefined}
+          onClick={(event: MouseEvent) => {
+            return event.preventDefault();
           }}
         />
       );
     },
   );
-};
+}

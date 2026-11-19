@@ -1,17 +1,26 @@
+import { match } from "ts-pattern";
 import { resolveMotionSettings } from "./motionSettings";
 import type { MotionRect } from "./getOverlayTimings";
 import type { MotionOptions } from "./motionSettings";
 import type { CSSProperties } from "react";
 
+/**
+ * Every reveal and continuity treatment a scene transition supports. Schemas
+ * validate a transition's `kind` against this list.
+ */
+export const SCENE_TRANSITION_KINDS = [
+  "cut",
+  "dissolve",
+  "wipe",
+  "aperture",
+  "spatial",
+  "handoff",
+  "morph",
+] as const;
+
 /** Reveal and continuity treatments available to any TransitionSeries. */
-export type SceneTransitionKind =
-  | "cut"
-  | "dissolve"
-  | "wipe"
-  | "aperture"
-  | "spatial"
-  | "handoff"
-  | "morph";
+export type SceneTransitionKind = (typeof SCENE_TRANSITION_KINDS)[number];
+
 /** Native stage geometry and motion controls for a scene boundary. */
 export type SceneTransitionProps = {
   kind: SceneTransitionKind;
@@ -31,8 +40,10 @@ export type SceneTransitionProps = {
 };
 
 /**
- * Scene geometry is independent of playback history and uses one native UI
- * instance per scene.
+ * The CSS style for the entering or exiting scene at `progress` (0 to 1)
+ * through a scene transition. The style depends only on `progress`, never on
+ * playback history, so it is safe to seek. Each scene keeps one native UI
+ * instance, and only its clip, opacity, transform and filter change.
  */
 export function getSceneTransitionStyle(
   progress: number,
@@ -58,13 +69,20 @@ export function getSceneTransitionStyle(
   const settings = resolveMotionSettings(props.motion);
   const clipPath = !entering
     ? undefined
-    : kind === "aperture"
-      ? `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`
-      : kind === "morph"
-        ? `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${morphRadius * (1 - progress)}px)`
-        : kind === "wipe" || kind === "handoff"
-          ? `inset(0 ${(1 - progress) * 100}% 0 0)`
-          : undefined;
+    : match(kind)
+        .with("aperture", () => {
+          return `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`;
+        })
+        .with("morph", () => {
+          return `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${morphRadius * (1 - progress)}px)`;
+        })
+        .with("wipe", "handoff", () => {
+          return `inset(0 ${(1 - progress) * 100}% 0 0)`;
+        })
+        .with("cut", "dissolve", "spatial", () => {
+          return undefined;
+        })
+        .exhaustive();
   return {
     clipPath,
     opacity: kind === "dissolve" && entering ? progress : 1,

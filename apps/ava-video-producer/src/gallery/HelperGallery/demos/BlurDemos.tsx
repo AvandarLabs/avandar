@@ -1,5 +1,5 @@
 import { DUR, EASE, mix, ramp } from "../../../motion";
-import { getHorizontalBlurFilter } from "../../../motion-components/getHorizontalBlurFilter";
+import { getHorizontalBlurFilter } from "../../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
 import { HorizontalBlurFilter } from "../../../motion-components/HorizontalBlur";
 import { getVelocityBlur } from "../../../motion-components/motionSettings";
 import css from "./demos.module.css";

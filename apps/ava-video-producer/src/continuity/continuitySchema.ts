@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { retimeCameraTrack } from "../motion-components/cameraTrack";
 import { getOverlayTimings } from "../motion-components/getOverlayTimings";
+import { SCENE_TRANSITION_KINDS } from "../motion-components/getSceneTransitionStyle";
 import {
   getMotionDuration,
   motionOptionsSchema,
@@ -109,15 +110,7 @@ const overlay = z
   }, "Overlay needs travel and a reading hold");
 const transition = z
   .object({
-    kind: z.enum([
-      "cut",
-      "dissolve",
-      "wipe",
-      "aperture",
-      "spatial",
-      "handoff",
-      "morph",
-    ]),
+    kind: z.enum(SCENE_TRANSITION_KINDS),
     frames: frame.max(300),
     motion: motionOptionsSchema.optional(),
     origin: z

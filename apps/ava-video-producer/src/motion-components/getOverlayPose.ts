@@ -12,8 +12,10 @@ export type OverlayPose = {
 };
 
 /**
- * Floating artwork originates at a measured region without moving the source
- * UI.
+ * The pose (x, y, opacity, scale) of an anchored overlay on one frame. The
+ * overlay rises from the center of the measured source rect to the cue's
+ * target, then returns to the source before its cue ends. Use it to place
+ * overlay artwork without moving the source UI.
  */
 export function getOverlayPose(
   frame: number,

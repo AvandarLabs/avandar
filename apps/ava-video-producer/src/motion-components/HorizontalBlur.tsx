@@ -1,4 +1,4 @@
-import { MIN_VISIBLE_BLUR } from "./getHorizontalBlurFilter";
+import { MIN_VISIBLE_BLUR } from "./getHorizontalBlurFilter/getHorizontalBlurFilter";
 import type { ReactNode } from "react";
 
 type Props = {

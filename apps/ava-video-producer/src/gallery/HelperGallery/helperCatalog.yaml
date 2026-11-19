@@ -71,7 +71,7 @@ modules:
     excluded: []
   - path: src/motion-components/HorizontalBlur.tsx
     excluded: []
-  - path: src/motion-components/getHorizontalBlurFilter.ts
+  - path: src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts
     excluded:
       - name: MIN_VISIBLE_BLUR
         reason: "The blur radius below which HorizontalBlurFilter and getHorizontalBlurFilter skip the filter; not a helper on its own."
@@ -96,7 +96,9 @@ modules:
   - path: src/motion-components/createSceneTransition.ts
     excluded: []
   - path: src/motion-components/getSceneTransitionStyle.ts
-    excluded: []
+    excluded:
+      - name: SCENE_TRANSITION_KINDS
+        reason: "The list of transition kinds that schemas validate against; not motion."
   - path: src/motion-components/SharedElement.tsx
     excluded: []
   - path: src/motion-components/AnchoredOverlay.tsx
@@ -892,7 +894,8 @@ helpers:
     category: blur
     description: "An SVG filter that blurs along X only, the motion blur of a layer moving sideways. Below 0.25 px no filter runs."
     source: src/motion-components/HorizontalBlur.tsx
-    relatedSources: [src/motion-components/getHorizontalBlurFilter.ts]
+    relatedSources:
+      [src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts]
     exports: [HorizontalBlurFilter, getHorizontalBlurFilter]
     signature: "<HorizontalBlurFilter id={id} amount={px} /> + getHorizontalBlurFilter(id: string, amount: number): string | undefined"
     defaults:

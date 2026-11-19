@@ -1,7 +1,7 @@
 /**
  * Blur radii below this are invisible at delivery size, so no filter runs.
  * `HorizontalBlurFilter` reads it to skip rendering a filter that would not
- * show.
+ * show, and `getHorizontalBlurFilter` reads it to return no `filter` value.
  */
 export const MIN_VISIBLE_BLUR = 0.25;
 
