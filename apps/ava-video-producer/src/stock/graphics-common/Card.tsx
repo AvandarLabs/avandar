@@ -2,7 +2,6 @@ import { StockRect } from "../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
   useGraphicShapeScales,
-  useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
@@ -23,7 +22,6 @@ export function Card({
   children?: ReactNode;
 }): ReactNode {
   const card = useGraphicProps("Card", {});
-  const { stroke } = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
     <g>
@@ -37,7 +35,6 @@ export function Card({
         fillOpacity={scales.wash(card.fillAlpha)}
         stroke={color}
         strokeOpacity={card.strokeAlpha}
-        strokeWidth={scales.stroke(stroke.hairline)}
       />
       {children}
     </g>

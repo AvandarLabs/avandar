@@ -2,7 +2,6 @@ import { StockRect } from "../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
   useGraphicShapeScales,
-  useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import { Text } from "./Text";
 import type { ReactNode } from "react";
@@ -22,7 +21,6 @@ export function Pill({
   width: number;
 }): ReactNode {
   const pill = useGraphicProps("Pill", {});
-  const { stroke } = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
     <g>
@@ -36,7 +34,6 @@ export function Pill({
         fillOpacity={scales.wash(pill.fillAlpha)}
         stroke={color}
         strokeOpacity={pill.strokeAlpha}
-        strokeWidth={scales.stroke(stroke.hairline)}
       />
       <Text
         role="pill"

@@ -76,7 +76,7 @@ test("any Atlas motion or composition can be named before it is covered", () => 
   );
 });
 
-test("a composition may differ by one level anywhere and by no more", () => {
+test("a composition captured on the oklch palette may differ by one level and no more", () => {
   assert.deepEqual(
     getAllowedRegionsFromFilm("brand-lockup", {
       kind: "storyboard",
@@ -84,5 +84,16 @@ test("a composition may differ by one level anywhere and by no more", () => {
       height: 1000,
     }),
     [{ x: 0, y: 0, width: 1600, height: 1000, maxChannelDelta: 1 }],
+  );
+});
+
+test("a composition with no starter allowance must match exactly", () => {
+  assert.deepEqual(
+    getAllowedRegionsFromFilm("fly-through", {
+      kind: "storyboard",
+      width: 1600,
+      height: 1000,
+    }),
+    [],
   );
 });

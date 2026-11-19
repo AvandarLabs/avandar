@@ -101,13 +101,28 @@ function _createTargetFromId(id: string): ParityTarget | undefined {
 }
 
 /**
- * How far a composition pixel may move now that `VideoThemeProvider` emits
- * the starter palette (`--brand`, `--ground`, ...) as hex measured from
- * rendered frames instead of the `oklch()` values in `theme.css`. Solid
- * fills match exactly; anti-aliased edges blended from an unrounded colour
- * can differ by one level. Anything larger is still a failure.
+ * How far a pixel of a composition may move, by Atlas id, against reference
+ * frames captured while scenes still read the starter palette from the
+ * `oklch()` values in `theme.css`. `VideoThemeProvider` now emits it as hex
+ * measured from rendered frames: solid fills match exactly, but an
+ * anti-aliased edge is blended from the unrounded colour. Edges differ by one
+ * level, and by up to three where the out-of-gamut `--brand` meets a light
+ * ground. Anything larger is still a failure. References captured after the
+ * palette moved need no allowance, so only these ids have one.
  */
-const STARTER_HEX_ROUNDING = 1;
+const STARTER_HEX_ROUNDING: Readonly<Record<string, number>> = {
+  "shared-object-handoff": 1,
+  "frame-to-interface": 1,
+  "aperture-detail": 1,
+  "spatial-continuation": 1,
+  "occlusion-wipe": 1,
+  "brand-lockup": 1,
+  "typography-reveals": 1,
+  "field-colour-cut": 1,
+  "tilted-window": 3,
+  "bar-comparison": 3,
+  "heading-wipe": 3,
+};
 
 /**
  * Parity targets for the named ids, or by default every in-scope item: the
@@ -171,7 +186,8 @@ export function getAllowedRegionsFromFilm(
       height: Math.ceil(region.height * scale),
     };
   });
-  return film.kind === "stock"
+  const starterRounding = STARTER_HEX_ROUNDING[id];
+  return starterRounding === undefined
     ? regions
     : [
         ...regions,
@@ -180,7 +196,7 @@ export function getAllowedRegionsFromFilm(
           y: 0,
           width: film.width,
           height: film.height,
-          maxChannelDelta: STARTER_HEX_ROUNDING,
+          maxChannelDelta: starterRounding,
         },
       ];
 }
