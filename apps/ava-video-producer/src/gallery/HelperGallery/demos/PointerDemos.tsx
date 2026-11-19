@@ -53,11 +53,10 @@ const TRAIL_FRAMES = 105;
 /** The theme's pointer motion: travel curve, press dip, and trail. */
 function useCursorMotion(): CursorMotion {
   const motion = useVideoMotion();
-  const tokens = useVideoTokens();
   const cursor = useVideoProps("Cursor", {});
   return useMemo(() => {
-    return createCursorMotion(motion, tokens, cursor);
-  }, [motion, tokens, cursor]);
+    return createCursorMotion(motion, cursor);
+  }, [motion, cursor]);
 }
 
 /** The whole route, sampled once a frame, as an SVG path. */
