@@ -529,12 +529,15 @@ async function _resolveTurnConversation(
  * turn's question card is cleared.
  */
 function _startTurn(
-  conversation: DataAgentConversation,
-  turn: Readonly<DataAgentTurnOptions>,
+  options: Readonly<{
+    conversation: DataAgentConversation;
+    turn: Readonly<DataAgentTurnOptions>;
+  }>,
 ): {
   results: AgentQueryResultData[];
   dashboardCards: AgentDashboardBlockData[];
 } {
+  const { conversation, turn } = options;
   const results: AgentQueryResultData[] = [];
   const dashboardCards: AgentDashboardBlockData[] = [];
   conversation.turnRef.current = turn;
@@ -603,7 +606,7 @@ export async function askConversationDataAgent(
   while (conversation.activeAsk) {
     await _stopAsk(conversation, conversation.activeAsk);
   }
-  const { results, dashboardCards } = _startTurn(conversation, turn);
+  const { results, dashboardCards } = _startTurn({ conversation, turn });
   options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};

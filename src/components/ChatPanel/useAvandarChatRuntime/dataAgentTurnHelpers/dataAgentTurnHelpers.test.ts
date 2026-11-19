@@ -1017,7 +1017,7 @@ describe("askConversationDataAgent", () => {
       expect(conversation.asked).toEqual(["How many?", "How many?"]);
     });
 
-    it("sends an offline Try again no line", async () => {
+    it("sends an offline Try again with no line", async () => {
       const conversation = _fakeConversation();
       const conversations = new Map([[KEY, conversation]]);
       const offlineTurn = { ..._turn("How many?"), isOffline: true };
@@ -1114,7 +1114,18 @@ describe("askConversationDataAgent", () => {
       expect(newChat.asked).toEqual(["How many?"]);
     });
 
-    it("keeps the newer turn's record when a run it stopped settles", async () => {
+    it("records no ask for a run whose conversation moved to another turn", async () => {
+      const conversation = _fakeConversation(async () => {
+        conversation.turnRef.current = _turn("Newer?");
+        return { text: "Stopped." };
+      });
+
+      await _ask(new Map([[KEY, conversation]]), _turn("First?"));
+
+      expect(conversation.lastAsk).toBeUndefined();
+    });
+
+    it("ends with the newer turn's record after a run it stopped settles", async () => {
       let finishFirstRun: (() => void) | undefined;
       const conversation = _fakeConversation(async (text) => {
         if (text === "First?") {
