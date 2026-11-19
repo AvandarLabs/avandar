@@ -1,19 +1,25 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; opacity: number };
 /** The requester retains the exact delivered result during the next lookup. */
 export function CacheResponse({ input, opacity }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g
       data-response-key={input.request.key}
       data-response-value={input.result.value}
       opacity={opacity}
     >
-      <path d="M40 520 H920" stroke={STOCK.line} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M40 520 H920" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+      />
       <FitText
         text={input.result.label}
         x={40}

@@ -1,6 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
@@ -13,13 +17,20 @@ export function CacheStoredEntry({
   opacity,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g
       data-stored-entry={input.request.key}
       data-stored-value={input.result.value}
       opacity={opacity}
     >
-      <path d="M430 338 H890" stroke={accent} strokeWidth={3} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M430 338 H890" }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
       <LiteralDataText
         value={input.request.key}
         x={430}
@@ -41,7 +52,7 @@ export function CacheStoredEntry({
           value={input.result.value}
           x={430}
           y={325}
-          color={STOCK.text}
+          color={tokens.color.text}
         />
       ) : undefined}
     </g>
