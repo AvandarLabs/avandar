@@ -36,6 +36,7 @@ The two lines are parallel:
 | Vercel | One `avandar` project. The alpha line deploys explicitly from CI, not through the Git integration. |
 | Mainline test URL | `main`'s test URL uses the staging Supabase project, the same database as `develop`. `main` never runs migrations of its own. |
 | Rehearsal | Restore a production dump into a local switched stack. Approved: production holds no sensitive data yet. |
+| `alpha-dev` data | Seeded at cutover from the same production dump, then refreshed by guardrail 2.2. |
 
 ## Rules that hold from cutover onward
 
@@ -72,8 +73,11 @@ The two lines are parallel:
 2. Rename `demo/measles` to `alpha-dev` on GitHub. Open PRs retarget
    automatically.
 3. Push `alpha-dev`. Its workflow creates the `alpha-dev` Supabase branch
-   and deploys `alpha.avandarlabs.com`. Load the catalog into it and check
-   the site.
+   and deploys `alpha.avandarlabs.com`. Seed the branch with the
+   rehearsal's production dump (roles, then data; the branch already has
+   the schema from the push), load the catalog into it, and check the site.
+   From here on, `alpha.avandarlabs.com` holds a copy of real production
+   data, so rule 4's data check means something from the first release.
 4. Back up production: database dump plus a note of the latest Supabase
    backup. Verify the dump restores.
 5. Merge the mainline lock-out (0.4) into `main`. Confirm `main` no longer
@@ -104,7 +108,7 @@ partial rollback, because `main`'s code does not match the migrated schema.
 | # | Guardrail | Purpose |
 |---|---|---|
 | 2.1 | CI check that fails a PR which edits or deletes an existing migration | Enforces rule 1. |
-| 2.2 | Refresh the `alpha-dev` database from a production dump on a schedule | Migrations are tested against real data on `alpha.avandarlabs.com` before release. |
+| 2.2 | Refresh the `alpha-dev` database from a production dump on a schedule (the first seed happens at cutover) | Migrations are tested against real data on `alpha.avandarlabs.com` before release. |
 | 2.3 | Migration rehearsal in CI against a production snapshot before `alpha` deploys | Catches data-dependent failures automatically, not only by manual check. |
 | 2.4 | Automatic database backup as the first step of every `alpha` deploy | A restore point per release. |
 | 2.5 | Fixture corpus of real persisted JSON (dashboards, queries, map snapshots) run through every migrator on every PR | No user loses a dashboard to a schema change. |
