@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
@@ -16,6 +17,7 @@ export function CapabilityColumn({
   columnWidth,
   height,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const x = 302 + columnWidth * index;
   const label = {
     text: option.label,
@@ -28,7 +30,11 @@ export function CapabilityColumn({
   return (
     <g aria-label={option.label}>
       <FitText {...label} breakLongWords normalizeWhitespace anchor="middle" />
-      <line x1={x} x2={x} y1={176} y2={176 + height} stroke={STOCK.line} />
+      <SketchedShape
+        shape={{ kind: "line", x1: x, x2: x, y1: 176, y2: 176 + height }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+      />
     </g>
   );
 }

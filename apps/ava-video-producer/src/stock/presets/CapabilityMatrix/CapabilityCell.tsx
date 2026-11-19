@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CapabilityGlyph } from "./CapabilityGlyph";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
@@ -25,6 +25,7 @@ export function CapabilityCell({
   width,
   showNotes,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const note = {
     text: cell.note,
     x: x + 48,
@@ -46,7 +47,7 @@ export function CapabilityCell({
             {...note}
             breakLongWords
             normalizeWhitespace
-            color={STOCK.muted}
+            color={tokens.color.textMuted}
           />
         </g>
       ) : null}
