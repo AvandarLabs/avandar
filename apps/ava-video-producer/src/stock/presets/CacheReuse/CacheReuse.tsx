@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheCaptions } from "./CacheCaptions";
 import { CacheLookupToken } from "./CacheLookupToken";
 import { CacheParticipants } from "./CacheParticipants";
@@ -17,15 +21,19 @@ export function CacheReuse({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const state = getCacheJourneyFromFrame(frame);
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const state = getCacheJourneyFromFrame(frame, motion);
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <CacheCaptions frame={frame} input={input} accent={accent} />
-      <path
-        d="M190 290 H650 V440"
+      <SketchedShape
+        shape={{ kind: "path", d: "M190 290 H650 V440" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <CacheParticipants
         input={input}

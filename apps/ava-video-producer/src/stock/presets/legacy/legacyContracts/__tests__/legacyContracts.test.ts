@@ -32,8 +32,23 @@ const BASELINE: {
   }>;
 };
 
+/**
+ * Markup that draws the same SVG: generated ids collapsed, each tag's
+ * attributes in name order (themed shapes spread their props in a different
+ * order), and `stroke-width="1"` dropped because it is SVG's default width.
+ */
 const _normalizeSvgIds = (markup: string): string => {
-  return markup.replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID");
+  return markup
+    .replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID")
+    .replace(/<([a-zA-Z]+)((?:\s+[^\s=>]+="[^"]*")*)\s*(\/?)>/g, (...match) => {
+      const [, tag, attributes, selfClosing] = match as string[];
+      const sorted = (attributes.match(/[^\s=>]+="[^"]*"/g) ?? [])
+        .filter((attribute) => {
+          return attribute !== 'stroke-width="1"';
+        })
+        .sort();
+      return `<${[tag, ...sorted].join(" ")}${selfClosing}>`;
+    });
 };
 
 const _render = ({

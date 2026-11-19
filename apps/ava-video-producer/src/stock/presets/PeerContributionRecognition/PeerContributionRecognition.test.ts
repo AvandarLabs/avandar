@@ -1,4 +1,20 @@
 /** Semantic geometry assertions for the authored study. */
+
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
@@ -44,11 +60,11 @@ test("focus moves the pointing fingertip and acknowledgment anchor to the author
   const input = fixtures[3].input;
   input.contributions.forEach((contribution) => {
     const focused = { ...input, focusedContributionId: contribution.id };
-    const point = SvgAttributes.fromMarker({
+    const point = _markedShape({
       markup: render({ frame: 78, input: focused }),
       marker: "pointing-hand",
     });
-    const object = SvgAttributes.fromMarker({
+    const object = _markedShape({
       markup: render({ frame: 78, input: focused }),
       marker: "focused-object",
     });
@@ -70,7 +86,7 @@ test("focus moves the pointing fingertip and acknowledgment anchor to the author
         }),
     );
     const hold = render({ frame: 150, input: focused });
-    const acknowledgment = SvgAttributes.fromMarker({
+    const acknowledgment = _markedShape({
       markup: hold,
       marker: "acknowledgment-anchor",
     });
@@ -142,13 +158,13 @@ test("hidden authorship stays visibly beside the focused stationary work through
       ...fixtures[3].input,
       focusedContributionId: fixtures[3].input.contributions[index].id,
     };
-    const setup = SvgAttributes.fromMarker({
+    const setup = _markedShape({
       markup: render({ frame: 30, input: input }),
       marker: "focused-object",
     });
     [129, 140, 150, 167].forEach((frame) => {
       const markup = render({ frame: frame, input: input });
-      const object = SvgAttributes.fromMarker({
+      const object = _markedShape({
         markup,
         marker: "focused-object",
       });
@@ -239,7 +255,7 @@ test("complete contribution captions clear both acknowledgment containers and th
             },
           },
         });
-        const bubble = SvgAttributes.fromMarker({
+        const bubble = _markedShape({
           markup,
           marker: "acknowledgment-box",
         });
@@ -277,7 +293,7 @@ test("complete contribution captions clear both acknowledgment containers and th
             baseline - fontSize > bottom,
             `${baseline - fontSize} <= acknowledgment bottom ${bottom}`,
           );
-          const object = SvgAttributes.fromMarker({
+          const object = _markedShape({
             markup,
             marker: "focused-object",
           });

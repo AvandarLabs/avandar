@@ -1,8 +1,12 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix, ramp } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CustodyAcceptance } from "./CustodyAcceptance";
 import { CustodyCaptions } from "./CustodyCaptions";
 import { CustodyObject } from "./CustodyObject";
+import { TRANSFER_CUE, WITHDRAW_CUE } from "./custodyShape";
 import { CustodySupport } from "./CustodySupport";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CustodyTransfer.schema";
@@ -15,13 +19,24 @@ export function CustodyTransfer({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const accepted = input.outcome === "accepted";
-  const transfer = accepted ? ramp(frame, 80, 20, EASE.inOut) : 0;
+  // Responsibility crosses from the acknowledgement until the sender's
+  // support withdraws, so this move keeps its cue span.
+  const transfer = accepted
+    ? ramp(
+        frame,
+        TRANSFER_CUE,
+        WITHDRAW_CUE - TRANSFER_CUE,
+        motion.travel.easing,
+      )
+    : 0;
   const marker = {
     cx: mix(transfer, 240, 720),
     cy: 415,
     r: 9,
-    fill: STOCK.orange,
+    fill: tokens.color.highlight,
   };
   return (
     <g>

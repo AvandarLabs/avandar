@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FoundationApproach } from "./FoundationApproach";
 import { FoundationBase } from "./FoundationBase";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,9 +14,10 @@ export function SharedFoundation({
   accent,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
-      <g opacity={ramp(frame, 12, 18)}>
+      <g opacity={motion.ramp(frame, 12, motion.hero)}>
         <FitText
           text={input.openingConnector}
           x={480}

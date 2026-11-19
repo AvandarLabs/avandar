@@ -1,16 +1,29 @@
-import { countTo } from "../../../motion";
+import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DetailEventLedger } from "./DetailEventLedger";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
+
+const COUNT_AT = 111;
+const COUNT_FRAMES = 28;
+const TOLERANCE_SIZE = 16;
 /** Retained and removed counts accompany their actual algorithm outputs. */
 export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
+  const { text } = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const counted = motion.ramp(frame, COUNT_AT, motion.scale(COUNT_FRAMES));
   const { keptIndices, removed } = makeDetailSimplificationFromInput(input);
+  const keptCount = Math.round(mix(counted, 0, keptIndices.length));
+  const removedCount = Math.round(mix(counted, 0, removed.length));
+  const figure = text.graphic.question;
   return (
     <g>
       <LabelSlots
@@ -21,26 +34,26 @@ export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
         ]}
       />
       <text
-        data-kept-count={countTo(frame, 111, keptIndices.length, 28)}
+        data-kept-count={keptCount}
         x={880}
         y={210}
-        fontSize={24}
-        fill={STOCK.text}
+        fontSize={figure.fontSize}
+        fill={figure.color}
         textAnchor="end"
       >
-        {countTo(frame, 111, keptIndices.length, 28)}
+        {keptCount}
       </text>
       <text
-        data-removed-count={countTo(frame, 111, removed.length, 28)}
+        data-removed-count={removedCount}
         x={880}
         y={274}
-        fontSize={24}
-        fill={STOCK.text}
+        fontSize={figure.fontSize}
+        fill={figure.color}
         textAnchor="end"
       >
-        {countTo(frame, 111, removed.length, 28)}
+        {removedCount}
       </text>
-      <Text x={480} y={382} size={16}>
+      <Text x={480} y={382} size={TOLERANCE_SIZE}>
         ≤ {input.tolerance}
       </Text>
       <DetailEventLedger input={input} />

@@ -1,7 +1,9 @@
-import { ramp } from "../../../motion";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
 
@@ -12,20 +14,22 @@ export function TradeoffCopy({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const labels = [
     {
       text: input.approach,
       y: 60,
       fontSize: 24 as const,
-      color: STOCK.text,
-      opacity: ramp(frame, 12, 18),
+      color: tokens.color.text,
+      opacity: motion.ramp(frame, 12, motion.hero),
     },
     {
       text: input.priorityStatement,
       y: 548,
       fontSize: 18 as const,
-      color: STOCK.muted,
-      opacity: ramp(frame, 108, 12),
+      color: tokens.color.textMuted,
+      opacity: motion.reveal(frame, 108),
     },
   ];
   return (

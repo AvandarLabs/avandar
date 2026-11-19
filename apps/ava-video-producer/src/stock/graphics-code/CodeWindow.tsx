@@ -1,7 +1,9 @@
 import { Panel } from "../graphics-common/Panel";
 import { Text } from "../graphics-common/Text";
+import { SketchedShape } from "../primitives/SketchedShape";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
@@ -21,13 +23,15 @@ export function CodeWindow({
   children: ReactNode;
 }): ReactNode {
   const style = useGraphicProps("CodeWindow", {});
-  const { color } = useGraphicTokens();
+  const { color, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <Panel x={70} y={111} width={820} height={411} radius={style.radius}>
-      <path
-        d="M70 164 H890"
+      <SketchedShape
+        shape={{ kind: "path", d: "M70 164 H890" }}
+        profile={sketch.shape}
         stroke={color.line}
-        strokeWidth={style.dividerWidth}
+        strokeWidth={shapes.stroke(style.dividerWidth)}
       />
       {Array.from({ length: DOT_COUNT }, (_, i) => {
         return (

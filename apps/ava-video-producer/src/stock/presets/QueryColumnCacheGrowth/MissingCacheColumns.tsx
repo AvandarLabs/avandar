@@ -1,8 +1,10 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
@@ -17,7 +19,8 @@ export function MissingCacheColumns({
   missingIds,
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const { color } = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const { color, sketch } = useGraphicTokens();
   return (
     <g>
       {missingIds.map((id, index) => {
@@ -32,15 +35,19 @@ export function MissingCacheColumns({
               fill="none"
               stroke={color.highlight}
               strokeDasharray={style.missingDash.join(" ")}
-              strokeWidth={style.missingStrokeWidth}
+              strokeWidth={scales.stroke(style.missingStrokeWidth)}
             />
             <LabelSlots
               labels={[[column.label, 70 + index * 168, 210, 138, 14, 3]]}
             />
-            <path
-              d={`M${198 + index * 168} 238 h10 m-5 -5 v10`}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${198 + index * 168} 238 h10 m-5 -5 v10`,
+              }}
+              profile={sketch.shape}
               stroke={color.highlight}
-              strokeWidth={style.missingStrokeWidth}
+              strokeWidth={scales.stroke(style.missingStrokeWidth)}
             />
           </g>
         );

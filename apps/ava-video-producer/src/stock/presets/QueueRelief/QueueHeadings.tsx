@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
 /** Inputs for QueueHeadings. */
@@ -7,9 +7,10 @@ type Props = { frame: number; input: Input };
 
 /** Queue, completion and expansion captions label their respective regions. */
 export function QueueHeadings({ frame, input }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
-      <g opacity={ramp(frame, 54, 18)}>
+      <g opacity={motion.ramp(frame, 54, motion.hero)}>
         <FitText
           text={input.capacityChangeLabel}
           x={44}

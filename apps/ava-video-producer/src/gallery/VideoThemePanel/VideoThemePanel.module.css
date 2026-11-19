@@ -1,29 +1,29 @@
 .videoThemePanel {
   display: grid;
-  gap: 12px;
+  gap: var(--atlas-space-12);
   min-width: 0;
-  padding-block: 16px 20px;
-  padding-inline: 20px;
+  padding-block: var(--atlas-space-16) var(--atlas-space-20);
+  padding-inline: var(--atlas-space-20);
 
   /*
    * One focus ring for every control in the panel, matching the gallery's own
    * focus style: 2px of --ava-primary-7. It overrides Mantine's stock blue.
    */
   :focus-visible {
-    outline: 2px solid var(--ava-primary-7);
-    outline-offset: 2px;
+    outline: var(--atlas-border-2) solid var(--ava-primary-7);
+    outline-offset: var(--atlas-space-2);
   }
 
   /* A switch and a segmented control hide their input, so the ring goes on what is drawn. */
   :global(.mantine-Switch-input):focus-visible
     + :global(.mantine-Switch-track) {
-    outline: 2px solid var(--ava-primary-7);
-    outline-offset: 2px;
+    outline: var(--atlas-border-2) solid var(--ava-primary-7);
+    outline-offset: var(--atlas-space-2);
   }
 
   :global(.mantine-SegmentedControl-input):focus-visible
     + :global(.mantine-SegmentedControl-label) {
-    outline: 2px solid var(--ava-primary-7);
+    outline: var(--atlas-border-2) solid var(--ava-primary-7);
     outline-offset: 0;
   }
 
@@ -55,7 +55,7 @@
  */
 @media (width <= 760px) {
   .videoThemePanel {
-    padding: 12px;
+    padding: var(--atlas-space-12);
 
     :global(.mantine-Button-root),
     :global(.mantine-Input-input) {
@@ -80,9 +80,9 @@
     }
 
     :global(.mantine-ColorInput-swatch) {
-      flex: 0 0 32px;
+      flex: 0 0 var(--atlas-size-32);
       height: 0;
-      padding-bottom: 32px;
+      padding-bottom: var(--atlas-space-32);
       width: 32px;
     }
   }

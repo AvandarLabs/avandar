@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -19,6 +23,8 @@ export function RehearsalRuler({
   value,
   y,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <FitText
@@ -31,10 +37,14 @@ export function RehearsalRuler({
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d={`M380 ${y} H650 M380 ${y - 7} V${y + 7} M650 ${y - 7} V${y + 7}`}
-        stroke={STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M380 ${y} H650 M380 ${y - 7} V${y + 7} M650 ${y - 7} V${y + 7}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={String(min)}
@@ -45,7 +55,7 @@ export function RehearsalRuler({
         maxLines={2}
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
       <FitText
         text={String(max)}
@@ -57,7 +67,7 @@ export function RehearsalRuler({
         anchor="end"
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
       <FitText
         text={unit}
@@ -68,7 +78,7 @@ export function RehearsalRuler({
         maxLines={2}
         breakLongWords
         normalizeWhitespace
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
       <FitText
         text={String(value)}

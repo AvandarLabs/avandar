@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { EvolutionCaptions } from "./EvolutionCaptions";
 import { EvolutionHeader } from "./EvolutionHeader";
 import { EvolutionRow } from "./EvolutionRow";
@@ -14,7 +15,13 @@ export function SchemaColumnEvolution({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const expansion = ramp(frame, 12, 36, EASE.inOut);
+  const motion = useGraphicMotion();
+  const expansion = motion.ramp(
+    frame,
+    12,
+    motion.scale(36),
+    motion.travel.easing,
+  );
   const x = mix(expansion, 190, 80);
   return (
     <g>
@@ -35,7 +42,11 @@ export function SchemaColumnEvolution({
             accent={accent}
             expansion={expansion}
             missingLabel={input.fields.missingLabel}
-            missingOpacity={ramp(frame, 49 + index * 6, 31)}
+            missingOpacity={motion.ramp(
+              frame,
+              49 + index * 6,
+              motion.scale(31),
+            )}
           />
         );
       })}

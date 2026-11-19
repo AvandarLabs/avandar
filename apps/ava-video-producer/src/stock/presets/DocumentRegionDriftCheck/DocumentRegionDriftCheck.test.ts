@@ -39,11 +39,14 @@ function _marker({
   const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
     return match[0];
   });
-  const tag = tags.find((candidateTag) => {
+  const index = tags.findIndex((candidateTag) => {
     return candidateTag.includes(`data-${key}="${value}"`);
   });
-  assert.ok(tag, `${key} ${value}`);
-  return tag;
+  assert.ok(index >= 0, `${key} ${value}`);
+  // A marked group wraps the sketch-aware shape it names.
+  return tags[index].startsWith("<g ")
+    ? `${tags[index]}${tags[index + 1]}`
+    : tags[index];
 }
 
 test("exact header and fingerprint determine the review latch independently of ordinal", () => {

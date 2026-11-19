@@ -69,7 +69,7 @@ test("both proposal halves write beneath one moving latch before one atomic stam
   assert.notEqual(early, written);
   const y = (frame: number) => {
     return SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: frame }),
         marker: "commit-latch",
       }),
@@ -88,6 +88,23 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
 import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
+
+/**
+ * A marker group and the sketch-aware shape it wraps, since the marker sits
+ * on the group around the shape.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const match = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  assert.ok(match, marker);
+  return match[0];
+}
 
 function _getVisibleTexts({
   input,
@@ -193,7 +210,7 @@ test("the complete latch stroke and handle remain clear of the record caption th
         });
       const top = y - fontSize,
         bottom = y + fontSize * 0.3;
-      const latch = SvgAttributes.fromMarker({
+      const latch = _markedShape({
         markup,
         marker: "commit-latch",
       });

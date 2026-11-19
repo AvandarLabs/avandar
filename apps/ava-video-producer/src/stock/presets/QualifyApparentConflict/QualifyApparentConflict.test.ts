@@ -87,7 +87,7 @@ test("original claims survive under their authored contexts before the qualifier
   );
   assert.match(
     SvgAttributes.fromMarker({ markup: held, marker: "context-divider" }),
-    /y1="130" y2="410"/,
+    /y1="130"[^>]*y2="410"/,
   );
   assert.match(
     SvgAttributes.fromMarker({

@@ -1,6 +1,8 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { getExclusionFromFrame } from "./getExclusionFromFrame";
 import { SubscriptionFrame } from "./SubscriptionFrame";
 import { SubscriptionRecord } from "./SubscriptionRecord";
 import type { Input } from "./FilterSubscriptionScope.schema";
@@ -13,6 +15,11 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+/** Frames between neighbouring views appearing. */
+const VIEW_STAGGER_FRAMES = 3;
+/** Frames a view takes to fade in. */
+const VIEW_FRAMES = 25;
 /** One view retains the common denominator unless it subscribes. */
 export function SubscriptionView({
   view,
@@ -21,9 +28,10 @@ export function SubscriptionView({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const x = 48 + index * (864 / input.views.length),
     width = 864 / input.views.length - 18;
-  const progress = ramp(frame, 91, 48);
+  const progress = getExclusionFromFrame(frame, motion);
   const rows =
     view.subscribed && progress === 1
       ? input.records.filter(propEq("category", input.selectedCategory))
@@ -38,7 +46,12 @@ export function SubscriptionView({
       data-sum={sum}
       data-value-unit={input.metric.valueUnit}
       data-count-unit={input.metric.countUnit}
-      opacity={ramp(frame, 13 + index * 3, 25)}
+      opacity={ramp(
+        frame,
+        13 + index * motion.scale(VIEW_STAGGER_FRAMES),
+        motion.scale(VIEW_FRAMES),
+        motion.reveal.easing,
+      )}
     >
       <SubscriptionFrame {...{ view, x, width, accent }} />
       {input.records.map((record, rowIndex) => {

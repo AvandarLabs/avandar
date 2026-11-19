@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ObservationSlot } from "./ObservationSlot";
 import { ProseHeadings } from "./ProseHeadings";
 import { SentenceSpans } from "./SentenceSpans";
@@ -13,9 +13,10 @@ export function ProseMeasurementLedger({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g
-      opacity={ramp(frame, 0, 12)}
+      opacity={motion.reveal(frame, 0)}
       data-method={input.method}
       data-review={input.reviewState}
     >

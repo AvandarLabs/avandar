@@ -1,17 +1,26 @@
-import { ramp } from "../../../motion";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** The dash of the empty selection slot. */
+const SLOT_DASH = "4 6";
 /** A stated criterion and unchanged selection slot explain the replacement. */
 export function SelectionCriterion({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const label = {
     text: input.criterion,
     x: 480,
@@ -20,10 +29,19 @@ export function SelectionCriterion({
     fontSize: 24 as const,
     maxLines: 3,
   };
-  const slot = { x: 312, y: 202, width: 336, height: 320, rx: 22 };
+  const slot = {
+    x: 312,
+    y: 202,
+    width: 336,
+    height: 320,
+    rx: scales.corner(22),
+  };
   return (
     <g>
-      <g opacity={ramp(frame, 12, 18)} aria-label={input.criterion}>
+      <g
+        opacity={motion.ramp(frame, 12, motion.hero)}
+        aria-label={input.criterion}
+      >
         <FitText
           {...label}
           breakLongWords
@@ -31,15 +49,18 @@ export function SelectionCriterion({
           anchor="middle"
         />
       </g>
-      <rect
+      <StockRect
         {...slot}
         fill="none"
-        stroke={STOCK.line}
-        strokeDasharray="4 6"
-        opacity={ramp(frame, 18, 18)}
+        stroke={tokens.color.line}
+        strokeDasharray={SLOT_DASH}
+        opacity={motion.ramp(frame, 18, motion.hero)}
       />
       {input.showCriterionLink ? (
-        <g data-criterion-link="replacement" opacity={ramp(frame, 108, 12)}>
+        <g
+          data-criterion-link="replacement"
+          opacity={motion.reveal(frame, 108)}
+        >
           <DrawPath
             d="M480 145 V176 H674 V444 H624"
             frame={frame}

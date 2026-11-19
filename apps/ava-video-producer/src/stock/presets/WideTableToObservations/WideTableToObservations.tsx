@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MeasurementStrip } from "./MeasurementStrip";
 import { WideLedgerCaptions } from "./WideLedgerCaptions";
 import { WideSourceGuides } from "./WideSourceGuides";
@@ -13,8 +13,9 @@ export function WideTableToObservations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <WideLedgerCaptions input={input} frame={frame} />
       <WideSourceGuides input={input} frame={frame} />
       {input.measures.flatMap((measure, measureIndex) => {

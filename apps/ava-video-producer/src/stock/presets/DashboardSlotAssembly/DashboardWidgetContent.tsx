@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -24,12 +24,13 @@ export function DashboardWidgetContent({
   bodyLines,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const label = {
     x: x + (widget.kind === "list" ? 22 : 12),
     width: width - (widget.kind === "list" ? 34 : 24),
     fontSize: widget.kind === "value" ? (16 as const) : (12 as const),
     maxLines: widget.kind === "value" ? 4 : bodyLines,
-    color: widget.kind === "note" ? STOCK.muted : STOCK.text,
+    color: widget.kind === "note" ? tokens.color.textMuted : tokens.color.text,
   };
   return (
     <g>

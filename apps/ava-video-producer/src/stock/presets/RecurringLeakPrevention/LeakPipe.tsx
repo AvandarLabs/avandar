@@ -1,35 +1,62 @@
-import { loopPhase, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { loopPhase } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The dash of the flowing outlet stream. */
+const FLOW_DASH = "12 12";
 /** Normal outlet flow is independently visible from the side leak. */
 export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const running = frame < 63 || (frame >= 107 && input.retest !== "not-tested");
   const leaking =
     frame < 63 || (frame >= 107 && input.retest === "still-leaking");
   return (
-    <g opacity={ramp(frame, 12, 12)}>
-      <path
-        d="M200 245 H750 V340 M200 275 H720 V340"
-        stroke={STOCK.line}
-        strokeWidth={7}
+    <g opacity={motion.reveal(frame, 12)}>
+      <SketchedShape
+        shape={{ kind: "path", d: "M200 245 H750 V340 M200 275 H720 V340" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(7)}
         fill="none"
       />
-      <path d="M473 235 v50 M487 235 v50" stroke={accent} strokeWidth={5} />
-      <path d="M720 340 h30" stroke={STOCK.muted} strokeWidth={6} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M473 235 v50 M487 235 v50" }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(5)}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M720 340 h30" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(6)}
+      />
       {running ? (
         <g data-outlet-flow="true">
-          <path
-            d="M220 260 H735 V430"
-            stroke={STOCK.cyan}
-            strokeWidth={5}
-            strokeDasharray="12 12"
+          <SketchedShape
+            shape={{ kind: "path", d: "M220 260 H735 V430" }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.accentAlt}
+            strokeWidth={scales.stroke(5)}
+            strokeDasharray={FLOW_DASH}
             strokeDashoffset={-loopPhase(frame, 48) * 48}
             fill="none"
           />
-          <path d="M720 440 h30" stroke={STOCK.cyan} strokeWidth={3} />
+          <SketchedShape
+            shape={{ kind: "path", d: "M720 440 h30" }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.accentAlt}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          />
         </g>
       ) : undefined}
       {leaking ? (
@@ -41,7 +68,7 @@ export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
                 cx={480}
                 cy={300 + loopPhase(frame, 30, index * 10) * 110}
                 r={4}
-                fill={STOCK.cyan}
+                fill={tokens.color.accentAlt}
               />
             );
           })}

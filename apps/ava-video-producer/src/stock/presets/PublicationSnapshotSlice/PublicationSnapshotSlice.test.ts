@@ -218,7 +218,14 @@ test("hidden excluded cells cannot enter the snapshot for either explicit audien
   });
 });
 
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { createVideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { makeResolvedVideoThemeFromSource } from "../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
+
+const CLASSIC_MOTION = createVideoMotion(
+  makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE).semantic.motion,
+);
 
 test("the live write cue never changes the frozen snapshot or an unedited source cell", () => {
   [96, 109, 116, 117, 130, 139, 150].forEach((frame) => {
@@ -228,6 +235,7 @@ test("the live write cue never changes the frozen snapshot or an unedited source
       rowIndex: 0,
       columnIndex: 1,
       snapshot: true,
+      motion: CLASSIC_MOTION,
     });
     const otherCell = getSnapshotCellFromFrame({
       input: DEFAULT_INPUT,
@@ -235,6 +243,7 @@ test("the live write cue never changes the frozen snapshot or an unedited source
       rowIndex: 1,
       columnIndex: 1,
       snapshot: false,
+      motion: CLASSIC_MOTION,
     });
     assert.equal(snapshot.value, "12");
     assert.equal(snapshot.isEditTarget, false);

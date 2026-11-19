@@ -1,10 +1,22 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CartridgeText } from "./CartridgeText";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** The closed cartridge's corner, before the theme's corner style. */
+const CARTRIDGE_CORNER = 16;
+/** The dash of the cartridge's cutaway outline. */
+const CUTAWAY_DASH = "4 5";
+/** The peak opacity of the inference ripple. */
+const RIPPLE_OPACITY = 0.3;
 /**
  * The resident model seats entirely inside the casing before the single
  * inference ripple.
@@ -14,33 +26,46 @@ export function ModelCartridge({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const y = mix(ramp(frame, 20, 16), 106, 130);
-  const ripple = ramp(frame, 56, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const y = mix(motion.ramp(frame, 20, motion.scale(16)), 106, 130);
+  const ripple = motion.ramp(frame, 56, motion.scale(24));
   return (
     <g>
-      <rect
+      <StockRect
         data-model-socket={input.showCutaway ? "cutaway" : "screen-inset"}
         x={194}
         y={122}
         width={572}
         height={88}
-        rx={input.showCutaway ? 4 : 16}
-        fill={STOCK.ground}
-        stroke={STOCK.line}
-        strokeDasharray={input.showCutaway ? "4 5" : undefined}
+        rx={scales.corner(
+          input.showCutaway ? tokens.corner.chip : CARTRIDGE_CORNER,
+        )}
+        fill={tokens.color.ground}
+        stroke={tokens.color.line}
+        strokeDasharray={input.showCutaway ? CUTAWAY_DASH : undefined}
       />
-      <g data-cartridge-installation="local" opacity={ramp(frame, 20, 6)}>
-        <rect
+      <g
+        data-cartridge-installation="local"
+        opacity={motion.ramp(frame, 20, motion.chip)}
+      >
+        <StockRect
           data-model-cartridge="resident"
           x={202}
           y={y}
           width={556}
           height={72}
-          rx={6}
-          fill={STOCK.elevated}
+          rx={scales.corner(6)}
+          fill={tokens.color.elevated}
           stroke={accent}
         />
-        <path d={`M214 ${y + 62} h532`} stroke={accent} strokeOpacity={0.4} />
+        <SketchedShape
+          shape={{ kind: "path", d: `M214 ${y + 62} h532` }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeOpacity={tokens.alpha.dimmed}
+        />
         <CartridgeText {...{ input, y }} />
         {frame >= 56 && frame < 80 ? (
           <rect
@@ -50,7 +75,7 @@ export function ModelCartridge({
             width={6}
             height={48}
             fill={accent}
-            fillOpacity={0.3 * Math.sin(ripple * Math.PI)}
+            fillOpacity={RIPPLE_OPACITY * Math.sin(ripple * Math.PI)}
           />
         ) : undefined}
       </g>

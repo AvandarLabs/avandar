@@ -1,8 +1,13 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
 
@@ -16,34 +21,49 @@ export function PlannerExchange({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const sending = ramp(frame, 13, 30, EASE.inOut);
-  const returning = ramp(frame, 56, 44, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const sending = motion.ramp(
+    frame,
+    13,
+    motion.scale(30),
+    motion.travel.easing,
+  );
+  const returning = motion.ramp(
+    frame,
+    56,
+    motion.scale(44),
+    motion.travel.easing,
+  );
   const outboundX = mix(sending, 55, 630);
   const inboundX = mix(returning, 630, 60);
   return (
     <g>
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M550 180 H620" }}
+        profile={tokens.sketch.shape}
         data-outbound-route="true"
-        d="M550 180 H620"
-        stroke={STOCK.orange}
-        strokeWidth={2}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M620 154 H550" }}
+        profile={tokens.sketch.shape}
         data-inbound-route="true"
-        d="M620 154 H550"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <g
         data-outbound="true"
-        transform={`translate(${outboundX} ${mix(ramp(frame, 43, 12, EASE.inOut), 108, 340)})`}
+        transform={`translate(${outboundX} ${mix(motion.ramp(frame, 43, motion.scale(12), motion.travel.easing), 108, 340)})`}
       >
         <StockRect
           width={280}
           height={186}
-          rx={8}
-          fill={STOCK.elevated}
-          stroke={STOCK.orange}
+          rx={scales.corner(tokens.corner.cell)}
+          fill={tokens.color.elevated}
+          stroke={tokens.color.highlight}
         />
         <FitText
           text={input.request.question}
@@ -70,8 +90,8 @@ export function PlannerExchange({
         <StockRect
           width={280}
           height={90}
-          rx={6}
-          fill={STOCK.surface}
+          rx={scales.corner(6)}
+          fill={tokens.color.surface}
           stroke={accent}
         />
         <LabelSlots labels={[[input.request.planLabel, 12, 22, 256, 16, 4]]} />

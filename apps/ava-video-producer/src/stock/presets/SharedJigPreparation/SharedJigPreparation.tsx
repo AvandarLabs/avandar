@@ -1,7 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import { JigGuide } from "./JigGuide";
 import { JigMakingTool } from "./JigMakingTool";
@@ -19,7 +22,9 @@ export function SharedJigPreparation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getJigSceneFromFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scene = getJigSceneFromFrame({ motion, frame, input });
   const action =
     frame < 49
       ? input.labels.prepare
@@ -55,7 +60,7 @@ export function SharedJigPreparation({
         y={440}
         size={32}
         role="worker"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
       />
       <FitText
         text={input.makerLabel}
@@ -64,7 +69,7 @@ export function SharedJigPreparation({
         width={300}
         fontSize={12}
         maxLines={2}
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         normalizeWhitespace
         breakLongWords
       />

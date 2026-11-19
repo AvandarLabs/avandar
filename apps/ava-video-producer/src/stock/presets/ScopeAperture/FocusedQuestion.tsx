@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
 /**
@@ -10,9 +10,13 @@ export function FocusedQuestion({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <>
-      <g data-focused-question="true" opacity={ramp(frame, 84, 24)}>
+      <g
+        data-focused-question="true"
+        opacity={motion.ramp(frame, 84, motion.scale(24))}
+      >
         <FitText
           text={input.focusedQuestion}
           x={480}
@@ -25,7 +29,7 @@ export function FocusedQuestion({
           normalizeWhitespace
         />
       </g>
-      <g opacity={ramp(frame, 96, 12)}>
+      <g opacity={motion.reveal(frame, 96)}>
         <FitText
           text={input.insideLabel}
           x={480}

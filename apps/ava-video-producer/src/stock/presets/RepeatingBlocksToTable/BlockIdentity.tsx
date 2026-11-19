@@ -1,5 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BlockCaption } from "./BlockCaption";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
@@ -12,25 +15,27 @@ export function BlockIdentity({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const duration = 9 / input.blocks.length,
     departure = 96 + (input.blocks.length - 1 - index) * duration;
-  const color = [accent, STOCK.cyan, STOCK.orange][index];
+  const color = [accent, tokens.color.accentAlt, tokens.color.highlight][index];
   const poses = [
     {
       x: 52 + index * 294,
       y: 135,
       width: 268,
-      opacity: 1 - ramp(frame, 96, 9),
+      opacity: 1 - motion.ramp(frame, 96, motion.panel),
     },
     {
       x: 52,
       y: mix(
-        ramp(frame, departure, duration - 0.5, EASE.inOut),
+        motion.ramp(frame, departure, duration - 0.5, motion.travel.easing),
         210,
         280 + index * 112,
       ),
       width: 224,
-      opacity: ramp(frame, departure, 0.5),
+      opacity: motion.ramp(frame, departure, motion.scale(0.5)),
     },
   ];
   return (

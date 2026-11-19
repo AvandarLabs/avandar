@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -8,6 +12,8 @@ type Props = {
   slotWidth: number;
   color: string;
 };
+/** How strongly a label's leader line shows. */
+const LEADER_OPACITY = 0.55;
 /** A leader connects each external label slot to its own segment. */
 export function ScheduleLabelBackdrop({
   targetX,
@@ -16,13 +22,19 @@ export function ScheduleLabelBackdrop({
   slotWidth,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <path
-        d={`M${targetX} 371 V${382 + index * 3} L${x + slotWidth / 2} 414`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${targetX} 371 V${382 + index * 3} L${x + slotWidth / 2} 414`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={0.55}
+        strokeOpacity={LEADER_OPACITY}
       />
       <rect
         data-label-slot={index}
@@ -30,8 +42,8 @@ export function ScheduleLabelBackdrop({
         y={418}
         width={slotWidth - 8}
         height={155}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
       />
     </g>
   );

@@ -1,11 +1,16 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input };
+
+/** The dash of the dispatch boundary. */
+const BOUNDARY_DASH = "6 8";
 /** Intake, dispatch, and destination captions frame the batch journey. */
 export function BatchHeadings({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <FitText
@@ -37,15 +42,17 @@ export function BatchHeadings({ input }: Readonly<Props>): ReactNode {
         maxLines={3}
         normalizeWhitespace
         breakLongWords
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
-      <path
-        data-dispatch-boundary="true"
-        d="M500 200 V580"
-        fill="none"
-        stroke={STOCK.muted}
-        strokeDasharray="6 8"
-      />
+      <g data-dispatch-boundary="true">
+        <SketchedShape
+          shape={{ kind: "path", d: "M500 200 V580" }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={tokens.color.inactive}
+          strokeDasharray={BOUNDARY_DASH}
+        />
+      </g>
     </g>
   );
 }

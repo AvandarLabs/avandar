@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { JournalCopy } from "./JournalCopy";
 import { JournalTab } from "./JournalTab";
 import { ReceiptHalf } from "./ReceiptHalf";
@@ -16,15 +20,27 @@ export function JournalReceipts({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const pocketPath =
     input.foldDirection === "horizontal"
       ? "M808 224 h144 v256 h-144 z M808 248 q72 28 144 0"
       : "M690 224 h262 v256 h-262 z M690 248 q131 28 262 0";
   return (
     <g data-fold-direction={input.foldDirection}>
-      <path d="M38 532 h770" stroke={STOCK.line} strokeWidth={3} />
-      <path d={pocketPath} fill={STOCK.surface} stroke={STOCK.line} />
-      <circle cx={70} cy={128} r={5} fill={STOCK.orange} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M38 532 h770" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: pocketPath }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+      />
+      <circle cx={70} cy={128} r={5} fill={tokens.color.highlight} />
       <circle cx={520} cy={128} r={5} fill={accent} />
       {input.entries.map((entry, index) => {
         return (

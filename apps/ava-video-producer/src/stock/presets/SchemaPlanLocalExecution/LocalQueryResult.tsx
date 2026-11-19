@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,7 @@ export function LocalQueryResult({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const result = input.rows
     .filter(({ category }) => {
       return category === input.request.selectedCategory;
@@ -29,12 +31,18 @@ export function LocalQueryResult({
         x={360}
         y={216}
         fill={accent}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
         aria-label={String(result)}
       >
         {String(result)}
       </text>
-      <text x={345} y={248} fill={accent} fontSize={14}>
+      <text
+        x={345}
+        y={248}
+        fill={accent}
+        fontSize={tokens.text.graphic.eyebrow.fontSize}
+      >
         {"="}
       </text>
       <LiteralDataText value={input.request.selectedCategory} x={360} y={248} />

@@ -1,6 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ApproachTrait } from "./ApproachTrait";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
@@ -22,20 +27,24 @@ export function FoundationApproach({
   index,
   showTrait,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const x = 80 + index * 440;
-  const lift = ramp(frame, 36, 36, EASE.inOut);
-  const arrival = ramp(frame, 12 + index * 6, 18);
+  const lift = motion.ramp(frame, 36, motion.scale(36), motion.travel.easing);
+  const arrival = motion.ramp(frame, 12 + index * 6, motion.hero);
   return (
     <g
       data-approach={approach.id}
       opacity={arrival}
       transform={`translate(0 ${mix(lift, 0, -40) + mix(arrival, 12, 0)})`}
     >
-      <path
-        d={`M${x} 370 V180 H${x + 360} V370 Z`}
-        stroke={index ? STOCK.mint : accent}
-        fill={STOCK.surface}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} 370 V180 H${x + 360} V370 Z` }}
+        profile={tokens.sketch.shape}
+        stroke={index ? tokens.color.positive : accent}
+        fill={tokens.color.surface}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={approach.label}

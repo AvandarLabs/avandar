@@ -1,7 +1,9 @@
 import { ramp } from "../../../../motion";
+import { SketchedShape } from "../../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../../theme/useGraphicTheme/useGraphicTheme";
 import { PushdownRow } from "../PushdownRow";
@@ -31,8 +33,9 @@ export function PushdownSourceRow({
   accent,
 }: Props): ReactNode {
   const style = useGraphicProps("PredicatePushdownBoundary", {});
-  const { color } = useGraphicTokens();
+  const { color, sketch } = useGraphicTokens();
   const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const gates = ramp(
     frame,
     GATE_CUE,
@@ -49,11 +52,15 @@ export function PushdownSourceRow({
         accent={accent}
       />
       {isRejected ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${438 - 18 * gates} ${228 + index * 32} v32`,
+          }}
+          profile={sketch.shape}
           data-gate={row.id}
-          d={`M${438 - 18 * gates} ${228 + index * 32} v32`}
           stroke={color.highlight}
-          strokeWidth={style.gateWidth}
+          strokeWidth={scales.stroke(style.gateWidth)}
         />
       ) : undefined}
     </g>

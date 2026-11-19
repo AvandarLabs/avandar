@@ -1,4 +1,5 @@
-import { EASE, ramp } from "../../../motion";
+import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ConflictCandidate } from "./ConflictCandidate";
 import { ConflictChoiceMark } from "./ConflictChoiceMark";
 import { ConflictFieldHeading } from "./ConflictFieldHeading";
@@ -12,6 +13,9 @@ type Props = {
   field: Input["fields"][number];
   index: number;
 };
+
+/** Frames the candidates take to lift into their result lanes. */
+const CHOOSE_FRAMES = 70;
 /**
  * A field keeps the chosen result and its unresolved or rejected alternatives.
  */
@@ -22,8 +26,14 @@ export function ConflictField({
   field,
   index,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const y = 106 + index * 122;
-  const progress = ramp(frame, 42, 70, EASE.inOut);
+  const progress = ramp(
+    frame,
+    42,
+    motion.scale(CHOOSE_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <g>
       <ConflictFieldHeading

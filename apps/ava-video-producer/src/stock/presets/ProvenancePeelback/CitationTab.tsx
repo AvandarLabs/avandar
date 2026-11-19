@@ -1,7 +1,9 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { label: string; frame: number; accent: string };
@@ -11,15 +13,17 @@ export function CitationTab({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 82, 22)}>
+    <g opacity={motion.ramp(frame, 82, motion.scale(22))}>
       <StockRect
         data-citation-tab="summary-edge"
         x={16}
         y={220}
         width={384}
         height={30}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <FitText

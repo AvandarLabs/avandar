@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +13,8 @@ type Props = { input: Input; accent: string };
  * strokes.
  */
 export function ResponseWriting({ input, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const labels = [
     { text: input.response.label, y: 354, maxLines: 1, color: accent },
     ...input.response.lines.map((text, index) => {
@@ -16,7 +22,7 @@ export function ResponseWriting({ input, accent }: Readonly<Props>): ReactNode {
         text,
         y: 378 + index * 34,
         maxLines: 2,
-        color: STOCK.text,
+        color: tokens.color.text,
       };
     }),
   ];
@@ -38,12 +44,16 @@ export function ResponseWriting({ input, accent }: Readonly<Props>): ReactNode {
           })
         : input.response.lines.map((_, index) => {
             return (
-              <path
-                data-response-stroke={index}
+              <SketchedShape
                 key={index}
-                d={`M214 ${378 + index * 34} h${490 - index * 32}`}
+                shape={{
+                  kind: "path",
+                  d: `M214 ${378 + index * 34} h${490 - index * 32}`,
+                }}
+                profile={tokens.sketch.shape}
+                data-response-stroke={index}
                 stroke={accent}
-                strokeWidth={3}
+                strokeWidth={scales.stroke(tokens.stroke.emphasis)}
               />
             );
           })}

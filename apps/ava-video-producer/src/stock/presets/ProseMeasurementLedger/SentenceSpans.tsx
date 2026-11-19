@@ -1,7 +1,13 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
-import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  getSentenceGlyphsFromInput,
+  SENTENCE_FONT_SIZE,
+} from "./getSentenceGlyphsFromInput";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
@@ -20,6 +26,8 @@ export function SentenceSpans({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   let offset = 0;
   const spans = input.fragments.map((fragment) => {
     const start = offset + fragment.contentStart,
@@ -42,19 +50,23 @@ export function SentenceSpans({
             <text
               x={glyph.x}
               y={glyph.y}
-              fontSize={16}
-              fontFamily="Arial, sans-serif"
-              fill={STOCK.text}
+              fontSize={SENTENCE_FONT_SIZE}
+              fontFamily={tokens.text.graphic.secondary.fontFamily}
+              fill={tokens.color.text}
             >
               {glyph.text}
             </text>
             {input.showSourceSpans && spanIndex >= 0 ? (
-              <path
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${glyph.x} ${glyph.y + 6} h${Math.max(2, glyph.width)}`,
+                }}
+                profile={tokens.sketch.shape}
                 data-source-span={spans[spanIndex].role}
-                d={`M${glyph.x} ${glyph.y + 6} h${Math.max(2, glyph.width)}`}
                 stroke={accent}
                 strokeDasharray={PATTERNS[spans[spanIndex].role]}
-                opacity={ramp(frame, 13 + spanIndex * 3, 18)}
+                opacity={motion.ramp(frame, 13 + spanIndex * 3, motion.hero)}
               />
             ) : undefined}
           </g>

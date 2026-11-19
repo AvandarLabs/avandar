@@ -2,6 +2,7 @@ import { Text } from "../../graphics-common/Text";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
@@ -37,6 +38,7 @@ export function FieldRow({
 }: Props): ReactNode {
   const style = useGraphicProps("SchemaMapping", {});
   const tokens = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   const port = <circle cx={portX} cy={y} r={style.dotRadius} fill={color} />;
   return (
     <>
@@ -45,7 +47,7 @@ export function FieldRow({
         y={y - ROW_HALF_HEIGHT}
         width={ROW_WIDTH}
         height={ROW_HEIGHT}
-        rx={style.fieldRadius}
+        rx={shapes.corner(style.fieldRadius)}
         fill={tokens.color.elevated}
       />
       {isPortFirst ? port : null}

@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CandidateAnchorGuides } from "./CandidateAnchorGuides";
 import { FigureAnchor } from "./FigureAnchor";
 import type { Input } from "./PdfNearestLabelReview.schema";
@@ -13,16 +17,18 @@ export function ReviewSourcePage({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={60}
         y={170}
         width={400}
         height={300}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FigureAnchor input={input} frame={frame} accent={accent} />
       {input.labels.map((label, index) => {

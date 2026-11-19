@@ -1,5 +1,10 @@
 import { Check } from "../../../graphics-common/Check";
-import { useGraphicProps } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../../primitives/SketchedShape";
+import {
+  useGraphicProps,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 const ICON_Y = 284;
@@ -9,17 +14,18 @@ type Props = Readonly<{ x: number; accent: string; active: number }>;
 /** The stage's ring icon, a check that fades in and a dot that fades out. */
 export function StageIcon({ x, accent, active }: Props): ReactNode {
   const style = useGraphicProps("DataPipeline", {});
+  const { sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
   return (
     <>
-      <circle
-        cx={x}
-        cy={ICON_Y}
-        r={style.iconRadius}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: ICON_Y, r: style.iconRadius }}
+        profile={sketch.shape}
         fill={accent}
-        fillOpacity={style.iconFillAlpha}
+        fillOpacity={shapes.wash(style.iconFillAlpha)}
         stroke={accent}
         strokeOpacity={style.iconStrokeAlpha}
-        strokeWidth={style.iconStrokeWidth}
+        strokeWidth={shapes.stroke(style.iconStrokeWidth)}
       />
       <g opacity={active}>
         <Check x={x} y={ICON_Y} color={accent} size={style.checkSize} />

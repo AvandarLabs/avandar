@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ConflictCandidateCopy } from "./ConflictCandidateCopy";
 import { getConflictCandidateStateFromField } from "./getConflictCandidateStateFromField";
 import type { Input } from "./FieldConflictChoice.schema";
@@ -13,6 +17,9 @@ type Props = {
   progress: number;
   accent: string;
 };
+
+/** A candidate panel's corner before the corner style scales it. */
+const PANEL_CORNER = 5;
 /** A source value remains literal as its panel lifts into its chosen lane. */
 export function ConflictCandidate({
   source,
@@ -23,6 +30,8 @@ export function ConflictCandidate({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const { value, isChosen, isResolved, isHidden, x, top, opacity } =
     getConflictCandidateStateFromField({
       source,
@@ -37,7 +46,7 @@ export function ConflictCandidate({
   }
   return (
     <g opacity={opacity}>
-      <rect
+      <StockRect
         data-candidate-source={source.id}
         data-field={field.id}
         data-result-field={isChosen && progress === 1 ? field.id : undefined}
@@ -46,9 +55,9 @@ export function ConflictCandidate({
         y={top}
         width={416}
         height={66}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={isChosen ? accent : STOCK.line}
+        rx={scales.corner(PANEL_CORNER)}
+        fill={tokens.color.surface}
+        stroke={isChosen ? accent : tokens.color.line}
       />
       <ConflictCandidateCopy
         sourceLabel={source.label}

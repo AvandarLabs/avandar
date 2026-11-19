@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PredicatePushdownBoundary.schema";
@@ -26,6 +27,7 @@ export function PushdownRow({
   opacity = 1,
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("PredicatePushdownBoundary", {});
+  const scales = useGraphicShapeScales();
   const { color } = useGraphicTokens();
   return (
     <g
@@ -41,10 +43,10 @@ export function PushdownRow({
         y={y - 18}
         width={332}
         height={32}
-        rx={style.rowRadius}
+        rx={scales.corner(style.rowRadius)}
         fill={color.surface}
         stroke={source ? color.line : accent}
-        strokeWidth={style.rowStrokeWidth}
+        strokeWidth={scales.stroke(style.rowStrokeWidth)}
       />
       <LiteralDataText value={row.id} x={x} y={y - 5} />
       <LabelSlots labels={[[String(row.value), x, y + 10, 316, 12, 1]]} />

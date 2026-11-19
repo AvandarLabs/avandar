@@ -1,52 +1,67 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
 /** Exact authored words stay distinct from the structured response state. */
 export function SupportWords({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <g
         data-request-copy="true"
         opacity={
-          ramp(frame, 12, 12) *
-          (input.showRequestAtHold ? 1 : 1 - ramp(frame, 130, 1))
+          motion.reveal(frame, 12) *
+          (input.showRequestAtHold
+            ? 1
+            : 1 - motion.ramp(frame, 130, motion.scale(1)))
         }
       >
-        <rect
+        <StockRect
           x={60}
           y={55}
           width={390}
           height={126}
-          rx={18}
-          fill={STOCK.surface}
-          stroke={STOCK.line}
+          rx={scales.corner(tokens.corner.panel)}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
         />
-        <path
-          d="M225 181 l15 18 l15 -18"
-          fill={STOCK.surface}
-          stroke={STOCK.line}
+        <SketchedShape
+          shape={{ kind: "path", d: "M225 181 l15 18 l15 -18" }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={tokens.color.line}
         />
         <LabelSlots labels={[[input.requestText, 80, 86, 350, 18, 4]]} />
       </g>
-      <g data-response-copy="true" opacity={ramp(frame, 43, 20)}>
-        <rect
+      <g
+        data-response-copy="true"
+        opacity={motion.ramp(frame, 43, motion.scale(20))}
+      >
+        <StockRect
           x={510}
           y={55}
           width={390}
           height={126}
-          rx={18}
-          fill={STOCK.surface}
-          stroke={STOCK.cyan}
+          rx={scales.corner(tokens.corner.panel)}
+          fill={tokens.color.surface}
+          stroke={tokens.color.accentAlt}
         />
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: "M640 181 l15 18 l15 -18" }}
+          profile={tokens.sketch.shape}
           data-response-tail="true"
-          d="M640 181 l15 18 l15 -18"
-          fill={STOCK.surface}
-          stroke={STOCK.cyan}
+          fill={tokens.color.surface}
+          stroke={tokens.color.accentAlt}
         />
         <LabelSlots labels={[[input.response.text, 530, 86, 350, 18, 4]]} />
       </g>

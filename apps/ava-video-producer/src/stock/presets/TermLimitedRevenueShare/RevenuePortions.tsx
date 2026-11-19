@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RevenueAmount } from "./RevenueAmount";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
@@ -18,6 +18,7 @@ export function RevenuePortions({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {amounts.map((amount, portion) => {
@@ -27,7 +28,9 @@ export function RevenuePortions({
           }, 0) *
             340) /
           receipts;
-        const color = [STOCK.cyan, STOCK.orange, accent][portion];
+        const color = [tokens.color.accentAlt, tokens.color.highlight, accent][
+          portion
+        ];
         return (
           <g key={portion}>
             <rect

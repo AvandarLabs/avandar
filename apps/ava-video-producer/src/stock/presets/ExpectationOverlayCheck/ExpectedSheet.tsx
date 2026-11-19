@@ -1,6 +1,13 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 
@@ -12,14 +19,37 @@ type Props = {
   state: string;
   accent: string;
 };
+
+/** Frames the expected sheet takes to register over the observed slot. */
+const REGISTER_FRAMES = 45;
+/** Frames a mismatching sheet takes to lift away from its slot. */
+const SEPARATE_FRAMES = 19;
+/** The expected sheet's faint wash before the tint strength scales it. */
+const SHEET_WASH = 0.06;
+/** The expected sheet's corner before the corner style scales it. */
+const SHEET_CORNER = 2;
+
 function _getSheetGeometry({
   frame,
   y,
   input,
   state,
-}: Readonly<Pick<Props, "frame" | "y" | "input" | "state">>) {
-  const registration = ramp(frame, 43, 45, EASE.inOut);
-  const separation = ramp(frame, 89, 19, EASE.inOut);
+  motion,
+}: Readonly<
+  Pick<Props, "frame" | "y" | "input" | "state"> & { motion: VideoMotion }
+>) {
+  const registration = ramp(
+    frame,
+    43,
+    motion.scale(REGISTER_FRAMES),
+    motion.travel.easing,
+  );
+  const separation = ramp(
+    frame,
+    89,
+    motion.scale(SEPARATE_FRAMES),
+    motion.travel.easing,
+  );
   const top =
     (input.sheetMotion === "hinge"
       ? y + 20
@@ -40,11 +70,15 @@ export function ExpectedSheet({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const { registration, top, scale } = _getSheetGeometry({
     frame,
     y,
     input,
     state,
+    motion,
   });
   return (
     <g>
@@ -53,23 +87,27 @@ export function ExpectedSheet({
           data-hinge={input.sheetMotion === "hinge"}
           transform={`matrix(1 0 0 ${scale} 0 0)`}
         >
-          <rect
+          <StockRect
             width={390}
             height={39}
-            rx={2}
+            rx={scales.corner(SHEET_CORNER)}
             fill={accent}
-            fillOpacity={0.06}
+            fillOpacity={scales.wash(SHEET_WASH)}
             stroke={accent}
-            strokeWidth={2}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
           />
         </g>
         <g opacity={input.sheetMotion === "hinge" ? registration : 1}>
           <LiteralDataText value={item.expected} x={15} y={24} color={accent} />
         </g>
       </g>
-      <path
-        d={`M490 ${y - 20} H500 V${top + 6} H510 M490 ${y + 65} H500 V${y + 50} H510`}
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M490 ${y - 20} H500 V${top + 6} H510 M490 ${y + 65} H500 V${y + 50} H510`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
         fill="none"
       />
     </g>

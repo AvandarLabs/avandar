@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import { ServiceCaptions } from "./ServiceCaptions";
 import { ServiceEnclosure } from "./ServiceEnclosure";
@@ -15,7 +16,8 @@ export function ServiceablePanelSwap({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getServiceSceneFromFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const scene = getServiceSceneFromFrame({ motion, frame, input });
   return (
     <g>
       <ServiceCaptions input={input} frame={frame} />

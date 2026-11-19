@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SubscriptionSocket } from "./SubscriptionSocket";
 import { SubscriptionView } from "./SubscriptionView";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,8 +13,9 @@ export function FilterSubscriptionScope({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots
         labels={[
           [input.copy.context, 48, 28, 864, 14, 1],

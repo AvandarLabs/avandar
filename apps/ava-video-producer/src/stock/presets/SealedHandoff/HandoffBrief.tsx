@@ -1,6 +1,12 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
 
@@ -10,17 +16,20 @@ type Props = { frame: number; input: Input };
  * concealment.
  */
 export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
-  const y = mix(ramp(frame, 36, 12), -54, 16);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const y = mix(motion.reveal(frame, 36), -54, 16);
   return (
     <g data-brief-content="retained">
-      <rect
+      <StockRect
         data-brief-paper="intact"
         x={24}
         y={y}
         width={488}
         height={246}
-        fill={STOCK.ground}
-        stroke={STOCK.line}
+        fill={tokens.color.ground}
+        stroke={tokens.color.line}
       />
       {input.brief.map(({ id, line }, index) => {
         return (
@@ -37,10 +46,14 @@ export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
                 breakLongWords
               />
             ) : (
-              <path
-                d={`M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`}
-                stroke={STOCK.muted}
-                strokeWidth={3}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`,
+                }}
+                profile={tokens.sketch.shape}
+                stroke={tokens.color.inactive}
+                strokeWidth={scales.stroke(tokens.stroke.emphasis)}
               />
             )}
           </g>

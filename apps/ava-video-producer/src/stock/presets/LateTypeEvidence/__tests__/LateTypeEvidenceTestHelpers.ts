@@ -42,7 +42,18 @@ function _tags({
   markup: string;
   attribute: string;
 }): string[] {
-  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags;
+  // A marked group wraps the sketch-aware shape it names.
+  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags.map(
+    (tag) => {
+      if (!tag.startsWith("<g ")) {
+        return tag;
+      }
+      const next = markup
+        .slice(markup.indexOf(tag) + tag.length)
+        .match(/^<[^>]+>/);
+      return next ? `${tag}${next[0]}` : tag;
+    },
+  );
 }
 
 function _getVisibleTexts({

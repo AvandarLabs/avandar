@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CapacityTray } from "./CapacityTray";
 import { PendingResources } from "./PendingResources";
 import { ResourceTab } from "./ResourceTab";
@@ -14,6 +14,7 @@ export function WorkspaceCapacityExtension({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const isExpanded = input.choice.decision === "expand" && frame >= 125;
   const allowance = isExpanded
     ? input.allowances.expandedAllowance
@@ -29,7 +30,7 @@ export function WorkspaceCapacityExtension({
           [input.copy.example, 60, 577, 840, 14, 1],
         ]}
       />
-      <g opacity={ramp(frame, 51, 29)}>
+      <g opacity={motion.ramp(frame, 51, motion.scale(29))}>
         <LabelSlots labels={[[input.choice.label, 60, 158, 840, 16, 1]]} />
       </g>
       <CapacityTray input={input} frame={frame} accent={accent} />

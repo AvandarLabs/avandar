@@ -1,5 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +13,8 @@ export function BackoffLabel({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const attempt = input.attempts[index];
   const slotX = 40 + index * 220;
   const isFinal = index === input.attempts.length - 1;
@@ -21,8 +26,8 @@ export function BackoffLabel({
         y={416}
         width={190}
         height={140}
-        rx={10}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.label)}
+        fill={tokens.color.surface}
       />
       {input.showAttemptLabels ? (
         <FitText
@@ -45,7 +50,7 @@ export function BackoffLabel({
         maxLines={3}
         normalizeWhitespace
         breakLongWords
-        color={isFinal ? accent : STOCK.muted}
+        color={isFinal ? accent : tokens.color.textMuted}
       />
     </g>
   );

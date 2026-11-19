@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
   opacity?: number;
   letterSpacing?: number;
 };
+
+/** A literal cell value's size, as content: no graphic text role is 14 px. */
+const VALUE_FONT_SIZE = 14;
 function _valuePresentation({
   value,
   showWhitespace,
@@ -33,19 +36,20 @@ export function CellLiteralValue({
   x,
   y,
   showWhitespace,
-  color = STOCK.text,
+  color,
   opacity = 1,
   letterSpacing = 0,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <text
       aria-label={value}
       x={x}
       y={y}
-      fontSize={14}
-      fontFamily="Arial, sans-serif"
+      fontSize={VALUE_FONT_SIZE}
+      fontFamily={tokens.text.graphic.data.fontFamily}
       xmlSpace="preserve"
-      fill={color}
+      fill={color ?? tokens.color.text}
       opacity={opacity}
       letterSpacing={letterSpacing}
     >

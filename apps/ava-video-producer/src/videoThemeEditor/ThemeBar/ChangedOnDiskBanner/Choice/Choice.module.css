@@ -1,7 +1,7 @@
 .choice {
   align-items: center;
   display: grid;
-  gap: 4px 8px;
+  gap: var(--atlas-space-4) var(--atlas-space-8);
   grid-template-columns: max-content minmax(0, 1fr);
 }
 
@@ -10,7 +10,7 @@
 }
 
 .choiceNote {
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   line-height: 1.4;
 }
 

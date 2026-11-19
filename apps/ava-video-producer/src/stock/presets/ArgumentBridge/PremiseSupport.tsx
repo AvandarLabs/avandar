@@ -1,4 +1,10 @@
 import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { SUGGESTED_DASH } from "./argumentShape";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 /** Inputs for PremiseSupport. */
@@ -26,28 +32,42 @@ export function PremiseSupport({
   showSupport,
   relationship,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const dash = relationship === "suggests" ? SUGGESTED_DASH : undefined;
+  const width = scales.stroke(tokens.stroke.emphasis);
   return (
     <>
-      <path
-        data-premise-join={premise.id}
-        d={`M${center} 410 V390 M${center} 390 H${mix(joining, center, x + 4)} V${mix(joining, 390, 350)} M${center} 390 H${mix(joining, center, x + slotWidth - 4)} V${mix(joining, 390, 350)}`}
-        stroke={accent}
-        strokeWidth={3}
-        fill="none"
-        strokeDasharray={relationship === "suggests" ? "8 7" : undefined}
-        opacity={joining}
-      />
-      {showSupport ? (
-        <line
-          data-individual-support={premise.id}
-          x1={center}
-          y1={390}
-          x2={center}
-          y2={mix(joining, 390, 350)}
+      <g data-premise-join={premise.id}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${center} 410 V390 M${center} 390 H${mix(joining, center, x + 4)} V${mix(joining, 390, 350)} M${center} 390 H${mix(joining, center, x + slotWidth - 4)} V${mix(joining, 390, 350)}`,
+          }}
+          profile={tokens.sketch.shape}
           stroke={accent}
-          strokeWidth={3}
-          strokeDasharray={relationship === "suggests" ? "8 7" : undefined}
+          strokeWidth={width}
+          fill="none"
+          strokeDasharray={dash}
+          opacity={joining}
         />
+      </g>
+      {showSupport ? (
+        <g data-individual-support={premise.id}>
+          <SketchedShape
+            shape={{
+              kind: "line",
+              x1: center,
+              y1: 390,
+              x2: center,
+              y2: mix(joining, 390, 350),
+            }}
+            profile={tokens.sketch.shape}
+            stroke={accent}
+            strokeWidth={width}
+            strokeDasharray={dash}
+          />
+        </g>
       ) : null}
     </>
   );

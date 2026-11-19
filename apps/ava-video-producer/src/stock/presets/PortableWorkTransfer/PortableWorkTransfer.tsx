@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import { TransferArtifact } from "./TransferArtifact";
 import { TransferCaptions } from "./TransferCaptions";
@@ -18,21 +23,26 @@ export function PortableWorkTransfer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getTransferSceneFromFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const scene = getTransferSceneFromFrame({ motion, frame, input });
   return (
     <g>
       <TransferCaptions input={input} frame={frame} folioX={scene.folioX} />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M36 550 H310 M45 550 v12 M300 550 v12" }}
+        profile={tokens.sketch.shape}
         data-source-bench="true"
-        d="M36 550 H310 M45 550 v12 M300 550 v12"
-        stroke={STOCK.line}
-        strokeWidth={4}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M330 550 H920 M340 550 v12 M910 550 v12" }}
+        profile={tokens.sketch.shape}
         data-destination-bench="true"
-        d="M330 550 H920 M340 550 v12 M910 550 v12"
-        stroke={STOCK.line}
-        strokeWidth={4}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
       {input.artifacts.map((artifact, index) => {
         return (

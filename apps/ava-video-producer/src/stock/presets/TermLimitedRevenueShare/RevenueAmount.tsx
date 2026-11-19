@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
 
@@ -17,10 +17,17 @@ export function RevenueAmount({
   reveal,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g data-amount={portion} opacity={reveal}>
       <circle cx={8 + portion * 115} cy={105} r={4} fill={color} />
-      <text x={18 + portion * 115} y={110} fill={STOCK.text} fontSize={12}>
+      <text
+        x={18 + portion * 115}
+        y={110}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
+      >
         {(amount / input.money.minorUnitsPerUnit).toFixed(
           input.money.minorUnitsPerUnit === 100 ? 2 : 0,
         )}
