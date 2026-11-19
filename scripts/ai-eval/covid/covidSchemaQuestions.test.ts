@@ -15,7 +15,7 @@ describe("gradeSchemaComparison", () => {
     expect(gradeSchemaComparison(GOOD_ANSWER).pass).toBe(true);
   });
 
-  it("passes a reply that says the files stack only after renaming", () => {
+  it("passes a reply that says the files stack after renaming and the columns would not line up", () => {
     expect(gradeSchemaComparison(STACKABLE_AFTER_RENAMING_ANSWER).pass).toBe(
       true,
     );
@@ -29,6 +29,22 @@ describe("gradeSchemaComparison", () => {
     expect(
       gradeSchemaComparison(
         "Yes, they can be stacked as they are. The US file adds Admin2 and Population, which stay empty for the global rows.",
+      ).pass,
+    ).toBe(false);
+  });
+
+  it("passes a reply that says the columns won't line up", () => {
+    expect(
+      gradeSchemaComparison(
+        "Stacked as stored, the columns won't line up, because the US file has Admin2 and Population.",
+      ).pass,
+    ).toBe(true);
+  });
+
+  it("fails a reply that says the files stack without renaming anything", () => {
+    expect(
+      gradeSchemaComparison(
+        "They can be stacked as they are without renaming anything. The US file adds Admin2.",
       ).pass,
     ).toBe(false);
   });
