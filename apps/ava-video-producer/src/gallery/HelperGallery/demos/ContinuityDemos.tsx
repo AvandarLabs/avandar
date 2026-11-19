@@ -1,13 +1,9 @@
-import {
-  AnchoredOverlay,
-  getOverlayPose,
-} from "../../../motion-components/AnchoredOverlay";
+import { AnchoredOverlay } from "../../../motion-components/AnchoredOverlay";
+import { getObjectFlight } from "../../../motion-components/getObjectFlight";
+import { getOverlayPose } from "../../../motion-components/getOverlayPose";
 import { getMotionProgress } from "../../../motion-components/motionSettings";
 import { SharedElement } from "../../../motion-components/SharedElement";
-import {
-  SvgObjectDeparture,
-  getObjectFlight,
-} from "../../../motion-components/SvgObjectDeparture";
+import { SvgObjectDeparture } from "../../../motion-components/SvgObjectDeparture";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
@@ -16,7 +12,7 @@ import { getDiagramNodeRect } from "./parts/getDiagramNodeRect";
 import type {
   MotionRect,
   OverlayCue,
-} from "../../../motion-components/AnchoredOverlay";
+} from "../../../motion-components/getOverlayTimings";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 

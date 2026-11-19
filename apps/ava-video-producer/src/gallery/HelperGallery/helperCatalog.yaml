@@ -71,6 +71,10 @@ modules:
     excluded: []
   - path: src/motion-components/HorizontalBlur.tsx
     excluded: []
+  - path: src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts
+    excluded:
+      - name: MIN_VISIBLE_BLUR
+        reason: "The blur radius below which HorizontalBlurFilter and getHorizontalBlurFilter skip the filter; not a helper on its own."
   - path: src/motion-components/cameraTrack.ts
     excluded: []
   - path: src/motion-components/DiagramCamera.tsx
@@ -89,11 +93,23 @@ modules:
     excluded: []
   - path: src/motion-components/SceneTransition.tsx
     excluded: []
+  - path: src/motion-components/createSceneTransition.ts
+    excluded: []
+  - path: src/motion-components/getSceneTransitionStyle.ts
+    excluded:
+      - name: SCENE_TRANSITION_KINDS
+        reason: "The list of transition kinds that schemas validate against; not motion."
   - path: src/motion-components/SharedElement.tsx
     excluded: []
   - path: src/motion-components/AnchoredOverlay.tsx
     excluded: []
+  - path: src/motion-components/getOverlayPose.ts
+    excluded: []
+  - path: src/motion-components/getOverlayTimings.ts
+    excluded: []
   - path: src/motion-components/SvgObjectDeparture.tsx
+    excluded: []
+  - path: src/motion-components/getObjectFlight.ts
     excluded: []
   - path: src/scenes/BrandLockupScene/brandLockupMotion.ts
     excluded: []
@@ -176,7 +192,7 @@ helpers:
     avoid: "Short UI responses, where the long slow start delays the answer."
     usedBy:
       - src/cursor-motion.ts
-      - src/motion-components/SvgObjectDeparture.tsx
+      - src/motion-components/getObjectFlight.ts
     demo: { id: curve-in-out-cubic, frames: 75 }
 
   - id: ease-word
@@ -281,7 +297,8 @@ helpers:
     avoid: "Scene choreography built on ramp(); presets only apply to the configurable motion components."
     usedBy:
       - src/motion-components/SharedElement.tsx
-      - src/motion-components/AnchoredOverlay.tsx
+      - src/motion-components/getOverlayPose.ts
+      - src/motion-components/getOverlayTimings.ts
       - src/continuity/ContinuityToken.tsx
     demo: { id: motion-presets, frames: 120 }
 
@@ -877,6 +894,8 @@ helpers:
     category: blur
     description: "An SVG filter that blurs along X only, the motion blur of a layer moving sideways. Below 0.25 px no filter runs."
     source: src/motion-components/HorizontalBlur.tsx
+    relatedSources:
+      [src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts]
     exports: [HorizontalBlurFilter, getHorizontalBlurFilter]
     signature: "<HorizontalBlurFilter id={id} amount={px} /> + getHorizontalBlurFilter(id: string, amount: number): string | undefined"
     defaults:
@@ -1201,6 +1220,9 @@ helpers:
     category: transitions
     description: "Reveal and continuity treatments for a TransitionSeries: dissolve, wipe, aperture, spatial, handoff and morph, with matching timing."
     source: src/motion-components/SceneTransition.tsx
+    relatedSources:
+      - src/motion-components/createSceneTransition.ts
+      - src/motion-components/getSceneTransitionStyle.ts
     exports: [SceneTransition, createSceneTransition, getSceneTransitionStyle]
     signature: "createSceneTransition({ kind, durationInFrames, anchor?, origin?, width?, height?, motion? }): { timing, presentation }"
     defaults:
@@ -1240,6 +1262,9 @@ helpers:
     category: continuity
     description: "Floating artwork that rises from a measured region to a target, holds while it is read, and returns, without moving the source UI."
     source: src/motion-components/AnchoredOverlay.tsx
+    relatedSources:
+      - src/motion-components/getOverlayPose.ts
+      - src/motion-components/getOverlayTimings.ts
     exports: [AnchoredOverlay, getOverlayPose, getOverlayTimings]
     signature: "<AnchoredOverlay frame source={rect} cue={{ at, until, target, entryFrames?, exitFrames?, fadeFrames?, motion? }} motionBlur?>"
     defaults:
@@ -1262,6 +1287,7 @@ helpers:
     category: continuity
     description: "Cuts a rectangle out of an SVG drawing and sends it away on its own vector while the rest stays."
     source: src/motion-components/SvgObjectDeparture.tsx
+    relatedSources: [src/motion-components/getObjectFlight.ts]
     exports: [SvgObjectDeparture, getObjectFlight]
     signature: "<SvgObjectDeparture frame flight={{ at, duration, dx, dy, rect, motion? }}>{svg}</SvgObjectDeparture>"
     defaults:
