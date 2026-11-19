@@ -71,8 +71,7 @@ export function MotionPresetsDemo({
               <span className={css.timelineName}>
                 {preset} ·{" "}
                 {getMotionDuration(AUTHORED_FRAMES, { preset }, settingsTheme)}f
-                ·{" "}
-                {settings.shutterAngle}°
+                · {settings.shutterAngle}°
               </span>
               <div className={css.rail}>
                 <span

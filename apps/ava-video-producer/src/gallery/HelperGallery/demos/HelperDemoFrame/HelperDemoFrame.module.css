@@ -13,11 +13,11 @@
   align-items: center;
   border-bottom: var(--demo-stroke-hairline) solid var(--demo-line);
   display: flex;
-  gap: 24px;
+  gap: var(--demo-space-24);
   height: 56px;
   justify-content: space-between;
   left: 0;
-  padding: 0 28px;
+  padding: 0 var(--demo-space-28);
   position: absolute;
   right: 0;
   top: 0;
@@ -49,11 +49,11 @@
 .readouts {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--demo-space-10);
   height: 48px;
   left: 0;
   overflow: hidden;
-  padding: 0 28px;
+  padding: 0 var(--demo-space-28);
   position: absolute;
   right: 0;
   top: 56px;
@@ -67,10 +67,10 @@
   flex: none;
   font-family: var(--demo-mono);
   font-size: var(--demo-font-size-xs);
-  gap: 8px;
+  gap: var(--demo-space-8);
   max-width: 100%;
   overflow: hidden;
-  padding: 6px 10px;
+  padding: var(--demo-space-6) var(--demo-space-10);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

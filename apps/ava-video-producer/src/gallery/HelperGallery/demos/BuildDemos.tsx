@@ -35,7 +35,7 @@ const MARK = { x: 200, y: 110, width: 180, height: 180 };
 /** An abstract mark rising through eight column masks, left to right. */
 export function MarkBuildDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const buildMotion = useMarkBuildMotion();
-  const progress = getMarkBuildProgress(frame, BUILD, buildMotion);
+  const progress = getMarkBuildProgress(frame, BUILD, undefined, buildMotion);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -170,7 +170,13 @@ export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
         </p>
         <p
           className={css.headline}
-          style={getLineRevealStyle(frame, beats.urlAt, "line-fade", {}, motion)}
+          style={getLineRevealStyle(
+            frame,
+            beats.urlAt,
+            "line-fade",
+            {},
+            motion,
+          )}
         >
           localhost:4173/motion.html
         </p>

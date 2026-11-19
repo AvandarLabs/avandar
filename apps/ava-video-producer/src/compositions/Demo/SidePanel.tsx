@@ -45,8 +45,7 @@ export function SidePanel({
     <div
       style={{
         ...abs(SIDE),
-        // No corner token holds the starter 14 px radius yet.
-        borderRadius: "var(--radius)",
+        borderRadius: scales.corner(semantic.corner.scene),
         border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.border}`,
         background: scene.card,
         padding: 28,
@@ -71,15 +70,13 @@ export function SidePanel({
 }
 
 function MatchedCount({ shown }: { shown: number }): ReactNode {
-  const { atomic } = useVideoTheme();
+  const { atomic, mantine } = useVideoTheme();
   return (
     <div
       style={{
-        // No size step or figure role holds the 76 px counter and its
-        // -2 px tracking yet.
-        fontSize: 76,
+        fontSize: mantine.fontSizes["76"],
         fontWeight: atomic.fontWeight.bold,
-        letterSpacing: -2,
+        letterSpacing: `${atomic.letterSpacing.counter}em`,
         marginTop: 6,
         // Weight and size stay stepped. Tweening fontSize reflows the
         // line every frame; this number changes its value, not its type.
@@ -113,8 +110,7 @@ function FilterChips({
         // is lit from the start and hands over to "Paid only" on the same
         // ramp: three inert chips are a control in no state at all, which
         // no real UI ever shows.
-        const lit =
-          index === 0 ? 1 - chipOn : index === LIT_CHIP ? chipOn : 0;
+        const lit = index === 0 ? 1 - chipOn : index === LIT_CHIP ? chipOn : 0;
         return (
           <div
             key={chip}
@@ -215,7 +211,12 @@ function PublishedToast({ frame }: { frame: number }): ReactNode {
         display: "flex",
         gap: 14,
         alignItems: "center",
-        opacity: motion.ramp(frame, TOAST_AT, motion.chip, motion.reveal.easing),
+        opacity: motion.ramp(
+          frame,
+          TOAST_AT,
+          motion.chip,
+          motion.reveal.easing,
+        ),
         transform: `translateY(${mix(motion.pop(frame, TOAST_AT), RISE.toast, 0).toFixed(2)}px)`,
       }}
     >

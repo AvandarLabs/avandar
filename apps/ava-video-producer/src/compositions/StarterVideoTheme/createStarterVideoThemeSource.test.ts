@@ -5,7 +5,7 @@ import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedV
 import {
   createStarterVideoThemeSource,
   STARTER_VIDEO_THEME_ID,
-} from "./StarterVideoTheme";
+} from "./createStarterVideoThemeSource";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 /** The hex Chrome renders for each `src/theme.css` colour. */
@@ -40,7 +40,7 @@ test("starter draws the theme.css palette", () => {
 
 test("starter keeps the theme.css palette when classic's scene palette moves", () => {
   const classic = BUILT_IN_VIDEO_THEMES.get("classic") as VideoThemeDocument;
-  const moved = structuredClone(classic) as {
+  const moved = structuredClone(classic) as unknown as {
     other: { video: { semantic: { color: { scene: { brand: string } } } } };
   };
   moved.other.video.semantic.color.scene.brand = "$atomic.swatch.orange";

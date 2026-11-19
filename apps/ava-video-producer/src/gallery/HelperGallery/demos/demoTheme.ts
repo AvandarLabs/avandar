@@ -2,8 +2,8 @@ import { buildColorWithAlpha } from "../../../videoTheme/cssValueHelpers/cssValu
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
 import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
 import { VIDEO_FONT_REGISTRY } from "../../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
-import type { ResolvedVideoTheme } from "../../../videoTheme/videoTheme.types";
 import type { VideoShapeScales } from "../../../videoTheme/createVideoShapeScales/createVideoShapeScales";
+import type { ResolvedVideoTheme } from "../../../videoTheme/videoTheme.types";
 import type { CSSProperties } from "react";
 
 /** The colours a helper preview draws with, by the part they paint. */
@@ -126,7 +126,8 @@ export function useDemoThemeStyle(): CSSProperties {
       scales.wash(ACTIVE_CELL_WASH),
     ),
     "--demo-font": theme.semantic.text.stage.appBody.fontFamily,
-    "--demo-mono": VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
+    "--demo-mono":
+      VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
     ..._scaleVariables("font-size", theme.mantine.fontSizes),
     ..._scaleVariables("font-weight", theme.atomic.fontWeight),
     ..._scaleVariables("space", theme.mantine.spacing),

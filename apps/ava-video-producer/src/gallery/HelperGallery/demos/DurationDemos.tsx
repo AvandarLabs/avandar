@@ -91,10 +91,7 @@ export function StaggerColumnDemo({
       <div className={css.columns}>
         {progress.map((columnProgress, index) => {
           return (
-            <div
-              key={COLUMN_IDS[index]}
-              className={css.columnCell}
-            >
+            <div key={COLUMN_IDS[index]} className={css.columnCell}>
               <div className={css.columnTrack}>
                 <span
                   className={css.columnFill}

@@ -83,8 +83,7 @@ function useDemoBeats(frame: number) {
   // glyph inside. Opacity is safe: it composites.
   const appIn = motion.ramp(frame, APP_IN, motion.sheet, appearEasing);
   const appOut =
-    1 -
-    motion.ramp(frame, OUT_AT, motion.scale(APP_OUT_FRAMES), appearEasing);
+    1 - motion.ramp(frame, OUT_AT, motion.scale(APP_OUT_FRAMES), appearEasing);
   const app = Math.min(appIn, appOut);
 
   // Focus arrives on the click and leaves again on Run. A field that stays

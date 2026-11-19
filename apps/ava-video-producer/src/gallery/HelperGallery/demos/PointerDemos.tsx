@@ -21,7 +21,11 @@ import {
 import css from "./demos.module.css";
 import { formatReadout, useDemoColors } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import type { CursorKey, CursorMotion, CursorTarget } from "../../../cursor-motion";
+import type {
+  CursorKey,
+  CursorMotion,
+  CursorTarget,
+} from "../../../cursor-motion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 

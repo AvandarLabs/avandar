@@ -15,7 +15,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
-import { createStarterVideoThemeSource } from "../StarterVideoTheme/StarterVideoTheme";
+import { createStarterVideoThemeSource } from "../StarterVideoTheme/createStarterVideoThemeSource";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 import type { ComponentType } from "react";
 
@@ -93,12 +93,10 @@ register(`data:text/javascript,${encodeURIComponent(TEST_HOOKS)}`);
 const { Demo } = await import("../Demo/Demo");
 const { MotionLab } = await import("../MotionLab");
 const { TitleStudy } = await import("../TitleStudy");
-const { HelperComposition } = await import(
-  "../../gallery/HelperGallery/HelperPlayer/HelperComposition"
-);
-const { HELPER_CATALOG } = await import(
-  "../../gallery/HelperGallery/helperCatalog"
-);
+const { HelperComposition } =
+  await import("../../gallery/HelperGallery/HelperPlayer/HelperComposition");
+const { HELPER_CATALOG } =
+  await import("../../gallery/HelperGallery/helperCatalog");
 /**
  * The product palette helper previews used to draw with. It is generated
  * into the gallery by the motion gallery build, so a fresh checkout may not
@@ -258,7 +256,10 @@ function _renderAt(id: string, Composition: ComponentType, frame: number) {
   const source = createStarterVideoThemeSource(id);
   return renderToStaticMarkup(
     <VideoThemeProvider
-      source={{ ...source, scope: { ...source.scope, patches: [SENTINEL_THEME] } }}
+      source={{
+        ...source,
+        scope: { ...source.scope, patches: [SENTINEL_THEME] },
+      }}
     >
       <Composition />
     </VideoThemeProvider>,
@@ -269,7 +270,11 @@ test("fixed compositions draw no classic value under the sentinel theme", () => 
   assert.deepEqual(
     COMPOSITIONS.flatMap(({ id, component, frames }) => {
       const markup = Array.from({ length: 12 }, (_, index) => {
-        return _renderAt(id, component, Math.round((index * (frames - 1)) / 11));
+        return _renderAt(
+          id,
+          component,
+          Math.round((index * (frames - 1)) / 11),
+        );
       }).join("");
       return _findClassicValues(markup).map((value) => {
         return `${id}: ${value}`;

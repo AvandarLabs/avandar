@@ -62,7 +62,9 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
       readouts={ROWS.slice(0, 3).map((row, index) => {
         return {
           name: `row ${index}`,
-          value: formatReadout(Number(motion.enterAt(frame, 12, index).opacity)),
+          value: formatReadout(
+            Number(motion.enterAt(frame, 12, index).opacity),
+          ),
         };
       })}
     >
@@ -92,7 +94,8 @@ const LEAVE_AT = 48;
 /** A card entering, then `leave()` reversing the same rise. */
 export function LeaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
-  const style = frame < LEAVE_AT ? motion.enter(frame, 6) : motion.leave(frame, LEAVE_AT);
+  const style =
+    frame < LEAVE_AT ? motion.enter(frame, 6) : motion.leave(frame, LEAVE_AT);
   return (
     <HelperDemoFrame
       frame={frame}

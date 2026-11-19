@@ -156,13 +156,23 @@ export function SceneTransitionDemo({
               <div className={clsx(css.miniFrame, css.miniFrameScene)}>
                 <div
                   className={clsx(css.shot, css.shotA)}
-                  style={getSceneTransitionStyle(progress, false, props, settingsTheme)}
+                  style={getSceneTransitionStyle(
+                    progress,
+                    false,
+                    props,
+                    settingsTheme,
+                  )}
                 >
                   A
                 </div>
                 <div
                   className={clsx(css.shot, css.shotB)}
-                  style={getSceneTransitionStyle(progress, true, props, settingsTheme)}
+                  style={getSceneTransitionStyle(
+                    progress,
+                    true,
+                    props,
+                    settingsTheme,
+                  )}
                 >
                   B
                 </div>

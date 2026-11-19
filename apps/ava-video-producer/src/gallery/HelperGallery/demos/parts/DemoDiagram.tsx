@@ -83,7 +83,13 @@ export function DemoDiagram(): ReactNode {
         return (
           <SketchedShape
             key={`${from}-${to}`}
-            shape={{ kind: "line", x1: start.x, y1: start.y, x2: end.x, y2: end.y }}
+            shape={{
+              kind: "line",
+              x1: start.x,
+              y1: start.y,
+              x2: end.x,
+              y2: end.y,
+            }}
             profile={sketch.shape}
             stroke={colors.line}
             strokeWidth={scales.stroke(stroke.emphasis)}

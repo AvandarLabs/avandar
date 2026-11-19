@@ -38,15 +38,16 @@ type Props = {
  * with the theme's `WindowTilt` plane where the props leave it unset.
  */
 function _buildTiltTransform(
-  {
+  props: Props,
+  windowTilt: ResolvedVideoComponents["WindowTilt"],
+): string {
+  const {
     pose,
     tilt = 1,
     perspective = windowTilt.perspective,
     rotateX = windowTilt.rotateX,
     rotateZ = windowTilt.rotateZ,
-  }: Props,
-  windowTilt: ResolvedVideoComponents["WindowTilt"],
-): string {
+  } = props;
   return [
     `perspective(${perspective}px)`,
     `translateX(${pose.translateX.toFixed(2)}px)`,

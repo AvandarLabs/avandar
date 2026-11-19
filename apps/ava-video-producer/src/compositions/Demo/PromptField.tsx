@@ -32,8 +32,7 @@ export function PromptField({
     <div
       style={{
         ...abs(FIELD),
-        // No corner token holds the starter 14 px radius yet.
-        borderRadius: "var(--radius)",
+        borderRadius: scales.corner(semantic.corner.scene),
         background: scene.card,
         // The single most common defect this kit exists to prevent:
         // `focused ? scene.brand : scene.border`. That is a one-frame
@@ -73,8 +72,7 @@ export function PromptField({
           marginLeft: "auto",
           padding: "12px 28px",
           borderRadius: scales.corner(semantic.corner.label),
-          // No size step holds the Run label's 19 px yet.
-          fontSize: 19,
+          fontSize: mantine.fontSizes["19"],
           fontWeight: atomic.fontWeight.semibold,
           color: mantine.white,
           background: scene.brand,

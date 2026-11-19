@@ -57,14 +57,13 @@ function SectionLabel({
   style?: CSSProperties;
   children: ReactNode;
 }): ReactNode {
-  const { semantic, mantine } = useVideoTheme();
+  const { semantic, mantine, atomic } = useVideoTheme();
   return (
     <div
       style={{
         ...style,
         fontSize: mantine.fontSizes.md,
-        // No letter-spacing step holds the 2 px label tracking yet.
-        letterSpacing: 2,
+        letterSpacing: `${atomic.letterSpacing.capitals}em`,
         color: semantic.color.scene.mutedForeground,
       }}
     >
@@ -148,7 +147,10 @@ function BuildingBlocks({ frame }: { frame: number }): ReactNode {
         }}
       >
         <span
-          style={{ fontSize: mantine.fontSizes["6xl"], color: scene.brandStrong }}
+          style={{
+            fontSize: mantine.fontSizes["6xl"],
+            color: scene.brandStrong,
+          }}
         >
           {number}
         </span>
@@ -205,7 +207,7 @@ function TypedCard({ frame }: { frame: number }): ReactNode {
 }
 
 function CounterCard({ frame }: { frame: number }): ReactNode {
-  const { semantic, atomic } = useVideoTheme();
+  const { semantic, atomic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const panel = usePanelStyle();
@@ -232,13 +234,11 @@ function CounterCard({ frame }: { frame: number }): ReactNode {
       <div
         style={{
           marginTop: 18,
-          // No size step, line height, or figure role holds the 108 px
-          // counter and its -4 px tracking yet.
-          fontSize: 108,
-          lineHeight: 1.15,
+          fontSize: mantine.fontSizes["108"],
+          lineHeight: mantine.lineHeights["115"],
           fontWeight: atomic.fontWeight.semibold,
           fontVariantNumeric: "tabular-nums",
-          letterSpacing: -4,
+          letterSpacing: `${atomic.letterSpacing.largeCounter}em`,
         }}
       >
         {Math.round(mix(progress, 0, COUNT_TO)).toLocaleString("en-US")}
@@ -247,7 +247,7 @@ function CounterCard({ frame }: { frame: number }): ReactNode {
         style={{
           marginTop: 22,
           height: 5,
-          background: scene.muted,
+          background: semantic.color.scene.muted,
           borderRadius: pill,
         }}
       >

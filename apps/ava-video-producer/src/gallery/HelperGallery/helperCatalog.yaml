@@ -57,12 +57,20 @@ modules:
     excluded: []
   - path: src/motion-components/motionSettings.ts
     excluded:
+      - name: createMotionSettingsTheme
+        reason: "Builds the theme values the motion helpers read; plumbing, not motion."
+      - name: getClassicMotionSettingsTheme
+        reason: "The classic theme values the motion helpers default to; plumbing, not motion."
+      - name: useMotionSettingsTheme
+        reason: "Reads the theme values the motion helpers take from the video theme in effect; plumbing, not motion."
       - name: motionOptionsSchema
         reason: "Validation schema for the options the motion presets resolve, not motion."
       - name: motionEasingSchema
         reason: "Validation schema for named and cubic Bezier easings, not motion."
   - path: src/cursor-motion.ts
-    excluded: []
+    excluded:
+      - name: createCursorMotion
+        reason: "Builds the theme values the pointer helpers read; plumbing, not motion."
   - path: src/scenes/textReveal.ts
     excluded:
       - name: getTypographyRevealFrames
@@ -78,9 +86,15 @@ modules:
   - path: src/scenes/MediaPlane.tsx
     excluded: []
   - path: src/scenes/TiltedWindowScene/windowMotion.ts
-    excluded: []
+    excluded:
+      - name: getClassicWindowStage
+        reason: "The classic theme values the window helpers default to; plumbing, not motion."
+      - name: getRestingPose
+        reason: "A window's resting pose in the theme's tilt; a value, previewed through the window helpers."
   - path: src/scenes/TiltedWindowScene/windowTilt.ts
-    excluded: []
+    excluded:
+      - name: WINDOW_SHADOW_FALLBACK_ALPHA
+        reason: "The share of the scene background the window shadow uses when the theme sets no shadow colour; a fallback, not motion."
   - path: src/storyboard/StoryFilm/steppedColumnWipe.ts
     excluded: []
   - path: src/storyboard/StoryFilm/getShotTransitionLayers.ts
@@ -118,9 +132,7 @@ helpers:
       const progress = ramp(frame, 12, DUR.panel, EASE.out);
     goodFor: "Anything arriving or responding: cards, rows, panels, a whip-in settling into its box."
     avoid: "Travel between two visible landmarks, which reads better on EASE.inOut."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: curve-out, frames: 75 }
 
   - id: ease-out-back
@@ -154,10 +166,7 @@ helpers:
       const x = mix(ramp(frame, 30, DUR.sheet, EASE.inOut), 120, 640);
     goodFor: "Travel, dissolves, colour cross-fades and staged exits."
     avoid: "Arrivals from off screen: the slow start reads as hesitation."
-    usedBy:
-      - src/scenes/BarComparisonScene/BarComparisonScene.tsx
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
-      - src/motion-components/cameraTrack.ts
+    usedBy: []
     demo: { id: curve-in-out, frames: 75 }
 
   - id: ease-in-out-cubic
@@ -174,9 +183,7 @@ helpers:
       const progress = ramp(frame, from.at, to.at - from.at, EASE.inOutCubic);
     goodFor: "A thing crossing the frame under its own power: a cursor between targets, an object departing."
     avoid: "Short UI responses, where the long slow start delays the answer."
-    usedBy:
-      - src/cursor-motion.ts
-      - src/motion-components/SvgObjectDeparture.tsx
+    usedBy: []
     demo: { id: curve-in-out-cubic, frames: 75 }
 
   - id: ease-word
@@ -193,10 +200,7 @@ helpers:
       const rise = ramp(frame, at, DUR.word, EASE.word);
     goodFor: "Staged builds: words, lines, columns, bars and carousel slides."
     avoid: "Departures; pair it with EASE.in or EASE.inOut on the way out."
-    usedBy:
-      - src/scenes/textReveal.ts
-      - src/scenes/TypographyScene.tsx
-      - src/scenes/TiltedWindowScene/windowMotion.ts
+    usedBy: []
     demo: { id: curve-word, frames: 75 }
 
   - id: ease-in
@@ -213,9 +217,7 @@ helpers:
       const away = ramp(frame, exitAt, DUR.whip, EASE.in);
     goodFor: "Accelerating departures: a window whipped off the frame, an outgoing shot drifting under a wipe."
     avoid: "Arrivals. It lands at full speed and reads as a crash."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/storyboard/StoryFilm/getShotTransitionLayers.ts
+    usedBy: []
     demo: { id: curve-in, frames: 75 }
 
   - id: ease-surge
@@ -232,8 +234,7 @@ helpers:
       const flight = ramp(frame, flightAt, DUR.hero, EASE.surge);
     goodFor: "A fly-through that fills the frame before a cut."
     avoid: "Ordinary travel; the long hold at each end reads as a stall."
-    usedBy:
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: curve-surge, frames: 75 }
 
   - id: bezier
@@ -297,9 +298,7 @@ helpers:
       const split = ramp(frame, at, DUR.press, EASE.out);
     goodFor: "A press answering back, the smallest step of a build."
     avoid: "Entrances; at 4 frames an element appears to pop in."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: duration-press, frames: 60 }
 
   - id: dur-chip
@@ -314,9 +313,7 @@ helpers:
       const fill = mixToken(ramp(frame, at, DUR.chip), "var(--border)", "var(--brand)");
     goodFor: "State flips, line fades, carousel slides."
     avoid: "Travel across the frame."
-    usedBy:
-      - src/scenes/MediaScene.tsx
-      - src/scenes/textReveal.ts
+    usedBy: []
     demo: { id: duration-chip, frames: 60 }
 
   - id: dur-panel
@@ -331,9 +328,7 @@ helpers:
       const style = enter(frame, 12, { dur: DUR.panel });
     goodFor: "Most entrances."
     avoid: "The one hero beat of a phase; use DUR.hero for that."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/textReveal.ts
+    usedBy: []
     demo: { id: duration-panel, frames: 60 }
 
   - id: dur-sheet
@@ -348,9 +343,7 @@ helpers:
       const pose = getWhipEntrance(frame, 0, canvas, box, DUR.sheet);
     goodFor: "Large surfaces, counters, bars growing."
     avoid: "Small chips and labels, which feel sluggish at this length."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/MetricScene.tsx
+    usedBy: []
     demo: { id: duration-sheet, frames: 60 }
 
   - id: dur-hero
@@ -365,9 +358,7 @@ helpers:
       const { rect } = getPullBack(frame, { kind: "pull-back", atFrame: 0 }, canvas, box);
     goodFor: "The pull-back, the fly-through, the result landing."
     avoid: "Several hero beats in one phase."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: duration-hero, frames: 60 }
 
   - id: dur-word
@@ -382,9 +373,7 @@ helpers:
       const rise = ramp(frame, 6 + index * 3, DUR.word, EASE.word);
     goodFor: "Masked word rises and the gap between CTA lines."
     avoid: "Line fades, which use DUR.chip."
-    usedBy:
-      - src/title-card.tsx
-      - src/scenes/TypographyScene.tsx
+    usedBy: []
     demo: { id: duration-word, frames: 60 }
 
   - id: dur-whip
@@ -399,9 +388,7 @@ helpers:
       const pose = getWhipExit(frame, exitAt, box, DUR.whip);
     goodFor: "Whip exits, flip-ins, mark column rises."
     avoid: "Arrivals the viewer has to read."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: duration-whip, frames: 60 }
 
   - id: stagger
@@ -416,9 +403,7 @@ helpers:
       rows.map((row, index) => enter(frame, 10 + index * STAGGER));
     goodFor: "Rows, cards, list items, bar rows."
     avoid: "Longer gaps: at 30 fps a six-item list then takes half a second to arrive."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/BarComparisonScene/barComparisonMotion.ts
+    usedBy: []
     demo: { id: stagger, frames: 60 }
 
   - id: stagger-column
@@ -433,9 +418,7 @@ helpers:
       getSteppedColumnWipeStyle(frame, 18, { columns: 8, staggerFrames: STAGGER_COLUMN });
     goodFor: "Eight columns crossing the frame inside one whip."
     avoid: "Rounding the offsets; the columns then move in lockstep pairs."
-    usedBy:
-      - src/storyboard/StoryFilm/steppedColumnWipe.ts
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+    usedBy: []
     demo: { id: stagger-column, frames: 60 }
 
   # ----------------------------------------------------- interpolation --
@@ -458,7 +441,6 @@ helpers:
     avoid: "Unclamped arithmetic on frame, which keeps moving after its window closes."
     usedBy:
       - src/scenes/MetricScene.tsx
-      - src/scenes/MediaScene.tsx
       - src/compositions/MotionLab.tsx
     demo: { id: ramp, frames: 75 }
 
@@ -493,9 +475,7 @@ helpers:
       const value = countTo(frame, 20, 1280, 30);
     goodFor: "A count the viewer is already reading, so it never snaps."
     avoid: "Changes between two nonzero values; use Math.round(mix(ramp(...), from, to))."
-    usedBy:
-      - src/compositions/MotionLab.tsx
-      - src/compositions/Demo/Demo.tsx
+    usedBy: []
     demo: { id: count-to, frames: 75 }
 
   # --------------------------------------------------------- entrances --
@@ -521,10 +501,7 @@ helpers:
       <div style={enter(frame, 12, { y: 12 })}>Saved</div>
     goodFor: "Cards, labels and panels settling into place."
     avoid: "Travel above 16 px or scale below 0.9, which stops looking like software. A later transform in the same style replaces it."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/BarComparisonScene/BarComparisonScene.tsx
-      - src/continuity/ContinuityThesis.tsx
+    usedBy: []
     demo: { id: enter, frames: 75 }
 
   - id: enter-at
@@ -541,9 +518,7 @@ helpers:
       rows.map((row, index) => <Row key={row.id} style={enterAt(frame, 20, index)} />);
     goodFor: "Sibling rows and cards."
     avoid: "Unrelated elements; give each its own beat instead."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: enter-at, frames: 75 }
 
   - id: leave
@@ -588,8 +563,7 @@ helpers:
       const y = mix(landing, -40, 0);
     goodFor: "Something physical landing: a toast, a value snapping into a slot."
     avoid: "Damping below 14, which wobbles. Travel, which belongs to ramp()."
-    usedBy:
-      - src/compositions/Demo/SidePanel.tsx
+    usedBy: []
     demo: { id: pop, frames: 75 }
 
   - id: press
@@ -608,10 +582,7 @@ helpers:
       <button style={{ transform: `scale(${press(frame, CLICK)})` }}>Publish</button>
     goodFor: "The clicked element answering on the same beat as the pointer."
     avoid: "Deeper dips than 0.07; the button reads as squashed."
-    usedBy:
-      - src/compositions/Demo/PublishButton.tsx
-      - src/compositions/MotionLab.tsx
-      - src/cursor-motion.ts
+    usedBy: []
     demo: { id: press, frames: 75 }
 
   # -------------------------------------------------------------- text --
@@ -1123,9 +1094,7 @@ helpers:
       const transform = `perspective(${WINDOW_TILT.perspective}px) rotateY(${WINDOW_TILT.rotateY}deg) rotateX(${WINDOW_TILT.rotateX}deg)`;
     goodFor: "Keeping every window shot of a film in the same plane."
     avoid: "Inline angles per shot; add new geometry here."
-    usedBy:
-      - src/scenes/TiltedWindowScene/WindowCard.tsx
-      - src/scenes/TiltedWindowScene/RacePair.tsx
+    usedBy: []
     demo: { id: window-tilt, frames: 90 }
 
   - id: window-boxes
@@ -1290,8 +1259,7 @@ helpers:
       <AbsoluteFill style={createThemeStyleFromTheme(shot.theme)}>{scene}</AbsoluteFill>
     goodFor: "Cutting between field colours within one film."
     avoid: "Names outside the theme schema; scenes only read the listed tokens."
-    usedBy:
-      - src/storyboard/StoryFilm/StoryFilm.tsx
+    usedBy: []
     demo: { id: theme-style, frames: 90 }
 
   # ----------------------------------------------------------- pointer --

@@ -6,6 +6,7 @@ import {
   getCarouselState,
   getFlipSplit,
   getPullBack,
+  getRestingPose,
   getScrollOffset,
   getSideEntrance,
   getWhipEntrance,
@@ -50,8 +51,8 @@ export function WindowWhipDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const stage = useWindowStage();
   const pose =
     frame < WHIP_OUT
-      ? getWhipEntrance(frame, WHIP_IN, DEMO_CANVAS, BOX, stage)
-      : getWhipExit(frame, WHIP_OUT, BOX, stage);
+      ? getWhipEntrance(frame, WHIP_IN, DEMO_CANVAS, BOX, undefined, stage)
+      : getWhipExit(frame, WHIP_OUT, BOX, undefined, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -83,6 +84,7 @@ export function SideEntranceDemo({
       side === 0 ? 0 : 1,
       DEMO_CANVAS,
       box,
+      undefined,
       stage,
     );
   });

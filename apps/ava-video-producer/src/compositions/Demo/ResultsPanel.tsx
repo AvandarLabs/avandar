@@ -58,8 +58,7 @@ function EmptyState({ frame }: { frame: number }): ReactNode {
           w: SIDE.x + SIDE.w - RESULTS.x,
           h: RESULTS.h,
         }),
-        // No corner token holds the starter 14 px radius yet.
-        borderRadius: "var(--radius)",
+        borderRadius: scales.corner(semantic.corner.scene),
         border: `${scales.stroke(semantic.stroke.hairline)}px dashed ${scene.border}`,
         display: "flex",
         flexDirection: "column",
@@ -100,8 +99,7 @@ function Results({
     <div
       style={{
         ...abs(RESULTS),
-        // No corner token holds the starter 14 px radius yet.
-        borderRadius: "var(--radius)",
+        borderRadius: scales.corner(semantic.corner.scene),
         border: hairline,
         background: scene.card,
         padding: 28,
@@ -136,8 +134,7 @@ function Results({
           borderTop: hairline,
           display: "flex",
           justifyContent: "space-between",
-          // No size step holds the 19 px row text yet.
-          fontSize: 19,
+          fontSize: mantine.fontSizes["19"],
           ...motion.enter(frame, ROWS_AT + CUES.total, { y: RISE.total }),
         }}
       >
@@ -189,7 +186,7 @@ function ResultRow({
   row: (typeof ROWS)[number];
   index: number;
 }): ReactNode {
-  const { semantic } = useVideoTheme();
+  const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
@@ -216,8 +213,7 @@ function ResultRow({
         style={{
           display: "flex",
           justifyContent: "space-between",
-          // No size step holds the 19 px row text yet.
-          fontSize: 19,
+          fontSize: mantine.fontSizes["19"],
           marginBottom: 9,
         }}
       >
@@ -230,7 +226,7 @@ function ResultRow({
         style={{
           height: 10,
           borderRadius: pill,
-          background: scene.muted,
+          background: semantic.color.scene.muted,
           overflow: "hidden",
         }}
       >

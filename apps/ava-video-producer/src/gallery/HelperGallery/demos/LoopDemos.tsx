@@ -45,7 +45,13 @@ function LoopSeries({ frame, frames, sample }: SeriesProps) {
         strokeWidth={scales.stroke(stroke.emphasis)}
       />
       <SketchedShape
-        shape={{ kind: "line", x1: playheadX, y1: 0, x2: playheadX, y2: PLOT.height }}
+        shape={{
+          kind: "line",
+          x1: playheadX,
+          y1: 0,
+          x2: playheadX,
+          y2: PLOT.height,
+        }}
         profile={sketch.shape}
         stroke={colors.highlight}
         strokeWidth={scales.stroke(stroke.default)}
@@ -131,7 +137,7 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps): ReactNode {
   );
 }
 
-/** The halo's opacity at the bottom and top of its pulse, before tint strength. */
+/** The halo opacity at the low and high point of its pulse, before tint. */
 const HALO_OPACITY = { min: 0.15, max: 0.45 };
 
 /** A halo pulsing on a smooth cosine, beside the pulse over time. */
@@ -156,7 +162,9 @@ export function WaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
           <circle
             r={mix(pulse, 60, 120)}
             fill={colors.brand}
-            opacity={scales.wash(mix(pulse, HALO_OPACITY.min, HALO_OPACITY.max))}
+            opacity={scales.wash(
+              mix(pulse, HALO_OPACITY.min, HALO_OPACITY.max),
+            )}
           />
           <circle r={48} fill={colors.brand} />
         </svg>

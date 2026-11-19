@@ -3,7 +3,7 @@
 .row {
   align-items: center;
   display: flex;
-  gap: 24px;
+  gap: var(--demo-space-24);
 }
 
 .centered {
@@ -15,7 +15,7 @@
 
 .split {
   display: grid;
-  gap: 48px;
+  gap: var(--demo-space-48);
   grid-template-columns: 360px 1fr;
   height: 100%;
 }
@@ -24,13 +24,13 @@
   align-items: center;
   display: flex;
   justify-content: center;
-  padding-left: 24px;
+  padding-left: var(--demo-space-24);
 }
 
 .rails {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: var(--demo-space-48);
   justify-content: center;
 }
 
@@ -66,7 +66,7 @@
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--demo-space-10);
   height: 100%;
   justify-content: center;
   position: relative;
@@ -149,7 +149,7 @@
 }
 
 .bigNumber {
-  font-size: 140px;
+  font-size: var(--demo-font-size-140);
   font-variant-numeric: tabular-nums;
   font-weight: var(--demo-font-weight-semibold);
   letter-spacing: -0.02em;
@@ -177,7 +177,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--demo-space-10);
   margin: 0 auto;
   width: 420px;
 }
@@ -188,7 +188,7 @@
   border: var(--demo-stroke-hairline) solid var(--demo-line);
   border-radius: var(--demo-corner-cell);
   display: flex;
-  gap: 14px;
+  gap: var(--demo-space-14);
   height: 52px;
   padding: 0 var(--demo-space-2xs);
 }
@@ -221,7 +221,7 @@
 }
 
 .headline {
-  font-size: 46px;
+  font-size: var(--demo-font-size-46);
   font-weight: var(--demo-font-weight-semibold);
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -231,15 +231,15 @@
 .kicker {
   color: var(--demo-muted);
   font-size: var(--demo-font-size-4xl);
-  margin: 10px 0 0;
+  margin: var(--demo-space-10) 0 0;
 }
 
 .lines {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--demo-space-6);
   justify-content: center;
-  padding-left: 48px;
+  padding-left: var(--demo-space-48);
 }
 
 .inlineBlock {
@@ -274,8 +274,8 @@
   border: var(--demo-stroke-hairline) solid var(--demo-line);
   border-radius: var(--demo-corner-label);
   font-family: var(--demo-mono);
-  font-size: 34px;
-  padding: 28px var(--demo-space-sm);
+  font-size: var(--demo-font-size-34);
+  padding: var(--demo-space-28) var(--demo-space-sm);
   width: 640px;
 }
 
@@ -306,14 +306,14 @@
 .miniStages {
   align-content: center;
   display: grid;
-  gap: 18px;
+  gap: var(--demo-space-18);
   height: 100%;
 }
 
 .miniStage {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--demo-space-8);
 }
 
 .miniFrame {
@@ -327,7 +327,7 @@
 .shot {
   align-items: center;
   display: flex;
-  font-size: 44px;
+  font-size: var(--demo-font-size-44);
   font-weight: var(--demo-font-weight-bold);
   inset: 0;
   justify-content: center;
@@ -373,7 +373,7 @@
   background: var(--demo-brand);
   border-radius: var(--demo-corner-pill);
   height: 48px;
-  margin-bottom: 12px;
+  margin-bottom: var(--demo-space-12);
   width: 48px;
 }
 
@@ -443,7 +443,7 @@
   background: var(--demo-ground);
   border-radius: var(--demo-corner-chip);
   bottom: 10px;
-  padding: 4px 8px;
+  padding: var(--demo-space-4) var(--demo-space-8);
   right: 10px;
 }
 
@@ -466,7 +466,7 @@
 
 .tableRow {
   display: flex;
-  gap: 12px;
+  gap: var(--demo-space-12);
   left: 60px;
   position: absolute;
 }
@@ -488,7 +488,7 @@
   font-size: var(--demo-font-size-6xl);
   font-weight: var(--demo-font-weight-semibold);
   justify-content: center;
-  padding: 0 24px;
+  padding: 0 var(--demo-space-24);
   text-align: center;
 }
 
@@ -499,7 +499,6 @@
 
 .themedShot {
   align-items: center;
-  background: var(--background);
   border: var(--demo-stroke-hairline) solid var(--demo-line);
   border-radius: var(--demo-corner-label);
   display: flex;
@@ -509,16 +508,13 @@
 }
 
 .themedCard {
-  background: var(--card);
   border-radius: var(--demo-corner-label);
-  color: var(--foreground);
   font-size: var(--demo-font-size-8xl);
   font-weight: var(--demo-font-weight-semibold);
-  padding: var(--demo-space-sm) 40px;
+  padding: var(--demo-space-sm) var(--demo-space-40);
 }
 
 .themedAccent {
-  background: var(--brand);
   border-radius: var(--demo-corner-pill);
   height: 96px;
   width: 96px;
@@ -585,7 +581,7 @@
 
 .wordmark {
   color: var(--demo-text);
-  font-size: 36px;
+  font-size: var(--demo-font-size-36);
   font-weight: var(--demo-font-weight-bold);
   left: 400px;
   margin: 0;
@@ -601,24 +597,24 @@
   color: var(--demo-ground);
   font-size: var(--demo-font-size-md);
   font-weight: var(--demo-font-weight-bold);
-  margin-top: 12px;
-  padding: 6px 14px;
+  margin-top: var(--demo-space-12);
+  padding: var(--demo-space-6) var(--demo-space-14);
 }
 
 .barPanel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--demo-space-12);
   justify-content: center;
-  padding-left: 48px;
+  padding-left: var(--demo-space-48);
 }
 
 .columns {
   display: flex;
-  gap: 10px;
+  gap: var(--demo-space-10);
   height: 100%;
   justify-content: center;
-  padding: 0 120px;
+  padding: 0 var(--demo-space-120);
 }
 
 .columnCell {
@@ -626,7 +622,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--demo-space-8);
 }
 
 .columnTrack {

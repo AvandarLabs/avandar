@@ -8,7 +8,8 @@ import type { ReactNode } from "react";
 /**
  * A shot recoloured by its own theme tokens halfway through: a dark shot
  * from the video theme's colour roles, then a light one from its slate
- * swatches.
+ * swatches. The shot draws the colours `createThemeStyleFromTheme` sets as
+ * its custom properties.
  */
 export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const { semantic, atomic, mantine } = useVideoTheme();
@@ -39,9 +40,20 @@ export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
           return { name, value: String(value) };
         })}
     >
-      <div className={css.themedShot} style={style}>
-        <span className={css.themedCard}>Same scene, shot theme</span>
-        <span className={css.themedAccent} />
+      <div
+        className={css.themedShot}
+        style={{ ...style, background: shotTheme.background }}
+      >
+        <span
+          className={css.themedCard}
+          style={{ background: shotTheme.card, color: shotTheme.foreground }}
+        >
+          Same scene, shot theme
+        </span>
+        <span
+          className={css.themedAccent}
+          style={{ background: shotTheme.brand }}
+        />
       </div>
     </HelperDemoFrame>
   );

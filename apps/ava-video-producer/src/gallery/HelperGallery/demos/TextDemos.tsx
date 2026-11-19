@@ -21,7 +21,12 @@ const EXIT_FRAMES = 12;
 /** A wordmark wiped in, then retracted by `getWipeExitStyle()`. */
 export function WipeExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
-  const exit = getWipeExitStyle(frame, EXIT_AT, motion.scale(EXIT_FRAMES), motion);
+  const exit = getWipeExitStyle(
+    frame,
+    EXIT_AT,
+    motion.scale(EXIT_FRAMES),
+    motion,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -68,7 +73,11 @@ export function HeadingRevealDemo({
     >
       <div className={css.cards}>
         {HEADING_MODES.map((mode) => {
-          const styles = getHeadingRevealStyles(frame, { mode, atFrame: 8 }, motion);
+          const styles = getHeadingRevealStyles(
+            frame,
+            { mode, atFrame: 8 },
+            motion,
+          );
           return (
             <div key={mode} className={css.cardColumn}>
               <span className={css.caption}>{`mode: "${mode}"`}</span>
@@ -108,7 +117,10 @@ export function StagedExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
         return {
           name: index === 3 ? "icon" : `line ${index}`,
           value: formatReadout(
-            Number(getStagedExitStyle(frame, STAGED_EXIT, index, motion).opacity ?? 1),
+            Number(
+              getStagedExitStyle(frame, STAGED_EXIT, index, motion).opacity ??
+                1,
+            ),
           ),
         };
       })}
