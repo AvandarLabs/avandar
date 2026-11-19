@@ -9,8 +9,9 @@
  */
 import "../../../tests/helpers/registerRemotionTestHooks";
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import { execFileSync } from "node:child_process";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   findClassicValuesInMarkup,
@@ -29,17 +30,22 @@ const { HelperComposition } =
 const { HELPER_CATALOG } =
   await import("../../gallery/HelperGallery/helperCatalog");
 /**
- * The product palette helper previews used to draw with. It is generated
- * into the gallery by the motion gallery build, so a fresh checkout may not
- * have it yet.
+ * The product palette, read from the workspace theme the way the Atlas
+ * build reads it. No helper preview may draw a product colour.
  */
-const PRODUCT_COLORS_FILE = new URL(
-  "../../gallery/theme-colors.json",
-  import.meta.url,
+const PRODUCT_COLORS: unknown = JSON.parse(
+  execFileSync(
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      fileURLToPath(
+        new URL("../../../scripts/read-theme.mjs", import.meta.url),
+      ),
+    ],
+    { encoding: "utf8" },
+  ),
 );
-const PRODUCT_COLORS: unknown = fs.existsSync(PRODUCT_COLORS_FILE)
-  ? JSON.parse(fs.readFileSync(PRODUCT_COLORS_FILE, "utf8"))
-  : {};
 
 const STARTER_NAMES =
   /var\(--(?:brand|brand-soft|brand-strong|ground|foreground|background|card|muted|muted-foreground|border|shadow)\)/g;

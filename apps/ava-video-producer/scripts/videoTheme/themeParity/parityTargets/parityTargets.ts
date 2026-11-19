@@ -101,13 +101,13 @@ function _createTargetFromId(id: string): ParityTarget | undefined {
 
 /**
  * How far a pixel of a composition may move, by Atlas id, against reference
- * frames captured while scenes still read the starter palette from the
- * `oklch()` values in `theme.css`. `VideoThemeProvider` now emits it as hex
- * measured from rendered frames: solid fills match exactly, but an
- * anti-aliased edge is blended from the unrounded colour. Edges differ by one
- * level, and by up to three where the out-of-gamut `--brand` meets a light
- * ground. Anything larger is still a failure. References captured after the
- * palette moved need no allowance, so only these ids have one.
+ * frames drawn with the starter palette's `oklch()` values from `theme.css`.
+ * `VideoThemeProvider` emits that palette as hex measured from rendered
+ * frames: solid fills match exactly, but an anti-aliased edge is blended from
+ * the unrounded colour. Edges differ by one level, and by up to three where
+ * the out-of-gamut `--brand` meets a light ground. Anything larger is a
+ * failure. References drawn with the hex palette need no allowance, so only
+ * these ids have one.
  */
 const STARTER_HEX_ROUNDING: Readonly<Record<string, number>> = {
   "shared-object-handoff": 1,

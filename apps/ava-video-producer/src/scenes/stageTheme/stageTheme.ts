@@ -14,9 +14,9 @@ import type { CSSProperties } from "react";
 let classicMotion: VideoMotion | undefined;
 
 /**
- * The `classic` theme, resolved once. Stage helpers that take the theme's
- * motion as an argument default to it, so a caller that has not moved to the
- * theme yet still draws today's look.
+ * The `classic` theme, resolved once. Pure stage helpers that take the
+ * theme's motion as an argument default to it, for a caller that renders
+ * outside any video theme, such as a unit test.
  */
 export function getClassicStageTheme(): ResolvedVideoTheme {
   return makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE);
