@@ -29,7 +29,8 @@ function _saysNotStackable(folded: string): boolean {
     /(?:aren't|are not) the same/.test(folded) ||
     /columns differ/.test(folded) ||
     /different columns/.test(folded) ||
-    /rename/.test(folded)
+    /(?:would|will|do|does) not line up/.test(folded) ||
+    /renam/.test(folded)
   );
 }
 
