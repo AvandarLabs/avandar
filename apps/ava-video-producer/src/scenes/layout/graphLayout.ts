@@ -1,6 +1,8 @@
-import { DUR, EASE, mix, ramp } from "../../motion";
+import { mix } from "../../motion";
+import { getClassicStageMotion } from "../stageTheme/stageTheme";
 import { assertFrame, assertUnit, type Point, type Rect } from "./geometry";
 import { fitTextLines } from "./textLayout";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type {
   FlowStep,
   GraphEdge,
@@ -151,6 +153,7 @@ export function getPacketPositions(
   packets: readonly GraphPacket[],
   start: Point,
   end: Point,
+  motion: VideoMotion = getClassicStageMotion(),
 ): Point[] {
   return packets
     .filter((packet) => {
@@ -160,11 +163,11 @@ export function getPacketPositions(
       );
     })
     .map((packet) => {
-      const travel = ramp(
+      const travel = motion.ramp(
         frame,
         packet.atFrame,
         packet.durationInFrames,
-        EASE.inOut,
+        motion.travel.easing,
       );
       const along = packet.direction === "reverse" ? 1 - travel : travel;
       return { x: mix(along, start.x, end.x), y: mix(along, start.y, end.y) };
@@ -188,28 +191,45 @@ export function flowNodes(steps: FlowStep[]): GraphNode[] {
   });
 }
 
+/**
+ * How lit a node is, 0 to 1: it lights over the chip duration when the
+ * traversal reaches it and dims as the traversal moves on.
+ */
 export function nodeHighlight(
   frame: number,
   nodeId: string,
   traversal: TraversalBeat[],
+  motion: VideoMotion = getClassicStageMotion(),
 ): number {
+  const easing = motion.reveal.easing;
   return Math.max(
     0,
     ...traversal.map((beat, index) => {
       return beat.nodeId !== nodeId
         ? 0
-        : ramp(frame, beat.atFrame, DUR.chip) *
+        : motion.ramp(frame, beat.atFrame, motion.chip, easing) *
             (index + 1 === traversal.length
               ? 1
-              : 1 - ramp(frame, traversal[index + 1].atFrame, DUR.chip));
+              : 1 -
+                motion.ramp(
+                  frame,
+                  traversal[index + 1].atFrame,
+                  motion.chip,
+                  easing,
+                ));
     }),
   );
 }
 
+/**
+ * How far the traversal has drawn along an edge, 0 to 1, over the sheet
+ * duration once it moves from the edge's source to its target.
+ */
 export function edgeHighlight(
   frame: number,
   edge: GraphEdge,
   traversal: TraversalBeat[],
+  motion: VideoMotion = getClassicStageMotion(),
 ): number {
   let amount = 0;
   traversal.forEach((beat, index) => {
@@ -218,7 +238,10 @@ export function edgeHighlight(
       traversal[index - 1].nodeId === edge.from &&
       beat.nodeId === edge.to
     ) {
-      amount = Math.max(amount, ramp(frame, beat.atFrame, DUR.sheet));
+      amount = Math.max(
+        amount,
+        motion.ramp(frame, beat.atFrame, motion.sheet, motion.reveal.easing),
+      );
     }
   });
   return amount;

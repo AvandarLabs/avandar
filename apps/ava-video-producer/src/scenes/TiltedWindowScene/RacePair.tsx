@@ -1,13 +1,16 @@
-import { DUR, EASE, enter, mix, mixToken, ramp } from "../../motion";
+import { mix, mixToken } from "../../motion";
+import { useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { formatMetric } from "../layout/layout";
+import { useWindowStage } from "./useWindowStage";
 import { WindowCard } from "./WindowCard";
 import {
   getFlipSplit,
   getSideEntrance,
   getWhipEntrance,
   getWhipExit,
+  type WindowStage,
 } from "./windowMotion";
-import { PAIR_BOXES, PAIR_TILT } from "./windowTilt";
+import { PAIR_BOXES } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
 
@@ -20,13 +23,16 @@ type Props = TiltedWindowSceneProps & {
 /**
  * Two windows side by side, each with a label above and a live counter
  * below, for a race between two runs of the same task. The pair can enter
- * as one card that flips in and splits apart.
+ * as one card that flips in and splits apart. The mirrored tilt is the
+ * pair's part of `components.WindowTilt`.
  */
 export function RacePair(props: Props): ReactNode {
   const { frame, pair, width, height, enter: entrance, exit } = props;
+  const stage = useWindowStage();
+  const tilt = stage.tilt;
   const at = entrance?.atFrame ?? 1;
   const isFlip = (entrance?.kind ?? "flip-split") === "flip-split";
-  const flip = isFlip ? getFlipSplit(frame, at, width) : undefined;
+  const flip = isFlip ? getFlipSplit(frame, at, width, stage) : undefined;
   const split = flip ? flip.split : 1;
   const boxes = PAIR_BOXES.map((box) => {
     return {
@@ -45,7 +51,7 @@ export function RacePair(props: Props): ReactNode {
           transformOrigin: "50% 50%",
           opacity: flip?.opacity,
           transform: flip
-            ? `perspective(${PAIR_TILT.flipPerspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`
+            ? `perspective(${tilt.flipPerspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`
             : undefined,
         }}
       >
@@ -56,7 +62,13 @@ export function RacePair(props: Props): ReactNode {
           const sign = side === 0 ? 1 : -1;
           const base =
             exit && frame >= exit.atFrame
-              ? getWhipExit(frame, exit.atFrame, box, exit.durationInFrames)
+              ? getWhipExit(
+                  frame,
+                  exit.atFrame,
+                  box,
+                  exit.durationInFrames,
+                  stage,
+                )
               : entrance?.kind === "whip"
                 ? getWhipEntrance(
                     frame,
@@ -64,6 +76,7 @@ export function RacePair(props: Props): ReactNode {
                     { width },
                     box,
                     entrance.durationInFrames,
+                    stage,
                   )
                 : entrance?.kind === "from-sides"
                   ? getSideEntrance(
@@ -73,6 +86,7 @@ export function RacePair(props: Props): ReactNode {
                       { width },
                       box,
                       entrance.durationInFrames,
+                      stage,
                     )
                   : {
                       translateX: 0,
@@ -86,14 +100,14 @@ export function RacePair(props: Props): ReactNode {
               key={`${side}-${column.label}`}
               frame={frame}
               rect={{ ...box, x: mix(split, joinedX, box.x) }}
-              pose={{ ...base, rotateY: sign * PAIR_TILT.rotateY }}
+              pose={{ ...base, rotateY: sign * tilt.pairRotateY }}
               source={column.window}
               canvasHeight={height}
               tilt={split}
               chrome={props.chrome}
-              rotateX={PAIR_TILT.rotateX}
+              rotateX={tilt.pairRotateX}
               rotateZ={0}
-              perspective={PAIR_TILT.perspective}
+              perspective={tilt.pairPerspective}
             />
           );
         })}
@@ -106,6 +120,7 @@ export function RacePair(props: Props): ReactNode {
             column={column}
             side={side}
             labelsAt={at + 2}
+            stage={stage}
           />
         );
       })}
@@ -113,7 +128,11 @@ export function RacePair(props: Props): ReactNode {
   );
 }
 
-/** One column's label, counter and stat, outside the flipping card. */
+/**
+ * One column's label, counter and stat, outside the flipping card, in the
+ * `text.stage.windowHeadline` weight. The counter turns from the foreground
+ * to the brand colour as it finishes.
+ */
 function _RaceStats({
   frame,
   column,
@@ -123,10 +142,20 @@ function _RaceStats({
   badge,
   labelsAt,
   exit,
-}: Props & { column: RaceColumn; side: number; labelsAt: number }) {
+  stage,
+}: Props & {
+  column: RaceColumn;
+  side: number;
+  labelsAt: number;
+  stage: WindowStage;
+}) {
+  const tokens = useVideoTokens();
+  const { motion } = stage;
+  const scene = tokens.color.scene;
+  const fontWeight = tokens.text.stage.windowHeadline.fontWeight;
   const left = PAIR_BOXES[side].x * width + width * 0.027;
   const { counter } = column;
-  const elapsed = ramp(
+  const elapsed = motion.ramp(
     frame,
     counter.startFrame,
     counter.endFrame - counter.startFrame,
@@ -134,11 +163,17 @@ function _RaceStats({
       return t;
     },
   );
-  const done = ramp(frame, counter.endFrame, DUR.chip, EASE.out);
+  const done = motion.ramp(
+    frame,
+    counter.endFrame,
+    motion.chip,
+    motion.entrance.easing,
+  );
   const fade = exit
-    ? 1 - ramp(frame, exit.atFrame + 1, DUR.chip, EASE.inOut)
+    ? 1 -
+      motion.ramp(frame, exit.atFrame + 1, motion.chip, motion.dissolve.easing)
     : 1;
-  const arrive = enter(frame, labelsAt, { y: 0 });
+  const arrive = motion.enter(frame, labelsAt, { y: 0 });
   return (
     <div style={{ position: "absolute", inset: 0, opacity: fade }}>
       <div
@@ -147,7 +182,7 @@ function _RaceStats({
           left,
           top: height * 0.085,
           fontSize: height * 0.05,
-          fontWeight: 600,
+          fontWeight,
           ...arrive,
         }}
       >
@@ -160,8 +195,8 @@ function _RaceStats({
             right: width * 0.04,
             top: height * 0.095,
             fontSize: height * 0.026,
-            fontWeight: 600,
-            color: "var(--brand)",
+            fontWeight,
+            color: scene.brand,
             ...arrive,
           }}
         >
@@ -174,9 +209,9 @@ function _RaceStats({
           left,
           top: height * 0.825,
           fontSize: height * 0.1,
-          fontWeight: 600,
+          fontWeight,
           fontVariantNumeric: "tabular-nums",
-          color: mixToken(done, "var(--foreground)", "var(--brand)"),
+          color: mixToken(done, scene.foreground, scene.brand),
           ...arrive,
         }}
       >
@@ -195,7 +230,7 @@ function _RaceStats({
               width * 0.01,
             top: height * 0.885,
             fontSize: height * 0.026,
-            color: "var(--muted-foreground)",
+            color: scene.mutedForeground,
             ...arrive,
           }}
         >

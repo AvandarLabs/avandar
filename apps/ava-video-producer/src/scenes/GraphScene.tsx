@@ -1,5 +1,9 @@
 import { useId } from "react";
-import { DUR, STAGGER, enter, enterAt, mixToken, ramp } from "../motion";
+import { mixToken } from "../motion";
+import { SketchedShape } from "../stock/primitives/SketchedShape";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   GRAPH_ITEM_GAP,
   GRAPH_ITEM_PITCH,
@@ -16,6 +20,8 @@ import {
 } from "./layout/layout";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
+import { getStageTextStyle } from "./stageTheme/stageTheme";
+import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphNode, GraphSceneProps } from "./scenes.types";
 import type { ReactNode } from "react";
 
@@ -23,8 +29,22 @@ import type { ReactNode } from "react";
 const PACKET_RADIUS = 6;
 /** Arm length of a `ticks` node's corner ticks, in pixels. */
 const TICK_ARM = 18;
+/** How far a node rises as it arrives, in pixels. */
+const NODE_RISE = 10;
+/** How far a node's list item rises as it arrives, in pixels. */
+const ITEM_RISE = 6;
+/**
+ * A node list item's size, set to the fixed item pitch the layout reserves
+ * (`GRAPH_ITEM_PITCH`), like a fitted size.
+ */
+const GRAPH_ITEM_FONT_SIZE = 19;
 
-/** An editorial graph, with authored placement and directed traversal. */
+/**
+ * An editorial graph, with authored placement and directed traversal. Edges
+ * draw at the emphasis stroke through the theme's shape sketch, node cards
+ * take `text.stage.cardTitle`, and traversal lights them in the strong brand
+ * colour of the scene palette.
+ */
 export function GraphScene({
   frame,
   width = 1600,
@@ -51,6 +71,14 @@ export function GraphScene({
     }),
   );
   const markerId = `arrow-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const fontSizes = useVideoTheme().mantine.fontSizes;
+  const scene = tokens.color.scene;
+  const cardTitle = tokens.text.stage.cardTitle;
+  const edgeWidth = scales.stroke(tokens.stroke.emphasis);
+  const nodeBorderWidth = scales.stroke(tokens.stroke.default);
   return (
     <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
       <svg
@@ -69,7 +97,7 @@ export function GraphScene({
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--muted-foreground)" />
+            <path d="M 0 0 L 8 4 L 0 8 z" fill={scene.mutedForeground} />
           </marker>
         </defs>
         {edges.map((edge) => {
@@ -80,49 +108,69 @@ export function GraphScene({
           );
           const revealAt =
             revealAtFrame +
-            Math.max(indices.get(edge.from)!, indices.get(edge.to)!) * STAGGER +
-            DUR.panel;
-          const reveal = ramp(frame, revealAt, DUR.sheet);
-          const highlight = edgeHighlight(frame, edge, traversal);
+            Math.max(indices.get(edge.from)!, indices.get(edge.to)!) *
+              motion.stagger.list +
+            motion.panel;
+          const reveal = motion.ramp(
+            frame,
+            revealAt,
+            motion.sheet,
+            motion.reveal.easing,
+          );
+          const highlight = edgeHighlight(frame, edge, traversal, motion);
           const path = `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
           const labelWidth = edge.label ? textUnits(edge.label) * 18 + 24 : 0;
           return (
             <g key={edge.id} opacity={reveal}>
-              <path
-                d={path}
+              <SketchedShape
+                shape={{ kind: "path", d: path }}
+                profile={tokens.sketch.shape}
                 fill="none"
-                stroke="var(--border)"
-                strokeWidth={3}
+                stroke={scene.border}
+                strokeWidth={edgeWidth}
                 pathLength={1}
                 strokeDasharray={1}
                 strokeDashoffset={1 - reveal}
-                markerEnd={
-                  edge.arrow === false ? undefined : `url(#${markerId})`
-                }
               />
-              <path
-                d={path}
+              {edge.arrow === false ? null : (
+                // The arrowhead alone: markers draw without a stroke, scaled
+                // by the edge's stroke width.
+                <path
+                  d={path}
+                  fill="none"
+                  stroke="none"
+                  strokeWidth={edgeWidth}
+                  markerEnd={`url(#${markerId})`}
+                />
+              )}
+              <SketchedShape
+                shape={{ kind: "path", d: path }}
+                profile={tokens.sketch.shape}
                 fill="none"
-                stroke="var(--brand-strong)"
-                strokeWidth={3}
+                stroke={scene.brandStrong}
+                strokeWidth={edgeWidth}
                 pathLength={1}
                 strokeDasharray={1}
                 strokeDashoffset={1 - highlight}
                 opacity={highlight > 0 ? 1 : 0}
               />
-              {getPacketPositions(frame, edge.packets ?? [], start, end).map(
-                (point, index) => {
-                  return (
-                    <circle
-                      key={`packet-${index}`}
-                      cx={point.x}
-                      cy={point.y}
-                      r={PACKET_RADIUS}
-                      fill="var(--brand)"
-                    />
-                  );
-                },
-              )}
+              {getPacketPositions(
+                frame,
+                edge.packets ?? [],
+                start,
+                end,
+                motion,
+              ).map((point, index) => {
+                return (
+                  <circle
+                    key={`packet-${index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={PACKET_RADIUS}
+                    fill={scene.brand}
+                  />
+                );
+              })}
               {edge.label ? (
                 <g
                   transform={`translate(${(start.x + end.x) / 2}, ${(start.y + end.y) / 2})`}
@@ -132,12 +180,12 @@ export function GraphScene({
                     y={-17}
                     width={labelWidth}
                     height={34}
-                    rx={8}
-                    fill="var(--ground)"
+                    rx={scales.corner(tokens.corner.cell)}
+                    fill={scene.ground}
                   />
                   <text
-                    fill="var(--muted-foreground)"
-                    fontSize={18}
+                    fill={scene.mutedForeground}
+                    fontSize={fontSizes.xl}
                     textAnchor="middle"
                     dominantBaseline="central"
                   >
@@ -151,7 +199,7 @@ export function GraphScene({
       </svg>
       {nodes.map((node, index) => {
         const rect = rects.get(node.id)!;
-        const active = nodeHighlight(frame, node.id, traversal);
+        const active = nodeHighlight(frame, node.id, traversal, motion);
         const label = fitTextLines(
           [node.label],
           rect.width - 40,
@@ -175,20 +223,20 @@ export function GraphScene({
               border:
                 node.frame === "ticks"
                   ? "none"
-                  : `2px solid ${mixToken(active, "var(--border)", "var(--brand-strong)")}`,
+                  : `${nodeBorderWidth}px solid ${mixToken(active, scene.border, scene.brandStrong)}`,
+              // No corner token holds the starter 14 px radius yet.
               borderRadius: "var(--radius)",
               background:
                 node.frame === "ticks"
                   ? "transparent"
-                  : mixToken(active, "var(--card)", "var(--brand-soft)"),
-              ...enterAt(frame, revealAtFrame, index, { y: 10 }),
+                  : mixToken(active, scene.card, scene.brandSoft),
+              ...motion.enterAt(frame, revealAtFrame, index, { y: NODE_RISE }),
             }}
           >
             <div
               style={{
                 fontSize: label.fontSize,
-                fontWeight: 600,
-                lineHeight: 1.22,
+                ...getStageTextStyle(cardTitle, ["fontWeight", "lineHeight"]),
                 overflowWrap: "anywhere",
               }}
             >
@@ -201,8 +249,8 @@ export function GraphScene({
                 style={{
                   marginTop: 10,
                   fontSize: detail.fontSize,
-                  color: "var(--muted-foreground)",
-                  lineHeight: 1.22,
+                  color: scene.mutedForeground,
+                  lineHeight: cardTitle.lineHeight,
                 }}
               >
                 {detail.lines.map((line, i) => {
@@ -213,9 +261,15 @@ export function GraphScene({
             <_NodeItems
               node={node}
               frame={frame}
-              at={revealAtFrame + index * STAGGER + DUR.panel}
+              at={revealAtFrame + index * motion.stagger.list + motion.panel}
+              motion={motion}
+              color={scene.mutedForeground}
             />
-            {node.frame === "ticks" ? <_CornerTicks /> : null}
+            {node.frame === "ticks" ? (
+              <_CornerTicks
+                line={`${nodeBorderWidth}px solid ${scene.border}`}
+              />
+            ) : null}
           </article>
         );
       })}
@@ -223,15 +277,20 @@ export function GraphScene({
   );
 }
 
-/** A node's list items, cascading in one stagger apart under its label. */
+/** A node's list items, cascading in two list staggers apart under its
+ *  label. */
 function _NodeItems({
   node,
   frame,
   at,
+  motion,
+  color,
 }: {
   node: GraphNode;
   frame: number;
   at: number;
+  motion: VideoMotion;
+  color: string;
 }) {
   if (!node.items?.length) {
     return null;
@@ -250,13 +309,15 @@ function _NodeItems({
             key={`${index}-${item}`}
             style={{
               height: GRAPH_ITEM_PITCH,
-              fontSize: 19,
+              fontSize: GRAPH_ITEM_FONT_SIZE,
               lineHeight: `${GRAPH_ITEM_PITCH}px`,
-              color: "var(--muted-foreground)",
+              color,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              ...enter(frame, at + index * STAGGER * 2, { y: 6 }),
+              ...motion.enter(frame, at + index * motion.stagger.list * 2, {
+                y: ITEM_RISE,
+              }),
             }}
           >
             {item}
@@ -268,14 +329,13 @@ function _NodeItems({
 }
 
 /** Four L-shaped corner ticks framing a node without a full border. */
-function _CornerTicks() {
+function _CornerTicks({ line }: { line: string }) {
   const corners = [
     { top: 0, left: 0, borderTop: true, borderLeft: true },
     { top: 0, right: 0, borderTop: true, borderRight: true },
     { bottom: 0, left: 0, borderBottom: true, borderLeft: true },
     { bottom: 0, right: 0, borderBottom: true, borderRight: true },
   ];
-  const line = "2px solid var(--border)";
   return (
     <>
       {corners.map(

@@ -4,10 +4,14 @@ import {
   HorizontalBlurFilter,
   getHorizontalBlurFilter,
 } from "../../motion-components/HorizontalBlur";
+import { buildColorWithAlpha, elevationToBoxShadow } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
+import { useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { MediaPlane } from "../MediaPlane";
 import { positioned } from "../positioned";
-import { getScrollOffset } from "./windowMotion";
-import { WINDOW_CHROME, WINDOW_SHADOW, WINDOW_TILT } from "./windowTilt";
+import { useWindowStage } from "./useWindowStage";
+import { getScrollOffset, type WindowStage } from "./windowMotion";
+import { WINDOW_SHADOW_FALLBACK_ALPHA } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { WindowSource } from "../scenes.types";
 import type { WindowPose } from "./windowMotion";
@@ -22,7 +26,8 @@ type Props = {
   /** How much of the resting tilt and chrome applies, 0 to 1. Default 1. */
   tilt?: number;
   chrome?: "titlebar" | "none";
-  /** Mirrors the tilt for the right-hand window of a pair. */
+  /** Mirrors the tilt for the right-hand window of a pair. Each defaults to
+   *  `components.WindowTilt`. */
   rotateX?: number;
   rotateZ?: number;
   perspective?: number;
@@ -33,7 +38,9 @@ type Props = {
 /**
  * One tilted window card holding a still or footage: rounded, shadowed,
  * with an optional titlebar, posed in 3D and blurred along X while it
- * moves. Used by every `TiltedWindowScene` layout.
+ * moves. Used by every `TiltedWindowScene` layout. The plane and chrome are
+ * `components.WindowTilt`; the shadow is `elevation.window` in the scene's
+ * shadow colour, or a mix of its background when the theme sets none.
  */
 export function WindowCard({
   frame,
@@ -43,23 +50,34 @@ export function WindowCard({
   canvasHeight,
   tilt = 1,
   chrome = "titlebar",
-  rotateX = WINDOW_TILT.rotateX,
-  rotateZ = WINDOW_TILT.rotateZ,
-  perspective = WINDOW_TILT.perspective,
+  rotateX,
+  rotateZ,
+  perspective,
   clipPath,
 }: Props): ReactNode {
   const filterId = `window-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const stage = useWindowStage();
+  const tokens = useVideoTokens();
+  const scales = useVideoShapeScales();
+  const scene = tokens.color.scene;
+  const windowTilt = stage.tilt;
+  const shadow = elevationToBoxShadow({
+    layers: tokens.elevation.window.layers,
+    color:
+      scene.shadow ??
+      buildColorWithAlpha(scene.background, WINDOW_SHADOW_FALLBACK_ALPHA),
+  });
   const titlebar =
     chrome === "titlebar"
-      ? canvasHeight * WINDOW_CHROME.titlebarHeight * tilt
+      ? canvasHeight * windowTilt.titlebarHeight * tilt
       : 0;
   const transform = [
-    `perspective(${perspective}px)`,
+    `perspective(${perspective ?? windowTilt.perspective}px)`,
     `translateX(${pose.translateX.toFixed(2)}px)`,
     `translateZ(${pose.translateZ.toFixed(2)}px)`,
     `rotateY(${(pose.rotateY * tilt).toFixed(3)}deg)`,
-    `rotateX(${(rotateX * tilt).toFixed(3)}deg)`,
-    `rotateZ(${(rotateZ * tilt).toFixed(3)}deg)`,
+    `rotateX(${((rotateX ?? windowTilt.rotateX) * tilt).toFixed(3)}deg)`,
+    `rotateZ(${((rotateZ ?? windowTilt.rotateZ) * tilt).toFixed(3)}deg)`,
   ].join(" ");
   return (
     <>
@@ -71,10 +89,10 @@ export function WindowCard({
           transformOrigin: "50% 50%",
           opacity: pose.opacity,
           filter: getHorizontalBlurFilter(filterId, pose.blurX),
-          borderRadius: WINDOW_CHROME.radius * tilt,
+          borderRadius: scales.corner(windowTilt.chromeRadius) * tilt,
           overflow: "hidden",
-          background: "var(--background)",
-          boxShadow: tilt > 0 && !clipPath ? WINDOW_SHADOW : undefined,
+          background: scene.background,
+          boxShadow: tilt > 0 && !clipPath ? shadow : undefined,
           clipPath,
         }}
       >
@@ -82,8 +100,8 @@ export function WindowCard({
           <div
             style={{
               height: titlebar,
-              background: "var(--card)",
-              borderBottom: "1px solid var(--border)",
+              background: scene.card,
+              borderBottom: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
               opacity: tilt,
             }}
           />
@@ -92,6 +110,7 @@ export function WindowCard({
           frame={frame}
           source={source}
           height={rect.height - titlebar}
+          stage={stage}
         />
       </div>
     </>
@@ -103,14 +122,16 @@ function _WindowContent({
   frame,
   source,
   height,
+  stage,
 }: {
   frame: number;
   source: WindowSource;
   height: number;
+  stage: WindowStage;
 }) {
   const position = source.objectPosition ?? { x: 0.5, y: 0 };
   const scroll = source.scrollSteps
-    ? getScrollOffset(frame, source.scrollSteps)
+    ? getScrollOffset(frame, source.scrollSteps, stage)
     : undefined;
   return (
     <div style={{ position: "relative", height, overflow: "hidden" }}>

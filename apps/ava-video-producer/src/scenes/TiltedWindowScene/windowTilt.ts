@@ -1,31 +1,49 @@
-/**
- * Design tokens for the tilted window: its resting 3D plane, its box on the
- * canvas, and its chrome. Shared by every layout of `TiltedWindowScene` so
- * the window sits in the same plane in every shot of a film.
+import {
+  buildColorWithAlpha,
+  elevationToBoxShadow,
+} from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { getClassicStageTheme } from "../stageTheme/stageTheme";
+
+/*
+ * The tilted window's boxes on the canvas. Its 3D plane, chrome, and blur
+ * are the theme's `components.WindowTilt` and `components.WindowMotion`,
+ * shared by every layout of `TiltedWindowScene` so the window sits in the
+ * same plane in every shot of a film.
  *
  * The tilt is only ever applied to layers holding stills or footage. Live
  * product UI must never sit inside it: a lasting transform resamples every
  * glyph of the interface.
  */
+
+const CLASSIC = getClassicStageTheme();
+const CLASSIC_TILT = CLASSIC.components.WindowTilt;
+
+/** Share of the scene background a window's fallback shadow takes. */
+export const WINDOW_SHADOW_FALLBACK_ALPHA = 0.6;
+
+/**
+ * The single window's resting plane in `classic`, for callers without a
+ * theme. `rotateY` is negative to bring the right edge toward the camera,
+ * and `entryRotateY` is the steeper angle a window enters at.
+ */
 export const WINDOW_TILT = {
-  perspective: 1400,
-  /** Negative brings the right edge toward the camera. */
-  rotateY: -13,
-  rotateX: 3,
-  rotateZ: -1,
-  /** The steeper angle a window enters at before it settles. */
-  entryRotateY: -24,
+  perspective: CLASSIC_TILT.perspective,
+  rotateY: CLASSIC_TILT.rotateY,
+  rotateX: CLASSIC_TILT.rotateX,
+  rotateZ: CLASSIC_TILT.rotateZ,
+  entryRotateY: CLASSIC_TILT.entryRotateY,
 } as const;
 
-/** Mirrored, flatter tilt of the two windows in the `pair` layout. */
+/**
+ * The mirrored, flatter tilt of the two `pair` windows in `classic`, for
+ * callers without a theme. The joined card flips in through the longer
+ * `flipPerspective` lens.
+ */
 export const PAIR_TILT = {
-  perspective: 1600,
-  /** The left window turns this way; the right one mirrors it. */
-  rotateY: 8,
-  rotateX: 2,
-  /** A longer lens for the joined card flipping in, so its near edge is
-   *  not magnified past the frame. */
-  flipPerspective: 3200,
+  perspective: CLASSIC_TILT.pairPerspective,
+  rotateY: CLASSIC_TILT.pairRotateY,
+  rotateX: CLASSIC_TILT.pairRotateX,
+  flipPerspective: CLASSIC_TILT.flipPerspective,
 } as const;
 
 /**
@@ -67,10 +85,23 @@ export const PAIR_BOXES = [
 /** The headline column, as fractions of the canvas. */
 export const HEADLINE_BOX = { x: 0.062, y: 0.115, width: 0.27 };
 
-/** Window chrome: corner radius in pixels and titlebar height in canvas
- *  fractions. */
-export const WINDOW_CHROME = { radius: 10, titlebarHeight: 0.035 };
+/**
+ * Window chrome in `classic`, for callers without a theme: corner radius in
+ * pixels and titlebar height in canvas fractions.
+ */
+export const WINDOW_CHROME = {
+  radius: CLASSIC_TILT.chromeRadius,
+  titlebarHeight: CLASSIC_TILT.titlebarHeight,
+};
 
-/** A soft cast shadow, from the `shadow` token or a mix of the background. */
-export const WINDOW_SHADOW =
-  "0 30px 60px var(--shadow, color-mix(in oklab, var(--background) 60%, transparent))";
+/**
+ * The window's cast shadow in `classic`, for callers without a theme:
+ * `elevation.window` in a mix of the scene background.
+ */
+export const WINDOW_SHADOW = elevationToBoxShadow({
+  layers: CLASSIC.semantic.elevation.window.layers,
+  color: buildColorWithAlpha(
+    CLASSIC.semantic.color.scene.background,
+    WINDOW_SHADOW_FALLBACK_ALPHA,
+  ),
+});

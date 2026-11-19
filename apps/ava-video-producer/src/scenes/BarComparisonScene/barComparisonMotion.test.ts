@@ -7,6 +7,8 @@ import {
   getRoughEdgeClipPath,
   getRowValueLabel,
 } from "./barComparisonMotion";
+import { getClassicStageTheme } from "../stageTheme/stageTheme";
+import { createVideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 
 test("a panel stages its hero, then labels, then bars, then values", () => {
   const beats = getBarComparisonBeats(10, 0, 3);
@@ -67,4 +69,14 @@ test("a rough bar edge stays within its depth and repeats for the same row", () 
 test("a row value without display text keeps the panel's decimal places", () => {
   assert.equal(getRowValueLabel({ value: 4.2 }, 1), "4.2");
   assert.equal(getRowValueLabel({ value: 4.2, display: "4.2 s" }, 1), "4.2 s");
+});
+
+test("a panel's staging stretches with the theme's tempo", () => {
+  const motion = getClassicStageTheme().semantic.motion;
+  const slowest = createVideoMotion({ ...motion, tempo: 0.8 });
+  const classic = getBarComparisonBeats(10, 0, 3);
+  const slow = getBarComparisonBeats(10, 0, 3, slowest);
+  assert.equal(slow.heroAt, classic.heroAt);
+  assert.equal(slow.labelsAt - slow.heroAt, slowest.panel);
+  assert.equal(slow.valuesAt - slow.barsAt, slowest.sheet + slowest.stagger.list);
 });

@@ -1,5 +1,18 @@
+import { useMemo } from "react";
 import { z } from "zod";
-import { bezier, EASE, ramp } from "../motion";
+import { bezier, ramp } from "../motion";
+import {
+  getClassicStageMotion,
+  getClassicStageTheme,
+} from "../scenes/stageTheme/stageTheme";
+import { createVideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
+import { useVideoThemeContext } from "../videoTheme/useVideoTheme";
+import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
+import type {
+  ResolvedVideoAtomic,
+  ResolvedVideoSemantic,
+  ResolvedVideoTheme,
+} from "../videoTheme/videoTheme.types";
 
 const controlPoint = z.number().min(0).max(1);
 /** Bounded curves keep camera viewports inside their authored endpoints. */
@@ -11,8 +24,10 @@ export const motionEasingSchema = z.union([
 export type MotionEasing = z.infer<typeof motionEasingSchema>;
 
 /**
- * Editorial motion vocabulary. Speed multiplies travel rate, never reading
- * holds.
+ * Editorial motion vocabulary: the named camera presets and the curve each
+ * one names. Speed multiplies travel rate, never reading holds. Settings
+ * read each preset's speed and shutter from the theme's `camera.presets`,
+ * whose `classic` values these equal.
  */
 export const MOTION_PRESETS = {
   deliberate: { speed: 0.25, shutterAngle: 45, easing: "ease-in-out" },
@@ -58,21 +73,78 @@ type ResolvedMotionSettings = {
   transitionBlur: number;
 };
 
-/** Resolve safe motion settings without modifying the caller's options. */
+/**
+ * The theme values motion cues fall back to: camera presets, motion blur,
+ * the atomic curves the named easings stand for, and the travel curve of
+ * an unnamed cue.
+ */
+export type MotionSettingsTheme = Readonly<{
+  camera: ResolvedVideoSemantic["camera"];
+  motionBlur: ResolvedVideoSemantic["motionBlur"];
+  easing: ResolvedVideoAtomic["easing"];
+  motion: VideoMotion;
+}>;
+
+/** The motion settings theme of a resolved video theme. */
+export function createMotionSettingsTheme(
+  theme: ResolvedVideoTheme,
+  motion: VideoMotion = createVideoMotion(theme.semantic.motion),
+): MotionSettingsTheme {
+  return {
+    camera: theme.semantic.camera,
+    motionBlur: theme.semantic.motionBlur,
+    easing: theme.atomic.easing,
+    motion,
+  };
+}
+
+let classicSettingsTheme: MotionSettingsTheme | undefined;
+
+/** `classic`'s motion settings theme, the default of every settings helper. */
+export function getClassicMotionSettingsTheme(): MotionSettingsTheme {
+  classicSettingsTheme ??= createMotionSettingsTheme(
+    getClassicStageTheme(),
+    getClassicStageMotion(),
+  );
+  return classicSettingsTheme;
+}
+
+/**
+ * The motion settings theme of the surrounding video theme, or `classic`
+ * outside any provider, for motion components that also render in helper
+ * previews.
+ */
+export function useMotionSettingsTheme(): MotionSettingsTheme {
+  const theme = useVideoThemeContext()?.theme;
+  return useMemo(() => {
+    return theme
+      ? createMotionSettingsTheme(theme)
+      : getClassicMotionSettingsTheme();
+  }, [theme]);
+}
+
+/**
+ * Resolve safe motion settings without modifying the caller's options. What
+ * the options leave out comes from the theme: the preset's speed and shutter
+ * from `camera.presets`, the rest from `motionBlur`.
+ */
 export function resolveMotionSettings(
   options: MotionOptions = {},
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): ResolvedMotionSettings {
   const parsed = motionOptionsSchema.parse(options);
-  const preset = MOTION_PRESETS[parsed.preset ?? "brisk"];
+  const presetName = parsed.preset ?? "brisk";
+  const preset = theme.camera.presets[presetName];
+  const { motionBlur } = theme;
   return {
     speed: parsed.speed ?? preset.speed,
-    easing: parsed.easing ?? preset.easing,
-    shutterAngle: parsed.shutterAngle ?? preset.shutterAngle,
-    samples: parsed.samples ?? 10,
-    blurStrength: parsed.blurStrength ?? 1,
-    velocityBlurFactor: parsed.velocityBlurFactor ?? 0.09,
-    velocityBlurLimit: parsed.velocityBlurLimit ?? 3,
-    transitionBlur: parsed.transitionBlur ?? 12,
+    easing: parsed.easing ?? MOTION_PRESETS[presetName].easing,
+    shutterAngle: parsed.shutterAngle ?? preset.shutter,
+    samples: parsed.samples ?? motionBlur.samples,
+    blurStrength: parsed.blurStrength ?? motionBlur.strength,
+    velocityBlurFactor: parsed.velocityBlurFactor ?? motionBlur.velocityFactor,
+    velocityBlurLimit: parsed.velocityBlurLimit ?? motionBlur.velocityMax,
+    transitionBlur: parsed.transitionBlur ?? motionBlur.transitionBlur,
   };
 }
 
@@ -83,36 +155,42 @@ export function resolveMotionSettings(
 export function getMotionDuration(
   frames: number,
   options?: MotionOptions,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): number {
   z.number().int().nonnegative().parse(frames);
-  const { speed } = resolveMotionSettings(options);
+  const { speed } = resolveMotionSettings(options, theme);
   return frames === 0 ? 0 : Math.max(1, Math.round(frames / speed));
 }
 
 /**
- * Existing cues retain their curve unless a preset or explicit easing replaces
- * it.
+ * Existing cues retain their curve (the theme's travel curve unless the
+ * caller names one) unless a preset or explicit easing replaces it. A named
+ * easing is the theme's atomic curve of that name.
  */
 export function getMotionEasing(
   options?: MotionOptions,
-  fallback = EASE.inOut,
+  fallback?: (t: number) => number,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): (t: number) => number {
-  if (!options?.easing && !options?.preset) return fallback;
-  const { easing } = resolveMotionSettings(options);
+  if (!options?.easing && !options?.preset) {
+    return fallback ?? theme.motion.travel.easing;
+  }
+  const { easing } = resolveMotionSettings(options, theme);
   if (Array.isArray(easing)) return bezier(...easing);
+  const curve = theme.motion.curve;
   switch (easing) {
     case "linear":
       return (progress: number) => {
         return progress;
       };
     case "ease-in":
-      return bezier(0.42, 0, 1, 1);
+      return curve(theme.easing.cssEaseIn);
     case "ease-out":
-      return bezier(0, 0, 0.58, 1);
+      return curve(theme.easing.cssEaseOut);
     case "ease-in-out-cubic":
-      return EASE.inOutCubic;
+      return curve(theme.easing.inOutCubic);
     case "ease-in-out":
-      return EASE.inOut;
+      return curve(theme.easing.inOut);
   }
 }
 
@@ -124,13 +202,14 @@ export function getMotionProgress(
   at: number,
   duration: number,
   options?: MotionOptions,
-  fallback = EASE.inOut,
+  fallback?: (t: number) => number,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): number {
   return ramp(
     frame,
     at,
-    getMotionDuration(duration, options),
-    getMotionEasing(options, fallback),
+    getMotionDuration(duration, options, theme),
+    getMotionEasing(options, fallback, theme),
   );
 }
 
@@ -143,8 +222,9 @@ export function getVelocityBlur(
   distancePerFrame: number,
   options?: MotionOptions,
   maximum?: number,
+  theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): number {
-  const settings = resolveMotionSettings(options);
+  const settings = resolveMotionSettings(options, theme);
   return (
     (Math.min(
       maximum ?? settings.velocityBlurLimit,

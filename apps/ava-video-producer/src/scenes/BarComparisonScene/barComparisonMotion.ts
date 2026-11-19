@@ -1,29 +1,35 @@
-import { DUR, STAGGER } from "../../motion";
 import { formatMetric } from "../layout/layout";
+import { getClassicStageMotion } from "../stageTheme/stageTheme";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 
-/** Frames a bar takes to grow to its length. */
-export const BAR_GROW_FRAMES = DUR.sheet;
+/**
+ * Frames a bar takes to grow to its length in `classic`. The scene grows
+ * bars over its theme's `motion.sheet`; this is for callers without one.
+ */
+export const BAR_GROW_FRAMES = getClassicStageMotion().sheet;
 
 /**
  * When each layer of one `BarComparisonScene` panel starts: the hero number,
  * the row labels, the bars and the row values. Panels after the first start
- * `panelStaggerFrames` later each, so two charts read left to right.
+ * `panelStaggerFrames` later each, so two charts read left to right. Gaps
+ * between layers are the theme's durations, so they follow its tempo.
  */
 export function getBarComparisonBeats(
   revealAtFrame: number,
   panelIndex: number,
   panelStaggerFrames: number,
+  motion: VideoMotion = getClassicStageMotion(),
 ): { heroAt: number; labelsAt: number; barsAt: number; valuesAt: number } {
   const heroAt = revealAtFrame + panelIndex * panelStaggerFrames;
   // Labels follow the hero, bars follow the first labels, and values land
   // once the bars have nearly finished growing.
-  const labelsAt = heroAt + DUR.panel;
-  const barsAt = labelsAt + DUR.chip;
+  const labelsAt = heroAt + motion.panel;
+  const barsAt = labelsAt + motion.chip;
   return {
     heroAt,
     labelsAt,
     barsAt,
-    valuesAt: barsAt + BAR_GROW_FRAMES + STAGGER,
+    valuesAt: barsAt + motion.sheet + motion.stagger.list,
   };
 }
 
