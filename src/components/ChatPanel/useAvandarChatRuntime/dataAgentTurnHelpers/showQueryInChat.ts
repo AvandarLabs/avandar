@@ -93,3 +93,25 @@ export async function showQueryInChat(
     };
   }
 }
+
+/**
+ * Runs SQL through the workspace query session without showing it, for a
+ * dashboard chart's check. Returns the result's shape, never rows.
+ */
+export async function checkQueryOnDevice(
+  options: Readonly<{ workspaceId: Workspace.Id; sql: string }>,
+): Promise<DataAgentQueryOutcome> {
+  try {
+    const result = await WorkspaceQuerySession.runQuery({
+      rawSql: options.sql,
+      workspaceId: options.workspaceId,
+    });
+    const isEmpty = result.numRows === 0 || _isAllBlank(result.data);
+    return _toQueryOutcome(result, isEmpty, undefined);
+  } catch (error) {
+    return {
+      kind: "failed",
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}

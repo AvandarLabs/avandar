@@ -166,6 +166,32 @@ describe("PendingClarificationBlock", () => {
     expect(appendMock).toHaveBeenCalledWith("[Clarification answer: First]");
   });
 
+  it("posts a picked option's value, never the label the card showed", async () => {
+    useStateMock.mockReturnValue({
+      pendingClarification: {
+        ...pendingClarification,
+        responseShape: {
+          kind: "fixed_options",
+          options: ["<value 1>", "Queens"],
+          optionLabels: ["Kings", "Queens"],
+          multi: false,
+        },
+      },
+    });
+    render(<PendingClarificationBlock />);
+
+    await act(async () => {
+      await clarificationCardHarness.onAnswer?.({
+        answer: { kind: "preset", value: "<value 1>" },
+      });
+    });
+
+    expect(appendMock).toHaveBeenCalledWith(
+      "[Clarification answer: <value 1>]",
+    );
+    expect(JSON.stringify(appendMock.mock.calls)).not.toContain("Kings");
+  });
+
   it("records cancellation with the pending audit id when boundary consent is rejected", async () => {
     decideIfDataCanCrossBoundaryMock.mockResolvedValue({
       approved: false,

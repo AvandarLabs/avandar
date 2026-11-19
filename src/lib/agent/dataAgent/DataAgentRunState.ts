@@ -24,6 +24,11 @@ export type DataAgentRunState = {
     chart?: string;
     outcome: DataAgentQueryOutcome;
   };
+  /**
+   * The block this answer added or proposed. Set once: an answer adds one
+   * block, and its summary is the reply.
+   */
+  dashboardBlock?: { summary: string };
   questions: DataAgentQuestionRecord[];
   /** A question card is on screen, so the turn ends until the user answers. */
   isWaitingForUser: boolean;
@@ -49,8 +54,12 @@ export function createDataAgentRunState(): DataAgentRunState {
 }
 
 /**
- * The run state for one new user message. Query bookkeeping starts over.
- * Earlier user texts stay, so a retry of a column question is still one.
+ * The run state for one new user message. Query bookkeeping starts over, and
+ * so do the last query and the dashboard block. Both are explicitly
+ * undefined so that merging this into the live state clears the earlier
+ * answer's values: an optional field left out of the result would survive
+ * the merge. Earlier user texts stay, so a retry of a column question is
+ * still one.
  */
 export function beginDataAgentRun(
   previous: DataAgentRunState,
@@ -58,6 +67,8 @@ export function beginDataAgentRun(
 ): DataAgentRunState {
   return {
     ...createDataAgentRunState(),
+    lastQuery: undefined,
+    dashboardBlock: undefined,
     userTexts: [...previous.userTexts, message],
   };
 }

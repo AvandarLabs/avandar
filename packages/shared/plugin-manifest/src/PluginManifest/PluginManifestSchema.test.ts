@@ -741,6 +741,7 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     ["lookupValues", "lookup_values"],
     ["askUser", "ask_user"],
     ["planQuery", "plan_query"],
+    ["addDashboardBlock", "add_dashboard_block"],
   ])(
     "rejects the tool name %s, which only differs from %s in case and underscores",
     (name, reservedName) => {

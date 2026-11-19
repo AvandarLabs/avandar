@@ -34,6 +34,8 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   agentAccessDenied: string;
   /** The agent's reply when a turn fails and cannot be answered offline. */
   agentUnavailable: string;
+  /** The agent's reply when a dashboard chart's query kept failing. */
+  chartNotBuilt: string;
 };
 
 /**

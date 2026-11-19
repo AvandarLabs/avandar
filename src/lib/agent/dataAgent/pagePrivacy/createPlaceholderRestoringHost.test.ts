@@ -211,4 +211,191 @@ describe("createPlaceholderRestoringHost", () => {
     );
     expect(JSON.stringify(result)).not.toContain("Kings");
   });
+
+  it("restores a chart check's SQL and masks what comes back", async () => {
+    const checkQuery = vi.fn().mockResolvedValue({
+      kind: "failed",
+      error: "Conversion Error: Kings is not a number",
+    });
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ checkQuery }),
+      _createVault(),
+    );
+
+    const outcome = await host.checkQuery!(MODEL_SQL);
+
+    expect(checkQuery).toHaveBeenCalledWith(RESTORED_SQL);
+    expect(outcome).toEqual({
+      kind: "failed",
+      error: "Conversion Error: <value 1> is not a number",
+    });
+  });
+
+  it("refuses a chart check with an unknown placeholder", async () => {
+    const checkQuery = vi.fn();
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ checkQuery }),
+      _createVault(),
+    );
+
+    const outcome = await host.checkQuery!(`SELECT 1 WHERE x = '<value 4>'`);
+
+    expect(checkQuery).not.toHaveBeenCalled();
+    expect(outcome).toEqual({
+      kind: "failed",
+      error: expect.stringContaining("unknown"),
+    });
+  });
+
+  it("restores the dashboard name and the block before adding it", async () => {
+    const addDashboardBlock = vi.fn().mockResolvedValue({ kind: "card_shown" });
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ addDashboardBlock }),
+      _createVault(),
+    );
+
+    await host.addDashboardBlock!({
+      dashboard: "<value 1> deaths",
+      block: {
+        kind: "DataViz",
+        prompt: "Deaths in <value 1>",
+        sql: MODEL_SQL,
+        vizType: "line",
+      },
+    });
+
+    expect(addDashboardBlock).toHaveBeenCalledWith({
+      dashboard: "Kings deaths",
+      block: {
+        kind: "DataViz",
+        prompt: "Deaths in Kings",
+        sql: RESTORED_SQL,
+        vizType: "line",
+      },
+    });
+  });
+
+  it("shows a query's summary with the real value in place of its placeholder", async () => {
+    const inner = _createInnerHost({});
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    await host.showQuery({
+      sql: MODEL_SQL,
+      summary: "Weekly cases for <value 1>.",
+    });
+
+    expect(inner.showQuery).toHaveBeenCalledWith({
+      sql: RESTORED_SQL,
+      summary: "Weekly cases for Kings.",
+    });
+  });
+
+  it("shows a question card's text and option labels with the real value, and keeps its options masked", async () => {
+    const askUser = vi.fn().mockResolvedValue({ kind: "deferred" });
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({ askUser }),
+      _createVault(),
+    );
+
+    await host.askUser({
+      question: "Did you mean <value 1> or Queens?",
+      options: ["<value 1>", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    // An option the user picks is posted back to the model as their next
+    // message without a consent check, so its value must stay a placeholder.
+    // Only its label, which the screen shows, carries the real value.
+    expect(askUser).toHaveBeenCalledWith({
+      question: "Did you mean Kings or Queens?",
+      options: ["<value 1>", "Queens"],
+      optionLabels: ["Kings", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+  });
+
+  it("adds no option labels when no option holds a value", async () => {
+    const askUser = vi.fn().mockResolvedValue({ kind: "deferred" });
+    const request = {
+      question: "Which year?",
+      options: ["2021", "2022"],
+      isMulti: false,
+      kind: "choice" as const,
+    };
+    const hosted = createPlaceholderRestoringHost(
+      _createInnerHost({ askUser }),
+      _createVault(),
+    );
+    const device = createPlaceholderRestoringHost(
+      _createInnerHost({ askUser }),
+      createSqlPlaceholderVault(),
+    );
+
+    await hosted.askUser(request);
+    await device.askUser({ ...request, options: ["<value 1>", "2022"] });
+
+    expect(askUser).toHaveBeenNthCalledWith(1, request);
+    expect(askUser).toHaveBeenNthCalledWith(2, {
+      ...request,
+      options: ["<value 1>", "2022"],
+    });
+  });
+
+  it("leaves a placeholder the vault does not hold as written in each text it shows", async () => {
+    const inner = _createInnerHost({
+      addDashboardBlock: vi.fn().mockResolvedValue({ kind: "card_shown" }),
+    });
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    await host.showQuery({ sql: MODEL_SQL, summary: "About <value 9>." });
+    await host.addDashboardBlock!({
+      dashboard: "current",
+      block: { kind: "HeadingBlock", text: "About <value 9>.", level: 2 },
+    });
+    await host.askUser({
+      question: "About <value 9>?",
+      options: [],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(inner.showQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ summary: "About <value 9>." }),
+    );
+    expect(inner.addDashboardBlock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        block: expect.objectContaining({ text: "About <value 9>." }),
+      }),
+    );
+    expect(inner.askUser).toHaveBeenCalledWith(
+      expect.objectContaining({ question: "About <value 9>?" }),
+    );
+  });
+
+  it("changes nothing a device turn shows, since its vault holds no value", async () => {
+    const inner = _createInnerHost({});
+    const host = createPlaceholderRestoringHost(
+      inner,
+      createSqlPlaceholderVault(),
+    );
+
+    await host.showQuery({ sql: "SELECT 1", summary: "Cases for <value 1>." });
+
+    expect(inner.showQuery).toHaveBeenCalledWith({
+      sql: "SELECT 1",
+      summary: "Cases for <value 1>.",
+    });
+  });
+
+  it("leaves dashboard members out when the host has none", () => {
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({}),
+      createSqlPlaceholderVault(),
+    );
+
+    expect(host.checkQuery).toBeUndefined();
+    expect(host.addDashboardBlock).toBeUndefined();
+  });
 });

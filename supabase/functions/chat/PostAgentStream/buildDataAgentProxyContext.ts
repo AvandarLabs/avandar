@@ -2,7 +2,7 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 import {
-  DATA_AGENT_TOOLS,
+  DATA_AGENT_TOOLS_BY_PROMPT_ID,
   PLUGIN_TOOL_PROMPT_IDS,
 } from "$/agent/dataAgent/dataAgentTools.ts";
 import { makeDataAgentToolsFromPluginAiTools } from "$/agent/dataAgent/makeDataAgentToolsFromPluginAiTools.ts";
@@ -49,9 +49,10 @@ function _assertKnownTools(
  * conversation from the browser. Any system message the browser sends is
  * dropped, so a caller cannot replace the prompt or add tools. A tool call
  * or result is refused unless it names a tool offered now or one a bundled
- * plugin declares. The tools are the built-in `DATA_AGENT_TOOLS` followed by
- * `pluginTools`, the plugin tools active in the workspace, which only a
- * prompt version in `PLUGIN_TOOL_PROMPT_IDS` is offered.
+ * plugin declares. The tools are the built-in tools the prompt version
+ * serves (`DATA_AGENT_TOOLS_BY_PROMPT_ID`) followed by `pluginTools`, the
+ * plugin tools active in the workspace, which only a prompt version in
+ * `PLUGIN_TOOL_PROMPT_IDS` is offered.
  */
 export function buildDataAgentProxyContext(
   options: Readonly<{
@@ -66,7 +67,7 @@ export function buildDataAgentProxyContext(
     ? options.pluginTools
     : [];
   const tools = [
-    ...DATA_AGENT_TOOLS,
+    ...DATA_AGENT_TOOLS_BY_PROMPT_ID[options.promptId],
     ...makeDataAgentToolsFromPluginAiTools(pluginTools),
   ].map((tool) => {
     return {

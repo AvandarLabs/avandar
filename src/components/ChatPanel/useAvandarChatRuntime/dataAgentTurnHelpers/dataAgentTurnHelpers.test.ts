@@ -1,7 +1,9 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
@@ -66,6 +68,7 @@ function _createTurnOptions(): DataAgentTurnOptions {
       setActiveVizType: vi.fn(),
     } as unknown as DataAgentTurnOptions["dataExplorerDispatch"],
     chatPanelDispatch: {} as DataAgentTurnOptions["chatPanelDispatch"],
+    copy: { chartNotBuilt: "Chart not built." },
   };
 }
 
@@ -255,16 +258,21 @@ describe("askConversationDataAgent", () => {
     ask?: (text: string) => Promise<{ text: string }>,
   ): FakeConversation {
     const asked: string[] = [];
+    // Like the real agent, the fake takes a turn's text into its transcript
+    // before the model answers, so a failed answer still leaves it there.
+    const messages: string[] = [];
     const conversation = {
       asked,
       turnRef: { current: _createTurnOptions() },
       results: [],
       resultsByTurn: [],
+      dashboardCards: [],
       datasets: [],
       dataAgent: {
-        agent: { abort: vi.fn() },
+        agent: { abort: vi.fn(), state: { messages } },
         ask: vi.fn(async (text: string) => {
           asked.push(text);
+          messages.push(text);
           if (ask) {
             return await ask(text);
           }
@@ -336,7 +344,7 @@ describe("askConversationDataAgent", () => {
     expect(conversation.asked[1]).toBe(`${dashboardBlock}\n\nAnd here?`);
   });
 
-  it("resends a block the agent failed to answer", async () => {
+  it("resends a block the agent never took", async () => {
     const conversation = _fakeConversation();
     const conversations = new Map([["workspace-1:0", conversation]]);
     const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
@@ -348,10 +356,74 @@ describe("askConversationDataAgent", () => {
     await expect(
       _ask(conversations, _turn("And here?"), dashboardBlock),
     ).rejects.toThrow("model down");
-    await _ask(conversations, _turn("And here?"), dashboardBlock);
 
+    expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
+    await _ask(conversations, _turn("And here?"), dashboardBlock);
     expect(conversation.lastPageBlock).toBe(dashboardBlock);
     expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd here?`);
+  });
+
+  it("remembers a block the agent took and then failed to answer", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+    await _ask(conversations, _turn("How many?"), dashboardBlock);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+
+    await expect(
+      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+    ).rejects.toThrow("model down");
+
+    expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
+  });
+
+  it("sends the page in full on the turn after a failed turn on another page", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+    const fakeAsk = conversation.dataAgent.ask;
+    await _ask(conversations, _turn("How many?"), dashboardBlock);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+    await expect(
+      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+    ).rejects.toThrow("model down");
+    conversation.dataAgent.ask = fakeAsk;
+
+    await _ask(conversations, _turn("And back?"), dashboardBlock);
+
+    expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd back?`);
+  });
+
+  it("remembers the tray a failed turn took", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    conversation.dataAgent.ask = vi.fn(async (text: string) => {
+      (conversation.dataAgent.agent.state.messages as unknown[]).push(text);
+      throw new Error("model down");
+    });
+
+    await expect(
+      askConversationDataAgent({
+        conversations,
+        turn: _turn("How many?"),
+        buildTurnInputs: () => {
+          return {
+            blocks: { attachedBlock: "<attached>\nA\n</attached>" },
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+          };
+        },
+        createConversation: vi.fn(),
+      }),
+    ).rejects.toThrow("model down");
+
+    expect(conversation.lastAttachedBlock).toBe("<attached>\nA\n</attached>");
   });
 
   it("clears the previous turn's question card", async () => {
@@ -381,6 +453,221 @@ describe("askConversationDataAgent", () => {
         AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
       ),
     ]);
+  });
+
+  describe("a reply that holds a placeholder", () => {
+    const MODEL_TEXT = "<value 1> has 2 visits.";
+
+    function _askWithUnmask(
+      unmaskReplyText: ((text: string) => string) | undefined,
+    ) {
+      return askConversationDataAgent({
+        conversations: new Map([
+          [
+            "workspace-1:0",
+            _fakeConversation(async () => {
+              return { text: MODEL_TEXT };
+            }),
+          ],
+        ]),
+        turn: _turn("How many visits?"),
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            unmaskReplyText,
+          };
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    function _unmaskJane(text: string): string {
+      return text.replaceAll("<value 1>", "Jane Doe");
+    }
+
+    it("shows the real value on a hosted turn", async () => {
+      const reply = await _askWithUnmask(_unmaskJane);
+
+      expect(reply.content?.[0]).toEqual({
+        type: "text",
+        text: "Jane Doe has 2 visits.",
+      });
+    });
+
+    it("keeps the text the model wrote beside the real text, for the next request", async () => {
+      const reply = await _askWithUnmask(_unmaskJane);
+
+      expect(
+        HostedAnswerText.getModelText({
+          text: "Jane Doe has 2 visits.",
+          metadata: reply.metadata,
+        }),
+      ).toBe(MODEL_TEXT);
+    });
+
+    it("leaves a device turn's reply as written, with no kept text", async () => {
+      const reply = await _askWithUnmask(undefined);
+
+      expect(reply).toEqual({
+        content: [{ type: "text", text: MODEL_TEXT }],
+      });
+    });
+
+    it("keeps no model text when the vault holds no value for the placeholder", async () => {
+      const reply = await _askWithUnmask(_keepText);
+
+      expect(reply).toEqual({
+        content: [{ type: "text", text: MODEL_TEXT }],
+      });
+    });
+  });
+
+  it("starts with card lines, then marks them heard after the reply", async () => {
+    const cardLine =
+      "<dashboard_card>Cancelled: nothing was added.</dashboard_card>";
+    const card = AgentDashboardBlock.create({
+      block: { kind: "heading", text: "Visits" },
+      summary: "Added a heading.",
+      candidates: [{ id: "d-1", name: "Clinic visits" }],
+    } as never);
+    const onReplied = vi.fn();
+    const conversation = _fakeConversation(async () => {
+      expect(onReplied).not.toHaveBeenCalled();
+      conversation.dashboardCards.push(card);
+      return { text: "Done." };
+    });
+
+    const reply = await askConversationDataAgent({
+      conversations: new Map([["workspace-1:0", conversation]]),
+      turn: _turn("Add a heading"),
+      buildTurnInputs: () => {
+        return {
+          blocks: {},
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+          dashboardCardLines: [cardLine],
+          onReplied,
+        };
+      },
+      createConversation: vi.fn(),
+    });
+
+    expect(conversation.asked[0]).toBe(`${cardLine}\n\nAdd a heading`);
+    expect(onReplied).toHaveBeenCalledTimes(1);
+    expect(reply.content).toEqual([
+      { type: "text", text: "Done." },
+      AgentDashboardBlock.toDataPart(card),
+    ]);
+  });
+
+  describe("when the chat has moved on during the ask", () => {
+    function _askWithStaleness(
+      isStale: () => boolean,
+      onReplied: () => void,
+    ): Promise<unknown> {
+      return askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", _fakeConversation()]]),
+        turn: { ..._turn("Add a heading"), isStale },
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            dashboardCardLines: ["<dashboard_card>x</dashboard_card>"],
+            onReplied,
+          };
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    it("keeps card lines unheard when the reply is discarded", async () => {
+      const onReplied = vi.fn();
+
+      await _askWithStaleness(() => {
+        return true;
+      }, onReplied);
+
+      expect(onReplied).not.toHaveBeenCalled();
+    });
+
+    it("marks card lines heard when the chat is still current", async () => {
+      const onReplied = vi.fn();
+
+      await _askWithStaleness(() => {
+        return false;
+      }, onReplied);
+
+      expect(onReplied).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when the agent could not build the chart", () => {
+    function _askWithChartFailure(failure: "chart_not_built" | undefined) {
+      const conversation = _fakeConversation(async () => {
+        return { text: failure ? "" : "Here it is.", failure };
+      });
+      return askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", conversation]]),
+        turn: {
+          ..._turn("Add a chart"),
+          copy: { chartNotBuilt: "Translated: chart not built." },
+        },
+        createConversation: vi.fn(),
+      });
+    }
+
+    it("shows the translated copy as the reply", async () => {
+      const reply = await _askWithChartFailure("chart_not_built");
+
+      expect(reply.content).toEqual([
+        { type: "text", text: "Translated: chart not built." },
+      ]);
+    });
+
+    it("leaves an ordinary reply as the agent wrote it", async () => {
+      const reply = await _askWithChartFailure(undefined);
+
+      expect(reply.content).toEqual([{ type: "text", text: "Here it is." }]);
+    });
+  });
+
+  it("keeps card lines unheard when the agent fails to reply", async () => {
+    const onReplied = vi.fn();
+    const conversation = _fakeConversation(async () => {
+      throw new Error("model down");
+    });
+
+    await expect(
+      askConversationDataAgent({
+        conversations: new Map([["workspace-1:0", conversation]]),
+        turn: _turn("Add a heading"),
+        buildTurnInputs: () => {
+          return {
+            blocks: {},
+            nameOf: _noName,
+            maskAssistantText: _keepText,
+            dashboardCardLines: ["<dashboard_card>x</dashboard_card>"],
+            onReplied,
+          };
+        },
+        createConversation: vi.fn(),
+      }),
+    ).rejects.toThrow("model down");
+
+    expect(onReplied).not.toHaveBeenCalled();
+  });
+
+  it("gives each turn its own list of dashboard cards", async () => {
+    const conversation = _fakeConversation();
+    const staleCards = conversation.dashboardCards;
+
+    await _ask(new Map([["workspace-1:0", conversation]]), _turn("How many?"));
+
+    expect(conversation.dashboardCards).not.toBe(staleCards);
+    expect(conversation.dashboardCards).toEqual([]);
   });
 
   it("asks the conversation it creates on the first turn", async () => {

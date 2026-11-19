@@ -1,12 +1,19 @@
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
-import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import {
+  createDataAgent,
+  createDataAgentToolList,
+  getDataAgentReplyFailure,
+  getDataAgentReplyText,
+} from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import { createLocalModel } from "@/lib/agent/localModels/createLocalModelStreamFn/createLocalModelStreamFn";
 import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { runPluginAiTool as runPluginAiToolOnScreen } from "@/lib/plugins/runPluginAiTool/runPluginAiTool";
 import { runFitRegression } from "../../../../../plugins/epidemiology/src/fitRegression/runFitRegression";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
+import type { CreateDataAgentOptions } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
@@ -345,6 +352,359 @@ describe("createDataAgent", () => {
       expect(reply.text).toBe("One row.");
       expect(showQuery).toHaveBeenCalledTimes(1);
       expect(reply.modelIds).toHaveLength(1);
+    });
+  });
+});
+
+function _options(
+  overrides: Partial<CreateDataAgentOptions>,
+): CreateDataAgentOptions {
+  return {
+    datasets: [],
+    host: HOST,
+    policy: {} as CreateDataAgentOptions["policy"],
+    streamFn: vi.fn(),
+    today: "2026-11-11",
+    ...overrides,
+  };
+}
+
+function _namesOf(options: CreateDataAgentOptions): string[] {
+  return createDataAgentToolList(options, [], createDataAgentRunState()).map(
+    (tool) => {
+      return tool.name;
+    },
+  );
+}
+
+describe("createDataAgentToolList", () => {
+  it.each([
+    "data-agent-v1",
+    "data-agent-v2",
+    "data-agent-v3",
+    "data-agent-v4",
+    "data-agent-v5",
+  ] as const)("leaves the dashboard tool out for %s", (promptId) => {
+    expect(_namesOf(_options({ promptId }))).not.toContain(
+      "add_dashboard_block",
+    );
+  });
+
+  it("adds the dashboard tool for v6, which serves it", () => {
+    expect(_namesOf(_options({ promptId: "data-agent-v6" }))).toContain(
+      "add_dashboard_block",
+    );
+  });
+
+  it("adds it beside plan_query for the offline plan style", () => {
+    expect(
+      _namesOf(_options({ promptId: "data-agent-v6", queryTools: "plan" })),
+    ).toEqual(["plan_query", "run_query", "ask_user", "add_dashboard_block"]);
+  });
+
+  it("leaves the dashboard tool out when the caller does not offer it", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v6",
+          shouldOfferDashboardTool: () => {
+            return false;
+          },
+        }),
+      ),
+    ).toEqual(["run_query", "lookup_values", "ask_user"]);
+  });
+
+  it("keeps the plugin tools when the caller does not offer the dashboard tool", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v6",
+          shouldOfferDashboardTool: () => {
+            return false;
+          },
+          getPluginAiTools: () => {
+            return [FIT_DECLARATION];
+          },
+          runPluginAiTool: vi.fn(),
+        }),
+      ),
+    ).toEqual(["run_query", "lookup_values", "ask_user", FIT_DECLARATION.name]);
+  });
+
+  it("never offers the dashboard tool to a version that does not serve it", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v5",
+          shouldOfferDashboardTool: () => {
+            return true;
+          },
+        }),
+      ),
+    ).not.toContain("add_dashboard_block");
+  });
+
+  it("lists v6's built-in tools, then the plugin tools, as the proxy does", () => {
+    expect(
+      _namesOf(
+        _options({
+          promptId: "data-agent-v6",
+          getPluginAiTools: () => {
+            return [FIT_DECLARATION];
+          },
+          runPluginAiTool: vi.fn(),
+        }),
+      ),
+    ).toEqual([
+      "run_query",
+      "lookup_values",
+      "ask_user",
+      "add_dashboard_block",
+      FIT_DECLARATION.name,
+    ]);
+  });
+});
+
+function _endedOn(
+  toolName: string,
+  text = "Let me add that.",
+): Parameters<typeof getDataAgentReplyText>[0] {
+  return [
+    {
+      role: "assistant",
+      content: [
+        { type: "text", text },
+        { type: "toolCall", id: "c1", name: toolName, arguments: {} },
+      ],
+    },
+  ] as unknown as Parameters<typeof getDataAgentReplyText>[0];
+}
+
+describe("getDataAgentReplyText", () => {
+  it("replies with the dashboard tool's summary when the turn ended on it", () => {
+    const state = createDataAgentRunState();
+    state.dashboardBlock = { summary: "Added a heading to COVID 2022." };
+
+    expect(getDataAgentReplyText(_endedOn("add_dashboard_block"), state)).toBe(
+      "Added a heading to COVID 2022.",
+    );
+  });
+
+  it("marks the chart as not built when its query cap ran out", () => {
+    const state = createDataAgentRunState();
+    state.queryRuns = 3;
+    state.needsEscalation = true;
+    const messages = _endedOn("add_dashboard_block");
+
+    expect(getDataAgentReplyFailure(messages, state)).toBe("chart_not_built");
+    expect(getDataAgentReplyText(messages, state)).toBe("");
+  });
+
+  it("marks no failure when the dashboard tool placed its block", () => {
+    const state = createDataAgentRunState();
+    state.queryRuns = 3;
+    state.dashboardBlock = { summary: "Added a chart." };
+
+    expect(
+      getDataAgentReplyFailure(_endedOn("add_dashboard_block"), state),
+    ).toBeUndefined();
+  });
+
+  it("keeps the model's text while the chart query may still be retried", () => {
+    const state = createDataAgentRunState();
+    state.queryRuns = 2;
+
+    expect(getDataAgentReplyText(_endedOn("add_dashboard_block"), state)).toBe(
+      "Let me add that.",
+    );
+    expect(
+      getDataAgentReplyFailure(_endedOn("add_dashboard_block"), state),
+    ).toBeUndefined();
+  });
+});
+
+type ScriptedToolCall = { name: string; arguments: JsonObject };
+
+/** A stream function whose n-th model call is the n-th scripted tool call. */
+function _createToolCallingStreamFn(
+  script: readonly ScriptedToolCall[],
+): StreamFn {
+  let callCount = 0;
+  return () => {
+    const scripted = script[callCount];
+    if (!scripted) {
+      throw new Error("The model was called more often than scripted.");
+    }
+    callCount += 1;
+    const toolCall = {
+      type: "toolCall" as const,
+      id: `call-${callCount}`,
+      ...scripted,
+    };
+    const message: AssistantMessage = {
+      role: "assistant",
+      content: [toolCall],
+      api: MODEL.api,
+      provider: MODEL.provider,
+      model: MODEL.id,
+      usage: {
+        input: 0,
+        output: 0,
+        cacheRead: 0,
+        cacheWrite: 0,
+        totalTokens: 0,
+        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+      },
+      stopReason: "toolUse",
+      timestamp: 0,
+    };
+    const stream = createAssistantMessageEventStream();
+    queueMicrotask(() => {
+      stream.push({ type: "start", partial: message });
+      stream.push({ type: "done", reason: "toolUse", message });
+    });
+    return stream;
+  };
+}
+
+function _addHeading(summary: string): ScriptedToolCall {
+  return {
+    name: "add_dashboard_block",
+    arguments: {
+      dashboard: "COVID 2022",
+      block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+      summary,
+    },
+  };
+}
+
+describe("createDataAgent across several asks", () => {
+  function _createDashboardAgent(
+    script: readonly ScriptedToolCall[],
+    checkOutcome: Awaited<
+      ReturnType<NonNullable<DataAgentHost["checkQuery"]>>
+    > = { kind: "rows", columns: [], rowCount: 2 },
+  ) {
+    const host: DataAgentHost = {
+      ...HOST,
+      approveValuesForModel: vi.fn().mockResolvedValue(true),
+      showQuery: vi
+        .fn()
+        .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      checkQuery: vi.fn().mockResolvedValue(checkOutcome),
+      addDashboardBlock: vi.fn().mockResolvedValue({ kind: "added_to_editor" }),
+    };
+    const dataAgent = createDataAgent({
+      datasets: [],
+      host,
+      policy: { primary: { model: MODEL, thinkingLevel: "off" } },
+      streamFn: _createToolCallingStreamFn(script),
+      today: "2026-11-08",
+      promptId: "data-agent-v6",
+    });
+    return { dataAgent, host };
+  }
+
+  it("adds a block on a later ask after one was added", async () => {
+    const { dataAgent, host } = _createDashboardAgent([
+      _addHeading("Added the first heading."),
+      _addHeading("Added the second heading."),
+    ]);
+
+    await dataAgent.ask("Add a heading");
+    const second = await dataAgent.ask("Add another heading");
+
+    expect(host.addDashboardBlock).toHaveBeenCalledTimes(2);
+    expect(second.text).toBe("Added the second heading.");
+  });
+
+  it("carries a chart-not-built marker, not text, when the chart's query keeps failing", async () => {
+    const chart: ScriptedToolCall = {
+      name: "add_dashboard_block",
+      arguments: {
+        dashboard: "COVID 2022",
+        block: {
+          kind: "DataViz",
+          prompt: "Deaths",
+          sql: "SELECT 1",
+          vizType: "bar",
+        },
+        summary: "Added a chart.",
+      },
+    };
+    const { dataAgent } = _createDashboardAgent([chart, chart, chart], {
+      kind: "failed",
+      error: "bad column",
+    });
+
+    const reply = await dataAgent.ask("Add a chart");
+
+    expect(reply.failure).toBe("chart_not_built");
+    expect(reply.text).toBe("");
+  });
+
+  it("does not reply with an earlier answer's block summary", async () => {
+    const { dataAgent } = _createDashboardAgent([
+      _addHeading("Added the first heading."),
+      {
+        name: "run_query",
+        arguments: { sql: "SELECT 1", summary: "One row of numbers." },
+      },
+    ]);
+
+    await dataAgent.ask("Add a heading");
+    const second = await dataAgent.ask("How many deaths?");
+
+    expect(second.text).toBe("One row of numbers.");
+  });
+
+  describe("after a run_query answer", () => {
+    function _createQueryAgent(streamFn: StreamFn) {
+      const host: DataAgentHost = {
+        ...HOST,
+        approveValuesForModel: vi.fn().mockResolvedValue(true),
+        showQuery: vi
+          .fn()
+          .mockResolvedValue({ kind: "rows", columns: [], rowCount: 2 }),
+      };
+      return createDataAgent({
+        datasets: [],
+        host,
+        policy: { primary: { model: MODEL, thinkingLevel: "off" } },
+        streamFn,
+        today: "2026-11-08",
+        promptId: "data-agent-v6",
+      });
+    }
+
+    const FIRST_QUERY = toolCallMessage("run_query", {
+      sql: "SELECT 1",
+      summary: "One row of numbers.",
+    });
+
+    it("keeps its query out of a later message-only reply", async () => {
+      const dataAgent = _createQueryAgent(
+        scriptedStream([FIRST_QUERY, textMessage("Glad to help.")]),
+      );
+
+      const first = await dataAgent.ask("How many deaths?");
+      expect(first.state.lastQuery?.summary).toBe("One row of numbers.");
+      const second = await dataAgent.ask("Thanks");
+
+      expect(second.text).toBe("Glad to help.");
+      expect(second.state.lastQuery).toBeUndefined();
+    });
+
+    it("does not fall back to its summary for an empty reply", async () => {
+      const dataAgent = _createQueryAgent(
+        scriptedStream([FIRST_QUERY, _createAssistantMessage([], "stop")]),
+      );
+
+      await dataAgent.ask("How many deaths?");
+      const second = await dataAgent.ask("Thanks");
+
+      expect(second.text).toBe("");
     });
   });
 });

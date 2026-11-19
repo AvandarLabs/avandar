@@ -7,9 +7,12 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
+import type { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
@@ -50,8 +53,9 @@ export type DataAgentTurnOptions = {
    */
   pageContext?: AgentPageContext;
   /**
-   * True for a turn answered by the offline models. Offline turns run only
-   * in the Data Explorer, so their results always go there.
+   * True for a turn answered by the offline models. Its answer is marked as
+   * offline. Its results go where an online turn's do once it carries a page
+   * context.
    */
   isOffline?: boolean;
   /**
@@ -73,6 +77,26 @@ export type DataAgentTurnOptions = {
   getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
   /** The workspace's slug, for the API a plugin AI tool receives. */
   workspaceSlug?: string;
+  /**
+   * The dashboard editor when the turn started: the dashboard it shows, and
+   * how to add a block to it unsaved. Absent where no editor is known.
+   */
+  dashboardEditor?: {
+    activeDashboardId: string | undefined;
+    dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+  };
+  /** The chat session the turn belongs to, for its dashboard cards. */
+  sessionId?: string;
+  /**
+   * The words for replies the agent has none for, already translated.
+   * `chartNotBuilt` is the reply when a dashboard chart's query kept failing.
+   */
+  copy: Pick<ChatRuntimeCopy, "chartNotBuilt">;
+  /**
+   * True once the chat moved on (a reset or another session) and the turn's
+   * reply will be thrown away. Then nothing about the reply is recorded.
+   */
+  isStale?: () => boolean;
 };
 
 /**
@@ -92,10 +116,12 @@ export type AgentConversationState = {
   resultsByTurn: AgentQueryResultData[][];
   /**
    * Created with the conversation. Page blocks hide values with it, and the
-   * host restores them before SQL runs. An offline conversation sends no
-   * page block, so its vault stays empty and restoring changes nothing.
+   * host restores them before SQL runs. An offline conversation never
+   * redacts, so its vault stays empty and restoring changes nothing.
    */
   sqlVault: SqlPlaceholderVault;
+  /** Dashboard cards this turn added to the chat. Reset every turn. */
+  dashboardCards: AgentDashboardBlockData[];
 };
 
 /** One conversation's agent, the turn it is answering, and its results. */
@@ -106,11 +132,16 @@ export type DataAgentConversation = AgentConversationState & {
    * so every page block in this conversation is built from this same list.
    */
   datasets: readonly DataAgentDataset[];
-  /** The page block sent last, to send "unchanged" instead of repeats. */
+  /**
+   * The page block last sent in full, to send "unchanged" instead of
+   * repeats. Recorded once the agent has the turn's text, even if its answer
+   * then failed, and not for a turn that failed before. An empty Data
+   * Explorer's block that a device turn left out is not recorded.
+   */
   lastPageBlock?: string;
   /**
-   * The attached block built last turn, to send "unchanged" or "cleared"
-   * lines.
+   * The attached block the agent last took, to send "unchanged" or "cleared"
+   * lines. Recorded on the same terms as `lastPageBlock`.
    */
   lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */

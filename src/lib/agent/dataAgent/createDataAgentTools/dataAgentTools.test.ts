@@ -1,6 +1,7 @@
 import { RESERVED_AI_TOOL_NAMES } from "@avandar/plugin-manifest";
 import { describe, expect, it, vi } from "vitest";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { createAddDashboardBlockTool } from "@/lib/agent/dataAgent/createDataAgentTools/addDashboardBlockTool";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
@@ -417,6 +418,7 @@ describe("built-in tool names", () => {
       createPlanQueryTool(queryContext, []),
       createLookupValuesTool({ host, aliases: ALIASES, datasets: [], state }),
       createAskUserTool({ host, state }),
+      createAddDashboardBlockTool(queryContext),
     ];
 
     expect(RESERVED_AI_TOOL_NAMES).toEqual(

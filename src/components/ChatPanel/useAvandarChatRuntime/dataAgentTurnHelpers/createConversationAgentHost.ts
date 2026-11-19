@@ -1,8 +1,12 @@
+import { addAgentDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock";
 import {
   createExplorerShowQuery,
   getTurnQuestionLabel,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
-import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
+import {
+  checkQueryOnDevice,
+  showQueryInChat,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
@@ -16,12 +20,16 @@ import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createData
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /**
- * Results go to the Data Explorer only when the turn says so: the user is on
- * it, or the turn is offline (offline turns run only there). An unknown page
- * sends them to the chat, which shows them on any page.
+ * Results go to the Data Explorer when the user is on it, and for an
+ * offline turn that carries no page at all. Any other page, including one
+ * the app could not identify, sends them to the chat, which shows them
+ * anywhere.
  */
 function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
-  return turn.isOffline === true || turn.pageContext?.app === "data-explorer";
+  return (
+    turn.pageContext?.app === "data-explorer" ||
+    (turn.isOffline === true && turn.pageContext === undefined)
+  );
 }
 
 /**
@@ -51,6 +59,19 @@ export function createConversationAgentHost(
         request,
       });
     },
+    checkQuery: (sql) => {
+      return checkQueryOnDevice({
+        workspaceId: state.turnRef.current.workspaceId,
+        sql,
+      });
+    },
+    addDashboardBlock: (request) => {
+      return addAgentDashboardBlock({
+        turn: state.turnRef.current,
+        cards: state.dashboardCards,
+        request,
+      });
+    },
     showQuestionCard: (clarification) => {
       state.turnRef.current.chatPanelDispatch.setPendingClarification(
         clarification,
@@ -77,6 +98,7 @@ export function createAgentConversation(
     results: [],
     resultsByTurn: [],
     sqlVault: createSqlPlaceholderVault(),
+    dashboardCards: [],
   };
   const host = createConversationAgentHost(state);
   return Object.assign(state, {

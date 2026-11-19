@@ -1,7 +1,10 @@
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatClarifyRequest } from "$/types/chat.types";
+import type {
+  ChatClarifyRequest,
+  ChatClarifyResponseShape,
+} from "$/types/chat.types";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /** What the browser host needs from the chat runtime and the page. */
@@ -13,6 +16,10 @@ export type BrowserDataAgentHostOptions = {
    * the caller decides.
    */
   showQuery: DataAgentHost["showQuery"];
+  /** Checks a dashboard chart's SQL on this device. */
+  checkQuery?: DataAgentHost["checkQuery"];
+  /** Places a dashboard block in the open editor or on a card. */
+  addDashboardBlock?: DataAgentHost["addDashboardBlock"];
   /** Shows a question card in the chat panel. */
   showQuestionCard: (clarification: ChatClarifyRequest) => void;
 };
@@ -37,6 +44,29 @@ async function _readColumnValues(
   }
 }
 
+/** The question card's answer shape for what the agent asked. */
+function _buildResponseShape(
+  request: Parameters<DataAgentHost["askUser"]>[0],
+): ChatClarifyResponseShape {
+  if (request.lookup) {
+    return {
+      kind: "discovery",
+      query: request.lookup.listQuery,
+      column: request.lookup.column,
+      multi: request.isMulti,
+      candidateValues: [...request.lookup.candidateValues],
+    };
+  }
+  return {
+    kind: "fixed_options",
+    options: [...request.options],
+    ...(request.optionLabels
+      ? { optionLabels: [...request.optionLabels] }
+      : {}),
+    multi: request.isMulti,
+  };
+}
+
 /**
  * The data agent's host in the app. Queries run where the caller's
  * `showQuery` sends them (DuckDB-Wasm, in the browser), lookups run locally
@@ -49,6 +79,8 @@ export function createBrowserDataAgentHost(
 ): DataAgentHost {
   return {
     showQuery: options.showQuery,
+    checkQuery: options.checkQuery,
+    addDashboardBlock: options.addDashboardBlock,
     readColumnValues: (sql) => {
       return _readColumnValues(options.workspaceId, sql);
     },
@@ -56,19 +88,7 @@ export function createBrowserDataAgentHost(
       options.showQuestionCard({
         question: request.question,
         turnNumber: 1,
-        responseShape: request.lookup
-          ? {
-              kind: "discovery",
-              query: request.lookup.listQuery,
-              column: request.lookup.column,
-              multi: request.isMulti,
-              candidateValues: [...request.lookup.candidateValues],
-            }
-          : {
-              kind: "fixed_options",
-              options: [...request.options],
-              multi: request.isMulti,
-            },
+        responseShape: _buildResponseShape(request),
       });
       return { kind: "deferred" };
     },

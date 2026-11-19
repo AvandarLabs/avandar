@@ -1,3 +1,4 @@
+import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText.ts";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken.ts";
 
 const EXCERPT_LIMIT = 2000;
@@ -50,7 +51,8 @@ function _latest(
  *
  * A later title request uses this string so the model never sees gadget
  * ids, SQL, or unmasked names. Pass the hosted turn's messages, the same
- * mask the turn used, and the offline-answer sentence.
+ * mask the turn used, and the offline-answer sentence. A hosted reply that
+ * the chat shows with real values is read as the model wrote it.
  */
 export function buildChatSessionTitleExcerpt(options: {
   messages: readonly ExcerptMessage[];
@@ -69,9 +71,15 @@ export function buildChatSessionTitleExcerpt(options: {
   const assistantText = assistantIsOffline
     ? options.offlineAnswerText
     : options.mask(
-        ChatMentionToken.toModelText(_textParts(assistant?.content), (ref) => {
-          return ref.gadgetType;
-        }),
+        ChatMentionToken.toModelText(
+          HostedAnswerText.getModelText({
+            text: _textParts(assistant?.content),
+            metadata: assistant?.metadata,
+          }),
+          (ref) => {
+            return ref.gadgetType;
+          },
+        ),
       );
   const excerpt = `user: ${userText}\nassistant: ${assistantText}`;
   return excerpt.length > EXCERPT_LIMIT

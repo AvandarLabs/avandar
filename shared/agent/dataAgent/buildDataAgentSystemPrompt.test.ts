@@ -435,7 +435,129 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(
       v5Instructions.startsWith(`${v4Instructions}\n\nCODED COLUMNS\n`),
     ).toBe(true);
-    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v5");
+  });
+
+  it("builds v6 as v5 plus the dashboard rules", () => {
+    const instructionsOf = (promptId: "data-agent-v5" | "data-agent-v6") => {
+      const prompt = buildDataAgentSystemPrompt({
+        datasets: DATASETS,
+        today: "2026-11-18",
+        promptId,
+      });
+      return prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+    };
+    const v5 = instructionsOf("data-agent-v5");
+    const v6 = instructionsOf("data-agent-v6");
+
+    expect(v6.startsWith(`${v5}\n\nDASHBOARD BLOCKS\n`)).toBe(true);
+    expect(v6).toContain("add_dashboard_block");
+    expect(v6).toContain("<dashboard_card>");
+    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v6");
+  });
+
+  it("tells v6 to ask which chart before changing how one is shown, right after the run_query sentence", () => {
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v5",
+    });
+    const v6 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v6",
+    });
+    const dashboardRules = v6.slice(v6.indexOf("DASHBOARD BLOCKS"));
+    const bullets = dashboardRules.split("\n- ");
+    const addBullet = bullets[1]!;
+    const changeBullet = bullets[2]!;
+
+    expect(v5).not.toContain("how a chart on the page is shown");
+    expect(addBullet.endsWith("a question about the data, uses run_query.")).toBe(
+      true,
+    );
+    expect(changeBullet).toContain(
+      "Changing how a chart on the page is shown",
+    );
+    expect(changeBullet).toContain(
+      "When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer.",
+    );
+    expect(changeBullet).toContain(
+      "A request to add, put, or pin something on a dashboard is not covered by this rule",
+    );
+    expect(bullets[3]).toMatch(/^dashboard: "current"/);
+  });
+
+  it("tells v6 not to copy a dashboard's year into a chart or drop rows from a ranking, right after the DataViz bullet", () => {
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v5",
+    });
+    const v6 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId: "data-agent-v6",
+    });
+    const bullets = v6.slice(v6.indexOf("DASHBOARD BLOCKS")).split("\n- ");
+    const dataVizIndex = bullets.findIndex((bullet) => {
+      return bullet.startsWith("DataViz is a chart or table from SQL");
+    });
+    const filterBullet = bullets[dataVizIndex + 1]!;
+
+    expect(v5).not.toContain("are labels, not filters");
+    expect(dataVizIndex).toBeGreaterThan(0);
+    expect(
+      filterBullet.startsWith(
+        "A dashboard's name, title, and charts are labels, not filters.",
+      ),
+    ).toBe(true);
+    expect(filterBullet).toContain(
+      "Never copy their year or place into a chart or table you build from the user's words",
+    );
+    expect(filterBullet).toContain(
+      "use only the filters and period the user asked for, and all dates when they named no period",
+    );
+    expect(filterBullet).toContain(
+      "only when the user refers to that period",
+    );
+    expect(filterBullet).toContain(
+      "A chart copied from the page keeps its own filters.",
+    );
+    expect(filterBullet).toContain(
+      'A ranking or top-N is still a total, so each total keeps the "Unassigned" and "Out of <state>" rows, as the SQL rules say.',
+    );
+    expect(filterBullet).not.toMatch(/covid|2022/i);
+  });
+
+  it.each([
+    "data-agent-v1",
+    "data-agent-v2",
+    "data-agent-v3",
+    "data-agent-v4",
+    "data-agent-v5",
+  ] as const)("leaves the dashboard rules out of %s", (promptId) => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-18",
+      promptId,
+    });
+
+    expect(prompt).not.toContain("DASHBOARD BLOCKS");
+    expect(prompt).not.toContain("add_dashboard_block");
+  });
+
+  it("lists v6's datasets and code lists exactly as v5 does", () => {
+    const datasetsOf = (promptId: "data-agent-v5" | "data-agent-v6") => {
+      const prompt = buildDataAgentSystemPrompt({
+        datasets: CODED_DATASETS,
+        today: "2026-11-18",
+        promptId,
+      });
+      return prompt.slice(prompt.indexOf("\n\nDATASETS\n"));
+    };
+
+    expect(datasetsOf("data-agent-v6")).toContain("GENDER: codes 1=Male");
+    expect(datasetsOf("data-agent-v6")).toBe(datasetsOf("data-agent-v5"));
   });
 });
 

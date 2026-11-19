@@ -38,8 +38,15 @@ function useResultTitle(result: AgentQueryResultData): string {
   return title === "" ? i18n._(AGENT_QUERY_RESULT_DEFINITION.label) : title;
 }
 
-/** The card's body: the chart once the result is in, else its state. */
-function ResultCardBody({ view }: { view: AgentQueryResultView }): ReactNode {
+/**
+ * A result card's body: the chart once the result is in, else its state.
+ * Shared with the dashboard card, which previews a chart the same way.
+ */
+export function AgentQueryResultBody({
+  view,
+}: {
+  view: AgentQueryResultView;
+}): ReactNode {
   const { t } = useLingui();
   if (view.status === "loading") {
     return <Skeleton h="100%" data-testid="agent-query-result-skeleton" />;
@@ -86,7 +93,7 @@ function ResultCard({ result }: { result: AgentQueryResultData }): ReactNode {
         menu={undefined}
       />
       <div className={classes.body}>
-        <ResultCardBody view={view} />
+        <AgentQueryResultBody view={view} />
       </div>
     </div>
   );

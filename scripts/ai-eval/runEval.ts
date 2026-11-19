@@ -13,9 +13,14 @@
  * `--questions M` runs the mention questions (gadgets the user mentions or
  * attaches). `--questions R` runs the fitRegression question, which calls the
  * epidemiology plugin's tool on a result the Data Explorer shows.
+ * `--questions D` runs the dashboard questions (adding a block).
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
+ *
+ * `--page data-explorer` (pi and pi-local) sends every question that sets no
+ * page the Data Explorer page block the app always sends. Without it a
+ * question that sets no page is sent no page block.
  *
  * `--workspace measles` asks the coded-column questions (D) over the
  * measles line list with its code lists attached, on the `pi` and
@@ -44,6 +49,7 @@ import {
 import { selectEvalQuestions } from "./selectEvalQuestions";
 import type { EvalQuestion } from "./EvalQuestion";
 import type { EvalHarness } from "./harnesses/EvalHarness";
+import type { PiEvalDefaultPage } from "./harnesses/pi/piEvalConfigs";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
 import type { GradedAnswer } from "./runtime/gradeEvalAnswer";
 
@@ -127,6 +133,7 @@ function _parseOptions() {
       concurrency: { type: "string", default: "4" },
       label: { type: "string", default: "" },
       workspace: { type: "string", default: "covid" },
+      page: { type: "string", default: "" },
     },
   });
   return values;
@@ -184,12 +191,24 @@ function _selectQuestions(
     : workspaceQuestions;
 }
 
+/** Looks up a `--page` name. Throws on a name it does not know. */
+function _getDefaultPage(name: string): PiEvalDefaultPage | undefined {
+  if (name === "") {
+    return undefined;
+  }
+  if (name !== "data-explorer") {
+    throw new Error(`Unknown page "${name}": use "data-explorer"`);
+  }
+  return name;
+}
+
 async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
   workspace: EvalWorkspace,
   database: EvalDatabase,
 ): Promise<EvalHarness> {
   const { datasets } = workspace;
+  const defaultPage = _getDefaultPage(options.page);
   if (options.harness === "pi-local") {
     return createPiLocalHarness({
       repoRoot: REPO_ROOT,
@@ -197,6 +216,7 @@ async function _createHarness(
       configName: options.config || "default",
       model: options.model,
       datasets,
+      defaultPage,
     });
   }
   const openRouterApiKey = readOpenRouterApiKey(REPO_ROOT);
@@ -207,7 +227,11 @@ async function _createHarness(
       configName: options.config || "default",
       model: options.model,
       datasets,
+      defaultPage,
     });
+  }
+  if (defaultPage) {
+    throw new Error("--page runs on the pi and pi-local harnesses only");
   }
   if (datasets) {
     throw new Error(

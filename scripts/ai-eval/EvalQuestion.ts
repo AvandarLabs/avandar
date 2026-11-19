@@ -1,5 +1,9 @@
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
-import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type {
+  AgentPageContext,
+  AgentPageTile,
+} from "$/agent/pageContext/AgentPageContext";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { Verdict } from "./grading/ResultMatchers";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
 
@@ -14,6 +18,24 @@ export type SimulatedUserScript = {
   say?: string;
   /** The stored values the user means, for a value lookup card. */
   pick?: readonly string[];
+};
+
+/** A dashboard in the workspace, as a dashboard question's fixture. */
+export type EvalDashboard = {
+  id: string;
+  name: string;
+  /** Whether the user may edit it. Only editable dashboards can be targets. */
+  canEdit: boolean;
+  tiles: readonly AgentPageTile[];
+};
+
+/** The one block a dashboard question's answer must add. */
+export type ExpectedDashboardWrite = {
+  dashboardId: string;
+  via: "editor" | "card";
+  kind: ChatGeneratedDashboardBlock["kind"];
+  /** Checks the block's own fields, such as a heading's text. */
+  checkBlock?: (block: ChatGeneratedDashboardBlock) => Verdict;
 };
 
 /** What a grader sees: the model's final result and the truth results. */
@@ -34,7 +56,8 @@ export type EvalQuestion = {
     | "page_context"
     | "mentions"
     | "schema"
-    | "coded";
+    | "coded"
+    | "dashboards";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -101,4 +124,22 @@ export type EvalQuestion = {
     yColumn: string;
     slope: number;
   };
+  /**
+   * The workspace's dashboards. Set on dashboard questions, whose answer may
+   * add a block to one of them.
+   */
+  dashboards?: readonly EvalDashboard[];
+  /** The dashboard open in the editor when the user asks, if any. */
+  openEditorDashboardId?: string;
+  /**
+   * How the simulated user answers a dashboard card: confirm (the default)
+   * or cancel, and which dashboard to pick when several match.
+   */
+  card?: { action: "confirm" | "cancel"; pickDashboardId?: string };
+  /**
+   * The one block the answer must add, or `none` when it must add none.
+   * With `none`, `grade` or `gradeText` then grades the reply as usual. A
+   * DataViz write is graded by `grade` on the block's own result.
+   */
+  expectedWrite?: ExpectedDashboardWrite | "none";
 };

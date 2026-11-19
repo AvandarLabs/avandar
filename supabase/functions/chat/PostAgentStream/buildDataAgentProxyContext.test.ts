@@ -2,6 +2,7 @@ import { buildDataAgentProxyContext } from "@sbfn/chat/PostAgentStream/buildData
 import { describe, expect, it } from "vitest";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 import { DATA_AGENT_TOOLS } from "$/agent/dataAgent/dataAgentTools.ts";
+import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types.ts";
 
 const DATASETS = [
@@ -225,5 +226,92 @@ describe("buildDataAgentProxyContext", () => {
       }),
       "fitRegression",
     ]);
+  });
+
+  it.each([
+    "data-agent-v1",
+    "data-agent-v2",
+    "data-agent-v3",
+    "data-agent-v4",
+    "data-agent-v5",
+  ] as const)("never offers add_dashboard_block to %s", (promptId) => {
+    const context = buildDataAgentProxyContext({
+      clientMessages: [],
+      datasets: [],
+      today: "2026-11-18",
+      promptId,
+      pluginTools: [EPIDEMIOLOGY_TOOL],
+    });
+
+    expect(
+      context.tools?.map((tool) => {
+        return tool.name;
+      }),
+    ).not.toContain("add_dashboard_block");
+  });
+
+  it("offers v6 the built-in tools, add_dashboard_block, then plugin tools", () => {
+    const context = buildDataAgentProxyContext({
+      clientMessages: [],
+      datasets: [],
+      today: "2026-11-18",
+      promptId: "data-agent-v6",
+      pluginTools: [EPIDEMIOLOGY_TOOL],
+    });
+
+    expect(
+      context.tools?.map((tool) => {
+        return tool.name;
+      }),
+    ).toEqual([
+      ...DATA_AGENT_TOOLS.map((tool) => {
+        return tool.name;
+      }),
+      "add_dashboard_block",
+      "fitRegression",
+    ]);
+  });
+
+  describe("an add_dashboard_block call in the history", () => {
+    const messages = [
+      { role: "user", content: "add a heading", timestamp: 1 },
+      {
+        role: "assistant",
+        content: [
+          {
+            type: "toolCall",
+            id: "call-1",
+            name: "add_dashboard_block",
+            arguments: {},
+          },
+        ],
+        timestamp: 2,
+      },
+    ];
+    const build = (promptId: DataAgentPromptId) => {
+      return () => {
+        return buildDataAgentProxyContext({
+          clientMessages: messages,
+          datasets: [],
+          today: "2026-11-18",
+          promptId,
+          pluginTools: [],
+        });
+      };
+    };
+
+    it.each([
+      "data-agent-v1",
+      "data-agent-v2",
+      "data-agent-v3",
+      "data-agent-v4",
+      "data-agent-v5",
+    ] as const)("is refused on %s", (promptId) => {
+      expect(build(promptId)).toThrow(/no tool "add_dashboard_block"/);
+    });
+
+    it("is accepted on v6", () => {
+      expect(build("data-agent-v6")).not.toThrow();
+    });
   });
 });

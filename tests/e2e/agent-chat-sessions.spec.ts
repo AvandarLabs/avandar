@@ -59,7 +59,7 @@ test.describe("agent chat sessions", () => {
       window.localStorage.setItem("avandar:data-agent", "on");
     });
     await page.route(
-      "**/functions/v1/chat/*/agent/data-agent-v5/api/stream",
+      "**/functions/v1/chat/*/agent/data-agent-v6/api/stream",
       async (route) => {
         await route.fulfill({
           contentType: "text/event-stream",

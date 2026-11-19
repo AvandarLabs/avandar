@@ -702,6 +702,39 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   refused, and names show placeholders unescaped. Replies still show
   `<value N>`: mapping them back for the user needs the recap redacted
   first.
+- **Updated 2026-11-18: replies show real values.** A hosted reply now
+  shows the user real values on their device. The chat stores the text the
+  user reads and keeps the model's own text, with its placeholders, in the
+  message's `metadata.custom` (`shared/agent/HostedAnswerText`). Every later
+  hosted request reads the model's text: the recap after a reload or
+  session switch, today's chat, and the chat title excerpt. This holds even
+  when a reload has lost the vault that knew the value. The same unmasking
+  applies to a query's summary, a question card's text, and the labels of a
+  question card's options. An option's value stays a placeholder, since the
+  option the user picks is posted back to the model as their next message
+  with no consent check, so that message reads `<value N>` in the thread.
+  The dashboard card carries no summary: the reply above it is the
+  summary. Device turns are unchanged.
+- **Updated 2026-11-18: an earlier chat's placeholders mean nothing in a
+  new one.** A placeholder's number means a value only inside the vault that
+  issued it, and each new conversation (a reload, or a switch to another
+  session and back) starts a new vault that numbers its own values from
+  `<value 1>`. The recap of the thread kept the old numbers, so a model that
+  repeated "`<value 1>` had 2 visits" could be shown the new vault's
+  `<value 1>`: another person's name. The recap, and the message being
+  answered, now read every placeholder in the thread's own text as
+  `[earlier value]`, a text no vault issues or unmasks
+  (`hideEarlierPlaceholders`, in `askConversationDataAgent`). The names and
+  values the new vault masks afterwards stay as they are. Nothing stored
+  changes: the thread keeps the model's text with its placeholders. The
+  other design, starting the new vault's numbers above the highest one in
+  the thread, was not taken. It would change how the vault numbers,
+  restores, and checks placeholders, depend on scanning every stored message
+  for numbers, and still show the model old placeholders it would try to
+  reuse in SQL. The cost of the chosen one: the model cannot tell that an
+  `[earlier value]` is the page's `<value 1>` again, even when the same
+  page shows the same person. The chat title request reads the model's text
+  as it is, since a title is never unmasked.
 - **Costs.** About 120 to 170 more input tokens per call for the prompt
   rules.
   Columns outside the page's datasets count as personal, and DuckDB-only
@@ -796,3 +829,52 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   expanded (tab switches would jump).
 - **Left out.** Database history, plan limits, and moving case management
   onto the agent.
+
+## D44. Dashboard blocks from any page, online and offline (approved)
+
+- **Decision (Pablo, 2026-11-11).** The agent gets `add_dashboard_block`
+  under prompt `data-agent-v6`, with today's ten block kinds. On the
+  dashboard open in the editor the block is added unsaved, as today's chat
+  does. On any other dashboard a card in the chat shows the block and the
+  target, and only Confirm saves it. The tool names the dashboard as the
+  model saw it, or `"current"`, and the browser resolves the name against
+  the page, mentions, the tray, and the workspace's editable dashboards.
+  Several matches put a picker on the card. The offline agent gets the
+  same tool and card and answers on every page. Spec:
+  [phase-1d.md](specs/phase-1d.md).
+- **Why.** Dashboards are the last thing today's chat does that the agent
+  cannot (D33). A saved change to a dashboard the user is not looking at
+  follows D33's rule of a confirm card first, while the open editor's
+  Save already confirms. Resolving names on the device needs no extra
+  tool or model call, and the model never sees the workspace's dashboard
+  list. Offline ships too because nothing in it needs a connection except
+  the save itself (Pablo: offline is left out only when it cannot be built
+  without one).
+- **Tools per version.** v1 to v5 keep their three built-in tools
+  unchanged. v6 is the first version whose built-in tool list differs, so
+  the proxy and the browser read `DATA_AGENT_TOOLS_BY_PROMPT_ID`, and the
+  proxy adds plugin tools after them for v4 to v6.
+- **Renumbered on rebase (2026-11-18).** Approved as `data-agent-v4`,
+  built on v3. `demo/measles` shipped v4 (plugin tools) and v5 (coded
+  columns) first, so the dashboard prompt is `data-agent-v6`, v5's
+  instructions plus the dashboard rules. v4 and v5 stay as they shipped.
+- **Revised after a review against the code (2026-11-11).** The editor
+  saves without checking for changes made elsewhere, so Confirm on a
+  dashboard open in the editor adds the block there, unsaved, instead of
+  writing a row the editor's next Save would overwrite. Confirm prepares
+  column bindings as the editor's Save does. Edit rights are checked only
+  for dashboards whose name matches. The card's status lives in a
+  per-session store beside the tray, because a message part cannot change
+  after its turn and the thread record is rewritten at the end of every
+  run. Offline routing reads only the user's message, and offline blocks
+  keep SQL for at most three tiles to fit the offline model's window.
+- **Alternatives.** Saving at once with Undo in the chat (breaks D33's
+  confirm-first rule). Only the open dashboard (misses "from anywhere").
+  A separate `find_dashboard` tool (a model call more per request). Listing
+  every dashboard in each turn (tokens on every turn, and names unrelated
+  to the question). Fewer block kinds (a regression from today's chat).
+  Offline left for later (Pablo reversed it).
+- **Left out.** Try again, question-card parity, and
+  `dashboard.block_added_via_chat` (1E, D40). Editing, moving, removing,
+  and creating dashboards (Phase 3.1). Confirmation for other tools
+  (roadmap 2.3).

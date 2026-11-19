@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:agent-dashboards-d04c",
+  "questionCount": 9,
+  "passCount": 9,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 10,
+  "promptTokens": 58501,
+  "cachedPromptTokens": 56568,
+  "completionTokens": 2927,
+  "totalCost": 0.0022698550000000003,
+  "costPerQuestion": 0.00025220611111111113,
+  "latencyMedianMs": 1933.553542,
+  "latencyP90Ms": 2550.597041,
+  "failedIds": []
+}
