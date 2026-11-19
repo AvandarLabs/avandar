@@ -283,10 +283,12 @@ function registerRawTextLoader(builder) {
       errors: resolved.errors,
     };
   });
-  builder.onLoad({ filter: /.*/, namespace: "raw" }, async (args) => ({
-    contents: await fs.readFile(args.path, "utf8"),
-    loader: "text",
-  }));
+  builder.onLoad({ filter: /.*/, namespace: "raw" }, async (args) => {
+    return {
+      contents: await fs.readFile(args.path, "utf8"),
+      loader: "text",
+    };
+  });
 }
 
 function createSourcePlugin(aliases, outputDirectory, onBuilt) {

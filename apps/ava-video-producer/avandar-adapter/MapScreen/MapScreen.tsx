@@ -124,10 +124,11 @@ export function MapScreen({
       }
       continueRender(frameHandle);
     };
-    const onError = (event: MapLibreErrorEvent) =>
+    const onError = (event: MapLibreErrorEvent) => {
       cancelRender(
         new Error(event.error.message || "Native map failed to render"),
       );
+    };
     map.once("idle", complete);
     map.on("error", onError);
     map.resize();
