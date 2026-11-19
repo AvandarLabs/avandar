@@ -5,15 +5,10 @@ import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
-/**
- * A shot recoloured by its own theme tokens halfway through: a dark shot
- * from the video theme's colour roles, then a light one from its slate
- * swatches. The shot draws the colours `createThemeStyleFromTheme` sets as
- * its custom properties.
- */
-export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
+/** The dark shot theme from colour roles, then the light one from swatches. */
+function useDemoShotThemes() {
   const { semantic, atomic, mantine } = useVideoTheme();
-  const themes = [
+  return [
     {
       background: semantic.color.ground,
       foreground: semantic.color.text,
@@ -27,6 +22,16 @@ export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
       card: mantine.white,
     },
   ];
+}
+
+/**
+ * A shot recoloured by its own theme tokens halfway through: a dark shot
+ * from the video theme's colour roles, then a light one from its slate
+ * swatches. The shot draws the colours `createThemeStyleFromTheme` sets as
+ * its custom properties.
+ */
+export function ThemeStyleDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const themes = useDemoShotThemes();
   const shotTheme = themes[frame < 45 ? 0 : 1];
   const style = createThemeStyleFromTheme(shotTheme);
   return (

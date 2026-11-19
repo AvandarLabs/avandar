@@ -19,6 +19,15 @@ const EDGES = [
   ["chart", "share"],
 ] as const;
 
+const NODE_LABELS: Readonly<Record<string, string>> = {
+  source: "Source",
+  join: "Join",
+  filter: "Filter",
+  model: "Model",
+  chart: "Chart",
+  share: "Share",
+};
+
 /** One labelled node of the preview diagram. */
 function DiagramNode({
   x,
@@ -66,14 +75,6 @@ export function DemoDiagram(): ReactNode {
   const { stroke, sketch } = useVideoTheme().semantic;
   const scales = useVideoShapeScales();
   const colors = useDemoColors();
-  const labels: Record<string, string> = {
-    source: "Source",
-    join: "Join",
-    filter: "Filter",
-    model: "Model",
-    chart: "Chart",
-    share: "Share",
-  };
   return (
     <g>
       <rect width={960} height={600} fill={colors.ground} />
@@ -102,7 +103,7 @@ export function DemoDiagram(): ReactNode {
             key={node.id}
             x={node.x}
             y={node.y}
-            label={labels[node.id]}
+            label={NODE_LABELS[node.id]}
           />
         );
       })}

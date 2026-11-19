@@ -29,6 +29,35 @@ function _frames(motion: VideoMotion, name: DemoDurationName): number {
   return name === "press" ? motion.press.duration : motion[name];
 }
 
+/** One duration step's name and its track on the timeline. */
+function DurationRow({
+  name,
+  isActive,
+  elapsed,
+}: {
+  name: DemoDurationName;
+  isActive: boolean;
+  elapsed: number;
+}): ReactNode {
+  const motion = useVideoMotion();
+  const nameFrames = _frames(motion, name);
+  return (
+    <div className={css.timelineRow}>
+      <span
+        className={clsx(css.timelineName, isActive && css.timelineNameActive)}
+      >
+        {`DUR.${name} ${formatReadout(nameFrames, 1)}f`}
+      </span>
+      <TimelineTrack
+        startFrame={0}
+        frames={nameFrames}
+        elapsed={elapsed}
+        isActive={isActive}
+      />
+    </div>
+  );
+}
+
 /**
  * Every `DUR` step on one timeline at the video theme's lengths and tempo,
  * shortest first, with `token` highlighted.
@@ -56,24 +85,13 @@ export function createDurationDemo(
       >
         <div className={css.timeline}>
           {order.map((name) => {
-            const nameFrames = _frames(motion, name);
             return (
-              <div key={name} className={css.timelineRow}>
-                <span
-                  className={clsx(
-                    css.timelineName,
-                    name === token && css.timelineNameActive,
-                  )}
-                >
-                  {`DUR.${name} ${formatReadout(nameFrames, 1)}f`}
-                </span>
-                <TimelineTrack
-                  startFrame={0}
-                  frames={nameFrames}
-                  elapsed={elapsed}
-                  isActive={name === token}
-                />
-              </div>
+              <DurationRow
+                key={name}
+                name={name}
+                isActive={name === token}
+                elapsed={elapsed}
+              />
             );
           })}
           <Ruler />

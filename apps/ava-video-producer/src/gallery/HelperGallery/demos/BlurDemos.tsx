@@ -93,6 +93,36 @@ const PRESETS = ["gentle", "brisk", "whip"] as const;
 const MOVE = { at: 15, frames: 24, distance: 700 };
 
 /** Velocity blur for the same move under three motion presets. */
+/** One rail per preset, each block blurred by that preset. */
+function VelocityBlurRails({
+  x,
+  getBlur,
+}: {
+  x: number;
+  getBlur: (preset: (typeof PRESETS)[number]) => number;
+}) {
+  return (
+    <div className={css.timeline}>
+      {PRESETS.map((preset) => {
+        return (
+          <div key={preset} className={css.timelineRow}>
+            <span className={css.timelineName}>{preset}</span>
+            <div className={css.rail}>
+              <span
+                className={css.railBlock}
+                style={{
+                  left: x * 0.85,
+                  filter: `blur(${getBlur(preset).toFixed(2)}px)`,
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function VelocityBlurDemo({
   frame,
   frames,
@@ -127,24 +157,7 @@ export function VelocityBlurDemo({
         }),
       ]}
     >
-      <div className={css.timeline}>
-        {PRESETS.map((preset) => {
-          return (
-            <div key={preset} className={css.timelineRow}>
-              <span className={css.timelineName}>{preset}</span>
-              <div className={css.rail}>
-                <span
-                  className={css.railBlock}
-                  style={{
-                    left: x * 0.85,
-                    filter: `blur(${blur(preset).toFixed(2)}px)`,
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <VelocityBlurRails x={x} getBlur={blur} />
     </HelperDemoFrame>
   );
 }

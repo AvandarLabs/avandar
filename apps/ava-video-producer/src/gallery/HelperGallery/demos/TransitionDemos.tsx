@@ -124,6 +124,37 @@ const SCENE_KINDS: SceneTransitionKind[] = [
 ];
 const STAGE = { width: 160, height: 110 };
 
+/** One mini stage: shot A leaving and shot B entering by `kind`. */
+function SceneTransitionStage({
+  kind,
+  progress,
+}: {
+  kind: (typeof SCENE_KINDS)[number];
+  progress: number;
+}) {
+  const settingsTheme = useMotionSettingsTheme();
+  const props = { kind, ...STAGE };
+  return (
+    <div className={css.miniStage}>
+      <div className={clsx(css.miniFrame, css.miniFrameScene)}>
+        <div
+          className={clsx(css.shot, css.shotA)}
+          style={getSceneTransitionStyle(progress, false, props, settingsTheme)}
+        >
+          A
+        </div>
+        <div
+          className={clsx(css.shot, css.shotB)}
+          style={getSceneTransitionStyle(progress, true, props, settingsTheme)}
+        >
+          B
+        </div>
+      </div>
+      <span className={css.caption}>{kind}</span>
+    </div>
+  );
+}
+
 /** The scene transition kinds at the same progress, side by side. */
 export function SceneTransitionDemo({
   frame,
@@ -150,35 +181,8 @@ export function SceneTransitionDemo({
     >
       <div className={clsx(css.miniStages, css.fiveUp)}>
         {SCENE_KINDS.map((kind) => {
-          const props = { kind, ...STAGE };
           return (
-            <div key={kind} className={css.miniStage}>
-              <div className={clsx(css.miniFrame, css.miniFrameScene)}>
-                <div
-                  className={clsx(css.shot, css.shotA)}
-                  style={getSceneTransitionStyle(
-                    progress,
-                    false,
-                    props,
-                    settingsTheme,
-                  )}
-                >
-                  A
-                </div>
-                <div
-                  className={clsx(css.shot, css.shotB)}
-                  style={getSceneTransitionStyle(
-                    progress,
-                    true,
-                    props,
-                    settingsTheme,
-                  )}
-                >
-                  B
-                </div>
-              </div>
-              <span className={css.caption}>{kind}</span>
-            </div>
+            <SceneTransitionStage key={kind} kind={kind} progress={progress} />
           );
         })}
       </div>

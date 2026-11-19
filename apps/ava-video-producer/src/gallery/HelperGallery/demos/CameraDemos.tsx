@@ -43,10 +43,34 @@ function _getViewBox(pose: { x: number; y: number; zoom: number }): string {
 }
 
 /** An overview with the camera's viewport beside what the camera sees. */
-export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const settingsTheme = useMotionSettingsTheme();
+/** The whole diagram with the camera's viewport outlined on it. */
+function CameraOverview({
+  pose,
+}: {
+  pose: { x: number; y: number; zoom: number };
+}) {
   const scales = useVideoShapeScales();
   const { highlight } = useDemoColors();
+  const viewWidth = 960 / pose.zoom;
+  const viewHeight = 600 / pose.zoom;
+  return (
+    <svg viewBox="0 0 960 600" width={320} height={200} aria-hidden="true">
+      <DemoDiagram />
+      <StockRect
+        x={pose.x - viewWidth / 2}
+        y={pose.y - viewHeight / 2}
+        width={viewWidth}
+        height={viewHeight}
+        fill="none"
+        stroke={highlight}
+        strokeWidth={scales.stroke(VIEWPORT_STROKE)}
+      />
+    </svg>
+  );
+}
+
+export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const settingsTheme = useMotionSettingsTheme();
   const pose = getCameraPose(
     TRACK,
     frame,
@@ -55,8 +79,6 @@ export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
     undefined,
     settingsTheme,
   );
-  const viewWidth = 960 / pose.zoom;
-  const viewHeight = 600 / pose.zoom;
   return (
     <HelperDemoFrame
       frame={frame}
@@ -73,18 +95,7 @@ export function CameraTrackDemo({ frame, frames }: HelperDemoProps): ReactNode {
       ]}
     >
       <div className={css.row}>
-        <svg viewBox="0 0 960 600" width={320} height={200} aria-hidden="true">
-          <DemoDiagram />
-          <StockRect
-            x={pose.x - viewWidth / 2}
-            y={pose.y - viewHeight / 2}
-            width={viewWidth}
-            height={viewHeight}
-            fill="none"
-            stroke={highlight}
-            strokeWidth={scales.stroke(VIEWPORT_STROKE)}
-          />
-        </svg>
+        <CameraOverview pose={pose} />
         <svg
           viewBox={_getViewBox(pose)}
           width={540}

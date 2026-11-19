@@ -139,6 +139,40 @@ const CTA = { atFrame: 10, command: COMMAND };
 const CPS = 30;
 
 /** Subtitle, URL, typed command and badge arriving on their computed beats. */
+/** The CTA's subtitle, URL, typed command, and badge on their beats. */
+function CtaBeatLines({
+  frame,
+  beats,
+  cps,
+}: {
+  frame: number;
+  beats: ReturnType<typeof getCtaBeats>;
+  cps: number;
+}) {
+  const motion = useVideoMotion();
+  const reveal = (at: number) => {
+    return getLineRevealStyle(frame, at, "line-fade", {}, motion);
+  };
+  return (
+    <div className={css.lines}>
+      <p className={css.kicker} style={reveal(beats.subtitleAt)}>
+        Every helper, previewed live.
+      </p>
+      <p className={css.headline} style={reveal(beats.urlAt)}>
+        localhost:4173/motion.html
+      </p>
+      <div className={css.terminal} style={reveal(beats.promptAt)}>
+        <span className={css.prompt}>$ </span>
+        {typed(frame, beats.typingAt, COMMAND, cps)}
+        <span style={{ opacity: motion.caretOn(frame) ? 1 : 0 }}>▍</span>
+      </div>
+      <span className={css.badge} style={motion.enter(frame, beats.badgeAt)}>
+        Live previews
+      </span>
+    </div>
+  );
+}
+
 export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
   const cps = CPS * motion.tempo;
@@ -155,49 +189,7 @@ export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
         { name: "badgeAt", value: `${beats.badgeAt}f` },
       ]}
     >
-      <div className={css.lines}>
-        <p
-          className={css.kicker}
-          style={getLineRevealStyle(
-            frame,
-            beats.subtitleAt,
-            "line-fade",
-            {},
-            motion,
-          )}
-        >
-          Every helper, previewed live.
-        </p>
-        <p
-          className={css.headline}
-          style={getLineRevealStyle(
-            frame,
-            beats.urlAt,
-            "line-fade",
-            {},
-            motion,
-          )}
-        >
-          localhost:4173/motion.html
-        </p>
-        <div
-          className={css.terminal}
-          style={getLineRevealStyle(
-            frame,
-            beats.promptAt,
-            "line-fade",
-            {},
-            motion,
-          )}
-        >
-          <span className={css.prompt}>$ </span>
-          {typed(frame, beats.typingAt, COMMAND, cps)}
-          <span style={{ opacity: motion.caretOn(frame) ? 1 : 0 }}>▍</span>
-        </div>
-        <span className={css.badge} style={motion.enter(frame, beats.badgeAt)}>
-          Live previews
-        </span>
-      </div>
+      <CtaBeatLines frame={frame} beats={beats} cps={cps} />
     </HelperDemoFrame>
   );
 }

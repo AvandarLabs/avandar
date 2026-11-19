@@ -24,6 +24,7 @@ import type {
   CursorMotion,
   CursorTarget,
 } from "../../../cursor-motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
@@ -141,6 +142,15 @@ const PRESS_PATH: CursorKey[] = [
 ];
 const PRESS_CLICKS = [35, 62];
 
+/** The deepest press of any click in progress on this frame. */
+function _getPressScale(frame: number, motion: VideoMotion): number {
+  return Math.min(
+    ...PRESS_CLICKS.map((at) => {
+      return motion.press(frame, at);
+    }),
+  );
+}
+
 /** A button held down while `downAt()` is true, the pointer dipping with it. */
 export function ClickFeedbackDemo({
   frame,
@@ -172,11 +182,7 @@ export function ClickFeedbackDemo({
         className={clsx(css.button, css.absolute, css.pressTarget)}
         style={{
           background: fill,
-          transform: `scale(${Math.min(
-            ...PRESS_CLICKS.map((at) => {
-              return motion.press(frame, at);
-            }),
-          )})`,
+          transform: `scale(${_getPressScale(frame, motion)})`,
         }}
       >
         Run query
@@ -202,13 +208,39 @@ const FAST_PATH: CursorKey[] = [
 const SAMPLE_NAMES = ["far", "middle", "near"] as const;
 /** How much the shutter samples are enlarged in the inset. */
 const INSET_SCALE = 12;
+/** The shutter samples relative to the pointer, enlarged. */
+function ShutterInset({
+  samples,
+}: {
+  samples: ReturnType<typeof cursorShutter>;
+}) {
+  const { atomic } = useVideoTheme();
+  return (
+    <div className={css.inset}>
+      {samples.map((sample, index) => {
+        return (
+          <span
+            key={SAMPLE_NAMES[index]}
+            className={css.insetSample}
+            style={{
+              transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
+              opacity: sample.opacity > 0 ? atomic.opacity["60"] : 0,
+            }}
+          />
+        );
+      })}
+      <span className={css.insetCenter} />
+      <span className={css.insetLabel}>{`× ${INSET_SCALE}`}</span>
+    </div>
+  );
+}
+
 /** A fast pointer with its trailing shutter samples drawn enlarged. */
 export function CursorShutterDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
-  const { atomic } = useVideoTheme();
   const samples = cursorShutter(frame, FAST_PATH, useCursorMotion());
   return (
     <HelperDemoFrame
@@ -222,22 +254,7 @@ export function CursorShutterDemo({
         };
       })}
     >
-      <div className={css.inset}>
-        {samples.map((sample, index) => {
-          return (
-            <span
-              key={SAMPLE_NAMES[index]}
-              className={css.insetSample}
-              style={{
-                transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
-                opacity: sample.opacity > 0 ? atomic.opacity["60"] : 0,
-              }}
-            />
-          );
-        })}
-        <span className={css.insetCenter} />
-        <span className={css.insetLabel}>{`× ${INSET_SCALE}`}</span>
-      </div>
+      <ShutterInset samples={samples} />
       <Cursor frame={frame} path={FAST_PATH} />
       <span
         className={css.footnote}

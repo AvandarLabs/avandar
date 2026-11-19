@@ -68,17 +68,41 @@ const MIX_CUES = { on: 15, off: 50 };
  * A chip turning on and off through `mixToken()` rather than snapping,
  * between the theme's scene border and brand.
  */
+/** The mix in steps, with the step nearest `t` outlined. */
+function MixTokenSwatches({ t }: { t: number }) {
+  const tokens = useVideoTokens();
+  const scene = tokens.color.scene;
+  const scales = useVideoShapeScales();
+  const { highlight } = useDemoColors();
+  return (
+    <div className={css.swatchStrip}>
+      {SWATCH_STEPS.map((step) => {
+        return (
+          <span
+            key={step}
+            className={css.swatch}
+            style={{
+              background: mixToken(step, scene.border, scene.brand),
+              outline:
+                Math.abs(step - t) < 0.05
+                  ? `${scales.stroke(tokens.stroke.default)}px solid ${highlight}`
+                  : undefined,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export function MixTokenDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
   const scene = useVideoTokens().color.scene;
-  const scales = useVideoShapeScales();
-  const { highlight } = useDemoColors();
   const easing = motion.reveal.easing;
   const t =
     motion.ramp(frame, MIX_CUES.on, motion.chip, easing) *
     (1 - motion.ramp(frame, MIX_CUES.off, motion.chip, easing));
   const color = mixToken(t, scene.border, scene.brand);
-  const stroke = useVideoTokens().stroke.default;
   return (
     <HelperDemoFrame
       frame={frame}
@@ -94,23 +118,7 @@ export function MixTokenDemo({ frame, frames }: HelperDemoProps): ReactNode {
           <div className={css.chip} style={{ borderColor: color, color }}>
             Selected
           </div>
-          <div className={css.swatchStrip}>
-            {SWATCH_STEPS.map((step) => {
-              return (
-                <span
-                  key={step}
-                  className={css.swatch}
-                  style={{
-                    background: mixToken(step, scene.border, scene.brand),
-                    outline:
-                      Math.abs(step - t) < 0.05
-                        ? `${scales.stroke(stroke)}px solid ${highlight}`
-                        : undefined,
-                  }}
-                />
-              );
-            })}
-          </div>
+          <MixTokenSwatches t={t} />
         </div>
       </div>
     </HelperDemoFrame>

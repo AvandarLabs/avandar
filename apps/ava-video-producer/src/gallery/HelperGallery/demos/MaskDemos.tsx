@@ -157,6 +157,40 @@ const WIPES = [
   },
 ] as const;
 
+/** One mini stage: shot B wiping over shot A, captioned with its options. */
+function SteppedWipeStage({
+  wipe,
+  frame,
+  local,
+}: {
+  wipe: (typeof WIPES)[number];
+  frame: number;
+  local: number;
+}) {
+  const motion = useVideoMotion();
+  return (
+    <div className={css.miniStage}>
+      <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
+        <div className={`${css.shot} ${css.shotA}`}>A</div>
+        {frame >= WIPE_AT ? (
+          <div
+            className={`${css.shot} ${css.shotB}`}
+            style={getSteppedColumnWipeStyle(
+              local,
+              WIPE_FRAMES,
+              wipe.options,
+              motion,
+            )}
+          >
+            B
+          </div>
+        ) : null}
+      </div>
+      <span className={css.caption}>{wipe.code}</span>
+    </div>
+  );
+}
+
 /** The stepped column wipe revealing shot B over shot A. */
 export function SteppedColumnWipeDemo({
   frame,
@@ -183,25 +217,12 @@ export function SteppedColumnWipeDemo({
       <div className={`${css.miniStages} ${css.twoUp}`}>
         {WIPES.map((wipe) => {
           return (
-            <div key={wipe.code} className={css.miniStage}>
-              <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
-                <div className={`${css.shot} ${css.shotA}`}>A</div>
-                {frame >= WIPE_AT ? (
-                  <div
-                    className={`${css.shot} ${css.shotB}`}
-                    style={getSteppedColumnWipeStyle(
-                      local,
-                      WIPE_FRAMES,
-                      wipe.options,
-                      motion,
-                    )}
-                  >
-                    B
-                  </div>
-                ) : null}
-              </div>
-              <span className={css.caption}>{wipe.code}</span>
-            </div>
+            <SteppedWipeStage
+              key={wipe.code}
+              wipe={wipe}
+              frame={frame}
+              local={local}
+            />
           );
         })}
       </div>
