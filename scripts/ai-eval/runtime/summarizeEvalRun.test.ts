@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { summarizeEvalRun } from "./summarizeEvalRun";
 import type { GradedAnswer } from "./gradeEvalAnswer";
 
-function _graded(id: string, isRepeat?: boolean): GradedAnswer {
+function _createGradedAnswer(id: string, isRepeat?: boolean): GradedAnswer {
   return {
     id,
     category: "try_again",
@@ -35,9 +35,9 @@ function _graded(id: string, isRepeat?: boolean): GradedAnswer {
 describe("summarizeEvalRun", () => {
   it("counts the Try again answers that repeated their first attempt", () => {
     const summary = summarizeEvalRun("run", [
-      _graded("T01", true),
-      _graded("T02", false),
-      _graded("B01"),
+      _createGradedAnswer("T01", true),
+      _createGradedAnswer("T02", false),
+      _createGradedAnswer("B01"),
     ]);
 
     expect(summary.repeatCount).toBe(1);

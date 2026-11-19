@@ -255,7 +255,7 @@ describe("gradeEvalAnswer on a follow-up and a Try again", () => {
     rows: [["Ohio"]],
   };
 
-  function _queryQuestion(grade: EvalQuestion["grade"]): EvalQuestion {
+  function _createQueryQuestion(grade: EvalQuestion["grade"]): EvalQuestion {
     return {
       id: "T06",
       category: "try_again",
@@ -272,7 +272,7 @@ describe("gradeEvalAnswer on a follow-up and a Try again", () => {
     });
 
     gradeEvalAnswer(
-      _queryQuestion(grade),
+      _createQueryQuestion(grade),
       _createAnswer({ result: RESULT, error: undefined }),
       {},
       PARENT_RESULT,
@@ -298,6 +298,21 @@ describe("gradeEvalAnswer on a follow-up and a Try again", () => {
     );
 
     expect(graded.isRepeat).toBe(true);
+  });
+
+  it("marks a Try again whose second attempt differs as not a repeat", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I can't see that dashboard.",
+        firstAttempt: _createAnswer({
+          assistantText: "I am unable to see that chart.",
+        }),
+      }),
+      {},
+    );
+
+    expect(graded.isRepeat).toBe(false);
   });
 
   it("leaves isRepeat unset on an answer with no first attempt", () => {
