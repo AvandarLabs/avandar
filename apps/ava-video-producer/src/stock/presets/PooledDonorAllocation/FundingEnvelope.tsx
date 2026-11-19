@@ -7,8 +7,6 @@ import {
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
 
-/** The size of an envelope's ordinal and allocation total. */
-const ENVELOPE_NUMBER_SIZE = 14;
 type Props = {
   input: Input;
   index: number;
@@ -51,8 +49,8 @@ export function FundingEnvelope({
         x={x + 12}
         y={top + 27}
         fill={tokens.color.highlight}
-        fontSize={ENVELOPE_NUMBER_SIZE}
-        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.value.fontSize}
+        fontFamily={tokens.text.graphic.value.fontFamily}
       >
         {index + 1}
       </text>
@@ -73,8 +71,8 @@ export function FundingEnvelope({
           y={top + 27}
           textAnchor="end"
           fill={accent}
-          fontSize={ENVELOPE_NUMBER_SIZE}
-          fontFamily={tokens.text.graphic.data.fontFamily}
+          fontSize={tokens.text.graphic.value.fontSize}
+          fontFamily={tokens.text.graphic.value.fontFamily}
         >
           {allocatedCredits}
         </text>

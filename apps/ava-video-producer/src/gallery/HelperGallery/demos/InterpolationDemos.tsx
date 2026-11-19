@@ -1,4 +1,4 @@
-import { countTo, mix, mixToken } from "../../../motion";
+import { mix, mixToken } from "../../../motion";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
 import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
@@ -126,7 +126,7 @@ const COUNT_FRAMES = 30;
 /** A count rising to its final value instead of snapping to it. */
 export function CountToDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
-  const value = countTo(
+  const value = motion.count(
     frame,
     COUNT_AT,
     COUNT_TARGET,
@@ -136,7 +136,7 @@ export function CountToDemo({ frame, frames }: HelperDemoProps): ReactNode {
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`countTo(frame, ${COUNT_AT}, ${COUNT_TARGET}, ${COUNT_FRAMES})`}
+      label={`motion.count(frame, ${COUNT_AT}, ${COUNT_TARGET}, ${COUNT_FRAMES})`}
       readouts={[
         { name: "value", value: String(value) },
         { name: "progress", value: formatReadout(value / COUNT_TARGET) },

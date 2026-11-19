@@ -1,4 +1,3 @@
-import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
@@ -27,11 +26,11 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
         (quantity, index) => {
           const countAt = 108 + index * motion.stagger.list;
-          const count = motion.ramp(
+          const count = motion.count(
             frame,
             countAt,
+            quantity,
             motion.scale(COUNT_FRAMES),
-            motion.entrance.easing,
           );
           return (
             <g
@@ -44,7 +43,7 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
               )}
             >
               <Text x={40 + index * 310} y={552} role="question">
-                {Math.round(mix(count, 0, quantity))}
+                {count}
               </Text>
             </g>
           );

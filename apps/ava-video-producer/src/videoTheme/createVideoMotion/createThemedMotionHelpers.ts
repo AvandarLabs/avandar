@@ -9,6 +9,7 @@ type TimedStep = Readonly<{ duration: number; easing: EasingFunction }>;
 type MotionDefaults = Readonly<{
   press: number;
   panel: number;
+  sheet: number;
   entrance: TimedStep & Readonly<{ distance: number }>;
   exit: TimedStep & Readonly<{ distance: number }>;
   emphasis: Readonly<{ duration: number; spring: SpringValue }>;
@@ -81,6 +82,12 @@ export type ThemedMotionHelpers = Readonly<{
     at: number,
     options?: ThemedEnterOptions,
   ) => CSSProperties;
+  /**
+   * A whole number counting up from 0 to `to` across `[at, at + duration]`,
+   * on the entrance curve. Defaults to the sheet duration, so `classic`
+   * counts like `motion.ts`'s `countTo`. Pass a tempo-scaled duration.
+   */
+  count: (frame: number, at: number, to: number, duration?: number) => number;
   /** A spring landing, 0 to 1, on the emphasis step. */
   pop: (frame: number, at: number, duration?: number) => number;
   /**
@@ -220,6 +227,11 @@ export function createThemedMotionHelpers(
     },
     leave: (frame, at, options = {}) => {
       return _leave(frame, at, defaults, options);
+    },
+    count: (frame, at, to, duration = defaults.sheet) => {
+      return Math.round(
+        mix(ramp(frame, at, duration, defaults.entrance.easing), 0, to),
+      );
     },
     pop: (frame, at, duration = defaults.emphasis.duration) => {
       return pop(frame, at, defaults.emphasis.spring, duration);

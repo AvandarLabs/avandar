@@ -6,8 +6,6 @@ import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
 
-/** The size of each destination's travel cost. */
-const COST_SIZE = 14;
 type Props = { input: Input; frame: number; accent: string };
 /** Stable destination identities tie map markers to their cost ledger. */
 export function NetworkDestinations({
@@ -35,7 +33,7 @@ export function NetworkDestinations({
             <Text
               x={540}
               y={156 + index * 54}
-              size={COST_SIZE}
+              role="value"
               fill={
                 node.cost <= input.budgetMinutes
                   ? accent

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   caretOn,
+  countTo,
   DUR,
   EASE,
   enter,
@@ -149,4 +150,18 @@ test("each entrance style animates only what it names", () => {
     [undefined, 1],
   );
   assert.match(String(styleAt("scale").transform), /scale\(0\.9\d+\)/);
+});
+
+test("classic's themed count draws what countTo draws, and tempo stretches it", () => {
+  const classic = _motionAtTempo(1);
+  const slow = _motionAtTempo(0.8);
+  [0, 10, 20, 30, 40].forEach((frame) => {
+    assert.equal(classic.count(frame, 10, 1280), countTo(frame, 10, 1280));
+    assert.equal(
+      classic.count(frame, 10, 1280, 20),
+      countTo(frame, 10, 1280, 20),
+    );
+  });
+  assert.ok(slow.count(20, 10, 1280) < classic.count(20, 10, 1280));
+  assert.equal(slow.count(40, 10, 1280), 1280);
 });
