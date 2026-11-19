@@ -25,6 +25,8 @@ function _namesNearMatch(folded: string): boolean {
 function _saysNotStackable(folded: string): boolean {
   return (
     /not (?:directly )?(?:append|stack)/.test(folded) ||
+    /\bnot directly\b/.test(folded) ||
+    /(?<!\bno )renaming is (?:needed|required)/.test(folded) ||
     /can(?:not|'t| not) be (?:appended|stacked)/.test(folded) ||
     /(?:aren't|are not) the same/.test(folded) ||
     /columns differ/.test(folded) ||
@@ -32,7 +34,7 @@ function _saysNotStackable(folded: string): boolean {
     /(?:(?:would|will|do|does) not|wouldn't|won't|don't|doesn't) line up/.test(
       folded,
     ) ||
-    /rename/.test(folded)
+    /(?<!\b(?:nothing|no need) to )rename/.test(folded)
   );
 }
 
