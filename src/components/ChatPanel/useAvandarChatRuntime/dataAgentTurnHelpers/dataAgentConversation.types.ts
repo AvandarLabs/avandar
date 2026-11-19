@@ -137,7 +137,7 @@ export type AgentConversationState = {
   /**
    * The last query this turn showed, and where it went, for the turn's one
    * `chat.sql_generated`. Reset every turn, and cleared when a newer message
-   * stops the run.
+   * stops the run. A stopped turn never logs it, whatever this holds.
    */
   lastShownQuery?: { sql: string; app: AnalyticsApp | undefined };
 };
@@ -180,6 +180,13 @@ export type DataAgentConversation = AgentConversationState & {
   lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */
   activeAsk?: Promise<unknown>;
+  /**
+   * The last turn whose run a newer message stopped. Written by
+   * `askConversationDataAgent` when it stops a run, and read once that run
+   * settles, so the stopped turn logs no `chat.sql_generated` even when a
+   * tool still running shows a query after the stop.
+   */
+  stoppedTurn?: DataAgentTurnOptions;
   /**
    * The last ask that settled, to tell a Try again from a follow-up. Unset
    * until one does. In memory only, so a reload or a session switch forgets

@@ -73,9 +73,12 @@ async function _showQuestionCard(
  * Explorer, the turn's app otherwise. The SQL is already restored.
  */
 function _showQuery(
-  state: AgentConversationState,
-  request: Parameters<DataAgentHost["showQuery"]>[0],
+  options: Readonly<{
+    state: AgentConversationState;
+    request: Parameters<DataAgentHost["showQuery"]>[0];
+  }>,
 ): ReturnType<DataAgentHost["showQuery"]> {
+  const { state, request } = options;
   const turn = state.turnRef.current;
   const isOnExplorer = _isOnDataExplorer(turn);
   state.lastShownQuery = {
@@ -109,7 +112,7 @@ export function createConversationAgentHost(
     workspaceId: firstTurn.workspaceId,
     userId: firstTurn.currentUser?.id,
     showQuery: (request) => {
-      return _showQuery(state, request);
+      return _showQuery({ state, request });
     },
     checkQuery: (sql) => {
       return checkQueryOnDevice({

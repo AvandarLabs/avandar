@@ -247,13 +247,15 @@ function _dropOtherChats(
  * Stops a run still in progress (a message sent before the last reply
  * finished) and waits for it to settle, so its turn keeps its results and
  * the agent is free for the next message. The stopped run's shown query is
- * forgotten, so its turn logs no `chat.sql_generated`.
+ * forgotten and its turn is noted as stopped, so the turn logs no
+ * `chat.sql_generated`, even for a query a tool still running shows later.
  */
 async function _stopAsk(
   conversation: DataAgentConversation,
   activeAsk: Promise<unknown>,
 ): Promise<void> {
   conversation.lastShownQuery = undefined;
+  conversation.stoppedTurn = conversation.turnRef.current;
   conversation.dataAgent.agent.abort();
   await activeAsk.catch(() => {
     // The stopped turn reports its own failure.
@@ -599,17 +601,22 @@ async function _recordAsk<Reply>(
 
 /**
  * Logs one `chat.sql_generated` for a kept answer that showed a query, with
- * the last query it showed. An answer whose turn went stale, or is no longer
- * the conversation's current turn, logs nothing.
+ * the last query it showed. An answer whose turn went stale, was stopped by
+ * a newer message, or is no longer the conversation's current turn logs
+ * nothing.
  */
 function _logShownQuery(
-  conversation: DataAgentConversation,
-  turn: Readonly<DataAgentTurnOptions>,
+  options: Readonly<{
+    conversation: DataAgentConversation;
+    turn: Readonly<DataAgentTurnOptions>;
+  }>,
 ): void {
+  const { conversation, turn } = options;
   const shownQuery = conversation.lastShownQuery;
   if (
     shownQuery === undefined ||
     turn.isStale?.() ||
+    conversation.stoppedTurn === turn ||
     conversation.turnRef.current !== turn
   ) {
     return;
@@ -668,7 +675,7 @@ export async function askConversationDataAgent(
     },
   });
   _reportReplyIfKept(turn, inputs);
-  _logShownQuery(conversation, turn);
+  _logShownQuery({ conversation, turn });
   return _toRunResult({
     replyText: _replyTextOf(reply, turn),
     inputs,

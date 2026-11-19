@@ -1348,39 +1348,80 @@ describe("askConversationDataAgent", () => {
       expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
     });
 
-    it("logs only the newer turn's query when a newer message stops a run", async () => {
-      let finishFirstRun: (() => void) | undefined;
-      const conversation = _fakeConversation(async (text) => {
-        if (text === "First?") {
+    describe("when a newer message stops a run", () => {
+      /**
+       * Asks "First?" and, once its run is in progress, a newer message that
+       * stops it. The stopped run shows `SELECT 1` before the stop, or after
+       * it, as a tool already running when the run was stopped would. The
+       * newer turn shows `SELECT 22`.
+       */
+      async function _askAndStop(
+        options: Readonly<{ isShownAfterStop: boolean }>,
+      ): Promise<void> {
+        let finishFirstRun: (() => void) | undefined;
+        const showFirstQuery = (): void => {
           conversation.lastShownQuery = {
             sql: "SELECT 1",
             app: "data_explorer",
           };
-          await new Promise<void>((resolve) => {
-            finishFirstRun = resolve;
-          });
-          return { text: "Stopped." };
-        }
-        conversation.lastShownQuery = { sql: "SELECT 22", app: "dashboards" };
-        return { text: "Second." };
-      });
-      vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
-        finishFirstRun?.();
-      });
-      const conversations = new Map([["workspace-1:0", conversation]]);
+        };
+        const conversation = _fakeConversation(async (text) => {
+          if (text === "First?") {
+            if (!options.isShownAfterStop) {
+              showFirstQuery();
+            }
+            await new Promise<void>((resolve) => {
+              finishFirstRun = resolve;
+            });
+            if (options.isShownAfterStop) {
+              showFirstQuery();
+            }
+            return { text: "Stopped." };
+          }
+          conversation.lastShownQuery = {
+            sql: "SELECT 22",
+            app: "dashboards",
+          };
+          return { text: "Second." };
+        });
+        vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+          finishFirstRun?.();
+        });
+        const conversations = new Map([["workspace-1:0", conversation]]);
 
-      await Promise.all([
-        _ask(conversations, _turn("First?")),
-        _ask(conversations, _turn(["First?", "Stopped.", "Second?"])),
-      ]);
+        const firstReply = _ask(conversations, _turn("First?"));
+        await vi.waitFor(() => {
+          expect(finishFirstRun).toBeDefined();
+        });
+        await Promise.all([
+          firstReply,
+          _ask(conversations, _turn(["First?", "Stopped.", "Second?"])),
+        ]);
+      }
 
-      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
-      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          app: "dashboards",
-          payload: { sqlChars: 9 },
-        }),
-      );
+      it("logs only the newer turn's query", async () => {
+        await _askAndStop({ isShownAfterStop: false });
+
+        expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+        expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            app: "dashboards",
+            payload: { sqlChars: 9 },
+          }),
+        );
+      });
+
+      it("logs no query the stopped run shows after the stop", async () => {
+        await _askAndStop({ isShownAfterStop: true });
+
+        expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+        expect(AnalyticsClient.logEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            app: "dashboards",
+            payload: { sqlChars: 9 },
+          }),
+        );
+      });
     });
   });
 });
