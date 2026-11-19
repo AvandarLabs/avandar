@@ -18,7 +18,7 @@ export function getAnnotationProgress(
 }
 
 /** Compatibility export for the reusable measured-region overlay. */
-export { getOverlayPose } from "../motion-components/AnchoredOverlay";
+export { getOverlayPose } from "../motion-components/getOverlayPose";
 
 /**
  * Only a causal treatment draws a connector, after its authored signal cue,

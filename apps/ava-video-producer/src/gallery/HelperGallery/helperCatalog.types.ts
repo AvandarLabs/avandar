@@ -46,6 +46,12 @@ export type HelperEntry = {
   description: string;
   /** App-relative source module, for example `src/motion.ts`. */
   source: string;
+  /**
+   * Further app-relative modules that hold some of `exports`, for a helper
+   * whose functions live beside its component rather than in `source`.
+   * Empty when `source` holds every export.
+   */
+  relatedSources?: readonly string[];
   /** Exported names, dotted for members such as `EASE.out`. */
   exports: readonly string[];
   signature: string;

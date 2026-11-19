@@ -24,4 +24,4 @@ export const objectFlightSchema = z
   .strict();
 
 /** Compatibility export for deterministic object-departure geometry. */
-export { getObjectFlight } from "../../motion-components/SvgObjectDeparture";
+export { getObjectFlight } from "../../motion-components/getObjectFlight";

@@ -1,7 +1,7 @@
 import { TransitionSeries } from "@remotion/transitions";
 import { Fragment } from "react";
 import { Sequence, useCurrentFrame } from "remotion";
-import { createSceneTransition } from "../motion-components/SceneTransition";
+import { createSceneTransition } from "../motion-components/createSceneTransition";
 import { buildColorWithAlpha } from "../videoTheme/cssValueHelpers/cssValueHelpers";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityAppearanceContext } from "./ContinuityAppearanceContext";

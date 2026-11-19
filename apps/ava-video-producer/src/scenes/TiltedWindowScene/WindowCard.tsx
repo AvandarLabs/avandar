@@ -1,9 +1,7 @@
 import { useId } from "react";
 import { mix } from "../../motion";
-import {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "../../motion-components/HorizontalBlur";
+import { getHorizontalBlurFilter } from "../../motion-components/getHorizontalBlurFilter";
+import { HorizontalBlurFilter } from "../../motion-components/HorizontalBlur";
 import { MediaPlane } from "../MediaPlane";
 import { positioned } from "../positioned";
 import { getScrollOffset } from "./windowMotion";

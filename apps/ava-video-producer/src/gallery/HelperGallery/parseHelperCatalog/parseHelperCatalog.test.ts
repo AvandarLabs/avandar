@@ -35,7 +35,7 @@ function createCatalog(overrides: Record<string, unknown> = {}) {
 
 test("preserves authored helper metadata in catalog order", () => {
   const catalog = parseHelperCatalog(createCatalog());
-  assert.deepEqual(catalog.helpers, [HELPER]);
+  assert.deepEqual(catalog.helpers, [{ ...HELPER, relatedSources: [] }]);
   assert.deepEqual(catalog.categories, [CATEGORY]);
   assert.deepEqual(catalog.modules, [{ ...MODULE, exhaustiveMembers: [] }]);
 });
@@ -68,6 +68,39 @@ test("rejects a helper whose source module is not listed for drift checks", () =
       createCatalog({ helpers: [{ ...HELPER, source: "src/other.ts" }] }),
     );
   }, /Unlisted source module "src\/other.ts" for "ease-out"/);
+});
+
+test("keeps a helper's related source modules in authored order", () => {
+  const relatedSources = ["src/easeIn.ts", "src/easeOut.ts"];
+  const catalog = parseHelperCatalog(
+    createCatalog({
+      modules: [
+        MODULE,
+        { path: "src/easeOut.ts", excluded: [] },
+        { path: "src/easeIn.ts", excluded: [] },
+      ],
+      helpers: [{ ...HELPER, relatedSources }],
+    }),
+  );
+  assert.deepEqual(catalog.helpers[0]?.relatedSources, relatedSources);
+});
+
+test("rejects a helper whose related source module is not listed for drift checks", () => {
+  assert.throws(() => {
+    return parseHelperCatalog(
+      createCatalog({
+        helpers: [{ ...HELPER, relatedSources: ["src/other.ts"] }],
+      }),
+    );
+  }, /Unlisted related source module "src\/other.ts" for "ease-out"/);
+});
+
+test("rejects an empty related source path", () => {
+  assert.throws(() => {
+    return parseHelperCatalog(
+      createCatalog({ helpers: [{ ...HELPER, relatedSources: [""] }] }),
+    );
+  });
 });
 
 test("rejects a declared category with no helpers", () => {

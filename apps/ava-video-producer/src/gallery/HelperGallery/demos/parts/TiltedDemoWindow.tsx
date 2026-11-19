@@ -1,8 +1,6 @@
 import { useId } from "react";
-import {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "../../../../motion-components/HorizontalBlur";
+import { getHorizontalBlurFilter } from "../../../../motion-components/getHorizontalBlurFilter";
+import { HorizontalBlurFilter } from "../../../../motion-components/HorizontalBlur";
 import {
   WINDOW_CHROME,
   WINDOW_SHADOW,

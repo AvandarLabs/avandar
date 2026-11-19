@@ -58,6 +58,24 @@ function UsedByList({ helper }: { helper: HelperEntry }) {
   );
 }
 
+/**
+ * Links to the helper's primary source and then each related source, in
+ * catalog order.
+ */
+function SourceList({ helper }: { helper: HelperEntry }) {
+  return (
+    <ul className={css.links}>
+      {[helper.source, ...(helper.relatedSources ?? [])].map((path) => {
+        return (
+          <li key={path}>
+            <SourceLink path={path} />
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 /** Exports, defaults, consumers and source of the selected helper. */
 export function HelperReference({
   helper,
@@ -81,7 +99,7 @@ export function HelperReference({
       <h3>Used by</h3>
       <UsedByList helper={helper} />
       <h3>Source</h3>
-      <SourceLink path={helper.source} />
+      <SourceList helper={helper} />
     </aside>
   );
 }

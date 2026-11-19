@@ -1,6 +1,6 @@
 import { interpolateStyles } from "@remotion/animation-utils";
 import { getMotionProgress } from "./motionSettings";
-import type { MotionRect } from "./AnchoredOverlay";
+import type { MotionRect } from "./getOverlayTimings";
 import type { MotionOptions } from "./motionSettings";
 import type { CSSProperties, ReactNode } from "react";
 

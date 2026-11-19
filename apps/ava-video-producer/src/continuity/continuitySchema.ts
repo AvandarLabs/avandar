@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { getOverlayTimings } from "../motion-components/AnchoredOverlay";
 import { retimeCameraTrack } from "../motion-components/cameraTrack";
+import { getOverlayTimings } from "../motion-components/getOverlayTimings";
 import {
   getMotionDuration,
   motionOptionsSchema,

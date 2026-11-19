@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { HELPER_CATALOG } from "./helperCatalog";
 import { HELPER_DEMO_IDS } from "./helperDemoIds";
+import type { HelperEntry } from "./helperCatalog.types";
 
 const APP_ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 
@@ -26,11 +27,16 @@ function _resolveExport(
   }, namespace);
 }
 
+/** The helper's primary source followed by its related sources. */
+function _helperSources(helper: HelperEntry): readonly string[] {
+  return [helper.source, ...(helper.relatedSources ?? [])];
+}
+
 function _catalogedNames(source: string): Set<string> {
   return new Set(
     HELPER_CATALOG.helpers
       .filter((helper) => {
-        return helper.source === source;
+        return _helperSources(helper).includes(source);
       })
       .flatMap((helper) => {
         return helper.exports;
@@ -40,16 +46,20 @@ function _catalogedNames(source: string): Set<string> {
 
 test("every catalog source file exists and every listed export resolves", async () => {
   for (const helper of HELPER_CATALOG.helpers) {
-    assert.ok(
-      existsSync(path.join(APP_ROOT, helper.source)),
-      `${helper.id}: missing ${helper.source}`,
-    );
-    const namespace = await _importModule(helper.source);
+    const sources = _helperSources(helper);
+    sources.forEach((source) => {
+      return assert.ok(
+        existsSync(path.join(APP_ROOT, source)),
+        `${helper.id}: missing ${source}`,
+      );
+    });
+    const namespaces = await Promise.all(sources.map(_importModule));
     helper.exports.forEach((name) => {
-      return assert.notEqual(
-        _resolveExport(namespace, name),
-        undefined,
-        `${helper.id}: ${helper.source} does not export ${name}`,
+      return assert.ok(
+        namespaces.some((namespace) => {
+          return _resolveExport(namespace, name) !== undefined;
+        }),
+        `${helper.id}: none of ${sources.join(", ")} exports ${name}`,
       );
     });
   }

@@ -69,7 +69,7 @@ function remember(imported, file, contents) {
 
 async function resolveSource(args, aliases) {
   if (args.path === "@tanstack/react-router")
-    return { path: path.join(adapterRoot, "shims/router.tsx") };
+    return { path: path.join(adapterRoot, "shims/router.ts") };
   if (aliases[args.path])
     return { path: await locate(path.resolve(root, aliases[args.path])) };
   if (args.path.startsWith("@/"))
@@ -288,7 +288,10 @@ function createSourcePlugin(aliases, outputDirectory, onBuilt) {
       );
       builder.onLoad({ filter: /\.(tsx?|jsx?)$/ }, async (args) => {
         const compiled = await compileSource(args, currentAliases, imported);
-        if (compiled && args.path === path.join(adapterRoot, "index.tsx")) {
+        if (
+          compiled &&
+          args.path === path.join(adapterRoot, "product-entry.ts")
+        ) {
           compiled.watchDirs = [adapterRoot];
           compiled.watchFiles = (await fs.readdir(adapterRoot))
             .filter((file) => file.endsWith("-aliases.json"))
@@ -312,7 +315,7 @@ function createSourcePlugin(aliases, outputDirectory, onBuilt) {
 function createBuildOptions(aliases, outputDirectory, onBuilt) {
   return {
     absWorkingDir: root,
-    entryPoints: ["avandar-adapter/index.tsx"],
+    entryPoints: ["avandar-adapter/product-entry.ts"],
     outfile: path.join(outputDirectory, "product.js"),
     bundle: true,
     format: "esm",
