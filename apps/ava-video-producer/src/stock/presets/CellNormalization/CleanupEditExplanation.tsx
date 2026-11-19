@@ -39,7 +39,7 @@ export function CleanupEditExplanation({
           placement="edit"
           x={88}
           y={42}
-          fontSize={12}
+          isSublabel
         />
       )}
       <g data-edit-value={row.id}>

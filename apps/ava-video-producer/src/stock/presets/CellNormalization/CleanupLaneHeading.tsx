@@ -10,7 +10,8 @@ type Props = {
   y: number;
   opacity?: number;
   color?: string;
-  fontSize?: 12 | 14;
+  /** A smaller sublabel inside a row, rather than a lane heading. */
+  isSublabel?: boolean;
 };
 /** A supplied label stays attached to the value lane it actually describes. */
 export function CleanupLaneHeading({
@@ -21,7 +22,7 @@ export function CleanupLaneHeading({
   y,
   opacity = 1,
   color,
-  fontSize = 14,
+  isSublabel = false,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   return (
@@ -35,7 +36,7 @@ export function CleanupLaneHeading({
         x={x}
         y={y}
         width={352}
-        fontSize={fontSize}
+        fontSize={isSublabel ? 12 : 14}
         maxLines={1}
         breakLongWords
         normalizeWhitespace

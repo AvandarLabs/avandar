@@ -36,7 +36,7 @@ export function CleanupRetainedValue({
           placement="retained"
           x={88}
           y={42}
-          fontSize={12}
+          isSublabel
         />
       ) : undefined}
       <g data-retained-literal={row.id}>
