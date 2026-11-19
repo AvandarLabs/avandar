@@ -15,8 +15,12 @@ import {
   type Storyboard,
 } from "../schema/schema";
 import { createThemePatchesFromTheme } from "./createThemePatchFromTheme";
-import { getShotTransitionLayers } from "./getShotTransitionLayers";
+import {
+  getShotTransitionLayers,
+  type OutgoingShotLayer,
+} from "./getShotTransitionLayers";
 import { ShotView, type ProductSceneRenderer } from "./ShotView";
+import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { CSSProperties, ReactNode } from "react";
 
 export type { ProductSceneRenderer } from "./ShotView";
@@ -58,14 +62,8 @@ export function StoryFilmPicture({
   );
 }
 
-function FilmFrame({
-  plan,
-  productScene,
-  showCaptions = true,
-  frame,
-}: Props & { frame: number }): ReactNode {
-  const motion = useVideoMotion();
-  const tokens = useVideoTokens();
+/** The shot playing at `frame`, and the one before it, if any. */
+function _findShotsAtFrame(plan: Storyboard, frame: number) {
   const shots = timeline(plan);
   const index = Math.max(
     0,
@@ -73,9 +71,23 @@ function FilmFrame({
       return frame >= shot.startFrame && frame < shot.endFrame;
     }),
   );
-  const shot = shots[index];
+  return {
+    shot: shots[index],
+    previous: index > 0 ? shots[index - 1] : undefined,
+  };
+}
+
+/**
+ * The shot playing at `frame`, the one before it, the shot's own frame, and
+ * the transition layers between them.
+ */
+function _getShotLayersAtFrame(
+  plan: Storyboard,
+  frame: number,
+  motion: VideoMotion,
+) {
+  const { shot, previous } = _findShotsAtFrame(plan, frame);
   const localFrame = frame - shot.startFrame;
-  const previous = index > 0 ? shots[index - 1] : undefined;
   const layers = getShotTransitionLayers({
     transition: shot.transition,
     transitionInFrames: shot.transitionInFrames,
@@ -84,40 +96,67 @@ function FilmFrame({
     width: plan.width,
     motion,
   });
-  const total = durationInFrames(plan);
-  // Reserve a stable caption band rather than placing text over scene content.
-  const sceneHeight =
+  return { shot, previous, localFrame, layers };
+}
+
+/**
+ * The height left for shots. A stable caption band is reserved rather than
+ * placing text over scene content.
+ */
+function _getSceneHeight(plan: Storyboard): number {
+  return (
     plan.height -
-    (plan.captions ? captionBand(plan.narration, plan.width, plan.height) : 0);
+    (plan.captions ? captionBand(plan.narration, plan.width, plan.height) : 0)
+  );
+}
+
+/**
+ * A loop film's fade back to its ground over its last loop-fade frames. Other
+ * films stay opaque.
+ */
+function _getLoopOutOpacity(
+  plan: Storyboard,
+  frame: number,
+  motion: VideoMotion,
+): number {
+  if (plan.purpose !== "loop") {
+    return 1;
+  }
+  const total = durationInFrames(plan);
   const loopFade = motion.loopFade.film;
-  const loopOut =
-    plan.purpose === "loop"
-      ? 1 -
-        motion.ramp(frame, total - loopFade, loopFade, motion.dissolve.easing)
-      : 1;
-  const common = { width: plan.width, height: sceneHeight, productScene };
+  return (
+    1 - motion.ramp(frame, total - loopFade, loopFade, motion.dissolve.easing)
+  );
+}
+
+function FilmFrame({
+  plan,
+  productScene,
+  showCaptions = true,
+  frame,
+}: Props & { frame: number }): ReactNode {
+  const motion = useVideoMotion();
+  const tokens = useVideoTokens();
+  const { shot, previous, localFrame, layers } = _getShotLayersAtFrame(
+    plan,
+    frame,
+    motion,
+  );
+  const loopOut = _getLoopOutOpacity(plan, frame, motion);
+  const common = {
+    width: plan.width,
+    height: _getSceneHeight(plan),
+    productScene,
+  };
   return (
     <AbsoluteFill style={{ background: tokens.color.scene.ground }}>
       <AbsoluteFill style={{ opacity: loopOut }}>
         {previous && layers.outgoing ? (
-          <>
-            <HorizontalBlurFilter
-              id={OUTGOING_BLUR_ID}
-              amount={layers.outgoing.blurX}
-            />
-            <_ShotLayer
-              {...common}
-              shot={previous}
-              frame={layers.outgoing.frame}
-              style={{
-                transform: `translateX(${layers.outgoing.offsetX.toFixed(2)}px)`,
-                filter: getHorizontalBlurFilter(
-                  OUTGOING_BLUR_ID,
-                  layers.outgoing.blurX,
-                ),
-              }}
-            />
-          </>
+          <_OutgoingShotLayer
+            {...common}
+            shot={previous}
+            layer={layers.outgoing}
+          />
         ) : null}
         <_ShotLayer
           {...common}
@@ -126,12 +165,7 @@ function FilmFrame({
           style={layers.incoming}
         />
         {plan.captions && showCaptions ? (
-          <CaptionOverlay
-            frame={frame}
-            cues={absoluteCues(plan)}
-            width={plan.width}
-            height={plan.height}
-          />
+          <_FilmCaptions plan={plan} frame={frame} />
         ) : null}
       </AbsoluteFill>
     </AbsoluteFill>
@@ -146,6 +180,37 @@ type ShotLayerProps = {
   productScene?: ProductSceneRenderer;
   style: CSSProperties;
 };
+
+function _FilmCaptions({ plan, frame }: { plan: Storyboard; frame: number }) {
+  return (
+    <CaptionOverlay
+      frame={frame}
+      cues={absoluteCues(plan)}
+      width={plan.width}
+      height={plan.height}
+    />
+  );
+}
+
+/** The outgoing shot, drifted and blurred by its transition layer. */
+function _OutgoingShotLayer({
+  layer,
+  ...props
+}: Omit<ShotLayerProps, "frame" | "style"> & { layer: OutgoingShotLayer }) {
+  return (
+    <>
+      <HorizontalBlurFilter id={OUTGOING_BLUR_ID} amount={layer.blurX} />
+      <_ShotLayer
+        {...props}
+        frame={layer.frame}
+        style={{
+          transform: `translateX(${layer.offsetX.toFixed(2)}px)`,
+          filter: getHorizontalBlurFilter(OUTGOING_BLUR_ID, layer.blurX),
+        }}
+      />
+    </>
+  );
+}
 
 /** One opaque shot, painted on its own theme's ground. */
 function _ShotLayer(props: ShotLayerProps) {

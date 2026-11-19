@@ -27,46 +27,43 @@ type Options = {
   motion?: VideoMotion;
 };
 
-/**
- * The two layers `StoryFilm` stacks at one frame of a shot boundary: the
- * outgoing shot (absent outside a transition) and the style of the incoming
- * shot above it. A missing transition kind is the original dissolve, so
- * existing plans keep their look. A declared `cut` never draws the outgoing
- * shot.
- */
-export function getShotTransitionLayers({
-  transition,
-  transitionInFrames,
-  previousDurationInFrames,
-  localFrame,
-  width,
-  motion = getClassicStageMotion(),
-}: Options): { outgoing?: OutgoingShotLayer; incoming: CSSProperties } {
-  if (
-    previousDurationInFrames === undefined ||
-    transition?.kind === "cut" ||
-    transitionInFrames === 0 ||
-    localFrame >= transitionInFrames
-  ) {
-    return { incoming: {} };
-  }
-  const frame =
-    transition?.outgoing === "playing"
-      ? previousDurationInFrames + localFrame
-      : previousDurationInFrames - 1;
-  if (transition?.kind !== "stepped-column-wipe") {
-    return {
-      outgoing: { frame, offsetX: 0, blurX: 0 },
-      incoming: {
-        opacity: motion.ramp(
-          localFrame,
-          0,
-          transitionInFrames,
-          motion.dissolve.easing,
-        ),
-      },
-    };
-  }
+type ShotTransitionLayers = {
+  outgoing?: OutgoingShotLayer;
+  incoming: CSSProperties;
+};
+
+/** The original dissolve: the incoming shot fades in over the outgoing one. */
+function _createDissolveLayers(
+  frame: number,
+  localFrame: number,
+  transitionInFrames: number,
+  motion: VideoMotion,
+): ShotTransitionLayers {
+  return {
+    outgoing: { frame, offsetX: 0, blurX: 0 },
+    incoming: {
+      opacity: motion.ramp(
+        localFrame,
+        0,
+        transitionInFrames,
+        motion.dissolve.easing,
+      ),
+    },
+  };
+}
+
+/** Columns cover the outgoing shot while it drifts and blurs away. */
+function _createSteppedWipeLayers(
+  frame: number,
+  options: Readonly<{
+    transition: Extract<ShotTransition, { kind: "stepped-column-wipe" }>;
+    localFrame: number;
+    transitionInFrames: number;
+    width: number;
+    motion: VideoMotion;
+  }>,
+): ShotTransitionLayers {
+  const { transition, localFrame, transitionInFrames, width, motion } = options;
   // The outgoing layer accelerates away while the columns cover it.
   const drift = motion.ramp(
     localFrame,
@@ -87,4 +84,42 @@ export function getShotTransitionLayers({
       motion,
     ),
   };
+}
+
+/**
+ * The two layers `StoryFilm` stacks at one frame of a shot boundary: the
+ * outgoing shot (absent outside a transition) and the style of the incoming
+ * shot above it. A missing transition kind is the original dissolve, so
+ * existing plans keep their look. A declared `cut` never draws the outgoing
+ * shot.
+ */
+export function getShotTransitionLayers({
+  transition,
+  transitionInFrames,
+  previousDurationInFrames,
+  localFrame,
+  width,
+  motion = getClassicStageMotion(),
+}: Options): ShotTransitionLayers {
+  if (
+    previousDurationInFrames === undefined ||
+    transition?.kind === "cut" ||
+    transitionInFrames === 0 ||
+    localFrame >= transitionInFrames
+  ) {
+    return { incoming: {} };
+  }
+  const frame =
+    transition?.outgoing === "playing"
+      ? previousDurationInFrames + localFrame
+      : previousDurationInFrames - 1;
+  return transition?.kind === "stepped-column-wipe"
+    ? _createSteppedWipeLayers(frame, {
+        transition,
+        localFrame,
+        transitionInFrames,
+        width,
+        motion,
+      })
+    : _createDissolveLayers(frame, localFrame, transitionInFrames, motion);
 }

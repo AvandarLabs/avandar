@@ -380,6 +380,32 @@ function _getShadowStrength(semantic: unknown): number {
   return typeof strength === "number" ? strength : 1;
 }
 
+/** `_scaleShadows`, skipped at strength 1 so the value is returned as is. */
+function _scaleShadowsByStrength(
+  node: CatalogNode,
+  value: unknown,
+  strength: number,
+): unknown {
+  return strength === 1 ? value : _scaleShadows(node, value, strength);
+}
+
+/** The context that resolves the ground colour, before the ground is known. */
+function _createGroundContext(
+  options: Readonly<{ merged: VideoThemePatch; mantine: MantineTheme }>,
+  issues: VideoThemeIssue[],
+): ResolutionContext {
+  const video = getValueAtPath(options.merged, ["other", "video"]);
+  return {
+    atomic: getValueAtPath(video, ["atomic"]),
+    semantic: getValueAtPath(video, ["semantic"]),
+    components: options.merged.components,
+    mantine: options.mantine,
+    isDarkGround: true,
+    forbidColorPairs: true,
+    issues,
+  };
+}
+
 function _isGroundDark(groundContext: ResolutionContext): boolean {
   const ground = _buildValueFromRaw(
     groundContext,
@@ -404,17 +430,8 @@ function _isGroundDark(groundContext: ResolutionContext): boolean {
 export function makeResolvedTokenTiersFromMergedTheme(
   options: Readonly<{ merged: VideoThemePatch; mantine: MantineTheme }>,
 ): ResolvedTokenTiers {
-  const video = getValueAtPath(options.merged, ["other", "video"]);
   const issues: VideoThemeIssue[] = [];
-  const groundContext: ResolutionContext = {
-    atomic: getValueAtPath(video, ["atomic"]),
-    semantic: getValueAtPath(video, ["semantic"]),
-    components: options.merged.components,
-    mantine: options.mantine,
-    isDarkGround: true,
-    forbidColorPairs: true,
-    issues,
-  };
+  const groundContext = _createGroundContext(options, issues);
   const isDarkGround = _isGroundDark(groundContext);
   const context: ResolutionContext = {
     ...groundContext,
@@ -436,14 +453,16 @@ export function makeResolvedTokenTiersFromMergedTheme(
       context.atomic,
       "atomic",
     ),
-    semantic:
-      strength === 1
-        ? semantic
-        : _scaleShadows(VIDEO_TOKEN_CATALOG.semantic, semantic, strength),
-    components:
-      strength === 1
-        ? components
-        : _scaleShadows(VIDEO_TOKEN_CATALOG.components, components, strength),
+    semantic: _scaleShadowsByStrength(
+      VIDEO_TOKEN_CATALOG.semantic,
+      semantic,
+      strength,
+    ),
+    components: _scaleShadowsByStrength(
+      VIDEO_TOKEN_CATALOG.components,
+      components,
+      strength,
+    ),
     isDarkGround,
     issues,
   };

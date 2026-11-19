@@ -211,6 +211,78 @@ function _matches(
   });
 }
 
+/** Classic stroke, corner, border, and dash values in rendered markup. */
+function _findClassicShapeValues(markup: string): string[] {
+  return [
+    ..._matches(markup, /stroke-width="([\d.]+)"/g, CLASSIC_STROKES, (v) => {
+      return `stroke-width ${v}`;
+    }),
+    ..._matches(markup, /\brx="([\d.]+)"/g, CLASSIC_RADII, (v) => {
+      return `rx ${v}`;
+    }),
+    ..._matches(markup, /border-radius:([\d.]+)px/g, CLASSIC_RADII, (_, m) => {
+      return m;
+    }),
+    ..._matches(
+      markup,
+      /border(?:-\w+)?:([\d.]+)px/g,
+      CLASSIC_STROKES,
+      (_, m) => {
+        return m;
+      },
+    ),
+    ..._matches(markup, /stroke-dasharray="([^"]+)"/g, CLASSIC_DASHES, (v) => {
+      return `dash ${v}`;
+    }),
+  ];
+}
+
+/** Classic weight, tracking, size, and opacity values in rendered markup. */
+function _findClassicTypeValues(markup: string): string[] {
+  return [
+    ..._matches(
+      markup,
+      /\bfont-weight(?:="|:)(\d+)/g,
+      CLASSIC_FONT_WEIGHTS,
+      (v) => {
+        return `font-weight ${v}`;
+      },
+    ),
+    ..._matches(
+      markup,
+      /\bletter-spacing="(-?[\d.]+)"/g,
+      CLASSIC_TRACKING_PIXELS,
+      (v) => {
+        return `letter-spacing ${v}`;
+      },
+    ),
+    ..._matches(
+      markup,
+      /\bletter-spacing:(-?[\d.]+)em/g,
+      CLASSIC_TRACKING_EMS,
+      (v) => {
+        return `letter-spacing ${v}em`;
+      },
+    ),
+    ..._matches(
+      markup,
+      /<text\b[^>]*?\sfont-size="([\d.]+)"[^>]*>(?!<tspan)/g,
+      CLASSIC_FONT_SIZES,
+      (v) => {
+        return `font-size ${v}`;
+      },
+    ),
+    ..._matches(
+      markup,
+      /\b((?:fill-|stroke-)?opacity)(?:="|:)([\d.]+)/g,
+      CLASSIC_OPACITIES,
+      (v, m) => {
+        return `${m.split(/[=:]/)[0]} ${v}`;
+      },
+    ),
+  ];
+}
+
 /**
  * The classic values a markup string still holds, one line each: colours,
  * SVG and CSS stroke widths, radii, dash steps, opacity steps, font weights,
@@ -233,76 +305,8 @@ export function findClassicValuesInMarkup(
       ..._matches(markup.toLowerCase(), /#[0-9a-f]{3,8}\b/g, colors, (v) => {
         return v;
       }),
-      ..._matches(markup, /stroke-width="([\d.]+)"/g, CLASSIC_STROKES, (v) => {
-        return `stroke-width ${v}`;
-      }),
-      ..._matches(markup, /\brx="([\d.]+)"/g, CLASSIC_RADII, (v) => {
-        return `rx ${v}`;
-      }),
-      ..._matches(
-        markup,
-        /border-radius:([\d.]+)px/g,
-        CLASSIC_RADII,
-        (_, m) => {
-          return m;
-        },
-      ),
-      ..._matches(
-        markup,
-        /border(?:-\w+)?:([\d.]+)px/g,
-        CLASSIC_STROKES,
-        (_, m) => {
-          return m;
-        },
-      ),
-      ..._matches(
-        markup,
-        /stroke-dasharray="([^"]+)"/g,
-        CLASSIC_DASHES,
-        (v) => {
-          return `dash ${v}`;
-        },
-      ),
-      ..._matches(
-        markup,
-        /\bfont-weight(?:="|:)(\d+)/g,
-        CLASSIC_FONT_WEIGHTS,
-        (v) => {
-          return `font-weight ${v}`;
-        },
-      ),
-      ..._matches(
-        markup,
-        /\bletter-spacing="(-?[\d.]+)"/g,
-        CLASSIC_TRACKING_PIXELS,
-        (v) => {
-          return `letter-spacing ${v}`;
-        },
-      ),
-      ..._matches(
-        markup,
-        /\bletter-spacing:(-?[\d.]+)em/g,
-        CLASSIC_TRACKING_EMS,
-        (v) => {
-          return `letter-spacing ${v}em`;
-        },
-      ),
-      ..._matches(
-        markup,
-        /<text\b[^>]*?\sfont-size="([\d.]+)"[^>]*>(?!<tspan)/g,
-        CLASSIC_FONT_SIZES,
-        (v) => {
-          return `font-size ${v}`;
-        },
-      ),
-      ..._matches(
-        markup,
-        /\b((?:fill-|stroke-)?opacity)(?:="|:)([\d.]+)/g,
-        CLASSIC_OPACITIES,
-        (v, m) => {
-          return `${m.split(/[=:]/)[0]} ${v}`;
-        },
-      ),
+      ..._findClassicShapeValues(markup),
+      ..._findClassicTypeValues(markup),
     ]),
   ];
 }

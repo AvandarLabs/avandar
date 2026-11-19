@@ -40,6 +40,29 @@ function _isAllowed(
   });
 }
 
+/** The reference pixel at `offset` as a dimmed gray, for unchanged pixels. */
+function _dimmedGrayAt(reference: Uint8Array, offset: number): number {
+  return Math.round(
+    (reference[offset] * 0.2126 +
+      reference[offset + 1] * 0.7152 +
+      reference[offset + 2] * 0.0722) *
+      0.3,
+  );
+}
+
+/** The largest channel change between the two pixels at `offset`. */
+function _maxChannelDeltaAt(
+  reference: Uint8Array,
+  current: Uint8Array,
+  offset: number,
+): number {
+  return Math.max(
+    ...[0, 1, 2, 3].map((channel) => {
+      return Math.abs(reference[offset + channel] - current[offset + channel]);
+    }),
+  );
+}
+
 /**
  * Compares two same-size RGBA frames pixel by pixel. `theme:parity` uses it
  * to prove a renderer change kept `classic` identical, with the only allowed
@@ -67,12 +90,7 @@ export function compareRgbaFrames(
       return reference[offset + channel] === current[offset + channel];
     });
     if (isSame) {
-      const gray = Math.round(
-        (reference[offset] * 0.2126 +
-          reference[offset + 1] * 0.7152 +
-          reference[offset + 2] * 0.0722) *
-          0.3,
-      );
+      const gray = _dimmedGrayAt(reference, offset);
       diff.set([gray, gray, gray, 255], offset);
       continue;
     }
@@ -81,13 +99,7 @@ export function compareRgbaFrames(
     const isAllowed = _isAllowed(allowedRegions, {
       x: pixel % width,
       y: Math.floor(pixel / width),
-      channelDelta: Math.max(
-        ...[0, 1, 2, 3].map((channel) => {
-          return Math.abs(
-            reference[offset + channel] - current[offset + channel],
-          );
-        }),
-      ),
+      channelDelta: _maxChannelDeltaAt(reference, current, offset),
     });
     unexplainedPixels += isAllowed ? 0 : 1;
     diff.set(isAllowed ? ALLOWED_COLOR : UNEXPLAINED_COLOR, offset);

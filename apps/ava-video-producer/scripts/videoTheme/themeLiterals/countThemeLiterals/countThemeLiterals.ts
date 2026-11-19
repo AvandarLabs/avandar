@@ -263,6 +263,64 @@ function _attributeName(attribute: ts.JsxAttribute): string {
   return attribute.name.getText();
 }
 
+/** One branch of a keyed value: a line, opacity, or spacing literal. */
+function _countKeyedBranch(
+  key: string,
+  branch: ts.Expression,
+  count: Counter,
+): void {
+  const branchText = _stringText(branch);
+  // 0 on a line key means none: no stroke or a square corner.
+  if (
+    LINE_NUMBER_KEYS.has(key) &&
+    branch.getText() !== "0" &&
+    (_isNumericLiteral(branch) || /^-?\d/.test(branchText ?? ""))
+  ) {
+    count("line");
+  }
+  if (
+    OPACITY_KEYS.has(key) &&
+    (_isDecimalLiteral(branch) || /^0?\.\d/.test(branchText ?? ""))
+  ) {
+    count("line");
+  }
+  if (
+    SPACING_KEY.test(key) &&
+    branch.getSourceFile().fileName.endsWith(".tsx") &&
+    _isSpacingLiteral(branch)
+  ) {
+    count("spacing");
+  }
+}
+
+/** A keyed transition, blur, dash, or shadow literal. */
+function _countKeyedEffect(
+  key: string,
+  value: ts.Expression | undefined,
+  count: Counter,
+): void {
+  const text = _stringText(value);
+  if (
+    key === "transition" &&
+    text !== undefined &&
+    INLINE_EFFECT_PATTERN.test(text)
+  ) {
+    count("motion");
+  }
+  if (key === "filter" && text !== undefined && /\bblur\(\s*\d/.test(text)) {
+    count("line");
+  }
+  if (
+    key === "strokeDasharray" &&
+    (_isNumericLiteral(value) || /^\d/.test(text ?? ""))
+  ) {
+    count("line");
+  }
+  if (SHADOW_KEYS.has(key) && value && !ts.isIdentifier(value)) {
+    count("line");
+  }
+}
+
 /**
  * One `key: value` or `key={value}` pair, from an object or a JSX tag. On a
  * JSX tag any colour word counts; in an object, where a word may name a
@@ -284,48 +342,9 @@ function _countKeyedValue(
     count("colour");
   }
   _valueBranches(value).forEach((branch) => {
-    const branchText = _stringText(branch);
-    // 0 on a line key means none: no stroke or a square corner.
-    if (
-      LINE_NUMBER_KEYS.has(key) &&
-      branch.getText() !== "0" &&
-      (_isNumericLiteral(branch) || /^-?\d/.test(branchText ?? ""))
-    ) {
-      count("line");
-    }
-    if (
-      OPACITY_KEYS.has(key) &&
-      (_isDecimalLiteral(branch) || /^0?\.\d/.test(branchText ?? ""))
-    ) {
-      count("line");
-    }
-    if (
-      SPACING_KEY.test(key) &&
-      branch.getSourceFile().fileName.endsWith(".tsx") &&
-      _isSpacingLiteral(branch)
-    ) {
-      count("spacing");
-    }
+    _countKeyedBranch(key, branch, count);
   });
-  if (
-    key === "transition" &&
-    text !== undefined &&
-    INLINE_EFFECT_PATTERN.test(text)
-  ) {
-    count("motion");
-  }
-  if (key === "filter" && text !== undefined && /\bblur\(\s*\d/.test(text)) {
-    count("line");
-  }
-  if (
-    key === "strokeDasharray" &&
-    (_isNumericLiteral(value) || /^\d/.test(text ?? ""))
-  ) {
-    count("line");
-  }
-  if (SHADOW_KEYS.has(key) && value && !ts.isIdentifier(value)) {
-    count("line");
-  }
+  _countKeyedEffect(key, value, count);
 }
 
 function _countTextElement(

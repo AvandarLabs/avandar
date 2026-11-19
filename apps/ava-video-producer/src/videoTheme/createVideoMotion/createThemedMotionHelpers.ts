@@ -193,6 +193,14 @@ function _press(defaults: MotionDefaults): ThemedMotionHelpers["press"] {
   return Object.assign(press, { duration: defaults.press });
 }
 
+function _createCount(defaults: MotionDefaults): ThemedMotionHelpers["count"] {
+  return (frame, at, to, duration = defaults.sheet) => {
+    return Math.round(
+      mix(ramp(frame, at, duration, defaults.entrance.easing), 0, to),
+    );
+  };
+}
+
 /**
  * Builds the themed motion helpers from resolved motion values. Called by
  * `createVideoMotion`, which spreads them into `VideoMotion`.
@@ -227,11 +235,7 @@ export function createThemedMotionHelpers(
     leave: (frame, at, options = {}) => {
       return _leave(frame, at, defaults, options);
     },
-    count: (frame, at, to, duration = defaults.sheet) => {
-      return Math.round(
-        mix(ramp(frame, at, duration, defaults.entrance.easing), 0, to),
-      );
-    },
+    count: _createCount(defaults),
     pop: (frame, at, duration = defaults.emphasis.duration) => {
       return pop(frame, at, defaults.emphasis.spring, duration);
     },
