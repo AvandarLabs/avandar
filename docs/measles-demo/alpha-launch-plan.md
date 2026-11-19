@@ -7,19 +7,21 @@ How `demo/measles` becomes the `alpha` branch and takes over
 
 | Term | Meaning |
 |---|---|
-| Alpha | The `alpha` branch (today `demo/measles`). Temporarily the production app at `app.avandarlabs.com`, on the production Supabase project `Avandar`. |
-| Mainline | The reviewed line: `develop`, then `main`. |
-| Staging | Mainline on `develop`, at `staging.avandarlabs.com`. |
-| Mainline release | `main`. It keeps a test URL but serves no users until it reaches parity with alpha. |
+| Production | Whatever serves users at `app.avandarlabs.com`. Today that is alpha. |
+| Alpha | The `alpha` branch (today `demo/measles`). Temporarily production, on the production Supabase project `Avandar`. |
+| Mainline | The reviewed code line as a whole: `develop` and `main` together. The counterpart to alpha. |
+| Staging | `develop`, at `staging.avandarlabs.com`. |
+| Mainline release | `main`, cut from `develop` by `ava release`. It keeps a test URL but serves no users until it reaches parity with alpha. |
 
 ## Decisions already made
 
 | Topic | Decision |
 |---|---|
 | Versions | Alpha versions carry a constant `-alpha` suffix: `0.15.0-alpha`, tag `v0.15.0-alpha`. Mainline stays on `0.14.x`. |
-| `ava release` | On `alpha`: version bump, tag, and GitHub release only. No merge. On `develop` or `main`: today's mainline release. On any other branch: fail. |
+| `ava release` | On `alpha`: version bump, tag, and GitHub release only. No merge. On `develop`: today's mainline release (`develop` into `main`). On any other branch, `main` included: fail. |
 | Demo user data | Not migrated. Only the open data catalog tables and the prebuilt Parquet copies move to production. |
 | Production users | All 333 accounts and their data are kept. Back up before migrating. |
+| Rehearsal | Restore a production dump into a local switched stack. Approved: production holds no sensitive data yet. |
 | Who touches production | Pablo only. The agent writes runbooks and never writes to production. |
 | Test gate | Alpha deploys only after lint, type-check, and `test-quick` pass. Same gates as production today. |
 | Alpha and `develop` | Merges flow both ways until parity. |
@@ -77,8 +79,8 @@ partial rollback, because `main`'s code does not match the migrated schema.
 | Run on | Banner (colored, first line) | What happens |
 |---|---|---|
 | `alpha` | `ALPHA release: app.avandarlabs.com` | Preflight: clean and in sync with `origin/alpha`, CI green on that commit. Prompt for the version, suggesting the next one. The `-alpha` suffix is appended automatically and rejected if typed twice. Commit the bump on `alpha`, tag `vX.Y.Z-alpha`, push, publish GitHub release notes. The push redeploys, so Cmd+K shows the new version. No merge and no `-dev` bump. |
-| `develop` or `main` | `MAINLINE release: develop to main` | Today's flow, unchanged: `main` becomes a copy of `develop`, tagged `vX.Y.Z`, and `develop` moves to the next `-dev`. |
-| Anything else | Error | Fails before any git command, naming the three allowed branches. |
+| `develop` | `MAINLINE release: develop to main` | Today's flow, unchanged: `main` becomes a copy of `develop`, tagged `vX.Y.Z`, and `develop` moves to the next `-dev`. |
+| Anything else, `main` included | Error | Fails before any git command, naming `alpha` and `develop`. |
 
 ## Stage 2: hardening (starts the week after cutover)
 
@@ -101,11 +103,7 @@ partial rollback, because `main`'s code does not match the migrated schema.
    which is when it is tested, and drifts as `develop` moves on. The
    alternative is a dedicated Supabase branch, billed like the demo branch
    was.
-2. **Rehearsal target.** Recommended: restore the production dump into a
-   local switched stack. It is free, but puts production user data on the
-   laptop. The alternative is Supabase's restore-to-new-project, which is
-   billed while it exists.
-3. **`--include-all` on alpha.** Two-way merging brings in migrations with
+2. **`--include-all` on alpha.** Two-way merging brings in migrations with
    timestamps older than ones production already ran, so alpha needs
    `--include-all`, as staging uses today. The risk is an older migration
    that assumes a schema production has moved past. Guardrail 2.2 covers it.
