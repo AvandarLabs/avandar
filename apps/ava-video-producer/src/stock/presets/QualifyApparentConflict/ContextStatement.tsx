@@ -1,6 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { StatementContext } from "./StatementContext";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
@@ -20,8 +25,11 @@ export function ContextStatement({
   index,
   placement,
 }: Readonly<Props>): ReactNode {
-  const arrival = ramp(frame, 12 + index * 6, 18);
-  const split = ramp(frame, 48, 36, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const arrival = motion.ramp(frame, 12 + index * 6, motion.hero);
+  const split = motion.ramp(frame, 48, motion.scale(36), motion.travel.easing);
   const x =
     mix(split, index ? 680 : 280, index ? 710 : 250) +
     mix(arrival, index ? 14 : -14, 0);
@@ -32,11 +40,12 @@ export function ContextStatement({
       opacity={arrival}
       transform={`translate(${x} 0)`}
     >
-      <path
-        d="M-180 316 H180"
+      <SketchedShape
+        shape={{ kind: "path", d: "M-180 316 H180" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={statement.claim}

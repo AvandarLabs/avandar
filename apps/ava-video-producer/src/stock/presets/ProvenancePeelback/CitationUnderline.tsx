@@ -1,6 +1,11 @@
-import { ramp } from "../../../motion";
 import { wrapTextToLines } from "../../primitives/FitText/wrapTextToLines";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
 
@@ -15,6 +20,9 @@ export function CitationUnderline({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const firstLine =
     wrapTextToLines({
       text: source.excerpt,
@@ -29,15 +37,13 @@ export function CitationUnderline({
     getConservativeWidthFromText({ text: firstLine, fontSize: 14 }),
   );
   return (
-    <line
+    <SketchedShape
+      shape={{ kind: "line", x1: 16, y1: 96, x2: 16 + width, y2: 96 }}
+      profile={tokens.sketch.shape}
       data-citation-underline={source.id}
-      x1={16}
-      y1={96}
-      x2={16 + width}
-      y2={96}
       stroke={accent}
-      strokeWidth={1}
-      opacity={ramp(frame, 82, 22)}
+      strokeWidth={scales.stroke(tokens.stroke.hairline)}
+      opacity={motion.ramp(frame, 82, motion.scale(22))}
     />
   );
 }

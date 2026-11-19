@@ -1,6 +1,11 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getRequestPositionFromInputAndFrame } from "./getRequestPositionFromInputAndFrame";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
@@ -14,9 +19,16 @@ export function RequestDisposition({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const position = getRequestPositionFromInputAndFrame({ frame, input });
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const position = getRequestPositionFromInputAndFrame({
+    motion,
+    frame,
+    input,
+  });
   return (
-    <g opacity={ramp(frame, 77, 20)}>
+    <g opacity={motion.ramp(frame, 77, motion.scale(20))}>
       <g data-disposition-caption={input.request.placement}>
         <LabelSlots
           labels={[
@@ -34,22 +46,26 @@ export function RequestDisposition({
         />
       </g>
       {input.request.placement === "reschedule" ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${position.x + position.width / 2} ${position.y + position.height} V518 H50 V522`,
+          }}
+          profile={tokens.sketch.shape}
           data-disposition-link={input.request.agreedSlotId ?? undefined}
-          d={`M${position.x + position.width / 2} ${position.y + position.height} V518 H50 V522`}
           fill="none"
           stroke={accent}
         />
       ) : undefined}
       {input.request.placement === "defer" ? (
-        <rect
+        <StockRect
           x={650}
           y={75}
           width={260}
           height={125}
-          rx={8}
+          rx={scales.corner(tokens.corner.cell)}
           fill="none"
-          stroke={STOCK.orange}
+          stroke={tokens.color.highlight}
           strokeDasharray="6 4"
         />
       ) : undefined}

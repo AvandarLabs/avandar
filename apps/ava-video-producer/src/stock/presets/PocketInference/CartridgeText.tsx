@@ -1,17 +1,24 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; y: number };
 /** Model identity and optional detail sit on the resident cartridge face. */
 export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   if (!input.showLabels) {
     return (
-      <path
-        d={`M220 ${y + 28} h240 M544 ${y + 28} h164`}
-        stroke={STOCK.muted}
-        strokeWidth={3}
+      <SketchedShape
+        shape={{ kind: "path", d: `M220 ${y + 28} h240 M544 ${y + 28} h164` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
     );
   }
@@ -23,7 +30,7 @@ export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
       width: 300,
       fontSize: 14 as const,
       maxLines: 2,
-      color: STOCK.text,
+      color: tokens.color.text,
     },
     {
       text: input.model.detail,
@@ -32,7 +39,7 @@ export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
       width: 198,
       fontSize: 12 as const,
       maxLines: 3,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
   ];
   return (

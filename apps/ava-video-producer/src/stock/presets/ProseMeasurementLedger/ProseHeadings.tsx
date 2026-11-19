@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
   methodMessages,
   reviewMessages,
@@ -11,9 +11,10 @@ type Props = { input: Input; frame: number };
 
 /** Method and authored review status retain separate captions. */
 export function ProseHeadings({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
-      <g opacity={ramp(frame, 110, 4)}>
+      <g opacity={motion.ramp(frame, 110, motion.press.duration)}>
         <LabelSlots labels={[[input.copy.result, 52, 280, 856, 14, 2]]} />
       </g>
       <LabelSlots

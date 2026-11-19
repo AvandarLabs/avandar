@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 
@@ -19,6 +23,8 @@ export function JigPattern({
   isGuide = false,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const radius = 7 * progress;
   const body = `M${x} ${y} h100 v64 h-100 Z`;
   const holes = [30, 70]
@@ -30,36 +36,44 @@ export function JigPattern({
   return (
     <g>
       {isGuide ? (
-        <path
-          data-guide-body="true"
-          d={`${body} ${pattern === "two-holes" ? holes : notch}`}
-          fillRule="evenodd"
-          fill={STOCK.elevated}
-          stroke={color}
-          strokeWidth={2}
-        />
+        <g fillRule="evenodd">
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `${body} ${pattern === "two-holes" ? holes : notch}`,
+            }}
+            profile={tokens.sketch.shape}
+            data-guide-body="true"
+            fill={tokens.color.elevated}
+            stroke={color}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
       ) : undefined}
       {pattern === "two-holes" ? (
         [30, 70].map((offset) => {
           return (
-            <circle
+            <SketchedShape
               key={offset}
+              shape={{ kind: "circle", cx: x + offset, cy: y + 32, r: radius }}
+              profile={tokens.sketch.shape}
               data-hole-mark="true"
-              cx={x + offset}
-              cy={y + 32}
-              r={radius}
               fill={isGuide ? "none" : color}
               stroke={color}
             />
           );
         })
       ) : (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x} ${y + 22 * progress} h${22 * progress} v${-22 * progress}`,
+          }}
+          profile={tokens.sketch.shape}
           data-corner-mark="true"
-          d={`M${x} ${y + 22 * progress} h${22 * progress} v${-22 * progress}`}
           fill="none"
           stroke={color}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       )}
     </g>

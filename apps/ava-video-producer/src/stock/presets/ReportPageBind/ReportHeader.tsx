@@ -1,6 +1,8 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryFromInputAndFrame";
 import { ReportHeaderPaper } from "./ReportHeaderPaper";
 import type { Input } from "./ReportPageBind.schema";
@@ -13,7 +15,10 @@ export function ReportHeader({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const { x, y, margins } = getReportPageGeometryFromInputAndFrame({
+    motion,
     input,
     frame,
     index: 0,
@@ -34,7 +39,7 @@ export function ReportHeader({
       width: 620,
       fontSize: 14,
       maxLines: 1,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
     {
       text: input.formatLabel,
@@ -48,7 +53,10 @@ export function ReportHeader({
     },
   ];
   return (
-    <g data-report-header="first-page" opacity={ramp(frame, 38, 30)}>
+    <g
+      data-report-header="first-page"
+      opacity={motion.ramp(frame, 38, motion.scale(30))}
+    >
       <ReportHeaderPaper x={x} y={y} margins={margins} />
       {labels.map((label) => {
         return (

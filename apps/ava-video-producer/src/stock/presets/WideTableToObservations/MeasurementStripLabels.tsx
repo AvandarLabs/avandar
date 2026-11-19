@@ -1,5 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { missingMessage } from "./WideTableToObservations.controls";
 import type { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import type { ReactNode } from "react";
@@ -17,6 +18,7 @@ export function MeasurementStripLabels({
   subjectIndex,
   measureIndex,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const { x, y, progress, subject, measure, value } = scene;
   return (
     <g>
@@ -40,7 +42,7 @@ export function MeasurementStripLabels({
           ],
         ]}
       />
-      <g opacity={ramp(progress, 0.92, 0.08)}>
+      <g opacity={motion.ramp(progress, 0.92, motion.scale(0.08))}>
         <LabelSlots
           labels={[
             [measure.label, x + mix(progress, 10, 218), y, 200, 12, 3],

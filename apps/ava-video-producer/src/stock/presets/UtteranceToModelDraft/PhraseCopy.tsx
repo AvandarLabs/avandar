@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -23,9 +24,16 @@ export function PhraseCopy({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, start, duration - 4, EASE.out);
+  const motion = useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    start,
+    duration - 4,
+    motion.reveal.easing,
+  );
   const opacity =
-    ramp(frame, start, 2) * (1 - ramp(frame, start + duration - 2, 2));
+    motion.ramp(frame, start, motion.scale(2)) *
+    (1 - motion.ramp(frame, start + duration - 2, motion.scale(2)));
   return (
     <g
       data-phrase-copy={itemId}

@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RevisionCurrentLines } from "./RevisionCurrentLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
@@ -22,6 +26,8 @@ export function RevisionDocument({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g
       data-current-content={content
@@ -31,15 +37,15 @@ export function RevisionDocument({
         .join("|")}
       data-surface={input.surface}
     >
-      <rect
+      <StockRect
         x={270}
         y={140}
         width={420}
         height={200}
         rx={input.surface === "page" ? 5 : 22}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <RevisionCurrentLines
         input={input}

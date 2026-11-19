@@ -1,8 +1,12 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
 
@@ -15,6 +19,9 @@ export function LocalRows({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g data-local-table="true">
       <LabelSlots
@@ -25,7 +32,7 @@ export function LocalRows({
       />
       {input.rows.map((row, index) => {
         const selected = row.category === input.request.selectedCategory;
-        const applied = ramp(frame, 101 + index * 5, 8);
+        const applied = motion.ramp(frame, 101 + index * 5, motion.whip);
         return (
           <g key={row.id} data-local-row={row.id}>
             <StockRect
@@ -34,9 +41,9 @@ export function LocalRows({
               y={342 + index * 32}
               width={500}
               height={30}
-              fill={selected && applied > 0 ? accent : STOCK.surface}
+              fill={selected && applied > 0 ? accent : tokens.color.surface}
               fillOpacity={selected ? 0.12 + applied * 0.12 : 1}
-              stroke={selected && applied > 0 ? accent : STOCK.line}
+              stroke={selected && applied > 0 ? accent : tokens.color.line}
             />
             {input.showRows ? (
               <g>
@@ -54,24 +61,30 @@ export function LocalRows({
                 </g>
               </g>
             ) : (
-              <path
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M60 ${359 + index * 32} h130 M310 ${359 + index * 32} h70`,
+                }}
+                profile={tokens.sketch.shape}
                 data-hidden-cells={row.id}
-                d={`M60 ${359 + index * 32} h130 M310 ${359 + index * 32} h70`}
-                stroke={STOCK.muted}
-                strokeWidth={4}
+                stroke={tokens.color.inactive}
+                strokeWidth={scales.stroke(tokens.stroke.heavy)}
               />
             )}
             {applied > 0 ? (
-              <path
-                data-row-selected={selected ? row.id : undefined}
-                d={
-                  selected
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: selected
                     ? `M520 ${359 + index * 32} l6 5 l12 -12`
-                    : `M520 ${359 + index * 32} h15`
-                }
-                stroke={selected ? accent : STOCK.muted}
+                    : `M520 ${359 + index * 32} h15`,
+                }}
+                profile={tokens.sketch.shape}
+                data-row-selected={selected ? row.id : undefined}
+                stroke={selected ? accent : tokens.color.inactive}
                 fill="none"
-                strokeWidth={2}
+                strokeWidth={scales.stroke(tokens.stroke.default)}
               />
             ) : undefined}
           </g>

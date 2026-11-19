@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +14,8 @@ export function CapacitySlots({
   extension,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const current = input.allowances.currentAllowance.limit;
   const numVisibleSlots =
     extension > 0 ? input.allowances.expandedAllowance.limit : current;
@@ -22,7 +28,7 @@ export function CapacitySlots({
           ? Math.max(0, Math.min(84, 80 + width - 7 - x))
           : 84;
         return slotWidth > 0 ? (
-          <rect
+          <StockRect
             key={index}
             data-current-slot={isExtra ? undefined : index}
             data-extra-slot={isExtra ? index - current : undefined}
@@ -30,9 +36,9 @@ export function CapacitySlots({
             y={232}
             width={slotWidth}
             height={145}
-            rx={7}
+            rx={scales.corner(7)}
             fill="none"
-            stroke={isExtra ? accent : STOCK.line}
+            stroke={isExtra ? accent : tokens.color.line}
             opacity={isExtra ? extension : 1}
           />
         ) : null;

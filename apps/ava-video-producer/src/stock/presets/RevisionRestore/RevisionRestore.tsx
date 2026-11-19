@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RestoreImpression } from "./RestoreImpression";
 import { RevisionDocument } from "./RevisionDocument";
 import { RevisionHeadings } from "./RevisionHeadings";
@@ -16,6 +16,7 @@ export function RevisionRestore({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const selectedIndex = input.revisions.findIndex(({ id }) => {
     return id === input.restoreRevisionId;
   });
@@ -28,7 +29,7 @@ export function RevisionRestore({
       : previous[index];
   });
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <RevisionHeadings input={input} frame={frame} accent={accent} />
       <RevisionDocument
         input={input}

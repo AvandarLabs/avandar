@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -18,6 +18,7 @@ export function ReportPageCopy({
   margins,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const labels: Array<ComponentProps<typeof FitText>> = [
     {
       text: section.heading,
@@ -34,7 +35,7 @@ export function ReportPageCopy({
       width: 744,
       fontSize: 14,
       maxLines: 4,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
   ];
   return (

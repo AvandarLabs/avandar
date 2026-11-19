@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 
@@ -21,6 +22,7 @@ export function UncertaintyValues({
   pointX,
   opacity,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const values = [
     { value: input.estimate.lower, x: lowerX, slot: 100 },
     { value: input.estimate.point, x: pointX, slot: 480 },
@@ -31,9 +33,10 @@ export function UncertaintyValues({
       {values.map(({ value, x, slot }, index) => {
         return (
           <g key={index}>
-            <path
-              d={`M${x} 326 L${slot} 362`}
-              stroke={STOCK.line}
+            <SketchedShape
+              shape={{ kind: "path", d: `M${x} 326 L${slot} 362` }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
               fill="none"
             />
             <FitText

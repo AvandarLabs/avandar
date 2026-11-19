@@ -1,14 +1,23 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props } from "./QualifyApparentConflict";
 import type { ReactNode } from "react";
 /** The opening question holds between the two apparently conflicting claims. */
 export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
-  const resolution = ramp(frame, 96, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const resolution = motion.ramp(frame, 96, motion.scale(24));
   return (
     <>
-      <g opacity={ramp(frame, 12, 18) * (1 - ramp(frame, 84, 18))}>
+      <g
+        opacity={
+          motion.ramp(frame, 12, motion.hero) *
+          (1 - motion.ramp(frame, 84, motion.hero))
+        }
+      >
         <FitText
           text={input.openingLabel}
           x={480}
@@ -24,7 +33,7 @@ export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
       <text
         x={480}
         y={270}
-        fill={STOCK.muted}
+        fill={tokens.color.textMuted}
         fontSize={32}
         fontFamily="Arial, sans-serif"
         textAnchor="middle"

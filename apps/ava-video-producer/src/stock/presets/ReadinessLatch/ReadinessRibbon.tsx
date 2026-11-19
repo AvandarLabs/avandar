@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReadinessRibbonLabels } from "./ReadinessRibbonLabels";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
@@ -29,14 +34,20 @@ export function ReadinessRibbon({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const horizontal = input.orientation === "horizontal";
   const position = (index * 280) / (numParticipants - 1);
   const x = horizontal ? 300 : 300 + (index * 584) / (numParticipants - 1);
   const y = horizontal ? 135 + position : 300;
   const duration = (88 * participant.workUnits) / maxWork;
   const progress =
-    ramp(frame, 24, duration, EASE.inOut) * (participant.ready ? 1 : 0.72);
-  const withdrawal = participant.ready ? ramp(frame, 24 + duration, 8) : 0;
+    motion.ramp(frame, 24, duration, motion.travel.easing) *
+    (participant.ready ? 1 : 0.72);
+  const withdrawal = participant.ready
+    ? motion.ramp(frame, 24 + duration, motion.whip)
+    : 0;
   const state =
     participant.ready && frame >= 24 + duration
       ? input.copy.ready
@@ -60,9 +71,18 @@ export function ReadinessRibbon({
   };
   const labels = { participant, input, state, horizontal, x, y };
   return (
-    <g opacity={ramp(frame, 12 + index * 2, 10)}>
-      <rect {...track} rx={4} fill={STOCK.line} />
-      <rect data-ribbon={participant.id} {...ribbon} rx={4} fill={accent} />
+    <g opacity={motion.ramp(frame, 12 + index * 2, motion.scale(10))}>
+      <rect
+        {...track}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.line}
+      />
+      <rect
+        data-ribbon={participant.id}
+        {...ribbon}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={accent}
+      />
       <line data-pin={participant.id} {...pin} {...PIN} />
       {input.showLabels ? <ReadinessRibbonLabels {...labels} /> : undefined}
     </g>

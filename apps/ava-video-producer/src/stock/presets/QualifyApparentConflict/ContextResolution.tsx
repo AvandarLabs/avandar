@@ -1,5 +1,10 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ContextQualifier } from "./ContextQualifier";
 import { ContextQuestion } from "./ContextQuestion";
 import type { Props } from "./QualifyApparentConflict";
@@ -12,30 +17,41 @@ export function ContextResolution({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const split = ramp(frame, 48, 36);
-  const resolution = ramp(frame, 96, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const split = motion.ramp(frame, 48, motion.scale(36));
+  const resolution = motion.ramp(frame, 96, motion.scale(24));
   const dividerOpacity =
-    split * (input.showCentralDivider ? 1 : 1 - ramp(frame, 108, 12));
+    split * (input.showCentralDivider ? 1 : 1 - motion.reveal(frame, 108));
   return (
     <g>
       <ContextQuestion {...{ frame, input, accent, id: "question" }} />
-      <line
+      <SketchedShape
+        shape={{
+          kind: "line",
+          x1: 480,
+          y1: mix(split, 270, 130),
+          x2: 480,
+          y2: mix(split, 270, 410),
+        }}
+        profile={tokens.sketch.shape}
         data-context-divider="true"
-        x1={480}
-        y1={mix(split, 270, 130)}
-        y2={mix(split, 270, 410)}
-        x2={480}
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         opacity={dividerOpacity}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M250 408 V420 H466 Q480 420 480 434 Q480 420 494 420 H710 V408",
+        }}
+        profile={tokens.sketch.shape}
         data-joining-brace="true"
         opacity={resolution}
-        d="M250 408 V420 H466 Q480 420 480 434 Q480 420 494 420 H710 V408"
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <ContextQualifier {...{ frame, input, accent, id: "qualifier" }} />
     </g>

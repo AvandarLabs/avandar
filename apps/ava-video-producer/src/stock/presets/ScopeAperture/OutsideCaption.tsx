@@ -1,13 +1,17 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
 /** An authored caption qualifies the topics outside the current explanation. */
 export function OutsideCaption({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <>
-      <g data-outside-caption="true" opacity={ramp(frame, 108, 12)}>
+      <g data-outside-caption="true" opacity={motion.reveal(frame, 108)}>
         <FitText
           text={input.outsideLabel}
           x={480}
@@ -16,7 +20,7 @@ export function OutsideCaption({ frame, input }: Readonly<Props>): ReactNode {
           fontSize={18}
           maxLines={1}
           anchor="middle"
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
           breakLongWords
           normalizeWhitespace
         />

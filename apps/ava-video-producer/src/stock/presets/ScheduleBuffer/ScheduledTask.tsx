@@ -1,4 +1,8 @@
-import { ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
 import type { Input } from "./ScheduleBuffer.schema";
@@ -23,9 +27,11 @@ export function ScheduledTask({
   accent,
   numSlots,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12 + index * 5, 12)}>
-      <rect
+    <g opacity={motion.reveal(frame, 12 + index * 5)}>
+      <StockRect
         data-task-id={task.id}
         x={task.x}
         y={310}

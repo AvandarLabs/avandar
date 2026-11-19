@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CategoryTally } from "./CategoryTally";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
@@ -11,11 +11,12 @@ export function CategoryTallies({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const hasTallies = input.installation.choice === "install" && frame >= 91;
   return (
     <g>
       {hasTallies ? (
-        <g opacity={ramp(frame, 91, 12)}>
+        <g opacity={motion.reveal(frame, 91)}>
           <LabelSlots labels={[[input.copy.result, 55, 557, 840, 12, 1]]} />
         </g>
       ) : null}

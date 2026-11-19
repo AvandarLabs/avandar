@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DeviceCopy } from "./DeviceCopy";
 import { InternalWriting } from "./InternalWriting";
 import { ModelCartridge } from "./ModelCartridge";
@@ -16,32 +21,36 @@ export function PocketInference({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const phone = input.deviceShape === "phone";
   const laptop = input.deviceShape === "laptop";
   return (
     <g>
-      <rect
+      <StockRect
         data-device-boundary={input.deviceShape}
         x={phone ? 174 : 142}
         y={90}
         width={phone ? 612 : 676}
         height={414}
         rx={phone ? 38 : 18}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {laptop ? (
-        <path
-          d="M142 504 h676 l30 8 h-736 z"
-          fill={STOCK.elevated}
-          stroke={STOCK.line}
+        <SketchedShape
+          shape={{ kind: "path", d: "M142 504 h676 l30 8 h-736 z" }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.elevated}
+          stroke={tokens.color.line}
         />
       ) : (
-        <path
-          d={phone ? "M438 100 h84" : "M466 100 h28"}
-          stroke={STOCK.muted}
-          strokeWidth={3}
+        <SketchedShape
+          shape={{ kind: "path", d: phone ? "M438 100 h84" : "M466 100 h28" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.inactive}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       )}
       <g data-processing-content="inside-device">

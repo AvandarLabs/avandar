@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
 
@@ -34,6 +35,7 @@ export function ReadinessRibbonLabels({
   x,
   y,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const label = {
     text: participant.label,
     x: horizontal ? 40 : x + 4,
@@ -49,7 +51,7 @@ export function ReadinessRibbonLabels({
     width: horizontal ? 210 : 146,
     maxLines: 4,
     anchor: horizontal ? ("start" as const) : ("middle" as const),
-    color: STOCK.orange,
+    color: tokens.color.highlight,
   };
   const unit = {
     text: input.unitLabel,

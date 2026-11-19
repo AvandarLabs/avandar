@@ -1,5 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { horizontal: boolean; allReady: boolean; frame: number };
@@ -13,7 +17,11 @@ export function ReadinessGate({
   allReady,
   frame,
 }: Readonly<Props>): ReactNode {
-  const opening = allReady ? ramp(frame, 122, 8, EASE.inOut) : 0;
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const opening = allReady
+    ? motion.ramp(frame, 122, motion.whip, motion.travel.easing)
+    : 0;
   const halfGap = opening * (horizontal ? 40 : 132);
   const before = horizontal
     ? { x1: 650, x2: 650, y1: 110, y2: 500 - halfGap }
@@ -25,10 +33,10 @@ export function ReadinessGate({
     cx: horizontal ? 650 : mix(opening, 150, 18),
     cy: horizontal ? mix(opening, 500, 460) : 400,
     r: 4,
-    fill: STOCK.orange,
+    fill: tokens.color.highlight,
   };
   return (
-    <g opacity={ramp(frame, 20, 12)}>
+    <g opacity={motion.reveal(frame, 20)}>
       <line data-gate="before" {...GATE} {...before} />
       <line data-gate="after" {...GATE} {...after} />
       <circle {...hinge} />

@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
 /** Inputs for ScopeTopicCopy. */
@@ -10,6 +14,8 @@ type Props = {
 
 /** A topic label keeps its full authored text clear of the rule stroke. */
 export function ScopeTopicCopy({ topic, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <>
       <FitText
@@ -20,14 +26,15 @@ export function ScopeTopicCopy({ topic, accent }: Readonly<Props>): ReactNode {
         fontSize={16}
         maxLines={topic.included ? 1 : 4}
         anchor="middle"
-        color={topic.included ? accent : STOCK.muted}
+        color={topic.included ? accent : tokens.color.textMuted}
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d="M-38 -20 H38"
-        stroke={topic.included ? accent : STOCK.line}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "path", d: "M-38 -20 H38" }}
+        profile={tokens.sketch.shape}
+        stroke={topic.included ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     </>
   );

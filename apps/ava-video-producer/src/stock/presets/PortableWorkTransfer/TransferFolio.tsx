@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FolioCopies } from "./FolioCopies";
 import { FolioCover } from "./FolioCover";
 import type { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
@@ -20,24 +24,27 @@ export function TransferFolio({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const body = {
     x: scene.folioX,
     y: 198,
     width: 264,
     height: input.artifacts.length * 86 + 10,
-    rx: 8,
-    fill: STOCK.elevated,
-    stroke: STOCK.orange,
-    strokeWidth: 2,
+    rx: scales.corner(tokens.corner.cell),
+    fill: tokens.color.elevated,
+    stroke: tokens.color.highlight,
+    strokeWidth: scales.stroke(tokens.stroke.default),
   };
   return (
     <g>
       <rect data-folio="one" {...body} />
-      <path
-        d={`M${scene.folioX + 100} 198 v-14 h50 v14`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${scene.folioX + 100} 198 v-14 h50 v14` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={3}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <FolioCopies input={input} scene={scene} frame={frame} accent={accent} />
       <FolioCover

@@ -1,5 +1,10 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { roleMessages } from "./ProseMeasurementLedger.controls";
 import type { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
 import type { ReactNode } from "react";
@@ -15,17 +20,20 @@ export function ObservationFrame({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
-    <g opacity={ramp(frame, 56, 20)}>
-      <rect
+    <g opacity={motion.ramp(frame, 56, motion.scale(20))}>
+      <StockRect
         x={scene.slotX}
         y={scene.slotY}
         width={268}
         height={100}
-        rx={6}
+        rx={scales.corner(6)}
         fill="none"
         stroke={accent}
-        strokeOpacity={0.5}
+        strokeOpacity={tokens.alpha.guide}
       />
       <g opacity={scene.captionOpacity}>
         <LabelSlots

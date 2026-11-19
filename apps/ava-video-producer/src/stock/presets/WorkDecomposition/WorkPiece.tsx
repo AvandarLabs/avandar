@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import type { ReactNode } from "react";
 
@@ -21,14 +25,16 @@ export function WorkPiece({
   parentLabel,
   showEffortValues,
 }: Readonly<Props>): ReactNode {
-  const separation = ramp(frame, 86, 38);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const separation = motion.ramp(frame, 86, motion.scale(38));
   const x = piece.x + piece.shiftX * separation,
     y = piece.y + piece.shiftY * separation;
   const labelY = 222 + index * 56;
-  const color = index % 2 === 0 ? accent : STOCK.cyan;
+  const color = index % 2 === 0 ? accent : tokens.color.accentAlt;
   return (
     <g>
-      <rect
+      <StockRect
         data-piece-id={piece.id}
         data-parent={parentLabel}
         x={x}
@@ -37,12 +43,16 @@ export function WorkPiece({
         height={piece.height}
         fill={color}
         fillOpacity={0.16}
-        stroke={STOCK.ground}
+        stroke={tokens.color.ground}
         strokeWidth={separation * 2}
       />
       <g opacity={separation}>
-        <path
-          d={`M${x + piece.width / 2} ${y + piece.height / 2} L624 ${labelY - 5} H646`}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x + piece.width / 2} ${y + piece.height / 2} L624 ${labelY - 5} H646`,
+          }}
+          profile={tokens.sketch.shape}
           fill="none"
           stroke={color}
           strokeOpacity={0.45}

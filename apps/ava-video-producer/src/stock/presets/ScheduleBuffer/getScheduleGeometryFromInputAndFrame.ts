@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ScheduleBuffer.schema";
 /** Data for getScheduleGeometryFromInputAndFrame. */
 type GetScheduleGeometryResult = {
@@ -21,7 +22,12 @@ type GetScheduleGeometryResult = {
 export function getScheduleGeometryFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetScheduleGeometryResult {
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): GetScheduleGeometryResult {
   const taskUnits = input.tasks.reduce((total, task) => {
     return total + task.duration;
   }, 0);
@@ -29,7 +35,12 @@ export function getScheduleGeometryFromInputAndFrame({
   const interruptionIndex = input.tasks.findIndex(({ id }) => {
     return id === input.interruption.afterTaskId;
   });
-  const progress = ramp(frame, 74, 44, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    74,
+    motion.scale(44),
+    motion.travel.easing,
+  );
   const delayWidth = input.interruption.duration * scale;
   let units = 0;
   const tasks = input.tasks.map((task, index) => {

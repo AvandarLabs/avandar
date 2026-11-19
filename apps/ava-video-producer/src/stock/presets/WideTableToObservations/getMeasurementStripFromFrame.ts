@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./WideTableToObservations.schema";
 
 type Params = {
@@ -6,6 +7,7 @@ type Params = {
   frame: number;
   subjectIndex: number;
   measureIndex: number;
+  motion: VideoMotion;
 };
 function _getOrderedValues(input: Readonly<Input>): Array<number | null> {
   return input.measures.flatMap((measure) => {
@@ -40,6 +42,7 @@ export function getMeasurementStripFromFrame({
   frame,
   subjectIndex,
   measureIndex,
+  motion,
 }: Readonly<Params>): GetMeasurementStripFromFrameResult {
   const subject = input.subjects[subjectIndex],
     measure = input.measures[measureIndex];
@@ -56,7 +59,12 @@ export function getMeasurementStripFromFrame({
         }).length;
   const isOmitted =
     value === null && input.missingPolicy === "omit-with-ledger";
-  const progress = ramp(frame, 81 + sourceIndex * 2, 23, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    81 + sourceIndex * 2,
+    motion.scale(23),
+    motion.travel.easing,
+  );
   return {
     subject,
     measure,
@@ -66,13 +74,18 @@ export function getMeasurementStripFromFrame({
     progress,
     x: mix(progress, 350 + measureIndex * 280, 52),
     y: mix(
-      ramp(frame, 51 + sourceIndex * 2, 24, EASE.inOut),
+      motion.ramp(
+        frame,
+        51 + sourceIndex * 2,
+        motion.scale(24),
+        motion.travel.easing,
+      ),
       210 + subjectIndex * 112,
       isOmitted ? 530 : 170 + outputIndex * 88,
     ),
     width: mix(progress, 264, 856),
     opacity:
-      ramp(frame, 13 + sourceIndex * 2, 12) *
-      (isOmitted ? 1 - ramp(frame, 100, 10) : 1),
+      motion.reveal(frame, 13 + sourceIndex * 2) *
+      (isOmitted ? 1 - motion.ramp(frame, 100, motion.scale(10)) : 1),
   };
 }

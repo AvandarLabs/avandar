@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PendingCaption } from "./PendingCaption";
 import { ResourceTab } from "./ResourceTab";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
@@ -11,9 +12,17 @@ export function PendingResources({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const seating =
-    input.choice.decision === "expand" ? ramp(frame, 106, 19, EASE.inOut) : 0;
-  const arrival = ramp(frame, 12, 38, EASE.inOut);
+    input.choice.decision === "expand"
+      ? motion.ramp(frame, 106, motion.scale(19), motion.travel.easing)
+      : 0;
+  const arrival = motion.ramp(
+    frame,
+    12,
+    motion.scale(38),
+    motion.travel.easing,
+  );
   const requestX = 90 + input.existingResources.length * 86;
   const requestY = mix(seating, mix(arrival, 433, 419), 240);
   return (

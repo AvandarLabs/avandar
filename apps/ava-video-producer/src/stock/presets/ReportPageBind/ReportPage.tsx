@@ -1,5 +1,11 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryFromInputAndFrame";
 import { ReportPageCopy } from "./ReportPageCopy";
 import type { Input } from "./ReportPageBind.schema";
@@ -20,7 +26,11 @@ export function ReportPage({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const { x, y, margins } = getReportPageGeometryFromInputAndFrame({
+    motion,
     input,
     frame,
     index,
@@ -29,20 +39,21 @@ export function ReportPage({
     <g
       data-page={section.id}
       transform={`translate(${x} ${y})`}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * 2)}
     >
-      <rect
+      <StockRect
         data-page-paper={section.id}
         x={-16}
         y={-8}
         width={mix(margins, 740, 800)}
         height={mix(margins, 86, 136)}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
-        d="M0 6V108"
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 6V108" }}
+        profile={tokens.sketch.shape}
         stroke={accent}
         strokeWidth={mix(margins, 1, 3)}
         opacity={margins}

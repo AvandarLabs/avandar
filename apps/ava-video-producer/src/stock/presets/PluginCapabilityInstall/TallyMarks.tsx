@@ -1,5 +1,10 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
@@ -18,20 +23,24 @@ export function TallyMarks({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {records.map((record, index) => {
         return (
-          <path
+          <SketchedShape
             key={record.id}
+            shape={{ kind: "path", d: `M${768 + index * 16.875} ${y - 7} v14` }}
+            profile={tokens.sketch.shape}
             data-tally-record={record.id}
-            d={`M${768 + index * 16.875} ${y - 7} v14`}
             stroke={accent}
-            strokeWidth={2}
-            opacity={ramp(
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+            opacity={motion.ramp(
               frame,
               91 + input.records.findIndex(propEq("id", record.id)) * 3,
-              20,
+              motion.scale(20),
             )}
           />
         );

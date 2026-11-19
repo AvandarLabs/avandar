@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +9,7 @@ type Props = { input: Input };
  * claims.
  */
 export function DeviceCopy({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g data-device-copy="captions">
       {input.showLabels
@@ -28,7 +29,7 @@ export function DeviceCopy({ input }: Readonly<Props>): ReactNode {
                 anchor="middle"
                 normalizeWhitespace
                 breakLongWords
-                color={STOCK.muted}
+                color={tokens.color.textMuted}
               />
             );
           })

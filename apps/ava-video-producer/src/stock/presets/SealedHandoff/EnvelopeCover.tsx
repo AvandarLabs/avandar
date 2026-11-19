@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = { opening: number };
@@ -7,6 +7,7 @@ type Props = { opening: number };
  * complete paper.
  */
 export function EnvelopeCover({ opening }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <rect
       data-opaque-cover={opening === 0 ? "closed" : "peeling"}
@@ -14,7 +15,7 @@ export function EnvelopeCover({ opening }: Readonly<Props>): ReactNode {
       y={266 * opening}
       width={536}
       height={266 * (1 - opening)}
-      fill={STOCK.elevated}
+      fill={tokens.color.elevated}
       fillOpacity={1}
       opacity={1}
     />

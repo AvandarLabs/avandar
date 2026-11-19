@@ -1,11 +1,15 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Props } from "./QualifyApparentConflict";
 import type { ReactNode } from "react";
 /** The joining language and qualifier follow the completed context split. */
 export function ContextQualifier({ frame, input }: Readonly<Props>): ReactNode {
-  const resolution = ramp(frame, 96, 24);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const resolution = motion.ramp(frame, 96, motion.scale(24));
   return (
     <>
       <g opacity={resolution}>
@@ -17,7 +21,7 @@ export function ContextQualifier({ frame, input }: Readonly<Props>): ReactNode {
           fontSize={18}
           maxLines={1}
           anchor="middle"
-          color={STOCK.mint}
+          color={tokens.color.positive}
           breakLongWords
           normalizeWhitespace
         />

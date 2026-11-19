@@ -1,6 +1,9 @@
-import { ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CitationUnderline } from "./CitationUnderline";
 import { getSourceSheetGeometryFromSelectionAndFrame } from "./getSourceSheetGeometryFromSelectionAndFrame";
 import { SourcePassageCopy } from "./SourcePassageCopy";
@@ -24,8 +27,12 @@ export function ProvenanceSource({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const selected = source.id === input.selectedSourceId;
   const { x, y, height, angle } = getSourceSheetGeometryFromSelectionAndFrame({
+    motion,
     index,
     otherIndex,
     selected,
@@ -36,16 +43,16 @@ export function ProvenanceSource({
     <g
       data-source-sheet={source.id}
       transform={`translate(${x} ${y})`}
-      opacity={ramp(frame, 14 + index * 2, 12)}
+      opacity={motion.reveal(frame, 14 + index * 2)}
     >
       <StockRect
         x={0}
         y={0}
         width={400}
         height={height}
-        rx={3}
-        fill={STOCK.surface}
-        stroke={selected ? accent : STOCK.line}
+        rx={scales.corner(3)}
+        fill={tokens.color.surface}
+        stroke={selected ? accent : tokens.color.line}
         transform={`rotate(${angle} 200 ${height / 2})`}
       />
       <SourcePassageCopy

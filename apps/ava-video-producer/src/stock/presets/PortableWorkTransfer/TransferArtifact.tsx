@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
 
@@ -22,30 +27,35 @@ export function TransferArtifact({
   showIdentityTabs,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g
       data-original={isCopy ? undefined : artifact.id}
       data-transfer-copy={isCopy ? artifact.id : undefined}
     >
-      <rect
+      <StockRect
         data-artifact-body={artifact.id}
         x={x}
         y={y}
         width={240}
         height={80}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={isCopy ? accent : STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={isCopy ? accent : tokens.color.line}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d:
+            artifact.kind === "chart"
+              ? `M${x + 8} ${y + 30} v-14 m7 14 v-24 m7 24 v-18`
+              : artifact.kind === "sheet"
+                ? `M${x + 8} ${y + 10} h20 v22 h-20 Z m0 11 h20 m-10 -11 v22`
+                : `M${x + 8} ${y + 10} h20 m-20 8 h20 m-20 8 h12`,
+        }}
+        profile={tokens.sketch.shape}
         data-artifact-kind={artifact.kind}
-        d={
-          artifact.kind === "chart"
-            ? `M${x + 8} ${y + 30} v-14 m7 14 v-24 m7 24 v-18`
-            : artifact.kind === "sheet"
-              ? `M${x + 8} ${y + 10} h20 v22 h-20 Z m0 11 h20 m-10 -11 v22`
-              : `M${x + 8} ${y + 10} h20 m-20 8 h20 m-20 8 h12`
-        }
         fill="none"
         stroke={accent}
       />

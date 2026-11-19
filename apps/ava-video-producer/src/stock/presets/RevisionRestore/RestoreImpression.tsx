@@ -1,5 +1,11 @@
-import { mix, ramp, EASE } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
 
@@ -16,31 +22,41 @@ export function RestoreImpression({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 60, 18, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const progress = motion.ramp(frame, 60, motion.hero, motion.travel.easing);
   return (
     <g
       data-restoring-id={revision.id}
-      opacity={ramp(frame, 56, 8) * (1 - ramp(frame, 112, 14))}
+      opacity={
+        motion.ramp(frame, 56, motion.whip) *
+        (1 - motion.ramp(frame, 112, motion.scale(14)))
+      }
     >
-      <rect
+      <StockRect
         x={mix(progress, 40 + index * 225, 270)}
         y={mix(progress, 382, 140)}
         width={mix(progress, 205, 420)}
         height={mix(progress, 190, 200)}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
         fillOpacity={0.22}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         strokeDasharray="8 5"
       />
       {revision.content.map((line, lineIndex) => {
         return (
-          <path
+          <SketchedShape
             key={lineIndex}
-            d={`M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`}
+            shape={{
+              kind: "path",
+              d: `M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`,
+            }}
+            profile={tokens.sketch.shape}
             stroke={accent}
-            strokeWidth={3}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
             strokeOpacity={0.7}
           />
         );

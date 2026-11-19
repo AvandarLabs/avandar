@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FocusedQuestion } from "./FocusedQuestion";
 import { OutsideCaption } from "./OutsideCaption";
 import { ScopeHeading } from "./ScopeHeading";
@@ -11,7 +16,15 @@ export function ScopeBoundary({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const contraction = ramp(frame, 36, 72, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const contraction = motion.ramp(
+    frame,
+    36,
+    motion.scale(72),
+    motion.travel.easing,
+  );
   return (
     <g>
       <ScopeHeading {...{ frame, input, accent, id: "heading" }} />
@@ -21,13 +34,13 @@ export function ScopeBoundary({
         y={mix(contraction, 140, 150)}
         width={mix(contraction, 840, 480)}
         height={mix(contraction, 380, 360)}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         pathLength={1}
         strokeDasharray={1}
-        strokeDashoffset={1 - ramp(frame, 20, 16)}
+        strokeDashoffset={1 - motion.ramp(frame, 20, motion.scale(16))}
       />
       <FocusedQuestion {...{ frame, input, accent, id: "question" }} />
       <OutsideCaption {...{ frame, input, accent, id: "outside" }} />

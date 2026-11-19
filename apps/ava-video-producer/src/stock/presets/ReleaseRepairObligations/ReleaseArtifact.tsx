@@ -1,6 +1,11 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getVisibleReleaseIssueRowsFromInput } from "./getVisibleReleaseIssueRowsFromInput";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
@@ -15,10 +20,13 @@ export function ReleaseArtifact({
   accent,
   artifactX,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const visibleIssues = getVisibleReleaseIssueRowsFromInput(input);
   return (
-    <g opacity={ramp(frame, 12, 12)}>
-      <rect
+    <g opacity={motion.reveal(frame, 12)}>
+      <StockRect
         data-release-artifact={input.artifact.kind}
         x={artifactX}
         y={100}
@@ -26,8 +34,8 @@ export function ReleaseArtifact({
         height={298}
         rx={input.artifact.kind === "guide" ? 3 : 18}
         stroke={accent}
-        strokeWidth={2}
-        fill={STOCK.surface}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        fill={tokens.color.surface}
       />
       <LabelSlots
         labels={[
@@ -39,23 +47,31 @@ export function ReleaseArtifact({
         return (
           <g key={issue.id} data-attached-issue={issue.id}>
             {input.issueMarks === "tabs" ? (
-              <rect
+              <StockRect
                 data-issue-tab={issue.id}
                 x={artifactX - 8}
                 y={y - 12}
                 width={25}
                 height={24}
-                rx={2}
-                fill={STOCK.surface}
-                stroke={issue.state === "open" ? STOCK.orange : accent}
+                rx={scales.corner(2)}
+                fill={tokens.color.surface}
+                stroke={
+                  issue.state === "open" ? tokens.color.highlight : accent
+                }
               />
             ) : (
-              <path
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${artifactX} ${y - 12} l16 12 l-16 12`,
+                }}
+                profile={tokens.sketch.shape}
                 data-issue-notch={issue.id}
-                d={`M${artifactX} ${y - 12} l16 12 l-16 12`}
                 fill="none"
-                stroke={issue.state === "open" ? STOCK.orange : accent}
-                strokeWidth={2}
+                stroke={
+                  issue.state === "open" ? tokens.color.highlight : accent
+                }
+                strokeWidth={scales.stroke(tokens.stroke.default)}
               />
             )}
             <text
@@ -63,7 +79,7 @@ export function ReleaseArtifact({
               y={y + 4}
               textAnchor="middle"
               fontSize={12}
-              fill={STOCK.text}
+              fill={tokens.color.text}
             >
               {ordinal}
             </text>
@@ -71,11 +87,15 @@ export function ReleaseArtifact({
               labels={[[issue.label, artifactX + 32, y, 248, 12, 3]]}
             />
             {issue.state === "resolved" ? (
-              <path
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${artifactX + 284} ${y - 4} l5 5 l9 -11`,
+                }}
+                profile={tokens.sketch.shape}
                 data-resolved-mark={issue.id}
-                d={`M${artifactX + 284} ${y - 4} l5 5 l9 -11`}
                 stroke={accent}
-                strokeWidth={2}
+                strokeWidth={scales.stroke(tokens.stroke.default)}
                 fill="none"
               />
             ) : undefined}

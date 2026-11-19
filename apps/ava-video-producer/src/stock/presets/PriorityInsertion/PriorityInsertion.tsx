@@ -1,7 +1,13 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PriorityQueueItem } from "./PriorityQueueItem";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PriorityInsertion.schema";
@@ -14,14 +20,22 @@ export function PriorityInsertion({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const insertion = input.queue.findIndex(propEq("id", input.insertBeforeId));
-  const shift = ramp(frame, 64, 44, EASE.inOut);
-  const incoming = ramp(frame, 120, 12, EASE.inOut);
-  const spur = ramp(frame, 108, 12, EASE.inOut);
+  const shift = motion.ramp(frame, 64, motion.scale(44), motion.travel.easing);
+  const incoming = motion.ramp(
+    frame,
+    120,
+    motion.scale(12),
+    motion.travel.easing,
+  );
+  const spur = motion.ramp(frame, 108, motion.scale(12), motion.travel.easing);
   const insertionY = 190 + 58 * insertion;
   return (
     <g>
-      <g opacity={ramp(frame, 12, 26)}>
+      <g opacity={motion.ramp(frame, 12, motion.scale(26))}>
         <FitText
           text={input.serviceLabel}
           x={100}
@@ -33,8 +47,12 @@ export function PriorityInsertion({
           normalizeWhitespace
           color={accent}
         />
-        <path
-          d="M80 160 l-6 10 M80 160 l6 10 M80 160 V532"
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: "M80 160 l-6 10 M80 160 l6 10 M80 160 V532",
+          }}
+          profile={tokens.sketch.shape}
           stroke={accent}
           fill="none"
         />
@@ -50,18 +68,18 @@ export function PriorityInsertion({
                 maxLines={1}
                 normalizeWhitespace
                 anchor="end"
-                color={STOCK.muted}
+                color={tokens.color.textMuted}
               />
               {input.showOriginalPositions && index < input.queue.length ? (
-                <rect
+                <StockRect
                   data-original-slot={index}
                   x={96}
                   y={186 + 58 * index}
                   width={368}
                   height={56}
-                  rx={8}
+                  rx={scales.corner(tokens.corner.cell)}
                   fill="none"
-                  stroke={STOCK.line}
+                  stroke={tokens.color.line}
                   strokeDasharray="3 6"
                 />
               ) : undefined}
@@ -69,10 +87,11 @@ export function PriorityInsertion({
           );
         })}
       </g>
-      <g opacity={ramp(frame, 38, 26)}>
-        <path
-          d={`M760 300 V${insertionY + 24} H460`}
-          stroke={STOCK.orange}
+      <g opacity={motion.ramp(frame, 38, motion.scale(26))}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M760 300 V${insertionY + 24} H460` }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.highlight}
           fill="none"
           strokeDasharray="5 8"
         />
@@ -85,7 +104,7 @@ export function PriorityInsertion({
           maxLines={3}
           breakLongWords
           normalizeWhitespace
-          color={STOCK.orange}
+          color={tokens.color.highlight}
         />
       </g>
       {input.queue.map((item, index) => {
@@ -96,7 +115,7 @@ export function PriorityInsertion({
             x={100}
             y={190 + 58 * (index + (index >= insertion ? shift : 0))}
             accent={accent}
-            opacity={ramp(frame, 12 + index * 2, 18)}
+            opacity={motion.ramp(frame, 12 + index * 2, motion.hero)}
           />
         );
       })}
@@ -105,7 +124,7 @@ export function PriorityInsertion({
         x={mix(incoming, 580, 100)}
         y={mix(spur, 276, insertionY)}
         accent={accent}
-        opacity={ramp(frame, 38, 26)}
+        opacity={motion.ramp(frame, 38, motion.scale(26))}
         isIncoming
       />
     </g>

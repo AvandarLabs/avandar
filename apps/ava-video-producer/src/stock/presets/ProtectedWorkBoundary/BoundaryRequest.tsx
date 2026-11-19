@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getRequestPositionFromInputAndFrame } from "./getRequestPositionFromInputAndFrame";
 import { RequestDisposition } from "./RequestDisposition";
 import type { Input } from "./ProtectedWorkBoundary.schema";
@@ -13,23 +17,30 @@ export function BoundaryRequest({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const position = getRequestPositionFromInputAndFrame({ frame, input });
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const position = getRequestPositionFromInputAndFrame({
+    motion,
+    frame,
+    input,
+  });
   return (
     <g>
       <RequestDisposition frame={frame} input={input} accent={accent} />
       <g
         data-request={input.request.placement}
         data-request-outstanding="true"
-        opacity={ramp(frame, 39, 7)}
+        opacity={motion.ramp(frame, 39, motion.scale(7))}
       >
-        <rect
+        <StockRect
           data-request-body="true"
           x={position.x}
           y={position.y}
           width={position.width}
           height={position.height}
-          rx={6}
-          fill={STOCK.elevated}
+          rx={scales.corner(6)}
+          fill={tokens.color.elevated}
           stroke={accent}
         />
         <circle

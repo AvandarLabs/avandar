@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import { MeasurementStripLabels } from "./MeasurementStripLabels";
 import type { Input } from "./WideTableToObservations.schema";
@@ -19,7 +23,10 @@ export function MeasurementStrip({
   subjectIndex,
   measureIndex,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
   const scene = getMeasurementStripFromFrame({
+    motion,
     input,
     frame,
     subjectIndex,
@@ -27,7 +34,7 @@ export function MeasurementStrip({
   });
   return (
     <g opacity={scene.opacity}>
-      <rect
+      <StockRect
         data-transfer-measurement={`${subjectIndex}:${measureIndex}`}
         data-observation={
           !scene.isOmitted
@@ -42,7 +49,7 @@ export function MeasurementStrip({
         y={scene.y - 22}
         width={scene.width}
         height={76}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         fillOpacity={0.8}
         stroke={accent}
       />

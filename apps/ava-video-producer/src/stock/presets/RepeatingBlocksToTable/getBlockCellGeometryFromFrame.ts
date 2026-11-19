@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { BLOCK_SLIDE_PLANS } from "./blockSlidePlans";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 
 type Params = {
@@ -7,6 +8,7 @@ type Params = {
   frame: number;
   blockIndex: number;
   fieldIndex: number;
+  motion: VideoMotion;
 };
 /** Continuous compression and empty-slot slides preserve every full strip. */
 export function getBlockCellGeometryFromFrame({
@@ -14,8 +16,14 @@ export function getBlockCellGeometryFromFrame({
   frame,
   blockIndex,
   fieldIndex,
+  motion,
 }: Readonly<Params>): { x: number; y: number; width: number } {
-  const compression = ramp(frame, 56, 5, EASE.inOut),
+  const compression = motion.ramp(
+      frame,
+      56,
+      motion.scale(5),
+      motion.travel.easing,
+    ),
     token = 1 + blockIndex * input.fields.length + fieldIndex;
   const plan =
       BLOCK_SLIDE_PLANS[`${input.blocks.length}:${input.fields.length}`],
@@ -30,7 +38,12 @@ export function getBlockCellGeometryFromFrame({
     if (!move || frame < departure) {
       return;
     }
-    const progress = ramp(frame, departure, duration, EASE.inOut);
+    const progress = motion.ramp(
+      frame,
+      departure,
+      duration,
+      motion.travel.easing,
+    );
     x = mix(progress, 92 + (move[0] % 4) * 208, 92 + (move[1] % 4) * 208);
     top = mix(
       progress,
