@@ -160,7 +160,7 @@ export function writeThemeLiteralBudget(budget: ThemeLiteralBudget): void {
  * glob starting with `!` removes files, as in a budget. The list lives in
  * `rendererGlobs.json` because the root ESLint config reads it too.
  */
-const RENDERER_GLOBS: readonly string[] = rendererGlobs;
+const RENDERER_GLOBS: string[] = rendererGlobs;
 const SOURCE_DIRECTORIES = ["src", "showcase"];
 const SOURCE_EXTENSION = /\.(?:tsx?|css)$/;
 /**
