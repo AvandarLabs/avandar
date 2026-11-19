@@ -13,6 +13,10 @@ export const ATTACHED_UNCHANGED_BLOCK =
 export const ATTACHED_CLEARED_BLOCK =
   "<attached>Nothing is attached any more.</attached>";
 
+/** Sent before the message on a hosted Try again of the latest answer. */
+export const TRY_AGAIN_LINE =
+  "The user clicked Try again: they want a different answer to the message below than your last one above. Do not repeat it. Read the message another way, take a different approach, or ask one question if your last answer had to guess.";
+
 function _pageText(
   pageBlock: string | undefined,
   previousPageBlock: string | undefined,
@@ -39,8 +43,9 @@ function _attachedText(
 
 /**
  * The text of one agent turn: the dashboard card lines, the page block, the
- * attached block, the mentioned block, then the user's message. A page or
- * attached block identical to the previous turn's becomes one short line,
+ * attached block, the mentioned block, then the user's message. On a Try
+ * again the Try again line goes between the blocks and the message. A page
+ * or attached block identical to the previous turn's becomes one short line,
  * so a long conversation does not resend the same charts every turn. An
  * attached block that disappeared becomes one "nothing attached" line. The
  * `previous*` options are the full blocks built for the previous turn, not
@@ -59,6 +64,11 @@ export function buildAgentTurnText(
      * first.
      */
     dashboardCardLines?: readonly string[];
+    /**
+     * A hosted Try again of the latest answer: the line goes before the
+     * message.
+     */
+    isRetry?: boolean;
   }>,
 ): string {
   const blocks = [
@@ -69,7 +79,8 @@ export function buildAgentTurnText(
   ].filter((block): block is string => {
     return block !== undefined;
   });
-  return [...blocks, options.message].join("\n\n");
+  const retryLines = options.isRetry ? [TRY_AGAIN_LINE] : [];
+  return [...blocks, ...retryLines, options.message].join("\n\n");
 }
 
 /** The blocks at the start of a turn's text, each with its blank line. */
