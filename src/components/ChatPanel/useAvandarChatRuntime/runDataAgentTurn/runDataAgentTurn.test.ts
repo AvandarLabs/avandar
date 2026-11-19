@@ -414,7 +414,7 @@ describe("runDataAgentTurn", () => {
     getAllDatasetsMock.mockResolvedValue([DATASET_A, DATASET_B]);
 
     await runDataAgentTurn(
-      _turn("workspace-aliases", "And this one?"),
+      _turn("workspace-aliases", ["How many?", "Done.", "And this one?"]),
       _page(`/acme/data-manager/${DATASET_A.id}`),
     );
 
@@ -520,7 +520,10 @@ describe("runDataAgentTurn", () => {
     const page = _page(`/acme/dashboards/edit/${DASHBOARD_ID}`);
 
     await runDataAgentTurn(_turn("workspace-vault", "What is this?"), page);
-    await runDataAgentTurn(_turn("workspace-vault", "And now?"), page);
+    await runDataAgentTurn(
+      _turn("workspace-vault", ["What is this?", "Done.", "And now?"]),
+      page,
+    );
     await _lastAgentOptions().host.showQuery({
       sql: `SELECT * FROM t WHERE "last_name" = '<value 1>'`,
       summary: "s",
@@ -659,7 +662,11 @@ describe("runDataAgentTurn", () => {
     });
 
     await runDataAgentTurn({
-      ..._turn("workspace-load-failed", `Totals for ${DATASET_TOKEN}`),
+      ..._turn("workspace-load-failed", [
+        "What is pinned?",
+        "Done.",
+        `Totals for ${DATASET_TOKEN}`,
+      ]),
       gadgetContext: { attachedRefs: [DASHBOARD_REF], contexts: undefined },
     });
 
@@ -683,8 +690,18 @@ describe("runDataAgentTurn", () => {
       },
     });
 
-    await runDataAgentTurn(_turn("workspace-tray-emptied", "And now?"));
-    await runDataAgentTurn(_turn("workspace-tray-emptied", "And still?"));
+    await runDataAgentTurn(
+      _turn("workspace-tray-emptied", ["What is pinned?", "Done.", "And now?"]),
+    );
+    await runDataAgentTurn(
+      _turn("workspace-tray-emptied", [
+        "What is pinned?",
+        "Done.",
+        "And now?",
+        "Done.",
+        "And still?",
+      ]),
+    );
 
     expect(_askedTexts()[1]).toBe(
       "<attached>Nothing is attached any more.</attached>\n\nAnd now?",
@@ -703,7 +720,11 @@ describe("runDataAgentTurn", () => {
     });
 
     await runDataAgentTurn({
-      ..._turn("workspace-load-failed-empty", `Totals for ${DATASET_TOKEN}`),
+      ..._turn("workspace-load-failed-empty", [
+        "What is pinned?",
+        "Done.",
+        `Totals for ${DATASET_TOKEN}`,
+      ]),
       gadgetContext: { attachedRefs: [], contexts: undefined },
     });
 

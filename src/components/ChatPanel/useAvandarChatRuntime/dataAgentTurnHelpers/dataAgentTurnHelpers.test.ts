@@ -2,10 +2,12 @@ import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { TRY_AGAIN_LINE } from "$/agent/pageContext/buildAgentTurnText";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
+import { chatMessagesKey } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
 import {
   askConversationDataAgent,
@@ -325,7 +327,11 @@ describe("askConversationDataAgent", () => {
     const conversations = new Map([["workspace-1:0", conversation]]);
 
     await _ask(conversations, _turn("How many?"), PAGE_BLOCK);
-    await _ask(conversations, _turn("And deaths?"), PAGE_BLOCK);
+    await _ask(
+      conversations,
+      _turn(["How many?", "Here it is.", "And deaths?"]),
+      PAGE_BLOCK,
+    );
 
     expect(conversation.asked[0]).toBe(`${PAGE_BLOCK}\n\nHow many?`);
     expect(conversation.asked[1]).toContain(
@@ -339,7 +345,11 @@ describe("askConversationDataAgent", () => {
     const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
 
     await _ask(conversations, _turn("How many?"), PAGE_BLOCK);
-    await _ask(conversations, _turn("And here?"), dashboardBlock);
+    await _ask(
+      conversations,
+      _turn(["How many?", "Here it is.", "And here?"]),
+      dashboardBlock,
+    );
 
     expect(conversation.asked[1]).toBe(`${dashboardBlock}\n\nAnd here?`);
   });
@@ -354,11 +364,19 @@ describe("askConversationDataAgent", () => {
     );
 
     await expect(
-      _ask(conversations, _turn("And here?"), dashboardBlock),
+      _ask(
+        conversations,
+        _turn(["How many?", "Here it is.", "And here?"]),
+        dashboardBlock,
+      ),
     ).rejects.toThrow("model down");
 
     expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
-    await _ask(conversations, _turn("And here?"), dashboardBlock);
+    await _ask(
+      conversations,
+      _turn(["How many?", "Here it is.", "And here?"]),
+      dashboardBlock,
+    );
     expect(conversation.lastPageBlock).toBe(dashboardBlock);
     expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd here?`);
   });
@@ -374,7 +392,11 @@ describe("askConversationDataAgent", () => {
     });
 
     await expect(
-      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+      _ask(
+        conversations,
+        _turn(["How many?", "Here it is.", "And here?"]),
+        PAGE_BLOCK,
+      ),
     ).rejects.toThrow("model down");
 
     expect(conversation.lastPageBlock).toBe(PAGE_BLOCK);
@@ -391,11 +413,25 @@ describe("askConversationDataAgent", () => {
       throw new Error("model down");
     });
     await expect(
-      _ask(conversations, _turn("And here?"), PAGE_BLOCK),
+      _ask(
+        conversations,
+        _turn(["How many?", "Here it is.", "And here?"]),
+        PAGE_BLOCK,
+      ),
     ).rejects.toThrow("model down");
     conversation.dataAgent.ask = fakeAsk;
 
-    await _ask(conversations, _turn("And back?"), dashboardBlock);
+    await _ask(
+      conversations,
+      _turn([
+        "How many?",
+        "Here it is.",
+        "And here?",
+        "Could not answer.",
+        "And back?",
+      ]),
+      dashboardBlock,
+    );
 
     expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd back?`);
   });
@@ -873,7 +909,10 @@ describe("askConversationDataAgent", () => {
     const conversations = new Map([["workspace-1:0", conversation]]);
 
     const firstReply = _ask(conversations, _turn("First?"));
-    const secondReply = _ask(conversations, _turn("Second?"));
+    const secondReply = _ask(
+      conversations,
+      _turn(["First?", "Stopped.", "Second?"]),
+    );
     await firstReply;
 
     expect((await secondReply).content).toEqual([
@@ -905,7 +944,7 @@ describe("askConversationDataAgent", () => {
       finishFirstRun?.();
     });
     const conversations = new Map([["workspace-1:0", conversation]]);
-    const secondTurn = _turn("Second?");
+    const secondTurn = _turn(["First?", "Stopped.", "Second?"]);
 
     const firstReply = _ask(conversations, _turn("First?"));
     const secondReply = _ask(conversations, secondTurn);
@@ -925,5 +964,183 @@ describe("askConversationDataAgent", () => {
     expect(conversation.dataAgent.agent.abort).toHaveBeenCalledTimes(1);
     expect(conversation.turnRef.current).toBe(secondTurn);
     expect(conversation.activeAsk).toBeUndefined();
+  });
+
+  describe("on Try again", () => {
+    const KEY = "workspace-1:0";
+
+    it("asks the same conversation the line after a kept hosted reply", async () => {
+      const conversation = _fakeConversation();
+      const conversations = new Map([[KEY, conversation]]);
+
+      await _ask(conversations, _turn("How many?"));
+      await _ask(conversations, _turn("How many?"));
+
+      expect(conversations.get(KEY)).toBe(conversation);
+      expect(conversation.asked).toEqual([
+        "How many?",
+        `${TRY_AGAIN_LINE}\n\nHow many?`,
+      ]);
+      expect(conversation.dataAgent.agent.state.messages).toEqual(
+        conversation.asked,
+      );
+    });
+
+    it("asks again with no line after the ask was rejected", async () => {
+      const conversation = _fakeConversation();
+      const conversations = new Map([[KEY, conversation]]);
+      vi.mocked(conversation.dataAgent.ask).mockRejectedValueOnce(
+        new Error("model down"),
+      );
+      await expect(_ask(conversations, _turn("How many?"))).rejects.toThrow(
+        "model down",
+      );
+
+      await _ask(conversations, _turn("How many?"));
+
+      expect(conversations.get(KEY)).toBe(conversation);
+      expect(conversation.asked).toEqual(["How many?"]);
+    });
+
+    it("asks again with no line after a reply the chat discarded", async () => {
+      const conversation = _fakeConversation();
+      const conversations = new Map([[KEY, conversation]]);
+      await _ask(conversations, {
+        ..._turn("How many?"),
+        isStale: () => {
+          return true;
+        },
+      });
+
+      await _ask(conversations, _turn("How many?"));
+
+      expect(conversation.asked).toEqual(["How many?", "How many?"]);
+    });
+
+    it("sends an offline Try again no line", async () => {
+      const conversation = _fakeConversation();
+      const conversations = new Map([[KEY, conversation]]);
+      const offlineTurn = { ..._turn("How many?"), isOffline: true };
+
+      await _ask(conversations, offlineTurn);
+      await _ask(conversations, { ...offlineTurn });
+
+      expect(conversations.get(KEY)).toBe(conversation);
+      expect(conversation.asked).toEqual(["How many?", "How many?"]);
+    });
+
+    it.each([
+      ["a follow-up", ["How many?", "Here it is.", "And deaths?"]],
+      [
+        "a card answer",
+        ["How many?", "Which state?", "[Clarification answer: Ohio]"],
+      ],
+      [
+        "a view change",
+        [
+          "How many?",
+          "Here it is.",
+          ChatViewEvent.format({
+            app: "dashboards",
+            route: "/acme/dashboards",
+          }),
+        ],
+      ],
+    ])(
+      "asks %s on the same conversation with no line",
+      async (_label, thread) => {
+        const conversation = _fakeConversation();
+        const conversations = new Map([[KEY, conversation]]);
+
+        await _ask(conversations, _turn("How many?"));
+        await _ask(conversations, _turn(thread));
+
+        expect(conversations.get(KEY)).toBe(conversation);
+        expect(conversation.asked[1]).not.toContain(TRY_AGAIN_LINE);
+      },
+    );
+
+    it("starts a new conversation from the recap when the thread rewinds", async () => {
+      const oldConversation = _fakeConversation();
+      const newConversation = _fakeConversation();
+      const conversations = new Map<string, DataAgentConversation>([
+        [KEY, oldConversation],
+      ]);
+      const askThread = (thread: readonly string[]) => {
+        return askConversationDataAgent({
+          conversations,
+          turn: _turn(thread),
+          buildTurnInputs: () => {
+            return {
+              blocks: {},
+              nameOf: _noName,
+              maskAssistantText: _keepText,
+            };
+          },
+          createConversation: async () => {
+            return newConversation;
+          },
+        });
+      };
+      const second = ["How many?", "Here it is.", "And deaths?"];
+
+      await askThread(["How many?"]);
+      await askThread(second);
+      await askThread([...second, "Here it is.", "And cases?"]);
+      await askThread(second);
+
+      expect(oldConversation.dataAgent.agent.abort).toHaveBeenCalledTimes(1);
+      expect(conversations.get(KEY)).toBe(newConversation);
+      expect(newConversation.asked).toEqual([
+        "Earlier in this conversation:\nUser: How many?\nAssistant: Here it is.\n\nAnd deaths?",
+      ]);
+    });
+
+    it("asks a new chat's same question with no line", async () => {
+      const newChat = _fakeConversation();
+      const conversations = new Map<string, DataAgentConversation>([
+        [KEY, _fakeConversation()],
+      ]);
+      await _ask(conversations, _turn("How many?"));
+
+      await askConversationDataAgent({
+        conversations,
+        turn: _turn("How many?", 1),
+        createConversation: async () => {
+          return newChat;
+        },
+      });
+
+      expect(newChat.asked).toEqual(["How many?"]);
+    });
+
+    it("keeps the newer turn's record when a run it stopped settles", async () => {
+      let finishFirstRun: (() => void) | undefined;
+      const conversation = _fakeConversation(async (text) => {
+        if (text === "First?") {
+          await new Promise<void>((resolve) => {
+            finishFirstRun = resolve;
+          });
+          return { text: "Stopped." };
+        }
+        return { text: "Second." };
+      });
+      vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+        finishFirstRun?.();
+      });
+      const conversations = new Map([[KEY, conversation]]);
+      const secondTurn = _turn(["First?", "Stopped.", "Second?"]);
+
+      const firstReply = _ask(conversations, _turn("First?"));
+      const secondReply = _ask(conversations, secondTurn);
+      await Promise.all([firstReply, secondReply]);
+
+      expect(conversation.lastAsk).toEqual({
+        threadKey: chatMessagesKey(secondTurn.apiMessages),
+        messageCount: 3,
+        isKept: true,
+      });
+      expect(conversation.asked).toEqual(["First?", "Second?"]);
+    });
   });
 });
