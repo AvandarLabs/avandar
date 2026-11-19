@@ -112,8 +112,9 @@ registerStockPresetAssertions({
   contract,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
   textFrames: [24, 72, 150],
 });
 registerStockTextLayoutAssertions({
@@ -125,9 +126,9 @@ registerStockTextLayoutAssertions({
 });
 
 test("both support choices preserve rehearsal people and stop identity with either optional trace", () => {
-  (["alongside", "stands-back"] as const).forEach((finalStepSupport) =>
-    [true, false].forEach((showPracticeStrip) =>
-      [true, false].forEach((showFootprints) => {
+  (["alongside", "stands-back"] as const).forEach((finalStepSupport) => {
+    return [true, false].forEach((showPracticeStrip) => {
+      return [true, false].forEach((showFootprints) => {
         const input = {
           ...defaultInput,
           finalStepSupport,
@@ -201,7 +202,7 @@ test("both support choices preserve rehearsal people and stop identity with eith
             390,
           );
         });
-      }),
-    ),
-  );
+      });
+    });
+  });
 });

@@ -28,13 +28,13 @@ export function ScopeSwitch({
           { value: "theme", label: "Whole theme" },
           { value: "item", label: item.scopeLabel },
         ]}
-        onChange={(kind) =>
-          onScopeChange(
+        onChange={(kind) => {
+          return onScopeChange(
             kind === "item"
               ? { kind: "item", itemId: item.id }
               : { kind: "theme" },
-          )
-        }
+          );
+        }}
       />
       {overrideCount > 0 ? (
         <Badge

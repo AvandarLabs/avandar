@@ -39,9 +39,9 @@ export function StoryFilm({
   const shots = timeline(plan);
   const index = Math.max(
     0,
-    shots.findIndex(
-      (shot) => frame >= shot.startFrame && frame < shot.endFrame,
-    ),
+    shots.findIndex((shot) => {
+      return frame >= shot.startFrame && frame < shot.endFrame;
+    }),
   );
   const shot = shots[index];
   const localFrame = frame - shot.startFrame;

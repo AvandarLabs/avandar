@@ -45,15 +45,21 @@ export function GalleryToolbar({
           id="collection-filter"
           className="collection-filter"
           value={collection}
-          onChange={(event) => setCollection(event.target.value)}
+          onChange={(event) => {
+            return setCollection(event.target.value);
+          }}
         >
           <option value="all">All collections ({STOCK_CATALOG.length})</option>
-          {(["general", "social-sector"] as const).map((value) => (
-            <option key={value} value={value}>
-              {value === "general" ? "General and technology" : "Social sector"}{" "}
-              {`(${STOCK_CATALOG.filter(propEq("collection", value)).length})`}
-            </option>
-          ))}
+          {(["general", "social-sector"] as const).map((value) => {
+            return (
+              <option key={value} value={value}>
+                {value === "general"
+                  ? "General and technology"
+                  : "Social sector"}{" "}
+                {`(${STOCK_CATALOG.filter(propEq("collection", value)).length})`}
+              </option>
+            );
+          })}
         </select>
         <div className="search-field">
           <Icon name="search" size={17} />
@@ -65,18 +71,29 @@ export function GalleryToolbar({
             type="search"
             placeholder="Search motions, ideas…"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              return setQuery(event.target.value);
+            }}
             autoComplete="off"
           />
           {query ? (
-            <button onClick={() => setQuery("")} aria-label="Clear search">
+            <button
+              onClick={() => {
+                return setQuery("");
+              }}
+              aria-label="Clear search"
+            >
               <Icon name="close" size={14} />
             </button>
           ) : null}
         </div>
         <button
           className="play-all"
-          onClick={() => setPlaying((value) => !value)}
+          onClick={() => {
+            return setPlaying((value) => {
+              return !value;
+            });
+          }}
           aria-label={playing ? "Pause all animations" : "Play all animations"}
         >
           <Icon name={playing ? "pause" : "play"} size={15} />

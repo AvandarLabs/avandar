@@ -26,12 +26,14 @@ function Root() {
       width={film.width}
       height={film.height}
       fps={film.fps}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: props.film.frames,
-        width: props.film.width,
-        height: props.film.height,
-        fps: props.film.fps,
-      })}
+      calculateMetadata={({ props }) => {
+        return {
+          durationInFrames: props.film.frames,
+          width: props.film.width,
+          height: props.film.height,
+          fps: props.film.fps,
+        };
+      }}
     />
   );
 }

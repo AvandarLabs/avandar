@@ -4,11 +4,15 @@ export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "machine"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "machine";
+    }),
   ),
   { ...DEFAULT_INPUT, machine: { ...DEFAULT_INPUT.machine, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "timeSlots"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "timeSlots";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
@@ -57,7 +61,9 @@ export const invalidInputs: unknown[] = [
     ],
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "requests"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "requests";
+    }),
   ),
   {
     ...DEFAULT_INPUT,
@@ -107,18 +113,20 @@ export const invalidInputs: unknown[] = [
     ],
   },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "labels"),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "labels";
+    }),
   ),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showOriginalRequests",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showOriginalRequests";
+    }),
   ),
   Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showUsageTurns",
-    ),
+    Object.entries(DEFAULT_INPUT).filter(([field]) => {
+      return field !== "showUsageTurns";
+    }),
   ),
   { ...DEFAULT_INPUT, machine: { ...DEFAULT_INPUT.machine, kind: "invalid" } },
   {

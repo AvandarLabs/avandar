@@ -19,9 +19,9 @@ const DOCUMENT_ONLY_KEYS: readonly string[] = [
 
 function _toPatch(document: VideoThemeDocument): VideoThemePatch {
   return Object.fromEntries(
-    Object.entries(document).filter(
-      ([key]) => !DOCUMENT_ONLY_KEYS.includes(key),
-    ),
+    Object.entries(document).filter(([key]) => {
+      return !DOCUMENT_ONLY_KEYS.includes(key);
+    }),
   );
 }
 
@@ -52,9 +52,12 @@ export function mergeVideoThemeLayers(
     return override ? [override] : [];
   });
   const layers: readonly VideoThemePatch[] = [
-    ...[classic, ...chain.filter((document) => document !== classic)].map(
-      _toPatch,
-    ),
+    ...[
+      classic,
+      ...chain.filter((document) => {
+        return document !== classic;
+      }),
+    ].map(_toPatch),
     ...overrides,
     ...(scope.patches ?? []),
   ];

@@ -43,13 +43,12 @@ export function getObservationSlotFromFrame({
     fragment = input.fragments.find(propEq("role", role))!;
   const fragmentIndex = input.fragments.indexOf(fragment),
     start =
-      input.fragments
-        .slice(0, fragmentIndex)
-        .reduce((total, item) => total + item.text.length, 0) +
-      fragment.contentStart;
-  const origin = getSentenceGlyphsFromInput(input).find(
-    (glyph) => glyph.end > start,
-  )!;
+      input.fragments.slice(0, fragmentIndex).reduce((total, item) => {
+        return total + item.text.length;
+      }, 0) + fragment.contentStart;
+  const origin = getSentenceGlyphsFromInput(input).find((glyph) => {
+    return glyph.end > start;
+  })!;
   const departure = 56 + ((index + 3) % 6) * 8.5;
   const progress = ramp(frame, departure, 8, EASE.inOut),
     alignment = ramp(frame, departure, 3, EASE.inOut),

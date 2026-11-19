@@ -81,10 +81,9 @@ export function FixtureDataViz() {
   const { frame, chartAt } = useContext(DashboardFixtureContext);
   // The complete, exact fixture totals stay in the chart. Frame-driven clipping
   // reveals bar geometry without changing the data or Recharts' axis domain.
-  const barRules = EXPLORER_DISTRICT_COUNTS.map(
-    (_, index) =>
-      `.film-dashboard-viz .recharts-bar-rectangle:nth-child(${index + 1}) { clip-path: inset(${(1 - ramp(frame, chartAt + index * 3, 22)) * 100}% 0 0 0); }`,
-  ).join("\n");
+  const barRules = EXPLORER_DISTRICT_COUNTS.map((_, index) => {
+    return `.film-dashboard-viz .recharts-bar-rectangle:nth-child(${index + 1}) { clip-path: inset(${(1 - ramp(frame, chartAt + index * 3, 22)) * 100}% 0 0 0); }`;
+  }).join("\n");
   return (
     <div className="film-dashboard-viz">
       <style>{barRules}</style>

@@ -23,9 +23,9 @@ export function SpineObservation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const entityIndex = input.entities.findIndex(
-      ({ id }) => id === observation.entityId,
-    ),
+  const entityIndex = input.entities.findIndex(({ id }) => {
+      return id === observation.entityId;
+    }),
     sourceY = 104 + index * 60;
   const targetY = 164 + entityIndex * 100;
   return (

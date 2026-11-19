@@ -65,19 +65,21 @@ export function MixTokenDemo({ frame, frames }: HelperDemoProps) {
             Selected
           </div>
           <div className={css.swatchStrip}>
-            {SWATCH_STEPS.map((step) => (
-              <span
-                key={step}
-                className={css.swatch}
-                style={{
-                  background: mixToken(step, "var(--border)", "var(--brand)"),
-                  outline:
-                    Math.abs(step - t) < 0.05
-                      ? "2px solid var(--demo-highlight)"
-                      : undefined,
-                }}
-              />
-            ))}
+            {SWATCH_STEPS.map((step) => {
+              return (
+                <span
+                  key={step}
+                  className={css.swatch}
+                  style={{
+                    background: mixToken(step, "var(--border)", "var(--brand)"),
+                    outline:
+                      Math.abs(step - t) < 0.05
+                        ? "2px solid var(--demo-highlight)"
+                        : undefined,
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

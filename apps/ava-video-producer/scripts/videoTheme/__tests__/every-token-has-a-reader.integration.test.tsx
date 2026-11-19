@@ -52,13 +52,17 @@ const STAGE_SOURCE_DIRECTORIES = ["src/continuity", "src/motion-components"];
 const PALETTE_GROUPS = ["sketch.profile", "camera.presets"];
 
 const TOKEN_PATHS = listTokenDefinitions()
-  .map((entry) => entry.path)
-  .filter((tokenPath) => !isMantineTokenRoot(tokenPath.split(".")[0]));
+  .map((entry) => {
+    return entry.path;
+  })
+  .filter((tokenPath) => {
+    return !isMantineTokenRoot(tokenPath.split(".")[0]);
+  });
 const TOKEN_PATH_SET: ReadonlySet<string> = new Set(TOKEN_PATHS);
 /** Atomic scales are exempt: they are vocabularies a theme or the editor writes new entries into. */
-const AUDITED_TOKEN_PATHS = TOKEN_PATHS.filter(
-  (tokenPath) => !tokenPath.startsWith("atomic."),
-);
+const AUDITED_TOKEN_PATHS = TOKEN_PATHS.filter((tokenPath) => {
+  return !tokenPath.startsWith("atomic.");
+});
 
 function _stockReads(): string[] {
   const collector = createTokenUsageCollector();
@@ -77,7 +81,9 @@ function _stockReads(): string[] {
 function _planBuilderReads(): string[] {
   const collector = createTokenUsageCollector();
   const plans = PARITY_COMPOSITION_IDS.map((id) => {
-    const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
+    const entry = CONTINUITY_CATALOG.find((candidate) => {
+      return candidate.id === id;
+    });
     assert.ok(entry, id);
     return storyboardSchema.parse(
       JSON.parse(
@@ -105,9 +111,9 @@ function _planBuilderReads(): string[] {
       basePath: [],
       report: collector.report,
     });
-    plans.forEach((plan) =>
-      createContinuityPlanFromVideoTheme(plan, { semantic }),
-    );
+    plans.forEach((plan) => {
+      return createContinuityPlanFromVideoTheme(plan, { semantic });
+    });
   });
   return [...collector.getPaths()];
 }
@@ -118,19 +124,24 @@ function _readStageSources(pattern: RegExp): string {
     const root = new URL(`../../../${directory}/`, import.meta.url);
     return fs
       .readdirSync(root, { recursive: true, encoding: "utf8" })
-      .filter(
-        (file) =>
+      .filter((file) => {
+        return (
           pattern.test(file) &&
           !file.includes(".test.") &&
-          !file.includes("gallery"),
-      )
-      .map((file) => fs.readFileSync(new URL(file, root), "utf8"));
+          !file.includes("gallery")
+        );
+      })
+      .map((file) => {
+        return fs.readFileSync(new URL(file, root), "utf8");
+      });
   }).join("\n");
 }
 
 function _kebab(segment: string): string {
   return segment
-    .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+    .replace(/[A-Z]/g, (letter) => {
+      return `-${letter.toLowerCase()}`;
+    })
     .replace(/^-/, "");
 }
 
@@ -145,18 +156,24 @@ function _variablePrefix(tokenPath: string): string {
 function _cssReads(): string[] {
   const names = new Set(
     [..._readStageSources(/\.css$/).matchAll(/var\((--video-[a-z0-9-]+)/g)].map(
-      (match) => match[1],
+      (match) => {
+        return match[1];
+      },
     ),
   );
-  const owners = TOKEN_PATHS.filter(
-    (tokenPath) => !tokenPath.startsWith("atomic."),
-  )
-    .map((tokenPath) => ({ tokenPath, prefix: _variablePrefix(tokenPath) }))
-    .sort((left, right) => right.prefix.length - left.prefix.length);
+  const owners = TOKEN_PATHS.filter((tokenPath) => {
+    return !tokenPath.startsWith("atomic.");
+  })
+    .map((tokenPath) => {
+      return { tokenPath, prefix: _variablePrefix(tokenPath) };
+    })
+    .sort((left, right) => {
+      return right.prefix.length - left.prefix.length;
+    });
   return [...names].flatMap((name) => {
-    const owner = owners.find(
-      ({ prefix }) => name === prefix || name.startsWith(`${prefix}-`),
-    );
+    const owner = owners.find(({ prefix }) => {
+      return name === prefix || name.startsWith(`${prefix}-`);
+    });
     return owner ? [owner.tokenPath] : [];
   });
 }
@@ -164,7 +181,9 @@ function _cssReads(): string[] {
 function _scriptReads(): string[] {
   const source = _readStageSources(/\.tsx?$/);
   const components = new Set(
-    [...source.matchAll(/useVideoProps\("(\w+)"/g)].map((match) => match[1]),
+    [...source.matchAll(/useVideoProps\("(\w+)"/g)].map((match) => {
+      return match[1];
+    }),
   );
   return TOKEN_PATHS.filter((tokenPath) => {
     const [root, name] = tokenPath.split(".");
@@ -204,10 +223,14 @@ function _referencedTokenPaths(value: unknown): string[] {
     }
     const segments =
       target.tier === "atomic" ? ["atomic", ...target.path] : [...target.path];
-    const prefixes = segments.map((_, index) =>
-      segments.slice(0, segments.length - index).join("."),
-    );
-    return prefixes.filter((prefix) => TOKEN_PATH_SET.has(prefix)).slice(0, 1);
+    const prefixes = segments.map((_, index) => {
+      return segments.slice(0, segments.length - index).join(".");
+    });
+    return prefixes
+      .filter((prefix) => {
+        return TOKEN_PATH_SET.has(prefix);
+      })
+      .slice(0, 1);
   }
   return typeof value === "object" && value !== null
     ? Object.values(value).flatMap(_referencedTokenPaths)
@@ -216,11 +239,13 @@ function _referencedTokenPaths(value: unknown): string[] {
 
 /** A token plus, when it belongs to a menu group, every other choice in that menu. */
 function _withPaletteSiblings(tokenPath: string): string[] {
-  const group = PALETTE_GROUPS.find((prefix) =>
-    tokenPath.startsWith(`${prefix}.`),
-  );
+  const group = PALETTE_GROUPS.find((prefix) => {
+    return tokenPath.startsWith(`${prefix}.`);
+  });
   return group
-    ? TOKEN_PATHS.filter((candidate) => candidate.startsWith(`${group}.`))
+    ? TOKEN_PATHS.filter((candidate) => {
+        return candidate.startsWith(`${group}.`);
+      })
     : [tokenPath];
 }
 
@@ -238,7 +263,9 @@ function _liveTokenPaths(directReads: readonly string[]): Set<string> {
     }
   };
   directReads
-    .filter((tokenPath) => TOKEN_PATH_SET.has(tokenPath))
+    .filter((tokenPath) => {
+      return TOKEN_PATH_SET.has(tokenPath);
+    })
     .forEach(markLive);
   for (
     let tokenPath = pending.pop();
@@ -247,9 +274,9 @@ function _liveTokenPaths(directReads: readonly string[]): Set<string> {
   ) {
     const current = tokenPath;
     documents
-      .flatMap((document) =>
-        _referencedTokenPaths(_rawValue(document, current)),
-      )
+      .flatMap((document) => {
+        return _referencedTokenPaths(_rawValue(document, current));
+      })
       .forEach(markLive);
   }
   return live;
@@ -261,7 +288,9 @@ test("every reader source finds tokens, so a broken collector cannot pass the au
     planBuilder: _planBuilderReads(),
     css: _cssReads(),
     script: _scriptReads(),
-  }).forEach(([name, reads]) => assert.ok(reads.length > 0, name));
+  }).forEach(([name, reads]) => {
+    return assert.ok(reads.length > 0, name);
+  });
 });
 
 test("every token is read by an in-scope renderer or referenced by one that is", () => {
@@ -272,7 +301,9 @@ test("every token is read by an in-scope renderer or referenced by one that is",
     ..._scriptReads(),
   ]);
   assert.deepEqual(
-    AUDITED_TOKEN_PATHS.filter((tokenPath) => !live.has(tokenPath)),
+    AUDITED_TOKEN_PATHS.filter((tokenPath) => {
+      return !live.has(tokenPath);
+    }),
     [],
   );
 });

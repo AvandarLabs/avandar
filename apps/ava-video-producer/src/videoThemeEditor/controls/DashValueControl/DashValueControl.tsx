@@ -18,7 +18,10 @@ export function DashValueControl({
 }: ValueControlProps) {
   const hasIssue = useRowHasIssue();
   const pattern: readonly number[] =
-    Array.isArray(value) && value.every((dash) => typeof dash === "number")
+    Array.isArray(value) &&
+    value.every((dash) => {
+      return typeof dash === "number";
+    })
       ? value
       : [];
   const field = useDraftValue<readonly number[], string>({
@@ -40,7 +43,9 @@ export function DashValueControl({
             ? hasIssue
             : "Use up to eight numbers separated by spaces."
         }
-        onChange={(event) => field.change(event.currentTarget.value)}
+        onChange={(event) => {
+          return field.change(event.currentTarget.value);
+        }}
       />
       <DashPreview pattern={pattern} />
     </div>

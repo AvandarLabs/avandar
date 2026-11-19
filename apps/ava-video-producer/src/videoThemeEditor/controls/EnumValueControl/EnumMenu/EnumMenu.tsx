@@ -15,7 +15,9 @@ type Props = Readonly<{
 /** An enum menu whose options show their explanations under their names. */
 export function EnumMenu({ label, value, options, hasIssue, onChange }: Props) {
   const descriptions = new Map(
-    options.map((entry) => [entry.option, entry.description]),
+    options.map((entry) => {
+      return [entry.option, entry.description];
+    }),
   );
   return (
     <AtlasSelect
@@ -23,11 +25,15 @@ export function EnumMenu({ label, value, options, hasIssue, onChange }: Props) {
       error={hasIssue}
       value={value ?? null}
       placeholder="Not set"
-      data={options.map((entry) => ({
-        value: entry.option,
-        label: entry.label,
-      }))}
-      onChange={(selectedOption) => selectedOption && onChange(selectedOption)}
+      data={options.map((entry) => {
+        return {
+          value: entry.option,
+          label: entry.label,
+        };
+      })}
+      onChange={(selectedOption) => {
+        return selectedOption && onChange(selectedOption);
+      }}
       renderOption={({ option }) => {
         const description = descriptions.get(option.value);
         return (

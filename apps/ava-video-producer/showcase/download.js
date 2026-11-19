@@ -38,7 +38,9 @@ function buildExportRequest(id, options) {
     return Object.fromEntries(
       Object.keys(value)
         .sort()
-        .map((key) => [key, value[key]]),
+        .map((key) => {
+          return [key, value[key]];
+        }),
     );
   });
 }
@@ -52,7 +54,9 @@ async function runExport({ request, onStatus }) {
   });
   while (job.state === "running") {
     onStatus(job);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 1000);
+    });
     job = await requestJob(`/api/exports/${encodeURIComponent(job.id)}`);
   }
   if (job.state === "failed") {
@@ -76,7 +80,9 @@ export async function downloadFilm({ id, options = {}, onStatus = () => {} }) {
       onStatus({ state: "failed", message: error.message });
       throw error;
     })
-    .finally(() => activeDownloads.delete(request));
+    .finally(() => {
+      return activeDownloads.delete(request);
+    });
   activeDownloads.set(request, pending);
   return pending;
 }

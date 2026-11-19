@@ -12,7 +12,9 @@ import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePan
 import { viewStates } from "./mapFixtures";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 
 /** The real layer inspector panel: product data/style/sensitivity sections over an immutable fixture layer. */
 export function PointInspector({
@@ -115,7 +117,9 @@ export function PointInspector({
                 cluster: "Cluster",
                 heatmap: "Heat",
               }}
-              isOptionAvailable={() => true}
+              isOptionAvailable={() => {
+                return true;
+              }}
               onTypeChange={_noop}
             />
           </div>

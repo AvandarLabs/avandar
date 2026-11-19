@@ -19,10 +19,9 @@ type Props = Readonly<{
  * `story-film` composition the `video` CLI renders.
  */
 export function ThemedStoryFilm({ plan, theme, productScene }: Props) {
-  const themedPlan = useMemo(
-    () => createContinuityPlanFromVideoThemeSnapshot(plan, theme, [plan.id]),
-    [plan, theme],
-  );
+  const themedPlan = useMemo(() => {
+    return createContinuityPlanFromVideoThemeSnapshot(plan, theme, [plan.id]);
+  }, [plan, theme]);
   return (
     <VideoThemeProvider
       source={createVideoThemeSourceFromSnapshot(theme, [plan.id])}

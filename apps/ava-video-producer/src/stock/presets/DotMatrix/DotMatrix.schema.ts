@@ -28,9 +28,16 @@ export const dotMatrixInputSchema = z
     showLegend: z.boolean(),
   })
   .refine(
-    (input) =>
-      input.groups.reduce((sum, group) => sum + group.value, 0) >= 1 &&
-      input.groups.reduce((sum, group) => sum + group.value, 0) <= 100,
+    (input) => {
+      return (
+        input.groups.reduce((sum, group) => {
+          return sum + group.value;
+        }, 0) >= 1 &&
+        input.groups.reduce((sum, group) => {
+          return sum + group.value;
+        }, 0) <= 100
+      );
+    },
     {
       path: ["groups"],
       message: "The cohort must contain 1 to 100 authored examples.",

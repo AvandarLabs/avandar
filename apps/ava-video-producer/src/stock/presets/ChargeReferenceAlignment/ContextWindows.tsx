@@ -14,12 +14,14 @@ export function ContextWindows({
   const registration = ramp(frame, 12, 58, EASE.inOut);
   return (
     <g>
-      {CONTEXT_FIELDS.map(([field, copyKey], index) => (
-        <ContextWindow
-          key={field}
-          {...{ input, field, copyKey, index, registration, accent }}
-        />
-      ))}
+      {CONTEXT_FIELDS.map(([field, copyKey], index) => {
+        return (
+          <ContextWindow
+            key={field}
+            {...{ input, field, copyKey, index, registration, accent }}
+          />
+        );
+      })}
     </g>
   );
 }

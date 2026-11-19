@@ -41,11 +41,23 @@ function Review() {
   window.review = {
     feature,
     beats: FEATURE_BEATS,
-    setFeature: (value) => flushSync(() => setFeature(value)),
-    seek: (frame) => ref.current?.seekTo(frame),
-    frame: () => ref.current?.getCurrentFrame() ?? 0,
-    play: () => ref.current?.play(),
-    pause: () => ref.current?.pause(),
+    setFeature: (value) => {
+      return flushSync(() => {
+        return setFeature(value);
+      });
+    },
+    seek: (frame) => {
+      return ref.current?.seekTo(frame);
+    },
+    frame: () => {
+      return ref.current?.getCurrentFrame() ?? 0;
+    },
+    play: () => {
+      return ref.current?.play();
+    },
+    pause: () => {
+      return ref.current?.pause();
+    },
   };
   return (
     <Player

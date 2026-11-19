@@ -100,7 +100,9 @@ export function DiagramCameraDemo({ frame, frames }: HelperDemoProps) {
           <DiagramCamera
             track={TRACK}
             preset="balanced"
-            render={() => <DemoDiagram />}
+            render={() => {
+              return <DemoDiagram />;
+            }}
           />
         </div>
       </div>

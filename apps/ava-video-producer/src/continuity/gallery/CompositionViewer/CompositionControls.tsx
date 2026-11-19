@@ -35,22 +35,44 @@ export function CompositionControls({ appearance, isScene }: ControlsProps) {
 function TransportControls({ appearance, isScene }: ControlsProps) {
   return (
     <div className={css.transport}>
-      <button onClick={() => appearance.send("play")}>Play</button>
-      <button onClick={() => appearance.send("pause")}>Pause</button>
-      <button onClick={() => appearance.send("replay")}>Replay</button>
+      <button
+        onClick={() => {
+          return appearance.send("play");
+        }}
+      >
+        Play
+      </button>
+      <button
+        onClick={() => {
+          return appearance.send("pause");
+        }}
+      >
+        Pause
+      </button>
+      <button
+        onClick={() => {
+          return appearance.send("replay");
+        }}
+      >
+        Replay
+      </button>
       <AtlasSelect
         label="Speed"
         value={String(appearance.transport.speed)}
-        data={[0.5, 1, 1.5, 2].map((speed) => ({
-          value: String(speed),
-          label: `${speed}×`,
-        }))}
-        onChange={(speed) =>
-          appearance.setTransport((current) => ({
-            ...current,
-            speed: Number(speed),
-          }))
-        }
+        data={[0.5, 1, 1.5, 2].map((speed) => {
+          return {
+            value: String(speed),
+            label: `${speed}×`,
+          };
+        })}
+        onChange={(speed) => {
+          return appearance.setTransport((current) => {
+            return {
+              ...current,
+              speed: Number(speed),
+            };
+          });
+        }}
       />
       <Checkbox
         size="xs"
@@ -58,7 +80,9 @@ function TransportControls({ appearance, isScene }: ControlsProps) {
         checked={appearance.transport.loop}
         onChange={(event) => {
           const loop = event.currentTarget.checked;
-          appearance.setTransport((current) => ({ ...current, loop }));
+          appearance.setTransport((current) => {
+            return { ...current, loop };
+          });
         }}
       />
       {isScene ? null : <AppearanceToggles appearance={appearance} />}
@@ -76,17 +100,21 @@ function AppearanceToggles({ appearance }: Props) {
   return (
     <>
       {(["cameraMotion", "motionBlur", "annotations", "captions"] as const).map(
-        (key) => (
-          <Checkbox
-            key={key}
-            size="xs"
-            label={labels[key]}
-            checked={appearance.draft[key]}
-            onChange={(event) =>
-              appearance.update({ [key]: event.currentTarget.checked })
-            }
-          />
-        ),
+        (key) => {
+          return (
+            <Checkbox
+              key={key}
+              size="xs"
+              label={labels[key]}
+              checked={appearance.draft[key]}
+              onChange={(event) => {
+                return appearance.update({
+                  [key]: event.currentTarget.checked,
+                });
+              }}
+            />
+          );
+        },
       )}
     </>
   );

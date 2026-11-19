@@ -15,9 +15,9 @@ type Props = TokenRowGroup &
 export function SectionRows({ group, rows, allRows }: Props) {
   return (
     <>
-      {rows.map((row) => (
-        <TokenRow key={row.path} row={row} />
-      ))}
+      {rows.map((row) => {
+        return <TokenRow key={row.path} row={row} />;
+      })}
       {group.startsWith("atomic:") ? (
         <AddScaleValue group={group} rows={rows} allRows={allRows} />
       ) : null}

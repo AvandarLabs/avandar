@@ -56,14 +56,16 @@ export function EraseMaskDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.list}>
-        {ROWS.map((row, index) => (
-          <ErasedRow
-            key={row}
-            frame={frame}
-            index={index}
-            eraseAt={ERASE_AT + index * 3}
-          />
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <ErasedRow
+              key={row}
+              frame={frame}
+              index={index}
+              eraseAt={ERASE_AT + index * 3}
+            />
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -84,24 +86,34 @@ export function EraseScheduleDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="getEraseStartFrames({ atFrame: 40, elementCounts: [4, 4], staggerFrames: 1.5, panelStaggerFrames: 6 })"
-      readouts={SCHEDULE.map((starts, panel) => ({
-        name: `panel ${panel}`,
-        value: starts.map((start) => `${start}f`).join(" "),
-      }))}
+      readouts={SCHEDULE.map((starts, panel) => {
+        return {
+          name: `panel ${panel}`,
+          value: starts
+            .map((start) => {
+              return `${start}f`;
+            })
+            .join(" "),
+        };
+      })}
     >
       <div className={css.cards}>
-        {SCHEDULE.map((starts, panel) => (
-          <div key={`panel-${starts[0]}`} className={css.list}>
-            {starts.map((start, index) => (
-              <ErasedRow
-                key={start}
-                frame={frame}
-                index={index + panel}
-                eraseAt={start}
-              />
-            ))}
-          </div>
-        ))}
+        {SCHEDULE.map((starts, panel) => {
+          return (
+            <div key={`panel-${starts[0]}`} className={css.list}>
+              {starts.map((start, index) => {
+                return (
+                  <ErasedRow
+                    key={start}
+                    frame={frame}
+                    index={index + panel}
+                    eraseAt={start}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -138,26 +150,28 @@ export function SteppedColumnWipeDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={`${css.miniStages} ${css.twoUp}`}>
-        {WIPES.map((wipe) => (
-          <div key={wipe.code} className={css.miniStage}>
-            <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
-              <div className={`${css.shot} ${css.shotA}`}>A</div>
-              {frame >= WIPE_AT ? (
-                <div
-                  className={`${css.shot} ${css.shotB}`}
-                  style={getSteppedColumnWipeStyle(
-                    local,
-                    WIPE_FRAMES,
-                    wipe.options,
-                  )}
-                >
-                  B
-                </div>
-              ) : null}
+        {WIPES.map((wipe) => {
+          return (
+            <div key={wipe.code} className={css.miniStage}>
+              <div className={`${css.miniFrame} ${css.miniFrameTall}`}>
+                <div className={`${css.shot} ${css.shotA}`}>A</div>
+                {frame >= WIPE_AT ? (
+                  <div
+                    className={`${css.shot} ${css.shotB}`}
+                    style={getSteppedColumnWipeStyle(
+                      local,
+                      WIPE_FRAMES,
+                      wipe.options,
+                    )}
+                  >
+                    B
+                  </div>
+                ) : null}
+              </div>
+              <span className={css.caption}>{wipe.code}</span>
             </div>
-            <span className={css.caption}>{wipe.code}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -206,20 +220,22 @@ export function RoughEdgeDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.timeline}>
-        {BAR_VALUES.map((value, index) => (
-          <div key={value} className={css.row}>
-            <div
-              className={css.bar}
-              style={{
-                width:
-                  ramp(frame, 10 + index * 2, DUR.sheet, EASE.word) *
-                  value *
-                  760,
-                clipPath: getRoughEdgeClipPath(index, EDGE_DEPTH),
-              }}
-            />
-          </div>
-        ))}
+        {BAR_VALUES.map((value, index) => {
+          return (
+            <div key={value} className={css.row}>
+              <div
+                className={css.bar}
+                style={{
+                  width:
+                    ramp(frame, 10 + index * 2, DUR.sheet, EASE.word) *
+                    value *
+                    760,
+                  clipPath: getRoughEdgeClipPath(index, EDGE_DEPTH),
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

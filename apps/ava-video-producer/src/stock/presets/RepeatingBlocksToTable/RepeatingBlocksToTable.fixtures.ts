@@ -79,18 +79,24 @@ const minimum: Input = {
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  fields: ["a", "b", "c"].map((id) => ({
-    id: id.repeat(12),
-    label: "W".repeat(18),
-  })),
-  blocks: ["a", "b", "c"].map((id) => ({
-    id: id.repeat(12),
-    heading: "W".repeat(20),
-    cells: ["c", "a", "b"].map((field) => ({
-      fieldId: field.repeat(12),
-      text: "W".repeat(26),
-    })),
-  })),
+  fields: ["a", "b", "c"].map((id) => {
+    return {
+      id: id.repeat(12),
+      label: "W".repeat(18),
+    };
+  }),
+  blocks: ["a", "b", "c"].map((id) => {
+    return {
+      id: id.repeat(12),
+      heading: "W".repeat(20),
+      cells: ["c", "a", "b"].map((field) => {
+        return {
+          fieldId: field.repeat(12),
+          text: "W".repeat(26),
+        };
+      }),
+    };
+  }),
   missingLabel: "W".repeat(20),
   copy: {
     context: "W".repeat(34),
@@ -101,10 +107,12 @@ const dense: Input = {
 const changed: Input = {
   ...DEFAULT_INPUT,
   fields: [...DEFAULT_INPUT.fields].reverse(),
-  blocks: DEFAULT_INPUT.blocks.map((b) => ({
-    ...b,
-    cells: [...b.cells].reverse(),
-  })),
+  blocks: DEFAULT_INPUT.blocks.map((b) => {
+    return {
+      ...b,
+      cells: [...b.cells].reverse(),
+    };
+  }),
   showBlockNumbers: false,
 };
 /** Complete default, empty-ID minimum, full-capacity and reordered examples. */
@@ -132,28 +140,40 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    blocks: DEFAULT_INPUT.blocks.map((b) => ({ ...b, cells: [] })),
+    blocks: DEFAULT_INPUT.blocks.map((b) => {
+      return { ...b, cells: [] };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    blocks: DEFAULT_INPUT.blocks.map((b) => ({
-      ...b,
-      cells: [{ fieldId: "ghost", text: "x" }, b.cells[1]],
-    })),
+    blocks: DEFAULT_INPUT.blocks.map((b) => {
+      return {
+        ...b,
+        cells: [{ fieldId: "ghost", text: "x" }, b.cells[1]],
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    blocks: DEFAULT_INPUT.blocks.map((b) => ({ ...b, id: "x".repeat(13) })),
+    blocks: DEFAULT_INPUT.blocks.map((b) => {
+      return { ...b, id: "x".repeat(13) };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((f) => ({ ...f, id: "x".repeat(13) })),
+    fields: DEFAULT_INPUT.fields.map((f) => {
+      return { ...f, id: "x".repeat(13) };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    blocks: DEFAULT_INPUT.blocks.map((b) => ({
-      ...b,
-      cells: b.cells.map((c) => ({ ...c, text: "" })),
-    })),
+    blocks: DEFAULT_INPUT.blocks.map((b) => {
+      return {
+        ...b,
+        cells: b.cells.map((c) => {
+          return { ...c, text: "" };
+        }),
+      };
+    }),
   },
 ];

@@ -22,7 +22,9 @@ function useSourceWatch(
     let cancelRefresh: (() => void) | undefined;
     const stopWatching = watchFilms([player.current], () => {
       cancelRefresh?.();
-      cancelRefresh = afterDownloads(() => location.reload());
+      cancelRefresh = afterDownloads(() => {
+        return location.reload();
+      });
     });
     return () => {
       stopWatching();

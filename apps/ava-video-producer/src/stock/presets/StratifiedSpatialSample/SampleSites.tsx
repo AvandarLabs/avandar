@@ -11,20 +11,22 @@ export function SampleSites({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.sites.map((site, index) => (
-        <SampleSite
-          key={site.id}
-          site={site}
-          index={index}
-          frame={frame}
-          accent={accent}
-          selected={input.selectedSiteIds.includes(site.id)}
-          showLabel={
-            input.showUnselectedLabels ||
-            input.selectedSiteIds.includes(site.id)
-          }
-        />
-      ))}
+      {input.sites.map((site, index) => {
+        return (
+          <SampleSite
+            key={site.id}
+            site={site}
+            index={index}
+            frame={frame}
+            accent={accent}
+            selected={input.selectedSiteIds.includes(site.id)}
+            showLabel={
+              input.showUnselectedLabels ||
+              input.selectedSiteIds.includes(site.id)
+            }
+          />
+        );
+      })}
     </g>
   );
 }

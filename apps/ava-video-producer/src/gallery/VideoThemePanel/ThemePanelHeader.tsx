@@ -23,12 +23,16 @@ export function ThemePanelHeader({ gallery, barRef, onReloadTheme }: Props) {
         status={gallery.status}
         copyStatus={gallery.copyStatus}
         onSelectTheme={gallery.selectTheme}
-        onSave={() => void gallery.save()}
+        onSave={() => {
+          return void gallery.save();
+        }}
         onSaveAsNew={gallery.saveAsNew}
         onDiscard={gallery.discard}
         onReloadTheme={onReloadTheme}
         barRef={barRef}
-        onCopyJson={() => void gallery.copyThemeJson()}
+        onCopyJson={() => {
+          return void gallery.copyThemeJson();
+        }}
       />
       {gallery.isChangedOnDisk ? (
         <ChangedOnDiskBanner

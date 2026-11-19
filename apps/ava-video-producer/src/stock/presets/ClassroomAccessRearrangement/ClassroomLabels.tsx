@@ -31,26 +31,22 @@ export function ClassroomLabels({ input, frame }: Readonly<Props>): ReactNode {
       1,
     ],
     [input.caption, 48, 589, 864, 12, 1, STOCK.muted],
-    ...input.adaptations.map((adaptation, index): Slot => [
-      adaptation.label,
-      48 + index * 300,
-      525,
-      276,
-      14,
-      3,
-      STOCK.mint,
-    ]),
+    ...input.adaptations.map((adaptation, index): Slot => {
+      return [adaptation.label, 48 + index * 300, 525, 276, 14, 3, STOCK.mint];
+    }),
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => (
-        <FitText
-          key={index}
-          {...{ text, x, y, width, fontSize, maxLines, color }}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => {
+        return (
+          <FitText
+            key={index}
+            {...{ text, x, y, width, fontSize, maxLines, color }}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       <ClassroomRoster input={input} />
     </g>
   );

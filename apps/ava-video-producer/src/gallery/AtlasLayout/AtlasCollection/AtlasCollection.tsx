@@ -70,13 +70,17 @@ export function AtlasCollection({
                 type="search"
                 placeholder={searchPlaceholder}
                 value={query}
-                onChange={(event) => onQueryChange(event.target.value)}
+                onChange={(event) => {
+                  return onQueryChange(event.target.value);
+                }}
                 autoComplete="off"
               />
               {query ? (
                 <button
                   type="button"
-                  onClick={() => onQueryChange("")}
+                  onClick={() => {
+                    return onQueryChange("");
+                  }}
                   aria-label="Clear search"
                 >
                   <Icon name="close" size={14} />

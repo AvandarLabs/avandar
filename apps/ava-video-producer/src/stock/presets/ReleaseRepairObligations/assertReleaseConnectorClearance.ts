@@ -39,11 +39,9 @@ function _getPoints(attributes: string): Point[] {
   );
 }
 function _decodeText(text: string): string {
-  return text.replace(
-    /&(amp|lt|gt|quot|#x27);/g,
-    (_, entity: string) =>
-      ({ amp: "&", lt: "<", gt: ">", quot: '"', "#x27": "'" })[entity]!,
-  );
+  return text.replace(/&(amp|lt|gt|quot|#x27);/g, (_, entity: string) => {
+    return { amp: "&", lt: "<", gt: ">", quot: '"', "#x27": "'" }[entity]!;
+  });
 }
 function _getTextBounds(markup: string): Bounds[] {
   return [...markup.matchAll(/<text([^>]*)>([\s\S]*?)<\/text>/g)].flatMap(
@@ -58,23 +56,25 @@ function _getTextBounds(markup: string): Bounds[] {
       });
       const spans = [...body.matchAll(/<tspan([^>]*)>([^<]*)<\/tspan>/g)];
       const lines = spans.length
-        ? spans.map(([, span, line], index) => ({
-            x: SvgAttributes.getNumberFromMarkup({
-              attributes: span,
-              name: "x",
-            }),
-            y:
-              baseline +
-              spans
-                .slice(0, index + 1)
-                .reduce(
-                  (offset, [, spanAttributes]) =>
-                    offset +
-                    Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0),
-                  0,
-                ),
-            line,
-          }))
+        ? spans.map(([, span, line], index) => {
+            return {
+              x: SvgAttributes.getNumberFromMarkup({
+                attributes: span,
+                name: "x",
+              }),
+              y:
+                baseline +
+                spans
+                  .slice(0, index + 1)
+                  .reduce((offset, [, spanAttributes]) => {
+                    return (
+                      offset +
+                      Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0)
+                    );
+                  }, 0),
+              line,
+            };
+          })
         : [
             {
               x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
@@ -134,7 +134,9 @@ function _assertPortContact({
 }: Readonly<{ markup: string; id: string; points: Point[] }>): void {
   const port = [
     ...markup.matchAll(/<circle data-register-port="([^"]*)"[^>]*>/g),
-  ].find((match) => match[1] === id)?.[0];
+  ].find((match) => {
+    return match[1] === id;
+  })?.[0];
   assert.ok(port);
   assert.deepEqual(points.at(-1), {
     x: SvgAttributes.getNumberFromMarkup({ attributes: port, name: "cx" }),
@@ -182,12 +184,12 @@ export function assertReleaseConnectorClearance(markup: string): void {
           top: bounds.top - halfStroke,
           bottom: bounds.bottom + halfStroke,
         };
-        textBounds.forEach((text) =>
-          assert.ok(
+        textBounds.forEach((text) => {
+          return assert.ok(
             !_intersects({ first: paint, second: text }),
             `${id} crosses complete text bounds ${JSON.stringify(text)}`,
-          ),
-        );
+          );
+        });
       });
       _assertPortContact({ markup, id, points });
       assert.equal(

@@ -24,25 +24,25 @@ export function DatasetParseControls({
       <NumberInput
         label="Number of rows to skip"
         value={parseOptions.numRowsToSkip ?? 0}
-        onChange={(value) =>
-          onDataSourceMetadataChange({
+        onChange={(value) => {
+          return onDataSourceMetadataChange({
             ...csvProps,
             parseOptions: { ...parseOptions, numRowsToSkip: Number(value) },
-          })
-        }
+          });
+        }}
       />
       <TextInput
         label="Delimiter"
         value={parseOptions.delimiter ?? ","}
-        onChange={(event) =>
-          onDataSourceMetadataChange({
+        onChange={(event) => {
+          return onDataSourceMetadataChange({
             ...csvProps,
             parseOptions: {
               ...parseOptions,
               delimiter: event.currentTarget.value,
             },
-          })
-        }
+          });
+        }}
       />
     </>
   );

@@ -12,22 +12,24 @@ export function SourceList({ saved }: { saved: boolean }) {
       <NavLinkList
         gap={6}
         inactiveHoverColor="neutral.1"
-        links={SOURCE_NAMES.map((name, index) => ({
-          key: name,
-          to: "/$workspaceSlug/data-manager/$datasetId",
-          params: {
-            workspaceSlug: "avandar-labs",
-            datasetId: `film-dataset-${index}`,
-          },
-          className: datasetNavCss.datasetNavbarLink,
-          leftSection: <DatasetSourceIcon sourceType="csv_file" />,
-          label: (
-            <Text size="sm" component="span" truncate>
-              {name}
-            </Text>
-          ),
-          active: saved && name === NAME,
-        }))}
+        links={SOURCE_NAMES.map((name, index) => {
+          return {
+            key: name,
+            to: "/$workspaceSlug/data-manager/$datasetId",
+            params: {
+              workspaceSlug: "avandar-labs",
+              datasetId: `film-dataset-${index}`,
+            },
+            className: datasetNavCss.datasetNavbarLink,
+            leftSection: <DatasetSourceIcon sourceType="csv_file" />,
+            label: (
+              <Text size="sm" component="span" truncate>
+                {name}
+              </Text>
+            ),
+            active: saved && name === NAME,
+          };
+        })}
       />
     </AppListPane>
   );

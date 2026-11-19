@@ -14,18 +14,20 @@ export function CustodyLegend({
 }: Readonly<Props>): ReactNode {
   return (
     <g opacity={ramp(frame, 30, 12)}>
-      {[0, 1, 2].flatMap((column) =>
-        Array.from({ length: column === 1 ? 2 : 3 }, (_, row) => (
-          <CustodyLegendEntry
-            key={`${column}-${row}`}
-            input={input}
-            frame={frame}
-            accent={accent}
-            column={column}
-            row={row}
-          />
-        )),
-      )}
+      {[0, 1, 2].flatMap((column) => {
+        return Array.from({ length: column === 1 ? 2 : 3 }, (_, row) => {
+          return (
+            <CustodyLegendEntry
+              key={`${column}-${row}`}
+              input={input}
+              frame={frame}
+              accent={accent}
+              column={column}
+              row={row}
+            />
+          );
+        });
+      })}
       {input.showLedger ? (
         <g data-ledger="custody" opacity={ramp(frame, 116, 10)}>
           <SceneLabel

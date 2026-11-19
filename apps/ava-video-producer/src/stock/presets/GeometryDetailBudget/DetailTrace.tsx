@@ -16,15 +16,14 @@ export function DetailTrace({
 }: Readonly<Props>): ReactNode {
   const { keptIndices } = makeDetailSimplificationFromInput(input);
   const original = input.vertices
-    .map(
-      ([x, y], index) => `${index ? "L" : "M"}${60 + x * 3.6} ${160 + y * 3.6}`,
-    )
+    .map(([x, y], index) => {
+      return `${index ? "L" : "M"}${60 + x * 3.6} ${160 + y * 3.6}`;
+    })
     .join(" ");
   const simplified = keptIndices
-    .map(
-      (index, position) =>
-        `${position ? "L" : "M"}${60 + input.vertices[index][0] * 3.6} ${160 + input.vertices[index][1] * 3.6}`,
-    )
+    .map((index, position) => {
+      return `${position ? "L" : "M"}${60 + input.vertices[index][0] * 3.6} ${160 + input.vertices[index][1] * 3.6}`;
+    })
     .join(" ");
   return (
     <g>

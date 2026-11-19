@@ -49,18 +49,16 @@ export function useGraphicTheme(): ResolvedVideoTheme {
 export function useGraphicTokens(): ResolvedVideoSemantic {
   const theme = useGraphicTheme();
   const report = useContext(VideoTokenUsageContext);
-  return useMemo(
-    () =>
-      report
-        ? createTokenUsageProxy({
-            value: theme.semantic,
-            catalog: SEMANTIC_TOKENS,
-            basePath: [],
-            report,
-          })
-        : theme.semantic,
-    [theme, report],
-  );
+  return useMemo(() => {
+    return report
+      ? createTokenUsageProxy({
+          value: theme.semantic,
+          catalog: SEMANTIC_TOKENS,
+          basePath: [],
+          report,
+        })
+      : theme.semantic;
+  }, [theme, report]);
 }
 
 /**
@@ -78,8 +76,12 @@ export function useGraphicProps<
   const given: Readonly<Record<string, unknown>> = filterProps(props);
   if (report) {
     Object.keys(defaults)
-      .filter((key) => !(key in given))
-      .forEach((key) => report(`components.${name}.${key}`));
+      .filter((key) => {
+        return !(key in given);
+      })
+      .forEach((key) => {
+        return report(`components.${name}.${key}`);
+      });
   }
   return { ...defaults, ...given } as ResolvedVideoComponents[Name] & Props;
 }
@@ -87,7 +89,9 @@ export function useGraphicProps<
 /** Tempo-scaled motion for a stock shape. See `VideoMotion`. */
 export function useGraphicMotion(): VideoMotion {
   const { motion } = useGraphicTokens();
-  return useMemo(() => createVideoMotion(motion), [motion]);
+  return useMemo(() => {
+    return createVideoMotion(motion);
+  }, [motion]);
 }
 
 /**

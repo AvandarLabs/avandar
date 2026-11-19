@@ -27,20 +27,18 @@ const HIGHLIGHT_FRAMES = 13;
 /** The fractional line the highlight sits on at `frame`, easing between authored lines. */
 function useHighlightLine(highlight: readonly number[], frame: number): number {
   const motion = useGraphicMotion();
-  return highlight
-    .slice(1)
-    .reduce(
-      (offset, lineIndex, index) =>
-        offset +
-        ramp(
-          frame,
-          HIGHLIGHT_CUE + index * HIGHLIGHT_STEP,
-          motion.scale(HIGHLIGHT_FRAMES),
-          motion.travel.easing,
-        ) *
-          (lineIndex - highlight[index]),
-      highlight[0],
+  return highlight.slice(1).reduce((offset, lineIndex, index) => {
+    return (
+      offset +
+      ramp(
+        frame,
+        HIGHLIGHT_CUE + index * HIGHLIGHT_STEP,
+        motion.scale(HIGHLIGHT_FRAMES),
+        motion.travel.easing,
+      ) *
+        (lineIndex - highlight[index])
     );
+  }, highlight[0]);
 }
 
 /** Draws the bounded authored code-focus study at an explicit frame. */
@@ -71,14 +69,16 @@ export function CodeFocus({
         {input.showHighlight ? (
           <CodeHighlight line={line} accent={accent} />
         ) : null}
-        {input.lines.map((codeTokens, i) => (
-          <CodeLineRow
-            key={i}
-            codeTokens={codeTokens}
-            index={i}
-            accent={accent}
-          />
-        ))}
+        {input.lines.map((codeTokens, i) => {
+          return (
+            <CodeLineRow
+              key={i}
+              codeTokens={codeTokens}
+              index={i}
+              accent={accent}
+            />
+          );
+        })}
         <CodeFooter footer={input.footer} accent={accent} />
       </CodeWindow>
     </g>

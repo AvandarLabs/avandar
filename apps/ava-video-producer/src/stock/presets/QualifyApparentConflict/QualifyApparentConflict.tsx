@@ -14,13 +14,15 @@ export function QualifyApparentConflict({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.statements.map((statement, index) => (
-        <ContextStatement
-          key={statement.id}
-          {...{ statement, index, frame, accent }}
-          placement={input.contextPlacement}
-        />
-      ))}
+      {input.statements.map((statement, index) => {
+        return (
+          <ContextStatement
+            key={statement.id}
+            {...{ statement, index, frame, accent }}
+            placement={input.contextPlacement}
+          />
+        );
+      })}
       <ContextResolution {...{ ...remainingProps, input, frame, accent }} />
     </g>
   );

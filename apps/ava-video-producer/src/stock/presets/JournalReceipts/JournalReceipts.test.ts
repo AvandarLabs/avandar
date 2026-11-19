@@ -56,7 +56,13 @@ test("only identity-matched receipts flatten tabs while unacknowledged journal e
       assert.ok(tab, id);
       assert.ok(
         tab.includes(
-          `data-tab-rise="${fixture.input.receipts.some(({ entryId }) => entryId === id) ? 0 : 28}"`,
+          `data-tab-rise="${
+            fixture.input.receipts.some(({ entryId }) => {
+              return entryId === id;
+            })
+              ? 0
+              : 28
+          }"`,
         ),
       );
     });
@@ -117,16 +123,18 @@ import { journalReceiptsContract } from "./JournalReceipts.contract";
 import { inputSchema } from "./JournalReceipts.schema";
 
 test("the completed hold begins exactly when every dense receipt tab has settled", () => {
-  const dense = fixtures.find(({ id }) => id === "dense")!.input;
+  const dense = fixtures.find(({ id }) => {
+    return id === "dense";
+  })!.input;
   const [, action, hold] = journalReceiptsContract.metadata.motionBeats;
   assert.equal(action.endFrame + 1, hold.startFrame);
   Array.from(["horizontal", "vertical"] as const).forEach((foldDirection) => {
     const input = { ...dense, foldDirection };
     const beforeHold = _render({ frame: hold.startFrame - 1, input });
     assert.ok(
-      [...beforeHold.matchAll(/data-tab-rise="([^"]+)"/g)].some(
-        ([, rise]) => Number(rise) > 0,
-      ),
+      [...beforeHold.matchAll(/data-tab-rise="([^"]+)"/g)].some(([, rise]) => {
+        return Number(rise) > 0;
+      }),
       "The frame before the completed hold must still contain a closing tab.",
     );
     Array.from(
@@ -136,12 +144,16 @@ test("the completed hold begins exactly when every dense receipt tab has settled
           Math.floor((hold.endFrame - hold.startFrame) / 1) + 1,
         ),
       },
-      (_, sampleIndex) => hold.startFrame + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return hold.startFrame + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame, input });
       const rises = [...markup.matchAll(/data-tab-rise="([^"]+)"/g)];
       assert.deepEqual(
-        rises.map(([, rise]) => Number(rise)),
+        rises.map(([, rise]) => {
+          return Number(rise);
+        }),
         Array(dense.entries.length).fill(0),
         `${foldDirection} frame ${frame}: completed hold contains a raised tab`,
       );
@@ -156,11 +168,11 @@ test("the completed hold begins exactly when every dense receipt tab has settled
         assert.ok(position);
         assert.deepEqual(
           position.slice(1).map(Number),
-          ["x", "y"].map((axis) =>
-            Number(
+          ["x", "y"].map((axis) => {
+            return Number(
               receipt.match(new RegExp(`data-target-${axis}="([^"]+)"`))?.[1],
-            ),
-          ),
+            );
+          }),
           `${foldDirection} frame ${frame}: receipt has not reached its target`,
         );
       });
@@ -187,26 +199,28 @@ registerStockPresetAssertions({
   },
   excludedTextFields: ["id", "entryId", "foldDirection"],
   textFrames: [18, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.copy.journal,
-    input.copy.receiptPocket,
-    input.copy.pending,
-    input.copy.acknowledged,
-    input.copy.example,
-    input.copy[frame < 36 ? "disconnected" : "reconnected"],
-    ...(frame >= 56
-      ? input.entries.flatMap(({ label, id }) =>
-          input.showIdentifiers ? [label, id] : [label],
-        )
-      : []),
-    ...input.receipts.flatMap(({ label, entryId }, index) =>
-      frame >= 60 + index * 12
-        ? input.showIdentifiers
-          ? [label, entryId]
-          : [label]
-        : [],
-    ),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.copy.journal,
+      input.copy.receiptPocket,
+      input.copy.pending,
+      input.copy.acknowledged,
+      input.copy.example,
+      input.copy[frame < 36 ? "disconnected" : "reconnected"],
+      ...(frame >= 56
+        ? input.entries.flatMap(({ label, id }) => {
+            return input.showIdentifiers ? [label, id] : [label];
+          })
+        : []),
+      ...input.receipts.flatMap(({ label, entryId }, index) => {
+        return frame >= 60 + index * 12
+          ? input.showIdentifiers
+            ? [label, entryId]
+            : [label]
+          : [];
+      }),
+    ];
+  },
 });
 test("identifier and label toggles preserve the retained folds and receipt matching", () => {
   const noIdentifiers = _render({
@@ -238,7 +252,9 @@ test("dense vertical receipts and their painted text remain inside the canvas th
             1,
         ),
       },
-      (_, sampleIndex) => 60 + receiptIndex * 12 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 60 + receiptIndex * 12 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame, input });
       const receipt = markup.match(

@@ -14,13 +14,17 @@ export function EnumValueControl({
   optionKey = "",
 }: ValueControlProps) {
   const hasIssue = useRowHasIssue();
-  const options = (definition.options ?? []).map((option) => ({
-    option,
-    ...getOptionCopy({ key: optionKey, option }),
-  }));
+  const options = (definition.options ?? []).map((option) => {
+    return {
+      option,
+      ...getOptionCopy({ key: optionKey, option }),
+    };
+  });
   const selection = getEnumSelection(
     value,
-    options.map((entry) => entry.option),
+    options.map((entry) => {
+      return entry.option;
+    }),
   );
   if (options.length > 3) {
     return (
@@ -40,10 +44,12 @@ export function EnumValueControl({
       aria-label={label}
       aria-invalid={hasIssue || undefined}
       value={selection ?? ""}
-      data={options.map((entry) => ({
-        value: entry.option,
-        label: entry.label,
-      }))}
+      data={options.map((entry) => {
+        return {
+          value: entry.option,
+          label: entry.label,
+        };
+      })}
       onChange={onChange}
     />
   );

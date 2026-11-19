@@ -8,7 +8,9 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Unique people, attempts and exclusive outcomes retain separate totals. */
 export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const numAttempts = input.cases.reduce((sum, item) => sum + item.attempts, 0);
+  const numAttempts = input.cases.reduce((sum, item) => {
+    return sum + item.attempts;
+  }, 0);
   return (
     <g opacity={ramp(frame, 115, 10)}>
       <ReconnectOutcomes input={input} />

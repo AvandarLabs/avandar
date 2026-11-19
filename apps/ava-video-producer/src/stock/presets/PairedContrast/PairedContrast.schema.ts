@@ -40,7 +40,11 @@ export const inputSchema = z
         });
       }
     });
-    if (!input.criteria.some(({ id }) => id === input.focusCriterionId)) {
+    if (
+      !input.criteria.some(({ id }) => {
+        return id === input.focusCriterionId;
+      })
+    ) {
       context.addIssue({
         code: "custom",
         path: ["focusCriterionId"],

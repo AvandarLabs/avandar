@@ -24,19 +24,21 @@ export function OperatingEmissionRow({
   ];
   return (
     <g>
-      {copies.map(([text, x, y, width, maxLines], ordinal) => (
-        <FitText
-          key={ordinal}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={maxLines}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {copies.map(([text, x, y, width, maxLines], ordinal) => {
+        return (
+          <FitText
+            key={ordinal}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={12}
+            maxLines={maxLines}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
       <path
         data-operation-ribbon={row.id}
         data-tonnes={row.tonnesCO2e}

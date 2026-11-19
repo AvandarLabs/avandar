@@ -38,16 +38,18 @@ export function DemoWindow({ variant = 0, label }: Props) {
       </div>
       <div className={css.windowBody}>
         {label ? <span className={css.windowLabel}>{label}</span> : null}
-        {BAR_IDS.map((id, index) => (
-          <span
-            key={id}
-            className={css.windowBar}
-            style={{
-              height: `${VARIANTS[variant][index] * 70}%`,
-              background: VARIANT_COLORS[variant],
-            }}
-          />
-        ))}
+        {BAR_IDS.map((id, index) => {
+          return (
+            <span
+              key={id}
+              className={css.windowBar}
+              style={{
+                height: `${VARIANTS[variant][index] * 70}%`,
+                background: VARIANT_COLORS[variant],
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

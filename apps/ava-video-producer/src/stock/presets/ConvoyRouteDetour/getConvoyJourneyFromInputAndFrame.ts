@@ -9,31 +9,37 @@ function _getPoint({
   progress,
 }: Readonly<{ points: readonly Point[]; progress: number }>): Point {
   if (
-    points.every((point) => point.x === points[0].x && point.y === points[0].y)
+    points.every((point) => {
+      return point.x === points[0].x && point.y === points[0].y;
+    })
   ) {
     return { ...points[0] };
   }
   return getRoutePointFromProgress({ points, progress });
 }
 function _getSafePrefix(input: Readonly<Input>): Point[] {
-  const points = input.routes.find(({ role }) => role === "blocked")!.points;
+  const points = input.routes.find(({ role }) => {
+    return role === "blocked";
+  })!.points;
   const start = points[input.obstruction.segmentIndex];
   const end = points[input.obstruction.segmentIndex + 1];
   const encounters = points
     .slice(1, input.obstruction.segmentIndex + 1)
-    .map((to, index) => ({
-      to,
-      from: points[index],
-      encounter: getClosedInteriorEncounterFromSegments({
-        from: points[index],
+    .map((to, index) => {
+      return {
         to,
-        start,
-        end,
-      }),
-    }));
-  const crossingIndex = encounters.findIndex(
-    ({ encounter }) => encounter !== undefined,
-  );
+        from: points[index],
+        encounter: getClosedInteriorEncounterFromSegments({
+          from: points[index],
+          to,
+          start,
+          end,
+        }),
+      };
+    });
+  const crossingIndex = encounters.findIndex(({ encounter }) => {
+    return encounter !== undefined;
+  });
   const stopIndex =
     crossingIndex === -1 ? encounters.length - 1 : crossingIndex;
   const { from, to, encounter } = encounters[stopIndex];
@@ -68,8 +74,12 @@ export function getConvoyJourneyFromInputAndFrame({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): GetConvoyJourneyResult {
-  const blocked = input.routes.find(({ role }) => role === "blocked")!.points;
-  const detour = input.routes.find(({ role }) => role === "detour")!.points;
+  const blocked = input.routes.find(({ role }) => {
+    return role === "blocked";
+  })!.points;
+  const detour = input.routes.find(({ role }) => {
+    return role === "detour";
+  })!.points;
   const prefix = _getSafePrefix(input);
   // A first-edge stop is before the shared junction, so continue to it safely.
   const returning =

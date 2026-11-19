@@ -10,7 +10,9 @@ import type { HelperDemoId } from "../helperDemoIds";
 export function HelperComposition({ helperId }: { helperId: string }) {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const helper = HELPER_CATALOG.helpers.find((entry) => entry.id === helperId);
+  const helper = HELPER_CATALOG.helpers.find((entry) => {
+    return entry.id === helperId;
+  });
   if (!helper) {
     throw new Error(`Unknown helper preview: ${helperId}`);
   }

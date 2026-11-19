@@ -59,9 +59,9 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map((caption) => (
-        <FitText key={caption.y} {...TEXT} {...caption} />
-      ))}
+      {captions.map((caption) => {
+        return <FitText key={caption.y} {...TEXT} {...caption} />;
+      })}
       {frame >= 108 ? (
         <FitText {...TEXT} text={input.copy.unassigned} y={518} fontSize={14} />
       ) : undefined}

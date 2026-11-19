@@ -78,12 +78,15 @@ export function getCustomScaleFromReference(
 /** The scale key for a custom value, such as `customColorAccent`, at most 32 characters. */
 export function buildCustomScaleKeyFromPath(path: readonly string[]): string {
   const words = path
-    .flatMap((segment) => segment.split(/[^A-Za-z0-9]+/))
+    .flatMap((segment) => {
+      return segment.split(/[^A-Za-z0-9]+/);
+    })
     .filter(Boolean);
-  return `${CUSTOM_SCALE_KEY_PREFIX}${words.map((word) => capitalize(word)).join("")}`.slice(
-    0,
-    32,
-  );
+  return `${CUSTOM_SCALE_KEY_PREFIX}${words
+    .map((word) => {
+      return capitalize(word);
+    })
+    .join("")}`.slice(0, 32);
 }
 
 function _toScaleLiteral(scale: string, literal: unknown): unknown {

@@ -95,56 +95,61 @@ export function SavedSource() {
             "dataset-summary": "Data Summary",
           }}
           renderTabPanel={{
-            "dataset-metadata": () => (
-              <Stack gap="xl">
-                <Box maw="72ch">
-                  <EditableDisplayText
-                    name="description"
-                    value={DESCRIPTION}
-                    textarea
-                    onChange={_noop}
-                    onSave={_noop}
-                    onCancel={_noop}
-                    isSaving={false}
-                    emptyDisplayText="No description yet. Add one so teammates know what this dataset covers."
-                  />
-                </Box>
-                <AppViewSection title="Columns" meta={columns.length}>
-                  <ObjectDescriptionList
-                    data={columns}
-                    renderAsTable
-                    editable
-                    maxHeight={420}
-                    renderTableHeader={(key: string) =>
-                      ({
-                        name: "Name",
-                        dataType: "Type",
-                        description: "Description",
-                      })[key]
-                    }
-                    itemRenderOptions={{
-                      includeKeys: ["name", "dataType", "description"],
-                      keyRenderOptions: {
-                        description: { renderAsType: "text" },
-                        dataType: {
-                          renderValue: (value: string) =>
-                            avaDataTypeLabel(value as AvaDataType.T),
+            "dataset-metadata": () => {
+              return (
+                <Stack gap="xl">
+                  <Box maw="72ch">
+                    <EditableDisplayText
+                      name="description"
+                      value={DESCRIPTION}
+                      textarea
+                      onChange={_noop}
+                      onSave={_noop}
+                      onCancel={_noop}
+                      isSaving={false}
+                      emptyDisplayText="No description yet. Add one so teammates know what this dataset covers."
+                    />
+                  </Box>
+                  <AppViewSection title="Columns" meta={columns.length}>
+                    <ObjectDescriptionList
+                      data={columns}
+                      renderAsTable
+                      editable
+                      maxHeight={420}
+                      renderTableHeader={(key: string) => {
+                        return {
+                          name: "Name",
+                          dataType: "Type",
+                          description: "Description",
+                        }[key];
+                      }}
+                      itemRenderOptions={{
+                        includeKeys: ["name", "dataType", "description"],
+                        keyRenderOptions: {
+                          description: { renderAsType: "text" },
+                          dataType: {
+                            renderValue: (value: string) => {
+                              return avaDataTypeLabel(value as AvaDataType.T);
+                            },
+                          },
                         },
-                      },
-                    }}
-                    onSubmitChange={async () => {}}
-                  />
-                </AppViewSection>
-                <AppViewSection title="Data preview" meta="First 200 rows">
-                  <DataGrid
-                    columnNames={columnNames}
-                    data={cases.slice(0, 200)}
-                    dateFormat="YYYY-MM-DD"
-                  />
-                </AppViewSection>
-              </Stack>
-            ),
-            "dataset-summary": () => null,
+                      }}
+                      onSubmitChange={async () => {}}
+                    />
+                  </AppViewSection>
+                  <AppViewSection title="Data preview" meta="First 200 rows">
+                    <DataGrid
+                      columnNames={columnNames}
+                      data={cases.slice(0, 200)}
+                      dateFormat="YYYY-MM-DD"
+                    />
+                  </AppViewSection>
+                </Stack>
+              );
+            },
+            "dataset-summary": () => {
+              return null;
+            },
           }}
         />
       </AppViewBody>

@@ -30,15 +30,17 @@ export function ShelterUsableAreaCapacity({
       <LabelSlots labels={[[input.copy.context, 60, 30, 840, 14, 2]]} />
       <ShelterFloor input={input} frame={frame} accent={accent} />
       <g opacity={ramp(frame, 108, 12)}>
-        {Array.from({ length: values.equivalents + 1 }, (_, index) => (
-          <path
-            key={index}
-            data-place-division={index}
-            d={`M${60 + (values.usable === 0 ? 0 : ((index * input.illustrativeAreaPerPlace) / values.usable) * width)} 388v28`}
-            stroke={accent}
-            strokeWidth={0.8}
-          />
-        ))}
+        {Array.from({ length: values.equivalents + 1 }, (_, index) => {
+          return (
+            <path
+              key={index}
+              data-place-division={index}
+              d={`M${60 + (values.usable === 0 ? 0 : ((index * input.illustrativeAreaPerPlace) / values.usable) * width)} 388v28`}
+              stroke={accent}
+              strokeWidth={0.8}
+            />
+          );
+        })}
       </g>
       <ShelterAccounting input={input} frame={frame} />
     </g>

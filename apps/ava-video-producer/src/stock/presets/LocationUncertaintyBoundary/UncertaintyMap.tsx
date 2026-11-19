@@ -26,29 +26,34 @@ export function UncertaintyMap({
         fill={STOCK.surface}
         stroke={STOCK.line}
       />
-      {input.districts.map((district, index) => (
-        <DistrictFootprint
-          key={district.id}
-          district={district}
-          index={index}
-          frame={frame}
-          isPossible={focus.possible.includes(index)}
-          accent={accent}
-        />
-      ))}
-      {input.locations.map((location, index) => (
-        <UncertainLocation
-          key={location.id}
-          location={location}
-          index={index}
-          isFocused={location.id === input.focusedLocationId}
-          showFootprint={
-            location.id === input.focusedLocationId || input.showOtherFootprints
-          }
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.districts.map((district, index) => {
+        return (
+          <DistrictFootprint
+            key={district.id}
+            district={district}
+            index={index}
+            frame={frame}
+            isPossible={focus.possible.includes(index)}
+            accent={accent}
+          />
+        );
+      })}
+      {input.locations.map((location, index) => {
+        return (
+          <UncertainLocation
+            key={location.id}
+            location={location}
+            index={index}
+            isFocused={location.id === input.focusedLocationId}
+            showFootprint={
+              location.id === input.focusedLocationId ||
+              input.showOtherFootprints
+            }
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

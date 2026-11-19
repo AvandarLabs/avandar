@@ -97,10 +97,12 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label={`loopPhase(frame, ${PERIOD}, offset)  offsets ${ORBITS.join(", ")}`}
-      readouts={ORBITS.map((offset) => ({
-        name: `offset ${offset}`,
-        value: formatReadout(loopPhase(frame, PERIOD, offset)),
-      }))}
+      readouts={ORBITS.map((offset) => {
+        return {
+          name: `offset ${offset}`,
+          value: formatReadout(loopPhase(frame, PERIOD, offset)),
+        };
+      })}
     >
       <div className={css.cards}>
         <Orbits frame={frame} />
@@ -108,7 +110,9 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => loopPhase(value, PERIOD)}
+            sample={(value) => {
+              return loopPhase(value, PERIOD);
+            }}
           />
         </div>
       </div>
@@ -144,7 +148,9 @@ export function WaveDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => wave(value, 45)}
+            sample={(value) => {
+              return wave(value, 45);
+            }}
           />
         </div>
       </div>
@@ -177,7 +183,9 @@ export function LoopEnvelopeDemo({ frame, frames }: HelperDemoProps) {
           <LoopSeries
             frame={frame}
             frames={frames}
-            sample={(value) => loopEnvelope(value, frames)}
+            sample={(value) => {
+              return loopEnvelope(value, frames);
+            }}
           />
         </div>
       </div>

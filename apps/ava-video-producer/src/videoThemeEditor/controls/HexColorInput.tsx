@@ -78,12 +78,12 @@ function useColorPopoverHandlers(
 ) {
   const { field, onFocus, onClick, onKeyDown, onBlur } = options;
   const [isOpen, setOpen] = useState(false);
-  const popoverProps = useMemo(
-    () => ({ withinPortal: false, opened: isOpen }),
-    [isOpen],
-  );
-  const reactTo = (event: ColorPopoverEvent) =>
-    setOpen(isColorPopoverOpenAfter(event));
+  const popoverProps = useMemo(() => {
+    return { withinPortal: false, opened: isOpen };
+  }, [isOpen]);
+  const reactTo = (event: ColorPopoverEvent) => {
+    return setOpen(isColorPopoverOpenAfter(event));
+  };
   const handlers: PopoverHandlerProps = {
     onChange: (typedText) => {
       reactTo("type");
@@ -131,9 +131,15 @@ export function HexColorInput({
   const hasIssue = useRowHasIssue();
   const field = useDraftValue<string, string>({
     value,
-    toKey: (color) => color,
-    toDraft: (color) => color,
-    parse: (draft) => parseHexDraft(draft, { allowAlpha }),
+    toKey: (color) => {
+      return color;
+    },
+    toDraft: (color) => {
+      return color;
+    },
+    parse: (draft) => {
+      return parseHexDraft(draft, { allowAlpha });
+    },
     onChange,
   });
   const { popoverProps, handlers } = useColorPopoverHandlers({

@@ -50,10 +50,11 @@ function _getVisibleTexts({
     input.copy.envelope,
     input.copy.clearance,
     input.copy.unit,
-    ...(input.parcels.some(
-      (parcel) =>
-        parcel.width <= 2 * input.setback || parcel.height <= 2 * input.setback,
-    )
+    ...(input.parcels.some((parcel) => {
+      return (
+        parcel.width <= 2 * input.setback || parcel.height <= 2 * input.setback
+      );
+    })
       ? [input.copy.empty]
       : []),
   ];
@@ -239,16 +240,16 @@ function _getTextBoxes(markup: string): TextBox[] {
       const spans = [...content.matchAll(/<tspan\b([^>]*)>([^<]*)<\/tspan>/g)];
       assert.ok(spans.length > 0, "Expected explicit emitted FitText lines");
       const width = Math.max(
-        ...spans.map(([, , text]) =>
-          getConservativeWidthFromText({ text, fontSize }),
-        ),
+        ...spans.map(([, , text]) => {
+          return getConservativeWidthFromText({ text, fontSize });
+        }),
       );
-      const lineOffset = spans.reduce(
-        (sum, [, span]) =>
+      const lineOffset = spans.reduce((sum, [, span]) => {
+        return (
           sum +
-          SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" }),
-        0,
-      );
+          SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" })
+        );
+      }, 0);
       return {
         text: content,
         left,
@@ -261,8 +262,8 @@ function _getTextBoxes(markup: string): TextBox[] {
 }
 function _assertTextSeparation(markup: string): void {
   const boxes = _getTextBoxes(markup);
-  boxes.forEach((first, index) =>
-    boxes.slice(index + 1).forEach((second) => {
+  boxes.forEach((first, index) => {
+    return boxes.slice(index + 1).forEach((second) => {
       assert.ok(
         first.right <= second.left ||
           second.right <= first.left ||
@@ -270,27 +271,29 @@ function _assertTextSeparation(markup: string): void {
           second.bottom <= first.top,
         `Overlapping emitted text bounds: ${JSON.stringify(first)} and ${JSON.stringify(second)}`,
       );
-    }),
-  );
+    });
+  });
 }
 const longNumericInput: ReturnType<typeof inputSchema.parse> =
   inputSchema.parse({
     ...defaultInput,
     setback: 4.123456789012345,
-    parcels: defaultInput.parcels.map((parcel) => ({
-      ...parcel,
-      width: 35.12345678901234,
-      height: 60.12345678901234,
-    })),
+    parcels: defaultInput.parcels.map((parcel) => {
+      return {
+        ...parcel,
+        width: 35.12345678901234,
+        height: 60.12345678901234,
+      };
+    }),
   });
 const emptyEnvelopeInput: ReturnType<typeof inputSchema.parse> =
   inputSchema.parse({
     ...fixtures[2].input,
-    parcels: fixtures[2].input.parcels.map((parcel, index) =>
-      index === 1
+    parcels: fixtures[2].input.parcels.map((parcel, index) => {
+      return index === 1
         ? parcel
-        : { ...parcel, width: 5.123456789012345, height: 5.123456789012345 },
-    ),
+        : { ...parcel, width: 5.123456789012345, height: 5.123456789012345 };
+    }),
     copy: {
       ...fixtures[2].input.copy,
       empty: `${"W".repeat(13)} ${"W".repeat(13)} ${"W".repeat(12)}`,
@@ -301,10 +304,10 @@ const emptyEnvelopeInput: ReturnType<typeof inputSchema.parse> =
   { id: "dense", input: fixtures[2].input },
   { id: "long numeric", input: longNumericInput },
   { id: "empty envelope", input: emptyEnvelopeInput },
-].forEach(({ id, input }) =>
-  test(`parcel ${id} labels have separate emitted text bounds`, () => {
-    [0, 36, 72, 108, 150, 179].forEach((frame) =>
-      _assertTextSeparation(_render({ frame: frame, input: input })),
-    );
-  }),
-);
+].forEach(({ id, input }) => {
+  return test(`parcel ${id} labels have separate emitted text bounds`, () => {
+    [0, 36, 72, 108, 150, 179].forEach((frame) => {
+      return _assertTextSeparation(_render({ frame: frame, input: input }));
+    });
+  });
+});

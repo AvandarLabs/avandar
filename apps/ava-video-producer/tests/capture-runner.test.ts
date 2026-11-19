@@ -100,7 +100,9 @@ function fakeBrowser(): {
   const events: string[] = [];
   const contexts: FakeContext[] = [];
   const browser: FakeBrowser = {
-    version: () => "fake-browser-for-lifecycle-unit-test",
+    version: () => {
+      return "fake-browser-for-lifecycle-unit-test";
+    },
     close: async () => {
       events.push("browser-close");
     },
@@ -125,19 +127,28 @@ function fakeBrowser(): {
         goto: async (url: string) => {
           currentUrl = url;
         },
-        url: () => currentUrl,
-        video: () => video,
+        url: () => {
+          return currentUrl;
+        },
+        video: () => {
+          return video;
+        },
         evaluate: async () => {
           events.push("fonts-ready");
         },
         waitForTimeout: async (milliseconds: number) => {
           events.push(`settle-${milliseconds}`);
         },
-        locator: () => ({
-          innerText: async () =>
-            "Visible result for user@example.test with capture-test-password",
-        }),
-        getByText: () => ({}),
+        locator: () => {
+          return {
+            innerText: async () => {
+              return "Visible result for user@example.test with capture-test-password";
+            },
+          };
+        },
+        getByText: () => {
+          return {};
+        },
         screenshot: async ({ path, animations }) => {
           assert.equal(animations, "disabled");
           await writeFile(path, "unit-test-image-placeholder");
@@ -155,11 +166,19 @@ function fakeBrowser(): {
           assert.ok(routeHandler, "network guard must be installed first");
           const result: DispatchResult = { continued: false, aborted: false };
           await routeHandler({
-            request: () => ({
-              url: () => url,
-              method: () => method,
-              resourceType: () => "fetch",
-            }),
+            request: () => {
+              return {
+                url: () => {
+                  return url;
+                },
+                method: () => {
+                  return method;
+                },
+                resourceType: () => {
+                  return "fetch";
+                },
+              };
+            },
             continue: async () => {
               result.continued = true;
             },
@@ -172,11 +191,15 @@ function fakeBrowser(): {
           });
           return result;
         },
-        newPage: async () => page,
-        storageState: async () => ({
-          cookies: [{ name: "session", value: "never-persist-this" }],
-          origins: [],
-        }),
+        newPage: async () => {
+          return page;
+        },
+        storageState: async () => {
+          return {
+            cookies: [{ name: "session", value: "never-persist-this" }],
+            origins: [],
+          };
+        },
         close: async () => {
           events.push(`close-${number}`);
         },
@@ -190,7 +213,9 @@ function fakeBrowser(): {
 
 async function captureFixture(t: TestContext) {
   const root = await mkdtemp(join(tmpdir(), "capture-run-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   await mkdir(join(root, "demo-data"));
   await writeFile(join(root, "demo-data", "cases.csv"), "id\n1\n");
   return root;
@@ -211,7 +236,12 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
     },
     flowMap: {
       import: async (ctx: any) => {
-        assert.equal(await ctx.step("read-result", async () => 42), 42);
+        assert.equal(
+          await ctx.step("read-result", async () => {
+            return 42;
+          }),
+          42,
+        );
         await ctx.checkpoint("ready", { text: true });
         await ctx.recordResource({
           kind: "dataset",
@@ -226,7 +256,9 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
   assert.ok(typeof storageState === "object" && storageState !== null);
   assert.equal(storageState.cookies[0].value, "never-persist-this");
   assert.ok(
-    contexts.every((context) => context.options.serviceWorkers === "block"),
+    contexts.every((context) => {
+      return context.options.serviceWorkers === "block";
+    }),
   );
   assert.equal(events.includes("browser-close"), false);
   assert.ok(events.includes("fonts-ready") && events.includes("settle-600"));
@@ -284,11 +316,12 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   assert.deepEqual(result.manifest.networkPolicy.blockedRequests, []);
   assert.equal(result.manifest.networkPolicy.suppressedRequests.length, 2);
   assert.ok(
-    result.manifest.networkPolicy.suppressedRequests.every(
-      (request: any) =>
+    result.manifest.networkPolicy.suppressedRequests.every((request: any) => {
+      return (
         request.sourceUrl === endpoint &&
-        request.reason === "nonessential-feedback-widget",
-    ),
+        request.reason === "nonessential-feedback-widget"
+      );
+    }),
   );
   assert.equal(
     result.manifest.networkPolicy.suppressedRequests[0].videoAtMs,
@@ -396,7 +429,9 @@ test("swallowed action failures remain failed evidence and skip later flows whil
   assert.ok(failure instanceof CaptureRunError);
   assert.equal(failure.manifest.status, "failed");
   assert.deepEqual(
-    failure.manifest.features.map((feature: any) => feature.status),
+    failure.manifest.features.map((feature: any) => {
+      return feature.status;
+    }),
     ["failed", "skipped"],
   );
   assert.equal(failure.manifest.actions[0].status, "failed");

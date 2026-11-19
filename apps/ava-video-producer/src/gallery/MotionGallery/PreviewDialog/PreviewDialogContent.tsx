@@ -44,7 +44,9 @@ function usePlayingUnlessReducedMotion(initialPlaying: boolean) {
       }
     };
     preference.addEventListener("change", pauseForPreference);
-    return () => preference.removeEventListener("change", pauseForPreference);
+    return () => {
+      return preference.removeEventListener("change", pauseForPreference);
+    };
   }, []);
   return [playing, setPlaying] as const;
 }

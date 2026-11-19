@@ -39,9 +39,15 @@ export function GraphScene({
   assertFrame(revealAtFrame, "revealAtFrame");
   const bounds = sceneBounds(width, height, Boolean(title || kicker));
   const rects = new Map(
-    nodes.map((node) => [node.id, graphNodeRect(node, bounds)]),
+    nodes.map((node) => {
+      return [node.id, graphNodeRect(node, bounds)];
+    }),
   );
-  const indices = new Map(nodes.map((node, index) => [node.id, index]));
+  const indices = new Map(
+    nodes.map((node, index) => {
+      return [node.id, index];
+    }),
+  );
   const markerId = `arrow-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
     <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
@@ -103,15 +109,17 @@ export function GraphScene({
                 opacity={highlight > 0 ? 1 : 0}
               />
               {getPacketPositions(frame, edge.packets ?? [], start, end).map(
-                (point, index) => (
-                  <circle
-                    key={`packet-${index}`}
-                    cx={point.x}
-                    cy={point.y}
-                    r={PACKET_RADIUS}
-                    fill="var(--brand)"
-                  />
-                ),
+                (point, index) => {
+                  return (
+                    <circle
+                      key={`packet-${index}`}
+                      cx={point.x}
+                      cy={point.y}
+                      r={PACKET_RADIUS}
+                      fill="var(--brand)"
+                    />
+                  );
+                },
               )}
               {edge.label ? (
                 <g
@@ -182,9 +190,9 @@ export function GraphScene({
                 overflowWrap: "anywhere",
               }}
             >
-              {label.lines.map((line, i) => (
-                <div key={i}>{line}</div>
-              ))}
+              {label.lines.map((line, i) => {
+                return <div key={i}>{line}</div>;
+              })}
             </div>
             {detail ? (
               <div
@@ -195,9 +203,9 @@ export function GraphScene({
                   lineHeight: 1.22,
                 }}
               >
-                {detail.lines.map((line, i) => (
-                  <div key={i}>{line}</div>
-                ))}
+                {detail.lines.map((line, i) => {
+                  return <div key={i}>{line}</div>;
+                })}
               </div>
             ) : null}
             <_NodeItems
@@ -234,23 +242,25 @@ function _NodeItems({
         listStyle: "none",
       }}
     >
-      {node.items.map((item, index) => (
-        <li
-          key={`${index}-${item}`}
-          style={{
-            height: GRAPH_ITEM_PITCH,
-            fontSize: 19,
-            lineHeight: `${GRAPH_ITEM_PITCH}px`,
-            color: "var(--muted-foreground)",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            ...enter(frame, at + index * STAGGER * 2, { y: 6 }),
-          }}
-        >
-          {item}
-        </li>
-      ))}
+      {node.items.map((item, index) => {
+        return (
+          <li
+            key={`${index}-${item}`}
+            style={{
+              height: GRAPH_ITEM_PITCH,
+              fontSize: 19,
+              lineHeight: `${GRAPH_ITEM_PITCH}px`,
+              color: "var(--muted-foreground)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              ...enter(frame, at + index * STAGGER * 2, { y: 6 }),
+            }}
+          >
+            {item}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -270,22 +280,24 @@ function _CornerTicks() {
         (
           { borderTop, borderLeft, borderBottom, borderRight, ...position },
           index,
-        ) => (
-          <span
-            key={index}
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              ...position,
-              width: TICK_ARM,
-              height: TICK_ARM,
-              borderTop: borderTop ? line : undefined,
-              borderLeft: borderLeft ? line : undefined,
-              borderBottom: borderBottom ? line : undefined,
-              borderRight: borderRight ? line : undefined,
-            }}
-          />
-        ),
+        ) => {
+          return (
+            <span
+              key={index}
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                ...position,
+                width: TICK_ARM,
+                height: TICK_ARM,
+                borderTop: borderTop ? line : undefined,
+                borderLeft: borderLeft ? line : undefined,
+                borderBottom: borderBottom ? line : undefined,
+                borderRight: borderRight ? line : undefined,
+              }}
+            />
+          );
+        },
       )}
     </>
   );

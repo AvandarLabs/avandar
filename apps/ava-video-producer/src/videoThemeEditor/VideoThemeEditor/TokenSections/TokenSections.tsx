@@ -25,13 +25,14 @@ function useSectionGroups(
   rows: readonly TokenRowModel[],
   emptyGroups: readonly string[],
 ): TokenRowGroup[] {
-  return useMemo(
-    () => [
+  return useMemo(() => {
+    return [
       ...groupTokenRows(rows),
-      ...emptyGroups.map((group) => ({ group, rows: [] })),
-    ],
-    [rows, emptyGroups],
-  );
+      ...emptyGroups.map((group) => {
+        return { group, rows: [] };
+      }),
+    ];
+  }, [rows, emptyGroups]);
 }
 
 /**
@@ -65,19 +66,21 @@ export function TokenSections({
         panel: css.tokenSectionPanel,
       }}
     >
-      {groups.map(({ group, rows: grouped }) => (
-        <Accordion.Item key={group} value={group}>
-          <Accordion.Control>
-            {_groupToName(group)}{" "}
-            <span className={css.tokenSectionCount}>{grouped.length}</span>
-          </Accordion.Control>
-          <Accordion.Panel>
-            {openGroups.includes(group) ? (
-              <SectionRows group={group} rows={grouped} allRows={allRows} />
-            ) : null}
-          </Accordion.Panel>
-        </Accordion.Item>
-      ))}
+      {groups.map(({ group, rows: grouped }) => {
+        return (
+          <Accordion.Item key={group} value={group}>
+            <Accordion.Control>
+              {_groupToName(group)}{" "}
+              <span className={css.tokenSectionCount}>{grouped.length}</span>
+            </Accordion.Control>
+            <Accordion.Panel>
+              {openGroups.includes(group) ? (
+                <SectionRows group={group} rows={grouped} allRows={allRows} />
+              ) : null}
+            </Accordion.Panel>
+          </Accordion.Item>
+        );
+      })}
     </Accordion>
   );
 }

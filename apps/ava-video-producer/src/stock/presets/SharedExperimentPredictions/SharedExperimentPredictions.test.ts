@@ -56,19 +56,18 @@ function _getVisibleTexts({
     ...input.learners.map(prop("label")),
     `0 / ${input.track.maximum} ${input.track.unit}`,
     ...(input.showPredictionValues
-      ? input.learners.map(
-          (item) => `${item.predictionDistance} ${input.track.unit}`,
-        )
+      ? input.learners.map((item) => {
+          return `${item.predictionDistance} ${input.track.unit}`;
+        })
       : []),
     ...(frame >= 108
       ? [
           input.labels.observation,
           `${input.observationDistance} ${input.track.unit}`,
           ...(input.showDistanceDifferences
-            ? input.learners.map(
-                (item) =>
-                  `↔ ${Math.abs(item.predictionDistance - input.observationDistance)} ${input.track.unit}`,
-              )
+            ? input.learners.map((item) => {
+                return `↔ ${Math.abs(item.predictionDistance - input.observationDistance)} ${input.track.unit}`;
+              })
             : []),
         ]
       : []),
@@ -93,17 +92,19 @@ function _flags(markup: string): number[][] {
     ...markup.matchAll(
       /data-prediction-id="[^"]*" data-prediction-distance="([-.\d]+)" transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
     ),
-  ].map((match) => match.slice(1).map(Number));
+  ].map((match) => {
+    return match.slice(1).map(Number);
+  });
 }
 test("four coincident endpoint predictions retain separate flags and learners after observation", () => {
-  [0, 100].forEach((distance) =>
-    [true, false].forEach((showPredictionValues) =>
-      [true, false].forEach((showDistanceDifferences) => {
+  [0, 100].forEach((distance) => {
+    return [true, false].forEach((showPredictionValues) => {
+      return [true, false].forEach((showDistanceDifferences) => {
         const input = {
           ...denseInput,
-          learners: [...denseInput.learners]
-            .reverse()
-            .map((learner) => ({ ...learner, predictionDistance: distance })),
+          learners: [...denseInput.learners].reverse().map((learner) => {
+            return { ...learner, predictionDistance: distance };
+          }),
           observationDistance: distance,
           showPredictionValues,
           showDistanceDifferences,
@@ -113,7 +114,11 @@ test("four coincident endpoint predictions retain separate flags and learners af
         assert.deepEqual(_flags(before), _flags(hold));
         assert.equal(_flags(hold).length, 4);
         assert.equal(
-          new Set(_flags(hold).map(([, x, y]) => `${x},${y}`)).size,
+          new Set(
+            _flags(hold).map(([, x, y]) => {
+              return `${x},${y}`;
+            }),
+          ).size,
           4,
         );
         assert.equal([...hold.matchAll(/data-experiment-learner=/g)].length, 4);
@@ -123,23 +128,27 @@ test("four coincident endpoint predictions retain separate flags and learners af
           showDistanceDifferences ? 4 : 0,
         );
         assert.doesNotMatch(before, /data-observation-distance=/);
-      }),
-    ),
-  );
+      });
+    });
+  });
 });
 test("participant hands carry flags with full identity separation across planting joins", () => {
   [
     denseInput,
     {
       ...denseInput,
-      learners: denseInput.learners.map((learner, index) => ({
-        ...learner,
-        predictionDistance: index % 2 ? 0 : 100,
-      })),
+      learners: denseInput.learners.map((learner, index) => {
+        return {
+          ...learner,
+          predictionDistance: index % 2 ? 0 : 100,
+        };
+      }),
     },
   ].forEach((input) => {
     [36, 42, 48, 54, 60, 66, 76, 86, 108]
-      .flatMap((frame) => [frame - 0.001, frame, frame + 0.001])
+      .flatMap((frame) => {
+        return [frame - 0.001, frame, frame + 0.001];
+      })
       .forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
         const learners = [
@@ -160,13 +169,13 @@ test("participant hands carry flags with full identity separation across plantin
           assert.ok(Number(x) - 12 >= 413 && Number(x) + 52 <= 907);
           assert.ok(Number(y) - 25 >= 155 && Number(y) + 39 <= 471);
         });
-        _flags(markup).forEach(([, x, y], index, flags) =>
-          flags
-            .slice(index + 1)
-            .forEach(([, otherX, otherY]) =>
-              assert.ok(Math.abs(x - otherX) > 28 || Math.abs(y - otherY) > 66),
-            ),
-        );
+        _flags(markup).forEach(([, x, y], index, flags) => {
+          return flags.slice(index + 1).forEach(([, otherX, otherY]) => {
+            return assert.ok(
+              Math.abs(x - otherX) > 28 || Math.abs(y - otherY) > 66,
+            );
+          });
+        });
       });
   });
 });
@@ -174,18 +183,22 @@ test("small fractional distances preserve exact authored values and absolute dif
   const input = {
     ...denseInput,
     observationDistance: 1e-7,
-    learners: denseInput.learners.map((learner, index) => ({
-      ...learner,
-      predictionDistance: index ? 1.0000000000000002e-7 : 0,
-    })),
+    learners: denseInput.learners.map((learner, index) => {
+      return {
+        ...learner,
+        predictionDistance: index ? 1.0000000000000002e-7 : 0,
+      };
+    }),
   };
   assert.deepEqual(inputSchema.parse(input), input);
-  assert.doesNotThrow(() => _render({ frame: 150, input: input }));
-  input.learners.forEach((learner) =>
-    assert.ok(
+  assert.doesNotThrow(() => {
+    return _render({ frame: 150, input: input });
+  });
+  input.learners.forEach((learner) => {
+    return assert.ok(
       _render({ frame: 150, input: input }).includes(
         `data-prediction-distance="${learner.predictionDistance}"`,
       ),
-    ),
-  );
+    );
+  });
 });

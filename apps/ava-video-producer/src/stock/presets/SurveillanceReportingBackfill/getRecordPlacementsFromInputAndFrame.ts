@@ -18,16 +18,19 @@ export function getRecordPlacementsFromInputAndFrame({
   input,
   frame,
 }: Readonly<{ input: Input; frame: number }>): GetRecordPlacementsResult[] {
-  const ordered = [...input.records].sort(
-    (first, second) =>
+  const ordered = [...input.records].sort((first, second) => {
+    return (
       first.firstSnapshot - second.firstSnapshot ||
-      (first.id < second.id ? -1 : first.id > second.id ? 1 : 0),
-  );
+      (first.id < second.id ? -1 : first.id > second.id ? 1 : 0)
+    );
+  });
   const later = ordered.filter(propEq("firstSnapshot", 1));
   return ordered.map((record) => {
     const bin = input.eventBins.findIndex(propEq("id", record.eventBinId));
     const rank = ordered
-      .filter((item) => item.eventBinId === record.eventBinId)
+      .filter((item) => {
+        return item.eventBinId === record.eventBinId;
+      })
       .findIndex(propEq("id", record.id));
     const arrival = later.findIndex(propEq("id", record.id));
     const progress =

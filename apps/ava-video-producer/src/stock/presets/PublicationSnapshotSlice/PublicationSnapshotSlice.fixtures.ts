@@ -69,18 +69,28 @@ const minimum: Input = {
 const dense: Input = {
   ...DEFAULT_INPUT,
   table: {
-    columns: ["a", "b", "c", "d"].map((id) => ({
-      id: id.repeat(18),
-      label: "W".repeat(18),
-    })),
-    rows: ["a", "b", "c", "d"].map((id) => ({
-      id: id.repeat(18),
-      cells: Array.from({ length: 4 }, () => "W".repeat(18)),
-    })),
+    columns: ["a", "b", "c", "d"].map((id) => {
+      return {
+        id: id.repeat(18),
+        label: "W".repeat(18),
+      };
+    }),
+    rows: ["a", "b", "c", "d"].map((id) => {
+      return {
+        id: id.repeat(18),
+        cells: Array.from({ length: 4 }, () => {
+          return "W".repeat(18);
+        }),
+      };
+    }),
   },
   selection: {
-    rowIds: ["d", "c", "b", "a"].map((id) => id.repeat(18)),
-    columnIds: ["d", "c", "b", "a"].map((id) => id.repeat(18)),
+    rowIds: ["d", "c", "b", "a"].map((id) => {
+      return id.repeat(18);
+    }),
+    columnIds: ["d", "c", "b", "a"].map((id) => {
+      return id.repeat(18);
+    }),
   },
   liveEdit: {
     rowId: "a".repeat(18),
@@ -134,14 +144,18 @@ export const invalidInputs: unknown[] = [
     ...DEFAULT_INPUT,
     table: {
       ...DEFAULT_INPUT.table,
-      rows: DEFAULT_INPUT.table.rows.map((r) => ({ ...r, cells: [] })),
+      rows: DEFAULT_INPUT.table.rows.map((r) => {
+        return { ...r, cells: [] };
+      }),
     },
   },
   ...[
     { rowIds: [], columnIds: ["site"] },
     { rowIds: ["a", "a"], columnIds: ["site"] },
     { rowIds: ["ghost"], columnIds: ["site"] },
-  ].map((selection) => ({ ...DEFAULT_INPUT, selection })),
+  ].map((selection) => {
+    return { ...DEFAULT_INPUT, selection };
+  }),
   { ...DEFAULT_INPUT, liveEdit: { ...DEFAULT_INPUT.liveEdit, value: "12" } },
   {
     ...DEFAULT_INPUT,
@@ -151,17 +165,21 @@ export const invalidInputs: unknown[] = [
     ...DEFAULT_INPUT,
     table: {
       ...DEFAULT_INPUT.table,
-      columns: DEFAULT_INPUT.table.columns.map((c) => ({
-        ...c,
-        id: "x".repeat(19),
-      })),
+      columns: DEFAULT_INPUT.table.columns.map((c) => {
+        return {
+          ...c,
+          id: "x".repeat(19),
+        };
+      }),
     },
   },
   {
     ...DEFAULT_INPUT,
     table: {
       ...DEFAULT_INPUT.table,
-      rows: DEFAULT_INPUT.table.rows.map((r) => ({ ...r, id: "x".repeat(19) })),
+      rows: DEFAULT_INPUT.table.rows.map((r) => {
+        return { ...r, id: "x".repeat(19) };
+      }),
     },
   },
   {

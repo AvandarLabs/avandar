@@ -85,18 +85,20 @@ function useOntologyFixture(
     ...concept,
     datasets: [{ id: datasetId, name: sourceName }],
     attributes: stage.fields.map(
-      (field, index): OntologyAttributeProjection => ({
-        id: uuid<ConceptAttribute.Id>(
-          `00000000-0000-4000-8000-${String(
-            (stage.conceptKey === "response" ? 620 : 630) + index,
-          ).padStart(12, "0")}`,
-        ),
-        name: field.name,
-        isIdentifier: field.isIdentifier ?? false,
-        isLabel: field.isLabel ?? false,
-        mappingType: "dataset_column",
-        mapping: { type: "dataset_column", datasetId },
-      }),
+      (field, index): OntologyAttributeProjection => {
+        return {
+          id: uuid<ConceptAttribute.Id>(
+            `00000000-0000-4000-8000-${String(
+              (stage.conceptKey === "response" ? 620 : 630) + index,
+            ).padStart(12, "0")}`,
+          ),
+          name: field.name,
+          isIdentifier: field.isIdentifier ?? false,
+          isLabel: field.isLabel ?? false,
+          mappingType: "dataset_column",
+          mapping: { type: "dataset_column", datasetId },
+        };
+      },
     ),
   };
   return { concepts, concept, fullConcept };

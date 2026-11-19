@@ -49,9 +49,9 @@ async function _fresh(relative: string) {
 
 async function _preview(requests: MotionRequest[]) {
   await Promise.all(
-    requests.map(({ sourceHash }) =>
-      StockFingerprintModule.verifySources({ root: ROOT, sourceHash }),
-    ),
+    requests.map(({ sourceHash }) => {
+      return StockFingerprintModule.verifySources({ root: ROOT, sourceHash });
+    }),
   );
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   const temporary = await _fresh("bundle");
@@ -288,11 +288,11 @@ async function _main() {
   const args = MotionRequests.parseArgs(process.argv.slice(2));
   const { command, entries } = args;
   if (command === "list") {
-    entries.forEach((entry) =>
-      console.log(
+    entries.forEach((entry) => {
+      return console.log(
         `${entry.id.padEnd(20)} ${entry.category.padEnd(12)} ${entry.name}`,
-      ),
-    );
+      );
+    });
   } else {
     const requests = await MotionRequests.fromArgs({ args });
     if (command === "preview") {

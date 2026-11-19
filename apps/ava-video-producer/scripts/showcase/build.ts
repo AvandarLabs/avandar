@@ -13,10 +13,9 @@ export async function buildLivePlayers(onBuilt: () => Promise<void>) {
   const productBundle: Plugin = {
     name: "showcase-product-bundle",
     setup(builder) {
-      builder.onResolve(
-        { filter: /generated\/product\.(js|css)$/ },
-        (args) => ({ path: path.join(product, path.basename(args.path)) }),
-      );
+      builder.onResolve({ filter: /generated\/product\.(js|css)$/ }, (args) => {
+        return { path: path.join(product, path.basename(args.path)) };
+      });
       builder.onEnd(async (result) => {
         if (!result.errors.length) {
           await onBuilt();

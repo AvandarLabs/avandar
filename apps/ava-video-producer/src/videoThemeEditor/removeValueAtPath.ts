@@ -14,7 +14,9 @@ export function removeValueAtPath(
   }
   if (rest.length === 0) {
     return Object.fromEntries(
-      Object.entries(source).filter(([entry]) => entry !== key),
+      Object.entries(source).filter(([entry]) => {
+        return entry !== key;
+      }),
     );
   }
   const child = source[key];

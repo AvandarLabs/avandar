@@ -64,7 +64,11 @@ function _parseCssColor(
   }
   const alphaText = match[4];
   return {
-    hex: `#${[match[1], match[2], match[3]].map((channel) => _byte(Number(channel))).join("")}`,
+    hex: `#${[match[1], match[2], match[3]]
+      .map((channel) => {
+        return _byte(Number(channel));
+      })
+      .join("")}`,
     alpha:
       alphaText === undefined
         ? 1
@@ -104,13 +108,21 @@ export function getShadowFromCss(
       },
     };
   });
-  const colors = new Set(layers.map(({ color }) => color));
+  const colors = new Set(
+    layers.map(({ color }) => {
+      return color;
+    }),
+  );
   if (colors.size !== 1) {
     throw new Error(`Shadow layers use more than one colour: ${css}`);
   }
   return {
     color: layers[0].color,
-    shadow: { layers: layers.map(({ layer }) => layer) },
+    shadow: {
+      layers: layers.map(({ layer }) => {
+        return layer;
+      }),
+    },
   };
 }
 
@@ -124,9 +136,9 @@ function _cubicBezier(css: string): readonly number[] {
 
 function _fontStack(fontFamily: string): string {
   const face = fontFamily.split(",")[0].trim().replace(/['"]/g, "");
-  const id = VIDEO_FONT_IDS.find(
-    (fontId) => VIDEO_FONT_REGISTRY[fontId].label === face,
-  );
+  const id = VIDEO_FONT_IDS.find((fontId) => {
+    return VIDEO_FONT_REGISTRY[fontId].label === face;
+  });
   if (!id) {
     throw new Error(
       `The Avandar font ${face} is not in the video font registry`,
@@ -162,9 +174,9 @@ function _swatches(source: AvandarThemeSource, shadowColor: string) {
 export function createAvandarTheme(
   source: AvandarThemeSource,
 ): VideoThemeDocument {
-  const shadows = SIZE_KEYS.map(
-    (key) => [key, getShadowFromCss(source.shadows[key])] as const,
-  );
+  const shadows = SIZE_KEYS.map((key) => {
+    return [key, getShadowFromCss(source.shadows[key])] as const;
+  });
   const stack = _fontStack(source.fontFamily);
   return {
     schemaVersion: 1,
@@ -187,14 +199,18 @@ export function createAvandarTheme(
     fontFamily: stack,
     headings: { fontFamily: stack },
     radius: Object.fromEntries(
-      SIZE_KEYS.map((key) => [key, `${parseCssPixels(source.radius[key])}px`]),
+      SIZE_KEYS.map((key) => {
+        return [key, `${parseCssPixels(source.radius[key])}px`];
+      }),
     ),
     other: {
       video: {
         atomic: {
           swatch: _swatches(source, shadows[0][1].color),
           shadow: Object.fromEntries(
-            shadows.map(([key, { shadow }]) => [key, shadow]),
+            shadows.map(([key, { shadow }]) => {
+              return [key, shadow];
+            }),
           ),
           easing: {
             out: _cubicBezier(source.easing.out),

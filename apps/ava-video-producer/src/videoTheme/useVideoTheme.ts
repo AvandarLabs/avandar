@@ -54,18 +54,16 @@ export function useVideoTheme(): ResolvedVideoTheme {
 export function useVideoTokens(): ResolvedVideoSemantic {
   const theme = useVideoTheme();
   const report = useContext(VideoTokenUsageContext);
-  return useMemo(
-    () =>
-      report
-        ? createTokenUsageProxy({
-            value: theme.semantic,
-            catalog: SEMANTIC_TOKENS,
-            basePath: [],
-            report,
-          })
-        : theme.semantic,
-    [theme, report],
-  );
+  return useMemo(() => {
+    return report
+      ? createTokenUsageProxy({
+          value: theme.semantic,
+          catalog: SEMANTIC_TOKENS,
+          basePath: [],
+          report,
+        })
+      : theme.semantic;
+  }, [theme, report]);
 }
 
 /**
@@ -84,8 +82,12 @@ export function useVideoProps<
   if (report) {
     const given: Readonly<Record<string, unknown>> = props;
     Object.keys(theme.components[name])
-      .filter((key) => given[key] === undefined)
-      .forEach((key) => report(`components.${name}.${key}`));
+      .filter((key) => {
+        return given[key] === undefined;
+      })
+      .forEach((key) => {
+        return report(`components.${name}.${key}`);
+      });
   }
   return merged as ResolvedVideoComponents[Name] & Props;
 }

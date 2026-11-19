@@ -60,8 +60,8 @@ export function PlexusField({
         {input.heading}
       </Text>
       {input.showConnections
-        ? points.flatMap((a, i) =>
-            points.slice(i + 1).map((b, j) => {
+        ? points.flatMap((a, i) => {
+            return points.slice(i + 1).map((b, j) => {
               const distance = Math.hypot(a.x - b.x, a.y - b.y);
               return distance < style.linkDistance ? (
                 <line
@@ -77,21 +77,23 @@ export function PlexusField({
                   strokeWidth={style.linkWidth}
                 />
               ) : null;
-            }),
-          )
+            });
+          })
         : null}
-      {points.map((point, i) => (
-        <Particle
-          key={i}
-          x={point.x}
-          y={point.y}
-          frame={frame}
-          phase={i * TWINKLE_PHASE_STEP}
-          color={i % 4 === 0 ? color.accentAlt : accent}
-          haloColor={accent}
-          isLarge={i % 7 === 0}
-        />
-      ))}
+      {points.map((point, i) => {
+        return (
+          <Particle
+            key={i}
+            x={point.x}
+            y={point.y}
+            frame={frame}
+            phase={i * TWINKLE_PHASE_STEP}
+            color={i % 4 === 0 ? color.accentAlt : accent}
+            haloColor={accent}
+            isLarge={i % 7 === 0}
+          />
+        );
+      })}
       <Rule x1={margin} x2={right} y={RULE_Y} />
       <Text role="footnote" x={margin} y={FOOTER_Y}>
         {getStockDisplayCopyFromDescriptor({

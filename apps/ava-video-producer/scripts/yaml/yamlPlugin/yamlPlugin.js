@@ -5,10 +5,12 @@ import { compileYaml } from "../compileYaml.cjs";
 export const yamlPlugin = {
   name: "authored-yaml",
   setup(builder) {
-    builder.onLoad({ filter: /\.ya?ml$/ }, async ({ path: filename }) => ({
-      contents: compileYaml(await readFile(filename, "utf8")),
-      loader: "js",
-      watchFiles: [filename],
-    }));
+    builder.onLoad({ filter: /\.ya?ml$/ }, async ({ path: filename }) => {
+      return {
+        contents: compileYaml(await readFile(filename, "utf8")),
+        loader: "js",
+        watchFiles: [filename],
+      };
+    });
   },
 };

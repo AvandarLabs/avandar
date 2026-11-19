@@ -111,13 +111,16 @@ export function explorerStage(frame: number, mode: ExplorerMode = "full") {
 /** Return the same click list in the local coordinates of a focused variant. */
 export function explorerBeats(mode: ExplorerMode = "full") {
   const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
-  return EXPLORER_BEATS.filter(
-    (beat) =>
+  return EXPLORER_BEATS.filter((beat) => {
+    return (
       mode === "full" ||
       (mode === "filter"
         ? beat.frame < 290
         : mode === "query"
           ? beat.frame >= 290 && beat.frame <= 570
-          : beat.frame >= 620),
-  ).map((beat) => ({ ...beat, frame: beat.frame - offset }));
+          : beat.frame >= 620)
+    );
+  }).map((beat) => {
+    return { ...beat, frame: beat.frame - offset };
+  });
 }

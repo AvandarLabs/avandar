@@ -109,9 +109,9 @@ function _canonicalizeObject(
     if (Object.keys(value).length !== value.length) {
       throw new Error("Unsupported stock value: sparse or extended array");
     }
-    return Array.from(value, (child) =>
-      _canonicalize({ value: child, ancestors }),
-    );
+    return Array.from(value, (child) => {
+      return _canonicalize({ value: child, ancestors });
+    });
   }
   return Object.fromEntries(
     Object.keys(value)
@@ -162,16 +162,17 @@ async function _sourceFiles(
       ? [relative]
       : [];
   }
-  const children = (await fs.readdir(filename)).filter(
-    (name) =>
+  const children = (await fs.readdir(filename)).filter((name) => {
+    return (
       !name.startsWith(".") &&
-      !["out", "node_modules", "__tests__"].includes(name),
-  );
+      !["out", "node_modules", "__tests__"].includes(name)
+    );
+  });
   return (
     await Promise.all(
-      children.map((name) =>
-        _sourceFiles({ root, relative: `${relative}/${name}` }),
-      ),
+      children.map((name) => {
+        return _sourceFiles({ root, relative: `${relative}/${name}` });
+      }),
     )
   ).flat();
 }
@@ -182,9 +183,9 @@ async function _sourceFiles(
 async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   root = await fs.realpath(root);
   const discovered = await Promise.all(
-    SOURCE_DIRECTORIES.map((directory) =>
-      _sourceFiles({ root, relative: directory }),
-    ),
+    SOURCE_DIRECTORIES.map((directory) => {
+      return _sourceFiles({ root, relative: directory });
+    }),
   );
   const optional = await Promise.all(
     SOURCE_FILES.map(async (file) => {
@@ -201,7 +202,9 @@ async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   );
   const files = [
     ...discovered.flat(),
-    ...optional.filter((file): file is string => file !== undefined),
+    ...optional.filter((file): file is string => {
+      return file !== undefined;
+    }),
   ].sort();
   const hash = createHash("sha256");
   await files.reduce(async (previous, file) => {

@@ -19,15 +19,17 @@ export function CaseIdentityGuides({
     <g opacity={visibility}>
       {getCasePositionsFromInput(input)
         .filter(prop("isInvestigated"))
-        .map((position) => (
-          <TravelingCase
-            key={position.record.id}
-            position={position}
-            frame={frame}
-            accent={accent}
-            showGuide={input.showIdentityGuides}
-          />
-        ))}
+        .map((position) => {
+          return (
+            <TravelingCase
+              key={position.record.id}
+              position={position}
+              frame={frame}
+              accent={accent}
+              showGuide={input.showIdentityGuides}
+            />
+          );
+        })}
     </g>
   );
 }

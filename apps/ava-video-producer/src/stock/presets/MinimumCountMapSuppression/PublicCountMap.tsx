@@ -17,23 +17,27 @@ export function PublicCountMap({
   return (
     <g data-public-map="safe">
       <g opacity={ramp(frame, 106, 12)}>
-        {cells.map((cell) => (
-          <PublicReleaseTile
+        {cells.map((cell) => {
+          return (
+            <PublicReleaseTile
+              key={cell.id}
+              cell={cell}
+              labels={input.labels}
+              accent={accent}
+            />
+          );
+        })}
+      </g>
+      {cells.filter(propNotEq("value", undefined)).map((cell) => {
+        return (
+          <ReleasedCountToken
             key={cell.id}
             cell={cell}
-            labels={input.labels}
+            frame={frame}
             accent={accent}
           />
-        ))}
-      </g>
-      {cells.filter(propNotEq("value", undefined)).map((cell) => (
-        <ReleasedCountToken
-          key={cell.id}
-          cell={cell}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+        );
+      })}
     </g>
   );
 }

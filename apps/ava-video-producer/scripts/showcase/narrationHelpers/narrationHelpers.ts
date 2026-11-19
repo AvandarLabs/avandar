@@ -28,7 +28,9 @@ async function _prepareNarration(
       JSON.parse(await fs.readFile(cache, "utf8")),
     );
     await Promise.all(
-      assetReferences(plan).map((asset) => publicAsset(root, asset)),
+      assetReferences(plan).map((asset) => {
+        return publicAsset(root, asset);
+      }),
     );
     return plan;
   } catch {

@@ -32,16 +32,16 @@ const render: ({
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
 test("all authored fixtures are accepted and every rejection fixture fails", () => {
-  FIXTURES.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(
+  FIXTURES.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(
       inputSchema.safeParse(input).success,
       false,
       JSON.stringify(input),
-    ),
-  );
+    );
+  });
 });
 test("one guide leaves matching marks on each existing workpiece exactly once", () => {
   const input = FIXTURES[3].input;
@@ -66,10 +66,9 @@ function _getVisibleTexts({
   return [
     input.makerLabel,
     input.guide.label,
-    ...input.collaborators.flatMap(({ label, workpieceLabel }) => [
-      label,
-      workpieceLabel,
-    ]),
+    ...input.collaborators.flatMap(({ label, workpieceLabel }) => {
+      return [label, workpieceLabel];
+    }),
     input.labels.example,
     frame < 49
       ? input.labels.prepare
@@ -170,8 +169,11 @@ test("guide carries with a contacting hand and applications follow every input s
 test("guide caption follows the single moving guide instead of staying at its source", () => {
   const first = render({ frame: 30, input: DEFAULT_INPUT }),
     travelling = render({ frame: 90, input: DEFAULT_INPUT });
-  const label = (markup: string) =>
-    markup.match(/<text[^>]*aria-label="Marking guide"[^>]*>/)?.[0] ?? "";
+  const label = (markup: string) => {
+    return (
+      markup.match(/<text[^>]*aria-label="Marking guide"[^>]*>/)?.[0] ?? ""
+    );
+  };
   assert.notEqual(
     SvgAttributes.getNumberFromMarkup({ attributes: label(first), name: "x" }),
     SvgAttributes.getNumberFromMarkup({
@@ -254,8 +256,8 @@ test("marking hands contact the selected cutout and paint above the opaque guide
             ),
           ];
           assert.ok(
-            holes.some(
-              ([hole]) =>
+            holes.some(([hole]) => {
+              return (
                 Math.hypot(
                   handX -
                     SvgAttributes.getNumberFromMarkup({
@@ -272,8 +274,9 @@ test("marking hands contact the selected cutout and paint above the opaque guide
                 SvgAttributes.getNumberFromMarkup({
                   attributes: hole,
                   name: "r",
-                }),
-            ),
+                })
+              );
+            }),
           );
           assert.equal(Number(contact[1]), handX);
           assert.equal(Number(contact[2]), handY);

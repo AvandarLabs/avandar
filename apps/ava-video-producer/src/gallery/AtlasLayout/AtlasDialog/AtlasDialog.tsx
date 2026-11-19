@@ -28,7 +28,9 @@ function _trapDialogFocus(event: KeyboardEvent<HTMLDialogElement>) {
     event.currentTarget.querySelectorAll<HTMLElement>(
       'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe, [tabindex="0"]',
     ),
-  ).filter((element) => element.getClientRects().length > 0);
+  ).filter((element) => {
+    return element.getClientRects().length > 0;
+  });
   const first = controls[0];
   const last = controls[controls.length - 1];
   if (!first || !last) {

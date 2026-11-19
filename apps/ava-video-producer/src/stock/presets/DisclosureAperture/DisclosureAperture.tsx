@@ -44,14 +44,16 @@ export function DisclosureAperture({
         stroke={STOCK.line}
       />
       <AperturePanel {...{ frame, input, accent }} />
-      {input.fields.map((field, index) => (
-        <DisclosureField
-          key={field.id}
-          {...{ field, index, frame, input, accent }}
-          shareIndex={0}
-          isCopy={false}
-        />
-      ))}
+      {input.fields.map((field, index) => {
+        return (
+          <DisclosureField
+            key={field.id}
+            {...{ field, index, frame, input, accent }}
+            shareIndex={0}
+            isCopy={false}
+          />
+        );
+      })}
       <DisclosureCopies {...{ input, frame, accent }} />
       <DisclosureCopy input={input} />
     </g>

@@ -39,19 +39,21 @@ export function BatteryWindows({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(({ text, x, y, width }, index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {labels.map(({ text, x, y, width }, index) => {
+        return (
+          <FitText
+            key={index}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={12}
+            maxLines={3}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

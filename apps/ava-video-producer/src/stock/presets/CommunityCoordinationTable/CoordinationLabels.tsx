@@ -24,24 +24,28 @@ export function CoordinationLabels({
         breakLongWords
         normalizeWhitespace
       />
-      {input.places.map((place, index) => (
-        <CoordinationPlaceCopy
-          key={place.id}
-          place={place}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
-      {input.teams.map((team, index) => (
-        <CoordinationTeamCopy
-          key={team.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.places.map((place, index) => {
+        return (
+          <CoordinationPlaceCopy
+            key={place.id}
+            place={place}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      {input.teams.map((team, index) => {
+        return (
+          <CoordinationTeamCopy
+            key={team.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       {input.showUnassignedRequests && frame >= 108 ? (
         <CoordinationOpenRequests input={input} accent={accent} />
       ) : undefined}

@@ -24,23 +24,25 @@ export function createCameraTrackSchema(width = 960, height = 600) {
             .default("glide"),
         })
         .strict()
-        .refine(
-          (key) =>
+        .refine((key) => {
+          return (
             key.x >= width / 2 / key.zoom &&
             key.x <= width - width / 2 / key.zoom &&
             key.y >= height / 2 / key.zoom &&
-            key.y <= height - height / 2 / key.zoom,
-          "Camera viewport must stay inside the diagram",
-        ),
+            key.y <= height - height / 2 / key.zoom
+          );
+        }, "Camera viewport must stay inside the diagram"),
     )
     .min(2)
     .max(16)
-    .refine(
-      (keys) =>
+    .refine((keys) => {
+      return (
         keys[0].at === 0 &&
-        keys.every((key, index) => index === 0 || key.at > keys[index - 1].at),
-      "Camera keys must start at zero and increase",
-    );
+        keys.every((key, index) => {
+          return index === 0 || key.at > keys[index - 1].at;
+        })
+      );
+    }, "Camera keys must start at zero and increase");
 }
 /** Default camera contract for the 960 by 600 Motion Atlas canvas. */
 export const cameraTrackSchema = createCameraTrackSchema();
@@ -89,7 +91,9 @@ export function getCameraPose(
   if (!enabled || !keys?.length)
     return { x: viewport.width / 2, y: viewport.height / 2, zoom: 1 };
   const route = retimeCameraTrack(keys, options);
-  const destinationIndex = route.findIndex((key) => key.at > frame);
+  const destinationIndex = route.findIndex((key) => {
+    return key.at > frame;
+  });
   const destination =
     route[destinationIndex < 0 ? route.length - 1 : destinationIndex];
   const origin =

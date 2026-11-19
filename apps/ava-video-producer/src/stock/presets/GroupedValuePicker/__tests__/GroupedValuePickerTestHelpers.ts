@@ -100,34 +100,38 @@ function _assertCardClearance({
   copies: readonly AssertCardClearanceCopies[];
   message: string;
 }) {
-  copies.forEach((first, index) =>
-    copies
-      .slice(index + 1)
-      .forEach((second) =>
-        assert.ok(
-          first.x + first.width <= second.x ||
-            second.x + second.width <= first.x ||
-            first.y + first.height <= second.y ||
-            second.y + second.height <= first.y,
-          message,
-        ),
-      ),
-  );
+  copies.forEach((first, index) => {
+    return copies.slice(index + 1).forEach((second) => {
+      return assert.ok(
+        first.x + first.width <= second.x ||
+          second.x + second.width <= first.x ||
+          first.y + first.height <= second.y ||
+          second.y + second.height <= first.y,
+        message,
+      );
+    });
+  });
 }
 
 function _assertReusedColumnClearance(values: ReadonlyArray<number | null>) {
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
     nullPolicy: values.includes(null) ? "include-in-mode" : "exclude-from-mode",
-    observations: values.map((value, index) => ({ id: String(index), value })),
+    observations: values.map((value, index) => {
+      return { id: String(index), value };
+    }),
   });
-  Array.from({ length: 161 }, (_, index) => 56 + index / 4).forEach((frame) => {
+  Array.from({ length: 161 }, (_, index) => {
+    return 56 + index / 4;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     const copies = input.observations.map(({ id, value }) => {
       const copy = _getMovingCopy({ markup, id });
       assert.equal(
         [...copy.body.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)]
-          .map(([, text]) => text)
+          .map(([, text]) => {
+            return text;
+          })
           .join(""),
         value === null ? "∅" : String(value),
       );
@@ -194,14 +198,13 @@ function _assertModeArrival(input: Input) {
 
 function _getPermutedOrders(values: ReadonlyArray<number | null>) {
   return values.reduce<Array<Array<number | null>>>(
-    (orders, value) =>
-      orders.flatMap((order) =>
-        Array.from({ length: order.length + 1 }, (_, index) => [
-          ...order.slice(0, index),
-          value,
-          ...order.slice(index),
-        ]),
-      ),
+    (orders, value) => {
+      return orders.flatMap((order) => {
+        return Array.from({ length: order.length + 1 }, (_, index) => {
+          return [...order.slice(0, index), value, ...order.slice(index)];
+        });
+      });
+    },
     [[]],
   );
 }
@@ -210,10 +213,14 @@ function _assertPermutedCopyClearance(order: ReadonlyArray<number | null>) {
   const input: Input = {
     ...DEFAULT_INPUT,
     nullPolicy: "include-in-mode",
-    observations: order.map((value, index) => ({ id: String(index), value })),
+    observations: order.map((value, index) => {
+      return { id: String(index), value };
+    }),
   };
   const groups = getPickerGroupsFromInput(input);
-  Array.from({ length: 161 }, (_, index) => 56 + index / 4).forEach((frame) => {
+  Array.from({ length: 161 }, (_, index) => {
+    return 56 + index / 4;
+  }).forEach((frame) => {
     const copies = order.map((value, index) => {
       const copy = getPickerCopyFromFrame({ input, index, frame, groups });
       assert.ok(copy);

@@ -28,13 +28,15 @@ export function getCacheSceneFromFrame({
   input: Input;
   motion: Pick<VideoMotion, "scale" | "travel">;
 }>): GetCacheSceneFromFrameResult {
-  const missingIds = input.requests[1].columnIds.filter(
-    (id) => !input.cachedColumnIds.includes(id),
-  );
-  const original = input.columns.filter(({ id }) =>
-    input.cachedColumnIds.includes(id),
-  );
-  const additions = input.columns.filter(({ id }) => missingIds.includes(id));
+  const missingIds = input.requests[1].columnIds.filter((id) => {
+    return !input.cachedColumnIds.includes(id);
+  });
+  const original = input.columns.filter(({ id }) => {
+    return input.cachedColumnIds.includes(id);
+  });
+  const additions = input.columns.filter(({ id }) => {
+    return missingIds.includes(id);
+  });
   const union = [...original, ...additions];
   const growth = ramp(
     frame,

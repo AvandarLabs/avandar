@@ -137,11 +137,9 @@ export function getCarouselState(
   frame: number,
   windows: readonly CarouselWindow[],
 ): { current: number; previous?: number; progress: number } {
-  const current = windows.reduce(
-    (latest, window, index) =>
-      index > 0 && (window.atFrame ?? 0) <= frame ? index : latest,
-    0,
-  );
+  const current = windows.reduce((latest, window, index) => {
+    return index > 0 && (window.atFrame ?? 0) <= frame ? index : latest;
+  }, 0);
   const window = windows[current];
   if (current === 0 || window.swap === "cut") {
     return { current, progress: 1 };
@@ -273,11 +271,9 @@ export function getActiveHeadline(
   frame: number,
   headlines: ReadonlyArray<{ atFrame: number }>,
 ): { index: number; opacity: number } {
-  const index = headlines.reduce(
-    (latest, headline, position) =>
-      position > 0 && headline.atFrame <= frame ? position : latest,
-    0,
-  );
+  const index = headlines.reduce((latest, headline, position) => {
+    return position > 0 && headline.atFrame <= frame ? position : latest;
+  }, 0);
   const next = headlines[index + 1];
   const opacity = next
     ? 1 - ramp(frame, next.atFrame - DUR.press, DUR.press, EASE.inOut)
@@ -293,9 +289,11 @@ export function getScrollOffset(
   frame: number,
   steps: readonly ScrollStep[],
 ): number {
-  return steps.reduce(
-    (offset, step) =>
-      mix(ramp(frame, step.atFrame, DUR.press, EASE.out), offset, step.offset),
-    0,
-  );
+  return steps.reduce((offset, step) => {
+    return mix(
+      ramp(frame, step.atFrame, DUR.press, EASE.out),
+      offset,
+      step.offset,
+    );
+  }, 0);
 }

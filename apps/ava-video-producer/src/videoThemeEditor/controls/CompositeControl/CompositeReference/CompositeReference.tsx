@@ -19,7 +19,9 @@ export function CompositeReference({ row, label }: Props) {
         value={row.value}
         tokenValue={row.value}
         allowLiteral={false}
-        onChange={(reference) => editor.setToken(row.path, reference)}
+        onChange={(reference) => {
+          return editor.setToken(row.path, reference);
+        }}
       />
       <CompositeSketchPreview row={row} />
     </div>

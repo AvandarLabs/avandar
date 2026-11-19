@@ -110,7 +110,9 @@ test("internal and maximum boundaries assign every coincident identity exactly o
         attribute: "data-cell-count",
       })
         .values.map(Number)
-        .reduce((sum, numCellPoints) => sum + numCellPoints, 0),
+        .reduce((sum, numCellPoints) => {
+          return sum + numCellPoints;
+        }, 0),
       points.length,
     );
     const tokens = getSvgAttributeMatchesFromMarkup({
@@ -144,10 +146,9 @@ test("count tokens travel from actual fixed observations to distinct visible cel
   assert.equal(hold.length, 12);
   assert.equal(
     new Set(
-      hold.map(
-        (tag) =>
-          `${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" })},${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" })}`,
-      ),
+      hold.map((tag) => {
+        return `${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" })},${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" })}`;
+      }),
     ).size,
     12,
   );
@@ -182,9 +183,9 @@ test("count tokens travel from actual fixed observations to distinct visible cel
     }).tags.length,
     0,
   );
-  CHANGED_INPUT.points.forEach((point) =>
-    assert.ok(markup.includes(`aria-label="${point.id}"`)),
-  );
+  CHANGED_INPUT.points.forEach((point) => {
+    return assert.ok(markup.includes(`aria-label="${point.id}"`));
+  });
   assert.ok(
     markup.indexOf("data-cell-shade") < markup.indexOf("data-count-token"),
   );
@@ -196,7 +197,9 @@ test("maximum and empty IDs preserve exact supplied content without invented min
   ];
   const input = inputSchema.parse({ ...DEFAULT_INPUT, points });
   assert.deepEqual(input.points, points);
-  assert.doesNotThrow(() => _render({ frame: 150, input: input }));
+  assert.doesNotThrow(() => {
+    return _render({ frame: 150, input: input });
+  });
   assert.equal(
     inputSchema.safeParse({
       ...input,
@@ -213,15 +216,16 @@ test("complete authored captions remain clear of other captions and opaque foreg
         _render({ frame: frame, input: input }),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity > 0.9,
-        ),
+            item.opacity * item.fillOpacity > 0.9
+          );
+        }),
       });
     });
   });
@@ -246,13 +250,14 @@ test("zero copy owns an explicit zero sample even when every observed cell is no
       assert.ok(sample);
       const paint =
         SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-      const caption = paint.find(
-        (item) =>
+      const caption = paint.find((item) => {
+        return (
           item.kind === "text" &&
           item.ariaLabel === input.labels.zero &&
           item.left >= 450 &&
-          item.top < 150,
-      )!;
+          item.top < 150
+        );
+      })!;
       assert.ok(
         caption.left >
           SvgAttributes.getNumberFromMarkup({ attributes: sample, name: "x" }) +

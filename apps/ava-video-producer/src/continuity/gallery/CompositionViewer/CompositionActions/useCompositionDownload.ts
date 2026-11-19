@@ -22,7 +22,9 @@ export function useCompositionDownload(options: {
       await downloadFilm({
         id,
         options: theme ? { ...appearance, theme } : appearance,
-        onStatus: (job) => setProgress({ id, message: job.message }),
+        onStatus: (job) => {
+          return setProgress({ id, message: job.message });
+        },
       });
     } catch {
       setProgress({

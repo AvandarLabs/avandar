@@ -58,20 +58,22 @@ export function BarComparisonScene(props: BarComparisonSceneProps) {
     : undefined;
   return (
     <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
-      {panels.map((panel, panelIndex) => (
-        <_Panel
-          key={panelIndex}
-          {...props}
-          panel={panel}
-          panelIndex={panelIndex}
-          rect={{
-            ...bounds,
-            x: bounds.x + panelIndex * (panelWidth + gap),
-            width: panelWidth,
-          }}
-          eraseStarts={eraseStarts?.[panelIndex]}
-        />
-      ))}
+      {panels.map((panel, panelIndex) => {
+        return (
+          <_Panel
+            key={panelIndex}
+            {...props}
+            panel={panel}
+            panelIndex={panelIndex}
+            rect={{
+              ...bounds,
+              x: bounds.x + panelIndex * (panelWidth + gap),
+              width: panelWidth,
+            }}
+            eraseStarts={eraseStarts?.[panelIndex]}
+          />
+        );
+      })}
       {props.footnote ? (
         <p
           style={{
@@ -121,16 +123,18 @@ function _Panel(props: PanelProps) {
   );
   // Erase order: hero, caption, then label, bar and value of each row.
   let elementIndex = 0;
-  const erasable = (children: ReactNode, key: string) => (
-    <_Erasable
-      key={key}
-      frame={frame}
-      startFrame={eraseStarts?.[elementIndex++]}
-      durationInFrames={props.exit?.durationInFrames ?? DUR.press}
-    >
-      {children}
-    </_Erasable>
-  );
+  const erasable = (children: ReactNode, key: string) => {
+    return (
+      <_Erasable
+        key={key}
+        frame={frame}
+        startFrame={eraseStarts?.[elementIndex++]}
+        durationInFrames={props.exit?.durationInFrames ?? DUR.press}
+      >
+        {children}
+      </_Erasable>
+    );
+  };
   return (
     <>
       {erasable(
@@ -172,8 +176,8 @@ function _Panel(props: PanelProps) {
             "caption",
           )
         : null}
-      {panel.rows.map((row, rowIndex) =>
-        _renderRow({
+      {panel.rows.map((row, rowIndex) => {
+        return _renderRow({
           ...props,
           row,
           rowIndex,
@@ -182,8 +186,8 @@ function _Panel(props: PanelProps) {
           fraction: getBarFractions(panel.rows)[rowIndex],
           beats,
           erasable,
-        }),
-      )}
+        });
+      })}
     </>
   );
 }

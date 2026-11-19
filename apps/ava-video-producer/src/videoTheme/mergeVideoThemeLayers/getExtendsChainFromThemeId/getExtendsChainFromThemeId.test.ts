@@ -14,23 +14,23 @@ test("the chain runs from the root theme to the requested one", () => {
     _theme("child", "studio"),
   ]);
   assert.deepEqual(
-    getExtendsChainFromThemeId(library, "child").map(({ id }) => id),
+    getExtendsChainFromThemeId(library, "child").map(({ id }) => {
+      return id;
+    }),
     ["classic", "studio", "child"],
   );
 });
 
 test("an extends cycle is reported", () => {
   const library = createVideoThemeLibrary([_theme("a", "b"), _theme("b", "a")]);
-  assert.throws(
-    () => getExtendsChainFromThemeId(library, "a"),
-    /extends itself/,
-  );
+  assert.throws(() => {
+    return getExtendsChainFromThemeId(library, "a");
+  }, /extends itself/);
 });
 
 test("an unknown extends target is reported", () => {
   const library = createVideoThemeLibrary([_theme("orphan", "missing")]);
-  assert.throws(
-    () => getExtendsChainFromThemeId(library, "orphan"),
-    /Unknown theme "missing"/,
-  );
+  assert.throws(() => {
+    return getExtendsChainFromThemeId(library, "orphan");
+  }, /Unknown theme "missing"/);
 });

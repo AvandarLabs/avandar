@@ -36,7 +36,9 @@ export function useDraftValue<Value, Draft>({
   onChange,
 }: DraftValueOptions<Value, Draft>): DraftValue<Draft> {
   const valueKey = toKey(value);
-  const [draft, setDraft] = useState(() => toDraft(value));
+  const [draft, setDraft] = useState(() => {
+    return toDraft(value);
+  });
   const [syncedKey, setSyncedKey] = useState(valueKey);
   if (syncedKey !== valueKey) {
     setSyncedKey(valueKey);
@@ -50,6 +52,8 @@ export function useDraftValue<Value, Draft>({
       onChange(parsed);
     }
   };
-  const revert = () => setDraft(toDraft(value));
+  const revert = () => {
+    return setDraft(toDraft(value));
+  };
   return { draft, isValid: parse(draft) !== undefined, change, revert };
 }

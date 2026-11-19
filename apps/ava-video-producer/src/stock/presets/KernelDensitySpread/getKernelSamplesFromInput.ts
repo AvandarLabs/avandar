@@ -17,14 +17,14 @@ export function getKernelSamplesFromInput({
     const x = (((index % input.gridSize) + 0.5) * 100) / input.gridSize;
     const y =
       ((Math.floor(index / input.gridSize) + 0.5) * 100) / input.gridSize;
-    const intensity = input.points.reduce(
-      (sum, point, pointIndex) =>
+    const intensity = input.points.reduce((sum, point, pointIndex) => {
+      return (
         sum +
         point.weight *
           Math.max(0, 1 - Math.hypot(x - point.x, y - point.y) / radius) *
-          ramp(frame, 56 + pointIndex * 8, 17, EASE.inOut),
-      0,
-    );
+          ramp(frame, 56 + pointIndex * 8, 17, EASE.inOut)
+      );
+    }, 0);
     return { x, y, intensity };
   });
   return { radius, cells };

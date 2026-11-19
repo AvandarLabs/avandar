@@ -77,9 +77,9 @@ function _isInside({
   }
   assert.equal(obstacle.segments.length, 4);
   assert.ok(
-    obstacle.segments.every(
-      ({ start, end }) => start.x === end.x || start.y === end.y,
-    ),
+    obstacle.segments.every(({ start, end }) => {
+      return start.x === end.x || start.y === end.y;
+    }),
   );
   const points = obstacle.segments.map(prop("start"));
   return (
@@ -99,9 +99,9 @@ function _assertWheelchairContact({
 }): void {
   const [head, rear, front, hand] = participant.circles;
   [rear, front].forEach((wheel) => {
-    const floor = segments.find(
-      ({ start, end }) => wheel.x >= start.x && wheel.x <= end.x,
-    );
+    const floor = segments.find(({ start, end }) => {
+      return wheel.x >= start.x && wheel.x <= end.x;
+    });
     assert.ok(floor);
     const floorY =
       floor.start.y +
@@ -111,9 +111,9 @@ function _assertWheelchairContact({
     assert.ok(
       Math.abs(
         Math.min(
-          ...segments.map((segment) =>
-            _getPointDistance({ point: wheel, segment: segment }),
-          ),
+          ...segments.map((segment) => {
+            return _getPointDistance({ point: wheel, segment: segment });
+          }),
         ) - wheel.radius,
       ) < 1e-8,
     );
@@ -143,9 +143,9 @@ function _assertWalkingContact({
     .forEach(({ end }) => {
       assert.ok(
         Math.min(
-          ...segments.map((segment) =>
-            _getPointDistance({ point: end, segment: segment }),
-          ),
+          ...segments.map((segment) => {
+            return _getPointDistance({ point: end, segment: segment });
+          }),
         ) < 1e-8,
       );
     });
@@ -154,24 +154,24 @@ function _assertWalkingContact({
 function _assertParticipantCanvas(
   participant: Readonly<ServiceParticipantGeometry>,
 ): void {
-  participant.circles.forEach(({ x, y, radius }) =>
-    assert.ok(
+  participant.circles.forEach(({ x, y, radius }) => {
+    return assert.ok(
       x - radius >= 0 &&
         x + radius <= 960 &&
         y - radius >= 0 &&
         y + radius <= 640,
-    ),
-  );
-  participant.segments.forEach(({ start, end, strokeWidth }) =>
-    [start, end].forEach(({ x, y }) =>
-      assert.ok(
+    );
+  });
+  participant.segments.forEach(({ start, end, strokeWidth }) => {
+    return [start, end].forEach(({ x, y }) => {
+      return assert.ok(
         x >= strokeWidth / 2 &&
           x <= 960 - strokeWidth / 2 &&
           y >= strokeWidth / 2 &&
           y <= 640 - strokeWidth / 2,
-      ),
-    ),
-  );
+      );
+    });
+  });
 }
 
 function _assertObstacleClearance({
@@ -187,9 +187,9 @@ function _assertObstacleClearance({
     const distance = _isInside({ point: circle, obstacle })
       ? 0
       : Math.min(
-          ...obstacle.segments.map((segment) =>
-            _getPointDistance({ point: circle, segment: segment }),
-          ),
+          ...obstacle.segments.map((segment) => {
+            return _getPointDistance({ point: circle, segment: segment });
+          }),
         );
     assert.ok(
       distance > circle.radius + obstacle.strokeWidth / 2,
@@ -202,9 +202,9 @@ function _assertObstacleClearance({
       _isInside({ point: segment.end, obstacle })
         ? 0
         : Math.min(
-            ...obstacle.segments.map((edge) =>
-              _getSegmentDistance({ first: segment, second: edge }),
-            ),
+            ...obstacle.segments.map((edge) => {
+              return _getSegmentDistance({ first: segment, second: edge });
+            }),
           );
     assert.ok(
       distance > (segment.strokeWidth + obstacle.strokeWidth) / 2,

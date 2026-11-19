@@ -14,7 +14,9 @@ test("original source and caption paint over copies with full opaque clearance",
   fixtures.forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((105 - 49) / 1) + 1) },
-      (_, sampleIndex) => 49 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 49 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = renderToStaticMarkup(
         createElement(UtteranceToModelDraft, {
@@ -110,61 +112,65 @@ test("only one phrase copy travels and role captions wait until all copies finis
   fixtures.forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((105 - 49) / 1) + 1) },
-      (_, sampleIndex) => 49 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 49 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const copies = _attributes({ markup, marker: "phrase-copy" });
       const sockets = _attributes({ markup, marker: "model-item" });
       assert.equal(copies.length, 3 + input.draft.attributes.length);
       assert.equal(sockets.length, copies.length);
-      const active = copies.filter(
-        (copy) =>
+      const active = copies.filter((copy) => {
+        return (
           SvgAttributes.getNumberFromMarkup({
             attributes: copy,
             name: "opacity",
-          }) > 0,
-      );
+          }) > 0
+        );
+      });
       assert.ok(
         active.length <= 1,
         `frame ${frame}: overlapping phrase copies`,
       );
       if (active.length) {
-        sockets.forEach((socket) =>
-          assert.equal(
+        sockets.forEach((socket) => {
+          return assert.equal(
             SvgAttributes.getNumberFromMarkup({
               attributes: socket,
               name: "opacity",
             }),
             0,
-          ),
-        );
+          );
+        });
       }
       if (frame === 105) {
         assert.equal(active.length, 0);
-        sockets.forEach((socket) =>
-          assert.equal(
+        sockets.forEach((socket) => {
+          return assert.equal(
             SvgAttributes.getNumberFromMarkup({
               attributes: socket,
               name: "opacity",
             }),
             1,
-          ),
-        );
+          );
+        });
       }
     });
-    [55, 60].forEach((frame) =>
-      assert.ok(
+    [55, 60].forEach((frame) => {
+      return assert.ok(
         _attributes({
           markup: _render({ frame: frame, input: input }),
           marker: "phrase-copy",
-        }).some(
-          (copy) =>
+        }).some((copy) => {
+          return (
             SvgAttributes.getNumberFromMarkup({
               attributes: copy,
               name: "opacity",
-            }) > 0,
-        ),
-      ),
-    );
+            }) > 0
+          );
+        }),
+      );
+    });
   });
 });

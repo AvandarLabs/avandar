@@ -40,9 +40,9 @@ export function StockRect(props: SVGProps<SVGRectElement>) {
   );
   return (
     <g {...attributes} data-rough-box={profile.roughness}>
-      {paths.map((path, index) => (
-        <path key={index} {...path} />
-      ))}
+      {paths.map((path, index) => {
+        return <path key={index} {...path} />;
+      })}
       {children}
     </g>
   );

@@ -38,11 +38,16 @@ export const inputSchema = z
     showRouteLabels: z.boolean(),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
 
-    const blocked = input.routes.find(({ role }) => role === "blocked");
-    const detour = input.routes.find(({ role }) => role === "detour");
+    const blocked = input.routes.find(({ role }) => {
+      return role === "blocked";
+    });
+    const detour = input.routes.find(({ role }) => {
+      return role === "detour";
+    });
     if (!blocked || !detour) {
       issue("routes", "Exactly one route per role is required.");
       return;
@@ -69,15 +74,16 @@ export const inputSchema = z
       );
     }
     if (
-      detour.points.slice(1).some(
-        (to, index) =>
+      detour.points.slice(1).some((to, index) => {
+        return (
           getClosedInteriorEncounterFromSegments({
             from: detour.points[index],
             to,
             start,
             end,
-          }) !== undefined,
-      )
+          }) !== undefined
+        );
+      })
     ) {
       issue(
         "routes",

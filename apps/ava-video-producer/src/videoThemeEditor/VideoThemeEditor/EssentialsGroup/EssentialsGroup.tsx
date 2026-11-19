@@ -16,9 +16,9 @@ export function EssentialsGroup({
       <h3 id={titleId} className={css.essentialsGroupTitle}>
         {"Look and feel"}
       </h3>
-      {getEssentialRows(rows).map((row) => (
-        <TokenRow key={row.path} row={row} />
-      ))}
+      {getEssentialRows(rows).map((row) => {
+        return <TokenRow key={row.path} row={row} />;
+      })}
     </section>
   );
 }

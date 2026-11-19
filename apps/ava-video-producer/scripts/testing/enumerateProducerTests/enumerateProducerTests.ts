@@ -38,12 +38,14 @@ async function _enumerate(
  */
 export async function enumerateProducerTests(root: string): Promise<string[]> {
   const trees = await Promise.all([
-    ...["src", "scripts", "tests/helpers", "avandar-adapter"].map((directory) =>
-      _enumerate({ root, directory, recursive: true }),
+    ...["src", "scripts", "tests/helpers", "avandar-adapter"].map(
+      (directory) => {
+        return _enumerate({ root, directory, recursive: true });
+      },
     ),
-    ...["tests", "showcase"].map((directory) =>
-      _enumerate({ root, directory, recursive: false }),
-    ),
+    ...["tests", "showcase"].map((directory) => {
+      return _enumerate({ root, directory, recursive: false });
+    }),
   ]);
   return trees.flat().sort();
 }

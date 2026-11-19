@@ -18,12 +18,15 @@ const image = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3ioAAAAASUVORK5CYII=",
   "base64",
 );
-const hash = (value: Buffer | string) =>
-  createHash("sha256").update(value).digest("hex");
+const hash = (value: Buffer | string) => {
+  return createHash("sha256").update(value).digest("hex");
+};
 
 async function fixture(t: TestContext) {
   const root = await mkdtemp(join(tmpdir(), "capture-curation-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   const runDir = "out/captures/fixture-run";
   const run = join(root, runDir);
   await mkdir(join(run, "screens"), { recursive: true });
@@ -68,8 +71,9 @@ async function fixture(t: TestContext) {
       },
     ],
   };
-  const save = () =>
-    writeFile(join(run, "manifest.json"), JSON.stringify(manifest));
+  const save = () => {
+    return writeFile(join(run, "manifest.json"), JSON.stringify(manifest));
+  };
   await save();
   return { root, runDir, run, manifest, save };
 }
@@ -236,7 +240,9 @@ test("replacement is explicit and preserves the complete previous curated set", 
 test("curation refuses output symlinks without creating files outside the project", async (t) => {
   const f = await fixture(t);
   const outside = await mkdtemp(join(tmpdir(), "curation-outside-"));
-  t.after(() => rm(outside, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(outside, { recursive: true, force: true });
+  });
   await symlink(outside, join(f.root, "public"));
   await assert.rejects(
     curateCapture({ root: f.root, runDir: f.runDir }),

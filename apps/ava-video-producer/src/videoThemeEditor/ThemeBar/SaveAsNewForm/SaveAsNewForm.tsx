@@ -13,7 +13,9 @@ export function SaveAsNewForm({ onSubmit, onCancel }: Props) {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const label = getThemeLabelFromInput(input);
-  useEffect(() => inputRef.current?.focus(), []);
+  useEffect(() => {
+    return inputRef.current?.focus();
+  }, []);
   return (
     <form
       className={css.saveAsNewForm}
@@ -29,7 +31,9 @@ export function SaveAsNewForm({ onSubmit, onCancel }: Props) {
         size="xs"
         label="New theme name"
         value={input}
-        onChange={(event) => setInput(event.currentTarget.value)}
+        onChange={(event) => {
+          return setInput(event.currentTarget.value);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();

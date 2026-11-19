@@ -19,9 +19,9 @@ export function CatchmentDefinitions({
         width={520}
         height={320}
       >
-        {getCatchmentShapesFromInput(input).map((shape) => (
-          <polygon key={shape.id} points={shape.points} fill="white" />
-        ))}
+        {getCatchmentShapesFromInput(input).map((shape) => {
+          return <polygon key={shape.id} points={shape.points} fill="white" />;
+        })}
       </mask>
       <filter
         id={`${definitionId}-edge`}

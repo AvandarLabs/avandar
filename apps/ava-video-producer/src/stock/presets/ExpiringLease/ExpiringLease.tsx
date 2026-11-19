@@ -64,14 +64,16 @@ export function ExpiringLease({
         opacity={ramp(frame, 12, 12)}
       />
       <path {...route} />
-      {input.participants.map((participant, index) => (
-        <LeaseSocket
-          key={participant.id}
-          participant={participant}
-          index={index}
-          {...socketProps}
-        />
-      ))}
+      {input.participants.map((participant, index) => {
+        return (
+          <LeaseSocket
+            key={participant.id}
+            participant={participant}
+            index={index}
+            {...socketProps}
+          />
+        );
+      })}
       <circle data-permission-token="single" {...token} />
       {input.showLabels ? (
         <LeaseCaptions input={input} frame={frame} />

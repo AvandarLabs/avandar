@@ -26,7 +26,9 @@ export function PowerFields({ power, isCameraCurve, onChange }: Props) {
       step={0.5}
       decimalScale={2}
       value={power}
-      onChange={(exponent) => onChange({ powerInOut: exponent })}
+      onChange={(exponent) => {
+        return onChange({ powerInOut: exponent });
+      }}
     />
   );
 }

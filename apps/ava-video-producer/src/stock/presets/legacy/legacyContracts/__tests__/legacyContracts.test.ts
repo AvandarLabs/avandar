@@ -32,14 +32,18 @@ const BASELINE: {
   }>;
 };
 
-const _normalizeSvgIds = (markup: string): string =>
-  markup.replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID");
+const _normalizeSvgIds = (markup: string): string => {
+  return markup.replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID");
+};
 
 const _render = ({
   preset,
   input,
-}: Readonly<{ preset: (typeof LEGACY_IDS)[number]; input: unknown }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{
+  preset: (typeof LEGACY_IDS)[number];
+  input: unknown;
+}>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       null,
@@ -49,6 +53,7 @@ const _render = ({
       ),
     ),
   );
+};
 
 test("original twenty samples preserve every SVG label and geometry at all sixty gates", () => {
   assert.equal(BASELINE.records.length, 60);
@@ -93,19 +98,23 @@ test("all legacy entries expose complete controls, bindings and changed fixtures
         /NaN|Infinity|undefined/,
       );
     });
-    const changed = contract.fixtures.find(({ id }) => id === "changed");
+    const changed = contract.fixtures.find(({ id }) => {
+      return id === "changed";
+    });
     assert.ok(changed);
     assert.notEqual(
       _render({ preset: preset, input: changed.input }),
       _render({ preset: preset, input: contract.defaultInput }),
     );
-    assert.throws(() => parseStockInput({ preset: preset, rawInput: {} }));
-    assert.throws(() =>
-      parseStockInput({
+    assert.throws(() => {
+      return parseStockInput({ preset: preset, rawInput: {} });
+    });
+    assert.throws(() => {
+      return parseStockInput({
         preset: preset,
         rawInput: { ...contract.defaultInput, unexpected: true },
-      }),
-    );
+      });
+    });
   });
 });
 
@@ -124,9 +133,12 @@ test("authored graph edges and node labels determine only the supplied network",
   assert.match(markup, /M200,200 C380,200 420,300 600,300/);
   assert.doesNotMatch(markup, /Nexus|Alpha/);
   assert.equal((markup.match(/pathLength="1"/g) ?? []).length, 1);
-  assert.throws(() =>
-    _render({ preset: "network-graph", input: { ...input, edges: [[0, 2]] } }),
-  );
+  assert.throws(() => {
+    return _render({
+      preset: "network-graph",
+      input: { ...input, edges: [[0, 2]] },
+    });
+  });
 });
 
 test("traversal follows authored adjacent edges instead of the default route", () => {
@@ -135,9 +147,12 @@ test("traversal follows authored adjacent edges instead of the default route", (
   const markup = _render({ preset: "node-traversal", input: input });
   assert.doesNotMatch(markup, /A → C → D → E → G/);
   assert.match(markup, /x1="310" y1="170" x2="502" y2="302"/);
-  assert.throws(() =>
-    _render({ preset: "node-traversal", input: { ...input, route: [0, 6] } }),
-  );
+  assert.throws(() => {
+    return _render({
+      preset: "node-traversal",
+      input: { ...input, route: [0, 6] },
+    });
+  });
 });
 
 test("chart values and collection lengths control bar widths and trace coordinates", () => {
@@ -170,8 +185,8 @@ test("chart values and collection lengths control bar widths and trace coordinat
     _render({ preset: "line-trace", input: trace }),
     /M121 458 L839 148/,
   );
-  assert.throws(() =>
-    _render({
+  assert.throws(() => {
+    return _render({
       preset: "bar-race",
       input: {
         ...bars,
@@ -186,19 +201,21 @@ test("chart values and collection lengths control bar widths and trace coordinat
           },
         ],
       },
-    }),
-  );
+    });
+  });
 });
 
 test("mapping enrichment retains explicit correspondence and source-derived acceptance", () => {
   const contract = stockContracts["schema-mapping"];
   assert.ok(
-    contract.metadata.tags.some(({ message }) => message === "case schema"),
+    contract.metadata.tags.some(({ message }) => {
+      return message === "case schema";
+    }),
   );
   assert.ok(
-    contract.semanticRules.some(({ description }) =>
-      description.includes("never manufacture"),
-    ),
+    contract.semanticRules.some(({ description }) => {
+      return description.includes("never manufacture");
+    }),
   );
   const input = {
     mappings: [{ source: "identifier", target: "case_key", type: "string" }],
@@ -221,12 +238,14 @@ test("all authored fixture text is passed through instead of retaining default l
       return value ? [value] : [];
     }
     if (Array.isArray(value)) {
-      return value.flatMap((item) => textValues(item, key));
+      return value.flatMap((item) => {
+        return textValues(item, key);
+      });
     }
     if (value && typeof value === "object") {
-      return Object.entries(value).flatMap(([field, item]) =>
-        textValues(item, field),
-      );
+      return Object.entries(value).flatMap(([field, item]) => {
+        return textValues(item, field);
+      });
     }
     return [];
   };
@@ -255,65 +274,59 @@ test("all authored fixture text is passed through instead of retaining default l
 
 test("masked words reject content wider than the fixed authored masks", () => {
   const input = stockContracts["word-reveal"].defaultInput;
-  assert.throws(
-    () =>
-      parseStockInput({
-        preset: "word-reveal",
-        rawInput: {
-          ...input,
-          words: [{ word: "WWWWWW", accented: false }],
-        },
-      }),
-    /words/,
-  );
+  assert.throws(() => {
+    return parseStockInput({
+      preset: "word-reveal",
+      rawInput: {
+        ...input,
+        words: [{ word: "WWWWWW", accented: false }],
+      },
+    });
+  }, /words/);
 });
 
 test("wide authored labels fail before overflowing fixed node and bar slots", () => {
   const graph = stockContracts["network-graph"].defaultInput;
-  assert.throws(
-    () =>
-      parseStockInput({
-        preset: "network-graph",
-        rawInput: {
-          ...graph,
-          nodes: [
-            { ...graph.nodes[0], label: "W".repeat(12) },
-            ...graph.nodes.slice(1),
-          ],
-        },
-      }),
-    /nodes.0.label/,
-  );
+  assert.throws(() => {
+    return parseStockInput({
+      preset: "network-graph",
+      rawInput: {
+        ...graph,
+        nodes: [
+          { ...graph.nodes[0], label: "W".repeat(12) },
+          ...graph.nodes.slice(1),
+        ],
+      },
+    });
+  }, /nodes.0.label/);
   const bars = stockContracts["bar-race"].defaultInput;
-  assert.throws(
-    () =>
-      parseStockInput({
-        preset: "bar-race",
-        rawInput: {
-          ...bars,
-          bars: [
-            { ...bars.bars[0], label: "W".repeat(12) },
-            ...bars.bars.slice(1),
-          ],
-        },
-      }),
-    /bars.0.label/,
-  );
-  assert.doesNotThrow(() =>
-    parseStockInput({
+  assert.throws(() => {
+    return parseStockInput({
+      preset: "bar-race",
+      rawInput: {
+        ...bars,
+        bars: [
+          { ...bars.bars[0], label: "W".repeat(12) },
+          ...bars.bars.slice(1),
+        ],
+      },
+    });
+  }, /bars.0.label/);
+  assert.doesNotThrow(() => {
+    return parseStockInput({
       preset: "bar-race",
       rawInput: {
         ...bars,
         bars: [{ ...bars.bars[0], label: "WWWW" }, ...bars.bars.slice(1)],
       },
-    }),
-  );
+    });
+  });
 });
 
 test("dense traversal summaries expand within the header instead of overflowing the pill", () => {
-  const dense = stockContracts["node-traversal"].fixtures.find(
-    ({ id }) => id === "dense",
-  );
+  const dense = stockContracts["node-traversal"].fixtures.find(({ id }) => {
+    return id === "dense";
+  });
   assert.ok(dense);
   const markup = _render({ preset: "node-traversal", input: dense.input });
   assert.match(markup, /x="676" y="44" width="220"/);
@@ -322,19 +335,25 @@ test("dense traversal summaries expand within the header instead of overflowing 
 
 test("long node labels wrap a complete route summary inside the header", () => {
   const contract = stockContracts["node-traversal"];
-  const dense = contract.fixtures.find(({ id }) => id === "dense");
+  const dense = contract.fixtures.find(({ id }) => {
+    return id === "dense";
+  });
   assert.ok(dense);
   const input = {
     ...dense.input,
-    nodes: dense.input.nodes.map((node, index) => ({
-      ...node,
-      label: `MMMMMMM${index}`,
-    })),
+    nodes: dense.input.nodes.map((node, index) => {
+      return {
+        ...node,
+        label: `MMMMMMM${index}`,
+      };
+    }),
   };
   const markup = _render({ preset: "node-traversal", input: input });
   assert.match(markup, /x="520" y="44" width="376"/);
   assert.match(markup, /font-size="12"/);
-  input.nodes.forEach(({ label }) => assert.ok(markup.includes(label)));
+  input.nodes.forEach(({ label }) => {
+    return assert.ok(markup.includes(label));
+  });
 });
 
 test("baseline normalization preserves semantic SVG definition suffixes", () => {
@@ -356,22 +375,20 @@ test("baseline normalization preserves semantic SVG definition suffixes", () => 
 
 test("large weighted metric and unit pairs cannot overflow the fixed display", () => {
   const input = stockContracts["metric-counter"].defaultInput;
-  assert.throws(
-    () =>
-      parseStockInput({
-        preset: "metric-counter",
-        rawInput: {
-          ...input,
-          value: 0,
-          unit: " mmmmmm",
-        },
-      }),
-    /unit/,
-  );
-  assert.doesNotThrow(() =>
-    parseStockInput({
+  assert.throws(() => {
+    return parseStockInput({
+      preset: "metric-counter",
+      rawInput: {
+        ...input,
+        value: 0,
+        unit: " mmmmmm",
+      },
+    });
+  }, /unit/);
+  assert.doesNotThrow(() => {
+    return parseStockInput({
       preset: "metric-counter",
       rawInput: { ...input, value: 725, unit: " kg" },
-    }),
-  );
+    });
+  });
 });

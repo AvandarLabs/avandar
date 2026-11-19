@@ -20,7 +20,9 @@ export function RefreshRecord({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const source = input.sourceRows.find(({ id }) => id === record.id),
+  const source = input.sourceRows.find(({ id }) => {
+      return id === record.id;
+    }),
     y = 112 + index * 106;
   const refresh = ramp(frame, 105, 34, EASE.inOut),
     isApplied = refresh === 1;

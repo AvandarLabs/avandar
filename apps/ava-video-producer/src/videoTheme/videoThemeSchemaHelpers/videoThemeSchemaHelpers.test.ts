@@ -37,36 +37,41 @@ test("a theme without extends must define every token", () => {
     label: "Warm",
     other: { video: { atomic: { swatch: { ground: "#201510" } } } },
   };
-  assert.throws(() => parseVideoThemeDocument(sparse), /colors/);
+  assert.throws(() => {
+    return parseVideoThemeDocument(sparse);
+  }, /colors/);
 });
 
 test("a semantic token rejects a literal value", () => {
-  assert.throws(
-    () =>
-      parseVideoThemeDocument(
-        _sparse({ semantic: { color: { accent: "#ff0000" } } }),
-      ),
-    /accent/,
-  );
+  assert.throws(() => {
+    return parseVideoThemeDocument(
+      _sparse({ semantic: { color: { accent: "#ff0000" } } }),
+    );
+  }, /accent/);
 });
 
 test("an atomic token rejects a reference", () => {
-  assert.throws(
-    () =>
-      parseVideoThemeDocument(
-        _sparse({ atomic: { swatch: { ground: "$color.text" } } }),
-      ),
-    /ground/,
-  );
+  assert.throws(() => {
+    return parseVideoThemeDocument(
+      _sparse({ atomic: { swatch: { ground: "$color.text" } } }),
+    );
+  }, /ground/);
 });
 
 test("a tempo below the slowest allowed is rejected", () => {
   assert.throws(
-    () => parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.75 } } })),
-    (error: { issues?: ReadonlyArray<{ path: readonly PropertyKey[] }> }) =>
-      error.issues?.some(
-        (issue) => issue.path.join(".") === "other.video.atomic.tempo.md",
-      ) ?? false,
+    () => {
+      return parseVideoThemeDocument(
+        _sparse({ atomic: { tempo: { md: 0.75 } } }),
+      );
+    },
+    (error: { issues?: ReadonlyArray<{ path: readonly PropertyKey[] }> }) => {
+      return (
+        error.issues?.some((issue) => {
+          return issue.path.join(".") === "other.video.atomic.tempo.md";
+        }) ?? false
+      );
+    },
   );
 });
 
@@ -89,31 +94,29 @@ test("a component token accepts a literal one-off", () => {
 });
 
 test("an unknown token is rejected", () => {
-  assert.throws(
-    () =>
-      parseVideoThemeDocument(
-        _sparse({ semantic: { color: { sparkle: "$color.accent" } } }),
-      ),
-    /sparkle/,
-  );
+  assert.throws(() => {
+    return parseVideoThemeDocument(
+      _sparse({ semantic: { color: { sparkle: "$color.accent" } } }),
+    );
+  }, /sparkle/);
 });
 
 test("a font stack must belong to a registered font", () => {
-  assert.throws(() =>
-    parseVideoThemeDocument({
+  assert.throws(() => {
+    return parseVideoThemeDocument({
       schemaVersion: 1,
       id: "comic",
       label: "Comic",
       extends: "classic",
       fontFamily: "Comic Sans MS, cursive",
-    }),
-  );
+    });
+  });
 });
 
 test("theme ids are slugs", () => {
-  assert.throws(() =>
-    parseVideoThemeDocument({ ..._sparse({}), id: "My Theme" }),
-  );
+  assert.throws(() => {
+    return parseVideoThemeDocument({ ..._sparse({}), id: "My Theme" });
+  });
 });
 
 test("the JSON Schema carries every token's description", () => {

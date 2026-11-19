@@ -27,9 +27,9 @@ function _describeStyle(style: CSSProperties): string {
 export function createLineRevealDemo(mode: "line-fade" | "wipe" | "cut") {
   return function LineRevealDemo({ frame, frames }: HelperDemoProps) {
     const lines = ["Every line arrives", "on its own beat,", "then holds."];
-    const styles = lines.map((_, index) =>
-      getLineRevealStyle(frame, LINE_AT + index * LINE_STAGGER, mode),
-    );
+    const styles = lines.map((_, index) => {
+      return getLineRevealStyle(frame, LINE_AT + index * LINE_STAGGER, mode);
+    });
     return (
       <HelperDemoFrame
         frame={frame}
@@ -38,11 +38,13 @@ export function createLineRevealDemo(mode: "line-fade" | "wipe" | "cut") {
         readouts={[{ name: "line 0", value: _describeStyle(styles[0]) }]}
       >
         <div className={css.lines}>
-          {lines.map((line, index) => (
-            <p key={line} className={css.headline} style={styles[index]}>
-              {line}
-            </p>
-          ))}
+          {lines.map((line, index) => {
+            return (
+              <p key={line} className={css.headline} style={styles[index]}>
+                {line}
+              </p>
+            );
+          })}
         </div>
       </HelperDemoFrame>
     );
@@ -86,12 +88,14 @@ export function HeadingRevealDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="getHeadingRevealStyles(frame, { mode, atFrame: 8 })"
-      readouts={HEADING_MODES.map((mode) => ({
-        name: `${mode} title`,
-        value: _describeStyle(
-          getHeadingRevealStyles(frame, { mode, atFrame: 8 }).title,
-        ),
-      }))}
+      readouts={HEADING_MODES.map((mode) => {
+        return {
+          name: `${mode} title`,
+          value: _describeStyle(
+            getHeadingRevealStyles(frame, { mode, atFrame: 8 }).title,
+          ),
+        };
+      })}
     >
       <div className={css.cards}>
         {HEADING_MODES.map((mode) => {
@@ -130,24 +134,28 @@ export function StagedExitDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="getStagedExitStyle(frame, { atFrame: 50 }, orderIndex)"
-      readouts={[0, 1, 2, 3].map((index) => ({
-        name: index === 3 ? "icon" : `line ${index}`,
-        value: formatReadout(
-          Number(getStagedExitStyle(frame, STAGED_EXIT, index).opacity ?? 1),
-        ),
-      }))}
+      readouts={[0, 1, 2, 3].map((index) => {
+        return {
+          name: index === 3 ? "icon" : `line ${index}`,
+          value: formatReadout(
+            Number(getStagedExitStyle(frame, STAGED_EXIT, index).opacity ?? 1),
+          ),
+        };
+      })}
     >
       <div className={css.lines} style={enter(frame, 6)}>
         <span className={css.icon} style={iconExit} />
-        {lines.map((line, index) => (
-          <p
-            key={line}
-            className={css.headline}
-            style={getStagedExitStyle(frame, STAGED_EXIT, index)}
-          >
-            {line}
-          </p>
-        ))}
+        {lines.map((line, index) => {
+          return (
+            <p
+              key={line}
+              className={css.headline}
+              style={getStagedExitStyle(frame, STAGED_EXIT, index)}
+            >
+              {line}
+            </p>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

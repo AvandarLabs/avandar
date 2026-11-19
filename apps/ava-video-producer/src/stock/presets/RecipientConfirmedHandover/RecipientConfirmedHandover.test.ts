@@ -74,25 +74,35 @@ registerStockTextLayoutAssertions({
 
 test("receipt quantities equal completed physical moves while each offered unit remains singular", () => {
   fixtures.forEach(({ input }) => {
-    Array.from({ length: 90 }, (_, index) => index * 2).forEach((frame) => {
+    Array.from({ length: 90 }, (_, index) => {
+      return index * 2;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const objects = [
         ...markup.matchAll(/<g data-good="([^"]*)" data-unit="([^"]*)"[^>]*>/g),
       ];
       assert.equal(
         objects.length,
-        input.contents.reduce((sum, item) => sum + item.offeredUnits, 0),
+        input.contents.reduce((sum, item) => {
+          return sum + item.offeredUnits;
+        }, 0),
       );
       input.contents.forEach((item) => {
-        const units = objects.filter((match) => match[1] === item.id);
+        const units = objects.filter((match) => {
+          return match[1] === item.id;
+        });
         assert.equal(units.length, item.offeredUnits);
         assert.equal(
-          new Set(units.map((match) => match[2])).size,
+          new Set(
+            units.map((match) => {
+              return match[2];
+            }),
+          ).size,
           item.offeredUnits,
         );
-        const received = units.filter(([attributes]) =>
-          attributes.includes('data-owner="basket"'),
-        ).length;
+        const received = units.filter(([attributes]) => {
+          return attributes.includes('data-owner="basket"');
+        }).length;
         assert.match(
           markup,
           new RegExp(`data-receipt="${item.id}" data-selected="${received}"`),
@@ -100,9 +110,9 @@ test("receipt quantities equal completed physical moves while each offered unit 
         if (frame >= 108) {
           assert.equal(received, item.selectedUnits);
           assert.equal(
-            units.filter(([attributes]) =>
-              attributes.includes('data-owner="delivery"'),
-            ).length,
+            units.filter(([attributes]) => {
+              return attributes.includes('data-owner="delivery"');
+            }).length,
             item.offeredUnits - item.selectedUnits,
           );
         }
@@ -126,22 +136,26 @@ test("selection cannot exceed line availability or accepted aggregate limits", (
     },
     {
       ...DENSE_INPUT,
-      contents: DENSE_INPUT.contents.map((item) => ({
-        ...item,
-        offeredUnits: 4,
-      })),
+      contents: DENSE_INPUT.contents.map((item) => {
+        return {
+          ...item,
+          offeredUnits: 4,
+        };
+      }),
     },
     {
       ...DENSE_INPUT,
-      contents: DENSE_INPUT.contents.map((item) => ({
-        ...item,
-        selectedUnits: item.offeredUnits,
-      })),
+      contents: DENSE_INPUT.contents.map((item) => {
+        return {
+          ...item,
+          selectedUnits: item.offeredUnits,
+        };
+      }),
     },
   ];
-  invalid.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalid.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 function _getUnitCoordinate({
@@ -170,9 +184,9 @@ test("unknown goods, fractional quantities and invalid initials fail strict vali
       receiptLabels: { ...DEFAULT_INPUT.receiptLabels, extra: true },
     },
     { ...DEFAULT_INPUT, initialsText: "abcd" },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("recipient indicates, pulls and releases each selected unit with a connected hand", () => {
@@ -181,7 +195,9 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
     input.contents.forEach((content) => {
       Array.from(
         { length: Math.max(0, Math.ceil((content.selectedUnits - 0) / 1)) },
-        (_, sampleIndex) => 0 + sampleIndex * 1,
+        (_, sampleIndex) => {
+          return 0 + sampleIndex * 1;
+        },
       ).forEach((unit) => {
         const frame = 39 + ordinal * 14;
         const markup = _render({ frame: frame, input: input });
@@ -191,7 +207,9 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
           ...markup.matchAll(
             /<g data-good="([^"]*)" data-unit="([^"]*)"[^>]*>/g,
           ),
-        ].find((match) => match[1] === content.id && Number(match[2]) === unit);
+        ].find((match) => {
+          return match[1] === content.id && Number(match[2]) === unit;
+        });
         assert.ok(hand, "the recipient must pull the counted unit");
         assert.ok(arm && /d="M[^"]+ L[^"]+ L/.test(arm[0]));
         assert.ok(item);
@@ -230,7 +248,9 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
 test("recipient hand releases continuously before reaching for another selected unit", () => {
   Array.from(
     { length: Math.max(0, Math.ceil((5 - 1) / 1)) },
-    (_, sampleIndex) => 1 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 1 + sampleIndex * 1;
+    },
   ).forEach((ordinal) => {
     const boundary = 30 + ordinal * 14;
     const hands = [boundary - 0.001, boundary].map((frame) => {

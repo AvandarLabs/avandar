@@ -68,9 +68,9 @@ function _send(message: object) {
 }
 
 function _findContinuityShot(film: Film): ContinuityShot | undefined {
-  const shot = film.plan?.shots.find(
-    (candidate) => candidate.scene === "continuity",
-  );
+  const shot = film.plan?.shots.find((candidate) => {
+    return candidate.scene === "continuity";
+  });
   return shot?.scene === "continuity" ? shot : undefined;
 }
 
@@ -101,8 +101,8 @@ function useSavedPlayback(
   const { captions, speed, loop } = state;
   useEffect(
     function rememberPlaybackForReload() {
-      savePlayback = () =>
-        sessionStorage.setItem(
+      savePlayback = () => {
+        return sessionStorage.setItem(
           `film:${id}`,
           JSON.stringify({
             frame: player.current?.getCurrentFrame() ?? 0,
@@ -112,13 +112,16 @@ function useSavedPlayback(
             loop,
           }),
         );
+      };
     },
     [player, captions, speed, loop],
   );
   useEffect(
     function registerPlayEventListener() {
       const current = player.current;
-      const play = () => _send({ type: "film-playing", id });
+      const play = () => {
+        return _send({ type: "film-playing", id });
+      };
       current?.addEventListener("play", play);
       return () => {
         current?.removeEventListener("play", play);
@@ -133,9 +136,9 @@ function useSavedPlayback(
  * the playback saved before a source reload.
  */
 function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
-  const [appearance, setAppearance] = useState(() =>
-    _getInitialAppearance(continuity),
-  );
+  const [appearance, setAppearance] = useState(() => {
+    return _getInitialAppearance(continuity);
+  });
   const [theme, setTheme] = useState<VideoThemeSnapshot | undefined>(
     film.theme,
   );
@@ -170,23 +173,22 @@ function usePreviewTiming(options: {
   const { film, appearance, theme, isContinuity } = options;
   const previewPlan = useMemo(
     // The film keeps its unthemed plan: FilmComposition applies the theme.
-    () =>
-      film.plan && isContinuity
+    () => {
+      return film.plan && isContinuity
         ? createContinuityPlanFromOptions(film.plan, appearance)
-        : film.plan,
+        : film.plan;
+    },
     [film, appearance, isContinuity],
   );
-  const previewFrames = useMemo(
-    () =>
-      previewPlan
-        ? durationInFrames(
-            createContinuityPlanFromVideoThemeSnapshot(previewPlan, theme, [
-              film.id,
-            ]),
-          )
-        : film.frames,
-    [previewPlan, theme, film.id, film.frames],
-  );
+  const previewFrames = useMemo(() => {
+    return previewPlan
+      ? durationInFrames(
+          createContinuityPlanFromVideoThemeSnapshot(previewPlan, theme, [
+            film.id,
+          ]),
+        )
+      : film.frames;
+  }, [previewPlan, theme, film.id, film.frames]);
   return { previewPlan, previewFrames };
 }
 

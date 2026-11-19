@@ -57,41 +57,45 @@ function _readPlan(path: string): Storyboard {
   );
 }
 
-const PLANS = CONTINUITY_CATALOG.map((entry) => ({
-  id: entry.id,
-  plan: _readPlan(entry.path),
-}));
+const PLANS = CONTINUITY_CATALOG.map((entry) => {
+  return {
+    id: entry.id,
+    plan: _readPlan(entry.path),
+  };
+});
 const HANDOFF = _readPlan("explainers/study-shared-object-handoff");
 
 function _cameraKeys(plan: Storyboard) {
-  return plan.shots.flatMap((shot) =>
-    shot.scene !== "continuity"
+  return plan.shots.flatMap((shot) => {
+    return shot.scene !== "continuity"
       ? []
-      : shot.props.beats.flatMap((beat) =>
-          beat.content.kind === "stock" ? (beat.content.camera ?? []) : [],
-        ),
-  );
+      : shot.props.beats.flatMap((beat) => {
+          return beat.content.kind === "stock"
+            ? (beat.content.camera ?? [])
+            : [];
+        });
+  });
 }
 
 /** Every camera pose of every stock beat, frame by frame, with the beat's options or the given ones. */
 function _cameraPoses(plan: Storyboard, options?: MotionOptions) {
-  return plan.shots.flatMap((shot) =>
-    shot.scene !== "continuity"
+  return plan.shots.flatMap((shot) => {
+    return shot.scene !== "continuity"
       ? []
       : shot.props.beats.flatMap((beat) => {
           const content = beat.content;
           return content.kind === "stock" && content.camera
-            ? Array.from({ length: beat.duration }, (_, frame) =>
-                getCameraPose(
+            ? Array.from({ length: beat.duration }, (_, frame) => {
+                return getCameraPose(
                   content.camera,
                   frame,
                   true,
                   options ?? content.cameraOptions,
-                ),
-              )
+                );
+              })
             : [];
-        }),
-  );
+        });
+  });
 }
 
 test("a motion preset expands from the theme's camera presets", () => {
@@ -248,11 +252,17 @@ test("the theme's zoom limit keeps every camera key inside it and inside the dia
   const theme = _classicWith({
     other: { video: { atomic: { zoom: { max: 1.5 } } } },
   });
-  assert.ok(_cameraKeys(HANDOFF).some((key) => key.zoom > 1.5));
+  assert.ok(
+    _cameraKeys(HANDOFF).some((key) => {
+      return key.zoom > 1.5;
+    }),
+  );
   PLANS.forEach(({ id, plan }) => {
     const themed = createContinuityPlanFromVideoTheme(plan, theme);
     assert.ok(
-      _cameraKeys(themed).every((key) => key.zoom <= 1.5),
+      _cameraKeys(themed).every((key) => {
+        return key.zoom <= 1.5;
+      }),
       id,
     );
     assert.equal(storyboardSchema.safeParse(themed).success, true, id);
@@ -268,8 +278,7 @@ test("a camera curve that overshoots its framings is refused", () => {
       },
     },
   };
-  assert.throws(
-    () => createContinuityPlanFromVideoTheme(HANDOFF, _classicWith(patch)),
-    /camera\.easing\.push/,
-  );
+  assert.throws(() => {
+    return createContinuityPlanFromVideoTheme(HANDOFF, _classicWith(patch));
+  }, /camera\.easing\.push/);
 });

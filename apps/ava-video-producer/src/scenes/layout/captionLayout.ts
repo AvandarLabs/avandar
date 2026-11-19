@@ -59,7 +59,9 @@ export function captionBand(
   if (!cues.length) return 0;
   return Math.max(
     160,
-    ...cues.map((cue) => captionGeometry(cue.text, width, height).requiredBand),
+    ...cues.map((cue) => {
+      return captionGeometry(cue.text, width, height).requiredBand;
+    }),
   );
 }
 
@@ -70,7 +72,9 @@ export function safePublicPath(src: string): string {
     src.startsWith("/") ||
     // eslint-disable-next-line no-control-regex -- intentional: rejecting control characters in a media URL
     /[\\:%?#\u0000-\u001f]/.test(src) ||
-    src.split("/").some((part) => !part || part === "." || part === "..")
+    src.split("/").some((part) => {
+      return !part || part === "." || part === "..";
+    })
   ) {
     throw new Error(
       "Media src must be a public-relative file path without traversal, URLs, queries, or fragments",
@@ -98,5 +102,7 @@ export function activeCaption(
   frame: number,
   cues: CaptionCue[],
 ): CaptionCue | undefined {
-  return cues.find((cue) => frame >= cue.startFrame && frame < cue.endFrame);
+  return cues.find((cue) => {
+    return frame >= cue.startFrame && frame < cue.endFrame;
+  });
 }

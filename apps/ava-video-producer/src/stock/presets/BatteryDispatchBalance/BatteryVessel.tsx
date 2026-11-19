@@ -104,20 +104,22 @@ export function BatteryVessel({
               progress: dispatch,
               value: cycle.dischargeLossKwh,
             },
-          ].map(({ key, path, progress, value }) => (
-            <path
-              key={key}
-              data-loss-channel={key}
-              d={path}
-              pathLength={1}
-              strokeDasharray={1}
-              strokeDashoffset={1 - progress}
-              stroke={STOCK.orange}
-              strokeWidth={5}
-              opacity={value ? 1 : 0}
-              fill="none"
-            />
-          ))}
+          ].map(({ key, path, progress, value }) => {
+            return (
+              <path
+                key={key}
+                data-loss-channel={key}
+                d={path}
+                pathLength={1}
+                strokeDasharray={1}
+                strokeDashoffset={1 - progress}
+                stroke={STOCK.orange}
+                strokeWidth={5}
+                opacity={value ? 1 : 0}
+                fill="none"
+              />
+            );
+          })}
         </g>
       ) : undefined}
     </g>

@@ -15,9 +15,9 @@ export function getServiceSceneFromFrame({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): GetServiceSceneFromFrameResult {
-  const targetIndex = input.modules.findIndex(
-    ({ id }) => id === input.replacement.targetModuleId,
-  );
+  const targetIndex = input.modules.findIndex(({ id }) => {
+    return id === input.replacement.targetModuleId;
+  });
   const slotX = 180 + targetIndex * 170;
   const original = {
     x: mix(ramp(frame, 86, 8, EASE.inOut), slotX, 60),

@@ -31,13 +31,17 @@ test("each cell occurrence unfolds from its original row and column without valu
   fixtures.forEach(({ input }) => {
     const hold = _render({ frame: 150, input: input });
     const cells = [...hold.matchAll(/data-result-cell="(\d+):(\d+)"/g)].map(
-      ([, row, column]) => [Number(row), Number(column)],
+      ([, row, column]) => {
+        return [Number(row), Number(column)];
+      },
     );
     assert.deepEqual(
       cells,
-      input.grid.rows.flatMap((row, rowIndex) =>
-        row.map((_, columnIndex) => [rowIndex, columnIndex]),
-      ),
+      input.grid.rows.flatMap((row, rowIndex) => {
+        return row.map((_, columnIndex) => {
+          return [rowIndex, columnIndex];
+        });
+      }),
     );
     assert.equal(
       (hold.match(/data-source-cell=/g) ?? []).length,
@@ -47,14 +51,15 @@ test("each cell occurrence unfolds from its original row and column without valu
 });
 test("all evidence modes change geometry while preserving cells and qualify whitespace inference", () => {
   const rendered = ["tagged-cells", "ruling-lines", "whitespace"].map(
-    (signal) =>
-      _render({
+    (signal) => {
+      return _render({
         frame: 50,
         input: {
           ...fixtures[2].input,
           signal: signal as typeof DEFAULT_INPUT.signal,
         },
-      }),
+      });
+    },
   );
   assert.match(rendered[0], /data-tagged-outline=/);
   assert.match(rendered[1], /data-ruling-line=/);
@@ -62,11 +67,12 @@ test("all evidence modes change geometry while preserving cells and qualify whit
   assert.match(rendered[2], /Inferred layout/);
 });
 test("actual result cells travel horizontally into an equal sized adjacent grid", () => {
-  const cell = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const cell = (frame: number) => {
+    return SvgAttributes.fromMarker({
       markup: _render({ frame: frame }),
       marker: "result-cell",
     });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: cell(106), name: "x" }),
     548,
@@ -150,7 +156,9 @@ test("literal grid lines preserve whitespace and multibase graphemes within each
       createElement(GridLiteralCell, { value, x: 8, y: 17 }),
     );
     const lines = [...markup.matchAll(/data-literal-value="([^"]*)"/g)].map(
-      ([, line]) => line,
+      ([, line]) => {
+        return line;
+      },
     );
     assert.equal(lines.join(""), value);
     assert.ok(lines.length <= 3);
@@ -173,13 +181,17 @@ test("dense repeated and empty cells retain their exact coordinates in all evide
     (signal) => {
       const input = { ...fixtures[2].input, signal, showSourceLinks: false };
       const hold = _render({ frame: 150, input: input });
-      input.grid.rows.forEach((row, rowIndex) =>
-        row.forEach((_, columnIndex) => {
+      input.grid.rows.forEach((row, rowIndex) => {
+        return row.forEach((_, columnIndex) => {
           const rect = [...hold.matchAll(/<rect[^>]+>/g)]
-            .map(([tag]) => tag)
-            .find((tag) =>
-              tag.includes(`data-result-cell="${rowIndex}:${columnIndex}"`),
-            );
+            .map(([tag]) => {
+              return tag;
+            })
+            .find((tag) => {
+              return tag.includes(
+                `data-result-cell="${rowIndex}:${columnIndex}"`,
+              );
+            });
           assert.ok(rect);
           assert.equal(
             SvgAttributes.getNumberFromMarkup({ attributes: rect, name: "x" }),
@@ -203,8 +215,8 @@ test("dense repeated and empty cells retain their exact coordinates in all evide
             }),
             64,
           );
-        }),
-      );
+        });
+      });
       assert.equal(
         (hold.match(/data-raw-grid-value="same"/g) ?? []).length,
         18,
@@ -221,7 +233,9 @@ function _assertGridTextFitsCell({
   const end = markup.indexOf("<rect", start);
   const fragment = markup.slice(start, end === -1 ? undefined : end);
   const text = [...fragment.matchAll(/<text[^>]*>[\s\S]*?<\/text>/g)]
-    .map(([block]) => block)
+    .map(([block]) => {
+      return block;
+    })
     .join("");
   assert.ok(text.length > 0);
   SvgPaintAssertions.assertTextCanvasBounds({
@@ -240,9 +254,9 @@ test("complete moving columns remain distinct from all retained source cells and
   [DEFAULT_INPUT, fixtures[2].input].forEach((input) => {
     [106, 106.5, 108, 110, 118, 122, 130, 138.5, 139, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
-      const rectangles = [...markup.matchAll(/<rect[^>]+>/g)].map(
-        ([tag]) => tag,
-      );
+      const rectangles = [...markup.matchAll(/<rect[^>]+>/g)].map(([tag]) => {
+        return tag;
+      });
       const sourcePage = SvgAttributes.fromMarker({
         markup,
         marker: "source-page",
@@ -256,21 +270,25 @@ test("complete moving columns remain distinct from all retained source cells and
           attributes: sourcePage,
           name: "width",
         });
-      const headers = rectangles.filter((tag) => tag.includes('height="80"'));
+      const headers = rectangles.filter((tag) => {
+        return tag.includes('height="80"');
+      });
       const sourceHeaders = headers.slice(0, input.grid.columnLabels.length);
       const resultHeaders = headers.slice(input.grid.columnLabels.length);
-      const resultCells = rectangles.filter((tag) =>
-        tag.includes("data-result-cell="),
-      );
-      const sourceCells = rectangles.filter((tag) =>
-        tag.includes("data-source-cell="),
-      );
+      const resultCells = rectangles.filter((tag) => {
+        return tag.includes("data-result-cell=");
+      });
+      const sourceCells = rectangles.filter((tag) => {
+        return tag.includes("data-source-cell=");
+      });
       [
         ...sourceHeaders,
         ...sourceCells,
         ...resultHeaders,
         ...resultCells,
-      ].forEach((tag) => _assertGridTextFitsCell({ markup, tag }));
+      ].forEach((tag) => {
+        return _assertGridTextFitsCell({ markup, tag });
+      });
       assert.equal(resultHeaders.length, input.grid.columnLabels.length);
       assert.equal(
         resultCells.length,
@@ -296,12 +314,12 @@ test("complete moving columns remain distinct from all retained source cells and
             960,
         );
       });
-      sourceHeaders.forEach((header, columnIndex) =>
-        assert.equal(
+      sourceHeaders.forEach((header, columnIndex) => {
+        return assert.equal(
           SvgAttributes.getNumberFromMarkup({ attributes: header, name: "x" }),
           52 + (columnIndex * 400) / input.grid.columnLabels.length,
-        ),
-      );
+        );
+      });
       resultHeaders.forEach((header, columnIndex) => {
         if (columnIndex > 0) {
           assert.ok(
@@ -320,18 +338,18 @@ test("complete moving columns remain distinct from all retained source cells and
             "whole columns remain disjoint during their stagger",
           );
         }
-        const cells = resultCells.filter((tag) =>
-          tag.includes(`:${columnIndex}"`),
-        );
-        cells.forEach((cell) =>
-          assert.equal(
+        const cells = resultCells.filter((tag) => {
+          return tag.includes(`:${columnIndex}"`);
+        });
+        cells.forEach((cell) => {
+          return assert.equal(
             SvgAttributes.getNumberFromMarkup({ attributes: cell, name: "x" }),
             SvgAttributes.getNumberFromMarkup({
               attributes: header,
               name: "x",
             }),
-          ),
-        );
+          );
+        });
       });
       assert.ok(
         markup.indexOf("data-source-page=") <

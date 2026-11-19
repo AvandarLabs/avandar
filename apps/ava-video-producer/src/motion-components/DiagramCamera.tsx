@@ -97,10 +97,9 @@ export function DiagramCamera({
   ...motion
 }: DiagramCameraProps) {
   const frame = useCurrentFrame();
-  const validatedTrack = useMemo(
-    () => track && createCameraTrackSchema(width, height).parse(track),
-    [track, width, height],
-  );
+  const validatedTrack = useMemo(() => {
+    return track && createCameraTrackSchema(width, height).parse(track);
+  }, [track, width, height]);
   const settings = resolveMotionSettings({ ...motion, ...blurOptions });
   const shutterAngle = Math.min(
     360,

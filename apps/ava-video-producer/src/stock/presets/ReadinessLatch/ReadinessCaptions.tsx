@@ -41,9 +41,9 @@ export function ReadinessCaptions({
   ];
   return (
     <g>
-      {captions.map((caption) => (
-        <FitText key={caption.y} {...TEXT} {...caption} />
-      ))}
+      {captions.map((caption) => {
+        return <FitText key={caption.y} {...TEXT} {...caption} />;
+      })}
     </g>
   );
 }

@@ -50,7 +50,9 @@ export function DownloadButton({
       }
       aria-busy={download.busy}
       aria-describedby={isBlocked ? noticeId : undefined}
-      onClick={() => void download.start()}
+      onClick={() => {
+        return void download.start();
+      }}
     >
       {label}
     </button>

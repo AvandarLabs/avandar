@@ -52,7 +52,9 @@ function _buildStatusText(): (message: ThemeBarMessage) => string {
     themeTooLarge: "This theme is too large to save.",
     saveFailed: "The theme could not be saved. Check the showcase terminal.",
   };
-  return (message) => texts[message];
+  return (message) => {
+    return texts[message];
+  };
 }
 
 /** Whether the new theme's name form is open, and where focus returns when it closes. */
@@ -67,7 +69,9 @@ function useNamingForm() {
     isNaming,
     saveAsNewRef,
     closeNaming,
-    startNaming: () => setIsNaming(true),
+    startNaming: () => {
+      return setIsNaming(true);
+    },
   };
 }
 
@@ -110,13 +114,13 @@ export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props) {
       {isNaming ? (
         <SaveAsNewForm
           onCancel={closeNaming}
-          onSubmit={(label) =>
-            submitNewThemeName({
+          onSubmit={(label) => {
+            return submitNewThemeName({
               label,
               saveAsNew: onSaveAsNew,
               close: closeNaming,
-            })
-          }
+            });
+          }}
         />
       ) : null}
       <p className={css.status} role="status" aria-live="polite">

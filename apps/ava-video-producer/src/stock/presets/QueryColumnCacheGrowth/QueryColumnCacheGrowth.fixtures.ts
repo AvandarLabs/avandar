@@ -221,90 +221,90 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, showSetNotation: 1 },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0 ? { ...item, id: "" } : item,
-    ),
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0 ? { ...item, id: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0 ? { ...item, id: "W".repeat(13) } : item,
-    ),
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0 ? { ...item, id: "W".repeat(13) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0 ? { ...item, label: "" } : item,
-    ),
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0 ? { ...item, label: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0 ? { ...item, label: "W".repeat(19) } : item,
-    ),
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0 ? { ...item, label: "W".repeat(19) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0
         ? {
             ...item,
-            cells: item.cells.map((cell, cellIndex) =>
-              cellIndex === 0 ? "W".repeat(17) : cell,
-            ),
+            cells: item.cells.map((cell, cellIndex) => {
+              return cellIndex === 0 ? "W".repeat(17) : cell;
+            }),
           }
-        : item,
-    ),
+        : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    cachedColumnIds: DEFAULT_INPUT.cachedColumnIds.map((item, index) =>
-      index === 0 ? "" : item,
-    ),
+    cachedColumnIds: DEFAULT_INPUT.cachedColumnIds.map((item, index) => {
+      return index === 0 ? "" : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    cachedColumnIds: DEFAULT_INPUT.cachedColumnIds.map((item, index) =>
-      index === 0 ? "W".repeat(13) : item,
-    ),
+    cachedColumnIds: DEFAULT_INPUT.cachedColumnIds.map((item, index) => {
+      return index === 0 ? "W".repeat(13) : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    requests: DEFAULT_INPUT.requests.map((item, index) =>
-      index === 0 ? { ...item, label: "" } : item,
-    ),
+    requests: DEFAULT_INPUT.requests.map((item, index) => {
+      return index === 0 ? { ...item, label: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    requests: DEFAULT_INPUT.requests.map((item, index) =>
-      index === 0 ? { ...item, label: "W".repeat(25) } : item,
-    ),
+    requests: DEFAULT_INPUT.requests.map((item, index) => {
+      return index === 0 ? { ...item, label: "W".repeat(25) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    requests: DEFAULT_INPUT.requests.map((item, index) =>
-      index === 0
+    requests: DEFAULT_INPUT.requests.map((item, index) => {
+      return index === 0
         ? {
             ...item,
-            columnIds: item.columnIds.map((columnId, columnIndex) =>
-              columnIndex === 0 ? "" : columnId,
-            ),
+            columnIds: item.columnIds.map((columnId, columnIndex) => {
+              return columnIndex === 0 ? "" : columnId;
+            }),
           }
-        : item,
-    ),
+        : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    requests: DEFAULT_INPUT.requests.map((item, index) =>
-      index === 0
+    requests: DEFAULT_INPUT.requests.map((item, index) => {
+      return index === 0
         ? {
             ...item,
-            columnIds: item.columnIds.map((columnId, columnIndex) =>
-              columnIndex === 0 ? "W".repeat(13) : columnId,
-            ),
+            columnIds: item.columnIds.map((columnId, columnIndex) => {
+              return columnIndex === 0 ? "W".repeat(13) : columnId;
+            }),
           }
-        : item,
-    ),
+        : item;
+    }),
   },
   { ...DEFAULT_INPUT, keyColumnId: "" },
   { ...DEFAULT_INPUT, keyColumnId: "W".repeat(13) },
@@ -319,15 +319,15 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, copy: { ...DEFAULT_INPUT.copy, after: "W".repeat(39) } },
   {
     ...DEFAULT_INPUT,
-    columns: DEFAULT_INPUT.columns.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    columns: DEFAULT_INPUT.columns.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    requests: DEFAULT_INPUT.requests.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    requests: DEFAULT_INPUT.requests.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   { ...DEFAULT_INPUT, copy: { ...DEFAULT_INPUT.copy, extra: true } },
 ];

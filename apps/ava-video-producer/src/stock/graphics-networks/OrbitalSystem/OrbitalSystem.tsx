@@ -30,15 +30,17 @@ export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
           descriptor: LEGACY_DISPLAY_COPY["orbital-system"].orbitalSystem,
         })}
       </Eyebrow>
-      {input.bodies.map((orbit, i) => (
-        <OrbitingBody
-          key={i}
-          orbit={orbit}
-          frame={frame}
-          color={getContentColorFromValue(orbit.color, { tokens, accent })}
-          showOrbit={input.showOrbits}
-        />
-      ))}
+      {input.bodies.map((orbit, i) => {
+        return (
+          <OrbitingBody
+            key={i}
+            orbit={orbit}
+            frame={frame}
+            color={getContentColorFromValue(orbit.color, { tokens, accent })}
+            showOrbit={input.showOrbits}
+          />
+        );
+      })}
       <circle
         cx={CENTER.x}
         cy={CENTER.y}

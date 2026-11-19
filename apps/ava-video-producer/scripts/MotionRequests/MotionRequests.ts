@@ -32,17 +32,19 @@ function _parseFlags(
 ): Readonly<Record<string, string>> {
   const pairs = Array.from(
     { length: Math.ceil(extra.length / 2) },
-    (_, pairIndex): [string, string] => [
-      extra[pairIndex * 2],
-      extra[pairIndex * 2 + 1],
-    ],
+    (_, pairIndex): [string, string] => {
+      return [extra[pairIndex * 2], extra[pairIndex * 2 + 1]];
+    },
   );
-  const isInvalid = pairs.some(
-    ([flag, value], pairIndex) =>
+  const isInvalid = pairs.some(([flag, value], pairIndex) => {
+    return (
       !["--input", "--theme"].includes(flag) ||
       !value ||
-      pairs.findIndex(([otherFlag]) => otherFlag === flag) !== pairIndex,
-  );
+      pairs.findIndex(([otherFlag]) => {
+        return otherFlag === flag;
+      }) !== pairIndex
+    );
+  });
   if (isInvalid) {
     throw new Error(MOTION_USAGE);
   }
@@ -79,7 +81,9 @@ function _parseMotionArgs(args: readonly string[]): {
 
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
-    Object.values(value).forEach((child) => _freezeSnapshot(child));
+    Object.values(value).forEach((child) => {
+      return _freezeSnapshot(child);
+    });
     Object.freeze(value);
   }
   return value;

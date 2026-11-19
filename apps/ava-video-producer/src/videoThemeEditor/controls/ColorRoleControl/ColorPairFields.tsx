@@ -25,9 +25,9 @@ export function ColorPairFields({ row, label, pair }: Props) {
         value={pair[side]}
         tokenValue={row.value}
         allowLiteral={row.tier === "component"}
-        onChange={(reference) =>
-          editor.setToken(row.path, { ...pair, [side]: reference })
-        }
+        onChange={(reference) => {
+          return editor.setToken(row.path, { ...pair, [side]: reference });
+        }}
       />
     );
   });

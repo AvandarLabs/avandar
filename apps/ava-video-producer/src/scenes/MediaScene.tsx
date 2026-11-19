@@ -95,9 +95,9 @@ export function MediaScene({
                 ...enter(frame, 0, { y: 6, dur: DUR.sheet }),
               }}
             >
-              {heading.lines.map((line, i) => (
-                <div key={i}>{line}</div>
-              ))}
+              {heading.lines.map((line, i) => {
+                return <div key={i}>{line}</div>;
+              })}
             </h1>
           ) : null}
           {subtitle ? (
@@ -111,11 +111,13 @@ export function MediaScene({
                 ...enter(frame, DUR.panel, { y: 4 }),
               }}
             >
-              {subtitle.lines.map((line, i) => (
-                <span key={i} style={{ display: "block" }}>
-                  {line}
-                </span>
-              ))}
+              {subtitle.lines.map((line, i) => {
+                return (
+                  <span key={i} style={{ display: "block" }}>
+                    {line}
+                  </span>
+                );
+              })}
             </p>
           ) : null}
         </header>
@@ -213,9 +215,9 @@ export function MediaScene({
                   borderRadius: 8,
                 }}
               >
-                {label.lines.map((line, i) => (
-                  <div key={i}>{line}</div>
-                ))}
+                {label.lines.map((line, i) => {
+                  return <div key={i}>{line}</div>;
+                })}
               </div>
             </div>
           );

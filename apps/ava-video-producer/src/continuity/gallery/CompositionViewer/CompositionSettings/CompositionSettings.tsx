@@ -31,28 +31,24 @@ function useCompositionDraftTheme(
 ) {
   const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const isScene = isSceneEntry(selected);
-  const snapshot = useMemo(
-    () =>
-      isScene
-        ? undefined
-        : createSnapshotFromDraft({
-            library,
-            themeId,
-            draft: validDraft,
-            itemId: selected.id,
-          }),
-    [isScene, library, themeId, validDraft, selected.id],
-  );
-  const exportTheme = useMemo(
-    () =>
-      createExportThemeFromDraft({
-        library,
-        themeId,
-        draft: validDraft,
-        itemId: selected.id,
-      }),
-    [library, themeId, validDraft, selected.id],
-  );
+  const snapshot = useMemo(() => {
+    return isScene
+      ? undefined
+      : createSnapshotFromDraft({
+          library,
+          themeId,
+          draft: validDraft,
+          itemId: selected.id,
+        });
+  }, [isScene, library, themeId, validDraft, selected.id]);
+  const exportTheme = useMemo(() => {
+    return createExportThemeFromDraft({
+      library,
+      themeId,
+      draft: validDraft,
+      itemId: selected.id,
+    });
+  }, [library, themeId, validDraft, selected.id]);
   const theme = useCompositionTheme({
     id: selected.id,
     player,

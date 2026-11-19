@@ -86,18 +86,20 @@ export function ShotTransitionDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={clsx(css.miniStages, css.threeUp)}>
-        {TRANSITIONS.map((item) => (
-          <div key={item.code} className={css.miniStage}>
-            <div className={clsx(css.miniFrame, css.miniFrameShort)}>
-              <ShotBoundary
-                frame={frame}
-                transition={item.transition}
-                frames={item.frames}
-              />
+        {TRANSITIONS.map((item) => {
+          return (
+            <div key={item.code} className={css.miniStage}>
+              <div className={clsx(css.miniFrame, css.miniFrameShort)}>
+                <ShotBoundary
+                  frame={frame}
+                  transition={item.transition}
+                  frames={item.frames}
+                />
+              </div>
+              <span className={css.caption}>{item.code}</span>
             </div>
-            <span className={css.caption}>{item.code}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

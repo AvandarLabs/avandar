@@ -38,29 +38,36 @@ export const AvandarScene: ProductSceneRenderer = ({
   const beats = (
     (targets as Partial<Record<string, MeasuredBeat[]>>)[feature] ?? []
   )
-    .filter(
-      (b) =>
+    .filter((b) => {
+      return (
         mode === "full" ||
         (mode === "filter" && b.frame < 300) ||
         (mode === "query" && b.frame >= 300 && b.frame < 620) ||
-        (mode === "chart" && b.frame >= 620),
-    )
-    .map((b) => ({
-      ...b,
-      frame: b.frame - offset,
-      holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
-      cursor: (b.target in TEXT_HOLDS
-        ? "text"
-        : b.action === "click"
-          ? "pointer"
-          : "default") as CursorKind,
-    }));
+        (mode === "chart" && b.frame >= 620)
+      );
+    })
+    .map((b) => {
+      return {
+        ...b,
+        frame: b.frame - offset,
+        holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
+        cursor: (b.target in TEXT_HOLDS
+          ? "text"
+          : b.action === "click"
+            ? "pointer"
+            : "default") as CursorKind,
+      };
+    });
   const keys = beats.length
     ? measuredPath(beats, width, height)
     : [{ at: 0, x: 0, y: 0 }];
   const clicks = beats
-    .filter((b) => b.action === "click" || b.action === "select")
-    .map((b) => b.frame);
+    .filter((b) => {
+      return b.action === "click" || b.action === "select";
+    })
+    .map((b) => {
+      return b.frame;
+    });
   const cursor = cursorOnTarget(productFrame, keys, beats);
   return (
     <div

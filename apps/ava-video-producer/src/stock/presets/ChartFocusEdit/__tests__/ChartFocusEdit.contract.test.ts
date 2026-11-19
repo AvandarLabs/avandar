@@ -26,23 +26,26 @@ registerStockPresetAssertions({
 
 test("editorial treatments preserve each bar length and the common scale", () => {
   fixtures.forEach(({ input }) => {
-    const bars = (markup: string) =>
-      [...markup.matchAll(/<rect data-chart-bar="[^"]*"[^>]*>/g)].map(
-        (match) => [
-          SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "x",
-          }),
-          SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "y",
-          }),
-          SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "width",
-          }),
-        ],
+    const bars = (markup: string) => {
+      return [...markup.matchAll(/<rect data-chart-bar="[^"]*"[^>]*>/g)].map(
+        (match) => {
+          return [
+            SvgAttributes.getNumberFromMarkup({
+              attributes: match[0],
+              name: "x",
+            }),
+            SvgAttributes.getNumberFromMarkup({
+              attributes: match[0],
+              name: "y",
+            }),
+            SvgAttributes.getNumberFromMarkup({
+              attributes: match[0],
+              name: "width",
+            }),
+          ];
+        },
       );
+    };
     const setup = _render({ frame: 36, input: input }),
       middle = _render({ frame: 76, input: input }),
       hold = _render({ frame: 150, input: input });
@@ -92,10 +95,17 @@ test("focus selection changes emphasis while direct-labels alone only move label
       frame: 150,
       input: { ...DEFAULT_INPUT, focusId: "paper" },
     });
-  const focused = (markup: string) =>
-    [...markup.matchAll(/data-bar-emphasis="([^"]*)" opacity="([^"]*)"/g)]
-      .filter((match) => Number(match[2]) === 1)
-      .map((match) => match[1]);
+  const focused = (markup: string) => {
+    return [
+      ...markup.matchAll(/data-bar-emphasis="([^"]*)" opacity="([^"]*)"/g),
+    ]
+      .filter((match) => {
+        return Number(match[2]) === 1;
+      })
+      .map((match) => {
+        return match[1];
+      });
+  };
   assert.deepEqual(focused(both), ["ink"]);
   assert.deepEqual(focused(other), ["paper"]);
   assert.deepEqual(
@@ -171,18 +181,20 @@ test("focus and both settle an authored context heading beside the selected cate
   const dense: Input = {
     ...fixtures[2].input,
     focusId: fixtures[2].input.categories.at(-1)!.id,
-    categories: fixtures[2].input.categories.map((category) => ({
-      ...category,
-      label: "界".repeat(22),
-    })),
+    categories: fixtures[2].input.categories.map((category) => {
+      return {
+        ...category,
+        label: "界".repeat(22),
+      };
+    }),
     headings: {
       ...fixtures[2].input.headings,
       after: `界 ${"界".repeat(19)} ${"界".repeat(6)}`,
     },
   };
-  [DEFAULT_INPUT, dense].forEach((source) =>
-    ["focus", "both"].forEach((treatment) =>
-      [true, false].forEach((showValueLabels) => {
+  [DEFAULT_INPUT, dense].forEach((source) => {
+    return ["focus", "both"].forEach((treatment) => {
+      return [true, false].forEach((showValueLabels) => {
         const input: Input = {
           ...source,
           treatment: treatment as Input["treatment"],
@@ -196,12 +208,12 @@ test("focus and both settle an authored context heading beside the selected cate
           }),
           /opacity="0"/,
         );
-        [104, 108, 112, 150].forEach((frame) =>
-          _assertContextPlacement({ input, frame }),
-        );
-      }),
-    ),
-  );
+        [104, 108, 112, 150].forEach((frame) => {
+          return _assertContextPlacement({ input, frame });
+        });
+      });
+    });
+  });
   assert.doesNotMatch(
     _render({
       frame: 150,
@@ -253,9 +265,9 @@ test("refined chart copy retains category and value association with each bar", 
 
     const stageLabels = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       markup,
-    ).filter(
-      (item) => item.kind === "text" && item.ariaLabel === input.headings.after,
-    );
+    ).filter((item) => {
+      return item.kind === "text" && item.ariaLabel === input.headings.after;
+    });
     assert.equal(
       stageLabels.length,
       1,

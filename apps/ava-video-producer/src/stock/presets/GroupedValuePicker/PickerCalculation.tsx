@@ -29,27 +29,33 @@ export function PickerCalculation({
         <PickerFormula input={input} frame={frame} />
       )}
       {frame >= 56
-        ? input.observations.map((observation, index) => (
-            <PickerValueCopy
-              key={observation.id}
-              input={input}
-              index={index}
-              frame={frame}
-              accent={accent}
-              groups={groups}
-            />
-          ))
+        ? input.observations.map((observation, index) => {
+            return (
+              <PickerValueCopy
+                key={observation.id}
+                input={input}
+                index={index}
+                frame={frame}
+                accent={accent}
+                groups={groups}
+              />
+            );
+          })
         : null}
       {input.rule === "count" && frame >= 94 && frame < 105
         ? input.observations
-            .filter(({ value }) => value !== null)
-            .map((observation, index) => (
-              <g key={observation.id} opacity={ramp(frame, 94, 6)}>
-                <LabelSlots
-                  labels={[["↦ 1", 56 + index * 144, 402, 128, 12, 1]]}
-                />
-              </g>
-            ))
+            .filter(({ value }) => {
+              return value !== null;
+            })
+            .map((observation, index) => {
+              return (
+                <g key={observation.id} opacity={ramp(frame, 94, 6)}>
+                  <LabelSlots
+                    labels={[["↦ 1", 56 + index * 144, 402, 128, 12, 1]]}
+                  />
+                </g>
+              );
+            })
         : null}
     </g>
   );

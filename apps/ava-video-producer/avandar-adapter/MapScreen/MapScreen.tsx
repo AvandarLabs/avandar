@@ -36,7 +36,9 @@ import { PointMapTools } from "./PointMapTools";
 
 export { MAP_BEATS, MAP_DURATION };
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 
 /** Native MapLibre canvas and product map panels, driven solely by film time. */
 export function MapScreen({
@@ -52,41 +54,41 @@ export function MapScreen({
   const surface = useRef<HTMLDivElement>(null);
   const pointTarget = useRef<HTMLSpanElement>(null);
   const isFacilityHidden = frame >= 308 && frame < 388;
-  const layers = useMemo(
-    () => [caseLayer, { ...facilityLayer, isVisible: !isFacilityHidden }],
-    [isFacilityHidden],
-  );
-  const spec = useMemo(() => _createSpec(layers), [layers]);
+  const layers = useMemo(() => {
+    return [caseLayer, { ...facilityLayer, isVisible: !isFacilityHidden }];
+  }, [isFacilityHidden]);
+  const spec = useMemo(() => {
+    return _createSpec(layers);
+  }, [layers]);
   const selected = frame < 98 ? caseLayer : layers[1]!;
   const camera = ramp(frame, 448, 66, EASE.inOut);
-  const view = useMemo(
-    () => ({
+  const view = useMemo(() => {
+    return {
       center: [
         mix(camera, 10.12, selectedCoordinates[0] + 0.012),
         mix(camera, 10.08, selectedCoordinates[1] + 0.01),
       ] as [number, number],
       zoom: mix(camera, 10.15, 11.05),
-    }),
-    [camera],
-  );
+    };
+  }, [camera]);
   const controller = useMapCanvas({
     basemap: BASEMAP,
     view,
     spec,
     fitBoundsRequest: undefined,
-    interactiveLayerIds: spec.layers.map((layer) => layer.id),
+    interactiveLayerIds: spec.layers.map((layer) => {
+      return layer.id;
+    }),
     onFeatureClick: _noop,
     onViewChange: _noop,
     mapToolMode: PAN,
   });
   const { mapInstance } = controller;
-  const frameHandle = useMemo(
-    () =>
-      delayRender(
-        `Harborfield map frame ${frame}, style ${mapInstance.styleLoadCount}`,
-      ),
-    [frame, mapInstance.styleLoadCount],
-  );
+  const frameHandle = useMemo(() => {
+    return delayRender(
+      `Harborfield map frame ${frame}, style ${mapInstance.styleLoadCount}`,
+    );
+  }, [frame, mapInstance.styleLoadCount]);
 
   useEffect(() => {
     const map = mapInstance.mapRef.current;
@@ -95,8 +97,12 @@ export function MapScreen({
       // Idle alone is insufficient if a provider returned an empty/failed style.
       // Require the actual vector source, loaded tiles and rendered geography.
       const basemapLayers = (map.getStyle().layers ?? [])
-        .filter((layer) => "source" in layer && layer.source === "openmaptiles")
-        .map((layer) => layer.id);
+        .filter((layer) => {
+          return "source" in layer && layer.source === "openmaptiles";
+        })
+        .map((layer) => {
+          return layer.id;
+        });
       const geography = basemapLayers.length
         ? map.queryRenderedFeatures({ layers: basemapLayers }).length
         : 0;
@@ -122,8 +128,11 @@ export function MapScreen({
       }
       continueRender(frameHandle);
     };
-    const onError = (event: { error?: Error }) =>
-      cancelRender(event.error ?? new Error("Native map failed to render"));
+    const onError = (event: { error?: Error }) => {
+      return cancelRender(
+        event.error ?? new Error("Native map failed to render"),
+      );
+    };
     map.once("idle", complete);
     map.on("error", onError);
     map.resize();
@@ -257,7 +266,9 @@ export function MapScreen({
         inspector={<PointInspector layer={selected} frame={frame} />}
         legend={
           <MapLegend
-            layers={[...layers].reverse().filter((layer) => layer.isVisible)}
+            layers={[...layers].reverse().filter((layer) => {
+              return layer.isVisible;
+            })}
             hasDrawnDisputedFeature={false}
             isCollapsed={false}
             onToggleCollapsed={_noop}

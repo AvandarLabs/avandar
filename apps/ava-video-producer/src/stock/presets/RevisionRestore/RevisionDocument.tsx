@@ -25,7 +25,9 @@ export function RevisionDocument({
   return (
     <g
       data-current-content={content
-        .filter((line) => line !== undefined)
+        .filter((line) => {
+          return line !== undefined;
+        })
         .join("|")}
       data-surface={input.surface}
     >

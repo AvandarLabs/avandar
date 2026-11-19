@@ -26,7 +26,9 @@ export function Editor({ config, data, dashboardId, height }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(function markEditorViewButtonVideoTarget() {
     [...(rootRef.current?.querySelectorAll("button") ?? [])]
-      .find((button) => button.textContent?.trim() === "View")
+      .find((button) => {
+        return button.textContent?.trim() === "View";
+      })
       ?.setAttribute("data-video-target", "dashboard-view");
   });
   return (
@@ -44,38 +46,40 @@ export function Editor({ config, data, dashboardId, height }: Props) {
         onAction={onAction}
         overrides={{
           puck: PuckOverride,
-          headerActions: () => (
-            <>
-              <SaveDashboardButton onSave={_noop} />
-              {/* Exact visible draft button markup from DashboardShareButton and
+          headerActions: () => {
+            return (
+              <>
+                <SaveDashboardButton onSave={_noop} />
+                {/* Exact visible draft button markup from DashboardShareButton and
             DeleteDashboardButton; neither action is activated in this film. */}
-              <Button
-                size="compact-sm"
-                variant="default"
-                leftSection={<IconShare size={16} />}
-              >
-                Share
-              </Button>
-              <span
-                data-video-target="dashboard-view"
-                style={{ display: "inline-flex" }}
-              >
-                <ViewDashboardButton
-                  workspaceSlug="avandar-labs"
-                  dashboardId={dashboardId}
-                  hasUnsavedChanges={false}
-                />
-              </span>
-              <Button
-                size="compact-sm"
-                variant="light"
-                color="danger"
-                leftSection={<IconTrash size={16} />}
-              >
-                Delete
-              </Button>
-            </>
-          ),
+                <Button
+                  size="compact-sm"
+                  variant="default"
+                  leftSection={<IconShare size={16} />}
+                >
+                  Share
+                </Button>
+                <span
+                  data-video-target="dashboard-view"
+                  style={{ display: "inline-flex" }}
+                >
+                  <ViewDashboardButton
+                    workspaceSlug="avandar-labs"
+                    dashboardId={dashboardId}
+                    hasUnsavedChanges={false}
+                  />
+                </span>
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  color="danger"
+                  leftSection={<IconTrash size={16} />}
+                >
+                  Delete
+                </Button>
+              </>
+            );
+          },
         }}
       />
     </div>

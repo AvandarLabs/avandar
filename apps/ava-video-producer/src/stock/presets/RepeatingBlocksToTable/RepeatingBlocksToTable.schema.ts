@@ -44,12 +44,19 @@ export const inputSchema = z
     if (
       ids.size !== input.fields.length ||
       new Set(input.blocks.map(prop("id"))).size !== input.blocks.length ||
-      input.blocks.some(
-        ({ cells }) =>
+      input.blocks.some(({ cells }) => {
+        return (
           cells.length !== ids.size ||
-          new Set(cells.map(({ fieldId }) => fieldId)).size !== ids.size ||
-          cells.some(({ fieldId }) => !ids.has(fieldId)),
-      )
+          new Set(
+            cells.map(({ fieldId }) => {
+              return fieldId;
+            }),
+          ).size !== ids.size ||
+          cells.some(({ fieldId }) => {
+            return !ids.has(fieldId);
+          })
+        );
+      })
     ) {
       context.addIssue({
         code: "custom",

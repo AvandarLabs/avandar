@@ -20,10 +20,9 @@ export function GalleryItemTheme({
   children,
 }: Readonly<{ itemId: string; children: ReactNode }>) {
   const { library, themeId, validDraft } = useGalleryVideoTheme();
-  const themeInputs = useMemo(
-    () => ({ library, themeId, draft: validDraft }),
-    [library, themeId, validDraft],
-  );
+  const themeInputs = useMemo(() => {
+    return { library, themeId, draft: validDraft };
+  }, [library, themeId, validDraft]);
   // Thumbnails trail the modal by one deferred render so typing stays fast.
   const deferredThemeInputs = useDeferredValue(themeInputs);
   // Providers resolve each source object once, so the source is memoized.

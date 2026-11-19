@@ -20,8 +20,9 @@ export function ShadowValueControl({
 }: ValueControlProps) {
   const { theme } = useTokenEditor();
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
-  const setLayers = (nextLayers: readonly ShadowLayer[]) =>
-    onChange({ layers: nextLayers });
+  const setLayers = (nextLayers: readonly ShadowLayer[]) => {
+    return onChange({ layers: nextLayers });
+  };
   const boxShadow = elevationToBoxShadow({
     layers,
     color: theme.semantic.color.shadowColor,
@@ -34,7 +35,9 @@ export function ShadowValueControl({
           size="compact-xs"
           variant="default"
           disabled={layers.length >= MAX_SHADOW_LAYERS}
-          onClick={() => setLayers([...layers, DEFAULT_SHADOW_LAYER])}
+          onClick={() => {
+            return setLayers([...layers, DEFAULT_SHADOW_LAYER]);
+          }}
         >
           {"Add layer"}
         </Button>

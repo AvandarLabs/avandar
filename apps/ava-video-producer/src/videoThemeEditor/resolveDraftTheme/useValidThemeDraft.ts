@@ -20,10 +20,9 @@ export function useValidThemeDraft(
   }>,
 ): { draft: ThemeDraft; isValid: boolean } {
   const { library, themeId, draft } = options;
-  const isValid = useMemo(
-    () => isThemeDraftValid({ library, themeId, draft }),
-    [library, themeId, draft],
-  );
+  const isValid = useMemo(() => {
+    return isThemeDraftValid({ library, themeId, draft });
+  }, [library, themeId, draft]);
   const [lastValid, setLastValid] = useState<LastValidDraft>();
   const nextLastValid = nextLastValidDraft({
     current: lastValid,

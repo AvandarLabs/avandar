@@ -66,7 +66,9 @@ test("one timeline drives duration and frame-accurate SRT/VTT", () => {
   const plan = storyboardSchema.parse(fixture());
   assert.equal(durationInFrames(plan), 216);
   assert.deepEqual(
-    timeline(plan).map((shot) => shot.startFrame),
+    timeline(plan).map((shot) => {
+      return shot.startFrame;
+    }),
     [0, 66],
   );
   assert.equal(absoluteCues(plan)[0].endFrame, 156);
@@ -77,24 +79,38 @@ test("one timeline drives duration and frame-accurate SRT/VTT", () => {
 
 test("reject invalid IDs, timing, FPS, aspect ratios and unknown fields", () => {
   const changes: Array<(plan: StoryboardInput) => void> = [
-    (plan) => (plan.shots[1].id = "opening"),
+    (plan) => {
+      return (plan.shots[1].id = "opening");
+    },
     // `fps` is a literal 30 in the schema; 24 is deliberately invalid input.
-    (plan) => (plan.fps = 24 as unknown as 30),
-    (plan) => (plan.narration![0].endFrame = 151),
-    (plan) => (plan.narration![0].shotId = "missing"),
-    (plan) => (plan.delivery.height = 864),
+    (plan) => {
+      return (plan.fps = 24 as unknown as 30);
+    },
+    (plan) => {
+      return (plan.narration![0].endFrame = 151);
+    },
+    (plan) => {
+      return (plan.narration![0].shotId = "missing");
+    },
+    (plan) => {
+      return (plan.delivery.height = 864);
+    },
     // `extra` isn't a schema field; the cast adds just that one field so the
     // rest of the object keeps real type checking.
-    (plan) =>
-      ((plan as StoryboardInput & { extra?: string }).extra =
-        "silently ignored?"),
-    (plan) => (plan.shots[0].durationInFrames = 100),
-    (plan) =>
-      plan.narration!.push({
+    (plan) => {
+      return ((plan as StoryboardInput & { extra?: string }).extra =
+        "silently ignored?");
+    },
+    (plan) => {
+      return (plan.shots[0].durationInFrames = 100);
+    },
+    (plan) => {
+      return plan.narration!.push({
         ...plan.narration![0],
         id: "overlap",
         startFrame: 20,
-      }),
+      });
+    },
   ];
   for (const change of changes) {
     const plan = fixture();
@@ -171,22 +187,20 @@ test("SRT alignment preserves narration text and requires cues to fit their shot
   );
   assert.equal(aligned.narration[0].startFrame, 6);
   assert.equal(aligned.narrationTrack?.src, "voice/recorded.wav");
-  assert.throws(
-    () =>
-      applySrt(
-        plan,
-        "1\n00:00:02,400 --> 00:00:05,400\nDifferent words.\n",
-        "voice/recorded.wav",
-      ),
-    /differs/,
-  );
-  assert.throws(() =>
-    applySrt(
+  assert.throws(() => {
+    return applySrt(
+      plan,
+      "1\n00:00:02,400 --> 00:00:05,400\nDifferent words.\n",
+      "voice/recorded.wav",
+    );
+  }, /differs/);
+  assert.throws(() => {
+    return applySrt(
       plan,
       "1\n00:00:00,000 --> 00:00:05,400\nTwo hundred forty records.\n",
       "voice/recorded.wav",
-    ),
-  );
+    );
+  });
 });
 
 test("scene plans reject typography and flow settings the renderer cannot honor", () => {

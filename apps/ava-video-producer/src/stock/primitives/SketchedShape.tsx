@@ -101,9 +101,9 @@ export function SketchedShape(props: Props) {
       opacity={opacity}
       data-rough-shape={profile.roughness}
     >
-      {paths.map((path, index) => (
-        <path key={index} {...path} {...pathAttributes} />
-      ))}
+      {paths.map((path, index) => {
+        return <path key={index} {...path} {...pathAttributes} />;
+      })}
     </g>
   );
 }

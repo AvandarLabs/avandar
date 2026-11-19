@@ -30,25 +30,38 @@ test("all catalogue entries have unique stable references and six-second loops",
     new Set([...LEGACY_IDS, ...acceptedAdditions.map(prop("id"))]),
   );
   assert.equal(
-    STOCK_CATALOG.filter(({ collection }) => collection === "general").length,
+    STOCK_CATALOG.filter(({ collection }) => {
+      return collection === "general";
+    }).length,
     106,
   );
   assert.equal(
-    STOCK_CATALOG.filter(({ collection }) => collection === "social-sector")
-      .length,
+    STOCK_CATALOG.filter(({ collection }) => {
+      return collection === "social-sector";
+    }).length,
     64,
   );
   assert.equal(new Set(STOCK_IDS).size, STOCK_IDS.length);
   assert.deepEqual(
-    STOCK_CATALOG.map(({ id }) => id),
+    STOCK_CATALOG.map(({ id }) => {
+      return id;
+    }),
     [...STOCK_IDS],
   );
   assert.equal(
-    new Set(STOCK_CATALOG.map(({ id }) => id)).size,
+    new Set(
+      STOCK_CATALOG.map(({ id }) => {
+        return id;
+      }),
+    ).size,
     STOCK_CATALOG.length,
   );
   assert.deepEqual(
-    new Set(STOCK_CATALOG.map(({ category }) => category)),
+    new Set(
+      STOCK_CATALOG.map(({ category }) => {
+        return category;
+      }),
+    ),
     new Set(STOCK_CATEGORIES),
   );
   assert.equal(STOCK_LOOP_FRAMES / STOCK_FPS, 6);
@@ -66,10 +79,9 @@ test("all catalogue entries have unique stable references and six-second loops",
       `${entry.id} brief must retain a reusable preset reference`,
     );
   }
-  assert.throws(
-    () => stockEntry("unknown-preset"),
-    /Unknown stock motion preset/,
-  );
+  assert.throws(() => {
+    return stockEntry("unknown-preset");
+  }, /Unknown stock motion preset/);
 });
 
 function _stockPlan(props: Record<string, unknown>) {
@@ -125,7 +137,9 @@ test("stock storyboards accept every catalogue preset and only safe explicit pro
       "red",
       "#12345g",
       "#91e7c4;opacity:0",
-    ].map((accent) => ({ preset: "network-graph", accent })),
+    ].map((accent) => {
+      return { preset: "network-graph", accent };
+    }),
   ])
     assert.equal(
       storyboardSchema.safeParse(_stockPlan(props)).success,
@@ -149,13 +163,14 @@ test("every stock renderer produces finite deterministic SVG under random frame 
   const frames = [90, 0, 179, 18, 138, 45, 1, 167, 178, 180, -1];
   for (const preset of STOCK_IDS) {
     for (const frame of frames) {
-      const render = () =>
-        renderToStaticMarkup(
+      const render = () => {
+        return renderToStaticMarkup(
           createElement(StockGraphic, {
             ...({ preset } as StockRequest),
             frame,
           }),
         );
+      };
       const markup = render();
       assert.match(markup, /^<svg\b/);
       assert.match(markup, /<\/svg>$/);
@@ -182,16 +197,16 @@ test("SVG masks and gradients remain local when cards and previews share a page"
     createElement(
       Fragment,
       null,
-      ...[0, 1].flatMap((copy) =>
-        STOCK_IDS.map((preset) =>
-          createElement(StockGraphic, {
+      ...[0, 1].flatMap((copy) => {
+        return STOCK_IDS.map((preset) => {
+          return createElement(StockGraphic, {
             key: `${copy}-${preset}`,
             ...({ preset } as StockRequest),
             frame: copy ? 70 : 120,
             accent: copy ? "#b4b8ff" : "#9fefca",
-          }),
-        ),
-      ),
+          });
+        });
+      }),
     ),
   );
   const ids = getSvgAttributeMatchesFromMarkup({
@@ -204,9 +219,9 @@ test("SVG masks and gradients remain local when cards and previews share a page"
     ids.length,
     "Every instance must own unique definition IDs",
   );
-  const svgs = [...markup.matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map(
-    (match) => match[0],
-  );
+  const svgs = [...markup.matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map((match) => {
+    return match[0];
+  });
   assert.equal(svgs.length, STOCK_IDS.length * 2);
   let references = 0;
   for (const svg of svgs) {
@@ -280,8 +295,8 @@ test("storyboard rendering preserves configured content, heading space and cycle
       background: "#112233",
     }),
   );
-  const render = ({ frame }: Readonly<{ frame: number }>) =>
-    renderToStaticMarkup(
+  const render = ({ frame }: Readonly<{ frame: number }>) => {
+    return renderToStaticMarkup(
       createElement(ShotView, {
         shot: plan.shots[0],
         frame,
@@ -289,6 +304,7 @@ test("storyboard rendering preserves configured content, heading space and cycle
         height: 800,
       }),
     );
+  };
   const markup = render({ frame: 150 });
   assert.match(markup, /Authored heading/);
   assert.match(markup, /Return to the notebook/);
@@ -298,10 +314,11 @@ test("storyboard rendering preserves configured content, heading space and cycle
 });
 
 test("standalone stock frames keep the existing clamp at both boundaries", () => {
-  const render = ({ frame }: Readonly<{ frame: number }>) =>
-    renderToStaticMarkup(
+  const render = ({ frame }: Readonly<{ frame: number }>) => {
+    return renderToStaticMarkup(
       createElement(StockGraphic, { preset: "decision-fork", frame }),
     );
+  };
   assert.equal(render({ frame: -15 }), render({ frame: 0 }));
   assert.equal(render({ frame: 180 }), render({ frame: 179 }));
   assert.equal(render({ frame: Infinity }), render({ frame: 0 }));
@@ -335,11 +352,9 @@ test("composition metadata validates complete replacements after top-level prop 
   assert.deepEqual(props.input, input);
   assert.equal(props.accent, "#aabbcc");
   assert.equal(props.background, "#112233");
-  assert.throws(
-    () =>
-      decision.props.calculateMetadata({
-        props: { ...defaults, input: { prompt: "Incomplete replacement" } },
-      }),
-    /branches/,
-  );
+  assert.throws(() => {
+    return decision.props.calculateMetadata({
+      props: { ...defaults, input: { prompt: "Incomplete replacement" } },
+    });
+  }, /branches/);
 });

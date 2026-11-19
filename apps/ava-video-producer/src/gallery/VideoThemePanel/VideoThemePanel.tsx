@@ -21,11 +21,14 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
   const gallery = useGalleryVideoTheme();
   const [scope, setScope] = useState<ThemeEditScope>({ kind: "theme" });
   const barRef = useRef<HTMLDivElement>(null);
-  const reloadTheme = () =>
-    void reloadThenFocus({
+  const reloadTheme = () => {
+    return void reloadThenFocus({
       reload: gallery.reloadTheme,
-      focus: () => barRef.current?.focus(),
+      focus: () => {
+        return barRef.current?.focus();
+      },
     });
+  };
   return (
     <div className={css.videoThemePanel}>
       <VideoThemeEditor

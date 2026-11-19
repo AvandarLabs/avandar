@@ -59,9 +59,12 @@ export function EditorToolbar({
         aria-label="Search settings"
         placeholder="Search by name, path, or description"
         value={filters.query}
-        onChange={(event) =>
-          onFiltersChange({ ...filters, query: event.currentTarget.value })
-        }
+        onChange={(event) => {
+          return onFiltersChange({
+            ...filters,
+            query: event.currentTarget.value,
+          });
+        }}
       />
       {hasUsage ? (
         <UsageFilter filters={filters} onFiltersChange={onFiltersChange} />

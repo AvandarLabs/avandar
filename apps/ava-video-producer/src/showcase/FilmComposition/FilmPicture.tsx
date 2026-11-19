@@ -62,8 +62,8 @@ export function FilmPicture({ film, withAudio = true }: Props) {
         showCaptions={film.showCaptions}
       />
       {withAudio
-        ? absoluteCues(film.plan).map((cue) =>
-            cue.audio ? (
+        ? absoluteCues(film.plan).map((cue) => {
+            return cue.audio ? (
               <Sequence
                 key={cue.id}
                 from={cue.startFrame}
@@ -71,8 +71,8 @@ export function FilmPicture({ film, withAudio = true }: Props) {
               >
                 <Audio src={staticFile(cue.audio)} />
               </Sequence>
-            ) : null,
-          )
+            ) : null;
+          })
         : null}
       {withAudio && film.plan.narrationTrack ? (
         <Sequence from={film.plan.narrationTrack.startFrame}>
@@ -83,11 +83,13 @@ export function FilmPicture({ film, withAudio = true }: Props) {
         </Sequence>
       ) : null}
       {withAudio
-        ? film.plan.soundEffects.map((sound) => (
-            <Sequence key={sound.id} from={sound.atFrame}>
-              <Audio src={staticFile(sound.src)} volume={sound.volume} />
-            </Sequence>
-          ))
+        ? film.plan.soundEffects.map((sound) => {
+            return (
+              <Sequence key={sound.id} from={sound.atFrame}>
+                <Audio src={staticFile(sound.src)} volume={sound.volume} />
+              </Sequence>
+            );
+          })
         : null}
     </>
   );

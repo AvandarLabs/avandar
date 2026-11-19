@@ -34,15 +34,17 @@ export function QueueStructure({
         fill="none"
         stroke={accent}
       />
-      {input.serviceSlots.map((slot, index) => (
-        <QueueServiceBay
-          key={slot.id}
-          slot={slot}
-          index={index}
-          expansion={expansion}
-          accent={accent}
-        />
-      ))}
+      {input.serviceSlots.map((slot, index) => {
+        return (
+          <QueueServiceBay
+            key={slot.id}
+            slot={slot}
+            index={index}
+            expansion={expansion}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

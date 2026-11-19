@@ -10,7 +10,9 @@ export function CaptionToggle({ captions, onChange }: Props) {
       <input
         type="checkbox"
         checked={captions}
-        onChange={(event) => onChange(event.target.checked)}
+        onChange={(event) => {
+          return onChange(event.target.checked);
+        }}
       />
       Captions
     </label>

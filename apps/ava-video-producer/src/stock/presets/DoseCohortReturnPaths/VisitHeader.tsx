@@ -39,12 +39,13 @@ export function VisitHeader({
           textAnchor="middle"
         >
           {
-            input.participants.filter((person) =>
-              person.records.some(
-                (record) =>
-                  record.visitId === visit.id && record.state === "recorded",
-              ),
-            ).length
+            input.participants.filter((person) => {
+              return person.records.some((record) => {
+                return (
+                  record.visitId === visit.id && record.state === "recorded"
+                );
+              });
+            }).length
           }
           /{input.participants.length}
         </text>

@@ -16,18 +16,20 @@ export function ScopeAperture({
   return (
     <g>
       <ScopeBoundary {...{ ...remainingProps, input, frame, accent }} />
-      {input.topics.map((topic, index) => (
-        <ScopeTopic
-          key={topic.id}
-          {...{ topic, index, frame, accent }}
-          membershipIndex={
-            input.topics
-              .slice(0, index)
-              .filter(propEq("included", topic.included)).length
-          }
-          showExcluded={input.showExcludedTopics}
-        />
-      ))}
+      {input.topics.map((topic, index) => {
+        return (
+          <ScopeTopic
+            key={topic.id}
+            {...{ topic, index, frame, accent }}
+            membershipIndex={
+              input.topics
+                .slice(0, index)
+                .filter(propEq("included", topic.included)).length
+            }
+            showExcluded={input.showExcludedTopics}
+          />
+        );
+      })}
     </g>
   );
 }

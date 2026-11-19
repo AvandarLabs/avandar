@@ -86,7 +86,9 @@ function useMappingTargets(
       ?.setAttribute("data-video-target", "mapping-value-rule");
     root.current
       ?.querySelectorAll('[data-video-target="mapping-add-manual"]')
-      .forEach((button) => button.removeAttribute("data-video-target"));
+      .forEach((button) => {
+        return button.removeAttribute("data-video-target");
+      });
     const manualButtons = root.current?.querySelectorAll(
       '[data-video-target="mapping-manual-controls"] button',
     );

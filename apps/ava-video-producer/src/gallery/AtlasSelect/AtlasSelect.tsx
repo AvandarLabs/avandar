@@ -39,7 +39,9 @@ export function AtlasSelect(props: SelectProps) {
         }}
         {...props}
         dropdownOpened={opened}
-        onDropdownOpen={() => setOpened(true)}
+        onDropdownOpen={() => {
+          return setOpened(true);
+        }}
         onDropdownClose={closeDropdown}
       />
     </div>

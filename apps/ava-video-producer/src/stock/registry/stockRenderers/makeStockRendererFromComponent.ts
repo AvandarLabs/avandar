@@ -15,9 +15,10 @@ export function makeStockRendererFromComponent<Id extends StockPresetId>({
   preset: Id;
   Renderer: ComponentType<GraphicProps & { input: StockInputByPreset[Id] }>;
 }>): (props: GraphicProps, rawInput?: unknown) => React.JSX.Element {
-  return (props, rawInput) =>
-    createElement(Renderer, {
+  return (props, rawInput) => {
+    return createElement(Renderer, {
       ...props,
       input: parseStockInput({ preset: preset, rawInput: rawInput }),
     });
+  };
 }

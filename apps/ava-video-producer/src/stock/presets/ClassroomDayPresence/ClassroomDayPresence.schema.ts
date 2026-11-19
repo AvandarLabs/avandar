@@ -65,7 +65,9 @@ export const inputSchema = z
       if (
         ids.length !== input.learners.length ||
         new Set(ids).size !== ids.length ||
-        !input.learners.every((learner) => ids.includes(learner.id))
+        !input.learners.every((learner) => {
+          return ids.includes(learner.id);
+        })
       ) {
         context.addIssue({
           code: "custom",

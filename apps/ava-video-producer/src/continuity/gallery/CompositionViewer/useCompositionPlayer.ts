@@ -37,7 +37,9 @@ export function useCompositionPlayer(options: {
     let cancelRefresh: (() => void) | undefined;
     const stopWatching = watchFilms([player.current], () => {
       cancelRefresh?.();
-      cancelRefresh = afterDownloads(() => location.reload());
+      cancelRefresh = afterDownloads(() => {
+        return location.reload();
+      });
     });
     return () => {
       stopWatching();
@@ -57,6 +59,8 @@ export function useCompositionPlayer(options: {
       onOptions({ id, captions: event.data.options.captions });
     };
     window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
+    return () => {
+      return window.removeEventListener("message", receive);
+    };
   }, [id, onOptions, player]);
 }

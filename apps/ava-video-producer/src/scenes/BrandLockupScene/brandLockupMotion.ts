@@ -45,9 +45,9 @@ export function getMarkBuildProgress(
   const stagger = build.staggerFrames ?? MARK_BUILD_DEFAULTS.staggerFrames;
   const duration =
     build.durationInFrames ?? MARK_BUILD_DEFAULTS.durationInFrames;
-  return Array.from({ length: columns }, (_, index) =>
-    ramp(frame, at + index * stagger, duration, EASE.word),
-  );
+  return Array.from({ length: columns }, (_, index) => {
+    return ramp(frame, at + index * stagger, duration, EASE.word);
+  });
 }
 
 /** The frame the last column of a build finishes rising. */

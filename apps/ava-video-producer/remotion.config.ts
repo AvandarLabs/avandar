@@ -8,12 +8,13 @@ const { publicKey } = readLicense(process.cwd());
 // Preserve inherited credentials for reloads under a server-only prefix.
 // The CLI forwards REMOTION_* variables to browser code, including key paths.
 Object.keys(process.env)
-  .filter(
-    (name) =>
+  .filter((name) => {
+    return (
       name.startsWith("REMOTION_") &&
       name.includes("KEY") &&
-      name !== "REMOTION_PUBLIC_KEY",
-  )
+      name !== "REMOTION_PUBLIC_KEY"
+    );
+  })
   .forEach((name) => {
     process.env[`AVANDAR_${name}`] = process.env[name];
     delete process.env[name];

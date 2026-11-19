@@ -26,12 +26,12 @@ export function AddScaleValue({ group, allRows }: Props) {
     <Button
       size="compact-xs"
       variant="subtle"
-      onClick={() =>
-        editor.setToken(
+      onClick={() => {
+        return editor.setToken(
           `${scalePath}.${buildNextCustomScaleKey({ rows: allRows, group })}`,
           getDefaultLiteralFromKind(kind),
-        )
-      }
+        );
+      }}
     >
       {"Add value"}
     </Button>

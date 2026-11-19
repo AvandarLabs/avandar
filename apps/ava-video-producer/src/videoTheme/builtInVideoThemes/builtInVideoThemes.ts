@@ -39,7 +39,11 @@ export function createVideoThemeLibrary(
   return new Map([
     ...BUILT_IN_VIDEO_THEMES,
     ...documents
-      .filter((document) => !BUILT_IN_VIDEO_THEMES.has(document.id))
-      .map((document) => [document.id, document] as const),
+      .filter((document) => {
+        return !BUILT_IN_VIDEO_THEMES.has(document.id);
+      })
+      .map((document) => {
+        return [document.id, document] as const;
+      }),
   ]);
 }

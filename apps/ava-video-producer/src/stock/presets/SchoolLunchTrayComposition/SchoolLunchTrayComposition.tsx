@@ -26,15 +26,17 @@ export function SchoolLunchTrayComposition({
         stroke={STOCK.line}
       />
       <LunchLabels input={input} accent={accent} frame={frame} />
-      {input.learners.map((learner, index) => (
-        <LunchTray
-          key={learner.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.learners.map((learner, index) => {
+        return (
+          <LunchTray
+            key={learner.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

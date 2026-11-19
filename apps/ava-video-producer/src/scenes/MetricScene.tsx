@@ -73,9 +73,9 @@ export function MetricScene({
             color: "var(--muted-foreground)",
           }}
         >
-          {layout.label.lines.map((line, i) => (
-            <div key={i}>{line}</div>
-          ))}
+          {layout.label.lines.map((line, i) => {
+            return <div key={i}>{line}</div>;
+          })}
         </div>
         <div
           style={{
@@ -125,9 +125,9 @@ export function MetricScene({
               ...enter(frame, countAtFrame + countDurationInFrames, { y: 8 }),
             }}
           >
-            {layout.detail.lines.map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+            {layout.detail.lines.map((line, i) => {
+              return <div key={i}>{line}</div>;
+            })}
           </div>
         ) : null}
       </section>

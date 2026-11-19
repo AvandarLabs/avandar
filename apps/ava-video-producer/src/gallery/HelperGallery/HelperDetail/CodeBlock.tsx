@@ -18,11 +18,17 @@ export function CodeBlock({
     if (!isCopied) {
       return;
     }
-    const timer = setTimeout(() => setIsCopied(false), COPIED_MILLISECONDS);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      return setIsCopied(false);
+    }, COPIED_MILLISECONDS);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [isCopied]);
   const copy = () => {
-    void navigator.clipboard?.writeText(code).then(() => setIsCopied(true));
+    void navigator.clipboard?.writeText(code).then(() => {
+      return setIsCopied(true);
+    });
   };
   return (
     <div className={css.codeBlock}>

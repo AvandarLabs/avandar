@@ -29,8 +29,12 @@ export function RangeNumberInput({
   const field = useDraftValue<number, number | string>({
     value,
     toKey: String,
-    toDraft: (current) => current,
-    parse: (draft) => parseNumberInRange({ value: draft, min, max }),
+    toDraft: (current) => {
+      return current;
+    },
+    parse: (draft) => {
+      return parseNumberInRange({ value: draft, min, max });
+    },
     onChange,
   });
   return (

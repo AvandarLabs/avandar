@@ -41,27 +41,36 @@ export function CollectionField({
       <legend>
         {label} ({items.length}/{control.maxItems})
       </legend>
-      {items.map((item, index) => (
-        <CollectionItem
-          {...{ ...remainingProps, control, context, preset, state, onChange }}
-          key={keys[index]}
-          item={item}
-          index={index}
-          count={items.length}
-        />
-      ))}
+      {items.map((item, index) => {
+        return (
+          <CollectionItem
+            {...{
+              ...remainingProps,
+              control,
+              context,
+              preset,
+              state,
+              onChange,
+            }}
+            key={keys[index]}
+            item={item}
+            index={index}
+            count={items.length}
+          />
+        );
+      })}
       <button
         disabled={items.length >= control.maxItems}
-        onClick={() =>
-          onChange(
+        onClick={() => {
+          return onChange(
             ContentDraftModule.addItem({
               preset,
               state,
               path: context.path,
               schema: control.itemSchema,
             }),
-          )
-        }
+          );
+        }}
       >
         Add {label} item
       </button>

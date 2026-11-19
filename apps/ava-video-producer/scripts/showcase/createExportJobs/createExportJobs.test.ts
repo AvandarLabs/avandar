@@ -10,17 +10,20 @@ import { createExportJobs } from "./createExportJobs";
 
 test("only one render runs and repeated clicks reuse the active job", async () => {
   let finish!: (value: string) => void;
-  const jobs = createExportJobs(
-    async () =>
-      await new Promise<string>((resolve) => {
-        finish = resolve;
-      }),
-  );
+  const jobs = createExportJobs(async () => {
+    return await new Promise<string>((resolve) => {
+      finish = resolve;
+    });
+  });
   const first = jobs.start("same", {});
   assert.equal(jobs.start("same", {}).id, first.id);
-  assert.throws(() => jobs.start("different", {}), /already rendering/);
+  assert.throws(() => {
+    return jobs.start("different", {});
+  }, /already rendering/);
   finish("/tmp/film.mp4");
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(jobs.get(first.id)?.state, "complete");
   assert.equal(
     jobs.get(first.id)?.download,
@@ -34,7 +37,9 @@ test("failed render never exposes a downloadable file and allows retry", async (
     throw new Error("/Users/private/path: Gate failed");
   });
   const first = jobs.start("film", {});
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(jobs.get(first.id)?.state, "failed");
   assert.doesNotMatch(jobs.get(first.id)?.message ?? "", /Users|private/);
   assert.equal(jobs.get(first.id)?.download, undefined);
@@ -76,12 +81,13 @@ test("different stock content cannot reuse an active export while equivalent req
   );
   const active = jobs.start(original.configurationHash, film);
   assert.equal(jobs.start(equivalent.configurationHash, film).id, active.id);
-  assert.throws(
-    () => jobs.start(dense.configurationHash, denseFilm),
-    /already rendering/,
-  );
+  assert.throws(() => {
+    return jobs.start(dense.configurationHash, denseFilm);
+  }, /already rendering/);
   finish("/tmp/completed-stock.mp4");
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(jobs.file(active.id), "/tmp/completed-stock.mp4");
 });
 
@@ -124,7 +130,9 @@ test("a source edit during an active stock job prevents a downloadable completed
     await fs.writeFile(source, "export const value = 2;");
     finish();
     await settled;
-    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => {
+      return setImmediate(resolve);
+    });
     assert.equal(jobs.get(active.id)?.state, "failed");
     assert.equal(jobs.file(active.id), undefined);
   } finally {

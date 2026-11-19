@@ -63,7 +63,9 @@ registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
     ),
     [
       {
@@ -85,9 +87,9 @@ test("serialized semantic rules retain every runtime relation", () => {
     ],
   );
   assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
   );
 });
 
@@ -204,92 +206,98 @@ test("visible keys tie every aquifer boundary flow and hollow bracket to its cap
       approvedWithdrawalM3: 0,
     },
   };
-  [...fixtures.map(({ input }) => input), emptyCaptions, zero].forEach(
-    (input) => {
-      inputSchema.parse(input);
-      [0, 36, 50, 66, 72, 90, 108, 150, 179].forEach((frame) => {
-        const markup = _render({ frame: frame, input: input });
-        _assertOwnershipClearance(markup);
-        [
-          {
-            owner: "recharge",
-            number: 1,
-            label: input.copy.recharge,
-            quantity: input.flows.rechargeM3,
-          },
-          {
-            owner: "approved",
-            number: 2,
-            label: input.copy.approved,
-            quantity: input.flows.approvedWithdrawalM3,
-          },
-          {
-            owner: "natural",
-            number: 3,
-            label: input.copy.naturalOutflow,
-            quantity: input.flows.naturalOutflowM3,
-          },
-        ].forEach((term) => {
-          _assertOwner({ markup, ...term });
-          _assertRouteOwnership({ markup, owner: term.owner });
+  [
+    ...fixtures.map(({ input }) => {
+      return input;
+    }),
+    emptyCaptions,
+    zero,
+  ].forEach((input) => {
+    inputSchema.parse(input);
+    [0, 36, 50, 66, 72, 90, 108, 150, 179].forEach((frame) => {
+      const markup = _render({ frame: frame, input: input });
+      _assertOwnershipClearance(markup);
+      [
+        {
+          owner: "recharge",
+          number: 1,
+          label: input.copy.recharge,
+          quantity: input.flows.rechargeM3,
+        },
+        {
+          owner: "approved",
+          number: 2,
+          label: input.copy.approved,
+          quantity: input.flows.approvedWithdrawalM3,
+        },
+        {
+          owner: "natural",
+          number: 3,
+          label: input.copy.naturalOutflow,
+          quantity: input.flows.naturalOutflowM3,
+        },
+      ].forEach((term) => {
+        _assertOwner({ markup, ...term });
+        _assertRouteOwnership({ markup, owner: term.owner });
+      });
+      if (input.showUnallocatedRequest) {
+        _assertOwner({
+          markup,
+          owner: "unallocated",
+          number: 4,
+          label: input.copy.unallocated,
+          quantity:
+            input.flows.requestedWithdrawalM3 -
+            input.flows.approvedWithdrawalM3,
         });
-        if (input.showUnallocatedRequest) {
-          _assertOwner({
+        const bracket = SvgAttributes.fromMarker({
+          markup,
+          marker: "unallocated",
+        });
+        assert.match(bracket, /fill="none"/);
+        const key = SvgAttributes.fromMarker({
+          markup: _getOwnershipGroup({
             markup,
+            marker: "flow-ownership",
             owner: "unallocated",
-            number: 4,
-            label: input.copy.unallocated,
-            quantity:
-              input.flows.requestedWithdrawalM3 -
-              input.flows.approvedWithdrawalM3,
-          });
-          const bracket = SvgAttributes.fromMarker({
-            markup,
-            marker: "unallocated",
-          });
-          assert.match(bracket, /fill="none"/);
-          const key = SvgAttributes.fromMarker({
-            markup: _getOwnershipGroup({
-              markup,
-              marker: "flow-ownership",
-              owner: "unallocated",
-            }),
-            marker: "ownership-key",
-          });
-          assert.ok(
-            Math.abs(
-              SvgAttributes.getNumberFromMarkup({
-                attributes: key,
-                name: "cx",
-              }) -
-                SvgAttributes.getNumberFromMarkup({
-                  attributes: bracket,
-                  name: "x",
-                }),
-            ) <= 20,
-          );
-          assert.ok(
-            _getCircleBounds(key).right <
+          }),
+          marker: "ownership-key",
+        });
+        assert.ok(
+          Math.abs(
+            SvgAttributes.getNumberFromMarkup({
+              attributes: key,
+              name: "cx",
+            }) -
               SvgAttributes.getNumberFromMarkup({
                 attributes: bracket,
                 name: "x",
-              }) -
-                0.5,
-          );
-        } else {
-          assert.doesNotMatch(
-            markup,
-            /data-(?:flow-ownership|budget-term)="unallocated"/,
-          );
-        }
-        assert.doesNotMatch(markup, /data-flow="requested"/);
-      });
-    },
-  );
+              }),
+          ) <= 20,
+        );
+        assert.ok(
+          _getCircleBounds(key).right <
+            SvgAttributes.getNumberFromMarkup({
+              attributes: bracket,
+              name: "x",
+            }) -
+              0.5,
+        );
+      } else {
+        assert.doesNotMatch(
+          markup,
+          /data-(?:flow-ownership|budget-term)="unallocated"/,
+        );
+      }
+      assert.doesNotMatch(markup, /data-flow="requested"/);
+    });
+  });
 });
 
 test("full ownership keys and budget labels clear neighboring rows for every dense prefix", () => {
-  Array.from({ length: 28 }, (_, index) => index + 1).forEach((wordLength) => {
+  Array.from({ length: 28 }, (_, index) => {
+    return index + 1;
+  }).forEach((wordLength) => {
     const label = `界 ${"界".repeat(wordLength)} ${"界".repeat(28)}`.slice(
       0,
       28,

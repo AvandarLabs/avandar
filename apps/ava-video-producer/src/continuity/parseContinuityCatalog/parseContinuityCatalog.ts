@@ -53,7 +53,11 @@ export function parseContinuityCatalog(
   const parsedStudies = z.array(STUDY_SCHEMA).parse(studies);
   const entries = [...parsedFilms, ...parsedStudies];
   _assertUniqueIds(entries);
-  const filmIds = new Set(parsedFilms.map((entry) => entry.id));
+  const filmIds = new Set(
+    parsedFilms.map((entry) => {
+      return entry.id;
+    }),
+  );
   parsedStudies.forEach((entry) => {
     if (!filmIds.has(entry.sourceFilm)) {
       throw new Error(

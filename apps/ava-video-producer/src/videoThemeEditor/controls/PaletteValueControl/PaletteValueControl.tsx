@@ -11,23 +11,25 @@ export function PaletteValueControl({
   const shades = Array.isArray(value) ? value : [];
   return (
     <div className={css.paletteValueGrid} role="group" aria-label={label}>
-      {shades.map((shade, index) => (
-        <HexColorInput
-          // A shade's position is its identity: the palette always has ten.
-          key={`shade-${String(index)}`}
-          size="xs"
-          aria-label={`${label}, shade ${index}`}
-          value={shade}
-          allowAlpha={false}
-          onChange={(color) =>
-            onChange(
-              shades.map((current, position) =>
-                position === index ? color : current,
-              ),
-            )
-          }
-        />
-      ))}
+      {shades.map((shade, index) => {
+        return (
+          <HexColorInput
+            // A shade's position is its identity: the palette always has ten.
+            key={`shade-${String(index)}`}
+            size="xs"
+            aria-label={`${label}, shade ${index}`}
+            value={shade}
+            allowAlpha={false}
+            onChange={(color) => {
+              return onChange(
+                shades.map((current, position) => {
+                  return position === index ? color : current;
+                }),
+              );
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

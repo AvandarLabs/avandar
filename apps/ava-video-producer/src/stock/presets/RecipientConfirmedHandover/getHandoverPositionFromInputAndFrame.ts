@@ -23,9 +23,9 @@ export function getHandoverPositionFromInputAndFrame({
 } {
   const content = input.contents[contentIndex];
   const ordinal =
-    input.contents
-      .slice(0, contentIndex)
-      .reduce((sum, item) => sum + item.selectedUnits, 0) + unitIndex;
+    input.contents.slice(0, contentIndex).reduce((sum, item) => {
+      return sum + item.selectedUnits;
+    }, 0) + unitIndex;
   const travel =
     unitIndex < content.selectedUnits
       ? ramp(frame, 34 + ordinal * 14, 10, EASE.inOut)

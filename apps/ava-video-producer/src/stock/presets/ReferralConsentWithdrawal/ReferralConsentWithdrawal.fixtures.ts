@@ -198,10 +198,12 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    permissions: DEFAULT_INPUT.permissions.map((permission) => ({
-      ...permission,
-      withdrawn: false,
-    })),
+    permissions: DEFAULT_INPUT.permissions.map((permission) => {
+      return {
+        ...permission,
+        withdrawn: false,
+      };
+    }),
   },
   { ...DEFAULT_INPUT, plannedContacts: [DEFAULT_INPUT.plannedContacts[1]] },
   {

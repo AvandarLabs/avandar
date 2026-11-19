@@ -94,7 +94,9 @@ export const denseInput: Input = {
     return: "界".repeat(24),
   },
   priorWork: (["drawing", "writing", "number-work"] as const).map(
-    (form, index) => ({ id: `work ${index}`, label: "界".repeat(24), form }),
+    (form, index) => {
+      return { id: `work ${index}`, label: "界".repeat(24), form };
+    },
   ),
   returnActivities: [
     {

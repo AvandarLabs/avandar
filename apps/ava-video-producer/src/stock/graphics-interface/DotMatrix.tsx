@@ -21,21 +21,29 @@ export function DotMatrix({
 }: Readonly<Props>): ReactNode {
   const selectedTotal = input.groups
     .filter(prop("selected"))
-    .reduce((total, group) => total + group.value, 0);
-  const cohortTotal = input.groups.reduce((sum, group) => sum + group.value, 0);
-  const matrixPoints = Array.from({ length: cohortTotal }, (_, i) => ({
-    x: 78 + (i % 20) * 30,
-    y: 222 + Math.floor(i / 20) * 48,
-    selected: i < selectedTotal,
-  }));
-  const legendGroups = input.groups.map((group, index) => ({
-    ...group,
-    x: 78 + index * 189,
-  }));
+    .reduce((total, group) => {
+      return total + group.value;
+    }, 0);
+  const cohortTotal = input.groups.reduce((sum, group) => {
+    return sum + group.value;
+  }, 0);
+  const matrixPoints = Array.from({ length: cohortTotal }, (_, i) => {
+    return {
+      x: 78 + (i % 20) * 30,
+      y: 222 + Math.floor(i / 20) * 48,
+      selected: i < selectedTotal,
+    };
+  });
+  const legendGroups = input.groups.map((group, index) => {
+    return {
+      ...group,
+      x: 78 + index * 189,
+    };
+  });
   const selected = Math.round(
-    matrixPoints
-      .slice(0, selectedTotal)
-      .reduce((total, _, i) => total + ramp(frame, 18 + i, DUR.chip), 0),
+    matrixPoints.slice(0, selectedTotal).reduce((total, _, i) => {
+      return total + ramp(frame, 18 + i, DUR.chip);
+    }, 0),
   );
   return (
     <g>
@@ -89,20 +97,22 @@ export function DotMatrix({
         {input.cohortLabel}
       </Text>
       {input.showLegend
-        ? legendGroups.map((group) => (
-            <Fragment key={group.x}>
-              <circle
-                cx={group.x}
-                cy={492}
-                r={5}
-                fill={group.selected ? accent : STOCK.muted}
-                fillOpacity={group.selected ? undefined : 0.4}
-              />
-              <Text x={group.x + 16} y={498} size={17} fill={STOCK.muted}>
-                {group.value} {group.label}
-              </Text>
-            </Fragment>
-          ))
+        ? legendGroups.map((group) => {
+            return (
+              <Fragment key={group.x}>
+                <circle
+                  cx={group.x}
+                  cy={492}
+                  r={5}
+                  fill={group.selected ? accent : STOCK.muted}
+                  fillOpacity={group.selected ? undefined : 0.4}
+                />
+                <Text x={group.x + 16} y={498} size={17} fill={STOCK.muted}>
+                  {group.value} {group.label}
+                </Text>
+              </Fragment>
+            );
+          })
         : null}
       <Text x={64} y={553} size={13} fill={STOCK.muted} mono>
         {getStockDisplayCopyFromDescriptor({

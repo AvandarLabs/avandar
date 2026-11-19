@@ -33,13 +33,19 @@ test("closing shelf and basket conserve each authored product", () => {
       ...markup.matchAll(
         /<g data-good="([^"]*)" data-unit="[^"]*" data-owner="([^"]*)"/g,
       ),
-    ].filter((match) => match[1] === good.id);
+    ].filter((match) => {
+      return match[1] === good.id;
+    });
     assert.equal(
-      units.filter((match) => match[2] === "shelf").length,
+      units.filter((match) => {
+        return match[2] === "shelf";
+      }).length,
       good.openingUnits + good.incomingUnits - good.selectedUnits,
     );
     assert.equal(
-      units.filter((match) => match[2] === "basket").length,
+      units.filter((match) => {
+        return match[2] === "basket";
+      }).length,
       good.selectedUnits,
     );
   });
@@ -68,8 +74,10 @@ test("changed zero-opening purchase leaves exactly zero stock and three basket u
   assert.equal((markup.match(/data-owner="basket"/g) ?? []).length, 3);
 });
 test("every physical unit stays unique and handled units contact the active actor hand", () => {
-  fixtures.forEach(({ input }) =>
-    Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) => {
+  fixtures.forEach(({ input }) => {
+    return Array.from({ length: 180 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const units = [
         ...markup.matchAll(
@@ -78,19 +86,22 @@ test("every physical unit stays unique and handled units contact the active acto
       ];
       assert.equal(
         units.length,
-        input.goods.reduce(
-          (sum, good) => sum + good.openingUnits + good.incomingUnits,
-          0,
-        ),
+        input.goods.reduce((sum, good) => {
+          return sum + good.openingUnits + good.incomingUnits;
+        }, 0),
       );
       assert.equal(
-        new Set(units.map((unit) => `${unit[1]}:${unit[2]}`)).size,
+        new Set(
+          units.map((unit) => {
+            return `${unit[1]}:${unit[2]}`;
+          }),
+        ).size,
         units.length,
       );
       units
-        .filter(
-          (unit) => unit[3] === "retailer-hand" || unit[3] === "shopper-hand",
-        )
+        .filter((unit) => {
+          return unit[3] === "retailer-hand" || unit[3] === "shopper-hand";
+        })
         .forEach((unit) => {
           const hand = markup.match(
             new RegExp(`<circle data-${unit[3]}[^>]*>`),
@@ -113,19 +124,25 @@ test("every physical unit stays unique and handled units contact the active acto
         });
       if (frame === 150) {
         input.goods.forEach((good) => {
-          const own = units.filter((unit) => unit[1] === good.id);
+          const own = units.filter((unit) => {
+            return unit[1] === good.id;
+          });
           assert.equal(
-            own.filter((unit) => unit[3] === "shelf").length,
+            own.filter((unit) => {
+              return unit[3] === "shelf";
+            }).length,
             good.openingUnits + good.incomingUnits - good.selectedUnits,
           );
           assert.equal(
-            own.filter((unit) => unit[3] === "basket").length,
+            own.filter((unit) => {
+              return unit[3] === "basket";
+            }).length,
             good.selectedUnits,
           );
         });
       }
-    }),
-  );
+    });
+  });
 });
 test("retailer points and orders before a loaded carrier arrives, then shopper selects", () => {
   const pointing = _render({ frame: 24 });
@@ -160,9 +177,9 @@ function _getVisibleTexts({
   return [
     input.scenarioCaption,
     ...input.goods.map(prop("label")),
-    ...Object.entries(input.labels).flatMap(([key, text]) =>
-      key === "order" && !input.showOrderSlip ? [] : [text],
-    ),
+    ...Object.entries(input.labels).flatMap(([key, text]) => {
+      return key === "order" && !input.showOrderSlip ? [] : [text];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "symbol", "deliveryMode"];
@@ -189,30 +206,40 @@ test("minimum empty identifiers and maximum accepted collections stay schema-val
 });
 test("displayed quantity follows the actual shelf at every handoff frame", () => {
   fixtures
-    .filter(({ input }) => input.showQuantityLabels)
-    .forEach(({ input }) =>
-      Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) => {
+    .filter(({ input }) => {
+      return input.showQuantityLabels;
+    })
+    .forEach(({ input }) => {
+      return Array.from({ length: 180 }, (_, frame) => {
+        return frame;
+      }).forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
         input.goods.forEach((good) => {
           const own = [
             ...markup.matchAll(
               /<g data-good="([^"]*)" data-unit="[^"]*" data-owner="([^"]*)"/g,
             ),
-          ].filter((unit) => unit[1] === good.id && unit[2] === "shelf").length;
+          ].filter((unit) => {
+            return unit[1] === good.id && unit[2] === "shelf";
+          }).length;
           const label = [
             ...markup.matchAll(
               /<text data-quantity="([^"]*)"[^>]*>([^<]*)<\/text>/g,
             ),
-          ].find((candidate) => candidate[1] === good.id);
+          ].find((candidate) => {
+            return candidate[1] === good.id;
+          });
           assert.ok(label);
           assert.equal(Number(label[2]), own);
         });
-      }),
-    );
+      });
+    });
 });
 test("retailer points to the actual first incoming shelf gap", () => {
   fixtures.forEach(({ input }) => {
-    const index = input.goods.findIndex((good) => good.incomingUnits > 0);
+    const index = input.goods.findIndex((good) => {
+      return good.incomingUnits > 0;
+    });
     const hand = _render({ frame: 24, input: input }).match(
       /<circle data-retailer-hand[^>]*>/,
     );
@@ -229,9 +256,13 @@ test("retailer points to the actual first incoming shelf gap", () => {
 });
 test("I1 retailer grips the emitted slip throughout its moving placement", () => {
   fixtures
-    .filter(({ input }) => input.showOrderSlip)
+    .filter(({ input }) => {
+      return input.showOrderSlip;
+    })
     .forEach(({ input }) => {
-      Array.from({ length: 9 }, (_, offset) => 28 + offset).forEach((frame) => {
+      Array.from({ length: 9 }, (_, offset) => {
+        return 28 + offset;
+      }).forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
         const slip = markup.match(
           /data-order-slip[^>]*transform="translate\(([^ ]+) ([^)]+)\)"/,

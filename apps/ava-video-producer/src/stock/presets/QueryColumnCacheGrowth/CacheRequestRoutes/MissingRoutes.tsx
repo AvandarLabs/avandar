@@ -10,14 +10,16 @@ export function MissingRoutes({
 }: Readonly<{ missingIds: string[] }>): ReactNode {
   const style = useGraphicProps("QueryColumnCacheGrowth", {});
   const { color } = useGraphicTokens();
-  return missingIds.map((id, index) => (
-    <path
-      key={id}
-      data-missing-route={id}
-      d={`M700 178 V184 H${139 + index * 168} V191`}
-      fill="none"
-      stroke={color.highlight}
-      strokeWidth={style.routeStrokeWidth}
-    />
-  ));
+  return missingIds.map((id, index) => {
+    return (
+      <path
+        key={id}
+        data-missing-route={id}
+        d={`M700 178 V184 H${139 + index * 168} V191`}
+        fill="none"
+        stroke={color.highlight}
+        strokeWidth={style.routeStrokeWidth}
+      />
+    );
+  });
 }

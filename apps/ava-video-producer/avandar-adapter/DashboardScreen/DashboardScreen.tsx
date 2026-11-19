@@ -98,7 +98,9 @@ export function DashboardScreen({
   width: number;
   height: number;
 }) {
-  const context = useMemo(() => ({ frame, chartAt: 328 }), [frame]);
+  const context = useMemo(() => {
+    return { frame, chartAt: 328 };
+  }, [frame]);
   return (
     <DashboardFixtureContext.Provider value={context}>
       <div

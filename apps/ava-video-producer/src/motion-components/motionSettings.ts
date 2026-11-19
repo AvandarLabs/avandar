@@ -79,7 +79,9 @@ export function getMotionEasing(
   if (Array.isArray(easing)) return bezier(...easing);
   switch (easing) {
     case "linear":
-      return (progress: number) => progress;
+      return (progress: number) => {
+        return progress;
+      };
     case "ease-in":
       return bezier(0.42, 0, 1, 1);
     case "ease-out":

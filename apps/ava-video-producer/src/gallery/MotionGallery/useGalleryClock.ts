@@ -7,7 +7,10 @@ let lastTick = 0;
 function clockTick(time: number) {
   const elapsed = lastTick ? Math.min(time - lastTick, 100) : 0;
   lastTick = time;
-  if (!document.hidden) clockListeners.forEach((listener) => listener(elapsed));
+  if (!document.hidden)
+    clockListeners.forEach((listener) => {
+      return listener(elapsed);
+    });
   clockRequest = requestAnimationFrame(clockTick);
 }
 function subscribeClock(listener: (elapsed: number) => void) {
@@ -62,11 +65,15 @@ export function useVisible() {
   useEffect(function observeCardVisibility() {
     if (!element.current) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
+      ([entry]) => {
+        return setVisible(entry.isIntersecting);
+      },
       { threshold: 0.05 },
     );
     observer.observe(element.current);
-    return () => observer.disconnect();
+    return () => {
+      return observer.disconnect();
+    };
   }, []);
   return [element, visible] as const;
 }

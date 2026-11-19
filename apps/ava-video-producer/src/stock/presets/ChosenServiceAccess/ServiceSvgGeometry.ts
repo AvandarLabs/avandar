@@ -106,10 +106,12 @@ function _getServiceParticipantGeometryFromMarkup(
       });
     } else {
       result.segments.push(
-        ..._getServicePathSegmentsFromTag(tag).map((segment) => ({
-          ...segment,
-          strokeWidth: style.hasStroke ? style.strokeWidth : 0,
-        })),
+        ..._getServicePathSegmentsFromTag(tag).map((segment) => {
+          return {
+            ...segment,
+            strokeWidth: style.hasStroke ? style.strokeWidth : 0,
+          };
+        }),
       );
     }
   });
@@ -122,14 +124,16 @@ function _getServiceObstaclesFromMarkup(markup: string): ServiceObstacle[] {
     ...markup.matchAll(
       /<path data-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
     ),
-  ].map(([tag]) => ({
-    segments: _getServicePathSegmentsFromTag(tag),
-    hasFill: _getAttribute({ tag, key: "fill" }) !== "none",
-    strokeWidth: SvgAttributes.getNumberFromMarkup({
-      attributes: tag,
-      name: "stroke-width",
-    }),
-  }));
+  ].map(([tag]) => {
+    return {
+      segments: _getServicePathSegmentsFromTag(tag),
+      hasFill: _getAttribute({ tag, key: "fill" }) !== "none",
+      strokeWidth: SvgAttributes.getNumberFromMarkup({
+        attributes: tag,
+        name: "stroke-width",
+      }),
+    };
+  });
 }
 
 /** Related service svg geometry operations. */

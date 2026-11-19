@@ -26,12 +26,13 @@ test("a shot without a transition kind dissolves over the frozen last frame", ()
 });
 
 test("a playing outgoing shot keeps advancing past its own end", () => {
-  const at = (localFrame: number) =>
-    getShotTransitionLayers({
+  const at = (localFrame: number) => {
+    return getShotTransitionLayers({
       ...base,
       localFrame,
       transition: { kind: "dissolve", outgoing: "playing" },
     }).outgoing?.frame;
+  };
   assert.equal(at(0), 120);
   assert.equal(at(5), 125);
 });
@@ -63,8 +64,8 @@ test("a declared cut never shows the outgoing shot", () => {
 });
 
 test("a column wipe clips the incoming shot and drifts the outgoing one further over time", () => {
-  const at = (localFrame: number) =>
-    getShotTransitionLayers({
+  const at = (localFrame: number) => {
+    return getShotTransitionLayers({
       ...base,
       localFrame,
       transition: {
@@ -72,6 +73,7 @@ test("a column wipe clips the incoming shot and drifts the outgoing one further 
         outgoingDrift: { x: -0.06, blur: 12 },
       },
     });
+  };
   assert.match(String(at(3).incoming.clipPath), /^polygon/);
   assert.equal(at(3).incoming.opacity, undefined);
   assert.ok(at(6).outgoing!.offsetX < at(2).outgoing!.offsetX);

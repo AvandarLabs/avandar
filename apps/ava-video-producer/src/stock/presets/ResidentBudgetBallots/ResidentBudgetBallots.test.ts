@@ -83,8 +83,9 @@ registerStockPresetAssertions({
   invalidInputs: INVALID_INPUTS,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
 });
 registerStockTextLayoutAssertions({
   inputSchema,
@@ -95,59 +96,63 @@ registerStockTextLayoutAssertions({
 });
 
 test("concentrated papers preserve all identities and disjoint final envelopes", () => {
-  (["stacks", "rows"] as const).forEach((tallyArrangement) =>
-    [null, "bench"].forEach((projectId) => {
+  (["stacks", "rows"] as const).forEach((tallyArrangement) => {
+    return [null, "bench"].forEach((projectId) => {
       const input = {
         ...fixtures[2].input,
         tallyArrangement,
-        ballots: Array.from({ length: 8 }, (_, index) => ({
-          id: `${"界".repeat(14)}${index}`,
-          projectId,
-        })),
+        ballots: Array.from({ length: 8 }, (_, index) => {
+          return {
+            id: `${"界".repeat(14)}${index}`,
+            projectId,
+          };
+        }),
       };
       const hold = _render({ frame: 150, input: input });
       const papers = [...hold.matchAll(/<rect data-paper="[^"]*"[^>]*>/g)].map(
-        ([attributes]) => ({
-          x: SvgAttributes.getNumberFromMarkup({
-            attributes: attributes,
-            name: "x",
-          }),
-          y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-          width: SvgAttributes.getNumberFromMarkup({
-            attributes,
-            name: "width",
-          }),
-          height: SvgAttributes.getNumberFromMarkup({
-            attributes,
-            name: "height",
-          }),
-        }),
+        ([attributes]) => {
+          return {
+            x: SvgAttributes.getNumberFromMarkup({
+              attributes: attributes,
+              name: "x",
+            }),
+            y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+            width: SvgAttributes.getNumberFromMarkup({
+              attributes,
+              name: "width",
+            }),
+            height: SvgAttributes.getNumberFromMarkup({
+              attributes,
+              name: "height",
+            }),
+          };
+        },
       );
       assert.equal(papers.length, 8);
       papers.forEach((paper, index) => {
         assert.ok(paper.x >= 48 && paper.x + paper.width <= 912);
         assert.ok(paper.y >= 294 && paper.y + paper.height < 553);
-        papers
-          .slice(index + 1)
-          .forEach((other) =>
-            assert.ok(
-              paper.x + paper.width <= other.x ||
-                other.x + other.width <= paper.x ||
-                paper.y + paper.height <= other.y ||
-                other.y + other.height <= paper.y,
-            ),
+        papers.slice(index + 1).forEach((other) => {
+          return assert.ok(
+            paper.x + paper.width <= other.x ||
+              other.x + other.width <= paper.x ||
+              paper.y + paper.height <= other.y ||
+              other.y + other.height <= paper.y,
           );
+        });
       });
-      input.ballots.forEach((ballot) =>
-        assert.ok(hold.includes(`aria-label="${ballot.id}"`)),
-      );
+      input.ballots.forEach((ballot) => {
+        return assert.ok(hold.includes(`aria-label="${ballot.id}"`));
+      });
       const totals = [...hold.matchAll(/data-total="(\d+)"/g)].reduce(
-        (sum, match) => sum + Number(match[1]),
+        (sum, match) => {
+          return sum + Number(match[1]);
+        },
         0,
       );
       assert.equal(totals + (projectId === null ? 8 : 0), 8);
-    }),
-  );
+    });
+  });
 });
 test("a valid empty project ID remains a cast ballot rather than an abstention", () => {
   const hold = _render({ frame: 150, input: fixtures[1].input });
@@ -251,9 +256,11 @@ function _assertPrivateMark({
   );
 }
 test("opaque privacy screens shield the actual mark bounds during marking", () => {
-  [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) =>
-    input.ballots.forEach((_, index) => _assertPrivateMark({ input, index })),
-  );
+  [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
+    return input.ballots.forEach((_, index) => {
+      return _assertPrivateMark({ input, index });
+    });
+  });
 });
 function _boxShapes(markup: string): string[] {
   const box = markup.split('data-ballot-box="shared"')[1].split("</g>")[0];

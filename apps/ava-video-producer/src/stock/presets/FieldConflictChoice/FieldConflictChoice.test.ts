@@ -17,8 +17,8 @@ import { inputSchema, type Input } from "./FieldConflictChoice.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(FieldConflictChoice, {
       frame,
       input,
@@ -26,6 +26,7 @@ const render = ({
       id: "test",
     }),
   );
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -35,31 +36,42 @@ registerStockPresetAssertions({
   render,
   excludedTextFields: ["id", "sourceId", "chosenSourceId", "decisionStyle"],
   textFrames: [36, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.recordTitle,
-    ...input.fields.flatMap((field) => [
-      field.label,
-      ...field.candidates
-        .filter(
-          (candidate) =>
-            frame < 112 ||
-            field.chosenSourceId === null ||
-            input.showRetainedAlternatives ||
-            candidate.sourceId === field.chosenSourceId,
-        )
-        .map(prop("value")),
-    ]),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.recordTitle,
+      ...input.fields.flatMap((field) => {
+        return [
+          field.label,
+          ...field.candidates
+            .filter((candidate) => {
+              return (
+                frame < 112 ||
+                field.chosenSourceId === null ||
+                input.showRetainedAlternatives ||
+                candidate.sourceId === field.chosenSourceId
+              );
+            })
+            .map(prop("value")),
+        ];
+      }),
+    ];
+  },
 });
 function _cells(markup: string) {
   return [
     ...markup.matchAll(/<rect[^>]*data-candidate-source="[^"]*"[^>]*>/g),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 function _texts({ markup, label }: { markup: string; label: string }) {
   return [...markup.matchAll(/<text\b[^>]*>/g)]
-    .map((match) => match[0])
-    .filter((text) => text.includes(`aria-label="${label}"`));
+    .map((match) => {
+      return match[0];
+    })
+    .filter((text) => {
+      return text.includes(`aria-label="${label}"`);
+    });
 }
 function _chosenCell({
   markup,
@@ -71,11 +83,12 @@ function _chosenCell({
   fieldIndex: number;
 }) {
   const field = input.fields[fieldIndex];
-  const cell = _cells(markup).find(
-    (candidate) =>
+  const cell = _cells(markup).find((candidate) => {
+    return (
       candidate.includes(`data-field="${field.id}"`) &&
-      candidate.includes(`data-candidate-source="${field.chosenSourceId}"`),
-  );
+      candidate.includes(`data-candidate-source="${field.chosenSourceId}"`)
+    );
+  });
   assert.ok(cell);
   return cell;
 }
@@ -109,41 +122,45 @@ function _assertChoiceMarks({
 Array.from(["sliding-rail", "selection-bracket"] as const).forEach(
   (decisionStyle) => {
     test(`${decisionStyle} stays attached to either chosen panel throughout travel`, () => {
-      [DEFAULT_INPUT, fixtures[1].input].forEach((seed) =>
-        seed.sources.forEach((source) =>
-          [true, false].forEach((showRetainedAlternatives) => {
+      [DEFAULT_INPUT, fixtures[1].input].forEach((seed) => {
+        return seed.sources.forEach((source) => {
+          return [true, false].forEach((showRetainedAlternatives) => {
             const input = {
               ...seed,
               decisionStyle,
               showRetainedAlternatives,
-              fields: seed.fields.map((field) => ({
-                ...field,
-                chosenSourceId: source.id,
-              })),
+              fields: seed.fields.map((field) => {
+                return {
+                  ...field,
+                  chosenSourceId: source.id,
+                };
+              }),
             };
-            [60, 77, 100, 112, 150].forEach((frame) =>
-              _assertChoiceMarks({
+            [60, 77, 100, 112, 150].forEach((frame) => {
+              return _assertChoiceMarks({
                 markup: render({ frame: frame, input: input }),
                 input,
-              }),
-            );
-          }),
-        ),
-      );
+              });
+            });
+          });
+        });
+      });
     });
   },
 );
 test("selected captions follow either chosen panel below its content with separate field rows", () => {
-  fixtures[2].input.sources.forEach((source) =>
-    [true, false].forEach((showRetainedAlternatives) => {
+  fixtures[2].input.sources.forEach((source) => {
+    return [true, false].forEach((showRetainedAlternatives) => {
       const input = {
         ...fixtures[2].input,
         showRetainedAlternatives,
         labels: { ...DEFAULT_INPUT.labels, selected: "界".repeat(28) },
-        fields: fixtures[2].input.fields.map((field) => ({
-          ...field,
-          chosenSourceId: source.id,
-        })),
+        fields: fixtures[2].input.fields.map((field) => {
+          return {
+            ...field,
+            chosenSourceId: source.id,
+          };
+        }),
       };
       [60, 77, 100, 112, 150].forEach((frame) => {
         const markup = render({ frame: frame, input: input });
@@ -189,16 +206,18 @@ test("selected captions follow either chosen panel below its content with separa
           }
         });
       });
-    }),
-  );
+    });
+  });
 });
 test("unresolved status spans the open pair without a chosen result caption", () => {
   const input = {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      chosenSourceId: null,
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        chosenSourceId: null,
+      };
+    }),
   };
   const markup = render({ frame: 150, input: input });
   assert.equal(_texts({ markup, label: input.labels.selected }).length, 0);
@@ -214,11 +233,13 @@ test("unresolved status spans the open pair without a chosen result caption", ()
 test("moving decision marks leave clear space below the field names", () => {
   const input = {
     ...fixtures[2].input,
-    fields: fixtures[2].input.fields.map((field, index) => ({
-      ...field,
-      label: `${"W".repeat(21)}${index}`,
-      chosenSourceId: DEFAULT_INPUT.sources[index % 2].id,
-    })),
+    fields: fixtures[2].input.fields.map((field, index) => {
+      return {
+        ...field,
+        label: `${"W".repeat(21)}${index}`,
+        chosenSourceId: DEFAULT_INPUT.sources[index % 2].id,
+      };
+    }),
   };
   [60, 77, 100, 112].forEach((frame) => {
     const markup = render({ frame: frame, input: input });
@@ -259,10 +280,12 @@ test("only explicit selected source values enter result while unresolved alterna
 test("source choices move horizontally into the result lane and retain source identity", () => {
   const input = {
     ...DEFAULT_INPUT,
-    fields: DEFAULT_INPUT.fields.map((field) => ({
-      ...field,
-      chosenSourceId: "notes",
-    })),
+    fields: DEFAULT_INPUT.fields.map((field) => {
+      return {
+        ...field,
+        chosenSourceId: "notes",
+      };
+    }),
   };
   const start = _cells(render({ frame: 36, input: input })),
     hold = _cells(render({ frame: 150, input: input }));
@@ -316,8 +339,8 @@ test("all dense data lanes stay on canvas and settle into separate bounded rows"
       );
     });
     if (frame === 150) {
-      [0, 2, 4].forEach((index) =>
-        assert.ok(
+      [0, 2, 4].forEach((index) => {
+        return assert.ok(
           SvgAttributes.getNumberFromMarkup({
             attributes: rects[index],
             name: "y",
@@ -330,8 +353,8 @@ test("all dense data lanes stay on canvas and settle into separate bounded rows"
               attributes: rects[index + 2],
               name: "y",
             }),
-        ),
-      );
+        );
+      });
     }
   });
 });
@@ -340,13 +363,17 @@ test("conflict decisions preserve maximum whitespace values and reject duplicate
   const value = `${" \t\n\r".repeat(6)}  `;
   const input = {
     ...fixtures[1].input,
-    fields: fixtures[1].input.fields.map((field) => ({
-      ...field,
-      candidates: field.candidates.map((candidate) => ({
-        ...candidate,
-        value,
-      })),
-    })),
+    fields: fixtures[1].input.fields.map((field) => {
+      return {
+        ...field,
+        candidates: field.candidates.map((candidate) => {
+          return {
+            ...candidate,
+            value,
+          };
+        }),
+      };
+    }),
   };
   const markup = render({ frame: 150, input: input });
   assert.ok(markup.includes(`data-result-value="${value}"`));

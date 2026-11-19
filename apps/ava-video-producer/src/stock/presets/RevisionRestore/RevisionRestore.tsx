@@ -16,17 +16,17 @@ export function RevisionRestore({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const selectedIndex = input.revisions.findIndex(
-    ({ id }) => id === input.restoreRevisionId,
-  );
+  const selectedIndex = input.revisions.findIndex(({ id }) => {
+    return id === input.restoreRevisionId;
+  });
   const selected = input.revisions[selectedIndex];
   const previous = input.revisions.at(-1)!.content;
   const numLines = Math.max(previous.length, selected.content.length);
-  const content = Array.from({ length: numLines }, (_, index) =>
-    frame >= 78 + ((index + 1) * 48) / numLines
+  const content = Array.from({ length: numLines }, (_, index) => {
+    return frame >= 78 + ((index + 1) * 48) / numLines
       ? selected.content[index]
-      : previous[index],
-  );
+      : previous[index];
+  });
   return (
     <g opacity={ramp(frame, 12, 12)}>
       <RevisionHeadings input={input} frame={frame} accent={accent} />

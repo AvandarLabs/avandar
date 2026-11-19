@@ -139,8 +139,8 @@ function useSaveAsNew(options: SaveHookOptions) {
     latestDrafts,
   } = options;
   return useCallback(
-    (label: string) =>
-      run(async () => {
+    (label: string) => {
+      return run(async () => {
         const base = library.get(themeId);
         if (!base) {
           throw new Error(`The base theme "${themeId}" is not loaded.`);
@@ -162,7 +162,8 @@ function useSaveAsNew(options: SaveHookOptions) {
           discard();
         }
         selectTheme(id);
-      }),
+      });
+    },
     [
       library,
       themeId,
@@ -192,8 +193,9 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   }, []);
   const inFlight = useRef(false);
   const run = useCallback<RunThemeRequest>(
-    (request, failureKind) =>
-      runThemeRequest({ inFlight, setStatus, request, failureKind }),
+    (request, failureKind) => {
+      return runThemeRequest({ inFlight, setStatus, request, failureKind });
+    },
     [setStatus],
   );
   const latestDrafts = useRef(new Map<string, ThemeDraft>());
@@ -203,27 +205,24 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const save = useSaveInPlace({ ...options, run, latestDrafts });
   const saveAsNew = useSaveAsNew({ ...options, run, latestDrafts });
   const { themeId, storeTheme, rebaseDraft } = options;
-  const reloadTheme = useCallback(
-    () =>
-      reloadStoredTheme({
-        themeId,
-        inFlight,
-        read: ThemeApi.read,
-        storeTheme,
-        rebaseDraft,
-        setStatus,
-      }),
-    [themeId, storeTheme, rebaseDraft, setStatus],
-  );
-  return useMemo(
-    () => ({
+  const reloadTheme = useCallback(() => {
+    return reloadStoredTheme({
+      themeId,
+      inFlight,
+      read: ThemeApi.read,
+      storeTheme,
+      rebaseDraft,
+      setStatus,
+    });
+  }, [themeId, storeTheme, rebaseDraft, setStatus]);
+  return useMemo(() => {
+    return {
       status,
       copyStatus,
       setCopyStatus,
       save,
       saveAsNew,
       reloadTheme,
-    }),
-    [status, copyStatus, save, saveAsNew, reloadTheme],
-  );
+    };
+  }, [status, copyStatus, save, saveAsNew, reloadTheme]);
 }

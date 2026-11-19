@@ -16,8 +16,8 @@ type LinkRouterProps = {
 };
 
 /** Builds a product-shaped link component whose `data-status` reflects `VideoRouteContext`, with no real navigation. */
-export const createLink = (Component: React.ElementType) =>
-  forwardRef(
+export const createLink = (Component: React.ElementType) => {
+  return forwardRef(
     (
       {
         to,
@@ -39,37 +39,50 @@ export const createLink = (Component: React.ElementType) =>
           ref={ref}
           href="#"
           data-status={active === to ? "active" : undefined}
-          onClick={(e: MouseEvent) => e.preventDefault()}
+          onClick={(e: MouseEvent) => {
+            return e.preventDefault();
+          }}
         />
       );
     },
   );
+};
 
 /** The product's plain anchor link, routed through `createLink`. */
 export const Link = createLink("a");
 const _noop = () => {};
 
 /** Always resolves to a no-op; no fixture flow navigates imperatively. */
-export const useNavigate = () => _noop;
+export const useNavigate = () => {
+  return _noop;
+};
 
 /** A minimal router handle exposing the same shape the product reads from TanStack Router. */
-export const useRouter = () => ({
-  navigate: _noop,
-  invalidate: _noop,
-  state: { location: { pathname: "/" } },
-});
+export const useRouter = () => {
+  return {
+    navigate: _noop,
+    invalidate: _noop,
+    state: { location: { pathname: "/" } },
+  };
+};
 
 /** The fixed route params every fixture screen renders under. */
-export const useParams = () => ({
-  workspaceSlug: "avandar-labs",
-  dashboardId: "video-dashboard",
-});
+export const useParams = () => {
+  return {
+    workspaceSlug: "avandar-labs",
+    dashboardId: "video-dashboard",
+  };
+};
 
 /** No fixture screen reads search params, so this is always empty. */
-export const useSearch = () => ({});
+export const useSearch = () => {
+  return {};
+};
 
 /** The current pathname, driven by `VideoRouteContext` instead of real navigation. */
-export const useLocation = () => ({ pathname: useContext(VideoRouteContext) });
+export const useLocation = () => {
+  return { pathname: useContext(VideoRouteContext) };
+};
 
 /** The subset of TanStack Router's `useRouterState` actually used: an optional `select` over `{ location }`. */
 export function useRouterState(options?: {
@@ -80,7 +93,11 @@ export function useRouterState(options?: {
 }
 
 /** A minimal match object carrying the same fixed params as `useParams`. */
-export const useMatch = () => ({ params: useParams() });
+export const useMatch = () => {
+  return { params: useParams() };
+};
 
 /** Returns the same `useParams`/`useSearch` shims a real route API would expose. */
-export const getRouteApi = () => ({ useParams, useSearch });
+export const getRouteApi = () => {
+  return { useParams, useSearch };
+};

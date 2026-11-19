@@ -44,7 +44,9 @@ async function _request<Body>(
     ...init,
     headers: { "Content-Type": "application/json", ...init.headers },
   });
-  const body: unknown = await response.json().catch(() => ({}));
+  const body: unknown = await response.json().catch(() => {
+    return {};
+  });
   if (!response.ok) {
     const { message, issues } = _errorBody(body);
     throw new ThemeApiError(response.status, message, issues);
@@ -68,7 +70,9 @@ async function _loadAll(): Promise<{
 }> {
   const themes = await _request<ThemeSummary[]>("/api/themes");
   const stored = await Promise.all(
-    themes.map(async (theme) => [theme.id, await _read(theme.id)] as const),
+    themes.map(async (theme) => {
+      return [theme.id, await _read(theme.id)] as const;
+    }),
   );
   return { themes, stored: new Map(stored) };
 }
@@ -81,18 +85,20 @@ async function _loadAll(): Promise<{
 export const ThemeApi = {
   loadAll: _loadAll,
   read: _read,
-  create: (document: VideoThemeDocument) =>
-    _request<{ id: string; hash: string }>("/api/themes", {
+  create: (document: VideoThemeDocument) => {
+    return _request<{ id: string; hash: string }>("/api/themes", {
       method: "POST",
       body: JSON.stringify(document),
-    }),
-  save: (options: Readonly<{ document: VideoThemeDocument; hash: string }>) =>
-    _request<{ hash: string }>(
+    });
+  },
+  save: (options: Readonly<{ document: VideoThemeDocument; hash: string }>) => {
+    return _request<{ hash: string }>(
       `/api/themes/${encodeURIComponent(options.document.id)}`,
       {
         method: "PUT",
         headers: { "If-Match": options.hash },
         body: JSON.stringify(options.document),
       },
-    ),
+    );
+  },
 };

@@ -30,20 +30,22 @@ export function SchemaMapping({ input, frame, accent }: Readonly<Props>) {
         frame={frame}
         index={1}
       />
-      {input.mappings.map((mapping, i) => (
-        <MappingRow
-          key={mapping.source}
-          label={mapping.source}
-          target={mapping.target}
-          type={mapping.type}
-          index={i}
-          frame={frame}
-          accent={accent}
-          left={left}
-          right={right}
-          showChecks={input.showChecks}
-        />
-      ))}
+      {input.mappings.map((mapping, i) => {
+        return (
+          <MappingRow
+            key={mapping.source}
+            label={mapping.source}
+            target={mapping.target}
+            type={mapping.type}
+            index={i}
+            frame={frame}
+            accent={accent}
+            left={left}
+            right={right}
+            showChecks={input.showChecks}
+          />
+        );
+      })}
       <Text role="note" x={GRAPHIC_WIDTH / 2} y={CAPTION_Y} anchor="middle">
         {getStockDisplayCopyFromDescriptor({
           descriptor: copy.differentNamesExplicitConnections,

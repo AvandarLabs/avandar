@@ -19,14 +19,16 @@ export function CaseMap({ input, frame, accent }: Readonly<Props>): ReactNode {
         fill={STOCK.surface}
       />
       <InvestigationBracket input={input} frame={frame} accent={accent} />
-      {getCasePositionsFromInput(input).map((position) => (
-        <CasePin
-          key={position.record.id}
-          position={position}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {getCasePositionsFromInput(input).map((position) => {
+        return (
+          <CasePin
+            key={position.record.id}
+            position={position}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

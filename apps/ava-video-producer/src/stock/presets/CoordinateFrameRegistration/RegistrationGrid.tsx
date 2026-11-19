@@ -23,14 +23,16 @@ export function RegistrationGrid({
         fill="none"
         stroke={STOCK.line}
       />
-      {[0, 1, 2, 3, 4].map((tick) => (
-        <path
-          key={tick}
-          d={`M${x + tick * 60} 185 V425 M${x} ${185 + tick * 60} H${x + 240}`}
-          stroke={STOCK.line}
-          opacity={ramp(frame, 13, 39)}
-        />
-      ))}
+      {[0, 1, 2, 3, 4].map((tick) => {
+        return (
+          <path
+            key={tick}
+            d={`M${x + tick * 60} 185 V425 M${x} ${185 + tick * 60} H${x + 240}`}
+            stroke={STOCK.line}
+            opacity={ramp(frame, 13, 39)}
+          />
+        );
+      })}
       <RegistrationAxes x={x} index={index} />
     </g>
   );

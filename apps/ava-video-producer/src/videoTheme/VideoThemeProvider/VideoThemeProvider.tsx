@@ -40,11 +40,12 @@ export function VideoThemeProvider({
   children,
   element = "div",
 }: Props) {
-  const theme = useMemo(
-    () => makeResolvedVideoThemeFromSource(source),
-    [source],
-  );
-  const value = useMemo(() => ({ theme, source }), [theme, source]);
+  const theme = useMemo(() => {
+    return makeResolvedVideoThemeFromSource(source);
+  }, [source]);
+  const value = useMemo(() => {
+    return { theme, source };
+  }, [theme, source]);
   const style = _styleFromTheme(theme);
   const content = (
     <MantineThemeProvider theme={theme.mantine} inherit={false}>

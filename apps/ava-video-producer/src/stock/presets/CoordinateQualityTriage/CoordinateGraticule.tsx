@@ -13,14 +13,16 @@ export function CoordinateGraticule(): ReactNode {
         fill="none"
         stroke={STOCK.line}
       />
-      {[0, 1, 2, 3, 4].map((index) => (
-        <path
-          key={index}
-          d={`M${50 + index * 85} 180 V390 M50 ${180 + index * 52.5} H390`}
-          stroke={STOCK.line}
-          strokeOpacity={0.5}
-        />
-      ))}
+      {[0, 1, 2, 3, 4].map((index) => {
+        return (
+          <path
+            key={index}
+            d={`M${50 + index * 85} 180 V390 M50 ${180 + index * 52.5} H390`}
+            stroke={STOCK.line}
+            strokeOpacity={0.5}
+          />
+        );
+      })}
       <Text x={50} y={410} size={12}>
         −180
       </Text>

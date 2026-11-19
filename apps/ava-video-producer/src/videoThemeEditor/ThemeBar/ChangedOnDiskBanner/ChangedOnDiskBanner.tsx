@@ -66,21 +66,23 @@ export function ChangedOnDiskBanner({ onKeep, onDiscard, onReload }: Props) {
         }
       </p>
       <ul className={css.bannerChoices}>
-        {choices.map((choice) => (
-          <Choice
-            key={choice.label}
-            action={
-              <Button
-                size="compact-xs"
-                variant={choice.variant}
-                onClick={choice.onClick}
-              >
-                {choice.label}
-              </Button>
-            }
-            note={choice.note}
-          />
-        ))}
+        {choices.map((choice) => {
+          return (
+            <Choice
+              key={choice.label}
+              action={
+                <Button
+                  size="compact-xs"
+                  variant={choice.variant}
+                  onClick={choice.onClick}
+                >
+                  {choice.label}
+                </Button>
+              }
+              note={choice.note}
+            />
+          );
+        })}
       </ul>
     </Alert>
   );

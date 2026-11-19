@@ -87,13 +87,15 @@ export function RemotionRoot() {
       />
       <Composition
         id="demo"
-        component={() => (
-          <Clip
-            body={<Demo />}
-            name="Acme Studio"
-            kicker="Ask a question, publish the answer"
-          />
-        )}
+        component={() => {
+          return (
+            <Clip
+              body={<Demo />}
+              name="Acme Studio"
+              kicker="Ask a question, publish the answer"
+            />
+          );
+        }}
         durationInFrames={DEMO_LEN + TITLE_LEN}
         fps={FPS}
         width={WIDTH}
@@ -109,13 +111,15 @@ export function RemotionRoot() {
       />
       <Composition
         id="motion-lab"
-        component={() => (
-          <Clip
-            body={<MotionLab />}
-            name="Motion vocabulary"
-            kicker="Four building blocks, one visual language"
-          />
-        )}
+        component={() => {
+          return (
+            <Clip
+              body={<MotionLab />}
+              name="Motion vocabulary"
+              kicker="Four building blocks, one visual language"
+            />
+          );
+        }}
         durationInFrames={MOTION_LAB_LEN + TITLE_LEN}
         fps={FPS}
         width={WIDTH}

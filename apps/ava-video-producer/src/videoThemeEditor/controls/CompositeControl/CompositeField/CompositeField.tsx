@@ -19,8 +19,9 @@ export function CompositeField({ row, label, name, field, value }: Props) {
   const editor = useTokenEditor();
   const fieldName = getFieldName(name);
   const fieldLabel = `${label}, ${fieldName}`;
-  const write = (fieldValue: unknown) =>
-    editor.setToken(row.path, { ...value, [name]: fieldValue });
+  const write = (fieldValue: unknown) => {
+    return editor.setToken(row.path, { ...value, [name]: fieldValue });
+  };
   return (
     <div className={css.compositeField}>
       <span className={css.compositeFieldName} aria-hidden="true">

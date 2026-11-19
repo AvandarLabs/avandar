@@ -41,11 +41,11 @@ function _getVisibleTexts({
     input.labels.readers,
     input.caption,
     ...input.learners.map(prop("label")),
-    ...input.books.flatMap((book) =>
-      frame >= (input.startingShelf === "side" ? 118 : 108)
+    ...input.books.flatMap((book) => {
+      return frame >= (input.startingShelf === "side" ? 118 : 108)
         ? [book.label, book.pageLabel]
-        : [book.label],
-    ),
+        : [book.label];
+    }),
   ];
 }
 
@@ -66,21 +66,27 @@ function _bookPositions(markup: string): number[][] {
     ...markup.matchAll(
       /data-book-id="[^"]+" transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
     ),
-  ].map((match) => [Number(match[1]), Number(match[2])]);
+  ].map((match) => {
+    return [Number(match[1]), Number(match[2])];
+  });
 }
 
 function _createCrossingInput(): Input {
   return {
     ...DEFAULT_INPUT,
-    learners: Array.from({ length: 8 }, (_, index) => ({
-      id: `l${index}`,
-      label: `Learner ${index + 1}`,
-    })),
-    books: Array.from({ length: 3 }, (_, index) => ({
-      id: `b${index}`,
-      label: `Book ${index + 1}`,
-      pageLabel: `Passage ${index + 1}`,
-    })),
+    learners: Array.from({ length: 8 }, (_, index) => {
+      return {
+        id: `l${index}`,
+        label: `Learner ${index + 1}`,
+      };
+    }),
+    books: Array.from({ length: 3 }, (_, index) => {
+      return {
+        id: `b${index}`,
+        label: `Book ${index + 1}`,
+        pageLabel: `Passage ${index + 1}`,
+      };
+    }),
     readingGroups: [
       { bookId: "b2", learnerIds: ["l7"] },
       { bookId: "b0", learnerIds: ["l0", "l1", "l2", "l3"] },
@@ -135,10 +141,30 @@ function _getBoundsFromPoints({
   stroke: number;
 }): Bounds {
   return {
-    left: Math.min(...points.map(([x]) => x)) - stroke,
-    right: Math.max(...points.map(([x]) => x)) + stroke,
-    top: Math.min(...points.map(([, y]) => y)) - stroke,
-    bottom: Math.max(...points.map(([, y]) => y)) + stroke,
+    left:
+      Math.min(
+        ...points.map(([x]) => {
+          return x;
+        }),
+      ) - stroke,
+    right:
+      Math.max(
+        ...points.map(([x]) => {
+          return x;
+        }),
+      ) + stroke,
+    top:
+      Math.min(
+        ...points.map(([, y]) => {
+          return y;
+        }),
+      ) - stroke,
+    bottom:
+      Math.max(
+        ...points.map(([, y]) => {
+          return y;
+        }),
+      ) + stroke,
   };
 }
 
@@ -150,7 +176,9 @@ function _getReaderShapeBounds(segment: string): Bounds[] {
   const scale = Number(person[1]);
   const radius = (Number(person[4]) + Number(person[2]) / 2) * scale;
   const centerY = Number(person[3]) * scale;
-  const body = _pathPoints(person[5]).map(([x, y]) => [x * scale, y * scale]);
+  const body = _pathPoints(person[5]).map(([x, y]) => {
+    return [x * scale, y * scale];
+  });
   const seat = segment.match(/data-reading-seat="[^"]+" d="([^"]+)"/);
   assert.ok(seat);
   return [
@@ -208,12 +236,14 @@ function _getReaderBounds({
   const shapes = [
     ..._getReaderShapeBounds(segment),
     _getReaderKeyBounds({ segment, key }),
-  ].map((shape) => ({
-    left: shape.left + x,
-    right: shape.right + x,
-    top: shape.top + y,
-    bottom: shape.bottom + y,
-  }));
+  ].map((shape) => {
+    return {
+      left: shape.left + x,
+      right: shape.right + x,
+      top: shape.top + y,
+      bottom: shape.bottom + y,
+    };
+  });
   return {
     identityBounds: [shapes[0], shapes[3]],
     left: Math.min(...shapes.map(prop("left"))),
@@ -232,31 +262,31 @@ function _assertReaderSeparation({
 }): void {
   const markup = _render({ frame: frame, input: input });
   assert.equal(_bookPositions(markup).length, input.books.length);
-  _bookPositions(markup).forEach(([, bookY]) =>
-    assert.ok(
+  _bookPositions(markup).forEach(([, bookY]) => {
+    return assert.ok(
       bookY - 20 > 188.6,
       `${input.startingShelf} frame ${frame}: book enters maximum-label roster rail`,
-    ),
-  );
-  input.learners.forEach(({ id }) =>
-    assert.equal(markup.split(`data-reader-id="${id}"`).length - 1, 1),
-  );
-  const bounds = input.learners.map((learner, index) =>
-    _getReaderBounds({ markup, id: learner.id, key: String(index + 1) }),
-  );
+    );
+  });
+  input.learners.forEach(({ id }) => {
+    return assert.equal(markup.split(`data-reader-id="${id}"`).length - 1, 1);
+  });
+  const bounds = input.learners.map((learner, index) => {
+    return _getReaderBounds({ markup, id: learner.id, key: String(index + 1) });
+  });
   bounds.forEach((reader, index) => {
     _bookPositions(markup).forEach(([bookX, bookY]) => {
       const openingStart = input.startingShelf === "front" ? 94 : 104;
       const halfWidth = frame <= openingStart ? 23 : 41;
-      reader.identityBounds.forEach((identity) =>
-        assert.ok(
+      reader.identityBounds.forEach((identity) => {
+        return assert.ok(
           identity.right <= bookX - halfWidth ||
             identity.left >= bookX + halfWidth ||
             identity.bottom <= bookY - 22 ||
             identity.top >= bookY + 24,
           `${input.startingShelf} frame ${frame}: book obscures reader ${index + 1} head or key`,
-        ),
-      );
+        );
+      });
     });
     assert.ok(
       reader.left >= 0 &&
@@ -312,24 +342,32 @@ function _createRouteInputs(): Input[] {
       readingGroups.splice(largeGroupIndex, 0, denseInput.readingGroups[0]);
       return { ...denseInput, readingGroups };
     }),
-    ...groups.map((members) => ({
-      ...exact,
-      learners: exact.learners.map((learner) => ({
-        ...learner,
-        label: "界".repeat(16),
-      })),
-      books: books.map((book) => ({
-        ...book,
-        label: "界".repeat(22),
-        pageLabel: "界".repeat(28),
-      })),
-      labels: denseInput.labels,
-      caption: denseInput.caption,
-      readingGroups: members.map((learnerIds, index) => ({
-        bookId: `b${3 - index}`,
-        learnerIds,
-      })),
-    })),
+    ...groups.map((members) => {
+      return {
+        ...exact,
+        learners: exact.learners.map((learner) => {
+          return {
+            ...learner,
+            label: "界".repeat(16),
+          };
+        }),
+        books: books.map((book) => {
+          return {
+            ...book,
+            label: "界".repeat(22),
+            pageLabel: "界".repeat(28),
+          };
+        }),
+        labels: denseInput.labels,
+        caption: denseInput.caption,
+        readingGroups: members.map((learnerIds, index) => {
+          return {
+            bookId: `b${3 - index}`,
+            learnerIds,
+          };
+        }),
+      };
+    }),
   ];
 }
 export {

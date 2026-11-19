@@ -17,7 +17,9 @@ export function PickAnotherButton({ name, isColor, containerRef }: Props) {
       size="compact-xs"
       variant="light"
       aria-label={`Pick another for ${name}`}
-      onClick={() => containerRef.current?.querySelector("input")?.focus()}
+      onClick={() => {
+        return containerRef.current?.querySelector("input")?.focus();
+      }}
     >
       {isColor ? "Pick a colour" : "Pick a value"}
     </Button>

@@ -46,9 +46,9 @@ function _parseArgs(
   }
   return {
     themeId,
-    ids: argv.filter(
-      (_, position) => position !== flag && position !== flag + 1,
-    ),
+    ids: argv.filter((_, position) => {
+      return position !== flag && position !== flag + 1;
+    }),
   };
 }
 
@@ -64,7 +64,9 @@ async function _loadPosterFilms(
   themeId: string,
 ): Promise<readonly Film[]> {
   const entries = ids.length
-    ? CONTINUITY_CATALOG.filter((entry) => ids.includes(entry.id))
+    ? CONTINUITY_CATALOG.filter((entry) => {
+        return ids.includes(entry.id);
+      })
     : CONTINUITY_CATALOG;
   if (entries.length !== (ids.length || CONTINUITY_CATALOG.length)) {
     throw new Error("Unknown Atlas composition id");
@@ -72,13 +74,13 @@ async function _loadPosterFilms(
   // Camera travel blurs a still; with it off, a poster shows the sharp wide
   // composition. Plain storyboard scenes have no camera options.
   return Promise.all(
-    entries.map((entry) =>
-      ShowcaseFilms.load(entry.id, {
+    entries.map((entry) => {
+      return ShowcaseFilms.load(entry.id, {
         captions: false,
         theme: { id: themeId },
         ...(isSceneEntry(entry) ? {} : { cameraMotion: false }),
-      }),
-    ),
+      });
+    }),
   );
 }
 

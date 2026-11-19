@@ -14,27 +14,27 @@ export function MissedVisitReconnect({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const workerPosition = input.cases.reduce(
-    (position, _, index) =>
-      mix(
-        ramp(frame, 39 + index * 9, 7, EASE.inOut),
-        position,
-        160 + index * 48,
-      ),
-    160,
-  );
+  const workerPosition = input.cases.reduce((position, _, index) => {
+    return mix(
+      ramp(frame, 39 + index * 9, 7, EASE.inOut),
+      position,
+      160 + index * 48,
+    );
+  }, 160);
   return (
     <g>
       <ReconnectSetting input={input} />
-      {input.cases.map((item, index) => (
-        <ReconnectCase
-          key={item.id}
-          item={item}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.cases.map((item, index) => {
+        return (
+          <ReconnectCase
+            key={item.id}
+            item={item}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <g data-worker="outreach" opacity={ramp(frame, 39, 8)}>
         <PersonGlyph
           x={350}

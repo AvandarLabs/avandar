@@ -10,8 +10,8 @@ import {
  * No DataViz properties are selected or edited in this film.
  */
 export function useDataVizPBlockConfig() {
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    return {
       label: "Data Visualization",
       fields: {},
       defaultProps: {
@@ -26,7 +26,6 @@ export function useDataVizPBlockConfig() {
         localFilters: [],
       },
       render: FixtureDataViz,
-    }),
-    [],
-  );
+    };
+  }, []);
 }

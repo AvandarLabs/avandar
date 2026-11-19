@@ -22,10 +22,9 @@ export function elevationToBoxShadow(elevation: ResolvedElevation): string {
     return "none";
   }
   return elevation.layers
-    .map(
-      (layer) =>
-        `${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px ${layer.spread}px ${buildColorWithAlpha(elevation.color, layer.alpha)}`,
-    )
+    .map((layer) => {
+      return `${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px ${layer.spread}px ${buildColorWithAlpha(elevation.color, layer.alpha)}`;
+    })
     .join(", ");
 }
 
@@ -41,10 +40,9 @@ export function elevationToDropShadowFilter(
     return "none";
   }
   return elevation.layers
-    .map(
-      (layer) =>
-        `drop-shadow(${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px ${buildColorWithAlpha(elevation.color, layer.alpha)})`,
-    )
+    .map((layer) => {
+      return `drop-shadow(${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px ${buildColorWithAlpha(elevation.color, layer.alpha)})`;
+    })
     .join(" ");
 }
 

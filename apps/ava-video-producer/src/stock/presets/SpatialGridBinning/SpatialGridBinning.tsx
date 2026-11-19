@@ -31,29 +31,31 @@ export function SpatialGridBinning({
       <Text x={870} y={485} size={20} anchor="end">
         {input.points.length}
       </Text>
-      {input.points.map((point, index) => (
-        <g key={point.id}>
-          <Text
-            x={40 + (index % 4) * 220}
-            y={534 + Math.floor(index / 4) * 28}
-            size={12}
-          >
-            {index + 1}·
-          </Text>
-          <LabelSlots
-            labels={[
-              [
-                point.id,
-                68 + (index % 4) * 220,
-                534 + Math.floor(index / 4) * 28,
-                180,
-                12,
-                1,
-              ],
-            ]}
-          />
-        </g>
-      ))}
+      {input.points.map((point, index) => {
+        return (
+          <g key={point.id}>
+            <Text
+              x={40 + (index % 4) * 220}
+              y={534 + Math.floor(index / 4) * 28}
+              size={12}
+            >
+              {index + 1}·
+            </Text>
+            <LabelSlots
+              labels={[
+                [
+                  point.id,
+                  68 + (index % 4) * 220,
+                  534 + Math.floor(index / 4) * 28,
+                  180,
+                  12,
+                  1,
+                ],
+              ]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

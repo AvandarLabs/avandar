@@ -20,32 +20,34 @@ export function CacheRequestCards({
   const { color } = useGraphicTokens();
   return (
     <g>
-      {input.requests.map((request, index) => (
-        <g key={index}>
-          <StockRect
-            x={60 + index * 440}
-            y={54}
-            width={400}
-            height={124}
-            rx={style.cardRadius}
-            fill={color.elevated}
-            stroke={index === 0 && frame >= 40 ? accent : color.line}
-            strokeWidth={style.cardStrokeWidth}
-          />
-          <LabelSlots
-            labels={[[request.label, 80 + index * 440, 82, 330, 18, 3]]}
-          />
-          {index === 0 && frame >= 40 ? (
-            <path
-              data-covered="true"
-              d="M420 132 l10 10 l18 -26"
-              stroke={accent}
-              strokeWidth={style.checkWidth}
-              fill="none"
+      {input.requests.map((request, index) => {
+        return (
+          <g key={index}>
+            <StockRect
+              x={60 + index * 440}
+              y={54}
+              width={400}
+              height={124}
+              rx={style.cardRadius}
+              fill={color.elevated}
+              stroke={index === 0 && frame >= 40 ? accent : color.line}
+              strokeWidth={style.cardStrokeWidth}
             />
-          ) : undefined}
-        </g>
-      ))}
+            <LabelSlots
+              labels={[[request.label, 80 + index * 440, 82, 330, 18, 3]]}
+            />
+            {index === 0 && frame >= 40 ? (
+              <path
+                data-covered="true"
+                d="M420 132 l10 10 l18 -26"
+                stroke={accent}
+                strokeWidth={style.checkWidth}
+                fill="none"
+              />
+            ) : undefined}
+          </g>
+        );
+      })}
     </g>
   );
 }

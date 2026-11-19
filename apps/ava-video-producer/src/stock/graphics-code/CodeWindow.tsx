@@ -26,16 +26,18 @@ export function CodeWindow({
         stroke={color.line}
         strokeWidth={style.dividerWidth}
       />
-      {Array.from({ length: DOT_COUNT }, (_, i) => (
-        <circle
-          key={i}
-          cx={95 + i * DOT_SPACING}
-          cy={138}
-          r={style.dotRadius}
-          fill={color.inactive}
-          fillOpacity={style.dotAlpha}
-        />
-      ))}
+      {Array.from({ length: DOT_COUNT }, (_, i) => {
+        return (
+          <circle
+            key={i}
+            cx={95 + i * DOT_SPACING}
+            cy={138}
+            r={style.dotRadius}
+            fill={color.inactive}
+            fillOpacity={style.dotAlpha}
+          />
+        );
+      })}
       <Text role="footnote" x={480} y={144} anchor="middle">
         {title}
       </Text>

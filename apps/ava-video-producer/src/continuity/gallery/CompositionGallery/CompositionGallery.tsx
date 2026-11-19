@@ -59,7 +59,9 @@ export function CompositionGallery({ section }: Props) {
   );
   const { selection, open, previous, next } = gallery;
   const categories = countCompositionCategories(selection.family).map(
-    (category) => ({ ...category, label: categoryLabel(category.id) }),
+    (category) => {
+      return { ...category, label: categoryLabel(category.id) };
+    },
   );
   return (
     <>
@@ -73,7 +75,9 @@ export function CompositionGallery({ section }: Props) {
           label={copy.navigation}
           eyebrow="BROWSE THE COLLECTION"
           allLabel={copy.all}
-          total={categories.reduce((total, item) => total + item.count, 0)}
+          total={categories.reduce((total, item) => {
+            return total + item.count;
+          }, 0)}
           categories={categories}
           selected={selection.category}
           onSelect={gallery.chooseCategory}
@@ -83,8 +87,9 @@ export function CompositionGallery({ section }: Props) {
           title={copy.title}
           description={copy.description}
           heading={
-            categories.find((item) => item.id === selection.category)?.label ??
-            copy.all
+            categories.find((item) => {
+              return item.id === selection.category;
+            })?.label ?? copy.all
           }
           resultCount={gallery.entries.length}
           query={selection.query}
@@ -98,15 +103,17 @@ export function CompositionGallery({ section }: Props) {
           }}
           resetLabel={copy.all}
         >
-          {gallery.entries.map((entry) => (
-            <CompositionCard
-              key={entry.id}
-              entry={entry}
-              category={categoryLabel(entry.category)}
-              themeId={themeId}
-              onOpen={gallery.openEntry}
-            />
-          ))}
+          {gallery.entries.map((entry) => {
+            return (
+              <CompositionCard
+                key={entry.id}
+                entry={entry}
+                category={categoryLabel(entry.category)}
+                themeId={themeId}
+                onOpen={gallery.openEntry}
+              />
+            );
+          })}
         </AtlasCollection>
       </div>
       {open ? (
@@ -117,9 +124,19 @@ export function CompositionGallery({ section }: Props) {
           nextLabel="Next preview"
           onClose={gallery.close}
           onPrevious={
-            previous ? () => gallery.openEntry(previous.id) : undefined
+            previous
+              ? () => {
+                  return gallery.openEntry(previous.id);
+                }
+              : undefined
           }
-          onNext={next ? () => gallery.openEntry(next.id) : undefined}
+          onNext={
+            next
+              ? () => {
+                  return gallery.openEntry(next.id);
+                }
+              : undefined
+          }
         >
           <CompositionViewer
             selected={open}

@@ -20,7 +20,9 @@ import { ReferenceTray } from "./ReferenceTray";
 import { useMotionGalleryState } from "./useMotionGalleryState";
 
 const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
-  STOCK_CATALOG.map((preset, index) => [preset.id, index]),
+  STOCK_CATALOG.map((preset, index) => {
+    return [preset.id, index];
+  }),
 );
 
 /**
@@ -129,18 +131,20 @@ function MotionGallery() {
             </div>
             {results.length ? (
               <div className="motion-grid">
-                {results.map((preset) => (
-                  <MotionCard
-                    key={preset.id}
-                    preset={preset}
-                    index={PRESET_INDEX.get(preset.id) ?? 0}
-                    playing={playing && !selected}
-                    contentState={drafts[preset.id]}
-                    saved={saved.includes(preset.id)}
-                    onOpen={onOpen}
-                    onSave={onSave}
-                  />
-                ))}
+                {results.map((preset) => {
+                  return (
+                    <MotionCard
+                      key={preset.id}
+                      preset={preset}
+                      index={PRESET_INDEX.get(preset.id) ?? 0}
+                      playing={playing && !selected}
+                      contentState={drafts[preset.id]}
+                      saved={saved.includes(preset.id)}
+                      onOpen={onOpen}
+                      onSave={onSave}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <div className="empty-state">
@@ -164,7 +168,9 @@ function MotionGallery() {
                 </p>
                 <button
                   className="button"
-                  onClick={() => selectCategory("All motions")}
+                  onClick={() => {
+                    return selectCategory("All motions");
+                  }}
                 >
                   Explore all motions
                   <Icon name="arrow" size={16} />
@@ -207,10 +213,24 @@ function MotionGallery() {
           accent={selectedColors?.accent ?? accent}
           background={selectedColors?.background ?? background}
           preset={selected}
-          onPrevious={previousPreset ? () => onOpen(previousPreset) : undefined}
-          onNext={nextPreset ? () => onOpen(nextPreset) : undefined}
+          onPrevious={
+            previousPreset
+              ? () => {
+                  return onOpen(previousPreset);
+                }
+              : undefined
+          }
+          onNext={
+            nextPreset
+              ? () => {
+                  return onOpen(nextPreset);
+                }
+              : undefined
+          }
           contentState={contentState!}
-          onContentChange={(state) => updateContent(selected.id, state)}
+          onContentChange={(state) => {
+            return updateContent(selected.id, state);
+          }}
           saved={saved.includes(selected.id)}
           initialPlaying={playing}
           onClose={onClose}

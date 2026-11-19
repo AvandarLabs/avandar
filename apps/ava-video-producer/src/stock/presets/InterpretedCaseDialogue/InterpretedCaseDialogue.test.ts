@@ -89,8 +89,9 @@ registerStockPresetAssertions({
   contract,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
   textFrames: [24, 72, 150],
 });
 registerStockTextLayoutAssertions({
@@ -102,8 +103,8 @@ registerStockTextLayoutAssertions({
 });
 
 test("both layouts retain all supplied maximum CJK wordings without speaker substitution", () => {
-  (["paired", "stacked"] as const).forEach((bubbleLayout) =>
-    [true, false].forEach((showSightlines) => {
+  (["paired", "stacked"] as const).forEach((bubbleLayout) => {
+    return [true, false].forEach((showSightlines) => {
       const input = {
         ...fixtures[2].input,
         bubbleLayout,
@@ -138,24 +139,30 @@ test("both layouts retain all supplied maximum CJK wordings without speaker subs
       });
       const rectangles = [
         ...markup.matchAll(/<rect data-bubble="[^"]*"[^>]*>/g),
-      ].map(([r]) => ({
-        x: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "x" }),
-        y: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "y" }),
-        w: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "width" }),
-        h: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "height" }),
-      }));
-      rectangles.forEach((a, index) =>
-        rectangles
-          .slice(index + 1)
-          .forEach((b) =>
-            assert.ok(
-              a.x + a.w <= b.x ||
-                b.x + b.w <= a.x ||
-                a.y + a.h <= b.y ||
-                b.y + b.h <= a.y,
-            ),
-          ),
-      );
-    }),
-  );
+      ].map(([r]) => {
+        return {
+          x: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "x" }),
+          y: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "y" }),
+          w: SvgAttributes.getNumberFromMarkup({
+            attributes: r,
+            name: "width",
+          }),
+          h: SvgAttributes.getNumberFromMarkup({
+            attributes: r,
+            name: "height",
+          }),
+        };
+      });
+      rectangles.forEach((a, index) => {
+        return rectangles.slice(index + 1).forEach((b) => {
+          return assert.ok(
+            a.x + a.w <= b.x ||
+              b.x + b.w <= a.x ||
+              a.y + a.h <= b.y ||
+              b.y + b.h <= a.y,
+          );
+        });
+      });
+    });
+  });
 });

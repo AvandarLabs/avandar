@@ -46,20 +46,20 @@ function useVisibleRows(
   usedTokens: readonly string[] | undefined,
 ) {
   const toLabel = useTokenRowLabel();
-  return useMemo(
-    () =>
-      filterTokenRows({
-        rows,
-        filter: {
-          tiers:
-            filters.tier === "atomic" ? ["atomic", "mantine"] : [filters.tier],
-          query: filters.query,
-          usedTokens: filters.isUsedOnly ? usedTokens : undefined,
-          getText: (row) => `${toLabel(row)} ${row.definition.description}`,
+  return useMemo(() => {
+    return filterTokenRows({
+      rows,
+      filter: {
+        tiers:
+          filters.tier === "atomic" ? ["atomic", "mantine"] : [filters.tier],
+        query: filters.query,
+        usedTokens: filters.isUsedOnly ? usedTokens : undefined,
+        getText: (row) => {
+          return `${toLabel(row)} ${row.definition.description}`;
         },
-      }),
-    [rows, filters, usedTokens, toLabel],
-  );
+      },
+    });
+  }, [rows, filters, usedTokens, toLabel]);
 }
 
 /**
@@ -78,10 +78,9 @@ function useEditorFilters(
   const visibleRows = useVisibleRows(rows, filters, usedTokens);
   const showsEmptyScales =
     filters.tier === "atomic" && !filters.query && !filters.isUsedOnly;
-  const emptyGroups = useMemo(
-    () => (showsEmptyScales ? listEmptyAtomicScaleGroups(rows) : []),
-    [showsEmptyScales, rows],
-  );
+  const emptyGroups = useMemo(() => {
+    return showsEmptyScales ? listEmptyAtomicScaleGroups(rows) : [];
+  }, [showsEmptyScales, rows]);
   return { filters, setFilters, visibleRows, emptyGroups };
 }
 
@@ -95,10 +94,9 @@ function useItemTheme({
   draft,
   item,
 }: Pick<Props, "library" | "themeId" | "draft" | "item">) {
-  const itemScope = useMemo<ThemeEditScope>(
-    () => (item ? { kind: "item", itemId: item.id } : { kind: "theme" }),
-    [item],
-  );
+  const itemScope = useMemo<ThemeEditScope>(() => {
+    return item ? { kind: "item", itemId: item.id } : { kind: "theme" };
+  }, [item]);
   return useDraftTheme({ library, themeId, draft, scope: itemScope }).theme;
 }
 
@@ -116,28 +114,26 @@ function useEditorRows({
 >) {
   const draftTheme = useDraftTheme({ library, themeId, draft, scope });
   const itemTheme = useItemTheme({ library, themeId, draft, item });
-  const rows = useMemo(
-    () =>
-      listTokenRows({
-        library,
-        themeId,
-        draft,
-        scope,
-        merged: draftTheme.merged,
-        theme: draftTheme.theme,
-        ...(item ? { item: { id: item.id, theme: itemTheme } } : {}),
-      }),
-    [
+  const rows = useMemo(() => {
+    return listTokenRows({
       library,
       themeId,
       draft,
       scope,
-      draftTheme.merged,
-      draftTheme.theme,
-      item,
-      itemTheme,
-    ],
-  );
+      merged: draftTheme.merged,
+      theme: draftTheme.theme,
+      ...(item ? { item: { id: item.id, theme: itemTheme } } : {}),
+    });
+  }, [
+    library,
+    themeId,
+    draft,
+    scope,
+    draftTheme.merged,
+    draftTheme.theme,
+    item,
+    itemTheme,
+  ]);
   const context = useTokenEditorValue({
     draft,
     scope,

@@ -28,7 +28,9 @@ export function FontValueControl({
       error={hasIssue}
       data={data}
       value={String(value)}
-      onChange={(selectedOption) => selectedOption && onChange(selectedOption)}
+      onChange={(selectedOption) => {
+        return selectedOption && onChange(selectedOption);
+      }}
     />
   );
 }

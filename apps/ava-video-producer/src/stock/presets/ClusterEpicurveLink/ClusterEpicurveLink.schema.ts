@@ -67,7 +67,11 @@ export const inputSchema = z
         message: "Unknown focus bin.",
       });
     }
-    if (input.investigationCaseIds.some((id) => !caseIds.includes(id))) {
+    if (
+      input.investigationCaseIds.some((id) => {
+        return !caseIds.includes(id);
+      })
+    ) {
       context.addIssue({
         code: "custom",
         path: ["investigationCaseIds"],

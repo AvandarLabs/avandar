@@ -101,9 +101,9 @@ export function AvandarStage({
 }) {
   const contentWidth = width - 240;
   const contentHeight = height - 82;
-  const [initialHandle] = useState(() =>
-    delayRender("Avandar product fonts and initial layout"),
-  );
+  const [initialHandle] = useState(() => {
+    return delayRender("Avandar product fonts and initial layout");
+  });
   useLayoutEffect(
     function delayUntilFontsReady() {
       let alive = true;
@@ -121,7 +121,9 @@ export function AvandarStage({
   useLayoutEffect(
     function delayUntilControlledLayoutSettles() {
       const handle = delayRender("Avandar controlled component layout");
-      const timer = setTimeout(() => continueRender(handle), 100);
+      const timer = setTimeout(() => {
+        return continueRender(handle);
+      }, 100);
       return () => {
         clearTimeout(timer);
         continueRender(handle);
@@ -155,9 +157,11 @@ export function AvandarStage({
                 </Text>
                 <IconChevronDown size={18} />
               </Group>
-              {links.map((item) => (
-                <NavbarLinkItem key={item.link.key} item={item} isOnline />
-              ))}
+              {links.map((item) => {
+                return (
+                  <NavbarLinkItem key={item.link.key} item={item} isOnline />
+                );
+              })}
               <Box mt="auto">
                 <NavbarLinkItem
                   item={NavbarLinks.workspaceSettings("avandar-labs")}

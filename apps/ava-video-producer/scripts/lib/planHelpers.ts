@@ -48,9 +48,13 @@ export function assetReferences(plan: Storyboard): string[] {
   return [
     ...new Set([
       ...plan.shots.flatMap(_shotAssetReferences),
-      ...plan.narration.flatMap((cue) => (cue.audio ? [cue.audio] : [])),
+      ...plan.narration.flatMap((cue) => {
+        return cue.audio ? [cue.audio] : [];
+      }),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
-      ...plan.soundEffects.map((sound) => sound.src),
+      ...plan.soundEffects.map((sound) => {
+        return sound.src;
+      }),
     ]),
   ];
 }
@@ -66,8 +70,12 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
       return [shot.props.logo.src];
     case "tilted-window":
       return [
-        ...(shot.props.windows ?? []).map((window) => window.src),
-        ...(shot.props.pair ?? []).map((column) => column.window.src),
+        ...(shot.props.windows ?? []).map((window) => {
+          return window.src;
+        }),
+        ...(shot.props.pair ?? []).map((column) => {
+          return column.window.src;
+        }),
         ...(shot.props.secondary ? [shot.props.secondary.src] : []),
       ];
     default:
@@ -83,9 +91,9 @@ function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
       : undefined;
   const swaps =
     shot.scene === "tilted-window"
-      ? (shot.props.windows ?? []).flatMap((window) =>
-          window.atFrame === undefined ? [] : [window.atFrame + 2],
-        )
+      ? (shot.props.windows ?? []).flatMap((window) => {
+          return window.atFrame === undefined ? [] : [window.atFrame + 2];
+        })
       : [];
   return [
     ...(exitAt === undefined ? [] : [exitAt + 3]),
@@ -123,28 +131,34 @@ export function timestamp(frame: number, fps: number, separator = ","): string {
 export function captionFiles(plan: Storyboard) {
   const cues = absoluteCues(plan);
   const srt = cues
-    .map(
-      (cue, index) =>
-        `${index + 1}\n${timestamp(cue.startFrame, plan.fps)} --> ${timestamp(cue.endFrame, plan.fps)}\n${cue.text}\n`,
-    )
+    .map((cue, index) => {
+      return `${index + 1}\n${timestamp(cue.startFrame, plan.fps)} --> ${timestamp(cue.endFrame, plan.fps)}\n${cue.text}\n`;
+    })
     .join("\n");
   const vtt =
     "WEBVTT\n\n" +
     cues
-      .map(
-        (cue) =>
-          `${cue.id}\n${timestamp(cue.startFrame, plan.fps, ".")} --> ${timestamp(cue.endFrame, plan.fps, ".")}\n${cue.text}\n`,
-      )
+      .map((cue) => {
+        return `${cue.id}\n${timestamp(cue.startFrame, plan.fps, ".")} --> ${timestamp(cue.endFrame, plan.fps, ".")}\n${cue.text}\n`;
+      })
       .join("\n");
-  const transcript = `${plan.title}\n\n${cues.map((cue) => cue.text).join("\n\n")}\n`;
+  const transcript = `${plan.title}\n\n${cues
+    .map((cue) => {
+      return cue.text;
+    })
+    .join("\n\n")}\n`;
   return { srt, vtt, transcript };
 }
 
 export function shotList(plan: Storyboard): string {
   const lines = timeline(plan).map((shot) => {
     const cues = plan.narration
-      .filter((cue) => cue.shotId === shot.id)
-      .map((cue) => cue.text)
+      .filter((cue) => {
+        return cue.shotId === shot.id;
+      })
+      .map((cue) => {
+        return cue.text;
+      })
       .join(" ");
     const summary =
       shot.note ??
@@ -154,7 +168,11 @@ export function shotList(plan: Storyboard): string {
           shot.scene));
     return `| ${shot.startFrame} | ${(shot.startFrame / plan.fps).toFixed(2)} s | ${shot.id} | ${shot.scene} | ${shot.durationInFrames} | ${summary.replaceAll("|", "\\|")} | ${cues.replaceAll("|", "\\|")} |`;
   });
-  return `# ${plan.title}\n\n${plan.description}\n\n${durationInFrames(plan)} frames at ${plan.fps} fps (${(durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes.map((note) => `- ${note}`).join("\n")}\n`;
+  return `# ${plan.title}\n\n${plan.description}\n\n${durationInFrames(plan)} frames at ${plan.fps} fps (${(durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes
+    .map((note) => {
+      return `- ${note}`;
+    })
+    .join("\n")}\n`;
 }
 
 /** Import manually aligned SRT cues without pretending to perform speech recognition. */
@@ -190,10 +208,14 @@ export function applySrt(
     if (!times || times.length !== 2)
       throw new Error(`Invalid SRT cue ${index + 1}`);
     const cue = plan.narration[index];
-    const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+    const normalize = (value: string) => {
+      return value.replace(/\s+/g, " ").trim();
+    };
     if (normalize(lines.join(" ")) !== normalize(cue.text))
       throw new Error(`SRT text differs from narration cue ${cue.id}`);
-    const shot = shots.find((item) => item.id === cue.shotId)!;
+    const shot = shots.find((item) => {
+      return item.id === cue.shotId;
+    })!;
     const { audio: _audio, ...withoutAudio } = cue;
     return {
       ...withoutAudio,
@@ -214,10 +236,15 @@ export async function safeInputFile(
   filename: string,
   extensions: readonly string[],
 ): Promise<string> {
-  const allowed = (value: string) =>
-    !path.basename(value).startsWith(".") &&
-    !value.split(path.sep).some((part) => part.startsWith(".env")) &&
-    extensions.includes(path.extname(value).toLowerCase());
+  const allowed = (value: string) => {
+    return (
+      !path.basename(value).startsWith(".") &&
+      !value.split(path.sep).some((part) => {
+        return part.startsWith(".env");
+      }) &&
+      extensions.includes(path.extname(value).toLowerCase())
+    );
+  };
   if (!allowed(filename))
     throw new Error("Input file has a hidden name or unsupported extension");
   const resolved = await fs.realpath(filename);
@@ -237,9 +264,9 @@ export async function ensureDirectory(
   const parts = relative.split("/");
   if (
     path.isAbsolute(relative) ||
-    parts.some(
-      (part) => !part || part === "." || part === ".." || part.includes("\\"),
-    )
+    parts.some((part) => {
+      return !part || part === "." || part === ".." || part.includes("\\");
+    })
   ) {
     throw new Error("Output directory must be relative and cannot traverse");
   }
@@ -281,7 +308,9 @@ async function _rendererFiles(
     withFileTypes: true,
   });
   const files: string[] = [];
-  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const entry of entries.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  })) {
     const relative = `${directory}/${entry.name}`;
     if (entry.isSymbolicLink())
       throw new Error("Renderer source cannot contain symlinks");
@@ -397,11 +426,12 @@ export function previewFrames(plan: Storyboard): number[] {
       frames.add(Math.round(value));
   };
   for (const shot of timeline(plan)) {
-    const local = (value: number) =>
-      add(
+    const local = (value: number) => {
+      return add(
         shot.startFrame +
           Math.min(shot.durationInFrames - 1, Math.max(0, value)),
       );
+    };
     add(shot.startFrame - 1);
     for (const value of [
       0,
@@ -470,5 +500,7 @@ export function previewFrames(plan: Storyboard): number[] {
   }
   for (const cue of absoluteCues(plan))
     add(Math.floor((cue.startFrame + cue.endFrame) / 2));
-  return [...frames].sort((a, b) => a - b);
+  return [...frames].sort((a, b) => {
+    return a - b;
+  });
 }

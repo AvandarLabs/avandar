@@ -22,13 +22,17 @@ export function ThemePicker({
     <Group gap="xs" wrap="nowrap">
       <AtlasSelect
         aria-label="Theme"
-        data={themes.map(({ id, label, builtIn }) => ({
-          value: id,
-          label: builtIn ? `${label} (built-in)` : label,
-        }))}
+        data={themes.map(({ id, label, builtIn }) => {
+          return {
+            value: id,
+            label: builtIn ? `${label} (built-in)` : label,
+          };
+        })}
         value={themeId}
         disabled={isDisabled}
-        onChange={(id) => id && onSelectTheme(id)}
+        onChange={(id) => {
+          return id && onSelectTheme(id);
+        }}
       />
       {isDirty ? (
         <Badge size="sm" variant="light">

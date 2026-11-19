@@ -76,19 +76,21 @@ function _SingleWindow(
           props.enter.reveal,
         ).clipPath
       : undefined;
-  const card = (index: number, pose: WindowPose) => (
-    <WindowCard
-      key={`window-${index}-${windows[index].src}`}
-      frame={frame}
-      rect={rect}
-      pose={_combinePoses(base, pose, lens?.blurX ?? 0)}
-      source={windows[index]}
-      canvasHeight={height}
-      tilt={pullBack?.tilt ?? 1}
-      chrome={props.chrome}
-      clipPath={reveal}
-    />
-  );
+  const card = (index: number, pose: WindowPose) => {
+    return (
+      <WindowCard
+        key={`window-${index}-${windows[index].src}`}
+        frame={frame}
+        rect={rect}
+        pose={_combinePoses(base, pose, lens?.blurX ?? 0)}
+        source={windows[index]}
+        canvasHeight={height}
+        tilt={pullBack?.tilt ?? 1}
+        chrome={props.chrome}
+        clipPath={reveal}
+      />
+    );
+  };
   return (
     <>
       <div

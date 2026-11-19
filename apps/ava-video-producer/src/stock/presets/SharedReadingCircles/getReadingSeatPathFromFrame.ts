@@ -15,9 +15,8 @@ export function getReadingSeatPathFromFrame({
     [12, 0],
     [12, 10],
   ]
-    .map(
-      ([x, y], index) =>
-        `${index % 2 === 0 ? "M" : "L"}${x * Math.cos(rotation) - y * Math.sin(rotation)} ${pivotY + x * Math.sin(rotation) + y * Math.cos(rotation)}`,
-    )
+    .map(([x, y], index) => {
+      return `${index % 2 === 0 ? "M" : "L"}${x * Math.cos(rotation) - y * Math.sin(rotation)} ${pivotY + x * Math.sin(rotation) + y * Math.cos(rotation)}`;
+    })
     .join(" ");
 }

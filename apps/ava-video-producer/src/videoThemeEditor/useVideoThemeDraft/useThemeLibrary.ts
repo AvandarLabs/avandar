@@ -63,22 +63,24 @@ export function useThemeLibrary(): ThemeLibraryState {
       isCurrent = false;
     };
   }, []);
-  const library = useMemo(
-    () =>
-      createVideoThemeLibrary(
-        [...collection.stored.values()].map((entry) => entry.document),
-      ),
-    [collection.stored],
-  );
-  const storeTheme = useCallback(
-    (stored: StoredTheme) =>
-      setCollection((current) => ({
-        themes: current.themes.some((theme) => theme.id === stored.document.id)
+  const library = useMemo(() => {
+    return createVideoThemeLibrary(
+      [...collection.stored.values()].map((entry) => {
+        return entry.document;
+      }),
+    );
+  }, [collection.stored]);
+  const storeTheme = useCallback((stored: StoredTheme) => {
+    return setCollection((current) => {
+      return {
+        themes: current.themes.some((theme) => {
+          return theme.id === stored.document.id;
+        })
           ? current.themes
           : [...current.themes, _summaryFromDocument(stored.document)],
         stored: new Map([...current.stored, [stored.document.id, stored]]),
-      })),
-    [],
-  );
+      };
+    });
+  }, []);
   return { ...collection, library, storeTheme };
 }

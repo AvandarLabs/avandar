@@ -22,7 +22,9 @@ export function TierSwitch({ filters, onFiltersChange }: Props) {
         { value: "semantic", label: "Styles" },
         { value: "atomic", label: "Base values" },
       ]}
-      onChange={(tier) => onFiltersChange({ ...filters, tier })}
+      onChange={(tier) => {
+        return onFiltersChange({ ...filters, tier });
+      }}
     />
   );
 }

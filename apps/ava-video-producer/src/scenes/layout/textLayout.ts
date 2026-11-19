@@ -14,8 +14,8 @@ export function formatMetric(value: number, precision = 0): string {
 
 /** Conservative width estimate, used for a stable font size before rendering. */
 export function textUnits(text: string): number {
-  return Array.from(text).reduce(
-    (sum, character) =>
+  return Array.from(text).reduce((sum, character) => {
+    return (
       sum +
       (/[\s.,:;!'|ilI]/.test(character)
         ? 0.3
@@ -23,9 +23,9 @@ export function textUnits(text: string): number {
           ? 0.95
           : character.codePointAt(0)! > 0x2ff
             ? 1
-            : 0.62),
-    0,
-  );
+            : 0.62)
+    );
+  }, 0);
 }
 
 export function wrapText(
@@ -62,7 +62,9 @@ export function fitTextLines(
     throw new Error(`fontSize must be from ${minimum} to 160`);
   for (let size = requested; size >= minimum; size -= 1) {
     try {
-      const wrapped = lines.flatMap((line) => wrapText(line, width, size));
+      const wrapped = lines.flatMap((line) => {
+        return wrapText(line, width, size);
+      });
       if (wrapped.length && wrapped.length * size * 1.22 <= height)
         return { fontSize: size, lines: wrapped };
     } catch {
@@ -99,8 +101,9 @@ export function fitMetricContent({
   // Prefer the original spacious treatment; compact only when the whole stack needs it.
   for (let step = 0; step <= 24; step++) {
     const amount = step / 24;
-    const choose = (large: number, small: number) =>
-      Math.round(large + (small - large) * amount);
+    const choose = (large: number, small: number) => {
+      return Math.round(large + (small - large) * amount);
+    };
     const paddingY = choose(50, 20);
     const numberGap = choose(28, 12);
     const unitGap = choose(28, 14);

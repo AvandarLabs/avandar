@@ -51,7 +51,9 @@ export function TokenRowHeader({ row, label, isInherited, hasIssue }: Props) {
           variant="subtle"
           aria-label={`Reset ${label}`}
           title={`Reset ${label}`}
-          onClick={() => editor.resetToken(row.path)}
+          onClick={() => {
+            return editor.resetToken(row.path);
+          }}
         >
           <IconArrowBackUp size={14} aria-hidden="true" />
         </ActionIcon>

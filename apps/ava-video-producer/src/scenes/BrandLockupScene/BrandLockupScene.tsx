@@ -127,11 +127,13 @@ function _Mark({
     );
   }
   const rise = getMarkBuildProgress(frame, build, columns);
-  const flights = rise.map(
-    (_, index) =>
-      getFlightProgress(frame - index * STAGGER_COLUMN, exit).flight,
-  );
-  const meanFlight = flights.reduce((sum, value) => sum + value, 0) / columns;
+  const flights = rise.map((_, index) => {
+    return getFlightProgress(frame - index * STAGGER_COLUMN, exit).flight;
+  });
+  const meanFlight =
+    flights.reduce((sum, value) => {
+      return sum + value;
+    }, 0) / columns;
   const tilt = FLIGHT_TILT_DEGREES * Math.sin(Math.PI * meanFlight);
   const cover = getFlightProgress(frame, exit).cover;
   return (
@@ -207,16 +209,18 @@ function _LockupCta({
 }) {
   const cps = cta.commandCharsPerSecond ?? COMMAND_CHARS_PER_SECOND;
   const beats = getCtaBeats(cta, cps);
-  const line = (top: number, fontSize: number) => ({
-    position: "absolute" as const,
-    left: width * 0.1,
-    width: width * 0.8,
-    top: height * top,
-    textAlign: "center" as const,
-    fontSize,
-    lineHeight: 1.2,
-    whiteSpace: "nowrap" as const,
-  });
+  const line = (top: number, fontSize: number) => {
+    return {
+      position: "absolute" as const,
+      left: width * 0.1,
+      width: width * 0.8,
+      top: height * top,
+      textAlign: "center" as const,
+      fontSize,
+      lineHeight: 1.2,
+      whiteSpace: "nowrap" as const,
+    };
+  };
   const isTyping = frame >= beats.typingAt && frame < beats.typingEnd;
   return (
     <>

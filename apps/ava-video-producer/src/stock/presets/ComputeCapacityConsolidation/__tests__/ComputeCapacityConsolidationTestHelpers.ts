@@ -48,7 +48,9 @@ function _getVisibleTexts({
     input.decision.actionLabel,
     ...input.hosts.map(prop("label")),
     ...input.jobs.map(prop("label")),
-    `${input.copy.work}: ${input.jobs.reduce((sum, job) => sum + job.cpuHours, 0)} ${input.copy.unit}`,
+    `${input.copy.work}: ${input.jobs.reduce((sum, job) => {
+      return sum + job.cpuHours;
+    }, 0)} ${input.copy.unit}`,
     `${input.copy.occupied}: ${occupied} · ${input.copy[input.emptyHostState]}: ${input.hosts.length - occupied}`,
     input.copy.disclaimer,
     ...(frame >= 108 && occupied < input.hosts.length
@@ -91,12 +93,14 @@ function _getJobs({
     ..._render({ frame: frame, input: input }).matchAll(
       /<rect[^>]*data-job="\d+"[^>]*>/g,
     ),
-  ].map(([attributes]) => ({
-    x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-    y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-    width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-    height: SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
-  }));
+  ].map(([attributes]) => {
+    return {
+      x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+      y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+      width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+      height: SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
+    };
+  });
 }
 
 function _assertClear({

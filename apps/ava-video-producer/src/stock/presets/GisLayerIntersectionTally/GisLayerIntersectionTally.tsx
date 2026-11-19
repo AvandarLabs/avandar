@@ -37,18 +37,19 @@ export function GisLayerIntersectionTally({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const selected = input.households.map((household) =>
-    _isSelected({ input, household }),
-  );
-  const quantity = (household: Input["households"][number]) =>
-    input.measure === "members" ? household.members : 1;
-  const totalQuantity = input.households.reduce(
-    (total, household) => total + quantity(household),
-    0,
-  );
+  const selected = input.households.map((household) => {
+    return _isSelected({ input, household });
+  });
+  const quantity = (household: Input["households"][number]) => {
+    return input.measure === "members" ? household.members : 1;
+  };
+  const totalQuantity = input.households.reduce((total, household) => {
+    return total + quantity(household);
+  }, 0);
   const selectedQuantity = input.households.reduce(
-    (total, household, index) =>
-      total + (selected[index] ? quantity(household) : 0),
+    (total, household, index) => {
+      return total + (selected[index] ? quantity(household) : 0);
+    },
     0,
   );
   return (
@@ -61,16 +62,18 @@ export function GisLayerIntersectionTally({
         stroke={accent}
         strokeWidth={2}
       />
-      {input.households.map((household, index) => (
-        <HouseholdMarker
-          key={household.id}
-          household={household}
-          index={index}
-          frame={frame}
-          isSelected={selected[index]}
-          accent={accent}
-        />
-      ))}
+      {input.households.map((household, index) => {
+        return (
+          <HouseholdMarker
+            key={household.id}
+            household={household}
+            index={index}
+            frame={frame}
+            isSelected={selected[index]}
+            accent={accent}
+          />
+        );
+      })}
       <GisLabels
         input={input}
         selectedQuantity={selectedQuantity}

@@ -10,14 +10,16 @@ type Props = { input: Input; frame: number };
 export function SnapshotHeadings({ input, frame }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.table.columns.map((column, index) => (
-        <SnapshotColumnHeading
-          key={column.id}
-          input={input}
-          frame={frame}
-          index={index}
-        />
-      ))}
+      {input.table.columns.map((column, index) => {
+        return (
+          <SnapshotColumnHeading
+            key={column.id}
+            input={input}
+            frame={frame}
+            index={index}
+          />
+        );
+      })}
       <g
         data-revision={input.publication.revision}
         data-audience={input.publication.audience}

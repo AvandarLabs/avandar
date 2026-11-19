@@ -23,17 +23,19 @@ export function ZoneLids({ input, frame, accent }: Readonly<Props>): ReactNode {
         rx={8}
         fill={STOCK.surface}
       />
-      {input.zones.map((zone, index) => (
-        <ZoneLid
-          key={zone.id}
-          zone={zone}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-          lift={lift}
-        />
-      ))}
+      {input.zones.map((zone, index) => {
+        return (
+          <ZoneLid
+            key={zone.id}
+            zone={zone}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+            lift={lift}
+          />
+        );
+      })}
     </g>
   );
 }

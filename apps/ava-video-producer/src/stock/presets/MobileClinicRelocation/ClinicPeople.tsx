@@ -36,9 +36,9 @@ export function ClinicPeople({
       {input.people.map((person, index) => {
         const x = 62 + index * 114;
         const y = 418;
-        const slotIndex = input.slots.findIndex(
-          ({ id }) => id === person.slotId,
-        );
+        const slotIndex = input.slots.findIndex(({ id }) => {
+          return id === person.slotId;
+        });
         return (
           <g
             key={person.id}

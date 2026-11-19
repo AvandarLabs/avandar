@@ -32,13 +32,18 @@ export const inputSchema = z
     bubbleLayout: z.enum(["paired", "stacked"]),
   })
   .refine(
-    (input) => new Set(input.turns.map(prop("id"))).size === input.turns.length,
+    (input) => {
+      return new Set(input.turns.map(prop("id"))).size === input.turns.length;
+    },
     { path: ["turns"], message: "Turn IDs must be unique." },
   )
   .refine(
-    (input) =>
-      input.turns[0]?.speaker === "participant" &&
-      input.turns[1]?.speaker === "worker",
+    (input) => {
+      return (
+        input.turns[0]?.speaker === "participant" &&
+        input.turns[1]?.speaker === "worker"
+      );
+    },
     { path: ["turns"], message: "Turns must be participant then worker." },
   ) satisfies z.ZodType;
 /** Schema-inferred scene input. */

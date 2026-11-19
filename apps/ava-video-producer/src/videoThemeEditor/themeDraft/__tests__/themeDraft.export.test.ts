@@ -32,7 +32,9 @@ test("a snapshot carries custom themes in its chain and leaves built-ins to the 
     draft: EMPTY_THEME_DRAFT,
   });
   assert.deepEqual(
-    snapshot.documents.map((document) => document.id),
+    snapshot.documents.map((document) => {
+      return document.id;
+    }),
     ["studio"],
   );
   assert.deepEqual(snapshot.patches, []);
@@ -138,7 +140,9 @@ test("a built-in theme's draft snapshots as the unsaved theme that extends it", 
   });
   assert.equal(snapshot.themeId, DRAFT_THEME_ID);
   assert.deepEqual(
-    snapshot.documents.map((document) => document.extends),
+    snapshot.documents.map((document) => {
+      return document.extends;
+    }),
     ["classic"],
   );
 });

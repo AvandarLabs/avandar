@@ -47,17 +47,19 @@ const textLayoutOptions = {
   fixtures,
   render: _render,
   excludedTextFields: ["id", "visitId", "state", "emphasis"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    input.copy.baseline,
-    ...input.visits.map(prop("label")),
-    ...input.participants.map(prop("label")),
-    input.copy.recorded,
-    input.copy.missed,
-    input.copy.notDue,
-    input.copy.unknown,
-    ...(input.showFractions ? [input.copy.retained] : []),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      input.copy.baseline,
+      ...input.visits.map(prop("label")),
+      ...input.participants.map(prop("label")),
+      input.copy.recorded,
+      input.copy.missed,
+      input.copy.notDue,
+      input.copy.unknown,
+      ...(input.showFractions ? [input.copy.retained] : []),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -82,26 +84,29 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
     input.participants.length,
   );
   input.visits.forEach((visit) => {
-    const numerator = input.participants.filter((person) =>
-      person.records.some(
-        (record) => record.visitId === visit.id && record.state === "recorded",
-      ),
-    ).length;
+    const numerator = input.participants.filter((person) => {
+      return person.records.some((record) => {
+        return record.visitId === visit.id && record.state === "recorded";
+      });
+    }).length;
     assert.ok(
       markup.includes(`>${numerator}/${input.participants.length}</text>`),
     );
   });
   assert.match(markup, />3\/6<\/text>/);
-  const translations = (value: string) =>
-    Array.from(
+  const translations = (value: string) => {
+    return Array.from(
       value.matchAll(
         /data-cohort-person="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
       ),
-    ).map((match) => match.slice(1));
+    ).map((match) => {
+      return match.slice(1);
+    });
+  };
   const expected = translations(markup);
   ["all-records", "missed-and-returned", "unknown-records"].forEach(
-    (emphasis) =>
-      assert.deepEqual(
+    (emphasis) => {
+      return assert.deepEqual(
         translations(
           _render({
             frame: 150,
@@ -109,33 +114,39 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
           }),
         ),
         expected,
-      ),
+      );
+    },
   );
-  [24, 36, 54, 72, 94, 116, 150].forEach((frame) =>
-    translations(_render({ frame: frame, input: fixtures[2].input })).forEach(
-      ([, x, y]) => {
-        assert.ok(Number(x) - 8 >= 270 && Number(x) + 8 < 920);
-        assert.ok(Number(y) - 11 >= 160 && Number(y) + 14 < 480);
-      },
-    ),
-  );
+  [24, 36, 54, 72, 94, 116, 150].forEach((frame) => {
+    return translations(
+      _render({ frame: frame, input: fixtures[2].input }),
+    ).forEach(([, x, y]) => {
+      assert.ok(Number(x) - 8 >= 270 && Number(x) + 8 < 920);
+      assert.ok(Number(y) - 11 >= 160 && Number(y) + 14 < 480);
+    });
+  });
   assert.notDeepEqual(
     translations(_render({ frame: 24, input: input })),
     expected,
   );
   input.participants.forEach((person) => {
     const recorded = input.visits
-      .map((visit, index) =>
-        person.records.some(
-          (record) =>
-            record.visitId === visit.id && record.state === "recorded",
-        )
+      .map((visit, index) => {
+        return person.records.some((record) => {
+          return record.visitId === visit.id && record.state === "recorded";
+        })
           ? index
-          : -1,
-      )
-      .filter((index) => index >= 0);
+          : -1;
+      })
+      .filter((index) => {
+        return index >= 0;
+      });
     assert.equal(
-      Number(expected.find(([id]) => id === person.id)?.[1]),
+      Number(
+        expected.find(([id]) => {
+          return id === person.id;
+        })?.[1],
+      ),
       recorded.length ? 380 + Math.max(...recorded) * 155 : 285,
     );
   });
@@ -152,13 +163,17 @@ test("missed-and-returned accents only chronologically later records regardless 
     const input = inputSchema.parse({
       ...DEFAULT_INPUT,
       emphasis: "missed-and-returned",
-      participants: DEFAULT_INPUT.participants.map((person) => ({
-        ...person,
-        records: sequence.map((state, index) => ({
-          visitId: DEFAULT_INPUT.visits[index].id,
-          state,
-        })),
-      })),
+      participants: DEFAULT_INPUT.participants.map((person) => {
+        return {
+          ...person,
+          records: sequence.map((state, index) => {
+            return {
+              visitId: DEFAULT_INPUT.visits[index].id,
+              state,
+            };
+          }),
+        };
+      }),
     });
     const expectedColors =
       sequence[1] === "missed"
@@ -171,30 +186,39 @@ test("missed-and-returned accents only chronologically later records regardless 
       ),
     );
     assert.deepEqual(
-      marks.slice(0, 3).map((match) => match[1]),
+      marks.slice(0, 3).map((match) => {
+        return match[1];
+      }),
       input.visits.map(prop("id")),
     );
     assert.deepEqual(
-      marks.slice(0, 3).map((match) => match[2]),
+      marks.slice(0, 3).map((match) => {
+        return match[2];
+      }),
       expectedColors,
     );
     const reordered = {
       ...input,
-      participants: input.participants.map((person) => ({
-        ...person,
-        records: [...person.records].reverse(),
-      })),
+      participants: input.participants.map((person) => {
+        return {
+          ...person,
+          records: [...person.records].reverse(),
+        };
+      }),
     };
     assert.equal(_render({ frame: 150, input: reordered }), markup);
     const allRecords = _render({
       frame: 150,
       input: { ...input, emphasis: "all-records" },
     });
-    const people = (svg: string) =>
-      Array.from(
+    const people = (svg: string) => {
+      return Array.from(
         svg.matchAll(/data-cohort-person="[^"]*" transform="[^"]*"/g),
-        (match) => match[0],
+        (match) => {
+          return match[0];
+        },
       );
+    };
     assert.deepEqual(people(markup), people(allRecords));
     assert.equal((markup.match(/data-denominator="6"/g) ?? []).length, 3);
   });

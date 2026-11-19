@@ -49,9 +49,9 @@ export const inputSchema = z
       });
     }
     if (
-      input.topics.some(
-        (topic) => !input.people.some(propEq("id", topic.expertId)),
-      )
+      input.topics.some((topic) => {
+        return !input.people.some(propEq("id", topic.expertId));
+      })
     ) {
       context.addIssue({
         code: "custom",

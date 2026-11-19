@@ -34,10 +34,11 @@ const render: ({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
-test("complete rejection fixtures reject structural and reference violations", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("complete rejection fixtures reject structural and reference violations", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 test("retest resumes actual outlet flow without turning an untested repair into success", () => {
   ["stopped", "still-leaking", "not-tested"].forEach((retest) => {
     const input: Input = {
@@ -198,8 +199,8 @@ test("supplied multilingual prose and literal punctuation remain unchanged", () 
 });
 
 test("an unperformed retest retains repair copy and never paints a performed test phase", () => {
-  [true, false].forEach((showPhaseCaptions) =>
-    [120, 150, 167].forEach((frame) => {
+  [true, false].forEach((showPhaseCaptions) => {
+    return [120, 150, 167].forEach((frame) => {
       const markup = render({
         frame: frame,
         input: {
@@ -222,8 +223,8 @@ test("an unperformed retest retains repair copy and never paints a performed tes
           phase.includes(`aria-label="${DEFAULT_INPUT.labels.repair}"`),
         );
       }
-    }),
-  );
+    });
+  });
 });
 
 test("serialized controls preserve the reviewed pre-extraction bounds and message identities", () => {

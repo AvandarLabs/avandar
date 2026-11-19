@@ -50,14 +50,16 @@ export function ReportHeader({
   return (
     <g data-report-header="first-page" opacity={ramp(frame, 38, 30)}>
       <ReportHeaderPaper x={x} y={y} margins={margins} />
-      {labels.map((label) => (
-        <FitText
-          key={`${label.y}:${label.anchor ?? "start"}`}
-          {...label}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={`${label.y}:${label.anchor ?? "start"}`}
+            {...label}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

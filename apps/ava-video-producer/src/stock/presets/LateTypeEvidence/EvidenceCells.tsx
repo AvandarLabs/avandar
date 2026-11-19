@@ -19,34 +19,36 @@ export function EvidenceCells({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.values.map((value, index) => (
-        <g key={`${index}:${value}`}>
-          <rect
-            x={64}
-            y={225 + index * 50}
-            width={330}
-            height={42}
-            fill="none"
-            stroke={STOCK.line}
-          />
-          <rect
-            x={540}
-            y={225 + index * 50}
-            width={330}
-            height={42}
-            fill="none"
-            stroke={STOCK.line}
-          />
-          <EvidenceSourceCell input={input} index={index} frame={frame} />
-          <EvidenceOutputCell
-            input={input}
-            index={index}
-            frame={frame}
-            accent={accent}
-            background={background}
-          />
-        </g>
-      ))}
+      {input.values.map((value, index) => {
+        return (
+          <g key={`${index}:${value}`}>
+            <rect
+              x={64}
+              y={225 + index * 50}
+              width={330}
+              height={42}
+              fill="none"
+              stroke={STOCK.line}
+            />
+            <rect
+              x={540}
+              y={225 + index * 50}
+              width={330}
+              height={42}
+              fill="none"
+              stroke={STOCK.line}
+            />
+            <EvidenceSourceCell input={input} index={index} frame={frame} />
+            <EvidenceOutputCell
+              input={input}
+              index={index}
+              frame={frame}
+              accent={accent}
+              background={background}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

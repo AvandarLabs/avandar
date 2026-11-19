@@ -44,7 +44,9 @@ test("storage lid stays closed without loss and joins smoothly before planting",
     );
     Array.from(
       { length: Math.max(0, Math.floor((111 - 56) / 0.25) + 1) },
-      (_, sampleIndex) => 56 + sampleIndex * 0.25,
+      (_, sampleIndex) => {
+        return 56 + sampleIndex * 0.25;
+      },
     ).forEach((frame) => {
       const current = _lid({ frame, input });
       assert.ok(current >= 250 && current <= 286);
@@ -65,7 +67,9 @@ test("storage lid stays closed without loss and joins smoothly before planting",
 
 test("loss lid closes only after the full material shape clears its opening", () => {
   Array.from(
-    _lossInputs().filter((value) => value.crop.storageLossQuantity > 0),
+    _lossInputs().filter((value) => {
+      return value.crop.storageLossQuantity > 0;
+    }),
   ).forEach((input) => {
     assert.equal(
       _lid({ frame: 74, input }),
@@ -74,7 +78,9 @@ test("loss lid closes only after the full material shape clears its opening", ()
     );
     Array.from(
       { length: Math.max(0, Math.floor((101 - 74) / 0.25) + 1) },
-      (_, sampleIndex) => 74 + sampleIndex * 0.25,
+      (_, sampleIndex) => {
+        return 74 + sampleIndex * 0.25;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const lid = SvgAttributes.fromMarker({ markup, marker: "jar-lid" });
@@ -123,11 +129,11 @@ test("loss lid closes only after the full material shape clears its opening", ()
 });
 
 test("remaining and sown captions change together only after the actual sowing transfer", () => {
-  captionCases.forEach((value) =>
-    [123, 124, 143, 143.999, 144, 150].forEach((frame) =>
-      _assertBalanceCaptions({ value, frame }),
-    ),
-  );
+  captionCases.forEach((value) => {
+    return [123, 124, 143, 143.999, 144, 150].forEach((frame) => {
+      return _assertBalanceCaptions({ value, frame });
+    });
+  });
 });
 
 test("zero loss never opens the jar during the closed storage interval", () => {
@@ -136,7 +142,9 @@ test("zero loss never opens the jar during the closed storage interval", () => {
     .forEach((input) => {
       Array.from(
         { length: Math.max(0, Math.floor((101 - 56) / 0.25) + 1) },
-        (_, sampleIndex) => 56 + sampleIndex * 0.25,
+        (_, sampleIndex) => {
+          return 56 + sampleIndex * 0.25;
+        },
       ).forEach((frame) => {
         assert.equal(_lid({ frame, input }), 286, `zero-loss jar at ${frame}`);
       });

@@ -218,7 +218,9 @@ test("missing, blank, swapped, and free-license keys fail without disclosing val
     ];
     invalidPairs.forEach((environment) => {
       assert.throws(
-        () => readLicense(directory, environment),
+        () => {
+          return readLicense(directory, environment);
+        },
         (error: unknown) => {
           assert.ok(error instanceof Error);
           assert.match(error.message, /Remotion license keys are required/);
@@ -326,7 +328,9 @@ test("direct script entry points reject missing keys before doing work", async (
       "check-frames",
       "curate-capture",
       "capture-avandar/capture-avandar",
-    ].map((name) => [process.execPath, [`scripts/${name}.mjs`]]),
+    ].map((name) => {
+      return [process.execPath, [`scripts/${name}.mjs`]];
+    }),
     [
       process.execPath,
       [
@@ -338,12 +342,13 @@ test("direct script entry points reject missing keys before doing work", async (
       ],
     ],
     ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
-      (name) => ["sh", [`scripts/${name}.sh`]],
+      (name) => {
+        return ["sh", [`scripts/${name}.sh`]];
+      },
     ),
-    ...["generate", "validate"].map((name) => [
-      "python3",
-      [`demo-data/${name}.py`],
-    ]),
+    ...["generate", "validate"].map((name) => {
+      return ["python3", [`demo-data/${name}.py`]];
+    }),
   ] as Array<[string, string[]]>;
   const directory = await mkdtemp(path.join(tmpdir(), "producer-license-"));
   try {

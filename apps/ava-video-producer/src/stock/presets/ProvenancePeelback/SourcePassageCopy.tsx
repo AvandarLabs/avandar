@@ -52,9 +52,11 @@ export function SourcePassageCopy({
   ];
   return (
     <g data-copy-block={source.id} data-bottom={height - 8}>
-      {slots.map((slot) => (
-        <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
-      ))}
+      {slots.map((slot) => {
+        return (
+          <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
+        );
+      })}
     </g>
   );
 }

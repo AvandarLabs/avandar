@@ -40,11 +40,13 @@ const minimumInput: Input = {
 const denseInput: Input = {
   ...DEFAULT_INPUT,
   parent: { id: "source 空", label: "W".repeat(24), volume: 12 },
-  aliquots: [1, 2, 3, 5].map((volume, index) => ({
-    id: `child ${index}`,
-    label: "W".repeat(20),
-    volume,
-  })),
+  aliquots: [1, 2, 3, 5].map((volume, index) => {
+    return {
+      id: `child ${index}`,
+      label: "W".repeat(20),
+      volume,
+    };
+  }),
   unitLabel: "W".repeat(20),
   sceneLabel: "W".repeat(40),
   copy: {

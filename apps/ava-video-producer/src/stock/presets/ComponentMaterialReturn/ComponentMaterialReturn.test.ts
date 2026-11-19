@@ -68,21 +68,30 @@ function _getVisibleTexts({
   input,
   frame,
 }: Readonly<{ input: Input; frame: number }>) {
-  const returned = input.parts.reduce((sum, part) => sum + part.massKg, 0);
-  const replacement = input.replacementInputs.reduce(
-    (sum, part) => sum + part.massKg,
-    0,
-  );
+  const returned = input.parts.reduce((sum, part) => {
+    return sum + part.massKg;
+  }, 0);
+  const replacement = input.replacementInputs.reduce((sum, part) => {
+    return sum + part.massKg;
+  }, 0);
   const recycle = input.parts
     .filter(propEq("route", "recycle"))
-    .reduce((sum, part) => sum + part.massKg, 0);
+    .reduce((sum, part) => {
+      return sum + part.massKg;
+    }, 0);
   const residue = input.parts
     .filter(propEq("route", "residue"))
-    .reduce((sum, part) => sum + part.massKg, 0);
+    .reduce((sum, part) => {
+      return sum + part.massKg;
+    }, 0);
   const assembled =
     input.parts
-      .filter((part) => part.route === "reuse" || part.route === "repair")
-      .reduce((sum, part) => sum + part.massKg, 0) + replacement;
+      .filter((part) => {
+        return part.route === "reuse" || part.route === "repair";
+      })
+      .reduce((sum, part) => {
+        return sum + part.massKg;
+      }, 0) + replacement;
   return [
     ...Object.values(input.decision),
     input.copy.reuse,
@@ -92,9 +101,9 @@ function _getVisibleTexts({
     input.copy.recycle,
     input.copy.residue,
     input.copy.replacement,
-    ...[...input.parts, ...input.replacementInputs].map(
-      (part, index) => `${index + 1}. ${part.label}`,
-    ),
+    ...[...input.parts, ...input.replacementInputs].map((part, index) => {
+      return `${index + 1}. ${part.label}`;
+    }),
     ...(input.showMassEquation
       ? [
           `${returned} + ${replacement} = ${assembled} + ${recycle} + ${residue} ${input.copy.unit}`,
@@ -134,12 +143,16 @@ test("whole parts follow their declared destination with exact identities and ma
     const initial = _render({ frame: 24, input: input });
     Array.from(
       { length: Math.max(0, Math.floor((120 - 24) / 0.5) + 1) },
-      (_, sampleIndex) => 24 + sampleIndex * 0.5,
+      (_, sampleIndex) => {
+        return 24 + sampleIndex * 0.5;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const parts = [
         ...markup.matchAll(/<rect[^>]*data-part="\d+"[^>]*>/g),
-      ].map((match) => match[0]);
+      ].map((match) => {
+        return match[0];
+      });
       assert.equal(parts.length, items.length);
       parts.forEach((part, index) => {
         assert.equal(
@@ -184,9 +197,15 @@ test("whole parts follow their declared destination with exact identities and ma
     });
     const assembled =
       input.parts
-        .filter((part) => part.route === "reuse" || part.route === "repair")
-        .reduce((sum, part) => sum + part.massKg, 0) +
-      input.replacementInputs.reduce((sum, part) => sum + part.massKg, 0);
+        .filter((part) => {
+          return part.route === "reuse" || part.route === "repair";
+        })
+        .reduce((sum, part) => {
+          return sum + part.massKg;
+        }, 0) +
+      input.replacementInputs.reduce((sum, part) => {
+        return sum + part.massKg;
+      }, 0);
     assert.equal(
       SvgAttributes.getNumberFromMarkup({
         attributes: SvgAttributes.fromMarker({
@@ -207,7 +226,9 @@ test("the operator grips each selected part while all other components remain cl
   Array.from(fixtures).forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((108 - 36) / 0.25) + 1) },
-      (_, sampleIndex) => 36 + sampleIndex * 0.25,
+      (_, sampleIndex) => {
+        return 36 + sampleIndex * 0.25;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const hand = SvgAttributes.fromMarker({ markup, marker: "hand" });
@@ -218,7 +239,9 @@ test("the operator grips each selected part while all other components remain cl
       const phase = frame - (36 + index * 8);
       const parts = [
         ...markup.matchAll(/<rect[^>]*data-part="\d+"[^>]*>/g),
-      ].map((match) => match[0]);
+      ].map((match) => {
+        return match[0];
+      });
       const selected = parts[index];
       const handX = SvgAttributes.getNumberFromMarkup({
         attributes: hand,
@@ -289,10 +312,9 @@ test("the returned heading clears the next full wrapped caption", () => {
   )![1];
   const bottom =
     70 +
-    [...heading.matchAll(/dy="([^"]+)"/g)].reduce(
-      (sum, match) => sum + Number(match[1]),
-      0,
-    ) +
+    [...heading.matchAll(/dy="([^"]+)"/g)].reduce((sum, match) => {
+      return sum + Number(match[1]);
+    }, 0) +
     3.6;
   const reuse = markup.match(
     /<text[^>]* x="45" y="(1\d+)"[^>]*><tspan[^>]*>W/,
@@ -324,9 +346,9 @@ test("visible route keys own the corresponding parts through their full paths", 
         ),
       ];
       assert.ok(parts.length > 0);
-      parts.forEach(([part]) =>
-        assert.equal(part.match(/stroke="([^"]+)"/)![1], color),
-      );
+      parts.forEach(([part]) => {
+        return assert.equal(part.match(/stroke="([^"]+)"/)![1], color);
+      });
     });
   });
 });
@@ -334,7 +356,9 @@ test("visible route keys own the corresponding parts through their full paths", 
 test("the opened lid clears the full operator shape throughout handling", () => {
   Array.from(
     { length: Math.max(0, Math.floor((108 - 36) / 0.25) + 1) },
-    (_, sampleIndex) => 36 + sampleIndex * 0.25,
+    (_, sampleIndex) => {
+      return 36 + sampleIndex * 0.25;
+    },
   ).forEach((frame) => {
     const markup = _render({ frame: frame, input: fixtures[2].input });
     const shell = SvgAttributes.fromMarker({

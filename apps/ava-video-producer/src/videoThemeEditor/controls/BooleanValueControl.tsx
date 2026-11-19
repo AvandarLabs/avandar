@@ -20,7 +20,9 @@ export function BooleanValueControl({
       error={hasIssue}
       {...issueAriaProps}
       checked={value === true}
-      onChange={(event) => onChange(event.currentTarget.checked)}
+      onChange={(event) => {
+        return onChange(event.currentTarget.checked);
+      }}
     />
   );
 }

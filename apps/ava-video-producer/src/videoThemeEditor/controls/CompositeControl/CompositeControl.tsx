@@ -34,16 +34,18 @@ export function CompositeControl({ row, label }: Props) {
         <TypeSpecimen style={row.resolved as ResolvedTypeStyle | undefined} />
       ) : null}
       <CompositeSketchPreview row={row} />
-      {Object.entries(fields).map(([name, field]) => (
-        <CompositeField
-          key={name}
-          row={row}
-          label={label}
-          name={name}
-          field={field}
-          value={value}
-        />
-      ))}
+      {Object.entries(fields).map(([name, field]) => {
+        return (
+          <CompositeField
+            key={name}
+            row={row}
+            label={label}
+            name={name}
+            field={field}
+            value={value}
+          />
+        );
+      })}
     </fieldset>
   );
 }

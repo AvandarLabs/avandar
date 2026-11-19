@@ -32,14 +32,16 @@ export function FolioCover({
         {...cover}
       />
       {isClosed
-        ? input.artifacts.map((artifact, index) => (
-            <LabelSlots
-              key={artifact.id}
-              labels={[
-                [artifact.label, folioX + 22, 238 + index * 86, 220, 14, 3],
-              ]}
-            />
-          ))
+        ? input.artifacts.map((artifact, index) => {
+            return (
+              <LabelSlots
+                key={artifact.id}
+                labels={[
+                  [artifact.label, folioX + 22, 238 + index * 86, 220, 14, 3],
+                ]}
+              />
+            );
+          })
         : undefined}
     </g>
   );

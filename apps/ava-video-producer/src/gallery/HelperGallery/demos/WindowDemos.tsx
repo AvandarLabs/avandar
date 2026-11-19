@@ -67,38 +67,50 @@ export function WindowWhipDemo({ frame, frames }: HelperDemoProps) {
   );
 }
 
-const PAIR = PAIR_BOXES.map((box) => getCanvasRect(box));
+const PAIR = PAIR_BOXES.map((box) => {
+  return getCanvasRect(box);
+});
 
 /** Two windows sliding in from their own outer edges. */
 export function SideEntranceDemo({ frame, frames }: HelperDemoProps) {
-  const poses = PAIR.map((box, side) =>
-    getSideEntrance(frame, 8 + side * 3, side === 0 ? 0 : 1, DEMO_CANVAS, box),
-  );
+  const poses = PAIR.map((box, side) => {
+    return getSideEntrance(
+      frame,
+      8 + side * 3,
+      side === 0 ? 0 : 1,
+      DEMO_CANVAS,
+      box,
+    );
+  });
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
       label="getSideEntrance(frame, at, side, canvas, box)"
-      readouts={poses.map((pose, side) => ({
-        name: `side ${side}`,
-        value: formatReadout(pose.translateX, 1),
-      }))}
+      readouts={poses.map((pose, side) => {
+        return {
+          name: `side ${side}`,
+          value: formatReadout(pose.translateX, 1),
+        };
+      })}
     >
       <DemoCanvas>
-        {PAIR.map((box, side) => (
-          <TiltedDemoWindow
-            key={box.x}
-            box={box}
-            pose={{
-              ...poses[side],
-              rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
-            }}
-            perspective={PAIR_TILT.perspective}
-            rotateX={PAIR_TILT.rotateX}
-            rotateZ={0}
-            variant={side === 0 ? 0 : 1}
-          />
-        ))}
+        {PAIR.map((box, side) => {
+          return (
+            <TiltedDemoWindow
+              key={box.x}
+              box={box}
+              pose={{
+                ...poses[side],
+                rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
+              }}
+              perspective={PAIR_TILT.perspective}
+              rotateX={PAIR_TILT.rotateX}
+              rotateZ={0}
+              variant={side === 0 ? 0 : 1}
+            />
+          );
+        })}
       </DemoCanvas>
     </HelperDemoFrame>
   );
@@ -174,21 +186,26 @@ const FLIP_AT = 8;
 /** The pair's two windows, joined at 0 and in their own boxes at 1. */
 function SplitPair({ split }: { split: number }) {
   const joinedLeft = (DEMO_CANVAS.width - PAIR[0].width - PAIR[1].width) / 2;
-  return PAIR.map((box, side) => (
-    <TiltedDemoWindow
-      key={box.x}
-      box={{ ...box, x: mix(split, joinedLeft + side * PAIR[0].width, box.x) }}
-      pose={{
-        ...RESTING_WINDOW_POSE,
-        rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
-      }}
-      tilt={split}
-      perspective={PAIR_TILT.perspective}
-      rotateX={PAIR_TILT.rotateX}
-      rotateZ={0}
-      variant={side === 0 ? 0 : 1}
-    />
-  ));
+  return PAIR.map((box, side) => {
+    return (
+      <TiltedDemoWindow
+        key={box.x}
+        box={{
+          ...box,
+          x: mix(split, joinedLeft + side * PAIR[0].width, box.x),
+        }}
+        pose={{
+          ...RESTING_WINDOW_POSE,
+          rotateY: (side === 0 ? 1 : -1) * PAIR_TILT.rotateY,
+        }}
+        tilt={split}
+        perspective={PAIR_TILT.perspective}
+        rotateX={PAIR_TILT.rotateX}
+        rotateZ={0}
+        variant={side === 0 ? 0 : 1}
+      />
+    );
+  });
 }
 
 /** A joined card flipping in, then splitting into the pair boxes. */
@@ -291,8 +308,8 @@ const HEADLINE_DRAWN_HEIGHT = 0.3;
 
 /** Every named box on the mini canvas, the active one filled and labelled. */
 function BoxOutlines({ activeIndex }: { activeIndex: number }) {
-  return NAMED_BOXES.flatMap((named, index) =>
-    named.boxes.map((fractions) => {
+  return NAMED_BOXES.flatMap((named, index) => {
+    return named.boxes.map((fractions) => {
       const rect = getCanvasRect({
         height: HEADLINE_DRAWN_HEIGHT,
         ...fractions,
@@ -312,8 +329,8 @@ function BoxOutlines({ activeIndex }: { activeIndex: number }) {
           {isActive ? <span className={css.boxLabel}>{named.name}</span> : null}
         </div>
       );
-    }),
-  );
+    });
+  });
 }
 
 /** Every window and headline box on the canvas, highlighted in turn. */

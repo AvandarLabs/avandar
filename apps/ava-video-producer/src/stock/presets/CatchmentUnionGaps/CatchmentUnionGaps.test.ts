@@ -93,25 +93,27 @@ test("union membership counts a coincident record once and recomputes after remo
     _render({ frame: 150, input: changedInput }),
     /data-covered="5" data-denominator="8"/,
   );
-  [defaultInput, changedInput].forEach((input) =>
-    assert.equal(
+  [defaultInput, changedInput].forEach((input) => {
+    return assert.equal(
       (_render({ frame: 150, input: input }).match(/data-household=/g) ?? [])
         .length,
       4,
-    ),
-  );
+    );
+  });
   const duplicate = inputSchema.parse({
     ...defaultInput,
     catchments: [
       defaultInput.catchments[0],
       { ...defaultInput.catchments[0], id: "duplicate" },
     ],
-    households: defaultInput.households.map((home, index) => ({
-      ...home,
-      x: 20,
-      y: 30,
-      id: String(index),
-    })),
+    households: defaultInput.households.map((home, index) => {
+      return {
+        ...home,
+        x: 20,
+        y: 30,
+        id: String(index),
+      };
+    }),
   });
   assert.match(
     _render({ frame: 150, input: duplicate }),
@@ -119,7 +121,9 @@ test("union membership counts a coincident record once and recomputes after remo
   );
   const outside = {
     ...duplicate,
-    households: duplicate.households.map((home) => ({ ...home, x: 99, y: 99 })),
+    households: duplicate.households.map((home) => {
+      return { ...home, x: 99, y: 99 };
+    }),
   };
   assert.match(
     _render({ frame: 150, input: outside }),
@@ -162,9 +166,9 @@ test("catchment schemas reject boundary homes, invalid rings and duplicate IDs",
   const rejected = [
     {
       ...defaultInput,
-      households: defaultInput.households.map((home, index) =>
-        index ? home : { ...home, x: 5, y: 30 },
-      ),
+      households: defaultInput.households.map((home, index) => {
+        return index ? home : { ...home, x: 5, y: 30 };
+      }),
     },
     {
       ...defaultInput,
@@ -186,15 +190,17 @@ test("catchment schemas reject boundary homes, invalid rings and duplicate IDs",
     },
     {
       ...defaultInput,
-      households: defaultInput.households.map((home) => ({
-        ...home,
-        members: 0,
-      })),
+      households: defaultInput.households.map((home) => {
+        return {
+          ...home,
+          members: 0,
+        };
+      }),
     },
   ];
-  rejected.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  rejected.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("dense household keys, label slots and paths have separate full envelopes", () => {
   [0, 36, 72, 108, 150].forEach((frame) => {
@@ -202,11 +208,13 @@ test("dense household keys, label slots and paths have separate full envelopes",
       frame: frame,
       input: {
         ...fixtures[2].input,
-        households: fixtures[2].input.households.map((home) => ({
-          ...home,
-          x: 99,
-          y: 99,
-        })),
+        households: fixtures[2].input.households.map((home) => {
+          return {
+            ...home,
+            x: 99,
+            y: 99,
+          };
+        }),
       },
     });
     assert.equal((markup.match(/data-household=/g) ?? []).length, 12);

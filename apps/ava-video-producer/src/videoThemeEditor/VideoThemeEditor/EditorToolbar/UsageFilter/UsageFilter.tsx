@@ -15,12 +15,12 @@ export function UsageFilter({ filters, onFiltersChange }: Props) {
         size="xs"
         label="Only settings used by this preview"
         checked={filters.isUsedOnly}
-        onChange={(event) =>
-          onFiltersChange({
+        onChange={(event) => {
+          return onFiltersChange({
             ...filters,
             isUsedOnly: event.currentTarget.checked,
-          })
-        }
+          });
+        }}
       />
       {filters.isUsedOnly ? (
         <p className={css.usageFilterHint}>

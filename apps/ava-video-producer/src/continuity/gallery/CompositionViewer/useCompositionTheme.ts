@@ -87,18 +87,24 @@ function usePlayerReplies(
         }
         const acknowledgement = receiveThemeAcknowledgement(data, id);
         if (acknowledgement) {
-          setReplies((current) =>
-            current.id === id ? { ...current, acknowledgement } : current,
-          );
+          setReplies((current) => {
+            return current.id === id
+              ? { ...current, acknowledgement }
+              : current;
+          });
         }
         if (isFilmTokensUsedMessage(data, id)) {
-          setReplies((current) =>
-            current.id === id ? { ...current, paths: data.paths } : current,
-          );
+          setReplies((current) => {
+            return current.id === id
+              ? { ...current, paths: data.paths }
+              : current;
+          });
         }
       };
       window.addEventListener("message", receive);
-      return () => window.removeEventListener("message", receive);
+      return () => {
+        return window.removeEventListener("message", receive);
+      };
     },
     [id, player, onOptions],
   );
@@ -117,10 +123,9 @@ function useRequestTimeout(requestKey: string | undefined): boolean {
       if (requestKey === undefined) {
         return;
       }
-      const timer = setTimeout(
-        () => setTimedOutKey(requestKey),
-        ACKNOWLEDGEMENT_TIMEOUT_MS,
-      );
+      const timer = setTimeout(() => {
+        return setTimedOutKey(requestKey);
+      }, ACKNOWLEDGEMENT_TIMEOUT_MS);
       return () => {
         clearTimeout(timer);
         setTimedOutKey(undefined);
@@ -158,7 +163,9 @@ function useThemeSender(
   useEffect(
     function sendThemeAfterDelay() {
       const timer = setTimeout(send, THEME_SEND_DELAY_MS);
-      return () => clearTimeout(timer);
+      return () => {
+        return clearTimeout(timer);
+      };
     },
     [send],
   );
@@ -184,10 +191,9 @@ export function useCompositionTheme(
 ) {
   const { id, player, snapshot, isScene, hasDraftIssues } = options;
   const snapshotKey = snapshot ? JSON.stringify(snapshot) : "";
-  const expected = useMemo(
-    () => _expectedTheme(snapshotKey, id),
-    [snapshotKey, id],
-  );
+  const expected = useMemo(() => {
+    return _expectedTheme(snapshotKey, id);
+  }, [snapshotKey, id]);
   const [attempt, setAttempt] = useState(0);
   const requestKey = snapshotKey
     ? `${id}:${expected?.hash}:${attempt}`
@@ -209,6 +215,10 @@ export function useCompositionTheme(
     usedTokens: replies.paths,
     // A new attempt is a new request, so the debounced sender posts it
     // under its own key rather than the one that was refused or timed out.
-    retry: () => setAttempt((current) => current + 1),
+    retry: () => {
+      return setAttempt((current) => {
+        return current + 1;
+      });
+    },
   };
 }

@@ -18,7 +18,9 @@ export function CreateModal({ frame }: { frame: number }) {
     // normal insertion point so completed text does not stay selected.
     input?.setSelectionRange(name.length, name.length);
     [...(rootRef.current?.querySelectorAll("button") ?? [])]
-      .find((button) => button.textContent?.includes("Create dashboard"))
+      .find((button) => {
+        return button.textContent?.includes("Create dashboard");
+      })
       ?.setAttribute("data-video-target", "dashboard-create");
   });
   return (

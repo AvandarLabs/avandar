@@ -47,12 +47,14 @@ const minimumInput: Input = {
 };
 const denseInput: Input = {
   ...DEFAULT_INPUT,
-  referrals: Array.from({ length: 5 }, (_, index) => ({
-    id: `referral ${index}`,
-    personLabel: "W".repeat(18),
-    attended: index !== 4,
-    acknowledged: index < 2,
-  })),
+  referrals: Array.from({ length: 5 }, (_, index) => {
+    return {
+      id: `referral ${index}`,
+      personLabel: "W".repeat(18),
+      attended: index !== 4,
+      acknowledged: index < 2,
+    };
+  }),
   services: { referring: "W".repeat(24), receiving: "W".repeat(24) },
   sceneLabel: "W".repeat(40),
   copy: {
@@ -67,11 +69,13 @@ const denseInput: Input = {
 /** Attendance without any returned acknowledgement keeps every loop open. */
 export const changedInput: Input = {
   ...DEFAULT_INPUT,
-  referrals: DEFAULT_INPUT.referrals.map((referral) => ({
-    ...referral,
-    attended: true,
-    acknowledged: false,
-  })),
+  referrals: DEFAULT_INPUT.referrals.map((referral) => {
+    return {
+      ...referral,
+      attended: true,
+      acknowledged: false,
+    };
+  }),
 };
 const toggledInput: Input = {
   ...denseInput,

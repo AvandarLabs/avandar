@@ -88,7 +88,9 @@ function _isSimplePolygon({ polygon }: Readonly<{ polygon: Ring }>): boolean {
   if (polygon.length < 3 || !polygon.every(_isFinitePoint)) {
     return false;
   }
-  const identities = polygon.map(([x, y]) => `${x},${y}`);
+  const identities = polygon.map(([x, y]) => {
+    return `${x},${y}`;
+  });
   return (
     new Set(identities).size === polygon.length && !_hasInvalidEdges(polygon)
   );
@@ -167,8 +169,12 @@ function _isExactMidpointInside({
   let isBoundary = false;
   polygon.forEach((vertex, index) => {
     const following = polygon[(index + 1) % polygon.length];
-    const start = vertex.map((value) => binary64ToInteger(value) * 2n);
-    const end = following.map((value) => binary64ToInteger(value) * 2n);
+    const start = vertex.map((value) => {
+      return binary64ToInteger(value) * 2n;
+    });
+    const end = following.map((value) => {
+      return binary64ToInteger(value) * 2n;
+    });
     const cross =
       (end[0] - start[0]) * (point[1] - start[1]) -
       (end[1] - start[1]) * (point[0] - start[0]);
@@ -201,15 +207,19 @@ function _hasInteriorEdge({
     const splits = [
       first,
       second,
-      ...secondPolygon.filter((third) => _onSegment({ first, second, third })),
-    ].sort((left, right) => left[axis] - right[axis]);
-    return splits.slice(1).some((end, splitIndex) =>
-      _isExactMidpointInside({
+      ...secondPolygon.filter((third) => {
+        return _onSegment({ first, second, third });
+      }),
+    ].sort((left, right) => {
+      return left[axis] - right[axis];
+    });
+    return splits.slice(1).some((end, splitIndex) => {
+      return _isExactMidpointInside({
         first: splits[splitIndex],
         second: end,
         polygon: secondPolygon,
-      }),
-    );
+      });
+    });
   });
 }
 
@@ -277,18 +287,18 @@ function _doPolygonInteriorsOverlap({
       firstPolygon: secondPolygon,
       secondPolygon: firstPolygon,
     }) ||
-    firstPolygon.some((first, index) =>
-      secondPolygon.some((third, otherIndex) =>
-        _edgesShareInterior({
+    firstPolygon.some((first, index) => {
+      return secondPolygon.some((third, otherIndex) => {
+        return _edgesShareInterior({
           first,
           second: firstPolygon[(index + 1) % firstPolygon.length],
           third,
           fourth: secondPolygon[(otherIndex + 1) % secondPolygon.length],
           firstWinding,
           secondWinding,
-        }),
-      ),
-    )
+        });
+      });
+    })
   );
 }
 
@@ -342,14 +352,14 @@ function _getDiskClassificationFromPolygon({
     polygon,
   });
   if (
-    polygon.some((first, index) =>
-      _diskMeetsEdge({
+    polygon.some((first, index) => {
+      return _diskMeetsEdge({
         center,
         radius,
         first,
         second: polygon[(index + 1) % polygon.length],
-      }),
-    )
+      });
+    })
   ) {
     return "intersecting";
   }

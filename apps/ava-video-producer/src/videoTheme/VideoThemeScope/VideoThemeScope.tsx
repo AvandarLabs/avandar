@@ -27,10 +27,9 @@ export function VideoThemeScope({
   const outer = useVideoThemeContext()?.source ?? DEFAULT_VIDEO_THEME_SOURCE;
   // Callers rebuild these arrays on every frame; the key keeps the source stable.
   const scopeKey = JSON.stringify({ overrideIds, patches });
-  const source = useMemo(
-    () => getScopedVideoThemeSource(outer, JSON.parse(scopeKey)),
-    [outer, scopeKey],
-  );
+  const source = useMemo(() => {
+    return getScopedVideoThemeSource(outer, JSON.parse(scopeKey));
+  }, [outer, scopeKey]);
   return (
     <VideoThemeProvider source={source} element={element}>
       {children}

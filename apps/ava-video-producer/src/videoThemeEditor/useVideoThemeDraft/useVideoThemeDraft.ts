@@ -51,8 +51,8 @@ export function useVideoThemeDraft(): VideoThemeDraftState {
     discard: draftState.discard,
     rebaseDraft: draftState.rebaseDraft,
   });
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    return {
       themes,
       themeId,
       selectTheme,
@@ -60,7 +60,6 @@ export function useVideoThemeDraft(): VideoThemeDraftState {
       isBuiltIn,
       ...draftState,
       ...saving,
-    }),
-    [themes, themeId, selectTheme, library, isBuiltIn, draftState, saving],
-  );
+    };
+  }, [themes, themeId, selectTheme, library, isBuiltIn, draftState, saving]);
 }

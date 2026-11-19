@@ -33,8 +33,12 @@ const TARGETS: CursorTarget[] = [
 ];
 
 /** The whole route, sampled once a frame, for a faint trail. */
-const TRAIL = Array.from({ length: 105 }, (_, frame) => trackPos(frame, PATH))
-  .map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+const TRAIL = Array.from({ length: 105 }, (_, frame) => {
+  return trackPos(frame, PATH);
+})
+  .map((point) => {
+    return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+  })
   .join(" ");
 
 /** The field and button the pointer travels between. */
@@ -132,7 +136,11 @@ export function ClickFeedbackDemo({ frame, frames }: HelperDemoProps) {
         className={clsx(css.button, css.absolute, css.pressTarget)}
         style={{
           background: fill,
-          transform: `scale(${Math.min(...PRESS_CLICKS.map((at) => press(frame, at)))})`,
+          transform: `scale(${Math.min(
+            ...PRESS_CLICKS.map((at) => {
+              return press(frame, at);
+            }),
+          )})`,
         }}
       >
         Run query
@@ -167,22 +175,26 @@ export function CursorShutterDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="cursorShutter(frame, path)"
-      readouts={samples.map((sample, index) => ({
-        name: `sample ${index}`,
-        value: `${formatReadout(Math.hypot(sample.x, sample.y), 1)}px · ${sample.opacity}`,
-      }))}
+      readouts={samples.map((sample, index) => {
+        return {
+          name: `sample ${index}`,
+          value: `${formatReadout(Math.hypot(sample.x, sample.y), 1)}px · ${sample.opacity}`,
+        };
+      })}
     >
       <div className={css.inset}>
-        {samples.map((sample, index) => (
-          <span
-            key={SAMPLE_NAMES[index]}
-            className={css.insetSample}
-            style={{
-              transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
-              opacity: sample.opacity > 0 ? 0.6 : 0,
-            }}
-          />
-        ))}
+        {samples.map((sample, index) => {
+          return (
+            <span
+              key={SAMPLE_NAMES[index]}
+              className={css.insetSample}
+              style={{
+                transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
+                opacity: sample.opacity > 0 ? 0.6 : 0,
+              }}
+            />
+          );
+        })}
         <span className={css.insetCenter} />
         <span className={css.insetLabel}>{`× ${INSET_SCALE}`}</span>
       </div>

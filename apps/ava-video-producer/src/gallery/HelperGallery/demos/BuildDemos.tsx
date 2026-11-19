@@ -45,19 +45,21 @@ export function MarkBuildDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <DemoCanvas>
-        {progress.map((columnProgress, index) => (
-          <span
-            key={`column-${MARK.x + index * 25}`}
-            className={css.markColumn}
-            style={{
-              left: MARK.x + (index * MARK.width) / BUILD.columns,
-              top: MARK.y,
-              width: MARK.width / BUILD.columns,
-              height: MARK.height,
-              clipPath: `inset(${((1 - columnProgress) * 100).toFixed(2)}% 0 0 0)`,
-            }}
-          />
-        ))}
+        {progress.map((columnProgress, index) => {
+          return (
+            <span
+              key={`column-${MARK.x + index * 25}`}
+              className={css.markColumn}
+              style={{
+                left: MARK.x + (index * MARK.width) / BUILD.columns,
+                top: MARK.y,
+                width: MARK.width / BUILD.columns,
+                height: MARK.height,
+                clipPath: `inset(${((1 - columnProgress) * 100).toFixed(2)}% 0 0 0)`,
+              }}
+            />
+          );
+        })}
       </DemoCanvas>
     </HelperDemoFrame>
   );
@@ -221,26 +223,30 @@ export function BarBeatsDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="getBarComparisonBeats(8, 0, 3)  getBarFractions(rows)"
-      readouts={Object.entries(beats).map(([name, value]) => ({
-        name,
-        value: `${value}f`,
-      }))}
+      readouts={Object.entries(beats).map(([name, value]) => {
+        return {
+          name,
+          value: `${value}f`,
+        };
+      })}
     >
       <div className={css.barPanel}>
         <p className={css.headline} style={enter(frame, beats.heroAt)}>
           42
         </p>
-        {ROWS.map((row, index) => (
-          <BarRow
-            key={row.id}
-            frame={frame}
-            beats={beats}
-            index={index}
-            label={labels[index]}
-            value={row.value}
-            fraction={fractions[index]}
-          />
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <BarRow
+              key={row.id}
+              frame={frame}
+              beats={beats}
+              index={index}
+              label={labels[index]}
+              value={row.value}
+              fraction={fractions[index]}
+            />
+          );
+        })}
       </div>
       <span className={css.footnote}>{"Fictional demonstration data"}</span>
     </HelperDemoFrame>

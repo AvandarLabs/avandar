@@ -31,8 +31,10 @@ type Pose = {
 function _getPathCoordinates(tag: string): number[] {
   const path = tag.match(/\bd="([^"]*)"/);
   assert.ok(path);
-  return [...path[1].matchAll(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/g)].map((match) =>
-    Number(match[0]),
+  return [...path[1].matchAll(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/g)].map(
+    (match) => {
+      return Number(match[0]);
+    },
   );
 }
 
@@ -43,11 +45,12 @@ function _getCircle({
   tags: readonly string[];
   radius: number;
 }): Circle {
-  const tag = tags.find(
-    (circle) =>
+  const tag = tags.find((circle) => {
+    return (
       SvgAttributes.getNumberFromMarkup({ attributes: circle, name: "r" }) ===
-      radius,
-  );
+      radius
+    );
+  });
   assert.ok(tag);
   return {
     x: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
@@ -98,15 +101,33 @@ function _getParticipantBounds({
         padding: radius + stroke / 2,
       };
     }),
-    ...paths.flatMap((tag) =>
-      _getPathPoints(tag).map((point) => ({ ...point, padding: 1.5 })),
-    ),
+    ...paths.flatMap((tag) => {
+      return _getPathPoints(tag).map((point) => {
+        return { ...point, padding: 1.5 };
+      });
+    }),
   ];
   return {
-    left: Math.min(...shapes.map((shape) => shape.x - shape.padding)),
-    top: Math.min(...shapes.map((shape) => shape.y - shape.padding)),
-    right: Math.max(...shapes.map((shape) => shape.x + shape.padding)),
-    bottom: Math.max(...shapes.map((shape) => shape.y + shape.padding)),
+    left: Math.min(
+      ...shapes.map((shape) => {
+        return shape.x - shape.padding;
+      }),
+    ),
+    top: Math.min(
+      ...shapes.map((shape) => {
+        return shape.y - shape.padding;
+      }),
+    ),
+    right: Math.max(
+      ...shapes.map((shape) => {
+        return shape.x + shape.padding;
+      }),
+    ),
+    bottom: Math.max(
+      ...shapes.map((shape) => {
+        return shape.y + shape.padding;
+      }),
+    ),
   };
 }
 
@@ -120,10 +141,12 @@ function _getPose({
   const markup = renderToStaticMarkup(
     createElement(AccessParticipant, { frame, input, accent: "#9fefca" }),
   );
-  const circles = [...markup.matchAll(/<circle\b[^>]*>/g)].map(
-    (match) => match[0],
-  );
-  const paths = [...markup.matchAll(/<path\b[^>]*>/g)].map((match) => match[0]);
+  const circles = [...markup.matchAll(/<circle\b[^>]*>/g)].map((match) => {
+    return match[0];
+  });
+  const paths = [...markup.matchAll(/<path\b[^>]*>/g)].map((match) => {
+    return match[0];
+  });
   const head = _getCircle({ tags: circles, radius: 8 }),
     rear = _getCircle({ tags: circles, radius: 20 }),
     front = _getCircle({ tags: circles, radius: 5 }),
@@ -135,10 +158,12 @@ function _getPose({
     front,
     hand,
     coordinates: [
-      ...circles.flatMap((circle) => [
-        SvgAttributes.getNumberFromMarkup({ attributes: circle, name: "cx" }),
-        SvgAttributes.getNumberFromMarkup({ attributes: circle, name: "cy" }),
-      ]),
+      ...circles.flatMap((circle) => {
+        return [
+          SvgAttributes.getNumberFromMarkup({ attributes: circle, name: "cx" }),
+          SvgAttributes.getNumberFromMarkup({ attributes: circle, name: "cy" }),
+        ];
+      }),
       ...paths.flatMap(_getPathCoordinates),
     ],
     armEndpoint: { x: arm.at(-2)!, y: arm.at(-1)! },
@@ -164,7 +189,9 @@ function _getFloorSegments({
   const route = markup.match(/<path data-access-route[^>]*>/);
   assert.ok(route);
   return ServiceSvgGeometry.getPathSegmentsFromTag(route[0]).map(
-    ({ start, end }) => [start, end],
+    ({ start, end }) => {
+      return [start, end];
+    },
   );
 }
 
@@ -200,32 +227,32 @@ function _assertWheelFloorContact({
   segments: ReadonlyArray<readonly [Point, Point]>;
   frame: number;
 }): void {
-  const distances = segments.map((segment) =>
-    _getSegmentDistance({ point: wheel, segment: segment }),
-  );
+  const distances = segments.map((segment) => {
+    return _getSegmentDistance({ point: wheel, segment: segment });
+  });
   assert.ok(
     Math.abs(Math.min(...distances) - wheel.radius - 1) < 1e-8,
     `wheel r${wheel.radius} misses the stroke-inclusive floor contact at frame ${frame}`,
   );
-  Array.from({ length: 73 }, (_, index) => (index * Math.PI) / 36).forEach(
-    (angle) => {
-      const point = {
-        x: wheel.x + (wheel.radius + 1) * Math.cos(angle),
-        y: wheel.y + (wheel.radius + 1) * Math.sin(angle),
-      };
-      const segment = segments.find(
-        ([start, end]) => point.x >= start.x && point.x <= end.x,
-      );
-      assert.ok(segment);
-      const [start, end] = segment;
-      const floorY =
-        start.y + ((point.x - start.x) * (end.y - start.y)) / (end.x - start.x);
-      assert.ok(
-        point.y <= floorY + 1e-8,
-        `wheel crosses the emitted floor at frame ${frame}`,
-      );
-    },
-  );
+  Array.from({ length: 73 }, (_, index) => {
+    return (index * Math.PI) / 36;
+  }).forEach((angle) => {
+    const point = {
+      x: wheel.x + (wheel.radius + 1) * Math.cos(angle),
+      y: wheel.y + (wheel.radius + 1) * Math.sin(angle),
+    };
+    const segment = segments.find(([start, end]) => {
+      return point.x >= start.x && point.x <= end.x;
+    });
+    assert.ok(segment);
+    const [start, end] = segment;
+    const floorY =
+      start.y + ((point.x - start.x) * (end.y - start.y)) / (end.x - start.x);
+    assert.ok(
+      point.y <= floorY + 1e-8,
+      `wheel crosses the emitted floor at frame ${frame}`,
+    );
+  });
 }
 
 function _assertFloorContact({
@@ -237,9 +264,9 @@ function _assertFloorContact({
 }): void {
   const pose = _getPose({ frame, input }),
     segments = _getFloorSegments({ frame, input });
-  [pose.rear, pose.front].forEach((wheel) =>
-    _assertWheelFloorContact({ wheel, segments, frame }),
-  );
+  [pose.rear, pose.front].forEach((wheel) => {
+    return _assertWheelFloorContact({ wheel, segments, frame });
+  });
   assert.ok(
     Math.abs(
       Math.hypot(pose.hand.x - pose.rear.x, pose.hand.y - pose.rear.y) -
@@ -256,17 +283,17 @@ function _assertContinuousBoundary({
   frame: number;
   input: Readonly<Input>;
 }): void {
-  const poses = [frame - 0.000001, frame, frame + 0.000001].map((sample) =>
-    _getPose({ frame: sample, input }),
-  );
+  const poses = [frame - 0.000001, frame, frame + 0.000001].map((sample) => {
+    return _getPose({ frame: sample, input });
+  });
   [poses[0], poses[2]].forEach((pose) => {
     assert.equal(pose.coordinates.length, poses[1].coordinates.length);
-    pose.coordinates.forEach((coordinate, index) =>
-      assert.ok(
+    pose.coordinates.forEach((coordinate, index) => {
+      return assert.ok(
         Math.abs(coordinate - poses[1].coordinates[index]) < 0.0001,
         `emitted coordinate ${index} jumps ${Math.abs(coordinate - poses[1].coordinates[index])} pixels at frame ${frame}`,
-      ),
-    );
+      );
+    });
   });
 }
 
@@ -310,7 +337,9 @@ function _assertParticipantEnvelope({
       });
     const displacement = [
       ...text[2].matchAll(/<tspan\b[^>]*dy="([^"]*)"/g),
-    ].reduce((sum, span) => sum + Number(span[1]), 0);
+    ].reduce((sum, span) => {
+      return sum + Number(span[1]);
+    }, 0);
     assert.ok(
       bounds.bottom < baseline - fontSize ||
         bounds.top > baseline + displacement + fontSize * 0.4,
@@ -322,7 +351,9 @@ function _assertParticipantEnvelope({
 function _registerApproachCase(input: Readonly<Input>): void {
   test(`N1 ${input.services.length} services, chosen ${JSON.stringify(input.chosenServiceId)}, ${input.accessChange}: complete approach keeps wheels grounded with actual hand contact`, () => {
     const frames = [
-      ...Array.from({ length: 85 }, (_, index) => 78 + index / 2),
+      ...Array.from({ length: 85 }, (_, index) => {
+        return 78 + index / 2;
+      }),
       77.999999,
       78.000001,
       97.999999,
@@ -330,10 +361,12 @@ function _registerApproachCase(input: Readonly<Input>): void {
       119.999999,
       120.000001,
     ];
-    frames.forEach((frame) => _assertFloorContact({ frame, input }));
-    [78, 98, 120].forEach((frame) =>
-      _assertContinuousBoundary({ frame, input }),
-    );
+    frames.forEach((frame) => {
+      return _assertFloorContact({ frame, input });
+    });
+    [78, 98, 120].forEach((frame) => {
+      return _assertContinuousBoundary({ frame, input });
+    });
     const boundaryBefore = _getPose({ frame: 98, input });
     const final = _getPose({ frame: 120, input });
     assert.deepEqual(_getPose({ frame: 98, input }), boundaryBefore);
@@ -343,12 +376,12 @@ function _registerApproachCase(input: Readonly<Input>): void {
       _getPose({ frame: 78, input }).head.x,
     );
     [false, true].forEach((showChoiceLabel) => {
-      [0, 24, 36, 77, 78, 88, 97.999999, 98, 108, 120].forEach((frame) =>
-        _assertParticipantEnvelope({
+      [0, 24, 36, 77, 78, 88, 97.999999, 98, 108, 120].forEach((frame) => {
+        return _assertParticipantEnvelope({
           frame,
           input: { ...input, showChoiceLabel },
-        }),
-      );
+        });
+      });
     });
   });
 }

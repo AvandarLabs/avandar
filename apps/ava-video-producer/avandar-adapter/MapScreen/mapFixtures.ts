@@ -5,7 +5,9 @@ import fixtures from "../fixtures.json";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 export const PAN = { type: "pan" } as const;
 // Resolve the product's own Avandar style through its unchanged BasemapStyle.
 // Real basemap geography supplies context; the overlaid records remain fictional.
@@ -116,30 +118,39 @@ export const MAP_DURATION = 720;
 
 /** Builds the native MapLibre spec for the given layers, disabling paint transitions for deterministic seeks. */
 export function _createSpec(layers: readonly MapLayer.T[]): MapSpec {
-  const specs = layers.map((layer) =>
-    makeLayerSpecFromMapLayer({
+  const specs = layers.map((layer) => {
+    return makeLayerSpecFromMapLayer({
       layer,
       featureCollection:
         layer.id === caseLayer.id
           ? casePoints.featureCollection
           : facilityPoints.featureCollection,
       stats: { valueDomain: undefined },
-    }),
-  );
+    });
+  });
   return {
-    sources: Object.assign({}, ...specs.map((spec) => spec.sources)),
+    sources: Object.assign(
+      {},
+      ...specs.map((spec) => {
+        return spec.sources;
+      }),
+    ),
     layers: specs
-      .flatMap((spec) => spec.layers)
-      .map((layer) => ({
-        ...layer,
-        // A render seek must never leave native MapLibre paint in a wall-clock
-        // transition. Colors/radii themselves remain the source layer output.
-        paint: {
-          ...layer.paint,
-          "circle-opacity-transition": { duration: 0, delay: 0 },
-          "circle-color-transition": { duration: 0, delay: 0 },
-          "circle-radius-transition": { duration: 0, delay: 0 },
-        },
-      })),
+      .flatMap((spec) => {
+        return spec.layers;
+      })
+      .map((layer) => {
+        return {
+          ...layer,
+          // A render seek must never leave native MapLibre paint in a wall-clock
+          // transition. Colors/radii themselves remain the source layer output.
+          paint: {
+            ...layer.paint,
+            "circle-opacity-transition": { duration: 0, delay: 0 },
+            "circle-color-transition": { duration: 0, delay: 0 },
+            "circle-radius-transition": { duration: 0, delay: 0 },
+          },
+        };
+      }),
   } as MapSpec;
 }

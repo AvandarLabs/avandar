@@ -11,13 +11,17 @@ export function getQuantitySegmentsFromValues({
   if (
     !Number.isFinite(denominator) ||
     denominator <= 0 ||
-    values.some((value) => !Number.isFinite(value) || value < 0)
+    values.some((value) => {
+      return !Number.isFinite(value) || value < 0;
+    })
   ) {
     throw new Error(
       "Quantities must be finite and nonnegative with a positive denominator.",
     );
   }
-  const allocatedTotal = values.reduce((sum, value) => sum + value, 0);
+  const allocatedTotal = values.reduce((sum, value) => {
+    return sum + value;
+  }, 0);
   const tolerance =
     Number.EPSILON *
     Math.max(denominator, allocatedTotal) *
@@ -28,11 +32,14 @@ export function getQuantitySegmentsFromValues({
   ) {
     throw new Error("Authored quantities cannot exceed their denominator.");
   }
-  return values.map((value, index) => ({
-    value,
-    start:
-      values.slice(0, index).reduce((total, amount) => total + amount, 0) /
-      denominator,
-    fraction: value / denominator,
-  }));
+  return values.map((value, index) => {
+    return {
+      value,
+      start:
+        values.slice(0, index).reduce((total, amount) => {
+          return total + amount;
+        }, 0) / denominator,
+      fraction: value / denominator,
+    };
+  });
 }

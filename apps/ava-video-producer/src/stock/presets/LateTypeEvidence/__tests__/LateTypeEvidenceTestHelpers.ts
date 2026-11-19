@@ -145,17 +145,18 @@ function _assertStationaryStrokeShielding({
   value: string;
 }): void {
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup),
-    glyphs = paint.filter(
-      (item) => item.kind === "text" && item.ariaLabel === value,
-    );
+    glyphs = paint.filter((item) => {
+      return item.kind === "text" && item.ariaLabel === value;
+    });
   assert.ok(glyphs.length >= 16);
   paint
-    .filter(
-      (item) =>
+    .filter((item) => {
+      return (
         item.kind === "rect" &&
         item.attributes.stroke !== undefined &&
-        item.attributes.stroke !== "none",
-    )
+        item.attributes.stroke !== "none"
+      );
+    })
     .forEach((rectangle) => {
       const half = Number(rectangle.attributes["stroke-width"] ?? 1) / 2;
       const edges = [
@@ -184,13 +185,15 @@ function _assertStationaryStrokeShielding({
           bottom: rectangle.bottom + half,
         },
       ];
-      glyphs.forEach((glyph) =>
-        edges
-          .filter((edge) => _overlaps({ first: edge, second: glyph }))
+      glyphs.forEach((glyph) => {
+        return edges
+          .filter((edge) => {
+            return _overlaps({ first: edge, second: glyph });
+          })
           .forEach((edge) => {
             assert.ok(
-              paint.some(
-                (backing) =>
+              paint.some((backing) => {
+                return (
                   backing.kind === "rect" &&
                   backing.fill !== "none" &&
                   backing.opacity * backing.fillOpacity === 1 &&
@@ -199,12 +202,13 @@ function _assertStationaryStrokeShielding({
                   backing.left <= Math.max(edge.left, glyph.left) &&
                   backing.right >= Math.min(edge.right, glyph.right) &&
                   backing.top <= Math.max(edge.top, glyph.top) &&
-                  backing.bottom >= Math.min(edge.bottom, glyph.bottom),
-              ),
+                  backing.bottom >= Math.min(edge.bottom, glyph.bottom)
+                );
+              }),
               `Unshielded slot stroke through ${value}`,
             );
-          }),
-      );
+          });
+      });
     });
 }
 export {

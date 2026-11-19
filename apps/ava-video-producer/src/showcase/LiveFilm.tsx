@@ -44,11 +44,13 @@ export function LiveFilm({
       style={{ width: "100%" }}
       clickToPlay={false}
       spaceKeyToPlayOrPause
-      errorFallback={() => (
-        <p className="liveError">
-          Preview unavailable. Check the showcase terminal, then reload.
-        </p>
-      )}
+      errorFallback={() => {
+        return (
+          <p className="liveError">
+            Preview unavailable. Check the showcase terminal, then reload.
+          </p>
+        );
+      }}
     />
   );
 }

@@ -27,7 +27,11 @@ export async function alignRecording(
   const src = `audio/${plan.id}/recorded-${digest}${path.extname(recording).toLowerCase()}`;
   const derived = applySrt(plan, await fs.readFile(srtFile, "utf8"), src);
   const info = await probe(recording);
-  if (!info.streams.some((stream) => stream.codec_type === "audio"))
+  if (
+    !info.streams.some((stream) => {
+      return stream.codec_type === "audio";
+    })
+  )
     throw new Error("Provided recording has no audio stream");
   const directory = await freshStage(plan, "aligned", workspace);
   const assetDirectory = await ensureDirectory(

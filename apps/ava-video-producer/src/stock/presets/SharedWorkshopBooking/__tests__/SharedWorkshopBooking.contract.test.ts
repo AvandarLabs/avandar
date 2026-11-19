@@ -24,10 +24,14 @@ test("overlapping requests become distinct slots around exactly one machine", ()
   const setup = _render({ frame: 20 });
   const hold = _render({ frame: 150 });
   const before = [...setup.matchAll(/<rect data-request="([^"]*)"[^>]*>/g)].map(
-    ([v]) => SvgAttributes.getNumberFromMarkup({ attributes: v, name: "x" }),
+    ([v]) => {
+      return SvgAttributes.getNumberFromMarkup({ attributes: v, name: "x" });
+    },
   );
   const after = [...hold.matchAll(/<rect data-request="[^"]*"[^>]*>/g)].map(
-    ([v]) => SvgAttributes.getNumberFromMarkup({ attributes: v, name: "x" }),
+    ([v]) => {
+      return SvgAttributes.getNumberFromMarkup({ attributes: v, name: "x" });
+    },
   );
   assert.deepEqual(before, [390, 390]);
   assert.deepEqual(after, [390, 570]);
@@ -44,8 +48,9 @@ registerStockPresetAssertions({
   contract,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
   textFrames: [24, 72, 150],
 });
 
@@ -60,14 +65,16 @@ registerStockTextLayoutAssertions({
 test("all-null choices never use the machine while empty booked IDs remain real bookings", () => {
   const unresolved = {
     ...defaultInput,
-    requests: defaultInput.requests.map((request) => ({
-      ...request,
-      agreedSlotId: null,
-    })),
+    requests: defaultInput.requests.map((request) => {
+      return {
+        ...request,
+        agreedSlotId: null,
+      };
+    }),
   };
   inputSchema.parse(unresolved);
-  [true, false].forEach((showOriginalRequests) =>
-    [true, false].forEach((showUsageTurns) => {
+  [true, false].forEach((showOriginalRequests) => {
+    return [true, false].forEach((showUsageTurns) => {
       [20, 90, 116, 138, 150, 166].forEach((frame) => {
         const markup = _render({
           frame: frame,
@@ -81,17 +88,18 @@ test("all-null choices never use the machine while empty booked IDs remain real 
         assert.equal([...markup.matchAll(/data-participant="/g)].length, 2);
         assert.equal([...markup.matchAll(/data-machine="/g)].length, 1);
         [...markup.matchAll(/<rect data-request="[^"]*"[^>]*>/g)].forEach(
-          ([rect]) =>
-            assert.ok(
+          ([rect]) => {
+            return assert.ok(
               SvgAttributes.getNumberFromMarkup({
                 attributes: rect,
                 name: "y",
               }) < 400,
-            ),
+            );
+          },
         );
       });
-    }),
-  );
+    });
+  });
   const input = fixtures[1].input;
   assert.match(_render({ frame: 120, input: input }), /data-use-person=""/);
   assert.doesNotMatch(
@@ -109,30 +117,32 @@ test("booked turns follow slot order rather than request order and ghosts add no
         input: { ...input, showOriginalRequests },
       });
       const uses = [...markup.matchAll(/data-use-person="([^"]*)"/g)].map(
-        (match) => match[1],
+        (match) => {
+          return match[1];
+        },
       );
       assert.deepEqual(uses, [String(2 - index)]);
     });
   });
   const hold = _render({ frame: 150, input: input });
   const rects = [...hold.matchAll(/<rect data-request="[^"]*"[^>]*>/g)].map(
-    ([rect]) => ({
-      x: SvgAttributes.getNumberFromMarkup({ attributes: rect, name: "x" }),
-      width: SvgAttributes.getNumberFromMarkup({
-        attributes: rect,
-        name: "width",
-      }),
-    }),
+    ([rect]) => {
+      return {
+        x: SvgAttributes.getNumberFromMarkup({ attributes: rect, name: "x" }),
+        width: SvgAttributes.getNumberFromMarkup({
+          attributes: rect,
+          name: "width",
+        }),
+      };
+    },
   );
-  rects.forEach((first, index) =>
-    rects
-      .slice(index + 1)
-      .forEach((second) =>
-        assert.ok(
-          first.x + first.width < second.x || second.x + second.width < first.x,
-        ),
-      ),
-  );
+  rects.forEach((first, index) => {
+    return rects.slice(index + 1).forEach((second) => {
+      return assert.ok(
+        first.x + first.width < second.x || second.x + second.width < first.x,
+      );
+    });
+  });
 });
 
 test("participants keep their hands on request strips throughout the agreement movement", () => {
@@ -144,15 +154,21 @@ test("participants keep their hands on request strips throughout the agreement m
         ...markup.matchAll(/<line data-request-hand="([^"]*)"[^>]*>/g),
       ];
       assert.deepEqual(
-        rects.map(([, id]) => id),
+        rects.map(([, id]) => {
+          return id;
+        }),
         input.requests.map(prop("id")),
       );
       assert.deepEqual(
-        hands.map(([, id]) => id),
+        hands.map(([, id]) => {
+          return id;
+        }),
         input.requests.map(prop("id")),
       );
       rects.forEach(([rect, id]) => {
-        const hand = hands.find(([, handId]) => handId === id)![0];
+        const hand = hands.find(([, handId]) => {
+          return handId === id;
+        })![0];
         assert.equal(
           SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "x2" }),
           SvgAttributes.getNumberFromMarkup({ attributes: rect, name: "x" }) +
@@ -231,11 +247,13 @@ test("wrapped agreement caption stays clear of names, heads, hands and returning
         36,
         49.5,
         66,
-        ...Array.from({ length: 165 }, (_, index) => 75 + index / 2),
+        ...Array.from({ length: 165 }, (_, index) => {
+          return 75 + index / 2;
+        }),
         167,
-      ].forEach((frame) =>
-        _assertAgreementClearance({ input: candidate, frame }),
-      );
+      ].forEach((frame) => {
+        return _assertAgreementClearance({ input: candidate, frame });
+      });
       assert.match(
         _render({ frame: 150, input: candidate }),
         /data-agreed-caption-guide=/,
@@ -244,24 +262,28 @@ test("wrapped agreement caption stays clear of names, heads, hands and returning
   });
   Array.from(
     { length: Math.max(0, Math.floor((30 - 1) / 1) + 1) },
-    (_, sampleIndex) => 1 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 1 + sampleIndex * 1;
+    },
   ).forEach((prefix) => {
     const candidate = {
       ...fixtures[2].input,
-      requests: fixtures[2].input.requests.map((request) => ({
-        ...request,
-        participant: `界 ${"界".repeat(prefix)} ${"界".repeat(24)}`.slice(
-          0,
-          24,
-        ),
-      })),
+      requests: fixtures[2].input.requests.map((request) => {
+        return {
+          ...request,
+          participant: `界 ${"界".repeat(prefix)} ${"界".repeat(24)}`.slice(
+            0,
+            24,
+          ),
+        };
+      }),
       labels: {
         ...fixtures[2].input.labels,
         agreed: `語 ${"語".repeat(prefix)} ${"語".repeat(30)}`.slice(0, 30),
       },
     };
-    [90, 150].forEach((frame) =>
-      _assertAgreementClearance({ input: candidate, frame }),
-    );
+    [90, 150].forEach((frame) => {
+      return _assertAgreementClearance({ input: candidate, frame });
+    });
   });
 });

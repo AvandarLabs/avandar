@@ -30,12 +30,13 @@ export function SentenceSpans({
   return (
     <g aria-label={input.fragments.map(prop("text")).join("")}>
       {getSentenceGlyphsFromInput(input).map((glyph, index) => {
-        const spanIndex = spans.findIndex(
-          (span) =>
+        const spanIndex = spans.findIndex((span) => {
+          return (
             span.role !== "connector" &&
             glyph.start < span.end &&
-            glyph.end > span.start,
-        );
+            glyph.end > span.start
+          );
+        });
         return (
           <g key={index}>
             <text

@@ -80,14 +80,16 @@ export function ContinuityDiagramLane({ content, frame, accent }: Props) {
   return (
     <>
       <DiagramConnector content={content} frame={frame} accent={accent} />
-      {content.diagrams.map((diagram) => (
-        <FloatingDiagram
-          key={diagram.at}
-          content={content}
-          diagram={diagram}
-          frame={frame}
-        />
-      ))}
+      {content.diagrams.map((diagram) => {
+        return (
+          <FloatingDiagram
+            key={diagram.at}
+            content={content}
+            diagram={diagram}
+            frame={frame}
+          />
+        );
+      })}
     </>
   );
 }

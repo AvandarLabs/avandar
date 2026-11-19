@@ -17,18 +17,20 @@ export function WideTableToObservations({
     <g opacity={ramp(frame, 0, 12)}>
       <WideLedgerCaptions input={input} frame={frame} />
       <WideSourceGuides input={input} frame={frame} />
-      {input.measures.flatMap((measure, measureIndex) =>
-        input.subjects.map((subject, subjectIndex) => (
-          <MeasurementStrip
-            key={`${subjectIndex}:${measureIndex}`}
-            input={input}
-            frame={frame}
-            accent={accent}
-            subjectIndex={subjectIndex}
-            measureIndex={measureIndex}
-          />
-        )),
-      )}
+      {input.measures.flatMap((measure, measureIndex) => {
+        return input.subjects.map((subject, subjectIndex) => {
+          return (
+            <MeasurementStrip
+              key={`${subjectIndex}:${measureIndex}`}
+              input={input}
+              frame={frame}
+              accent={accent}
+              subjectIndex={subjectIndex}
+              measureIndex={measureIndex}
+            />
+          );
+        });
+      })}
     </g>
   );
 }

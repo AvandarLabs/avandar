@@ -14,18 +14,18 @@ const supported: StockControl[] = makeStockControlsFromSchema({
     z.strictObject(inputSchema.shape).omit({ grid: true }),
   ),
   messageNamespace: NAMESPACE,
-}).map((control) =>
-  control.kind === "select" && "options" in control
+}).map((control) => {
+  return control.kind === "select" && "options" in control
     ? {
         ...control,
-        options: control.options.map((option) =>
-          option.value === "whitespace"
+        options: control.options.map((option) => {
+          return option.value === "whitespace"
             ? { ...option, label: inferredLayoutMessage }
-            : option,
-        ),
+            : option;
+        }),
       }
-    : control,
-);
+    : control;
+});
 /**
  * Explicit nested primitive collections preserve every coordinate occurrence.
  */

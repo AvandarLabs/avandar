@@ -24,21 +24,23 @@ export function BezierFields({ points, isCameraCurve, onChange }: Props) {
   const names = ["Start x", "Start y", "End x", "End y"];
   return (
     <div className={css.bezierFields}>
-      {points.map((point, index) => (
-        <RangeNumberInput
-          key={names[index]}
-          size="xs"
-          label={names[index]}
-          min={isCameraCurve || index % 2 === 0 ? 0 : -1}
-          max={isCameraCurve || index % 2 === 0 ? 1 : 2}
-          step={0.01}
-          decimalScale={3}
-          value={point}
-          onChange={(pointValue) =>
-            onChange(_withPoint(points, index, pointValue))
-          }
-        />
-      ))}
+      {points.map((point, index) => {
+        return (
+          <RangeNumberInput
+            key={names[index]}
+            size="xs"
+            label={names[index]}
+            min={isCameraCurve || index % 2 === 0 ? 0 : -1}
+            max={isCameraCurve || index % 2 === 0 ? 1 : 2}
+            step={0.01}
+            decimalScale={3}
+            value={point}
+            onChange={(pointValue) => {
+              return onChange(_withPoint(points, index, pointValue));
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

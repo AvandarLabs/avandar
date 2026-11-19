@@ -24,8 +24,12 @@ async function _statusOfFailedLoad({
   load: (id: string) => Promise<unknown>;
 }>): Promise<400 | 404> {
   const isKnownFilm = await load(id).then(
-    () => true,
-    () => false,
+    () => {
+      return true;
+    },
+    () => {
+      return false;
+    },
   );
   console.error(
     isKnownFilm

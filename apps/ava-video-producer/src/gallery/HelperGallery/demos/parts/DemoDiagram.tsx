@@ -22,7 +22,9 @@ const EDGES = [
 const NODE = { width: 150, height: 64 };
 
 function _findNode(id: string) {
-  return DIAGRAM_NODES.find((node) => node.id === id)!;
+  return DIAGRAM_NODES.find((node) => {
+    return node.id === id;
+  })!;
 }
 
 /** One labelled node of the preview diagram. */
@@ -82,14 +84,16 @@ export function DemoDiagram() {
           />
         );
       })}
-      {DIAGRAM_NODES.map((node) => (
-        <DiagramNode
-          key={node.id}
-          x={node.x}
-          y={node.y}
-          label={labels[node.id]}
-        />
-      ))}
+      {DIAGRAM_NODES.map((node) => {
+        return (
+          <DiagramNode
+            key={node.id}
+            x={node.x}
+            y={node.y}
+            label={labels[node.id]}
+          />
+        );
+      })}
     </g>
   );
 }

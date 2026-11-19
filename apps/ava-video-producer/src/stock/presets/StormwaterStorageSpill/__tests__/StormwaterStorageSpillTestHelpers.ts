@@ -50,9 +50,9 @@ function _getVisibleTexts({
     input.copy.discharge,
     input.copy.detained,
     input.copy.overflow,
-    ...[infiltration, discharge, detained, overflow].map(
-      (value) => `${value} ${input.copy.unit}`,
-    ),
+    ...[infiltration, discharge, detained, overflow].map((value) => {
+      return `${value} ${input.copy.unit}`;
+    }),
     ...(input.showBalance
       ? [
           `${incoming} = ${infiltration} + ${discharge} + ${detained} + ${overflow} ${input.copy.unit}`,

@@ -43,10 +43,9 @@ export function LiteralDataText({
             textDecoration={isWhitespace ? "underline" : undefined}
           >
             {isWhitespace
-              ? segment.replace(
-                  /\s/gu,
-                  (character) => WHITESPACE_MARKS[character] ?? "␣",
-                )
+              ? segment.replace(/\s/gu, (character) => {
+                  return WHITESPACE_MARKS[character] ?? "␣";
+                })
               : segment}
           </tspan>
         );

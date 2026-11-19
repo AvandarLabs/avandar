@@ -56,9 +56,9 @@ export const inputSchema = z
       });
     }
     if (
-      !input.rows.some(
-        ({ category }) => category === input.request.selectedCategory,
-      )
+      !input.rows.some(({ category }) => {
+        return category === input.request.selectedCategory;
+      })
     ) {
       context.addIssue({
         code: "custom",

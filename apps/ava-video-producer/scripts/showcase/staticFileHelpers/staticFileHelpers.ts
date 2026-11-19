@@ -5,7 +5,11 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 
 /** Resolve only regular files inside an explicitly served directory. */
 export async function servedFile(root: string, relative: string) {
-  if (relative.split(/[\\/]/).some((part) => part.startsWith("."))) {
+  if (
+    relative.split(/[\\/]/).some((part) => {
+      return part.startsWith(".");
+    })
+  ) {
     throw new Error("Not found");
   }
   const base = await realpath(root);
@@ -78,6 +82,8 @@ export async function streamFile(
     return;
   }
   createReadStream(file, { start, end })
-    .on("error", () => res.destroy())
+    .on("error", () => {
+      return res.destroy();
+    })
     .pipe(res);
 }

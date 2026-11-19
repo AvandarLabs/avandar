@@ -23,10 +23,9 @@ export function ContinuityToken({
   const timing = getContinuityTimeline(plan.beats);
   const index = Math.max(
     0,
-    timing.reduce(
-      (found, entry, position) => (frame >= entry.start ? position : found),
-      0,
-    ),
+    timing.reduce((found, entry, position) => {
+      return frame >= entry.start ? position : found;
+    }, 0),
   );
   const beat = plan.beats[index];
   if (!beat.token) return null;

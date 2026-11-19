@@ -36,8 +36,8 @@ export function Cursor({
         pointerEvents: "none",
       }}
     >
-      {cursorShutter(frame, path).map((sample, index) =>
-        sample.opacity > 0 ? (
+      {cursorShutter(frame, path).map((sample, index) => {
+        return sample.opacity > 0 ? (
           <MacOSCursor
             key={index}
             cursor={cursor}
@@ -48,8 +48,8 @@ export function Cursor({
               opacity: sample.opacity,
             }}
           />
-        ) : null,
-      )}
+        ) : null;
+      })}
       <MacOSCursor
         cursor={cursor}
         showInTimeline={false}

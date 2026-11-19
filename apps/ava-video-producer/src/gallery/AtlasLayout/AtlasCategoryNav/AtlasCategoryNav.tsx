@@ -49,19 +49,25 @@ export function AtlasCategoryNav({
           label={allLabel}
           count={total}
           isActive={selected === ALL_ATLAS_CATEGORIES}
-          onClick={() => onSelect(ALL_ATLAS_CATEGORIES)}
+          onClick={() => {
+            return onSelect(ALL_ATLAS_CATEGORIES);
+          }}
         />
         <div className="category-list">
-          {categories.map((category) => (
-            <CategoryButton
-              key={category.id}
-              icon={category.icon ?? "grid"}
-              label={category.label}
-              count={category.count}
-              isActive={selected === category.id}
-              onClick={() => onSelect(category.id)}
-            />
-          ))}
+          {categories.map((category) => {
+            return (
+              <CategoryButton
+                key={category.id}
+                icon={category.icon ?? "grid"}
+                label={category.label}
+                count={category.count}
+                isActive={selected === category.id}
+                onClick={() => {
+                  return onSelect(category.id);
+                }}
+              />
+            );
+          })}
         </div>
       </div>
       {children}

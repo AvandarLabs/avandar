@@ -47,9 +47,9 @@ export function CaptionOverlay({
         pointerEvents: "none",
       }}
     >
-      {geometry.lines.map((line, index) => (
-        <div key={index}>{line}</div>
-      ))}
+      {geometry.lines.map((line, index) => {
+        return <div key={index}>{line}</div>;
+      })}
     </div>
   );
 }

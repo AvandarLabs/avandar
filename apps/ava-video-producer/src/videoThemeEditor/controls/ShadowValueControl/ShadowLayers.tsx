@@ -23,22 +23,26 @@ export function ShadowLayers({ layers, onChange }: Props) {
         fields={EFFECT_FIELDS.shadow}
         values={layer}
         fallback={DEFAULT_SHADOW_LAYER}
-        onChange={(layerValues) =>
-          onChange(
-            layers.map((current, position) =>
-              position === index
+        onChange={(layerValues) => {
+          return onChange(
+            layers.map((current, position) => {
+              return position === index
                 ? { ...DEFAULT_SHADOW_LAYER, ...layerValues }
-                : current,
-            ),
-          )
-        }
+                : current;
+            }),
+          );
+        }}
         action={
           <Button
             size="compact-xs"
             variant="subtle"
-            onClick={() =>
-              onChange(layers.filter((_, position) => position !== index))
-            }
+            onClick={() => {
+              return onChange(
+                layers.filter((_, position) => {
+                  return position !== index;
+                }),
+              );
+            }}
           >
             {`Remove layer ${layerNumber}`}
           </Button>

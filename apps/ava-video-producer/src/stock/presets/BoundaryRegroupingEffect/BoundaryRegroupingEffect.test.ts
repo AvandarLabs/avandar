@@ -92,15 +92,15 @@ test("fixed atomic cells survive a change from west/east rates 15/15 to north/so
   const start = _render({ frame: 0 }),
     hold = _render({ frame: 150 });
   assert.deepEqual(
-    [...start.matchAll(/data-value="([^"]+)"/g)].map((match) =>
-      Number(match[1]),
-    ),
+    [...start.matchAll(/data-value="([^"]+)"/g)].map((match) => {
+      return Number(match[1]);
+    }),
     [15, 15],
   );
   assert.deepEqual(
-    [...hold.matchAll(/data-value="([^"]+)"/g)].map((match) =>
-      Number(match[1]),
-    ),
+    [...hold.matchAll(/data-value="([^"]+)"/g)].map((match) => {
+      return Number(match[1]);
+    }),
     [20, 10],
   );
   assert.deepEqual(
@@ -119,11 +119,13 @@ test("fixed atomic cells survive a change from west/east rates 15/15 to north/so
 test("unequal populations aggregate before dividing and hidden values retain zero-count groups", () => {
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell, index) => ({
-      ...cell,
-      records: index === 0 ? 7 : 0,
-      population: index === 0 ? 24 : 1,
-    })),
+    cells: DEFAULT_INPUT.cells.map((cell, index) => {
+      return {
+        ...cell,
+        records: index === 0 ? 7 : 0,
+        population: index === 0 ? 24 : 1,
+      };
+    }),
     showCellValues: false,
   });
   assert.deepEqual(
@@ -131,7 +133,9 @@ test("unequal populations aggregate before dividing and hidden values retain zer
       ..._render({ frame: 150, input: input }).matchAll(
         /data-value="([^"]+)"/g,
       ),
-    ].map((match) => Number(match[1])),
+    ].map((match) => {
+      return Number(match[1]);
+    }),
     [28, 0],
   );
   assert.match(
@@ -143,7 +147,9 @@ test("unequal populations aggregate before dividing and hidden values retain zer
       ..._render({ frame: 150, input: changedInput }).matchAll(
         /data-value="([^"]+)"/g,
       ),
-    ].map((match) => Number(match[1])),
+    ].map((match) => {
+      return Number(match[1]);
+    }),
     [7, 0],
   );
 });
@@ -162,14 +168,18 @@ test("holes remain empty and diagonal-only zones reject as noncontiguous", () =>
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
     cells,
-    groupings: groups.map((zones) => ({
-      label: "",
-      zones: zones.map((cellIds, index) => ({
-        id: String(index),
+    groupings: groups.map((zones) => {
+      return {
         label: "",
-        cellIds,
-      })),
-    })),
+        zones: zones.map((cellIds, index) => {
+          return {
+            id: String(index),
+            label: "",
+            cellIds,
+          };
+        }),
+      };
+    }),
   });
   assert.equal(
     (_render({ frame: 150, input: input }).match(/data-atomic-cell=/g) ?? [])
@@ -183,13 +193,15 @@ test("holes remain empty and diagonal-only zones reject as noncontiguous", () =>
   assert.equal(
     inputSchema.safeParse({
       ...DEFAULT_INPUT,
-      groupings: DEFAULT_INPUT.groupings.map((grouping) => ({
-        ...grouping,
-        zones: [
-          { id: "a", label: "", cellIds: ["nw", "se"] },
-          { id: "b", label: "", cellIds: ["ne", "sw"] },
-        ],
-      })),
+      groupings: DEFAULT_INPUT.groupings.map((grouping) => {
+        return {
+          ...grouping,
+          zones: [
+            { id: "a", label: "", cellIds: ["nw", "se"] },
+            { id: "b", label: "", cellIds: ["ne", "sw"] },
+          ],
+        };
+      }),
     }).success,
     false,
   );
@@ -197,10 +209,12 @@ test("holes remain empty and diagonal-only zones reject as noncontiguous", () =>
 test("full cell labels leave vertical clearance above their fixed fraction", () => {
   const input = {
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell) => ({
-      ...cell,
-      label: "界界界 界界界 界界界 界界界 ",
-    })),
+    cells: DEFAULT_INPUT.cells.map((cell) => {
+      return {
+        ...cell,
+        label: "界界界 界界界 界界界 界界界 ",
+      };
+    }),
   };
   const markup = _render({ frame: 150, input: input });
   const texts = [
@@ -215,7 +229,9 @@ test("full cell labels leave vertical clearance above their fixed fraction", () 
       name: "y",
     });
     const offsets = [...match[0].matchAll(/ dy="([^"]+)"/g)].reduce(
-      (total, item) => total + Number(item[1]),
+      (total, item) => {
+        return total + Number(item[1]);
+      },
       0,
     );
     assert.ok(baseline + offsets + 3 < 240 + input.cells[index].row * 110 - 12);
@@ -235,10 +251,9 @@ test("the full rate-unit heading stays clear of the unchanged total figures", ()
   )![0];
   const bottom =
     SvgAttributes.getNumberFromMarkup({ attributes: text, name: "y" }) +
-    [...text.matchAll(/ dy="([^"]+)"/g)].reduce(
-      (sum, item) => sum + Number(item[1]),
-      0,
-    ) +
+    [...text.matchAll(/ dy="([^"]+)"/g)].reduce((sum, item) => {
+      return sum + Number(item[1]);
+    }, 0) +
     3;
   assert.ok(bottom < 510 - 18);
 });

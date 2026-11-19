@@ -17,8 +17,8 @@ import { inputSchema, type Input } from "./NestedDrilldownWindow.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(NestedDrilldownWindow, {
       frame,
       input,
@@ -26,6 +26,7 @@ const render = ({
       id: "test",
     }),
   );
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -35,24 +36,29 @@ registerStockPresetAssertions({
   render,
   excludedTextFields: ["id", "groups", "selectionPath", "selectionStyle"],
   textFrames: [36, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.labels.title,
-    input.labels.root,
-    ...input.selectionPath,
-    ...input.records
-      .filter(
-        (record) =>
-          frame < 40 ||
-          input.selectionPath.every(
-            (value, index) => record.groups[index] === value,
-          ),
-      )
-      .map(prop("label")),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.labels.title,
+      input.labels.root,
+      ...input.selectionPath,
+      ...input.records
+        .filter((record) => {
+          return (
+            frame < 40 ||
+            input.selectionPath.every((value, index) => {
+              return record.groups[index] === value;
+            })
+          );
+        })
+        .map(prop("label")),
+    ];
+  },
 });
 function _slips(markup: string) {
   return [...markup.matchAll(/<rect[^>]*data-record-id="[^"]*"[^>]*>/g)].map(
-    (match) => match[0],
+    (match) => {
+      return match[0];
+    },
   );
 }
 test("detail membership satisfies the full exact path and preserves the parent breadcrumb", () => {
@@ -88,8 +94,8 @@ test("the first group window opens before a distinct second narrowing and slips 
   assert.equal((grouped.match(/data-parent-group=/g) ?? []).length, 2);
 });
 test("dense setup and selected detail geometry stays bounded through both narrowing beats", () => {
-  [fixtures[2].input, fixtures[4].input].forEach((input) =>
-    [36, 40, 58, 74, 92, 118, 150].forEach((frame) => {
+  [fixtures[2].input, fixtures[4].input].forEach((input) => {
+    return [36, 40, 58, 74, 92, 118, 150].forEach((frame) => {
       const rects = _slips(render({ frame: frame, input: input }));
       assert.ok(rects.length > 0);
       rects.forEach((rect) => {
@@ -121,8 +127,8 @@ test("dense setup and selected detail geometry stays bounded through both narrow
         );
       });
       if (frame === 150) {
-        rects.forEach((rect, index) =>
-          rects.slice(index + 1).forEach((other) => {
+        rects.forEach((rect, index) => {
+          return rects.slice(index + 1).forEach((other) => {
             const x = SvgAttributes.getNumberFromMarkup({
                 attributes: rect,
                 name: "x",
@@ -165,20 +171,22 @@ test("dense setup and selected detail geometry stays bounded through both narrow
                   }) <=
                   y,
             );
-          }),
-        );
+          });
+        });
       }
-    }),
-  );
+    });
+  });
 });
 
 test("visually similar whitespace groups remain separate exact selections", () => {
   const input: Input = {
     ...DEFAULT_INPUT,
-    records: DEFAULT_INPUT.records.map((record, index) => ({
-      ...record,
-      groups: [index === 0 ? "A B" : "A  B", `${" \t\n\r".repeat(4)}  `],
-    })),
+    records: DEFAULT_INPUT.records.map((record, index) => {
+      return {
+        ...record,
+        groups: [index === 0 ? "A B" : "A  B", `${" \t\n\r".repeat(4)}  `],
+      };
+    }),
     selectionPath: ["A B"],
   };
   const markup = render({ frame: 150, input: input });

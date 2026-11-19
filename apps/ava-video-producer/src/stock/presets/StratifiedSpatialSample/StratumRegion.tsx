@@ -23,9 +23,9 @@ export function StratumRegion({
   accent,
 }: Readonly<Props>): ReactNode {
   const eligible = input.sites.filter(propEq("stratumId", stratum.id));
-  const selected = eligible.filter((site) =>
-    input.selectedSiteIds.includes(site.id),
-  );
+  const selected = eligible.filter((site) => {
+    return input.selectedSiteIds.includes(site.id);
+  });
   const color = [accent, STOCK.cyan, STOCK.orange, STOCK.mint][index];
   return (
     <g

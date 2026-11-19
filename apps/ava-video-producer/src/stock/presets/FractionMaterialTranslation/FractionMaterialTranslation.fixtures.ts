@@ -63,11 +63,13 @@ export const minimumInput: Input = {
 export const denseInput: Input = {
   ...DEFAULT_INPUT,
   fraction: { numerator: 1, denominator: 8 },
-  representations: DEFAULT_INPUT.representations.map((representation) => ({
-    ...representation,
-    learnerLabel: "界".repeat(16),
-    materialLabel: "界".repeat(22),
-  })),
+  representations: DEFAULT_INPUT.representations.map((representation) => {
+    return {
+      ...representation,
+      learnerLabel: "界".repeat(16),
+      materialLabel: "界".repeat(22),
+    };
+  }),
   lessonLabel: "界".repeat(36),
   caption: "界".repeat(56),
 };

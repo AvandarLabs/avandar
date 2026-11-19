@@ -57,8 +57,8 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 
 test("changed choice clears only the other entrance and all mobility/barrier combinations work", () => {
-  ["unfold-ramp", "clear-entrance"].forEach((accessChange) =>
-    ["walking", "wheelchair"].forEach((participantMobility) => {
+  ["unfold-ramp", "clear-entrance"].forEach((accessChange) => {
+    return ["walking", "wheelchair"].forEach((participantMobility) => {
       const input = inputSchema.parse({
         ...CHANGED_INPUT,
         accessChange,
@@ -66,18 +66,18 @@ test("changed choice clears only the other entrance and all mobility/barrier com
       });
       const setup = _render({ frame: 24, input: input });
       const final = _render({ frame: 150, input: input });
-      const barriers = (markup: string) => [
-        ...markup.matchAll(/<path data-barrier="([^"]*)"[^>]*>/g),
-      ];
+      const barriers = (markup: string) => {
+        return [...markup.matchAll(/<path data-barrier="([^"]*)"[^>]*>/g)];
+      };
       const before = barriers(setup);
       const after = barriers(final);
       assert.equal(after.length, input.services.length);
-      after.forEach((barrier, index) =>
-        assert.equal(
+      after.forEach((barrier, index) => {
+        return assert.equal(
           barrier[0] === before[index][0],
           input.services[index].id !== input.chosenServiceId,
-        ),
-      );
+        );
+      });
       const actor = final.match(/<g data-participant-position="inside"[^>]*>/);
       assert.ok(actor);
       const choiceIndex = input.services.findIndex(
@@ -100,8 +100,8 @@ test("changed choice clears only the other entrance and all mobility/barrier com
       );
       assert.match(_render({ frame: 65, input: input }), /data-staff-hand/);
       assert.doesNotMatch(final, /data-choice-label/);
-    }),
-  );
+    });
+  });
 });
 test("participant points toward the selected doorway and clears the whole barrier before moving", () => {
   const selected = _render({ frame: 36 });
@@ -212,22 +212,24 @@ test("I2 obstruction-only access has a level threshold and wheel clearance", () 
   });
 });
 test("I2 actual wheel rims and walking feet clear the emitted route in both barrier variants", () => {
-  ["clear-entrance", "unfold-ramp"].forEach((accessChange) =>
-    ["walking", "wheelchair"].forEach((participantMobility) => {
+  ["clear-entrance", "unfold-ramp"].forEach((accessChange) => {
+    return ["walking", "wheelchair"].forEach((participantMobility) => {
       const input = inputSchema.parse({
         ...CHANGED_INPUT,
         accessChange,
         participantMobility,
       });
-      Array.from({ length: 23 }, (_, index) => 98 + index).forEach((frame) => {
+      Array.from({ length: 23 }, (_, index) => {
+        return 98 + index;
+      }).forEach((frame) => {
         const markup = _render({ frame: frame, input: input }),
           route = markup.match(/<path data-access-route[^>]*>/);
         assert.ok(route);
         const segments = ServiceSvgGeometry.getPathSegmentsFromTag(route[0]);
         const floor = (x: number) => {
-          const segment = segments.find(
-            ({ start, end }) => x >= start.x && x <= end.x,
-          );
+          const segment = segments.find(({ start, end }) => {
+            return x >= start.x && x <= end.x;
+          });
           assert.ok(segment);
           return (
             segment.start.y +
@@ -252,15 +254,14 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
                 attributes: wheel[0],
                 name: "r",
               }) + 1;
-          Array.from(
-            { length: 73 },
-            (_, index) => (index * Math.PI) / 36,
-          ).forEach((angle) =>
-            assert.ok(
+          Array.from({ length: 73 }, (_, index) => {
+            return (index * Math.PI) / 36;
+          }).forEach((angle) => {
+            return assert.ok(
               cy + radius * Math.sin(angle) <=
                 floor(cx + radius * Math.cos(angle)) + 1e-8,
-            ),
-          );
+            );
+          });
         });
         if (participantMobility === "walking") {
           const body =
@@ -269,13 +270,13 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
           assert.ok(body);
           const feet = [...body[1].matchAll(/L([^ ]+) ([^ M]+)/g)];
           assert.equal(feet.length, 2);
-          feet.forEach((foot) =>
-            assert.ok(
+          feet.forEach((foot) => {
+            return assert.ok(
               Math.abs(Number(foot[2]) - floor(Number(foot[1]))) < 1e-8,
-            ),
-          );
+            );
+          });
         }
       });
-    }),
-  );
+    });
+  });
 });

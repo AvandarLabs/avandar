@@ -25,16 +25,18 @@ export function CellNormalization({
           strokeDashoffset={1 - ramp(frame, 60, 52)}
         />
       </g>
-      {input.rows.map((row, index) => (
-        <CleanupRow
-          key={row.id}
-          row={row}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.rows.map((row, index) => {
+        return (
+          <CleanupRow
+            key={row.id}
+            row={row}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

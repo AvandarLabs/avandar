@@ -31,7 +31,9 @@ export function ThemeStyleDemo({ frame, frames }: HelperDemoProps) {
       label="createThemeStyleFromTheme(shot.theme)"
       readouts={Object.entries(style)
         .slice(0, 3)
-        .map(([name, value]) => ({ name, value: String(value) }))}
+        .map(([name, value]) => {
+          return { name, value: String(value) };
+        })}
     >
       <div className={css.themedShot} style={style}>
         <span className={css.themedCard}>Same scene, shot theme</span>

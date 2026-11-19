@@ -20,10 +20,12 @@ export function TerminalType({
   accent,
 }: Readonly<Props>): ReactNode {
   const terminalCommand = input.command;
-  const steps = input.steps.map((step, index) => ({
-    ...step,
-    at: 61 + index * 22,
-  }));
+  const steps = input.steps.map((step, index) => {
+    return {
+      ...step,
+      at: 61 + index * 22,
+    };
+  });
   const command = typed(frame, 17, terminalCommand, 28);
   const terminalX = 130;
   return (
@@ -50,24 +52,26 @@ export function TerminalType({
             fill={accent}
           />
         ) : null}
-        {steps.map((step, i) => (
-          <Arrive frame={frame} at={step.at} key={step.at}>
-            <Check x={111} y={267 + i * 54} color={accent} size={14} />
-            <Text x={139} y={274 + i * 54} size={21} mono>
-              {step.text}
-            </Text>
-            <Text
-              x={851}
-              y={274 + i * 54}
-              size={16}
-              mono
-              anchor="end"
-              fill={STOCK.muted}
-            >
-              {step.detail}
-            </Text>
-          </Arrive>
-        ))}
+        {steps.map((step, i) => {
+          return (
+            <Arrive frame={frame} at={step.at} key={step.at}>
+              <Check x={111} y={267 + i * 54} color={accent} size={14} />
+              <Text x={139} y={274 + i * 54} size={21} mono>
+                {step.text}
+              </Text>
+              <Text
+                x={851}
+                y={274 + i * 54}
+                size={16}
+                mono
+                anchor="end"
+                fill={STOCK.muted}
+              >
+                {step.detail}
+              </Text>
+            </Arrive>
+          );
+        })}
         <g opacity={ramp(frame, 126, DUR.sheet)}>
           <rect
             x={96}

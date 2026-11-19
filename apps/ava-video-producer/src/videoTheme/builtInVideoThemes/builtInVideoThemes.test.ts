@@ -20,7 +20,9 @@ import type { EasingValue } from "../videoTheme.types";
 
 const atomic = classicJson.other.video.atomic;
 const semantic = classicJson.other.video.semantic;
-const SAMPLES = Array.from({ length: 21 }, (_, index) => index / 20);
+const SAMPLES = Array.from({ length: 21 }, (_, index) => {
+  return index / 20;
+});
 
 test("classic's swatches equal the stock palette", () => {
   for (const [name, color] of Object.entries(STOCK)) {
@@ -160,8 +162,12 @@ test("every continuity composition keeps its authored accent through classic's o
 
 test("every continuity entry in the Atlas has a classic override", () => {
   assert.deepEqual(
-    CONTINUITY_CATALOG.filter((entry) => !isSceneEntry(entry))
-      .map((entry) => entry.id)
+    CONTINUITY_CATALOG.filter((entry) => {
+      return !isSceneEntry(entry);
+    })
+      .map((entry) => {
+        return entry.id;
+      })
       .sort(),
     Object.keys(AUTHORED_ACCENTS).sort(),
   );

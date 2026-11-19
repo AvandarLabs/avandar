@@ -98,7 +98,9 @@ function _steps(motion: MotionTokens, scale: (frames: number) => number) {
  * `useGraphicMotion` in stock shapes and `useVideoMotion` on the stage.
  */
 export function createVideoMotion(motion: MotionTokens): VideoMotion {
-  const scale = (frames: number) => frames / motion.tempo;
+  const scale = (frames: number) => {
+    return frames / motion.tempo;
+  };
   return {
     tempo: motion.tempo,
     scale,

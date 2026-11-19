@@ -35,7 +35,9 @@ export const MotionCard = memo(function MotionCard({
       <button
         ref={element}
         className="card-preview"
-        onClick={() => onOpen(preset)}
+        onClick={() => {
+          return onOpen(preset);
+        }}
         aria-label={`Explore ${preset.name}`}
       >
         {visible ? (
@@ -68,12 +70,19 @@ export const MotionCard = memo(function MotionCard({
           </span>
         </div>
         <div className="card-heading">
-          <button className="card-title" onClick={() => onOpen(preset)}>
+          <button
+            className="card-title"
+            onClick={() => {
+              return onOpen(preset);
+            }}
+          >
             {preset.name}
           </button>
           <button
             className={`save-button ${saved ? "is-saved" : ""}`}
-            onClick={() => onSave(preset.id)}
+            onClick={() => {
+              return onSave(preset.id);
+            }}
             aria-label={
               saved
                 ? `Remove ${preset.name} from references`
@@ -90,7 +99,9 @@ export const MotionCard = memo(function MotionCard({
             {String(index + 1).padStart(2, "0")}/{preset.id}
           </code>
           <button
-            onClick={() => onOpen(preset)}
+            onClick={() => {
+              return onOpen(preset);
+            }}
             aria-label={`View ${preset.name} details`}
           >
             <span>Explore</span>

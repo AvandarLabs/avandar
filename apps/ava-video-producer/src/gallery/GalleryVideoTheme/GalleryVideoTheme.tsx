@@ -83,24 +83,21 @@ export function GalleryVideoTheme({
   });
   const valid = useValidThemeDraft({ library, themeId, draft });
   const copyThemeJson = useCopyThemeJson(state);
-  const savedTheme = useMemo(
-    () => makeResolvedVideoThemeFromLibrary(library, themeId),
-    [library, themeId],
-  );
-  const videoContext = useMemo(
-    () => ({ theme: savedTheme, source: { library, themeId } }),
-    [savedTheme, library, themeId],
-  );
-  const value = useMemo<GalleryVideoThemeValue>(
-    () => ({
+  const savedTheme = useMemo(() => {
+    return makeResolvedVideoThemeFromLibrary(library, themeId);
+  }, [library, themeId]);
+  const videoContext = useMemo(() => {
+    return { theme: savedTheme, source: { library, themeId } };
+  }, [savedTheme, library, themeId]);
+  const value = useMemo<GalleryVideoThemeValue>(() => {
+    return {
       ...state,
       validDraft: valid.draft,
       galleryTheme: draftTheme.theme,
       hasIssues: !valid.isValid,
       copyThemeJson,
-    }),
-    [state, valid.draft, valid.isValid, draftTheme.theme, copyThemeJson],
-  );
+    };
+  }, [state, valid.draft, valid.isValid, draftTheme.theme, copyThemeJson]);
   return (
     <GalleryVideoThemeContext.Provider value={value}>
       <VideoThemeContext.Provider value={videoContext}>

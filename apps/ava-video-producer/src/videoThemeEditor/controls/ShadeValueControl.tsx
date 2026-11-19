@@ -14,18 +14,22 @@ export function ShadeValueControl({
     typeof value === "number"
       ? { light: value, dark: value }
       : (value as Shade);
-  const field = (side: keyof Shade, name: string) => (
-    <RangeNumberInput
-      size="xs"
-      label={name}
-      min={0}
-      max={9}
-      step={1}
-      allowDecimal={false}
-      value={shade[side]}
-      onChange={(shadeIndex) => onChange({ ...shade, [side]: shadeIndex })}
-    />
-  );
+  const field = (side: keyof Shade, name: string) => {
+    return (
+      <RangeNumberInput
+        size="xs"
+        label={name}
+        min={0}
+        max={9}
+        step={1}
+        allowDecimal={false}
+        value={shade[side]}
+        onChange={(shadeIndex) => {
+          return onChange({ ...shade, [side]: shadeIndex });
+        }}
+      />
+    );
+  };
   return (
     <Group gap="xs" role="group" aria-label={label}>
       {field("dark", "On dark backgrounds")}

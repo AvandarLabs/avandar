@@ -14,7 +14,9 @@ function _saveTextFile(text: string, fileName: string): void {
   link.href = url;
   link.download = fileName;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
+  setTimeout(() => {
+    return URL.revokeObjectURL(url);
+  }, 0);
 }
 
 /**
@@ -33,7 +35,9 @@ export async function downloadCaptionFile(
   const {
     id,
     options,
-    fetchFile = (url, init) => fetch(url, init),
+    fetchFile = (url, init) => {
+      return fetch(url, init);
+    },
     saveFile = _saveTextFile,
   } = request;
   const response = await fetchFile("/api/captions", {

@@ -41,11 +41,13 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "minimum",
     input: {
       ...DEFAULT_INPUT,
-      records: Array.from({ length: 4 }, (_, index) => ({
-        id: index === 0 ? "" : ` 二 ${index}`,
-        label: "",
-        groups: [" ", " "],
-      })),
+      records: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: index === 0 ? "" : ` 二 ${index}`,
+          label: "",
+          groups: [" ", " "],
+        };
+      }),
       dimensions: ["A", "B"],
       selectionPath: [" "],
       labels: { ...DEFAULT_INPUT.labels, title: "" },
@@ -56,14 +58,16 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      records: Array.from({ length: 8 }, (_, index) => ({
-        id: `record ${index}`,
-        label: "W".repeat(22),
-        groups: [
-          `${"N".repeat(17)}${index % 3}`,
-          `${"S".repeat(17)}${index % 2}`,
-        ],
-      })),
+      records: Array.from({ length: 8 }, (_, index) => {
+        return {
+          id: `record ${index}`,
+          label: "W".repeat(22),
+          groups: [
+            `${"N".repeat(17)}${index % 3}`,
+            `${"S".repeat(17)}${index % 2}`,
+          ],
+        };
+      }),
       dimensions: ["W".repeat(22), "W".repeat(22)],
       selectionPath: [`${"N".repeat(17)}0`, `${"S".repeat(17)}0`],
       labels: {
@@ -87,11 +91,13 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "all-detail",
     input: {
       ...DEFAULT_INPUT,
-      records: Array.from({ length: 8 }, (_, index) => ({
-        id: `detail ${index}`,
-        label: "W".repeat(22),
-        groups: ["North", "Stored"],
-      })),
+      records: Array.from({ length: 8 }, (_, index) => {
+        return {
+          id: `detail ${index}`,
+          label: "W".repeat(22),
+          groups: ["North", "Stored"],
+        };
+      }),
       selectionPath: ["North"],
     },
   },
@@ -105,14 +111,18 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, selectionPath: ["north"] },
   {
     ...DEFAULT_INPUT,
-    records: DEFAULT_INPUT.records.map((record) => ({ ...record, id: "" })),
+    records: DEFAULT_INPUT.records.map((record) => {
+      return { ...record, id: "" };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    records: DEFAULT_INPUT.records.map((record, index) => ({
-      ...record,
-      groups: [String(index), "Stored"],
-    })),
+    records: DEFAULT_INPUT.records.map((record, index) => {
+      return {
+        ...record,
+        groups: [String(index), "Stored"],
+      };
+    }),
   },
   { ...DEFAULT_INPUT, dimensions: ["Only"] },
 ];

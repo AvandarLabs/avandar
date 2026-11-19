@@ -7,10 +7,12 @@ import { fileURLToPath } from "node:url";
 import { storyboardSchema } from "../src/storyboard/schema/schema";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const readJson = async (relative: string) =>
-  JSON.parse(await fs.readFile(path.join(root, relative), "utf8"));
-const sha256 = (bytes: Buffer) =>
-  createHash("sha256").update(bytes).digest("hex");
+const readJson = async (relative: string) => {
+  return JSON.parse(await fs.readFile(path.join(root, relative), "utf8"));
+};
+const sha256 = (bytes: Buffer) => {
+  return createHash("sha256").update(bytes).digest("hex");
+};
 
 test("compiled components match current workspace source for every feature", async () => {
   const manifest: {
@@ -21,12 +23,18 @@ test("compiled components match current workspace source for every feature", asy
   assert.equal(manifest.repository, "AvandarLabs/avandar");
   assert.match(manifest.revision, /^[a-f0-9]{40}$/);
   assert.ok(manifest.files.length > 0);
-  const sourcePaths = new Set(manifest.files.map((file) => file.path));
+  const sourcePaths = new Set(
+    manifest.files.map((file) => {
+      return file.path;
+    }),
+  );
   assert.equal(sourcePaths.size, manifest.files.length);
   for (const file of manifest.files) {
     assert.ok(!path.isAbsolute(file.path) && !file.path.includes("\\"));
     assert.ok(
-      file.path.split("/").every((part) => part && !part.startsWith(".")),
+      file.path.split("/").every((part) => {
+        return part && !part.startsWith(".");
+      }),
       file.path,
     );
     assert.match(file.path, /\.(tsx?|jsx?|css|json|svg|png|woff2?)$/);
@@ -205,14 +213,18 @@ test("all six final films use complete React feature bodies without screenshot m
       await readJson(`storyboards/${name}.json`),
     );
     assert.ok(
-      plan.shots.every(
-        (shot) => shot.scene === "title" || shot.scene === "avandar",
-      ),
+      plan.shots.every((shot) => {
+        return shot.scene === "title" || shot.scene === "avandar";
+      }),
       name,
     );
-    const bodies = plan.shots.filter((shot) => shot.scene === "avandar");
+    const bodies = plan.shots.filter((shot) => {
+      return shot.scene === "avandar";
+    });
     assert.deepEqual(
-      bodies.map((shot) => shot.props.feature),
+      bodies.map((shot) => {
+        return shot.props.feature;
+      }),
       name === "avandar-overview"
         ? ["import", "explorer", "dashboards"]
         : [name],

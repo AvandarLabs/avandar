@@ -28,15 +28,17 @@ export function NestedDrilldownWindow({
       />
       <DrillBreadcrumb input={input} />
       <DrillCompartments frame={frame} input={input} accent={accent} />
-      {input.records.map((record) => (
-        <DrillRecord
-          key={record.id}
-          frame={frame}
-          input={input}
-          record={record}
-          accent={accent}
-        />
-      ))}
+      {input.records.map((record) => {
+        return (
+          <DrillRecord
+            key={record.id}
+            frame={frame}
+            input={input}
+            record={record}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

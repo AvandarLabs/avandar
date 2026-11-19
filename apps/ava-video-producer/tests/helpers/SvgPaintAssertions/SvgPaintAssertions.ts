@@ -42,12 +42,11 @@ function _estimateWidth({
   fontSize: number;
 }): number {
   return Array.from(GRAPHEMES.segment(text)).reduce((sum, { segment }) => {
-    const bases = Array.from(segment).filter(
-      (character) =>
-        !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
-          character,
-        ),
-    );
+    const bases = Array.from(segment).filter((character) => {
+      return !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
+        character,
+      );
+    });
     const advance = getConservativeWidthFromText({
       text: bases.join(""),
       fontSize,
@@ -256,14 +255,14 @@ function _assertSvgTextCanvasBounds({
   const stack: Frame[] = [_createRootFrame()];
   const tokens = markup.match(/<!--[\s\S]*?-->|<[^>]+>|[^<]+/g) ?? [];
   const relevant = getTextRelevantTokenIndicesFromTokens({ tokens });
-  tokens.forEach((token, index) =>
-    _visitToken({
+  tokens.forEach((token, index) => {
+    return _visitToken({
       stack,
       token,
       canvas: { width, height },
       hasRelevantText: relevant.has(index),
-    }),
-  );
+    });
+  });
   assert.equal(stack.length, 1, "Unbalanced SVG markup.");
 }
 
@@ -300,16 +299,16 @@ function _getSvgVisiblePaintEnvelopesFromMarkup(
     tokens,
     extraTags: ["rect"],
   });
-  tokens.forEach((token, index) =>
-    _visitToken({
+  tokens.forEach((token, index) => {
+    return _visitToken({
       stack,
       token,
       canvas: undefined,
       hasRelevantText: relevant.has(index),
       paint,
       paintIndex: index,
-    }),
-  );
+    });
+  });
   assert.equal(stack.length, 1, "Unbalanced SVG markup.");
   return paint;
 }
@@ -342,24 +341,24 @@ function _assertSvgPaintClearance({
 }>): void {
   assert.ok(texts.length > 0, "Expected visible text paint.");
   texts.forEach((text, index) => {
-    texts
-      .slice(index + 1)
-      .forEach((other) =>
-        assert.equal(
-          _paintOverlaps({ first: text, second: other }),
-          false,
-          `Text overprint: ${text.text} / ${other.text} at ${JSON.stringify([text, other])}`,
-        ),
+    texts.slice(index + 1).forEach((other) => {
+      return assert.equal(
+        _paintOverlaps({ first: text, second: other }),
+        false,
+        `Text overprint: ${text.text} / ${other.text} at ${JSON.stringify([text, other])}`,
       );
+    });
     rectangles
-      .filter((rectangle) => rectangle.paintIndex > text.paintIndex)
-      .forEach((rectangle) =>
-        assert.equal(
+      .filter((rectangle) => {
+        return rectangle.paintIndex > text.paintIndex;
+      })
+      .forEach((rectangle) => {
+        return assert.equal(
           _paintOverlaps({ first: text, second: rectangle }),
           false,
           `Foreground covers ${text.text}: ${JSON.stringify([text, rectangle])}`,
-        ),
-      );
+        );
+      });
   });
 }
 

@@ -9,6 +9,8 @@ export function createRequestHarness() {
   return {
     statuses,
     inFlight: { current: false },
-    setStatus: (status: ThemeSaveStatus) => statuses.push(status),
+    setStatus: (status: ThemeSaveStatus) => {
+      return statuses.push(status);
+    },
   };
 }

@@ -23,16 +23,18 @@ export function TermLimitedRevenueShare({
           [input.copy.example, 60, 580, 840, 12, 2],
         ]}
       />
-      {input.periods.map((period, index) => (
-        <RevenuePeriod
-          key={period.id}
-          period={period}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.periods.map((period, index) => {
+        return (
+          <RevenuePeriod
+            key={period.id}
+            period={period}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       <RevenueTerm frame={frame} input={input} accent={accent} />
       <RevenueLegend input={input} accent={accent} />
     </g>

@@ -18,9 +18,9 @@ export function DashPresets({ pattern, onChange }: Props) {
   const issueAriaProps = useRowIssueAriaProps();
   const patternText = formatDashPattern(pattern);
   const preset =
-    Object.entries(DASH_PRESETS).find(
-      ([, dashes]) => formatDashPattern(dashes) === patternText,
-    )?.[0] ?? "";
+    Object.entries(DASH_PRESETS).find(([, dashes]) => {
+      return formatDashPattern(dashes) === patternText;
+    })?.[0] ?? "";
   return (
     <SegmentedControl
       size="xs"
@@ -32,7 +32,9 @@ export function DashPresets({ pattern, onChange }: Props) {
         { value: "dotted", label: "Dotted" },
         { value: "dashed", label: "Dashed" },
       ]}
-      onChange={(presetName) => onChange(DASH_PRESETS[presetName] ?? [])}
+      onChange={(presetName) => {
+        return onChange(DASH_PRESETS[presetName] ?? []);
+      }}
     />
   );
 }

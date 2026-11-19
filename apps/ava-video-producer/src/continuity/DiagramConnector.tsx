@@ -12,9 +12,9 @@ type Props = Readonly<{
 
 /** The spotlight around the source and the connector line to the active diagram. */
 export function DiagramConnector({ content, frame, accent }: Props) {
-  const active = content.diagrams.find(
-    (diagram) => frame >= diagram.overlay.at && frame < diagram.overlay.until,
-  );
+  const active = content.diagrams.find((diagram) => {
+    return frame >= diagram.overlay.at && frame < diagram.overlay.until;
+  });
   const opacity = active?.overlay
     ? getOverlayPose(frame, active.overlay, content.source).opacity
     : 0;

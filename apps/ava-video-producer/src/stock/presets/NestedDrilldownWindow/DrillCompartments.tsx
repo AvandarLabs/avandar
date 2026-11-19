@@ -12,7 +12,13 @@ export function DrillCompartments({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const groups = [...new Set(input.records.map((record) => record.groups[0]))];
+  const groups = [
+    ...new Set(
+      input.records.map((record) => {
+        return record.groups[0];
+      }),
+    ),
+  ];
   const progress = ramp(frame, 40, 34);
   return (
     <g>
@@ -26,17 +32,19 @@ export function DrillCompartments({
         breakLongWords
         normalizeWhitespace
       />
-      {groups.map((group, index) => (
-        <DrillParentCompartment
-          key={group}
-          group={group}
-          index={index}
-          isSelected={group === input.selectionPath[0]}
-          retainContext={input.retainContext}
-          progress={progress}
-          accent={accent}
-        />
-      ))}
+      {groups.map((group, index) => {
+        return (
+          <DrillParentCompartment
+            key={group}
+            group={group}
+            index={index}
+            isSelected={group === input.selectionPath[0]}
+            retainContext={input.retainContext}
+            progress={progress}
+            accent={accent}
+          />
+        );
+      })}
       {frame >= 40 ? (
         <g opacity={progress}>
           <FitText

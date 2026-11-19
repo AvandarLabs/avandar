@@ -5,12 +5,12 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Exclusive final states and attendance fractions retain separate meanings. */
 export function ReferralLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const numAttended = input.referrals.filter(
-    (referral, index) => referral.attended && frame >= 77 + index * 2,
-  ).length;
-  const numReturned = input.referrals.filter(
-    (referral, index) => referral.acknowledged && frame >= 105 + index * 2,
-  ).length;
+  const numAttended = input.referrals.filter((referral, index) => {
+    return referral.attended && frame >= 77 + index * 2;
+  }).length;
+  const numReturned = input.referrals.filter((referral, index) => {
+    return referral.acknowledged && frame >= 105 + index * 2;
+  }).length;
   const rows = [
     {
       state: "waiting",
@@ -41,29 +41,31 @@ export function ReferralLedger({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {rows.map(({ state, label, value }, index) => (
-        <g key={state} data-referral-category={state} data-quantity={value}>
-          <FitText
-            text={String(value)}
-            x={45 + index * 150}
-            y={454}
-            width={135}
-            fontSize={18}
-            maxLines={1}
-            normalizeWhitespace
-          />
-          <FitText
-            text={label}
-            x={45 + index * 150}
-            y={478}
-            width={135}
-            fontSize={12}
-            maxLines={7}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      {rows.map(({ state, label, value }, index) => {
+        return (
+          <g key={state} data-referral-category={state} data-quantity={value}>
+            <FitText
+              text={String(value)}
+              x={45 + index * 150}
+              y={454}
+              width={135}
+              fontSize={18}
+              maxLines={1}
+              normalizeWhitespace
+            />
+            <FitText
+              text={label}
+              x={45 + index * 150}
+              y={478}
+              width={135}
+              fontSize={12}
+              maxLines={7}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -51,8 +51,12 @@ export const EXPLORER_COLUMNS = EXPLORER_COLUMN_NAMES.map((name, index) => {
   };
 }) as unknown as QueryColumn.T[];
 
-export const EXPLORER_SELECTED_COLUMNS = EXPLORER_DISPLAY_COLUMNS.map((name) =>
-  EXPLORER_COLUMNS.find((column) => column.baseColumn.name === name)!,
+export const EXPLORER_SELECTED_COLUMNS = EXPLORER_DISPLAY_COLUMNS.map(
+  (name) => {
+    return EXPLORER_COLUMNS.find((column) => {
+      return column.baseColumn.name === name;
+    })!;
+  },
 );
 
 /** The same GROUP BY and ORDER BY as the authored SQL below. */
@@ -63,12 +67,15 @@ export const EXPLORER_DISTRICT_COUNTS = Object.entries(
     return counts;
   }, {}),
 )
-  .map(([district_name, recorded_cases]) => ({ district_name, recorded_cases }))
-  .sort(
-    (left, right) =>
+  .map(([district_name, recorded_cases]) => {
+    return { district_name, recorded_cases };
+  })
+  .sort((left, right) => {
+    return (
       right.recorded_cases - left.recorded_cases ||
-      left.district_name.localeCompare(right.district_name),
-  );
+      left.district_name.localeCompare(right.district_name)
+    );
+  });
 
 /** The single fixture dataset and its columns, in the shape the SQL editor's autocomplete expects. */
 export const EXPLORER_SQL_CATALOG = {
@@ -76,7 +83,9 @@ export const EXPLORER_SQL_CATALOG = {
     {
       id: EXPLORER_CASES_DATASET_ID,
       name: EXPLORER_CASES_DATASET_NAME,
-      columns: EXPLORER_COLUMN_NAMES.map((name) => ({ name })),
+      columns: EXPLORER_COLUMN_NAMES.map((name) => {
+        return { name };
+      }),
     },
   ],
 } as unknown as SqlDisplayCatalog;

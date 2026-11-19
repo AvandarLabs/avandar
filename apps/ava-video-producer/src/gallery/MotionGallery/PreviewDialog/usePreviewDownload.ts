@@ -36,7 +36,9 @@ export function usePreviewDownload({
             itemId: preset.id,
           }),
         },
-        onStatus: (status) => setExportStatus(status.message),
+        onStatus: (status) => {
+          return setExportStatus(status.message);
+        },
       });
     } catch (error) {
       setExportStatus(

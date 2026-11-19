@@ -16,7 +16,9 @@ export function LunchTray({
   accent,
 }: Readonly<Props>): ReactNode {
   const learner = input.learners[index];
-  const tray = input.trays.find(({ learnerId }) => learnerId === learner.id)!;
+  const tray = input.trays.find(({ learnerId }) => {
+    return learnerId === learner.id;
+  })!;
   const x = 480 + (index - (input.learners.length - 1) / 2) * 150;
   const y = mix(ramp(frame, 88, 20, EASE.inOut), 244, 220);
   return (
@@ -34,18 +36,20 @@ export function LunchTray({
       />
       <PersonGlyph x={0} y={190} size={32} color={accent} />
       <g data-tray-for={learner.id} transform={`translate(0 ${y})`}>
-        {input.plannedComponents.map((component, componentIndex) => (
-          <TrayCompartment
-            key={component.id}
-            component={component}
-            index={componentIndex}
-            frame={frame}
-            isServed={tray.componentIds.includes(component.id)}
-            showNames={input.showComponentNames}
-            emphasize={input.emphasizeMissingComponents}
-            accent={accent}
-          />
-        ))}
+        {input.plannedComponents.map((component, componentIndex) => {
+          return (
+            <TrayCompartment
+              key={component.id}
+              component={component}
+              index={componentIndex}
+              frame={frame}
+              isServed={tray.componentIds.includes(component.id)}
+              showNames={input.showComponentNames}
+              emphasize={input.emphasizeMissingComponents}
+              accent={accent}
+            />
+          );
+        })}
       </g>
     </g>
   );

@@ -45,21 +45,23 @@ const textLayoutOptions = {
   fixtures,
   render: _render,
   excludedTextFields: ["id", "outcome", "channel"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    ...Object.values(input.places),
-    ...input.cases.map(prop("label")),
-    input.copy.group,
-    ...(input.showAttemptCount ? [input.copy.attempts] : []),
-    ...(input.showOutcomeLedger
-      ? [
-          input.copy.unreached,
-          input.copy.contacted,
-          input.copy.booked,
-          input.copy.attended,
-        ]
-      : []),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      ...Object.values(input.places),
+      ...input.cases.map(prop("label")),
+      input.copy.group,
+      ...(input.showAttemptCount ? [input.copy.attempts] : []),
+      ...(input.showOutcomeLedger
+        ? [
+            input.copy.unreached,
+            input.copy.contacted,
+            input.copy.booked,
+            input.copy.attended,
+          ]
+        : []),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"

@@ -27,17 +27,19 @@ export function PocketInput({ frame, input }: Readonly<Props>): ReactNode {
       />
       <g opacity={progress}>
         {input.showLabels ? (
-          labels.map((label) => (
-            <FitText
-              key={label.y}
-              {...label}
-              x={214}
-              width={532}
-              fontSize={12}
-              normalizeWhitespace
-              breakLongWords
-            />
-          ))
+          labels.map((label) => {
+            return (
+              <FitText
+                key={label.y}
+                {...label}
+                x={214}
+                width={532}
+                fontSize={12}
+                normalizeWhitespace
+                breakLongWords
+              />
+            );
+          })
         ) : (
           <path
             d={`M214 ${y + 20} h490 M214 ${y + 38} h418`}

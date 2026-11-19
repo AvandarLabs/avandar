@@ -17,7 +17,9 @@ export function VolumeTotal({
   frame,
   y,
 }: Readonly<Props>): ReactNode {
-  const total = group.items.reduce((sum, item) => sum + item.bytes, 0);
+  const total = group.items.reduce((sum, item) => {
+    return sum + item.bytes;
+  }, 0);
   return frame >= 111 ? (
     <g opacity={ramp(frame, 111, 34)} data-total-bytes={total}>
       <LabelSlots

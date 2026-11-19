@@ -58,9 +58,9 @@ export const inputSchema = z
       !_unique(input.events) ||
       !accounts.has(input.sharedAccountId) ||
       new Set(individuals).size !== 2 ||
-      individuals.some(
-        (id) => !accounts.has(id) || id === input.sharedAccountId,
-      )
+      individuals.some((id) => {
+        return !accounts.has(id) || id === input.sharedAccountId;
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -70,19 +70,23 @@ export const inputSchema = z
       });
     }
     if (
-      input.events.some(
-        (event, index) =>
+      input.events.some((event, index) => {
+        return (
           event.phase !== (index < 2 ? "shared" : "individual") ||
-          !input.collaborators.some(({ id }) => id === event.collaboratorId),
-      ) ||
-      input.collaborators.some(({ id }) =>
-        ["shared", "individual"].some(
-          (phase) =>
-            input.events.filter(
-              (event) => event.collaboratorId === id && event.phase === phase,
-            ).length !== 1,
-        ),
-      )
+          !input.collaborators.some(({ id }) => {
+            return id === event.collaboratorId;
+          })
+        );
+      }) ||
+      input.collaborators.some(({ id }) => {
+        return ["shared", "individual"].some((phase) => {
+          return (
+            input.events.filter((event) => {
+              return event.collaboratorId === id && event.phase === phase;
+            }).length !== 1
+          );
+        });
+      })
     ) {
       context.addIssue({
         code: "custom",

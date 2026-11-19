@@ -42,17 +42,19 @@ export function ChartHeadings({
   ];
   return (
     <g>
-      {slots.map(({ opacity, ...label }, index) => (
-        <g key={index} opacity={opacity}>
-          <FitText
-            {...label}
-            x={64}
-            width={832}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      {slots.map(({ opacity, ...label }, index) => {
+        return (
+          <g key={index} opacity={opacity}>
+            <FitText
+              {...label}
+              x={64}
+              width={832}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

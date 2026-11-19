@@ -43,11 +43,12 @@ export function useCompositionAppearance(
     options: ContinuityAppearance;
   }>();
   const send = useCallback(
-    (action: string, value?: unknown) =>
-      player.current?.contentWindow?.postMessage(
+    (action: string, value?: unknown) => {
+      return player.current?.contentWindow?.postMessage(
         { type: "film-control", id, action, value },
         location.origin,
-      ),
+      );
+    },
     [id, player],
   );
   useEffect(() => {
@@ -72,7 +73,9 @@ export function useCompositionAppearance(
       }
     };
     window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
+    return () => {
+      return window.removeEventListener("message", receive);
+    };
   }, [id, player, draft, transport, send, isScene]);
   useEffect(() => {
     if (!isScene) send("appearance", draft);
@@ -103,8 +106,11 @@ export function useCompositionAppearance(
     setTransport,
     options,
     send,
-    update: (patch: Partial<ContinuityAppearance>) =>
-      setDraft((current) => ({ ...current, ...patch })),
+    update: (patch: Partial<ContinuityAppearance>) => {
+      return setDraft((current) => {
+        return { ...current, ...patch };
+      });
+    },
     loaded: () => {
       if (!isScene) send("appearance", draft);
     },

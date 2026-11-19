@@ -26,16 +26,18 @@ export function FieldConflictChoice({
         breakLongWords
         normalizeWhitespace
       />
-      {input.fields.map((field, index) => (
-        <ConflictField
-          key={field.id}
-          frame={frame}
-          accent={accent}
-          input={input}
-          field={field}
-          index={index}
-        />
-      ))}
+      {input.fields.map((field, index) => {
+        return (
+          <ConflictField
+            key={field.id}
+            frame={frame}
+            accent={accent}
+            input={input}
+            field={field}
+            index={index}
+          />
+        );
+      })}
     </g>
   );
 }

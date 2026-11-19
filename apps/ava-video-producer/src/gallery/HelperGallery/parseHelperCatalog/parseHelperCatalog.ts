@@ -52,8 +52,16 @@ function _assertUniqueIds(ids: readonly string[]): void {
 }
 
 function _assertReferences(catalog: HelperCatalog): void {
-  const categories = new Set(catalog.categories.map((item) => item.id));
-  const modules = new Set(catalog.modules.map((item) => item.path));
+  const categories = new Set(
+    catalog.categories.map((item) => {
+      return item.id;
+    }),
+  );
+  const modules = new Set(
+    catalog.modules.map((item) => {
+      return item.path;
+    }),
+  );
   catalog.helpers.forEach((helper) => {
     if (!categories.has(helper.category)) {
       throw new Error(
@@ -67,7 +75,11 @@ function _assertReferences(catalog: HelperCatalog): void {
     }
   });
   catalog.categories.forEach((category) => {
-    if (!catalog.helpers.some((helper) => helper.category === category.id)) {
+    if (
+      !catalog.helpers.some((helper) => {
+        return helper.category === category.id;
+      })
+    ) {
       throw new Error(`Category "${category.id}" has no helpers`);
     }
   });
@@ -79,7 +91,11 @@ function _assertReferences(catalog: HelperCatalog): void {
  */
 export function parseHelperCatalog(raw: unknown): HelperCatalog {
   const catalog = CATALOG_SCHEMA.parse(raw);
-  _assertUniqueIds(catalog.helpers.map((helper) => helper.id));
+  _assertUniqueIds(
+    catalog.helpers.map((helper) => {
+      return helper.id;
+    }),
+  );
   _assertReferences(catalog);
   return catalog;
 }

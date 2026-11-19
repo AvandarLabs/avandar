@@ -22,19 +22,27 @@ export function timeline(plan: Storyboard) {
  */
 export function declaredCutFrames(plan: Storyboard): number[] {
   return timeline(plan)
-    .filter((shot) => shot.transition?.kind === "cut")
-    .map((shot) => shot.startFrame);
+    .filter((shot) => {
+      return shot.transition?.kind === "cut";
+    })
+    .map((shot) => {
+      return shot.startFrame;
+    });
 }
 
 export function durationInFrames(plan: Storyboard): number {
-  return plan.shots.reduce((sum, shot) => sum + shot.durationInFrames, 0);
+  return plan.shots.reduce((sum, shot) => {
+    return sum + shot.durationInFrames;
+  }, 0);
 }
 
 /** Resolve local narration cues to absolute film frames. */
 export function absoluteCues(plan: Storyboard) {
   const shots = timeline(plan);
   return plan.narration.map((cue) => {
-    const shot = shots.find((candidate) => candidate.id === cue.shotId)!;
+    const shot = shots.find((candidate) => {
+      return candidate.id === cue.shotId;
+    })!;
     const offset =
       shot.startFrame +
       getCueWindowFromShot({ shot, beatId: cue.beatId }).start;

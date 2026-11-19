@@ -18,12 +18,12 @@ export function ClassroomFurniture({
   accent,
 }: Readonly<Props>): ReactNode {
   const progress = ramp(frame, 36, 36, EASE.inOut);
-  const hasTable = input.adaptations.some(
-    ({ kind }) => kind === "shared-table",
-  );
-  const hasBoard = input.adaptations.some(
-    ({ kind }) => kind === "large-print-board",
-  );
+  const hasTable = input.adaptations.some(({ kind }) => {
+    return kind === "shared-table";
+  });
+  const hasBoard = input.adaptations.some(({ kind }) => {
+    return kind === "large-print-board";
+  });
   const boardProgress = hasBoard ? progress : 0;
   return (
     <g>

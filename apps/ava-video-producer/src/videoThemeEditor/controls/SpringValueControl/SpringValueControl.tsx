@@ -21,21 +21,23 @@ export function SpringValueControl({
   ] as const;
   return (
     <div className={css.springValueFields} role="group" aria-label={label}>
-      {fields.map((field) => (
-        <RangeNumberInput
-          key={field.key}
-          size="xs"
-          label={field.name}
-          min={field.min}
-          max={field.max}
-          step={field.step}
-          decimalScale={2}
-          value={spring[field.key]}
-          onChange={(fieldValue) =>
-            onChange({ ...spring, [field.key]: fieldValue })
-          }
-        />
-      ))}
+      {fields.map((field) => {
+        return (
+          <RangeNumberInput
+            key={field.key}
+            size="xs"
+            label={field.name}
+            min={field.min}
+            max={field.max}
+            step={field.step}
+            decimalScale={2}
+            value={spring[field.key]}
+            onChange={(fieldValue) => {
+              return onChange({ ...spring, [field.key]: fieldValue });
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

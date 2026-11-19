@@ -29,18 +29,20 @@ export function ArgumentBridge({
           normalizeWhitespace
         />
       </g>
-      {input.premises.map((premise, index) => (
-        <ArgumentPremise
-          key={premise.id}
-          frame={frame}
-          accent={accent}
-          premise={premise}
-          index={index}
-          count={input.premises.length}
-          showSupport={input.showIndividualSupports}
-          relationship={input.relationship}
-        />
-      ))}
+      {input.premises.map((premise, index) => {
+        return (
+          <ArgumentPremise
+            key={premise.id}
+            frame={frame}
+            accent={accent}
+            premise={premise}
+            index={index}
+            count={input.premises.length}
+            showSupport={input.showIndividualSupports}
+            relationship={input.relationship}
+          />
+        );
+      })}
       <ArgumentDeck {...{ frame, accent, input, id }} />
     </g>
   );

@@ -48,7 +48,9 @@ export function getUnresolvedReference(
   const { value, referenceOptions } = options;
   return typeof value === "string" &&
     value.startsWith("$") &&
-    !referenceOptions.some((option) => option.reference === value)
+    !referenceOptions.some((option) => {
+      return option.reference === value;
+    })
     ? (value as TokenReference)
     : undefined;
 }
@@ -86,14 +88,16 @@ function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
   return Object.entries(theme.mantine.colors).flatMap(([name, shades]) => {
     const definition = getTokenDefinitionFromPath(`colors.${name}`);
     return definition
-      ? shades.map((value, index) => ({
-          reference: `$colors.${name}.${index}`,
-          path: `colors.${name}.${index}`,
-          kind: "color" as const,
-          definition,
-          key: String(index),
-          value,
-        }))
+      ? shades.map((value, index) => {
+          return {
+            reference: `$colors.${name}.${index}`,
+            path: `colors.${name}.${index}`,
+            kind: "color" as const,
+            definition,
+            key: String(index),
+            value,
+          };
+        })
       : [];
   });
 }
@@ -149,14 +153,16 @@ export function listReferenceOptions(
         (!isCameraCurve || isCameraSafeEasing(row.resolved as EasingValue))
       );
     })
-    .map((row) => ({
-      reference: `$${row.path}`,
-      path: row.path,
-      kind: row.definition.kind,
-      definition: row.definition,
-      ...(row.scaleKey === undefined ? {} : { key: row.scaleKey }),
-      value: row.resolved,
-    }));
+    .map((row) => {
+      return {
+        reference: `$${row.path}`,
+        path: row.path,
+        kind: row.definition.kind,
+        definition: row.definition,
+        ...(row.scaleKey === undefined ? {} : { key: row.scaleKey }),
+        value: row.resolved,
+      };
+    });
   return [
     ...(isColor ? [_primaryOption(theme)] : []),
     ...fromRows,
@@ -181,7 +187,11 @@ export function orderReferenceOptions(
   }
   const scale = _scaleOf(current.slice(1));
   return [
-    ...referenceOptions.filter((option) => _scaleOf(option.path) === scale),
-    ...referenceOptions.filter((option) => _scaleOf(option.path) !== scale),
+    ...referenceOptions.filter((option) => {
+      return _scaleOf(option.path) === scale;
+    }),
+    ...referenceOptions.filter((option) => {
+      return _scaleOf(option.path) !== scale;
+    }),
   ];
 }

@@ -277,41 +277,6 @@ export default [
 
   ...privacyChokepoint,
   {
-    // The imported Remotion toolkit retains its established frame DSL and
-    // fixture types. Keep behavioral rules active without rewriting its API.
-    files: ["apps/ava-video-producer/**/*.{ts,tsx,js,mjs}"],
-    rules: {
-      "max-len": "off",
-      "arrow-body-style": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "react/function-component-definition": "off",
-      // Remotion and esbuild review use full reloads, not Vite Fast Refresh.
-      "react-refresh/only-export-components": "off",
-    },
-  },
-  {
-    // Film controllers and capture doubles deliberately emulate partial APIs.
-    files: [
-      "apps/ava-video-producer/avandar-adapter/**/*.{ts,tsx}",
-      "apps/ava-video-producer/tests/**/*.ts",
-    ],
-    rules: { "@typescript-eslint/no-explicit-any": "off" },
-  },
-  {
-    files: ["apps/ava-video-producer/avandar-adapter/index.tsx"],
-    rules: {
-      "import-x/no-unresolved": ["error", { ignore: ["^@product-assets/"] }],
-    },
-  },
-  {
-    // Playwright's generated CommonJS export table is not statically named.
-    files: [
-      "apps/ava-video-producer/capture-flows/**/*.mjs",
-      "apps/ava-video-producer/scripts/measure-avandar.mjs",
-    ],
-    rules: { "import-x/named": "off" },
-  },
-  {
     // This config loads via Node's native ESM loader, not a bundler, so its
     // own relative imports need real extensions to resolve at all.
     files: ["eslint.config.js", "eslint/**/*.js"],

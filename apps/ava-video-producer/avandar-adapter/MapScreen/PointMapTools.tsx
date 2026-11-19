@@ -8,7 +8,9 @@ import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
 import { PAN } from "./mapFixtures";
 
-const _noop = () => undefined;
+const _noop = () => {
+  return undefined;
+};
 
 /** The renderer supplies point data without loading DuckDB Spatial. Reuse the product's unavailable tool slots, including its precise reason. */
 export function PointMapTools() {

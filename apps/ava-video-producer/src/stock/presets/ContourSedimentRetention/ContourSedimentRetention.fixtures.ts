@@ -86,19 +86,21 @@ const dense: Input = {
 };
 const extraFixtures: StockContract<Input>["fixtures"] = (
   ["vegetated-strip", "stone-bund"] as const
-).flatMap((kind) =>
-  [0, 8].flatMap((retainedKg) =>
-    [true, false].map((showExportTray) => ({
-      id: `${kind}-${retainedKg}-${showExportTray}`,
-      input: {
-        ...DEFAULT_INPUT,
-        sediment: { mobilizedKg: 8, retainedKg },
-        intervention: { ...DEFAULT_INPUT.intervention, kind },
-        showExportTray,
-      },
-    })),
-  ),
-);
+).flatMap((kind) => {
+  return [0, 8].flatMap((retainedKg) => {
+    return [true, false].map((showExportTray) => {
+      return {
+        id: `${kind}-${retainedKg}-${showExportTray}`,
+        input: {
+          ...DEFAULT_INPUT,
+          sediment: { mobilizedKg: 8, retainedKg },
+          intervention: { ...DEFAULT_INPUT.intervention, kind },
+          showExportTray,
+        },
+      };
+    });
+  });
+});
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   { ...DEFAULT_INPUT, sediment: { mobilizedKg: 8, retainedKg: 9 } },

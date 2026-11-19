@@ -34,16 +34,16 @@ const render: ({
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
 test("all authored fixtures are accepted and every rejection fixture fails", () => {
-  FIXTURES.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(
+  FIXTURES.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(
       inputSchema.safeParse(input).success,
       false,
       JSON.stringify(input),
-    ),
-  );
+    );
+  });
 });
 test("every target slot swaps one module while original neighbors retain geometry", () => {
   FIXTURES[2].input.modules.forEach((target) => {
@@ -57,7 +57,9 @@ test("every target slot swaps one module while original neighbors retain geometr
     const setup = render({ frame: 30, input: input }),
       hold = render({ frame: 150, input: input });
     input.modules
-      .filter(({ id }) => id !== target.id)
+      .filter(({ id }) => {
+        return id !== target.id;
+      })
       .forEach(({ id }) => {
         const before = setup.match(
           new RegExp(`<rect[^>]*data-module="${id}"[^>]*>`),
@@ -186,10 +188,15 @@ test("the worker contacts the moving original, replacement and target latch", ()
       }),
     );
     input.modules
-      .filter(({ id }) => id !== input.replacement.targetModuleId)
+      .filter(({ id }) => {
+        return id !== input.replacement.targetModuleId;
+      })
       .forEach(({ id }) => {
-        const extract = (svg: string) =>
-          svg.match(new RegExp(`<rect[^>]*data-module="${id}"[^>]*>`))?.[0];
+        const extract = (svg: string) => {
+          return svg.match(
+            new RegExp(`<rect[^>]*data-module="${id}"[^>]*>`),
+          )?.[0];
+        };
         assert.equal(
           extract(markup),
           extract(render({ frame: 30, input: input })),
@@ -229,18 +236,19 @@ test("the complete removed-original caption clears the enclosure", async () => {
     );
 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-    const caption = paint.filter(
-      (item) => item.kind === "text" && item.ariaLabel === input.labels.removed,
-    );
+    const caption = paint.filter((item) => {
+      return item.kind === "text" && item.ariaLabel === input.labels.removed;
+    });
     assert.ok(caption.length > 0);
     SvgPaintAssertions.assertPaintClearance({
       texts: caption,
-      rectangles: paint.filter(
-        (item) =>
+      rectangles: paint.filter((item) => {
+        return (
           item.kind === "rect" &&
           item.fill !== "none" &&
-          item.opacity * item.fillOpacity === 1,
-      ),
+          item.opacity * item.fillOpacity === 1
+        );
+      }),
     });
   });
 });

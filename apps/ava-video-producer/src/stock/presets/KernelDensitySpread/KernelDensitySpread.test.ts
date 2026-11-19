@@ -253,7 +253,11 @@ test("cones rise before addition and grid intensity grows through the combinatio
     markup: _render({ frame: 105 }),
     attribute: "data-cell-intensity",
   }).map(Number);
-  assert.ok(values.some((value, index) => value > 0 && value < hold[index]));
+  assert.ok(
+    values.some((value, index) => {
+      return value > 0 && value < hold[index];
+    }),
+  );
   assert.ok(
     _render({ frame: 150 }).indexOf("data-cell-intensity") <
       _render({ frame: 150 }).indexOf("data-point-position"),
@@ -266,9 +270,9 @@ test("kernel headings, fixed legend and zero-intensity qualifier have clear pain
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -370,7 +374,9 @@ test("the intensity legend grades the same quantity scale as the field", async (
     );
     assert.ok(gradient, "Intensity legend contains a graded scale");
     const stops = [...gradient[1].matchAll(/stop-opacity="([^"]*)"/g)].map(
-      (match) => Number(match[1]),
+      (match) => {
+        return Number(match[1]);
+      },
     );
     assert.equal(stops[0], 0);
     assert.equal(stops.at(-1), 1);
@@ -380,8 +386,11 @@ test("the intensity legend grades the same quantity scale as the field", async (
         /data-cell-intensity="([^"]*)"[^>]*fill-opacity="([^"]*)"/g,
       ),
     ];
-    cells.forEach(([, quantity, opacity]) =>
-      assert.equal(Number(opacity), Number(quantity) / input.legendMaximum),
-    );
+    cells.forEach(([, quantity, opacity]) => {
+      return assert.equal(
+        Number(opacity),
+        Number(quantity) / input.legendMaximum,
+      );
+    });
   });
 });

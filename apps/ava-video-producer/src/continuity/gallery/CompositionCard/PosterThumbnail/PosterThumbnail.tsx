@@ -13,13 +13,17 @@ type Props = Readonly<{
  */
 export function PosterThumbnail({ id, themeId }: Props) {
   const [failedSources, setFailedSources] = useState<ReadonlySet<string>>(
-    () => new Set(),
+    () => {
+      return new Set();
+    },
   );
   // The posters tried in order: the theme's, then `classic`'s.
-  const sources = [...new Set([themeId, "classic"])].map(
-    (theme) => `assets/atlas/${theme}/${id}.jpg`,
-  );
-  const poster = sources.find((source) => !failedSources.has(source));
+  const sources = [...new Set([themeId, "classic"])].map((theme) => {
+    return `assets/atlas/${theme}/${id}.jpg`;
+  });
+  const poster = sources.find((source) => {
+    return !failedSources.has(source);
+  });
   if (poster === undefined) {
     return <span className={css.missing}>{"NO POSTER YET"}</span>;
   }
@@ -31,9 +35,11 @@ export function PosterThumbnail({ id, themeId }: Props) {
         src={poster}
         alt=""
         loading="lazy"
-        onError={() =>
-          setFailedSources((failed) => new Set([...failed, poster]))
-        }
+        onError={() => {
+          return setFailedSources((failed) => {
+            return new Set([...failed, poster]);
+          });
+        }}
       />
       {poster === sources[0] ? null : (
         <span className={css.posterThumbnailFallback}>

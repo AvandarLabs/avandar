@@ -41,73 +41,66 @@ test("preserves authored helper metadata in catalog order", () => {
 });
 
 test("rejects unknown fields instead of dropping authored copy", () => {
-  assert.throws(() =>
-    parseHelperCatalog(
+  assert.throws(() => {
+    return parseHelperCatalog(
       createCatalog({ helpers: [{ ...HELPER, goodfor: "Typo" }] }),
-    ),
-  );
+    );
+  });
 });
 
 test("rejects duplicate helper ids", () => {
-  assert.throws(
-    () => parseHelperCatalog(createCatalog({ helpers: [HELPER, HELPER] })),
-    /Duplicate helper id: ease-out/,
-  );
+  assert.throws(() => {
+    return parseHelperCatalog(createCatalog({ helpers: [HELPER, HELPER] }));
+  }, /Duplicate helper id: ease-out/);
 });
 
 test("rejects a helper whose category is not declared", () => {
-  assert.throws(
-    () =>
-      parseHelperCatalog(
-        createCatalog({ helpers: [{ ...HELPER, category: "missing" }] }),
-      ),
-    /Unknown category "missing" for "ease-out"/,
-  );
+  assert.throws(() => {
+    return parseHelperCatalog(
+      createCatalog({ helpers: [{ ...HELPER, category: "missing" }] }),
+    );
+  }, /Unknown category "missing" for "ease-out"/);
 });
 
 test("rejects a helper whose source module is not listed for drift checks", () => {
-  assert.throws(
-    () =>
-      parseHelperCatalog(
-        createCatalog({ helpers: [{ ...HELPER, source: "src/other.ts" }] }),
-      ),
-    /Unlisted source module "src\/other.ts" for "ease-out"/,
-  );
+  assert.throws(() => {
+    return parseHelperCatalog(
+      createCatalog({ helpers: [{ ...HELPER, source: "src/other.ts" }] }),
+    );
+  }, /Unlisted source module "src\/other.ts" for "ease-out"/);
 });
 
 test("rejects a declared category with no helpers", () => {
-  assert.throws(
-    () =>
-      parseHelperCatalog(
-        createCatalog({
-          categories: [CATEGORY, { ...CATEGORY, id: "empty" }],
-        }),
-      ),
-    /Category "empty" has no helpers/,
-  );
+  assert.throws(() => {
+    return parseHelperCatalog(
+      createCatalog({
+        categories: [CATEGORY, { ...CATEGORY, id: "empty" }],
+      }),
+    );
+  }, /Category "empty" has no helpers/);
 });
 
 test("rejects non-integer preview lengths and empty export lists", () => {
-  assert.throws(() =>
-    parseHelperCatalog(
+  assert.throws(() => {
+    return parseHelperCatalog(
       createCatalog({
         helpers: [{ ...HELPER, demo: { id: "curve-out", frames: 7.5 } }],
       }),
-    ),
-  );
-  assert.throws(() =>
-    parseHelperCatalog(
+    );
+  });
+  assert.throws(() => {
+    return parseHelperCatalog(
       createCatalog({ helpers: [{ ...HELPER, exports: [] }] }),
-    ),
-  );
+    );
+  });
 });
 
 test("rejects an exclusion without a reason", () => {
-  assert.throws(() =>
-    parseHelperCatalog(
+  assert.throws(() => {
+    return parseHelperCatalog(
       createCatalog({
         modules: [{ ...MODULE, excluded: [{ name: "span" }] }],
       }),
-    ),
-  );
+    );
+  });
 });

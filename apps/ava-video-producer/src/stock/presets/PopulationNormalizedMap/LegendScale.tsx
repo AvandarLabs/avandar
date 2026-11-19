@@ -8,17 +8,19 @@ type Props = { accent: string };
 export function LegendScale({ accent }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {Array.from({ length: 10 }, (_, index) => (
-        <rect
-          key={index}
-          x={40 + index * 24}
-          y={100}
-          width={24}
-          height={12}
-          fill={accent}
-          fillOpacity={0.12 + (index / 9) * 0.76}
-        />
-      ))}
+      {Array.from({ length: 10 }, (_, index) => {
+        return (
+          <rect
+            key={index}
+            x={40 + index * 24}
+            y={100}
+            width={24}
+            height={12}
+            fill={accent}
+            fillOpacity={0.12 + (index / 9) * 0.76}
+          />
+        );
+      })}
     </g>
   );
 }

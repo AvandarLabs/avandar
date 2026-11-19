@@ -86,27 +86,31 @@ export function VelocityBlurDemo({ frame, frames }: HelperDemoProps) {
       label="getVelocityBlur(distancePerFrame, { preset })"
       readouts={[
         { name: "velocity", value: `${formatReadout(velocity, 1)}px/f` },
-        ...PRESETS.map((preset) => ({
-          name: preset,
-          value: `${formatReadout(getVelocityBlur(velocity, { preset }))}px`,
-        })),
+        ...PRESETS.map((preset) => {
+          return {
+            name: preset,
+            value: `${formatReadout(getVelocityBlur(velocity, { preset }))}px`,
+          };
+        }),
       ]}
     >
       <div className={css.timeline}>
-        {PRESETS.map((preset) => (
-          <div key={preset} className={css.timelineRow}>
-            <span className={css.timelineName}>{preset}</span>
-            <div className={css.rail}>
-              <span
-                className={css.railBlock}
-                style={{
-                  left: x * 0.85,
-                  filter: `blur(${getVelocityBlur(velocity, { preset }).toFixed(2)}px)`,
-                }}
-              />
+        {PRESETS.map((preset) => {
+          return (
+            <div key={preset} className={css.timelineRow}>
+              <span className={css.timelineName}>{preset}</span>
+              <div className={css.rail}>
+                <span
+                  className={css.railBlock}
+                  style={{
+                    left: x * 0.85,
+                    filter: `blur(${getVelocityBlur(velocity, { preset }).toFixed(2)}px)`,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

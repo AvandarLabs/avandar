@@ -38,7 +38,9 @@ export function CompositionCard({
         </span>
       }
       thumbnail={<PosterThumbnail id={entry.id} themeId={themeId} />}
-      onOpen={() => onOpen(entry.id)}
+      onOpen={() => {
+        return onOpen(entry.id);
+      }}
     />
   );
 }

@@ -78,15 +78,17 @@ export function GroupedValuePicker({
           ],
         ]}
       />
-      {input.observations.map((observation, index) => (
-        <PickerObservation
-          key={observation.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.observations.map((observation, index) => {
+        return (
+          <PickerObservation
+            key={observation.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <g
         data-exact-result={value === null ? "null" : value}
         data-result-unit={value === null ? "" : unit}

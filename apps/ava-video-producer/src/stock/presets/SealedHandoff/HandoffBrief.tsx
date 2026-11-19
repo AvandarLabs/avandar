@@ -22,28 +22,30 @@ export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
         fill={STOCK.ground}
         stroke={STOCK.line}
       />
-      {input.brief.map(({ id, line }, index) => (
-        <g key={id} data-brief-line={id}>
-          {input.showLabels ? (
-            <FitText
-              text={line}
-              x={36}
-              y={y + 24 + index * 48}
-              width={464}
-              fontSize={14}
-              maxLines={2}
-              normalizeWhitespace
-              breakLongWords
-            />
-          ) : (
-            <path
-              d={`M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`}
-              stroke={STOCK.muted}
-              strokeWidth={3}
-            />
-          )}
-        </g>
-      ))}
+      {input.brief.map(({ id, line }, index) => {
+        return (
+          <g key={id} data-brief-line={id}>
+            {input.showLabels ? (
+              <FitText
+                text={line}
+                x={36}
+                y={y + 24 + index * 48}
+                width={464}
+                fontSize={14}
+                maxLines={2}
+                normalizeWhitespace
+                breakLongWords
+              />
+            ) : (
+              <path
+                d={`M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`}
+                stroke={STOCK.muted}
+                strokeWidth={3}
+              />
+            )}
+          </g>
+        );
+      })}
     </g>
   );
 }

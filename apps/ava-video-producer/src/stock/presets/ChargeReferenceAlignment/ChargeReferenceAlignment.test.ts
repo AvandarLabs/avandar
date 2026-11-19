@@ -48,15 +48,17 @@ test("exact context gates signed difference and both totals share one zero and c
 });
 
 test("complete fixture set includes minimum, dense and changed inputs before behavior", () => {
-  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach((input) =>
-    assert.deepEqual(inputSchema.parse(input), input),
+  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach(
+    (input) => {
+      return assert.deepEqual(inputSchema.parse(input), input);
+    },
   );
   assert.equal(fixtures.length, 4);
 });
 test("invalid structure and cross-field values are rejected", () => {
-  INVALID_INPUTS.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  INVALID_INPUTS.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("source-role captions accept 32 characters and reject 33", () => {
@@ -94,8 +96,9 @@ function _getVisibleTexts({
     "periodLabel",
   ] as const;
   const isMatched =
-    keys.every((key) => input.invoice[key] === input.reference[key]) &&
-    input.invoice.quantity === input.reference.quantity;
+    keys.every((key) => {
+      return input.invoice[key] === input.reference[key];
+    }) && input.invoice.quantity === input.reference.quantity;
   return [
     input.copy.invoice,
     input.copy.reference,
@@ -108,7 +111,9 @@ function _getVisibleTexts({
     input.copy.example,
     input.reference.sourceLabel,
     input.money.currencyLabel,
-    ...keys.flatMap((key) => [input.invoice[key], input.reference[key]]),
+    ...keys.flatMap((key) => {
+      return [input.invoice[key], input.reference[key]];
+    }),
     isMatched ? input.copy.matched : input.copy.unmatched,
     ...(isMatched && input.showDifference && frame >= 71
       ? [input.copy.difference]
@@ -203,16 +208,16 @@ test("zero, equal, positive and negative totals use exact shared ruler geometry"
         name: "x",
       }),
     );
-    rulers.forEach((ruler, index) =>
-      assert.ok(
+    rulers.forEach((ruler, index) => {
+      return assert.ok(
         Math.abs(
           SvgAttributes.getNumberFromMarkup({
             attributes: ruler[0],
             name: "width",
           }) - row.widths[index],
         ) < 1e-10,
-      ),
-    );
+      );
+    });
     assert.doesNotMatch(
       _render({ frame: 150, input: { ...input, showDifference: false } }),
       /data-difference-minor=|data-difference-bracket=/,
@@ -246,21 +251,26 @@ test("full literal context values fit inside their actual source windows", () =>
     "quantity",
   ] as const;
   assert.deepEqual(
-    literalTexts.map((text) => text[1]),
-    fields.flatMap((field) => [
-      String(input.invoice[field]),
-      String(input.reference[field]),
-    ]),
+    literalTexts.map((text) => {
+      return text[1];
+    }),
+    fields.flatMap((field) => {
+      return [String(input.invoice[field]), String(input.reference[field])];
+    }),
   );
   assert.equal(windows.length, fields.length * 2);
   assert.deepEqual(
-    windows.map(([window]) =>
-      window.match(/data-(invoice|reference)-window="([^"]*)"/)!.slice(1),
-    ),
-    fields.flatMap((field) => [
-      ["invoice", field],
-      ["reference", field],
-    ]),
+    windows.map(([window]) => {
+      return window
+        .match(/data-(invoice|reference)-window="([^"]*)"/)!
+        .slice(1);
+    }),
+    fields.flatMap((field) => {
+      return [
+        ["invoice", field],
+        ["reference", field],
+      ];
+    }),
   );
   literalTexts.forEach((text, index) => {
     const left = SvgAttributes.getNumberFromMarkup({
@@ -308,6 +318,8 @@ test("wrapped source captions clear actual context windows and currency clears a
     );
   });
   const currency = texts.find(propEq("label", input.money.currencyLabel))!;
-  const amount = texts.find((text) => text.x === 60 && text.y === 430)!;
+  const amount = texts.find((text) => {
+    return text.x === 60 && text.y === 430;
+  })!;
   assert.ok(currency.bottom + 4 <= amount.top);
 });

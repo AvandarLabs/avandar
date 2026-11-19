@@ -49,8 +49,8 @@ function useCustomValueWriter(
   >,
 ): (literal: unknown) => void {
   const editor = useTokenEditor();
-  return (literal: unknown) =>
-    reference.allowLiteral
+  return (literal: unknown) => {
+    return reference.allowLiteral
       ? reference.onChange(literal)
       : editor.setCustomValue({
           tokenPath: reference.tokenPath,
@@ -60,6 +60,7 @@ function useCustomValueWriter(
           kind: reference.kind,
           literal,
         });
+  };
 }
 
 /** The toggle and editor for a custom value in place of a reference. */
@@ -101,7 +102,9 @@ export function CustomValue({
     scale,
   });
   const current = isReference
-    ? options.find((option) => option.reference === value)?.value
+    ? options.find((option) => {
+        return option.reference === value;
+      })?.value
     : value;
   return (
     <div className={css.customValue}>
@@ -111,7 +114,9 @@ export function CustomValue({
         variant="subtle"
         aria-label={`Custom value for ${label}`}
         aria-expanded={isOpen}
-        onClick={() => setOpen(!isOpen)}
+        onClick={() => {
+          return setOpen(!isOpen);
+        }}
       >
         {"Custom value"}
       </Button>

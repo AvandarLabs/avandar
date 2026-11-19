@@ -39,11 +39,13 @@ export function HelperPlayer({
         autoPlay={!_isReducedMotionPreferred()}
         clickToPlay={false}
         spaceKeyToPlayOrPause
-        errorFallback={() => (
-          <p className="liveError">
-            Preview unavailable. Check the showcase terminal, then reload.
-          </p>
-        )}
+        errorFallback={() => {
+          return (
+            <p className="liveError">
+              Preview unavailable. Check the showcase terminal, then reload.
+            </p>
+          );
+        }}
       />
     </div>
   );

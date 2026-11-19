@@ -25,7 +25,9 @@ export function DistrictFootprint({
       <polygon
         data-district={district.id}
         points={district.polygon
-          .map(([x, y]) => `${50 + x * 3.6},${140 + y * 3.6}`)
+          .map(([x, y]) => {
+            return `${50 + x * 3.6},${140 + y * 3.6}`;
+          })
           .join(" ")}
         fill={index % 2 ? STOCK.cyan : accent}
         fillOpacity={0.08}

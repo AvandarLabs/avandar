@@ -89,16 +89,18 @@ export function AnchoredOverlayDemo({ frame, frames }: HelperDemoProps) {
         { name: "scale", value: formatReadout(pose.scale) },
       ]}
     >
-      {TABLE_ROWS.map((row, index) => (
-        <div
-          key={row}
-          className={css.tableRow}
-          style={{ top: 160 + index * 50 }}
-        >
-          <span className={css.tableCell} />
-          <span className={css.tableCell} />
-        </div>
-      ))}
+      {TABLE_ROWS.map((row, index) => {
+        return (
+          <div
+            key={row}
+            className={css.tableRow}
+            style={{ top: 160 + index * 50 }}
+          >
+            <span className={css.tableCell} />
+            <span className={css.tableCell} />
+          </div>
+        );
+      })}
       <div
         className={css.box}
         style={{

@@ -28,7 +28,9 @@ export function SubscriptionView({
     view.subscribed && progress === 1
       ? input.records.filter(propEq("category", input.selectedCategory))
       : input.records;
-  const sum = rows.reduce((total, record) => total + record.value, 0);
+  const sum = rows.reduce((total, record) => {
+    return total + record.value;
+  }, 0);
   return (
     <g
       data-view={view.id}
@@ -39,12 +41,14 @@ export function SubscriptionView({
       opacity={ramp(frame, 13 + index * 3, 25)}
     >
       <SubscriptionFrame {...{ view, x, width, accent }} />
-      {input.records.map((record, rowIndex) => (
-        <SubscriptionRecord
-          key={record.id}
-          {...{ record, rowIndex, x, width, view, input, frame, accent }}
-        />
-      ))}
+      {input.records.map((record, rowIndex) => {
+        return (
+          <SubscriptionRecord
+            key={record.id}
+            {...{ record, rowIndex, x, width, view, input, frame, accent }}
+          />
+        );
+      })}
       <LabelSlots
         labels={[
           [`${sum} ${input.metric.valueUnit}`, x + 12, 506, width - 24, 12, 3],

@@ -88,14 +88,16 @@ function useCaptionDownload(
       }
       setState(started);
       downloadCaptionFile({ id, options }).then(
-        () =>
-          setState((current) =>
-            finishCaptionDownload(current, { id, hasFailed: false }),
-          ),
-        () =>
-          setState((current) =>
-            finishCaptionDownload(current, { id, hasFailed: true }),
-          ),
+        () => {
+          return setState((current) => {
+            return finishCaptionDownload(current, { id, hasFailed: false });
+          });
+        },
+        () => {
+          return setState((current) => {
+            return finishCaptionDownload(current, { id, hasFailed: true });
+          });
+        },
       );
     },
   };

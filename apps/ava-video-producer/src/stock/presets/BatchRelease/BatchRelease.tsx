@@ -15,16 +15,18 @@ export function BatchRelease({
   return (
     <g opacity={ramp(frame, 12, 12)}>
       <BatchHeadings input={input} />
-      {input.batches.map((batch, index) => (
-        <BatchEnvelope
-          key={batch.id}
-          batch={batch}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.batches.map((batch, index) => {
+        return (
+          <BatchEnvelope
+            key={batch.id}
+            batch={batch}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

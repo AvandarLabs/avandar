@@ -47,8 +47,10 @@ test("abort retains the before value without durable tickets or visible proposal
   assert.doesNotMatch(hold, /data-provisional-half=/);
 });
 test("every sampled frame commits both durable halves or neither", () => {
-  fixtures.forEach(({ input }) =>
-    Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) => {
+  fixtures.forEach(({ input }) => {
+    return Array.from({ length: 180 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const committed = markup.includes('data-local-durable="true"');
       const tickets = (markup.match(/data-durable-ticket=/g) ?? []).length;
@@ -57,22 +59,23 @@ test("every sampled frame commits both durable halves or neither", () => {
         committed ? 1 : 0,
         `${input.outcome} frame ${frame}`,
       );
-    }),
-  );
+    });
+  });
 });
 test("both proposal halves write beneath one moving latch before one atomic stamp", () => {
   const early = _render({ frame: 20 }),
     written = _render({ frame: 55 });
   assert.equal((written.match(/data-provisional-half=/g) ?? []).length, 2);
   assert.notEqual(early, written);
-  const y = (frame: number) =>
-    SvgAttributes.getNumberFromMarkup({
+  const y = (frame: number) => {
+    return SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({
         markup: _render({ frame: frame }),
         marker: "commit-latch",
       }),
       name: "y1",
     });
+  };
   assert.ok(y(80) > y(56) && y(80) < y(110));
   assert.equal(
     (_render({ frame: 139 }).match(/data-commit-stamp=/g) ?? []).length,
@@ -158,13 +161,17 @@ test("the complete latch stroke and handle remain clear of the record caption th
       change: { ...fixtures[2].input.change, recordLabel: "界".repeat(28) },
     },
   ].forEach((input) => {
-    Array.from({ length: 221 }, (_, index) => index / 2).forEach((frame) => {
+    Array.from({ length: 221 }, (_, index) => {
+      return index / 2;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const caption = [...markup.matchAll(/<text[^>]+>/g)]
-        .map(([tag]) => tag)
-        .find((tag) =>
-          tag.includes(`aria-label="${input.change.recordLabel}"`),
-        );
+        .map(([tag]) => {
+          return tag;
+        })
+        .find((tag) => {
+          return tag.includes(`aria-label="${input.change.recordLabel}"`);
+        });
       assert.ok(caption);
       const x = SvgAttributes.getNumberFromMarkup({
           attributes: caption,

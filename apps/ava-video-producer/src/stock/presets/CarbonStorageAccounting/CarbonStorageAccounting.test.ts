@@ -54,10 +54,9 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
   fixtures.forEach(({ input }) => {
     const retained =
       input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-    const operations = input.operatingEmissions.reduce(
-      (sum, row) => sum + row.tonnesCO2e,
-      0,
-    );
+    const operations = input.operatingEmissions.reduce((sum, row) => {
+      return sum + row.tonnesCO2e;
+    }, 0);
     const markup = _render({ frame: 150, input: input });
     const store = markup.match(/<g data-retained[^>]*>/);
     const emissions = markup.match(/<g data-emissions[^>]*>/);
@@ -128,9 +127,11 @@ function _getVisibleTexts({
     ...Object.values(input.boundary),
     ...Object.values(input.decision),
     ...input.operatingEmissions.map(prop("label")),
-    ...Object.entries(input.copy).flatMap(([key, text]) =>
-      key === "net" && (!input.showNetAccounting || frame < 108) ? [] : [text],
-    ),
+    ...Object.entries(input.copy).flatMap(([key, text]) => {
+      return key === "net" && (!input.showNetAccounting || frame < 108)
+        ? []
+        : [text];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "view"];
@@ -181,35 +182,50 @@ test("zero operating emissions have no physical ribbon width and the operator co
 });
 test("full finite signed equation values stay readable above the bracket and beside their operators", () => {
   fixtures
-    .filter(({ input }) => input.showNetAccounting)
+    .filter(({ input }) => {
+      return input.showNetAccounting;
+    })
     .forEach(({ input }) => {
       const markup = _render({ frame: 150, input: input });
       const retained =
         input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-      const emissions = input.operatingEmissions.reduce(
-        (sum, row) => sum + row.tonnesCO2e,
-        0,
-      );
+      const emissions = input.operatingEmissions.reduce((sum, row) => {
+        return sum + row.tonnesCO2e;
+      }, 0);
       [retained, emissions, retained - emissions].forEach((value, index) => {
         const cell = [...markup.matchAll(/<text ([^>]*)>(.*?)<\/text>/g)].find(
-          (match) =>
-            SvgAttributes.getNumberFromMarkup({
-              attributes: match[1],
-              name: "x",
-            }) ===
-              540 + index * 135 &&
-            SvgAttributes.getNumberFromMarkup({
-              attributes: match[1],
-              name: "y",
-            }) === 510,
+          (match) => {
+            return (
+              SvgAttributes.getNumberFromMarkup({
+                attributes: match[1],
+                name: "x",
+              }) ===
+                540 + index * 135 &&
+              SvgAttributes.getNumberFromMarkup({
+                attributes: match[1],
+                name: "y",
+              }) === 510
+            );
+          },
         );
         assert.ok(cell);
         const spans = [
           ...cell[2].matchAll(/<tspan[^>]*dy="([^"]*)"[^>]*>([^<]*)<\/tspan>/g),
         ];
-        assert.equal(spans.map((span) => span[2]).join(""), String(value));
+        assert.equal(
+          spans
+            .map((span) => {
+              return span[2];
+            })
+            .join(""),
+          String(value),
+        );
         assert.ok(
-          510 + spans.reduce((sum, span) => sum + Number(span[1]), 0) + 3.6 <
+          510 +
+            spans.reduce((sum, span) => {
+              return sum + Number(span[1]);
+            }, 0) +
+            3.6 <
             550,
         );
       });
@@ -239,20 +255,21 @@ test("the precise captured quantity and unit sit beside the continuous physical 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       renderToStaticMarkup(createElement(CarbonPhysicalLabels, { input })),
     );
-    const captured = paint.filter(
-      (item) =>
+    const captured = paint.filter((item) => {
+      return (
         item.kind === "text" &&
         item.top >= 374 &&
         item.bottom < 432 &&
-        item.left < 248,
-    );
+        item.left < 248
+      );
+    });
     assert.ok(captured.length >= 2);
-    captured.forEach((line) =>
-      assert.ok(
+    captured.forEach((line) => {
+      return assert.ok(
         Math.abs(line.right - 236) < 1e-6,
         "Captured numerical copy stays beside the tower and clears the pipe at248",
-      ),
-    );
+      );
+    });
     assert.equal(
       paint.filter(propEq("kind", "rect")).length,
       0,

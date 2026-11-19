@@ -23,10 +23,9 @@ export function getBackoffStateFromInputAndFrame({
   tokenY: number;
 } {
   const waits = input.attempts.slice(0, -1);
-  const totalDelay = waits.reduce(
-    (total, attempt) => total + attempt.delayAfter,
-    0,
-  );
+  const totalDelay = waits.reduce((total, attempt) => {
+    return total + attempt.delayAfter;
+  }, 0);
   const waitFrames = 104 - input.attempts.length * 12;
   let x = 80;
   let at = 36;
@@ -43,7 +42,9 @@ export function getBackoffStateFromInputAndFrame({
     return marker;
   });
   const active =
-    [...markers].reverse().find((marker) => frame >= marker.at) ?? markers[0];
+    [...markers].reverse().find((marker) => {
+      return frame >= marker.at;
+    }) ?? markers[0];
   const excursion = Math.sin(Math.PI * ramp(frame, active.at, 12, EASE.inOut));
   const travel = active.attempt.delayAfter
     ? ramp(

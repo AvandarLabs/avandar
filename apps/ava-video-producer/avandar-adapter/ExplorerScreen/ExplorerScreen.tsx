@@ -64,44 +64,43 @@ export type Props = {
 export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
   const stage = explorerStage(frame, mode);
   const rootRef = useExplorerVideoTargets({ frame, mode, time: stage.time });
-  const filters: StructuredQuery.FilterGroup = useMemo(
-    () =>
-      stage.hasFilterRule
-        ? {
-            ...emptyFilter,
-            rules: [
-              {
-                type: "rule",
-                id: "demo-district-filter",
-                columnId: EXPLORER_COLUMNS.find(
-                  propEq("baseColumn.name", stage.filterColumn),
-                )!.id,
-                columnDataType: "varchar",
-                operator: "=",
-                value: stage.filterText,
-              },
-            ],
-          }
-        : emptyFilter,
-    [stage.hasFilterRule, stage.filterText, stage.filterColumn],
-  );
+  const filters: StructuredQuery.FilterGroup = useMemo(() => {
+    return stage.hasFilterRule
+      ? {
+          ...emptyFilter,
+          rules: [
+            {
+              type: "rule",
+              id: "demo-district-filter",
+              columnId: EXPLORER_COLUMNS.find(
+                propEq("baseColumn.name", stage.filterColumn),
+              )!.id,
+              columnDataType: "varchar",
+              operator: "=",
+              value: stage.filterText,
+            },
+          ],
+        }
+      : emptyFilter;
+  }, [stage.hasFilterRule, stage.filterText, stage.filterColumn]);
   const appliedFilters = stage.filterCommitted ? filters : emptyFilter;
   const rows = stage.isAggregate
     ? EXPLORER_DISTRICT_COUNTS
     : stage.filterCommitted
-      ? EXPLORER_CASES.filter((row) => row.district_name === "Eastbank")
+      ? EXPLORER_CASES.filter((row) => {
+          return row.district_name === "Eastbank";
+        })
       : EXPLORER_CASES;
   const drawerHeight = Math.min(330, Math.round(height * 0.46));
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    return {
       opened: stage.drawerProgress > 0,
       height: drawerHeight,
       maxHeight: drawerHeight,
       onResizePointerDown: _noop,
       onResizeKeyDown: _noop,
-    }),
-    [stage.drawerProgress, drawerHeight],
-  );
+    };
+  }, [stage.drawerProgress, drawerHeight]);
 
   const query = {
     queryColumns: EXPLORER_SELECTED_COLUMNS,
@@ -330,23 +329,25 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
                 <span data-video-target="explorer-viz-tab">Visualizations</span>
               ),
             }}
-            wrapPanels={(panels) => (
-              <div
-                id="demo-explorer-drawer"
-                className={css.explorerDrawerBody}
-                style={{ height: drawerHeight * stage.drawerProgress }}
-              >
-                <Box
-                  className={drawerBodyCss.canvasDrawerBody}
-                  style={{ height: drawerHeight }}
+            wrapPanels={(panels) => {
+              return (
+                <div
+                  id="demo-explorer-drawer"
+                  className={css.explorerDrawerBody}
+                  style={{ height: drawerHeight * stage.drawerProgress }}
                 >
-                  {stage.drawerProgress > 0 ? panels : null}
-                </Box>
-              </div>
-            )}
+                  <Box
+                    className={drawerBodyCss.canvasDrawerBody}
+                    style={{ height: drawerHeight }}
+                  >
+                    {stage.drawerProgress > 0 ? panels : null}
+                  </Box>
+                </div>
+              );
+            }}
             renderTabPanel={{
-              query: () =>
-                stage.isSql ? (
+              query: () => {
+                return stage.isSql ? (
                   <SettingsColumns
                     layout="columns"
                     minColumnWidth={320}
@@ -354,9 +355,10 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
                   />
                 ) : (
                   <SettingsColumns groups={manualGroups} layout="columns" />
-                ),
-              visualizations: () =>
-                stage.isChart ? (
+                );
+              },
+              visualizations: () => {
+                return stage.isChart ? (
                   <SeriesAwareVizForm
                     fields={aggregateColumns}
                     config={barConfig}
@@ -372,7 +374,8 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
                       Pick a chart type above to configure one.
                     </Text>
                   </Stack>
-                ),
+                );
+              },
             }}
           />
         </div>

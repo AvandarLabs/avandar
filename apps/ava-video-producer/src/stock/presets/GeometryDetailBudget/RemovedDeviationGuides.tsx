@@ -13,20 +13,22 @@ export function RemovedDeviationGuides({
   const { removed } = makeDetailSimplificationFromInput(input);
   return (
     <g>
-      {removed.map((item) => (
-        <line
-          key={item.index}
-          data-removed-index={item.index}
-          data-distance={item.distance}
-          x1={60 + input.vertices[item.index][0] * 3.6}
-          y1={160 + input.vertices[item.index][1] * 3.6}
-          x2={60 + item.projection[0] * 3.6}
-          y2={160 + item.projection[1] * 3.6}
-          stroke={STOCK.orange}
-          strokeDasharray="3 3"
-          opacity={ramp(frame, 111, 28)}
-        />
-      ))}
+      {removed.map((item) => {
+        return (
+          <line
+            key={item.index}
+            data-removed-index={item.index}
+            data-distance={item.distance}
+            x1={60 + input.vertices[item.index][0] * 3.6}
+            y1={160 + input.vertices[item.index][1] * 3.6}
+            x2={60 + item.projection[0] * 3.6}
+            y2={160 + item.projection[1] * 3.6}
+            stroke={STOCK.orange}
+            strokeDasharray="3 3"
+            opacity={ramp(frame, 111, 28)}
+          />
+        );
+      })}
     </g>
   );
 }

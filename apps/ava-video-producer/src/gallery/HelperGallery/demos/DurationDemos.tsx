@@ -15,7 +15,9 @@ const FRAME_WIDTH = 30;
 
 /** The duration tokens, shortest first, as the shared timeline lists them. */
 const DURATION_ORDER = (Object.keys(DUR) as Array<keyof typeof DUR>).sort(
-  (first, second) => DUR[first] - DUR[second],
+  (first, second) => {
+    return DUR[first] - DUR[second];
+  },
 );
 
 /** Elapsed frames since the playhead started, held at the ruler's end. */
@@ -29,22 +31,24 @@ function Ruler({ frameWidth = FRAME_WIDTH, frames = RULER_FRAMES }) {
     <div className={css.timelineRow}>
       <span />
       <div className={css.ruler}>
-        {Array.from({ length: frames + 1 }, (_, index) => (
-          <span key={`tick-${index * frameWidth}`}>
-            <span
-              className={css.rulerTick}
-              style={{ left: index * frameWidth }}
-            />
-            {index % 5 === 0 ? (
+        {Array.from({ length: frames + 1 }, (_, index) => {
+          return (
+            <span key={`tick-${index * frameWidth}`}>
               <span
-                className={css.rulerLabel}
+                className={css.rulerTick}
                 style={{ left: index * frameWidth }}
-              >
-                {index}f
-              </span>
-            ) : null}
-          </span>
-        ))}
+              />
+              {index % 5 === 0 ? (
+                <span
+                  className={css.rulerLabel}
+                  style={{ left: index * frameWidth }}
+                >
+                  {index}f
+                </span>
+              ) : null}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -99,24 +103,26 @@ export function createDurationDemo(token: keyof typeof DUR) {
         ]}
       >
         <div className={css.timeline}>
-          {DURATION_ORDER.map((name) => (
-            <div key={name} className={css.timelineRow}>
-              <span
-                className={clsx(
-                  css.timelineName,
-                  name === token && css.timelineNameActive,
-                )}
-              >
-                {`DUR.${name} ${DUR[name]}f`}
-              </span>
-              <TimelineTrack
-                startFrame={0}
-                frames={DUR[name]}
-                elapsed={elapsed}
-                isActive={name === token}
-              />
-            </div>
-          ))}
+          {DURATION_ORDER.map((name) => {
+            return (
+              <div key={name} className={css.timelineRow}>
+                <span
+                  className={clsx(
+                    css.timelineName,
+                    name === token && css.timelineNameActive,
+                  )}
+                >
+                  {`DUR.${name} ${DUR[name]}f`}
+                </span>
+                <TimelineTrack
+                  startFrame={0}
+                  frames={DUR[name]}
+                  elapsed={elapsed}
+                  isActive={name === token}
+                />
+              </div>
+            );
+          })}
           <Ruler />
         </div>
       </HelperDemoFrame>
@@ -137,21 +143,23 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps) {
       readouts={[{ name: "elapsed", value: `${elapsed}f` }]}
     >
       <div className={css.timeline}>
-        {SIBLINGS.map((name, index) => (
-          <div key={name} className={css.timelineRow}>
-            <span
-              className={css.timelineName}
-              style={enter(frame, START + index * STAGGER)}
-            >
-              {`index ${index} @ ${index * STAGGER}f`}
-            </span>
-            <TimelineTrack
-              startFrame={index * STAGGER}
-              frames={DUR.panel}
-              elapsed={elapsed}
-            />
-          </div>
-        ))}
+        {SIBLINGS.map((name, index) => {
+          return (
+            <div key={name} className={css.timelineRow}>
+              <span
+                className={css.timelineName}
+                style={enter(frame, START + index * STAGGER)}
+              >
+                {`index ${index} @ ${index * STAGGER}f`}
+              </span>
+              <TimelineTrack
+                startFrame={index * STAGGER}
+                frames={DUR.panel}
+                elapsed={elapsed}
+              />
+            </div>
+          );
+        })}
         <Ruler />
       </div>
     </HelperDemoFrame>
@@ -184,20 +192,24 @@ export function StaggerColumnDemo({ frame, frames }: HelperDemoProps) {
       ]}
     >
       <div className={css.columns}>
-        {progress.map((columnProgress, index) => (
-          <div
-            key={`column-${index * STAGGER_COLUMN}`}
-            className={css.columnCell}
-          >
-            <div className={css.columnTrack}>
+        {progress.map((columnProgress, index) => {
+          return (
+            <div
+              key={`column-${index * STAGGER_COLUMN}`}
+              className={css.columnCell}
+            >
+              <div className={css.columnTrack}>
+                <span
+                  className={css.columnFill}
+                  style={{ height: `${(columnProgress * 100).toFixed(2)}%` }}
+                />
+              </div>
               <span
-                className={css.columnFill}
-                style={{ height: `${(columnProgress * 100).toFixed(2)}%` }}
-              />
+                className={css.caption}
+              >{`${index * STAGGER_COLUMN}f`}</span>
             </div>
-            <span className={css.caption}>{`${index * STAGGER_COLUMN}f`}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );

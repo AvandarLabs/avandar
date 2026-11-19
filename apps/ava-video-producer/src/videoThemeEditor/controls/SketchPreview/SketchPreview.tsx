@@ -30,15 +30,17 @@ export function SketchPreview({
       aria-hidden="true"
       data-inherit-dim
     >
-      {paths.map((path) => (
-        <path
-          key={path.d}
-          d={path.d}
-          stroke={path.stroke}
-          strokeWidth={path.strokeWidth}
-          fill={path.fill ?? "none"}
-        />
-      ))}
+      {paths.map((path) => {
+        return (
+          <path
+            key={path.d}
+            d={path.d}
+            stroke={path.stroke}
+            strokeWidth={path.strokeWidth}
+            fill={path.fill ?? "none"}
+          />
+        );
+      })}
     </svg>
   );
 }

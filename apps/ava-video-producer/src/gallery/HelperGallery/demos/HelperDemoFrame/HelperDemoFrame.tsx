@@ -35,12 +35,14 @@ export function HelperDemoFrame({
       </header>
       <div className={css.stage}>{children}</div>
       <footer className={css.readouts}>
-        {readouts.map((readout) => (
-          <span key={readout.name} className={css.readout}>
-            <span className={css.readoutName}>{readout.name}</span>
-            <span className={css.readoutValue}>{readout.value}</span>
-          </span>
-        ))}
+        {readouts.map((readout) => {
+          return (
+            <span key={readout.name} className={css.readout}>
+              <span className={css.readoutName}>{readout.name}</span>
+              <span className={css.readoutValue}>{readout.value}</span>
+            </span>
+          );
+        })}
       </footer>
     </div>
   );

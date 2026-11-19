@@ -16,14 +16,13 @@ export function getMaterialEndpointsFromInput({
     item.route === "recycle" || item.route === "residue"
       ? item.route
       : "output";
-  const peers = items
-    .slice(0, index)
-    .filter(
-      (peer) =>
-        (peer.route === "recycle" || peer.route === "residue"
-          ? peer.route
-          : "output") === destination,
-    ).length;
+  const peers = items.slice(0, index).filter((peer) => {
+    return (
+      (peer.route === "recycle" || peer.route === "residue"
+        ? peer.route
+        : "output") === destination
+    );
+  }).length;
   const source = {
     x:
       item.origin === "returned"

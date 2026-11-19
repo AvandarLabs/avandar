@@ -24,18 +24,20 @@ export const cases = fixtureData.cases;
 export const columnNames = Object.keys(cases[0]!);
 
 /** Column metadata inferred from the fixture rows, in the shape the dataset preview and metadata view expect. */
-export const columns = columnNames.map((name, index) => ({
-  id: `film-case-column-${index}`,
-  name,
-  description: undefined,
-  dataType: DATE_COLUMNS.has(name)
-    ? "date"
-    : NUMERIC_COLUMNS.has(name)
-      ? name === "household_size"
-        ? "bigint"
-        : "double"
-      : "varchar",
-})) as unknown as DatasetColumn.T[];
+export const columns = columnNames.map((name, index) => {
+  return {
+    id: `film-case-column-${index}`,
+    name,
+    description: undefined,
+    dataType: DATE_COLUMNS.has(name)
+      ? "date"
+      : NUMERIC_COLUMNS.has(name)
+        ? name === "household_size"
+          ? "bigint"
+          : "double"
+        : "varchar",
+  };
+}) as unknown as DatasetColumn.T[];
 
 /** The saved dataset record this screen's "saved" phase displays. */
 export const dataset = {

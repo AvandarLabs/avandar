@@ -19,10 +19,15 @@ function _createReloadOptions(
   const options = {
     themeId: "harbor",
     inFlight: harness.inFlight,
-    read: async () => STORED_THEME,
-    storeTheme: () => calls.push("store"),
-    rebaseDraft: ({ baseHash }: Readonly<{ baseHash: string }>) =>
-      calls.push(`rebase:${baseHash}`),
+    read: async () => {
+      return STORED_THEME;
+    },
+    storeTheme: () => {
+      return calls.push("store");
+    },
+    rebaseDraft: ({ baseHash }: Readonly<{ baseHash: string }>) => {
+      return calls.push(`rebase:${baseHash}`);
+    },
     setStatus: harness.setStatus,
     ...overrides,
   };
@@ -78,7 +83,11 @@ test("a save is ignored while a reload is in flight", async () => {
   let finishRead: (stored: StoredTheme) => void = () => {};
   const reloading = reloadStoredTheme({
     ...options,
-    read: () => new Promise<StoredTheme>((resolve) => (finishRead = resolve)),
+    read: () => {
+      return new Promise<StoredTheme>((resolve) => {
+        return (finishRead = resolve);
+      });
+    },
   });
   assert.equal(harness.inFlight.current, true);
   let didSave = false;

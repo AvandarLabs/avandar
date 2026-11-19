@@ -38,9 +38,9 @@ export function EasingValueControl({
           { value: "bezier", label: "Bezier" },
           { value: "power", label: "Power" },
         ]}
-        onChange={(kind) =>
-          onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER)
-        }
+        onChange={(kind) => {
+          return onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER);
+        }}
       />
       <div className={css.easingBody}>
         <CurvePlot

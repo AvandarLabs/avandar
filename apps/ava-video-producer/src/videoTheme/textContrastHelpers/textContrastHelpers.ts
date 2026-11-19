@@ -22,7 +22,9 @@ export function getContrastRatioFromColors(
   background: string,
 ): number {
   const [lighter, darker] = [luminance(foreground), luminance(background)].sort(
-    (left, right) => right - left,
+    (left, right) => {
+      return right - left;
+    },
   );
   return (lighter + 0.05) / (darker + 0.05);
 }
@@ -55,7 +57,9 @@ export function listTextContrastFromTheme(
 ): TextContrast[] {
   const ground = theme.semantic.color.ground;
   return listTokenDefinitions()
-    .filter(({ definition }) => definition.kind === "typeStyle")
+    .filter(({ definition }) => {
+      return definition.kind === "typeStyle";
+    })
     .map(({ path }) => {
       const style = getResolvedTokenValue(theme, path) as ResolvedTypeStyle;
       const ratio = getContrastRatioFromColors(style.color, ground);

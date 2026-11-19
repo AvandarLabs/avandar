@@ -72,20 +72,18 @@ function useReferenceOptions({
 >): readonly ReferenceOption[] {
   const { rows, theme } = useTokenEditor();
   const isCameraCurve = isCameraCurveToken(tokenPath, fieldPath);
-  return useMemo(
-    () =>
-      orderReferenceOptions({
-        referenceOptions: listReferenceOptions({
-          kind,
-          excludePath: tokenPath,
-          rows,
-          theme,
-          isCameraCurve,
-        }),
-        current: value,
+  return useMemo(() => {
+    return orderReferenceOptions({
+      referenceOptions: listReferenceOptions({
+        kind,
+        excludePath: tokenPath,
+        rows,
+        theme,
+        isCameraCurve,
       }),
-    [kind, tokenPath, value, rows, theme, isCameraCurve],
-  );
+      current: value,
+    });
+  }, [kind, tokenPath, value, rows, theme, isCameraCurve]);
 }
 
 /** Each option's colour chip, keyed by its reference. Only colours have one. */
@@ -93,12 +91,14 @@ function _buildChipsFromOptions(
   options: readonly ReferenceOption[],
 ): Map<string, string | undefined> {
   return new Map(
-    options.map((option) => [
-      option.reference,
-      option.kind === "color" && typeof option.value === "string"
-        ? option.value
-        : undefined,
-    ]),
+    options.map((option) => {
+      return [
+        option.reference,
+        option.kind === "color" && typeof option.value === "string"
+          ? option.value
+          : undefined,
+      ];
+    }),
   );
 }
 
@@ -112,10 +112,12 @@ function _buildSelectData(
   }>,
 ) {
   const { options, toLabel, unresolved, isColor } = input;
-  const data = options.map((option) => ({
-    value: option.reference,
-    label: toLabel(option),
-  }));
+  const data = options.map((option) => {
+    return {
+      value: option.reference,
+      label: toLabel(option),
+    };
+  });
   return unresolved
     ? [
         ...data,
@@ -164,12 +166,14 @@ export function ReferenceControl({
         value={isTokenReference(value) ? value : null}
         placeholder={value === undefined ? "Not set" : "Custom value"}
         nothingFoundMessage="No matching settings"
-        onChange={(pickedReference) =>
-          pickedReference && onChange(pickedReference)
-        }
-        renderOption={({ option }) => (
-          <OptionRow label={option.label} chip={chips.get(option.value)} />
-        )}
+        onChange={(pickedReference) => {
+          return pickedReference && onChange(pickedReference);
+        }}
+        renderOption={({ option }) => {
+          return (
+            <OptionRow label={option.label} chip={chips.get(option.value)} />
+          );
+        }}
       />
       {unresolved ? (
         <PickAnotherButton

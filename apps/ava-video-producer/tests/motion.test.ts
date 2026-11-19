@@ -13,10 +13,9 @@ import {
 test("loop motion is bounded, periodic, and deterministic under out-of-order seeks", () => {
   const frames = [-361, -180, -1, 0, 1, 45, 90, 179, 180, 361];
   for (const offset of [-28, 0, 37]) {
-    const values = frames.map((frame) => [
-      loopPhase(frame, 180, offset),
-      wave(frame, 180, offset),
-    ]);
+    const values = frames.map((frame) => {
+      return [loopPhase(frame, 180, offset), wave(frame, 180, offset)];
+    });
     for (const frame of [...frames].reverse()) {
       const phase = loopPhase(frame, 180, offset);
       const pulse = wave(frame, 180, offset);
@@ -55,16 +54,31 @@ test("loop envelopes preserve a full reading hold and meet the same boundary gro
 test("loop helpers reject invalid timing before it reaches SVG geometry", () => {
   for (const helper of [loopPhase, wave]) {
     for (const value of [NaN, Infinity, -Infinity]) {
-      assert.throws(() => helper(value, 180));
-      assert.throws(() => helper(30, value));
-      assert.throws(() => helper(30, 180, value));
+      assert.throws(() => {
+        return helper(value, 180);
+      });
+      assert.throws(() => {
+        return helper(30, value);
+      });
+      assert.throws(() => {
+        return helper(30, 180, value);
+      });
     }
-    for (const period of [0, -180]) assert.throws(() => helper(30, period));
+    for (const period of [0, -180])
+      assert.throws(() => {
+        return helper(30, period);
+      });
   }
   for (const value of [NaN, Infinity, -Infinity]) {
-    assert.throws(() => loopEnvelope(value, 180));
-    assert.throws(() => loopEnvelope(30, value));
-    assert.throws(() => loopEnvelope(30, 180, value));
+    assert.throws(() => {
+      return loopEnvelope(value, 180);
+    });
+    assert.throws(() => {
+      return loopEnvelope(30, value);
+    });
+    assert.throws(() => {
+      return loopEnvelope(30, 180, value);
+    });
   }
   for (const [duration, fade] of [
     [0, 12],
@@ -74,7 +88,9 @@ test("loop helpers reject invalid timing before it reaches SVG geometry", () => 
     [180, -1],
     [180, 90],
   ]) {
-    assert.throws(() => loopEnvelope(30, duration, fade));
+    assert.throws(() => {
+      return loopEnvelope(30, duration, fade);
+    });
   }
 });
 

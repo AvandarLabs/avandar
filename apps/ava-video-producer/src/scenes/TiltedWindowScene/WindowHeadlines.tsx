@@ -54,25 +54,27 @@ export function WindowHeadlines({
         opacity: opacity * exitOpacity,
       }}
     >
-      {fitted.lines.map((line, row) => (
-        <div
-          key={`${headline.atFrame}-${row}`}
-          style={{
-            fontSize: fitted.fontSize,
-            lineHeight: 1.25,
-            fontWeight: 600,
-            letterSpacing: -fitted.fontSize * 0.02,
-            color: "var(--foreground)",
-            ...getLineRevealStyle(
-              frame,
-              headline.atFrame + row * LINE_STAGGER,
-              "line-fade",
-            ),
-          }}
-        >
-          {line}
-        </div>
-      ))}
+      {fitted.lines.map((line, row) => {
+        return (
+          <div
+            key={`${headline.atFrame}-${row}`}
+            style={{
+              fontSize: fitted.fontSize,
+              lineHeight: 1.25,
+              fontWeight: 600,
+              letterSpacing: -fitted.fontSize * 0.02,
+              color: "var(--foreground)",
+              ...getLineRevealStyle(
+                frame,
+                headline.atFrame + row * LINE_STAGGER,
+                "line-fade",
+              ),
+            }}
+          >
+            {line}
+          </div>
+        );
+      })}
       {headline.subtitle ? (
         <div
           style={{

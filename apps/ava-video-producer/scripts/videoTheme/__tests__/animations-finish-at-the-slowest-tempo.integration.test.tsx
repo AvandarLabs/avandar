@@ -63,7 +63,9 @@ function _picture(
 function _readContinuityShots(
   id: string,
 ): ReadonlyArray<readonly ContinuityBeat[]> {
-  const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
+  const entry = CONTINUITY_CATALOG.find((candidate) => {
+    return candidate.id === id;
+  });
   assert.ok(entry, id);
   const plan = storyboardSchema.parse(
     JSON.parse(
@@ -73,15 +75,17 @@ function _readContinuityShots(
       ),
     ),
   );
-  return plan.shots.flatMap((shot) =>
-    shot.scene === "continuity" ? [shot.props.beats] : [],
-  );
+  return plan.shots.flatMap((shot) => {
+    return shot.scene === "continuity" ? [shot.props.beats] : [];
+  });
 }
 
-const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => ({
-  id,
-  shots: _readContinuityShots(id),
-}));
+const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
+  return {
+    id,
+    shots: _readContinuityShots(id),
+  };
+});
 
 /** The last beat-local frame before the next beat's transition starts covering this one. */
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
@@ -101,11 +105,13 @@ function _listBeatRows(): Array<
     beats: readonly ContinuityBeat[];
   }>
 > {
-  return COMPOSITIONS.flatMap(({ id, shots }) =>
-    shots.flatMap((beats) =>
-      beats.map((beat, index) => ({ id, beat, index, beats })),
-    ),
-  );
+  return COMPOSITIONS.flatMap(({ id, shots }) => {
+    return shots.flatMap((beats) => {
+      return beats.map((beat, index) => {
+        return { id, beat, index, beats };
+      });
+    });
+  });
 }
 
 /** When each tempo-scaled stage animation of a beat ends, in beat-local frames. */

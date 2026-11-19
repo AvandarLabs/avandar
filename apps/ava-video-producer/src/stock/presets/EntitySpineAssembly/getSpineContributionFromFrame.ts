@@ -24,23 +24,27 @@ export function getSpineContributionFromFrame({
   index,
   frame,
 }: Readonly<Params>): GetSpineContributionFromFrameResult {
-  const entityIndex = input.entities.findIndex(
-    ({ id }) => id === observation.entityId,
-  );
+  const entityIndex = input.entities.findIndex(({ id }) => {
+    return id === observation.entityId;
+  });
   const groupStart =
     112 +
     input.entities.slice(0, entityIndex).reduce((height, entity) => {
       const numEntityObservations = input.observations.filter(
-        ({ entityId }) => entityId === entity.id,
+        ({ entityId }) => {
+          return entityId === entity.id;
+        },
       ).length;
       return (
         height + (numEntityObservations ? numEntityObservations * 20 + 34 : 0)
       );
     }, 0);
-  const entityRows = input.observations.filter(
-    ({ entityId }) => entityId === observation.entityId,
-  );
-  const rank = entityRows.findIndex(({ id }) => id === observation.id);
+  const entityRows = input.observations.filter(({ entityId }) => {
+    return entityId === observation.entityId;
+  });
+  const rank = entityRows.findIndex(({ id }) => {
+    return id === observation.id;
+  });
   const stackY = groupStart + 36 + rank * 20;
   const y = mix(ramp(frame, 61, 21, EASE.inOut), 154 + index * 60, stackY);
   return {
@@ -49,6 +53,8 @@ export function getSpineContributionFromFrame({
     opacity: 1 - ramp(frame, 96, 9),
     groupStart,
     entityIndex,
-    sum: entityRows.reduce((total, { value }) => total + value, 0),
+    sum: entityRows.reduce((total, { value }) => {
+      return total + value;
+    }, 0),
   };
 }

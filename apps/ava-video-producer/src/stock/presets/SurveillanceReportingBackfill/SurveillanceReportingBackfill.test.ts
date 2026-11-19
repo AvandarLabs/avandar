@@ -91,21 +91,21 @@ test("each receipt reaches its earlier event bin and bars retain first-snapshot 
   const start = _render({ frame: 0 }),
     hold = _render({ frame: 150 });
   assert.deepEqual(
-    [...start.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) =>
-      SvgAttributes.getNumberFromMarkup({
+    [...start.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) => {
+      return SvgAttributes.getNumberFromMarkup({
         attributes: match[0],
         name: "height",
-      }),
-    ),
+      });
+    }),
     [18, 18, 0],
   );
   assert.deepEqual(
-    [...hold.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) =>
-      SvgAttributes.getNumberFromMarkup({
+    [...hold.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) => {
+      return SvgAttributes.getNumberFromMarkup({
         attributes: match[0],
         name: "height",
-      }),
-    ),
+      });
+    }),
     [36, 36, 18],
   );
   assert.equal((hold.match(/data-record-token=/g) ?? []).length, 5);
@@ -127,7 +127,9 @@ test("array order and hidden prior outlines preserve totals and empty-bin backfi
   const hold = _render({ frame: 150, input: changedInput });
   assert.deepEqual(
     [...hold.matchAll(/data-prior="([^"]+)" data-revised="([^"]+)"/g)].map(
-      (match) => match.slice(1),
+      (match) => {
+        return match.slice(1);
+      },
     ),
     [
       ["1", "2"],
@@ -139,10 +141,12 @@ test("array order and hidden prior outlines preserve totals and empty-bin backfi
   assert.match(hold, /data-earlier-total="2" data-revised-total="5"/);
   const input = inputSchema.parse({
     ...fixtures[2].input,
-    records: fixtures[2].input.records.map((record) => ({
-      ...record,
-      eventBinId: "0",
-    })),
+    records: fixtures[2].input.records.map((record) => {
+      return {
+        ...record,
+        eventBinId: "0",
+      };
+    }),
   });
   assert.equal(
     (_render({ frame: 150, input: input }).match(/data-record-token=/g) ?? [])

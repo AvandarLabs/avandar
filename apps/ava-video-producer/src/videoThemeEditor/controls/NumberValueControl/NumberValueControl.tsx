@@ -39,13 +39,14 @@ export function NumberValueControl({
   const shown = Number(
     ((parseCssPixels(value) ?? min / scale) * scale).toFixed(4),
   );
-  const emit = (shownNumber: number) =>
-    onChange(
+  const emit = (shownNumber: number) => {
+    return onChange(
       _buildTokenValue(
         definition.kind,
         Number((shownNumber / scale).toFixed(6)),
       ),
     );
+  };
   return (
     <Group className={css.numberValueRow} gap="xs" wrap="nowrap">
       {(max - min) / step <= SLIDER_STEP_LIMIT ? (

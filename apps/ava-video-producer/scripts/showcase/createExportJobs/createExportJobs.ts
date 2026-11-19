@@ -76,7 +76,10 @@ export function createExportJobs<T>(
   return {
     start,
     get,
-    file: (id: string) =>
-      jobs.get(id)?.state === "complete" ? jobs.get(id)?.filename : undefined,
+    file: (id: string) => {
+      return jobs.get(id)?.state === "complete"
+        ? jobs.get(id)?.filename
+        : undefined;
+    },
   };
 }

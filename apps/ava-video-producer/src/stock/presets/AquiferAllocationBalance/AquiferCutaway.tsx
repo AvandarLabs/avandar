@@ -82,33 +82,35 @@ export function AquiferCutaway({
         strokeWidth={2}
         fill="none"
       />
-      {paths.map(({ key, number, x, y, path, progress, value, color }) => (
-        <g key={key}>
-          <path
-            data-flow-guide={key}
-            d={path}
-            stroke={STOCK.muted}
-            strokeWidth={1}
-            strokeDasharray="3 4"
-            fill="none"
-          />
-          <path
-            data-flow={key}
-            data-quantity={value}
-            d={path}
-            pathLength={1}
-            strokeDasharray={1}
-            strokeDashoffset={1 - progress}
-            opacity={value ? 1 : 0}
-            stroke={color}
-            strokeWidth={7}
-            fill="none"
-          />
-          <g data-flow-ownership={key}>
-            <AquiferOwnershipKey number={number} x={x} y={y} />
+      {paths.map(({ key, number, x, y, path, progress, value, color }) => {
+        return (
+          <g key={key}>
+            <path
+              data-flow-guide={key}
+              d={path}
+              stroke={STOCK.muted}
+              strokeWidth={1}
+              strokeDasharray="3 4"
+              fill="none"
+            />
+            <path
+              data-flow={key}
+              data-quantity={value}
+              d={path}
+              pathLength={1}
+              strokeDasharray={1}
+              strokeDashoffset={1 - progress}
+              opacity={value ? 1 : 0}
+              stroke={color}
+              strokeWidth={7}
+              fill="none"
+            />
+            <g data-flow-ownership={key}>
+              <AquiferOwnershipKey number={number} x={x} y={y} />
+            </g>
           </g>
-        </g>
-      ))}
+        );
+      })}
       <rect
         x={32}
         y={320}

@@ -15,20 +15,29 @@ type GetMaterialBalanceResult = {
 export function getMaterialBalanceFromInput(
   input: Readonly<Input>,
 ): GetMaterialBalanceResult {
-  const returned = input.parts.reduce((sum, part) => sum + part.massKg, 0);
-  const replacement = input.replacementInputs.reduce(
-    (sum, part) => sum + part.massKg,
-    0,
-  );
+  const returned = input.parts.reduce((sum, part) => {
+    return sum + part.massKg;
+  }, 0);
+  const replacement = input.replacementInputs.reduce((sum, part) => {
+    return sum + part.massKg;
+  }, 0);
   const recycle = input.parts
     .filter(propEq("route", "recycle"))
-    .reduce((sum, part) => sum + part.massKg, 0);
+    .reduce((sum, part) => {
+      return sum + part.massKg;
+    }, 0);
   const residue = input.parts
     .filter(propEq("route", "residue"))
-    .reduce((sum, part) => sum + part.massKg, 0);
+    .reduce((sum, part) => {
+      return sum + part.massKg;
+    }, 0);
   const assembled =
     input.parts
-      .filter((part) => part.route === "reuse" || part.route === "repair")
-      .reduce((sum, part) => sum + part.massKg, 0) + replacement;
+      .filter((part) => {
+        return part.route === "reuse" || part.route === "repair";
+      })
+      .reduce((sum, part) => {
+        return sum + part.massKg;
+      }, 0) + replacement;
   return { returned, replacement, recycle, residue, assembled };
 }

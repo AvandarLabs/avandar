@@ -11,14 +11,13 @@ export function useFilterTreeState({
 }: {
   value: StructuredQuery.FilterGroup;
 }) {
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    return {
       query: makeLibraryFilterGroupFromQueryFilterGroup(value),
       matchCaseById: getMatchCaseByIdFromFilterGroup(value),
       onQueryChange: () => {},
       commitNow: () => {},
       setMatchCase: () => {},
-    }),
-    [value],
-  );
+    };
+  }, [value]);
 }

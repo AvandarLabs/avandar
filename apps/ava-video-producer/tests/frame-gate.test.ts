@@ -18,7 +18,9 @@ function createLumaTrack(
   startFrame: number,
   values: number[],
 ): number[] {
-  const luma = Array.from({ length }, () => 100);
+  const luma = Array.from({ length }, () => {
+    return 100;
+  });
   values.forEach((value, offset) => {
     luma[startFrame + offset] = value;
   });
@@ -46,7 +48,13 @@ test("gate arguments keep the file apart from the declared cut list", () => {
     ["film.mp4", "--declared-cuts"],
     ["film.mp4", "--loose"],
   ]) {
-    assert.throws(() => parseGateArguments(argv), /usage/, argv.join(" "));
+    assert.throws(
+      () => {
+        return parseGateArguments(argv);
+      },
+      /usage/,
+      argv.join(" "),
+    );
   }
 });
 
@@ -77,7 +85,9 @@ test("a declared cut that reverses within ten frames is a flash and fails", () =
   assert.equal(cut.reversalFrame, 29);
   assert.equal(cut.reversal, 100);
   assert.deepEqual(
-    findLumaJumps(luma, [cut]).map((jump) => jump.to),
+    findLumaJumps(luma, [cut]).map((jump) => {
+      return jump.to;
+    }),
     [20, 29],
   );
 });
@@ -110,7 +120,9 @@ test("a reversal after ten frames is a new shot, not a flash", () => {
   const [cut] = judgeDeclaredCuts(luma, [20]);
   assert.equal(cut.verdict, "accepted");
   assert.deepEqual(
-    findLumaJumps(luma, [cut]).map((jump) => jump.to),
+    findLumaJumps(luma, [cut]).map((jump) => {
+      return jump.to;
+    }),
     [31],
   );
 });
@@ -160,9 +172,9 @@ test("a copy-level half match next to a near-uniform frame is still tiled", () =
   const halves = [...MEASURED_HALVES];
   halves[10] = 54.72;
   assert.deepEqual(
-    findTiledFrames({ halves, contrast: MEASURED_CONTRAST }).map(
-      (tile) => tile.frame,
-    ),
+    findTiledFrames({ halves, contrast: MEASURED_CONTRAST }).map((tile) => {
+      return tile.frame;
+    }),
     [10],
   );
 });
@@ -186,7 +198,9 @@ const TILE_GRAPH =
 test("a 2x3 grid of its own frame is caught, including next to a uniform frame", async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "frame-gate-"));
   try {
-    const frame = (index: number) => path.join(directory, `f-${index}.png`);
+    const frame = (index: number) => {
+      return path.join(directory, `f-${index}.png`);
+    };
     runFfmpeg([
       "-f",
       "lavfi",
@@ -232,7 +246,9 @@ test("a 2x3 grid of its own frame is caught, including next to a uniform frame",
     assert.equal(measured.halves.length, 18);
     assert.ok(measured.contrast[11] < 120, "frame 11 is near-uniform");
     assert.deepEqual(
-      findTiledFrames(measured).map((tile) => tile.frame),
+      findTiledFrames(measured).map((tile) => {
+        return tile.frame;
+      }),
       [4, 12],
     );
   } finally {

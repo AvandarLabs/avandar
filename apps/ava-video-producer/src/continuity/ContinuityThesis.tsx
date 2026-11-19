@@ -23,19 +23,21 @@ export function ContinuityThesis({ content, frame, accent }: Props) {
   const motion = useVideoMotion();
   return (
     <div className={css.continuityThesis}>
-      {content.lines.map((line, index) => (
-        <div
-          className={css.continuityThesisLine}
-          key={line}
-          style={enter(frame, index * motion.scale(thesis.lineStagger), {
-            y: thesis.lineDistance,
-            dur: motion.scale(thesis.lineDuration),
-            easing: motion.curve(thesis.lineEasing),
-          })}
-        >
-          {line}
-        </div>
-      ))}
+      {content.lines.map((line, index) => {
+        return (
+          <div
+            className={css.continuityThesisLine}
+            key={line}
+            style={enter(frame, index * motion.scale(thesis.lineStagger), {
+              y: thesis.lineDistance,
+              dur: motion.scale(thesis.lineDuration),
+              easing: motion.curve(thesis.lineEasing),
+            })}
+          >
+            {line}
+          </div>
+        );
+      })}
       <div className={css.continuityEmphasis}>
         <Underline
           disabled={!annotations}

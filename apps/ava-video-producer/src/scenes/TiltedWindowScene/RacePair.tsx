@@ -27,12 +27,14 @@ export function RacePair(props: Props) {
   const isFlip = (entrance?.kind ?? "flip-split") === "flip-split";
   const flip = isFlip ? getFlipSplit(frame, at, width) : undefined;
   const split = flip ? flip.split : 1;
-  const boxes = PAIR_BOXES.map((box) => ({
-    x: box.x * width,
-    y: box.y * height,
-    width: box.width * width,
-    height: box.height * height,
-  }));
+  const boxes = PAIR_BOXES.map((box) => {
+    return {
+      x: box.x * width,
+      y: box.y * height,
+      width: box.width * width,
+      height: box.height * height,
+    };
+  });
   return (
     <>
       <div
@@ -95,15 +97,17 @@ export function RacePair(props: Props) {
           );
         })}
       </div>
-      {pair.map((column, side) => (
-        <_RaceStats
-          key={`${side}-${column.label}`}
-          {...props}
-          column={column}
-          side={side}
-          labelsAt={at + 2}
-        />
-      ))}
+      {pair.map((column, side) => {
+        return (
+          <_RaceStats
+            key={`${side}-${column.label}`}
+            {...props}
+            column={column}
+            side={side}
+            labelsAt={at + 2}
+          />
+        );
+      })}
     </>
   );
 }
@@ -125,7 +129,9 @@ function _RaceStats({
     frame,
     counter.startFrame,
     counter.endFrame - counter.startFrame,
-    (t) => t,
+    (t) => {
+      return t;
+    },
   );
   const done = ramp(frame, counter.endFrame, DUR.chip, EASE.out);
   const fade = exit

@@ -78,9 +78,9 @@ function _getMarkedElementsFromMarkup({
   markup: string;
   field: string;
 }): string[] {
-  return (markup.match(/<[^>]+>/g) ?? []).filter((element) =>
-    element.includes(`data-${field}=`),
-  );
+  return (markup.match(/<[^>]+>/g) ?? []).filter((element) => {
+    return element.includes(`data-${field}=`);
+  });
 }
 test("exactly one holder loses its single token at expiry without a successor", () => {
   [
@@ -143,8 +143,9 @@ test("finite collar segments drain at evenly spaced beats and stay empty after r
     });
     assert.equal(segments.length, 8);
     assert.equal(
-      segments.filter((element) => element.includes('data-active="true"'))
-        .length,
+      segments.filter((element) => {
+        return element.includes('data-active="true"');
+      }).length,
       Math.max(0, 8 - index),
     );
   });
@@ -260,12 +261,12 @@ test("the full lifetime value and unit clear every supported holder route and co
       );
       const lines = paint.filter(propEq("ariaLabel", input.lifetime.unit));
       assert.ok(lines.length > 0);
-      lines.forEach((line) =>
-        assert.ok(
+      lines.forEach((line) => {
+        return assert.ok(
           line.top > 134 && line.bottom < 158 && line.right < 430,
           "Lifetime copy stays above all routes and clear of the middle collar",
-        ),
-      );
+        );
+      });
       assert.equal(
         paint.filter(propEq("kind", "rect")).length,
         0,

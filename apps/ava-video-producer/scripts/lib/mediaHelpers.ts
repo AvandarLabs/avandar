@@ -41,15 +41,15 @@ export async function runProcess(
         if (!options.quiet) process.stderr.write(chunk);
       });
       child.on("error", reject);
-      child.on("close", (code) =>
-        code === 0
+      child.on("close", (code) => {
+        return code === 0
           ? resolve({ stdout, stderr })
           : reject(
               new Error(
                 `${path.basename(command)} exited ${code}: ${stderr.slice(-3000)}`,
               ),
-            ),
-      );
+            );
+      });
     },
   );
 }
@@ -100,7 +100,9 @@ export async function validateMedia(plan: Storyboard, root: string) {
   const audio = async (asset: string, label: string) => {
     const info = await inspect(asset);
     if (
-      !info.streams.some((stream) => stream.codec_type === "audio") ||
+      !info.streams.some((stream) => {
+        return stream.codec_type === "audio";
+      }) ||
       !Number.isFinite(info.duration) ||
       info.duration <= 0
     )
@@ -111,12 +113,13 @@ export async function validateMedia(plan: Storyboard, root: string) {
     if (shot.scene !== "media") continue;
     const info = await inspect(shot.props.src);
     if (
-      !info.streams.some(
-        (stream) =>
+      !info.streams.some((stream) => {
+        return (
           stream.codec_type === "video" &&
           Number(stream.width) > 0 &&
-          Number(stream.height) > 0,
-      )
+          Number(stream.height) > 0
+        );
+      })
     )
       throw new Error(`${shot.id}: asset has no visual stream`);
     if (
@@ -201,7 +204,9 @@ export async function audioPeak(
 /** Verify picture duration before a mix can truncate or extend it. */
 async function _assertPictureDuration(plan: Storyboard, picture: string) {
   const info = await probe(picture);
-  const video = info.streams.find((stream) => stream.codec_type === "video");
+  const video = info.streams.find((stream) => {
+    return stream.codec_type === "video";
+  });
   if (!video) throw new Error("Picture has no video stream");
   const duration = Number(video.duration ?? info.duration);
   if (
@@ -236,9 +241,11 @@ export async function mixAudio(
           },
         ]
       : []),
-    ...absoluteCues(plan).flatMap((cue) =>
-      cue.audio ? [{ src: cue.audio, atFrame: cue.startFrame, volume: 1 }] : [],
-    ),
+    ...absoluteCues(plan).flatMap((cue) => {
+      return cue.audio
+        ? [{ src: cue.audio, atFrame: cue.startFrame, volume: 1 }]
+        : [];
+    }),
     ...plan.soundEffects,
   ];
   if (!tracks.length) {
@@ -253,7 +260,13 @@ export async function mixAudio(
     return `[${index + 1}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=${track.volume},adelay=${delay}|${delay}[a${index}]`;
   });
   filters.push(
-    `${tracks.map((_, index) => `[a${index}]`).join("")}amix=inputs=${tracks.length}:normalize=0:dropout_transition=0,alimiter=limit=0.95:level=false:latency=1,apad[mix]`,
+    `${tracks
+      .map((_, index) => {
+        return `[a${index}]`;
+      })
+      .join(
+        "",
+      )}amix=inputs=${tracks.length}:normalize=0:dropout_transition=0,alimiter=limit=0.95:level=false:latency=1,apad[mix]`,
   );
   const expectedDuration = durationInFrames(plan) / plan.fps;
   args.push(
@@ -277,14 +290,20 @@ export async function mixAudio(
   );
   await run(ffmpeg, args, { quiet: true });
   const result = await probe(destination);
-  if (!result.streams.some((stream) => stream.codec_type === "audio"))
+  if (
+    !result.streams.some((stream) => {
+      return stream.codec_type === "audio";
+    })
+  )
     throw new Error("Audio assembly produced no audio stream");
   if (Math.abs(result.duration - expectedDuration) > 0.08)
     throw new Error("Audio assembly changed film duration");
   if ((await videoHash(picture)) !== (await videoHash(destination)))
     throw new Error("Audio assembly changed the video packets");
   if (
-    tracks.some((track) => track.volume > 0) &&
+    tracks.some((track) => {
+      return track.volume > 0;
+    }) &&
     (await audioPeak(destination)) <= -80
   )
     throw new Error("Assembled audio is silent");

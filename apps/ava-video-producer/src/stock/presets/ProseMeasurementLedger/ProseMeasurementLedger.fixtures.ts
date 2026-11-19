@@ -58,12 +58,14 @@ export const DEFAULT_INPUT: Input = {
 
 const minimum: Input = {
   ...DEFAULT_INPUT,
-  fragments: DEFAULT_INPUT.fragments.map((fragment, index) => ({
-    ...fragment,
-    text: index === 2 ? "0" : "x",
-    contentStart: 0,
-    contentEnd: 1,
-  })),
+  fragments: DEFAULT_INPUT.fragments.map((fragment, index) => {
+    return {
+      ...fragment,
+      text: index === 2 ? "0" : "x",
+      contentStart: 0,
+      contentEnd: 1,
+    };
+  }),
   showSourceSpans: false,
   method: "model-assisted",
   reviewState: "reviewed",
@@ -71,12 +73,14 @@ const minimum: Input = {
 const dense: Input = {
   ...DEFAULT_INPUT,
   fragments: [
-    ...DEFAULT_INPUT.fragments.map((fragment, index) => ({
-      ...fragment,
-      text: index === 2 ? "-0.00000000000000001" : "W".repeat(16),
-      contentStart: 0,
-      contentEnd: index === 2 ? 20 : 16,
-    })),
+    ...DEFAULT_INPUT.fragments.map((fragment, index) => {
+      return {
+        ...fragment,
+        text: index === 2 ? "-0.00000000000000001" : "W".repeat(16),
+        contentStart: 0,
+        contentEnd: index === 2 ? 20 : 16,
+      };
+    }),
     { id: "g", role: "connector", text: " ", contentStart: 0, contentEnd: 0 },
     { id: "h", role: "connector", text: " ", contentStart: 0, contentEnd: 0 },
     { id: "i", role: "connector", text: " ", contentStart: 0, contentEnd: 0 },
@@ -89,9 +93,11 @@ const dense: Input = {
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
-  fragments: DEFAULT_INPUT.fragments.map((fragment) =>
-    fragment.role === "subject" ? { ...fragment, contentEnd: 4 } : fragment,
-  ),
+  fragments: DEFAULT_INPUT.fragments.map((fragment) => {
+    return fragment.role === "subject"
+      ? { ...fragment, contentEnd: 4 }
+      : fragment;
+  }),
   method: "model-assisted",
   showSourceSpans: false,
 };
@@ -114,26 +120,32 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    fragments: DEFAULT_INPUT.fragments.map((f) =>
-      f.role === "subject" ? { ...f, role: "metric" } : f,
-    ),
+    fragments: DEFAULT_INPUT.fragments.map((f) => {
+      return f.role === "subject" ? { ...f, role: "metric" } : f;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    fragments: DEFAULT_INPUT.fragments.map((f) => ({ ...f, contentStart: -1 })),
+    fragments: DEFAULT_INPUT.fragments.map((f) => {
+      return { ...f, contentStart: -1 };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    fragments: DEFAULT_INPUT.fragments.map((f) => ({ ...f, contentEnd: 99 })),
+    fragments: DEFAULT_INPUT.fragments.map((f) => {
+      return { ...f, contentEnd: 99 };
+    }),
   },
-  ...["1e3", "1,000", "NaN", "Infinity", " "].map((text) => ({
-    ...DEFAULT_INPUT,
-    fragments: DEFAULT_INPUT.fragments.map((f) =>
-      f.role === "value"
-        ? { ...f, text, contentStart: 0, contentEnd: text.length }
-        : f,
-    ),
-  })),
+  ...["1e3", "1,000", "NaN", "Infinity", " "].map((text) => {
+    return {
+      ...DEFAULT_INPUT,
+      fragments: DEFAULT_INPUT.fragments.map((f) => {
+        return f.role === "value"
+          ? { ...f, text, contentStart: 0, contentEnd: text.length }
+          : f;
+      }),
+    };
+  }),
   {
     ...DEFAULT_INPUT,
     fragments: [

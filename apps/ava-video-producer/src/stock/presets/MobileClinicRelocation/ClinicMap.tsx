@@ -13,11 +13,13 @@ export function ClinicMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const sites = input.sites.map((site) => ({
-    ...site,
-    x: 70 + site.x * 430,
-    y: 125 + site.y * 200,
-  }));
+  const sites = input.sites.map((site) => {
+    return {
+      ...site,
+      x: 70 + site.x * 430,
+      y: 125 + site.y * 200,
+    };
+  });
   const progress = ramp(frame, 50, 46, EASE.inOut);
   const x = mix(progress, sites[0].x, sites[1].x);
   const y = mix(progress, sites[0].y, sites[1].y);
@@ -49,32 +51,34 @@ export function ClinicMap({
         strokeDasharray="5 10"
         fill="none"
       />
-      {sites.map((site, index) => (
-        <g key={site.id}>
-          <circle
-            data-site-id={site.id}
-            cx={site.x}
-            cy={site.y}
-            r={9}
-            fill={STOCK.surface}
-            stroke={accent}
-          />
-          <FitText
-            text={site.label}
-            x={500}
-            y={190 + index * 70}
-            width={110}
-            fontSize={12}
-            maxLines={4}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <path
-            d={`M490 ${190 + index * 70} L${site.x} ${site.y}`}
-            stroke={STOCK.line}
-          />
-        </g>
-      ))}
+      {sites.map((site, index) => {
+        return (
+          <g key={site.id}>
+            <circle
+              data-site-id={site.id}
+              cx={site.x}
+              cy={site.y}
+              r={9}
+              fill={STOCK.surface}
+              stroke={accent}
+            />
+            <FitText
+              text={site.label}
+              x={500}
+              y={190 + index * 70}
+              width={110}
+              fontSize={12}
+              maxLines={4}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <path
+              d={`M490 ${190 + index * 70} L${site.x} ${site.y}`}
+              stroke={STOCK.line}
+            />
+          </g>
+        );
+      })}
       <ClinicVehicle x={x} y={y} awning={awning} accent={accent} />
     </g>
   );

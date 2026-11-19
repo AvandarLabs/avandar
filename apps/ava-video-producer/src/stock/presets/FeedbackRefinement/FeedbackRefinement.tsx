@@ -34,26 +34,28 @@ export function FeedbackRefinement({
       />
       <path d="M100 330 H860" stroke={STOCK.line} strokeDasharray="4 8" />
       {[input.roleLabels.author, input.roleLabels.reviewer].map(
-        (label, index) => (
-          <g key={index}>
-            <path
-              d={`M${100 + 460 * index} 188 V174 H${400 + 460 * index} V188`}
-              fill="none"
-              stroke={STOCK.line}
-            />
-            <FitText
-              text={label}
-              x={250 + 460 * index}
-              y={140}
-              width={300}
-              fontSize={16}
-              maxLines={2}
-              anchor="middle"
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        ),
+        (label, index) => {
+          return (
+            <g key={index}>
+              <path
+                d={`M${100 + 460 * index} 188 V174 H${400 + 460 * index} V188`}
+                fill="none"
+                stroke={STOCK.line}
+              />
+              <FitText
+                text={label}
+                x={250 + 460 * index}
+                y={140}
+                width={300}
+                fontSize={16}
+                maxLines={2}
+                anchor="middle"
+                breakLongWords
+                normalizeWhitespace
+              />
+            </g>
+          );
+        },
       )}
       {input.showRoundLabels ? (
         <FitText
@@ -84,16 +86,18 @@ export function FeedbackRefinement({
           color={accent}
         />
       </g>
-      {input.rounds.map((round, index) => (
-        <FeedbackNote
-          key={round.draft}
-          frame={frame}
-          round={round}
-          index={index}
-          numRounds={input.rounds.length}
-          showReviewTrail={input.showReviewTrail}
-        />
-      ))}
+      {input.rounds.map((round, index) => {
+        return (
+          <FeedbackNote
+            key={round.draft}
+            frame={frame}
+            round={round}
+            index={index}
+            numRounds={input.rounds.length}
+            showReviewTrail={input.showReviewTrail}
+          />
+        );
+      })}
     </g>
   );
 }

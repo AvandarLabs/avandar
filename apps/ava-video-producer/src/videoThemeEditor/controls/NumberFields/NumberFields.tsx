@@ -38,21 +38,23 @@ export function NumberFields({
       variant="unstyled"
     >
       <div className={css.numberFieldsGrid}>
-        {fields.map((field) => (
-          <RangeNumberInput
-            key={field.key}
-            size="xs"
-            label={field.name}
-            min={field.min}
-            max={field.max}
-            step={field.step}
-            decimalScale={2}
-            value={current[field.key] ?? 0}
-            onChange={(fieldValue) =>
-              onChange({ ...current, [field.key]: fieldValue })
-            }
-          />
-        ))}
+        {fields.map((field) => {
+          return (
+            <RangeNumberInput
+              key={field.key}
+              size="xs"
+              label={field.name}
+              min={field.min}
+              max={field.max}
+              step={field.step}
+              decimalScale={2}
+              value={current[field.key] ?? 0}
+              onChange={(fieldValue) => {
+                return onChange({ ...current, [field.key]: fieldValue });
+              }}
+            />
+          );
+        })}
       </div>
       {action}
     </Fieldset>

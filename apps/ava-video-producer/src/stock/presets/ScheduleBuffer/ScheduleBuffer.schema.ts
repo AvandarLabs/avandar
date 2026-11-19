@@ -34,9 +34,9 @@ export const inputSchema = z
   .superRefine((input, context) => {
     if (
       new Set(input.tasks.map(prop("id"))).size !== input.tasks.length ||
-      !input.tasks
-        .slice(0, -1)
-        .some(({ id }) => id === input.interruption.afterTaskId) ||
+      !input.tasks.slice(0, -1).some(({ id }) => {
+        return id === input.interruption.afterTaskId;
+      }) ||
       input.interruption.duration > input.reserveUnits
     ) {
       context.addIssue({

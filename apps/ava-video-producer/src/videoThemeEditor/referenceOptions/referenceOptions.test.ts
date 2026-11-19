@@ -40,7 +40,9 @@ function _references(kind: TokenKind, excludePath?: string): readonly string[] {
     excludePath,
     rows: ROWS,
     theme: THEME,
-  }).map((option) => option.reference);
+  }).map((option) => {
+    return option.reference;
+  });
 }
 
 test("a colour picker offers the primary colour, swatches, semantic colours, and palette shades", () => {
@@ -89,7 +91,9 @@ test("a camera curve picker offers only camera-safe curves", () => {
     rows: ROWS,
     theme: THEME,
     isCameraCurve: true,
-  }).map((option) => option.reference);
+  }).map((option) => {
+    return option.reference;
+  });
   assert.ok(references.includes("$atomic.easing.inOut"));
   assert.ok(references.includes("$atomic.easing.inOutCubic"));
   assert.ok(!references.includes("$atomic.easing.outBack"));

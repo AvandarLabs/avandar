@@ -61,37 +61,39 @@ export function AquiferBudget({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {terms.map(({ owner, number, label, value }, index) => (
-        <g key={owner} data-budget-term={owner}>
-          {number ? (
-            <AquiferOwnershipKey
-              number={number}
-              x={42 + (index % 4) * 232}
-              y={484 + Math.floor(index / 4) * 75}
+      {terms.map(({ owner, number, label, value }, index) => {
+        return (
+          <g key={owner} data-budget-term={owner}>
+            {number ? (
+              <AquiferOwnershipKey
+                number={number}
+                x={42 + (index % 4) * 232}
+                y={484 + Math.floor(index / 4) * 75}
+              />
+            ) : undefined}
+            <FitText
+              text={label}
+              x={32 + (index % 4) * 232}
+              y={435 + Math.floor(index / 4) * 75}
+              width={210}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
             />
-          ) : undefined}
-          <FitText
-            text={label}
-            x={32 + (index % 4) * 232}
-            y={435 + Math.floor(index / 4) * 75}
-            width={210}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(value)}
-            x={(number ? 64 : 32) + (index % 4) * 232}
-            y={488 + Math.floor(index / 4) * 75}
-            width={number ? 178 : 210}
-            fontSize={12}
-            maxLines={1}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+            <FitText
+              text={String(value)}
+              x={(number ? 64 : 32) + (index % 4) * 232}
+              y={488 + Math.floor(index / 4) * 75}
+              width={number ? 178 : 210}
+              fontSize={12}
+              maxLines={1}
+              breakLongWords
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

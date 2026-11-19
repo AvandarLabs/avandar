@@ -12,7 +12,9 @@ export function getCueWindowFromShot({ shot, beatId }: Options) {
   if (!beatId) return { start: 0, duration: shot.durationInFrames };
   if (shot.scene !== "continuity")
     throw new Error("Only continuity shots have beats");
-  const index = shot.props.beats.findIndex((beat) => beat.id === beatId);
+  const index = shot.props.beats.findIndex((beat) => {
+    return beat.id === beatId;
+  });
   if (index < 0)
     throw new Error("Narration references an unknown continuity beat");
   return {

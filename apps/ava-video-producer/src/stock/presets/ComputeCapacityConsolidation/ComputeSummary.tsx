@@ -8,7 +8,9 @@ type Props = { input: Input; frame: number };
 
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ComputeSummary({ input, frame }: Readonly<Props>): ReactNode {
-  const total = input.jobs.reduce((sum, job) => sum + job.cpuHours, 0);
+  const total = input.jobs.reduce((sum, job) => {
+    return sum + job.cpuHours;
+  }, 0);
   const occupied = new Set(input.jobs.map(prop("finalHostId"))).size;
   return (
     <g>

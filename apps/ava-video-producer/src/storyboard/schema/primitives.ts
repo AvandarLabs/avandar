@@ -20,14 +20,13 @@ export const assetPathSchema = text.max(240).refine((value) => {
     !value.includes("?") &&
     !value.includes("#") &&
     !value.includes("%") &&
-    value
-      .split("/")
-      .every(
-        (part) =>
-          part !== ".." &&
-          part !== "." &&
-          !part.startsWith(".") &&
-          part.length > 0,
-      )
+    value.split("/").every((part) => {
+      return (
+        part !== ".." &&
+        part !== "." &&
+        !part.startsWith(".") &&
+        part.length > 0
+      );
+    })
   );
 }, "Use a public-relative asset path without hidden files, URLs, or traversal");

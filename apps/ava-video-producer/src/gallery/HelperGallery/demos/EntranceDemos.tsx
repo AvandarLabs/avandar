@@ -38,15 +38,17 @@ export function EnterDemo({ frame, frames }: HelperDemoProps) {
     >
       <div className={css.centered}>
         <div className={css.cards}>
-          {ENTER_VARIANTS.map((variant) => (
-            <div key={variant.code} className={css.cardColumn}>
-              <DemoCard
-                title="Saved view"
-                style={enter(frame, ENTER_AT, variant.options)}
-              />
-              <span className={css.caption}>{variant.code}</span>
-            </div>
-          ))}
+          {ENTER_VARIANTS.map((variant) => {
+            return (
+              <div key={variant.code} className={css.cardColumn}>
+                <DemoCard
+                  title="Saved view"
+                  style={enter(frame, ENTER_AT, variant.options)}
+                />
+                <span className={css.caption}>{variant.code}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </HelperDemoFrame>
@@ -62,22 +64,29 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps) {
       frame={frame}
       frames={frames}
       label="enterAt(frame, 12, index)"
-      readouts={ROWS.slice(0, 3).map((row, index) => ({
-        name: `row ${index}`,
-        value: formatReadout(Number(enterAt(frame, 12, index).opacity)),
-      }))}
+      readouts={ROWS.slice(0, 3).map((row, index) => {
+        return {
+          name: `row ${index}`,
+          value: formatReadout(Number(enterAt(frame, 12, index).opacity)),
+        };
+      })}
     >
       <div className={css.list}>
-        {ROWS.map((row, index) => (
-          <div
-            key={row}
-            className={css.listRow}
-            style={enterAt(frame, 12, index)}
-          >
-            <span className={css.listDot} />
-            <span className={css.listBar} style={{ width: 120 + index * 30 }} />
-          </div>
-        ))}
+        {ROWS.map((row, index) => {
+          return (
+            <div
+              key={row}
+              className={css.listRow}
+              style={enterAt(frame, 12, index)}
+            >
+              <span className={css.listDot} />
+              <span
+                className={css.listBar}
+                style={{ width: 120 + index * 30 }}
+              />
+            </div>
+          );
+        })}
       </div>
     </HelperDemoFrame>
   );
@@ -124,7 +133,9 @@ export function PopDemo({ frame, frames }: HelperDemoProps) {
       <div className={css.split}>
         <div className={css.plotCell}>
           <CurvePlot
-            easing={(value) => pop(value * DUR.sheet, 0)}
+            easing={(value) => {
+              return pop(value * DUR.sheet, 0);
+            }}
             t={time}
             size={300}
           />
@@ -147,7 +158,11 @@ const PRESSES = [20, 50];
 
 /** A button answering two presses with `press()` and returning to exactly 1. */
 export function PressDemo({ frame, frames }: HelperDemoProps) {
-  const scale = Math.min(...PRESSES.map((at) => press(frame, at)));
+  const scale = Math.min(
+    ...PRESSES.map((at) => {
+      return press(frame, at);
+    }),
+  );
   return (
     <HelperDemoFrame
       frame={frame}

@@ -42,10 +42,9 @@ test("opt-in label whitespace normalization fits hard breaks without changing st
     }),
     ["A B C D"],
   );
-  assert.throws(
-    () => wrapTextToLines({ text, width: 200, fontSize: 18, maxLines: 1 }),
-    /line count/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({ text, width: 200, fontSize: 18, maxLines: 1 });
+  }, /line count/);
   const markup = renderToStaticMarkup(
     createElement(FitText, {
       text,
@@ -63,10 +62,9 @@ test("opt-in label whitespace normalization fits hard breaks without changing st
 
 test("seven and eight authored lines retain fixed-size leading within explicit capacity", () => {
   [7, 8].forEach((numLines) => {
-    const text = Array.from(
-      { length: numLines },
-      (_, index) => `Line ${index + 1}`,
-    ).join("\n");
+    const text = Array.from({ length: numLines }, (_, index) => {
+      return `Line ${index + 1}`;
+    }).join("\n");
     const lines = wrapTextToLines({
       text,
       width: 368,

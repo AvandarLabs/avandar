@@ -34,16 +34,18 @@ export function ColdChainCustody({
         </g>
       ) : undefined}
       <CustodyStops input={input} frame={frame} accent={accent} />
-      {input.crates.map((crate, index) => (
-        <CustodyLane
-          key={crate.id}
-          crate={crate}
-          index={index}
-          frame={frame}
-          accent={accent}
-          input={input}
-        />
-      ))}
+      {input.crates.map((crate, index) => {
+        return (
+          <CustodyLane
+            key={crate.id}
+            crate={crate}
+            index={index}
+            frame={frame}
+            accent={accent}
+            input={input}
+          />
+        );
+      })}
       <CustodyLegend input={input} frame={frame} accent={accent} />
     </g>
   );

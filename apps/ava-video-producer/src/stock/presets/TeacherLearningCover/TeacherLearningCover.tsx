@@ -20,17 +20,19 @@ export function TeacherLearningCover({
   return (
     <g>
       <LearningRooms input={input} />
-      {(["teacher", "cover", "mentor"] as const).map((role) => (
-        <CoverStaff
-          key={role}
-          role={role}
-          person={input.staff[role]}
-          x={positions[`${role}X`]}
-          frame={frame}
-          mode={input.session.mode}
-          accent={accent}
-        />
-      ))}
+      {(["teacher", "cover", "mentor"] as const).map((role) => {
+        return (
+          <CoverStaff
+            key={role}
+            role={role}
+            person={input.staff[role]}
+            x={positions[`${role}X`]}
+            frame={frame}
+            mode={input.session.mode}
+            accent={accent}
+          />
+        );
+      })}
       <ClassroomLearners input={input} />
       {input.showClassroomResponsibility ? (
         <path

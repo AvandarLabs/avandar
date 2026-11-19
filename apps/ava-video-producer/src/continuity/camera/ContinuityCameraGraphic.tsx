@@ -33,9 +33,11 @@ export function ContinuityCameraGraphic({ content }: Props) {
       blurOptions={
         useFlightBlur ? { shutterAngle, samples, blurStrength } : undefined
       }
-      render={(sampleFrame) => (
-        <ContinuityGraphicObjects content={content} frame={sampleFrame} />
-      )}
+      render={(sampleFrame) => {
+        return (
+          <ContinuityGraphicObjects content={content} frame={sampleFrame} />
+        );
+      }}
     />
   );
 }

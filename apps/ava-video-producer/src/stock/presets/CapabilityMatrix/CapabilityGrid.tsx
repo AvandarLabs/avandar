@@ -31,23 +31,27 @@ export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
       </g>
       <g opacity={ramp(frame, 18, 18)}>
         <StockRect {...panel} fill={STOCK.surface} stroke={STOCK.line} />
-        {input.options.map((option, index) => (
-          <CapabilityColumn
-            key={option.id}
-            {...{ option, index, height }}
-            columnWidth={606 / input.options.length}
-          />
-        ))}
-        {input.capabilities.map((row, index) => (
-          <line
-            key={row.id}
-            x1={54}
-            x2={908}
-            y1={176 + index * 66}
-            y2={176 + index * 66}
-            stroke={STOCK.line}
-          />
-        ))}
+        {input.options.map((option, index) => {
+          return (
+            <CapabilityColumn
+              key={option.id}
+              {...{ option, index, height }}
+              columnWidth={606 / input.options.length}
+            />
+          );
+        })}
+        {input.capabilities.map((row, index) => {
+          return (
+            <line
+              key={row.id}
+              x1={54}
+              x2={908}
+              y1={176 + index * 66}
+              y2={176 + index * 66}
+              stroke={STOCK.line}
+            />
+          );
+        })}
       </g>
     </g>
   );

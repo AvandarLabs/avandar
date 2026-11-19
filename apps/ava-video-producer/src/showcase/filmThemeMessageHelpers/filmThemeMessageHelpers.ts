@@ -241,7 +241,9 @@ export function createFilmTokensUsedMessage(
   paths: readonly string[],
 ): FilmTokensUsedMessage {
   const boundedPaths = paths
-    .filter((path) => path.length <= MAX_TOKEN_PATH_LENGTH)
+    .filter((path) => {
+      return path.length <= MAX_TOKEN_PATH_LENGTH;
+    })
     .slice(0, MAX_TOKEN_PATHS);
   return { type: "film-tokens-used", id, paths: boundedPaths };
 }

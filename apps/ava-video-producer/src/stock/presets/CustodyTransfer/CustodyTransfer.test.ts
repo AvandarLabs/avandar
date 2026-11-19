@@ -179,9 +179,9 @@ test("distinct holder names retain accepted packing, whitespace and grapheme tex
       holders: { sender, recipient: `R${sender.slice(1)}` },
     });
     const markup = _render({ frame: 150, input: input });
-    Object.values(input.holders).forEach((holder) =>
-      assert.ok(markup.includes(`aria-label="${holder}"`)),
-    );
+    Object.values(input.holders).forEach((holder) => {
+      return assert.ok(markup.includes(`aria-label="${holder}"`));
+    });
     assert.doesNotMatch(markup, />[\u0300-\u036f\u200d]/u);
   });
 });

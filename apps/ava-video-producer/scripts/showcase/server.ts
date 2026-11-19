@@ -43,9 +43,9 @@ let generation = 0;
 const publish = async () => {
   await buildStockContracts(appRoot);
   generation += 1;
-  clients.forEach((client) =>
-    client.write(`data: ${session}:${generation}\n\n`),
-  );
+  clients.forEach((client) => {
+    return client.write(`data: ${session}:${generation}\n\n`);
+  });
 };
 const live = await buildLivePlayers(publish);
 const atlas = await buildAtlas({
@@ -60,9 +60,15 @@ const plansWatcher = watch(
   () => {
     clearTimeout(planTimer);
     planTimer = setTimeout(() => {
-      void Promise.all(Object.keys(PLANS).map((id) => ShowcaseFilms.load(id)))
+      void Promise.all(
+        Object.keys(PLANS).map((id) => {
+          return ShowcaseFilms.load(id);
+        }),
+      )
         .then(publish)
-        .catch((error) => console.error("Storyboard not ready:", error));
+        .catch((error) => {
+          return console.error("Storyboard not ready:", error);
+        });
     }, 200);
   },
 );
@@ -79,7 +85,9 @@ const themesWatcher = watch(
     }
     clearTimeout(themeTimer);
     themeTimer = setTimeout(() => {
-      publish().catch((error) => console.error("Theme reload failed:", error));
+      publish().catch((error) => {
+        return console.error("Theme reload failed:", error);
+      });
     }, 200);
   },
 );
@@ -123,9 +131,9 @@ async function filmForPlayer(id: string) {
       ? film.assets
       : [];
   await Promise.all(
-    assets.map(async (asset) =>
-      media.set(`/${asset}`, await publicAsset(appRoot, asset)),
-    ),
+    assets.map(async (asset) => {
+      return media.set(`/${asset}`, await publicAsset(appRoot, asset));
+    }),
   );
   return film;
 }
@@ -324,7 +332,9 @@ const server = createServer(async (req, res) => {
       });
       res.write(`data: ${session}:${generation}\n\n`);
       clients.add(res);
-      req.on("close", () => clients.delete(res));
+      req.on("close", () => {
+        return clients.delete(res);
+      });
       return;
     }
     const generated = [
@@ -355,9 +365,11 @@ const server = createServer(async (req, res) => {
     res.end();
   }
 });
-server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () =>
-  console.log(`Live showcase: http://localhost:${process.env.PORT ?? 4173}`),
-);
+server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () => {
+  return console.log(
+    `Live showcase: http://localhost:${process.env.PORT ?? 4173}`,
+  );
+});
 server.on("error", (error: NodeJS.ErrnoException) => {
   if (error.code === "EADDRINUSE") {
     const port = Number(process.env.PORT ?? 4173);
@@ -373,12 +385,18 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 async function close() {
   clearTimeout(planTimer);
   clearTimeout(themeTimer);
-  clients.forEach((client) => client.end());
+  clients.forEach((client) => {
+    return client.end();
+  });
   plansWatcher.close();
   themesWatcher.close();
   server.close();
   await live.dispose();
   await atlas?.dispose();
 }
-process.once("SIGINT", () => void close());
-process.once("SIGTERM", () => void close());
+process.once("SIGINT", () => {
+  return void close();
+});
+process.once("SIGTERM", () => {
+  return void close();
+});

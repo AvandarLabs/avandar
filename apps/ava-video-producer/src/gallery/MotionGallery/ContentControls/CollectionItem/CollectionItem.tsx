@@ -34,40 +34,42 @@ export function CollectionItem({
         <button
           aria-label={`Remove ${context.label} item ${index + 1}`}
           disabled={count <= control.minItems}
-          onClick={() =>
-            onChange(
+          onClick={() => {
+            return onChange(
               ContentDraftModule.removeItem({
                 preset,
                 state,
                 path: context.path,
                 index,
               }),
-            )
-          }
+            );
+          }}
         >
           Remove
         </button>
       </div>
-      {control.itemControls.map((child) => (
-        <ContentField
-          {...{
-            ...remainingProps,
-            control,
-            context,
-            preset,
-            state,
-            onChange,
-            index,
-            item,
-            count,
-            itemPath: providedItemPath,
-          }}
-          key={child.path}
-          control={child}
-          parentPath={path}
-          itemPath={itemPath}
-        />
-      ))}
+      {control.itemControls.map((child) => {
+        return (
+          <ContentField
+            {...{
+              ...remainingProps,
+              control,
+              context,
+              preset,
+              state,
+              onChange,
+              index,
+              item,
+              count,
+              itemPath: providedItemPath,
+            }}
+            key={child.path}
+            control={child}
+            parentPath={path}
+            itemPath={itemPath}
+          />
+        );
+      })}
     </div>
   );
 }

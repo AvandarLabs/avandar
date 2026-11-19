@@ -25,9 +25,9 @@ function _lines({
       size,
     }),
   );
-  return [...markup.matchAll(/<text\b[^>]*>(.*?)<\/text>/g)].map((match) =>
-    match[1].replace(/&amp;/g, "&").replace(/&#x27;/g, "'"),
-  );
+  return [...markup.matchAll(/<text\b[^>]*>(.*?)<\/text>/g)].map((match) => {
+    return match[1].replace(/&amp;/g, "&").replace(/&#x27;/g, "'");
+  });
 }
 test("ordinary authored words wrap at pixel bounds without splitting fitting tokens", () => {
   [
@@ -38,20 +38,22 @@ test("ordinary authored words wrap at pixel bounds without splitting fitting tok
   ].forEach((text) => {
     const lines = _lines({ text });
     assert.equal(lines.join(""), text);
-    text.split(" ").forEach((word) =>
-      assert.ok(
-        lines.some((line) => line.includes(word)),
+    text.split(" ").forEach((word) => {
+      return assert.ok(
+        lines.some((line) => {
+          return line.includes(word);
+        }),
         `${text}: ${word}`,
-      ),
-    );
-    lines.forEach((line) =>
-      assert.ok(
+      );
+    });
+    lines.forEach((line) => {
+      return assert.ok(
         getConservativeWidthFromText({
           text: line,
           fontSize: 17,
         }) <= 168,
-      ),
-    );
+      );
+    });
   });
 });
 test("a question fits the wider heading slot with its punctuation attached", () => {
@@ -94,14 +96,14 @@ test("maximum wide glyphs wrap without loss at fixed sizes inside branch and hea
     const lines = _lines({ text, width, size });
     assert.equal(lines.join(""), text);
     assert.ok(lines.length <= maxLines);
-    lines.forEach((line) =>
-      assert.ok(
+    lines.forEach((line) => {
+      return assert.ok(
         getConservativeWidthFromText({
           text: line,
           fontSize: size,
         }) <= width,
-      ),
-    );
+      );
+    });
   });
 });
 test("two and four branches keep complete labels under deterministic out-of-order seeking", () => {
@@ -111,14 +113,16 @@ test("two and four branches keep complete labels under deterministic out-of-orde
       prompt: "Which path fits this request?",
       branches: DECISION_FORK_DENSE_INPUT.branches
         .slice(0, numBranches)
-        .map((branch, index) => ({
-          ...branch,
-          condition: index ? "Ready for release" : "Needs review",
-          outcome: index ? "Publish approved work" : "Send to reviewer",
-        })),
+        .map((branch, index) => {
+          return {
+            ...branch,
+            condition: index ? "Ready for release" : "Needs review",
+            outcome: index ? "Publish approved work" : "Send to reviewer",
+          };
+        }),
     };
-    const render = ({ frame }: Readonly<{ frame: number }>) =>
-      renderToStaticMarkup(
+    const render = ({ frame }: Readonly<{ frame: number }>) => {
+      return renderToStaticMarkup(
         createElement(DecisionFork, {
           frame,
           input,
@@ -127,15 +131,16 @@ test("two and four branches keep complete labels under deterministic out-of-orde
           id: "test",
         }),
       );
-    const samples = [0, 18, 36, 90, 150, 179].map((frame) => ({
-      frame,
-      markup: render({ frame: frame }),
-    }));
-    [...samples]
-      .reverse()
-      .forEach(({ frame, markup }) =>
-        assert.equal(render({ frame: frame }), markup),
-      );
+    };
+    const samples = [0, 18, 36, 90, 150, 179].map((frame) => {
+      return {
+        frame,
+        markup: render({ frame: frame }),
+      };
+    });
+    [...samples].reverse().forEach(({ frame, markup }) => {
+      return assert.equal(render({ frame: frame }), markup);
+    });
     assert.equal(
       (render({ frame: 150 }).match(/data-branch=/g) ?? []).length,
       numBranches,
@@ -150,10 +155,14 @@ test("two and four branches keep complete labels under deterministic out-of-orde
     const lines = _lines({ text });
     assert.equal(lines.join(""), text);
     assert.ok(
-      lines.some((line) =>
-        line.includes(text.endsWith("e\u0301") ? "e\u0301" : "👩‍🔬"),
-      ),
+      lines.some((line) => {
+        return line.includes(text.endsWith("e\u0301") ? "e\u0301" : "👩‍🔬");
+      }),
     );
-    assert.ok(lines.every((line) => !/^[\p{Mark}\u200d]/u.test(line)));
+    assert.ok(
+      lines.every((line) => {
+        return !/^[\p{Mark}\u200d]/u.test(line);
+      }),
+    );
   });
 });
