@@ -1,6 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +15,7 @@ type Props = {
   isFocused: boolean;
   accent: string;
 };
+const CONNECTOR_WIDTH = 0.8;
 /**
  * A persistent ring and stronger keyed connector identify the explained record.
  */
@@ -24,6 +28,7 @@ export function LocationPin({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <SketchedShape
@@ -32,7 +37,7 @@ export function LocationPin({
         data-nominal-pin={location.id}
         fill={isFocused ? accent : tokens.color.text}
         stroke={isFocused ? tokens.color.text : "none"}
-        strokeWidth={isFocused ? 2 : 0}
+        strokeWidth={isFocused ? scales.stroke(tokens.stroke.default) : 0}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M${x} ${y} L420 ${328 + index * 31} H440` }}
@@ -40,7 +45,9 @@ export function LocationPin({
         data-location-connector={location.id}
         fill="none"
         stroke={isFocused ? accent : tokens.color.inactive}
-        strokeWidth={isFocused ? 2 : 0.8}
+        strokeWidth={scales.stroke(
+          isFocused ? tokens.stroke.default : CONNECTOR_WIDTH,
+        )}
       />
       <LabelSlots
         labels={[[String(index + 1), 444, 332 + index * 31, 24, 12, 1]]}

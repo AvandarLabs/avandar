@@ -83,7 +83,7 @@ test("one team lifts its own marker from maximum initial concentration, preservi
         })
       ];
     assert.ok(marker);
-    const hand = carried.match(/<circle data-team-hand[^>]*>/);
+    const hand = carried.match(/<circle\b[^>]*\bdata-team-hand[^>]*>/);
     assert.ok(hand);
     assert.equal(
       SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }),
@@ -102,7 +102,7 @@ test("one team lifts its own marker from maximum initial concentration, preservi
       );
     })!;
     const pointing = _render({ frame: 36, input: input }).match(
-      /<circle data-community-hand[^>]*>/,
+      /<circle\b[^>]*\bdata-community-hand[^>]*>/,
     );
     assert.ok(pointing);
     assert.equal(

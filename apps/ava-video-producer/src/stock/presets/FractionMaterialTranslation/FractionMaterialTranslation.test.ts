@@ -87,16 +87,23 @@ test("learner hands actually contact their selected material during the operatio
       resolvedArrangement: "separate-desks",
     },
   });
-  const hand = markup.match(/data-material-hand="counters"[^>]*d="([^"]+)"/);
-  const piece = markup.match(
-    /<circle[^>]*data-piece-owner="counters"[^>]*cx="([^"]+)"[^>]*cy="([^"]+)"[^>]*r="([^"]+)"/,
-  );
+  const hand = markup
+    .match(/<path\b[^>]*\bdata-material-hand="counters"[^>]*>/)?.[0]
+    .match(/\bd="([^"]+)"/);
+  const pieceTag = markup.match(
+    /<circle\b[^>]*\bdata-piece-owner="counters"[^>]*>/,
+  )?.[0];
+  const piece = pieceTag
+    ? ["cx", "cy", "r"].map((name) => {
+        return pieceTag.match(new RegExp(` ${name}="([^"]+)"`))?.[1];
+      })
+    : null;
   assert.ok(hand);
   assert.ok(piece);
   const numbers = hand[1].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
-  assert.ok(Math.abs(numbers.at(-2)! - (480 + Number(piece[1]))) < 0.001);
+  assert.ok(Math.abs(numbers.at(-2)! - (480 + Number(piece[0]))) < 0.001);
   assert.ok(
-    Math.abs(numbers.at(-1)! - (330 + Number(piece[2]) - Number(piece[3]))) <
+    Math.abs(numbers.at(-1)! - (330 + Number(piece[1]) - Number(piece[2]))) <
       0.001,
   );
 });

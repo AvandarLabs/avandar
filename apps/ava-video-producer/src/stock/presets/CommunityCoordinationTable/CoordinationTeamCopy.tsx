@@ -2,7 +2,10 @@ import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -19,6 +22,7 @@ export function CoordinationTeamCopy({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const team = input.teams[index],
     reference = frame >= 108 ? team.agreedPlaceId : team.initialPlaceId;
   const placeIndex = input.places.findIndex(propEq("id", reference)),
@@ -35,7 +39,9 @@ export function CoordinationTeamCopy({
         y={y - 14}
         width={16}
         height={18}
-        rx={input.markerStyle === "flags" ? 0 : 4}
+        rx={
+          input.markerStyle === "flags" ? 0 : scales.corner(tokens.corner.chip)
+        }
         fill={tokens.color.surface}
         stroke={color}
       />

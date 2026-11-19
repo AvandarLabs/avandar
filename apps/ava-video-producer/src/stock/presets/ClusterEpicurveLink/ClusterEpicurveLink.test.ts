@@ -3,6 +3,8 @@ import test from "node:test";
 import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { createThemePatchFromStockColors } from "../../../videoTheme/createThemePatchFromStockColors/createThemePatchFromStockColors";
+import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { ClusterEpicurveLink } from "./ClusterEpicurveLink";
 import {
   defaultInput,
@@ -269,10 +271,13 @@ test("selected histogram identities keep at least 4.5 contrast under light and d
   ["#9fefca", "#3caeff", "#15151a", "#ffffff", "#ff0000", "#777777"].forEach(
     (accent) => {
       const markup = renderToStaticMarkup(
-        createElement(HistogramSegments, {
-          input: identityInput,
-          frame: 150,
-          accent,
+        createElement(VideoThemeScope, {
+          patches: [createThemePatchFromStockColors({ accent })],
+          children: createElement(HistogramSegments, {
+            input: identityInput,
+            frame: 150,
+            accent,
+          }),
         }),
       );
       const identityFill = markup.match(/<text[^>]*fill="([^"]*)"/)![1];

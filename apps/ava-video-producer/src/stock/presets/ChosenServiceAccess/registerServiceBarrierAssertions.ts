@@ -77,7 +77,7 @@ function _assertBarrierClearance({
       frame,
     });
   });
-  const route = markup.match(/<path data-access-route[^>]*>/);
+  const route = markup.match(/<path\b[^>]*\bdata-access-route[^>]*>/);
   assert.ok(route);
   const segments = ServiceSvgGeometry.getPathSegmentsFromTag(route[0]);
   if (input.participantMobility === "wheelchair") {
@@ -116,7 +116,7 @@ function _getFrameFromX({
 
 function _getJoinFrames(input: Readonly<Input>): number[] {
   const route = _renderScene({ frame: 120, input }).match(
-    /<path data-access-route[^>]*>/,
+    /<path\b[^>]*\bdata-access-route[^>]*>/,
   );
   assert.ok(route);
   const startX = ServiceSvgGeometry.getParticipantGeometryFromMarkup(

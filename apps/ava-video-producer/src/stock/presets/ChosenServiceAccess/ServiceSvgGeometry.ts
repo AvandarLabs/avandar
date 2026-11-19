@@ -125,7 +125,7 @@ function _getServiceParticipantGeometryFromMarkup(
 function _getServiceObstaclesFromMarkup(markup: string): ServiceObstacle[] {
   return [
     ...markup.matchAll(
-      /<path data-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
+      /<path\b[^>]*\bdata-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
     ),
   ].map(([tag]) => {
     return {

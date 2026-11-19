@@ -1,3 +1,4 @@
+import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
@@ -64,7 +65,9 @@ export function ClassroomFurniture({
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.surface}
         stroke={hasBoard ? accent : tokens.color.line}
-        strokeWidth={1 + boardProgress * 2}
+        strokeWidth={scales.stroke(
+          mix(boardProgress, tokens.stroke.hairline, tokens.stroke.emphasis),
+        )}
       />
       <ClassroomBoardText input={input} frame={frame} hasBoard={hasBoard} />
       <ApproachTrace input={input} progress={progress} accent={accent} />

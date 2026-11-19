@@ -116,16 +116,18 @@ export function registerCoordinationReviewAssertions(
     const input = DEFAULT_INPUT,
       markup = render({ frame: 150, input: input });
     input.places.forEach((place, index) => {
-      const connector = [
-        ...markup.matchAll(
-          /<path data-place-connector="([^"]*)"[^>]*d="([^"]*)"/g,
-        ),
-      ].find((match) => {
-        return match[1] === place.id;
-      });
+      const connector = [...markup.matchAll(/<path\b[^>]*>/g)]
+        .map(([tag]) => {
+          return tag;
+        })
+        .find((tag) => {
+          return tag.includes(`data-place-connector="${place.id}"`);
+        });
       assert.ok(connector, `missing visible place connector ${index}`);
       assert.ok(
-        connector[2].endsWith(`L${340 + place.x * 270} ${160 + place.y * 280}`),
+        connector
+          .match(/\bd="([^"]*)"/)?.[1]
+          .endsWith(`L${340 + place.x * 270} ${160 + place.y * 280}`),
       );
     });
     const open = markup.match(/<g data-unassigned-caption="c"[^>]*>(.*?)<\/g>/);

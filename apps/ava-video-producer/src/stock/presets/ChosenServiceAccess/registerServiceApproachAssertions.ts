@@ -192,7 +192,7 @@ function _getFloorSegments({
       id: "test",
     }),
   );
-  const route = markup.match(/<path data-access-route[^>]*>/);
+  const route = markup.match(/<path\b[^>]*\bdata-access-route[^>]*>/);
   assert.ok(route);
   return ServiceSvgGeometry.getPathSegmentsFromTag(route[0]).map(
     ({ start, end }) => {

@@ -3,6 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CarbonStorageAccounting.schema";
@@ -14,6 +15,8 @@ type Props = {
   unit: string;
   frame: number;
 };
+/** The ribbon width of 1,000 tonnes of operating emissions. */
+const RIBBON_WIDTH_PER_KILOTONNE = 16;
 /** One CO2e source enters its own accounting ribbon without invented mass. */
 export function OperatingEmissionRow({
   row,
@@ -22,6 +25,7 @@ export function OperatingEmissionRow({
   frame,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const copies: Array<[string, number, number, number, number]> = [
     [row.label, 540, 204 + index * 80, 170, 3],
@@ -54,7 +58,9 @@ export function OperatingEmissionRow({
         data-operation-ribbon={row.id}
         data-tonnes={row.tonnesCO2e}
         stroke={tokens.color.highlight}
-        strokeWidth={16 * (row.tonnesCO2e / 1000)}
+        strokeWidth={scales.stroke(
+          RIBBON_WIDTH_PER_KILOTONNE * (row.tonnesCO2e / 1000),
+        )}
         fill="none"
       />
     </g>

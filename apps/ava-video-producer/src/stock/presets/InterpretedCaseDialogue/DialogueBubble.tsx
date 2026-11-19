@@ -65,7 +65,9 @@ export function DialogueBubble({
         rx={scales.corner(tokens.corner.card)}
         fill={tokens.color.surface}
         stroke={interpreted ? tokens.color.accentAlt : accent}
-        strokeWidth={interpreted ? 1 : 2}
+        strokeWidth={scales.stroke(
+          interpreted ? tokens.stroke.hairline : tokens.stroke.default,
+        )}
       />
       <DialogueWording
         input={input}

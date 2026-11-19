@@ -1,3 +1,4 @@
+import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
@@ -9,6 +10,8 @@ import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The width the detour swells to once it is chosen. */
+const DETOUR_WIDTH = 5;
 /** Authored roads retain the closure even after the receiving gate opens. */
 export function ConvoyMap({
   input,
@@ -42,11 +45,15 @@ export function ConvoyMap({
             data-route-id={route.id}
             fill="none"
             stroke={route.role === "detour" ? accent : tokens.color.inactive}
-            strokeWidth={
+            strokeWidth={scales.stroke(
               route.role === "detour"
-                ? 3 + 2 * motion.ramp(frame, 60, motion.hero)
-                : 4
-            }
+                ? mix(
+                    motion.ramp(frame, 60, motion.hero),
+                    tokens.stroke.emphasis,
+                    DETOUR_WIDTH,
+                  )
+                : tokens.stroke.heavy,
+            )}
             strokeOpacity={motion.ramp(frame, 10 + index * 3, motion.word)}
             strokeLinejoin="round"
           />

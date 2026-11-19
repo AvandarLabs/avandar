@@ -12,6 +12,8 @@ import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The ribbon width of the whole captured quantity. */
+const RIBBON_WIDTH = 24;
 const GROUND_DASH = "5 7";
 const STORAGE_BAND_TINT = 0.22;
 /** An operator cues separate retained and released physical CO2 ribbons. */
@@ -72,7 +74,7 @@ export function CarbonPhysical({
         data-retained-ribbon
         data-tonnes={retained}
         stroke={accent}
-        strokeWidth={24 * retainedShare}
+        strokeWidth={scales.stroke(RIBBON_WIDTH * retainedShare)}
         fill="none"
       />
       <SketchedShape
@@ -84,10 +86,10 @@ export function CarbonPhysical({
         data-released-ribbon
         data-tonnes={input.capture.releasedTonnesCO2}
         stroke={tokens.color.highlight}
-        strokeWidth={
-          24 *
-          (input.capture.releasedTonnesCO2 / input.capture.capturedTonnesCO2)
-        }
+        strokeWidth={scales.stroke(
+          RIBBON_WIDTH *
+            (input.capture.releasedTonnesCO2 / input.capture.capturedTonnesCO2),
+        )}
         fill="none"
       />
       {input.view === "cutaway" ? (

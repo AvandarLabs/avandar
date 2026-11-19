@@ -1,7 +1,10 @@
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomDays. */
@@ -13,6 +16,7 @@ export function ClassroomDays({
   activeIndex,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.days.map((day, index) => {
@@ -47,7 +51,11 @@ export function ClassroomDays({
                   ? tokens.color.accentAlt
                   : tokens.color.line
               }
-              strokeWidth={index === activeIndex ? 3 : 1}
+              strokeWidth={scales.stroke(
+                index === activeIndex
+                  ? tokens.stroke.emphasis
+                  : tokens.stroke.hairline,
+              )}
             />
           </g>
         );

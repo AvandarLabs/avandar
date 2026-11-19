@@ -114,7 +114,7 @@ test("zero full and concentrated corrections conserve every per-payment position
         ],
       );
       const tokens = [
-        ...row.matchAll(/<circle data-payment-token="[^"]*"[^>]*>/g),
+        ...row.matchAll(/<circle\b[^>]*\bdata-payment-token="[^"]*"[^>]*>/g),
       ].map(([attributes]) => {
         return [
           SvgAttributes.getNumberFromMarkup({ attributes, name: "cx" }),

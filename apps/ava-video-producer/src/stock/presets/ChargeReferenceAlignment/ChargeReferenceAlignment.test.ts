@@ -197,7 +197,9 @@ test("zero, equal, positive and negative totals use exact shared ruler geometry"
       markup,
       new RegExp(`data-difference-minor="${row.difference}"`),
     );
-    const rulers = [...markup.matchAll(/<rect data-amount-ruler[^>]*>/g)];
+    const rulers = [
+      ...markup.matchAll(/<rect\b[^>]*\bdata-amount-ruler[^>]*>/g),
+    ];
     assert.equal(
       SvgAttributes.getNumberFromMarkup({
         attributes: rulers[0][0],
@@ -312,7 +314,9 @@ test("wrapped source captions clear actual context windows and currency clears a
     assert.ok(
       caption.bottom + 4 <
         SvgAttributes.getNumberFromMarkup({
-          attributes: markup.match(/<rect data-invoice-window[^>]*>/)![0],
+          attributes: markup.match(
+            /<rect\b[^>]*\bdata-invoice-window[^>]*>/,
+          )![0],
           name: "y",
         }),
     );

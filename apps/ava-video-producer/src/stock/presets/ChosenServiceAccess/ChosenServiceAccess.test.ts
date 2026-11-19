@@ -67,7 +67,9 @@ test("changed choice clears only the other entrance and all mobility/barrier com
       const setup = _render({ frame: 24, input: input });
       const final = _render({ frame: 150, input: input });
       const barriers = (markup: string) => {
-        return [...markup.matchAll(/<path data-barrier="([^"]*)"[^>]*>/g)];
+        return [
+          ...markup.matchAll(/<path\b[^>]*\bdata-barrier="([^"]*)"[^>]*>/g),
+        ];
       };
       const before = barriers(setup);
       const after = barriers(final);
@@ -92,10 +94,10 @@ test("changed choice clears only the other entrance and all mobility/barrier com
       );
       assert.notEqual(
         _render({ frame: 88, input: input }).match(
-          /<path data-participant-arm[^>]*>/,
+          /<path\b[^>]*\bdata-participant-arm[^>]*>/,
         )?.[0],
         _render({ frame: 104, input: input }).match(
-          /<path data-participant-arm[^>]*>/,
+          /<path\b[^>]*\bdata-participant-arm[^>]*>/,
         )?.[0],
       );
       assert.match(_render({ frame: 65, input: input }), /data-staff-hand/);
@@ -114,7 +116,9 @@ test("participant points toward the selected doorway and clears the whole barrie
   );
   assert.ok(still && travel);
   assert.notEqual(still[0], travel[0]);
-  const staff = _render({ frame: 80 }).match(/<circle data-staff-hand[^>]*>/);
+  const staff = _render({ frame: 80 }).match(
+    /<circle\b[^>]*\bdata-staff-hand[^>]*>/,
+  );
   assert.ok(staff);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: staff[0], name: "cx" }),
@@ -169,14 +173,16 @@ test("minimum empty identifiers and maximum accepted collections stay schema-val
 test("folded ramp starts upright and the self-propelled hand stays on the wheel rim", () => {
   const initial = _render({ frame: 24 });
   const rampPath = initial.match(
-    /<path data-barrier="shelter"[^>]*d="M([^ ]+) ([^ ]+) L([^ ]+) ([^ ]+)/,
+    /<path\b(?=[^>]*\bdata-barrier="shelter")[^>]*\sd="M([^ ]+) ([^ ]+) L([^ ]+) ([^ ]+)/,
   );
   assert.ok(rampPath);
   assert.equal(Number(rampPath[1]), Number(rampPath[3]));
   [88, 104].forEach((frame) => {
     const markup = _render({ frame: frame });
-    const person = markup.match(/<circle data-participant-wheel="rear"[^>]*>/);
-    const hand = markup.match(/<circle data-participant-hand[^>]*>/);
+    const person = markup.match(
+      /<circle\b[^>]*\bdata-participant-wheel="rear"[^>]*>/,
+    );
+    const hand = markup.match(/<circle\b[^>]*\bdata-participant-hand[^>]*>/);
     assert.ok(person && hand);
     const distance = Math.hypot(
       SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }) -
@@ -223,7 +229,7 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
         return 98 + index;
       }).forEach((frame) => {
         const markup = _render({ frame: frame, input: input }),
-          route = markup.match(/<path data-access-route[^>]*>/);
+          route = markup.match(/<path\b[^>]*\bdata-access-route[^>]*>/);
         assert.ok(route);
         const segments = ServiceSvgGeometry.getPathSegmentsFromTag(route[0]);
         const floor = (x: number) => {
@@ -238,7 +244,7 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
           );
         };
         const wheels = [
-          ...markup.matchAll(/<circle data-participant-wheel[^>]*>/g),
+          ...markup.matchAll(/<circle\b[^>]*\bdata-participant-wheel[^>]*>/g),
         ];
         wheels.forEach((wheel) => {
           const cx = SvgAttributes.getNumberFromMarkup({

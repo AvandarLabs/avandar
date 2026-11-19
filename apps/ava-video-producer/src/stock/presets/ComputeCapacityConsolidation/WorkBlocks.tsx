@@ -11,11 +11,15 @@ import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
+/** One stable categorical swatch per job, in job order. */
 const CATEGORY_KEYS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
+  const palette = CATEGORY_KEYS.map((key) => {
+    return tokens.color.categorical[key];
+  });
   const plan = useMemo(() => {
     return makeJobTransfersFromInput(input);
   }, [input]);
@@ -28,7 +32,7 @@ export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
           index,
           frame,
         });
-        const color = tokens.color.categorical[CATEGORY_KEYS[index]];
+        const color = palette[index];
         const legendX = 55 + (index % 4) * 215;
         const legendY = 437 + Math.floor(index / 4) * 44;
         return (
