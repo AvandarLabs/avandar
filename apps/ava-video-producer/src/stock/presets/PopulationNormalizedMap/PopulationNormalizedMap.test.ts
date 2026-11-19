@@ -22,20 +22,35 @@ import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { populationNormalizedMapContract } from "./PopulationNormalizedMap.contract";
 import { inputSchema, type Input } from "./PopulationNormalizedMap.schema";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input = defaultInput,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(PopulationNormalizedMap, {
-        frame,
-        input,
-        accent: "#46dbc9",
-        id: "packet17",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(PopulationNormalizedMap, {
+          frame,
+          input,
+          accent: "#46dbc9",
+          id: "packet17",
+        }),
+      ),
     ),
   );
 }
@@ -223,9 +238,7 @@ test("exact normalized maximum accepts seven records per twenty-five people at r
     2,
   );
   assert.equal((markup.match(/aria-label="28"/g) ?? []).length, 2);
-  const shades = [
-    ...markup.matchAll(/<polygon\b([^>]*data-zone-shade=[^>]*)>/g),
-  ];
+  const shades = [...markup.matchAll(/<path\b([^>]*data-zone-shade=[^>]*)>/g)];
   assert.equal(shades.length, 2);
   shades.forEach(([, attributes]) => {
     return assert.equal(

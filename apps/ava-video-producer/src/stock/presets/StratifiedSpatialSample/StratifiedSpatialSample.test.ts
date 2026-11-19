@@ -24,20 +24,35 @@ import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { stratifiedSpatialSampleContract } from "./StratifiedSpatialSample.contract";
 import { inputSchema, type Input } from "./StratifiedSpatialSample.schema";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input = defaultInput,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(StratifiedSpatialSample, {
-        frame,
-        input,
-        accent: "#46dbc9",
-        id: "packet17",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(StratifiedSpatialSample, {
+          frame,
+          input,
+          accent: "#46dbc9",
+          id: "packet17",
+        }),
+      ),
     ),
   );
 }

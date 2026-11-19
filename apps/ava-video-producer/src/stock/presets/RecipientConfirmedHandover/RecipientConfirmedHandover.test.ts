@@ -18,13 +18,15 @@ function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(RecipientConfirmedHandover, {
-      frame,
-      input,
-      accent: "#9fefca",
-      id: "test",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(RecipientConfirmedHandover, {
+        frame,
+        input,
+        accent: "#9fefca",
+        id: "test",
+      }),
+    ),
   );
 }
 test("The basket and receipt equal the recipient's selected quantities; unselected goods remain on the table and no acknowledgement changes quantities.", () => {
@@ -271,5 +273,18 @@ test("recipient hand releases continuously before reaching for another selected 
 });
 
 import { registerRecipientActionAssertions } from "./registerRecipientActionAssertions";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 registerRecipientActionAssertions(_render);
