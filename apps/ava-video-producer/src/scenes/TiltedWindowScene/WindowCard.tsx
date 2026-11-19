@@ -67,7 +67,7 @@ export function WindowCard({
   const shadow = elevationToBoxShadow({
     layers: tokens.elevation.window.layers,
     color:
-      scene.shadow ??
+      tokens.color.scene.shadow ??
       buildColorWithAlpha(scene.background, WINDOW_SHADOW_FALLBACK_ALPHA),
   });
   const boxShadow = tilt > 0 && !clipPath ? shadow : undefined;
