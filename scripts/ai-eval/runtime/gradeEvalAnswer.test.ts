@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { gradeEvalAnswer } from "./gradeEvalAnswer";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalAnswer } from "../harnesses/EvalHarness";
@@ -245,5 +245,68 @@ describe("gradeEvalAnswer with fitRegression", () => {
     );
 
     expect(graded.pass).toBe(true);
+  });
+});
+
+describe("gradeEvalAnswer on a follow-up and a Try again", () => {
+  const RESULT = { columns: [{ name: "value", type: "BIGINT" }], rows: [[42]] };
+  const PARENT_RESULT = {
+    columns: [{ name: "name", type: "VARCHAR" }],
+    rows: [["Ohio"]],
+  };
+
+  function _queryQuestion(grade: EvalQuestion["grade"]): EvalQuestion {
+    return {
+      id: "T06",
+      category: "try_again",
+      prompt: "show that by month",
+      clarification: "not_needed",
+      truth: {},
+      grade,
+    };
+  }
+
+  it("passes the parent's result to the grader", () => {
+    const grade = vi.fn(() => {
+      return { pass: true, detail: "ok" };
+    });
+
+    gradeEvalAnswer(
+      _queryQuestion(grade),
+      _createAnswer({ result: RESULT, error: undefined }),
+      {},
+      PARENT_RESULT,
+    );
+
+    expect(grade).toHaveBeenCalledWith({
+      result: RESULT,
+      truth: {},
+      parentResult: PARENT_RESULT,
+    });
+  });
+
+  it("marks a Try again that repeated its first attempt", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I can't see that dashboard.",
+        firstAttempt: _createAnswer({
+          assistantText: "I can't see that dashboard.",
+        }),
+      }),
+      {},
+    );
+
+    expect(graded.isRepeat).toBe(true);
+  });
+
+  it("leaves isRepeat unset on an answer with no first attempt", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({ assistantText: "I can't see that dashboard." }),
+      {},
+    );
+
+    expect(graded).not.toHaveProperty("isRepeat");
   });
 });

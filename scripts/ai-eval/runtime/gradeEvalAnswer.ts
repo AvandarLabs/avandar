@@ -1,4 +1,5 @@
 import { gradeDashboardWrites } from "./gradeDashboardWrites";
+import { isRepeatedAttempt } from "./isRepeatedAttempt";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalAnswer } from "../harnesses/EvalHarness";
 import type { EvalQueryResult } from "./EvalDatabase";
@@ -16,6 +17,11 @@ export type GradedAnswer = {
   isNeedlessQuestion: boolean;
   /** Answered without asking although the question needed one. */
   isMissedQuestion: boolean;
+  /**
+   * On a Try again question, whether the second attempt repeated the first
+   * (`isRepeatedAttempt`). Unset on every other question.
+   */
+  isRepeat?: boolean;
   answer: Omit<EvalAnswer, "result"> & {
     resultColumns?: string[];
     resultRowCount?: number;
@@ -81,6 +87,7 @@ function _gradeResult(
   question: EvalQuestion,
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
+  parentResult: EvalQueryResult | undefined,
 ): { pass: boolean; detail: string } {
   if (question.fitRegression) {
     return _gradeFitRegression(question.fitRegression.slope, answer);
@@ -111,7 +118,7 @@ function _gradeResult(
     return { pass: false, detail: "asked for a chart, got a table" };
   }
   try {
-    return question.grade({ result: answer.result, truth });
+    return question.grade({ result: answer.result, truth, parentResult });
   } catch (error) {
     return {
       pass: false,
@@ -120,13 +127,18 @@ function _gradeResult(
   }
 }
 
-/** Grades one answer against the question's ground truth and policy. */
+/**
+ * Grades one answer against the question's ground truth and policy. A
+ * follow-up's grader also reads `parentResult`, the result of the question
+ * it follows.
+ */
 export function gradeEvalAnswer(
   question: EvalQuestion,
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
+  parentResult?: EvalQueryResult,
 ): GradedAnswer {
-  const verdict = _gradeResult(question, answer, truth);
+  const verdict = _gradeResult(question, answer, truth, parentResult);
   const questionsAsked = answer.clarifications.filter((clarification) => {
     return !clarification.isAutomatic;
   }).length;
@@ -142,6 +154,9 @@ export function gradeEvalAnswer(
       question.clarification === "not_needed" && questionsAsked > 0,
     isMissedQuestion:
       question.clarification === "expected" && questionsAsked === 0,
+    ...(answer.firstAttempt
+      ? { isRepeat: isRepeatedAttempt(answer.firstAttempt, answer) }
+      : {}),
     answer: {
       ...answerWithoutResult,
       resultColumns: result?.columns.map((column) => {
