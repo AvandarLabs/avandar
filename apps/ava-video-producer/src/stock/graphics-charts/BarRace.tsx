@@ -10,6 +10,7 @@ import { getContentColorFromValue } from "../theme/getContentColorFromValue/getC
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
@@ -25,10 +26,10 @@ const LABEL_RETURN_AT = 116;
 const HEADING_SIZE = 29;
 const BAR_LABEL_SIZE = 23;
 const BAR_CORNER = 6;
-const BAR_FILL_ALPHA = 0.85;
 
 /** Draws the bounded authored bar-race study at an explicit frame. */
 export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const { color, stroke, alpha, sketch } = tokens;
   const shapes = useGraphicShapeScales();
@@ -108,7 +109,7 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
               height={43}
               rx={shapes.corner(BAR_CORNER)}
               fill={barColor}
-              fillOpacity={BAR_FILL_ALPHA}
+              fillOpacity={atomic.opacity["85"]}
             />
             <StockRect
               x={205}

@@ -299,14 +299,16 @@ test("storyboard rendering preserves configured content, heading space and cycle
   const render = ({ frame }: Readonly<{ frame: number }>) => {
     // StoryFilm supplies the theme scenes read; a bare shot needs its own.
     return renderToStaticMarkup(
-      createElement(VideoThemeScope, {
-        children: createElement(ShotView, {
+      createElement(
+        VideoThemeScope,
+        null,
+        createElement(ShotView, {
           shot: plan.shots[0],
           frame,
           width: 1280,
           height: 800,
         }),
-      }),
+      ),
     );
   };
   const markup = render({ frame: 150 });

@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CaseKey } from "./CaseKey";
@@ -13,7 +14,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-const LEADER_OPACITY = 0.16;
 /**
  * A stable coordinate and visible roster key keep coincident records distinct.
  */
@@ -22,6 +22,7 @@ export function CasePin({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const { record, index, mapX, mapY, isInvestigated, isFocused } = position;
@@ -31,7 +32,7 @@ export function CasePin({
         shape={{ kind: "path", d: `M${mapX} ${mapY} L628 ${154 + index * 26}` }}
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
-        strokeOpacity={LEADER_OPACITY}
+        strokeOpacity={atomic.opacity["16"]}
       />
       <circle
         data-map-case={record.id}

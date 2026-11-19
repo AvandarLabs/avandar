@@ -1,5 +1,8 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTheme, useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -11,8 +14,6 @@ type Props = {
   showExcludedRecords: boolean;
 };
 
-/** How strongly the exclusion mask darkens a row. */
-const MASK_OPACITY = 0.14;
 /** The exclusion sweep disappears with hidden excluded records. */
 export function SubscriptionMask({
   id,
@@ -32,7 +33,7 @@ export function SubscriptionMask({
       width={(width - 24) * progress}
       height={35}
       fill={tokens.color.ground}
-      fillOpacity={MASK_OPACITY}
+      fillOpacity={atomic.opacity["14"]}
       stroke={tokens.color.highlight}
       strokeOpacity={progress * atomic.opacity["50"]}
       strokeDasharray={atomic.dash.short.join(" ")}

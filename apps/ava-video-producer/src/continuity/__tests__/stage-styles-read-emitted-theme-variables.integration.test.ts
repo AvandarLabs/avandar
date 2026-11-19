@@ -78,7 +78,7 @@ test("every helper preview variable the preview styles read is set from the them
     return null;
   }
   renderToStaticMarkup(
-    createElement(VideoThemeScope, { children: createElement(Probe) }),
+    createElement(VideoThemeScope, null, createElement(Probe)),
   );
   const read = new Set(
     _readStyles().flatMap(({ css }) => {

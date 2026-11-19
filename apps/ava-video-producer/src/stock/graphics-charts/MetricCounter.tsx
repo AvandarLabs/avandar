@@ -9,6 +9,7 @@ import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
@@ -23,7 +24,6 @@ const PILL_AT = 82;
 const BARS_AT = 29;
 const BAR_GROW_AT = 34;
 const FIGURE_SIZE = 103;
-const BAR_ALPHA_FLOOR = 0.18;
 const BAR_ALPHA_STEPS = 18;
 
 /** Draws the bounded authored metric-counter study at an explicit frame. */
@@ -32,6 +32,7 @@ export function MetricCounter({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
   const { color, corner } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
@@ -88,7 +89,7 @@ export function MetricCounter({
                     height={Math.max(1, height * 54 * grow)}
                     rx={shapes.corner(corner.chip)}
                     fill={accent}
-                    fillOpacity={BAR_ALPHA_FLOOR + i / BAR_ALPHA_STEPS}
+                    fillOpacity={atomic.opacity["18"] + i / BAR_ALPHA_STEPS}
                   />
                 </Arrive>
               );

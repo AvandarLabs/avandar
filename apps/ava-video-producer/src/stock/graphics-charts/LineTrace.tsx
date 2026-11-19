@@ -5,7 +5,12 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import { useGraphicMotion, useGraphicShapeScales, useGraphicTheme, useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
 import type { ReactNode } from "react";
@@ -16,7 +21,6 @@ const TRACE_AT = 23;
 const TRACE_FRAMES = 94;
 const HEADING_SIZE = 29;
 const SAMPLE_NOTE_SIZE = 13;
-const REFERENCE_ALPHA = 0.38;
 
 /** Draws the bounded authored line-trace study at an explicit frame. */
 export function LineTrace({
@@ -126,7 +130,7 @@ export function LineTrace({
           profile={sketch.shape}
           fill="none"
           stroke={color.accentAlt}
-          strokeOpacity={REFERENCE_ALPHA}
+          strokeOpacity={atomic.opacity["38"]}
           strokeWidth={shapes.stroke(stroke.default)}
           strokeDasharray={atomic.dash.boundary.join(" ")}
         />

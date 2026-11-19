@@ -14,8 +14,6 @@ const CUES = { emptyState: 4, rows: 8, bar: 4, total: 20 };
 const RISE = { panel: 14, row: 10, total: 8 };
 /** The panel's starting scale as it arrives. */
 const PANEL_START_SCALE = 0.985;
-/** How much of an excluded row stays visible: dimmed, not removed. */
-const EXCLUDED_ROW_OPACITY = 0.26;
 
 /** The results phase: an empty state that dissolves into the channel
  *  breakdown once the query runs, then dims the rows the active filter
@@ -186,7 +184,7 @@ function ResultRow({
   row: (typeof ROWS)[number];
   index: number;
 }): ReactNode {
-  const { semantic, mantine } = useVideoTheme();
+  const { semantic, mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
   const scene = semantic.color.scene;
@@ -206,7 +204,7 @@ function ResultRow({
         // and the four below jump up a line; leaving it at a quarter says
         // "excluded" without moving anything.
         opacity:
-          (entrance.opacity as number) * mix(cut, 1, EXCLUDED_ROW_OPACITY),
+          (entrance.opacity as number) * mix(cut, 1, atomic.opacity["26"]),
       }}
     >
       <div
