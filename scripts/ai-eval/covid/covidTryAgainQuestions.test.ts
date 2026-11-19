@@ -52,12 +52,12 @@ describe("createTryAgainQuestions", () => {
       category: "try_again",
       prompt: source.prompt,
       truth: source.truth,
-      tryAgain: {},
     });
+    expect(question.tryAgain).toEqual({});
     expect(question.grade).toBe(source.grade);
   });
 
-  it("leaves T04's first card unanswered and adds Georgia the country to N06's truth", () => {
+  it("leaves T04's first card unanswered", () => {
     const question = _byId(createTryAgainQuestions(SOURCES), "T04");
 
     expect(question).toMatchObject({
@@ -66,6 +66,11 @@ describe("createTryAgainQuestions", () => {
       clarification: "allowed",
       tryAgain: { isFirstCardUnanswered: true },
     });
+  });
+
+  it("adds Georgia the country to N06's truth", () => {
+    const question = _byId(createTryAgainQuestions(SOURCES), "T04");
+
     expect(Object.keys(question.truth)).toEqual([
       "total",
       "countryTotal",

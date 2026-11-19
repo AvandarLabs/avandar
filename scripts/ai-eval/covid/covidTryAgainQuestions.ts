@@ -1,5 +1,5 @@
 import { ResultChecks } from "../grading/ResultChecks";
-import { MatcherText } from "../grading/ResultMatchers";
+import { firstScalar } from "./covidQuestionHelpers";
 import { CovidTruthSql as Sql } from "./covidTruthSql";
 import type { EvalQuestion, GradeContext } from "../EvalQuestion";
 import type { TruthRowSpec } from "../grading/ResultChecks";
@@ -55,11 +55,6 @@ function _tryAgainOf(
   };
 }
 
-/** A truth result's first cell, as a number. */
-function _scalar(context: GradeContext, name: string): number {
-  return MatcherText.toNumber(context.truth[name]?.rows[0]?.[0]) ?? Number.NaN;
-}
-
 /**
  * N06's grader, or Georgia the country: its total as one number or as rows
  * that add up to it, or its monthly series.
@@ -73,13 +68,13 @@ function _gradeStateOrCountry(source: EvalQuestion): EvalQuestion["grade"] {
       () => {
         return ResultChecks.hasValue(
           context.result,
-          _scalar(context, "countryTotal"),
+          firstScalar(context, "countryTotal"),
         );
       },
       () => {
         return ResultChecks.hasColumnSum(
           context.result,
-          _scalar(context, "countryTotal"),
+          firstScalar(context, "countryTotal"),
           { tolerance: 0.001 },
         );
       },
