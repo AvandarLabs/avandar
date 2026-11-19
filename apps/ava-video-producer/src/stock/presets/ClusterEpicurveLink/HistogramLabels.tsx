@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
 /** Inputs for HistogramLabels. */
@@ -7,6 +7,7 @@ type Props = { input: Input };
 
 /** Keyed chronological labels stay outside all bars and case-label rows. */
 export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.timeBins.map((bin, index) => {
@@ -15,7 +16,7 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
             <text
               x={40 + (index % 3) * 195}
               y={385 + Math.floor(index / 3) * 48}
-              fill={STOCK.muted}
+              fill={tokens.color.textMuted}
               fontSize={12}
             >
               {index + 1}
@@ -35,7 +36,7 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
           </g>
         );
       })}
-      <text x={620} y={84} fill={STOCK.muted} fontSize={12}>
+      <text x={620} y={84} fill={tokens.color.textMuted} fontSize={12}>
         ?
       </text>
       <LabelSlots labels={[[input.copy.unknown, 640, 84, 290, 12, 4]]} />

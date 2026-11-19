@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ConvoyLandmarks } from "./ConvoyLandmarks";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
@@ -11,6 +15,9 @@ export function ConvoyMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const points = input.routes.find(({ role }) => {
     return role === "blocked";
   })!.points;
@@ -20,21 +27,27 @@ export function ConvoyMap({
     <g>
       {input.routes.map((route, index) => {
         return (
-          <path
+          <SketchedShape
             key={route.role}
+            shape={{
+              kind: "path",
+              d: route.points
+                .map((point, pointIndex) => {
+                  return `${pointIndex ? "L" : "M"}${80 + point.x * 800} ${180 + point.y * 280}`;
+                })
+                .join(" "),
+            }}
+            profile={tokens.sketch.shape}
             data-road={route.role}
             data-route-id={route.id}
-            d={route.points
-              .map((point, pointIndex) => {
-                return `${pointIndex ? "L" : "M"}${80 + point.x * 800} ${180 + point.y * 280}`;
-              })
-              .join(" ")}
             fill="none"
-            stroke={route.role === "detour" ? accent : STOCK.muted}
+            stroke={route.role === "detour" ? accent : tokens.color.inactive}
             strokeWidth={
-              route.role === "detour" ? 3 + 2 * ramp(frame, 60, 18) : 4
+              route.role === "detour"
+                ? 3 + 2 * motion.ramp(frame, 60, motion.hero)
+                : 4
             }
-            strokeOpacity={ramp(frame, 10 + index * 3, 15)}
+            strokeOpacity={motion.ramp(frame, 10 + index * 3, motion.word)}
             strokeLinejoin="round"
           />
         );
@@ -43,16 +56,18 @@ export function ConvoyMap({
         data-obstruction={input.obstruction.kind}
         transform={`translate(${80 + (start.x + end.x) * 400} ${180 + (start.y + end.y) * 140})`}
       >
-        <path
-          d="M-20 -17 L20 17 M-20 17 L20 -17"
-          stroke={STOCK.orange}
-          strokeWidth={5}
+        <SketchedShape
+          shape={{ kind: "path", d: "M-20 -17 L20 17 M-20 17 L20 -17" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.highlight}
+          strokeWidth={scales.stroke(5)}
         />
         {input.obstruction.kind === "bridge-closure" ? (
-          <path
-            d="M-28 -24 V24 M28 -24 V24"
-            stroke={STOCK.orange}
-            strokeWidth={3}
+          <SketchedShape
+            shape={{ kind: "path", d: "M-28 -24 V24 M28 -24 V24" }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.highlight}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           />
         ) : undefined}
       </g>

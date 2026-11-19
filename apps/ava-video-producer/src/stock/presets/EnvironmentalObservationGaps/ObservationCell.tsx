@@ -1,6 +1,7 @@
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Data for Props. */
@@ -24,6 +25,7 @@ export function ObservationCell({
   accent,
   patternId,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const value = cell.value;
   const strength =
     value === null
@@ -35,7 +37,7 @@ export function ObservationCell({
         });
   return (
     <g data-observation-cell={cell.id}>
-      <rect
+      <StockRect
         data-missing-cell={value === null ? cell.id : undefined}
         x={cell.x}
         y={cell.y}
@@ -43,7 +45,7 @@ export function ObservationCell({
         height={cell.height}
         fill={value === null ? `url(#${patternId})` : accent}
         fillOpacity={value === null ? 1 : 0.12 + strength * 0.36}
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <FitText
         text={cell.label}

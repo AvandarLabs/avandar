@@ -1,3 +1,8 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,6 +18,8 @@ export function LayerDefinitions({
   second,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <defs>
       <clipPath id={`${identity}-a`}>
@@ -38,7 +45,12 @@ export function LayerDefinitions({
         height={8}
         patternUnits="userSpaceOnUse"
       >
-        <path d="M0 8 L8 0" stroke={accent} strokeWidth={1.5} />
+        <SketchedShape
+          shape={{ kind: "path", d: "M0 8 L8 0" }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
+        />
       </pattern>
     </defs>
   );

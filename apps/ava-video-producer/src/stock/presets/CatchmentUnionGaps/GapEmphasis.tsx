@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 
@@ -17,25 +22,31 @@ export function GapEmphasis({
   progress,
   gapEmphasis,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {" "}
       {!covered ? (
         <g opacity={progress}>
-          <rect
+          <StockRect
             data-uncovered-emphasis={householdId}
             x={626}
             y={railY - 11}
             width={24}
             height={24}
-            rx={4}
+            rx={scales.corner(tokens.corner.chip)}
             fill="none"
-            stroke={STOCK.orange}
+            stroke={tokens.color.highlight}
           />
           {gapEmphasis === "hatch" ? (
-            <path
-              d={`M627 ${railY + 10} l4 -4 M627 ${railY + 2} l4 -4 M644 ${railY + 10} l5 -5 M644 ${railY - 5} l4 -4`}
-              stroke={STOCK.orange}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M627 ${railY + 10} l4 -4 M627 ${railY + 2} l4 -4 M644 ${railY + 10} l5 -5 M644 ${railY - 5} l4 -4`,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.highlight}
             />
           ) : undefined}
         </g>

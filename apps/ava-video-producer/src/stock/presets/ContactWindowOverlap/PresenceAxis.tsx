@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
@@ -6,6 +7,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** One fixed axis owns all record and investigation-window bounds. */
 export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       <SceneLabel
@@ -22,11 +24,21 @@ export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
         width={240}
         lines={3}
       />
-      <path d="M280 180 H910" stroke={STOCK.muted} />
-      <text x={280} y={170} fill={STOCK.text} fontSize={12}>
+      <SketchedShape
+        shape={{ kind: "path", d: "M280 180 H910" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+      />
+      <text x={280} y={170} fill={tokens.color.text} fontSize={12}>
         {input.axis.start}
       </text>
-      <text x={910} y={170} fill={STOCK.text} fontSize={12} textAnchor="end">
+      <text
+        x={910}
+        y={170}
+        fill={tokens.color.text}
+        fontSize={12}
+        textAnchor="end"
+      >
         {input.axis.end}
       </text>
     </g>

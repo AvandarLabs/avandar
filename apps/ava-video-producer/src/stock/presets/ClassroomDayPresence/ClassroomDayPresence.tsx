@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClassroomDays } from "./ClassroomDays";
 import { ClassroomDesk } from "./ClassroomDesk";
 import { ClassroomTotals } from "./ClassroomTotals";
@@ -14,11 +15,9 @@ export function ClassroomDayPresence({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const { activeIndex, transition, desks, day } =
-    makeClassroomStateFromInputAndFrame({
-      frame,
-      input,
-    });
+    makeClassroomStateFromInputAndFrame({ motion, frame, input });
   return (
     <g>
       <ClassroomDays input={input} activeIndex={activeIndex} />

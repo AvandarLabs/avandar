@@ -1,5 +1,10 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 /** Inputs for ComplaintPlacement. */
@@ -11,28 +16,39 @@ export function ComplaintPlacement({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const complaint = ramp(frame, 32, 10);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const complaint = motion.ramp(frame, 32, motion.scale(10));
   return (
     <g>
       {" "}
       {input.showComplaintMarker && frame >= 32 ? (
         <g>
-          <circle
+          <SketchedShape
+            shape={{
+              kind: "circle",
+              cx: mix(complaint, 220, 320),
+              cy: mix(complaint, 325, 415),
+              r: 14,
+            }}
+            profile={tokens.sketch.shape}
             data-complaint-marker="retained"
-            cx={mix(complaint, 220, 320)}
-            cy={mix(complaint, 325, 415)}
-            r={14}
-            fill={STOCK.surface}
-            stroke={STOCK.orange}
-            strokeWidth={3}
+            fill={tokens.color.surface}
+            stroke={tokens.color.highlight}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           />
           {frame <= 42 ? (
-            <path
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M200 310 L${mix(complaint, 220, 320)} ${mix(complaint, 325, 415)}`,
+              }}
+              profile={tokens.sketch.shape}
               data-complaint-hand="participant"
-              d={`M200 310 L${mix(complaint, 220, 320)} ${mix(complaint, 325, 415)}`}
               fill="none"
               stroke={accent}
-              strokeWidth={4}
+              strokeWidth={scales.stroke(tokens.stroke.heavy)}
             />
           ) : undefined}
         </g>

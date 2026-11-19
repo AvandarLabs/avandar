@@ -1,5 +1,7 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
@@ -25,6 +27,8 @@ export function HistogramSegments({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <g>
       {getCasePositionsFromInput(input).map(
@@ -41,9 +45,15 @@ export function HistogramSegments({
                 y={histogramY - 13}
                 width={30}
                 height={15}
-                fill={isInvestigated && frame >= 36 ? accent : STOCK.cyan}
+                fill={
+                  isInvestigated && frame >= 36
+                    ? accent
+                    : tokens.color.accentAlt
+                }
                 fillOpacity={
-                  isInvestigated ? 0.45 + 0.55 * ramp(frame, 36, 48) : 0.4
+                  isInvestigated
+                    ? 0.45 + 0.55 * motion.ramp(frame, 36, motion.scale(48))
+                    : 0.4
                 }
               />
               <text
@@ -53,7 +63,7 @@ export function HistogramSegments({
                 fill={
                   isInvestigated && frame >= 36
                     ? _getIdentityInk(accent)
-                    : STOCK.text
+                    : tokens.color.text
                 }
                 textAnchor="middle"
               >

@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { GlobeCopy } from "./GlobeCopy";
 import { GlobeIncident } from "./GlobeIncident";
 import { GlobeSurface } from "./GlobeSurface";
@@ -13,16 +14,17 @@ export function FictionalConflictGlobe({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const sweep =
     ((input.longitudeSweep.end - input.longitudeSweep.start + 540) % 360) - 180;
   const longitude = mix(
-    ramp(frame, 24, 84, EASE.inOut),
+    motion.ramp(frame, 24, motion.scale(84), motion.travel.easing),
     input.longitudeSweep.start,
     input.longitudeSweep.start + sweep,
   );
   return (
     <g
-      opacity={ramp(frame, 12, 18)}
+      opacity={motion.ramp(frame, 12, motion.hero)}
       data-total-incidents={input.incidents.length}
     >
       <GlobeCopy input={input} />

@@ -1,5 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
 
@@ -18,36 +23,46 @@ export function PaymentTray({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const y = 306 + index * 120;
   const targetX = 330 + payment.receivedUnits * 68;
   return (
     <g>
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M290 ${y + 81} h540 v23 H290 Z M290 ${y + 81} l270 16 l270 -16`,
+        }}
+        profile={tokens.sketch.shape}
         data-correction-envelope={payment.id}
-        d={`M290 ${y + 81} h540 v23 H290 Z M290 ${y + 81} l270 16 l270 -16`}
-        fill={STOCK.surface}
-        stroke={STOCK.cyan}
+        fill={tokens.color.surface}
+        stroke={tokens.color.accentAlt}
       />
-      <rect
+      <StockRect
         data-receiving-tray={payment.id}
         x={300}
         y={y - 5}
         width={568}
         height={66}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <LabelSlots labels={[[payment.label, 48, y + 24, 220, 14, 3]]} />
       {frame >= 60 &&
       frame <= 70 &&
       payment.receivedUnits < payment.statedUnits ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M250 160 H280 V${y - 26} H${targetX} L${targetX} ${y + 24}`,
+          }}
+          profile={tokens.sketch.shape}
           data-gap-point={payment.id}
-          d={`M250 160 H280 V${y - 26} H${targetX} L${targetX} ${y + 24}`}
           fill="none"
           stroke={accent}
-          strokeWidth={4}
+          strokeWidth={scales.stroke(tokens.stroke.heavy)}
         />
       ) : undefined}
     </g>

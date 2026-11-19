@@ -1,6 +1,7 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationContext. */
@@ -11,6 +12,7 @@ type Props = { input: Input };
  * tile.
  */
 export function ObservationContext({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const labels = [
     { text: input.metric.label, x: 32, y: 27, width: 300 },
     { text: input.metric.unit, x: 350, y: 27, width: 150 },
@@ -36,14 +38,19 @@ export function ObservationContext({ input }: Readonly<Props>): ReactNode {
       })}
       {input.context === "globe-and-schematic-tile" ? (
         <g data-globe-context="true" transform="translate(115 175)">
-          <circle r={65} fill={STOCK.surface} stroke={STOCK.line} />
+          <SketchedShape
+            shape={{ kind: "circle", cx: 0, cy: 0, r: 65 }}
+            profile={tokens.sketch.shape}
+            fill={tokens.color.surface}
+            stroke={tokens.color.line}
+          />
           <path
             d={GlobeProjection.getLandPathFromView({
               centerLongitude: 0,
               centerLatitude: 15,
               radius: 65,
             })}
-            fill={STOCK.muted}
+            fill={tokens.color.inactive}
             fillOpacity={0.7}
           />
         </g>

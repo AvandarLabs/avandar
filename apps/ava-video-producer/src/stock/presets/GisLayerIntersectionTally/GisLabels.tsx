@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { GisTally } from "./GisTally";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
@@ -30,6 +30,7 @@ export function GisLabels({
   selectedQuantity,
   totalQuantity,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const slots: Slot[] = [
     [input.copy.context, 40, 35, 880, 16, 1],
     [
@@ -50,7 +51,7 @@ export function GisLabels({
         250,
         14,
         3,
-        index ? STOCK.mint : STOCK.cyan,
+        index ? tokens.color.positive : tokens.color.accentAlt,
       ];
     }),
   ];

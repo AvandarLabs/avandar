@@ -1,5 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
@@ -19,8 +25,18 @@ export function FractionLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const materialProgress = ramp(frame, 36, 48, EASE.inOut);
-  const handReach = ramp(frame, 30, 6) * (1 - ramp(frame, 84, 4));
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const materialProgress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
+  const handReach =
+    motion.ramp(frame, 30, motion.chip) *
+    (1 - motion.ramp(frame, 84, motion.press.duration));
   const firstCenter = -96 + 96 / input.fraction.denominator;
   const contactX =
     representation.material === "folded-paper"
@@ -46,12 +62,16 @@ export function FractionLearner({
       />
       <g data-fraction-learner={representation.id}>
         <PersonGlyph x={learnerX} y={270} size={64} color={accent} />
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${learnerX} 270 L${mix(handReach, learnerX + 18, contactX)} ${mix(handReach, 282, contactY)}`,
+          }}
+          profile={tokens.sketch.shape}
           data-material-hand={representation.id}
-          d={`M${learnerX} 270 L${mix(handReach, learnerX + 18, contactX)} ${mix(handReach, 282, contactY)}`}
           fill="none"
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       </g>
     </>

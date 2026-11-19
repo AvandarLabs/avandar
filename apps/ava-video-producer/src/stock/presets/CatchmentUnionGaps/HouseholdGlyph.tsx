@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { GapEmphasis } from "./GapEmphasis";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
@@ -22,11 +23,13 @@ export function HouseholdGlyph({
   progress,
   gapEmphasis,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
-      <path
-        d={`M630 ${railY - 1} l8 -7 l8 7 v10 h-16 Z`}
-        fill={STOCK.surface}
+      <SketchedShape
+        shape={{ kind: "path", d: `M630 ${railY - 1} l8 -7 l8 7 v10 h-16 Z` }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
         stroke={color}
       />
       <text
@@ -34,7 +37,7 @@ export function HouseholdGlyph({
         y={railY + 6}
         fontSize={12}
         textAnchor="middle"
-        fill={STOCK.text}
+        fill={tokens.color.text}
       >
         {index + 1}
       </text>

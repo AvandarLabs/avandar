@@ -1,5 +1,9 @@
 import { projectGlobePoint } from "../../geography/projectGlobePoint/projectGlobePoint";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { buildIncidentLeaderFromPoints } from "./buildIncidentLeaderFromPoints";
 import { GlobeIncidentLabel } from "./GlobeIncidentLabel";
 import type { Input } from "./FictionalConflictGlobe.schema";
@@ -22,6 +26,8 @@ export function GlobeIncident({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const point = projectGlobePoint({
     ...incident,
     centerLongitude: longitude,
@@ -36,26 +42,34 @@ export function GlobeIncident({
       {point.visible ? (
         <g data-incident-id={incident.id} data-x={x} data-y={y}>
           {showLabel ? (
-            <path
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: buildIncidentLeaderFromPoints({
+                  incident,
+                  incidents,
+                  longitude,
+                  x,
+                  y,
+                  labelY,
+                }),
+              }}
+              profile={tokens.sketch.shape}
               data-leader={incident.id}
-              d={buildIncidentLeaderFromPoints({
-                incident,
-                incidents,
-                longitude,
-                x,
-                y,
-                labelY,
-              })}
               fill="none"
-              stroke={STOCK.muted}
+              stroke={tokens.color.inactive}
             />
           ) : undefined}
-          <path
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${x - 7} ${y - 7} L${x + 7} ${y + 7} M${x + 7} ${y - 7} L${x - 7} ${y + 7}`,
+            }}
+            profile={tokens.sketch.shape}
             data-incident-cross={incident.id}
-            d={`M${x - 7} ${y - 7} L${x + 7} ${y + 7} M${x + 7} ${y - 7} L${x - 7} ${y + 7}`}
             fill="none"
             stroke={accent}
-            strokeWidth={3}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
             strokeLinecap="round"
           />
         </g>

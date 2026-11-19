@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import { VisitMark } from "./VisitMark";
 import type { Input } from "./DoseCohortReturnPaths.schema";
@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Distinct visit categories and the fixed denominator remain explicit. */
 export function CohortLegend({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {[
@@ -23,7 +24,7 @@ export function CohortLegend({ input }: Readonly<Props>): ReactNode {
               }
               x={30 + index * 230}
               y={485}
-              color={STOCK.text}
+              color={tokens.color.text}
             />
             <SceneLabel
               text={label}

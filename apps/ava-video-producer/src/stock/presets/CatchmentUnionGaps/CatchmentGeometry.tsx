@@ -1,4 +1,7 @@
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CatchmentDefinitions } from "./CatchmentDefinitions";
 import { CatchmentFootprints } from "./CatchmentFootprints";
 import { CatchmentNames } from "./CatchmentNames";
@@ -15,6 +18,8 @@ export function CatchmentGeometry({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const definitionId = `catchment-${Array.from(id)
     .map((character) => {
       return character.codePointAt(0)?.toString(16);
@@ -32,8 +37,8 @@ export function CatchmentGeometry({
         y={150}
         width={500}
         height={300}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
       />
       <CatchmentFootprints
         input={input}

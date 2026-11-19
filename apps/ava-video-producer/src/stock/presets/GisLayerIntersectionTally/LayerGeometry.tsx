@@ -1,5 +1,9 @@
 import { useId } from "react";
-import { EASE, ramp } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LayerDefinitions } from "./LayerDefinitions";
 import { MapSheets } from "./MapSheets";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -21,10 +25,18 @@ export function LayerGeometry({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const identity = useId().replaceAll(":", "");
   const first = _buildPath(input.layers[0].polygon);
   const second = _buildPath(input.layers[1].polygon);
-  const registration = ramp(frame, 36, 36, EASE.inOut);
+  const registration = motion.ramp(
+    frame,
+    36,
+    motion.scale(36),
+    motion.travel.easing,
+  );
   const isIntersection = input.operation === "intersection";
   return (
     <g>
@@ -43,7 +55,7 @@ export function LayerGeometry({
       />
       <g
         data-result-geometry={input.operation}
-        opacity={ramp(frame, 72, 12)}
+        opacity={motion.reveal(frame, 72)}
         clipPath={`url(#${identity}-a)`}
       >
         <g
@@ -55,7 +67,7 @@ export function LayerGeometry({
             data-result-boundary={input.operation}
             fill="none"
             stroke={accent}
-            strokeWidth={4}
+            strokeWidth={scales.stroke(tokens.stroke.heavy)}
           >
             <path d={first} />
             <path d={second} />

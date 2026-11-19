@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 
@@ -11,6 +15,9 @@ export function ConvoyLandmarks({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const points = input.routes.find(({ role }) => {
     return role === "blocked";
   })!.points;
@@ -23,7 +30,7 @@ export function ConvoyLandmarks({
             key={index}
             x={80 + point.x * 800}
             y={180 + point.y * 280 + 44}
-            fill={STOCK.cyan}
+            fill={tokens.color.accentAlt}
             fontSize={14}
             textAnchor="middle"
           >
@@ -31,21 +38,29 @@ export function ConvoyLandmarks({
           </text>
         );
       })}
-      <path
-        d={`M${80 + points[0].x * 800 - 20} ${180 + points[0].y * 280 - 22} v-20 l20 -15 l20 15 v20 Z`}
-        fill={STOCK.surface}
-        stroke={STOCK.cyan}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${80 + points[0].x * 800 - 20} ${180 + points[0].y * 280 - 22} v-20 l20 -15 l20 15 v20 Z`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.accentAlt}
       />
       <g
         data-gate="arrival"
         transform={`translate(${80 + destination.x * 800} ${180 + destination.y * 280})`}
       >
-        <path
-          d={`M-25 -28 V-52 M25 -28 V-52 M-25 -40 L${25 - 42 * ramp(frame, 114, 12)} ${-40 - 28 * ramp(frame, 114, 12)}`}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M-25 -28 V-52 M25 -28 V-52 M-25 -40 L${25 - 42 * motion.reveal(frame, 114)} ${-40 - 28 * motion.reveal(frame, 114)}`,
+          }}
+          profile={tokens.sketch.shape}
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
-        <PersonGlyph x={42} y={-40} size={30} color={STOCK.cyan} />
+        <PersonGlyph x={42} y={-40} size={30} color={tokens.color.accentAlt} />
       </g>
     </g>
   );

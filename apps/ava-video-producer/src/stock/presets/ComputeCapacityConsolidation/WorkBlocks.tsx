@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
 import { SceneLabel } from "./SceneLabel";
@@ -20,6 +21,7 @@ const COLORS: string[] = [
 ];
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const plan = useMemo(() => {
     return makeJobTransfersFromInput(input);
   }, [input]);
@@ -27,6 +29,7 @@ export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
     <g>
       {input.jobs.map((job, index) => {
         const { x, y, height } = getJobPlacementFromPlanAndFrame({
+          motion,
           plan,
           index,
           frame,

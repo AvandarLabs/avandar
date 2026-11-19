@@ -1,5 +1,9 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { MarketCheckout } from "./MarketCheckout";
 import { MarketLabels } from "./MarketLabels";
 import { MarketProduct } from "./MarketProduct";
@@ -15,20 +19,33 @@ export function HouseholdMarketChoice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <MarketLabels input={input} />
-      <path
-        d="M40 288 H922 M40 288 V304 M922 288 V304"
-        stroke={STOCK.line}
-        strokeWidth={3}
+      <SketchedShape
+        shape={{ kind: "path", d: "M40 288 H922 M40 288 V304 M922 288 V304" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         fill="none"
       />
-      <PersonGlyph x={790} y={414} size={52} role="worker" color={STOCK.cyan} />
-      <path
-        d="M285 399 L300 465 H553 L568 399 M302 399 Q426 320 550 399"
+      <PersonGlyph
+        x={790}
+        y={414}
+        size={52}
+        role="worker"
+        color={tokens.color.accentAlt}
+      />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M285 399 L300 465 H553 L568 399 M302 399 Q426 320 550 399",
+        }}
+        profile={tokens.sketch.shape}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         fill="none"
       />
       {input.products.map((product, index) => {

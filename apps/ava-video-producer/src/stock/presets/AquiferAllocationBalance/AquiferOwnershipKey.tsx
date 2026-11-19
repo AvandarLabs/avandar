@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 /** Inputs for AquiferOwnershipKey. */
 type Props = { number: number; x: number; y: number };
@@ -10,16 +14,17 @@ export function AquiferOwnershipKey({
   x,
   y,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: 10 }}
+        profile={tokens.sketch.shape}
         data-ownership-key={number}
-        cx={x}
-        cy={y}
-        r={10}
-        fill={STOCK.ground}
-        stroke={STOCK.muted}
-        strokeWidth={1}
+        fill={tokens.color.ground}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
       />
       <FitText
         text={String(number)}

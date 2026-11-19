@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
@@ -11,11 +11,12 @@ export function CustodyStops({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
       {input.stops.map((stop, index) => {
         return (
-          <g key={stop.id} opacity={ramp(frame, 12 + index * 2, 12)}>
+          <g key={stop.id} opacity={motion.reveal(frame, 12 + index * 2)}>
             <ObjectGlyph
               kind={
                 stop.kind === "vehicle" || stop.kind === "courier"

@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./AidCargoModeHandoff.schema";
 
 /**
@@ -9,7 +10,13 @@ export function getCarrierPositionFromInputAndFrame({
   input,
   frame,
   index,
-}: Readonly<{ input: Input; frame: number; index: number }>): {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>): {
   x: number;
   y: number;
 } {
@@ -20,7 +27,7 @@ export function getCarrierPositionFromInputAndFrame({
   const duration = isFinal ? (index === 1 ? 30 : 20) : 14;
   return {
     x: mix(
-      ramp(frame, start, duration, EASE.inOut),
+      motion.ramp(frame, start, duration, motion.travel.easing),
       destination - distance,
       destination + (isFinal ? 16 : 0),
     ),

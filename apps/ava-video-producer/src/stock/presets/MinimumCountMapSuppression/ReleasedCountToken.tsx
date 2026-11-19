@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { makeCountCopyPositionFromFrame } from "./makeCountCopyPositionFromFrame";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { ReactNode } from "react";
@@ -14,7 +14,12 @@ export function ReleasedCountToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { x, y } = makeCountCopyPositionFromFrame({ frame, index: cell.index });
+  const motion = useGraphicMotion();
+  const { x, y } = makeCountCopyPositionFromFrame({
+    motion,
+    frame,
+    index: cell.index,
+  });
   return (
     <text
       data-released-count={cell.value}
@@ -25,7 +30,7 @@ export function ReleasedCountToken({
       fill={accent}
       fontFamily="Arial, sans-serif"
       textAnchor="middle"
-      opacity={ramp(frame, 106 + cell.index * 2, 4)}
+      opacity={motion.ramp(frame, 106 + cell.index * 2, motion.press.duration)}
     >
       {cell.value}
     </text>

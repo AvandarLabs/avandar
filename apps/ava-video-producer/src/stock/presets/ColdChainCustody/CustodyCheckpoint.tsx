@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CustodyFacts } from "./CustodyFacts";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
@@ -22,13 +22,18 @@ export function CustodyCheckpoint({
   accent,
   showMonitoring,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g
       data-stop={checkpoint.stopId}
       data-state={checkpoint.state}
       data-acknowledged={checkpoint.acknowledged}
       data-seal={checkpoint.seal}
-      opacity={ramp(frame, [22, 60, 101][stopIndex] + crateIndex * 2, 6)}
+      opacity={motion.ramp(
+        frame,
+        [22, 60, 101][stopIndex] + crateIndex * 2,
+        motion.chip,
+      )}
       transform={`translate(${280 + stopIndex * 230} ${y + 25})`}
     >
       <CustodyFacts

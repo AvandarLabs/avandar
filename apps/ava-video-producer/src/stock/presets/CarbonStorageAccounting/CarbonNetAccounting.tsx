@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +14,8 @@ export function CarbonNetAccounting({
   retained,
   emissions,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g data-net={retained - emissions}>
       <FitText
@@ -22,11 +28,12 @@ export function CarbonNetAccounting({
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d="M535 490 V550 H925 V490"
+      <SketchedShape
+        shape={{ kind: "path", d: "M535 490 V550 H925 V490" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {[retained, emissions, retained - emissions].map((value, index) => {
         return (
@@ -43,10 +50,10 @@ export function CarbonNetAccounting({
           />
         );
       })}
-      <text x={658} y={515} fill={STOCK.text} fontSize={16}>
+      <text x={658} y={515} fill={tokens.color.text} fontSize={16}>
         −
       </text>
-      <text x={793} y={515} fill={STOCK.text} fontSize={16}>
+      <text x={793} y={515} fill={tokens.color.text} fontSize={16}>
         =
       </text>
       <FitText

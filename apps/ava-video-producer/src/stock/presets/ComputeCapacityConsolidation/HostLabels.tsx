@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
@@ -11,10 +11,11 @@ export function HostLabels({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const host = input.hosts[index];
   const x = 55 + index * 215;
   const isEmpty = !input.jobs.some(propEq("finalHostId", host.id));
-  const fold = isEmpty ? ramp(frame, 108, 12) : 0;
+  const fold = isEmpty ? motion.reveal(frame, 108) : 0;
   return (
     <g>
       <SceneLabel text={host.label} x={x} y={386} width={180} lines={3} />

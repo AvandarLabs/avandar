@@ -1,6 +1,11 @@
-import { ramp, EASE } from "../../../motion";
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryVessel. */
@@ -15,8 +20,11 @@ export function BatteryVessel({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const charge = ramp(frame, 36, 30, EASE.inOut),
-    dispatch = ramp(frame, 80, 28, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const charge = motion.ramp(frame, 36, motion.scale(30), motion.travel.easing),
+    dispatch = motion.ramp(frame, 80, motion.scale(28), motion.travel.easing);
   const { battery, cycle } = input;
   const peak =
     battery.initialStoredKwh + cycle.chargeInputKwh - cycle.chargeLossKwh;
@@ -47,16 +55,22 @@ export function BatteryVessel({
       };
   return (
     <g>
-      <rect x={x + 58} y={y - 8} width={48} height={8} fill={STOCK.line} />
       <rect
+        x={x + 58}
+        y={y - 8}
+        width={48}
+        height={8}
+        fill={tokens.color.line}
+      />
+      <StockRect
         x={x}
         y={y}
         width={164}
         height={170}
-        rx={12}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeWidth={2}
+        rx={scales.corner(tokens.corner.card)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <rect
         data-battery-fill="true"
@@ -67,9 +81,10 @@ export function BatteryVessel({
         fill={accent}
         fillOpacity={0.65}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: paths.charge }}
+        profile={tokens.sketch.shape}
         data-charge-path="true"
-        d={paths.charge}
         pathLength={1}
         strokeDasharray={1}
         strokeDashoffset={1 - charge}
@@ -78,13 +93,14 @@ export function BatteryVessel({
         opacity={cycle.chargeInputKwh ? 1 : 0.2}
         fill="none"
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: paths.delivery }}
+        profile={tokens.sketch.shape}
         data-delivery-path="true"
-        d={paths.delivery}
         pathLength={1}
         strokeDasharray={1}
         strokeDashoffset={1 - dispatch}
-        stroke={STOCK.cyan}
+        stroke={tokens.color.accentAlt}
         strokeWidth={cycle.deliveredKwh ? 8 : 1}
         opacity={cycle.deliveredKwh ? 1 : 0.2}
         fill="none"
@@ -106,15 +122,16 @@ export function BatteryVessel({
             },
           ].map(({ key, path, progress, value }) => {
             return (
-              <path
+              <SketchedShape
                 key={key}
+                shape={{ kind: "path", d: path }}
+                profile={tokens.sketch.shape}
                 data-loss-channel={key}
-                d={path}
                 pathLength={1}
                 strokeDasharray={1}
                 strokeDashoffset={1 - progress}
-                stroke={STOCK.orange}
-                strokeWidth={5}
+                stroke={tokens.color.highlight}
+                strokeWidth={scales.stroke(5)}
                 opacity={value ? 1 : 0}
                 fill="none"
               />

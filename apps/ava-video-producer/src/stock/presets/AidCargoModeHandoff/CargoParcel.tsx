@@ -1,4 +1,10 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCargoPositionFromInputAndFrame } from "./getCargoPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
@@ -23,8 +29,12 @@ export function CargoParcel({
   parcelIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const parcel = input.parcels[parcelIndex];
   const position = getCargoPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     parcelIndex,
@@ -33,22 +43,25 @@ export function CargoParcel({
     <g>
       {position.mechanism ? (
         <g data-mechanism={position.mechanism}>
-          <path
-            d={
-              position.mechanism === "hoist"
-                ? `M${position.x} 175 V${position.y - 17}`
-                : `M${position.x - 20} ${position.y + 20} h40 l5 -10`
-            }
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d:
+                position.mechanism === "hoist"
+                  ? `M${position.x} 175 V${position.y - 17}`
+                  : `M${position.x - 20} ${position.y + 20} h40 l5 -10`,
+            }}
+            profile={tokens.sketch.shape}
             fill="none"
-            stroke={STOCK.muted}
-            strokeWidth={2}
+            stroke={tokens.color.inactive}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
           />
           {position.mechanism === "handcart" ? (
             <circle
               cx={position.x}
               cy={position.y + 25}
               r={4}
-              fill={STOCK.muted}
+              fill={tokens.color.inactive}
             />
           ) : undefined}
         </g>
@@ -60,18 +73,29 @@ export function CargoParcel({
         data-y={position.y}
         transform={`translate(${position.x} ${position.y})`}
       >
-        <rect
+        <StockRect
           x={-18}
           y={-18}
           width={36}
           height={36}
-          rx={4}
-          fill={STOCK.surface}
+          rx={scales.corner(tokens.corner.chip)}
+          fill={tokens.color.surface}
           stroke={accent}
-          strokeWidth={2}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
-        <path d={SYMBOLS[parcel.symbol]} fill="none" stroke={accent} />
-        <text x={6} y={10} fontSize={14} fill={STOCK.text} textAnchor="middle">
+        <SketchedShape
+          shape={{ kind: "path", d: SYMBOLS[parcel.symbol] }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+        />
+        <text
+          x={6}
+          y={10}
+          fontSize={14}
+          fill={tokens.color.text}
+          textAnchor="middle"
+        >
           {parcelIndex + 1}
         </text>
       </g>

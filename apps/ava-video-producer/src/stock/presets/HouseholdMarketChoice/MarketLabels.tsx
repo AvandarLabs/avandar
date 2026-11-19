@@ -1,12 +1,13 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input };
 /** Shelf and role labels leave a clear physical selection corridor. */
 export function MarketLabels({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const labels: Array<[string, number, number, number, FitTextSize]> = [
     [input.scenarioCaption, 40, 36, 880, 16],
     [input.labels.shopper, 40, 340, 230, 14],
@@ -46,7 +47,7 @@ export function MarketLabels({ input }: Readonly<Props>): ReactNode {
               x={120 + index * 176}
               y={216}
               textAnchor="middle"
-              fill={STOCK.muted}
+              fill={tokens.color.textMuted}
               fontSize={16}
             >
               {product.price}

@@ -1,5 +1,10 @@
-import { ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { RecordedInterval } from "./RecordedInterval";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
@@ -20,6 +25,9 @@ export function PresenceRibbon({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const y = 215 + index * 45;
   const overlapStart = Math.max(
     record.start ?? 0,
@@ -33,24 +41,24 @@ export function PresenceRibbon({
     <g
       data-presence={record.id}
       data-state={state}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * 2)}
     >
       <PersonGlyph x={45} y={y} size={28} color={accent} />
       <SceneLabel text={record.label} x={70} y={y - 3} width={195} lines={3} />
       <RecordedInterval record={record} axisEnd={input.axis.end} y={y} />
       {hasOverlap ? (
-        <rect
+        <StockRect
           data-overlap="true"
           data-overlap-person={record.id}
           x={280 + (630 * overlapStart) / input.axis.end}
           y={y - 10}
           width={(630 * (overlapEnd - overlapStart)) / input.axis.end}
           height={20}
-          rx={4}
+          rx={scales.corner(tokens.corner.chip)}
           fill="none"
           stroke={accent}
-          strokeWidth={2}
-          opacity={ramp(frame, 96 + index * 2, 10)}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+          opacity={motion.ramp(frame, 96 + index * 2, motion.scale(10))}
         />
       ) : undefined}
     </g>

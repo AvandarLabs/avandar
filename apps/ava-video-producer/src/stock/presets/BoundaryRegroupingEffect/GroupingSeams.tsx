@@ -1,5 +1,9 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { buildZoneOutlineFromCells } from "./buildZoneOutlineFromCells";
 import { getGroupingFromCells } from "./getGroupingFromCells";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
@@ -12,6 +16,9 @@ export function GroupingSeams({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       {[0, 1].map((index) => {
@@ -19,20 +26,30 @@ export function GroupingSeams({
           <g
             key={index}
             data-seam-partition={index}
-            transform={`translate(0 ${index === 0 ? -28 * ramp(frame, 36, 36) : -28 * (1 - ramp(frame, 72, 36))})`}
+            transform={`translate(0 ${index === 0 ? -28 * motion.ramp(frame, 36, motion.scale(36)) : -28 * (1 - motion.ramp(frame, 72, motion.scale(36)))})`}
             opacity={
-              index === 0 ? 1 - ramp(frame, 60, 12) : ramp(frame, 72, 36)
+              index === 0
+                ? 1 - motion.reveal(frame, 60)
+                : motion.ramp(frame, 72, motion.scale(36))
             }
           >
             {getGroupingFromCells({ input, index }).map((zone) => {
               return (
-                <path
+                <SketchedShape
                   key={zone.id}
+                  shape={{
+                    kind: "path",
+                    d: buildZoneOutlineFromCells(zone.cells),
+                  }}
+                  profile={tokens.sketch.shape}
                   data-zone-outline={zone.id}
-                  d={buildZoneOutlineFromCells(zone.cells)}
                   fill="none"
-                  stroke={[accent, STOCK.cyan, STOCK.orange][zone.zoneIndex]}
-                  strokeWidth={4}
+                  stroke={
+                    [accent, tokens.color.accentAlt, tokens.color.highlight][
+                      zone.zoneIndex
+                    ]
+                  }
+                  strokeWidth={scales.stroke(tokens.stroke.heavy)}
                 />
               );
             })}

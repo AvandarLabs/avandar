@@ -1,6 +1,7 @@
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomDays. */
@@ -11,12 +12,18 @@ export function ClassroomDays({
   input,
   activeIndex,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
       {input.days.map((day, index) => {
         return (
           <g key={day.id}>
-            <Text x={32 + index * 310} y={32} size={16} fill={STOCK.muted}>
+            <Text
+              x={32 + index * 310}
+              y={32}
+              size={16}
+              fill={tokens.color.textMuted}
+            >
               {index + 1}
             </Text>
             <FitText
@@ -29,9 +36,17 @@ export function ClassroomDays({
               breakLongWords
               normalizeWhitespace
             />
-            <path
-              d={`M ${32 + index * 310} 90 H ${308 + index * 310}`}
-              stroke={index === activeIndex ? STOCK.cyan : STOCK.line}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M ${32 + index * 310} 90 H ${308 + index * 310}`,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={
+                index === activeIndex
+                  ? tokens.color.accentAlt
+                  : tokens.color.line
+              }
               strokeWidth={index === activeIndex ? 3 : 1}
             />
           </g>

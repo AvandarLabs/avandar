@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ConvoyCopy } from "./ConvoyCopy";
 import { ConvoyMap } from "./ConvoyMap";
 import { ConvoyVehicle } from "./ConvoyVehicle";
@@ -13,7 +14,8 @@ export function ConvoyRouteDetour({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const journey = getConvoyJourneyFromInputAndFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const journey = getConvoyJourneyFromInputAndFrame({ motion, frame, input });
   return (
     <g>
       <ConvoyCopy input={input} accent={accent} />

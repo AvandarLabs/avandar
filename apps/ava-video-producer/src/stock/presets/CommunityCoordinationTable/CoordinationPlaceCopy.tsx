@@ -1,5 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -17,11 +22,18 @@ export function CoordinationPlaceCopy({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const color = getCoordinationPlaceColorFromIndex({ index, accent });
   const y = 120 + 108 * index;
   return (
     <g data-request={place.id} data-request-face={frame >= 108 ? "up" : "edge"}>
-      <circle cx={25} cy={y - 4} r={9} fill={STOCK.surface} stroke={color} />
+      <SketchedShape
+        shape={{ kind: "circle", cx: 25, cy: y - 4, r: 9 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={color}
+      />
       <text
         data-place-key={place.id}
         x={25}
@@ -42,13 +54,13 @@ export function CoordinationPlaceCopy({
         breakLongWords
         normalizeWhitespace
       />
-      <rect
+      <StockRect
         data-request-card={place.id}
         x={36}
         y={158 + 108 * index}
         width={284}
         height={54}
-        rx={4}
+        rx={scales.corner(tokens.corner.chip)}
         fill="none"
         stroke={color}
         strokeOpacity={frame >= 108 ? 0.8 : 0.3}

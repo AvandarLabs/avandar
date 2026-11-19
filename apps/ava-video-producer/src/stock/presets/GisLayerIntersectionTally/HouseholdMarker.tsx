@@ -1,5 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdBadge } from "./HouseholdBadge";
 import { HouseholdCaption } from "./HouseholdCaption";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -22,7 +26,11 @@ export function HouseholdMarker({
   isSelected,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = isSelected ? ramp(frame, 84, 24, EASE.inOut) : 0;
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const progress = isSelected
+    ? motion.ramp(frame, 84, motion.scale(24), motion.travel.easing)
+    : 0;
   const mapX = 110 + household.x * 3.8;
   const mapY = 180 + household.y * 2.7;
   const x = mix(progress, 125 + (index % 4) * 112, 580);
@@ -34,12 +42,13 @@ export function HouseholdMarker({
         cx={mapX}
         cy={mapY}
         r={3}
-        fill={STOCK.muted}
+        fill={tokens.color.inactive}
       />
-      <path
-        d={`M${mapX} ${mapY} L${x} ${y}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${mapX} ${mapY} L${x} ${y}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={isSelected ? accent : STOCK.muted}
+        stroke={isSelected ? accent : tokens.color.inactive}
         strokeOpacity={0.35}
       />
       <HouseholdBadge

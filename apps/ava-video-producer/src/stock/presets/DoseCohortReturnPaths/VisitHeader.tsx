@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
@@ -18,15 +19,25 @@ export function VisitHeader({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const x =
     380 +
     index * 155 +
-    mix(ramp(frame, 24 + index * 18, 24, EASE.inOut), 35, 0);
+    mix(
+      motion.ramp(
+        frame,
+        24 + index * 18,
+        motion.scale(24),
+        motion.travel.easing,
+      ),
+      35,
+      0,
+    );
   return (
     <g
       data-visit={visit.id}
       data-denominator={input.participants.length}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * 2)}
     >
       <SceneLabel text={visit.label} x={x - 75} y={100} width={140} lines={3} />
       {input.showFractions ? (
