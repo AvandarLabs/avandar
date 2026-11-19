@@ -1,11 +1,18 @@
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+/** The faint fill inside an object's outline, scaled by tint strength. */
+const OBJECT_WASH = 0.06;
 
 type Props = {
   kind: keyof typeof OBJECT_PATHS;
   x: number;
   y: number;
   size?: number;
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
 const OBJECT_PATHS: Record<
@@ -33,8 +40,10 @@ export function ObjectGlyph({
   x,
   y,
   size = 48,
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   if (
     ![x, y, size].every(Number.isFinite) ||
     size < 8 ||
@@ -43,13 +52,14 @@ export function ObjectGlyph({
   ) {
     throw new Error("Object glyph placement, size or kind is unsupported.");
   }
+  const ink = color ?? tokens.color.positive;
   return (
     <g
       transform={`translate(${x} ${y}) scale(${size / 48})`}
-      fill={color}
-      fillOpacity={0.06}
-      stroke={color}
-      strokeWidth={2}
+      fill={ink}
+      fillOpacity={scales.wash(OBJECT_WASH)}
+      stroke={ink}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
       strokeLinecap="round"
       strokeLinejoin="round"
     >

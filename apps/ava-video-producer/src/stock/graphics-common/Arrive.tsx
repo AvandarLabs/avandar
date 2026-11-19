@@ -2,7 +2,14 @@ import { mix, ramp } from "../../motion";
 import { useGraphicMotion } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
-/** Fades and rises children in with the theme's entrance motion. */
+/** The starting scale of an entrance whose theme style is `scale`. */
+const SCALE_STYLE_START = 0.96;
+
+/**
+ * Fades children in with the theme's entrance motion and entrance style: a
+ * rise, a plain fade, a scale up about the children's own centre, or a cut
+ * on the cue.
+ */
 export function Arrive({
   frame,
   at = 12,
@@ -15,16 +22,39 @@ export function Arrive({
   children: ReactNode;
 }): ReactNode {
   const motion = useGraphicMotion();
+  const start = at + index * motion.stagger.list;
+  const style = motion.entranceStyle;
+  if (style === "none") {
+    return <g opacity={frame >= start ? 1 : 0}>{children}</g>;
+  }
   const t = ramp(
     frame,
-    at + index * motion.stagger.list,
+    start,
     motion.entrance.duration,
     motion.entrance.easing,
   );
+  if (style === "scale") {
+    return (
+      <g
+        opacity={t}
+        style={{
+          transformBox: "fill-box",
+          transformOrigin: "center",
+          transform: `scale(${mix(t, SCALE_STYLE_START, 1)})`,
+        }}
+      >
+        {children}
+      </g>
+    );
+  }
   return (
     <g
       opacity={t}
-      transform={`translate(0 ${mix(t, motion.entrance.distance, 0)})`}
+      transform={
+        style === "rise"
+          ? `translate(0 ${mix(t, motion.entrance.distance, 0)})`
+          : undefined
+      }
     >
       {children}
     </g>

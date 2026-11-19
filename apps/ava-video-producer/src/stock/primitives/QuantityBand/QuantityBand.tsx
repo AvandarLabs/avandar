@@ -1,5 +1,5 @@
 import { prop } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getQuantitySegmentsFromValues } from "./getQuantitySegmentsFromValues";
 import type { ReactNode } from "react";
 
@@ -21,6 +21,7 @@ export function QuantityBand({
   width,
   height,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   if (
     ![x, y, width, height].every(Number.isFinite) ||
     width <= 0 ||
@@ -34,7 +35,13 @@ export function QuantityBand({
   });
   return (
     <g>
-      <rect x={x} y={y} width={width} height={height} fill={STOCK.line} />
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={tokens.color.line}
+      />
       {segments.map((segment, index) => {
         return (
           <rect

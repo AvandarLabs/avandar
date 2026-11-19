@@ -1,5 +1,11 @@
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+
+/** A person's line weight before the theme's line weight scales it. */
+const PERSON_STROKE = 2.5;
 
 type Props = {
   x: number;
@@ -7,6 +13,7 @@ type Props = {
   size?: number;
   posture?: "standing" | "seated" | "walking";
   role?: "participant" | "facilitator" | "worker";
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
 const POSTURES: { standing: string; seated: string; walking: string } = {
@@ -42,19 +49,28 @@ export function PersonGlyph({
   size = 48,
   posture = "standing",
   role = "participant",
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   _validatePresentation({ x, y, size, posture, role });
+  const ink = color ?? tokens.color.positive;
   return (
     <g
       transform={`translate(${x} ${y}) scale(${size / 48})`}
-      stroke={color}
-      strokeWidth={2.5}
+      stroke={ink}
+      strokeWidth={scales.stroke(PERSON_STROKE)}
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
     >
-      <circle cx={0} cy={-14} r={7} fill={color} fillOpacity={0.12} />
+      <circle
+        cx={0}
+        cy={-14}
+        r={7}
+        fill={ink}
+        fillOpacity={scales.wash(tokens.alpha.tint)}
+      />
       <path d={POSTURES[posture]} />
       {role === "facilitator" ? <path d="M16 -17 h9 M20 -21 v8" /> : null}
       {role === "worker" ? <path d="M9 8 h10 v8 H9 Z M12 8 V5 h4 v3" /> : null}

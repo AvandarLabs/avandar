@@ -1427,8 +1427,7 @@ helpers:
       <g opacity={loopEnvelope(frame, 180)}>{graphic}</g>
     goodFor: "Graphics that loop in a page without a seam."
     avoid: "Durations shorter than twice the fade; they throw."
-    usedBy:
-      - src/stock/StockGraphic/StockCanvas.tsx
+    usedBy: []
     demo: { id: loop-envelope, frames: 90 }
 
   # ------------------------------------------------------------ builds --

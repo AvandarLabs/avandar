@@ -1,5 +1,8 @@
 import { SketchedShape } from "../primitives/SketchedShape";
-import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicShapeScales,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import { Arrive } from "./Arrive";
 import { Text } from "./Text";
 import type { NodeSize } from "./graphicCommon.types";
@@ -42,6 +45,7 @@ export function CircleNode({
   radius?: number;
 }): ReactNode {
   const node = useGraphicProps("Node", {});
+  const scales = useGraphicShapeScales();
   const r = radius ?? node[NODE_RADIUS_KEYS[size]];
   return (
     <Arrive frame={frame} index={index}>
@@ -57,7 +61,7 @@ export function CircleNode({
         profile={node.sketch}
         fill={node.fill}
         stroke={node.stroke}
-        strokeWidth={node.strokeWidth}
+        strokeWidth={scales.stroke(node.strokeWidth)}
       />
       <SketchedShape
         shape={{ kind: "circle", cx: x, cy: y, r }}
@@ -66,7 +70,7 @@ export function CircleNode({
         fillOpacity={active * node.tintAlpha}
         stroke={accent}
         strokeOpacity={node.outlineAlpha + active * (1 - node.outlineAlpha)}
-        strokeWidth={node.strokeWidth}
+        strokeWidth={scales.stroke(node.strokeWidth)}
       />
       <circle
         cx={x}

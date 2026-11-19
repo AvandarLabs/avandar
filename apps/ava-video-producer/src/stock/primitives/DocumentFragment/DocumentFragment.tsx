@@ -1,6 +1,15 @@
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FitText } from "../FitText/FitText";
+import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
+
+/** The fragment box's own corner, scaled by the theme's corner style. */
+const FRAGMENT_CORNER = 5;
+/** The accent wash of an emphasized fragment, scaled by tint strength. */
+const EMPHASIS_WASH = 0.09;
 
 type Props = {
   x: number;
@@ -8,6 +17,7 @@ type Props = {
   width: number;
   text: string;
   emphasized?: boolean;
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
 
@@ -20,13 +30,16 @@ export function DocumentFragment({
   width,
   text,
   emphasized = false,
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
     throw new Error(
       "Document fragments require finite placement and widths from 100 to 800 pixels.",
     );
   }
+  const accent = color ?? tokens.color.positive;
   return (
     <g>
       <rect
@@ -34,14 +47,17 @@ export function DocumentFragment({
         y={y}
         width={width}
         height={64}
-        rx={5}
-        fill={emphasized ? color : STOCK.surface}
-        fillOpacity={emphasized ? 0.09 : 1}
+        rx={scales.corner(FRAGMENT_CORNER)}
+        fill={emphasized ? accent : tokens.color.surface}
+        fillOpacity={emphasized ? scales.wash(EMPHASIS_WASH) : 1}
       />
-      <path
-        d={`M${x} ${y + 64} H${x + width}`}
-        stroke={emphasized ? color : STOCK.line}
-        strokeWidth={emphasized ? 2 : 1}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y + 64} H${x + width}` }}
+        profile={tokens.sketch.shape}
+        stroke={emphasized ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
+          emphasized ? tokens.stroke.default : tokens.stroke.hairline,
+        )}
       />
       <FitText
         x={x + 10}

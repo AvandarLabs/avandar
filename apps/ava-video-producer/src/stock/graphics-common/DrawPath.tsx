@@ -3,6 +3,7 @@ import { SketchedShape } from "../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicProps,
+  useGraphicShapeScales,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import { Curve } from "./Curve";
 import type { Point } from "./graphicCommon.types";
@@ -35,6 +36,7 @@ export function DrawPath({
 }): ReactNode {
   const edge = useGraphicProps("Edge", { color, strokeWidth: width });
   const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const path =
     d ?? (curve ? Curve({ ...curve, tension: edge.curveTension }) : "");
   const t = ramp(
@@ -50,7 +52,7 @@ export function DrawPath({
       pathLength={1}
       fill="none"
       stroke={edge.color}
-      strokeWidth={edge.strokeWidth}
+      strokeWidth={scales.stroke(edge.strokeWidth)}
       strokeLinecap={edge.cap}
       strokeDasharray={dashed ? edge.dash.join(" ") : 1}
       strokeDashoffset={dashed ? 0 : 1 - t}

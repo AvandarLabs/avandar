@@ -2,6 +2,7 @@ import { StockRect } from "../primitives/StockRect/StockRect";
 import {
   useGraphicFilter,
   useGraphicProps,
+  useGraphicShapeScales,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
@@ -27,6 +28,7 @@ export function Panel({
 }): ReactNode {
   const panel = useGraphicProps("Panel", { stroke, fill, radius });
   const filter = useGraphicFilter("components.Panel.elevation");
+  const scales = useGraphicShapeScales();
   return (
     <g filter={filter}>
       <StockRect
@@ -34,10 +36,10 @@ export function Panel({
         y={y}
         width={width}
         height={height}
-        rx={panel.radius}
+        rx={scales.corner(panel.radius)}
         fill={panel.fill}
         stroke={panel.stroke}
-        strokeWidth={panel.strokeWidth}
+        strokeWidth={scales.stroke(panel.strokeWidth)}
       />
       {children}
     </g>

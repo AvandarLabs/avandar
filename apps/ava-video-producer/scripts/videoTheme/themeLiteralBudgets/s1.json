@@ -5,26 +5,10 @@
     "src/stock/primitives/**",
     "src/stock/graphics-common/**",
     "src/stock/StockGraphic/**",
-    "src/stock/stockPalette.ts",
     "src/gallery/palette.ts"
   ],
-  "enforceLint": false,
+  "enforceLint": true,
   "coveredIds": [],
   "pendingTokens": [],
-  "literals": {
-    "src/gallery/palette.ts": 1,
-    "src/stock/graphics-common/Check.tsx": 1,
-    "src/stock/graphics-common/Glyph.tsx": 1,
-    "src/stock/graphics-common/Packet.tsx": 1,
-    "src/stock/graphics-common/Route.tsx": 2,
-    "src/stock/graphics-common/Rule.tsx": 1,
-    "src/stock/primitives/DocumentFragment/DocumentFragment.tsx": 5,
-    "src/stock/primitives/MembershipMarker/MembershipMarker.tsx": 7,
-    "src/stock/primitives/ObjectGlyph/ObjectGlyph.tsx": 3,
-    "src/stock/primitives/PersonGlyph/PersonGlyph.tsx": 3,
-    "src/stock/primitives/QuantityBand/QuantityBand.tsx": 1,
-    "src/stock/primitives/RoutePath/RoutePath.tsx": 3,
-    "src/stock/primitives/TableCell/TableCell.tsx": 3,
-    "src/stock/stockPalette.ts": 9
-  }
+  "literals": {}
 }

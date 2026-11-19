@@ -1,5 +1,9 @@
 import { StockRect } from "../primitives/StockRect/StockRect";
-import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicProps,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 /** A tinted summary card for labels that outgrow a pill. */
@@ -19,6 +23,8 @@ export function Card({
   children?: ReactNode;
 }): ReactNode {
   const card = useGraphicProps("Card", {});
+  const { stroke } = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -26,11 +32,12 @@ export function Card({
         y={y}
         width={width}
         height={height}
-        rx={card.radius}
+        rx={scales.corner(card.radius)}
         fill={color}
-        fillOpacity={card.fillAlpha}
+        fillOpacity={scales.wash(card.fillAlpha)}
         stroke={color}
         strokeOpacity={card.strokeAlpha}
+        strokeWidth={scales.stroke(stroke.hairline)}
       />
       {children}
     </g>

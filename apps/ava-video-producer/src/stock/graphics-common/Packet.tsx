@@ -1,4 +1,4 @@
-import { loopPhase, mix, ramp } from "../../motion";
+import { loopPhase, mix } from "../../motion";
 import {
   useGraphicMotion,
   useGraphicProps,
@@ -46,7 +46,7 @@ export function Packet({
     t,
   );
   const opacity =
-    ramp(frame, PACKET_FADE_IN_AT, motion.scale(packet.fadeIn)) *
+    motion.ramp(frame, PACKET_FADE_IN_AT, motion.scale(packet.fadeIn)) *
     Math.min(1, t * PACKET_EDGE_FADE, (1 - t) * PACKET_EDGE_FADE);
   return (
     <g opacity={opacity}>

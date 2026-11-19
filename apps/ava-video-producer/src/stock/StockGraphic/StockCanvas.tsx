@@ -1,4 +1,3 @@
-import { loopEnvelope } from "../../motion";
 import { fillToCss } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
 import { VideoEffectDefs } from "../../videoTheme/VideoEffectDefs/VideoEffectDefs";
 import { listVideoEffectFilters } from "../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
@@ -7,6 +6,7 @@ import { STOCK_GRAPHIC_COPY } from "../copy/stockGraphicCopy";
 import { stockRenderers } from "../registry/stockRenderers/stockRenderers";
 import {
   GraphicIdContext,
+  useGraphicMotion,
   useGraphicTheme,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
@@ -23,7 +23,8 @@ type Props = Omit<
 
 /**
  * The stock graphic's svg: its ground, effect definitions, and the preset
- * renderer at the clamped frame.
+ * renderer at the clamped frame, faded from and back to the ground over the
+ * theme's graphic loop fade.
  */
 export function StockCanvas({
   preset,
@@ -36,6 +37,7 @@ export function StockCanvas({
 }: Props): ReactNode {
   const tokens = useGraphicTokens();
   const theme = useGraphicTheme();
+  const motion = useGraphicMotion();
   const localFrame = Math.max(
     0,
     Math.min(179, Number.isFinite(frame) ? frame : 0),
@@ -62,7 +64,7 @@ export function StockCanvas({
       <VideoEffectDefs graphicId={id} filters={listVideoEffectFilters(theme)} />
       {transparent ? null : <GroundFill id={id} />}
       <GraphicIdContext.Provider value={id}>
-        <g opacity={loopEnvelope(localFrame, 180)}>
+        <g opacity={motion.loopEnvelope(localFrame, 180)}>
           {stockRenderers[preset](
             {
               frame: localFrame,
