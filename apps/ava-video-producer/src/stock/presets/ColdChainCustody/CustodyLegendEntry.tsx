@@ -69,6 +69,7 @@ export function CustodyLegendEntry({
           y={y + 20}
           fill={tokens.color.text}
           fontFamily={tokens.text.graphic.data.fontFamily}
+          fontWeight={tokens.text.graphic.data.fontWeight}
           fontSize={tokens.text.graphic.data.fontSize}
           opacity={motion.ramp(frame, 116, motion.scale(10))}
         >

@@ -46,6 +46,7 @@ export function FundingPool({
           fill={accent}
           fontSize={graphicTokens.text.graphic.secondary.fontSize}
           fontFamily={graphicTokens.text.graphic.secondary.fontFamily}
+          fontWeight={graphicTokens.text.graphic.secondary.fontWeight}
         >
           {remaining}
         </text>

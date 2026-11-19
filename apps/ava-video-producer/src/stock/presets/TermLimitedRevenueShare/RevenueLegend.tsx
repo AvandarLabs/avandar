@@ -23,6 +23,7 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         y={480}
         fill={tokens.color.textMuted}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         0
@@ -33,6 +34,7 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         textAnchor="end"
         fill={tokens.color.textMuted}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         {input.periods[0].receiptsMinor / input.money.minorUnitsPerUnit}

@@ -25,7 +25,7 @@ const SCAN_FRAMES = 110;
 const ROW_PASS_SPAN = 28;
 const PLACEHOLDER_STROKE = 5;
 const HANDLE_CORNER = 5;
-const FIELD_SIZE = 18;
+const FIELD_SIZE = "xl";
 
 /** Draws the bounded authored scan-lines study at an explicit frame. */
 export function ScanLines({

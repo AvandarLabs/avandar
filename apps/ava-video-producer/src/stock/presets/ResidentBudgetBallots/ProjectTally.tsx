@@ -53,6 +53,7 @@ export function ProjectTally({
           fill={project ? tokens.color.text : tokens.color.highlight}
           fontSize={tokens.text.graphic.body.fontSize}
           fontFamily={tokens.text.graphic.body.fontFamily}
+          fontWeight={tokens.text.graphic.body.fontWeight}
         >
           {total}
         </text>

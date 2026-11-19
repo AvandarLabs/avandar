@@ -25,6 +25,7 @@ export function BufferSourceRow({
         x={440}
         y={282 + index * 48}
         fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
         fill={data.color}
       >
         {index + 1}
@@ -38,6 +39,7 @@ export function BufferSourceRow({
           x={670}
           y={282 + index * 48}
           fontSize={data.fontSize}
+          fontWeight={data.fontWeight}
           textAnchor="end"
           fill={data.color}
         >

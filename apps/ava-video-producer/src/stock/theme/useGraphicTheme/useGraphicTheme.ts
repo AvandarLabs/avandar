@@ -90,6 +90,31 @@ export function useGraphicProps<
   return { ...defaults, ...given } as ResolvedVideoComponents[Name] & Props;
 }
 
+/**
+ * A step of a theme's type scale in pixels, for SVG text set larger or
+ * smaller than its role, for example a study heading at the `29` step.
+ * Throws on a step the theme does not define.
+ */
+export function getFontSizeFromStep(
+  theme: Pick<ResolvedVideoTheme, "mantine">,
+  step: string,
+): number {
+  const size = theme.mantine.fontSizes[step];
+  if (size === undefined) {
+    throw new Error(`fontSizes.${step} is not a step of the type scale`);
+  }
+  return Number.parseFloat(size);
+}
+
+/**
+ * A step of the surrounding theme's type scale in pixels, for a stock
+ * shape that draws its own `<text>`, such as a legend value. See
+ * `getFontSizeFromStep`.
+ */
+export function useGraphicFontSize(step: string): number {
+  return getFontSizeFromStep(useGraphicTheme(), step);
+}
+
 /** Tempo-scaled motion for a stock shape. See `VideoMotion`. */
 export function useGraphicMotion(): VideoMotion {
   const { motion } = useGraphicTokens();

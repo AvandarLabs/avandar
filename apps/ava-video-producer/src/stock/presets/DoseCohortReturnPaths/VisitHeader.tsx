@@ -50,6 +50,7 @@ export function VisitHeader({
           x={x}
           y={150}
           fontFamily={tokens.text.graphic.secondary.fontFamily}
+          fontWeight={tokens.text.graphic.secondary.fontWeight}
           fontSize={tokens.text.graphic.secondary.fontSize}
           fill={accent}
           textAnchor="middle"

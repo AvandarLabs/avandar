@@ -26,6 +26,7 @@ export function RevenueAmount({
         y={110}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         {(amount / input.money.minorUnitsPerUnit).toFixed(

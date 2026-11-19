@@ -23,8 +23,8 @@ const STREAM_PERIOD = 130;
 const PACKET_PHASE_STEP = 20;
 const PACKET_CORNER = 6;
 const PACKET_FILL_ALPHA = 0.13;
-const HEADING_SIZE = 29;
-const LANE_LABEL_SIZE = 16;
+const HEADING_SIZE = "29";
+const LANE_LABEL_SIZE = "md";
 
 /** Draws the bounded authored packet-stream study at an explicit frame. */
 export function PacketStream({

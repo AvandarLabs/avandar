@@ -39,6 +39,7 @@ export function PreviewValue({
         x={88}
         y={y + 27}
         fontFamily={valueStyle.fontFamily}
+        fontWeight={valueStyle.fontWeight}
         fontSize={valueStyle.fontSize}
         xmlSpace="preserve"
         fill={color}

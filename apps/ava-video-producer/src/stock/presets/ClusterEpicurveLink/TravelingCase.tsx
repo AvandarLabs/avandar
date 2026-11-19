@@ -67,6 +67,7 @@ export function TravelingCase({
         fill={tokens.color.text}
         textAnchor="middle"
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         {index + 1}

@@ -24,6 +24,7 @@ export function DoseCohortReturnPaths({
         y={60}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.label.fontFamily}
+        fontWeight={tokens.text.graphic.label.fontWeight}
         fontSize={tokens.text.graphic.label.fontSize}
       >
         {input.participants.length}

@@ -5,11 +5,11 @@ import type { VideoThemePatch } from "../../src/videoTheme/videoTheme.types";
 /*
  * The sentinel theme the "follow a sentinel theme" tests render every Atlas
  * item under. It moves every swatch, palette shade, white, black, radius,
- * stroke width, dash step, opacity step, glow opacity, and the identity
- * multiplier to an
- * improbable value. A renderer that reads the theme then draws no `classic`
- * value, so any `classic` value left in its markup is a literal, even one
- * routed through a constant the pattern scan cannot see.
+ * stroke width, dash step, opacity step, glow opacity, type scale step, font
+ * weight, tracking step, and the identity multiplier to an improbable value.
+ * A renderer that reads the theme then draws no `classic` value, so any
+ * `classic` value left in its markup is a literal, even one routed through a
+ * constant the pattern scan cannot see.
  */
 
 const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic");
@@ -19,6 +19,9 @@ const SENTINEL_RADIUS = 7;
 const SENTINEL_MULTIPLIER = 1.37;
 const SENTINEL_DASH = [1.7, 2.3];
 const SENTINEL_OPACITY = 0.4321;
+const SENTINEL_FONT_SIZE = "41px";
+const SENTINEL_FONT_WEIGHT = 900;
+const SENTINEL_TRACKING = 0.315;
 
 function _record(path: readonly string[]): Readonly<Record<string, unknown>> {
   const value = getValueAtPath(CLASSIC, path);
@@ -66,6 +69,18 @@ export const SENTINEL_THEME: VideoThemePatch = {
   radius: _mapKeys(["radius"], () => {
     return `${SENTINEL_RADIUS}px`;
   }),
+  fontSizes: _mapKeys(["fontSizes"], () => {
+    return SENTINEL_FONT_SIZE;
+  }),
+  headings: {
+    fontWeight: String(SENTINEL_FONT_WEIGHT),
+    sizes: _mapKeys(["headings", "sizes"], () => {
+      return {
+        fontSize: SENTINEL_FONT_SIZE,
+        fontWeight: String(SENTINEL_FONT_WEIGHT),
+      };
+    }),
+  },
   other: {
     video: {
       atomic: {
@@ -87,6 +102,13 @@ export const SENTINEL_THEME: VideoThemePatch = {
             ...(_record([...ATOMIC, "glow", key]) as object),
             opacity: SENTINEL_OPACITY,
           };
+        }),
+        fontWeight: _mapKeys([...ATOMIC, "fontWeight"], () => {
+          return SENTINEL_FONT_WEIGHT;
+        }),
+        // No tracking stays none: it means "not tracked", not a style value.
+        letterSpacing: _mapKeys([...ATOMIC, "letterSpacing"], (key) => {
+          return key === "none" ? 0 : SENTINEL_TRACKING;
         }),
         multiplier: { identity: SENTINEL_MULTIPLIER },
       },
@@ -141,6 +163,35 @@ const CLASSIC_OPACITIES: ReadonlySet<string> = new Set(
     .map(String),
 );
 
+/** Type scale steps in pixels. */
+const CLASSIC_FONT_SIZES: ReadonlySet<string> = new Set(
+  Object.values(_record(["fontSizes"])).map((value) => {
+    return String(value).replace("px", "");
+  }),
+);
+const CLASSIC_FONT_WEIGHTS: ReadonlySet<string> = new Set(
+  Object.values(_record([...ATOMIC, "fontWeight"])).map(String),
+);
+/** Tracking steps other than none, as em in CSS. */
+const CLASSIC_TRACKING = Object.values(_record([...ATOMIC, "letterSpacing"]))
+  .filter((value): value is number => {
+    return typeof value === "number" && value !== 0;
+  });
+/**
+ * Tracking in pixels as SVG text draws it: a classic tracking step at a
+ * classic type size.
+ */
+const CLASSIC_TRACKING_PIXELS: ReadonlySet<string> = new Set(
+  CLASSIC_TRACKING.flatMap((tracking) => {
+    return [...CLASSIC_FONT_SIZES].map((size) => {
+      return String(Number((tracking * Number(size)).toFixed(4)));
+    });
+  }),
+);
+const CLASSIC_TRACKING_EMS: ReadonlySet<string> = new Set(
+  CLASSIC_TRACKING.map(String),
+);
+
 /** What a sentinel test checks a markup string for. */
 export type SentinelChecks = Readonly<{
   /** Extra colours that count as classic, such as the product palette. */
@@ -161,7 +212,10 @@ function _matches(
 
 /**
  * The classic values a markup string still holds, one line each: colours,
- * SVG and CSS stroke widths, radii, dash steps, and opacity steps.
+ * SVG and CSS stroke widths, radii, dash steps, opacity steps, font weights,
+ * tracking, and type sizes on SVG text. Text whose first child is a
+ * `<tspan>` is `FitText` or a measured layout, whose size is content
+ * checked against glyph widths, so its size is not flagged.
  */
 export function findClassicValuesInMarkup(
   markup: string,
@@ -206,6 +260,38 @@ export function findClassicValuesInMarkup(
         CLASSIC_DASHES,
         (v) => {
           return `dash ${v}`;
+        },
+      ),
+      ..._matches(
+        markup,
+        /\bfont-weight(?:="|:)(\d+)/g,
+        CLASSIC_FONT_WEIGHTS,
+        (v) => {
+          return `font-weight ${v}`;
+        },
+      ),
+      ..._matches(
+        markup,
+        /\bletter-spacing="(-?[\d.]+)"/g,
+        CLASSIC_TRACKING_PIXELS,
+        (v) => {
+          return `letter-spacing ${v}`;
+        },
+      ),
+      ..._matches(
+        markup,
+        /\bletter-spacing:(-?[\d.]+)em/g,
+        CLASSIC_TRACKING_EMS,
+        (v) => {
+          return `letter-spacing ${v}em`;
+        },
+      ),
+      ..._matches(
+        markup,
+        /<text\b[^>]*?\sfont-size="([\d.]+)"[^>]*>(?!<tspan)/g,
+        CLASSIC_FONT_SIZES,
+        (v) => {
+          return `font-size ${v}`;
         },
       ),
       ..._matches(

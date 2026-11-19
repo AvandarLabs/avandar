@@ -32,6 +32,7 @@ export function LocalQueryResult({
         y={216}
         fill={accent}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
         aria-label={String(result)}
       >
@@ -42,6 +43,7 @@ export function LocalQueryResult({
         y={248}
         fill={accent}
         fontFamily={tokens.text.graphic.smallCaption.fontFamily}
+        fontWeight={tokens.text.graphic.smallCaption.fontWeight}
         fontSize={tokens.text.graphic.smallCaption.fontSize}
       >
         {"="}

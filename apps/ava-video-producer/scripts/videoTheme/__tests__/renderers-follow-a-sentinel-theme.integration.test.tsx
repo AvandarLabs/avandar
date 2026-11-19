@@ -44,6 +44,14 @@ import type { StockRequest } from "../../../src/stock/contracts/StockContract.ty
 import type { ReactNode } from "react";
 
 const SAMPLE_FRAMES = [0, 45, 90, 135, 178];
+/**
+ * Presets that lay a sentence out word by word at a size measured against
+ * glyph widths. Their text size is content, so it is not a finding.
+ */
+const MEASURED_SENTENCE_PRESETS: ReadonlySet<string> = new Set([
+  "prose-measurement-ledger",
+  "utterance-to-model-draft",
+]);
 /** The colour the test draws content with, so content is never flagged. */
 const CONTENT_COLOR = "#5a5b5c";
 
@@ -129,9 +137,17 @@ const PRIMITIVES: Readonly<Record<string, ReactNode>> = {
 test("the sentinel theme moves the values the test looks for", () => {
   assert.deepEqual(
     findClassicValuesInMarkup(
-      '<rect stroke="#2a404e" stroke-width="2" rx="12" stroke-dasharray="3 4" opacity="0.5"/>',
+      '<rect stroke="#2a404e" stroke-width="2" rx="12" stroke-dasharray="3 4" opacity="0.5"/><text font-size="29" font-weight="600">a</text><text font-size="16"><tspan>b</tspan></text>',
     ),
-    ["#2a404e", "stroke-width 2", "rx 12", "dash 3 4", "opacity 0.5"],
+    [
+      "#2a404e",
+      "stroke-width 2",
+      "rx 12",
+      "dash 3 4",
+      "font-weight 600",
+      "font-size 29",
+      "opacity 0.5",
+    ],
   );
 });
 
@@ -159,9 +175,16 @@ test("every stock preset draws no classic value under the sentinel theme", () =>
             </VideoThemeScope>,
           );
         },
-      }).map((value) => {
-        return `${preset}: ${value}`;
-      });
+      })
+        .filter((value) => {
+          return (
+            !MEASURED_SENTENCE_PRESETS.has(preset) ||
+            !value.startsWith("font-size ")
+          );
+        })
+        .map((value) => {
+          return `${preset}: ${value}`;
+        });
     }),
     [],
   );

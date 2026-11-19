@@ -29,6 +29,7 @@ export function CategoryContext({
           fill={tokens.text.graphic.value.color}
           fontSize={tokens.text.graphic.value.fontSize}
           fontFamily={tokens.text.graphic.value.fontFamily}
+          fontWeight={tokens.text.graphic.value.fontWeight}
           textAnchor="end"
         >
           {category.value}

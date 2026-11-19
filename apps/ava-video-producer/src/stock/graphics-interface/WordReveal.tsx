@@ -72,7 +72,7 @@ export function WordReveal({
                 role="title"
                 x={word.x}
                 y={word.y}
-                size={word.size}
+                fittedSize={word.size}
                 fill={word.accented ? accent : color.text}
               >
                 {word.word}

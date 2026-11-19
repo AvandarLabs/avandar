@@ -55,7 +55,13 @@ export function KernelDensitySpread({
         height={12}
         fill={`url(#${legendId})`}
       />
-      <text x={610} y={325} fill={data.color} fontSize={data.fontSize}>
+      <text
+        x={610}
+        y={325}
+        fill={data.color}
+        fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
+      >
         0
       </text>
       <text
@@ -64,10 +70,17 @@ export function KernelDensitySpread({
         fill={data.color}
         textAnchor="end"
         fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
       >
         {input.legendMaximum}
       </text>
-      <text x={610} y={438} fill={body.color} fontSize={body.fontSize}>
+      <text
+        x={610}
+        y={438}
+        fill={body.color}
+        fontSize={body.fontSize}
+        fontWeight={body.fontWeight}
+      >
         {input.points.length}
       </text>
     </g>

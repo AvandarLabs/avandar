@@ -18,6 +18,7 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
               y={385 + Math.floor(index / 3) * 48}
               fill={tokens.color.textMuted}
               fontFamily={tokens.text.graphic.data.fontFamily}
+              fontWeight={tokens.text.graphic.data.fontWeight}
               fontSize={tokens.text.graphic.data.fontSize}
             >
               {index + 1}
@@ -42,6 +43,7 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
         y={84}
         fill={tokens.color.textMuted}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         ?

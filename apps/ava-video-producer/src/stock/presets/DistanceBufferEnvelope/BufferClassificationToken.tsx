@@ -61,6 +61,7 @@ export function BufferClassificationToken({
           x={point.x}
           y={point.y + 4}
           fontSize={text.graphic.data.fontSize}
+          fontWeight={text.graphic.data.fontWeight}
           textAnchor="middle"
           fill={color.ground}
         >

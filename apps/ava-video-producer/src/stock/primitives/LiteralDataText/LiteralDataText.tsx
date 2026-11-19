@@ -32,6 +32,7 @@ export function LiteralDataText({
       y={y}
       fontSize={data.fontSize}
       fontFamily={data.fontFamily}
+      fontWeight={data.fontWeight}
       xmlSpace="preserve"
       fill={color ?? data.color}
     >

@@ -1,13 +1,20 @@
 import {
+  getFontSizeFromStep,
   useGraphicFilter,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { ResolvedTypeStyle } from "../../videoTheme/videoTheme.types";
 import type { GraphicTextRole } from "./graphicCommon.types";
 import type { CSSProperties, ReactNode } from "react";
 
-function _letterSpacing(
-  style: ResolvedTypeStyle,
+/**
+ * A text role's tracking in pixels at a font size, for SVG `letterSpacing`
+ * on text drawn in that role, such as `Text` and `FitText`. Undefined when
+ * the role sets no tracking.
+ */
+export function getLetterSpacingFromTypeStyle(
+  style: Pick<ResolvedTypeStyle, "letterSpacing">,
   fontSize: number,
 ): number | undefined {
   return style.letterSpacing === undefined
@@ -26,10 +33,12 @@ function _textStyle(style: ResolvedTypeStyle): CSSProperties | undefined {
 }
 
 /**
- * SVG text in a graphic type role (`body` unless named). `size`, `fill`,
- * `weight`, and `spacing` are content overrides; `mono` draws in the code
- * role's face. Out-of-scope presets still pass sizes; in-scope presets name
- * a role.
+ * SVG text in a graphic type role (`body` unless named), for headings,
+ * labels, and figures inside a stock graphic. `size` sets the text at
+ * another step of the theme's type scale, such as a study heading at `29`.
+ * `fittedSize` is a size measured against glyph widths, such as a word
+ * fitted to its mask, and stays put when the type scale changes. `fill` is
+ * a content colour, and `mono` draws in the code role's face.
  */
 export function Text({
   x,
@@ -37,27 +46,28 @@ export function Text({
   children,
   role = "body",
   size,
+  fittedSize,
   fill,
   anchor = "start",
   mono = false,
-  weight,
-  spacing,
 }: {
   x: number;
   y: number;
   children: ReactNode;
   role?: GraphicTextRole;
-  size?: number;
+  size?: string;
+  fittedSize?: number;
   fill?: string;
   anchor?: "start" | "middle" | "end";
   mono?: boolean;
-  weight?: number;
-  spacing?: number;
 }): ReactNode {
   const text = useGraphicTokens().text.graphic;
+  const theme = useGraphicTheme();
   const filter = useGraphicFilter(`text.graphic.${role}`);
   const style = text[role];
-  const fontSize = size ?? style.fontSize;
+  const fontSize =
+    fittedSize ??
+    (size === undefined ? style.fontSize : getFontSizeFromStep(theme, size));
   return (
     <text
       x={x}
@@ -66,10 +76,10 @@ export function Text({
       fill={fill ?? style.color}
       fillOpacity={style.alpha < 1 ? style.alpha : undefined}
       fontSize={fontSize}
-      fontWeight={weight ?? style.fontWeight}
+      fontWeight={style.fontWeight}
       textAnchor={anchor}
       fontFamily={mono ? text.code.fontFamily : style.fontFamily}
-      letterSpacing={spacing ?? _letterSpacing(style, fontSize)}
+      letterSpacing={getLetterSpacingFromTypeStyle(style, fontSize)}
       stroke={style.strokeWidth ? (fill ?? style.color) : undefined}
       strokeWidth={style.strokeWidth}
       paintOrder={style.strokeWidth ? "stroke" : undefined}

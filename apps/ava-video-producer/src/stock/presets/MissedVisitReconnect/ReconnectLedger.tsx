@@ -34,6 +34,7 @@ export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
         fill={tokens.color.text}
         fontSize={tokens.text.graphic.label.fontSize}
         fontFamily={tokens.text.graphic.label.fontFamily}
+        fontWeight={tokens.text.graphic.label.fontWeight}
       >
         {input.cases.length}
       </text>
@@ -53,6 +54,7 @@ export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
             fill={tokens.color.text}
             fontSize={tokens.text.graphic.label.fontSize}
             fontFamily={tokens.text.graphic.label.fontFamily}
+            fontWeight={tokens.text.graphic.label.fontWeight}
           >
             {numAttempts}
           </text>

@@ -53,6 +53,7 @@ export function CargoLabels({ input, accent }: Readonly<Props>): ReactNode {
                   y={505}
                   fill={accent}
                   fontFamily={tokens.text.graphic.secondary.fontFamily}
+                  fontWeight={tokens.text.graphic.secondary.fontWeight}
                   fontSize={tokens.text.graphic.secondary.fontSize}
                 >
                   {index + 1}

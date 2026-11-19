@@ -19,8 +19,8 @@ type Props = GraphicProps & { input: LineTraceInput };
 
 const TRACE_AT = 23;
 const TRACE_FRAMES = 94;
-const HEADING_SIZE = 29;
-const SAMPLE_NOTE_SIZE = 13;
+const HEADING_SIZE = "29";
+const SAMPLE_NOTE_SIZE = "2xs";
 
 /** Draws the bounded authored line-trace study at an explicit frame. */
 export function LineTrace({

@@ -55,6 +55,7 @@ export function CarbonNetAccounting({
         y={515}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
         fontSize={tokens.text.graphic.secondary.fontSize}
       >
         −
@@ -64,6 +65,7 @@ export function CarbonNetAccounting({
         y={515}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
         fontSize={tokens.text.graphic.secondary.fontSize}
       >
         =

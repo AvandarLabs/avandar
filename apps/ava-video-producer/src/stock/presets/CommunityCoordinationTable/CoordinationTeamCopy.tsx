@@ -51,6 +51,7 @@ export function CoordinationTeamCopy({
         y={y}
         textAnchor="middle"
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
         fill={tokens.color.text}
       >
@@ -77,6 +78,7 @@ export function CoordinationTeamCopy({
         y={y + 47}
         textAnchor="middle"
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
         fill={color}
       >

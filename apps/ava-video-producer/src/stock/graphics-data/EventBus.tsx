@@ -21,7 +21,7 @@ type Props = GraphicProps & { input: EventBusInput };
 
 const BUS_CORNER = 29;
 const BUS_FILL_ALPHA = 0.045;
-const ENDPOINT_NUMBER_SIZE = 11;
+const ENDPOINT_NUMBER_SIZE = "11";
 
 /** Draws the bounded authored event-bus study at an explicit frame. */
 export function EventBus({ input, frame, accent }: Readonly<Props>): ReactNode {

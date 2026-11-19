@@ -45,6 +45,7 @@ export function CellLiteralValue({
       y={y}
       fontSize={tokens.text.graphic.value.fontSize}
       fontFamily={tokens.text.graphic.value.fontFamily}
+      fontWeight={tokens.text.graphic.value.fontWeight}
       xmlSpace="preserve"
       fill={color ?? tokens.text.graphic.value.color}
       opacity={opacity}

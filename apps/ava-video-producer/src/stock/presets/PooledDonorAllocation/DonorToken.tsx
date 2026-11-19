@@ -1,14 +1,15 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
+  useGraphicFontSize,
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { ReactNode } from "react";
 
-/** The size of the request ordinal printed on an earmark tag. */
-const REQUEST_ORDINAL_SIZE = 10;
+/** The type scale step of the request ordinal printed on an earmark tag. */
+const REQUEST_ORDINAL_SIZE = "10";
 type Props = {
   token: ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
   requestOrdinal: number;
@@ -22,6 +23,8 @@ export function DonorToken({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
+  const ordinalSize = useGraphicFontSize(REQUEST_ORDINAL_SIZE);
+  const data = tokens.text.graphic.data;
   return (
     <g
       data-token={`${token.donorIndex}:${token.unitIndex}`}
@@ -56,8 +59,9 @@ export function DonorToken({
             x={0}
             y={17}
             textAnchor="middle"
-            fontSize={REQUEST_ORDINAL_SIZE}
-            fontFamily={tokens.text.graphic.data.fontFamily}
+            fontSize={ordinalSize}
+            fontWeight={data.fontWeight}
+            fontFamily={data.fontFamily}
             fill={tokens.color.ground}
           >
             {requestOrdinal}

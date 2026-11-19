@@ -38,6 +38,7 @@ export function SiteKey({
         fill={tokens.color.text}
         fontSize={tokens.text.graphic.data.fontSize}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         textAnchor="middle"
       >
         {index + 1}

@@ -51,6 +51,7 @@ export function StratumRegion({
         fill={color}
         fontSize={tokens.text.graphic.data.fontSize}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
       >
         {index + 1}
       </text>

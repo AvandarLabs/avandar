@@ -34,6 +34,7 @@ export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
         y={170}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
       >
         {input.axis.start}
@@ -43,6 +44,7 @@ export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
         y={170}
         fill={tokens.color.text}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
         textAnchor="end"
       >

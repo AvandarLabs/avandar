@@ -44,6 +44,7 @@ export function CoordinateRowSource({
         x={450}
         y={y + 4}
         fontFamily={data.fontFamily}
+        fontWeight={data.fontWeight}
         fontSize={data.fontSize}
         fill={data.color}
         textAnchor="middle"
@@ -56,6 +57,7 @@ export function CoordinateRowSource({
           x={472}
           y={y + 4}
           fontFamily={data.fontFamily}
+          fontWeight={data.fontWeight}
           fontSize={data.fontSize}
           fill={data.color}
         >{`→${row.representativeIndex + 1}`}</text>

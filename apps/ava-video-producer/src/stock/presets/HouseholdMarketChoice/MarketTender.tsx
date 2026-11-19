@@ -53,6 +53,7 @@ export function MarketTender({
         x={0}
         y={5}
         fontFamily={tokens.text.graphic.value.fontFamily}
+        fontWeight={tokens.text.graphic.value.fontWeight}
         fontSize={tokens.text.graphic.value.fontSize}
         fill={accent}
         textAnchor="middle"

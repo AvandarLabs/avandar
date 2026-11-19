@@ -84,7 +84,7 @@ export function ForkLabel({
             role={role}
             x={x}
             y={y + index * (fontSize + lineGap)}
-            size={fontSize}
+            fittedSize={fontSize}
             anchor="middle"
             fill={fill}
           >

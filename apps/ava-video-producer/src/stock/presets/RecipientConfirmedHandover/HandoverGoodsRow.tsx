@@ -44,6 +44,7 @@ export function HandoverGoodsRow({
           fill={tokens.color.textMuted}
           fontSize={tokens.text.graphic.data.fontSize}
           fontFamily={tokens.text.graphic.data.fontFamily}
+          fontWeight={tokens.text.graphic.data.fontWeight}
         >
           {content.offeredUnits} → {content.selectedUnits}
         </text>

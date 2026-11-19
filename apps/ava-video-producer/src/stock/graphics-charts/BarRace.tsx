@@ -23,8 +23,8 @@ const RACE_AT = 52;
 const RACE_FRAMES = 64;
 const GROW_AT = 12;
 const LABEL_RETURN_AT = 116;
-const HEADING_SIZE = 29;
-const BAR_LABEL_SIZE = 23;
+const HEADING_SIZE = "29";
+const BAR_LABEL_SIZE = "5xl";
 const BAR_CORNER = 6;
 
 /** Draws the bounded authored bar-race study at an explicit frame. */

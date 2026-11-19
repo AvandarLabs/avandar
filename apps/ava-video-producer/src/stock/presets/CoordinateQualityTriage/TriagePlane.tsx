@@ -33,6 +33,7 @@ export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {
         x={880}
         y={553}
         fontSize={body.fontSize}
+        fontWeight={body.fontWeight}
         fill={body.color}
       >
         <tspan>{input.rows.length}</tspan>

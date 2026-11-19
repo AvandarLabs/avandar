@@ -40,6 +40,7 @@ export function BlockCaption({
           y={y}
           fill={tokens.text.graphic.smallCaption.color}
           fontFamily={tokens.text.graphic.smallCaption.fontFamily}
+          fontWeight={tokens.text.graphic.smallCaption.fontWeight}
           fontSize={tokens.text.graphic.smallCaption.fontSize}
         >
           {index + 1}

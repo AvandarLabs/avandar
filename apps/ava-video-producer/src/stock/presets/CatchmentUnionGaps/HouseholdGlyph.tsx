@@ -36,6 +36,7 @@ export function HouseholdGlyph({
         x={638}
         y={railY + 6}
         fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
         fontSize={tokens.text.graphic.data.fontSize}
         textAnchor="middle"
         fill={tokens.color.text}

@@ -19,8 +19,8 @@ import type { ReactNode } from "react";
 type Props = GraphicProps & { input: DotMatrixInput };
 
 const FILL_AT = 18;
-const HEADING_SIZE = 31;
-const COUNT_SIZE = 79;
+const HEADING_SIZE = "31";
+const COUNT_SIZE = "79";
 
 /** Draws the bounded authored dot-matrix study at an explicit frame. */
 export function DotMatrix({

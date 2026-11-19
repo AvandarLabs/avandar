@@ -51,6 +51,7 @@ export function FundingEnvelope({
         fill={tokens.color.highlight}
         fontSize={tokens.text.graphic.value.fontSize}
         fontFamily={tokens.text.graphic.value.fontFamily}
+        fontWeight={tokens.text.graphic.value.fontWeight}
       >
         {index + 1}
       </text>
@@ -73,6 +74,7 @@ export function FundingEnvelope({
           fill={accent}
           fontSize={tokens.text.graphic.value.fontSize}
           fontFamily={tokens.text.graphic.value.fontFamily}
+          fontWeight={tokens.text.graphic.value.fontWeight}
         >
           {allocatedCredits}
         </text>

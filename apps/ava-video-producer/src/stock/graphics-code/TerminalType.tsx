@@ -22,9 +22,9 @@ const TYPING_AT = 17;
 const STEPS_AT = 61;
 const STEP_INTERVAL = 22;
 const RESPONSE_AT = 126;
-const PROMPT_SIZE = 22;
-const STEP_DETAIL_SIZE = 16;
-const RESPONSE_SIZE = 20;
+const PROMPT_SIZE = "4xl";
+const STEP_DETAIL_SIZE = "md";
+const RESPONSE_SIZE = "2xl";
 const CARET_CORNER = 1;
 
 /** Draws the bounded authored terminal-type study at an explicit frame. */

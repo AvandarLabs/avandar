@@ -56,6 +56,7 @@ export function SubscriptionRecord({
           y={y}
           fill={accent}
           fontSize={tokens.text.graphic.data.fontSize}
+          fontWeight={tokens.text.graphic.data.fontWeight}
         >
           {rowIndex + 1}
         </text>

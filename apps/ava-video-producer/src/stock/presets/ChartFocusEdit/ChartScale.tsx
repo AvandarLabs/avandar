@@ -61,6 +61,7 @@ export function ChartScale({
             fill={tokens.color.textMuted}
             fontSize={tokens.text.graphic.value.fontSize}
             fontFamily={tokens.text.graphic.value.fontFamily}
+            fontWeight={tokens.text.graphic.value.fontWeight}
             textAnchor={index ? "end" : "start"}
           >
             {value}

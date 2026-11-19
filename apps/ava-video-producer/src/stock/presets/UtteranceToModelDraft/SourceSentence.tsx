@@ -56,6 +56,7 @@ export function SourceSentence({
               fill={tokens.color.text}
               fontSize={SENTENCE_FONT_SIZE}
               fontFamily={tokens.text.graphic.data.fontFamily}
+              fontWeight={tokens.text.graphic.data.fontWeight}
               xmlSpace="preserve"
             >
               {part.text}

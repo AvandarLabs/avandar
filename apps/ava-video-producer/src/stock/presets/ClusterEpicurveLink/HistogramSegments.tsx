@@ -56,6 +56,7 @@ export function HistogramSegments({
                 x={histogramX}
                 y={histogramY - 1}
                 fontFamily={tokens.text.graphic.data.fontFamily}
+                fontWeight={tokens.text.graphic.data.fontWeight}
                 fontSize={tokens.text.graphic.data.fontSize}
                 fill={
                   isInvestigated && frame >= 36

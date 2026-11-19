@@ -49,6 +49,7 @@ export function CustodyLegend({
             y={562}
             fill={tokens.color.text}
             fontFamily={tokens.text.graphic.value.fontFamily}
+            fontWeight={tokens.text.graphic.value.fontWeight}
             fontSize={tokens.text.graphic.value.fontSize}
           >
             {input.crates.length}

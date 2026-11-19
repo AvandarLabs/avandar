@@ -38,6 +38,7 @@ export function AreaSiteLabels({
         textAnchor="middle"
         fill={accent}
         fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
       >
         {index + 1}
       </text>

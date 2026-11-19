@@ -23,7 +23,7 @@ const COUNT_FRAMES = 66;
 const PILL_AT = 82;
 const BARS_AT = 29;
 const BAR_GROW_AT = 34;
-const FIGURE_SIZE = 103;
+const FIGURE_SIZE = "103";
 const BAR_ALPHA_STEPS = 18;
 
 /** Draws the bounded authored metric-counter study at an explicit frame. */

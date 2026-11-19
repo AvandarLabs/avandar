@@ -25,7 +25,7 @@ const SPINNER_PERIOD = 45;
 const SPINNER_DASH = "0.28 0.72";
 const SPINNER_STROKE = 2.5;
 const DIAL_FILL_ALPHA = 0.035;
-const STATE_SIZE = 37;
+const STATE_SIZE = "37";
 const TRACK_CORNER = 3;
 
 /** Draws the bounded authored status-cycle study at an explicit frame. */

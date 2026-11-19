@@ -79,6 +79,7 @@ export function RepairRegister({
                   x={x - 12}
                   y={452}
                   fontFamily={tokens.text.graphic.data.fontFamily}
+                  fontWeight={tokens.text.graphic.data.fontWeight}
                   fontSize={tokens.text.graphic.data.fontSize}
                   fill={tokens.text.graphic.data.color}
                 >

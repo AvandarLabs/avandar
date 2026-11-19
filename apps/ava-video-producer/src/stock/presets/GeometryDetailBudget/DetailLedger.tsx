@@ -14,7 +14,7 @@ type Props = { input: Input; frame: number };
 
 const COUNT_AT = 111;
 const COUNT_FRAMES = 28;
-const TOLERANCE_SIZE = 16;
+const TOLERANCE_SIZE = "md";
 /** Retained and removed counts accompany their actual algorithm outputs. */
 export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
   const { text } = useGraphicTokens();
@@ -38,6 +38,7 @@ export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
         x={880}
         y={210}
         fontSize={figure.fontSize}
+        fontWeight={figure.fontWeight}
         fill={figure.color}
         textAnchor="end"
       >
@@ -48,6 +49,7 @@ export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
         x={880}
         y={274}
         fontSize={figure.fontSize}
+        fontWeight={figure.fontWeight}
         fill={figure.color}
         textAnchor="end"
       >

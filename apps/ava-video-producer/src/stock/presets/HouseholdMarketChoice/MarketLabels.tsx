@@ -49,6 +49,7 @@ export function MarketLabels({ input }: Readonly<Props>): ReactNode {
               textAnchor="middle"
               fill={tokens.color.textMuted}
               fontFamily={tokens.text.graphic.secondary.fontFamily}
+              fontWeight={tokens.text.graphic.secondary.fontWeight}
               fontSize={tokens.text.graphic.secondary.fontSize}
             >
               {product.price}

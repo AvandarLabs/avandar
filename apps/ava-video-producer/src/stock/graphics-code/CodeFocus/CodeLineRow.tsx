@@ -32,6 +32,7 @@ export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
         y={y}
         fontSize={code.fontSize}
         fontFamily={code.fontFamily}
+        fontWeight={code.fontWeight}
         xmlSpace="preserve"
       >
         {codeTokens.map((token, j) => {

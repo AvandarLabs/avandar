@@ -31,6 +31,7 @@ export function ReleasedCountToken({
       x={x}
       y={y}
       fontFamily={tokens.text.graphic.value.fontFamily}
+      fontWeight={tokens.text.graphic.value.fontWeight}
       fontSize={tokens.text.graphic.value.fontSize}
       fill={accent}
 

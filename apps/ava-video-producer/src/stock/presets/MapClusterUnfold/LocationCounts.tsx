@@ -72,6 +72,7 @@ export function LocationCounts({
                 y={location.y + 4}
                 textAnchor="middle"
                 fontSize={text.graphic.data.fontSize}
+                fontWeight={text.graphic.data.fontWeight}
                 fill={text.graphic.data.color}
               >
                 {location.numMembers}

@@ -55,6 +55,7 @@ export function PaymentQuantity({
           y={258}
           fill={tokens.color.text}
           fontFamily={tokens.text.graphic.body.fontFamily}
+          fontWeight={tokens.text.graphic.body.fontWeight}
           fontSize={tokens.text.graphic.body.fontSize}
         >
           {total}

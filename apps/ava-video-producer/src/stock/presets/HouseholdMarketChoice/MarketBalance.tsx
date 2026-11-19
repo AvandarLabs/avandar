@@ -34,6 +34,7 @@ export function MarketBalance({
         textAnchor="end"
         fill={accent}
         fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
         fontSize={tokens.text.graphic.secondary.fontSize}
       >
         {balance}

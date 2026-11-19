@@ -32,6 +32,7 @@ export function ShelfLabels({
                 y={252 + index * 105}
                 fontSize={tokens.text.graphic.secondary.fontSize}
                 fontFamily={tokens.text.graphic.secondary.fontFamily}
+                fontWeight={tokens.text.graphic.secondary.fontWeight}
                 fill="currentColor"
               >
                 {shelfQuantities[index]}

@@ -1,3 +1,4 @@
+import { getLetterSpacingFromTypeStyle } from "../../graphics-common/Text";
 import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { type TextBounds, wrapTextToLines } from "./wrapTextToLines";
 import type { ReactNode } from "react";
@@ -15,7 +16,9 @@ type Props = TextBounds & PropsResult;
 /**
  * Renders every authored word at one fixed size or fails before drawing.
  * The size is content, validated against measured widths; the family,
- * colour, and line spacing come from the `text.graphic.data` role.
+ * weight, tracking, colour, and line spacing come from the
+ * `text.graphic.data` role. Widths are measured at regular weight with no
+ * tracking, so a heavier or wider data role can run past them.
  */
 export function FitText({
   text,
@@ -46,7 +49,9 @@ export function FitText({
       y={y}
       fill={color ?? data.color}
       fontSize={fontSize}
+      fontWeight={data.fontWeight}
       fontFamily={data.fontFamily}
+      letterSpacing={getLetterSpacingFromTypeStyle(data, fontSize)}
       textAnchor={anchor}
     >
       {lines.map((line, index) => {

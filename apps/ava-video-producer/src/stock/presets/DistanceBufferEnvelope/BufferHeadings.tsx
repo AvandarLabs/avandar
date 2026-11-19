@@ -37,6 +37,7 @@ export function BufferHeadings({ input, accent }: Readonly<Props>): ReactNode {
         y={170}
         textAnchor="end"
         fontSize={text.graphic.data.fontSize}
+        fontWeight={text.graphic.data.fontWeight}
         fill={accent}
       >
         {numIncluded}/{input.locations.length}

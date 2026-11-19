@@ -54,6 +54,7 @@ export function NetworkDestinations({
                 textAnchor="end"
                 fontSize={tokens.text.graphic.secondary.fontSize}
                 fontFamily={tokens.text.graphic.secondary.fontFamily}
+                fontWeight={tokens.text.graphic.secondary.fontWeight}
               >
                 {node.cost}
               </text>

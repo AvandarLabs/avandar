@@ -57,6 +57,7 @@ export function ReportPageCopy({
           y={112}
           fill={accent}
           fontFamily={tokens.text.graphic.data.fontFamily}
+          fontWeight={tokens.text.graphic.data.fontWeight}
           fontSize={tokens.text.graphic.data.fontSize}
           textAnchor="middle"
           opacity={margins}

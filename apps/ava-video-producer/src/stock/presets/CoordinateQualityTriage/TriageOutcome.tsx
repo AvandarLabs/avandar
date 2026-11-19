@@ -43,6 +43,7 @@ export function TriageOutcome({
         x={index ? 145 + (index - 1) * 135 : 370}
         y={index ? 422 : 132}
         fontSize={text.graphic.body.fontSize}
+        fontWeight={text.graphic.body.fontWeight}
         fill={text.graphic.body.color}
         textAnchor="end"
       >

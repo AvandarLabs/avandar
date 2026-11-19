@@ -75,6 +75,7 @@ export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
             fontSize={tokens.text.graphic.value.fontSize}
             fill={tokens.color.textMuted}
             fontFamily={tokens.text.graphic.value.fontFamily}
+            fontWeight={tokens.text.graphic.value.fontWeight}
           >
             {input.lifetime.value}
           </text>

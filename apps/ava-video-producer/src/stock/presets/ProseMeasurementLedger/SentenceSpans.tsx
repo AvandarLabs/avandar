@@ -58,6 +58,7 @@ export function SentenceSpans({
               y={glyph.y}
               fontSize={SENTENCE_FONT_SIZE}
               fontFamily={tokens.text.graphic.secondary.fontFamily}
+              fontWeight={tokens.text.graphic.secondary.fontWeight}
               fill={tokens.color.text}
             >
               {glyph.text}

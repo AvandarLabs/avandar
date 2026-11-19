@@ -50,6 +50,7 @@ export function MarketCheckout({
         y={521}
         fill={accent}
         fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
         fontSize={tokens.text.graphic.secondary.fontSize}
       >
         {total}
