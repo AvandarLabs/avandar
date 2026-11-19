@@ -1,6 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +15,9 @@ type Props = {
   alternative: Input["alternatives"][number];
   index: number;
 };
+
+/** Frames the halves take to slide apart. */
+const SEPARATE_FRAMES = 24;
 /** Equal halves slide apart while their labels keep the same fixed size. */
 export function ContrastAlternative({
   frame,
@@ -17,13 +25,21 @@ export function ContrastAlternative({
   alternative,
   index,
 }: Readonly<Props>): ReactNode {
-  const separation = ramp(frame, 12, 24, EASE.inOut);
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const separation = ramp(
+    frame,
+    12,
+    motion.scale(SEPARATE_FRAMES),
+    motion.travel.easing,
+  );
   const panel = {
     x: 48 + index * 512,
     y: 146,
     width: 352,
     height: 408,
-    rx: 18,
+    rx: scales.corner(tokens.corner.panel),
   };
   const label = {
     text: alternative.label,
@@ -39,14 +55,18 @@ export function ContrastAlternative({
       opacity={separation}
       transform={`translate(${mix(separation, index ? -100 : 100, 0)} 0)`}
     >
-      <rect {...panel} fill={STOCK.surface} stroke={STOCK.line} />
+      <StockRect
+        {...panel}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+      />
       <g aria-label={alternative.label}>
         <FitText
           {...label}
           breakLongWords
           normalizeWhitespace
           anchor="middle"
-          color={index ? STOCK.mint : accent}
+          color={index ? tokens.color.positive : accent}
         />
       </g>
     </g>
