@@ -3,8 +3,11 @@ import {
   loadWorkspaceDashboardCandidates,
 } from "@/clients/dashboards/agentDashboards/agentDashboards";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
+import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { resolveAgentDashboardTarget } from "@/lib/agent/dataAgent/dashboards/resolveAgentDashboardTarget";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type {
   AgentTurnGadgetContext,
@@ -61,6 +64,38 @@ function _loadWorkspaceDashboardsOnce(
 }
 
 /**
+ * Queues the block unsaved into the open editor and logs that it reached
+ * the dashboard. The payload is built first, so its count reads the
+ * editor's content before the block lands.
+ */
+function _queueIntoEditor(
+  options: Readonly<{
+    turn: DataAgentTurnOptions;
+    editor: NonNullable<DataAgentTurnOptions["dashboardEditor"]>;
+    block: ChatGeneratedDashboardBlock;
+    dashboardId: string;
+  }>,
+): void {
+  const { editor, block, dashboardId } = options;
+  const payload = ChatAnalyticsPayloads.fromDashboardBlock({
+    block,
+    dashboardId,
+    editorState: editor.getState(),
+  });
+  editor.dispatch.queuePendingBlock({
+    pendingId: crypto.randomUUID(),
+    block: buildPendingDashboardBlock(block),
+    dashboardId,
+  });
+  void AnalyticsClient.logEvent({
+    event: "dashboard.block_added_via_chat",
+    workspaceId: options.turn.workspaceId,
+    app: "dashboards",
+    payload,
+  });
+}
+
+/**
  * The browser's `addDashboardBlock`. Finds the dashboard the agent named
  * on this device, then queues the block unsaved into the open editor, or
  * adds a card to this turn's reply. Nothing is saved here: a card saves
@@ -88,9 +123,10 @@ export async function addAgentDashboardBlock(
     canEdit: canEditDashboard,
   });
   if (target.kind === "editor" && turn.dashboardEditor) {
-    turn.dashboardEditor.dispatch.queuePendingBlock({
-      pendingId: crypto.randomUUID(),
-      block: buildPendingDashboardBlock(request.block),
+    _queueIntoEditor({
+      turn,
+      editor: turn.dashboardEditor,
+      block: request.block,
       dashboardId: target.dashboardId,
     });
     return { kind: "added_to_editor" };

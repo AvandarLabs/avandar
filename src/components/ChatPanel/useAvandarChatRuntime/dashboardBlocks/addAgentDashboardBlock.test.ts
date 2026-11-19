@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { addAgentDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import type { AgentDashboardBlockData } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 
@@ -14,7 +15,22 @@ vi.mock("@/clients/dashboards/agentDashboards/agentDashboards", () => {
   };
 });
 
+vi.mock("@/lib/analytics/AnalyticsClient", () => {
+  return { AnalyticsClient: { logEvent: vi.fn() } };
+});
+
 const HEADING = { kind: "HeadingBlock", text: "Deaths" } as const;
+
+/** The open editor, showing two blocks of the open dashboard. */
+const EDITOR_STATE = {
+  activeDashboardId: "d-open",
+  editorData: {
+    content: [
+      { type: "Card", props: { id: "block-1", content: [], title: "First" } },
+      { type: "Card", props: { id: "block-2", content: [], title: "Second" } },
+    ],
+  },
+};
 
 function _turn(overrides: Partial<DataAgentTurnOptions>): DataAgentTurnOptions {
   return {
@@ -26,6 +42,9 @@ function _turn(overrides: Partial<DataAgentTurnOptions>): DataAgentTurnOptions {
     dashboardEditor: {
       activeDashboardId: "d-open",
       dispatch: { queuePendingBlock: vi.fn() },
+      getState: () => {
+        return EDITOR_STATE;
+      },
     },
     ...overrides,
   } as unknown as DataAgentTurnOptions;
@@ -168,6 +187,49 @@ describe("addAgentDashboardBlock", () => {
       await expect(_ask(turn, "Mortality")).resolves.toEqual({
         kind: "card_shown",
       });
+    });
+  });
+
+  describe("analytics", () => {
+    beforeEach(() => {
+      vi.mocked(AnalyticsClient.logEvent).mockClear();
+    });
+
+    it("logs a block queued into the open editor with the editor's count", async () => {
+      canEditMock.mockResolvedValue(true);
+
+      await addAgentDashboardBlock({
+        turn: _turn({}),
+        cards: [],
+        request: { dashboard: "current", block: HEADING },
+      });
+
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledTimes(1);
+      expect(AnalyticsClient.logEvent).toHaveBeenCalledWith({
+        event: "dashboard.block_added_via_chat",
+        workspaceId: "ws-1",
+        app: "dashboards",
+        payload: {
+          blockKind: "HeadingBlock",
+          dashboardId: "d-open",
+          blockCountAfter: 3,
+        },
+      });
+    });
+
+    it("logs nothing when the block goes on a card", async () => {
+      canEditMock.mockResolvedValue(true);
+      loadCandidatesMock.mockResolvedValue([
+        { id: "d-mortality", name: "Mortality" },
+      ]);
+
+      await addAgentDashboardBlock({
+        turn: _turn({}),
+        cards: [],
+        request: { dashboard: "Mortality", block: HEADING },
+      });
+
+      expect(AnalyticsClient.logEvent).not.toHaveBeenCalled();
     });
   });
 });
