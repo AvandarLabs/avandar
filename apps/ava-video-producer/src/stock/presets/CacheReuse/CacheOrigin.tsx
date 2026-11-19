@@ -1,17 +1,27 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string; originActive: number };
+
+/** The origin's outline opacity while no lookup reaches it. */
+const IDLE_OUTLINE_OPACITY = 0.2;
+
 /** The distant source holds the supplied result and lights only on a miss. */
 export function CacheOrigin({
   input,
   accent,
   originActive,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -20,11 +30,13 @@ export function CacheOrigin({
         y={365}
         width={510}
         height={130}
-        rx={16}
-        fill={STOCK.surface}
+        rx={scales.corner(PANEL_CORNER)}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
-        strokeOpacity={0.2 + originActive * 0.8}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeOpacity={
+          IDLE_OUTLINE_OPACITY + originActive * (1 - IDLE_OUTLINE_OPACITY)
+        }
       />
       <FitText
         text={input.systemLabels.origin}

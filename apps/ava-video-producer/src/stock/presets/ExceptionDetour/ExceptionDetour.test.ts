@@ -15,6 +15,22 @@ import {
 import { inputSchema } from "./ExceptionDetour.schema";
 import type { Input } from "./ExceptionDetour.schema";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -49,18 +65,18 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     frame: 150,
     input: { ...DEFAULT_INPUT, detourSide: "above" },
   });
-  const standard = SvgAttributes.fromMarker({
+  const standard = _markedShape({
     markup: held,
     marker: "standard-route",
   });
   assert.match(standard, /d="M100 300 H880"/);
   assert.equal(
-    SvgAttributes.fromMarker({ markup: above, marker: "standard-route" }),
+    _markedShape({ markup: above, marker: "standard-route" }),
     standard,
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: early,
         marker: "moving-case",
       }),
@@ -70,7 +86,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: early,
         marker: "moving-case",
       }),
@@ -80,7 +96,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: held,
         marker: "moving-case",
       }),
@@ -90,7 +106,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: held,
         marker: "moving-case",
       }),
@@ -100,7 +116,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: above,
         marker: "moving-case",
       }),
@@ -121,7 +137,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     }),
     /data-standard-reference=/,
   );
-  assert.match(held, /data-resolved-bracket="true"[^>]*opacity="1"/);
+  assert.match(held, /data-resolved-bracket="true"><path[^>]*opacity="1"/);
   assert.notEqual(early, held);
 });
 

@@ -1,5 +1,6 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getPickerGroupsFromInput } from "./getPickerGroupsFromInput";
 import { PickerFormula } from "./PickerFormula";
 import { PickerModeGroups } from "./PickerModeGroups";
@@ -14,6 +15,7 @@ export function PickerCalculation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const groups = getPickerGroupsFromInput(input),
     isMode = input.rule === "most-frequent";
   return (
@@ -49,7 +51,10 @@ export function PickerCalculation({
             })
             .map((observation, index) => {
               return (
-                <g key={observation.id} opacity={ramp(frame, 94, 6)}>
+                <g
+                  key={observation.id}
+                  opacity={ramp(frame, 94, motion.chip, motion.reveal.easing)}
+                >
                   <LabelSlots
                     labels={[["↦ 1", 56 + index * 144, 402, 128, 12, 1]]}
                   />

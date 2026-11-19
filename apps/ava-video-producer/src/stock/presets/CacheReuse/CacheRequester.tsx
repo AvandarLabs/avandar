@@ -1,13 +1,19 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string };
 /** A requester keeps the same literal key across both lookups. */
 export function CacheRequester({ input, accent }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -15,9 +21,9 @@ export function CacheRequester({ input, accent }: Readonly<Props>): ReactNode {
         y={185}
         width={300}
         height={160}
-        rx={16}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(PANEL_CORNER)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={input.systemLabels.requester}

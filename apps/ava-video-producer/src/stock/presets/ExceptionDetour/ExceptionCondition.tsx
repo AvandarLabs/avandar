@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Inputs for ExceptionCondition. */
@@ -13,6 +13,7 @@ export function ExceptionCondition({
   input,
   targetY,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <>
       <FitText
@@ -23,7 +24,7 @@ export function ExceptionCondition({
         fontSize={16}
         maxLines={3}
         anchor="middle"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         breakLongWords
         normalizeWhitespace
       />
@@ -35,7 +36,7 @@ export function ExceptionCondition({
         fontSize={16}
         maxLines={4}
         anchor="middle"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         breakLongWords
         normalizeWhitespace
       />

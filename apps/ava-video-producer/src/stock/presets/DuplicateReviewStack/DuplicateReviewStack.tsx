@@ -1,19 +1,31 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DuplicateGroup } from "./DuplicateGroup";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */
 export type Props = GraphicProps & { input: Input };
+
+/** Frames the whole review takes to fade in. */
+const INTRO_FRAMES = 20;
 /** Candidate records align by comparison data before explicit retention. */
 export function DuplicateReviewStack({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 20)}>
+    <g
+      opacity={ramp(
+        frame,
+        12,
+        motion.scale(INTRO_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
       <FitText
         text={input.title}
         x={44}

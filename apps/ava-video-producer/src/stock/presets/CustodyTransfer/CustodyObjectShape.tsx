@@ -1,59 +1,63 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { SUPPORT_STROKE } from "./custodyShape";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
 
 type Props = { shape: Input["objectShape"]; accent: string };
-const FOLIO: Record<"x" | "y" | "width" | "height" | "rx", number> = {
-  x: 452,
-  y: 240,
-  width: 56,
-  height: 136,
-  rx: 5,
-};
-const BATON: Record<"x" | "y" | "width" | "height" | "rx", number> = {
-  x: 465,
-  y: 240,
-  width: 30,
-  height: 136,
-  rx: 15,
-};
-const KEY_STEM: Record<"x1" | "x2" | "y1" | "y2" | "strokeWidth", number> = {
-  x1: 480,
-  x2: 480,
-  y1: 284,
-  y2: 376,
-  strokeWidth: 8,
-};
+type Box = Record<"x" | "y" | "width" | "height", number>;
+const FOLIO: Box = { x: 452, y: 240, width: 56, height: 136 };
+const BATON: Box = { x: 465, y: 240, width: 30, height: 136 };
+/** The folio's corner before the corner style scales it. */
+const FOLIO_CORNER = 5;
+/** The baton's rounded end, half its width, before the corner style. */
+const BATON_CORNER = 15;
+const KEY_STEM = { kind: "line", x1: 480, x2: 480, y1: 284, y2: 376 } as const;
 /** Every silhouette ends at the shared physical support anchor. */
 export function CustodyObjectShape({
   shape,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const keyWidth = scales.stroke(SUPPORT_STROKE);
   return shape === "key" ? (
     <g>
-      <circle
-        cx={480}
-        cy={262}
-        r={22}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 480, cy: 262, r: 22 }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={8}
+        strokeWidth={keyWidth}
       />
-      <line data-object-base={shape} {...KEY_STEM} stroke={accent} />
-      <path
-        d="M480 366 H498 V352 H480"
+      <g data-object-base={shape}>
+        <SketchedShape
+          shape={KEY_STEM}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={keyWidth}
+        />
+      </g>
+      <SketchedShape
+        shape={{ kind: "path", d: "M480 366 H498 V352 H480" }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={8}
+        strokeWidth={keyWidth}
       />
     </g>
   ) : (
-    <rect
+    <StockRect
       data-object-base={shape}
       {...(shape === "folio" ? FOLIO : BATON)}
-      fill={STOCK.elevated}
+      rx={scales.corner(shape === "folio" ? FOLIO_CORNER : BATON_CORNER)}
+      fill={tokens.color.elevated}
       stroke={accent}
-      strokeWidth={2}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
     />
   );
 }

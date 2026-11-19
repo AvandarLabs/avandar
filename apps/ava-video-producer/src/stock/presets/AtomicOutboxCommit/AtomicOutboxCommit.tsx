@@ -1,9 +1,15 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { OutboxCommitMarks } from "./OutboxCommitMarks";
 import { OutboxDurableState } from "./OutboxDurableState";
 import { OutboxOutcome } from "./OutboxOutcome";
 import { OutboxProposal } from "./OutboxProposal";
+import { DIVIDER_DASH, UNMOUNT_CUE } from "./outboxShape";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
@@ -15,6 +21,8 @@ export function AtomicOutboxCommit({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <LabelSlots
@@ -25,18 +33,23 @@ export function AtomicOutboxCommit({
           [input.labels.outbox, 540, 180, 320, 16, 3],
         ]}
       />
-      <rect
+      <StockRect
         x={70}
         y={140}
         width={820}
         height={360}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
-      <path d="M480 155 V470" stroke={STOCK.line} strokeDasharray="5 7" />
+      <SketchedShape
+        shape={{ kind: "path", d: "M480 155 V470" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeDasharray={DIVIDER_DASH}
+      />
       <OutboxDurableState input={input} frame={frame} accent={accent} />
-      {frame < 139
+      {frame < UNMOUNT_CUE
         ? (["local", "journal"] as const).map((side) => {
             return (
               <OutboxProposal

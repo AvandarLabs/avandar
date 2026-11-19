@@ -1,6 +1,12 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DrillSubgroupCompartments } from "./DrillSubgroupCompartments";
+import { INSET_STROKE } from "./drillTiming";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
 
@@ -19,6 +25,8 @@ export function DrillSecondSelection({
   groups,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const x = 44 + groups.indexOf(input.selectionPath[1]) * 292;
   return (
     <g data-second-selection={input.selectionPath[1]}>
@@ -33,14 +41,18 @@ export function DrillSecondSelection({
         normalizeWhitespace
       />
       <DrillSubgroupCompartments groups={groups} progress={progress} />
-      <rect
+      <StockRect
         x={mix(progress, x, 36)}
         y={294}
         width={mix(progress, 284, 888)}
         height={266}
         fill="none"
         stroke={accent}
-        strokeWidth={input.selectionStyle === "inset-frame" ? 5 : 2}
+        strokeWidth={scales.stroke(
+          input.selectionStyle === "inset-frame"
+            ? INSET_STROKE
+            : tokens.stroke.default,
+        )}
       />
     </g>
   );

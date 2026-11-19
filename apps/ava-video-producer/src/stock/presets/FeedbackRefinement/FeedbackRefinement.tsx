@@ -1,6 +1,10 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { FeedbackDraft } from "./FeedbackDraft";
 import { FeedbackNote } from "./FeedbackNote";
 import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
@@ -9,6 +13,11 @@ import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
+/** Frames the whole study takes to fade in. */
+const INTRO_FRAMES = 20;
+/** The dash of the route between author and reviewer. */
+const ROUTE_DASH = "4 8";
 /**
  * Authored feedback travels with a changing draft through sequential
  * reviews.
@@ -19,9 +28,18 @@ export function FeedbackRefinement({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const state = getFeedbackStateFromInputAndFrame({ frame, input });
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const state = getFeedbackStateFromInputAndFrame({ frame, input, motion });
   return (
-    <g opacity={ramp(frame, 12, 20)}>
+    <g
+      opacity={ramp(
+        frame,
+        12,
+        motion.scale(INTRO_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
       <FitText
         text={input.artifactLabel}
         x={80}
@@ -32,15 +50,24 @@ export function FeedbackRefinement({
         breakLongWords
         normalizeWhitespace
       />
-      <path d="M100 330 H860" stroke={STOCK.line} strokeDasharray="4 8" />
+      <SketchedShape
+        shape={{ kind: "path", d: "M100 330 H860" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeDasharray={ROUTE_DASH}
+      />
       {[input.roleLabels.author, input.roleLabels.reviewer].map(
         (label, index) => {
           return (
             <g key={index}>
-              <path
-                d={`M${100 + 460 * index} 188 V174 H${400 + 460 * index} V188`}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${100 + 460 * index} 188 V174 H${400 + 460 * index} V188`,
+                }}
+                profile={tokens.sketch.shape}
                 fill="none"
-                stroke={STOCK.line}
+                stroke={tokens.color.line}
               />
               <FitText
                 text={label}
@@ -68,11 +95,11 @@ export function FeedbackRefinement({
           anchor="middle"
           breakLongWords
           normalizeWhitespace
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
       ) : undefined}
       <FeedbackDraft state={state} accent={accent} id={id} />
-      <g opacity={ramp(frame, state.doneAt, 12)}>
+      <g opacity={motion.reveal(frame, state.doneAt)}>
         <FitText
           text={input.finalLabel}
           x={480}

@@ -1,7 +1,11 @@
 import { ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { evaluateAffineRule } from "./evaluateAffineRule";
 import { RehearsalRuler } from "./RehearsalRuler";
 import type { Input } from "./LinkedParameterRehearsal.schema";
@@ -18,6 +22,13 @@ type Props = {
   showRules: boolean;
   showBaselineMarkers: boolean;
 };
+
+/** Frames between neighbouring output lanes appearing. */
+const LANE_STAGGER_FRAMES = 3;
+/** Frames an output lane takes to fade in. */
+const LANE_FRAMES = 16;
+/** How faint a coupling line between source and output stays. */
+const COUPLING_OPACITY = 0.24;
 /**
  * A pointer follows its direct affine rule with a coupling only when
  * dependent.
@@ -33,6 +44,8 @@ export function RehearsalOutput({
   showRules,
   showBaselineMarkers,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const computed = evaluateAffineRule({
     source: value,
     multiplier: output.multiplier,
@@ -60,17 +73,29 @@ export function RehearsalOutput({
         max: output.max,
       });
   const y = 252 + index * 90;
-  const color = output.multiplier === 0 ? STOCK.muted : accent;
+  const color = output.multiplier === 0 ? tokens.color.inactive : accent;
   return (
-    <g opacity={ramp(frame, 16 + index * 3, 16)}>
+    <g
+      opacity={ramp(
+        frame,
+        16 + index * motion.scale(LANE_STAGGER_FRAMES),
+        motion.scale(LANE_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
       {output.multiplier !== 0 ? (
-        <path
-          data-coupling-id={output.id}
-          d={`M${sourceX} 170 V${192 + index * 5} H${348 + index * 6} V${y} H${pointerX}`}
-          fill="none"
-          stroke={accent}
-          strokeOpacity={0.24}
-        />
+        <g data-coupling-id={output.id}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${sourceX} 170 V${192 + index * 5} H${348 + index * 6} V${y} H${pointerX}`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeOpacity={COUPLING_OPACITY}
+          />
+        </g>
       ) : undefined}
       <RehearsalRuler
         label={output.label}
@@ -81,15 +106,15 @@ export function RehearsalOutput({
         y={y}
       />
       {showBaselineMarkers ? (
-        <circle
-          data-baseline-id={output.id}
-          cx={baselineX}
-          cy={y}
-          r={9}
-          fill="none"
-          stroke={color}
-          strokeOpacity={0.5}
-        />
+        <g data-baseline-id={output.id}>
+          <SketchedShape
+            shape={{ kind: "circle", cx: baselineX, cy: y, r: 9 }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={color}
+            strokeOpacity={tokens.alpha.guide}
+          />
+        </g>
       ) : undefined}
       <circle
         data-output-id={output.id}
@@ -109,7 +134,7 @@ export function RehearsalOutput({
           maxLines={1}
           breakLongWords
           normalizeWhitespace
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
       ) : undefined}
     </g>

@@ -1,33 +1,49 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReconstructionColumnXsFromFrame } from "./getReconstructionColumnXsFromFrame";
+import { RESULT_CUE } from "./gridTiming";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
+/** The dash of a guide from a source row to its result row. */
+const LINK_DASH = "2 4";
 /** Source row guides bridge the retained page and its emerging table. */
 export function GridSourceLinks({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const resultX = getReconstructionColumnXsFromFrame({
     input,
     frame,
     isResult: true,
+    motion,
   })[0];
   return (
     <g>
       {" "}
-      {input.showSourceLinks && frame >= 106
+      {input.showSourceLinks && frame >= RESULT_CUE
         ? input.grid.rows.map((_, rowIndex) => {
             return (
-              <path
-                key={rowIndex}
-                data-source-link={rowIndex}
-                d={`M452 ${322 + rowIndex * 64} H${resultX}`}
-                stroke={accent}
-                strokeDasharray="2 4"
-                fill="none"
-              />
+              <g key={rowIndex} data-source-link={rowIndex}>
+                <SketchedShape
+                  shape={{
+                    kind: "path",
+                    d: `M452 ${322 + rowIndex * 64} H${resultX}`,
+                  }}
+                  profile={tokens.sketch.shape}
+                  stroke={accent}
+                  strokeDasharray={LINK_DASH}
+                  fill="none"
+                />
+              </g>
             );
           })
         : undefined}

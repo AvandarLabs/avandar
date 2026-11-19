@@ -1,5 +1,10 @@
 import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -9,6 +14,13 @@ type Props = {
   accent: string;
   isVisible: boolean;
 };
+
+/** The cue the first impression presses into storage on. */
+const FIRST_IMPRESSION_CUE = 44;
+/** Frames between impressions, matching the writing cadence. */
+const CADENCE_FRAMES = 16;
+/** How faint an impression's engraved outline is. */
+const OUTLINE_OPACITY = 0.55;
 /**
  * A shallow engraved impression remains after its matching entry is written.
  */
@@ -19,8 +31,12 @@ export function LedgerImpression({
   accent,
   isVisible,
 }: Readonly<Props>): ReactNode {
-  const impression = ramp(frame, 44 + index * 16, 6);
-  if (!isVisible || frame < 44 + index * 16) {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const pressAt = FIRST_IMPRESSION_CUE + index * CADENCE_FRAMES;
+  const impression = ramp(frame, pressAt, motion.chip, motion.entrance.easing);
+  if (!isVisible || frame < pressAt) {
     return undefined;
   }
   return (
@@ -29,13 +45,19 @@ export function LedgerImpression({
       transform={`translate(${220 + index * 136} ${mix(impression, 422, 448)})`}
       opacity={impression}
     >
-      <path
-        d="M0 0 h112 v22 h-112 z"
-        fill={STOCK.elevated}
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 0 h112 v22 h-112 z" }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.elevated}
         stroke={accent}
-        strokeOpacity={0.55}
+        strokeOpacity={OUTLINE_OPACITY}
       />
-      <path d="M12 8 h82 M12 14 h56" stroke={accent} strokeWidth={2} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M12 8 h82 M12 14 h56" }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
     </g>
   );
 }

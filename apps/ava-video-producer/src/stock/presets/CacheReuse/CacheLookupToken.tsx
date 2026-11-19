@@ -1,5 +1,10 @@
 import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +15,9 @@ type Props = {
   input: Input;
   accent: string;
 };
+/** Frames the carried result takes to appear or fade. */
+const RESULT_FADE_FRAMES = 4;
+
 /** A request key returns with a result impression only after retrieval. */
 export function CacheLookupToken({
   x,
@@ -18,12 +26,18 @@ export function CacheLookupToken({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
   const hasResult =
     (frame >= 60 && frame <= 92) || (frame >= 120 && frame <= 138);
+  const fade = motion.scale(RESULT_FADE_FRAMES);
   const resultOpacity =
     frame < 102
-      ? ramp(frame, 60, 4) * (1 - ramp(frame, 88, 4))
-      : ramp(frame, 120, 4) * (1 - ramp(frame, 134, 4));
+      ? ramp(frame, 60, fade, motion.reveal.easing) *
+        (1 - ramp(frame, 88, 92 - 88, motion.exit.easing))
+      : ramp(frame, 120, fade, motion.reveal.easing) *
+        (1 - ramp(frame, 134, 138 - 134, motion.exit.easing));
   return (
     <g>
       <circle
@@ -34,15 +48,22 @@ export function CacheLookupToken({
         fill={accent}
       />
       {hasResult ? (
-        <path
+        <g
           data-carried-result={input.result.value}
           aria-label={input.result.label}
-          opacity={resultOpacity}
-          d={`M${x + 14} ${y - 12} h20 v24 h-20 Z M${x + 18} ${y - 5} h12 M${x + 18} ${y + 1} h12 M${x + 18} ${y + 7} h8`}
-          fill={STOCK.surface}
-          stroke={STOCK.orange}
-          strokeWidth={1.5}
-        />
+        >
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${x + 14} ${y - 12} h20 v24 h-20 Z M${x + 18} ${y - 5} h12 M${x + 18} ${y + 1} h12 M${x + 18} ${y + 7} h8`,
+            }}
+            profile={tokens.sketch.shape}
+            opacity={resultOpacity}
+            fill={tokens.color.surface}
+            stroke={tokens.color.highlight}
+            strokeWidth={scales.stroke(tokens.stroke.outline)}
+          />
+        </g>
       ) : undefined}
     </g>
   );

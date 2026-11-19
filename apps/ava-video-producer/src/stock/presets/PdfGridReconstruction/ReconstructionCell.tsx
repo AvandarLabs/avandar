@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { GridLiteralCell } from "./GridLiteralCell";
 import type { ReactNode } from "react";
 
@@ -26,9 +27,10 @@ export function ReconstructionCell({
   width,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return (
     <g>
-      <rect
+      <StockRect
         data-source-cell={!isResult ? `${rowIndex}:${columnIndex}` : undefined}
         data-result-cell={isResult ? `${rowIndex}:${columnIndex}` : undefined}
         x={x}
@@ -36,7 +38,7 @@ export function ReconstructionCell({
         width={width}
         height={64}
         fill="none"
-        stroke={isResult ? accent : STOCK.line}
+        stroke={isResult ? accent : tokens.color.line}
       />
       <g opacity={isResult ? 1 : registration}>
         <GridLiteralCell

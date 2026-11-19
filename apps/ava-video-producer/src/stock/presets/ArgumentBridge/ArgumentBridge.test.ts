@@ -14,6 +14,23 @@ import {
 import { inputSchema } from "./ArgumentBridge.schema";
 import type { Input } from "./ArgumentBridge.schema";
 
+/**
+ * A marker group and the sketch-aware shape it wraps, since the marker sits
+ * on the group around the shape.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const match = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  assert.ok(match, marker);
+  return match[0];
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -58,7 +75,7 @@ test("every supplied premise builds its own physical support beneath the authore
     });
     assert.equal(
       SvgAttributes.getNumberFromMarkup({
-        attributes: SvgAttributes.fromMarker({
+        attributes: _markedShape({
           markup: held,
           marker: "bridge-deck",
         }),
@@ -107,7 +124,7 @@ test("every supplied premise builds its own physical support beneath the authore
     assert.match(markup, new RegExp(`data-relationship="${relationship}"`));
     if (relationship === "suggests") {
       assert.match(
-        SvgAttributes.fromMarker({ markup, marker: "bridge-deck" }),
+        _markedShape({ markup, marker: "bridge-deck" }),
         /stroke-dasharray="8 7"/,
       );
     }
@@ -125,7 +142,9 @@ test("premise joining arms reach the common deck when central supports are hidde
       showIndividualSupports: false,
     },
   });
-  const arms = [...markup.matchAll(/data-premise-join="[^"]+" d="([^"]+)"/g)];
+  const arms = [
+    ...markup.matchAll(/data-premise-join="[^"]+"><path d="([^"]+)"/g),
+  ];
   assert.equal(arms.length, 3);
   arms.forEach(([, path]) => {
     return assert.match(path, /V350/);

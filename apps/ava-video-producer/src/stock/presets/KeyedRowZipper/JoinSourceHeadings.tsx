@@ -1,5 +1,6 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./KeyedRowZipper.schema";
 import type { ReactNode } from "react";
 /** Inputs for JoinSourceHeadings. */
@@ -10,8 +11,9 @@ export function JoinSourceHeadings({
   frame,
   input,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
-    <g opacity={1 - ramp(frame, 90, 18)}>
+    <g opacity={1 - ramp(frame, 90, motion.hero, motion.exit.easing)}>
       <FitText
         text={input.labels.left}
         x={44}

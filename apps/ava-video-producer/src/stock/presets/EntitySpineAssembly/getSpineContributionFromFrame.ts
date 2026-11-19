@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./EntitySpineAssembly.schema";
 
 type Params = {
@@ -6,6 +7,7 @@ type Params = {
   observation: Input["observations"][number];
   index: number;
   frame: number;
+  motion: VideoMotion;
 };
 /** Data for getSpineContributionFromFrame. */
 type GetSpineContributionFromFrameResult = {
@@ -23,6 +25,7 @@ export function getSpineContributionFromFrame({
   observation,
   index,
   frame,
+  motion,
 }: Readonly<Params>): GetSpineContributionFromFrameResult {
   const entityIndex = input.entities.findIndex(({ id }) => {
     return id === observation.entityId;
@@ -46,11 +49,14 @@ export function getSpineContributionFromFrame({
     return id === observation.id;
   });
   const stackY = groupStart + 36 + rank * 20;
-  const y = mix(ramp(frame, 61, 21, EASE.inOut), 154 + index * 60, stackY);
+  // Each move runs cue to cue: across from 49, into the stack from 61, and
+  // collapsed from 86 until the contributions unmount at 105.
+  const travel = motion.travel.easing;
+  const y = mix(ramp(frame, 61, 82 - 61, travel), 154 + index * 60, stackY);
   return {
-    x: mix(ramp(frame, 49, 12, EASE.inOut), 60, 235),
-    y: mix(ramp(frame, 86, 19, EASE.inOut), y, groupStart + 36),
-    opacity: 1 - ramp(frame, 96, 9),
+    x: mix(ramp(frame, 49, 61 - 49, travel), 60, 235),
+    y: mix(ramp(frame, 86, 105 - 86, travel), y, groupStart + 36),
+    opacity: 1 - ramp(frame, 96, 105 - 96, motion.exit.easing),
     groupStart,
     entityIndex,
     sum: entityRows.reduce((total, { value }) => {

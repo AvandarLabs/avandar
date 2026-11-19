@@ -1,5 +1,12 @@
 import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
+import {
+  EXPLANATION_CUE,
+  EXPLANATION_FRAMES,
+  RAIL_CUE,
+  RAIL_FRAMES,
+} from "./cleanupTiming";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +19,7 @@ export function CleanupComparisonHeading({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const inline = input.comparison === "inline-ghost";
   if (inline && !input.showEditLabels) {
     return undefined;
@@ -23,7 +31,21 @@ export function CleanupComparisonHeading({
       placement={inline ? "edit" : "retained"}
       x={514}
       y={122}
-      opacity={inline ? ramp(frame, 76, 36) : ramp(frame, 60, 52)}
+      opacity={
+        inline
+          ? ramp(
+              frame,
+              EXPLANATION_CUE,
+              motion.scale(EXPLANATION_FRAMES),
+              motion.reveal.easing,
+            )
+          : ramp(
+              frame,
+              RAIL_CUE,
+              motion.scale(RAIL_FRAMES),
+              motion.reveal.easing,
+            )
+      }
     />
   );
 }

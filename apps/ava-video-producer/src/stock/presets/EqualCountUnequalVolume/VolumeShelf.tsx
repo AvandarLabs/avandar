@@ -1,5 +1,6 @@
-import { mix, ramp, EASE } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ByteItem } from "./ByteItem";
 import { VolumeScale } from "./VolumeScale";
 import { VolumeTotal } from "./VolumeTotal";
@@ -13,6 +14,9 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+/** Frames the shelves take to align on the shared ruler. */
+const ALIGN_FRAMES = 36;
 /** A shelf preserves item ownership and uses the shared byte ruler. */
 export function VolumeShelf({
   group,
@@ -21,8 +25,14 @@ export function VolumeShelf({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const y = 135 + index * 200;
-  const alignment = ramp(frame, 12, 36, EASE.inOut);
+  const alignment = ramp(
+    frame,
+    12,
+    motion.scale(ALIGN_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <g
       data-group-id={group.id}

@@ -10,6 +10,22 @@ import { expiringLeaseContract } from "./ExpiringLease.contract";
 import { DEFAULT_INPUT, fixtures } from "./ExpiringLease.fixtures";
 import { inputSchema, type Input } from "./ExpiringLease.schema";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -78,8 +94,13 @@ function _getMarkedElementsFromMarkup({
   markup: string;
   field: string;
 }): string[] {
-  return (markup.match(/<[^>]+>/g) ?? []).filter((element) => {
-    return element.includes(`data-${field}=`);
+  const tags = markup.match(/<[^>]+>/g) ?? [];
+  // A marked group wraps the sketch-aware shape it names.
+  return tags.flatMap((tag, index) => {
+    if (!tag.includes(`data-${field}=`)) {
+      return [];
+    }
+    return [tag.startsWith("<g ") ? `${tag}${tags[index + 1]}` : tag];
   });
 }
 test("exactly one holder loses its single token at expiry without a successor", () => {
@@ -120,7 +141,7 @@ test("exactly one holder loses its single token at expiry without a successor", 
         1,
       );
     });
-    const token = SvgAttributes.fromMarker({
+    const token = _markedShape({
       markup: _render({ frame: 150, input: input }),
       marker: "permission-token",
     });
@@ -227,7 +248,7 @@ test("hiding labels preserves expiry and the optional collar independently", () 
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: hiddenLifetime,
         marker: "permission-token",
       }),

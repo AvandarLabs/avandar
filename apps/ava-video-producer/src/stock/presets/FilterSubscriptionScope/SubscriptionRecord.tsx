@@ -1,6 +1,10 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { getExclusionFromFrame } from "./getExclusionFromFrame";
 import { SubscriptionMask } from "./SubscriptionMask";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
@@ -15,6 +19,9 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+/** How far an excluded row fades when excluded records stay visible. */
+const EXCLUDED_FADE = 0.7;
 /** Excluded source records are masked in subscribed tables only. */
 export function SubscriptionRecord({
   record,
@@ -26,13 +33,15 @@ export function SubscriptionRecord({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const excluded =
       view.subscribed && record.category !== input.selectedCategory,
-    progress = ramp(frame, 91, 48);
+    progress = getExclusionFromFrame(frame, motion);
   const y = 218 + rowIndex * 48,
     opacity = excluded
       ? input.showExcludedRecords
-        ? 1 - progress * 0.7
+        ? 1 - progress * EXCLUDED_FADE
         : 1 - progress
       : 1;
   return (
@@ -42,7 +51,12 @@ export function SubscriptionRecord({
         data-excluded-row={excluded ? record.id : undefined}
         opacity={opacity}
       >
-        <text x={x + 9} y={y} fill={accent} fontSize={12}>
+        <text
+          x={x + 9}
+          y={y}
+          fill={accent}
+          fontSize={tokens.text.graphic.data.fontSize}
+        >
           {rowIndex + 1}
         </text>
         <LiteralDataText value={record.category} x={x + 30} y={y} />

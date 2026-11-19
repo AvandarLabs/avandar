@@ -1,6 +1,9 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,8 +21,10 @@ export function BatchReleaseCaption({
   y,
   text,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, completeAt, 8)}>
+    <g opacity={ramp(frame, completeAt, motion.whip, motion.reveal.easing)}>
       <FitText
         text={text}
         x={x + 15}
@@ -29,7 +34,7 @@ export function BatchReleaseCaption({
         maxLines={2}
         normalizeWhitespace
         breakLongWords
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
     </g>
   );

@@ -1,6 +1,12 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { STAMP_CORNER } from "./attributionShape";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
 
@@ -19,26 +25,37 @@ export function AttributionCollaborator({
   separation,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const y = 170 + index * 160;
   const account = input.accounts.find(
     propEq("id", person.individualAccountId),
   )!;
   return (
     <g data-collaborator={person.id}>
-      <circle cx={85} cy={y} r={18} fill={STOCK.surface} stroke={accent} />
-      <path
-        d={`M65 ${y + 50} V${y + 30} Q85 ${y + 10} 105 ${y + 30} V${y + 50}`}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 85, cy: y, r: 18 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={accent}
+      />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M65 ${y + 50} V${y + 30} Q85 ${y + 10} 105 ${y + 30} V${y + 50}`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <LabelSlots labels={[[person.label, 45, y + 67, 225, 12, 3]]} />
       <g opacity={separation} transform={`translate(300 ${y - 30})`}>
-        <rect
+        <StockRect
           width={215}
           height={60}
-          rx={6}
-          fill={STOCK.surface}
+          rx={scales.corner(STAMP_CORNER)}
+          fill={tokens.color.surface}
           stroke={accent}
         />
         <LabelSlots labels={[[account.label, 12, 22, 190, 12, 3]]} />

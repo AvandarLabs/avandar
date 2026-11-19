@@ -1,6 +1,8 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
 
@@ -41,6 +43,8 @@ const HOLDER_TEXT = {
 >;
 /** Supplied custody copy occupies fixed slots away from the supports. */
 export function CustodyCaptions({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   const status =
     frame < 72
       ? input.copy.offered
@@ -59,12 +63,12 @@ export function CustodyCaptions({ input, frame }: Readonly<Props>): ReactNode {
       text: input.copy.example,
       y: 550,
       fontSize: 14 as const,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
   ];
 
   return (
-    <g opacity={ramp(frame, 18, 12)}>
+    <g opacity={motion.reveal(frame, 18)}>
       {holders.map(({ role, text, x }) => {
         return <FitText key={role} {...HOLDER_TEXT} text={text} x={x} />;
       })}

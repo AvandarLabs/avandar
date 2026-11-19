@@ -1,5 +1,9 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -17,6 +21,8 @@ export function JoinKeyCell({
   side,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const left = side === "left" ? x + 260 : x;
   return (
     <g>
@@ -27,7 +33,7 @@ export function JoinKeyCell({
         width={156}
         height={22}
         fill={accent}
-        fillOpacity={0.08}
+        fillOpacity={scales.wash(tokens.alpha.wash)}
       />
       <LiteralDataText value={value} x={left + 12} y={y + 14} color={accent} />
     </g>

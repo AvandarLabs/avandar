@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
 
@@ -10,13 +10,14 @@ export function DisclosurePolicyMark({
   policy,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   return policy === "share" ? (
     <circle data-policy-mark="share" cx={22} cy={12} r={4} fill={accent} />
   ) : (
     <path
       data-policy-mark="retain"
       d="M22 7 l5 5 l-5 5 l-5 -5 z"
-      fill={STOCK.orange}
+      fill={tokens.color.highlight}
     />
   );
 }

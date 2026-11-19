@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getConflictChoicePositionFromField } from "./getConflictChoicePositionFromField";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
@@ -20,6 +24,8 @@ export function ConflictChoiceMark({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const position = getConflictChoicePositionFromField({
     field,
     input,
@@ -28,31 +34,37 @@ export function ConflictChoiceMark({
   });
   if (!position) {
     return (
-      <path
-        data-review-field={field.id}
-        d={`M468 ${y + 34}h12v58h12`}
-        stroke={STOCK.orange}
-        fill="none"
-        opacity={progress}
-      />
+      <g data-review-field={field.id}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M468 ${y + 34}h12v58h12` }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.highlight}
+          fill="none"
+          opacity={progress}
+        />
+      </g>
     );
   }
   const { x, top } = position;
   return input.decisionStyle === "sliding-rail" ? (
-    <path
-      data-choice-rail={field.id}
-      d={`M${x} ${top - 5}H${x + 416}`}
-      stroke={accent}
-      strokeWidth={3}
-      opacity={progress}
-    />
+    <g data-choice-rail={field.id}>
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${top - 5}H${x + 416}` }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        opacity={progress}
+      />
+    </g>
   ) : (
-    <path
-      data-choice-bracket={field.id}
-      d={`M${x + 2} ${top - 5}h-8v76h8`}
-      stroke={accent}
-      fill="none"
-      opacity={progress}
-    />
+    <g data-choice-bracket={field.id}>
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x + 2} ${top - 5}h-8v76h8` }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        fill="none"
+        opacity={progress}
+      />
+    </g>
   );
 }

@@ -1,5 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +22,8 @@ export function ComparisonVerdict({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g data-verdict={item.observed === null ? undefined : item.id}>
       <LabelSlots
@@ -37,19 +43,23 @@ export function ComparisonVerdict({
         ]}
       />
       {input.showStateGlyphs ? (
-        <path
-          data-state-glyph={state}
-          d={
-            state === "mismatch"
-              ? `M909 ${y - 19} H920 V${y + 57} H909`
-              : state === "match"
-                ? `M905 ${y + 37} L911 ${y + 43} L925 ${y + 25}`
-                : `M915 ${y + 30} V${y + 42} M915 ${y + 48} V${y + 50}`
-          }
-          stroke={state === "mismatch" ? STOCK.orange : accent}
-          strokeWidth={2}
-          fill="none"
-        />
+        <g data-state-glyph={state}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d:
+                state === "mismatch"
+                  ? `M909 ${y - 19} H920 V${y + 57} H909`
+                  : state === "match"
+                    ? `M905 ${y + 37} L911 ${y + 43} L925 ${y + 25}`
+                    : `M915 ${y + 30} V${y + 42} M915 ${y + 48} V${y + 50}`,
+            }}
+            profile={tokens.sketch.shape}
+            stroke={state === "mismatch" ? tokens.color.highlight : accent}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+            fill="none"
+          />
+        </g>
       ) : undefined}
     </g>
   );

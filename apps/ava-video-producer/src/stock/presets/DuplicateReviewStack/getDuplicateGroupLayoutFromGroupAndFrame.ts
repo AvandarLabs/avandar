@@ -1,5 +1,7 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { FOLD_CUE, getFoldFromFrame } from "./duplicateTiming";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DuplicateReviewStack.schema";
 
 type Options = {
@@ -7,6 +9,7 @@ type Options = {
   input: Input;
   group: Input["groups"][number];
   groupIndex: number;
+  motion: VideoMotion;
 };
 /** Data for getDuplicateGroupLayoutFromGroupAndFrame. */
 type GetDuplicateGroupLayoutResult = {
@@ -23,8 +26,9 @@ export function getDuplicateGroupLayoutFromGroupAndFrame({
   input,
   group,
   groupIndex,
+  motion,
 }: Readonly<Options>): GetDuplicateGroupLayoutResult {
-  const progress = ramp(frame, 70, 30);
+  const progress = getFoldFromFrame(frame, motion);
   const isPair = input.finalView === "comparison-pair";
   const x = mix(isPair ? progress : 0, 44 + groupIndex * 456, 30);
   const y = mix(isPair ? progress : 0, 200, 192 + groupIndex * 240);
@@ -32,7 +36,7 @@ export function getDuplicateGroupLayoutFromGroupAndFrame({
     propNotEq<{ id: unknown }, "id", unknown>("id", group.retainedId),
   );
   const records =
-    group.retainedId !== null && frame >= 70
+    group.retainedId !== null && frame >= FOLD_CUE
       ? [
           ...alternatives.reverse(),
           ...group.records.filter(

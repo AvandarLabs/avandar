@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { createVideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import { makeResolvedVideoThemeFromSource } from "../../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
 import { getPickerCopyFromFrame } from ".././getPickerCopyFromFrame";
 import { getPickerGroupsFromInput } from ".././getPickerGroupsFromInput";
 import { GroupedValuePicker } from ".././GroupedValuePicker";
@@ -14,6 +17,10 @@ import {
 import { inputSchema } from ".././GroupedValuePicker.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from ".././GroupedValuePicker.schema";
+
+const CLASSIC_MOTION = createVideoMotion(
+  makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE).semantic.motion,
+);
 
 function _render({
   frame,
@@ -237,7 +244,13 @@ function _assertPermutedCopyClearance(
     return 56 + index / 4;
   }).forEach((frame) => {
     const copies = order.map((value, index) => {
-      const copy = getPickerCopyFromFrame({ input, index, frame, groups });
+      const copy = getPickerCopyFromFrame({
+        input,
+        index,
+        frame,
+        groups,
+        motion: CLASSIC_MOTION,
+      });
       assert.ok(copy);
       if (frame >= 59) {
         assert.equal(copy.opacity, 1);
