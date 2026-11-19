@@ -2,6 +2,7 @@ import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPro
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type { AnalyticsApp } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
@@ -12,7 +13,10 @@ import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/Age
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
-import type { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type {
+  DashboardEditorAppState,
+  DashboardEditorStateManager,
+} from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
@@ -53,6 +57,12 @@ export type DataAgentTurnOptions = {
    */
   pageContext?: AgentPageContext;
   /**
+   * The page's app as `chat.message_sent` records it. A shown query's
+   * `chat.sql_generated` names it, unless the query went to the Data
+   * Explorer.
+   */
+  analyticsApp?: AnalyticsApp;
+  /**
    * True for a turn answered by the offline models. Its answer is marked as
    * offline. Its results go where an online turn's do once it carries a page
    * context.
@@ -84,6 +94,8 @@ export type DataAgentTurnOptions = {
   dashboardEditor?: {
     activeDashboardId: string | undefined;
     dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+    /** Reads the editor's state now, for a block's analytics payload. */
+    getState: () => DashboardEditorAppState;
   };
   /** The chat session the turn belongs to, for its dashboard cards. */
   sessionId?: string;

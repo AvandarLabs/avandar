@@ -568,6 +568,9 @@ export function createChatModelAdapter(
         pageContext: currentPageContext,
       });
 
+      // Both chat events name the page the same way.
+      const analyticsApp =
+        ChatAnalyticsPayloads.toAnalyticsApp(currentPageContext);
       if (
         lastUserMessage &&
         !shouldSkipUserMessageConsent(lastUserMessage.content)
@@ -575,14 +578,7 @@ export function createChatModelAdapter(
         void AnalyticsClient.logEvent({
           event: "chat.message_sent",
           workspaceId,
-          app:
-            currentPageContext.app === "data-explorer"
-              ? "data_explorer"
-              : currentPageContext.app === "dashboards"
-                ? "dashboards"
-                : currentPageContext.app === "data-sources"
-                  ? "data_sources"
-                  : undefined,
+          app: analyticsApp,
           payload: ChatAnalyticsPayloads.fromMessage({
             content: lastUserMessage.content,
             pageContext: currentPageContext,
@@ -636,9 +632,13 @@ export function createChatModelAdapter(
         chatPanelDispatch,
         getPluginAiTools,
         workspaceSlug: workspaceRef.current.slug,
+        analyticsApp,
         dashboardEditor: {
           activeDashboardId: currentDashboardEditorState.activeDashboardId,
           dispatch: dashboardEditorDispatch,
+          getState: () => {
+            return dashboardEditorStateRef.current;
+          },
         },
         sessionId: activeSessionIdRef.current,
       };
