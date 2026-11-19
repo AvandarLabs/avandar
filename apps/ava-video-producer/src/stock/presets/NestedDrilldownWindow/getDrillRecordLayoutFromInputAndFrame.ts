@@ -1,5 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { getChildFromFrame, getParentFromFrame } from "./drillTiming";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./NestedDrilldownWindow.schema";
 /** Data for getDrillRecordLayoutFromInputAndFrame. */
 type GetDrillRecordLayoutResult = {
@@ -19,10 +21,12 @@ export function getDrillRecordLayoutFromInputAndFrame({
   frame,
   input,
   record,
+  motion,
 }: Readonly<{
   frame: number;
   input: Input;
   record: Input["records"][number];
+  motion: VideoMotion;
 }>): GetDrillRecordLayoutResult {
   const groups = [
     ...new Set(
@@ -55,8 +59,11 @@ export function getDrillRecordLayoutFromInputAndFrame({
   const isParent = record.groups[0] === input.selectionPath[0];
   const detailIndex = details.findIndex(propEq("id", record.id));
   const isDetail = detailIndex >= 0;
-  const parent = ramp(frame, 40, 34),
-    child = input.selectionPath.length === 2 ? ramp(frame, 74, 44) : parent;
+  const parent = getParentFromFrame(frame, motion),
+    child =
+      input.selectionPath.length === 2
+        ? getChildFromFrame(frame, motion)
+        : parent;
   const startX = 48 + groups.indexOf(record.groups[0]) * 292;
   const startY = 214 + siblings.findIndex(propEq("id", record.id)) * 42;
   const middleX =
