@@ -1,11 +1,13 @@
-import { DUR, caretOn, enter, typed } from "../../../motion";
+import { typed } from "../../../motion";
 import {
   getHeadingRevealStyles,
   getLineRevealStyle,
   getStagedExitStyle,
   getWipeExitStyle,
 } from "../../../scenes/textReveal";
+import { useWindowStage } from "../../../scenes/TiltedWindowScene/useWindowStage";
 import { getActiveHeadline } from "../../../scenes/TiltedWindowScene/windowMotion";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { describeStyle } from "./describeStyle";
@@ -18,7 +20,13 @@ const EXIT_FRAMES = 12;
 
 /** A wordmark wiped in, then retracted by `getWipeExitStyle()`. */
 export function WipeExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const exit = getWipeExitStyle(frame, EXIT_AT, EXIT_FRAMES);
+  const motion = useVideoMotion();
+  const exit = getWipeExitStyle(
+    frame,
+    EXIT_AT,
+    motion.scale(EXIT_FRAMES),
+    motion,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -30,7 +38,7 @@ export function WipeExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
         <div style={exit}>
           <p
             className={css.headline}
-            style={getLineRevealStyle(frame, 8, "wipe")}
+            style={getLineRevealStyle(frame, 8, "wipe", {}, motion)}
           >
             Motion Atlas
           </p>
@@ -48,23 +56,28 @@ export function HeadingRevealDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label="getHeadingRevealStyles(frame, { mode, atFrame: 8 })"
+      label="getHeadingRevealStyles(frame, { mode, atFrame: 8 }, motion)"
       readouts={HEADING_MODES.map((mode) => {
         return {
           name: `${mode} title`,
           value: describeStyle(
-            getHeadingRevealStyles(frame, { mode, atFrame: 8 }).title,
+            getHeadingRevealStyles(frame, { mode, atFrame: 8 }, motion).title,
           ),
         };
       })}
     >
       <div className={css.cards}>
         {HEADING_MODES.map((mode) => {
-          const styles = getHeadingRevealStyles(frame, { mode, atFrame: 8 });
+          const styles = getHeadingRevealStyles(
+            frame,
+            { mode, atFrame: 8 },
+            motion,
+          );
           return (
             <div key={mode} className={css.cardColumn}>
               <span className={css.caption}>{`mode: "${mode}"`}</span>
@@ -88,12 +101,13 @@ const STAGED_EXIT = { atFrame: 50 };
 
 /** A statement leaving line by line, its icon last. */
 export function StagedExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   const lines = [
     "The statement leaves",
     "one line at a time,",
     "then its icon.",
   ];
-  const iconExit = getStagedExitStyle(frame, STAGED_EXIT, lines.length);
+  const iconExit = getStagedExitStyle(frame, STAGED_EXIT, lines.length, motion);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -103,19 +117,22 @@ export function StagedExitDemo({ frame, frames }: HelperDemoProps): ReactNode {
         return {
           name: index === 3 ? "icon" : `line ${index}`,
           value: formatReadout(
-            Number(getStagedExitStyle(frame, STAGED_EXIT, index).opacity ?? 1),
+            Number(
+              getStagedExitStyle(frame, STAGED_EXIT, index, motion).opacity ??
+                1,
+            ),
           ),
         };
       })}
     >
-      <div className={css.lines} style={enter(frame, 6)}>
+      <div className={css.lines} style={motion.enter(frame, 6)}>
         <span className={css.icon} style={iconExit} />
         {lines.map((line, index) => {
           return (
             <p
               key={line}
               className={css.headline}
-              style={getStagedExitStyle(frame, STAGED_EXIT, index)}
+              style={getStagedExitStyle(frame, STAGED_EXIT, index, motion)}
             >
               {line}
             </p>
@@ -131,8 +148,9 @@ const TYPED_AT = 10;
 
 /** A command typed character by character with a blinking caret. */
 export function TypedDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const text = typed(frame, TYPED_AT, COMMAND);
-  const isCaretOn = caretOn(frame);
+  const motion = useVideoMotion();
+  const text = typed(frame, TYPED_AT, COMMAND, motion.typing.rate);
+  const isCaretOn = motion.caretOn(frame);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -161,16 +179,20 @@ export function ActiveHeadlineDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   const headlines = [
     "Open the record.",
     "Check the change.",
     "Share the answer.",
   ];
-  const active = getActiveHeadline(frame, HEADLINE_FRAMES);
+  const stage = useWindowStage();
+  const active = getActiveHeadline(frame, HEADLINE_FRAMES, stage);
   const reveal = getLineRevealStyle(
     frame,
     HEADLINE_FRAMES[active.index].atFrame,
     "line-fade",
+    {},
+    motion,
   );
   return (
     <HelperDemoFrame
@@ -180,7 +202,7 @@ export function ActiveHeadlineDemo({
       readouts={[
         { name: "index", value: String(active.index) },
         { name: "opacity", value: formatReadout(active.opacity) },
-        { name: "fade", value: `${DUR.press}f` },
+        { name: "fade", value: `${formatReadout(motion.press.duration, 1)}f` },
       ]}
     >
       <div className={css.lines}>

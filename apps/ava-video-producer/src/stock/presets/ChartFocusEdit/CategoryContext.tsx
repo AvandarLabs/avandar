@@ -1,6 +1,5 @@
 import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CategoryContextHeading } from "./CategoryContextHeading";
-import { VALUE_FONT_SIZE } from "./chartShape";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 
@@ -27,9 +26,9 @@ export function CategoryContext({
           data-value-label={category.id}
           x={884}
           y={y + 15}
-          fill={tokens.color.text}
-          fontSize={VALUE_FONT_SIZE}
-          fontFamily={tokens.text.graphic.data.fontFamily}
+          fill={tokens.text.graphic.value.color}
+          fontSize={tokens.text.graphic.value.fontSize}
+          fontFamily={tokens.text.graphic.value.fontFamily}
           textAnchor="end"
         >
           {category.value}

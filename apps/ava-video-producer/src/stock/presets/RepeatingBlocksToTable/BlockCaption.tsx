@@ -38,8 +38,9 @@ export function BlockCaption({
           data-block-number={index + 1}
           x={x + 4}
           y={y}
-          fill={tokens.color.textMuted}
-          fontSize={tokens.text.graphic.eyebrow.fontSize}
+          fill={tokens.text.graphic.smallCaption.color}
+          fontFamily={tokens.text.graphic.smallCaption.fontFamily}
+          fontSize={tokens.text.graphic.smallCaption.fontSize}
         >
           {index + 1}
         </text>

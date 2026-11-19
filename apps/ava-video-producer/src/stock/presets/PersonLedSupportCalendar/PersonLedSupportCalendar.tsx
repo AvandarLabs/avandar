@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerAppointments } from "./PlannerAppointments";
 import { PlannerGrid } from "./PlannerGrid";
@@ -18,6 +18,7 @@ export function PersonLedSupportCalendar({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   return (
     <g>
       <LabelSlots
@@ -32,7 +33,7 @@ export function PersonLedSupportCalendar({
       <PlannerAppointments input={input} frame={frame} accent={accent} />
       <PlannerPeople input={input} frame={frame} accent={accent} />
       <ExistingPlannerCommitments input={input} labelsOnly />
-      <g opacity={ramp(frame, 120, 12)}>
+      <g opacity={motion.reveal(frame, 120)}>
         <LabelSlots labels={[[input.copy.agreement, 680, 490, 220, 14, 4]]} />
       </g>
     </g>

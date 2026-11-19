@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ProjectSymbol } from "./ProjectSymbol";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
@@ -20,6 +20,7 @@ export function ProjectTally({
   columnWidth,
   offset,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const total = input.ballots.filter(
     propEq("projectId", project?.id ?? null),
   ).length;
@@ -49,8 +50,9 @@ export function ProjectTally({
         <text
           x={x + (project ? 100 : 30)}
           y={200 + offset}
-          fill={project ? STOCK.text : STOCK.orange}
-          fontSize={20}
+          fill={project ? tokens.color.text : tokens.color.highlight}
+          fontSize={tokens.text.graphic.body.fontSize}
+          fontFamily={tokens.text.graphic.body.fontFamily}
         >
           {total}
         </text>

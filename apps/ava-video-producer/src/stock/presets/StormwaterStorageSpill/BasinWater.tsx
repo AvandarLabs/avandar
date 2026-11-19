@@ -1,4 +1,9 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PhysicalWaterKeys } from "./PhysicalWaterKeys";
 import { StorageBasin } from "./StorageBasin";
 import { WaterOutlets } from "./WaterOutlets";
@@ -13,14 +18,18 @@ export function BasinWater({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <StorageBasin input={input} frame={frame} />
-      <path
-        d="M480 135V225"
+      <SketchedShape
+        shape={{ kind: "path", d: "M480 135V225" }}
+        profile={tokens.sketch.shape}
         stroke={accent}
-        strokeWidth={8}
-        opacity={1 - ramp(frame, 96, 12)}
+        strokeWidth={scales.stroke(8)}
+        opacity={1 - motion.reveal(frame, 96)}
       />
       <WaterOutlets input={input} frame={frame} />
       <WaterSpill input={input} frame={frame} />

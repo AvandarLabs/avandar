@@ -1,3 +1,4 @@
+import { getZoneShadeFromFraction } from "./zoneShade";
 import type { ReactNode } from "react";
 /** Inputs for LegendScale. */
 type Props = { accent: string };
@@ -17,7 +18,7 @@ export function LegendScale({ accent }: Readonly<Props>): ReactNode {
             width={24}
             height={12}
             fill={accent}
-            fillOpacity={0.12 + (index / 9) * 0.76}
+            fillOpacity={getZoneShadeFromFraction(index / 9)}
           />
         );
       })}

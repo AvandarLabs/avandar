@@ -1,4 +1,8 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
@@ -11,15 +15,19 @@ export function SatchelTotal({
   accent,
   total,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
     <>
-      <g opacity={ramp(frame, 108, 12)}>
-        <path
-          data-total-bracket="true"
-          d="M333 487 V497 H915 V487 M624 497 V510"
-          fill="none"
-          stroke={accent}
-        />
+      <g opacity={motion.reveal(frame, 108)}>
+        <g data-total-bracket="true">
+          <SketchedShape
+            shape={{ kind: "path", d: "M333 487 V497 H915 V487 M624 497 V510" }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+          />
+        </g>
         <SceneText
           text={input.sceneLabels.total}
           slot={[95, 505, 230, 16, 3]}

@@ -1,9 +1,15 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SharedWorkshopBooking.schema";
 
-type Props = { input: Input; frame: number; index: number };
-function _getUse({ input, frame, index }: Readonly<Props>) {
+type Props = {
+  input: Input;
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+};
+function _getUse({ input, frame, index, motion }: Readonly<Props>) {
   const bookings = input.requests
     .filter(propNotEq("agreedSlotId", null))
     .sort((first, second) => {
@@ -23,8 +29,14 @@ function _getUse({ input, frame, index }: Readonly<Props>) {
   const turnAt = 108 + order * duration;
   const use =
     input.showUsageTurns && input.requests[index].agreedSlotId !== null
-      ? ramp(frame, turnAt, 5, EASE.inOut) *
-        (1 - ramp(frame, turnAt + duration - 5, 5, EASE.inOut))
+      ? motion.ramp(frame, turnAt, motion.scale(5), motion.travel.easing) *
+        (1 -
+          motion.ramp(
+            frame,
+            turnAt + duration - 5,
+            motion.scale(5),
+            motion.travel.easing,
+          ))
       : 0;
   return use;
 }
@@ -45,6 +57,7 @@ export function getBookingFromFrame({
   input,
   frame,
   index,
+  motion,
 }: Readonly<Props>): GetBookingFromFrameResult {
   const request = input.requests[index];
   const width = 540 / input.timeSlots.length;
@@ -56,16 +69,18 @@ export function getBookingFromFrame({
   );
   const hasBooking = request.agreedSlotId !== null;
   const horizontal = hasBooking
-    ? ramp(frame, 36 + index * 3, 30, EASE.inOut)
+    ? motion.ramp(frame, 36 + index * 3, motion.scale(30), motion.travel.easing)
     : 0;
-  const vertical = hasBooking ? ramp(frame, 75 + index * 3, 24, EASE.inOut) : 0;
+  const vertical = hasBooking
+    ? motion.ramp(frame, 75 + index * 3, motion.scale(24), motion.travel.easing)
+    : 0;
   const x = mix(
     horizontal,
     390 + requestedIndex * width,
     390 + agreedIndex * width,
   );
   const y = mix(vertical, 170 + index * 66, 440);
-  const use = _getUse({ input, frame, index });
+  const use = _getUse({ input, frame, index, motion });
   return {
     x,
     y,

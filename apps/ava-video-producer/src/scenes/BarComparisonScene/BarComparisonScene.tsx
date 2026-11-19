@@ -35,7 +35,7 @@ const ROUGH_EDGE_DEPTH = 10;
  * stage hero, labels, growing bars and values in turn, and can leave with a
  * per-element left-to-right erase. Figures are authored data; label them as
  * fictional unless they are sourced. Type comes from the stage roles
- * (`figure`, `barLabel`, `sceneBody`) and colour from the scene palette.
+ * (`heroFigure`, `barLabel`, `sceneBody`) and colour from the scene palette.
  */
 export function BarComparisonScene(props: BarComparisonSceneProps): ReactNode {
   const {
@@ -157,10 +157,11 @@ function _Panel(props: PanelProps) {
           style={{
             ...positioned({ ...rect, height: heroHeight }),
             fontSize: hero.fontSize,
-            fontWeight: theme.semantic.text.stage.figure.fontWeight,
-            // No line height step or stage role holds a solid line yet.
-            lineHeight: 1,
-            letterSpacing: `${theme.atomic.letterSpacing.wordmark}em`,
+            ...getStageTextStyle(theme.semantic.text.stage.heroFigure, [
+              "fontWeight",
+              "lineHeight",
+              "letterSpacing",
+            ]),
             ...motion.enter(frame, beats.heroAt, {
               dur: motion.panel,
               easing: motion.rise.easing,

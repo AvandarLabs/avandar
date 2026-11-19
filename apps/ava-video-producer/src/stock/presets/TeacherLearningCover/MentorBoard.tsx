@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
@@ -6,6 +10,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Draws the scene's MentorBoard group with fixed authored geometry. */
 export function MentorBoard({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const phase =
     frame < 48
       ? input.phaseLabels.cover
@@ -14,16 +20,16 @@ export function MentorBoard({ input, frame }: Readonly<Props>): ReactNode {
         : input.phaseLabels.return;
   return (
     <>
-      <rect
+      <StockRect
         data-teaching-board="true"
         x={592}
         y={300}
         width={316}
         height={118}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <SceneText
         text={input.session.prompt}

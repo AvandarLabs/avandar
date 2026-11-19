@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
@@ -7,6 +7,7 @@ type Props = { input: Input; frame: number };
 
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ShadeSummary({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const total = input.zones.reduce((sum, zone) => {
     return sum + zone.areaM2;
   }, 0);
@@ -23,7 +24,7 @@ export function ShadeSummary({ input, frame }: Readonly<Props>): ReactNode {
         data-shaded="total"
         data-quantity={shaded}
         data-denominator={total}
-        opacity={ramp(frame, 108, 12)}
+        opacity={motion.reveal(frame, 108)}
       >
         {input.showAreaBalance ? (
           <SceneLabel

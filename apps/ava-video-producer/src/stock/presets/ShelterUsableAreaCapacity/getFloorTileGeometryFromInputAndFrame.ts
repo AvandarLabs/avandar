@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { ramp, mix } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 /** Data for getFloorTileGeometryFromInputAndFrame. */
 type GetFloorTileGeometryResult = {
@@ -16,17 +17,26 @@ export function getFloorTileGeometryFromInputAndFrame({
   input,
   tile,
   frame,
+  motion,
 }: Readonly<{
   input: Input;
   tile: Input["floorTiles"][number];
   frame: number;
+  motion: VideoMotion;
 }>): GetFloorTileGeometryResult {
-  const unroll = ramp(frame, 72, 36);
+  const unroll = motion.ramp(
+    frame,
+    72,
+    motion.scale(36),
+    motion.entrance.easing,
+  );
   const isSleeping = tile.role === "sleeping";
   const rank = input.floorTiles
     .filter(propEq("role", "sleeping"))
     .findIndex(propEq("id", tile.id));
-  const lift = isSleeping ? 0 : 24 * ramp(frame, 36, 36);
+  const lift = isSleeping
+    ? 0
+    : 24 * motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing);
   return {
     isSleeping,
     lift,

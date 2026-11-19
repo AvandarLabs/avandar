@@ -1,41 +1,62 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
+/** The privacy screen's tint, before the theme's tint strength. */
+const SCREEN_TINT = 0.45;
 type Props = { frame: number; partition: "door" | "screen" };
 /** Both separators close only after the supporter clears the doorway. */
 export function ConversationPartition({
   frame,
   partition,
 }: Readonly<Props>): ReactNode {
-  const closure = ramp(frame, 86, 22);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const closure = motion.ramp(
+    frame,
+    86,
+    motion.scale(22),
+    motion.entrance.easing,
+  );
   return (
     <g data-partition={partition} data-closed={closure === 1}>
-      <path
-        d="M623 150 V310 M623 450 V510"
+      <SketchedShape
+        shape={{ kind: "path", d: "M623 150 V310 M623 450 V510" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={6}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(6)}
       />
       {partition === "screen" ? (
-        <rect
+        <StockRect
           data-separator-shape="screen"
           x={617}
           y={310}
           width={12}
           height={140 * closure}
-          fill={STOCK.cyan}
-          fillOpacity={0.45}
-          stroke={STOCK.cyan}
+          fill={tokens.color.accentAlt}
+          fillOpacity={scales.wash(SCREEN_TINT)}
+          stroke={tokens.color.accentAlt}
         />
       ) : (
-        <path
-          data-separator-shape="door"
-          d={`M623 310 L${623 + 90 * (1 - closure)} ${310 + 140 * closure} L${631 + 90 * (1 - closure)} ${310 + 140 * closure} L631 310 Z`}
-          fill={STOCK.surface}
-          stroke={STOCK.cyan}
-          strokeWidth={2}
-        />
+        <g data-separator-shape="door">
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M623 310 L${623 + 90 * (1 - closure)} ${310 + 140 * closure} L${631 + 90 * (1 - closure)} ${310 + 140 * closure} L631 310 Z`,
+            }}
+            profile={tokens.sketch.shape}
+            fill={tokens.color.surface}
+            stroke={tokens.color.accentAlt}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
       )}
     </g>
   );

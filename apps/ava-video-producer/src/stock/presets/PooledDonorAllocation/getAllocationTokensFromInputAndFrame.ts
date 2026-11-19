@@ -1,7 +1,8 @@
 import { prop } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getAllocationIdentitiesFromInput } from "./getAllocationIdentitiesFromInput";
 import { getDonorTrayFromInputAndFrame } from "./getDonorTrayFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PooledDonorAllocation.schema";
 
 type Identity = ReturnType<typeof getAllocationIdentitiesFromInput>[number];
@@ -67,7 +68,12 @@ function _getPlacement({
 export function getAllocationTokensFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetAllocationTokensResult[] {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetAllocationTokensResult[] {
   const identities = getAllocationIdentitiesFromInput(input);
   return identities.map((token, index) => {
     const placement = _getPlacement({ input, identities, index });
@@ -75,8 +81,14 @@ export function getAllocationTokensFromInputAndFrame({
       input,
       frame,
       donorIndex: token.donorIndex,
+      motion,
     });
-    const pooling = ramp(frame, 32 + token.donorIndex * 3, 20, EASE.inOut);
+    const pooling = motion.ramp(
+      frame,
+      32 + token.donorIndex * 3,
+      motion.scale(20),
+      motion.travel.easing,
+    );
     const sourceX = tray.x - 20 + (token.unitIndex * 32 + 20) * tray.cosine;
     const sourceY = tray.y + (token.unitIndex * 32 + 20) * tray.sine;
     const x = mix(Math.min(1, pooling * 2), sourceX, placement.poolX);
@@ -84,7 +96,12 @@ export function getAllocationTokensFromInputAndFrame({
     const allocation =
       token.requestId === null
         ? 0
-        : ramp(frame, 64 + placement.requestIndex * 20, 14, EASE.inOut);
+        : motion.ramp(
+            frame,
+            64 + placement.requestIndex * 20,
+            motion.scale(14),
+            motion.travel.easing,
+          );
     const descend = Math.min(1, allocation / 0.45);
     const slide = Math.max(0, Math.min(1, (allocation - 0.45) / 0.4));
     const insert = Math.max(0, (allocation - 0.85) / 0.15);

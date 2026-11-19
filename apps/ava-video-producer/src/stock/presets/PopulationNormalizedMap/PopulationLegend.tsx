@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { LegendScale } from "./LegendScale";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
@@ -11,6 +12,7 @@ export function PopulationLegend({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const isNormalized = frame >= 72;
   const maximum = isNormalized
     ? input.colorDomains.normalizedMaximum
@@ -21,7 +23,11 @@ export function PopulationLegend({
       data-legend-maximum={maximum}
     >
       <LegendScale accent={accent} />
-      <line x1={40} x2={620} y1={515} y2={515} stroke={STOCK.muted} />
+      <SketchedShape
+        shape={{ kind: "line", x1: 40, y1: 515, x2: 620, y2: 515 }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+      />
       <LabelSlots
         labels={[
           [input.copy.context, 40, 36, 880, 18, 2],

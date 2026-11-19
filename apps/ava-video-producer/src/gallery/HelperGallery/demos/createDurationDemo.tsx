@@ -1,39 +1,62 @@
 import clsx from "clsx";
-import { DUR } from "../../../motion";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
+import { formatReadout } from "./demoTheme";
 import { getElapsed } from "./getElapsed";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { Ruler } from "./parts/Ruler";
 import { TimelineTrack } from "./parts/TimelineTrack";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
-/** The duration tokens, shortest first, as the shared timeline lists them. */
-const DURATION_ORDER = (Object.keys(DUR) as Array<keyof typeof DUR>).sort(
-  (first, second) => {
-    return DUR[first] - DUR[second];
-  },
-);
+/** The duration ladder, as `DUR` names it. */
+const DURATION_NAMES = [
+  "press",
+  "chip",
+  "whip",
+  "panel",
+  "sheet",
+  "word",
+  "hero",
+] as const;
 
-/** Every `DUR` token on one timeline, with `token` highlighted. */
+/** One step of the duration ladder. */
+export type DemoDurationName = (typeof DURATION_NAMES)[number];
+
+/** A step's tempo-scaled length in the theme, in frames. */
+function _frames(motion: VideoMotion, name: DemoDurationName): number {
+  return name === "press" ? motion.press.duration : motion[name];
+}
+
+/**
+ * Every `DUR` step on one timeline at the video theme's lengths and tempo,
+ * shortest first, with `token` highlighted.
+ */
 export function createDurationDemo(
-  token: keyof typeof DUR,
+  token: DemoDurationName,
 ): (props: HelperDemoProps) => ReactNode {
   function DurationDemo({ frame, frames }: HelperDemoProps): ReactNode {
+    const motion = useVideoMotion();
     const elapsed = getElapsed(frame);
+    const length = _frames(motion, token);
+    const order = [...DURATION_NAMES].sort((first, second) => {
+      return _frames(motion, first) - _frames(motion, second);
+    });
     return (
       <HelperDemoFrame
         frame={frame}
         frames={frames}
-        label={`DUR.${token} = ${DUR[token]}`}
+        label={`DUR.${token} = ${formatReadout(length, 1)}`}
         readouts={[
-          { name: "frames", value: String(DUR[token]) },
-          { name: "ms", value: String(Math.round((DUR[token] / 30) * 1000)) },
+          { name: "frames", value: formatReadout(length, 1) },
+          { name: "ms", value: String(Math.round((length / 30) * 1000)) },
           { name: "elapsed", value: `${elapsed}f` },
         ]}
       >
         <div className={css.timeline}>
-          {DURATION_ORDER.map((name) => {
+          {order.map((name) => {
+            const nameFrames = _frames(motion, name);
             return (
               <div key={name} className={css.timelineRow}>
                 <span
@@ -42,11 +65,11 @@ export function createDurationDemo(
                     name === token && css.timelineNameActive,
                   )}
                 >
-                  {`DUR.${name} ${DUR[name]}f`}
+                  {`DUR.${name} ${formatReadout(nameFrames, 1)}f`}
                 </span>
                 <TimelineTrack
                   startFrame={0}
-                  frames={DUR[name]}
+                  frames={nameFrames}
                   elapsed={elapsed}
                   isActive={name === token}
                 />

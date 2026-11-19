@@ -86,8 +86,7 @@ export function MetricScene({
           justifyContent: "center",
           flexDirection: "column",
           border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
-          // No corner token holds the starter 14 px radius yet.
-          borderRadius: "var(--radius)",
+          borderRadius: scales.corner(tokens.corner.scene),
           background: scene.card,
           padding: `${layout.paddingY}px ${layout.paddingX}px`,
           ...motion.enter(frame, 6, { dur: motion.sheet }),

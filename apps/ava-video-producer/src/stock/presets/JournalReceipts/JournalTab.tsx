@@ -36,7 +36,8 @@ function _getClosingProgress({
     ? 0
     : ramp(
         frame,
-        REGISTER_CUE + receiptIndex * motion.scale(RECEIPT_STAGGER_FRAMES),
+        REGISTER_CUE +
+          receiptIndex * motion.scaleStagger(RECEIPT_STAGGER_FRAMES),
         motion.whip,
         motion.entrance.easing,
       );

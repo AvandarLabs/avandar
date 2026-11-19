@@ -33,9 +33,9 @@ export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
       <text
         x={480}
         y={270}
-        fill={tokens.color.textMuted}
-        fontSize={tokens.text.graphic.figure.fontSize}
-        fontFamily={tokens.text.graphic.figure.fontFamily}
+        fill={tokens.text.graphic.mark.color}
+        fontSize={tokens.text.graphic.mark.fontSize}
+        fontFamily={tokens.text.graphic.mark.fontFamily}
         textAnchor="middle"
         opacity={1 - resolution}
         aria-hidden="true"

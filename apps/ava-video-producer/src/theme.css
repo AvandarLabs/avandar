@@ -5,8 +5,8 @@
  * palette (color.scene.*), so inside a provider the theme's values win and
  * storyboard scenes, the title card and the app chrome read the theme
  * directly. These values are what a composition drawn outside any provider
- * reads, and the theme's starter swatches reproduce them. --radius has no
- * token yet, so scenes still read it here.
+ * reads, and the theme's starter swatches reproduce them. Scenes take
+ * their corner from corner.scene, which reproduces --radius.
  *
  * mixToken() in motion.ts blends two colours through color-mix(in oklab, …),
  * which is what lets a state change ramp instead of snapping.

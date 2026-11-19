@@ -4,7 +4,6 @@ import {
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { VALUE_FONT_SIZE } from "./chartShape";
 import type { ReactNode } from "react";
 
 type Props = { axisMaximum: number; refinement: number };
@@ -60,8 +59,8 @@ export function ChartScale({
             x={x}
             y={555}
             fill={tokens.color.textMuted}
-            fontSize={VALUE_FONT_SIZE}
-            fontFamily={tokens.text.graphic.data.fontFamily}
+            fontSize={tokens.text.graphic.value.fontSize}
+            fontFamily={tokens.text.graphic.value.fontFamily}
             textAnchor={index ? "end" : "start"}
           >
             {value}

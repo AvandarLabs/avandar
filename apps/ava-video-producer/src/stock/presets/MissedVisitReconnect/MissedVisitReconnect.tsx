@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
@@ -14,9 +15,10 @@ export function MissedVisitReconnect({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const workerPosition = input.cases.reduce((position, _, index) => {
     return mix(
-      ramp(frame, 39 + index * 9, 7, EASE.inOut),
+      motion.ramp(frame, 39 + index * 9, motion.scale(7), motion.travel.easing),
       position,
       160 + index * 48,
     );
@@ -35,7 +37,10 @@ export function MissedVisitReconnect({
           />
         );
       })}
-      <g data-worker="outreach" opacity={ramp(frame, 39, 8)}>
+      <g
+        data-worker="outreach"
+        opacity={motion.ramp(frame, 39, motion.whip, motion.reveal.easing)}
+      >
         <PersonGlyph
           x={350}
           y={workerPosition}

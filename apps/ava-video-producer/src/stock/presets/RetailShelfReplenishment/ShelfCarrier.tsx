@@ -1,5 +1,10 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
@@ -10,37 +15,57 @@ export function ShelfCarrier({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const carrierX = mix(ramp(frame, 38, 18, EASE.inOut), 100, 0);
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const carrierX = mix(
+    motion.ramp(frame, 38, motion.hero, motion.travel.easing),
+    100,
+    0,
+  );
   return (
     <g data-carrier={input.deliveryMode} transform={`translate(${carrierX} 0)`}>
-      <path
-        d="M680 354 V424 H814 V344 M680 424 L665 330"
+      <SketchedShape
+        shape={{ kind: "path", d: "M680 354 V424 H814 V344 M680 424 L665 330" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={3}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <circle
-        cx={700}
-        cy={424}
-        r={input.deliveryMode === "cargo-bike" ? 20 : 10}
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: 700,
+          cy: 424,
+          r: input.deliveryMode === "cargo-bike" ? 20 : 10,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={3}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <circle
-        cx={800}
-        cy={424}
-        r={input.deliveryMode === "cargo-bike" ? 20 : 10}
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: 800,
+          cy: 424,
+          r: input.deliveryMode === "cargo-bike" ? 20 : 10,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.muted}
-        strokeWidth={3}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       {input.deliveryMode === "cargo-bike" ? (
-        <path
-          d="M700 424 L730 344 L765 424 H700 L750 370 H790"
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: "M700 424 L730 344 L765 424 H700 L750 370 H790",
+          }}
+          profile={tokens.sketch.shape}
           fill="none"
           stroke={accent}
-          strokeWidth={2}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       ) : undefined}
     </g>

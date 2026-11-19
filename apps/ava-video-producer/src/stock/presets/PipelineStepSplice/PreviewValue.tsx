@@ -8,9 +8,6 @@ type Props = {
   isOutput: boolean;
   accent: string;
 };
-
-/** A preview value's size, as content: no graphic text role is 14 px. */
-const VALUE_FONT_SIZE = 14;
 /** One literal value occupies a single bounded whitespace-preserving lane. */
 export function PreviewValue({
   label,
@@ -20,7 +17,8 @@ export function PreviewValue({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const y = isOutput ? 516 : 441;
-  const color = isOutput ? accent : tokens.color.text;
+  const valueStyle = tokens.text.graphic.value;
+  const color = isOutput ? accent : valueStyle.color;
   return (
     <g>
       <FitText
@@ -40,8 +38,8 @@ export function PreviewValue({
         aria-label={value}
         x={88}
         y={y + 27}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontSize={VALUE_FONT_SIZE}
+        fontFamily={valueStyle.fontFamily}
+        fontSize={valueStyle.fontSize}
         xmlSpace="preserve"
         fill={color}
       >

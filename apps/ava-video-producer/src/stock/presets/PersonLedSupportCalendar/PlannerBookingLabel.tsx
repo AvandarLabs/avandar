@@ -1,4 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -24,16 +29,23 @@ export function PlannerBookingLabel({
   accent,
   isProposal = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g data-booking-label={bookingId}>
       {isProposal ? (
-        <path
-          data-proposal-label-connector=""
-          d={`M${x + width / 2} ${y + height} L224 450 V462 H236`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={1.5}
-        />
+        <g data-proposal-label-connector="">
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M${x + width / 2} ${y + height} L224 450 V462 H236`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={scales.stroke(tokens.stroke.outline)}
+          />
+        </g>
       ) : undefined}
       <LabelSlots
         labels={[

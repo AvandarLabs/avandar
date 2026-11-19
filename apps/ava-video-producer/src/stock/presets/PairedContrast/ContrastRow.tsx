@@ -66,7 +66,7 @@ export function ContrastRow({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const y = 274 + index * 100;
-  const stagger = index * motion.scale(ROW_STAGGER_FRAMES);
+  const stagger = index * motion.scaleStagger(ROW_STAGGER_FRAMES);
   const entrance = ramp(
     frame,
     36 + stagger,

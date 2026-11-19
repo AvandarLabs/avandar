@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp, EASE } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 /** Data for getCellFromCommitment. */
 type GetCellFromCommitmentResult = {
@@ -59,12 +60,22 @@ type GetAppointmentGeometryResult = {
 function _getAppointmentGeometryFromInput({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetAppointmentGeometryResult {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetAppointmentGeometryResult {
   const commitment = input.commitments.find(propEq("kind", "support"))!;
   const initial = _getCellFromCommitment({ input, commitment, agreed: false });
   const agreed = _getCellFromCommitment({ input, commitment, agreed: true });
-  const proposal = ramp(frame, 12, 24, EASE.inOut);
-  const carry = ramp(frame, 52, 48, EASE.inOut);
+  const proposal = motion.ramp(
+    frame,
+    12,
+    motion.scale(24),
+    motion.travel.easing,
+  );
+  const carry = motion.ramp(frame, 52, motion.scale(48), motion.travel.easing);
   const x =
     frame < 52
       ? mix(proposal, 790, initial.x)

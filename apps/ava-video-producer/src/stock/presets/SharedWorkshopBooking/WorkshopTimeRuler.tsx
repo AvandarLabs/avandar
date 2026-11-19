@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
 /** Inputs for WorkshopTimeRuler. */
@@ -7,6 +8,7 @@ type Props = { input: Input };
 
 /** Discrete equal-width authored slots do not infer duration. */
 export function WorkshopTimeRuler({ input }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const slotWidth = 540 / input.timeSlots.length;
   return (
     <g>
@@ -14,10 +16,14 @@ export function WorkshopTimeRuler({ input }: Readonly<Props>): ReactNode {
       {input.timeSlots.map((slot, index) => {
         return (
           <g key={slot.id}>
-            <path
-              d={`M${390 + index * slotWidth} 490 V500 H${390 + (index + 1) * slotWidth} V490`}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${390 + index * slotWidth} 490 V500 H${390 + (index + 1) * slotWidth} V490`,
+              }}
+              profile={tokens.sketch.shape}
               fill="none"
-              stroke={STOCK.muted}
+              stroke={tokens.color.inactive}
             />
             <LabelSlots
               labels={[

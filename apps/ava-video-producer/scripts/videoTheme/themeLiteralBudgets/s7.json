@@ -12,7 +12,7 @@
     "!src/continuity/gallery/**",
     "src/avandar/AvandarScene.tsx"
   ],
-  "enforceLint": false,
+  "enforceLint": true,
   "coveredIds": [
     "shot-vocabulary",
     "stepped-column-wipe",
@@ -30,11 +30,5 @@
   ],
   "pendingTokens": [],
   "tempoPendingIds": [],
-  "literals": {
-    "src/scenes/BarComparisonScene/BarComparisonScene.tsx": 1,
-    "src/scenes/CaptionOverlay.tsx": 1,
-    "src/scenes/GraphScene.tsx": 1,
-    "src/scenes/MediaScene.tsx": 1,
-    "src/scenes/MetricScene.tsx": 1
-  }
+  "literals": {}
 }

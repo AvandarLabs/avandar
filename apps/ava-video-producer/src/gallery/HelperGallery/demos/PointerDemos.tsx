@@ -1,17 +1,31 @@
 import clsx from "clsx";
+import { useMemo } from "react";
 import { Cursor } from "../../../chrome/Cursor";
 import {
+  createCursorMotion,
   cursorOnTarget,
   cursorScale,
   cursorShutter,
   downAt,
   trackPos,
 } from "../../../cursor-motion";
-import { mixToken, press, ramp } from "../../../motion";
+import { mixToken } from "../../../motion";
+import { SketchedShape } from "../../../stock/primitives/SketchedShape";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
+import {
+  useVideoProps,
+  useVideoTheme,
+  useVideoTokens,
+} from "../../../videoTheme/useVideoTheme";
 import css from "./demos.module.css";
-import { DEMO_COLORS, formatReadout } from "./demoTheme";
+import { formatReadout, useDemoColors } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import type { CursorKey, CursorTarget } from "../../../cursor-motion";
+import type {
+  CursorKey,
+  CursorMotion,
+  CursorTarget,
+} from "../../../cursor-motion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
@@ -33,26 +47,46 @@ const TARGETS: CursorTarget[] = [
   { frame: CLICKS[1], ...BUTTON, cursor: "pointer" },
 ];
 
-/** The whole route, sampled once a frame, for a faint trail. */
-const TRAIL = Array.from({ length: 105 }, (_, frame) => {
-  return trackPos(frame, PATH);
-})
-  .map((point) => {
+/** Frames of the route the faint trail samples. */
+const TRAIL_FRAMES = 105;
+
+/** The theme's pointer motion: travel curve, press dip, and trail. */
+function useCursorMotion(): CursorMotion {
+  const motion = useVideoMotion();
+  const tokens = useVideoTokens();
+  const cursor = useVideoProps("Cursor", {});
+  return useMemo(() => {
+    return createCursorMotion(motion, tokens, cursor);
+  }, [motion, tokens, cursor]);
+}
+
+/** The whole route, sampled once a frame, as an SVG path. */
+function _buildTrailPath(cursorMotion: CursorMotion): string {
+  const points = Array.from({ length: TRAIL_FRAMES }, (_, frame) => {
+    const point = trackPos(frame, PATH, cursorMotion);
     return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
-  })
-  .join(" ");
+  });
+  return `M${points.join(" L")}`;
+}
 
 /** The field and button the pointer travels between. */
 function Targets({ frame }: { frame: number }) {
+  const theme = useVideoTheme();
+  const { stroke, sketch } = theme.semantic;
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
+  const cursorMotion = useCursorMotion();
   return (
     <>
       <svg className={css.layer} aria-hidden="true">
-        <polyline
-          points={TRAIL}
+        <SketchedShape
+          shape={{ kind: "path", d: _buildTrailPath(cursorMotion) }}
+          profile={sketch.shape}
           fill="none"
-          stroke={DEMO_COLORS.line}
-          strokeDasharray="4 6"
-          strokeWidth={2}
+          stroke={colors.line}
+          strokeDasharray={theme.atomic.dash.spaced.join(" ")}
+          strokeWidth={scales.stroke(stroke.default)}
         />
       </svg>
       <div
@@ -64,7 +98,7 @@ function Targets({ frame }: { frame: number }) {
         style={{
           left: BUTTON.x - 110,
           top: BUTTON.y - 32,
-          transform: `scale(${press(frame, CLICKS[1])})`,
+          transform: `scale(${motion.press(frame, CLICKS[1])})`,
         }}
       >
         Publish
@@ -75,7 +109,7 @@ function Targets({ frame }: { frame: number }) {
 
 /** A pointer travelling between measured targets with arrival holds. */
 export function TrackPosDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const position = trackPos(frame, PATH);
+  const position = trackPos(frame, PATH, useCursorMotion());
   return (
     <HelperDemoFrame
       frame={frame}
@@ -98,7 +132,7 @@ export function CursorOnTargetDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const shape = cursorOnTarget(frame, PATH, TARGETS);
+  const shape = cursorOnTarget(frame, PATH, TARGETS, useCursorMotion());
   return (
     <HelperDemoFrame
       frame={frame}
@@ -124,8 +158,12 @@ export function ClickFeedbackDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
+  const cursorMotion = useCursorMotion();
+  const brand = useVideoTokens().color.scene.brand;
+  const { accent } = useDemoColors();
   const isDown = downAt(frame, PRESS_CLICKS);
-  const fill = mixToken(Number(isDown), "var(--brand)", "var(--demo-accent)");
+  const fill = mixToken(Number(isDown), brand, accent);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -135,7 +173,10 @@ export function ClickFeedbackDemo({
         { name: "downAt", value: String(isDown) },
         {
           name: "cursorScale",
-          value: formatReadout(cursorScale(frame, PRESS_CLICKS), 3),
+          value: formatReadout(
+            cursorScale(frame, PRESS_CLICKS, cursorMotion),
+            3,
+          ),
         },
       ]}
     >
@@ -145,7 +186,7 @@ export function ClickFeedbackDemo({
           background: fill,
           transform: `scale(${Math.min(
             ...PRESS_CLICKS.map((at) => {
-              return press(frame, at);
+              return motion.press(frame, at);
             }),
           )})`,
         }}
@@ -173,13 +214,16 @@ const FAST_PATH: CursorKey[] = [
 const SAMPLE_NAMES = ["far", "middle", "near"] as const;
 /** How much the shutter samples are enlarged in the inset. */
 const INSET_SCALE = 12;
+/** How visible a lit shutter sample is in the inset. */
+const SAMPLE_OPACITY = 0.6;
 
 /** A fast pointer with its trailing shutter samples drawn enlarged. */
 export function CursorShutterDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const samples = cursorShutter(frame, FAST_PATH);
+  const motion = useVideoMotion();
+  const samples = cursorShutter(frame, FAST_PATH, useCursorMotion());
   return (
     <HelperDemoFrame
       frame={frame}
@@ -200,7 +244,7 @@ export function CursorShutterDemo({
               className={css.insetSample}
               style={{
                 transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
-                opacity: sample.opacity > 0 ? 0.6 : 0,
+                opacity: sample.opacity > 0 ? SAMPLE_OPACITY : 0,
               }}
             />
           );
@@ -209,7 +253,12 @@ export function CursorShutterDemo({
         <span className={css.insetLabel}>{`× ${INSET_SCALE}`}</span>
       </div>
       <Cursor frame={frame} path={FAST_PATH} />
-      <span className={css.footnote} style={{ opacity: ramp(frame, 0, 6) }}>
+      <span
+        className={css.footnote}
+        style={{
+          opacity: motion.ramp(frame, 0, motion.chip, motion.reveal.easing),
+        }}
+      >
         Inset: shutter samples relative to the pointer, enlarged
       </span>
     </HelperDemoFrame>

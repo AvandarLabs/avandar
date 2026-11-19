@@ -1,3 +1,4 @@
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { AllocationCoordinator } from "./AllocationCoordinator";
 import { DonorToken } from "./DonorToken";
 import { DonorTray } from "./DonorTray";
@@ -16,7 +17,8 @@ export function PooledDonorAllocation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = getAllocationTokensFromInputAndFrame({ input, frame });
+  const motion = useGraphicMotion();
+  const tokens = getAllocationTokensFromInputAndFrame({ input, frame, motion });
   return (
     <g>
       <FundingLabels input={input} />

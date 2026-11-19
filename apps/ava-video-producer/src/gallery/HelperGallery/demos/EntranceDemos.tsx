@@ -1,13 +1,5 @@
-import {
-  DUR,
-  enter,
-  enterAt,
-  leave,
-  mix,
-  pop,
-  press,
-  ramp,
-} from "../../../motion";
+import { mix } from "../../../motion";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
@@ -26,7 +18,8 @@ const ENTER_VARIANTS = [
 
 /** `enter()` with its default rise, a sideways arrival and a small scale. */
 export function EnterDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const style = enter(frame, ENTER_AT);
+  const motion = useVideoMotion();
+  const style = motion.enter(frame, ENTER_AT);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -44,7 +37,7 @@ export function EnterDemo({ frame, frames }: HelperDemoProps): ReactNode {
               <div key={variant.code} className={css.cardColumn}>
                 <DemoCard
                   title="Saved view"
-                  style={enter(frame, ENTER_AT, variant.options)}
+                  style={motion.enter(frame, ENTER_AT, variant.options)}
                 />
                 <span className={css.caption}>{variant.code}</span>
               </div>
@@ -60,6 +53,7 @@ const ROWS = ["first", "second", "third", "fourth", "fifth", "sixth"];
 
 /** `enterAt()` walking a list in, `STAGGER` frames apart. */
 export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   return (
     <HelperDemoFrame
       frame={frame}
@@ -68,7 +62,9 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
       readouts={ROWS.slice(0, 3).map((row, index) => {
         return {
           name: `row ${index}`,
-          value: formatReadout(Number(enterAt(frame, 12, index).opacity)),
+          value: formatReadout(
+            Number(motion.enterAt(frame, 12, index).opacity),
+          ),
         };
       })}
     >
@@ -78,7 +74,7 @@ export function EnterAtDemo({ frame, frames }: HelperDemoProps): ReactNode {
             <div
               key={row}
               className={css.listRow}
-              style={enterAt(frame, 12, index)}
+              style={motion.enterAt(frame, 12, index)}
             >
               <span className={css.listDot} />
               <span
@@ -97,7 +93,9 @@ const LEAVE_AT = 48;
 
 /** A card entering, then `leave()` reversing the same rise. */
 export function LeaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const style = frame < LEAVE_AT ? enter(frame, 6) : leave(frame, LEAVE_AT);
+  const motion = useVideoMotion();
+  const style =
+    frame < LEAVE_AT ? motion.enter(frame, 6) : motion.leave(frame, LEAVE_AT);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -119,13 +117,15 @@ const POP_AT = 15;
 
 /** A card landing on a spring, beside the spring's own curve. */
 export function PopDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const landing = pop(frame, POP_AT);
-  const time = Math.min(1, Math.max(0, (frame - POP_AT) / DUR.sheet));
+  const motion = useVideoMotion();
+  const landing = motion.pop(frame, POP_AT);
+  const { duration, spring } = motion.emphasis;
+  const time = Math.min(1, Math.max(0, (frame - POP_AT) / duration));
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`pop(frame, ${POP_AT})  damping 14 · stiffness 120 · mass 0.8`}
+      label={`pop(frame, ${POP_AT})  damping ${spring.damping} · stiffness ${spring.stiffness} · mass ${spring.mass}`}
       readouts={[
         { name: "pop", value: formatReadout(landing) },
         { name: "y", value: `${formatReadout(mix(landing, -80, 0), 1)}px` },
@@ -135,7 +135,7 @@ export function PopDemo({ frame, frames }: HelperDemoProps): ReactNode {
         <div className={css.plotCell}>
           <CurvePlot
             easing={(value) => {
-              return pop(value * DUR.sheet, 0);
+              return motion.pop(value * duration, 0);
             }}
             t={time}
             size={300}
@@ -145,7 +145,12 @@ export function PopDemo({ frame, frames }: HelperDemoProps): ReactNode {
           <DemoCard
             title="Export ready"
             style={{
-              opacity: ramp(frame, POP_AT, DUR.chip),
+              opacity: motion.ramp(
+                frame,
+                POP_AT,
+                motion.chip,
+                motion.reveal.easing,
+              ),
               transform: `translateY(${mix(landing, -80, 0).toFixed(2)}px)`,
             }}
           />
@@ -159,9 +164,10 @@ const PRESSES = [20, 50];
 
 /** A button answering two presses with `press()` and returning to exactly 1. */
 export function PressDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   const scale = Math.min(
     ...PRESSES.map((at) => {
-      return press(frame, at);
+      return motion.press(frame, at);
     }),
   );
   return (

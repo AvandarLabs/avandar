@@ -1,5 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 /** Data for getRecipientPoseFromInputAndFrame. */
 type GetRecipientPoseResult = {
@@ -26,7 +27,12 @@ function _getSelections(input: Input) {
 export function getRecipientPoseFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetRecipientPoseResult {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetRecipientPoseResult {
   const selections = _getSelections(input);
   const ordinal = Math.max(
     0,
@@ -36,6 +42,7 @@ export function getRecipientPoseFromInputAndFrame({
     input,
     frame,
     ...selections[ordinal],
+    motion,
   });
   const previous =
     ordinal === 0
@@ -44,12 +51,14 @@ export function getRecipientPoseFromInputAndFrame({
           input,
           frame: 150,
           ...selections[ordinal - 1],
+          motion,
         });
   const start = 30 + ordinal * 14;
-  const approach = ramp(
+  const approach = motion.ramp(
     frame,
     start + (ordinal === 0 ? 0 : 1),
     ordinal === 0 ? 4 : 3,
+    motion.entrance.easing,
   );
   const waypoint = Math.min(1, approach * 3);
   const vertical = Math.max(0, Math.min(1, approach * 3 - 1));
@@ -60,11 +69,19 @@ export function getRecipientPoseFromInputAndFrame({
     product.x + 38,
   );
   const y = mix(vertical, previous.y + 35, product.y + 35);
-  const release = ramp(frame, 30 + selections.length * 14, 4);
+  const release = motion.ramp(
+    frame,
+    30 + selections.length * 14,
+    motion.press.duration,
+    motion.entrance.easing,
+  );
   const grip = finalReach * (1 - release);
   const handX = mix(grip, x - 12, product.x + 12);
   const handY = mix(grip, y + 8, product.y);
-  const withdraw = ordinal === 0 ? 1 : ramp(frame, start, 1);
+  const withdraw =
+    ordinal === 0
+      ? 1
+      : motion.ramp(frame, start, motion.scale(1), motion.entrance.easing);
   return {
     x,
     y,

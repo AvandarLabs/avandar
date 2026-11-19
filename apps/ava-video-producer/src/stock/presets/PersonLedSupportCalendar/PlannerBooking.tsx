@@ -1,8 +1,14 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PlannerBookingLabel } from "./PlannerBookingLabel";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
 
+/** The dash of a booking that is still a proposal. */
+const PROPOSAL_DASH = "6 3";
 type Props = {
   commitment: Input["commitments"][number];
   x: number;
@@ -26,20 +32,22 @@ export function PlannerBooking({
   showLabel = true,
   isProposal = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-booking={commitment.id}
         data-kind={commitment.kind}
         x={x}
         y={y}
         width={width}
         height={height}
-        rx={5}
-        fill={isProposal ? "none" : STOCK.elevated}
+        rx={scales.corner(5)}
+        fill={isProposal ? "none" : tokens.color.elevated}
         stroke={accent}
-        strokeWidth={2}
-        strokeDasharray={isProposal ? "6 3" : undefined}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeDasharray={isProposal ? PROPOSAL_DASH : undefined}
       />
       {showLabel ? (
         <PlannerBookingLabel

@@ -16,21 +16,36 @@ import {
 import { inputSchema, type Input } from "./PracticeToWorkSample.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(PracticeToWorkSample, {
-        frame,
-        input,
-        accent: "#79d5bd",
-        background: "#101720",
-        id: "packet16",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(PracticeToWorkSample, {
+          frame,
+          input,
+          accent: "#79d5bd",
+          background: "#101720",
+          id: "packet16",
+        }),
+      ),
     ),
   );
 }

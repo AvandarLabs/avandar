@@ -1,4 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,14 +22,21 @@ export function DimensionTicks({
   marker,
   side = "outside",
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const offset = side === "outside" ? -9 : 3;
   return (
-    <path
-      data-dimension-ticks={marker}
-      d={`M${x} ${y + offset - 4} v8 M${x + width} ${y + offset - 4} v8 M${x} ${y + offset} H${x + width} M${x + offset - 4} ${y} h8 M${x + offset - 4} ${y + height} h8 M${x + offset} ${y} V${y + height}`}
-      fill="none"
-      stroke={STOCK.muted}
-      strokeWidth={0.8}
-    />
+    <g data-dimension-ticks={marker}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x} ${y + offset - 4} v8 M${x + width} ${y + offset - 4} v8 M${x} ${y + offset} H${x + width} M${x + offset - 4} ${y} h8 M${x + offset - 4} ${y + height} h8 M${x + offset} ${y} V${y + height}`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(0.8)}
+      />
+    </g>
   );
 }

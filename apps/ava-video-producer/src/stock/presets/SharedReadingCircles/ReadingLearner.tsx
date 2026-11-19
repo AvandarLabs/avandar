@@ -1,4 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+  useGraphicMotion,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getReadingLearnerFromInput } from "./getReadingLearnerFromInput";
 import { getReadingSeatPathFromFrame } from "./getReadingSeatPathFromFrame";
 import { ReadingPerson } from "./ReadingPerson";
@@ -24,11 +29,15 @@ export function ReadingLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const { x, y, isCarrying, hasHand, handX, handY, bookId, seatAngle } =
     getReadingLearnerFromInput({
       input,
       learner,
       frame,
+      motion,
     });
   return (
     <g>
@@ -37,13 +46,22 @@ export function ReadingLearner({
         data-reader-book={bookId}
         transform={`translate(${x} ${y})`}
       >
-        <path
-          data-reading-seat={learner.id}
-          d={getReadingSeatPathFromFrame({ frame, angle: seatAngle })}
-          fill="none"
-          stroke={STOCK.line}
-          strokeWidth={2}
-        />
+        <g data-reading-seat={learner.id}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: getReadingSeatPathFromFrame({
+                frame,
+                angle: seatAngle,
+                motion,
+              }),
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.line}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
         <ReadingPerson
           learnerId={learner.id}
           accent={accent}
@@ -54,7 +72,7 @@ export function ReadingLearner({
         />
         <SceneText
           text={String(index + 1)}
-          color={STOCK.cyan}
+          color={tokens.color.accentAlt}
           slot={[21, 0, 20, 12, 1]}
         />
       </g>

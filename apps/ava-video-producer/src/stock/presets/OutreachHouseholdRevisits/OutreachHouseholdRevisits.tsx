@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { HouseholdMap } from "./HouseholdMap";
 import { OutreachLedger } from "./OutreachLedger";
 import { OutreachWorker } from "./OutreachWorker";
@@ -15,6 +15,7 @@ export function OutreachHouseholdRevisits({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const numCompleted = Math.min(
     input.visits.length,
     Math.max(0, Math.floor(((frame - 36) / 72) * input.visits.length)),
@@ -22,7 +23,7 @@ export function OutreachHouseholdRevisits({
   const completed = input.visits.slice(0, numCompleted);
   return (
     <g
-      opacity={ramp(frame, 12, 18)}
+      opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}
       data-unique-contacted={
         new Set(
           completed

@@ -17,13 +17,15 @@ function _render({
   frame,
   input = DEFAULT_INPUT,
 }: Readonly<{ frame: number; input?: typeof DEFAULT_INPUT }>): string {
-  return renderToStaticMarkup(
-    createElement(RetailShelfReplenishment, {
-      frame,
-      input,
-      accent: "#9fefca",
-      id: "test",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(RetailShelfReplenishment, {
+        frame,
+        input,
+        accent: "#9fefca",
+        id: "test",
+      }),
+    ),
   );
 }
 test("closing shelf and basket conserve each authored product", () => {
@@ -53,13 +55,15 @@ test("closing shelf and basket conserve each authored product", () => {
 
 test("changed authored input emits its physical scene", () => {
   assert.notEqual(
-    renderToStaticMarkup(
-      createElement(RetailShelfReplenishment, {
-        frame: 150,
-        input: CHANGED_INPUT,
-        accent: "#9fefca",
-        id: "test",
-      }),
+    _joinMarkedShapes(
+      renderToStaticMarkup(
+        createElement(RetailShelfReplenishment, {
+          frame: 150,
+          input: CHANGED_INPUT,
+          accent: "#9fefca",
+          id: "test",
+        }),
+      ),
     ),
     "",
   );
@@ -169,6 +173,19 @@ test("retailer points and orders before a loaded carrier arrives, then shopper s
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { retailShelfReplenishmentContract } from "./RetailShelfReplenishment.contract";
 import { inputSchema, type Input } from "./RetailShelfReplenishment.schema";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 function _getVisibleTexts({
   input,

@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
@@ -14,13 +14,14 @@ export function ReturnActivityLabels({
   input,
   index,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const labelX = 180 + index * 300;
   return (
     <>
       <g>
         <SceneText
           text={String(index + 1)}
-          color={STOCK.orange}
+          color={tokens.color.highlight}
           slot={[labelX - 138, 460, 24, 14, 1]}
         />
         <SceneText

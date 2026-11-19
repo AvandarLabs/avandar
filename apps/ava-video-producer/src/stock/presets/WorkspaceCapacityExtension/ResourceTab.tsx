@@ -2,6 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
@@ -17,8 +18,6 @@ type Props = {
   isExisting?: boolean;
   isSeated?: boolean;
 };
-/** The dash of an open, unseated slot. */
-const OPEN_SLOT_DASH = "4 3";
 /** Stable resource badge and optional full name within its physical tab. */
 export function ResourceTab({
   resource,
@@ -31,6 +30,7 @@ export function ResourceTab({
   isSeated = false,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   return (
     <g
@@ -49,7 +49,9 @@ export function ResourceTab({
         rx={scales.corner(6)}
         fill={tokens.color.surface}
         stroke={accent}
-        strokeDasharray={!isExisting && !isSeated ? OPEN_SLOT_DASH : undefined}
+        strokeDasharray={
+          !isExisting && !isSeated ? atomic.dash.tight.join(" ") : undefined
+        }
       />
       <LabelSlots labels={[[String(index + 1), x + 10, y + 18, 58, 14, 1]]} />
       {showLabel ? (

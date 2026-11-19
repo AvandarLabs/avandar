@@ -13,9 +13,6 @@ type Props = {
   state: string;
   accent: string;
 };
-
-/** The dash of an empty slot with no observed value. */
-const MISSING_DASH = "5 5";
 /**
  * Aligned sheets preserve complete literal values and an empty missing slot.
  */
@@ -39,7 +36,9 @@ export function StationSheets({
         height={35}
         fill={tokens.color.surface}
         stroke={tokens.color.inactive}
-        strokeDasharray={item.observed === null ? MISSING_DASH : undefined}
+        strokeDasharray={
+          item.observed === null ? tokens.dash.placeholder.join(" ") : undefined
+        }
       />
       {item.observed !== null ? (
         <LiteralDataText value={item.observed} x={525} y={y + 44} />

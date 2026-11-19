@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReunionInvitation } from "./ReunionInvitation";
 import { ReunionMember } from "./ReunionMember";
 import { DEFAULT_INPUT } from "./VoluntaryFamilyReunion.fixtures";
@@ -16,17 +20,23 @@ export function VoluntaryFamilyReunion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const numMembers = input.groups.reduce((sum, group) => {
     return sum + group.members.length;
   }, 0);
   const halfWidth = (numMembers - 1) * 45 + 35;
   return (
     <g>
-      <path
-        d={`M70 405 H890 M${480 - halfWidth} 340 V405 M${480 + halfWidth} 340 V405 M${470 - halfWidth} 340 L480 310 L${490 + halfWidth} 340`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M70 405 H890 M${480 - halfWidth} 340 V405 M${480 + halfWidth} 340 V405 M${470 - halfWidth} 340 L480 310 L${490 + halfWidth} 340`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={input.meetingLabel}
@@ -56,7 +66,7 @@ export function VoluntaryFamilyReunion({
               input={input}
               groupIndex={groupIndex}
               frame={frame}
-              accent={groupIndex === 0 ? accent : STOCK.orange}
+              accent={groupIndex === 0 ? accent : tokens.color.highlight}
             />
             {group.members.map((member, index) => {
               return (
@@ -67,7 +77,7 @@ export function VoluntaryFamilyReunion({
                   groupIndex={groupIndex}
                   input={input}
                   frame={frame}
-                  accent={groupIndex === 0 ? accent : STOCK.orange}
+                  accent={groupIndex === 0 ? accent : tokens.color.highlight}
                 />
               );
             })}

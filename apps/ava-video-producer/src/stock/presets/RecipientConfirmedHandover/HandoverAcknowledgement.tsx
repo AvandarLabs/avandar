@@ -1,5 +1,10 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import {
+  useGraphicMotion,
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
 
@@ -14,9 +19,12 @@ export function HandoverAcknowledgement({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   return (
     <g
-      opacity={ramp(frame, 114, 12)}
+      opacity={motion.reveal(frame, 114)}
       data-acknowledgement={input.acknowledgementMark}
     >
       <FitText
@@ -41,10 +49,11 @@ export function HandoverAcknowledgement({
           breakLongWords
         />
       ) : (
-        <path
-          d="M875 542 l9 8 l17 -18"
+        <SketchedShape
+          shape={{ kind: "path", d: "M875 542 l9 8 l17 -18" }}
+          profile={tokens.sketch.shape}
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           fill="none"
         />
       )}

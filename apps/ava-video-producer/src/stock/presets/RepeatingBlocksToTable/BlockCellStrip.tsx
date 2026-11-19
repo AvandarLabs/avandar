@@ -3,6 +3,7 @@ import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
+  useGraphicTheme,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getBlockCellGeometryFromFrame } from "./getBlockCellGeometryFromFrame";
@@ -16,8 +17,6 @@ type Props = {
   blockIndex: number;
   fieldIndex: number;
 };
-/** The dash of a missing cell's outline. */
-const MISSING_DASH = "4 3";
 /** Field identity travels with its value as block stacks become table rows. */
 export function BlockCellStrip({
   input,
@@ -28,6 +27,7 @@ export function BlockCellStrip({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   const field = input.fields[fieldIndex],
     block = input.blocks[blockIndex];
@@ -55,7 +55,9 @@ export function BlockCellStrip({
         rx={scales.corner(5)}
         fill={tokens.color.surface}
         stroke={value === null ? tokens.color.highlight : color}
-        strokeDasharray={value === null ? MISSING_DASH : undefined}
+        strokeDasharray={
+          value === null ? atomic.dash.tight.join(" ") : undefined
+        }
       />
       <LabelSlots
         labels={[

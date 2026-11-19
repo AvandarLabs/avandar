@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 /** Inputs for getHandoverPositionFromInputAndFrame. */
 type GetHandoverPositionOptions = {
@@ -6,6 +7,7 @@ type GetHandoverPositionOptions = {
   frame: number;
   contentIndex: number;
   unitIndex: number;
+  motion: VideoMotion;
 };
 
 /**
@@ -16,6 +18,7 @@ export function getHandoverPositionFromInputAndFrame({
   frame,
   contentIndex,
   unitIndex,
+  motion,
 }: Readonly<GetHandoverPositionOptions>): {
   x: number;
   y: number;
@@ -28,7 +31,12 @@ export function getHandoverPositionFromInputAndFrame({
     }, 0) + unitIndex;
   const travel =
     unitIndex < content.selectedUnits
-      ? ramp(frame, 34 + ordinal * 14, 10, EASE.inOut)
+      ? motion.ramp(
+          frame,
+          34 + ordinal * 14,
+          motion.scale(10),
+          motion.travel.easing,
+        )
       : 0;
   return {
     x: mix(travel, 205 + unitIndex * 32, 542 + unitIndex * 32),

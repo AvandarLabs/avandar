@@ -18,13 +18,15 @@ function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(PooledDonorAllocation, {
-      frame,
-      input,
-      accent: "#9fefca",
-      id: "test",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(PooledDonorAllocation, {
+        frame,
+        input,
+        accent: "#9fefca",
+        id: "test",
+      }),
+    ),
   );
 }
 test("Every allocated token preserves donor attribution and obeys its earmark; allocations plus residual funds equal contributions and overspending fails.", () => {
@@ -378,5 +380,18 @@ test("coordinator arm and body stay on canvas through every scoop pickup and rel
 });
 
 import { registerFundingActionAssertions } from "./registerFundingActionAssertions";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 registerFundingActionAssertions(_render);

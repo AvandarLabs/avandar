@@ -1,12 +1,16 @@
-import { countTo, ramp, STAGGER } from "../../../motion";
+import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
+/** How long each aggregate quantity counts up from zero. */
+const COUNT_FRAMES = 28;
 type Props = { input: Input; frame: number };
 /** Captions and aggregate quantities retain the eligible sampling frame. */
 export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const selectedCount = input.selectedSiteIds.length;
   const eligibleCount = input.sites.length;
   return (
@@ -22,10 +26,25 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
       />
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
         (quantity, index) => {
+          const countAt = 108 + index * motion.stagger.list;
+          const count = motion.ramp(
+            frame,
+            countAt,
+            motion.scale(COUNT_FRAMES),
+            motion.entrance.easing,
+          );
           return (
-            <g key={index} opacity={ramp(frame, 108 + index * STAGGER)}>
-              <Text x={40 + index * 310} y={552} size={24}>
-                {countTo(frame, 108 + index * STAGGER, quantity, 28)}
+            <g
+              key={index}
+              opacity={motion.ramp(
+                frame,
+                countAt,
+                motion.panel,
+                motion.reveal.easing,
+              )}
+            >
+              <Text x={40 + index * 310} y={552} role="question">
+                {Math.round(mix(count, 0, quantity))}
               </Text>
             </g>
           );

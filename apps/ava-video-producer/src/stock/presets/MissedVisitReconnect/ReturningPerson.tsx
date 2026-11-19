@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
@@ -18,9 +19,19 @@ export function ReturningPerson({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = useGraphicMotion();
   const x =
     item.outcome === "attended"
-      ? mix(ramp(frame, 91 + index * 2, 13, EASE.inOut), 240, 830)
+      ? mix(
+          motion.ramp(
+            frame,
+            91 + index * motion.stagger.list,
+            motion.sheet,
+            motion.travel.easing,
+          ),
+          240,
+          830,
+        )
       : 240;
   return (
     <g data-returning-person={item.id} transform={`translate(${x} ${y})`}>
