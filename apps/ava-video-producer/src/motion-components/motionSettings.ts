@@ -38,6 +38,13 @@ export const MOTION_PRESETS = {
 } as const;
 
 /**
+ * The preset a motion cue without one follows: its speed, shutter, and curve.
+ * The continuity plan builder writes this preset's themed speed into such
+ * cues so their length is fixed in the plan.
+ */
+export const DEFAULT_MOTION_PRESET = "brisk";
+
+/**
  * Serializable overrides shared by JSX components and storyboard motion
  * cues. In a continuity shot, `createContinuityPlanFromVideoTheme` expands a
  * preset and fills the shutter, samples, and blur fields from the video
@@ -133,7 +140,7 @@ export function resolveMotionSettings(
   theme: MotionSettingsTheme = getClassicMotionSettingsTheme(),
 ): ResolvedMotionSettings {
   const parsed = motionOptionsSchema.parse(options);
-  const presetName = parsed.preset ?? "brisk";
+  const presetName = parsed.preset ?? DEFAULT_MOTION_PRESET;
   const preset = theme.camera.presets[presetName];
   const { motionBlur } = theme;
   return {

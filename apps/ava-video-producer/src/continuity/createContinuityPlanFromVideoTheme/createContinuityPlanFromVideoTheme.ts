@@ -1,8 +1,14 @@
+import { getOverlayTimings } from "../../motion-components/AnchoredOverlay";
 import { retimeCameraTrack } from "../../motion-components/cameraTrack";
-import { motionOptionsSchema } from "../../motion-components/motionSettings";
+import {
+  DEFAULT_MOTION_PRESET,
+  getMotionDuration,
+  motionOptionsSchema,
+} from "../../motion-components/motionSettings";
 import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
 import { makeResolvedVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { getContinuityTimeline } from "../continuityTimeline";
+import type { OverlayCue } from "../../motion-components/AnchoredOverlay";
 import type {
   MotionEasing,
   MotionOptions,
@@ -69,8 +75,9 @@ function _presetMotionOptions(
  * Motion options with the theme filled in. A named preset becomes the
  * theme's speed, shutter, and curve for that preset, and every cue gets the
  * theme's blur samples and limits. Values the storyboard authored win.
- * Without a preset, speed and curve stay unset, so the cue keeps its
- * authored timing and its own fallback curve.
+ * Without a preset, the cue takes the default preset's themed speed, so a
+ * timeline read without the theme still counts the frames it renders, and
+ * keeps its own fallback curve.
  */
 export function createMotionOptionsFromTheme(
   options: MotionOptions | undefined,
@@ -81,7 +88,10 @@ export function createMotionOptionsFromTheme(
   return {
     ...(preset
       ? _presetMotionOptions(preset, semantic)
-      : { shutterAngle: blur.shutter }),
+      : {
+          speed: semantic.camera.presets[DEFAULT_MOTION_PRESET].speed,
+          shutterAngle: blur.shutter,
+        }),
     samples: blur.samples,
     velocityBlurFactor: blur.velocityFactor,
     velocityBlurLimit: blur.velocityMax,
@@ -139,6 +149,39 @@ function _themeCameraKey(key: CameraKey, camera: CameraTheme): CameraKey {
   };
 }
 
+/** The fastest speed a motion cue may take. */
+const MAX_MOTION_SPEED = 4;
+
+function _fitsOverlayWindow(cue: OverlayCue): boolean {
+  try {
+    getOverlayTimings(cue);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Overlay motion with the theme filled in, sped up just enough that its
+ * travel still leaves a reading hold inside the authored window when the
+ * theme's speed is too slow for it. The plan's beats keep their content
+ * timing, so the window cannot grow instead.
+ */
+function _themeOverlayMotion(
+  overlay: OverlayCue,
+  semantic: ThemeSemantic,
+): MotionOptions {
+  const motion = createMotionOptionsFromTheme(overlay.motion, semantic);
+  let speed = motion.speed ?? 1;
+  while (
+    speed < MAX_MOTION_SPEED &&
+    !_fitsOverlayWindow({ ...overlay, motion: { ...motion, speed } })
+  ) {
+    speed = Math.min(MAX_MOTION_SPEED, Math.round(speed * 105) / 100);
+  }
+  return { ...motion, speed };
+}
+
 function _themeCompositeContent(
   content: Extract<BeatContent, { kind: "composite" }>,
   semantic: ThemeSemantic,
@@ -150,10 +193,7 @@ function _themeCompositeContent(
         ...diagram,
         overlay: {
           ...diagram.overlay,
-          motion: createMotionOptionsFromTheme(
-            diagram.overlay.motion,
-            semantic,
-          ),
+          motion: _themeOverlayMotion(diagram.overlay, semantic),
         },
       };
     }),
@@ -244,6 +284,36 @@ function _themeBeat(options: {
   };
 }
 
+/** Each beat's incoming overlap in frames. The first beat has none. */
+function _overlapFrames(beats: readonly ContinuityBeat[]): number[] {
+  return beats.map((beat, index) => {
+    return index === 0
+      ? 0
+      : getMotionDuration(beat.transition.frames, beat.transition.motion);
+  });
+}
+
+/**
+ * The beats with each one lengthened by what its themed overlaps gained, so
+ * the reading hold between its incoming and outgoing overlap keeps its
+ * length. A shorter overlap leaves the beat as it is.
+ */
+function _keepReadingHolds(
+  authored: readonly ContinuityBeat[],
+  themed: readonly ContinuityBeat[],
+): ContinuityBeat[] {
+  const before = _overlapFrames(authored);
+  const after = _overlapFrames(themed);
+  return themed.map((beat, index) => {
+    const gained =
+      after[index] -
+      before[index] +
+      (after[index + 1] ?? 0) -
+      (before[index + 1] ?? 0);
+    return { ...beat, duration: beat.duration + Math.max(0, gained) };
+  });
+}
+
 function _themeShot(
   shot: ContinuityShot,
   semantic: ThemeSemantic,
@@ -252,11 +322,20 @@ function _themeShot(
   const presetOptions = shot.props.cameraMotion
     ? camera.presetOptions
     : undefined;
-  const beats = shot.props.beats.map((beat) => {
-    return _themeBeat({ beat, semantic, camera, presetOptions });
-  });
+  const authored = shot.props.beats;
+  const beats = _keepReadingHolds(
+    authored,
+    authored.map((beat) => {
+      return _themeBeat({ beat, semantic, camera, presetOptions });
+    }),
+  );
+  const overlaps = _overlapFrames(authored);
+  const themedOverlaps = _overlapFrames(beats);
   const isRetimed = beats.some((beat, index) => {
-    return beat.duration !== shot.props.beats[index].duration;
+    return (
+      beat.duration !== authored[index].duration ||
+      themedOverlaps[index] !== overlaps[index]
+    );
   });
   if (!isRetimed) {
     return { ...shot, props: { ...shot.props, beats } };

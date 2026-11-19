@@ -67,6 +67,8 @@ modules:
         reason: "Validation schema for the options the motion presets resolve, not motion."
       - name: motionEasingSchema
         reason: "Validation schema for named and cubic Bezier easings, not motion."
+      - name: DEFAULT_MOTION_PRESET
+        reason: "The preset name an unnamed motion cue resolves to; plumbing, not motion."
   - path: src/cursor-motion.ts
     excluded:
       - name: createCursorMotion

@@ -3,6 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 import { getCameraPose } from "../../motion-components/cameraTrack";
 import {
+  createMotionSettingsTheme,
+  getMotionDuration,
   getMotionEasing,
   resolveMotionSettings,
 } from "../../motion-components/motionSettings";
@@ -12,11 +14,15 @@ import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/built
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { createContinuityPlanFromOptions } from "../continuityAppearance";
 import { CONTINUITY_CATALOG } from "../continuityCatalog";
+import { getContinuityTimeline } from "../continuityTimeline";
 import {
   createContinuityPlanFromVideoTheme,
   createMotionOptionsFromTheme,
 } from "./createContinuityPlanFromVideoTheme";
-import type { MotionOptions } from "../../motion-components/motionSettings";
+import type {
+  MotionOptions,
+  MotionSettingsTheme,
+} from "../../motion-components/motionSettings";
 import type { Storyboard } from "../../storyboard/schema/schema";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 
@@ -124,8 +130,9 @@ test("authored motion values win over the theme", () => {
   );
 });
 
-test("a cue without a preset keeps its own timing and curve and takes the theme's blur", () => {
+test("a cue without a preset takes the default preset's speed, keeps its curve, and takes the theme's blur", () => {
   assert.deepEqual(createMotionOptionsFromTheme(undefined, CLASSIC.semantic), {
+    speed: 1,
     shutterAngle: 180,
     ...CLASSIC_BLUR,
   });
@@ -159,6 +166,7 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
     });
   });
   const {
+    speed,
     shutterAngle,
     samples,
     velocityBlurFactor,
@@ -166,6 +174,7 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
     transitionBlur,
   } = resolveMotionSettings();
   assert.deepEqual(createMotionOptionsFromTheme(undefined, CLASSIC.semantic), {
+    speed,
     shutterAngle,
     samples,
     velocityBlurFactor,
@@ -241,6 +250,64 @@ test("every catalog film stays valid with every theme camera preset, which camer
         createContinuityPlanFromVideoTheme(still, CLASSIC),
         `${id}: ${preset}`,
       );
+    });
+  });
+});
+
+/**
+ * Each continuity shot's beats with the reading hold each one keeps between
+ * its incoming and outgoing overlap, and the frame its `TransitionSeries`
+ * ends on, with overlaps sized as `ContinuityScene` sizes them.
+ */
+function _renderedBeatSchedules(
+  plan: Storyboard,
+  settings?: MotionSettingsTheme,
+) {
+  return plan.shots.flatMap((shot) => {
+    if (shot.scene !== "continuity") return [];
+    const { beats } = shot.props;
+    const overlaps = beats.map((beat, index) => {
+      return index === 0
+        ? 0
+        : getMotionDuration(
+            beat.transition.frames,
+            beat.transition.motion,
+            settings,
+          );
+    });
+    const holds = beats.map((beat, index) => {
+      return beat.duration - overlaps[index] - (overlaps[index + 1] ?? 0);
+    });
+    const end = beats.reduce((sum, beat, index) => {
+      return sum + beat.duration - overlaps[index];
+    }, 0);
+    return [{ shot, holds, end }];
+  });
+}
+
+test("a theme's default camera speed retimes continuity beats the way they render", () => {
+  [0.15, 0.6, 1.5].forEach((brisk) => {
+    const theme = _classicWith({
+      other: { video: { atomic: { cameraSpeed: { brisk } } } },
+    });
+    const settings = createMotionSettingsTheme(theme);
+    PLANS.forEach(({ id, plan }) => {
+      const themed = createContinuityPlanFromVideoTheme(plan, theme);
+      const authored = _renderedBeatSchedules(plan);
+      _renderedBeatSchedules(themed, settings).forEach(
+        ({ shot, holds, end }, index) => {
+          const label = `${id}: ${shot.id} at ${brisk}`;
+          const props = shot.scene === "continuity" ? shot.props : undefined;
+          const timeline = getContinuityTimeline(props?.beats ?? []);
+          assert.equal(timeline[timeline.length - 1].end, end, label);
+          assert.equal(shot.durationInFrames, end, label);
+          holds.forEach((hold, beat) => {
+            assert.ok(hold >= authored[index].holds[beat], label);
+          });
+        },
+      );
+      const result = storyboardSchema.safeParse(themed);
+      assert.equal(result.success, true, `${id}: ${result.error?.message}`);
     });
   });
 });
