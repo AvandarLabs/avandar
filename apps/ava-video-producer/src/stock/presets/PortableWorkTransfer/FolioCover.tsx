@@ -1,4 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
@@ -31,7 +32,7 @@ export function FolioCover({
   };
   return (
     <g>
-      <rect
+      <StockRect
         data-folio-cover="true"
         data-folio-closed={isClosed ? true : undefined}
         {...cover}

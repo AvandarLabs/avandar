@@ -1,4 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicShapeScales,
   useGraphicTokens,
@@ -38,7 +39,7 @@ export function TransferFolio({
   };
   return (
     <g>
-      <rect data-folio="one" {...body} />
+      <StockRect data-folio="one" {...body} />
       <SketchedShape
         shape={{ kind: "path", d: `M${scene.folioX + 100} 198 v-14 h50 v14` }}
         profile={tokens.sketch.shape}

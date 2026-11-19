@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
@@ -56,7 +57,7 @@ export function ReadinessResult({
   const label = { text: input.sharedAction, x: centerX - 88, y: centerY - 16 };
   return (
     <g opacity={motion.reveal(frame, 22)}>
-      <rect data-result="single" {...panel} />
+      <StockRect data-result="single" {...panel} />
       <circle cx={centerX - 108} cy={centerY} r={8} fill={accent} />
       {input.showLabels ? <FitText {...LABEL} {...label} /> : undefined}
     </g>
