@@ -1,21 +1,24 @@
-import { DUR, EASE, enter, ramp } from "../../../motion";
 import { getEraseMaskStyle } from "../../../motion-components/eraseMask";
 import {
   getEraseStartFrames,
   getRoughEdgeClipPath,
 } from "../../../scenes/BarComparisonScene/barComparisonMotion";
-import { getWindowRevealStyle } from "../../../scenes/TiltedWindowScene/windowMotion";
+import { useWindowStage } from "../../../scenes/TiltedWindowScene/useWindowStage";
+import {
+  getRestingPose,
+  getWindowRevealStyle,
+} from "../../../scenes/TiltedWindowScene/windowMotion";
 import { WINDOW_BOX } from "../../../scenes/TiltedWindowScene/windowTilt";
 import {
   getColumnWipeProgress,
   getSteppedColumnWipeStyle,
 } from "../../../storyboard/StoryFilm/steppedColumnWipe";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCanvas } from "./parts/DemoCanvas";
 import { getCanvasRect } from "./parts/getCanvasRect";
-import { RESTING_WINDOW_POSE } from "./parts/parts.constants";
 import { TiltedDemoWindow } from "./parts/TiltedDemoWindow";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
@@ -24,15 +27,23 @@ const ROWS = ["first", "second", "third", "fourth"];
 const ERASE_AT = 40;
 /** Frames each row's erase takes, longer than the scene's so it reads. */
 const ERASE_FRAMES = 10;
+/** When the rows start arriving. A cue, not a length. */
+const ROWS_AT = 6;
 
-/** One list row erased behind the soft-edged mask. */
+/** One list row erased behind the soft-edged mask, on the travel curve. */
 function ErasedRow(props: { frame: number; index: number; eraseAt: number }) {
-  const progress = ramp(props.frame, props.eraseAt, ERASE_FRAMES, EASE.inOut);
+  const motion = useVideoMotion();
+  const progress = motion.ramp(
+    props.frame,
+    props.eraseAt,
+    motion.scale(ERASE_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <div
       className={css.listRow}
       style={{
-        ...enter(props.frame, 6 + props.index * 2),
+        ...motion.enterAt(props.frame, ROWS_AT, props.index),
         ...getEraseMaskStyle(progress),
       }}
     >
@@ -44,12 +55,18 @@ function ErasedRow(props: { frame: number; index: number; eraseAt: number }) {
 
 /** Rows erased left to right behind a soft edge, one after another. */
 export function EraseMaskDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const progress = ramp(frame, ERASE_AT, ERASE_FRAMES, EASE.inOut);
+  const motion = useVideoMotion();
+  const progress = motion.ramp(
+    frame,
+    ERASE_AT,
+    motion.scale(ERASE_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`getEraseMaskStyle(ramp(frame, ${ERASE_AT} + index * 3, ${ERASE_FRAMES}, EASE.inOut))`}
+      label={`getEraseMaskStyle(motion.ramp(frame, ${ERASE_AT} + index * 3, ${ERASE_FRAMES}, travel))`}
       readouts={[
         { name: "progress", value: formatReadout(progress) },
         { name: "feather", value: "0.1" },
@@ -145,8 +162,14 @@ export function SteppedColumnWipeDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   const local = Math.max(0, frame - WIPE_AT);
-  const progress = getColumnWipeProgress(local, WIPE_FRAMES, WIPES[0].options);
+  const progress = getColumnWipeProgress(
+    local,
+    WIPE_FRAMES,
+    WIPES[0].options,
+    motion,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -170,6 +193,7 @@ export function SteppedColumnWipeDemo({
                       local,
                       WIPE_FRAMES,
                       wipe.options,
+                      motion,
                     )}
                   >
                     B
@@ -192,7 +216,8 @@ export function WindowRevealDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const style = getWindowRevealStyle(frame, 10, REVEAL);
+  const stage = useWindowStage();
+  const style = getWindowRevealStyle(frame, 10, REVEAL, stage);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -206,7 +231,7 @@ export function WindowRevealDemo({
         {frame >= 10 ? (
           <TiltedDemoWindow
             box={getCanvasRect(WINDOW_BOX)}
-            pose={RESTING_WINDOW_POSE}
+            pose={getRestingPose(stage)}
             contentStyle={style}
           />
         ) : null}
@@ -217,9 +242,12 @@ export function WindowRevealDemo({
 
 const BAR_VALUES = [0.92, 0.7, 0.55, 0.38];
 const EDGE_DEPTH = 10;
+/** When the bars start growing. A cue, not a length. */
+const BARS_AT = 10;
 
 /** Bars growing with a seeded, brush-like right edge. */
 export function RoughEdgeDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const motion = useVideoMotion();
   return (
     <HelperDemoFrame
       frame={frame}
@@ -238,7 +266,12 @@ export function RoughEdgeDemo({ frame, frames }: HelperDemoProps): ReactNode {
                 className={css.bar}
                 style={{
                   width:
-                    ramp(frame, 10 + index * 2, DUR.sheet, EASE.word) *
+                    motion.ramp(
+                      frame,
+                      BARS_AT + index * motion.stagger.list,
+                      motion.sheet,
+                      motion.rise.easing,
+                    ) *
                     value *
                     760,
                   clipPath: getRoughEdgeClipPath(index, EDGE_DEPTH),

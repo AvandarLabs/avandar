@@ -1,14 +1,5 @@
+import { mixToken, typed } from "../../../motion";
 import {
-  EASE,
-  STAGGER,
-  caretOn,
-  enter,
-  mixToken,
-  ramp,
-  typed,
-} from "../../../motion";
-import {
-  BAR_GROW_FRAMES,
   getBarComparisonBeats,
   getBarFractions,
 } from "../../../scenes/BarComparisonScene/barComparisonMotion";
@@ -20,20 +11,31 @@ import {
   getMarkBuildProgress,
 } from "../../../scenes/BrandLockupScene/brandLockupMotion";
 import { getLineRevealStyle } from "../../../scenes/textReveal";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
+import { useVideoProps } from "../../../videoTheme/useVideoTheme";
 import css from "./demos.module.css";
-import { formatReadout } from "./demoTheme";
+import { formatReadout, useDemoColors } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCanvas, DEMO_CANVAS } from "./parts/DemoCanvas";
+import type { MarkBuildMotion } from "../../../scenes/BrandLockupScene/brandLockupMotion";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
 const BUILD = { columns: 8 };
+
+/** The theme's mark build: its motion and the lockup's column stagger. */
+function useMarkBuildMotion(): MarkBuildMotion {
+  const motion = useVideoMotion();
+  const { columnStagger } = useVideoProps("BrandLockup", {});
+  return { motion, columnStagger };
+}
 /** An abstract block mark, never another brand's geometry. */
 const MARK = { x: 200, y: 110, width: 180, height: 180 };
 
 /** An abstract mark rising through eight column masks, left to right. */
 export function MarkBuildDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const progress = getMarkBuildProgress(frame, BUILD);
+  const buildMotion = useMarkBuildMotion();
+  const progress = getMarkBuildProgress(frame, BUILD, undefined, buildMotion);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -42,7 +44,10 @@ export function MarkBuildDemo({ frame, frames }: HelperDemoProps): ReactNode {
       readouts={[
         { name: "first", value: formatReadout(progress[0]) },
         { name: "last", value: formatReadout(progress[7]) },
-        { name: "end", value: `${getMarkBuildEndFrame(BUILD)}f` },
+        {
+          name: "end",
+          value: `${formatReadout(getMarkBuildEndFrame(BUILD, buildMotion), 1)}f`,
+        },
       ]}
     >
       <DemoCanvas>
@@ -70,11 +75,8 @@ const FLY_THROUGH = { kind: "fly-through", atFrame: 30 } as const;
 
 /** The mark's columns at one point of their flight, coloured by the cover. */
 function FlightColumns({ flight, cover }: { flight: number; cover: number }) {
-  const background = mixToken(
-    cover,
-    "var(--demo-brand)",
-    "var(--demo-highlight)",
-  );
+  const colors = useDemoColors();
+  const background = mixToken(cover, colors.brand, colors.highlight);
   return Array.from({ length: BUILD.columns }, (_, index) => {
     const rect = getFlightColumnRect(
       index,
@@ -101,7 +103,12 @@ function FlightColumns({ flight, cover }: { flight: number; cover: number }) {
 
 /** The mark's columns flying out to cover the frame in a token colour. */
 export function FlyThroughDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const { retract, flight, cover } = getFlightProgress(frame, FLY_THROUGH);
+  const motion = useVideoMotion();
+  const { retract, flight, cover } = getFlightProgress(
+    frame,
+    FLY_THROUGH,
+    motion,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -128,11 +135,14 @@ export function FlyThroughDemo({ frame, frames }: HelperDemoProps): ReactNode {
 
 const COMMAND = "pnpm showcase";
 const CTA = { atFrame: 10, command: COMMAND };
+/** The command's typing speed at tempo 1, in characters per second. */
 const CPS = 30;
 
 /** Subtitle, URL, typed command and badge arriving on their computed beats. */
 export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const beats = getCtaBeats(CTA, CPS);
+  const motion = useVideoMotion();
+  const cps = CPS * motion.tempo;
+  const beats = getCtaBeats(CTA, cps, motion);
   return (
     <HelperDemoFrame
       frame={frame}
@@ -148,25 +158,43 @@ export function CtaBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
       <div className={css.lines}>
         <p
           className={css.kicker}
-          style={getLineRevealStyle(frame, beats.subtitleAt, "line-fade")}
+          style={getLineRevealStyle(
+            frame,
+            beats.subtitleAt,
+            "line-fade",
+            {},
+            motion,
+          )}
         >
           Every helper, previewed live.
         </p>
         <p
           className={css.headline}
-          style={getLineRevealStyle(frame, beats.urlAt, "line-fade")}
+          style={getLineRevealStyle(
+            frame,
+            beats.urlAt,
+            "line-fade",
+            {},
+            motion,
+          )}
         >
           localhost:4173/motion.html
         </p>
         <div
           className={css.terminal}
-          style={getLineRevealStyle(frame, beats.promptAt, "line-fade")}
+          style={getLineRevealStyle(
+            frame,
+            beats.promptAt,
+            "line-fade",
+            {},
+            motion,
+          )}
         >
           <span className={css.prompt}>$ </span>
-          {typed(frame, beats.typingAt, COMMAND, CPS)}
-          <span style={{ opacity: caretOn(frame) ? 1 : 0 }}>▍</span>
+          {typed(frame, beats.typingAt, COMMAND, cps)}
+          <span style={{ opacity: motion.caretOn(frame) ? 1 : 0 }}>▍</span>
         </div>
-        <span className={css.badge} style={enter(frame, beats.badgeAt)}>
+        <span className={css.badge} style={motion.enter(frame, beats.badgeAt)}>
           Live previews
         </span>
       </div>
@@ -193,20 +221,26 @@ type BarRowProps = {
 
 /** One row of the bar panel: label, growing bar and value, on their beats. */
 function BarRow({ frame, beats, index, label, value, fraction }: BarRowProps) {
-  const offset = index * STAGGER;
-  const growth = ramp(frame, beats.barsAt + offset, BAR_GROW_FRAMES, EASE.word);
+  const motion = useVideoMotion();
+  const offset = index * motion.stagger.list;
+  const growth = motion.ramp(
+    frame,
+    beats.barsAt + offset,
+    motion.sheet,
+    motion.rise.easing,
+  );
   return (
     <div className={css.row}>
       <span
         className={css.barLabel}
-        style={enter(frame, beats.labelsAt + offset)}
+        style={motion.enter(frame, beats.labelsAt + offset)}
       >
         {label}
       </span>
       <span className={css.bar} style={{ width: growth * fraction * 520 }} />
       <span
         className={css.barValue}
-        style={enter(frame, beats.valuesAt + offset)}
+        style={motion.enter(frame, beats.valuesAt + offset)}
       >
         {value}
       </span>
@@ -216,7 +250,8 @@ function BarRow({ frame, beats, index, label, value, fraction }: BarRowProps) {
 
 /** A bar panel building on its computed beats: hero, labels, bars, values. */
 export function BarBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const beats = getBarComparisonBeats(8, 0, 3);
+  const motion = useVideoMotion();
+  const beats = getBarComparisonBeats(8, 0, 3, motion);
   const fractions = getBarFractions(ROWS);
   const labels = ["North", "Harbor", "Valley", "Ridge"];
   return (
@@ -227,12 +262,12 @@ export function BarBeatsDemo({ frame, frames }: HelperDemoProps): ReactNode {
       readouts={Object.entries(beats).map(([name, value]) => {
         return {
           name,
-          value: `${value}f`,
+          value: `${formatReadout(value, 1)}f`,
         };
       })}
     >
       <div className={css.barPanel}>
-        <p className={css.headline} style={enter(frame, beats.heroAt)}>
+        <p className={css.headline} style={motion.enter(frame, beats.heroAt)}>
           42
         </p>
         {ROWS.map((row, index) => {

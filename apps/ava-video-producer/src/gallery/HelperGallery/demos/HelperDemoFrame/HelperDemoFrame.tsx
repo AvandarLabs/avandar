@@ -1,4 +1,4 @@
-import { DEMO_THEME_STYLE } from "../demoTheme";
+import { useDemoThemeStyle } from "../demoTheme";
 import css from "./HelperDemoFrame.module.css";
 import type { ReactNode } from "react";
 
@@ -16,7 +16,8 @@ type Props = {
 
 /**
  * The shared layout of every helper preview: the call being previewed, a
- * frame counter, a stage, and the live values the helper returns.
+ * frame counter, a stage, and the live values the helper returns. It sets
+ * the preview's theme custom properties, so draw it inside a video theme.
  */
 export function HelperDemoFrame({
   frame,
@@ -25,8 +26,9 @@ export function HelperDemoFrame({
   readouts = [],
   children,
 }: Props): ReactNode {
+  const themeStyle = useDemoThemeStyle();
   return (
-    <div className={css.root} style={DEMO_THEME_STYLE}>
+    <div className={css.root} style={themeStyle}>
       <header className={css.header}>
         <code className={css.label}>{label}</code>
         <span className={css.counter}>

@@ -1,6 +1,10 @@
-import { loopEnvelope, loopPhase, mix, wave } from "../../../motion";
+import { loopPhase, mix, wave } from "../../../motion";
+import { SketchedShape } from "../../../stock/primitives/SketchedShape";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
+import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
 import css from "./demos.module.css";
-import { DEMO_COLORS, formatReadout } from "./demoTheme";
+import { formatReadout, useDemoColors } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { DemoCard } from "./parts/DemoCard";
 import type { HelperDemoProps } from "./helperDemo.types";
@@ -17,11 +21,14 @@ type SeriesProps = {
 
 /** A helper's value across the whole loop, with a playhead at `frame`. */
 function LoopSeries({ frame, frames, sample }: SeriesProps) {
+  const { stroke, sketch } = useVideoTokens();
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
   const points = Array.from({ length: frames }, (_, index) => {
     const x = (index / (frames - 1)) * PLOT.width;
     const y = PLOT.height - sample(index) * PLOT.height;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
+  });
   const playheadX = (frame / (frames - 1)) * PLOT.width;
   return (
     <svg
@@ -30,25 +37,30 @@ function LoopSeries({ frame, frames, sample }: SeriesProps) {
       className={css.loopPlot}
       aria-hidden="true"
     >
-      <polyline
-        points={points}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${points.join(" L")}` }}
+        profile={sketch.shape}
         fill="none"
-        stroke={DEMO_COLORS.accent}
-        strokeWidth={3}
+        stroke={colors.accent}
+        strokeWidth={scales.stroke(stroke.emphasis)}
       />
-      <line
-        x1={playheadX}
-        x2={playheadX}
-        y1={0}
-        y2={PLOT.height}
-        stroke={DEMO_COLORS.highlight}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{
+          kind: "line",
+          x1: playheadX,
+          y1: 0,
+          x2: playheadX,
+          y2: PLOT.height,
+        }}
+        profile={sketch.shape}
+        stroke={colors.highlight}
+        strokeWidth={scales.stroke(stroke.default)}
       />
       <circle
         cx={playheadX}
         cy={PLOT.height - sample(frame) * PLOT.height}
         r={7}
-        fill={DEMO_COLORS.highlight}
+        fill={colors.highlight}
       />
     </svg>
   );
@@ -62,6 +74,9 @@ const ORBIT_RADIUS = 110;
 
 /** Dots orbiting at their own phase offsets. */
 function Orbits({ frame }: { frame: number }) {
+  const { stroke, sketch } = useVideoTokens();
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
   return (
     <svg
       width={300}
@@ -69,11 +84,12 @@ function Orbits({ frame }: { frame: number }) {
       viewBox="-150 -150 300 300"
       aria-hidden="true"
     >
-      <circle
-        r={ORBIT_RADIUS}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 0, cy: 0, r: ORBIT_RADIUS }}
+        profile={sketch.shape}
         fill="none"
-        stroke={DEMO_COLORS.line}
-        strokeWidth={2}
+        stroke={colors.line}
+        strokeWidth={scales.stroke(stroke.default)}
       />
       {ORBITS.map((offset) => {
         const angle = loopPhase(frame, PERIOD, offset) * Math.PI * 2;
@@ -83,7 +99,7 @@ function Orbits({ frame }: { frame: number }) {
             cx={Math.cos(angle) * ORBIT_RADIUS}
             cy={Math.sin(angle) * ORBIT_RADIUS}
             r={14}
-            fill={DEMO_COLORS.brand}
+            fill={colors.brand}
           />
         );
       })}
@@ -121,8 +137,13 @@ export function LoopPhaseDemo({ frame, frames }: HelperDemoProps): ReactNode {
   );
 }
 
+/** The halo opacity at the low and high point of its pulse, before tint. */
+const HALO_OPACITY = { min: 0.15, max: 0.45 };
+
 /** A halo pulsing on a smooth cosine, beside the pulse over time. */
 export function WaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
+  const scales = useVideoShapeScales();
+  const colors = useDemoColors();
   const pulse = wave(frame, 45);
   return (
     <HelperDemoFrame
@@ -140,10 +161,12 @@ export function WaveDemo({ frame, frames }: HelperDemoProps): ReactNode {
         >
           <circle
             r={mix(pulse, 60, 120)}
-            fill={DEMO_COLORS.brand}
-            opacity={mix(pulse, 0.15, 0.45)}
+            fill={colors.brand}
+            opacity={scales.wash(
+              mix(pulse, HALO_OPACITY.min, HALO_OPACITY.max),
+            )}
           />
-          <circle r={48} fill={DEMO_COLORS.brand} />
+          <circle r={48} fill={colors.brand} />
         </svg>
         <div className={css.centered}>
           <LoopSeries
@@ -164,18 +187,19 @@ export function LoopEnvelopeDemo({
   frame,
   frames,
 }: HelperDemoProps): ReactNode {
-  const envelope = loopEnvelope(frame, frames);
+  const motion = useVideoMotion();
+  const envelope = motion.loopEnvelope(frame, frames);
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`loopEnvelope(frame, ${frames})  fadeFrames 12`}
+      label={`loopEnvelope(frame, ${frames})  fadeFrames ${motion.loopFade.graphic}`}
       readouts={[
         { name: "envelope", value: formatReadout(envelope) },
-        { name: "first", value: formatReadout(loopEnvelope(0, frames)) },
+        { name: "first", value: formatReadout(motion.loopEnvelope(0, frames)) },
         {
           name: "last",
-          value: formatReadout(loopEnvelope(frames - 1, frames)),
+          value: formatReadout(motion.loopEnvelope(frames - 1, frames)),
         },
       ]}
     >
@@ -188,7 +212,7 @@ export function LoopEnvelopeDemo({
             frame={frame}
             frames={frames}
             sample={(value) => {
-              return loopEnvelope(value, frames);
+              return motion.loopEnvelope(value, frames);
             }}
           />
         </div>
