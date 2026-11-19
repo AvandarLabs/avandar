@@ -1,7 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
@@ -17,7 +19,8 @@ export function CacheRequestCards({
   accent,
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const { color } = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const { color, sketch } = useGraphicTokens();
   return (
     <g>
       {input.requests.map((request, index) => {
@@ -28,20 +31,21 @@ export function CacheRequestCards({
               y={54}
               width={400}
               height={124}
-              rx={style.cardRadius}
+              rx={scales.corner(style.cardRadius)}
               fill={color.elevated}
               stroke={index === 0 && frame >= 40 ? accent : color.line}
-              strokeWidth={style.cardStrokeWidth}
+              strokeWidth={scales.stroke(style.cardStrokeWidth)}
             />
             <LabelSlots
               labels={[[request.label, 80 + index * 440, 82, 330, 18, 3]]}
             />
             {index === 0 && frame >= 40 ? (
-              <path
+              <SketchedShape
+                shape={{ kind: "path", d: "M420 132 l10 10 l18 -26" }}
+                profile={sketch.shape}
                 data-covered="true"
-                d="M420 132 l10 10 l18 -26"
                 stroke={accent}
-                strokeWidth={style.checkWidth}
+                strokeWidth={scales.stroke(style.checkWidth)}
                 fill="none"
               />
             ) : undefined}

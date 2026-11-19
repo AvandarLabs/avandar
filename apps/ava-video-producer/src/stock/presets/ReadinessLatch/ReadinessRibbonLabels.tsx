@@ -1,5 +1,4 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
 import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
@@ -11,11 +10,6 @@ type Props = {
   horizontal: boolean;
   x: number;
   y: number;
-};
-const VALUE: { fill: "#728794"; fontSize: number; fontFamily: string } = {
-  fill: STOCK.muted,
-  fontSize: 12,
-  fontFamily: "Arial, sans-serif",
 };
 const TEXT: {
   fontSize: 12;
@@ -63,7 +57,9 @@ export function ReadinessRibbonLabels({
   const value = {
     x: horizontal ? 300 : x - 75,
     y: unit.y,
-    ...VALUE,
+    fill: tokens.color.textMuted,
+    fontSize: tokens.text.graphic.data.fontSize,
+    fontFamily: tokens.text.graphic.data.fontFamily,
   };
   return (
     <g>

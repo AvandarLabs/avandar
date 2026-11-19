@@ -1,6 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicProps,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheCell } from "./CacheCell";
@@ -25,13 +27,18 @@ export function CacheColumn({
   accent,
 }: Readonly<Props>): ReactNode {
   const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const { color } = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const { color, sketch } = useGraphicTokens();
   return (
     <g data-cache-column={column.id} opacity={isAdded ? growth : 1}>
-      <path
-        d={`M${60 + index * 168} 260 V${334 + rowCount * 44}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${60 + index * 168} 260 V${334 + rowCount * 44}`,
+        }}
+        profile={sketch.shape}
         stroke={isAdded ? accent : color.line}
-        strokeWidth={style.gridStrokeWidth}
+        strokeWidth={scales.stroke(style.gridStrokeWidth)}
       />
       <LabelSlots
         labels={[[column.label, 70 + index * 168, 280, 148, 14, 4]]}

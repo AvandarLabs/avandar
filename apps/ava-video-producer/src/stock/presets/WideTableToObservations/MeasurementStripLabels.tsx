@@ -11,6 +11,12 @@ type Props = {
   subjectIndex: number;
   measureIndex: number;
 };
+/**
+ * The labels fade in over the last part of the strip's travel. Both values
+ * are fractions of that travel, not frames, so tempo never scales them.
+ */
+const LABEL_REVEAL_AT = 0.92;
+const LABEL_REVEAL_SPAN = 0.08;
 /** Key copies and values keep distinct readable lanes throughout travel. */
 export function MeasurementStripLabels({
   scene,
@@ -42,7 +48,7 @@ export function MeasurementStripLabels({
           ],
         ]}
       />
-      <g opacity={motion.ramp(progress, 0.92, motion.scale(0.08))}>
+      <g opacity={motion.ramp(progress, LABEL_REVEAL_AT, LABEL_REVEAL_SPAN)}>
         <LabelSlots
           labels={[
             [measure.label, x + mix(progress, 10, 218), y, 200, 12, 3],

@@ -37,7 +37,7 @@ export function ScopeTopic({
   const x = mix(contraction, initialX, finalX);
   const y = mix(contraction, initialY, finalY);
   const opacity =
-    motion.reveal(frame, 12 + index * 2) *
+    motion.reveal(frame, 12 + index * motion.stagger.list) *
     (topic.included || showExcluded
       ? 1
       : 1 - motion.ramp(frame, 96, motion.scale(24)));

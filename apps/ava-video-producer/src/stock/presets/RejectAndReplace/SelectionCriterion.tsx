@@ -10,6 +10,8 @@ import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** The dash of the empty selection slot. */
+const SLOT_DASH = "4 6";
 /** A stated criterion and unchanged selection slot explain the replacement. */
 export function SelectionCriterion({
   frame,
@@ -51,7 +53,7 @@ export function SelectionCriterion({
         {...slot}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray="4 6"
+        strokeDasharray={SLOT_DASH}
         opacity={motion.ramp(frame, 18, motion.hero)}
       />
       {input.showCriterionLink ? (

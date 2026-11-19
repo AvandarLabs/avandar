@@ -9,6 +9,8 @@ import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The dash of the flowing outlet stream. */
+const FLOW_DASH = "12 12";
 /** Normal outlet flow is independently visible from the side leak. */
 export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
@@ -45,7 +47,7 @@ export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
             profile={tokens.sketch.shape}
             stroke={tokens.color.accentAlt}
             strokeWidth={scales.stroke(5)}
-            strokeDasharray="12 12"
+            strokeDasharray={FLOW_DASH}
             strokeDashoffset={-loopPhase(frame, 48) * 48}
             fill="none"
           />

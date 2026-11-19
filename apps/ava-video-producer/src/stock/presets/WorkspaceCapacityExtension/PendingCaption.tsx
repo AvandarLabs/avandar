@@ -9,6 +9,8 @@ type Props = {
   requestY: number;
   accent: string;
 };
+/** How strongly the pending caption's link shows. */
+const LINK_OPACITY = 0.65;
 /**
  * Pending copy stays below the tray and connects to the moving request group.
  */
@@ -31,7 +33,7 @@ export function PendingCaption({
         data-pending-link=""
         fill="none"
         stroke={accent}
-        strokeOpacity={0.65}
+        strokeOpacity={LINK_OPACITY}
       />
     </g>
   );

@@ -12,6 +12,8 @@ import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 /** Complete contained computation illustration input. */
 export type Props = GraphicProps & { input: Input };
+/** The phone casing's corner, before the theme's corner style. */
+const PHONE_CORNER = 38;
 /**
  * The complete illustrated computation stays inside one stable device
  * silhouette.
@@ -33,7 +35,7 @@ export function PocketInference({
         y={90}
         width={phone ? 612 : 676}
         height={414}
-        rx={phone ? 38 : 18}
+        rx={scales.corner(phone ? PHONE_CORNER : tokens.corner.panel)}
         fill={tokens.color.surface}
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.default)}

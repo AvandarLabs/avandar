@@ -5,6 +5,8 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
+/** The dash of the network boundary. */
+const NETWORK_DASH = "6 6";
 /**
  * Stable device and planner boundaries separate retained rows from messages.
  */
@@ -39,7 +41,7 @@ export function ExecutionBoundaries(): ReactNode {
         profile={tokens.sketch.shape}
         data-network-boundary="true"
         stroke={tokens.color.inactive}
-        strokeDasharray="6 6"
+        strokeDasharray={NETWORK_DASH}
       />
     </g>
   );

@@ -14,6 +14,10 @@ import type { Input } from "./PriorityInsertion.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+/** The dash of the priority item's insertion route. */
+const INSERTION_DASH = "5 8";
+/** The dash of a vacated queue slot. */
+const SLOT_DASH = "3 6";
 /** Open exactly one queue slot and insert authored work from a side spur. */
 export function PriorityInsertion({
   frame,
@@ -80,7 +84,7 @@ export function PriorityInsertion({
                   rx={scales.corner(tokens.corner.cell)}
                   fill="none"
                   stroke={tokens.color.line}
-                  strokeDasharray="3 6"
+                  strokeDasharray={SLOT_DASH}
                 />
               ) : undefined}
             </g>
@@ -93,7 +97,7 @@ export function PriorityInsertion({
           profile={tokens.sketch.shape}
           stroke={tokens.color.highlight}
           fill="none"
-          strokeDasharray="5 8"
+          strokeDasharray={INSERTION_DASH}
         />
         <FitText
           text={input.priorityLabel}
@@ -115,7 +119,11 @@ export function PriorityInsertion({
             x={100}
             y={190 + 58 * (index + (index >= insertion ? shift : 0))}
             accent={accent}
-            opacity={motion.ramp(frame, 12 + index * 2, motion.hero)}
+            opacity={motion.ramp(
+              frame,
+              12 + index * motion.stagger.list,
+              motion.hero,
+            )}
           />
         );
       })}

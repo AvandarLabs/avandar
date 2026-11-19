@@ -4,7 +4,10 @@ import {
   useGraphicMotion,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
+import {
+  getSentenceGlyphsFromInput,
+  SENTENCE_FONT_SIZE,
+} from "./getSentenceGlyphsFromInput";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
@@ -47,8 +50,8 @@ export function SentenceSpans({
             <text
               x={glyph.x}
               y={glyph.y}
-              fontSize={16}
-              fontFamily="Arial, sans-serif"
+              fontSize={SENTENCE_FONT_SIZE}
+              fontFamily={tokens.text.graphic.secondary.fontFamily}
               fill={tokens.color.text}
             >
               {glyph.text}

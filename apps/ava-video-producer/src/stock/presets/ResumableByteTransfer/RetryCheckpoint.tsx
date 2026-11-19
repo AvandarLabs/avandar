@@ -8,6 +8,8 @@ import {
 import type { ReactNode } from "react";
 
 type Props = { label: string; checkpoint: number; frame: number };
+/** The dash of the retry checkpoint line. */
+const CHECKPOINT_DASH = "4 6";
 /** A complete bounded caption connects to the exact acknowledged byte. */
 export function RetryCheckpoint({
   label,
@@ -25,7 +27,7 @@ export function RetryCheckpoint({
         profile={tokens.sketch.shape}
         data-checkpoint-line="true"
         stroke={tokens.color.highlight}
-        strokeDasharray="4 6"
+        strokeDasharray={CHECKPOINT_DASH}
       />
       <LabelSlots labels={[[label, captionX, 90, 360, 16, 3]]} />
       <SketchedShape

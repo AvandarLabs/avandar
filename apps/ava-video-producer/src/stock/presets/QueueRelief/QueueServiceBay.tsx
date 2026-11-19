@@ -14,6 +14,8 @@ type Props = {
   expansion: number;
   accent: string;
 };
+/** The dash of a service bay that is not open yet. */
+const CLOSED_BAY_DASH = "5 5";
 /** A named closed outline expands to full usable service capacity. */
 export function QueueServiceBay({
   slot,
@@ -36,7 +38,7 @@ export function QueueServiceBay({
         fill={tokens.color.surface}
         stroke={slot.initiallyOpen ? accent : tokens.color.highlight}
         strokeDasharray={
-          slot.initiallyOpen || expansion === 1 ? undefined : "5 5"
+          slot.initiallyOpen || expansion === 1 ? undefined : CLOSED_BAY_DASH
         }
       />
       <FitText

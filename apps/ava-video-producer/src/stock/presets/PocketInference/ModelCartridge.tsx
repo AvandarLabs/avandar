@@ -11,6 +11,12 @@ import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** The closed cartridge's corner, before the theme's corner style. */
+const CARTRIDGE_CORNER = 16;
+/** The dash of the cartridge's cutaway outline. */
+const CUTAWAY_DASH = "4 5";
+/** The peak opacity of the inference ripple. */
+const RIPPLE_OPACITY = 0.3;
 /**
  * The resident model seats entirely inside the casing before the single
  * inference ripple.
@@ -33,10 +39,12 @@ export function ModelCartridge({
         y={122}
         width={572}
         height={88}
-        rx={input.showCutaway ? 4 : 16}
+        rx={scales.corner(
+          input.showCutaway ? tokens.corner.chip : CARTRIDGE_CORNER,
+        )}
         fill={tokens.color.ground}
         stroke={tokens.color.line}
-        strokeDasharray={input.showCutaway ? "4 5" : undefined}
+        strokeDasharray={input.showCutaway ? CUTAWAY_DASH : undefined}
       />
       <g
         data-cartridge-installation="local"
@@ -67,7 +75,7 @@ export function ModelCartridge({
             width={6}
             height={48}
             fill={accent}
-            fillOpacity={0.3 * Math.sin(ripple * Math.PI)}
+            fillOpacity={RIPPLE_OPACITY * Math.sin(ripple * Math.PI)}
           />
         ) : undefined}
       </g>

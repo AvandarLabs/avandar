@@ -15,6 +15,8 @@ type Props = {
   subjectIndex: number;
   measureIndex: number;
 };
+/** How opaque a measurement strip's surface is over the table behind it. */
+const STRIP_FILL_OPACITY = 0.8;
 /** Each measurement peels away carrying its subject, measure and unit. */
 export function MeasurementStrip({
   input,
@@ -50,7 +52,7 @@ export function MeasurementStrip({
         width={scene.width}
         height={76}
         fill={tokens.color.surface}
-        fillOpacity={0.8}
+        fillOpacity={STRIP_FILL_OPACITY}
         stroke={accent}
       />
       <MeasurementStripLabels

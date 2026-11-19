@@ -10,6 +10,8 @@ import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; index: number };
+/** How opaque a filled observation slot becomes. */
+const SLOT_FILL_OPACITY = 0.7;
 /** Exact selected text travels through a clear rail into one role slot. */
 export function ObservationSlot({
   input,
@@ -37,7 +39,7 @@ export function ObservationSlot({
           width={244}
           height={70}
           fill={tokens.color.surface}
-          fillOpacity={scene.progress * 0.7}
+          fillOpacity={scene.progress * SLOT_FILL_OPACITY}
         />
         <g opacity={scene.movingCaptionOpacity}>
           <LabelSlots

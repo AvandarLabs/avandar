@@ -10,6 +10,8 @@ type Props = {
   accent: string;
   id: string;
 };
+/** How strongly the protected slot's hatch pattern shows. */
+const PATTERN_OPACITY = 0.2;
 /** Fixed equal block shape retains a non-color cue for protected time. */
 export function ProtectedSlotBody({
   slot,
@@ -38,7 +40,7 @@ export function ProtectedSlotBody({
           width={width - 4}
           height={296}
           fill={`url(#${id}-protected)`}
-          opacity={0.2}
+          opacity={PATTERN_OPACITY}
         />
       ) : undefined}
     </g>

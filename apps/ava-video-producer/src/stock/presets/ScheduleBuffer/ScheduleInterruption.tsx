@@ -15,6 +15,8 @@ type Props = {
   numSlots: number;
   frame: number;
 };
+/** The tint of the interruption segment, before the theme's tint strength. */
+const INTERRUPTION_TINT = 0.3;
 /** The delay descends into the gap opened after its named task. */
 export function ScheduleInterruption({
   state,
@@ -34,7 +36,7 @@ export function ScheduleInterruption({
         width={state.delayWidth}
         height={60}
         fill={tokens.color.highlight}
-        fillOpacity={0.3}
+        fillOpacity={scales.wash(INTERRUPTION_TINT)}
         stroke={tokens.color.highlight}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />

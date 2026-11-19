@@ -27,14 +27,14 @@ export function CitationUnderline({
     wrapTextToLines({
       text: source.excerpt,
       width: 368,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 8,
       breakLongWords: true,
       normalizeWhitespace: true,
     })[0] ?? "";
   const width = Math.min(
     368,
-    getConservativeWidthFromText({ text: firstLine, fontSize: 14 }),
+    getConservativeWidthFromText({ text: firstLine, fontSize: 14 as const }),
   );
   return (
     <SketchedShape

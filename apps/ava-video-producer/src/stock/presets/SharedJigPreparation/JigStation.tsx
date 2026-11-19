@@ -2,7 +2,10 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import {
+  useGraphicShapeScales,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { JigPattern } from "./JigPattern";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -15,6 +18,12 @@ type Props = {
   input: Input;
   accent: string;
 };
+/** A fabric workpiece's corner, before the theme's corner style. */
+const FABRIC_CORNER = 16;
+/** A card workpiece's corner, before the theme's corner style. */
+const CARD_CORNER = 2;
+/** The stitched dash of a fabric workpiece. */
+const FABRIC_DASH = "5 3";
 /** A retained existing workpiece receives one matching application. */
 export function JigStation({
   collaborator,
@@ -25,6 +34,7 @@ export function JigStation({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   return (
     <g>
       <PersonGlyph x={x} y={275} color={tokens.color.accentAlt} />
@@ -40,11 +50,13 @@ export function JigStation({
         y={330}
         width={140}
         height={112}
-        rx={input.workpieceMaterial === "fabric" ? 16 : 2}
+        rx={scales.corner(
+          input.workpieceMaterial === "fabric" ? FABRIC_CORNER : CARD_CORNER,
+        )}
         fill={tokens.color.surface}
         stroke={tokens.color.line}
         strokeDasharray={
-          input.workpieceMaterial === "fabric" ? "5 3" : undefined
+          input.workpieceMaterial === "fabric" ? FABRIC_DASH : undefined
         }
       />
       {hasApplication ? (

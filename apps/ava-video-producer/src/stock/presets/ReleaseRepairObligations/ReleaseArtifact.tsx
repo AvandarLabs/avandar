@@ -11,6 +11,8 @@ import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; artifactX: number };
+/** The guide artifact's corner, before the theme's corner style. */
+const GUIDE_CORNER = 3;
 /**
  * Stable issue identities and full limitations travel with the same artifact.
  */
@@ -32,7 +34,9 @@ export function ReleaseArtifact({
         y={100}
         width={300}
         height={298}
-        rx={input.artifact.kind === "guide" ? 3 : 18}
+        rx={scales.corner(
+          input.artifact.kind === "guide" ? GUIDE_CORNER : tokens.corner.panel,
+        )}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
         fill={tokens.color.surface}
@@ -78,8 +82,9 @@ export function ReleaseArtifact({
               x={artifactX + 5}
               y={y + 4}
               textAnchor="middle"
-              fontSize={12}
-              fill={tokens.color.text}
+              fontFamily={tokens.text.graphic.data.fontFamily}
+              fontSize={tokens.text.graphic.data.fontSize}
+              fill={tokens.text.graphic.data.color}
             >
               {ordinal}
             </text>

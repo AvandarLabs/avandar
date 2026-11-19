@@ -11,6 +11,8 @@ import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The dash of an empty tool socket. */
+const SOCKET_DASH = "6 6";
 /** A single utility approaches and enters only the authored install socket. */
 export function UtilitySocket({
   input,
@@ -43,7 +45,7 @@ export function UtilitySocket({
         rx={scales.corner(tokens.corner.card)}
         fill="none"
         stroke={tokens.color.line}
-        strokeDasharray="6 6"
+        strokeDasharray={SOCKET_DASH}
       />
       {frame >= 12 ? (
         <g

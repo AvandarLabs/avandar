@@ -32,7 +32,7 @@ export function SelectionOption({
   const entry = motion.ramp(
     frame,
     isReplacement ? 78 : 12,
-    isReplacement ? 30 : 18,
+    motion.scale(isReplacement ? 30 : 18),
     motion.travel.easing,
   );
   const x = isReplacement ? mix(entry, 1000, 480) : mix(move, 480, 156);

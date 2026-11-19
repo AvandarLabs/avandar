@@ -17,6 +17,8 @@ type Props = {
   isExisting?: boolean;
   isSeated?: boolean;
 };
+/** The dash of an open, unseated slot. */
+const OPEN_SLOT_DASH = "4 3";
 /** Stable resource badge and optional full name within its physical tab. */
 export function ResourceTab({
   resource,
@@ -47,7 +49,7 @@ export function ResourceTab({
         rx={scales.corner(6)}
         fill={tokens.color.surface}
         stroke={accent}
-        strokeDasharray={!isExisting && !isSeated ? "4 3" : undefined}
+        strokeDasharray={!isExisting && !isSeated ? OPEN_SLOT_DASH : undefined}
       />
       <LabelSlots labels={[[String(index + 1), x + 10, y + 18, 58, 14, 1]]} />
       {showLabel ? (

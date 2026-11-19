@@ -18,7 +18,13 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         stroke={tokens.color.inactive}
         fill="none"
       />
-      <text x={80} y={480} fill={tokens.color.textMuted} fontSize={12}>
+      <text
+        x={80}
+        y={480}
+        fill={tokens.color.textMuted}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
+      >
         0
       </text>
       <text
@@ -26,7 +32,8 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         y={480}
         textAnchor="end"
         fill={tokens.color.textMuted}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
       >
         {input.periods[0].receiptsMinor / input.money.minorUnitsPerUnit}
       </text>

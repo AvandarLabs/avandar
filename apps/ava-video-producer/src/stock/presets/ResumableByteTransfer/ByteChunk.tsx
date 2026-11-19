@@ -18,6 +18,8 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** The tint of a byte chunk, before the theme's tint strength. */
+const CHUNK_TINT = 0.15;
 /** An intact exact-width chunk travels between retained byte interval rails. */
 export function ByteChunk({
   chunk,
@@ -59,7 +61,7 @@ export function ByteChunk({
         height={54}
         rx={scales.corner(3)}
         fill={chunk.isInterrupted ? tokens.color.highlight : accent}
-        fillOpacity={0.15}
+        fillOpacity={scales.wash(CHUNK_TINT)}
         stroke={chunk.isInterrupted ? tokens.color.highlight : accent}
       />
       {input.showOffsets ? (

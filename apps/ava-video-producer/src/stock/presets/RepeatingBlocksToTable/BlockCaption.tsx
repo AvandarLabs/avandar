@@ -39,7 +39,7 @@ export function BlockCaption({
           x={x + 4}
           y={y}
           fill={tokens.color.textMuted}
-          fontSize={14}
+          fontSize={tokens.text.graphic.eyebrow.fontSize}
         >
           {index + 1}
         </text>

@@ -1,6 +1,7 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
@@ -18,6 +19,10 @@ type Props = {
   accent: string;
   numSlots: number;
 };
+/** The tint of the first task, before the theme's tint strength. */
+const TASK_TINT = 0.18;
+/** How much darker each later task's tint is. */
+const TASK_TINT_STEP = 0.04;
 /** One task keeps its duration width while later work shifts together. */
 export function ScheduledTask({
   task,
@@ -28,6 +33,7 @@ export function ScheduledTask({
   numSlots,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 12 + index * 5)}>
@@ -38,7 +44,7 @@ export function ScheduledTask({
         width={task.width}
         height={60}
         fill={accent}
-        fillOpacity={0.18 + index * 0.04}
+        fillOpacity={scales.wash(TASK_TINT + index * TASK_TINT_STEP)}
         stroke={accent}
       />
       <ScheduleLabelSlot

@@ -34,7 +34,7 @@ export function RevenuePeriod({
   const reveal = motion.ramp(
     frame,
     index === 0 ? 12 : 96,
-    index === 0 ? 53 : 44,
+    motion.scale(index === 0 ? 53 : 44),
     motion.travel.easing,
   );
   const x = input.arrangementLayout === "stacked" ? 80 : 80 + index * 460;

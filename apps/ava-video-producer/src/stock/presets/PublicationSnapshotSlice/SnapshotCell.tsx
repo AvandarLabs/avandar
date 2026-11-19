@@ -1,6 +1,8 @@
+import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getSnapshotCellFromFrame } from "./getSnapshotCellFromFrame";
@@ -28,6 +30,7 @@ export function SnapshotCell({
   snapshot,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const scene = getSnapshotCellFromFrame({
     motion,
@@ -55,16 +58,19 @@ export function SnapshotCell({
         height={72}
         fill={tokens.color.surface}
         stroke={scene.selected ? accent : tokens.color.line}
-        strokeWidth={
+        strokeWidth={scales.stroke(
           scene.selected
-            ? 1 +
-              motion.ramp(
-                frame,
-                13 + rowIndex * 2 + columnIndex * 2,
-                motion.scale(22),
+            ? mix(
+                motion.ramp(
+                  frame,
+                  13 + (rowIndex + columnIndex) * motion.stagger.list,
+                  motion.scale(22),
+                ),
+                tokens.stroke.hairline,
+                tokens.stroke.default,
               )
-            : 1
-        }
+            : tokens.stroke.hairline,
+        )}
       />
       <SnapshotCellText scene={scene} frame={frame} />
     </g>

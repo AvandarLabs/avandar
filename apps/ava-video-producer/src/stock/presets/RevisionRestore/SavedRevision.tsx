@@ -41,7 +41,9 @@ export function SavedRevision({
         rx={scales.corner(9)}
         fill={tokens.color.surface}
         stroke={selected ? accent : tokens.color.line}
-        strokeWidth={selected ? 2 : 1}
+        strokeWidth={scales.stroke(
+          selected ? tokens.stroke.default : tokens.stroke.hairline,
+        )}
       />
       {showLabel ? (
         <FitText

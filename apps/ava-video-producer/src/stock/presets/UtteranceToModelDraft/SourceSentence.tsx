@@ -5,7 +5,10 @@ import {
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
+import {
+  getPhrasePositionsFromSentenceParts,
+  SENTENCE_FONT_SIZE,
+} from "./getPhrasePositionsFromSentenceParts";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 
@@ -51,8 +54,8 @@ export function SourceSentence({
               x={part.x}
               y={part.y}
               fill={tokens.color.text}
-              fontSize={12}
-              fontFamily="Arial, sans-serif"
+              fontSize={SENTENCE_FONT_SIZE}
+              fontFamily={tokens.text.graphic.data.fontFamily}
               xmlSpace="preserve"
             >
               {part.text}

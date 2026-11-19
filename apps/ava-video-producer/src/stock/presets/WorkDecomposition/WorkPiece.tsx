@@ -3,6 +3,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
@@ -16,6 +17,10 @@ type Props = {
   parentLabel: string;
   showEffortValues: boolean;
 };
+/** How strongly a piece's leader line to its label shows. */
+const LEADER_OPACITY = 0.45;
+/** The tint of a work piece, before the theme's tint strength. */
+const PIECE_TINT = 0.16;
 /** Preserve piece area while separating cuts and attaching external labels. */
 export function WorkPiece({
   piece,
@@ -27,6 +32,7 @@ export function WorkPiece({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const separation = motion.ramp(frame, 86, motion.scale(38));
   const x = piece.x + piece.shiftX * separation,
     y = piece.y + piece.shiftY * separation;
@@ -42,9 +48,9 @@ export function WorkPiece({
         width={piece.width}
         height={piece.height}
         fill={color}
-        fillOpacity={0.16}
+        fillOpacity={scales.wash(PIECE_TINT)}
         stroke={tokens.color.ground}
-        strokeWidth={separation * 2}
+        strokeWidth={scales.stroke(separation * tokens.stroke.default)}
       />
       <g opacity={separation}>
         <SketchedShape
@@ -55,7 +61,7 @@ export function WorkPiece({
           profile={tokens.sketch.shape}
           fill="none"
           stroke={color}
-          strokeOpacity={0.45}
+          strokeOpacity={LEADER_OPACITY}
         />
         <circle
           cx={x + piece.width / 2}

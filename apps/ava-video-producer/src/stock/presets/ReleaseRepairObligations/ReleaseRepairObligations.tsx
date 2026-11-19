@@ -15,6 +15,8 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
 
+/** The dash of the empty recipient bay. */
+const BAY_DASH = "6 6";
 /**
  * A physical release gate preserves every unresolved limitation and commitment.
  */
@@ -46,7 +48,7 @@ export function ReleaseRepairObligations({
           rx={scales.corner(tokens.corner.card)}
           fill="none"
           stroke={tokens.color.line}
-          strokeDasharray="6 6"
+          strokeDasharray={BAY_DASH}
         />
         <LabelSlots labels={[[input.recipientLabel, 550, 35, 350, 16, 3]]} />
       </g>

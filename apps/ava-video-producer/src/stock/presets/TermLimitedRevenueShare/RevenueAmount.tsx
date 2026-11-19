@@ -25,7 +25,8 @@ export function RevenueAmount({
         x={18 + portion * 115}
         y={110}
         fill={tokens.color.text}
-        fontSize={12}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={tokens.text.graphic.data.fontSize}
       >
         {(amount / input.money.minorUnitsPerUnit).toFixed(
           input.money.minorUnitsPerUnit === 100 ? 2 : 0,

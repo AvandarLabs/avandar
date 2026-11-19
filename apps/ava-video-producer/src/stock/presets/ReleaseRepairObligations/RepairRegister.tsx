@@ -10,6 +10,8 @@ import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; artifactX: number };
+/** The dash of an obligation unfolding into the register. */
+const OBLIGATION_DASH = "4 6";
 /**
  * Open follow-ups unfold into keyed owner and due entries without resolution.
  */
@@ -39,7 +41,11 @@ export function RepairRegister({
             const sourceY = y - (input.issueMarks === "tabs" ? 0 : 12);
             const laneX = 16 + index * 8;
             const laneY = 420 + (followUps.length - 1 - index) * 3;
-            const unfold = motion.ramp(frame, 41 + index * 2, motion.scale(43));
+            const unfold = motion.ramp(
+              frame,
+              41 + index * motion.stagger.list,
+              motion.scale(43),
+            );
             return (
               <g key={issue.id} data-register-issue={issue.id} opacity={unfold}>
                 <SketchedShape
@@ -52,7 +58,7 @@ export function RepairRegister({
                   fill="none"
                   stroke={accent}
                   strokeWidth={scales.stroke(tokens.stroke.outline)}
-                  strokeDasharray="4 6"
+                  strokeDasharray={OBLIGATION_DASH}
                   opacity={
                     (1 - motion.ramp(frame, 88, motion.scale(3))) * unfold
                   }
@@ -69,7 +75,13 @@ export function RepairRegister({
                   profile={tokens.sketch.shape}
                   stroke={accent}
                 />
-                <text x={x - 12} y={452} fontSize={12} fill={tokens.color.text}>
+                <text
+                  x={x - 12}
+                  y={452}
+                  fontFamily={tokens.text.graphic.data.fontFamily}
+                  fontSize={tokens.text.graphic.data.fontSize}
+                  fill={tokens.text.graphic.data.color}
+                >
                   {ordinal}
                 </text>
                 <LabelSlots

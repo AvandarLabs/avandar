@@ -15,6 +15,10 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** A page document's corner, before the theme's corner style. */
+const PAGE_CORNER = 5;
+/** A canvas document's corner, before the theme's corner style. */
+const CANVAS_CORNER = 22;
 /**
  * The current document replaces positional lines and removes change notches.
  */
@@ -42,7 +46,9 @@ export function RevisionDocument({
         y={140}
         width={420}
         height={200}
-        rx={input.surface === "page" ? 5 : 22}
+        rx={scales.corner(
+          input.surface === "page" ? PAGE_CORNER : CANVAS_CORNER,
+        )}
         fill={tokens.color.surface}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}

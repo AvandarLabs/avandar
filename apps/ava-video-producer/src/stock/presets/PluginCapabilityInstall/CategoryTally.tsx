@@ -3,6 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { TallyMarks } from "./TallyMarks";
@@ -17,6 +18,8 @@ type Props = {
   accent: string;
   hasTallies: boolean;
 };
+/** The accent tint of a category bar, before the theme's tint strength. */
+const BAR_TINT = 0.18;
 /** Category membership derives bars and one visible mark for each source ID. */
 export function CategoryTally({
   input,
@@ -28,6 +31,7 @@ export function CategoryTally({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
   const records = input.records.filter(propEq("categoryId", category.id));
   const y = 432 + index * 46;
   return (
@@ -56,7 +60,7 @@ export function CategoryTally({
               records.length * 16.875 * motion.ramp(frame, 91, motion.scale(41))
             }
             fill={accent}
-            fillOpacity={0.18}
+            fillOpacity={scales.wash(BAR_TINT)}
           />
           <TallyMarks {...{ input, records, y, frame, accent }} />
         </g>

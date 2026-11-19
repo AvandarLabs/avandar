@@ -39,7 +39,7 @@ export function ReportPage({
     <g
       data-page={section.id}
       transform={`translate(${x} ${y})`}
-      opacity={motion.reveal(frame, 12 + index * 2)}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
       <StockRect
         data-page-paper={section.id}
@@ -55,7 +55,9 @@ export function ReportPage({
         shape={{ kind: "path", d: "M0 6V108" }}
         profile={tokens.sketch.shape}
         stroke={accent}
-        strokeWidth={mix(margins, 1, 3)}
+        strokeWidth={scales.stroke(
+          mix(margins, tokens.stroke.hairline, tokens.stroke.emphasis),
+        )}
         opacity={margins}
       />
       <ReportPageCopy

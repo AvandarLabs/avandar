@@ -4,6 +4,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import {
   useGraphicMotion,
+  useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
@@ -15,6 +16,11 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
 /**
+ * The tint of the whole piece before it splits, before the theme's tint
+ * strength.
+ */
+const WHOLE_TINT = 0.16;
+/**
  * A conserved slab becomes proportionally weighted, externally labeled
  * pieces.
  */
@@ -24,6 +30,7 @@ export function WorkDecomposition({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const separation = motion.ramp(frame, 86, motion.scale(38));
   const pieces = getWorkPartitionFromInput(input);
@@ -39,7 +46,10 @@ export function WorkDecomposition({
         width={500}
         height={270}
         fill={accent}
-        fillOpacity={0.16 * (1 - motion.ramp(frame, 38, motion.scale(2)))}
+        fillOpacity={
+          scales.wash(WHOLE_TINT) *
+          (1 - motion.ramp(frame, 38, motion.scale(2)))
+        }
         stroke={accent}
         strokeOpacity={tokens.alpha.ghost}
       />

@@ -12,6 +12,8 @@ type Props = {
   slotWidth: number;
   color: string;
 };
+/** How strongly a label's leader line shows. */
+const LEADER_OPACITY = 0.55;
 /** A leader connects each external label slot to its own segment. */
 export function ScheduleLabelBackdrop({
   targetX,
@@ -32,7 +34,7 @@ export function ScheduleLabelBackdrop({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={0.55}
+        strokeOpacity={LEADER_OPACITY}
       />
       <rect
         data-label-slot={index}

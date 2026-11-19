@@ -25,7 +25,7 @@ export function SourcePassageCopy({
       x: 16,
       y: 26,
       width: 368,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 2,
       color: selected ? accent : tokens.color.text,
     },
@@ -47,7 +47,7 @@ export function SourcePassageCopy({
       x: 16,
       y: selected ? 92 : 82,
       width: 368,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 8,
     },
   ];

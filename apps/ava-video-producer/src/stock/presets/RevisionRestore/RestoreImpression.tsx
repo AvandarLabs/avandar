@@ -15,6 +15,14 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** How strongly an impression's content lines show. */
+const LINE_OPACITY = 0.7;
+/** The dash of a restore impression's outline. */
+const IMPRESSION_DASH = "8 5";
+/**
+ * The surface tint of a restore impression, before the theme's tint strength.
+ */
+const IMPRESSION_TINT = 0.22;
 /** A copy lifts from its retained snapshot and aligns over current contents. */
 export function RestoreImpression({
   revision,
@@ -41,10 +49,10 @@ export function RestoreImpression({
         height={mix(progress, 190, 200)}
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.surface}
-        fillOpacity={0.22}
+        fillOpacity={scales.wash(IMPRESSION_TINT)}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
-        strokeDasharray="8 5"
+        strokeDasharray={IMPRESSION_DASH}
       />
       {revision.content.map((line, lineIndex) => {
         return (
@@ -57,7 +65,7 @@ export function RestoreImpression({
             profile={tokens.sketch.shape}
             stroke={accent}
             strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-            strokeOpacity={0.7}
+            strokeOpacity={LINE_OPACITY}
           />
         );
       })}

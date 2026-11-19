@@ -5,6 +5,11 @@ import type { Input } from "./ProseMeasurementLedger.schema";
 const graphemes: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",
 });
+/**
+ * The sentence's measured type size. Glyph positions are laid out from
+ * measured widths at this size, so it is layout, not a theme value.
+ */
+export const SENTENCE_FONT_SIZE = 16;
 type Glyph = {
   text: string;
   x: number;
@@ -21,14 +26,20 @@ export function getSentenceGlyphsFromInput(input: Readonly<Input>): Glyph[] {
     y = 140;
   Array.from(sentence.matchAll(/\s+|\S+/gu)).forEach((match) => {
     const word = match[0];
-    const width = getConservativeWidthFromText({ text: word, fontSize: 16 });
+    const width = getConservativeWidthFromText({
+      text: word,
+      fontSize: SENTENCE_FONT_SIZE,
+    });
     if (!/^\s+$/u.test(word) && x > 52 && x + width > 908) {
       x = 52;
       y += 25;
     }
     Array.from(graphemes.segment(word)).forEach(({ segment, index }) => {
       const text = /^\s+$/u.test(segment) ? " " : segment;
-      const advance = getConservativeWidthFromText({ text, fontSize: 16 });
+      const advance = getConservativeWidthFromText({
+        text,
+        fontSize: SENTENCE_FONT_SIZE,
+      });
       if (x + advance > 908) {
         x = 52;
         y += 25;

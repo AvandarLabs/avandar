@@ -12,6 +12,8 @@ type Props = {
   input: Input;
   scene: ReturnType<typeof getServiceSceneFromFrame>;
 };
+/** The cabinet's corner, before the theme's corner style. */
+const CABINET_CORNER = 2;
 /**
  * Stable enclosure and actual opening seam around the chosen fixed connector.
  */
@@ -26,7 +28,9 @@ export function ServiceEnclosure({ input, scene }: Readonly<Props>): ReactNode {
         y={205}
         width={input.modules.length * 170 - 10}
         height={174}
-        rx={input.enclosure === "console" ? 18 : 2}
+        rx={scales.corner(
+          input.enclosure === "console" ? tokens.corner.panel : CABINET_CORNER,
+        )}
         fill={tokens.color.elevated}
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}

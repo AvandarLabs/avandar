@@ -6,6 +6,8 @@ import {
 import type { ReactNode } from "react";
 
 type Props = { hasDrawer: boolean };
+/** The dash of the empty storage recess. */
+const RECESS_DASH = "4 5";
 /** Saved impressions sit in a local drawer or a labeled margin recess. */
 export function RevisionDrawer({ hasDrawer }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
@@ -28,7 +30,7 @@ export function RevisionDrawer({ hasDrawer }: Readonly<Props>): ReactNode {
           data-storage-recess="true"
           fill="none"
           stroke={tokens.color.line}
-          strokeDasharray="4 5"
+          strokeDasharray={RECESS_DASH}
         />
       )}
     </g>

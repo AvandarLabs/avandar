@@ -10,6 +10,10 @@ import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+/** The dash of a form task's placeholder fields. */
+const FORM_DASH = "5 5";
+/** The dash of a document task's placeholder lines. */
+const DOCUMENT_DASH = "6 6";
 /**
  * The same visibly unfinished document or assembly remains at its owner's desk.
  */
@@ -41,7 +45,7 @@ export function SupportWorktable({
           shape={{ kind: "path", d: "M350 325 h115 M350 340 h75 M480 340 h65" }}
           profile={tokens.sketch.shape}
           stroke={tokens.color.inactive}
-          strokeDasharray="6 6"
+          strokeDasharray={DOCUMENT_DASH}
           fill="none"
         />
       ) : (
@@ -52,7 +56,7 @@ export function SupportWorktable({
           }}
           profile={tokens.sketch.shape}
           stroke={tokens.color.inactive}
-          strokeDasharray="5 5"
+          strokeDasharray={FORM_DASH}
           fill="none"
         />
       )}

@@ -61,7 +61,7 @@ export function getMeasurementStripFromFrame({
     value === null && input.missingPolicy === "omit-with-ledger";
   const progress = motion.ramp(
     frame,
-    81 + sourceIndex * 2,
+    81 + sourceIndex * motion.stagger.list,
     motion.scale(23),
     motion.travel.easing,
   );
@@ -76,7 +76,7 @@ export function getMeasurementStripFromFrame({
     y: mix(
       motion.ramp(
         frame,
-        51 + sourceIndex * 2,
+        51 + sourceIndex * motion.stagger.list,
         motion.scale(24),
         motion.travel.easing,
       ),
@@ -85,7 +85,7 @@ export function getMeasurementStripFromFrame({
     ),
     width: mix(progress, 264, 856),
     opacity:
-      motion.reveal(frame, 13 + sourceIndex * 2) *
+      motion.reveal(frame, 13 + sourceIndex * motion.stagger.list) *
       (isOmitted ? 1 - motion.ramp(frame, 100, motion.scale(10)) : 1),
   };
 }

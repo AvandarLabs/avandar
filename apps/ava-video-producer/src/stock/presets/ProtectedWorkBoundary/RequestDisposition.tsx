@@ -11,6 +11,8 @@ import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** The dash of a deferred request's outline. */
+const DEFERRED_DASH = "6 4";
 /**
  * Disposition copy is visibly attached to its actual tray or work-slot target.
  */
@@ -66,7 +68,7 @@ export function RequestDisposition({
           rx={scales.corner(tokens.corner.cell)}
           fill="none"
           stroke={tokens.color.highlight}
-          strokeDasharray="6 4"
+          strokeDasharray={DEFERRED_DASH}
         />
       ) : undefined}
     </g>

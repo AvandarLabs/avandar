@@ -16,6 +16,8 @@ type Props = {
   blockIndex: number;
   fieldIndex: number;
 };
+/** The dash of a missing cell's outline. */
+const MISSING_DASH = "4 3";
 /** Field identity travels with its value as block stacks become table rows. */
 export function BlockCellStrip({
   input,
@@ -53,7 +55,7 @@ export function BlockCellStrip({
         rx={scales.corner(5)}
         fill={tokens.color.surface}
         stroke={value === null ? tokens.color.highlight : color}
-        strokeDasharray={value === null ? "4 3" : undefined}
+        strokeDasharray={value === null ? MISSING_DASH : undefined}
       />
       <LabelSlots
         labels={[

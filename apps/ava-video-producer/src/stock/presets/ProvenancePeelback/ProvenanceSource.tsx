@@ -43,7 +43,7 @@ export function ProvenanceSource({
     <g
       data-source-sheet={source.id}
       transform={`translate(${x} ${y})`}
-      opacity={motion.reveal(frame, 14 + index * 2)}
+      opacity={motion.reveal(frame, 14 + index * motion.stagger.list)}
     >
       <StockRect
         x={0}

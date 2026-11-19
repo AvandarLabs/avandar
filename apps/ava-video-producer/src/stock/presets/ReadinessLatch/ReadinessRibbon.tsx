@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import {
   useGraphicMotion,
   useGraphicShapeScales,
@@ -18,12 +18,8 @@ type Props = {
   input: Input;
   accent: string;
 };
-const PIN: { stroke: "#f0ba83"; strokeWidth: number; strokeLinecap: "round" } =
-  {
-    stroke: STOCK.orange,
-    strokeWidth: 6,
-    strokeLinecap: "round" as const,
-  };
+/** The retractable pin's line weight, before the theme's line weight scale. */
+const PIN_WIDTH = 6;
 /** A stable branch owns one progressing ribbon and one retractable pin. */
 export function ReadinessRibbon({
   participant,
@@ -71,7 +67,13 @@ export function ReadinessRibbon({
   };
   const labels = { participant, input, state, horizontal, x, y };
   return (
-    <g opacity={motion.ramp(frame, 12 + index * 2, motion.scale(10))}>
+    <g
+      opacity={motion.ramp(
+        frame,
+        12 + index * motion.stagger.list,
+        motion.scale(10),
+      )}
+    >
       <rect
         {...track}
         rx={scales.corner(tokens.corner.chip)}
@@ -83,7 +85,14 @@ export function ReadinessRibbon({
         rx={scales.corner(tokens.corner.chip)}
         fill={accent}
       />
-      <line data-pin={participant.id} {...pin} {...PIN} />
+      <SketchedShape
+        data-pin={participant.id}
+        shape={{ kind: "line", ...pin }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(PIN_WIDTH)}
+        strokeLinecap="round"
+      />
       {input.showLabels ? <ReadinessRibbonLabels {...labels} /> : undefined}
     </g>
   );

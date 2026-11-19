@@ -34,7 +34,7 @@ export function TradeoffLeaf({
   const entrance = motion.ramp(
     frame,
     isFirst ? 36 : 72,
-    isFirst ? 30 : 36,
+    motion.scale(isFirst ? 30 : 36),
     motion.travel.easing,
   );
   const angle = (isGain ? -7 : 7) * (1 - entrance);

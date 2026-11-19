@@ -11,6 +11,8 @@ import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+/** How strongly the shared timeline shows behind the attempts. */
+const TIMELINE_OPACITY = 0.24;
 /** One unchanged operation returns from retries across growing waiting gaps. */
 export function RetryBackoff({
   frame,
@@ -36,7 +38,7 @@ export function RetryBackoff({
         shape={{ kind: "path", d: "M80 310 H880" }}
         profile={tokens.sketch.shape}
         stroke={accent}
-        strokeOpacity={0.24}
+        strokeOpacity={TIMELINE_OPACITY}
       />
       {state.markers.map((marker) => {
         return (

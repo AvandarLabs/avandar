@@ -20,6 +20,8 @@ type Props = {
   y: number;
   role: string;
 };
+/** How strongly a mapping guide shows once drawn. */
+const GUIDE_OPACITY = 0.3;
 /** One phrase copy travels while the socket body waits at its destination. */
 export function DraftSlip({
   frame,
@@ -48,7 +50,7 @@ export function DraftSlip({
           }}
           profile={tokens.sketch.shape}
           data-source-guide={item.id}
-          opacity={0.3 * motion.ramp(frame, start, duration)}
+          opacity={GUIDE_OPACITY * motion.ramp(frame, start, duration)}
           stroke={tokens.color.inactive}
           fill="none"
         />

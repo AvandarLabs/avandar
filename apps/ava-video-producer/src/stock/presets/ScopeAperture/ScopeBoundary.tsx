@@ -10,6 +10,12 @@ import { OutsideCaption } from "./OutsideCaption";
 import { ScopeHeading } from "./ScopeHeading";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
+
+/**
+ * The aperture draws on as one dash over an outline normalised to this
+ * length, so it is geometry, not a theme dash.
+ */
+const DRAW_ON_LENGTH = 1;
 /** The full-field frame contracts around one explicitly authored question. */
 export function ScopeBoundary({
   frame,
@@ -38,9 +44,11 @@ export function ScopeBoundary({
         fill="none"
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - motion.ramp(frame, 20, motion.scale(16))}
+        pathLength={DRAW_ON_LENGTH}
+        strokeDasharray={DRAW_ON_LENGTH}
+        strokeDashoffset={
+          DRAW_ON_LENGTH * (1 - motion.ramp(frame, 20, motion.scale(16)))
+        }
       />
       <FocusedQuestion {...{ frame, input, accent, id: "question" }} />
       <OutsideCaption {...{ frame, input, accent, id: "outside" }} />

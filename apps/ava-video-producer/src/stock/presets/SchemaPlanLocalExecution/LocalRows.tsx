@@ -42,7 +42,9 @@ export function LocalRows({
               width={500}
               height={30}
               fill={selected && applied > 0 ? accent : tokens.color.surface}
-              fillOpacity={selected ? 0.12 + applied * 0.12 : 1}
+              fillOpacity={
+                selected ? scales.wash(tokens.alpha.tint * (1 + applied)) : 1
+              }
               stroke={selected && applied > 0 ? accent : tokens.color.line}
             />
             {input.showRows ? (
