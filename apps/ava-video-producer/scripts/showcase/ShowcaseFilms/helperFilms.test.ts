@@ -38,3 +38,25 @@ test("helper previews are live only and cannot be exported", async () => {
     return ShowcaseFilms.assertExportable(stock);
   });
 });
+
+test("a helper preview renders in classic unless a theme is given", async () => {
+  const film = await ShowcaseFilms.load("helper-ease-out");
+  assert.equal(film.theme?.themeId, "classic");
+  const themed = await ShowcaseFilms.load("helper-ease-out", {
+    theme: { id: "avandar" },
+  });
+  assert.equal(themed.theme?.themeId, "avandar");
+});
+
+test("the fixed compositions default to the starter theme they were authored on", async () => {
+  const titleStudy = await ShowcaseFilms.load("title-study");
+  const motionLab = await ShowcaseFilms.load("motion-lab");
+  assert.deepEqual([titleStudy.theme?.themeId, motionLab.theme?.themeId], [
+    "starter",
+    "starter",
+  ]);
+  const classic = await ShowcaseFilms.load("title-study", {
+    theme: { id: "classic" },
+  });
+  assert.equal(classic.theme?.themeId, "classic");
+});

@@ -5,21 +5,28 @@ import { getAtlasSection } from "./getAtlasSection";
 import { MotionLibrary } from "./MotionLibrary";
 import type { ReactNode } from "react";
 
-/**
- * The gallery for the section the URL names; themed sections share one draft.
- */
-export function AtlasSectionRoot(): ReactNode {
+/** The gallery for the section the URL names. */
+function AtlasSection(): ReactNode {
   const section = getAtlasSection();
   if (section === "helpers") {
     return <HelperGallery />;
   }
+  return section === "motions" ? (
+    <MotionLibrary />
+  ) : (
+    <CompositionGallery section={section} />
+  );
+}
+
+/**
+ * The gallery for the section the URL names. Every section, helpers
+ * included, shares one theme draft, so each preview follows the active
+ * theme.
+ */
+export function AtlasSectionRoot(): ReactNode {
   return (
     <GalleryVideoTheme>
-      {section === "motions" ? (
-        <MotionLibrary />
-      ) : (
-        <CompositionGallery section={section} />
-      )}
+      <AtlasSection />
     </GalleryVideoTheme>
   );
 }

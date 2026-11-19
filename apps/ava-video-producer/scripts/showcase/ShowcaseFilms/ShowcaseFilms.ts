@@ -117,17 +117,28 @@ async function _sourceModuleUrl(relative: string) {
   return url.href;
 }
 
-/** A helper preview at the Atlas canvas size. It accepts no options. */
-function _loadHelperFilm(id: string, options: object): Film | undefined {
+/**
+ * A helper preview at the Atlas canvas size. It accepts only a theme, and
+ * renders in `classic` without one.
+ */
+async function _loadHelperFilm(
+  id: string,
+  options: FilmOptions,
+): Promise<Film | undefined> {
   const helper = getHelperFromFilmId(id);
   if (!helper) {
     return undefined;
   }
-  if (Object.keys(options).length > 0) {
-    throw new Error("Helper previews accept no options");
+  if (
+    Object.keys(options).some((key) => {
+      return key !== "theme";
+    })
+  ) {
+    throw new Error("Helper previews accept only a theme");
   }
   return {
     id,
+    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
     kind: "helper",
     helper: helper.id,
     assets: helper.demo.assets ?? [],
@@ -167,13 +178,22 @@ function _renderOptions(
 
 type FilmOptions = z.infer<typeof optionsSchema>;
 
+/**
+ * The fixed compositions authored on the starter palette. They render in the
+ * `starter` theme unless the viewer picks another.
+ */
+const STARTER_FILM_IDS: readonly string[] = ["title-study", "motion-lab"];
+
 /** The fields every film shares, with the theme the film renders in. */
 async function _loadBaseFilm({
   id,
   options,
 }: Readonly<{ id: string; options: FilmOptions }>) {
+  const defaultThemeId = STARTER_FILM_IDS.includes(id) ? "starter" : "classic";
   return {
-    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
+    theme: await loadVideoThemeSnapshot(
+      options.theme ?? { id: defaultThemeId },
+    ),
     id,
     fps: 30,
     width: 1600,
@@ -323,7 +343,7 @@ async function _loadStoryboardFilm({
  */
 async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const options = optionsSchema.parse(rawOptions);
-  const helperFilm = _loadHelperFilm(id, options);
+  const helperFilm = await _loadHelperFilm(id, options);
   if (helperFilm) {
     return helperFilm;
   }

@@ -4,7 +4,10 @@
  * stock loop or continuity beat ends: every stock preset, and every
  * continuity composition. Tempo stretches only one-shot animations, never
  * cue frames or repeating motion, so a stock graphic has finished when its
- * picture at the slowest tempo equals its picture at tempo 1.
+ * picture at the slowest tempo equals its picture at tempo 1. The fixed
+ * compositions (`Demo`, `MotionLab`, `TitleStudy`, the title card) need
+ * Remotion's frame hook stubbed, so their half of this guard is
+ * `src/compositions/__tests__/fixed-compositions-finish-at-the-slowest-tempo`.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";

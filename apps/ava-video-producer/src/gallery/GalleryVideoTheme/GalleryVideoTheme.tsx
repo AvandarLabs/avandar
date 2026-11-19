@@ -36,7 +36,7 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
  * active theme the ambient video theme source. It sets no Mantine theme:
  * each preview gets its own `GalleryItemTheme`, so the gallery chrome never
  * picks up video tokens. Wrap the Motions, Compositions, and Sample films
- * sections in it. Its value keeps its identity until the draft state or
+ * sections and the Helpers section in it. Its value keeps its identity until the draft state or
  * the resolved draft changes, so consumers skip unrelated renders.
  */
 export function GalleryVideoTheme({

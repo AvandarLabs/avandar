@@ -1,5 +1,6 @@
 import { Player } from "@remotion/player";
 import { HelperComposition } from "./HelperComposition";
+import { useHelperFilmTheme } from "./useHelperFilmTheme";
 import type { Film } from "../../../showcase/showcase.types";
 import type { ReactNode } from "react";
 
@@ -19,19 +20,20 @@ function _isReducedMotionPreferred(): boolean {
 /**
  * The live player for a helper preview: a looping Remotion player with
  * frame controls, autoplaying unless the viewer prefers reduced motion. It
- * draws in the film's theme, or `classic` when the film has none.
+ * draws in the theme the embedding Atlas page posts, else the film's theme.
  */
 export function HelperPlayer({
   film,
 }: {
   film: Extract<Film, { kind: "helper" }>;
 }): ReactNode {
+  const theme = useHelperFilmTheme(film);
   return (
     <div className="liveFilm">
       <Player
         style={PLAYER_STYLE}
         component={HelperComposition}
-        inputProps={{ helperId: film.helper, theme: film.theme }}
+        inputProps={{ helperId: film.helper, theme }}
         compositionWidth={film.width}
         compositionHeight={film.height}
         durationInFrames={film.frames}
