@@ -255,7 +255,7 @@
           "wide": 0.17142857142857143,
           "title": -0.02717391304347826,
           "headline": -0.02,
-        "slight": -0.01,
+          "slight": -0.01,
           "wordmark": -0.03,
           "figure": -0.035,
           "capitals": 0.125,
@@ -423,7 +423,8 @@
         "zoom": { "min": 1, "max": 3 },
         "velocityBlur": { "factor": 0.09, "max": 3 },
         "multiplier": { "identity": 1 },
-        "pressDepth": { "md": 0.04 }
+        "pressDepth": { "md": 0.04 },
+        "entranceScale": { "md": 0.96 }
       },
       "semantic": {
         "color": {
@@ -952,7 +953,7 @@
           },
           "staggerScale": "$atomic.multiplier.identity",
           "entranceStyle": "rise",
-          "entranceScale": 0.96
+          "entranceScale": "$atomic.entranceScale.md"
         },
         "camera": {
           "preset": "authored",

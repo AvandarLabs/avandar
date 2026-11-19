@@ -264,6 +264,15 @@ export const ATOMIC_TOKENS = {
     description:
       "How far a pressed element shrinks, as a fraction of its size.",
   }),
+  entranceScale: scale({
+    kind: "number",
+    min: 0.5,
+    max: 1,
+    step: 0.01,
+    label: "Entrance scale start",
+    description:
+      "The size an element scaling in starts from, as a fraction of its full size.",
+  }),
   velocityBlur: scale({
     kind: "number",
     min: 0,

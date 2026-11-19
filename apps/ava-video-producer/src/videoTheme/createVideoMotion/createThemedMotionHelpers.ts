@@ -124,7 +124,8 @@ function _rise(
   if (style === "fade") {
     return { opacity: t };
   }
-  const scale = options.scale ?? (style === "scale" ? defaults.entranceScale : 1);
+  const scale =
+    options.scale ?? (style === "scale" ? defaults.entranceScale : 1);
   const travel = style === "scale" ? { x: 0, y: 0 } : { x, y };
   const parts = [
     `translate(${mix(t, travel.x, 0).toFixed(2)}px, ${mix(t, travel.y, 0).toFixed(2)}px)`,
