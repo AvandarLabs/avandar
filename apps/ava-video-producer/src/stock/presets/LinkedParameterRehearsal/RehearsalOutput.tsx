@@ -78,7 +78,7 @@ export function RehearsalOutput({
     <g
       opacity={ramp(
         frame,
-        16 + index * motion.scale(LANE_STAGGER_FRAMES),
+        16 + index * motion.scaleStagger(LANE_STAGGER_FRAMES),
         motion.scale(LANE_FRAMES),
         motion.reveal.easing,
       )}

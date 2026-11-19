@@ -8,9 +8,6 @@ import type { ReactNode } from "react";
 
 type Props = { rowKey: string; y: number; label: string; progress: number };
 
-/** The dash of an absent partner's outline. */
-const ABSENT_DASH = "5 5";
-
 /** A left join retains an explicit authored absent-partner label. */
 export function JoinMissingPartner({
   rowKey,
@@ -30,7 +27,7 @@ export function JoinMissingPartner({
         rx={scales.corner(tokens.corner.chip)}
         fill={tokens.color.surface}
         stroke={tokens.color.line}
-        strokeDasharray={ABSENT_DASH}
+        strokeDasharray={tokens.dash.placeholder.join(" ")}
       />
       <FitText
         text={label}
