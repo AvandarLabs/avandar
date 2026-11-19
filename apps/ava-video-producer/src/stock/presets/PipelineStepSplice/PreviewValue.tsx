@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -8,6 +8,9 @@ type Props = {
   isOutput: boolean;
   accent: string;
 };
+
+/** A preview value's size, as content: no graphic text role is 14 px. */
+const VALUE_FONT_SIZE = 14;
 /** One literal value occupies a single bounded whitespace-preserving lane. */
 export function PreviewValue({
   label,
@@ -15,8 +18,9 @@ export function PreviewValue({
   isOutput,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
   const y = isOutput ? 516 : 441;
-  const color = isOutput ? accent : STOCK.text;
+  const color = isOutput ? accent : tokens.color.text;
   return (
     <g>
       <FitText
@@ -28,7 +32,7 @@ export function PreviewValue({
         maxLines={1}
         breakLongWords
         normalizeWhitespace
-        color={isOutput ? accent : STOCK.muted}
+        color={isOutput ? accent : tokens.color.textMuted}
       />
       <text
         data-preview-input={isOutput ? undefined : value}
@@ -36,8 +40,8 @@ export function PreviewValue({
         aria-label={value}
         x={88}
         y={y + 27}
-        fontFamily="Arial, sans-serif"
-        fontSize={14}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontSize={VALUE_FONT_SIZE}
         xmlSpace="preserve"
         fill={color}
       >
