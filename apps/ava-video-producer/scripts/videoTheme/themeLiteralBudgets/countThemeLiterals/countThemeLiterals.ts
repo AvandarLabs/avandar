@@ -300,6 +300,15 @@ function _stripCssComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, "");
 }
 
+/**
+ * Properties that place or size a box on a fixed stage. Their lengths are
+ * structural geometry, the CSS counterpart of SVG viewBox coordinates, so
+ * they are not theme literals. Spacing (`gap`, `padding`, `margin`) is not in
+ * this list: it follows the theme's spacing scale.
+ */
+const STRUCTURAL_LAYOUT_PROPERTY =
+  /^(?:(?:min-|max-)?(?:width|height)|top|right|bottom|left|inset(?:-.+)?|grid-template(?:-.+)?|flex-basis)$/;
+
 function _countCss(source: string): number {
   const declarations = _stripCssComments(source)
     .split(/[;{}]/)
@@ -314,11 +323,13 @@ function _countCss(source: string): number {
       _countMatches(value, HEX_PATTERN) +
       _countMatches(value, COLOR_FUNCTION_PATTERN) +
       _countMatches(value, STARTER_PATTERN) +
-      _countMatches(value, /\b\d+(?:\.\d+)?px\b/g) +
+      (STRUCTURAL_LAYOUT_PROPERTY.test(property)
+        ? 0
+        : _countMatches(value, /\b\d+(?:\.\d+)?px\b/g)) +
       _countMatches(value, /cubic-bezier\(/g);
     const propertyCount = [
       /^font-(?:size|weight|family)$/.test(property) && !isVariable,
-      property === "border-radius",
+      property === "border-radius" && !isVariable,
       /^(?:box|text)-shadow$/.test(property) && !isVariable,
       /^(?:transition|animation)(?:-|$)/.test(property),
     ].filter(Boolean).length;

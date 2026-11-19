@@ -83,3 +83,11 @@ test("stylesheet values count unless they read a variable", () => {
   );
   assert.equal(counts.css, 3);
 });
+
+test("stage geometry lengths are structural but spacing and variable radii are judged apart", () => {
+  const counts = _count(
+    `.a { width: 640px; top: 73px; grid-template-columns: 360px 1fr; gap: 24px; border-radius: var(--r); }`,
+    "Stage.module.css",
+  );
+  assert.equal(counts.css, 1);
+});
