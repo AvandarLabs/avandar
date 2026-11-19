@@ -42,6 +42,12 @@ export type ExpectedDashboardWrite = {
 export type GradeContext = {
   result: EvalQueryResult;
   truth: Readonly<Record<string, EvalQueryResult>>;
+  /**
+   * The result of the question this one follows, as it was graded: for a
+   * Try again question, its second attempt's. Unset when the parent showed
+   * no result or there is no parent.
+   */
+  parentResult?: EvalQueryResult;
 };
 
 /** One question in the eval, with its ground truth and grader. */
@@ -57,7 +63,8 @@ export type EvalQuestion = {
     | "mentions"
     | "schema"
     | "coded"
-    | "dashboards";
+    | "dashboards"
+    | "try_again";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -142,4 +149,12 @@ export type EvalQuestion = {
    * DataViz write is graded by `grade` on the block's own result.
    */
   expectedWrite?: ExpectedDashboardWrite | "none";
+  /**
+   * Set on a Try again question. The harness asks `prompt`, keeps the first
+   * attempt, then reruns the same thread as a Try again and returns the
+   * second attempt. With `isFirstCardUnanswered`, the first attempt ends at
+   * its first question card, left unanswered, as when the user clicks Try
+   * again on the card.
+   */
+  tryAgain?: { isFirstCardUnanswered?: boolean };
 };
