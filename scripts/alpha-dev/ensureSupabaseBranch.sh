@@ -1,22 +1,21 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Makes sure the Supabase branch for the current `demo/*` Git branch exists on
-# the staging project, waits for it to be healthy, and prints its connection
-# details as `KEY=value` lines to `$DEMO_ENV_FILE` (stdout when unset).
+# Makes sure the persistent `alpha-dev` Supabase branch exists on the staging
+# project, waits for it to be healthy, and prints its connection details as
+# `KEY=value` lines to `$ALPHA_DEV_ENV_FILE` (stdout when unset).
 #
-# The Supabase branch name is the Git branch name with `/` replaced by `-`, so
-# `demo/measles` maps to `demo-measles`. A branch that does not exist yet is
-# created as a non-persistent branch: it is billed only while it exists and
-# auto-pauses when idle.
+# The only Git branch allowed is `alpha-dev`, and it maps to the Supabase
+# branch of the same name. A branch that does not exist yet is created as a
+# persistent branch, so it keeps its data between deploys.
 #
 # Usage:
-#   STAGING_PROJECT_ID=<ref> bash scripts/demo/ensureSupabaseBranch.sh <git-branch>
+#   STAGING_PROJECT_ID=<ref> bash scripts/alpha-dev/ensureSupabaseBranch.sh alpha-dev
 #
 # Requires `SUPABASE_ACCESS_TOKEN`, `curl`, and `jq`.
 #
 # Output, one per line:
-#   DEMO_SUPABASE_BRANCH, DEMO_SUPABASE_REF, DEMO_SUPABASE_URL,
-#   DEMO_DB_PASSWORD, DEMO_PUBLISHABLE_KEY, DEMO_SECRET_KEY
+#   ALPHA_DEV_SUPABASE_BRANCH, ALPHA_DEV_SUPABASE_REF, ALPHA_DEV_SUPABASE_URL,
+#   ALPHA_DEV_DB_PASSWORD, ALPHA_DEV_PUBLISHABLE_KEY, ALPHA_DEV_SECRET_KEY
 #
 # Progress goes to stderr. In GitHub Actions every secret value is masked on
 # stdout, where Actions reads workflow commands, before it is written out.
@@ -31,12 +30,12 @@ GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh <git-branch>}"
 WAIT_TIMEOUT_SECONDS=900
 POLL_INTERVAL_SECONDS=15
 
-if [[ "$GIT_BRANCH" != demo/* ]]; then
-  echo "Refusing to manage a Supabase branch for '$GIT_BRANCH': only demo/* branches are allowed." >&2
+if [[ "$GIT_BRANCH" != "alpha-dev" ]]; then
+  echo "Refusing to manage a Supabase branch for '$GIT_BRANCH': only alpha-dev is allowed." >&2
   exit 1
 fi
 
-SUPABASE_BRANCH="${GIT_BRANCH//\//-}"
+SUPABASE_BRANCH="alpha-dev"
 
 log() {
   echo "$@" >&2
@@ -62,10 +61,10 @@ create_branch() {
   )"
   log "Creating Supabase branch '$SUPABASE_BRANCH' in region '${region:-default}'..."
   if [[ -n "$region" ]]; then
-    supabase branches create "$SUPABASE_BRANCH" \
+    supabase branches create "$SUPABASE_BRANCH" --persistent \
       --project-ref "$STAGING_PROJECT_ID" --region "$region" >&2
   else
-    supabase branches create "$SUPABASE_BRANCH" \
+    supabase branches create "$SUPABASE_BRANCH" --persistent \
       --project-ref "$STAGING_PROJECT_ID" >&2
   fi
 }
@@ -136,10 +135,10 @@ mask "$PUBLISHABLE_KEY"
 mask "$SECRET_KEY"
 
 {
-  echo "DEMO_SUPABASE_BRANCH=$SUPABASE_BRANCH"
-  echo "DEMO_SUPABASE_REF=$BRANCH_REF"
-  echo "DEMO_SUPABASE_URL=https://$BRANCH_REF.supabase.co"
-  echo "DEMO_DB_PASSWORD=$DB_PASSWORD"
-  echo "DEMO_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
-  echo "DEMO_SECRET_KEY=$SECRET_KEY"
-} >>"${DEMO_ENV_FILE:-/dev/stdout}"
+  echo "ALPHA_DEV_SUPABASE_BRANCH=$SUPABASE_BRANCH"
+  echo "ALPHA_DEV_SUPABASE_REF=$BRANCH_REF"
+  echo "ALPHA_DEV_SUPABASE_URL=https://$BRANCH_REF.supabase.co"
+  echo "ALPHA_DEV_DB_PASSWORD=$DB_PASSWORD"
+  echo "ALPHA_DEV_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+  echo "ALPHA_DEV_SECRET_KEY=$SECRET_KEY"
+} >>"${ALPHA_DEV_ENV_FILE:-/dev/stdout}"
