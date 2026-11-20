@@ -98,6 +98,38 @@ describe("gradeSchemaComparison", () => {
     ).toBe(false);
   });
 
+  it("fails a reply that says no column renaming is needed", () => {
+    expect(
+      gradeSchemaComparison(
+        "Yes, they are appendable. No column renaming is needed. The US file adds Admin2 and Population.",
+      ).pass,
+    ).toBe(false);
+  });
+
+  it("fails a reply that says the files stack cleanly and only the extra columns don't line up", () => {
+    expect(
+      gradeSchemaComparison(
+        "Yes, they stack cleanly. Admin2 and Population don't line up with any global column, so they are just extra columns.",
+      ).pass,
+    ).toBe(false);
+  });
+
+  it("fails a reply that says the files stack fine with not directly mid-sentence", () => {
+    expect(
+      gradeSchemaComparison(
+        "They stack fine. Admin2 and Population are not directly present in the global file, but the rest are identical.",
+      ).pass,
+    ).toBe(false);
+  });
+
+  it("fails a reply that says you don't need to rename anything", () => {
+    expect(
+      gradeSchemaComparison(
+        "You don't need to rename anything. Yes they stack as they are. The US file adds Admin2.",
+      ).pass,
+    ).toBe(false);
+  });
+
   it("fails a reply that says the columns match", () => {
     expect(
       gradeSchemaComparison(
