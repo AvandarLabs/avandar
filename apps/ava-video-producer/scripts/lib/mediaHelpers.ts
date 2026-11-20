@@ -8,15 +8,17 @@ import {
   durationInFrames,
   type Storyboard,
 } from "../../src/storyboard/schema/schema";
-import { publicAsset } from "./planHelpers";
+import { publicAsset } from "./planHelpers/planHelpers";
 
 export const ffmpeg =
   process.env.FFMPEG_BIN ||
   (ffmpegStatic && existsSync(ffmpegStatic) ? ffmpegStatic : "ffmpeg");
 export const ffprobe = process.env.FFPROBE_BIN || "ffprobe";
-
-type RunOptions = { cwd?: string; quiet?: boolean; env?: NodeJS.ProcessEnv };
-
+type RunOptions = {
+  cwd?: string;
+  quiet?: boolean;
+  env?: NodeJS.ProcessEnv;
+};
 /**
  * Execute argument arrays without a shell; retain diagnostic stderr separately.
  */
@@ -24,38 +26,41 @@ export async function runProcess(
   command: string,
   args: string[],
   options: RunOptions = {},
-): Promise<{ stdout: string; stderr: string }> {
-  return await new Promise<{ stdout: string; stderr: string }>(
-    (resolve, reject) => {
-      const child = spawn(command, args, {
-        cwd: options.cwd,
-        env: options.env,
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (chunk) => {
-        stdout += chunk;
-        if (!options.quiet) process.stdout.write(chunk);
-      });
-      child.stderr.on("data", (chunk) => {
-        stderr = (stderr + chunk).slice(-32000);
-        if (!options.quiet) process.stderr.write(chunk);
-      });
-      child.on("error", reject);
-      child.on("close", (code) => {
-        return code === 0
-          ? resolve({ stdout, stderr })
-          : reject(
-              new Error(
-                `${path.basename(command)} exited ${code}: ${stderr.slice(-3000)}`,
-              ),
-            );
-      });
-    },
-  );
+): Promise<{
+  stdout: string;
+  stderr: string;
+}> {
+  return await new Promise<{
+    stdout: string;
+    stderr: string;
+  }>((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: options.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      if (!options.quiet) process.stdout.write(chunk);
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr = (stderr + chunk).slice(-32000);
+      if (!options.quiet) process.stderr.write(chunk);
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      return code === 0
+        ? resolve({ stdout, stderr })
+        : reject(
+            new Error(
+              `${path.basename(command)} exited ${code}: ${stderr.slice(-3000)}`,
+            ),
+          );
+    });
+  });
 }
-
 /**
  * Run without a shell so filenames and narration text cannot become commands.
  */
@@ -66,7 +71,6 @@ export async function run(
 ): Promise<string> {
   return (await runProcess(command, args, options)).stdout;
 }
-
 export type MediaStream = {
   codec_type: string;
   codec_name?: string;
@@ -77,11 +81,11 @@ export type MediaStream = {
   nb_frames?: string;
   sample_rate?: string;
 };
-
 /** Probe the actual media container, independent of its filename extension. */
-export async function probe(
-  filename: string,
-): Promise<{ duration: number; streams: MediaStream[] }> {
+export async function probe(filename: string): Promise<{
+  duration: number;
+  streams: MediaStream[];
+}> {
   const result = JSON.parse(
     await run(
       ffprobe,
@@ -94,7 +98,6 @@ export async function probe(
     streams: result.streams as MediaStream[],
   };
 }
-
 /**
  * Check timing before rendering so no speech or effects are silently cut off.
  */
@@ -169,7 +172,6 @@ export async function validateMedia(
       throw new Error(`${sound.id}: sound extends beyond the film`);
   }
 }
-
 /**
  * Hash encoded video packets to prove audio assembly did not re-encode picture.
  */
@@ -196,7 +198,6 @@ export async function videoHash(filename: string): Promise<string> {
     )
   ).trim();
 }
-
 /** Measure a whole track or a selected listening window in dBFS. */
 export async function audioPeak(
   filename: string,
@@ -213,7 +214,6 @@ export async function audioPeak(
   if (!match) throw new Error("Unable to measure assembled audio");
   return match[1] === "-inf" ? -Infinity : Number(match[1]);
 }
-
 /** Verify picture duration before a mix can truncate or extend it. */
 async function _assertPictureDuration(plan: Storyboard, picture: string) {
   const info = await probe(picture);
@@ -230,7 +230,6 @@ async function _assertPictureDuration(plan: Storyboard, picture: string) {
     throw new Error("Picture duration does not match the storyboard");
   }
 }
-
 /**
  * Mix approved tracks, then assert duration, signal and unchanged video
  * packets.

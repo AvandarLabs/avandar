@@ -1,6 +1,6 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
 
@@ -19,6 +19,8 @@ export function FundingEnvelope({
   accent,
   allocatedCredits,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const request = input.requests[index];
   const width = 880 / input.requests.length;
   const x = 40 + index * width;
@@ -29,14 +31,25 @@ export function FundingEnvelope({
   const top = 425 + offset;
   return (
     <g>
-      <path
-        data-envelope={request.id}
-        data-edge={top}
-        d={`M${x} ${top + 12 * (1 - ramp(frame, 118, 14))} H${x + width - 18} V${top + 42} H${x} Z M${x} ${top} L${x + width / 2 - 9} ${top + 28} L${x + width - 18} ${top}`}
-        fill={STOCK.surface}
-        stroke={accent}
-      />
-      <text x={x + 12} y={top + 27} fill={STOCK.orange} fontSize={14}>
+      <g data-envelope={request.id} data-edge={top}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x} ${top + 12 * (1 - motion.ramp(frame, 118, motion.scale(14), motion.exit.easing))} H${x + width - 18} V${top + 42} H${x} Z M${x} ${top} L${x + width / 2 - 9} ${top + 28} L${x + width - 18} ${top}`,
+          }}
+          profile={tokens.sketch.shape}
+          fill={tokens.color.surface}
+          stroke={accent}
+        />
+      </g>
+      <text
+        x={x + 12}
+        y={top + 27}
+        fill={tokens.color.highlight}
+        fontSize={tokens.text.graphic.value.fontSize}
+        fontFamily={tokens.text.graphic.value.fontFamily}
+        fontWeight={tokens.text.graphic.value.fontWeight}
+      >
         {index + 1}
       </text>
       <FitText
@@ -56,7 +69,9 @@ export function FundingEnvelope({
           y={top + 27}
           textAnchor="end"
           fill={accent}
-          fontSize={14}
+          fontSize={tokens.text.graphic.value.fontSize}
+          fontFamily={tokens.text.graphic.value.fontFamily}
+          fontWeight={tokens.text.graphic.value.fontWeight}
         >
           {allocatedCredits}
         </text>

@@ -1,7 +1,8 @@
-import { mix, ramp, EASE } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { ByteItem } from "./ByteItem";
-import { VolumeScale } from "./VolumeScale";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ByteItem } from "./ByteItem/ByteItem";
+import { VolumeScale } from "./VolumeScale/VolumeScale";
 import { VolumeTotal } from "./VolumeTotal";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
@@ -13,6 +14,8 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** Frames the shelves take to align on the shared ruler. */
+const ALIGN_FRAMES = 36;
 /** A shelf preserves item ownership and uses the shared byte ruler. */
 export function VolumeShelf({
   group,
@@ -21,8 +24,14 @@ export function VolumeShelf({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 135 + index * 200;
-  const alignment = ramp(frame, 12, 36, EASE.inOut);
+  const alignment = ramp(
+    frame,
+    12,
+    motion.scale(ALIGN_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <g
       data-group-id={group.id}

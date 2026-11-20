@@ -88,13 +88,13 @@
       "durationInFrames": 80,
       "transitionInFrames": 20,
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#94a3b8",
-        "background": "#0b0f17",
-        "card": "#1e293b"
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate400",
+        "background": "$atomic.swatch.slateInk",
+        "card": "$atomic.swatch.slate800"
       },
       "transition": {
         "kind": "stepped-column-wipe",

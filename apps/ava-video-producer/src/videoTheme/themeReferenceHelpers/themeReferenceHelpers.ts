@@ -1,4 +1,4 @@
-import { isMantineTokenRoot } from "../tokenCatalog/tokenCatalogHelpers";
+import { isMantineTokenRoot } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import type { TokenReference } from "../videoTheme.types";
 
 /** `$` then dot-separated segments; the first segment starts with a letter. */

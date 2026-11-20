@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheRequestCards } from "./CacheRequestCards";
 import { CacheRequestRoutes } from "./CacheRequestRoutes/CacheRequestRoutes";
 import { MissingCacheColumns } from "./MissingCacheColumns";
@@ -21,7 +21,7 @@ export function CacheRequests({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { text } = useGraphicTokens();
+  const { text } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <CacheRequestCards input={input} frame={frame} accent={accent} />

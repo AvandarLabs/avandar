@@ -1,13 +1,14 @@
+import { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import { DEMO_CANVAS } from "./DemoCanvas";
-import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 
-/** A rect on the mini canvas from fractions of it, as windowTilt boxes are. */
-export function getCanvasRect(fractions: {
+type GetCanvasRectOptions = {
   x: number;
   y: number;
   width: number;
   height?: number;
-}): MotionRect {
+};
+/** A rect on the mini canvas from fractions of it, as windowTilt boxes are. */
+export function getCanvasRect(fractions: GetCanvasRectOptions): MotionRect {
   return {
     x: fractions.x * DEMO_CANVAS.width,
     y: fractions.y * DEMO_CANVAS.height,

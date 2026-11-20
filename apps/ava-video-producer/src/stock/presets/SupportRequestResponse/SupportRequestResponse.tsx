@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SupportParticipants } from "./SupportParticipants";
 import { SupportWords } from "./SupportWords";
 import { SupportWorktable } from "./SupportWorktable";
@@ -8,7 +8,6 @@ import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /**
  * An authored reply changes participation without transferring task ownership.
  */
@@ -17,12 +16,13 @@ export function SupportRequestResponse({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <SupportWords input={input} frame={frame} />
       <SupportWorktable input={input} frame={frame} accent={accent} />
       <SupportParticipants input={input} frame={frame} accent={accent} />
-      <g opacity={ramp(frame, 12, 12)}>
+      <g opacity={motion.reveal(frame, 12)}>
         <LabelSlots
           labels={[
             [input.people.requester, 60, 448, 220, 20, 3],
@@ -31,7 +31,7 @@ export function SupportRequestResponse({
           ]}
         />
       </g>
-      <g opacity={ramp(frame, 131, 8)}>
+      <g opacity={motion.ramp(frame, 131, motion.whip)}>
         {input.response.state === "joins" ? (
           <LabelSlots labels={[[input.labels.shared, 650, 448, 250, 14, 3]]} />
         ) : undefined}

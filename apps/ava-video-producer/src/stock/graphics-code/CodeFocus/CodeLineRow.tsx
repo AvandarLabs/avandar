@@ -1,22 +1,19 @@
 import { Text } from "../../graphics-common/Text";
-import { STOCK } from "../../stockPalette";
+import { LEGACY_ACCENT_HEX } from "../../presets/legacy/legacyAccentHex";
 import { getContentColorFromValue } from "../../theme/getContentColorFromValue/getContentColorFromValue";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FIRST_LINE_Y, LINE_STEP } from "./CodeFocus.constants";
 import type { CodeFocusInput } from "../../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
 
 type CodeLine = CodeFocusInput["lines"][number];
-
-type Props = Readonly<{
-  codeTokens: CodeLine;
-  index: number;
-  accent: string;
-}>;
-
-/** One numbered code line. A mint token keeps meaning the graphic's accent. */
+type Props = Readonly<{ codeTokens: CodeLine; index: number; accent: string }>;
+/**
+ * One numbered code line. A token in the legacy accent hex keeps meaning the
+ * graphic's accent.
+ */
 export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const code = tokens.text.graphic.code;
   const y = FIRST_LINE_Y + index * LINE_STEP;
   return (
@@ -29,6 +26,7 @@ export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
         y={y}
         fontSize={code.fontSize}
         fontFamily={code.fontFamily}
+        fontWeight={code.fontWeight}
         xmlSpace="preserve"
       >
         {codeTokens.map((token, j) => {
@@ -36,7 +34,7 @@ export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
             <tspan
               key={j}
               fill={getContentColorFromValue(
-                token.color === STOCK.mint ? "accent" : token.color,
+                token.color === LEGACY_ACCENT_HEX ? "accent" : token.color,
                 { tokens, accent },
               )}
             >

@@ -13,21 +13,29 @@ const track = [
   { at: 140, x: 650, y: 330, zoom: 2, ease: "glide" as const },
 ];
 test("camera rests exactly on authored details and moves only during travel", () => {
-  assert.deepEqual(getCameraPose(track, 100), { x: 650, y: 330, zoom: 2 });
-  assert.equal(isCameraMoving(track, 30), false);
-  assert.equal(isCameraMoving(track, 69), true);
-  assert.equal(isCameraMoving(track, 100), false);
-  const moving = getCameraPose(track, 69);
+  assert.deepEqual(getCameraPose({ keys: track, frame: 100 }), {
+    x: 650,
+    y: 330,
+    zoom: 2,
+  });
+  assert.equal(isCameraMoving({ keys: track, frame: 30 }), false);
+  assert.equal(isCameraMoving({ keys: track, frame: 69 }), true);
+  assert.equal(isCameraMoving({ keys: track, frame: 100 }), false);
+  const moving = getCameraPose({ keys: track, frame: 69 });
   assert.ok(moving.x > 480 && moving.x < 650);
   assert.ok(moving.zoom > 1 && moving.zoom < 2);
 });
 test("disabling camera motion returns the wide pose without retiming the diagram", () => {
-  assert.deepEqual(getCameraPose(track, 69, false), {
+  assert.deepEqual(getCameraPose({ keys: track, frame: 69, enabled: false }), {
     x: 480,
     y: 300,
     zoom: 1,
   });
-  assert.deepEqual(getCameraPose(undefined, 800), { x: 480, y: 300, zoom: 1 });
+  assert.deepEqual(getCameraPose({ keys: undefined, frame: 800 }), {
+    x: 480,
+    y: 300,
+    zoom: 1,
+  });
 });
 test("camera targets must be ordered and contain a safe viewport", () => {
   assert.equal(cameraTrackSchema.safeParse(track).success, true);
@@ -43,27 +51,22 @@ test("camera targets must be ordered and contain a safe viewport", () => {
     false,
   );
 });
-
 test("camera speed changes travel without shortening the initial reading hold", () => {
   const options = { speed: 0.5, easing: "linear" as const };
-  assert.deepEqual(getCameraPose(track, 60, true, options), {
-    x: 480,
-    y: 300,
-    zoom: 1,
-  });
-  assert.deepEqual(getCameraPose(track, 78, true, options), {
-    x: 565,
-    y: 315,
-    zoom: 1.5,
-  });
-  assert.deepEqual(getCameraPose(track, 96, true, options), {
-    x: 650,
-    y: 330,
-    zoom: 2,
-  });
-  assert.equal(isCameraMoving(track, 80, options), true);
+  assert.deepEqual(
+    getCameraPose({ keys: track, frame: 60, enabled: true, options }),
+    { x: 480, y: 300, zoom: 1 },
+  );
+  assert.deepEqual(
+    getCameraPose({ keys: track, frame: 78, enabled: true, options }),
+    { x: 565, y: 315, zoom: 1.5 },
+  );
+  assert.deepEqual(
+    getCameraPose({ keys: track, frame: 96, enabled: true, options }),
+    { x: 650, y: 330, zoom: 2 },
+  );
+  assert.equal(isCameraMoving({ keys: track, frame: 80, options }), true);
 });
-
 test("camera accepts a bounded cubic bezier on an individual move", () => {
   const keys = [track[0], { ...track[2], ease: [0.42, 0, 0.58, 1] }];
   assert.equal(cameraTrackSchema.safeParse(keys).success, true);

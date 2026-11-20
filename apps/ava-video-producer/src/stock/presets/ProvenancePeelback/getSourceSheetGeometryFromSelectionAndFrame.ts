@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ProvenancePeelback.schema";
 
 type Options = {
@@ -7,6 +8,7 @@ type Options = {
   selected: boolean;
   frame: number;
   arrangement: Input["sourceArrangement"];
+  motion: VideoMotion;
 };
 /** Data for getSourceSheetGeometryFromSelectionAndFrame. */
 type GetSourceSheetGeometryResult = {
@@ -25,8 +27,14 @@ export function getSourceSheetGeometryFromSelectionAndFrame({
   selected,
   frame,
   arrangement,
+  motion,
 }: Readonly<Options>): GetSourceSheetGeometryResult {
-  const peeling = ramp(frame, 40, 64, EASE.inOut);
+  const peeling = motion.ramp(
+    frame,
+    40,
+    motion.scale(64),
+    motion.travel.easing,
+  );
   return {
     x: mix(peeling, 112 + index * 18, selected ? 496 : 64 + otherIndex * 432),
     y: mix(

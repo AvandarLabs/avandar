@@ -1,6 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
@@ -19,9 +21,14 @@ export function ServiceEntrance({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 160 + ((index + 0.5) * 640) / input.services.length;
   const selected = service.id === input.chosenServiceId;
-  const change = selected ? ramp(frame, 44, 32, EASE.inOut) : 0;
+  const change = selected
+    ? motion.ramp(frame, 44, motion.scale(32), motion.travel.easing)
+    : 0;
   const threshold = input.accessChange === "clear-entrance" ? 356 : 326;
   const barrier =
     input.accessChange === "unfold-ramp"
@@ -40,60 +47,79 @@ export function ServiceEntrance({
         breakLongWords
         normalizeWhitespace
       />
-      <rect
+      <StockRect
         x={x - 68}
         y={194}
         width={136}
         height={threshold - 180}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
-        d={`M${x - 42} ${threshold} V214 H${x + 42} V${threshold}`}
-        stroke={STOCK.muted}
-        strokeWidth={3}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x - 42} ${threshold} V214 H${x + 42} V${threshold}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         fill="none"
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 42} 214 L${x + 42 - 68 * (1 - change)} ${214 + change * 10} V${threshold} H${x + 42}`,
+        }}
+        profile={tokens.sketch.shape}
         data-door={service.id}
-        d={`M${x + 42} 214 L${x + 42 - 68 * (1 - change)} ${214 + change * 10} V${threshold} H${x + 42}`}
-        fill={STOCK.surface}
-        stroke={selected ? accent : STOCK.muted}
+        fill={tokens.color.surface}
+        stroke={selected ? accent : tokens.color.inactive}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d:
+            input.accessChange === "unfold-ramp"
+              ? `M${x - 42} 356 V326 H${x + 42}`
+              : `M${x - 42} 356 H${x + 42}`,
+        }}
+        profile={tokens.sketch.shape}
         data-threshold={service.id}
-        d={
-          input.accessChange === "unfold-ramp"
-            ? `M${x - 42} 356 V326 H${x + 42}`
-            : `M${x - 42} 356 H${x + 42}`
-        }
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={3}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: barrier }}
+        profile={tokens.sketch.shape}
         data-barrier={service.id}
         data-barrier-selected={selected}
-        d={barrier}
-        fill={input.accessChange === "unfold-ramp" ? "none" : STOCK.surface}
-        stroke={selected ? accent : STOCK.orange}
-        strokeWidth={5}
+        fill={
+          input.accessChange === "unfold-ramp" ? "none" : tokens.color.surface
+        }
+        stroke={selected ? accent : tokens.color.highlight}
+        strokeWidth={scales.stroke(5)}
       />
       {service.symbol === "shelter" ? (
-        <path
-          d={`M${x - 18} 184 L${x} 168 L${x + 18} 184`}
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x - 18} 184 L${x} 168 L${x + 18} 184` }}
+          profile={tokens.sketch.shape}
           fill="none"
-          stroke={STOCK.muted}
+          stroke={tokens.color.inactive}
         />
       ) : service.symbol === "water" ? (
-        <path
-          d={`M${x} 163 Q${x - 20} 187 ${x} 190 Q${x + 20} 187 ${x} 163`}
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x} 163 Q${x - 20} 187 ${x} 190 Q${x + 20} 187 ${x} 163`,
+          }}
+          profile={tokens.sketch.shape}
           fill="none"
-          stroke={STOCK.muted}
+          stroke={tokens.color.inactive}
         />
       ) : (
-        <g fill={STOCK.muted}>
+        <g fill={tokens.color.inactive}>
           <circle cx={x} cy={171} r={2} />
           <rect x={x - 1} y={178} width={2} height={12} />
         </g>

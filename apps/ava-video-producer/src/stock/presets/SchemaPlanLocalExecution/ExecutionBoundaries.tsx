@@ -1,10 +1,14 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /**
  * Stable device and planner boundaries separate retained rows from messages.
  */
 export function ExecutionBoundaries(): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -13,10 +17,10 @@ export function ExecutionBoundaries(): ReactNode {
         y={95}
         width={540}
         height={455}
-        rx={18}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={2}
+        rx={scales.corner(tokens.corner.panel)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <StockRect
         data-remote-boundary="true"
@@ -24,15 +28,16 @@ export function ExecutionBoundaries(): ReactNode {
         y={95}
         width={310}
         height={455}
-        rx={18}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.panel)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M594 90 V552" }}
+        profile={tokens.sketch.shape}
         data-network-boundary="true"
-        d="M594 90 V552"
-        stroke={STOCK.muted}
-        strokeDasharray="6 6"
+        stroke={tokens.color.inactive}
+        strokeDasharray={atomic.dash.long.join(" ")}
       />
     </g>
   );

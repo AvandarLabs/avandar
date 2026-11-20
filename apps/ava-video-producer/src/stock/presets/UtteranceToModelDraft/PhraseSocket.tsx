@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { role: string; label: string; accent: string };
@@ -9,13 +10,15 @@ export function PhraseSocket({
   label,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         width={254}
         height={96}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <LabelSlots

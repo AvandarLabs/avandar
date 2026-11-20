@@ -1,23 +1,11 @@
-import {
-  useGraphicFilter,
-  useGraphicProps,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
+type Props = { cx: number; cy: number; r: number; color: string };
 /** The theme's soft disc around a point, such as a packet's halo. */
-export function Halo({
-  cx,
-  cy,
-  r,
-  color,
-}: {
-  cx: number;
-  cy: number;
-  r: number;
-  color: string;
-}): ReactNode {
-  const { glow } = useGraphicProps("Halo", {});
-  const filter = useGraphicFilter("components.Halo.glow");
+export function Halo({ cx, cy, r, color }: Readonly<Props>): ReactNode {
+  const { glow } = GraphicThemeHooks.useGraphicProps("Halo", {});
+  const filter = GraphicThemeHooks.useGraphicFilter("components.Halo.glow");
   return (
     <circle
       filter={filter}

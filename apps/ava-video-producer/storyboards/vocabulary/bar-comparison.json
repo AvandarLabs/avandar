@@ -16,15 +16,6 @@
     "height": 1080
   },
   "captions": false,
-  "theme": {
-    "ground": "#f8fafc",
-    "foreground": "#0f172a",
-    "muted-foreground": "#64748b",
-    "muted": "#cbd5e1",
-    "border": "#94a3b8",
-    "background": "#0b0f17",
-    "card": "#1e293b"
-  },
   "shots": [
     {
       "id": "one-panel",

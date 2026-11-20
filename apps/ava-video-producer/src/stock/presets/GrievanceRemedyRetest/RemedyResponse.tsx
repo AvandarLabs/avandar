@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RemedyStageLabels } from "./RemedyStageLabels";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
@@ -11,6 +12,8 @@ export function RemedyResponse({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const response =
     frame < 120
       ? input.labels.pending
@@ -24,14 +27,13 @@ export function RemedyResponse({
     <g>
       <RemedyStageLabels frame={frame} input={input} />
       <LabelSlots labels={[[response, 80, 559, 832, 18, 2]]} />
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: 59, cy: 552, r: 10 }}
+        profile={tokens.sketch.shape}
         data-response-marker="separate"
-        cx={59}
-        cy={552}
-        r={10}
         fill={isClosed ? accent : "none"}
-        stroke={isClosed ? accent : STOCK.orange}
-        strokeWidth={3}
+        stroke={isClosed ? accent : tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
     </g>
   );

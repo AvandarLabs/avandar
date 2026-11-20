@@ -5,7 +5,10 @@ import {
   storyboardSchema,
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
-import { assetReferences, publicAsset } from "../../lib/planHelpers";
+import {
+  assetReferences,
+  publicAsset,
+} from "../../lib/planHelpers/planHelpers";
 import { scratchTts } from "../../video/scratchTts/scratchTts";
 import { appRoot, PLANS } from "../ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../../src/showcase/showcase.types";
@@ -15,7 +18,6 @@ type NarrationOptions = {
   platform?: NodeJS.Platform;
   synthesize?: typeof scratchTts;
 };
-
 async function _prepareNarration(
   film: Film,
   root: string,
@@ -54,7 +56,6 @@ async function _prepareNarration(
   await fs.writeFile(cache, JSON.stringify(plan));
   return plan;
 }
-
 /** Cache captured narration separately from each viewer's playback options. */
 export function createNarrationLoader({
   root = appRoot,
@@ -88,6 +89,5 @@ export function createNarrationLoader({
     return { ...film, plan: await result };
   };
 }
-
 /** Add cached local scratch speech while preserving viewer options. */
 export const withNarration = createNarrationLoader();

@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getOrderSlipPoseFromFrame } from "./getOrderSlipPoseFromFrame";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
-import { ShelfActor } from "./ShelfActor";
+import { ShelfActor } from "./ShelfActor/ShelfActor";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
@@ -14,7 +14,9 @@ export function ShelfActors({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const units = getShelfUnitsFromInputAndFrame({ input, frame });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const units = getShelfUnitsFromInputAndFrame({ input, frame, motion });
   const loading = units.find(propEq("owner", "retailer-hand"));
   const selecting = units.find(propEq("owner", "shopper-hand"));
   const gapIndex = input.goods.findIndex((good) => {
@@ -22,9 +24,14 @@ export function ShelfActors({
   });
   const gapX = 192 + input.goods[gapIndex].openingUnits * 56;
   const gapY = 200 + gapIndex * 105;
-  const slip = getOrderSlipPoseFromFrame(frame);
-  const reach = ramp(frame, 24, 4, EASE.inOut);
-  const release = ramp(frame, 36, 6, EASE.inOut);
+  const slip = getOrderSlipPoseFromFrame({ frame, motion });
+  const reach = motion.ramp(
+    frame,
+    24,
+    motion.press.duration,
+    motion.travel.easing,
+  );
+  const release = motion.ramp(frame, 36, motion.chip, motion.travel.easing);
   const orderHandX =
     frame < 28
       ? mix(reach, gapX, 626)
@@ -54,7 +61,7 @@ export function ShelfActors({
         y={selecting ? selecting.y - 42 : 478}
         handX={selecting ? selecting.x + 12 : 840}
         handY={selecting ? selecting.y : 470}
-        accent={STOCK.orange}
+        accent={tokens.color.highlight}
       />
     </g>
   );

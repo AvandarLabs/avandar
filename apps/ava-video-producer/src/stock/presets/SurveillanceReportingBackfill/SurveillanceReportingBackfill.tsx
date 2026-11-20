@@ -1,7 +1,10 @@
 import { propEq } from "@avandar/utils";
-import { ramp, mix } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackfillChart } from "./BackfillChart";
+import { ReportingTab } from "./ReportingTab";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
 import type { ReactNode } from "react";
@@ -33,12 +36,7 @@ export function SurveillanceReportingBackfill({
           [input.copy.unit, 670, 548, 230, 12, 4],
         ]}
       />
-      <path
-        data-reporting-tab=""
-        d={`M${mix(ramp(frame, 36, 36), 60, 500)} 198h380`}
-        stroke={accent}
-        strokeWidth={3}
-      />
+      <ReportingTab frame={frame} accent={accent} />
       <BackfillChart input={input} frame={frame} accent={accent} />
       {input.records.map((record, index) => {
         return (

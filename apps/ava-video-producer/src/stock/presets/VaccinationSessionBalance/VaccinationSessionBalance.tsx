@@ -1,6 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DoseToken } from "./DoseToken";
 import { SessionCarrier } from "./SessionCarrier";
+import { SessionFurniture } from "./SessionFurniture";
 import { SessionHeadings } from "./SessionHeadings";
 import { SessionRecipients } from "./SessionRecipients";
 import { SessionTotals } from "./SessionTotals";
@@ -19,20 +22,7 @@ export function VaccinationSessionBalance({
     <g>
       <SessionHeadings input={input} />
       <SessionCarrier frame={frame} accent={accent} />
-      <rect
-        x={280}
-        y={180}
-        width={375}
-        height={290}
-        rx={24}
-        fill="none"
-        stroke={STOCK.line}
-      />
-      <path
-        d="M690 205 V280 H930 V205 M690 385 V460 H930 V385"
-        fill="none"
-        stroke={STOCK.line}
-      />
+      <SessionFurniture />
       <SessionRecipients input={input} frame={frame} accent={accent} />
       {input.units.map((unit, index) => {
         return (

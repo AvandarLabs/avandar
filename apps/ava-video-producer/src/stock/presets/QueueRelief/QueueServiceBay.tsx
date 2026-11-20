@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
 
@@ -17,20 +18,24 @@ export function QueueServiceBay({
   expansion,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-slot-id={slot.id}
         data-open={slot.initiallyOpen || expansion === 1}
         x={344}
         y={154 + index * 100}
         width={slot.initiallyOpen ? 272 : mix(expansion, 48, 272)}
         height={90}
-        rx={6}
-        fill={STOCK.surface}
-        stroke={slot.initiallyOpen ? accent : STOCK.orange}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
+        stroke={slot.initiallyOpen ? accent : tokens.color.highlight}
         strokeDasharray={
-          slot.initiallyOpen || expansion === 1 ? undefined : "5 5"
+          slot.initiallyOpen || expansion === 1
+            ? undefined
+            : tokens.dash.placeholder.join(" ")
         }
       />
       <FitText

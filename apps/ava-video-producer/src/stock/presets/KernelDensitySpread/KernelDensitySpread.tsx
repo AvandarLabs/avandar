@@ -1,8 +1,8 @@
 import { useId } from "react";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
-import { KernelField } from "./KernelField";
+import { KernelField } from "./KernelField/KernelField";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
@@ -14,8 +14,12 @@ export function KernelDensitySpread({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { text } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const data = text.graphic.data;
+  const body = text.graphic.body;
   const legendId = useId();
-  const { radius } = getKernelSamplesFromInput({ input, frame });
+  const { radius } = getKernelSamplesFromInput({ input, frame, motion });
   const qualifier =
     "Zero modeled intensity does not establish zero population.";
   return (
@@ -44,13 +48,32 @@ export function KernelDensitySpread({
         height={12}
         fill={`url(#${legendId})`}
       />
-      <text x={610} y={325} fill={STOCK.text} fontSize={12}>
+      <text
+        x={610}
+        y={325}
+        fill={data.color}
+        fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
+      >
         0
       </text>
-      <text x={890} y={325} fill={STOCK.text} textAnchor="end" fontSize={12}>
+      <text
+        x={890}
+        y={325}
+        fill={data.color}
+        textAnchor="end"
+        fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
+      >
         {input.legendMaximum}
       </text>
-      <text x={610} y={438} fill={STOCK.text} fontSize={20}>
+      <text
+        x={610}
+        y={438}
+        fill={body.color}
+        fontSize={body.fontSize}
+        fontWeight={body.fontWeight}
+      >
         {input.points.length}
       </text>
     </g>

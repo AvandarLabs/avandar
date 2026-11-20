@@ -1,4 +1,6 @@
 import { mix, ramp } from "../../../motion";
+import { LABELS_CUE, OPEN_CUE } from "./journalTiming";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./JournalReceipts.schema";
 /** Data for getJournalGeometryFromFrame. */
 type GetJournalGeometryResult = {
@@ -18,12 +20,20 @@ export function getJournalGeometryFromFrame({
   index,
   frame,
   direction,
+  motion,
 }: Readonly<{
   index: number;
   frame: number;
   direction: Input["foldDirection"];
+  motion: VideoMotion;
 }>): GetJournalGeometryResult {
-  const opening = ramp(frame, 36, 20);
+  // The journal is open by the time entry labels appear.
+  const opening = ramp(
+    frame,
+    OPEN_CUE,
+    LABELS_CUE - OPEN_CUE,
+    motion.entrance.easing,
+  );
   return direction === "horizontal"
     ? {
         x: 46 + index * mix(opening, 28, 152),

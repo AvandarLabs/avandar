@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +19,8 @@ export function RevisionCurrentLines({
   selected,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const numLines = Math.max(previous.length, selected.length);
   return (
     <g>
@@ -39,11 +42,12 @@ export function RevisionCurrentLines({
             {input.showChangedLines &&
             frame < 126 &&
             previous[index] !== selected[index] ? (
-              <path
+              <SketchedShape
+                shape={{ kind: "path", d: `M278 ${168 + index * 53} h8` }}
+                profile={tokens.sketch.shape}
                 data-change-notch={index}
-                d={`M278 ${168 + index * 53} h8`}
-                stroke={STOCK.orange}
-                strokeWidth={4}
+                stroke={tokens.color.highlight}
+                strokeWidth={scales.stroke(tokens.stroke.heavy)}
               />
             ) : undefined}
           </g>

@@ -38,7 +38,7 @@ const clips = [
     provenance: "NEW STUDY / EXISTING MOTION HELPERS",
     description:
       "A new sample layout that isolates four things already in the kit: staggered entrances, typed text, counting, and a pointer that stops before it presses. This is a component study, not an Avandar product screen.",
-    source: "apps/ava-video-producer/src/compositions/MotionLab.tsx",
+    source: "apps/ava-video-producer/src/compositions/MotionLab/MotionLab.tsx",
     chapters: [
       [0, "Title"],
       [2.8, "Stagger"],

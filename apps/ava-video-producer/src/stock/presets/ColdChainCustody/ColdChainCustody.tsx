@@ -1,8 +1,10 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
-import { STOCK } from "../../stockPalette";
-import { CustodyLane } from "./CustodyLane";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CustodyLane } from "./CustodyLane/CustodyLane";
 import { CustodyLegend } from "./CustodyLegend";
 import { CustodyStops } from "./CustodyStops";
+import { GlobeContext } from "./GlobeContext";
 import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ColdChainCustody.schema";
@@ -20,18 +22,7 @@ export function ColdChainCustody({
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />
       <SceneLabel text={input.copy.schematic} x={32} y={55} width={650} />
       {input.geographyMode === "globe-and-schematic" ? (
-        <g data-globe="context" transform="translate(900 50)">
-          <circle r={30} fill={STOCK.surface} stroke={STOCK.line} />
-          <path
-            d={GlobeProjection.getLandPathFromView({
-              centerLongitude: 10,
-              centerLatitude: 15,
-              radius: 30,
-            })}
-            fill={accent}
-            fillOpacity={0.5}
-          />
-        </g>
+        <GlobeContext accent={accent} />
       ) : undefined}
       <CustodyStops input={input} frame={frame} accent={accent} />
       {input.crates.map((crate, index) => {

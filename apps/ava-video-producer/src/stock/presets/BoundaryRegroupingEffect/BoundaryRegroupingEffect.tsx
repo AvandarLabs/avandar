@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { AtomicCell } from "./AtomicCell";
 import { GroupingLedger } from "./GroupingLedger";
-import { GroupingSeams } from "./GroupingSeams";
+import { GroupingSeams } from "./GroupingSeams/GroupingSeams";
 import { GroupingTotals } from "./GroupingTotals";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BoundaryRegroupingEffect.schema";

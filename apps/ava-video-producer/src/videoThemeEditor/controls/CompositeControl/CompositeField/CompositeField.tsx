@@ -1,10 +1,10 @@
 import { getFieldName } from "../../../tokenCopy/editorCopy";
 import { useTokenEditor } from "../../../TokenEditorContext";
+import { type TokenRow } from "../../../tokenRows/tokenRows.types";
 import { EnumValueControl } from "../../EnumValueControl/EnumValueControl";
 import { ReferenceControl } from "../../ReferenceControl/ReferenceControl";
 import css from "./CompositeField.module.css";
 import type { FieldSpec } from "../../../../videoTheme/tokenCatalog/defineTokensHelpers";
-import type { TokenRow } from "../../../tokenRows/tokenRows";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{
@@ -14,7 +14,6 @@ type Props = Readonly<{
   field: FieldSpec;
   value: Readonly<Record<string, unknown>>;
 }>;
-
 /**
  * One field of a composite token: its name beside an enum menu or a reference
  * picker.

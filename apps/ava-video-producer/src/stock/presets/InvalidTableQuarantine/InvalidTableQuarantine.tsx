@@ -1,68 +1,103 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { QuarantinedRows } from "./QuarantinedRows";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InvalidTableQuarantine.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
+/** The cue the shutter starts to close on. */
+const CLOSE_CUE = 13;
+/** The cue a read is attempted on, once the shutter has closed. */
+const ATTEMPT_CUE = 46;
+/** The cue the replacement sheet starts to slide in on. */
+const INCOMING_CUE = 96;
+/** The cue the replacement takes the table's place on. */
+const REPLACED_CUE = 112;
+/** Frames the shutter takes to reopen after the replacement. */
+const OPEN_FRAMES = 26;
+/** How opaque the shutter is while a blocked attempt stays visible. */
+const SEE_THROUGH_SHUTTER = 0.87;
+/** The shutter slat's line weight before the line weight scales it. */
+const SLAT_STROKE = 8;
 /** Invalidation closes reads until a whole replacement precedes reopening. */
 export function InvalidTableQuarantine({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const isReplaced = input.reload.performed && frame >= 112;
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const travel = motion.travel.easing;
+  const emphasis = scales.stroke(tokens.stroke.emphasis);
+  const isReplaced = input.reload.performed && frame >= REPLACED_CUE;
   const rows = isReplaced
     ? input.reload.rows
     : input.originalRows.map((value, index) => {
-        return frame >= 46 &&
+        return frame >= ATTEMPT_CUE &&
           input.showAttempt &&
           index === input.attempt.rowIndex
           ? input.attempt.replacement
           : value;
       });
-  const closing = ramp(frame, 13, 32, EASE.inOut),
-    opening = input.reload.performed ? ramp(frame, 113, 26, EASE.inOut) : 0;
+  // The shutter is fully closed the frame before the attempt.
+  const closing = ramp(frame, CLOSE_CUE, ATTEMPT_CUE - 1 - CLOSE_CUE, travel),
+    opening = input.reload.performed
+      ? ramp(frame, REPLACED_CUE + 1, motion.scale(OPEN_FRAMES), travel)
+      : 0;
+  // The replacement slides in until it takes the table's place.
+  const arrival = ramp(
+    frame,
+    INCOMING_CUE,
+    REPLACED_CUE - INCOMING_CUE,
+    travel,
+  );
   const height = 300 * closing * (1 - opening),
-    readable = frame < 13 || opening === 1;
-  const incoming = input.reload.performed && frame >= 96 && frame < 112;
+    readable = frame < CLOSE_CUE || opening === 1;
+  const incoming =
+    input.reload.performed && frame >= INCOMING_CUE && frame < REPLACED_CUE;
   return (
     <g data-readable={readable}>
-      <rect
+      <StockRect
         x={100}
         y={146}
         width={540}
         height={324}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <QuarantinedRows rows={rows} x={110} />
-      <rect
+      <StockRect
         data-read-shutter="true"
         x={110}
         y={155}
         width={520}
         height={height}
-        fill={STOCK.ground}
-        fillOpacity={input.showAttempt ? 0.87 : 1}
-        stroke={STOCK.orange}
+        fill={tokens.color.ground}
+        fillOpacity={input.showAttempt ? SEE_THROUGH_SHUTTER : 1}
+        stroke={tokens.color.highlight}
       />
       {height > 0 ? (
-        <path
-          data-shutter-slat="true"
-          d={`M110 ${155 + height} H630`}
-          stroke={STOCK.orange}
-          strokeWidth={8}
-        />
+        <g data-shutter-slat="true">
+          <SketchedShape
+            shape={{ kind: "path", d: `M110 ${155 + height} H630` }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.highlight}
+            strokeWidth={scales.stroke(SLAT_STROKE)}
+          />
+        </g>
       ) : null}
       {incoming ? (
         <g data-replacement-sheet="true">
           <QuarantinedRows
             rows={input.reload.rows}
-            x={mix(ramp(frame, 96, 16, EASE.inOut), 170, 110)}
+            x={mix(arrival, 170, 110)}
             isReload
           />
         </g>
@@ -87,42 +122,48 @@ export function InvalidTableQuarantine({
           ],
         ]}
       />
-      {input.reload.performed && frame >= 96 ? (
+      {input.reload.performed && frame >= INCOMING_CUE ? (
         <LabelSlots labels={[[input.labels.reload, 680, 390, 230, 16, 4]]} />
       ) : null}
-      {frame >= 46 && input.showAttempt ? (
-        <path
-          data-attempt-outcome={input.attempt.outcome}
-          opacity={
-            input.reload.performed ? 1 - ramp(frame, 96, 16, EASE.inOut) : 1
-          }
-          d={
-            input.attempt.outcome === "failed"
-              ? "M690 330 l20 20 m0 -20 l-20 20"
-              : "M690 340 l8 8 l16 -20"
-          }
-          fill="none"
-          stroke={STOCK.orange}
-          strokeWidth={3}
-        />
+      {frame >= ATTEMPT_CUE && input.showAttempt ? (
+        <g data-attempt-outcome={input.attempt.outcome}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d:
+                input.attempt.outcome === "failed"
+                  ? "M690 330 l20 20 m0 -20 l-20 20"
+                  : "M690 340 l8 8 l16 -20",
+            }}
+            profile={tokens.sketch.shape}
+            opacity={input.reload.performed ? 1 - arrival : 1}
+            fill="none"
+            stroke={tokens.color.highlight}
+            strokeWidth={emphasis}
+          />
+        </g>
       ) : null}
       {readable && isReplaced ? (
-        <path
-          data-reload-outcome="complete"
-          d="M690 340 l8 8 l16 -20"
-          fill="none"
-          stroke={accent}
-          strokeWidth={3}
-        />
+        <g data-reload-outcome="complete">
+          <SketchedShape
+            shape={{ kind: "path", d: "M690 340 l8 8 l16 -20" }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={emphasis}
+          />
+        </g>
       ) : null}
-      <path
-        data-read-path="true"
-        d="M640 485 H940 V180 H922"
-        fill="none"
-        stroke={readable ? accent : STOCK.orange}
-        strokeWidth={2}
-        strokeDasharray={readable ? undefined : "6 6"}
-      />
+      <g data-read-path="true">
+        <SketchedShape
+          shape={{ kind: "path", d: "M640 485 H940 V180 H922" }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={readable ? accent : tokens.color.highlight}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+          strokeDasharray={readable ? undefined : atomic.dash.long.join(" ")}
+        />
+      </g>
     </g>
   );
 }

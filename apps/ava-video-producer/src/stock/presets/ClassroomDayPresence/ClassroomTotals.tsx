@@ -1,13 +1,15 @@
 import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomTotals. */
 type Props = { input: Input; day: Input["days"][number] };
-
 /** Separate state totals share the unchanged supplied-roster denominator. */
 export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const present = day.records.filter(propEq("state", "present")).length,
     absent = day.records.filter(propEq("state", "absent")).length,
     unknown = day.records.filter(propEq("state", "unknown")).length;
@@ -29,20 +31,29 @@ export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
         return (
           <g key={key}>
             {key === "present" ? (
-              <circle cx={39 + index * 232} cy={538} r={5} fill={STOCK.mint} />
+              <circle
+                cx={39 + index * 232}
+                cy={538}
+                r={5}
+                fill={tokens.color.positive}
+              />
             ) : key === "absent" ? (
-              <rect
+              <StockRect
                 x={34 + index * 232}
                 y={533}
                 width={10}
                 height={10}
-                stroke={STOCK.muted}
+                stroke={tokens.color.inactive}
                 fill="none"
               />
             ) : key === "unknown" ? (
-              <path
-                d={`M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`}
-                stroke={STOCK.orange}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`,
+                }}
+                profile={tokens.sketch.shape}
+                stroke={tokens.color.highlight}
                 fill="none"
               />
             ) : undefined}

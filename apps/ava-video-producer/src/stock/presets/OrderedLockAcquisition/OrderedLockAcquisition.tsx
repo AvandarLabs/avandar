@@ -1,9 +1,12 @@
 import { prop } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getLockStateFromFrame } from "./getLockStateFromFrame";
 import { LockOperation } from "./LockOperation";
+import { TILE_CORNER } from "./lockShape";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
@@ -15,6 +18,10 @@ export function OrderedLockAcquisition({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g data-canonical-order={input.resources.map(prop("id")).join(",")}>
       <LabelSlots
@@ -33,14 +40,14 @@ export function OrderedLockAcquisition({
       {input.resources.map((resource, index) => {
         return (
           <g key={resource.id}>
-            <rect
+            <StockRect
               x={340 + index * 260}
               y={55}
               width={240}
               height={84}
-              rx={6}
-              fill={STOCK.elevated}
-              stroke={STOCK.line}
+              rx={scales.corner(TILE_CORNER)}
+              fill={tokens.color.elevated}
+              stroke={tokens.color.line}
             />
             <LabelSlots
               labels={[[resource.label, 350 + index * 260, 72, 190, 14, 3]]}
@@ -59,15 +66,19 @@ export function OrderedLockAcquisition({
               return id === operation.requestedIds[0];
             });
             return (
-              <path
-                key={operation.id}
-                data-reach={operation.id}
-                d={`M300 ${205 + index * 200} L${560 + resourceIndex * 260} 145`}
-                fill="none"
-                stroke={STOCK.orange}
-                strokeDasharray="5 7"
-                opacity={0.65}
-              />
+              <g key={operation.id} data-reach={operation.id}>
+                <SketchedShape
+                  shape={{
+                    kind: "path",
+                    d: `M300 ${205 + index * 200} L${560 + resourceIndex * 260} 145`,
+                  }}
+                  profile={tokens.sketch.shape}
+                  fill="none"
+                  stroke={tokens.color.highlight}
+                  strokeDasharray={atomic.dash.boundary.join(" ")}
+                  opacity={atomic.opacity["65"]}
+                />
+              </g>
             );
           })
         : null}
@@ -84,19 +95,26 @@ export function OrderedLockAcquisition({
         );
       })}
       {input.resources.map((resource, resourceIndex) => {
-        const state = getLockStateFromFrame({ frame, input, resourceIndex });
+        const state = getLockStateFromFrame({
+          frame,
+          input,
+          resourceIndex,
+          motion,
+        });
         return (
-          <circle
+          <g
             key={resource.id}
             data-lock-key={resource.id}
             data-key-owner={state.owner}
-            cx={state.x}
-            cy={state.y}
-            r={11}
-            fill={state.owner ? accent : STOCK.cyan}
-            stroke={STOCK.text}
-            strokeWidth={2}
-          />
+          >
+            <SketchedShape
+              shape={{ kind: "circle", cx: state.x, cy: state.y, r: 11 }}
+              profile={tokens.sketch.shape}
+              fill={state.owner ? accent : tokens.color.accentAlt}
+              stroke={tokens.color.text}
+              strokeWidth={scales.stroke(tokens.stroke.default)}
+            />
+          </g>
         );
       })}
     </g>

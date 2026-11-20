@@ -104,8 +104,8 @@ test("fixed atomic cells survive a change from west/east rates 15/15 to north/so
     [20, 10],
   );
   assert.deepEqual(
-    start.match(/<rect data-atomic-cell[^>]+>/g),
-    hold.match(/<rect data-atomic-cell[^>]+>/g),
+    start.match(/<rect\b[^>]*\bdata-atomic-cell[^>]+>/g),
+    hold.match(/<rect\b[^>]*\bdata-atomic-cell[^>]+>/g),
   );
   assert.match(
     SvgAttributes.fromMarker({

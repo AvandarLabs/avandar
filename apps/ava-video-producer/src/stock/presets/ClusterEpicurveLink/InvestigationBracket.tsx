@@ -1,5 +1,6 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
@@ -14,6 +15,9 @@ export function InvestigationBracket({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const selected = getCasePositionsFromInput(input).filter(
     prop("isInvestigated"),
   );
@@ -22,13 +26,17 @@ export function InvestigationBracket({
   const top = Math.min(...selected.map(prop("mapY"))) - 12;
   const bottom = Math.max(...selected.map(prop("mapY"))) + 12;
   return (
-    <path
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M${left + 8} ${top} H${left} V${bottom} H${left + 8} M${right - 8} ${top} H${right} V${bottom} H${right - 8}`,
+      }}
+      profile={tokens.sketch.shape}
       data-investigation-bracket=""
-      d={`M${left + 8} ${top} H${left} V${bottom} H${left + 8} M${right - 8} ${top} H${right} V${bottom} H${right - 8}`}
       fill="none"
       stroke={accent}
-      strokeWidth={2}
-      opacity={ramp(frame, 24, 12)}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
+      opacity={motion.reveal(frame, 24)}
     />
   );
 }

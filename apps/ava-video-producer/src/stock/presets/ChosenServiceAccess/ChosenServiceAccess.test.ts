@@ -3,7 +3,11 @@ import test from "node:test";
 import { propEq, prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { ChosenServiceAccess } from "./ChosenServiceAccess";
+import { chosenServiceAccessContract } from "./ChosenServiceAccess.contract";
 import {
   DEFAULT_INPUT,
   CHANGED_INPUT,
@@ -12,7 +16,8 @@ import {
   DENSE_INPUT,
   MINIMUM_INPUT,
 } from "./ChosenServiceAccess.fixtures";
-import { registerServiceApproachAssertions } from "./registerServiceApproachAssertions";
+import { inputSchema, type Input } from "./ChosenServiceAccess.schema";
+import { registerServiceApproachAssertions } from "./registerServiceApproachAssertions/registerServiceApproachAssertions";
 import { registerServiceBarrierAssertions } from "./registerServiceBarrierAssertions";
 import { ServiceSvgGeometry } from "./ServiceSvgGeometry";
 
@@ -38,7 +43,6 @@ test("only the chosen doorway changes physically before participant entry", () =
   assert.match(final, /data-barrier-selected="true"/);
   assert.match(final, /data-participant-position="inside"/);
 });
-
 test("changed authored input emits its physical scene", () => {
   assert.notEqual(
     renderToStaticMarkup(
@@ -52,10 +56,6 @@ test("changed authored input emits its physical scene", () => {
     "",
   );
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-
 test("changed choice clears only the other entrance and all mobility/barrier combinations work", () => {
   ["unfold-ramp", "clear-entrance"].forEach((accessChange) => {
     return ["walking", "wheelchair"].forEach((participantMobility) => {
@@ -64,10 +64,12 @@ test("changed choice clears only the other entrance and all mobility/barrier com
         accessChange,
         participantMobility,
       });
-      const setup = _render({ frame: 24, input: input });
-      const final = _render({ frame: 150, input: input });
+      const setup = _render({ frame: 24, input });
+      const final = _render({ frame: 150, input });
       const barriers = (markup: string) => {
-        return [...markup.matchAll(/<path data-barrier="([^"]*)"[^>]*>/g)];
+        return [
+          ...markup.matchAll(/<path\b[^>]*\bdata-barrier="([^"]*)"[^>]*>/g),
+        ];
       };
       const before = barriers(setup);
       const after = barriers(final);
@@ -91,14 +93,14 @@ test("changed choice clears only the other entrance and all mobility/barrier com
         160 + ((choiceIndex + 0.5) * 640) / input.services.length,
       );
       assert.notEqual(
-        _render({ frame: 88, input: input }).match(
-          /<path data-participant-arm[^>]*>/,
+        _render({ frame: 88, input }).match(
+          /<path\b[^>]*\bdata-participant-arm[^>]*>/,
         )?.[0],
-        _render({ frame: 104, input: input }).match(
-          /<path data-participant-arm[^>]*>/,
+        _render({ frame: 104, input }).match(
+          /<path\b[^>]*\bdata-participant-arm[^>]*>/,
         )?.[0],
       );
-      assert.match(_render({ frame: 65, input: input }), /data-staff-hand/);
+      assert.match(_render({ frame: 65, input }), /data-staff-hand/);
       assert.doesNotMatch(final, /data-choice-label/);
     });
   });
@@ -114,18 +116,15 @@ test("participant points toward the selected doorway and clears the whole barrie
   );
   assert.ok(still && travel);
   assert.notEqual(still[0], travel[0]);
-  const staff = _render({ frame: 80 }).match(/<circle data-staff-hand[^>]*>/);
+  const staff = _render({ frame: 80 }).match(
+    /<circle\b[^>]*\bdata-staff-hand[^>]*>/,
+  );
   assert.ok(staff);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: staff[0], name: "cx" }),
     160 + (0.5 * 640) / 2 + 42,
   );
 });
-
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { chosenServiceAccessContract } from "./ChosenServiceAccess.contract";
-import { inputSchema, type Input } from "./ChosenServiceAccess.schema";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -169,14 +168,16 @@ test("minimum empty identifiers and maximum accepted collections stay schema-val
 test("folded ramp starts upright and the self-propelled hand stays on the wheel rim", () => {
   const initial = _render({ frame: 24 });
   const rampPath = initial.match(
-    /<path data-barrier="shelter"[^>]*d="M([^ ]+) ([^ ]+) L([^ ]+) ([^ ]+)/,
+    /<path\b(?=[^>]*\bdata-barrier="shelter")[^>]*\sd="M([^ ]+) ([^ ]+) L([^ ]+) ([^ ]+)/,
   );
   assert.ok(rampPath);
   assert.equal(Number(rampPath[1]), Number(rampPath[3]));
   [88, 104].forEach((frame) => {
-    const markup = _render({ frame: frame });
-    const person = markup.match(/<circle data-participant-wheel="rear"[^>]*>/);
-    const hand = markup.match(/<circle data-participant-hand[^>]*>/);
+    const markup = _render({ frame });
+    const person = markup.match(
+      /<circle\b[^>]*\bdata-participant-wheel="rear"[^>]*>/,
+    );
+    const hand = markup.match(/<circle\b[^>]*\bdata-participant-hand[^>]*>/);
     assert.ok(person && hand);
     const distance = Math.hypot(
       SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }) -
@@ -196,9 +197,9 @@ test("folded ramp starts upright and the self-propelled hand stays on the wheel 
 test("I2 obstruction-only access has a level threshold and wheel clearance", () => {
   ["walking", "wheelchair"].forEach((participantMobility) => {
     const input = inputSchema.parse({ ...CHANGED_INPUT, participantMobility });
-    const markup = _render({ frame: 108, input: input });
+    const markup = _render({ frame: 108, input });
     assert.doesNotMatch(markup, /d="M598 356 V326 H682"/);
-    const actor = _render({ frame: 150, input: input }).match(
+    const actor = _render({ frame: 150, input }).match(
       /<g data-participant-position[^>]*>/,
     );
     assert.ok(actor);
@@ -222,8 +223,8 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
       Array.from({ length: 23 }, (_, index) => {
         return 98 + index;
       }).forEach((frame) => {
-        const markup = _render({ frame: frame, input: input }),
-          route = markup.match(/<path data-access-route[^>]*>/);
+        const markup = _render({ frame, input }),
+          route = markup.match(/<path\b[^>]*\bdata-access-route[^>]*>/);
         assert.ok(route);
         const segments = ServiceSvgGeometry.getPathSegmentsFromTag(route[0]);
         const floor = (x: number) => {
@@ -238,7 +239,7 @@ test("I2 actual wheel rims and walking feet clear the emitted route in both barr
           );
         };
         const wheels = [
-          ...markup.matchAll(/<circle data-participant-wheel[^>]*>/g),
+          ...markup.matchAll(/<circle\b[^>]*\bdata-participant-wheel[^>]*>/g),
         ];
         wheels.forEach((wheel) => {
           const cx = SvgAttributes.getNumberFromMarkup({

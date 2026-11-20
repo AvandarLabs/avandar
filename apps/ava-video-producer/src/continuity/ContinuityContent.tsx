@@ -1,8 +1,8 @@
 import { ContinuityCameraGraphic } from "./camera/ContinuityCameraGraphic";
 import { ContinuityAnnotation } from "./ContinuityAnnotation";
 import { ContinuityComposite } from "./ContinuityComposite";
-import css from "./ContinuityScene.module.css";
-import { ContinuityThesis } from "./ContinuityThesis";
+import css from "./ContinuityScene/ContinuityScene.module.css";
+import { ContinuityThesis } from "./ContinuityThesis/ContinuityThesis";
 import { getProductFrame } from "./continuityTimeline";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
@@ -14,7 +14,6 @@ type Props = {
   accent: string;
   productScene?: ProductSceneRenderer;
 };
-
 /** Exhaustive content renderer with an explicit product-bridge requirement. */
 export function ContinuityContent({
   content,

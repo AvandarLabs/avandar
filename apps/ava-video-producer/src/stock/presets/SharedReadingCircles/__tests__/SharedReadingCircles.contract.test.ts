@@ -19,11 +19,11 @@ import {
   _createCrossingInput,
   _getReaderPosition,
   _createRouteInputs,
-} from "./SharedReadingCirclesTestHelpers";
+} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 test("book inventory and reader identities survive shelf-to-table travel", () => {
   [0, 36, 64.5, 90, 150].forEach((frame) => {
-    const markup = _render({ frame: frame, input: changedInput });
+    const markup = _render({ frame, input: changedInput });
     assert.equal([...markup.matchAll(/data-book-id="book-a"/g)].length, 1);
     changedInput.learners.forEach((learner) => {
       return assert.equal(
@@ -33,11 +33,8 @@ test("book inventory and reader identities survive shelf-to-table travel", () =>
     });
   });
 });
-
 registerStockPresetAssertions(options);
-
 registerStockTextLayoutAssertions(options);
-
 test("four copies and nonuniform reader groups survive both shelf positions and hidden counts", () => {
   (["front", "side"] as const).forEach((startingShelf) => {
     [true, false].forEach((showGroupCounts) => {
@@ -47,7 +44,7 @@ test("four copies and nonuniform reader groups survive both shelf positions and 
           0, 24, 43.999, 44, 44.001, 64.5, 93.999, 94, 94.001, 107.999, 108,
           108.001, 124, 150,
         ].forEach((frame) => {
-          const markup = _render({ frame: frame, input: input });
+          const markup = _render({ frame, input });
           assert.equal(_bookPositions(markup).length, input.books.length);
           _bookPositions(markup).forEach(([, bookY]) => {
             return assert.ok(
@@ -94,7 +91,6 @@ test("four copies and nonuniform reader groups survive both shelf positions and 
     /aria-label="4 \/ 8"/,
   );
 });
-
 test("the first reader picks up and carries the single physical copy with hand contact", () => {
   (["front", "side"] as const).forEach((startingShelf) => {
     [denseInput, ..._createRouteInputs()].forEach((fixture) => {
@@ -108,7 +104,7 @@ test("the first reader picks up and carries the single physical copy with hand c
                 return start + offset;
               });
         frames.forEach((frame) => {
-          const markup = _render({ frame: frame, input: input });
+          const markup = _render({ frame, input });
           const books = _bookPositions(markup);
           const [readerX, readerY] = _getReaderPosition({
             markup,
@@ -135,23 +131,20 @@ test("the first reader picks up and carries the single physical copy with hand c
         });
       });
       assert.notDeepEqual(
-        _bookPositions(_render({ frame: 24, input: input })),
-        _bookPositions(_render({ frame: 101, input: input })),
+        _bookPositions(_render({ frame: 24, input })),
+        _bookPositions(_render({ frame: 101, input })),
       );
       assert.equal(
-        [..._render({ frame: 130, input: input }).matchAll(/data-page-turn=/g)]
-          .length,
+        [..._render({ frame: 130, input }).matchAll(/data-page-turn=/g)].length,
         input.books.length,
       );
       assert.equal(
-        [..._render({ frame: 150, input: input }).matchAll(/data-page-turn=/g)]
-          .length,
+        [..._render({ frame: 150, input }).matchAll(/data-page-turn=/g)].length,
         0,
       );
     });
   });
 });
-
 test("every book is assigned once and references do not mutate during stress registration", () => {
   [
     undefined,
@@ -193,11 +186,10 @@ test("every book is assigned once and references do not mutate during stress reg
     }),
   );
 });
-
 test("every moving physical copy has a visible key matching its caption", () => {
   [24, 64.5, 124, 150].forEach((frame) => {
     const markup = _render({
-      frame: frame,
+      frame,
       input: { ...denseInput, startingShelf: "side" },
     });
     denseInput.readingGroups.forEach((group, index) => {
@@ -216,7 +208,6 @@ test("every moving physical copy has a visible key matching its caption", () => 
     });
   });
 });
-
 test("concentrated groups remain intact when the large group changes table position", () => {
   [0, 1, 2, 3].forEach((largeGroupIndex) => {
     const groups = denseInput.readingGroups.slice(1);
@@ -225,7 +216,7 @@ test("concentrated groups remain intact when the large group changes table posit
       const input = { ...denseInput, readingGroups: groups, startingShelf };
       assert.deepEqual(inputSchema.parse(input), input);
       [24, 44, 64.5, 94, 108, 124, 150].forEach((frame) => {
-        const markup = _render({ frame: frame, input: input });
+        const markup = _render({ frame, input });
         assert.equal(_bookPositions(markup).length, 4);
         const readers = [
           ...markup.matchAll(
@@ -244,7 +235,6 @@ test("concentrated groups remain intact when the large group changes table posit
     });
   });
 });
-
 test("seats physically pivot toward their group book and clear the caption rail", () => {
   const paths = (markup: string) => {
     return [...markup.matchAll(/data-reading-seat="([^"]+)" d="([^"]+)"/g)];
@@ -256,7 +246,7 @@ test("seats physically pivot toward their group book and clear the caption rail"
     return assert.notEqual(seat[2], setup[index][2]);
   });
   [44, 64.5, 94, 108, 150].forEach((frame) => {
-    const markup = _render({ frame: frame, input: denseInput });
+    const markup = _render({ frame, input: denseInput });
     paths(markup).forEach((seat) => {
       const reader = markup.match(
         new RegExp(
@@ -278,11 +268,10 @@ test("seats physically pivot toward their group book and clear the caption rail"
     });
   });
 });
-
 test("reordered front pickup keeps the exact l0 and l7 heads distinct at frame 36", () => {
   const input = _createCrossingInput();
   assert.deepEqual(inputSchema.parse(input), input);
-  const markup = _render({ frame: 36, input: input });
+  const markup = _render({ frame: 36, input });
   const [firstX, firstY] = _getReaderPosition({ markup, id: "l0" });
   const [lastX, lastY] = _getReaderPosition({ markup, id: "l7" });
   const fullHeadDiameter = (2 * 7 + 2.5) * (40 / 48);

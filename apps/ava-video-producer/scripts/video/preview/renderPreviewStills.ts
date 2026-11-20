@@ -1,5 +1,5 @@
 import { openBrowser, selectComposition } from "@remotion/renderer";
-import { previewFrames } from "../../lib/planHelpers";
+import { previewFrames } from "../../lib/planHelpers/previewFrames";
 import { getBrowserSettingsFromPlan } from "./getBrowserSettingsFromPlan";
 import { renderPreviewStill } from "./renderPreviewStill";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
@@ -12,7 +12,6 @@ type Props = Readonly<{
   serveUrl: string;
   directory: string;
 }>;
-
 /** Renders every preview frame with one reusable headless browser. */
 export async function renderPreviewStills({
   plan,

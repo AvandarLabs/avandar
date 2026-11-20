@@ -1,7 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
@@ -14,32 +16,53 @@ export function SupportParticipants({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const join =
-    input.response.state === "joins" ? ramp(frame, 97, 20, EASE.inOut) : 0;
+    input.response.state === "joins"
+      ? motion.ramp(frame, 97, motion.scale(20), motion.travel.easing)
+      : 0;
   const colleagueX = mix(join, 780, 670);
   const chairX = mix(join, 780, 650);
   const grab =
-    input.response.state === "joins" ? ramp(frame, 89, 8, EASE.inOut) : 0;
+    input.response.state === "joins"
+      ? motion.ramp(frame, 89, motion.whip, motion.travel.easing)
+      : 0;
   const reach =
-    input.response.state === "joins" ? ramp(frame, 117, 13, EASE.inOut) : 0;
+    input.response.state === "joins"
+      ? motion.ramp(frame, 117, motion.sheet, motion.travel.easing)
+      : 0;
   const handX = mix(reach, mix(grab, 760, chairX + 55), 570);
   const handY = mix(reach, mix(grab, 345, 375), 365);
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <PersonGlyph x={240} y={330} size={76} posture="seated" color={accent} />
-      <path d="M240 330 L330 365" fill="none" stroke={accent} strokeWidth={4} />
-      <PersonGlyph x={colleagueX} y={330} size={76} color={STOCK.cyan} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M240 330 L330 365" }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
+      <PersonGlyph
+        x={colleagueX}
+        y={330}
+        size={76}
+        color={tokens.color.accentAlt}
+      />
       <circle
-        cx={colleagueX - mix(ramp(frame, 43, 20), 0, 10)}
+        cx={colleagueX - mix(motion.ramp(frame, 43, motion.scale(20)), 0, 10)}
         cy={307}
         r={2.5}
-        fill={STOCK.cyan}
+        fill={tokens.color.accentAlt}
       />
-      <path
-        d={`M${colleagueX} 330 L${handX} ${handY}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${colleagueX} 330 L${handX} ${handY}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.cyan}
-        strokeWidth={4}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
       <circle
         data-chair-hand={
@@ -53,20 +76,20 @@ export function SupportParticipants({
         cx={handX}
         cy={handY}
         r={5}
-        fill={STOCK.cyan}
+        fill={tokens.color.accentAlt}
       />
       {input.response.state === "joins" && frame > 89 ? (
-        <rect
+        <StockRect
           data-second-chair="true"
           x={chairX}
           y={375}
           width={55}
           height={35}
-          rx={4}
-          stroke={STOCK.cyan}
+          rx={scales.corner(tokens.corner.chip)}
+          stroke={tokens.color.accentAlt}
           fill="none"
-          strokeWidth={3}
-          opacity={ramp(frame, 89, 8)}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          opacity={motion.ramp(frame, 89, motion.whip)}
         />
       ) : undefined}
       <g data-colleague-name="true">

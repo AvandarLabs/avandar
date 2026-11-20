@@ -1,6 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PipelineStrip } from "./PipelineStrip";
 import { SplicePreview } from "./SplicePreview";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,6 +13,8 @@ export function PipelineStepSplice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <FitText
@@ -26,7 +27,7 @@ export function PipelineStepSplice({
         breakLongWords
         normalizeWhitespace
       />
-      <g opacity={ramp(frame, 18, 12)}>
+      <g opacity={motion.reveal(frame, 18)}>
         <FitText
           text={input.editLabel}
           x={480}
@@ -37,7 +38,7 @@ export function PipelineStepSplice({
           breakLongWords
           normalizeWhitespace
           anchor="middle"
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
       </g>
       <PipelineStrip input={input} frame={frame} accent={accent} />

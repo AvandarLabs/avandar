@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMarketProductPositionFromInputAndFrame } from "./getMarketProductPositionFromInputAndFrame";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
@@ -17,8 +19,12 @@ export function MarketProduct({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const product = input.products[index];
   const { x, y, travel } = getMarketProductPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     index,
@@ -31,21 +37,22 @@ export function MarketProduct({
       data-y={y}
       transform={`translate(${x} ${y})`}
     >
-      <rect
+      <StockRect
         x={-23}
         y={-24}
         width={46}
         height={48}
-        rx={6}
-        fill={STOCK.surface}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
-        d={SYMBOLS[product.symbol]}
+      <SketchedShape
+        shape={{ kind: "path", d: SYMBOLS[product.symbol] }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
     </g>
   );

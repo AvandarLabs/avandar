@@ -1,4 +1,3 @@
-import { STOCK } from "../../stockPalette";
 import type { StockContract } from "../../contracts/StockContract.types";
 import type { OrbitalSystemInput } from "./OrbitalSystem.schema";
 
@@ -10,7 +9,7 @@ export const orbitalSystemDefaultInput: OrbitalSystemInput = {
       rx: 294,
       ry: 122,
       angle: 24,
-      color: STOCK.cyan,
+      color: "$color.accentAlt",
       phase: 58,
       label: "BETA",
     },
@@ -18,7 +17,7 @@ export const orbitalSystemDefaultInput: OrbitalSystemInput = {
       rx: 185,
       ry: 185,
       angle: 0,
-      color: STOCK.orange,
+      color: "$color.highlight",
       phase: 112,
       label: "GAMMA",
     },

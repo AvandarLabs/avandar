@@ -1,4 +1,6 @@
 import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
@@ -31,6 +33,9 @@ export function AreaTile({
   accent,
   areaPerUnit,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { stroke, alpha, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const side = Math.sqrt(areaPerUnit),
     columns = Math.ceil(Math.sqrt(site.value)),
     rows = Math.ceil(site.value / columns);
@@ -53,13 +58,15 @@ export function AreaTile({
     return `${originX + mix(progress, sourceX, sectorX)} ${originY + mix(progress, sourceY, sectorY)}`;
   });
   return (
-    <path
+    <SketchedShape
       data-unit-tile={`${site.id}:${unitIndex}`}
-      d={`M${points.join(" L")} Z`}
+      shape={{ kind: "path", d: `M${points.join(" L")} Z` }}
+      profile={sketch.shape}
       fill={accent}
-      fillOpacity={progress === 1 ? 0 : 0.4}
+      fillOpacity={progress === 1 ? 0 : alpha.dimmed}
       stroke={accent}
-      strokeOpacity={progress === 1 ? 0 : 0.7}
+      strokeOpacity={progress === 1 ? 0 : atomic.opacity["70"]}
+      strokeWidth={shapes.stroke(stroke.hairline)}
     />
   );
 }

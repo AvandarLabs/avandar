@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +10,7 @@ export function AttributeAttachments({
   input,
   stacked,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
@@ -17,16 +19,18 @@ export function AttributeAttachments({
           propEq("id", attribute.entityId),
         );
         return (
-          <path
+          <SketchedShape
             key={attribute.id}
-            data-attribute-attachment={attribute.entityId}
-            d={
-              stacked
+            shape={{
+              kind: "path",
+              d: stacked
                 ? `M314 ${314 + index * 120} H340 V490 H690`
-                : `M${175 + index * 610} 381 V404`
-            }
+                : `M${175 + index * 610} 381 V404`,
+            }}
+            profile={tokens.sketch.shape}
+            data-attribute-attachment={attribute.entityId}
             fill="none"
-            stroke={STOCK.orange}
+            stroke={tokens.color.highlight}
           />
         );
       })}

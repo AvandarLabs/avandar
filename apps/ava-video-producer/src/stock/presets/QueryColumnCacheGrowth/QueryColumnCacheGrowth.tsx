@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CachedRelation } from "./CachedRelation";
 import { CacheRequests } from "./CacheRequests";
 import { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
@@ -8,7 +8,6 @@ import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 /** Inputs for QueryColumnCacheGrowth. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * Column containment grows one retained relation without changing row grain.
  */
@@ -17,7 +16,7 @@ export function QueryColumnCacheGrowth({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const scene = getCacheSceneFromFrame({ frame, input, motion });
   return (
     <g>

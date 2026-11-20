@@ -1,9 +1,8 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { ensureDirectory } from "../lib/planHelpers";
+import { ensureDirectory } from "../lib/planHelpers/planHelpers";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
-
 /** Preserve the previous stage intact before creating its replacement. */
 export async function freshStage(
   plan: Storyboard,

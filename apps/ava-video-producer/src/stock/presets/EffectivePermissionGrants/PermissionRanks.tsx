@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ROLE_RANK } from "./getEffectiveRoleFromInput";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
@@ -7,15 +8,20 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Every role occupies a stable rank with its complete authored label. */
 export function PermissionRanks({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
       {(["none", "viewer", "editor", "admin"] as const).map((role) => {
         return (
           <g key={role}>
-            <path
-              d={`M210 ${440 - ROLE_RANK[role] * 90} H820`}
-              stroke={STOCK.line}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M210 ${440 - ROLE_RANK[role] * 90} H820`,
+              }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
             />
             <LabelSlots
               labels={[

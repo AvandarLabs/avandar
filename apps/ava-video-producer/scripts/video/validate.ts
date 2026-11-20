@@ -1,7 +1,6 @@
 import { validateMedia } from "../lib/mediaHelpers";
-import { assetReferences, publicAsset } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
-
 /** Checks that a plan's assets exist and its media timing fits its cues. */
 export async function validate(
   plan: Storyboard,

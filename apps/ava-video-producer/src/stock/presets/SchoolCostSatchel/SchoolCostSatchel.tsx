@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SatchelExpense } from "./SatchelExpense";
 import { SatchelHeading } from "./SatchelHeading";
 import { SatchelSetting } from "./SatchelSetting";
@@ -17,6 +18,7 @@ export function SchoolCostSatchel({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const expenses =
     input.unpackOrder === "largest-first"
       ? [...input.expenses].sort((left, right) => {
@@ -35,10 +37,11 @@ export function SchoolCostSatchel({
         anchor="middle"
         slot={[180, 347, 230, 14, 3]}
       />
-      <path
-        d="M325 304 H923 L909 320 H311 Z"
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{ kind: "path", d: "M325 304 H923 L909 320 H311 Z" }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       {expenses.map((expense, index) => {
         return (

@@ -69,8 +69,5 @@
     }
   ],
   "captions": true,
-  "soundEffects": [],
-  "theme": {
-    "brand": "#1563fe"
-  }
+  "soundEffects": []
 }

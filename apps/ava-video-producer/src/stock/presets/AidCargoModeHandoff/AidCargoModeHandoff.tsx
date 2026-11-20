@@ -1,5 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CargoCarrier } from "./CargoCarrier";
 import { CargoLabels } from "./CargoLabels";
 import { CargoParcel } from "./CargoParcel";
@@ -14,11 +15,16 @@ export function AidCargoModeHandoff({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <CargoLabels input={input} accent={accent} />
       <PersonGlyph x={910} y={330} size={36} role="worker" color={accent} />
-      <path d="M40 380 H920" stroke={STOCK.line} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M40 380 H920" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+      />
       {input.carriers.map((carrier, index) => {
         return (
           <CargoCarrier

@@ -1,16 +1,20 @@
-import { EASE, mix, ramp } from "../../motion";
+import { mix } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { STOCK } from "../stockPalette";
+import { SketchedShape } from "../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: LineTraceInput };
-
+const TRACE_AT = 23;
+const TRACE_FRAMES = 94;
+const HEADING_SIZE = "29";
+const SAMPLE_NOTE_SIZE = "2xs";
 /** Draws the bounded authored line-trace study at an explicit frame. */
 export function LineTrace({
   input,
@@ -18,6 +22,10 @@ export function LineTrace({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, dash, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const points = input.points;
   const chartPoint = (value: number, index: number) => {
     return {
@@ -35,7 +43,12 @@ export function LineTrace({
       return `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`;
     })
     .join(" ");
-  const t = ramp(frame, 23, 94, EASE.inOut);
+  const t = motion.ramp(
+    frame,
+    TRACE_AT,
+    motion.scale(TRACE_FRAMES),
+    motion.travel.easing,
+  );
   const tracePosition = t * (points.length - 1);
   const index = Math.min(points.length - 2, Math.floor(tracePosition));
   const between = tracePosition - index;
@@ -55,7 +68,11 @@ export function LineTrace({
     <g>
       <defs>
         <linearGradient id={`${id}-chart-fill`} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={accent} stopOpacity="0.15" />
+          <stop
+            offset="0"
+            stopColor={accent}
+            stopOpacity={shapes.wash(atomic.opacity["15"])}
+          />
           <stop offset="1" stopColor={accent} stopOpacity="0" />
         </linearGradient>
         <clipPath id={`${id}-chart-clip`}>
@@ -81,38 +98,34 @@ export function LineTrace({
         })}
         color={accent}
       />
-      <Text x={64} y={111} size={29} weight={600}>
+      <Text role="title" x={64} y={111} size={HEADING_SIZE}>
         {input.heading}
       </Text>
       {[0, 25, 50, 75, 100].map((value) => {
         return (
           <g key={value}>
-            <path
-              d={`M121 ${458 - value * 3.1} H839`}
-              stroke={STOCK.line}
-              strokeOpacity={0.6}
+            <SketchedShape
+              shape={{ kind: "path", d: `M121 ${458 - value * 3.1} H839` }}
+              profile={sketch.shape}
+              stroke={color.line}
+              strokeOpacity={atomic.opacity["60"]}
+              strokeWidth={shapes.stroke(stroke.hairline)}
             />
-            <Text
-              x={99}
-              y={463 - value * 3.1}
-              size={13}
-              fill={STOCK.muted}
-              mono
-              anchor="end"
-            >
+            <Text role="pill" x={99} y={463 - value * 3.1} anchor="end">
               {value}
             </Text>
           </g>
         );
       })}
       {input.showReference ? (
-        <path
-          d={referencePath}
+        <SketchedShape
+          shape={{ kind: "path", d: referencePath }}
+          profile={sketch.shape}
           fill="none"
-          stroke={STOCK.cyan}
-          strokeOpacity={0.38}
-          strokeWidth={2}
-          strokeDasharray="5 7"
+          stroke={color.accentAlt}
+          strokeOpacity={atomic.opacity["38"]}
+          strokeWidth={shapes.stroke(stroke.default)}
+          strokeDasharray={atomic.dash.boundary.join(" ")}
         />
       ) : null}
       <g clipPath={`url(#${id}-chart-clip)`}>
@@ -120,11 +133,12 @@ export function LineTrace({
           d={`${tracePath} L839 458 H121 Z`}
           fill={`url(#${id}-chart-fill)`}
         />
-        <path
-          d={tracePath}
+        <SketchedShape
+          shape={{ kind: "path", d: tracePath }}
+          profile={sketch.shape}
           fill="none"
           stroke={accent}
-          strokeWidth={3.5}
+          strokeWidth={shapes.stroke(stroke.route)}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -140,33 +154,47 @@ export function LineTrace({
           );
         })}
       </g>
-      <path
-        d={`M${head.x} ${head.y} V458`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${head.x} ${head.y} V458` }}
+        profile={sketch.shape}
         stroke={accent}
-        strokeOpacity={0.22}
-        strokeDasharray="3 5"
+        strokeOpacity={atomic.opacity["22"]}
+        strokeWidth={shapes.stroke(stroke.hairline)}
+        strokeDasharray={dash.guide.join(" ")}
       />
-      <circle cx={head.x} cy={head.y} r={12} fill={accent} fillOpacity={0.1} />
+      <circle
+        cx={head.x}
+        cy={head.y}
+        r={12}
+        fill={accent}
+        fillOpacity={shapes.wash(atomic.opacity["10"])}
+      />
       <circle cx={head.x} cy={head.y} r={5.5} fill={accent} />
-      <Text x={121} y={491} size={14} mono fill={STOCK.muted}>
+      <Text role="footnote" x={121} y={491}>
         01
       </Text>
-      <Text x={839} y={491} size={14} mono fill={STOCK.muted} anchor="end">
+      <Text role="footnote" x={839} y={491} anchor="end">
         {String(points.length).padStart(2, "0")}
       </Text>
       <circle cx={121} cy={543} r={4} fill={accent} />
-      <Text x={137} y={548} size={15} fill={STOCK.muted}>
+      <Text role="note" x={137} y={548}>
         {input.seriesLabel}
       </Text>
       {input.showReference ? (
         <>
-          <circle cx={260} cy={543} r={4} fill={STOCK.cyan} fillOpacity={0.5} />
-          <Text x={276} y={548} size={15} fill={STOCK.muted}>
+          <circle
+            cx={260}
+            cy={543}
+            r={4}
+            fill={color.accentAlt}
+            fillOpacity={atomic.opacity["50"]}
+          />
+          <Text role="note" x={276} y={548}>
             {input.referenceLabel}
           </Text>
         </>
       ) : null}
-      <Text x={896} y={548} size={13} fill={STOCK.muted} anchor="end">
+      <Text role="note" x={896} y={548} size={SAMPLE_NOTE_SIZE} anchor="end">
         {getStockDisplayCopyFromDescriptor({
           descriptor: LEGACY_DISPLAY_COPY["line-trace"].samplePeriods,
         })}

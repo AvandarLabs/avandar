@@ -1,4 +1,5 @@
-import { ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RetainedRecord } from "./RetainedRecord";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
@@ -10,6 +11,9 @@ export function RetainedRecordStrip({
   accent,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {input.records.map((record, index) => {
@@ -21,17 +25,17 @@ export function RetainedRecordStrip({
         );
       })}
       {input.installation.choice === "install" ? (
-        <rect
+        <StockRect
           data-counting-stencil=""
           x={244}
           y={148}
           width={225}
           height={input.records.length * 48 + 7}
-          rx={8}
+          rx={scales.corner(tokens.corner.cell)}
           fill="none"
           stroke={accent}
-          strokeDasharray="5 5"
-          opacity={ramp(frame, 56, 34)}
+          strokeDasharray={tokens.dash.placeholder.join(" ")}
+          opacity={motion.ramp(frame, 56, motion.scale(34))}
         />
       ) : null}
     </g>

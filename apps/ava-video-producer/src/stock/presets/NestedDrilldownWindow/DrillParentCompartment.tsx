@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -11,6 +12,8 @@ type Props = {
   progress: number;
   accent: string;
 };
+/** A parent group's corner before the corner style scales it. */
+const GROUP_CORNER = 6;
 /** Parent groups shrink into a context strip without changing membership. */
 export function DrillParentCompartment({
   group,
@@ -20,23 +23,30 @@ export function DrillParentCompartment({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (!retainContext && !isSelected && progress === 1) {
     return undefined;
   }
   return (
     <g
-      opacity={isSelected ? 1 : mix(progress, 1, retainContext ? 0.45 : 0)}
+      opacity={
+        isSelected
+          ? 1
+          : mix(progress, 1, retainContext ? atomic.opacity["45"] : 0)
+      }
       data-parent-context={retainContext && progress === 1 ? group : undefined}
     >
-      <rect
+      <StockRect
         data-parent-group={group}
         x={44 + index * 292}
         y={174}
         width={284}
         height={mix(progress, 390, 62)}
-        rx={6}
-        fill={STOCK.surface}
-        stroke={isSelected ? accent : STOCK.line}
+        rx={scales.corner(GROUP_CORNER)}
+        fill={tokens.color.surface}
+        stroke={isSelected ? accent : tokens.color.line}
       />
       <LiteralDataText value={group} x={56 + index * 292} y={196} />
     </g>

@@ -17,13 +17,15 @@ function _render({
   frame,
   input = DEFAULT_INPUT,
 }: Readonly<{ frame: number; input?: typeof DEFAULT_INPUT }>): string {
-  return renderToStaticMarkup(
-    createElement(VoluntaryFamilyReunion, {
-      frame,
-      input,
-      accent: "#9fefca",
-      id: "test",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(VoluntaryFamilyReunion, {
+        frame,
+        input,
+        accent: "#9fefca",
+        id: "test",
+      }),
+    ),
   );
 }
 test("two active acceptances precede travel and silhouettes remain distinct", () => {
@@ -43,13 +45,15 @@ test("two active acceptances precede travel and silhouettes remain distinct", ()
 
 test("changed authored input emits its physical scene", () => {
   assert.notEqual(
-    renderToStaticMarkup(
-      createElement(VoluntaryFamilyReunion, {
-        frame: 150,
-        input: CHANGED_INPUT,
-        accent: "#9fefca",
-        id: "test",
-      }),
+    _joinMarkedShapes(
+      renderToStaticMarkup(
+        createElement(VoluntaryFamilyReunion, {
+          frame: 150,
+          input: CHANGED_INPUT,
+          accent: "#9fefca",
+          id: "test",
+        }),
+      ),
     ),
     "",
   );
@@ -120,6 +124,19 @@ test("changed greeting changes actual arms and every member stays distinct after
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { voluntaryFamilyReunionContract } from "./VoluntaryFamilyReunion.contract";
 import { inputSchema, type Input } from "./VoluntaryFamilyReunion.schema";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 function _getVisibleTexts({
   input,

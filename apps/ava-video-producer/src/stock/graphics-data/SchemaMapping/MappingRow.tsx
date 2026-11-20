@@ -1,12 +1,8 @@
 import { ramp } from "../../../motion";
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { Text } from "../../graphics-common/Text";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FieldRow } from "./FieldRow";
 import { MatchRing } from "./MatchRing";
 import {
@@ -35,7 +31,6 @@ type Props = {
   right: number;
   showChecks: boolean;
 };
-
 /**
  * One mapping: the source field, the connecting edge, the match ring, and the
  * target field.
@@ -48,9 +43,9 @@ export function MappingRow({
   right,
   ...row
 }: Props): ReactNode {
-  const style = useGraphicProps("SchemaMapping", {});
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = FIRST_ROW_Y + index * ROW_STEP;
   const color = index % 2 ? tokens.color.accentAlt : accent;
   const sourceX = left + PANEL_WIDTH;

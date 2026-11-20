@@ -1,12 +1,11 @@
-import { ramp } from "../../../motion";
-import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import {
   getEffectiveRoleFromInput,
   ROLE_RANK,
 } from "./getEffectiveRoleFromInput";
-import { GrantCandidate } from "./GrantCandidate";
-import { PermissionLadder } from "./PermissionLadder";
+import { GrantCandidate } from "./GrantCandidate/GrantCandidate";
+import { PermissionLadder } from "./PermissionLadder/PermissionLadder";
 import { PermissionSceneHeadings } from "./PermissionSceneHeadings";
+import { PermissionVerdict } from "./PermissionVerdict";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
@@ -39,20 +38,10 @@ export function EffectivePermissionGrants({
           />
         );
       })}
-      <g opacity={ramp(frame, 139, 1)}>
-        <LabelSlots
-          labels={[
-            [
-              isAllowed ? input.labels.allowed : input.labels.denied,
-              55,
-              580,
-              840,
-              18,
-              1,
-            ],
-          ]}
-        />
-      </g>
+      <PermissionVerdict
+        label={isAllowed ? input.labels.allowed : input.labels.denied}
+        frame={frame}
+      />
     </g>
   );
 }

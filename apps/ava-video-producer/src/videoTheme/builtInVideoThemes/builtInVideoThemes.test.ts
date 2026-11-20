@@ -7,12 +7,7 @@ import {
 } from "../../continuity/continuityCatalog";
 import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../../gallery/palette";
 import { DUR, EASE, pop, STAGGER, STAGGER_COLUMN } from "../../motion";
-import {
-  getVelocityBlur,
-  MOTION_PRESETS,
-  resolveMotionSettings,
-} from "../../motion-components/motionSettings";
-import { STOCK } from "../../stock/stockPalette";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
 import { createEasingFromToken } from "../createEasingFromToken/createEasingFromToken";
 import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { BUILT_IN_VIDEO_THEMES } from "./builtInVideoThemes";
@@ -23,17 +18,27 @@ const semantic = classicJson.other.video.semantic;
 const SAMPLES = Array.from({ length: 21 }, (_, index) => {
   return index / 20;
 });
-
-test("classic's swatches equal the stock palette", () => {
-  for (const [name, color] of Object.entries(STOCK)) {
+/** The stock palette every stock preset drew from before it read the theme. */
+const STOCK_SWATCHES = {
+  ground: "#0b1219",
+  surface: "#101e28",
+  elevated: "#142632",
+  line: "#2a404e",
+  muted: "#728794",
+  text: "#edf7f4",
+  mint: "#9fefca",
+  cyan: "#82c8f2",
+  orange: "#f0ba83",
+};
+test("classic's swatches keep the stock palette", () => {
+  Object.entries(STOCK_SWATCHES).forEach(([name, color]) => {
     assert.equal(
       atomic.swatch[name as keyof typeof atomic.swatch],
       color,
       name,
     );
-  }
+  });
 });
-
 test("classic's durations equal DUR", () => {
   assert.deepEqual(
     {
@@ -48,7 +53,6 @@ test("classic's durations equal DUR", () => {
     { ...DUR },
   );
 });
-
 test("classic's curves equal EASE", () => {
   for (const [name, curve] of Object.entries(EASE)) {
     const easing = createEasingFromToken(
@@ -59,12 +63,10 @@ test("classic's curves equal EASE", () => {
     }
   }
 });
-
 test("classic's staggers equal STAGGER and STAGGER_COLUMN", () => {
   assert.equal(atomic.stagger.sm, STAGGER);
   assert.equal(atomic.stagger.xs, STAGGER_COLUMN);
 });
-
 test("classic's spring lands exactly like pop's default spring", () => {
   for (let frame = 0; frame <= DUR.sheet; frame += 1) {
     assert.equal(
@@ -73,9 +75,8 @@ test("classic's spring lands exactly like pop's default spring", () => {
     );
   }
 });
-
 test("classic's camera presets equal MOTION_PRESETS", () => {
-  for (const [name, preset] of Object.entries(MOTION_PRESETS)) {
+  for (const [name, preset] of Object.entries(MotionSettings.MOTION_PRESETS)) {
     const key = name as keyof typeof atomic.cameraSpeed;
     assert.equal(atomic.cameraSpeed[key], preset.speed, name);
     assert.equal(atomic.shutter[key], preset.shutterAngle, name);
@@ -88,16 +89,17 @@ test("classic's camera presets equal MOTION_PRESETS", () => {
     );
   }
 });
-
 test("classic's blur samples equal the motion settings default", () => {
-  assert.equal(atomic.samples.md, resolveMotionSettings().samples);
+  assert.equal(
+    atomic.samples.md,
+    MotionSettings.resolveMotionSettings({}).samples,
+  );
 });
-
 test("classic's velocity blur equals getVelocityBlur", () => {
   for (const distance of [0, 10, 40, 100]) {
     assert.ok(
       Math.abs(
-        getVelocityBlur(distance) -
+        MotionSettings.getVelocityBlur({ distancePerFrame: distance }) -
           Math.min(
             atomic.velocityBlur.max,
             distance * atomic.velocityBlur.factor,
@@ -107,7 +109,6 @@ test("classic's velocity blur equals getVelocityBlur", () => {
     );
   }
 });
-
 test("classic's accent and ground are the Atlas gallery defaults", () => {
   assert.equal(
     classicJson.colors.primary[classicJson.primaryShade.dark],
@@ -115,11 +116,9 @@ test("classic's accent and ground are the Atlas gallery defaults", () => {
   );
   assert.equal(atomic.swatch.ground, DEFAULT_BACKGROUND);
 });
-
 test("the built-in library holds classic", () => {
   assert.equal(BUILT_IN_VIDEO_THEMES.get("classic")?.label, "Classic");
 });
-
 /** The accent swatch each continuity plan resolves to. */
 const AUTHORED_ACCENTS = {
   "qetl-motion": "mint",
@@ -146,20 +145,16 @@ const AUTHORED_ACCENTS = {
   "record-to-relationships": "mint",
   "controls-and-meaning": "cyan",
 } as const;
-
 test("every continuity composition keeps its authored accent through classic's overrides", () => {
   for (const [id, swatch] of Object.entries(AUTHORED_ACCENTS)) {
     const theme = makeResolvedVideoThemeFromLibrary(
       BUILT_IN_VIDEO_THEMES,
       "classic",
-      {
-        overrideIds: [id],
-      },
+      { overrideIds: [id] },
     );
-    assert.equal(theme.semantic.color.accent, STOCK[swatch], id);
+    assert.equal(theme.semantic.color.accent, STOCK_SWATCHES[swatch], id);
   }
 });
-
 test("every continuity entry in the Atlas has a classic override", () => {
   assert.deepEqual(
     CONTINUITY_CATALOG.filter((entry) => {

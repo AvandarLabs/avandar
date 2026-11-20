@@ -2,12 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import { captionFiles } from "../../lib/planHelpers";
+import { captionFiles } from "../../lib/planHelpers/planHelpers";
 import { ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 import { createCaptionFilesFromRequest } from "./createCaptionFilesFromRequest";
 
 const FILM_ID = "shared-object-handoff";
-
 function _deliberateTheme(speed?: number) {
   return {
     id: "classic",
@@ -23,7 +22,6 @@ function _deliberateTheme(speed?: number) {
     },
   };
 }
-
 async function _captions(options: Readonly<Record<string, unknown>>) {
   const result = await createCaptionFilesFromRequest({
     id: FILM_ID,
@@ -35,7 +33,6 @@ async function _captions(options: Readonly<Record<string, unknown>>) {
   }
   return result;
 }
-
 test("a draft that changes a camera preset's speed reaches the captions and matches the export", async () => {
   const options = { theme: _deliberateTheme(0.1) };
   const captions = await _captions(options);
@@ -51,18 +48,15 @@ test("a draft that changes a camera preset's speed reaches the captions and matc
     (await _captions({ theme: _deliberateTheme() })).files.srt,
   );
 });
-
 test("a request with no draft resolves the saved built-in theme, overrides included", async () => {
   const captions = await _captions({ theme: { id: "classic" } });
   assert.equal(captions.film.theme?.themeId, "classic");
   assert.equal(captions.files.srt, (await _captions({})).files.srt);
 });
-
 test("an empty patch is a draft", async () => {
   const captions = await _captions({ theme: { id: "classic", patch: {} } });
   assert.equal(captions.film.theme?.themeId, DRAFT_THEME_ID);
 });
-
 test("bad options for a known film are a request error", async () => {
   const result = await createCaptionFilesFromRequest({
     id: FILM_ID,
@@ -71,7 +65,6 @@ test("bad options for a known film are a request error", async () => {
   });
   assert.deepEqual(result, { status: 400 });
 });
-
 test("an unknown film is not found", async () => {
   const result = await createCaptionFilesFromRequest({
     id: "missing-film",
@@ -80,7 +73,6 @@ test("an unknown film is not found", async () => {
   });
   assert.deepEqual(result, { status: 404 });
 });
-
 test("a film without a plan has no captions", async () => {
   const result = await createCaptionFilesFromRequest({
     id: "stock-network-graph",

@@ -1,6 +1,6 @@
 .videoThemeEditor {
   display: grid;
-  gap: 12px;
+  gap: var(--atlas-space-12);
   min-width: 0;
 }
 
@@ -14,20 +14,20 @@
  */
 .videoThemeEditorPinned {
   background: var(--paper);
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   display: grid;
-  gap: 8px;
+  gap: var(--atlas-space-8);
   grid-auto-rows: max-content;
   inset-block-start: calc(
     var(--atlas-panel-tabs-height, 0px) + var(--atlas-pin-offset, 0px)
   );
-  margin-inline: -4px;
+  margin-inline: calc(var(--atlas-space-4) * -1);
   max-block-size: 45dvh;
   overflow-y: auto;
-  padding-block: 4px 8px;
-  padding-inline: 4px;
+  padding-block: var(--atlas-space-4) var(--atlas-space-8);
+  padding-inline: var(--atlas-space-4);
   position: sticky;
-  z-index: 2;
+  z-index: var(--atlas-layer-2);
 }
 
 /* On a phone the player strip is pinned above, so this block keeps less. */

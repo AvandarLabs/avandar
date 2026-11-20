@@ -13,6 +13,22 @@ import {
 } from "./PdfNearestLabelReview.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -29,7 +45,7 @@ function _render({
 
 test("a close runner up flags ambiguity and human choice preserves the original token and distances", () => {
   const hold = _render({ frame: 150 });
-  const state = SvgAttributes.fromMarker({
+  const state = _markedShape({
     markup: hold,
     marker: "association-state",
   });
@@ -44,7 +60,7 @@ test("a close runner up flags ambiguity and human choice preserves the original 
   const farther = _render({ frame: 150, input: fixtures[3].input });
   assert.match(farther, /data-chosen-label="east"/);
   assert.ok(farther.includes('data-source-token=" 24\t"'));
-  const hiddenState = SvgAttributes.fromMarker({
+  const hiddenState = _markedShape({
     markup: farther,
     marker: "association-state",
   });
@@ -74,7 +90,7 @@ test("null remains unresolved while an empty reviewed ID accepts its actual labe
 });
 test("distance guides extend from actual anchors before the selected row travels", () => {
   const figure = (frame: number) => {
-    return SvgAttributes.fromMarker({
+    return _markedShape({
       markup: _render({ frame: frame }),
       marker: "source-figure",
     });
@@ -88,7 +104,7 @@ test("distance guides extend from actual anchors before the selected row travels
     320,
   );
   const guide = (frame: number) => {
-    return SvgAttributes.fromMarker({
+    return _markedShape({
       markup: _render({ frame: frame }),
       marker: "distance-guide",
     });
@@ -108,7 +124,7 @@ test("distance guides extend from actual anchors before the selected row travels
     205,
   );
   const row = (frame: number) => {
-    return SvgAttributes.fromMarker({
+    return _markedShape({
       markup: _render({ frame: frame }),
       marker: "extracted-row",
     });
@@ -214,11 +230,11 @@ test("coincident candidate anchors retain separate keyed rails and positive near
     }),
   );
   assert.ok(values[0] < 1e-12 && values[1] < 1e-12);
-  const guides = [...hold.matchAll(/<line[^>]+data-distance-guide[^>]+>/g)].map(
-    ([tag]) => {
-      return tag;
-    },
-  );
+  const guides = [
+    ...hold.matchAll(/<g data-distance-guide[^>]*><line[^>]+>/g),
+  ].map(([tag]) => {
+    return tag;
+  });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: guides[0], name: "x2" }),
     385,
@@ -257,7 +273,7 @@ test("corner extraction rows keep complete text clear of source anchors guides a
       };
       [96.5, 103, 108, 118, 130, 139, 150].forEach((frame) => {
         const markup = _render({ frame: frame, input: input });
-        const row = SvgAttributes.fromMarker({
+        const row = _markedShape({
           markup,
           marker: "extracted-row",
         });
@@ -342,13 +358,13 @@ test("corner extraction rows keep complete text clear of source anchors guides a
           height: 61,
         });
         assert.ok(top - 0.5 > 438);
-        const choice = SvgAttributes.fromMarker({
+        const choice = _markedShape({
           markup,
           marker: "review-choice",
         });
         assert.ok(choice.includes(`H${right + 8} V${top} H${right}`));
         assert.ok(right + 9 < 960);
-        const link = SvgAttributes.fromMarker({
+        const link = _markedShape({
           markup,
           marker: "extracted-source-link",
         });

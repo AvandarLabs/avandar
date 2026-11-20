@@ -220,3 +220,79 @@ test("an elevation resolves to its shadow layers and colour", () => {
     color: "#06101455",
   });
 });
+
+test("text on the accent turns dark on a light accent and stays white on a dark one", () => {
+  const onAccent = (accent: string) => {
+    return makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { swatch: { pick: accent } },
+              semantic: { color: { accent: "$atomic.swatch.pick" } },
+            },
+          },
+        },
+      ],
+    }).semantic.color.onAccent;
+  };
+  assert.deepEqual(
+    [onAccent("#9fefca"), onAccent("#1563fe")],
+    ["#000000", "#ffffff"],
+  );
+});
+
+test("text on the accent keeps its own threshold, not the ground's", () => {
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+    {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { swatch: { pick: "#8c8c8c" } },
+              semantic: { color: { accent: "$atomic.swatch.pick" } },
+            },
+          },
+        },
+      ],
+    },
+  );
+  assert.equal(theme.semantic.color.onAccent, "#000000");
+});
+
+test("an optional token a theme leaves unset resolves to undefined", () => {
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+  );
+  assert.equal(theme.semantic.color.scene.shadow, undefined);
+});
+
+test("shadow intensity scales the opacity of every shadow", () => {
+  const theme = makeResolvedVideoThemeFromLibrary(
+    BUILT_IN_VIDEO_THEMES,
+    "classic",
+    {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { multiplier: { half: 0.5 } },
+              semantic: { elevation: { strength: "$atomic.multiplier.half" } },
+            },
+          },
+        },
+      ],
+    },
+  );
+  assert.deepEqual(
+    [
+      theme.semantic.elevation.floating.layers[0]?.alpha,
+      theme.semantic.elevation.window.layers[0]?.alpha,
+      theme.components.Cursor.shadow.layers[0]?.alpha,
+    ],
+    [0.5, 0.5, 0.08],
+  );
+});

@@ -1,18 +1,15 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Inputs for ExceptionCondition. */
-type Props = {
-  input: Input;
-  targetY: number;
-};
-
+type Props = { input: Input; targetY: number };
 /** The condition and path label explicitly identify the exceptional branch. */
 export function ExceptionCondition({
   input,
   targetY,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <>
       <FitText
@@ -23,7 +20,7 @@ export function ExceptionCondition({
         fontSize={16}
         maxLines={3}
         anchor="middle"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         breakLongWords
         normalizeWhitespace
       />
@@ -35,7 +32,7 @@ export function ExceptionCondition({
         fontSize={16}
         maxLines={4}
         anchor="middle"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         breakLongWords
         normalizeWhitespace
       />

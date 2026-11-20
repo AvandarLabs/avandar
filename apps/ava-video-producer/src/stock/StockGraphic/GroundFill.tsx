@@ -1,11 +1,10 @@
-import { useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { id: string };
-
 /** The stage ground: a solid or gradient fill the size of the viewBox. */
 export function GroundFill({ id }: Props): ReactNode {
-  const { color } = useGraphicTokens();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   const fill = color.groundFill;
   if (fill.type === "solid") {
     return <rect width={960} height={600} fill={fill.color} />;

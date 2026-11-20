@@ -1,6 +1,7 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SnapshotCell } from "./SnapshotCell";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SnapshotCell } from "./SnapshotCell/SnapshotCell";
 import { SnapshotHeadings } from "./SnapshotHeadings";
 import { SnapshotRowGuide } from "./SnapshotRowGuide";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -16,8 +17,11 @@ export function PublicationSnapshotSlice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots
         labels={[
           [input.copy.context, 52, 40, 856, 18, 2],
@@ -25,15 +29,15 @@ export function PublicationSnapshotSlice({
           [input.copy.result, 508, 90, 400, 12, 3],
         ]}
       />
-      <rect
+      <StockRect
         x={500}
         y={142}
         width={416}
         height={402}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
         stroke={accent}
-        opacity={ramp(frame, 56, 39)}
+        opacity={motion.ramp(frame, 56, motion.scale(39))}
       />
       <SnapshotHeadings input={input} frame={frame} />
       {input.selection.rowIds.map((rowId, selectedRow) => {

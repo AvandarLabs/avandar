@@ -1,5 +1,5 @@
-import { EASE, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FractionUnit } from "./FractionUnit";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
@@ -17,17 +17,24 @@ export function FractionMaterial({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36, 48, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
   return (
     <g data-material={representation.material}>
       {representation.material === "folded-paper" ? (
-        <rect
+        <StockRect
           x={-97}
           y={-25}
           width={194}
           height={50}
-          fill={STOCK.surface}
-          stroke={STOCK.text}
+          fill={tokens.color.surface}
+          stroke={tokens.color.text}
         />
       ) : undefined}
       {Array.from({ length: fraction.denominator }, (_, index) => {

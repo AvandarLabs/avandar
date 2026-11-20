@@ -1,23 +1,45 @@
-import { DUR, EASE, mix, ramp } from "../../motion";
+import { mix } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { STOCK } from "../stockPalette";
+import { SketchedShape } from "../primitives/SketchedShape";
+import { StockRect } from "../primitives/StockRect/StockRect";
+import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { BarRaceInput } from "../presets/BarRace/BarRace.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: BarRaceInput };
-
+const RACE_AT = 52;
+const RACE_FRAMES = 64;
+const GROW_AT = 12;
+const LABEL_RETURN_AT = 116;
+const HEADING_SIZE = "29";
+const BAR_LABEL_SIZE = "5xl";
+const BAR_CORNER = 6;
 /** Draws the bounded authored bar-race study at an explicit frame. */
 export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { color, stroke, alpha, sketch } = tokens;
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const bars = input.bars;
-  const t = ramp(frame, 52, 64, EASE.inOut);
-  const enter = ramp(frame, 12, DUR.hero);
+  const t = motion.ramp(
+    frame,
+    RACE_AT,
+    motion.scale(RACE_FRAMES),
+    motion.travel.easing,
+  );
+  const enter = motion.ramp(frame, GROW_AT, motion.hero);
   const labelOpacity =
-    1 - ramp(frame, 52, DUR.chip) + ramp(frame, 116, DUR.panel);
+    1 -
+    motion.ramp(frame, RACE_AT, motion.chip) +
+    motion.ramp(frame, LABEL_RETURN_AT, motion.panel);
+  const hairline = shapes.stroke(stroke.hairline);
   return (
     <g>
       <Eyebrow>
@@ -34,28 +56,26 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
         })}
         color={accent}
       />
-      <Text x={64} y={112} size={29} weight={600}>
+      <Text role="title" x={64} y={112} size={HEADING_SIZE}>
         {input.heading}
       </Text>
       {[0, 25, 50, 75, 100].map((value) => {
         return (
           <g key={value}>
-            <line
-              x1={205 + value * 6}
-              y1={157}
-              x2={205 + value * 6}
-              y2={474}
-              stroke={STOCK.line}
-              strokeOpacity={0.5}
+            <SketchedShape
+              shape={{
+                kind: "line",
+                x1: 205 + value * 6,
+                y1: 157,
+                x2: 205 + value * 6,
+                y2: 474,
+              }}
+              profile={sketch.shape}
+              stroke={color.line}
+              strokeOpacity={alpha.guide}
+              strokeWidth={hairline}
             />
-            <Text
-              x={205 + value * 6}
-              y={507}
-              size={14}
-              mono
-              anchor="middle"
-              fill={STOCK.muted}
-            >
+            <Text role="footnote" x={205 + value * 6} y={507} anchor="middle">
               {value}
             </Text>
           </g>
@@ -64,11 +84,14 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
       {bars.map((bar, i) => {
         const value = mix(t, bar.start, bar.end) * enter;
         const y = 175 + mix(t, bar.from, bar.to) * 77;
-        const color = i === 0 ? accent : bar.color;
+        const barColor =
+          i === 0
+            ? accent
+            : getContentColorFromValue(bar.color, { tokens, accent });
         return (
           <g key={bar.label}>
             <g opacity={labelOpacity}>
-              <Text x={177} y={y + 29} size={23} anchor="end">
+              <Text x={177} y={y + 29} size={BAR_LABEL_SIZE} anchor="end">
                 {bar.label}
               </Text>
             </g>
@@ -77,22 +100,23 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
               y={y}
               width={Math.max(0.01, value * 6)}
               height={43}
-              rx={6}
-              fill={color}
-              fillOpacity={0.85}
+              rx={shapes.corner(BAR_CORNER)}
+              fill={barColor}
+              fillOpacity={atomic.opacity["85"]}
             />
-            <rect
+            <StockRect
               x={205}
               y={y}
               width={Math.max(0.01, value * 6)}
               height={43}
-              rx={6}
-              fill={color}
-              fillOpacity={0.12}
-              stroke={color}
+              rx={shapes.corner(BAR_CORNER)}
+              fill={barColor}
+              fillOpacity={shapes.wash(alpha.tint)}
+              stroke={barColor}
+              strokeWidth={hairline}
             />
             <g opacity={labelOpacity}>
-              <Text x={220 + value * 6} y={y + 29} size={21} mono fill={color}>
+              <Text role="code" x={220 + value * 6} y={y + 29} fill={barColor}>
                 {Math.round(value)}
               </Text>
             </g>
@@ -107,22 +131,26 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
                   cx={72 + i * 216}
                   cy={546}
                   r={5}
-                  fill={i === 0 ? accent : bar.color}
+                  fill={
+                    i === 0
+                      ? accent
+                      : getContentColorFromValue(bar.color, { tokens, accent })
+                  }
                 />
-                <Text x={86 + i * 216} y={552} size={17} fill={STOCK.text}>
+                <Text role="choice" x={86 + i * 216} y={552}>
                   {bar.label}
                 </Text>
               </g>
             );
           })
         : null}
-      <Text x={64} y={580} size={12} fill={STOCK.muted}>
+      <Text role="data" x={64} y={580} fill={color.textMuted}>
         {getStockDisplayCopyFromDescriptor({
           descriptor:
             LEGACY_DISPLAY_COPY["bar-race"].illustrativeValuesFixed0100Scale,
         })}
       </Text>
-      <Text x={896} y={580} size={12} fill={STOCK.muted} anchor="end" mono>
+      <Text role="detail" x={896} y={580} anchor="end">
         {Math.round(mix(t, 1, 2)) === 1
           ? getStockDisplayCopyFromDescriptor({
               descriptor: LEGACY_DISPLAY_COPY["bar-race"].periodTransition,

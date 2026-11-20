@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PortableWorkTransfer.schema";
 /** Data for getTransferSceneFromFrame. */
 type GetTransferSceneFromFrameResult = {
@@ -20,25 +21,32 @@ type GetTransferSceneFromFrameResult = {
 export function getTransferSceneFromFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetTransferSceneFromFrameResult {
-  const travel = ramp(frame, 93, 22, EASE.inOut);
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): GetTransferSceneFromFrameResult {
+  const travel = motion.ramp(frame, 93, motion.scale(22), motion.travel.easing);
   const folioX = mix(travel, 350, 640);
   const opening =
-    input.transferState === "accepted" ? ramp(frame, 115, 9, EASE.inOut) : 0;
+    input.transferState === "accepted"
+      ? motion.ramp(frame, 115, motion.panel, motion.travel.easing)
+      : 0;
   const copies = input.artifacts.map((artifact, index) => {
-    const packing = ramp(
+    const packing = motion.ramp(
       frame,
-      43 + (index * 36) / input.artifacts.length,
-      12,
-      EASE.inOut,
+      43 + (index * motion.scaleStagger(36)) / input.artifacts.length,
+      motion.scale(12),
+      motion.travel.easing,
     );
     const placement =
       input.transferState === "accepted"
-        ? ramp(
+        ? motion.ramp(
             frame,
-            124 + (index * 6) / input.artifacts.length,
-            6 / input.artifacts.length,
-            EASE.inOut,
+            124 + (index * motion.scaleStagger(6)) / input.artifacts.length,
+            motion.scale(6) / input.artifacts.length,
+            motion.travel.easing,
           )
         : 0;
     return {

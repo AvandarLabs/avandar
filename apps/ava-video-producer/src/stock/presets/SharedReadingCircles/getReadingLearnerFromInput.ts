@@ -1,7 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { getReadingGeometryFromInput } from "./getReadingGeometryFromInput";
 import { getReadingSeatFromInput } from "./getReadingSeatFromInput";
 import { getSideReadingCarrierFromFrame } from "./getSideReadingCarrierFromFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SharedReadingCircles.schema";
 /** Data for getReadingLearnerFromInput. */
 type GetReadingLearnerFromInputResult = {
@@ -22,10 +23,12 @@ export function getReadingLearnerFromInput({
   input,
   learner,
   frame,
+  motion,
 }: Readonly<{
   input: Input;
   learner: Input["learners"][number];
   frame: number;
+  motion: VideoMotion;
 }>): GetReadingLearnerFromInputResult {
   const groupIndex = input.readingGroups.findIndex((group) => {
     return group.learnerIds.includes(learner.id);
@@ -37,13 +40,29 @@ export function getReadingLearnerFromInput({
     input,
     frame,
     groupIndex,
+    motion,
   });
-  const seat = getReadingSeatFromInput({ frame, memberIndex, tableX, isSide });
-  const side = getSideReadingCarrierFromFrame({ frame, groupIndex, tableX });
-  const settle = ramp(frame, 94, 14, EASE.inOut);
+  const seat = getReadingSeatFromInput({
+    frame,
+    memberIndex,
+    tableX,
+    isSide,
+    motion,
+  });
+  const side = getSideReadingCarrierFromFrame({
+    frame,
+    groupIndex,
+    tableX,
+    motion,
+  });
+  const settle = motion.ramp(frame, 94, motion.scale(14), motion.travel.easing);
   const frontY =
     frame < 44
-      ? mix(ramp(frame, 24, 20, EASE.inOut), 330, 210)
+      ? mix(
+          motion.ramp(frame, 24, motion.scale(20), motion.travel.easing),
+          330,
+          210,
+        )
       : mix(settle, bookY - 40, 265);
   const x = memberIndex === 0 ? (isSide ? side.x : tableX + 60) : seat.x;
   const y = memberIndex === 0 ? (isSide ? side.y : frontY) : seat.y;

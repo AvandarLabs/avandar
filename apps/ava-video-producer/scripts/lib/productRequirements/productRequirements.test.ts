@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
-import { previewFrames } from "../planHelpers";
+import { previewFrames } from "../planHelpers/previewFrames";
 import { productRequirements } from "./productRequirements";
 
 const readFilm = (id: string) => {
@@ -18,7 +18,6 @@ const readFilm = (id: string) => {
     ),
   );
 };
-
 test("nested product beats select the product build and entry without affecting motion-only films", () => {
   assert.deepEqual(productRequirements(readFilm("ontology-to-product")), {
     needsProduct: true,
@@ -29,7 +28,6 @@ test("nested product beats select the product build and entry without affecting 
     needsMap: false,
   });
 });
-
 test("preview sampling includes incoming overlap and resolved poses inside a continuity shot", () => {
   const plan = readFilm("qetl-motion");
   const shot = plan.shots[0];

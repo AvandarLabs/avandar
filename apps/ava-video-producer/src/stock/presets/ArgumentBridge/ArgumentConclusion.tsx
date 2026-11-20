@@ -1,14 +1,24 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./ArgumentBridge";
 import type { ReactNode } from "react";
+/** Frames the conclusion takes to rise into place. */
+const RISE_FRAMES = 24;
 /** The authored conclusion rises above the completed support deck. */
 export function ArgumentConclusion({
   frame,
   input,
 }: Readonly<Props>): ReactNode {
-  const conclusion = ramp(frame, 84, 24, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const conclusion = ramp(
+    frame,
+    84,
+    motion.scale(RISE_FRAMES),
+    motion.travel.easing,
+  );
   return (
     <>
       <g
@@ -27,7 +37,12 @@ export function ArgumentConclusion({
           breakLongWords
           normalizeWhitespace
         />
-        <path d="M400 266 H560 M480 266 V278" stroke={STOCK.line} fill="none" />
+        <SketchedShape
+          shape={{ kind: "path", d: "M400 266 H560 M480 266 V278" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.line}
+          fill="none"
+        />
       </g>
     </>
   );

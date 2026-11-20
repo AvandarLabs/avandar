@@ -46,7 +46,7 @@ the composition that ships here is the generic one above.*
 | | |
 | --- | --- |
 | `src/motion.ts` | The vocabulary. Curves, durations, stagger, and the helpers that stop states teleporting. Imports nothing. |
-| `src/title-card.tsx` | The cold open — words rising out of per-word masks. |
+| `src/TitleCard/TitleCard.tsx` | The cold open — words rising out of per-word masks. |
 | `src/chrome.tsx` | The fake app window, the pointer, the click beats. |
 | `src/compositions/Demo.tsx` | A worked example. Copy this, change the flow. |
 | `scripts/preview.sh` | Stills on every beat, plus a contact sheet. What the gate cannot see. |

@@ -1,5 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { missingMessage } from "./WideTableToObservations.controls";
 import type { getMeasurementStripFromFrame } from "./getMeasurementStripFromFrame";
 import type { ReactNode } from "react";
@@ -10,6 +11,12 @@ type Props = {
   subjectIndex: number;
   measureIndex: number;
 };
+/**
+ * The labels fade in over the last part of the strip's travel. Both values
+ * are fractions of that travel, not frames, so tempo never scales them.
+ */
+const LABEL_REVEAL_AT = 0.92;
+const LABEL_REVEAL_SPAN = 0.08;
 /** Key copies and values keep distinct readable lanes throughout travel. */
 export function MeasurementStripLabels({
   scene,
@@ -17,6 +24,7 @@ export function MeasurementStripLabels({
   subjectIndex,
   measureIndex,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, progress, subject, measure, value } = scene;
   return (
     <g>
@@ -31,7 +39,7 @@ export function MeasurementStripLabels({
         labels={[
           [subject.label, x + 10, y, mix(progress, 150, 180), 12, 4],
           [
-            value === null ? missingMessage.message : String(value),
+            value === undefined ? missingMessage.message : String(value),
             x + mix(progress, 174, 440),
             y,
             mix(progress, 70, 190),
@@ -40,7 +48,7 @@ export function MeasurementStripLabels({
           ],
         ]}
       />
-      <g opacity={ramp(progress, 0.92, 0.08)}>
+      <g opacity={motion.ramp(progress, LABEL_REVEAL_AT, LABEL_REVEAL_SPAN)}>
         <LabelSlots
           labels={[
             [measure.label, x + mix(progress, 10, 218), y, 200, 12, 3],

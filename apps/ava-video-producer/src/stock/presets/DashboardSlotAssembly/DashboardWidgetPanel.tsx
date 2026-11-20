@@ -1,7 +1,6 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardWidgetContent } from "./DashboardWidgetContent";
 import { getWidgetRectFromInput } from "./getWidgetRectFromInput";
 import type { Input } from "./DashboardSlotAssembly.schema";
@@ -24,15 +23,25 @@ export function DashboardWidgetPanel({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const rect = getWidgetRectFromInput({ input, widgetId: widget.id, frame });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const rect = getWidgetRectFromInput({
+    input,
+    widgetId: widget.id,
+    frame,
+    motion,
+  });
   const featured = widget.id === input.featuredWidgetId;
   const compact = input.layout === "feature-left" ? !featured : featured;
   const panel = {
     ...rect,
-    rx: 8,
-    fill: STOCK.surface,
-    stroke: featured ? accent : STOCK.line,
-    strokeWidth: featured ? 2 : 1.5,
+    rx: scales.corner(tokens.corner.cell),
+    fill: tokens.color.surface,
+    stroke: featured ? accent : tokens.color.line,
+    strokeWidth: scales.stroke(
+      featured ? tokens.stroke.default : tokens.stroke.outline,
+    ),
   };
   const title = {
     text: widget.title,
@@ -53,7 +62,10 @@ export function DashboardWidgetPanel({
     accent,
   };
   return (
-    <g data-widget-panel={widget.id} opacity={ramp(frame, 12 + index * 2, 12)}>
+    <g
+      data-widget-panel={widget.id}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
+    >
       <StockRect
         data-widget={widget.id}
         data-widget-kind={widget.kind}

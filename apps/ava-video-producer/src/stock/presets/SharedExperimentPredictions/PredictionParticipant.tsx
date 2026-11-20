@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DistanceBracket } from "./DistanceBracket";
 import { PredictionActor } from "./PredictionActor";
 import { PredictionDrop } from "./PredictionDrop";
@@ -18,11 +19,17 @@ export function PredictionParticipant({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const learner = input.learners[index];
   const y = 180 + index * 84;
   const targetX =
     450 + (430 * learner.predictionDistance) / input.track.maximum;
-  const progress = ramp(frame, 36 + index * 6, 12, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    36 + index * motion.scaleStagger(6),
+    motion.scale(12),
+    motion.travel.easing,
+  );
   const flagX = mix(progress, 450, targetX);
   const personX = flagX - 25;
   const difference = Math.abs(

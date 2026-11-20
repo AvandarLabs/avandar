@@ -1,6 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 
@@ -11,21 +13,35 @@ export function LeakRepairWorker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const containment = ramp(frame, 39, 23, EASE.inOut);
-  const repair = ramp(frame, 63, 18, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const containment = motion.ramp(
+    frame,
+    39,
+    motion.scale(23),
+    motion.travel.easing,
+  );
+  const repair = motion.ramp(frame, 63, motion.hero, motion.travel.easing);
   const trayX = mix(containment, 220, 480);
-  const intervention = ramp(frame, 81, 25, EASE.inOut);
+  const intervention = motion.ramp(
+    frame,
+    81,
+    motion.scale(25),
+    motion.travel.easing,
+  );
   const repairX =
     input.repair.gesture === "replace-seal" ? mix(intervention, 439, 480) : 480;
   const handX = mix(repair, trayX, repairX);
   const handY = mix(repair, 430, 260);
   return (
-    <g opacity={ramp(frame, 14, 12)}>
+    <g opacity={motion.reveal(frame, 14)}>
       <PersonGlyph x={175} y={370} size={80} role="worker" color={accent} />
-      <path
-        d={`M175 370 L${handX} ${handY}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M175 370 L${handX} ${handY}` }}
+        profile={tokens.sketch.shape}
         stroke={accent}
-        strokeWidth={4}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
         fill="none"
       />
       <circle
@@ -35,49 +51,50 @@ export function LeakRepairWorker({
         r={5}
         fill={accent}
       />
-      <g opacity={ramp(frame, 39, 8)}>
-        <rect
+      <g opacity={motion.ramp(frame, 39, motion.whip)}>
+        <StockRect
           data-catch-tray="true"
           x={trayX - 80}
           y={430}
           width={160}
           height={24}
-          rx={5}
-          fill={STOCK.surface}
+          rx={scales.corner(5)}
+          fill={tokens.color.surface}
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       </g>
-      <g opacity={ramp(frame, 63, 8)}>
-        <circle
+      <g opacity={motion.ramp(frame, 63, motion.whip)}>
+        <SketchedShape
+          shape={{ kind: "circle", cx: 480, cy: 260, r: 18 }}
+          profile={tokens.sketch.shape}
           data-joint-repair="true"
-          cx={480}
-          cy={260}
-          r={18}
           fill="none"
           stroke={accent}
-          strokeWidth={4}
+          strokeWidth={scales.stroke(tokens.stroke.heavy)}
         />
         {input.repair.gesture === "tighten" ? (
-          <path
-            d="M480 260 l-22 30 l-8 -8"
-            transform={`rotate(${mix(intervention, -35, 35)} 480 260)`}
-            stroke={accent}
-            strokeWidth={5}
-            fill="none"
-          />
+          <g transform={`rotate(${mix(intervention, -35, 35)} 480 260)`}>
+            <SketchedShape
+              shape={{ kind: "path", d: "M480 260 l-22 30 l-8 -8" }}
+              profile={tokens.sketch.shape}
+              stroke={accent}
+              strokeWidth={scales.stroke(5)}
+              fill="none"
+            />
+          </g>
         ) : (
-          <rect
+          <StockRect
             data-replacement-seal="true"
             x={mix(intervention, 430, 471)}
             y={238}
             width={18}
             height={44}
-            rx={4}
+            rx={scales.corner(tokens.corner.chip)}
             stroke={accent}
-            fill={STOCK.surface}
-            fillOpacity={0.25}
-            strokeWidth={3}
+            fill={tokens.color.surface}
+            fillOpacity={tokens.alpha.ghost}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
           />
         )}
       </g>

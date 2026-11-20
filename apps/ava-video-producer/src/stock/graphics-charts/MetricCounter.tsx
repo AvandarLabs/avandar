@@ -1,26 +1,36 @@
-import { DUR, ramp, mix } from "../../motion";
+import { mix } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import { Arrive } from "../graphics-common/Arrive";
+import { Arrive } from "../graphics-common/Arrive/Arrive";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Panel } from "../graphics-common/Panel";
 import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import { STOCK } from "../stockPalette";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { MetricCounterInput } from "../presets/MetricCounter/MetricCounter.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: MetricCounterInput };
-
+const COUNT_AT = 22;
+const COUNT_FRAMES = 66;
+const PILL_AT = 82;
+const BARS_AT = 29;
+const BAR_GROW_AT = 34;
+const FIGURE_SIZE = "103";
+const BAR_ALPHA_STEPS = 18;
 /** Draws the bounded authored metric-counter study at an explicit frame. */
 export function MetricCounter({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, corner } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const bars = input.bars;
-  const t = ramp(frame, 22, 66);
+  const t = motion.ramp(frame, COUNT_AT, motion.scale(COUNT_FRAMES));
   const value = Math.round(mix(t, 0, input.value));
   return (
     <g>
@@ -39,13 +49,13 @@ export function MetricCounter({
         color={accent}
       />
       <Panel x={126} y={135} width={708} height={356}>
-        <Text x={170} y={185} size={20} fill={STOCK.muted}>
+        <Text x={170} y={185} fill={color.textMuted}>
           {input.label}
         </Text>
-        <Text x={165} y={301} size={103} weight={600}>
+        <Text role="figure" x={165} y={301} size={FIGURE_SIZE}>
           {`${value.toLocaleString("en-US")}${input.unit}`}
         </Text>
-        <g opacity={ramp(frame, 82, DUR.sheet)}>
+        <g opacity={motion.ramp(frame, PILL_AT, motion.sheet)}>
           <Pill
             x={170}
             y={326}
@@ -58,26 +68,28 @@ export function MetricCounter({
         </g>
         {input.showBars
           ? bars.map((height, i) => {
+              const grow = motion.ramp(
+                frame,
+                BAR_GROW_AT + i * motion.stagger.list,
+                motion.hero,
+              );
               return (
-                <Arrive frame={frame} at={29} index={i} key={i}>
+                <Arrive frame={frame} at={BARS_AT} index={i} key={i}>
                   <rect
                     x={172 + i * 50}
-                    y={437 - height * 54 * ramp(frame, 34 + i * 2, DUR.hero)}
+                    y={437 - height * 54 * grow}
                     width={34}
-                    height={Math.max(
-                      1,
-                      height * 54 * ramp(frame, 34 + i * 2, DUR.hero),
-                    )}
-                    rx={4}
+                    height={Math.max(1, height * 54 * grow)}
+                    rx={shapes.corner(corner.chip)}
                     fill={accent}
-                    fillOpacity={0.18 + i / 18}
+                    fillOpacity={atomic.opacity["18"] + i / BAR_ALPHA_STEPS}
                   />
                 </Arrive>
               );
             })
           : null}
       </Panel>
-      <Text x={480} y={550} size={16} fill={STOCK.muted} anchor="middle">
+      <Text role="secondary" x={480} y={550} anchor="middle">
         {getStockDisplayCopyFromDescriptor({
           descriptor:
             LEGACY_DISPLAY_COPY["metric-counter"]

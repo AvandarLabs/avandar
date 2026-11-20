@@ -1,9 +1,16 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BlockCaption } from "./BlockCaption";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 
+type CreateIdentityPosesOptions = {
+  input: Input;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+};
 type Props = { input: Input; frame: number; accent: string; index: number };
 /** Source block headings retain their identities beside the resulting rows. */
 export function BlockIdentity({
@@ -12,27 +19,10 @@ export function BlockIdentity({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
-  const duration = 9 / input.blocks.length,
-    departure = 96 + (input.blocks.length - 1 - index) * duration;
-  const color = [accent, STOCK.cyan, STOCK.orange][index];
-  const poses = [
-    {
-      x: 52 + index * 294,
-      y: 135,
-      width: 268,
-      opacity: 1 - ramp(frame, 96, 9),
-    },
-    {
-      x: 52,
-      y: mix(
-        ramp(frame, departure, duration - 0.5, EASE.inOut),
-        210,
-        280 + index * 112,
-      ),
-      width: 224,
-      opacity: ramp(frame, departure, 0.5),
-    },
-  ];
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const color = [accent, tokens.color.accentAlt, tokens.color.highlight][index];
+  const poses = _createIdentityPoses({ input, index, frame, motion });
   return (
     <g data-output-block={input.blocks[index].id}>
       {poses.map((pose, poseIndex) => {
@@ -49,4 +39,35 @@ export function BlockIdentity({
       })}
     </g>
   );
+}
+/**
+ * The heading over its source block, fading out, and beside its result row,
+ * arriving last block first.
+ */
+function _createIdentityPoses({
+  input,
+  index,
+  frame,
+  motion,
+}: Readonly<CreateIdentityPosesOptions>) {
+  const duration = 9 / input.blocks.length,
+    departure = 96 + (input.blocks.length - 1 - index) * duration;
+  return [
+    {
+      x: 52 + index * 294,
+      y: 135,
+      width: 268,
+      opacity: 1 - motion.ramp(frame, 96, motion.panel),
+    },
+    {
+      x: 52,
+      y: mix(
+        motion.ramp(frame, departure, duration - 0.5, motion.travel.easing),
+        210,
+        280 + index * 112,
+      ),
+      width: 224,
+      opacity: motion.ramp(frame, departure, motion.scale(0.5)),
+    },
+  ];
 }

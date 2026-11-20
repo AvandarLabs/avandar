@@ -14,7 +14,7 @@ description: >-
 One pipeline, three layers: the **story** (what the clip shows), the
 **motion** (how the interface behaves inside the frame), and the **title**
 (the two seconds that open it). Reference implementation:
-`src/compositions/Demo.tsx` + `src/motion.ts` + `src/title-card.tsx` +
+`src/compositions/Demo.tsx` + `src/motion.ts` + `src/TitleCard/TitleCard.tsx` +
 `scripts/render.sh`.
 
 New clips copy that pipeline. Do not invent a second one.

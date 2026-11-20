@@ -2,8 +2,7 @@ import {
   durationInFrames,
   type Storyboard,
 } from "../../src/storyboard/schema/schema";
-import { assetReferences } from "../lib/planHelpers";
-
+import { assetReferences } from "../lib/planHelpers/planHelpers";
 /** The JSON the `validate` command prints for a plan that passed. */
 export function buildValidationSummary(plan: Storyboard): string {
   return JSON.stringify(

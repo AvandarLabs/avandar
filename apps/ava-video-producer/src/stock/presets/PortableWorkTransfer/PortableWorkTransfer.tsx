@@ -1,6 +1,8 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import { TransferArtifact } from "./TransferArtifact";
+import { TransferBenches } from "./TransferBenches";
 import { TransferCaptions } from "./TransferCaptions";
 import { TransferFolio } from "./TransferFolio";
 import { TransferOwner } from "./TransferOwner";
@@ -9,7 +11,6 @@ import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
 /** Inputs for PortableWorkTransfer. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * The owner carries copies across tools while source originals remain anchored.
  */
@@ -18,22 +19,12 @@ export function PortableWorkTransfer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getTransferSceneFromFrame({ frame, input });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scene = getTransferSceneFromFrame({ motion, frame, input });
   return (
     <g>
       <TransferCaptions input={input} frame={frame} folioX={scene.folioX} />
-      <path
-        data-source-bench="true"
-        d="M36 550 H310 M45 550 v12 M300 550 v12"
-        stroke={STOCK.line}
-        strokeWidth={4}
-      />
-      <path
-        data-destination-bench="true"
-        d="M330 550 H920 M340 550 v12 M910 550 v12"
-        stroke={STOCK.line}
-        strokeWidth={4}
-      />
+      <TransferBenches />
       {input.artifacts.map((artifact, index) => {
         return (
           <TransferArtifact

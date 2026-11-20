@@ -45,7 +45,7 @@ test("first turn swaps while resource-array order remains canonical", () => {
 test("keys physically return to their tray before the waiting operation reuses them", () => {
   const key = (frame: number, resource: string) => {
     return _render({ frame: frame, input: DEFAULT_INPUT }).match(
-      new RegExp(`<circle data-lock-key="${resource}"[^>]*>`),
+      new RegExp(`<g data-lock-key="${resource}"[^>]*><circle[^>]*>`),
     )![0];
   };
   assert.equal(

@@ -1,4 +1,4 @@
-import { SampleSite } from "./SampleSite";
+import { SampleSite } from "./SampleSite/SampleSite";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 

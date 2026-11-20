@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
@@ -8,11 +8,14 @@ type Props = { input: Input; frame: number; accent: string };
 export function WhitespaceGridEvidence({
   input,
   frame,
-  accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const width = 400 / input.grid.columnLabels.length;
   const height = 80 + input.grid.rows.length * 64;
-  const progress = ramp(frame, 13, 42);
+  const progress = getEvidenceFromFrame({ frame, motion });
   return (
     <g>
       {" "}
@@ -29,8 +32,8 @@ export function WhitespaceGridEvidence({
                   y={210}
                   width={8}
                   height={height * progress}
-                  fill={STOCK.orange}
-                  fillOpacity={0.25}
+                  fill={tokens.color.highlight}
+                  fillOpacity={scales.wash(atomic.opacity["25"])}
                 />
               );
             },
@@ -44,8 +47,8 @@ export function WhitespaceGridEvidence({
                 y={286 + index * 64}
                 width={400 * progress}
                 height={8}
-                fill={STOCK.orange}
-                fillOpacity={0.25}
+                fill={tokens.color.highlight}
+                fillOpacity={scales.wash(atomic.opacity["25"])}
               />
             );
           })}

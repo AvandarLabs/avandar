@@ -1,4 +1,4 @@
-import { isMantineTokenRoot } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { isMantineTokenRoot } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 
 /**
  * Where a token lives in a theme file, such as

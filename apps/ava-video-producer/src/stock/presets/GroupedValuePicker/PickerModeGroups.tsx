@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
@@ -12,6 +12,10 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** Frames the bays take to fade in. */
+const BAY_FRAMES = 14;
+/** Frames the counted value marks take to appear. */
+const MARK_FRAMES = 2;
 /** Disjoint frequency bays retain full group labels and counted value marks. */
 export function PickerModeGroups({
   input,
@@ -19,8 +23,13 @@ export function PickerModeGroups({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 56, 14)}>
+    <g
+      opacity={ramp(frame, 56, motion.scale(BAY_FRAMES), motion.reveal.easing)}
+    >
       {groups.map((group) => {
         return (
           <g key={String(group.value)} data-mode-group={String(group.value)}>
@@ -30,11 +39,18 @@ export function PickerModeGroups({
               y={group.y}
               width={174}
               height={group.height}
-              rx={4}
-              fill={STOCK.surface}
-              stroke={STOCK.line}
+              rx={scales.corner(tokens.corner.chip)}
+              fill={tokens.color.surface}
+              stroke={tokens.color.line}
             />
-            <g opacity={ramp(frame, 92, 4)}>
+            <g
+              opacity={ramp(
+                frame,
+                92,
+                motion.press.duration,
+                motion.reveal.easing,
+              )}
+            >
               <LabelSlots
                 labels={[
                   [
@@ -64,7 +80,12 @@ export function PickerModeGroups({
                   width={12}
                   height={8}
                   fill={accent}
-                  opacity={ramp(frame, 90, 2)}
+                  opacity={ramp(
+                    frame,
+                    90,
+                    motion.scale(MARK_FRAMES),
+                    motion.reveal.easing,
+                  )}
                 />
               );
             })}

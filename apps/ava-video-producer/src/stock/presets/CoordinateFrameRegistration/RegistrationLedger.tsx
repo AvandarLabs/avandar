@@ -1,6 +1,7 @@
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
@@ -13,13 +14,18 @@ export function RegistrationLedger({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const points = makeRegisteredLandmarksFromInputAndFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const points = makeRegisteredLandmarksFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       {points.map((point) => {
         return (
           <g key={point.id}>
-            <Text x={40 + point.index * 220} y={445} size={12}>
+            <Text role="data" x={40 + point.index * 220} y={445}>
               {point.index + 1}·
             </Text>
             <LabelSlots

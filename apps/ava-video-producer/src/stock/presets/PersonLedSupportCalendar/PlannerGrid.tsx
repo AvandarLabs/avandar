@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PlannerColumns } from "./PlannerColumns";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
@@ -7,16 +8,18 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Fixed tabletop grid keeps all authored commitments in discrete cells. */
 export function PlannerGrid({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         x={180}
         y={110}
         width={620}
         height={355}
-        rx={18}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.panel)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <PlannerColumns input={input} />
       {input.timeBands.map((band, row) => {

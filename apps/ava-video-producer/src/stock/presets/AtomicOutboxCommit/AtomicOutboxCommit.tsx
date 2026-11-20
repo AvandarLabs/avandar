@@ -1,9 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
-import { OutboxCommitMarks } from "./OutboxCommitMarks";
+import { OutboxCommitMarks } from "./OutboxCommitMarks/OutboxCommitMarks";
 import { OutboxDurableState } from "./OutboxDurableState";
+import { OutboxEnclosure } from "./OutboxEnclosure";
 import { OutboxOutcome } from "./OutboxOutcome";
 import { OutboxProposal } from "./OutboxProposal";
+import { UNMOUNT_CUE } from "./outboxShape";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
@@ -25,18 +26,9 @@ export function AtomicOutboxCommit({
           [input.labels.outbox, 540, 180, 320, 16, 3],
         ]}
       />
-      <rect
-        x={70}
-        y={140}
-        width={820}
-        height={360}
-        rx={8}
-        fill="none"
-        stroke={STOCK.line}
-      />
-      <path d="M480 155 V470" stroke={STOCK.line} strokeDasharray="5 7" />
+      <OutboxEnclosure />
       <OutboxDurableState input={input} frame={frame} accent={accent} />
-      {frame < 139
+      {frame < UNMOUNT_CUE
         ? (["local", "journal"] as const).map((side) => {
             return (
               <OutboxProposal

@@ -1,4 +1,4 @@
-import { ContrastAlternative } from "./ContrastAlternative";
+import { ContrastAlternative } from "./ContrastAlternative/ContrastAlternative";
 import { ContrastHeading } from "./ContrastHeading";
 import { ContrastRow } from "./ContrastRow";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

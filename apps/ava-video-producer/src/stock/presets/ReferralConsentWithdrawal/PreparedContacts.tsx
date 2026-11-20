@@ -1,4 +1,5 @@
 import { propEq } from "@avandar/utils";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getConsentTurnFromPermissionsAndFrame } from "./getConsentTurnFromPermissionsAndFrame";
 import { PreparedContact } from "./PreparedContact";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
@@ -11,6 +12,7 @@ export function PreparedContacts({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const held = input.plannedContacts.filter((contact) => {
     return input.permissions.find(propEq("id", contact.permissionId))
       ?.withdrawn;
@@ -28,6 +30,7 @@ export function PreparedContacts({
               frame,
               permissions: input.permissions,
               permissionId: contact.permissionId,
+              motion,
             })}
             frame={frame}
             labels={input.labels}

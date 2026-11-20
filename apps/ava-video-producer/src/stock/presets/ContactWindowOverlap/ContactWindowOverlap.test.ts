@@ -72,7 +72,7 @@ test("partial, containing and exact intersections have correct geometry while en
   const markup = _render({ frame: 150, input: input });
   const spans = Array.from(
     markup.matchAll(
-      /<rect data-overlap="true" data-overlap-person="([^"]*)" x="([^"]*)" y="([^"]*)" width="([^"]*)" height="20"/g,
+      /<rect\b[^>]*\bdata-overlap="true" data-overlap-person="([^"]*)" x="([^"]*)" y="([^"]*)" width="([^"]*)" height="20"/g,
     ),
   );
   assert.deepEqual(

@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import {
-  durationInFrames,
-  type Storyboard,
-} from "../../src/storyboard/schema/schema";
 import { buildProduct } from "../build-avandar.mjs";
-import { readPlan } from "../lib/planHelpers";
+import { readPlan } from "../lib/planHelpers/planHelpers";
 import { productRequirements } from "../lib/productRequirements/productRequirements";
 import { videoWorkspace } from "../lib/video-workspace.mjs";
 import { requireLicense } from "../require-license.mjs";
@@ -18,7 +14,6 @@ import { runPictureCommand } from "./runPictureCommand";
 import { scratchTts } from "./scratchTts/scratchTts";
 import { validate } from "./validate";
 import { HELP, ROOT } from "./video.constants";
-
 /** Dispatch local pipeline stages; source plans are never edited in place. */
 export async function main(argv = process.argv.slice(2)): Promise<void> {
   requireLicense();
@@ -54,7 +49,6 @@ export async function main(argv = process.argv.slice(2)): Promise<void> {
     console.log("Plan artifacts:", await exportPlan(plan, workspace));
   else await runPictureCommand({ options, plan, workspace });
 }
-
 if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url

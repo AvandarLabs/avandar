@@ -8,7 +8,7 @@ import {
 import path from "node:path";
 import { z } from "zod";
 import { buildAtlas } from "../buildAtlas/buildAtlas.mjs";
-import { assetReferences, publicAsset } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
 import { requireLicense } from "../require-license.mjs";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";

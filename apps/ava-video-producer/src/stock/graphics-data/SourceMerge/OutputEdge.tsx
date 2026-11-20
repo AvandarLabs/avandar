@@ -1,14 +1,13 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { Packet } from "../../graphics-common/Packet";
-import { useGraphicProps } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OUTPUT } from "./SourceMerge.constants";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ frame: number; accent: string; showPackets: boolean }>;
-
 /** The edge and packets from the merge node to the destination. */
 export function OutputEdge({ frame, accent, showPackets }: Props): ReactNode {
-  const style = useGraphicProps("SourceMerge", {});
+  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
   return (
     <>
       <DrawPath

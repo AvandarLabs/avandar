@@ -1,12 +1,11 @@
-import { STOCK } from "../../stockPalette";
 import type { SourceMergeInput } from "./SourceMerge.schema";
 
 /** Complete fictional example used only when input is omitted. */
 export const sourceMergeDefaultInput: SourceMergeInput = {
   sources: [
-    { name: "Records", kind: "CSV", color: STOCK.cyan },
-    { name: "Events", kind: "API", color: STOCK.mint },
-    { name: "Documents", kind: "TXT", color: STOCK.orange },
+    { name: "Records", kind: "CSV", color: "$color.accentAlt" },
+    { name: "Events", kind: "API", color: "$color.positive" },
+    { name: "Documents", kind: "TXT", color: "$color.highlight" },
   ],
   destination: { label: "One dataset", detail: "A shared structure" },
   showPackets: true,
@@ -20,7 +19,7 @@ export const sourceMergeDenseInput: SourceMergeInput = {
 /** A complete smaller or differently selected authored example. */
 export const sourceMergeChangedInput: SourceMergeInput = {
   ...sourceMergeDefaultInput,
-  sources: [{ name: "Intake", kind: "CSV", color: STOCK.cyan }],
+  sources: [{ name: "Intake", kind: "CSV", color: "$color.accentAlt" }],
   destination: { label: "Case view", detail: "Authored mapping" },
   showPackets: false,
 };

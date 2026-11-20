@@ -9,7 +9,7 @@
  * inside it, so the bar and the header must never sit inside a lasting
  * transform.
  */
-
-export { AppFrame, BAR, HEAD, BODY_Y } from "./AppFrame";
-export { Orb } from "./Orb";
-export { Cursor } from "./Cursor";
+export { AppFrame, BODY_Y } from "./AppFrame/AppFrame";
+export { AppFrameShared } from "./AppFrame/AppFrameShared/AppFrameShared";
+export { Orb } from "./Orb/Orb";
+export { Cursor } from "./Cursor/Cursor";

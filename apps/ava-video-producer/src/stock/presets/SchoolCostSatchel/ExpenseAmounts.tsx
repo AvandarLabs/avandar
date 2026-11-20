@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
@@ -18,6 +18,7 @@ export function ExpenseAmounts({
   accent,
   showShares,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <>
       <g>
@@ -38,7 +39,7 @@ export function ExpenseAmounts({
               y={453}
               width={88}
               height={6}
-              fill={STOCK.line}
+              fill={tokens.color.line}
             />
             <rect
               data-share-id={expense.id}

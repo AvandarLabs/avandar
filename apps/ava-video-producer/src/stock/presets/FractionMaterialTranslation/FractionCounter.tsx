@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -19,16 +20,22 @@ export function FractionCounter({
   selected,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <circle
+    <SketchedShape
+      shape={{
+        kind: "circle",
+        cx: mix(progress, -82 + (index % 4) * 54, centerX),
+        cy: mix(progress, index < 4 ? -36 : 36, 0),
+        r: 8,
+      }}
+      profile={tokens.sketch.shape}
       data-piece-owner={id}
       data-selected={selected}
-      cx={mix(progress, -82 + (index % 4) * 54, centerX)}
-      cy={mix(progress, index < 4 ? -36 : 36, 0)}
-      r={8}
-      fill={selected ? accent : STOCK.surface}
-      stroke={selected ? accent : STOCK.muted}
-      strokeWidth={2}
+      fill={selected ? accent : tokens.color.surface}
+      stroke={selected ? accent : tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
     />
   );
 }

@@ -6,32 +6,28 @@ import { Particle } from "../graphics-common/Particle";
 import { Rule } from "../graphics-common/Rule";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { PlexusFieldInput } from "../presets/PlexusField/PlexusField.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: PlexusFieldInput };
-
 const LOOP_FRAMES = 180;
 const HEADING_Y = 101;
 const RULE_Y = 529;
 const FOOTER_Y = 560;
 const TWINKLE_PHASE_STEP = 9;
-
 /** Draws the bounded authored plexus-field study at an explicit frame. */
 export function PlexusField({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("PlexusField", {});
-  const { color, layout } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("PlexusField", {});
+  const { color, layout, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const margin = layout.graphic.margin;
   const right = GRAPHIC_WIDTH - margin;
   const drift = motion.drift.distance;
@@ -64,17 +60,15 @@ export function PlexusField({
             return points.slice(i + 1).map((b, j) => {
               const distance = Math.hypot(a.x - b.x, a.y - b.y);
               return distance < style.linkDistance ? (
-                <line
+                <SketchedShape
                   key={`${i}-${j}`}
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
+                  shape={{ kind: "line", x1: a.x, y1: a.y, x2: b.x, y2: b.y }}
+                  profile={sketch.shape}
                   stroke={(i + j) % 4 === 0 ? color.accentAlt : accent}
                   opacity={
                     (1 - distance / style.linkDistance) * style.linkAlpha
                   }
-                  strokeWidth={style.linkWidth}
+                  strokeWidth={shapes.stroke(style.linkWidth)}
                 />
               ) : null;
             });

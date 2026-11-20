@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { FoodSymbol } from "./FoodSymbol";
+import { FoodSymbol } from "./FoodSymbol/FoodSymbol";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 

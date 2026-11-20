@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +11,8 @@ export function CarbonNetAccounting({
   retained,
   emissions,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-net={retained - emissions}>
       <FitText
@@ -22,11 +25,12 @@ export function CarbonNetAccounting({
         breakLongWords
         normalizeWhitespace
       />
-      <path
-        d="M535 490 V550 H925 V490"
+      <SketchedShape
+        shape={{ kind: "path", d: "M535 490 V550 H925 V490" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {[retained, emissions, retained - emissions].map((value, index) => {
         return (
@@ -43,10 +47,24 @@ export function CarbonNetAccounting({
           />
         );
       })}
-      <text x={658} y={515} fill={STOCK.text} fontSize={16}>
+      <text
+        x={658}
+        y={515}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         −
       </text>
-      <text x={793} y={515} fill={STOCK.text} fontSize={16}>
+      <text
+        x={793}
+        y={515}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         =
       </text>
       <FitText

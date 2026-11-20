@@ -1,5 +1,7 @@
-import { EASE, ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DimensionTicks } from "./DimensionTicks";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
 
@@ -12,26 +14,23 @@ export function StructureFootprint({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const placement = ramp(frame, 84, 24, EASE.inOut);
-  const x = 70 + (input.placement.centerX - input.structure.width / 2) * 4.8;
-  const y =
-    160 +
-    (input.placement.centerY - input.structure.height / 2) * 2.8 -
-    32 * (1 - placement);
-  const width = input.structure.width * 4.8;
-  const height = input.structure.height * 2.8;
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { x, y, width, height } = _getFootprintBox({ input, frame, motion });
   return (
-    <g opacity={ramp(frame, 78, 6)}>
-      <rect
+    <g opacity={motion.ramp(frame, 78, motion.chip, motion.reveal.easing)}>
+      <StockRect
         data-structure-footprint=""
         x={x}
         y={y}
         width={width}
         height={height}
         fill={accent}
-        fillOpacity={0.32}
+        fillOpacity={scales.wash(atomic.opacity["32"])}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {input.showDimensions ? (
         <DimensionTicks
@@ -45,4 +44,26 @@ export function StructureFootprint({
       ) : undefined}
     </g>
   );
+}
+/** The footprint's box, lowering into its authored place. */
+function _getFootprintBox({
+  input,
+  frame,
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>) {
+  const placement = motion.ramp(
+    frame,
+    84,
+    motion.scale(24),
+    motion.travel.easing,
+  );
+  return {
+    x: 70 + (input.placement.centerX - input.structure.width / 2) * 4.8,
+    y:
+      160 +
+      (input.placement.centerY - input.structure.height / 2) * 2.8 -
+      32 * (1 - placement),
+    width: input.structure.width * 4.8,
+    height: input.structure.height * 2.8,
+  };
 }

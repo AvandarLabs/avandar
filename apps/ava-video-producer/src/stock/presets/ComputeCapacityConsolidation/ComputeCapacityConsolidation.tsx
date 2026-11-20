@@ -1,6 +1,6 @@
 import { ComputeHeader } from "./ComputeHeader";
 import { ComputeSummary } from "./ComputeSummary";
-import { HostBay } from "./HostBay";
+import { HostBay } from "./HostBay/HostBay";
 import { WorkBlocks } from "./WorkBlocks";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ComputeCapacityConsolidation.schema";

@@ -1,5 +1,5 @@
 import { getValueAtPath } from "./getValueAtPath";
-import { isMantineTokenRoot } from "./tokenCatalog/tokenCatalogHelpers";
+import { isMantineTokenRoot } from "./tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import type { ResolvedVideoTheme } from "./videoTheme.types";
 
 /**

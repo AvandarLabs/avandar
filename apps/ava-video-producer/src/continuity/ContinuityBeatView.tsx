@@ -3,7 +3,7 @@ import { enter } from "../motion";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoProps } from "../videoTheme/useVideoTheme";
 import { ContinuityContent } from "./ContinuityContent";
-import css from "./ContinuityScene.module.css";
+import css from "./ContinuityScene/ContinuityScene.module.css";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
 import type { ReactNode } from "react";

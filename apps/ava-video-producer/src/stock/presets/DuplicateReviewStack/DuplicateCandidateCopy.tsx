@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
 import type { ReactNode } from "react";
@@ -18,6 +18,7 @@ export function DuplicateCandidateCopy({
   layout,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const { x, y, width, isRetained } = layout;
   return (
     <g>
@@ -37,7 +38,7 @@ export function DuplicateCandidateCopy({
           value={record.id}
           x={x + 12}
           y={y + 100}
-          color={isRetained ? accent : STOCK.muted}
+          color={isRetained ? accent : tokens.color.textMuted}
         />
       ) : undefined}
     </g>

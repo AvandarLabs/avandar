@@ -95,10 +95,10 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
     assert.match(hidden, /data-boundary/);
     assert.notEqual(
       _render({ frame: 24, input: input }).match(
-        /<path data-operator-arm[^>]*>/,
+        /<path\b[^>]*\bdata-operator-arm[^>]*>/,
       )?.[0],
       _render({ frame: 52, input: input }).match(
-        /<path data-operator-arm[^>]*>/,
+        /<path\b[^>]*\bdata-operator-arm[^>]*>/,
       )?.[0],
     );
     assert.equal(
@@ -158,7 +158,7 @@ test("minimum empty identifiers and maximum accepted collections stay schema-val
 });
 test("zero operating emissions have no physical ribbon width and the operator contacts the valve", () => {
   const markup = _render({ frame: 150, input: MINIMUM_INPUT });
-  const ribbon = markup.match(/<path data-operation-ribbon[^>]*>/);
+  const ribbon = markup.match(/<path\b[^>]*\bdata-operation-ribbon[^>]*>/);
   assert.ok(ribbon);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
@@ -168,8 +168,8 @@ test("zero operating emissions have no physical ribbon width and the operator co
     0,
   );
   const cue = _render({ frame: 54 });
-  const hand = cue.match(/<circle data-operator-hand[^>]*>/);
-  const valve = cue.match(/<circle data-transfer-valve[^>]*>/);
+  const hand = cue.match(/<circle\b[^>]*\bdata-operator-hand[^>]*>/);
+  const valve = cue.match(/<circle\b[^>]*\bdata-transfer-valve[^>]*>/);
   assert.ok(hand && valve);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }),
@@ -233,8 +233,8 @@ test("full finite signed equation values stay readable above the bracket and bes
 });
 test("physical separation starts after the operator cue and accounting follows the split", () => {
   const setup = _render({ frame: 24 });
-  const retained = setup.match(/<path data-retained-ribbon[^>]*>/);
-  const released = setup.match(/<path data-released-ribbon[^>]*>/);
+  const retained = setup.match(/<path\b[^>]*\bdata-retained-ribbon[^>]*>/);
+  const released = setup.match(/<path\b[^>]*\bdata-released-ribbon[^>]*>/);
   assert.ok(retained && released);
   assert.match(retained[0], /d="M260 360 V360 H260"/);
   assert.match(released[0], /d="M260 360 H260 V360"/);

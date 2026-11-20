@@ -5,12 +5,9 @@ import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Packet } from "../../graphics-common/Packet";
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PipelineStage } from "./PipelineStage/PipelineStage";
 import { STAGE_WIDTH } from "./PipelineStage/PipelineStage.constants";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -18,7 +15,6 @@ import type { DataPipelineInput } from "../../presets/DataPipeline/DataPipeline.
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: DataPipelineInput };
-
 const STAGE_SPACING = 220;
 const CONNECTOR_Y = 303;
 const PACKET_PHASE_STEP = 17;
@@ -27,23 +23,20 @@ const PROGRESS_FRAMES = 92;
 const HEADING_Y = 115;
 const TRACK_Y = 464;
 const FOOTER_Y = 506;
-
 /** Draws the bounded authored data-pipeline study at an explicit frame. */
 export function DataPipeline({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("DataPipeline", {});
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("DataPipeline", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const margin = tokens.layout.graphic.margin;
   const trackWidth = GRAPHIC_WIDTH - margin * 2;
   const stages = input.stages.map((stage, index) => {
-    return {
-      ...stage,
-      x: margin + index * STAGE_SPACING,
-    };
+    return { ...stage, x: margin + index * STAGE_SPACING };
   });
   const progress =
     ramp(
@@ -65,10 +58,14 @@ export function DataPipeline({
       {stages.slice(0, -1).map((stage, i) => {
         return (
           <g key={stage.label}>
-            <path
-              d={`M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`,
+              }}
+              profile={tokens.sketch.shape}
               stroke={tokens.color.line}
-              strokeWidth={tokens.stroke.default}
+              strokeWidth={shapes.stroke(tokens.stroke.default)}
             />
             <Packet
               frame={frame}
@@ -100,7 +97,7 @@ export function DataPipeline({
             y={TRACK_Y}
             width={trackWidth}
             height={style.trackHeight}
-            rx={style.trackHeight / 2}
+            rx={shapes.corner(style.trackHeight / 2)}
             fill={tokens.color.line}
           />
           <StockRect
@@ -108,7 +105,7 @@ export function DataPipeline({
             y={TRACK_Y}
             width={trackWidth * Math.min(1, progress / stages.length)}
             height={style.trackHeight}
-            rx={style.trackHeight / 2}
+            rx={shapes.corner(style.trackHeight / 2)}
             fill={accent}
           />
         </>

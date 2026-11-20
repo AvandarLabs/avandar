@@ -1,19 +1,31 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AttributionCollaborator } from "./AttributionCollaborator";
+import { STAMP_CORNER } from "./attributionShape";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
+/** Frames the shared stamp takes to drop away as accounts separate. */
+const SEPARATION_FRAMES = 34;
 /** Supplied collaborators, the retired shared stamp and distinct new stamps. */
 export function AttributionActors({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const separation = ramp(frame, 61, 34, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const separation = ramp(
+    frame,
+    61,
+    motion.scale(SEPARATION_FRAMES),
+    motion.travel.easing,
+  );
   const shared = input.accounts.find(propEq("id", input.sharedAccountId))!;
   return (
     <g>
@@ -33,12 +45,12 @@ export function AttributionActors({
         data-shared-stamp="true"
         transform={`translate(300 ${mix(separation, 245, 490)})`}
       >
-        <rect
+        <StockRect
           width={215}
           height={60}
-          rx={6}
-          fill={STOCK.surface}
-          stroke={STOCK.muted}
+          rx={scales.corner(STAMP_CORNER)}
+          fill={tokens.color.surface}
+          stroke={tokens.color.inactive}
         />
         <LabelSlots labels={[[shared.label, 12, 22, 190, 12, 3]]} />
       </g>

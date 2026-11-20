@@ -1,5 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SeedPortion } from "./SeedPortion";
+import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { ReactNode } from "react";
 
@@ -10,7 +11,12 @@ type Props = {
 };
 type Destination = "current" | "remaining" | "sown" | "loss";
 type Portion = [Destination, { x: number; y: number }, number, string];
-function _getPortions({ scene, frame, accent }: Readonly<Props>): Portion[] {
+function _getPortions({
+  scene,
+  frame,
+  accent,
+  tokens,
+}: Readonly<Props & { tokens: ResolvedVideoSemantic }>): Portion[] {
   const {
     scale,
     current,
@@ -36,9 +42,14 @@ function _getPortions({ scene, frame, accent }: Readonly<Props>): Portion[] {
     ? [["current", { x: 58, y: 385 }, 180, accent]]
     : [
         ["current", { x: 58, y: 385 }, current * scale, accent],
-        ["remaining", reservePosition, remaining * scale, STOCK.mint],
-        ["sown", sownPoint, sown * scale, STOCK.cyan],
-        ["loss", lossPoint, loss * scale, STOCK.orange],
+        [
+          "remaining",
+          reservePosition,
+          remaining * scale,
+          tokens.color.positive,
+        ],
+        ["sown", sownPoint, sown * scale, tokens.color.accentAlt],
+        ["loss", lossPoint, loss * scale, tokens.color.highlight],
       ];
 }
 /**
@@ -49,9 +60,10 @@ export function SeedMaterial({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
-      {_getPortions({ scene, frame, accent }).map(
+      {_getPortions({ scene, frame, accent, tokens }).map(
         ([destination, position, width, color]) => {
           return (
             <SeedPortion

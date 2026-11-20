@@ -48,8 +48,10 @@ export function registerMarketActionAssertions(
         },
       ).forEach((frame) => {
         const markup = render({ frame: frame, input: input });
-        const arm = markup.match(/<path data-market-arm[^>]*d="([^"]+)"/);
-        const hand = markup.match(/<circle data-market-hand[^>]*>/);
+        const arm = markup.match(
+          /<path\b(?=[^>]*\bdata-market-arm)[^>]*\sd="([^"]+)"/,
+        );
+        const hand = markup.match(/<circle\b[^>]*\bdata-market-hand[^>]*>/);
         assert.ok(arm && hand);
         _assertArmClearance(arm[1]);
         const moving = [

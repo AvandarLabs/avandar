@@ -1,9 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { assetReferences, publicAsset } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
 import { ROOT } from "./video.constants";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
-
 /** Preview only explicitly referenced assets, never the repository root. */
 export async function stageAssets(
   plan: Storyboard,

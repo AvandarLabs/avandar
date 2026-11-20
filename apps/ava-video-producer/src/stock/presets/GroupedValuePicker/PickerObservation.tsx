@@ -1,12 +1,15 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; index: number; frame: number; accent: string };
+/** Frames each source tile takes to fade in. */
+const TILE_FRAMES = 30;
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",
 });
@@ -19,13 +22,21 @@ export function PickerObservation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const observation = input.observations[index],
     x = 48 + index * 144;
   const selected = input.rule === "first" && index === 0 && frame >= 56;
   return (
     <g
       data-picker-observation={observation.id}
-      opacity={ramp(frame, 13 + index * 2, 30)}
+      opacity={ramp(
+        frame,
+        13 + index * motion.stagger.list,
+        motion.scale(TILE_FRAMES),
+        motion.reveal.easing,
+      )}
     >
       <StockRect
         data-observation-tile={observation.id}
@@ -33,9 +44,11 @@ export function PickerObservation({
         y={160}
         width={144}
         height={132}
-        fill={STOCK.surface}
-        stroke={selected ? accent : STOCK.line}
-        strokeWidth={selected ? 3 : 1}
+        fill={tokens.color.surface}
+        stroke={selected ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
+          selected ? tokens.stroke.emphasis : tokens.stroke.hairline,
+        )}
       />
       {Array.from(GRAPHEMES.segment(observation.id), ({ segment }) => {
         return segment;
@@ -72,10 +85,14 @@ export function PickerObservation({
           ],
         ]}
       />
-      <path
-        d={`M${x + 12} 315 H${x + 132} m-7 -5 l7 5 l-7 5`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 12} 315 H${x + 132} m-7 -5 l7 5 l-7 5`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
     </g>
   );

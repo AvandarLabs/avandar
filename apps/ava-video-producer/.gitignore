@@ -18,6 +18,7 @@ scripts/beats/athana-launch.txt
 .env.*
 *.log
 .temp/
+*.tsbuildinfo
 .playwright-mcp/
 playwright-report/
 test-results/

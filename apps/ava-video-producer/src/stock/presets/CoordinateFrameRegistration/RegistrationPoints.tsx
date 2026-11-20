@@ -1,5 +1,7 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
-import { RegistrationReferences } from "./RegistrationReferences";
+import { RegistrationReferences } from "./RegistrationReferences/RegistrationReferences";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
 
@@ -12,23 +14,36 @@ export function RegistrationPoints({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const points = makeRegisteredLandmarksFromInputAndFrame({ input, frame });
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const points = makeRegisteredLandmarksFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       <RegistrationReferences input={input} frame={frame} />
       {points.map((point) => {
         return (
-          <circle
+          <SketchedShape
             key={point.id}
             data-landmark={point.id}
             data-target-x={point.targetX}
             data-target-y={point.targetY}
-            cx={point.canvasX}
-            cy={point.canvasY}
-            r={5}
+            shape={{
+              kind: "circle",
+              cx: point.canvasX,
+              cy: point.canvasY,
+              r: 5,
+            }}
+            profile={sketch.shape}
             fill={accent}
-            fillOpacity={0.6}
+            fillOpacity={atomic.opacity["60"]}
             stroke={accent}
+            strokeWidth={shapes.stroke(stroke.hairline)}
           />
         );
       })}

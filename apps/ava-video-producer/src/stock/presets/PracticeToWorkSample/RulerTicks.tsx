@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
@@ -9,13 +10,19 @@ export function RulerTicks({
   origin,
   rulerY,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return Array.from({ length: input.task.value + 1 }, (_, index) => {
     return (
-      <path
-        key={index}
-        d={`M${origin + index * 12} ${rulerY + 6} v7`}
-        stroke={STOCK.orange}
-      />
+      <g key={index}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${origin + index * 12} ${rulerY + 6} v7`,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.highlight}
+        />
+      </g>
     );
   });
 }

@@ -9,8 +9,8 @@ import {
   timestamp,
   publicAsset,
   assetReferences,
-  previewFrames,
-} from "../scripts/lib/planHelpers";
+} from "../scripts/lib/planHelpers/planHelpers";
+import { previewFrames } from "../scripts/lib/planHelpers/previewFrames";
 import {
   storyboardSchema,
   timeline,

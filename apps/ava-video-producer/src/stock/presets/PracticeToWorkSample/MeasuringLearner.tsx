@@ -1,7 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MeasuringTools } from "./MeasuringTools";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
@@ -14,14 +16,12 @@ export function MeasuringLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transfer = ramp(frame, 56, 22, EASE.inOut);
-  const x = mix(transfer, 330, 550);
-  const isApplication = frame >= 78;
-  const at = isApplication ? 82 : 24;
-  const rulerY = mix(ramp(frame, at, 8, EASE.inOut), 275, 330);
-  const origin = isApplication ? 620 : 400;
-  const progress = ramp(frame, at + 8, 18, EASE.inOut);
-  const pencilX = origin + input.task.value * 12 * progress;
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { x, isApplication, rulerY, origin, pencilX } = _getMeasuringPose({
+    input,
+    frame,
+    motion,
+  });
   const isMeasuring =
     (frame >= 24 && frame <= 54) || (frame >= 82 && frame <= 112);
   return (
@@ -50,4 +50,40 @@ export function MeasuringLearner({
       />
     </g>
   );
+}
+/**
+ * The learner moves from practice to application; at each, the ruler lowers
+ * and the pencil marks the measured length from the ruler's origin.
+ */
+function _getMeasuringPose({
+  input,
+  frame,
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>) {
+  const transfer = motion.ramp(
+    frame,
+    56,
+    motion.scale(22),
+    motion.travel.easing,
+  );
+  const isApplication = frame >= 78;
+  const at = isApplication ? 82 : 24;
+  const origin = isApplication ? 620 : 400;
+  const progress = motion.ramp(
+    frame,
+    at + 8,
+    motion.hero,
+    motion.travel.easing,
+  );
+  return {
+    x: mix(transfer, 330, 550),
+    isApplication,
+    rulerY: mix(
+      motion.ramp(frame, at, motion.whip, motion.travel.easing),
+      275,
+      330,
+    ),
+    origin,
+    pencilX: origin + input.task.value * 12 * progress,
+  };
 }

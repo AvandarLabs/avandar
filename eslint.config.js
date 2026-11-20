@@ -14,6 +14,8 @@ import tseslint from "typescript-eslint";
 import { denoRestrictions } from "./eslint/deno-restrictions.js";
 import { packageRestrictions } from "./eslint/package-restrictions.js";
 import { privacyChokepoint } from "./eslint/privacy-chokepoint.js";
+import { videoProducerFunctionLength } from "./eslint/video-producer-function-length.js";
+import { videoThemeRestrictions } from "./eslint/video-theme-restrictions.js";
 
 export default [
   {
@@ -39,6 +41,8 @@ export default [
       // bundles here. Gitignored, but still linted, so `pnpm lint` failed with
       // thousands of errors on any machine that had run the e2e suite.
       "playwright-report/**",
+      // Browser automation scratch files are generated, Git-ignored output.
+      ".playwright-mcp/**",
       // Lingui-compiled catalogs, each generated from the `messages.po` beside
       // it.
       "**/locales/**/messages.ts",
@@ -276,6 +280,10 @@ export default [
   },
 
   ...privacyChokepoint,
+  // Video producer renderers read every style value from the video theme.
+  ...videoThemeRestrictions,
+  // Video producer renderers keep functions at 45 lines, with a ratchet.
+  ...videoProducerFunctionLength,
   {
     // Plain JavaScript has no syntax for parameter or return types, so the
     // rule cannot be satisfied there. Such files carry their types in a

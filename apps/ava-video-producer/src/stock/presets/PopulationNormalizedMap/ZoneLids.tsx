@@ -1,5 +1,4 @@
-import { EASE, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ZoneLid } from "./ZoneLid";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
@@ -9,10 +8,13 @@ type Props = { input: Input; frame: number; accent: string };
  * Count shades lift and settle as population-normalized shades on stable zones.
  */
 export function ZoneLids({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const lift =
     32 *
-    ramp(frame, 36, 36, EASE.inOut) *
-    (1 - ramp(frame, 72, 36, EASE.inOut));
+    motion.ramp(frame, 36, motion.scale(36), motion.travel.easing) *
+    (1 - motion.ramp(frame, 72, motion.scale(36), motion.travel.easing));
   return (
     <g>
       <rect
@@ -20,8 +22,8 @@ export function ZoneLids({ input, frame, accent }: Readonly<Props>): ReactNode {
         y={155}
         width={530}
         height={305}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
       />
       {input.zones.map((zone, index) => {
         return (

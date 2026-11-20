@@ -1,9 +1,8 @@
-import { PaymentQuantity } from "./PaymentQuantity";
+import { PaymentQuantity } from "./PaymentQuantity/PaymentQuantity";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
 /** Inputs for PaymentLegend. */
 type Props = { input: Input; accent: string };
-
 /** Pattern and total keys name the actual quantities without merging them. */
 export function PaymentLegend({ input, accent }: Readonly<Props>): ReactNode {
   const totals = input.payments.reduce(

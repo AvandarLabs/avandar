@@ -1,28 +1,25 @@
 import { Card } from "../../../graphics-common/Card";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { wrapTextToLines } from "../../../primitives/FitText/wrapTextToLines";
-import { useGraphicTokens } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 const SUMMARY_TOP = 44;
 const CARD_WIDTH = 376;
 const CARD_FONT_SIZE = 12;
 const CARD_MAX_LINES = 4;
-
 /** The Card component values the summary layout depends on. */
 export type RouteSummaryCardMetrics = Readonly<{
   padding: number;
   baseHeight: number;
   textBaseline: number;
 }>;
-
 type Props = Readonly<{
   label: string;
   accent: string;
   right: number;
   card: RouteSummaryCardMetrics;
 }>;
-
 /**
  * A long authored summary wrapped onto a few lines inside a card. The card
  * values come from the caller, which reads them on every render.
@@ -33,7 +30,7 @@ export function RouteSummaryCard({
   right,
   card,
 }: Props): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const innerWidth = CARD_WIDTH - card.padding * 2;
   const lines = wrapTextToLines({
     text: label,

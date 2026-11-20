@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BookingTab } from "./BookingTab";
 import { CaseHome } from "./CaseHome";
 import { ContactAttempt } from "./ContactAttempt";
@@ -20,12 +20,13 @@ export function ReconnectCase({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 160 + index * 48;
   return (
     <g
       data-case={item.id}
       data-outcome={item.outcome}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
       <CaseHome item={item} y={y} />
       <ReturningPerson

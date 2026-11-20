@@ -18,13 +18,15 @@ function _render({
   frame,
   input = defaultInput,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(SchoolTransitionRehearsal, {
-      frame,
-      input,
-      accent: "#67e8c2",
-      id: "packet20",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(SchoolTransitionRehearsal, {
+        frame,
+        input,
+        accent: "#67e8c2",
+        id: "packet20",
+      }),
+    ),
   );
 }
 
@@ -83,6 +85,19 @@ test("learner opens the locker before approaching the classroom with chosen supp
 
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { schoolTransitionRehearsalContract as contract } from "./SchoolTransitionRehearsal.contract";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 function _visible({
   input,

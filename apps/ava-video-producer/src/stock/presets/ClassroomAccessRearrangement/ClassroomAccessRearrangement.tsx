@@ -1,4 +1,4 @@
-import { ClassroomFurniture } from "./ClassroomFurniture";
+import { ClassroomFurniture } from "./ClassroomFurniture/ClassroomFurniture";
 import { ClassroomLabels } from "./ClassroomLabels";
 import { ClassroomLearner } from "./ClassroomLearner";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -6,7 +6,6 @@ import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomAccessRearrangement. */
 type Props = GraphicProps & { input: Input };
-
 /** The same learners join one activity after selected furniture adaptations. */
 export function ClassroomAccessRearrangement({
   frame,

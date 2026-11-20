@@ -59,7 +59,7 @@ registerStockPresetAssertions({
 });
 test("the focal citation names only the selected source's exact passage and optional locator", () => {
   fixtures.forEach(({ input }) => {
-    const markup = _render({ frame: 150, input: input }),
+    const markup = _render({ frame: 150, input }),
       selected = input.sources.find(propEq("id", input.selectedSourceId))!;
     const citation = SvgAttributes.fromMarker({
       markup,
@@ -81,14 +81,14 @@ test("the focal citation names only the selected source's exact passage and opti
     });
     assert.notEqual(
       SvgAttributes.fromMarker({
-        markup: _render({ frame: 36, input: input }),
+        markup: _render({ frame: 36, input }),
         marker: "summary-strip",
       }),
       SvgAttributes.fromMarker({ markup, marker: "summary-strip" }),
     );
     assert.notEqual(
       SvgAttributes.fromMarker({
-        markup: _render({ frame: 72, input: input }),
+        markup: _render({ frame: 72, input }),
         marker: "summary-strip",
       }),
       SvgAttributes.fromMarker({ markup, marker: "summary-strip" }),
@@ -124,7 +124,7 @@ test("both arrangements keep actual paragraph baselines within their upright sou
       }),
     };
     [18, 72, 104, 150].forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const blocks = [
         ...markup.matchAll(
           /data-copy-block="[^"]*" data-bottom="([^"]*)"[^>]*>([\s\S]*?)<\/g>/g,

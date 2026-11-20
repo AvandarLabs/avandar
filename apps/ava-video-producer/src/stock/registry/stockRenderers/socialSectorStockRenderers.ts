@@ -63,7 +63,6 @@ import { TravelTimeNetworkFrontier } from "../../presets/TravelTimeNetworkFronti
 import { VaccinationSessionBalance } from "../../presets/VaccinationSessionBalance/VaccinationSessionBalance";
 import { VoluntaryFamilyReunion } from "../../presets/VoluntaryFamilyReunion/VoluntaryFamilyReunion";
 import { makeStockRendererFromComponent } from "./makeStockRendererFromComponent";
-
 /** Explicit registrations for social-sector catalog additions. */
 export const socialSectorStockRenderers = {
   "cold-chain-custody": makeStockRendererFromComponent({

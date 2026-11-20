@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
@@ -17,18 +18,20 @@ export function RetainedRecord({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const y = 153 + index * 48;
   const category = input.categories.find(propEq("id", record.categoryId))!;
   return (
     <g data-source-record={record.id} data-source-category={record.categoryId}>
-      <rect
+      <StockRect
         x={45}
         y={y}
         width={420}
         height={47}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(5)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <circle cx={53} cy={y + 14} r={3} fill={accent} />
       {input.showRecordIds ? (

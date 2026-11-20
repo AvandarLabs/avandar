@@ -1,5 +1,5 @@
-import { EASE, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapacitySlots } from "./CapacitySlots";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
@@ -13,9 +13,14 @@ export function CapacityTray({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { currentAllowance, expandedAllowance } = input.allowances;
   const extension =
-    input.choice.decision === "expand" ? ramp(frame, 81, 25, EASE.inOut) : 0;
+    input.choice.decision === "expand"
+      ? motion.ramp(frame, 81, motion.scale(25), motion.travel.easing)
+      : 0;
   const width =
     20 +
     86 *
@@ -24,18 +29,23 @@ export function CapacityTray({
   const hinge = 80 + 20 + 86 * currentAllowance.limit;
   return (
     <g>
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M80 220 H${80 + width} V390 H80 Z` }}
+        profile={tokens.sketch.shape}
         data-capacity-tray=""
-        d={`M80 220 H${80 + width} V390 H80 Z`}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${hinge} 390 L${hinge + 86 * (expandedAllowance.limit - currentAllowance.limit) * extension} ${390 - 170 * (1 - extension)}`,
+        }}
+        profile={tokens.sketch.shape}
         data-tray-hinge=""
-        d={`M${hinge} 390 L${hinge + 86 * (expandedAllowance.limit - currentAllowance.limit) * extension} ${390 - 170 * (1 - extension)}`}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <CapacitySlots {...{ input, width, extension, accent }} />
     </g>

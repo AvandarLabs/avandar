@@ -59,3 +59,21 @@ test("frames of different sizes are rejected", () => {
     });
   });
 });
+
+test("a region with a channel tolerance allows only changes within it", () => {
+  const nudged = _frame();
+  nudged[4] = 254;
+  const moved = _frame();
+  moved[4] = 250;
+  const region = { x: 0, y: 0, width: 2, height: 1, maxChannelDelta: 1 };
+  const compare = (current: Uint8Array) => {
+    return compareRgbaFrames({
+      reference: _frame(),
+      current,
+      width: 2,
+      height: 1,
+      allowedRegions: [region],
+    }).unexplainedPixels;
+  };
+  assert.deepEqual([compare(nudged), compare(moved)], [0, 1]);
+});

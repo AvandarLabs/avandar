@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { AssignmentRows } from "./AssignmentRows";
-import { DistrictLabels } from "./DistrictLabels";
+import { DistrictLabels } from "./DistrictLabels/DistrictLabels";
 import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";

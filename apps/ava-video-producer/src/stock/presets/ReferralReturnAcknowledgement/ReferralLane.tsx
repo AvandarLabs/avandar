@@ -1,7 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
 
@@ -23,13 +25,30 @@ export function ReferralLane({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const travel = referral.attended
-    ? ramp(frame, 41 + index * 2, 36, EASE.inOut)
+    ? motion.ramp(
+        frame,
+        41 + index * motion.stagger.list,
+        motion.scale(36),
+        motion.travel.easing,
+      )
     : 0;
   const x = mix(travel, 180, 650);
   const y = 162 + index * (input.showLedger ? 58 : 72);
   const returned = referral.acknowledged && frame >= 82 + index * 2;
-  const receiptX = mix(ramp(frame, 82 + index * 2, 23, EASE.inOut), 616, 228);
+  const receiptX = mix(
+    motion.ramp(
+      frame,
+      82 + index * motion.stagger.list,
+      motion.scale(23),
+      motion.travel.easing,
+    ),
+    616,
+    228,
+  );
   const state =
     returned && frame >= 105 + index * 2
       ? "closed"
@@ -37,17 +56,32 @@ export function ReferralLane({
         ? "attendedOpen"
         : "waiting";
   return (
-    <g opacity={ramp(frame, 12 + index * 2, 14)}>
-      <path
-        d={`M90 ${y + (input.showLedger ? 30 : 44)} H880`}
-        stroke={STOCK.line}
+    <g
+      opacity={motion.ramp(
+        frame,
+        12 + index * motion.stagger.list,
+        motion.scale(14),
+        motion.reveal.easing,
+      )}
+    >
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M90 ${y + (input.showLedger ? 30 : 44)} H880`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
       />
       <g data-person-id={referral.id} data-x={x} data-state={state}>
         <PersonGlyph
           x={x}
           y={y}
           size={32}
-          color={input.emphasis === "person-journey" ? accent : STOCK.cyan}
+          color={
+            input.emphasis === "person-journey"
+              ? accent
+              : tokens.color.accentAlt
+          }
           posture={travel > 0 && travel < 1 ? "walking" : "standing"}
         />
         <FitText
@@ -61,15 +95,15 @@ export function ReferralLane({
           normalizeWhitespace
         />
       </g>
-      <rect
+      <StockRect
         data-referral-slip={referral.id}
         x={x - 32}
         y={y - 13}
         width={17}
         height={24}
-        rx={2}
-        fill={STOCK.surface}
-        stroke={STOCK.cyan}
+        rx={scales.corner(2)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.accentAlt}
       />
       {returned ? (
         <rect
@@ -78,8 +112,12 @@ export function ReferralLane({
           y={y + 4}
           width={25}
           height={16}
-          rx={2}
-          fill={input.emphasis === "return-message" ? accent : STOCK.cyan}
+          rx={scales.corner(2)}
+          fill={
+            input.emphasis === "return-message"
+              ? accent
+              : tokens.color.accentAlt
+          }
         />
       ) : undefined}
       {input.showLedger ? (
@@ -91,8 +129,8 @@ export function ReferralLane({
             state === "closed"
               ? accent
               : state === "attendedOpen"
-                ? STOCK.orange
-                : STOCK.muted
+                ? tokens.color.highlight
+                : tokens.color.inactive
           }
         />
       ) : (
@@ -105,7 +143,7 @@ export function ReferralLane({
           maxLines={4}
           breakLongWords
           normalizeWhitespace
-          color={state === "closed" ? accent : STOCK.muted}
+          color={state === "closed" ? accent : tokens.color.textMuted}
         />
       )}
     </g>

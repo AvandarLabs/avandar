@@ -1,50 +1,129 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
+type GetHorseshoeFrontPositionOptions = {
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+  input: Position;
+};
+type GetHorseshoeBackPositionOptions = {
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+  input: Position;
+};
 type Props = { input: Input; index: number; frame: number; accent: string };
 function _getPosition({
   input,
   index,
   frame,
-}: Readonly<Omit<Props, "accent">>): { x: number; y: number } {
-  const column = index % 3;
-  let x = 110 + index * 90;
-  let y = index < 3 ? mix(ramp(frame, 36, 24, EASE.inOut), 250, 225) : 250;
-  if (index < 3) {
-    const progress = ramp(frame, 88, 8, EASE.inOut);
-    x = mix(progress, x, 210 + column * 170);
-    y = mix(progress, y, 280);
-  } else {
-    const lane = [210, 550, 600][column];
-    x = mix(ramp(frame, 80, 4, EASE.inOut), x, lane);
-    x = mix(ramp(frame, 90, 6, EASE.inOut), x, 210 + column * 170);
-    y = mix(ramp(frame, 76, 4, EASE.inOut), 250, 285);
-    y = mix(ramp(frame, 84, 6, EASE.inOut), y, 450);
+  motion,
+}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): Position {
+  const position =
+    index < 3
+      ? _getSeatedPosition({ index, frame, motion })
+      : _getEnteringPosition({ index, frame, motion });
+  if (input.resolvedLayout !== "open-horseshoe") {
+    return position;
   }
-  if (input.resolvedLayout === "open-horseshoe") {
-    if (index === 0) {
-      x = mix(ramp(frame, 96, 4, EASE.inOut), x, 200);
-      x = mix(ramp(frame, 104, 4, EASE.inOut), x, 210);
-    }
-    if (index === 1) {
-      x = mix(ramp(frame, 96, 4, EASE.inOut), x, 250);
-      y = mix(ramp(frame, 100, 4, EASE.inOut), y, 365);
-      x = mix(ramp(frame, 104, 4, EASE.inOut), x, 210);
-    }
-    if (index === 3) {
-      x = mix(ramp(frame, 96, 12, EASE.inOut), x, 290);
-    }
-    if (index === 4) {
-      x = mix(ramp(frame, 96, 12, EASE.inOut), x, 470);
-    }
-    if (index === 5) {
-      y = mix(ramp(frame, 96, 12, EASE.inOut), y, 365);
-    }
+  return index < 3
+    ? _getHorseshoeFrontPosition({ index, frame, motion, input: position })
+    : _getHorseshoeBackPosition({ index, frame, motion, input: position });
+}
+type Position = { x: number; y: number };
+/** The first three learners rise from their desks, then move to a column. */
+function _getSeatedPosition({
+  index,
+  frame,
+  motion,
+}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
+  const column = index % 3;
+  const y = mix(
+    motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
+    250,
+    225,
+  );
+  const progress = motion.ramp(frame, 88, motion.whip, motion.travel.easing);
+  return {
+    x: mix(progress, 110 + index * 90, 210 + column * 170),
+    y: mix(progress, y, 280),
+  };
+}
+/** The other learners step into a lane, then walk down to their column. */
+function _getEnteringPosition({
+  index,
+  frame,
+  motion,
+}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
+  const column = index % 3;
+  const lane = [210, 550, 600][column];
+  let x = mix(
+    motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
+    110 + index * 90,
+    lane,
+  );
+  x = mix(
+    motion.ramp(frame, 90, motion.chip, motion.travel.easing),
+    x,
+    210 + column * 170,
+  );
+  const y = mix(
+    motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
+    250,
+    285,
+  );
+  return {
+    x,
+    y: mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450),
+  };
+}
+/** In the open horseshoe, the first two learners step around the table. */
+function _getHorseshoeFrontPosition({
+  index,
+  frame,
+  motion,
+  input: { x, y },
+}: Readonly<GetHorseshoeFrontPositionOptions>): Position {
+  const step = (at: number) => {
+    return motion.ramp(frame, at, motion.press.duration, motion.travel.easing);
+  };
+  if (index === 0) {
+    return { x: mix(step(104), mix(step(96), x, 200), 210), y };
+  }
+  if (index === 1) {
+    return {
+      x: mix(step(104), mix(step(96), x, 250), 210),
+      y: mix(step(100), y, 365),
+    };
   }
   return { x, y };
+}
+/** In the open horseshoe, three of the back learners close the curve. */
+function _getHorseshoeBackPosition({
+  index,
+  frame,
+  motion,
+  input: { x, y },
+}: Readonly<GetHorseshoeBackPositionOptions>): Position {
+  const progress = motion.ramp(
+    frame,
+    96,
+    motion.scale(12),
+    motion.travel.easing,
+  );
+  if (index === 3) {
+    return { x: mix(progress, x, 290), y };
+  }
+  if (index === 4) {
+    return { x: mix(progress, x, 470), y };
+  }
+  return index === 5 ? { x, y: mix(progress, y, 365) } : { x, y };
 }
 /** Stable walking or wheeled icons enter the same shared activity footprint. */
 export function ClassroomLearner({
@@ -53,8 +132,11 @@ export function ClassroomLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const learner = input.learners[index];
-  const { x, y } = _getPosition({ input, index, frame });
+  const { x, y } = _getPosition({ input, index, frame, motion });
   return (
     <g
       data-classroom-learner={learner.id}
@@ -64,7 +146,11 @@ export function ClassroomLearner({
       {learner.movementIcon === "walking" ? (
         <PersonGlyph x={0} y={0} size={36} color={accent} />
       ) : (
-        <g stroke={accent} strokeWidth={2} fill="none">
+        <g
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+          fill="none"
+        >
           <circle cx={0} cy={-15} r={6} />
           <path d="M0 -8 V7 H12 L17 20 M0 0 H10" />
           <circle cx={-3} cy={13} r={11} />

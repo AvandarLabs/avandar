@@ -7,33 +7,28 @@ export {
   getCameraPose,
   isCameraMoving,
   retimeCameraTrack,
-} from "./cameraTrack";
-export type { CameraKeyframe, CameraPose } from "./cameraTrack";
+} from "./cameraTrack/cameraTrack";
+export type { CameraKeyframe, CameraPose } from "./cameraTrack/cameraTrack";
 export { AnchoredOverlay } from "./AnchoredOverlay";
 export { getOverlayPose } from "./getOverlayPose";
 export { getOverlayTimings } from "./getOverlayTimings";
 export type { MotionRect, OverlayCue } from "./getOverlayTimings";
 export { SvgObjectDeparture } from "./SvgObjectDeparture";
-export { getObjectFlight } from "./getObjectFlight";
-export type { ObjectFlight } from "./getObjectFlight";
+export { getObjectFlight } from "./getObjectFlight/getObjectFlight";
+export type { ObjectFlight } from "./getObjectFlight/getObjectFlight";
 export { SharedElement } from "./SharedElement";
+export type { SharedElementProps } from "./SharedElement";
 export { HorizontalBlurFilter } from "./HorizontalBlur";
 export { getHorizontalBlurFilter } from "./getHorizontalBlurFilter/getHorizontalBlurFilter";
-export type { SharedElementProps } from "./SharedElement";
 export { SceneTransition } from "./SceneTransition";
-export { createSceneTransition } from "./createSceneTransition";
+export { makeSceneTransitionSpecFromProps } from "./makeSceneTransitionSpecFromProps";
 export { getSceneTransitionStyle } from "./getSceneTransitionStyle";
 export type {
   SceneTransitionKind,
   SceneTransitionProps,
 } from "./getSceneTransitionStyle";
-export {
-  MOTION_PRESETS,
-  motionOptionsSchema,
-  motionEasingSchema,
-  resolveMotionSettings,
-  getMotionDuration,
-  getMotionProgress,
-  getMotionEasing,
-} from "./motionSettings";
-export type { MotionOptions, MotionEasing } from "./motionSettings";
+export { MotionSettings } from "./MotionSettings/MotionSettings";
+export type {
+  MotionOptions,
+  MotionEasing,
+} from "./MotionSettings/MotionSettings";

@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyObjectShape } from "./CustodyObjectShape";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
@@ -27,6 +27,7 @@ export function CustodyObject({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const label = {
     text: input.object.label,
     x: 480,
@@ -38,9 +39,8 @@ export function CustodyObject({
     breakLongWords: true,
     normalizeWhitespace: true,
   };
-
   return (
-    <g data-object-shape={input.objectShape} opacity={ramp(frame, 14, 12)}>
+    <g data-object-shape={input.objectShape} opacity={motion.reveal(frame, 14)}>
       <CustodyObjectShape shape={input.objectShape} accent={accent} />
       {input.showLabels ? (
         <g>

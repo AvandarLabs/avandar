@@ -1,18 +1,25 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
-import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import {
+  getSentenceGlyphsFromInput,
+  SENTENCE_FONT_SIZE,
+} from "./getSentenceGlyphsFromInput";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-const PATTERNS: Record<string, string> = {
+/**
+ * Each span role keeps its own guide dash. The qualifier reads the theme's
+ * dotted step; the other patterns encode their role and have no step.
+ */
+const PATTERNS: Record<string, string | undefined> = {
   subject: "1 0",
   metric: "5 2",
   value: "1 2",
   unit: "8 3",
   period: "3 2 1 2",
-  qualifier: "2 4",
+  qualifier: undefined,
 };
 /** Original sentence stays intact while exact authored spans gain guides. */
 export function SentenceSpans({
@@ -20,6 +27,9 @@ export function SentenceSpans({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   let offset = 0;
   const spans = input.fragments.map((fragment) => {
     const start = offset + fragment.contentStart,
@@ -42,19 +52,31 @@ export function SentenceSpans({
             <text
               x={glyph.x}
               y={glyph.y}
-              fontSize={16}
-              fontFamily="Arial, sans-serif"
-              fill={STOCK.text}
+              fontSize={SENTENCE_FONT_SIZE}
+              fontFamily={tokens.text.graphic.secondary.fontFamily}
+              fontWeight={tokens.text.graphic.secondary.fontWeight}
+              fill={tokens.color.text}
             >
               {glyph.text}
             </text>
             {input.showSourceSpans && spanIndex >= 0 ? (
-              <path
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${glyph.x} ${glyph.y + 6} h${Math.max(2, glyph.width)}`,
+                }}
+                profile={tokens.sketch.shape}
                 data-source-span={spans[spanIndex].role}
-                d={`M${glyph.x} ${glyph.y + 6} h${Math.max(2, glyph.width)}`}
                 stroke={accent}
-                strokeDasharray={PATTERNS[spans[spanIndex].role]}
-                opacity={ramp(frame, 13 + spanIndex * 3, 18)}
+                strokeDasharray={
+                  PATTERNS[spans[spanIndex].role] ??
+                  atomic.dash.dotted.join(" ")
+                }
+                opacity={motion.ramp(
+                  frame,
+                  13 + spanIndex * motion.scaleStagger(3),
+                  motion.hero,
+                )}
               />
             ) : undefined}
           </g>

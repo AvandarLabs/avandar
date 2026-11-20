@@ -1,6 +1,8 @@
 import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GisLabels } from "./GisLabels";
-import { HouseholdMarker } from "./HouseholdMarker";
+import { HouseholdMarker } from "./HouseholdMarker/HouseholdMarker";
 import { LayerGeometry } from "./LayerGeometry";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -28,7 +30,6 @@ function _isSelected({
 }
 /** Inputs for GisLayerIntersectionTally. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * Register geometric layers, preserve records and tally the chosen set measure.
  */
@@ -37,6 +38,8 @@ export function GisLayerIntersectionTally({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const selected = input.households.map((household) => {
     return _isSelected({ input, household });
   });
@@ -55,12 +58,13 @@ export function GisLayerIntersectionTally({
   return (
     <g>
       <LayerGeometry input={input} frame={frame} accent={accent} />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M565 155 H555 V510 H565" }}
+        profile={tokens.sketch.shape}
         data-counting-bracket="true"
-        d="M565 155 H555 V510 H565"
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {input.households.map((household, index) => {
         return (

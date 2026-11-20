@@ -1,6 +1,6 @@
 .customValue {
   display: grid;
-  gap: 6px;
+  gap: var(--atlas-space-6);
 }
 
 .customValueToggle {

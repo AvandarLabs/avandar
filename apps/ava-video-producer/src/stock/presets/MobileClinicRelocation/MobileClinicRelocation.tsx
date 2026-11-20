@@ -1,9 +1,9 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClinicLedger } from "./ClinicLedger";
 import { ClinicMap } from "./ClinicMap";
-import { ClinicPeople } from "./ClinicPeople";
-import { ClinicSlots } from "./ClinicSlots";
+import { ClinicPeople } from "./ClinicPeople/ClinicPeople";
+import { ClinicSlots } from "./ClinicSlots/ClinicSlots";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
@@ -17,8 +17,9 @@ export function MobileClinicRelocation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 18)}>
+    <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
       <FitText
         text={input.sceneLabel}
         x={50}

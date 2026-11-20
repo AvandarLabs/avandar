@@ -1,7 +1,8 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MarketBalance } from "./MarketBalance";
-import { MarketTender } from "./MarketTender";
+import { MarketTender } from "./MarketTender/MarketTender";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
@@ -14,6 +15,7 @@ export function MarketCheckout({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const total = input.products.filter(prop("chosen")).reduce((sum, product) => {
     return sum + product.price;
   }, 0);
@@ -42,7 +44,15 @@ export function MarketCheckout({
         normalizeWhitespace
         breakLongWords
       />
-      <text data-total={total} x={550} y={521} fill={accent} fontSize={16}>
+      <text
+        data-total={total}
+        x={550}
+        y={521}
+        fill={accent}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         {total}
       </text>
       <MarketBalance input={input} balance={balance} accent={accent} />

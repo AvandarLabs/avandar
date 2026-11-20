@@ -1,16 +1,16 @@
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryEquation. */
 type Props = { input: Input };
-
 /**
  * The complete energy equation remains visible even when loss ribbons are
  * hidden.
  */
 export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const { battery, cycle, copy } = input;
   const final =
     battery.initialStoredKwh +
@@ -51,7 +51,12 @@ export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
               breakLongWords
               normalizeWhitespace
             />
-            <Text x={164 + index * 152} y={539} size={16} fill={STOCK.muted}>
+            <Text
+              x={164 + index * 152}
+              y={539}
+              role="secondary"
+              fill={tokens.color.textMuted}
+            >
               {operator}
             </Text>
           </g>

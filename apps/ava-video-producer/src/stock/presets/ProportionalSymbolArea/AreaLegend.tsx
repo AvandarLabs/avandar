@@ -1,20 +1,33 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const COMPARISON_AT = 111;
+const COMPARISON_FRAMES = 28;
 /** Reference area and optional radius ratios use the same square-root scale. */
 export function AreaLegend({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const hairline = shapes.stroke(stroke.hairline);
   const ratio = input.sites[1].value / input.sites[0].value,
     radius = Math.sqrt(input.areaPerUnit / Math.PI);
   return (
     <g data-area-legend="true" data-area-per-unit={input.areaPerUnit}>
-      <circle cx={546} cy={466} r={radius} fill="none" stroke={accent} />
+      <SketchedShape
+        shape={{ kind: "circle", cx: 546, cy: 466, r: radius }}
+        profile={sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={hairline}
+      />
       <LabelSlots
         labels={[
           [
@@ -28,11 +41,19 @@ export function AreaLegend({
         ]}
       />
       {input.showRadiusComparison ? (
-        <g opacity={ramp(frame, 111, 28)}>
-          <path
+        <g
+          opacity={motion.ramp(
+            frame,
+            COMPARISON_AT,
+            motion.scale(COMPARISON_FRAMES),
+          )}
+        >
+          <SketchedShape
             data-reference-radius="true"
-            d={`M546 466 h${radius}`}
+            shape={{ kind: "path", d: `M546 466 h${radius}` }}
+            profile={sketch.shape}
             stroke={accent}
+            strokeWidth={hairline}
           />
           <LabelSlots
             labels={[

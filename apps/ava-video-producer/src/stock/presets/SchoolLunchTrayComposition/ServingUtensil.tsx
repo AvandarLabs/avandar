@@ -1,8 +1,12 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
-
+/**
+ * The ladle bowl: a 12 by 5 ellipse centred 5 below the handle's top, drawn
+ * as two arcs.
+ */
+const LADLE_BOWL = "M-12 5 a12 5 0 1 0 24 0 a12 5 0 1 0 -24 0";
 type Props = {
   component: Input["plannedComponents"][number];
   frame: number;
@@ -18,22 +22,38 @@ export function ServingUtensil({
   foodY,
   isServed,
 }: Readonly<Props>): ReactNode {
-  return isServed && frame >= 36 + index * 12 && frame < 50 + index * 12 ? (
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  return isServed &&
+    frame >= 36 + index * motion.scaleStagger(12) &&
+    frame < 50 + index * motion.scaleStagger(12) ? (
     <g
       data-serving-utensil={component.id}
       transform={`translate(-50 ${foodY})`}
-      opacity={1 - ramp(frame, 48 + index * 12, 2)}
+      opacity={
+        1 -
+        motion.ramp(
+          frame,
+          48 + index * motion.scaleStagger(12),
+          motion.scale(2),
+          motion.exit.easing,
+        )
+      }
     >
-      <ellipse
-        cx={0}
-        cy={5}
-        rx={12}
-        ry={5}
+      <SketchedShape
+        shape={{ kind: "path", d: LADLE_BOWL }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.text}
-        strokeWidth={2}
+        stroke={tokens.color.text}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path d="M0 10 V28" stroke={STOCK.text} strokeWidth={3} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 10 V28" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.text}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
     </g>
   ) : undefined;
 }

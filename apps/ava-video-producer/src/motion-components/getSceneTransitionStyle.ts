@@ -1,13 +1,19 @@
 import { match } from "ts-pattern";
-import { resolveMotionSettings } from "./motionSettings";
-import type { MotionRect } from "./getOverlayTimings";
-import type { MotionOptions } from "./motionSettings";
+import { MotionRect } from "./getOverlayTimings";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type {
+  MotionOptions,
+  MotionSettingsTheme,
+} from "./MotionSettings/MotionSettings";
 import type { CSSProperties } from "react";
 
-/**
- * Every reveal and continuity treatment a scene transition supports. Schemas
- * validate a transition's `kind` against this list.
- */
+type GetSceneTransitionStyleOptions = {
+  progress: number;
+  entering: boolean;
+  props: SceneTransitionProps;
+  theme?: MotionSettingsTheme;
+};
+/** Reveal and continuity treatments available to any TransitionSeries. */
 export const SCENE_TRANSITION_KINDS = [
   "cut",
   "dissolve",
@@ -17,15 +23,16 @@ export const SCENE_TRANSITION_KINDS = [
   "handoff",
   "morph",
 ] as const;
-
 /** Reveal and continuity treatments available to any TransitionSeries. */
 export type SceneTransitionKind = (typeof SCENE_TRANSITION_KINDS)[number];
-
 /** Native stage geometry and motion controls for a scene boundary. */
 export type SceneTransitionProps = {
   kind: SceneTransitionKind;
   anchor?: MotionRect;
-  origin?: { x: number; y: number };
+  origin?: {
+    x: number;
+    y: number;
+  };
   width?: number;
   height?: number;
   cameraMotion?: boolean;
@@ -38,27 +45,24 @@ export type SceneTransitionProps = {
    */
   apertureOverscan?: number;
 };
-
-/**
- * The CSS style for the entering or exiting scene at `progress` (0 to 1)
- * through a scene transition. The style depends only on `progress`, never on
- * playback history, so it is safe to seek. Each scene keeps one native UI
- * instance, and only its clip, opacity, transform and filter change.
- */
-export function getSceneTransitionStyle(
-  progress: number,
-  entering: boolean,
-  props: SceneTransitionProps,
-): CSSProperties {
+type TransitionClipPathOptions = {
+  props: SceneTransitionProps;
+  entering: boolean;
+  kind: SceneTransitionKind;
+  progress: number;
+};
+function _getTransitionClipPath({
+  props,
+  entering,
+  kind,
+  progress,
+}: Readonly<TransitionClipPathOptions>): string | undefined {
   const {
     width = 1600,
     height = 840,
-    cameraMotion = true,
-    motionBlur = true,
     morphRadius = 12,
     apertureOverscan = 1.05,
   } = props;
-  const kind = cameraMotion ? props.kind : "dissolve";
   const origin = props.origin ?? { x: width / 2, y: height / 2 };
   const anchor = props.anchor ?? {
     x: width * 0.36,
@@ -66,23 +70,44 @@ export function getSceneTransitionStyle(
     width: width * 0.15,
     height: height / 14,
   };
-  const settings = resolveMotionSettings(props.motion);
-  const clipPath = !entering
-    ? undefined
-    : match(kind)
-        .with("aperture", () => {
-          return `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`;
-        })
-        .with("morph", () => {
-          return `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${morphRadius * (1 - progress)}px)`;
-        })
-        .with("wipe", "handoff", () => {
-          return `inset(0 ${(1 - progress) * 100}% 0 0)`;
-        })
-        .with("cut", "dissolve", "spatial", () => {
-          return undefined;
-        })
-        .exhaustive();
+  if (!entering) return undefined;
+  return match(kind)
+    .with("aperture", () => {
+      return `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`;
+    })
+    .with("morph", () => {
+      return `inset(${(1 - progress) * anchor.y}px ${(1 - progress) * (width - anchor.x - anchor.width)}px ${(1 - progress) * (height - anchor.y - anchor.height)}px ${(1 - progress) * anchor.x}px round ${morphRadius * (1 - progress)}px)`;
+    })
+    .with("wipe", "handoff", () => {
+      return `inset(0 ${(1 - progress) * 100}% 0 0)`;
+    })
+    .with("cut", "dissolve", "spatial", () => {
+      return undefined;
+    })
+    .exhaustive();
+}
+/**
+ * Scene geometry is independent of playback history and uses one native UI
+ * instance per scene.
+ */
+export function getSceneTransitionStyle({
+  progress,
+  entering,
+  props,
+  theme = MotionSettings.getClassicMotionSettingsTheme(),
+}: Readonly<GetSceneTransitionStyleOptions>): CSSProperties {
+  const {
+    width = 1600,
+    height = 840,
+    cameraMotion = true,
+    motionBlur = true,
+  } = props;
+  const kind = cameraMotion ? props.kind : "dissolve";
+  const settings = MotionSettings.resolveMotionSettings({
+    options: props.motion,
+    theme,
+  });
+  const clipPath = _getTransitionClipPath({ props, entering, kind, progress });
   return {
     clipPath,
     opacity: kind === "dissolve" && entering ? progress : 1,

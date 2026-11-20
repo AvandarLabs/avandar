@@ -1,17 +1,24 @@
-import { enter, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { MediaPlane } from "../../../scenes/MediaPlane";
+import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
-import { formatReadout } from "./demoTheme";
+import { DemoTheme } from "./DemoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import type { HelperDemoProps } from "./helperDemo.types";
+import type { HelperDemoProps as Props } from "./helperDemo.types";
 import type { ReactNode } from "react";
-
 /** The curated fictional screenshot the media preview loads. */
 const SCREEN = "avandar/screens/explorer-explorer-chart.png";
-
+/** The slow drift across the still: its cue and length at tempo 1. */
+const DRIFT = { at: 10, frames: 70 };
 /** A still sampled through `MediaPlane`, fading in and drifting slightly. */
-export function MediaPlaneDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const drift = ramp(frame, 10, 70);
+export function MediaPlaneDemo({ frame, frames }: Props): ReactNode {
+  const motion = useVideoMotion();
+  const drift = motion.ramp(
+    frame,
+    DRIFT.at,
+    motion.scale(DRIFT.frames),
+    motion.reveal.easing,
+  );
   return (
     <HelperDemoFrame
       frame={frame}
@@ -21,12 +28,15 @@ export function MediaPlaneDemo({ frame, frames }: HelperDemoProps): ReactNode {
         { name: "kind", value: "image" },
         {
           name: "objectPosition",
-          value: `${formatReadout(mix(drift, 0, 100), 0)}% 0%`,
+          value: `${DemoTheme.formatReadout({
+            value: mix(drift, 0, 100),
+            digits: 0,
+          })}% 0%`,
         },
       ]}
     >
       <div className={css.centered}>
-        <div className={css.mediaFrame} style={enter(frame, 4)}>
+        <div className={css.mediaFrame} style={motion.enter(frame, 4)}>
           <MediaPlane
             frame={frame}
             kind="image"

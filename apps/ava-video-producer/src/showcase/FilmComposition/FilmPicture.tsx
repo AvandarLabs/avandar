@@ -5,21 +5,17 @@ import {
   staticFile,
   useCurrentFrame,
 } from "remotion";
-import { AvandarScene } from "../../avandar/AvandarScene";
-import { MotionLab } from "../../compositions/MotionLab";
+import { AvandarScene } from "../../avandar/AvandarScene/AvandarScene";
+import { MotionLab } from "../../compositions/MotionLab/MotionLab";
 import { TitleStudy } from "../../compositions/TitleStudy";
 import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { absoluteCues } from "../../storyboard/schema/schema";
 import { StoryFilm } from "../../storyboard/StoryFilm/StoryFilm";
-import { TitleCard, TITLE_LEN } from "../../title-card";
+import { TitleCard, TITLE_LEN } from "../../TitleCard/TitleCard";
 import type { Film } from "../showcase.types";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{
-  film: Film;
-  withAudio?: boolean;
-}>;
-
+type Props = Readonly<{ film: Film; withAudio?: boolean }>;
 /** The film's picture, drawn inside its theme by `FilmComposition`. */
 export function FilmPicture({ film, withAudio = true }: Props): ReactNode {
   const frame = useCurrentFrame();

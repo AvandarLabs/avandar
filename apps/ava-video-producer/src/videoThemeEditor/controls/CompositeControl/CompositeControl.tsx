@@ -4,6 +4,7 @@ import {
   type CompositeTokenKind,
   type FieldSpec,
 } from "../../../videoTheme/tokenCatalog/defineTokensHelpers";
+import { type TokenRow } from "../../tokenRows/tokenRows.types";
 import { getCompositeFieldsFromValue } from "../roleValueHelpers/roleValueHelpers";
 import { TypeSpecimen } from "../TypeSpecimen/TypeSpecimen";
 import css from "./CompositeControl.module.css";
@@ -11,11 +12,9 @@ import { CompositeField } from "./CompositeField/CompositeField";
 import { CompositeReference } from "./CompositeReference/CompositeReference";
 import { CompositeSketchPreview } from "./CompositeSketchPreview";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ row: TokenRow; label: string }>;
-
 /**
  * A composite token edited field by field (type style, paint, elevation,
  * sketch, box, motion step, camera preset, range). A composite that points

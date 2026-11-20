@@ -1,6 +1,7 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { UtilityModule } from "./UtilityModule";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
@@ -12,34 +13,33 @@ export function UtilitySocket({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const installation =
     input.installation.choice === "install"
-      ? ramp(frame, 56, 34, EASE.inOut)
+      ? motion.ramp(frame, 56, motion.scale(34), motion.travel.easing)
       : 0;
   const y = mix(installation, 78, 197);
-  const status =
-    installation === 1
-      ? input.copy.installed
-      : input.installation.choice === "defer" && frame >= 56
-        ? input.copy.deferred
-        : input.copy.emptySocket;
+  const status = _getSocketStatus({ input, frame, installation });
   return (
     <g>
-      <rect
+      <StockRect
         data-tool-socket=""
         data-socket-occupied={installation === 1}
         x={500}
         y={192}
         width={395}
         height={110}
-        rx={12}
+        rx={scales.corner(tokens.corner.card)}
         fill="none"
-        stroke={STOCK.line}
-        strokeDasharray="6 6"
+        stroke={tokens.color.line}
+        strokeDasharray={atomic.dash.long.join(" ")}
       />
       {frame >= 12 ? (
         <g
-          opacity={ramp(frame, 12, 30)}
+          opacity={motion.ramp(frame, 12, motion.scale(30))}
           data-installed-utility={installation === 1 ? "single" : undefined}
         >
           <UtilityModule {...{ input, y, accent }} />
@@ -48,4 +48,17 @@ export function UtilitySocket({
       <LabelSlots labels={[[status, 500, 317, 395, 12, 3]]} />
     </g>
   );
+}
+/** Installed once the utility seats, deferred once declined, else empty. */
+function _getSocketStatus({
+  input,
+  frame,
+  installation,
+}: Readonly<{ input: Input; frame: number; installation: number }>): string {
+  if (installation === 1) {
+    return input.copy.installed;
+  }
+  return input.installation.choice === "defer" && frame >= 56
+    ? input.copy.deferred
+    : input.copy.emptySocket;
 }

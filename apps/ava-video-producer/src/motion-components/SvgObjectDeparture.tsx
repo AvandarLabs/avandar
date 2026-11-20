@@ -1,8 +1,21 @@
 import { useId } from "react";
-import { getObjectFlight } from "./getObjectFlight";
-import type { ObjectFlight } from "./getObjectFlight";
+import {
+  ObjectFlight,
+  getObjectFlight,
+} from "./getObjectFlight/getObjectFlight";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
 import type { ReactNode } from "react";
 
+type Props = {
+  children: ReactNode;
+  frame: number;
+  flight: ObjectFlight;
+  width?: number;
+  height?: number;
+};
+/** Luminance mask fills: white keeps the scene, black cuts the object out. */
+const MASK_KEEP = "white";
+const MASK_CUT = "black";
 /**
  * Isolate a vector object for independent travel. Never pass live product
  * components.
@@ -13,22 +26,17 @@ export function SvgObjectDeparture({
   flight,
   width = 960,
   height = 600,
-}: {
-  children: ReactNode;
-  frame: number;
-  flight: ObjectFlight;
-  width?: number;
-  height?: number;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const identity = `departure-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const theme = MotionSettings.useMotionSettingsTheme();
   if (frame < flight.at) return children;
-  const pose = getObjectFlight(flight, frame);
+  const pose = getObjectFlight({ flight, frame, theme });
   return (
     <>
       <defs>
         <mask id={`${identity}-rest`}>
-          <rect width={width} height={height} fill="white" />
-          <rect {...flight.rect} fill="black" />
+          <rect width={width} height={height} fill={MASK_KEEP} />
+          <rect {...flight.rect} fill={MASK_CUT} />
         </mask>
         <clipPath id={`${identity}-object`}>
           <rect {...flight.rect} />

@@ -4,8 +4,8 @@ export {
   getCameraPose,
   isCameraMoving,
   retimeCameraTrack,
-} from "../../motion-components/cameraTrack";
+} from "../../motion-components/cameraTrack/cameraTrack";
 export type {
   CameraKeyframe,
   CameraPose,
-} from "../../motion-components/cameraTrack";
+} from "../../motion-components/cameraTrack/cameraTrack";

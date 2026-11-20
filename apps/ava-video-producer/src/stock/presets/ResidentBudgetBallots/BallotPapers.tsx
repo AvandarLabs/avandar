@@ -1,4 +1,5 @@
-import { BallotResident } from "./BallotResident";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BallotResident } from "./BallotResident/BallotResident";
 import { getBallotGeometryFromInputAndFrame } from "./getBallotGeometryFromInputAndFrame";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
@@ -10,6 +11,7 @@ export function BallotPapers({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       {input.ballots.map((ballot, index) => {
@@ -23,6 +25,7 @@ export function BallotPapers({
               input,
               frame,
               index,
+              motion,
             })}
             isRows={input.tallyArrangement === "rows"}
             accent={accent}

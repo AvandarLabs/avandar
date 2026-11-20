@@ -1,11 +1,20 @@
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import {
+  DEMONSTRATE_CUE,
+  HANDOFF_CUE,
+  RELEASE_CUE,
+  SECOND_DEMONSTRATION_CUE,
+} from "./exchangeTiming";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; toolX: number };
+/** Frames the first expert takes to reach for the tool. */
+const REACH_FRAMES = 15;
 /** Equal-scale participants retain names and organizational roles. */
 export function ExpertiseParticipants({
   input,
@@ -13,8 +22,16 @@ export function ExpertiseParticipants({
   accent,
   toolX,
 }: Readonly<Props>): ReactNode {
-  const topic = input.topics[frame < 83 ? 0 : 1];
-  const reach = ramp(frame, 35, 15);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const topic = input.topics[frame < HANDOFF_CUE ? 0 : 1];
+  const reach = ramp(
+    frame,
+    DEMONSTRATE_CUE,
+    motion.scale(REACH_FRAMES),
+    motion.entrance.easing,
+  );
   return (
     <g>
       {input.people.map((person, index) => {
@@ -37,11 +54,25 @@ export function ExpertiseParticipants({
         const isExpert = person.id === topic.expertId;
         const restingX = x + (index === 0 ? 22 : -22);
         const isOutgoing = person.id === input.topics[0].expertId;
-        const transfer = frame >= 83 && frame <= 103;
+        // The handoff keeps its cue spans: one hand lets go as the other takes
+        // hold, and both finish as the second demonstration starts.
+        const transfer =
+          frame >= HANDOFF_CUE && frame <= SECOND_DEMONSTRATION_CUE;
         const contact = transfer
           ? isOutgoing
-            ? 1 - ramp(frame, 93, 10)
-            : ramp(frame, 83, 10)
+            ? 1 -
+              ramp(
+                frame,
+                RELEASE_CUE,
+                SECOND_DEMONSTRATION_CUE - RELEASE_CUE,
+                motion.exit.easing,
+              )
+            : ramp(
+                frame,
+                HANDOFF_CUE,
+                RELEASE_CUE - HANDOFF_CUE,
+                motion.entrance.easing,
+              )
           : isExpert
             ? reach
             : 0;
@@ -51,7 +82,7 @@ export function ExpertiseParticipants({
           <g
             key={person.id}
             data-person-id={person.id}
-            opacity={ramp(frame, 12 + index * 2, 12)}
+            opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
           >
             <LabelSlots
               labels={[
@@ -71,16 +102,15 @@ export function ExpertiseParticipants({
               ]}
             />
             <PersonGlyph x={x} y={290} size={72} color={accent} />
-            <path
-              d={`M${x} 290 L${handX} ${handY}`}
+            <SketchedShape
+              shape={{ kind: "path", d: `M${x} 290 L${handX} ${handY}` }}
+              profile={tokens.sketch.shape}
               fill="none"
-              stroke={isExpert ? accent : STOCK.muted}
-              strokeWidth={4}
+              stroke={isExpert ? accent : tokens.color.inactive}
+              strokeWidth={scales.stroke(tokens.stroke.heavy)}
             />
             <circle
-              data-transfer-hand={
-                frame >= 83 && frame <= 103 ? "true" : undefined
-              }
+              data-transfer-hand={transfer ? "true" : undefined}
               data-demonstrating-hand={isExpert ? "true" : undefined}
               data-person-id={person.id}
               cx={handX}
@@ -88,7 +118,7 @@ export function ExpertiseParticipants({
               r={5}
               fill={accent}
             />
-            <g opacity={ramp(frame, 35, 12)}>
+            <g opacity={motion.reveal(frame, DEMONSTRATE_CUE)}>
               <LabelSlots
                 labels={[
                   [

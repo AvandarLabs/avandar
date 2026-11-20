@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { AssociationStatus } from "./AssociationStatus";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import { ReviewedExtraction } from "./ReviewedExtraction";
-import { ReviewLabelRail } from "./ReviewLabelRail";
+import { ReviewLabelRail } from "./ReviewLabelRail/ReviewLabelRail";
 import { ReviewSourcePage } from "./ReviewSourcePage";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfNearestLabelReview.schema";

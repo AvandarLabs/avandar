@@ -2,17 +2,18 @@ import { AbsoluteFill, Composition, Sequence, useCurrentFrame } from "remotion";
 import "./theme.css";
 import libraryPlan from "../storyboards/library.json";
 import { Demo, DEMO_LEN } from "./compositions/Demo/Demo";
-import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab";
+import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab/MotionLab";
+import { StarterVideoTheme } from "./compositions/StarterVideoTheme/StarterVideoTheme";
 import { TitleStudy, TITLE_STUDY_LEN } from "./compositions/TitleStudy";
 import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
 import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
-import { TITLE_LEN, TitleCard } from "./title-card";
+import { TITLE_LEN, TitleCard } from "./TitleCard/TitleCard";
+import { useVideoTokens } from "./videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 export const FPS = 30;
-
 /* 1600x1000 is 8:5, a wide tile, the shape a demo takes when it sits in a
  * page section rather than in a video player. For docs, a social post or an
  * app store listing you probably want 16:9 (1600x900) or 1:1; change these
@@ -23,7 +24,6 @@ export const FPS = 30;
  * ships at 1536x960, same aspect, both dimensions clean. */
 export const WIDTH = 1600;
 export const HEIGHT = 1000;
-
 /**
  * Title card, then the flow.
  *
@@ -37,7 +37,8 @@ export const HEIGHT = 1000;
  * Both layers sit on the same dark ground, so the handover is a dissolve
  * between two states of one field rather than a cut between two lit frames,
  * and the last frame matches frame 0, which is what keeps the loop seam
- * from strobing every time the tile repeats.
+ * from strobing every time the tile repeats. The ground is the scene
+ * palette's, so render it inside a video theme.
  */
 function Clip({
   body,
@@ -49,8 +50,9 @@ function Clip({
   kicker: string;
 }) {
   const frame = useCurrentFrame();
+  const tokens = useVideoTokens();
   return (
-    <AbsoluteFill style={{ background: "var(--ground)" }}>
+    <AbsoluteFill style={{ background: tokens.color.scene.ground }}>
       {frame < TITLE_LEN ? (
         <TitleCard name={name} kicker={kicker} frame={frame} />
       ) : null}
@@ -58,7 +60,6 @@ function Clip({
     </AbsoluteFill>
   );
 }
-
 export function RemotionRoot(): ReactNode {
   return (
     <>
@@ -90,11 +91,13 @@ export function RemotionRoot(): ReactNode {
         id="demo"
         component={() => {
           return (
-            <Clip
-              body={<Demo />}
-              name="Acme Studio"
-              kicker="Ask a question, publish the answer"
-            />
+            <StarterVideoTheme itemId="demo">
+              <Clip
+                body={<Demo />}
+                name="Acme Studio"
+                kicker="Ask a question, publish the answer"
+              />
+            </StarterVideoTheme>
           );
         }}
         durationInFrames={DEMO_LEN + TITLE_LEN}
@@ -104,7 +107,13 @@ export function RemotionRoot(): ReactNode {
       />
       <Composition
         id="title-study"
-        component={TitleStudy}
+        component={() => {
+          return (
+            <StarterVideoTheme itemId="title-study">
+              <TitleStudy />
+            </StarterVideoTheme>
+          );
+        }}
         durationInFrames={TITLE_STUDY_LEN}
         fps={FPS}
         width={WIDTH}
@@ -114,11 +123,13 @@ export function RemotionRoot(): ReactNode {
         id="motion-lab"
         component={() => {
           return (
-            <Clip
-              body={<MotionLab />}
-              name="Motion vocabulary"
-              kicker="Four building blocks, one visual language"
-            />
+            <StarterVideoTheme itemId="motion-lab">
+              <Clip
+                body={<MotionLab />}
+                name="Motion vocabulary"
+                kicker="Four building blocks, one visual language"
+              />
+            </StarterVideoTheme>
           );
         }}
         durationInFrames={MOTION_LAB_LEN + TITLE_LEN}

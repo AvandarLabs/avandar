@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
@@ -10,19 +11,20 @@ export function ReconstructionHeaders({
   columnXs,
   width,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
       {input.grid.columnLabels.map((label, columnIndex) => {
         return (
           <g key={columnIndex}>
-            <rect
+            <StockRect
               x={columnXs[columnIndex]}
               y={210}
               width={width}
               height={80}
               fill="none"
-              stroke={STOCK.line}
+              stroke={tokens.color.line}
             />
             <LabelSlots
               labels={[

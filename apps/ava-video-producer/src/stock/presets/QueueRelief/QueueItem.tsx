@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getQueueItemLayoutFromInputAndFrame } from "./getQueueItemLayoutFromInputAndFrame";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
@@ -19,15 +20,14 @@ export function QueueItem({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, y, state, serviceSlot, opacity } =
-    getQueueItemLayoutFromInputAndFrame({
-      input,
-      index,
-      frame,
-    });
+    getQueueItemLayoutFromInputAndFrame({ motion, input, index, frame });
   return (
     <g opacity={opacity}>
-      <rect
+      <StockRect
         data-item-id={item.id}
         data-state={state}
         data-service-slot={serviceSlot}
@@ -35,9 +35,9 @@ export function QueueItem({
         y={y}
         width={220}
         height={44}
-        rx={5}
-        fill={STOCK.elevated}
-        stroke={state === "completed" ? accent : STOCK.line}
+        rx={scales.corner(5)}
+        fill={tokens.color.elevated}
+        stroke={state === "completed" ? accent : tokens.color.line}
       />
       <circle cx={x + 10} cy={y + 10} r={3} fill={accent} />
       {input.showItemLabels ? (

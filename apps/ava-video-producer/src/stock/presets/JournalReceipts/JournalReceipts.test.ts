@@ -2,12 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { JournalReceipts } from "./JournalReceipts";
+import { journalReceiptsContract } from "./JournalReceipts.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./JournalReceipts.fixtures";
+import { inputSchema } from "./JournalReceipts.schema";
 /** Inputs for render. */
 type RenderInput = {
   entries: Array<{ id: string; label: string }>;
@@ -25,7 +30,6 @@ type RenderInput = {
   showIdentifiers: boolean;
   showLabels: boolean;
 };
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -115,13 +119,6 @@ test("both accordion directions align actual receipt geometry to its entry after
     });
   });
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
-import { journalReceiptsContract } from "./JournalReceipts.contract";
-import { inputSchema } from "./JournalReceipts.schema";
-
 test("the completed hold begins exactly when every dense receipt tab has settled", () => {
   const dense = fixtures.find(({ id }) => {
     return id === "dense";
@@ -179,7 +176,6 @@ test("the completed hold begins exactly when every dense receipt tab has settled
     });
   });
 });
-
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -225,10 +221,7 @@ registerStockPresetAssertions({
 test("identifier and label toggles preserve the retained folds and receipt matching", () => {
   const noIdentifiers = _render({
     frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      showIdentifiers: false,
-    },
+    input: { ...DEFAULT_INPUT, showIdentifiers: false },
   });
   assert.doesNotMatch(noIdentifiers, /aria-label="a"/);
   assert.match(noIdentifiers, /aria-label="Example note A"/);
@@ -240,7 +233,6 @@ test("identifier and label toggles preserve the retained folds and receipt match
   assert.equal((hidden.match(/data-journal-entry=/g) ?? []).length, 3);
   assert.equal((hidden.match(/data-tab-rise="0"/g) ?? []).length, 2);
 });
-
 test("dense vertical receipts and their painted text remain inside the canvas throughout emergence", () => {
   const input = { ...fixtures[2].input, foldDirection: "vertical" as const };
   input.receipts.forEach(({ entryId }, receiptIndex) => {

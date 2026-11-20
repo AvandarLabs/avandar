@@ -6,7 +6,10 @@ import type { LEGACY_IDS } from "../../../../../../tests/fixtures/legacyStockIds
  * - captions moved to the shared caption style (17 px at baseline 551);
  * - halo glows consolidated to the shared 0.03 opacity;
  * - 1 px hairlines that now pass an explicit `stroke-width="1"`, which draws
- *   the same pixels as the SVG default.
+ *   the same pixels as the SVG default;
+ * - rotated orbits whose rotation moved from the ellipse to a wrapping group;
+ * - code lines that now pass their role's `font-weight="400"`, which draws
+ *   the same glyphs as the SVG default.
  */
 const APPROVED_MARKUP_MOVES: Partial<
   Record<
@@ -20,6 +23,13 @@ const APPROVED_MARKUP_MOVES: Partial<
       return {
         from: `<path d="${path}" stroke="#2a404e"></path>`,
         to: `<path d="${path}" stroke="#2a404e" stroke-width="1"></path>`,
+      };
+    }),
+    // Each of the six code lines gains the code role's regular weight.
+    ...Array.from({ length: 6 }, () => {
+      return {
+        from: `font-size="21" font-family="&#x27;Courier New&#x27;, monospace" xml:space`,
+        to: `font-size="21" font-weight="400" font-family="&#x27;Courier New&#x27;, monospace" xml:space`,
       };
     }),
   ],
@@ -44,6 +54,20 @@ const APPROVED_MARKUP_MOVES: Partial<
     { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
   ],
   "orbital-system": [
+    // Each orbit draws as a sketch-aware ellipse inside a rotated group, once
+    // per body in drawing order.
+    ...[
+      { rx: 294, ry: 122, color: "#9fefca", angle: -24 },
+      { rx: 294, ry: 122, color: "#82c8f2", angle: 24 },
+      { rx: 185, ry: 185, color: "#f0ba83", angle: 0 },
+    ].map(({ rx, ry, color, angle }) => {
+      const ellipse = `<ellipse cx="480" cy="298" rx="${rx}" ry="${ry}" fill="none" stroke="${color}" stroke-opacity="0.24" stroke-width="1.5"`;
+      const rotation = `rotate(${angle} 480 298)`;
+      return {
+        from: `${ellipse} transform="${rotation}"></ellipse>`,
+        to: `<g transform="${rotation}">${ellipse}></ellipse></g>`,
+      };
+    }),
     ...["#9fefca", "#82c8f2", "#f0ba83"].map((color) => {
       return {
         from: `text-anchor="middle" fill="${color}" font-size="12" font-family`,

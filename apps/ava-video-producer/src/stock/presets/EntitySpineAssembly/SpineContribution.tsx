@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
@@ -12,6 +12,8 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** A contribution chip's corner before the corner style scales it. */
+const CHIP_CORNER = 3;
 /** A complete numeric value travels from its source into its entity stack. */
 export function SpineContribution({
   input,
@@ -20,11 +22,15 @@ export function SpineContribution({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, opacity } = getSpineContributionFromFrame({
     input,
     observation,
     index,
     frame,
+    motion,
   });
   return (
     <g data-spine-contribution={observation.id} opacity={opacity}>
@@ -34,8 +40,8 @@ export function SpineContribution({
         y={y - 14}
         width={222}
         height={18}
-        rx={3}
-        fill={STOCK.elevated}
+        rx={scales.corner(CHIP_CORNER)}
+        fill={tokens.color.elevated}
         stroke={accent}
       />
       <LabelSlots labels={[[String(observation.value), x, y, 216, 12, 1]]} />

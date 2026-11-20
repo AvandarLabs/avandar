@@ -2,7 +2,7 @@ import { AtlasCategoryNav } from "../../../gallery/AtlasLayout/AtlasCategoryNav/
 import { AtlasCollection } from "../../../gallery/AtlasLayout/AtlasCollection/AtlasCollection";
 import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialog";
 import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/useGalleryVideoTheme";
-import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
+import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
 import { categoryLabel } from "../categoryLabel";
 import { CompositionCard } from "../CompositionCard/CompositionCard";
@@ -11,9 +11,7 @@ import { countCompositionCategories } from "../gallerySelectionReducer/gallerySe
 import { useCompositionGallery } from "../useCompositionGallery";
 import type { ReactNode } from "react";
 
-type Props = {
-  section: "compositions" | "films";
-};
+type Props = { section: "compositions" | "films" };
 
 /** Section copy, so one gallery serves both Compositions and Sample films. */
 function _sectionCopy(section: Props["section"]) {

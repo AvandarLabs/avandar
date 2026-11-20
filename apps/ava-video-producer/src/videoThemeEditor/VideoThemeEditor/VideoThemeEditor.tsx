@@ -11,8 +11,8 @@ import {
   filterTokenRows,
   listEmptyAtomicScaleGroups,
   listTokenRows,
-  type TokenRow,
 } from "../tokenRows/tokenRows";
+import { type TokenRow } from "../tokenRows/tokenRows.types";
 import {
   EditorToolbar,
   type EditorFilters,
@@ -39,7 +39,6 @@ type Props = Readonly<{
   onDraftChange: (draft: ThemeDraft) => void;
   onScopeChange: (scope: ThemeEditScope) => void;
 }>;
-
 function useVisibleRows(
   rows: readonly TokenRow[],
   filters: EditorFilters,
@@ -61,7 +60,6 @@ function useVisibleRows(
     });
   }, [rows, filters, usedTokens, toLabel]);
 }
-
 /**
  * The search, tier, and usage filters, the rows they leave visible, and the
  * empty atomic scales to offer while the unfiltered atomic tier is open.
@@ -83,7 +81,6 @@ function useEditorFilters(
   }, [showsEmptyScales, rows]);
   return { filters, setFilters, visibleRows, emptyGroups };
 }
-
 /**
  * The theme as the previewed item sees it. Theme scope shows the item's own
  * values, so it resolves the item too.
@@ -99,7 +96,6 @@ function useItemTheme({
   }, [item]);
   return useDraftTheme({ library, themeId, draft, scope: itemScope }).theme;
 }
-
 /** The draft's rows and the context its controls read. */
 function useEditorRows({
   library,
@@ -145,7 +141,6 @@ function useEditorRows({
   });
   return { rows, context };
 }
-
 /**
  * The design-token editor: Essentials, then component, semantic, and atomic
  * tokens in searchable sections, editing a draft for the whole theme or one

@@ -1,8 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -13,6 +13,10 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** Frames the spine rows take to slide into their column. */
+const ALIGN_FRAMES = 35;
+/** A spine row's corner before the corner style scales it. */
+const ROW_CORNER = 6;
 /** One spine row receives a nullable aggregate without changing membership. */
 export function EntitySpineRow({
   input,
@@ -21,6 +25,9 @@ export function EntitySpineRow({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const rows = input.observations.filter(({ entityId }) => {
     return entityId === entity.id;
   });
@@ -30,8 +37,13 @@ export function EntitySpineRow({
       }, 0)
     : null;
   const y = 120 + index * 100,
-    attachment = ramp(frame, 106, 33, EASE.inOut);
-  const x = mix(ramp(frame, 13, 35, EASE.inOut), 495 + index * 12, 460);
+    // A missing value attaches as the summed values land, at 139.
+    attachment = ramp(frame, 106, 139 - 106, motion.travel.easing);
+  const x = mix(
+    ramp(frame, 13, motion.scale(ALIGN_FRAMES), motion.travel.easing),
+    495 + index * 12,
+    460,
+  );
   return (
     <g
       data-entity-row={entity.id}
@@ -43,8 +55,8 @@ export function EntitySpineRow({
         y={y}
         width={440}
         height={84}
-        rx={6}
-        fill={STOCK.surface}
+        rx={scales.corner(ROW_CORNER)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <LabelSlots labels={[[entity.label, x + 15, y + 18, 200, 14, 3]]} />

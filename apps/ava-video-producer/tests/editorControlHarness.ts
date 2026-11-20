@@ -4,6 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { isPlainObject } from "@avandar/utils";
 import { build } from "esbuild";
+import { yamlPlugin } from "../scripts/yaml/yamlPlugin/yamlPlugin";
 import type {
   StockMessageDescriptor,
   StockControl,
@@ -72,6 +73,7 @@ await build({
   jsx: "automatic",
   logLevel: "silent",
   plugins: [
+    yamlPlugin,
     {
       name: "editor-css-stub",
       setup(builder) {

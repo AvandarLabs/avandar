@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CompartmentLabel } from "./CompartmentLabel";
 import { ServedFood } from "./ServedFood";
 import { ServingUtensil } from "./ServingUtensil";
@@ -25,23 +26,35 @@ export function TrayCompartment({
   emphasize,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36 + index * 12, 12, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const progress = motion.ramp(
+    frame,
+    36 + index * motion.scaleStagger(12),
+    motion.scale(12),
+    motion.travel.easing,
+  );
   const foodY = mix(progress, -16, 34);
   const outlineEmphasis =
     !isServed && emphasize
-      ? ramp(frame, 88, 4, EASE.inOut) * (1 - ramp(frame, 100, 4, EASE.inOut))
+      ? motion.ramp(frame, 88, motion.press.duration, motion.travel.easing) *
+        (1 -
+          motion.ramp(frame, 100, motion.press.duration, motion.travel.easing))
       : 0;
   return (
     <g transform={`translate(0 ${index * 72})`} data-compartment={component.id}>
-      <rect
+      <StockRect
         x={-65}
         y={0}
         width={130}
         height={70}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
-        strokeWidth={mix(outlineEmphasis, 1, 2)}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(
+          mix(outlineEmphasis, tokens.stroke.hairline, tokens.stroke.default),
+        )}
       />
       <CompartmentLabel
         component={component}

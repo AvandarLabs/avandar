@@ -3,7 +3,7 @@
 .row {
   align-items: center;
   display: flex;
-  gap: 24px;
+  gap: var(--demo-space-24);
 }
 
 .centered {
@@ -15,7 +15,7 @@
 
 .split {
   display: grid;
-  gap: 48px;
+  gap: var(--demo-space-48);
   grid-template-columns: 360px 1fr;
   height: 100%;
 }
@@ -24,19 +24,19 @@
   align-items: center;
   display: flex;
   justify-content: center;
-  padding-left: 24px;
+  padding-left: var(--demo-space-24);
 }
 
 .rails {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: var(--demo-space-48);
   justify-content: center;
 }
 
 .rail {
   background: var(--demo-panel);
-  border-radius: 999px;
+  border-radius: var(--demo-corner-pill);
   height: 56px;
   position: relative;
 }
@@ -44,7 +44,7 @@
 .railLabel {
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 13px;
+  font-size: var(--demo-font-size-2xs);
   left: 0;
   position: absolute;
   top: -22px;
@@ -52,7 +52,7 @@
 
 .railBlock {
   background: var(--demo-brand);
-  border-radius: 999px;
+  border-radius: var(--demo-corner-pill);
   height: 56px;
   position: absolute;
   top: 0;
@@ -66,7 +66,7 @@
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--demo-space-10);
   height: 100%;
   justify-content: center;
   position: relative;
@@ -75,7 +75,7 @@
 .timelineRow {
   align-items: center;
   display: grid;
-  gap: 16px;
+  gap: var(--demo-space-2xs);
   grid-template-columns: 190px 1fr;
   height: 40px;
 }
@@ -83,7 +83,7 @@
 .timelineName {
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 14px;
+  font-size: var(--demo-font-size-xs);
 }
 
 .timelineNameActive {
@@ -97,8 +97,8 @@
 
 .timelineSpan {
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 6px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-span);
   bottom: 6px;
   position: absolute;
   top: 6px;
@@ -106,7 +106,7 @@
 
 .timelineFill {
   background: var(--demo-line);
-  border-radius: 5px;
+  border-radius: var(--demo-corner-tab);
   bottom: 0;
   left: 0;
   position: absolute;
@@ -126,7 +126,7 @@
 }
 
 .ruler {
-  border-top: 1px solid var(--demo-line);
+  border-top: var(--demo-stroke-hairline) solid var(--demo-line);
   height: 24px;
   position: relative;
 }
@@ -142,22 +142,22 @@
 .rulerLabel {
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 12px;
+  font-size: var(--demo-font-size-3xs);
   position: absolute;
   top: 8px;
   transform: translateX(-50%);
 }
 
 .bigNumber {
-  font-size: 140px;
+  font-size: var(--demo-font-size-140);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-headline);
 }
 
 .cards {
   display: flex;
-  gap: 32px;
+  gap: var(--demo-space-sm);
   justify-content: center;
 }
 
@@ -165,19 +165,19 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--demo-space-2xs);
 }
 
 .caption {
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 13px;
+  font-size: var(--demo-font-size-2xs);
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--demo-space-10);
   margin: 0 auto;
   width: 420px;
 }
@@ -185,17 +185,17 @@
 .listRow {
   align-items: center;
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 8px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
   display: flex;
-  gap: 14px;
+  gap: var(--demo-space-14);
   height: 52px;
-  padding: 0 16px;
+  padding: 0 var(--demo-space-2xs);
 }
 
 .listDot {
   background: var(--demo-brand);
-  border-radius: 50%;
+  border-radius: var(--demo-corner-pill);
   flex: none;
   height: 14px;
   width: 14px;
@@ -203,43 +203,43 @@
 
 .listBar {
   background: var(--demo-line);
-  border-radius: 4px;
+  border-radius: var(--demo-corner-chip);
   height: 10px;
 }
 
 .button {
   align-items: center;
   background: var(--demo-brand);
-  border-radius: 10px;
+  border-radius: var(--demo-corner-label);
   color: var(--demo-text);
   display: flex;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-4xl);
+  font-weight: var(--demo-font-weight-semibold);
   height: 64px;
   justify-content: center;
   width: 220px;
 }
 
 .headline {
-  font-size: 46px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: var(--demo-font-size-46);
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-slight);
   line-height: 1.2;
   margin: 0;
 }
 
 .kicker {
   color: var(--demo-muted);
-  font-size: 22px;
-  margin: 10px 0 0;
+  font-size: var(--demo-font-size-4xl);
+  margin: var(--demo-space-10) 0 0;
 }
 
 .lines {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--demo-space-6);
   justify-content: center;
-  padding-left: 48px;
+  padding-left: var(--demo-space-48);
 }
 
 .inlineBlock {
@@ -259,11 +259,11 @@
 
 .chip {
   align-items: center;
-  border: 3px solid;
-  border-radius: 999px;
+  border: var(--demo-stroke-emphasis) solid;
+  border-radius: var(--demo-corner-pill);
   display: flex;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-6xl);
+  font-weight: var(--demo-font-weight-semibold);
   height: 72px;
   justify-content: center;
   width: 260px;
@@ -271,11 +271,11 @@
 
 .terminal {
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   font-family: var(--demo-mono);
-  font-size: 34px;
-  padding: 28px 32px;
+  font-size: var(--demo-font-size-34);
+  padding: var(--demo-space-28) var(--demo-space-sm);
   width: 640px;
 }
 
@@ -288,8 +288,8 @@
 }
 
 .box {
-  border: 2px dashed var(--demo-line);
-  border-radius: 6px;
+  border: var(--demo-stroke-default) dashed var(--demo-line);
+  border-radius: var(--demo-corner-span);
   box-sizing: border-box;
   position: absolute;
 }
@@ -297,7 +297,7 @@
 .boxLabel {
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 12px;
+  font-size: var(--demo-font-size-3xs);
   left: 8px;
   position: absolute;
   top: 6px;
@@ -306,20 +306,20 @@
 .miniStages {
   align-content: center;
   display: grid;
-  gap: 18px;
+  gap: var(--demo-space-18);
   height: 100%;
 }
 
 .miniStage {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--demo-space-8);
 }
 
 .miniFrame {
   background: var(--demo-ground);
-  border: 1px solid var(--demo-line);
-  border-radius: 6px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-span);
   overflow: hidden;
   position: relative;
 }
@@ -327,8 +327,8 @@
 .shot {
   align-items: center;
   display: flex;
-  font-size: 44px;
-  font-weight: 700;
+  font-size: var(--demo-font-size-44);
+  font-weight: var(--demo-font-weight-bold);
   inset: 0;
   justify-content: center;
   position: absolute;
@@ -346,34 +346,34 @@
 
 .bar {
   background: var(--demo-brand);
-  border-radius: 4px;
+  border-radius: var(--demo-corner-chip);
   height: 36px;
 }
 
 .barLabel {
   color: var(--demo-muted);
-  font-size: 18px;
+  font-size: var(--demo-font-size-xl);
   width: 140px;
 }
 
 .barValue {
   font-family: var(--demo-mono);
-  font-size: 18px;
+  font-size: var(--demo-font-size-xl);
 }
 
 .footnote {
   bottom: 0;
   color: var(--demo-muted);
-  font-size: 13px;
+  font-size: var(--demo-font-size-2xs);
   position: absolute;
   right: 0;
 }
 
 .icon {
   background: var(--demo-brand);
-  border-radius: 50%;
+  border-radius: var(--demo-corner-pill);
   height: 48px;
-  margin-bottom: 12px;
+  margin-bottom: var(--demo-space-12);
   width: 48px;
 }
 
@@ -383,8 +383,8 @@
 }
 
 .cameraBox {
-  border: 1px solid var(--demo-line);
-  border-radius: 8px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
   height: 400px;
   overflow: hidden;
   width: 640px;
@@ -411,14 +411,14 @@
 }
 
 .boxActive {
-  background: color-mix(in oklab, var(--demo-brand) 22%, transparent);
+  background: var(--demo-brand-wash);
   border-color: var(--demo-brand);
   border-style: solid;
 }
 
 .scrollWindow {
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   height: 330px;
   overflow: hidden;
   width: 520px;
@@ -431,8 +431,8 @@
 }
 
 .mediaFrame {
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   height: 400px;
   overflow: hidden;
   position: relative;
@@ -441,9 +441,9 @@
 
 .mediaFrame .footnote {
   background: var(--demo-ground);
-  border-radius: 4px;
+  border-radius: var(--demo-corner-chip);
   bottom: 10px;
-  padding: 4px 8px;
+  padding: var(--demo-space-4) var(--demo-space-8);
   right: 10px;
 }
 
@@ -454,11 +454,11 @@
 .sharedToken {
   align-items: center;
   background: var(--demo-brand);
-  border-radius: 10px;
+  border-radius: var(--demo-corner-label);
   color: var(--demo-text);
   display: flex;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-4xl);
+  font-weight: var(--demo-font-weight-semibold);
   justify-content: center;
   overflow: hidden;
   white-space: nowrap;
@@ -466,15 +466,15 @@
 
 .tableRow {
   display: flex;
-  gap: 12px;
+  gap: var(--demo-space-12);
   left: 60px;
   position: absolute;
 }
 
 .tableCell {
   background: var(--demo-panel);
-  border: 1px solid var(--demo-line);
-  border-radius: 4px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-chip);
   height: 44px;
   width: 160px;
 }
@@ -482,60 +482,56 @@
 .callout {
   align-items: center;
   background: var(--demo-highlight);
-  border-radius: 12px;
+  border-radius: var(--demo-corner-card);
   color: var(--demo-ground);
   display: flex;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: var(--demo-font-size-6xl);
+  font-weight: var(--demo-font-weight-semibold);
   justify-content: center;
-  padding: 0 24px;
+  padding: 0 var(--demo-space-24);
   text-align: center;
 }
 
 .diagramFrame {
-  border: 1px solid var(--demo-line);
-  border-radius: 8px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
 }
 
 .themedShot {
   align-items: center;
-  background: var(--background);
-  border: 1px solid var(--demo-line);
-  border-radius: 10px;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
   display: flex;
-  gap: 32px;
+  gap: var(--demo-space-sm);
   height: 100%;
   justify-content: center;
 }
 
 .themedCard {
-  background: var(--card);
-  border-radius: 10px;
-  color: var(--foreground);
-  font-size: 30px;
-  font-weight: 600;
-  padding: 32px 40px;
+  border-radius: var(--demo-corner-label);
+  font-size: var(--demo-font-size-8xl);
+  font-weight: var(--demo-font-weight-semibold);
+  padding: var(--demo-space-sm) var(--demo-space-40);
 }
 
 .themedAccent {
-  background: var(--brand);
-  border-radius: 50%;
+  border-radius: var(--demo-corner-pill);
   height: 96px;
   width: 96px;
 }
 
 .field {
   background: var(--demo-panel);
-  border: 2px solid var(--demo-line);
-  border-radius: 8px;
+  border: var(--demo-stroke-default) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
   height: 52px;
   position: absolute;
   width: 280px;
 }
 
 .inset {
-  border: 1px solid var(--demo-line);
-  border-radius: 50%;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-pill);
   height: 160px;
   position: absolute;
   right: 20px;
@@ -545,7 +541,7 @@
 
 .insetCenter,
 .insetSample {
-  border-radius: 50%;
+  border-radius: var(--demo-corner-pill);
   height: 14px;
   left: 73px;
   position: absolute;
@@ -565,7 +561,7 @@
   bottom: -24px;
   color: var(--demo-muted);
   font-family: var(--demo-mono);
-  font-size: 12px;
+  font-size: var(--demo-font-size-3xs);
   left: 0;
   position: absolute;
   right: 0;
@@ -573,8 +569,8 @@
 }
 
 .loopPlot {
-  border-bottom: 1px solid var(--demo-line);
-  border-left: 1px solid var(--demo-line);
+  border-bottom: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-left: var(--demo-stroke-hairline) solid var(--demo-line);
   overflow: visible;
 }
 
@@ -585,8 +581,8 @@
 
 .wordmark {
   color: var(--demo-text);
-  font-size: 36px;
-  font-weight: 700;
+  font-size: var(--demo-font-size-36);
+  font-weight: var(--demo-font-weight-bold);
   left: 400px;
   margin: 0;
   position: absolute;
@@ -597,28 +593,28 @@
 .badge {
   align-self: flex-start;
   background: var(--demo-success);
-  border-radius: 999px;
+  border-radius: var(--demo-corner-pill);
   color: var(--demo-ground);
-  font-size: 16px;
-  font-weight: 700;
-  margin-top: 12px;
-  padding: 6px 14px;
+  font-size: var(--demo-font-size-md);
+  font-weight: var(--demo-font-weight-bold);
+  margin-top: var(--demo-space-12);
+  padding: var(--demo-space-6) var(--demo-space-14);
 }
 
 .barPanel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--demo-space-12);
   justify-content: center;
-  padding-left: 48px;
+  padding-left: var(--demo-space-48);
 }
 
 .columns {
   display: flex;
-  gap: 10px;
+  gap: var(--demo-space-10);
   height: 100%;
   justify-content: center;
-  padding: 0 120px;
+  padding: 0 var(--demo-space-120);
 }
 
 .columnCell {
@@ -626,13 +622,13 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--demo-space-8);
 }
 
 .columnTrack {
   align-items: flex-end;
   background: var(--demo-panel);
-  border-radius: 4px;
+  border-radius: var(--demo-corner-chip);
   display: flex;
   flex: 1;
   overflow: hidden;

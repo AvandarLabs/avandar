@@ -105,7 +105,7 @@ registerStockTextLayoutAssertions({
 test("partially revealed new slots stay inside the actually extended tray", () => {
   [81.5, 88, 100, 106, 110, 125, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: DENSE_INPUT });
-    const tray = markup.match(/data-capacity-tray="" d="M80 220 H([^ ]*)/)!;
+    const tray = markup.match(/d="M80 220 H([^ ]*)[^>]*data-capacity-tray=""/)!;
     assert.ok(tray);
     [...markup.matchAll(/<rect data-extra-slot[^>]*>/g)].forEach((slot) => {
       return assert.ok(
@@ -269,7 +269,7 @@ function _assertPendingCaptionClearance({
       "caption clears every resource throughout seating",
     );
   });
-  const connector = markup.match(/<path data-pending-link[^>]*>/)![0];
+  const connector = markup.match(/<path [^>]*data-pending-link[^>]*>/)![0];
   assert.match(connector, /stroke="#[a-fA-F0-9]+"/);
   assert.ok(connector.includes(`V${requestY + 66} H${requestX}`));
 }

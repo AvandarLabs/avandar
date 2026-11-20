@@ -1,5 +1,5 @@
 import { ContourLabels } from "./ContourLabels";
-import { ContourTreatment } from "./ContourTreatment";
+import { ContourTreatment } from "./ContourTreatment/ContourTreatment";
 import { SedimentFlow } from "./SedimentFlow";
 import { SedimentQuantities } from "./SedimentQuantities";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

@@ -1,5 +1,6 @@
-import { EASE, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupCells } from "./CleanupCells";
 import { CleanupRowCopy } from "./CleanupRowCopy";
 import type { Input } from "./CellNormalization.schema";
@@ -12,6 +13,10 @@ type Props = {
   input: Input;
   accent: string;
 };
+/** Frames a changed cell takes to cross-fade to its replacement. */
+const EDIT_FRAMES = 64;
+/** A row's corner before the corner style scales it. */
+const ROW_CORNER = 3;
 /** Each row remains anchored while only its changed data crossfades. */
 export function CleanupRow({
   row,
@@ -20,22 +25,32 @@ export function CleanupRow({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const edit =
-    row.before !== row.after ? ramp(frame, 40 + index * 2, 64, EASE.inOut) : 0;
+    row.before !== row.after
+      ? ramp(
+          frame,
+          40 + index * motion.stagger.list,
+          motion.scale(EDIT_FRAMES),
+          motion.travel.easing,
+        )
+      : 0;
   return (
     <g
       data-cleanup-row={row.id}
       transform={`translate(0 ${142 + index * 88})`}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
-      <rect
+      <StockRect
         x={64}
         y={0}
         width={832}
         height={82}
-        rx={3}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(ROW_CORNER)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <CleanupCells
         row={row}

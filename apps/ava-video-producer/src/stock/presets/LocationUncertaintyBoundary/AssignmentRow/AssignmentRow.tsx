@@ -1,5 +1,7 @@
-import { ramp, mix } from "../../../../motion";
+import { mix } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FocusedRecord } from "./FocusedRecord";
 import type { getAssignmentsFromLocations } from "../getAssignmentsFromLocations";
 import type { ReactNode } from "react";
@@ -21,6 +23,8 @@ export function AssignmentRow({
   accent,
   isFocused,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g data-assignment={location.id} data-district-index={location.district}>
       {isFocused ? (
@@ -40,9 +44,13 @@ export function AssignmentRow({
           ],
         ]}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${location.district < 0 ? mix(motion.ramp(frame, 72, motion.scale(36)), 850, 880) : 850} ${318 + index * 31}h12v20h-12`,
+        }}
+        profile={tokens.sketch.shape}
         data-accounting-bracket={location.id}
-        d={`M${location.district < 0 ? mix(ramp(frame, 72, 36), 850, 880) : 850} ${318 + index * 31}h12v20h-12`}
         fill="none"
         stroke={accent}
       />

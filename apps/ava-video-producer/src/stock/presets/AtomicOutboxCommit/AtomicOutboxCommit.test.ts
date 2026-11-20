@@ -3,14 +3,19 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { AtomicOutboxCommit } from "./AtomicOutboxCommit";
+import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./AtomicOutboxCommit.fixtures";
+import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
@@ -26,7 +31,6 @@ function _render({
     }),
   );
 }
-
 test("a committed local edit has exactly one matching pending durable ticket", () => {
   const hold = _render({ frame: 150 });
   assert.match(hold, /data-local-value="Count 3"/);
@@ -36,11 +40,7 @@ test("a committed local edit has exactly one matching pending durable ticket", (
 test("abort retains the before value without durable tickets or visible proposals", () => {
   const hold = _render({
     frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      outcome: "abort",
-      showIdentifier: false,
-    },
+    input: { ...DEFAULT_INPUT, outcome: "abort", showIdentifier: false },
   });
   assert.match(hold, /data-local-value="Count 2"/);
   assert.doesNotMatch(hold, /data-durable-ticket=/);
@@ -51,7 +51,7 @@ test("every sampled frame commits both durable halves or neither", () => {
     return Array.from({ length: 180 }, (_, frame) => {
       return frame;
     }).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const committed = markup.includes('data-local-durable="true"');
       const tickets = (markup.match(/data-durable-ticket=/g) ?? []).length;
       assert.equal(
@@ -69,8 +69,8 @@ test("both proposal halves write beneath one moving latch before one atomic stam
   assert.notEqual(early, written);
   const y = (frame: number) => {
     return SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: frame }),
+      attributes: _markedShape({
+        markup: _render({ frame }),
         marker: "commit-latch",
       }),
       name: "y1",
@@ -82,13 +82,22 @@ test("both proposal halves write beneath one moving latch before one atomic stam
     2,
   );
 });
-
-import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
-import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
-import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
-
+/**
+ * A marker group and the sketch-aware shape it wraps, since the marker sits
+ * on the group around the shape.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const match = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  assert.ok(match, marker);
+  return match[0];
+}
 function _getVisibleTexts({
   input,
   frame,
@@ -164,7 +173,7 @@ test("the complete latch stroke and handle remain clear of the record caption th
     Array.from({ length: 221 }, (_, index) => {
       return index / 2;
     }).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const caption = [...markup.matchAll(/<text[^>]+>/g)]
         .map(([tag]) => {
           return tag;
@@ -193,10 +202,7 @@ test("the complete latch stroke and handle remain clear of the record caption th
         });
       const top = y - fontSize,
         bottom = y + fontSize * 0.3;
-      const latch = SvgAttributes.fromMarker({
-        markup,
-        marker: "commit-latch",
-      });
+      const latch = _markedShape({ markup, marker: "commit-latch" });
       const latchY = SvgAttributes.getNumberFromMarkup({
         attributes: latch,
         name: "y1",

@@ -42,7 +42,6 @@ test("graph placement preserves cards at normalized canvas boundaries at both de
       }
   }
 });
-
 test("connectors terminate on card boundaries, including vertical and diagonal paths", () => {
   const a = { x: 0, y: 0, width: 100, height: 80 };
   assert.deepEqual(edgeEndpoints(a, { ...a, x: 300 }), {
@@ -60,7 +59,6 @@ test("connectors terminate on card boundaries, including vertical and diagonal p
     return edgeEndpoints(a, a);
   }, /share a center/);
 });
-
 test("short graph cards reserve connector clearance without changing size during animation", () => {
   const bounds = sceneBounds(1600, 1000, true);
   const a = graphNodeRect(
@@ -86,7 +84,6 @@ test("short graph cards reserve connector clearance without changing size during
   assert.ok(b.y - (a.y + a.height) >= 40);
   assert.ok(a.height >= 128 && b.height >= 128);
 });
-
 test("graph validates references and ordering, while traversal is deterministic under random seeks", () => {
   const nodes: GraphNode[] = [
     { id: "a", label: "A", x: 0, y: 0 },
@@ -98,12 +95,12 @@ test("graph validates references and ordering, while traversal is deterministic 
     { nodeId: "b", atFrame: 60 },
   ];
   validateGraph(nodes, [edge], beats);
-  assert.equal(nodeHighlight(40, "a", beats), 1);
-  assert.equal(nodeHighlight(80, "a", beats), 0);
-  assert.equal(nodeHighlight(80, "b", beats), 1);
-  assert.equal(edgeHighlight(59, edge, beats), 0);
-  assert.equal(edgeHighlight(100, edge, beats), 1);
-  assert.equal(nodeHighlight(40, "a", beats), 1);
+  assert.equal(nodeHighlight({ frame: 40, nodeId: "a", traversal: beats }), 1);
+  assert.equal(nodeHighlight({ frame: 80, nodeId: "a", traversal: beats }), 0);
+  assert.equal(nodeHighlight({ frame: 80, nodeId: "b", traversal: beats }), 1);
+  assert.equal(edgeHighlight({ frame: 59, edge, traversal: beats }), 0);
+  assert.equal(edgeHighlight({ frame: 100, edge, traversal: beats }), 1);
+  assert.equal(nodeHighlight({ frame: 40, nodeId: "a", traversal: beats }), 1);
   assert.throws(() => {
     return validateGraph(nodes, [{ ...edge, to: "missing" }]);
   }, /Invalid graph edge/);
@@ -114,13 +111,9 @@ test("graph validates references and ordering, while traversal is deterministic 
     return validateGraph(nodes, [edge], [...beats].reverse());
   }, /increasing/);
 });
-
 test("flowchart routes sequential nodes along a serpentine grid without losing input order", () => {
   const steps = Array.from({ length: 6 }, (_, index) => {
-    return {
-      id: String(index),
-      label: String(index),
-    };
+    return { id: String(index), label: String(index) };
   });
   const nodes = flowNodes(steps);
   assert.deepEqual(
@@ -154,7 +147,6 @@ test("flowchart routes sequential nodes along a serpentine grid without losing i
     return flowNodes([]);
   }, /1 to 6/);
 });
-
 test("metric formatting preserves fractional values, negatives, grouping, and zero", () => {
   assert.equal(formatMetric(12345.678, 2), "12,345.68");
   assert.equal(formatMetric(-12.5, 1), "-12.5");
@@ -167,7 +159,6 @@ test("metric formatting preserves fractional values, negatives, grouping, and ze
     return formatMetric(1, 7);
   }, /precision/);
 });
-
 test("metric fitting reserves the complete stack on a compact captioned canvas", () => {
   const bounds = sceneBounds(
     1600,
@@ -217,7 +208,6 @@ test("metric fitting reserves the complete stack on a compact captioned canvas",
     return fitMetricContent({ ...bounds, ...content, height: 100 });
   }, /cannot fit legibly/);
 });
-
 test("metric fitting preserves the spacious layout when the whole stack fits", () => {
   const bounds = sceneBounds(1600, 840, true);
   const fit = fitMetricContent({
@@ -232,7 +222,6 @@ test("metric fitting preserves the spacious layout when the whole stack fits", (
   assert.equal(fit.paddingY, 50);
   assert.equal(fit.numberGap, 28);
 });
-
 test("typography wraps at word boundaries and resolves a stable readable size", () => {
   const fit = fitTextLines(
     [
@@ -256,7 +245,6 @@ test("typography wraps at word boundaries and resolves a stable readable size", 
     return fitTextLines(["W".repeat(100)], 200, 300, 92);
   }, /cannot fit legibly/);
 });
-
 test("media accepts only public-relative assets and crop rectangles inside the viewport", () => {
   assert.equal(
     safePublicPath("captures/demo/screen 01.png"),
@@ -286,7 +274,6 @@ test("media accepts only public-relative assets and crop rectangles inside the v
     return assertRect({ x: 0, y: 0, width: 0, height: 1 }, "crop");
   }, /nonempty/);
 });
-
 test("captions use exact half-open cue boundaries and reject overlap or duplicate ids", () => {
   const cues: CaptionCue[] = [
     { id: "a", startFrame: 10, endFrame: 40, text: "First cue" },
@@ -305,14 +292,13 @@ test("captions use exact half-open cue boundaries and reject overlap or duplicat
     return validateCaptions([cues[0], { ...cues[1], id: "a" }]);
   }, /Duplicate/);
 });
-
 test("the tallest caption reserves its full box, inset and clearance without resizing the scene", () => {
   // 180 characters is long enough to force the caption onto its tallest
   // wrapped layout (>= 3 lines) at this canvas width, which is the boundary
   // this test exercises.
   const text =
     "These fictional cases connect to visits, facilities, and districts so teams can inspect source records, compare reported needs, and see which households are still awaiting contact.";
-  const long = captionGeometry(text, 1600, 1000);
+  const long = captionGeometry({ text, width: 1600, height: 1000 });
   assert.ok(long.lines.length >= 3);
   assert.equal(long.fontSize, 38);
   const band = captionBand([{ text: "Short cue." }, { text }], 1600, 1000);
@@ -327,7 +313,6 @@ test("the tallest caption reserves its full box, inset and clearance without res
   assert.equal(captionBand([], 1600, 1000), 0);
   assert.equal(captionBand([{ text: "Short cue." }], 1600, 1000), 160);
 });
-
 test("a packet travels its edge only during its window, in its direction", () => {
   const start = { x: 0, y: 0 };
   const end = { x: 100, y: 0 };
@@ -335,15 +320,14 @@ test("a packet travels its edge only during its window, in its direction", () =>
     { atFrame: 10, durationInFrames: 10 },
     { atFrame: 30, durationInFrames: 10, direction: "reverse" as const },
   ];
-  assert.deepEqual(getPacketPositions(5, packets, start, end), []);
-  const forward = getPacketPositions(15, packets, start, end);
+  assert.deepEqual(getPacketPositions({ frame: 5, packets, start, end }), []);
+  const forward = getPacketPositions({ frame: 15, packets, start, end });
   assert.equal(forward.length, 1);
   assert.ok(forward[0].x > 0 && forward[0].x < 100);
-  const reverse = getPacketPositions(33, packets, start, end);
+  const reverse = getPacketPositions({ frame: 33, packets, start, end });
   assert.ok(reverse[0].x > 50, "a reverse packet starts at the far end");
-  assert.deepEqual(getPacketPositions(45, packets, start, end), []);
+  assert.deepEqual(getPacketPositions({ frame: 45, packets, start, end }), []);
 });
-
 test("parallel edges with offsets stay apart and still meet both card borders", () => {
   const a = { x: 0, y: 0, width: 100, height: 120 };
   const b = { x: 300, y: 0, width: 100, height: 120 };
@@ -353,7 +337,6 @@ test("parallel edges with offsets stay apart and still meet both card borders", 
   assert.equal(upper.start.x, 100);
   assert.equal(lower.end.x, 300);
 });
-
 test("a wide node with list items is taller than its label alone", () => {
   const bounds = sceneBounds(1920, 1080, true);
   const plain = graphNodeRect({ id: "n", label: "Core", x: 0, y: 0.5 }, bounds);

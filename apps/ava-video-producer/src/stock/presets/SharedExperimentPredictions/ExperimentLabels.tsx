@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
@@ -19,10 +19,11 @@ type Slot = [
  * bound.
  */
 export function ExperimentLabels({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Slot[] = [
     [input.labels.experiment, 40, 35, 880, 20, 1],
     [input.labels.prediction, 40, 86, 880, 16, 2],
-    [input.caption, 40, 589, 880, 12, 1, STOCK.muted],
+    [input.caption, 40, 589, 880, 12, 1, tokens.color.inactive],
     ...(frame >= 108
       ? ([
           [input.labels.observation, 40, 506, 340, 14, 3],

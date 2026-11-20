@@ -2,6 +2,14 @@ import { assertFinite, assertFrame } from "./geometry";
 import { fitTextLines } from "./textLayout";
 import type { CaptionCue } from "../scenes.types";
 
+type CaptionGeometryOptions = {
+  text: string;
+  width: number;
+  height: number;
+  fontSize?: number;
+  bottom?: number;
+  borderWidth?: number;
+};
 /** A caption's fitted lines, box metrics and the band it reserves. */
 type CaptionGeometry = {
   fontSize: number;
@@ -16,18 +24,23 @@ type CaptionGeometry = {
   clearance: number;
   requiredBand: number;
 };
-
+/**
+ * The caption border the reserved band is measured with when no theme is at
+ * hand: `classic`'s hairline. The drawn caption passes the theme's own.
+ */
+const DEFAULT_BORDER_WIDTH = 1;
 /**
  * One geometry calculation controls both the caption box and its reserved
  * band.
  */
-export function captionGeometry(
-  text: string,
-  width: number,
-  height: number,
+export function captionGeometry({
+  text,
+  width,
+  height,
   fontSize = 38,
   bottom = 48,
-): CaptionGeometry {
+  borderWidth = DEFAULT_BORDER_WIDTH,
+}: Readonly<CaptionGeometryOptions>): CaptionGeometry {
   assertFinite(width, "caption width");
   assertFinite(height, "caption height");
   assertFinite(bottom, "caption bottom");
@@ -40,7 +53,6 @@ export function captionGeometry(
   const maxWidth = width * 0.84;
   const paddingX = 32;
   const paddingY = 18;
-  const borderWidth = 1;
   const lineHeight = 1.22;
   const clearance = 8;
   const fitted = fitTextLines(
@@ -67,7 +79,6 @@ export function captionGeometry(
     requiredBand: Math.ceil(boxHeight + bottom + clearance),
   };
 }
-
 /**
  * Reserve the tallest cue for the entire film so scenes never resize between
  * cues.
@@ -81,11 +92,10 @@ export function captionBand(
   return Math.max(
     160,
     ...cues.map((cue) => {
-      return captionGeometry(cue.text, width, height).requiredBand;
+      return captionGeometry({ text: cue.text, width, height }).requiredBand;
     }),
   );
 }
-
 export function safePublicPath(src: string): string {
   // Control characters must not enter a media URL.
   if (
@@ -104,7 +114,6 @@ export function safePublicPath(src: string): string {
   }
   return src;
 }
-
 export function validateCaptions(cues: CaptionCue[]): void {
   const ids = new Set<string>();
   cues.forEach((cue, index) => {
@@ -119,7 +128,6 @@ export function validateCaptions(cues: CaptionCue[]): void {
     ids.add(cue.id);
   });
 }
-
 export function activeCaption(
   frame: number,
   cues: CaptionCue[],

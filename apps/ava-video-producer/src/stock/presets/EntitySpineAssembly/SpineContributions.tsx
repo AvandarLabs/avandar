@@ -1,4 +1,5 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
 import { SpineContribution } from "./SpineContribution";
 import { SpineSum } from "./SpineSum";
@@ -18,6 +19,7 @@ export function SpineContributions({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   if (frame < 49 || frame >= 139) {
     return null;
   }
@@ -32,6 +34,7 @@ export function SpineContributions({
           observation,
           index,
           frame,
+          motion,
         });
         return (
           <g key={observation.id}>
