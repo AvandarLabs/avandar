@@ -121,11 +121,16 @@ audit: stop and re-run the audit's checks before going on. Never use port
 
 ### 1.5 Rules for production access and the dumps
 
-This runbook never runs `supabase link` or a `--linked` command. In CLI
-2.114 those create a temporary login role in the target project, with write
-access, and after 3 failed connection retries they delete the project's
-network bans. Every production dump goes through `--db-url "$PROD_DB_URL"`
-instead.
+`supabase link` itself makes no database connection: it calls Management
+API reads and writes files under `supabase/.temp/`. The dangerous case in
+CLI 2.114 is a `--linked` database connection (`db dump --linked`,
+`db push --linked`, and the like) that resolves no database password (no
+`--password`, no `SUPABASE_DB_PASSWORD`, nothing in the project's `.env`).
+The CLI then creates a temporary login role in the project with write
+access, and after 3 failed connection retries deletes the project's network
+bans. `--db-url` never takes that path, so every production dump here goes
+through `--db-url "$PROD_DB_URL"`, with the password in the URL, and this
+runbook runs no `--linked` command.
 
 | Connects to production | Steps | What it does there |
 | --- | --- | --- |
@@ -1167,6 +1172,12 @@ gh run watch "$RUN_ID"
 | 7 | Set edge function secrets | **Yes** |
 | 8 | Deploy edge functions | **Yes** |
 | 9 | Deploy the prebuilt web app to Vercel (`--prod`) | **Yes** |
+
+Step 6 runs `supabase link` and `db push` with a non-empty
+`SUPABASE_DB_PASSWORD` on purpose (1.5): the configuration check (step 4)
+refuses an empty `PRODUCTION_DB_PASSWORD`, so it must stay before "Apply
+migrations". `link` stays in CI because `db push` falls back to the pooler
+URL it saves when the direct host is IPv6 only.
 
 | Fails at | Production | Do |
 | --- | --- | --- |
