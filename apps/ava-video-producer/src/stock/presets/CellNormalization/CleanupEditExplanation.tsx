@@ -16,7 +16,6 @@ export function CleanupEditExplanation({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   if (!input.showEditLabels) {
     return undefined;
@@ -42,19 +41,30 @@ export function CleanupEditExplanation({
           isSublabel
         />
       )}
-      <g data-edit-value={row.id}>
-        <FitText
-          text={row.editLabel}
-          x={inline ? 514 : 88}
-          y={inline ? 22 : 62}
-          width={352}
-          fontSize={12}
-          maxLines={2}
-          breakLongWords
-          normalizeWhitespace
-          color={tokens.color.textMuted}
-        />
-      </g>
+      <EditValue row={row} isInline={inline} />
+    </g>
+  );
+}
+
+/** The row's edit explanation, inline beside the ghost or under its lane. */
+function EditValue({
+  row,
+  isInline,
+}: Readonly<{ row: Props["row"]; isInline: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g data-edit-value={row.id}>
+      <FitText
+        text={row.editLabel}
+        x={isInline ? 514 : 88}
+        y={isInline ? 22 : 62}
+        width={352}
+        fontSize={12}
+        maxLines={2}
+        breakLongWords
+        normalizeWhitespace
+        color={tokens.color.textMuted}
+      />
     </g>
   );
 }

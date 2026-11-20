@@ -31,13 +31,10 @@ export function AmountRuler({
 }: Readonly<Props>): ReactNode {
   const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
-  const x = comparison.isMatched ? 290 : 290 + index * 320;
-  const y = comparison.isMatched ? 425 + index * 39 : 425;
+  const { x, y, labelX, labelY } = _getRulerPlacement(comparison, index);
   const amountLabel = (total / input.money.minorUnitsPerUnit).toFixed(
     precision,
   );
-  const labelX = comparison.isMatched ? 60 : x;
-  const labelY = comparison.isMatched ? y + 5 : y + 44;
   return (
     <g
       key={index}
@@ -66,4 +63,19 @@ export function AmountRuler({
       <LabelSlots labels={[[amountLabel, labelX, labelY, 200, 14, 1]]} />
     </g>
   );
+}
+
+/**
+ * Matched rulers stack on one shared scale with labels to their left;
+ * unmatched ones sit side by side with labels below.
+ */
+function _getRulerPlacement(comparison: Props["comparison"], index: number) {
+  const x = comparison.isMatched ? 290 : 290 + index * 320;
+  const y = comparison.isMatched ? 425 + index * 39 : 425;
+  return {
+    x,
+    y,
+    labelX: comparison.isMatched ? 60 : x,
+    labelY: comparison.isMatched ? y + 5 : y + 44,
+  };
 }

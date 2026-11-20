@@ -52,38 +52,34 @@ export function LocalOffsetMarker({
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const { progress, source, displaced, vector } = _getOffsetGeometry({
-    location,
-    frame,
-    motion,
-  });
+  const offset = _getOffsetGeometry({ location, frame, motion });
   return (
     <g>
       {showOriginal ? (
         <circle
           data-local-original={location.id}
-          {...source}
+          {...offset.source}
           r={5}
           fill={tokens.color.highlight}
         />
       ) : undefined}
       <SketchedShape
-        shape={{ kind: "line", ...vector }}
+        shape={{ kind: "line", ...offset.vector }}
         profile={tokens.sketch.shape}
         data-local-offset={location.id}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
-        opacity={progress}
+        opacity={offset.progress}
       />
       <SketchedShape
-        shape={{ kind: "circle", ...displaced, r: 7 }}
+        shape={{ kind: "circle", ...offset.displaced, r: 7 }}
         profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        opacity={progress}
+        opacity={offset.progress}
       />
-      <Text x={displaced.cx} y={displaced.cy + 4} role="data">
+      <Text x={offset.displaced.cx} y={offset.displaced.cy + 4} role="data">
         {index + 1}
       </Text>
     </g>

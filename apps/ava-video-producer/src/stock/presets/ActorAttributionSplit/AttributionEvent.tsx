@@ -76,29 +76,23 @@ export function AttributionEvent({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const {
-    personIndex,
-    accountId,
-    account,
-    onset,
-    travelFrames,
-    travel,
-    x,
-    y,
-    visible,
-  } = _getEventStamp({ frame, input, event, index, motion });
+  const stamp = _getEventStamp({ frame, input, event, index, motion });
   return (
-    <g data-event={event.id} data-account={accountId} opacity={visible}>
-      <g opacity={travel}>
+    <g
+      data-event={event.id}
+      data-account={stamp.accountId}
+      opacity={stamp.visible}
+    >
+      <g opacity={stamp.travel}>
         <LabelSlots
           labels={[[event.label, 575, 135 + index * 82, 320, 12, 3]]}
         />
       </g>
-      {frame >= onset && frame < onset + travelFrames ? (
+      {frame >= stamp.onset && frame < stamp.onset + stamp.travelFrames ? (
         <StampHandling
-          x={x}
-          y={y}
-          personIndex={personIndex}
+          x={stamp.x}
+          y={stamp.y}
+          personIndex={stamp.personIndex}
           eventId={event.id}
           showGuides={input.showActionGuides}
           accent={accent}
@@ -106,9 +100,9 @@ export function AttributionEvent({
       ) : undefined}
       <RecordedStamp
         eventId={event.id}
-        accountLabel={account.label}
-        x={x}
-        y={y}
+        accountLabel={stamp.account.label}
+        x={stamp.x}
+        y={stamp.y}
         color={event.phase === "shared" ? tokens.color.inactive : accent}
       />
     </g>

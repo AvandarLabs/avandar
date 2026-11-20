@@ -13,25 +13,12 @@ export function BatchHeadings({ input }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   return (
     <g>
-      <FitText
-        text={input.intakeLabel}
-        x={40}
-        y={64}
-        width={400}
-        fontSize={20}
-        maxLines={2}
-        normalizeWhitespace
-        breakLongWords
-      />
-      <FitText
+      <BatchHeading text={input.intakeLabel} x={40} width={400} maxLines={2} />
+      <BatchHeading
         text={input.destinationLabel}
         x={550}
-        y={64}
         width={370}
-        fontSize={20}
         maxLines={3}
-        normalizeWhitespace
-        breakLongWords
       />
       <FitText
         text={input.boundaryLabel}
@@ -54,5 +41,31 @@ export function BatchHeadings({ input }: Readonly<Props>): ReactNode {
         />
       </g>
     </g>
+  );
+}
+
+/** A heading above one side of the boundary. */
+function BatchHeading({
+  text,
+  x,
+  width,
+  maxLines,
+}: Readonly<{
+  text: string;
+  x: number;
+  width: number;
+  maxLines: number;
+}>): ReactNode {
+  return (
+    <FitText
+      text={text}
+      x={x}
+      y={64}
+      width={width}
+      fontSize={20}
+      maxLines={maxLines}
+      normalizeWhitespace
+      breakLongWords
+    />
   );
 }

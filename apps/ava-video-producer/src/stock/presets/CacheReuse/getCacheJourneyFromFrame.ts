@@ -29,6 +29,37 @@ export function getCacheJourneyFromFrame(
   frame: number,
   motion: VideoMotion,
 ): GetCacheJourneyResult {
+  return {
+    ..._getKeyPosition(frame, motion),
+    originActive:
+      ramp(frame, 42, motion.whip, motion.reveal.easing) *
+      (1 -
+        ramp(
+          frame,
+          FIRST_RETURN_CUE,
+          motion.reveal.duration,
+          motion.exit.easing,
+        )),
+    stored: ramp(
+      frame,
+      FIRST_RETURN_CUE,
+      motion.scale(STORED_FRAMES),
+      motion.reveal.easing,
+    ),
+    response: ramp(
+      frame,
+      78,
+      motion.scale(RESPONSE_FRAMES),
+      motion.reveal.easing,
+    ),
+  };
+}
+
+/** Where the lookup key is: out to the cache, down to the origin, and back. */
+function _getKeyPosition(
+  frame: number,
+  motion: VideoMotion,
+): Pick<GetCacheJourneyResult, "x" | "y"> {
   const travel = motion.travel.easing;
   const outbound = ramp(frame, 24, motion.scale(OUTBOUND_FRAMES), travel);
   const originTrip = ramp(frame, 42, motion.scale(ORIGIN_TRIP_FRAMES), travel);
@@ -54,26 +85,5 @@ export function getCacheJourneyFromFrame(
       frame < FIRST_RETURN_CUE
         ? 290 + 150 * originTrip * (1 - originReturn)
         : 290,
-    originActive:
-      ramp(frame, 42, motion.whip, motion.reveal.easing) *
-      (1 -
-        ramp(
-          frame,
-          FIRST_RETURN_CUE,
-          motion.reveal.duration,
-          motion.exit.easing,
-        )),
-    stored: ramp(
-      frame,
-      FIRST_RETURN_CUE,
-      motion.scale(STORED_FRAMES),
-      motion.reveal.easing,
-    ),
-    response: ramp(
-      frame,
-      78,
-      motion.scale(RESPONSE_FRAMES),
-      motion.reveal.easing,
-    ),
   };
 }

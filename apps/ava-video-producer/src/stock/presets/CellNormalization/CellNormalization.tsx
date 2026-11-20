@@ -22,33 +22,10 @@ export function CellNormalization({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const rail = ramp(
-    frame,
-    RAIL_CUE,
-    motion.scale(RAIL_FRAMES),
-    motion.reveal.easing,
-  );
   return (
     <g>
       <CleanupHeadings input={input} frame={frame} accent={accent} />
-      <g data-original-rail={input.comparison} opacity={rail}>
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d:
-              input.comparison === "side-rail" ? "M496 132V584" : "M64 132H896",
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.hairline)}
-          pathLength={RAIL_LENGTH}
-          strokeDasharray={RAIL_LENGTH}
-          strokeDashoffset={RAIL_LENGTH * (1 - rail)}
-        />
-      </g>
+      <OriginalValueRail frame={frame} input={input} accent={accent} />
       {input.rows.map((row, index) => {
         return (
           <CleanupRow
@@ -61,6 +38,39 @@ export function CellNormalization({
           />
         );
       })}
+    </g>
+  );
+}
+
+/** The rail beside or across the rows that keeps the original values. */
+function OriginalValueRail({
+  frame,
+  input,
+  accent,
+}: Readonly<Pick<Props, "frame" | "input" | "accent">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const rail = ramp(
+    frame,
+    RAIL_CUE,
+    motion.scale(RAIL_FRAMES),
+    motion.reveal.easing,
+  );
+  return (
+    <g data-original-rail={input.comparison} opacity={rail}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: input.comparison === "side-rail" ? "M496 132V584" : "M64 132H896",
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+        pathLength={RAIL_LENGTH}
+        strokeDasharray={RAIL_LENGTH}
+        strokeDashoffset={RAIL_LENGTH * (1 - rail)}
+      />
     </g>
   );
 }

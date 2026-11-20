@@ -46,19 +46,31 @@ export function ArgumentDeck({
         />
       </g>
       {input.relationship === "requires" ? (
-        <g data-required-brackets="true">
-          <SketchedShape
-            shape={{ kind: "path", d: "M30 330 V370 H50 M930 330 V370 H910" }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-            opacity={deck}
-          />
-        </g>
+        <RequiredBrackets deck={deck} accent={accent} />
       ) : null}
       <ArgumentConnector {...{ frame, input, accent, id: "connector" }} />
       <ArgumentConclusion {...{ frame, input, accent, id: "conclusion" }} />
+    </g>
+  );
+}
+
+/** Brackets at both ends of the deck when the premises are necessary. */
+function RequiredBrackets({
+  deck,
+  accent,
+}: Readonly<{ deck: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-required-brackets="true">
+      <SketchedShape
+        shape={{ kind: "path", d: "M30 330 V370 H50 M930 330 V370 H910" }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        opacity={deck}
+      />
     </g>
   );
 }

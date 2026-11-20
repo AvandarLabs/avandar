@@ -3,6 +3,7 @@ import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BatchFrame } from "./BatchFrame";
 import { BatchMembers } from "./BatchMembers";
 import { BatchReleaseCaption } from "./BatchReleaseCaption";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
@@ -31,28 +32,16 @@ export function BatchEnvelope({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const start = index ? 94 : 18;
-  const completeAt = index ? 124 : 68;
-  const dispatchAt = index ? 128 : 82;
-  const dispatchDuration = motion.scale(
-    index ? LATER_DISPATCH_FRAMES : FIRST_DISPATCH_FRAMES,
-  );
-  const x = mix(
-    ramp(frame, dispatchAt, dispatchDuration, motion.travel.easing),
-    70,
-    560,
-  );
+  const { start, completeAt, x } = _getBatchLayout(frame, index, motion);
   const y = 210 + index * 200;
-  const width = 360;
-  const isComplete = frame >= completeAt;
   return (
     <g opacity={motion.reveal(frame, start - LEAD_IN_FRAMES)}>
       <BatchFrame
         batchId={batch.id}
-        isComplete={isComplete}
+        isComplete={frame >= completeAt}
         x={x}
         y={y}
-        width={width}
+        width={360}
         frame={frame}
         completeAt={completeAt}
         accent={accent}
@@ -73,4 +62,21 @@ export function BatchEnvelope({
       />
     </g>
   );
+}
+
+/** A batch's cues and its position as it crosses the dispatch boundary. */
+function _getBatchLayout(frame: number, index: number, motion: VideoMotion) {
+  const dispatchAt = index ? 128 : 82;
+  const dispatchDuration = motion.scale(
+    index ? LATER_DISPATCH_FRAMES : FIRST_DISPATCH_FRAMES,
+  );
+  return {
+    start: index ? 94 : 18,
+    completeAt: index ? 124 : 68,
+    x: mix(
+      ramp(frame, dispatchAt, dispatchDuration, motion.travel.easing),
+      70,
+      560,
+    ),
+  };
 }

@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { PremiseStrip } from "./PremiseStrip";
 import { PremiseSupport } from "./PremiseSupport";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 
@@ -35,18 +36,7 @@ export function ArgumentPremise({
   const slotWidth = 900 / count;
   const x = 30 + index * slotWidth;
   const center = x + slotWidth / 2;
-  const arrival = ramp(
-    frame,
-    12 + index * motion.scaleStagger(ARRIVAL_STAGGER_FRAMES),
-    motion.hero,
-    motion.entrance.easing,
-  );
-  const joining = ramp(
-    frame,
-    48 + index * motion.scaleStagger(JOIN_STAGGER_FRAMES),
-    motion.scale(JOIN_FRAMES),
-    motion.travel.easing,
-  );
+  const { arrival, joining } = _getPremiseProgress(frame, index, motion);
   return (
     <g
       data-premise={premise.id}
@@ -68,4 +58,26 @@ export function ArgumentPremise({
       />
     </g>
   );
+}
+
+/** A premise's arrival and its arms joining the deck, both 0 to 1. */
+function _getPremiseProgress(
+  frame: number,
+  index: number,
+  motion: VideoMotion,
+) {
+  return {
+    arrival: ramp(
+      frame,
+      12 + index * motion.scaleStagger(ARRIVAL_STAGGER_FRAMES),
+      motion.hero,
+      motion.entrance.easing,
+    ),
+    joining: ramp(
+      frame,
+      48 + index * motion.scaleStagger(JOIN_STAGGER_FRAMES),
+      motion.scale(JOIN_FRAMES),
+      motion.travel.easing,
+    ),
+  };
 }

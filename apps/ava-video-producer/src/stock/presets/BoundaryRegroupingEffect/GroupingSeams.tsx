@@ -16,9 +16,7 @@ export function GroupingSeams({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       {[0, 1].map((index) => {
@@ -33,29 +31,40 @@ export function GroupingSeams({
                 : motion.ramp(frame, 72, motion.scale(36))
             }
           >
-            {getGroupingFromCells({ input, index }).map((zone) => {
-              return (
-                <SketchedShape
-                  key={zone.id}
-                  shape={{
-                    kind: "path",
-                    d: buildZoneOutlineFromCells(zone.cells),
-                  }}
-                  profile={tokens.sketch.shape}
-                  data-zone-outline={zone.id}
-                  fill="none"
-                  stroke={
-                    [accent, tokens.color.accentAlt, tokens.color.highlight][
-                      zone.zoneIndex
-                    ]
-                  }
-                  strokeWidth={scales.stroke(tokens.stroke.heavy)}
-                />
-              );
-            })}
+            <PartitionOutlines input={input} index={index} accent={accent} />
           </g>
         );
       })}
     </g>
   );
+}
+
+/** The outline of every zone in one grouping of the grid. */
+function PartitionOutlines({
+  input,
+  index,
+  accent,
+}: Readonly<{ input: Input; index: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return getGroupingFromCells({ input, index }).map((zone) => {
+    return (
+      <SketchedShape
+        key={zone.id}
+        shape={{
+          kind: "path",
+          d: buildZoneOutlineFromCells(zone.cells),
+        }}
+        profile={tokens.sketch.shape}
+        data-zone-outline={zone.id}
+        fill="none"
+        stroke={
+          [accent, tokens.color.accentAlt, tokens.color.highlight][
+            zone.zoneIndex
+          ]
+        }
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
+    );
+  });
 }

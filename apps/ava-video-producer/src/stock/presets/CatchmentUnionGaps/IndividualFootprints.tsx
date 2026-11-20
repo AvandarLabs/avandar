@@ -21,6 +21,7 @@ export function IndividualFootprints({
   const { atomic } = useGraphicTheme();
   const scales = useGraphicShapeScales();
   const shapes = getCatchmentShapesFromInput(input);
+  const colors = _getFootprintColors(accent, tokens);
   return (
     <g>
       <g data-separate-tint="" opacity={1 - progress}>
@@ -29,14 +30,7 @@ export function IndividualFootprints({
             <polygon
               key={shape.id}
               points={shape.points}
-              fill={
-                [
-                  accent,
-                  tokens.color.accentAlt,
-                  tokens.color.highlight,
-                  tokens.color.positive,
-                ][index]
-              }
+              fill={colors[index]}
               fillOpacity={tokens.alpha.ghost}
             />
           );
@@ -53,14 +47,7 @@ export function IndividualFootprints({
               shape={{ kind: "path", d: `M${shape.points}Z` }}
               profile={tokens.sketch.shape}
               fill="none"
-              stroke={
-                [
-                  accent,
-                  tokens.color.accentAlt,
-                  tokens.color.highlight,
-                  tokens.color.positive,
-                ][index]
-              }
+              stroke={colors[index]}
               strokeWidth={scales.stroke(FOOTPRINT_WIDTH)}
               strokeDasharray={getFootprintDashFromIndex(atomic, index)}
             />
@@ -69,4 +56,17 @@ export function IndividualFootprints({
       </g>
     </g>
   );
+}
+
+/** One colour per footprint, in the order the input lists them. */
+function _getFootprintColors(
+  accent: string,
+  tokens: ReturnType<typeof useGraphicTokens>,
+): readonly string[] {
+  return [
+    accent,
+    tokens.color.accentAlt,
+    tokens.color.highlight,
+    tokens.color.positive,
+  ];
 }

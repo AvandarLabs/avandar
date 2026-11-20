@@ -16,96 +16,111 @@ function _getPosition({
   index,
   frame,
   motion,
-}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): {
-  x: number;
-  y: number;
-} {
-  const column = index % 3;
-  let x = 110 + index * 90;
-  let y =
+}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): Position {
+  const position =
     index < 3
-      ? mix(
-          motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
-          250,
-          225,
-        )
-      : 250;
-  if (index < 3) {
-    const progress = motion.ramp(frame, 88, motion.whip, motion.travel.easing);
-    x = mix(progress, x, 210 + column * 170);
-    y = mix(progress, y, 280);
-  } else {
-    const lane = [210, 550, 600][column];
-    x = mix(
-      motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
-      x,
-      lane,
-    );
-    x = mix(
-      motion.ramp(frame, 90, motion.chip, motion.travel.easing),
-      x,
-      210 + column * 170,
-    );
-    y = mix(
-      motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
-      250,
-      285,
-    );
-    y = mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450);
+      ? _getSeatedPosition(index, frame, motion)
+      : _getEnteringPosition(index, frame, motion);
+  if (input.resolvedLayout !== "open-horseshoe") {
+    return position;
   }
-  if (input.resolvedLayout === "open-horseshoe") {
-    if (index === 0) {
-      x = mix(
-        motion.ramp(frame, 96, motion.press.duration, motion.travel.easing),
-        x,
-        200,
-      );
-      x = mix(
-        motion.ramp(frame, 104, motion.press.duration, motion.travel.easing),
-        x,
-        210,
-      );
-    }
-    if (index === 1) {
-      x = mix(
-        motion.ramp(frame, 96, motion.press.duration, motion.travel.easing),
-        x,
-        250,
-      );
-      y = mix(
-        motion.ramp(frame, 100, motion.press.duration, motion.travel.easing),
-        y,
-        365,
-      );
-      x = mix(
-        motion.ramp(frame, 104, motion.press.duration, motion.travel.easing),
-        x,
-        210,
-      );
-    }
-    if (index === 3) {
-      x = mix(
-        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
-        x,
-        290,
-      );
-    }
-    if (index === 4) {
-      x = mix(
-        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
-        x,
-        470,
-      );
-    }
-    if (index === 5) {
-      y = mix(
-        motion.ramp(frame, 96, motion.scale(12), motion.travel.easing),
-        y,
-        365,
-      );
-    }
+  return index < 3
+    ? _getHorseshoeFrontPosition(index, frame, motion, position)
+    : _getHorseshoeBackPosition(index, frame, motion, position);
+}
+
+type Position = { x: number; y: number };
+
+/** The first three learners rise from their desks, then move to a column. */
+function _getSeatedPosition(
+  index: number,
+  frame: number,
+  motion: VideoMotion,
+): Position {
+  const column = index % 3;
+  const y = mix(
+    motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
+    250,
+    225,
+  );
+  const progress = motion.ramp(frame, 88, motion.whip, motion.travel.easing);
+  return {
+    x: mix(progress, 110 + index * 90, 210 + column * 170),
+    y: mix(progress, y, 280),
+  };
+}
+
+/** The other learners step into a lane, then walk down to their column. */
+function _getEnteringPosition(
+  index: number,
+  frame: number,
+  motion: VideoMotion,
+): Position {
+  const column = index % 3;
+  const lane = [210, 550, 600][column];
+  let x = mix(
+    motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
+    110 + index * 90,
+    lane,
+  );
+  x = mix(
+    motion.ramp(frame, 90, motion.chip, motion.travel.easing),
+    x,
+    210 + column * 170,
+  );
+  const y = mix(
+    motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
+    250,
+    285,
+  );
+  return {
+    x,
+    y: mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450),
+  };
+}
+
+/** In the open horseshoe, the first two learners step around the table. */
+function _getHorseshoeFrontPosition(
+  index: number,
+  frame: number,
+  motion: VideoMotion,
+  { x, y }: Position,
+): Position {
+  const step = (at: number) => {
+    return motion.ramp(frame, at, motion.press.duration, motion.travel.easing);
+  };
+  if (index === 0) {
+    return { x: mix(step(104), mix(step(96), x, 200), 210), y };
+  }
+  if (index === 1) {
+    return {
+      x: mix(step(104), mix(step(96), x, 250), 210),
+      y: mix(step(100), y, 365),
+    };
   }
   return { x, y };
+}
+
+/** In the open horseshoe, three of the back learners close the curve. */
+function _getHorseshoeBackPosition(
+  index: number,
+  frame: number,
+  motion: VideoMotion,
+  { x, y }: Position,
+): Position {
+  const progress = motion.ramp(
+    frame,
+    96,
+    motion.scale(12),
+    motion.travel.easing,
+  );
+  if (index === 3) {
+    return { x: mix(progress, x, 290), y };
+  }
+  if (index === 4) {
+    return { x: mix(progress, x, 470), y };
+  }
+  return index === 5 ? { x, y: mix(progress, y, 365) } : { x, y };
 }
 /** Stable walking or wheeled icons enter the same shared activity footprint. */
 export function ClassroomLearner({

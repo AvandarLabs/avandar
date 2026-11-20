@@ -26,7 +26,6 @@ export function PaymentTray({
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const y = 306 + index * 120;
-  const targetX = 330 + payment.receivedUnits * 68;
   return (
     <g>
       <SketchedShape
@@ -53,18 +52,36 @@ export function PaymentTray({
       {frame >= 60 &&
       frame <= 70 &&
       payment.receivedUnits < payment.statedUnits ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M250 160 H280 V${y - 26} H${targetX} L${targetX} ${y + 24}`,
-          }}
-          profile={tokens.sketch.shape}
-          data-gap-point={payment.id}
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.heavy)}
-        />
+        <GapPointer payment={payment} y={y} accent={accent} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The participant's pointer to the first stated position with no token. */
+function GapPointer({
+  payment,
+  y,
+  accent,
+}: Readonly<{
+  payment: Props["payment"];
+  y: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const targetX = 330 + payment.receivedUnits * 68;
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M250 160 H280 V${y - 26} H${targetX} L${targetX} ${y + 24}`,
+      }}
+      profile={tokens.sketch.shape}
+      data-gap-point={payment.id}
+      fill="none"
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.heavy)}
+    />
   );
 }

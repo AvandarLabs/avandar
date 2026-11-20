@@ -35,9 +35,6 @@ export function BatchFrame({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const seal = motion.scale(SEAL_FRAMES);
-  const lineWidth = scales.stroke(tokens.stroke.default);
   return (
     <g>
       <rect
@@ -60,25 +57,44 @@ export function BatchFrame({
         profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={lineWidth}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <g data-envelope-seal={batchId}>
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${x} ${y + 20} V${y} H${x + width} V${y + 20}`,
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={accent}
-          strokeWidth={lineWidth}
-          strokeDasharray={width + 40}
-          strokeDashoffset={
-            (width + 40) *
-            (1 - ramp(frame, completeAt - seal, seal, motion.reveal.easing))
-          }
-        />
-      </g>
+      <EnvelopeSeal {...{ batchId, x, y, width, frame, completeAt, accent }} />
+    </g>
+  );
+}
+
+/** The envelope's lid, drawn closed over the seal frames before completion. */
+function EnvelopeSeal({
+  batchId,
+  x,
+  y,
+  width,
+  frame,
+  completeAt,
+  accent,
+}: Readonly<Omit<Props, "isComplete">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const seal = motion.scale(SEAL_FRAMES);
+  return (
+    <g data-envelope-seal={batchId}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x} ${y + 20} V${y} H${x + width} V${y + 20}`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeDasharray={width + 40}
+        strokeDashoffset={
+          (width + 40) *
+          (1 - ramp(frame, completeAt - seal, seal, motion.reveal.easing))
+        }
+      />
     </g>
   );
 }

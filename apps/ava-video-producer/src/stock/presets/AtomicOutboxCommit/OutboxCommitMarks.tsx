@@ -47,28 +47,37 @@ export function OutboxCommitMarks({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      {input.outcome === "commit"
-        ? [400, 840].map((x) => {
-            return (
-              <circle
-                key={x}
-                data-commit-stamp={x}
-                cx={x}
-                cy={490}
-                r={
-                  9 *
-                  ramp(
-                    frame,
-                    OUTCOME_CUE,
-                    motion.scale(STAMP_FRAMES),
-                    motion.entrance.easing,
-                  )
-                }
-                fill={accent}
-              />
-            );
-          })
-        : undefined}
+      {input.outcome === "commit" ? (
+        <CommitStamps frame={frame} accent={accent} />
+      ) : undefined}
     </g>
   );
+}
+
+/** A commit stamp under each store, growing on the outcome cue. */
+function CommitStamps({
+  frame,
+  accent,
+}: Readonly<{ frame: number; accent: string }>): ReactNode {
+  const motion = useGraphicMotion();
+  const radius =
+    9 *
+    ramp(
+      frame,
+      OUTCOME_CUE,
+      motion.scale(STAMP_FRAMES),
+      motion.entrance.easing,
+    );
+  return [400, 840].map((x) => {
+    return (
+      <circle
+        key={x}
+        data-commit-stamp={x}
+        cx={x}
+        cy={490}
+        r={radius}
+        fill={accent}
+      />
+    );
+  });
 }

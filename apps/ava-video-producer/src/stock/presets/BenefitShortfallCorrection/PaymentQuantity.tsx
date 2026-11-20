@@ -48,19 +48,27 @@ export function PaymentQuantity({
         />
       ) : undefined}
       <LabelSlots labels={[[label, 76 + index * 224, 200, 192, 12, 3]]} />
-      {showTotals ? (
-        <text
-          data-quantity-total={index}
-          x={76 + index * 224}
-          y={258}
-          fill={tokens.color.text}
-          fontFamily={tokens.text.graphic.body.fontFamily}
-          fontWeight={tokens.text.graphic.body.fontWeight}
-          fontSize={tokens.text.graphic.body.fontSize}
-        >
-          {total}
-        </text>
-      ) : undefined}
+      {showTotals ? <QuantityTotal index={index} total={total} /> : undefined}
     </g>
+  );
+}
+
+function QuantityTotal({
+  index,
+  total,
+}: Readonly<{ index: number; total: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      data-quantity-total={index}
+      x={76 + index * 224}
+      y={258}
+      fill={tokens.color.text}
+      fontFamily={tokens.text.graphic.body.fontFamily}
+      fontWeight={tokens.text.graphic.body.fontWeight}
+      fontSize={tokens.text.graphic.body.fontSize}
+    >
+      {total}
+    </text>
   );
 }

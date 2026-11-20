@@ -15,49 +15,16 @@ export function ClassroomDays({
   input,
   activeIndex,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.days.map((day, index) => {
         return (
-          <g key={day.id}>
-            <Text
-              x={32 + index * 310}
-              y={32}
-              role="secondary"
-              fill={tokens.color.textMuted}
-            >
-              {index + 1}
-            </Text>
-            <FitText
-              text={day.label}
-              x={56 + index * 310}
-              y={32}
-              width={270}
-              fontSize={16}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
-            <SketchedShape
-              shape={{
-                kind: "path",
-                d: `M ${32 + index * 310} 90 H ${308 + index * 310}`,
-              }}
-              profile={tokens.sketch.shape}
-              stroke={
-                index === activeIndex
-                  ? tokens.color.accentAlt
-                  : tokens.color.line
-              }
-              strokeWidth={scales.stroke(
-                index === activeIndex
-                  ? tokens.stroke.emphasis
-                  : tokens.stroke.hairline,
-              )}
-            />
-          </g>
+          <ClassroomDay
+            key={day.id}
+            label={day.label}
+            index={index}
+            isActive={index === activeIndex}
+          />
         );
       })}
       <FitText
@@ -69,6 +36,49 @@ export function ClassroomDays({
         maxLines={1}
         breakLongWords
         normalizeWhitespace
+      />
+    </g>
+  );
+}
+
+/** One numbered day over its rule, emphasised while it is the active day. */
+function ClassroomDay({
+  label,
+  index,
+  isActive,
+}: Readonly<{ label: string; index: number; isActive: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g>
+      <Text
+        x={32 + index * 310}
+        y={32}
+        role="secondary"
+        fill={tokens.color.textMuted}
+      >
+        {index + 1}
+      </Text>
+      <FitText
+        text={label}
+        x={56 + index * 310}
+        y={32}
+        width={270}
+        fontSize={16}
+        maxLines={3}
+        breakLongWords
+        normalizeWhitespace
+      />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M ${32 + index * 310} 90 H ${308 + index * 310}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={isActive ? tokens.color.accentAlt : tokens.color.line}
+        strokeWidth={scales.stroke(
+          isActive ? tokens.stroke.emphasis : tokens.stroke.hairline,
+        )}
       />
     </g>
   );

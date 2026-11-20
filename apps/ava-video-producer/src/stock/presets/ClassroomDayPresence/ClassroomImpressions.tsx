@@ -52,36 +52,49 @@ export function ClassroomImpressions({
             >
               {index + 1}
             </Text>
-            {state === "present" ? (
-              <circle
-                cx={center + 7}
-                cy={y}
-                r={5}
-                fill={tokens.color.positive}
-              />
-            ) : state === "absent" ? (
-              <StockRect
-                x={center + 2}
-                y={y - 5}
-                width={10}
-                height={10}
-                fill="none"
-                stroke={tokens.color.inactive}
-              />
-            ) : (
-              <SketchedShape
-                shape={{
-                  kind: "path",
-                  d: `M ${center + 7} ${y - 6} l 6 6 l -6 6 l -6 -6 Z`,
-                }}
-                profile={tokens.sketch.shape}
-                fill="none"
-                stroke={tokens.color.highlight}
-              />
-            )}
+            <DayImpressionMark state={state} center={center} y={y} />
           </g>
         );
       })}
     </g>
+  );
+}
+
+/** A circle for present, an empty square for absent, a diamond if unknown. */
+function DayImpressionMark({
+  state,
+  center,
+  y,
+}: Readonly<{
+  state: Input["days"][number]["records"][number]["state"];
+  center: number;
+  y: number;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  if (state === "present") {
+    return <circle cx={center + 7} cy={y} r={5} fill={tokens.color.positive} />;
+  }
+  if (state === "absent") {
+    return (
+      <StockRect
+        x={center + 2}
+        y={y - 5}
+        width={10}
+        height={10}
+        fill="none"
+        stroke={tokens.color.inactive}
+      />
+    );
+  }
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M ${center + 7} ${y - 6} l 6 6 l -6 6 l -6 -6 Z`,
+      }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={tokens.color.highlight}
+    />
   );
 }

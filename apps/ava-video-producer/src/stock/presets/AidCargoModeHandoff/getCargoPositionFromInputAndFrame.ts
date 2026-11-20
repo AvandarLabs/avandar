@@ -10,6 +10,13 @@ type GetCargoPositionResult = {
   mechanism: string | undefined;
 };
 
+type CargoPositionArgs = Readonly<{
+  frame: number;
+  input: Input;
+  parcelIndex: number;
+  motion: VideoMotion;
+}>;
+
 /**
  * A parcel rides its carrier until unloading and shares the receiver's later
  * travel.
@@ -19,12 +26,7 @@ export function getCargoPositionFromInputAndFrame({
   input,
   parcelIndex,
   motion,
-}: Readonly<{
-  frame: number;
-  input: Input;
-  parcelIndex: number;
-  motion: VideoMotion;
-}>): GetCargoPositionResult {
+}: CargoPositionArgs): GetCargoPositionResult {
   const offset = (parcelIndex - (input.parcels.length - 1) / 2) * 42;
   const boundary =
     input.carriers.length === 3 && frame >= 84 + parcelIndex * 2 ? 1 : 0;
@@ -47,12 +49,7 @@ export function getCargoPositionFromInputAndFrame({
     frame,
     index: boundary + 1,
   });
-  const mechanism =
-    travel > 0 && travel < 1
-      ? input.transferMethod === "hoist-and-cart" && boundary === 0
-        ? "hoist"
-        : "handcart"
-      : undefined;
+  const mechanism = _getTransferMechanism(travel, input, boundary);
   return {
     x: mix(travel, source.x, receiver.x) + offset,
     y: 300 - Math.sin(travel * Math.PI) * 78,
@@ -61,4 +58,18 @@ export function getCargoPositionFromInputAndFrame({
       : input.carriers[boundary + (travel === 1 ? 1 : 0)].id,
     mechanism,
   };
+}
+
+/** The handling equipment moving a parcel across a boundary, mid-transfer. */
+function _getTransferMechanism(
+  travel: number,
+  input: Input,
+  boundary: number,
+): string | undefined {
+  if (!(travel > 0 && travel < 1)) {
+    return undefined;
+  }
+  return input.transferMethod === "hoist-and-cart" && boundary === 0
+    ? "hoist"
+    : "handcart";
 }

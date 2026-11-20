@@ -50,18 +50,31 @@ export function ReceivedToken({
         />
       ) : undefined}
       {isHandling ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M740 160 H950 V${y - 18} L${x} ${y - 18}`,
-          }}
-          profile={tokens.sketch.shape}
-          data-correction-hand={paymentId}
-          fill="none"
-          stroke={tokens.color.accentAlt}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
+        <CorrectionHand paymentId={paymentId} x={x} y={y} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The hand placing a correction token into its position. */
+function CorrectionHand({
+  paymentId,
+  x,
+  y,
+}: Readonly<{ paymentId: string; x: number; y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M740 160 H950 V${y - 18} L${x} ${y - 18}`,
+      }}
+      profile={tokens.sketch.shape}
+      data-correction-hand={paymentId}
+      fill="none"
+      stroke={tokens.color.accentAlt}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

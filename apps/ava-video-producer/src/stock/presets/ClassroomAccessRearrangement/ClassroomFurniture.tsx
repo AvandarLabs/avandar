@@ -39,7 +39,6 @@ export function ClassroomFurniture({
   const hasBoard = input.adaptations.some(({ kind }) => {
     return kind === "large-print-board";
   });
-  const boardProgress = hasBoard ? progress : 0;
   return (
     <g>
       <StockRect
@@ -56,21 +55,42 @@ export function ClassroomFurniture({
       />
       <ClassroomDesks progress={progress} />
       <ClassroomTable hasTable={hasTable} progress={progress} accent={accent} />
-      <StockRect
-        data-board-adaptation={hasBoard}
-        x={340}
-        y={100}
-        width={350}
-        height={105}
-        rx={scales.corner(tokens.corner.cell)}
-        fill={tokens.color.surface}
-        stroke={hasBoard ? accent : tokens.color.line}
-        strokeWidth={scales.stroke(
-          mix(boardProgress, tokens.stroke.hairline, tokens.stroke.emphasis),
-        )}
+      <ClassroomBoard
+        hasBoard={hasBoard}
+        progress={hasBoard ? progress : 0}
+        accent={accent}
       />
       <ClassroomBoardText input={input} frame={frame} hasBoard={hasBoard} />
       <ApproachTrace input={input} progress={progress} accent={accent} />
     </g>
+  );
+}
+
+/** The board, outlined more heavily as a large-print adaptation lands. */
+function ClassroomBoard({
+  hasBoard,
+  progress,
+  accent,
+}: Readonly<{
+  hasBoard: boolean;
+  progress: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-board-adaptation={hasBoard}
+      x={340}
+      y={100}
+      width={350}
+      height={105}
+      rx={scales.corner(tokens.corner.cell)}
+      fill={tokens.color.surface}
+      stroke={hasBoard ? accent : tokens.color.line}
+      strokeWidth={scales.stroke(
+        mix(progress, tokens.stroke.hairline, tokens.stroke.emphasis),
+      )}
+    />
   );
 }

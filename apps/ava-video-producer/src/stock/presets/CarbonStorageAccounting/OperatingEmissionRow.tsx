@@ -24,9 +24,6 @@ export function OperatingEmissionRow({
   unit,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
   const copies: Array<[string, number, number, number, number]> = [
     [row.label, 540, 204 + index * 80, 170, 3],
     [String(row.tonnesCO2e), 730, 204 + index * 80, 180, 3],
@@ -49,20 +46,34 @@ export function OperatingEmissionRow({
           />
         );
       })}
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M540 ${264 + index * 80} H${mix(motion.ramp(frame, 60, motion.scale(48), motion.travel.easing), 540, 918)}`,
-        }}
-        profile={tokens.sketch.shape}
-        data-operation-ribbon={row.id}
-        data-tonnes={row.tonnesCO2e}
-        stroke={tokens.color.highlight}
-        strokeWidth={scales.stroke(
-          RIBBON_WIDTH_PER_KILOTONNE * (row.tonnesCO2e / 1000),
-        )}
-        fill="none"
-      />
+      <EmissionRibbon row={row} index={index} frame={frame} />
     </g>
+  );
+}
+
+/** The source's ribbon, as wide as its emissions, drawing across the ledger. */
+function EmissionRibbon({
+  row,
+  index,
+  frame,
+}: Readonly<Omit<Props, "unit">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M540 ${264 + index * 80} H${mix(motion.ramp(frame, 60, motion.scale(48), motion.travel.easing), 540, 918)}`,
+      }}
+      profile={tokens.sketch.shape}
+      data-operation-ribbon={row.id}
+      data-tonnes={row.tonnesCO2e}
+      stroke={tokens.color.highlight}
+      strokeWidth={scales.stroke(
+        RIBBON_WIDTH_PER_KILOTONNE * (row.tonnesCO2e / 1000),
+      )}
+      fill="none"
+    />
   );
 }

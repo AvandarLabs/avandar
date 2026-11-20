@@ -7,6 +7,7 @@ import {
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
@@ -22,25 +23,7 @@ export function ServiceStaff({
   const scales = useGraphicShapeScales();
   const index = input.services.findIndex(propEq("id", input.chosenServiceId));
   const x = 160 + ((index + 0.5) * 640) / input.services.length;
-  const progress = motion.ramp(
-    frame,
-    44,
-    motion.scale(32),
-    motion.travel.easing,
-  );
-  const barrierX =
-    input.accessChange === "clear-entrance"
-      ? x -
-        30 +
-        motion.ramp(frame, 44, motion.scale(32), motion.travel.easing) * 94
-      : x - 42 - 58 * progress;
-  const handX = frame >= 44 && frame < 77 ? barrierX : x + 42;
-  const handY =
-    frame >= 44 && frame < 77
-      ? input.accessChange === "unfold-ramp"
-        ? mix(progress, 246, 356)
-        : 337
-      : 270;
+  const { handX, handY } = _getStaffHand(input, frame, x, motion);
   return (
     <g>
       <PersonGlyph x={x + 88} y={272} size={40} role="worker" color={accent} />
@@ -58,4 +41,34 @@ export function ServiceStaff({
       <circle data-staff-hand cx={handX} cy={handY} r={3} fill={accent} />
     </g>
   );
+}
+
+/** The staff hand: on the moving barrier while it works, else at rest. */
+function _getStaffHand(
+  input: Input,
+  frame: number,
+  x: number,
+  motion: VideoMotion,
+) {
+  const progress = motion.ramp(
+    frame,
+    44,
+    motion.scale(32),
+    motion.travel.easing,
+  );
+  const barrierX =
+    input.accessChange === "clear-entrance"
+      ? x -
+        30 +
+        motion.ramp(frame, 44, motion.scale(32), motion.travel.easing) * 94
+      : x - 42 - 58 * progress;
+  const isHandling = frame >= 44 && frame < 77;
+  return {
+    handX: isHandling ? barrierX : x + 42,
+    handY: isHandling
+      ? input.accessChange === "unfold-ramp"
+        ? mix(progress, 246, 356)
+        : 337
+      : 270,
+  };
 }

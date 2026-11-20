@@ -53,22 +53,42 @@ export function PremiseSupport({
         />
       </g>
       {showSupport ? (
-        <g data-individual-support={premise.id}>
-          <SketchedShape
-            shape={{
-              kind: "line",
-              x1: center,
-              y1: 390,
-              x2: center,
-              y2: mix(joining, 390, 350),
-            }}
-            profile={tokens.sketch.shape}
-            stroke={accent}
-            strokeWidth={width}
-            strokeDasharray={dash}
-          />
-        </g>
+        <SupportPost {...{ joining, center, accent, premise, dash, width }} />
       ) : null}
     </>
+  );
+}
+
+/** The premise's own centre post, rising to the deck. */
+function SupportPost({
+  joining,
+  center,
+  accent,
+  premise,
+  dash,
+  width,
+}: Readonly<
+  Pick<Props, "joining" | "center" | "accent" | "premise"> & {
+    dash: string | undefined;
+    width: number;
+  }
+>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g data-individual-support={premise.id}>
+      <SketchedShape
+        shape={{
+          kind: "line",
+          x1: center,
+          y1: 390,
+          x2: center,
+          y2: mix(joining, 390, 350),
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={width}
+        strokeDasharray={dash}
+      />
+    </g>
   );
 }

@@ -31,6 +31,26 @@ export function CacheStoredEntry({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
+      <StoredEntryLabel input={input} accent={accent} />
+      {input.showStoredValue ? (
+        <LiteralDataText
+          value={input.result.value}
+          x={430}
+          y={325}
+          color={tokens.color.text}
+        />
+      ) : undefined}
+    </g>
+  );
+}
+
+/** The entry's key over the label of the result it holds. */
+function StoredEntryLabel({
+  input,
+  accent,
+}: Readonly<Pick<Props, "input" | "accent">>): ReactNode {
+  return (
+    <>
       <LiteralDataText
         value={input.request.key}
         x={430}
@@ -47,14 +67,6 @@ export function CacheStoredEntry({
         normalizeWhitespace
         breakLongWords
       />
-      {input.showStoredValue ? (
-        <LiteralDataText
-          value={input.result.value}
-          x={430}
-          y={325}
-          color={tokens.color.text}
-        />
-      ) : undefined}
-    </g>
+    </>
   );
 }

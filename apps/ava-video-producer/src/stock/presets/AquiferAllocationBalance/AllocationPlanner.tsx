@@ -6,6 +6,7 @@ import {
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AllocationPlanner. */
@@ -20,15 +21,9 @@ export function AllocationPlanner({
   input,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const reach = motion.ramp(frame, 28, motion.whip, motion.travel.easing),
-    set = motion.ramp(frame, 36, motion.scale(14), motion.travel.easing);
-  const share = input.flows.requestedWithdrawalM3
-    ? input.flows.approvedWithdrawalM3 / input.flows.requestedWithdrawalM3
-    : 0;
-  const knobX = 220 + 100 * share * set,
-    handX = mix(reach, 190, knobX);
+  const motion = useGraphicMotion();
+  const { knobX, handX } = _getPlannerReach(frame, input, motion);
   return (
     <g>
       <PersonGlyph
@@ -51,6 +46,28 @@ export function AllocationPlanner({
         r={7}
         fill={accent}
       />
+      <PlannerHand handX={handX} />
+    </g>
+  );
+}
+
+/** Where the approval knob is set and how far the planner's hand reaches. */
+function _getPlannerReach(frame: number, input: Input, motion: VideoMotion) {
+  const reach = motion.ramp(frame, 28, motion.whip, motion.travel.easing),
+    set = motion.ramp(frame, 36, motion.scale(14), motion.travel.easing);
+  const share = input.flows.requestedWithdrawalM3
+    ? input.flows.approvedWithdrawalM3 / input.flows.requestedWithdrawalM3
+    : 0;
+  const knobX = 220 + 100 * share * set;
+  return { knobX, handX: mix(reach, 190, knobX) };
+}
+
+/** The planner's arm and hand on the approval control. */
+function PlannerHand({ handX }: Readonly<{ handX: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <SketchedShape
         shape={{ kind: "path", d: `M 187 182 L ${handX} 185` }}
         profile={tokens.sketch.shape}
@@ -65,6 +82,6 @@ export function AllocationPlanner({
         r={3}
         fill={tokens.color.highlight}
       />
-    </g>
+    </>
   );
 }

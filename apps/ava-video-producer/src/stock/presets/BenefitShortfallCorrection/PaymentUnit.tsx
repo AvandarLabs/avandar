@@ -26,47 +26,54 @@ export function PaymentUnit({
   unitIndex,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
-  const { x, y, isOriginal, isCorrection, tokenY, isHandling } =
-    getPaymentUnitGeometryFromPayment({
-      motion,
-      payment,
-      frame,
-      index,
-      unitIndex,
-    });
+  const unit = getPaymentUnitGeometryFromPayment({
+    motion,
+    payment,
+    frame,
+    index,
+    unitIndex,
+  });
   return (
     <g>
       <SketchedShape
-        shape={{ kind: "circle", cx: x, cy: y + 24, r: 23 }}
+        shape={{ kind: "circle", cx: unit.x, cy: unit.y + 24, r: 23 }}
         profile={tokens.sketch.shape}
         data-stated-slot={unitIndex}
         fill="none"
         stroke={tokens.color.highlight}
         strokeDasharray={tokens.dash.pending.join(" ")}
       />
-      {isOriginal || isCorrection ? (
+      {unit.isOriginal || unit.isCorrection ? (
         <ReceivedToken
           paymentId={payment.id}
           unitIndex={unitIndex}
-          x={x}
-          y={tokenY}
-          isOriginal={isOriginal}
-          isHandling={isHandling}
+          x={unit.x}
+          y={unit.tokenY}
+          isOriginal={unit.isOriginal}
+          isHandling={unit.isHandling}
           accent={accent}
         />
       ) : (
-        <SketchedShape
-          shape={{ kind: "circle", cx: x, cy: y + 24, r: 18 }}
-          profile={tokens.sketch.shape}
-          data-unit-kind="gap"
-          fill="none"
-          stroke={tokens.color.highlight}
-          strokeDasharray={atomic.dash.dotted.join(" ")}
-        />
+        <GapSlot x={unit.x} y={unit.y} />
       )}
     </g>
+  );
+}
+
+/** A stated position that no token accounts for. */
+function GapSlot({ x, y }: Readonly<{ x: number; y: number }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{ kind: "circle", cx: x, cy: y + 24, r: 18 }}
+      profile={tokens.sketch.shape}
+      data-unit-kind="gap"
+      fill="none"
+      stroke={tokens.color.highlight}
+      strokeDasharray={atomic.dash.dotted.join(" ")}
+    />
   );
 }
