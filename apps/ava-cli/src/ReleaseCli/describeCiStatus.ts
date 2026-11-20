@@ -1,4 +1,4 @@
-import type { CiStatus } from "@ava-cli/ReleaseCli/checkDevelopCi";
+import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 
 /**
  * A one-line description of a staging CI verdict, ready to print.

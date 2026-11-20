@@ -57,9 +57,9 @@ export function validateReleaseVersion(
  * `0.15.1-alpha-dev` yields the release it is working towards: `0.10.2` or
  * `0.15.1`.
  */
-export function toReleaseVersion(developVersion: string): string {
-  const [releaseVersion] = developVersion.trim().split("-");
-  return releaseVersion ?? developVersion.trim();
+export function toReleaseVersion(sourceVersion: string): string {
+  const [releaseVersion] = sourceVersion.trim().split("-");
+  return releaseVersion ?? sourceVersion.trim();
 }
 
 /**

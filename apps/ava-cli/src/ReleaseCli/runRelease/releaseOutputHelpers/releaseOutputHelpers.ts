@@ -1,15 +1,32 @@
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
-import {
-  RELEASE_SOURCE_BRANCH,
-  RELEASE_TARGET_BRANCH,
-} from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import { Acclimate } from "@avandar/acclimate";
 import { isDefined } from "@avandar/utils";
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
- * Terminal output helpers shared by the release stages: headings, aligned
- * label/value detail rows, and the version reference block.
+ * Terminal output helpers shared by the release stages: the opening banner,
+ * headings, aligned label/value detail rows, and the version reference block.
  */
+
+/** What a line's deploy reaches, for the banner. */
+const BANNER_DEPLOY_NOTE: Readonly<Record<ReleaseLine["kind"], string>> = {
+  alpha: "Deploys PRODUCTION (app.avandarlabs.com).",
+  mainline: "Deploys the mainline test URL, not production.",
+};
+
+/**
+ * The colored first line of `ava release`, naming the line being released and
+ * what its deploy reaches, so a reviewer on the wrong branch notices before
+ * answering any prompt.
+ */
+export function buildReleaseBanner(line: ReleaseLine): string {
+  return `|${line.bannerColor}|${line.bannerTitle}|reset|: ${line.sourceBranch} to ${line.targetBranch}. ${BANNER_DEPLOY_NOTE[line.kind]}`;
+}
+
+/** Print the banner from {@link buildReleaseBanner}. */
+export function printReleaseBanner(line: ReleaseLine): void {
+  Acclimate.log(buildReleaseBanner(line));
+}
 
 /** A label/value pair rendered as one aligned detail row. */
 export type ReleaseDetail = readonly [label: string, value: string];
@@ -41,10 +58,12 @@ export function printDetails(details: readonly ReleaseDetail[]): void {
 
 /** What the version reference block needs in order to be useful. */
 export type VersionReferenceOptions = {
+  /** The line being released, which names the branches in each row. */
+  line: ReleaseLine;
   /** The version on the release target branch, if it could be read. */
-  mainVersion: string | undefined;
+  targetVersion: string | undefined;
   /** The version currently on the source branch, e.g. `0.10.2-dev`. */
-  developVersion: string;
+  sourceVersion: string;
   /** The release version we would suggest. */
   suggestedRelease: string;
   /** The next version we would suggest, when one can be derived. */
@@ -66,8 +85,9 @@ export function printVersionReference(
   options: Readonly<VersionReferenceOptions>,
 ): void {
   const {
-    mainVersion,
-    developVersion,
+    line,
+    targetVersion,
+    sourceVersion,
     suggestedRelease,
     suggestedNext,
     needsReleaseVersion,
@@ -82,18 +102,18 @@ export function printVersionReference(
     needsNextVersion && isDefined(suggestedNext)
       ? ([
           "suggested next:",
-          `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext)})`,
+          `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext, line)})`,
         ] as const)
       : undefined;
   const details = [
     needsReleaseVersion
       ? ([
-          `current on ${RELEASE_TARGET_BRANCH}:`,
-          mainVersion ?? "unknown",
+          `current on ${line.targetBranch}:`,
+          targetVersion ?? "unknown",
         ] as const)
       : undefined,
     needsReleaseVersion
-      ? ([`current on ${RELEASE_SOURCE_BRANCH}:`, developVersion] as const)
+      ? ([`current on ${line.sourceBranch}:`, sourceVersion] as const)
       : undefined,
     needsReleaseVersion
       ? (["suggested release:", suggestedRelease] as const)

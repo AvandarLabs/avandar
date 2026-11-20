@@ -105,22 +105,34 @@ function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
 /**
  * What `rev-parse` answers for `revision` in the fake repo. Keys are exact,
  * since `origin/alpha` is a prefix of `origin/alpha-dev`. As in git, a bare
- * branch name resolves to a same-named tag when one exists.
+ * branch name resolves to a same-named tag when one exists. Nothing resolves
+ * on a branch with no target, which preflight refuses before any lookup.
  */
 function _resolveRevision(
-  state: ResolvedRepoState,
+  state: Readonly<ResolvedRepoState>,
   revision: string,
 ): string | undefined {
   const targetBranch = TARGET_BRANCH_BY_SOURCE[state.branch];
+  if (targetBranch === undefined) {
+    return undefined;
+  }
   const tipByRevision: Record<string, string | undefined> = {
     [`refs/remotes/origin/${state.branch}`]: state.originSource,
     [`refs/remotes/origin/${targetBranch}`]: state.originTarget,
     [`refs/heads/${state.branch}`]: state.localSource,
     [state.branch]: state.sourceTag ?? state.localSource,
     [`refs/heads/${targetBranch}`]: state.localTarget,
-    [`${targetBranch}`]: state.targetTag ?? state.localTarget,
+    [targetBranch]: state.targetTag ?? state.localTarget,
   };
   return tipByRevision[revision];
+}
+
+/**
+ * What `git symbolic-ref --quiet HEAD` prints: the checked-out branch's full
+ * ref, or nothing (a failed read) on a detached HEAD.
+ */
+function _readHeadRef(state: Readonly<ResolvedRepoState>): string | undefined {
+  return state.branch === "HEAD" ? undefined : `refs/heads/${state.branch}`;
 }
 
 /** The fake's `readGit`: the repo state, keyed by the git command asked for. */
@@ -135,11 +147,11 @@ function _createReadGit(
       ? state.trackedChanges
       : verb === "remote"
         ? state.remoteUrl
-        : verb !== "rev-parse"
-          ? undefined
-          : args.includes("--abbrev-ref")
-            ? state.branch
-            : _resolveRevision(state, args.at(-1) ?? "");
+        : verb === "symbolic-ref"
+          ? _readHeadRef(state)
+          : verb === "rev-parse"
+            ? _resolveRevision(state, args.at(-1) ?? "")
+            : undefined;
   };
 }
 

@@ -184,3 +184,107 @@ describe("ava release get-prod-version", () => {
     expect(process.exitCode).toBeUndefined();
   });
 });
+
+describe("ava release on a branch that is not a source branch", () => {
+  let directory: string;
+  let repoRoot: string;
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  /** Every ref in a repository with its SHA, to prove nothing moved. */
+  function _listRefs(cwd: string): string {
+    return _git({
+      cwd,
+      args: ["for-each-ref", "--format=%(refname) %(objectname)"],
+    });
+  }
+
+  /** Everything `ava release` printed, one `console.log` call per line. */
+  function _stdoutText(): string {
+    return vi
+      .mocked(console.log)
+      .mock.calls.map((call) => {
+        return call.map(String).join(" ");
+      })
+      .join("\n");
+  }
+
+  async function _runRelease(): Promise<void> {
+    // Versions are passed so nothing would prompt if the refusal regressed.
+    await ReleaseCli.state.action?.({
+      version: "0.15.0",
+      next: "0.15.1",
+      yes: false,
+      dryRun: false,
+      skipCiCheck: false,
+      skipChangelog: false,
+    });
+  }
+
+  beforeEach(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-refusal-"));
+    ({ repoRoot } = _createRepos(directory));
+    _git({ cwd: repoRoot, args: ["switch", "main"] });
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.argv = [process.execPath, "ava", "release"];
+    process.exitCode = undefined;
+    vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    vi.restoreAllMocks();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it("refuses main with exit code 1, naming both source branches", async () => {
+    await _runRelease();
+
+    expect(process.exitCode).toBe(1);
+    expect(_stdoutText()).toContain('"alpha-dev" or "develop"');
+    expect(_stdoutText()).toContain('(currently on "main")');
+  });
+
+  it("refuses main before fetching, committing, or pushing anything", async () => {
+    const origin = join(directory, "origin");
+    const refsBefore = _listRefs(repoRoot);
+    const originRefsBefore = _listRefs(origin);
+
+    await _runRelease();
+
+    // A fetch would move origin/main to origin's newer commit.
+    expect(_listRefs(repoRoot)).toBe(refsBefore);
+    expect(_listRefs(origin)).toBe(originRefsBefore);
+    expect(_git({ cwd: repoRoot, args: ["status", "--short"] })).toBe("");
+    // Every mutating command is echoed as `$ <command>` before it runs.
+    expect(_stdoutText()).not.toContain("$ ");
+  });
+
+  it("prints no release banner on a refused branch", async () => {
+    await _runRelease();
+
+    expect(_stdoutText()).not.toContain("MAINLINE release");
+    expect(_stdoutText()).not.toContain("ALPHA release");
+  });
+
+  it("names the branch, not heads/main, when a tag is also named main", async () => {
+    _git({ cwd: repoRoot, args: ["tag", "main"] });
+
+    await _runRelease();
+
+    expect(_stdoutText()).toContain('(currently on "main")');
+  });
+
+  it("refuses a detached HEAD, naming it", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "--detach"] });
+
+    await _runRelease();
+
+    expect(process.exitCode).toBe(1);
+    expect(_stdoutText()).toContain('(currently on "a detached HEAD")');
+  });
+});
