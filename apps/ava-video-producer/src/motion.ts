@@ -11,7 +11,7 @@
  * Moving individual elements on `transform` + `opacity` is the one path
  * that is both alive and safe: those two properties skip layout and paint
  * and composite on the GPU, so they cannot shimmer type, and
- * check-frames.mjs cannot flag them (it looks for tiled frames and
+ * checkFrames.ts cannot flag them (it looks for tiled frames and
  * luminance jumps, neither of which a GPU composite produces).
  *
  * Take curves from your own product's CSS so the film moves like the thing

@@ -456,7 +456,7 @@ asks whether a frame's left half resembles its right half, which is anomalous
 in a dense interface and perfectly normal elsewhere.
 
 *Flat frames.* Nearly one colour means matching halves by definition, so only
-frames with real contrast are judged (`FLAT = 120`). On a pale, low-contrast
+frames with real contrast are judged (`FLAT_CONTRAST_LIMIT = 120`). On a pale, low-contrast
 UI it will miss corruption a dark one would catch. Lower the threshold for a
 light product; never raise it to make a failure go away.
 

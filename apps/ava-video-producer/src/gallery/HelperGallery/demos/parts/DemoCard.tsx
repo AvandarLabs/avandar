@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "./parts.module.css";
 import type { CSSProperties, ReactNode } from "react";
 

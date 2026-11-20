@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "./DownloadButton.module.css";
 import type { CompositionExportOptions } from "../../compositionExportOptions";
 import type { ThemeExportState } from "../../themeExportStateHelpers/themeExportStateHelpers";

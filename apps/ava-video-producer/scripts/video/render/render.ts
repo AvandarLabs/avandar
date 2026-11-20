@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { mixAudio } from "../../lib/mediaHelpers";
-import { requireMatchingPreview } from "../../lib/planHelpers/planHelpers";
+import { requireMatchingPreview } from "../../lib/planHelpers/requireMatchingPreview";
 import { assertFingerprintUnchanged } from "../assertFingerprintUnchanged";
 import { exportPlan } from "../exportPlan";
 import { fingerprintThemedPlan } from "../fingerprintThemedPlan";
@@ -12,6 +12,7 @@ import { runPictureRender } from "./runPictureRender";
 import { writeRenderManifest } from "./writeRenderManifest";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { VideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+
 /**
  * Delegate picture creation to the original JPEG, encode and mandatory gate
  * path.

@@ -40,9 +40,10 @@ Remotion Player using the same compositions as its export. The homepage at
 speed, replay, and loop controls. No preview loads a prerecorded MP4.
 
 The server watches imported product components, adapters, film sources, and
-storyboards. Successful rebuilds refresh the player. Browser bundles live in
-ignored `apps/ava-video-producer/out/showcase/browser/`, separate from the CLI
-render bridge. Product data and backend services remain outside this preview.
+storyboards. Successful rebuilds refresh the player. The showcase compiles its
+own product bundle into ignored `apps/ava-video-producer/out/showcase/product/`
+with the same esbuild build as the CLI render bridge, and Vite builds every page
+around it into ignored `apps/ava-video-producer/out/showcase/browser/`. Product data and backend services remain outside this preview.
 
 Use the captions toggle in a production player before clicking **Download MP4**.
 That button captures the current film and caption choice, starts one local
@@ -70,7 +71,7 @@ The captions toggle does not add brand or background controls to product films.
 | `src/avandar/AvandarScene.tsx` | Storyboard integration and pointer choreography over the product stage. |
 | `src/avandar/cursor-targets.json` | Pointer locations measured from rendered `data-video-target` elements. |
 
-`scripts/build-avandar.mjs` resolves product aliases and workspace packages, compiles TypeScript and the product's own Lingui macros (producer code under `src/` has none), processes source CSS modules and Mantine variables, and adds the required Tailwind utilities. Installed dependencies provide the original Mantine, AG Grid, CodeMirror, Puck and MapLibre runtimes. React and Remotion remain shared with the film renderer. The bridge installs the product theme and navigation components, local Figtree font, English Lingui message compiler and fixture router.
+`scripts/buildProduct/` resolves product aliases and workspace packages, compiles TypeScript and the product's own Lingui macros (producer code under `src/` has none), processes source CSS modules and Mantine variables, and adds the required Tailwind utilities. Installed dependencies provide the original Mantine, AG Grid, CodeMirror, Puck and MapLibre runtimes. React and Remotion remain shared with the film renderer. The bridge installs the product theme and navigation components, local Figtree font, English Lingui message compiler and fixture router.
 
 The build always reads the enclosing Avandar worktree. `component:build` compiles
 its actual imported source files without copying them. `component:watch` watches

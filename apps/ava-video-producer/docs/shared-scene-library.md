@@ -163,16 +163,16 @@ evidence; update delivery records after those artifacts have been inspected.
 
 ## Supporting modules and verification
 
-| Module                                                           | Current role                                                                                                                                                                                                                        |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [motion.ts](../src/motion.ts)                                    | Original curves, durations and frame helpers, plus periodic phase/pulse/loop-envelope helpers; see [motion inventory](motion-vocabulary.md)                                                                                         |
-| [chrome.tsx](../src/chrome/chrome.tsx)                           | `BAR = 40`, `HEAD = 68`, `BODY_Y = 108`, pointer tracking and click windows                                                                                                                                                         |
-| [abs.ts](../src/chrome/abs.ts)                                   | `Box`, `abs`                                                                                                                                                                                                                        |
-| [fonts.ts](../src/fonts.ts)                                      | Loads the bundled Figtree variable font (Avandar's brand typeface, Latin subset, weights 300–900); exports `FACE`, `TYPE` and `MONO`                                                                                                |
-| [theme.css](../src/theme.css)                                    | Original generic surface, foreground, border, brand, ground and radius custom properties, for compositions drawn outside a video theme. `VideoThemeProvider` emits the same names from `color.scene.*`, and scenes take the radius from `corner.scene` |
-| [adopt-theme.mjs](../scripts/adopt-theme.mjs)                    | Product token/easing adoption for faithful reconstructions; not a scene                                                                                                                                                             |
-| [capture runner](../scripts/capture-avandar/capture-avandar.mjs) | Produces real footage and capture evidence; see [capture pipeline](capture-pipeline.md)                                                                                                                                             |
-| [video CLI](../scripts/video/video.ts)                           | Validates plans/media, exports shot lists/transcripts, renders composed previews, gates picture, and assembles audio                                                                                                                |
+| Module | Current role |
+| --- | --- |
+| [motion.ts](../src/motion.ts) | Original curves, durations and frame helpers, plus periodic phase/pulse/loop-envelope helpers; see [motion inventory](motion-vocabulary.md) |
+| [chrome.tsx](../src/chrome/chrome.tsx) | `BAR = 40`, `HEAD = 68`, `BODY_Y = 108`, pointer tracking and click windows |
+| [abs.ts](../src/chrome/abs.ts) | `Box`, `abs` |
+| [fonts.ts](../src/fonts.ts) | Loads the bundled Figtree variable font (Avandar's brand typeface, Latin subset, weights 300–900); exports `FACE`, `TYPE` and `MONO` |
+| [theme.css](../src/theme.css) | Original generic surface, foreground, border, brand, ground and radius custom properties, for compositions drawn outside a video theme. `VideoThemeProvider` emits the same names from `color.scene.*`, and scenes take the radius from `corner.scene` |
+| [adoptTheme.ts](../scripts/adoptTheme/adoptTheme.ts) | Product token/easing adoption for faithful reconstructions; not a scene |
+| [capture runner](../scripts/captureAvandar/runCapture.ts) | Produces real footage and capture evidence; see [capture pipeline](capture-pipeline.md) |
+| [video CLI](../scripts/video/video.ts) | Validates plans/media, exports shot lists/transcripts, renders composed previews, gates picture, and assembles audio |
 
 [Scene tests](../tests/scenes.test.ts) check geometry, content fitting, traversal,
 formatting, asset paths and caption boundaries. [Storyboard tests](../tests/storyboard.test.ts)

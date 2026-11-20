@@ -95,19 +95,17 @@ const flowchart = z
     revealAtFrame: frame.optional(),
   })
   .strict();
-const metric = z
-  .object({
-    ...headingWithReveal,
-    label,
-    value: z.number().finite(),
-    from: z.number().finite().optional(),
-    unit: z.string().max(24).optional(),
-    precision: z.number().int().min(0).max(6).optional(),
-    detail: detail.optional(),
-    countAtFrame: frame.optional(),
-    countDurationInFrames: positiveFrames.optional(),
-  })
-  .strict();
+const metric = z.strictObject({
+  ...headingWithReveal,
+  label,
+  value: z.number().finite(),
+  from: z.number().finite().optional(),
+  unit: z.string().max(24).optional(),
+  precision: z.number().int().min(0).max(6).optional(),
+  detail: detail.optional(),
+  countAtFrame: frame.optional(),
+  countDurationInFrames: positiveFrames.optional(),
+});
 const typography = z.strictObject({
   ...headingWithReveal,
   lines: z.array(text.max(120)).min(1).max(6),

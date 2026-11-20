@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { requireLicense } from "../../require-license.mjs";
+import { requireLicense } from "../../requireLicense";
 import { createAvandarTheme } from "./createAvandarTheme/createAvandarTheme";
 import { readAvandarThemeSource } from "./readAvandarThemeSource";
 

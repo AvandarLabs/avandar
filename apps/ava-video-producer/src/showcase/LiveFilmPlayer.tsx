@@ -19,6 +19,7 @@ import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/us
 import { CaptionToggle } from "./CaptionToggle";
 import { LiveFilm } from "./LiveFilm";
 import { LIVE_FILM_ID } from "./liveFilmId";
+import { postToParentGallery } from "./postToParentGallery";
 import { useFilmControl } from "./useFilmControl";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
@@ -62,12 +63,12 @@ window.addEventListener("message", (event) => {
   } catch {
     /* Storage can be unavailable in a restricted browser. */
   }
-  _send({ type: "film-reloading", requestId: event.data.requestId });
+  postToParentGallery({
+    type: "film-reloading",
+    requestId: event.data.requestId,
+  });
   location.reload();
 });
-function _send(message: object) {
-  window.parent.postMessage(message, location.origin);
-}
 
 function _findContinuityShot(film: Film): ContinuityShot | undefined {
   const shot = film.plan?.shots.find((candidate) => {
@@ -122,7 +123,7 @@ function useSavedPlayback(
     function registerPlayEventListener() {
       const current = player.current;
       const play = () => {
-        return _send({ type: "film-playing", id: LIVE_FILM_ID });
+        postToParentGallery({ type: "film-playing", id: LIVE_FILM_ID });
       };
       current?.addEventListener("play", play);
       return () => {
@@ -216,7 +217,6 @@ function useLiveFilmControl(options: LiveFilmControlOptions) {
     loop: state.loop,
     previewFrames: options.previewFrames,
     usedTokens: options.usedTokens,
-    send: _send,
     onAppearance: (nextAppearance) => {
       state.setAppearance(nextAppearance);
       state.setCaptions(nextAppearance.captions);

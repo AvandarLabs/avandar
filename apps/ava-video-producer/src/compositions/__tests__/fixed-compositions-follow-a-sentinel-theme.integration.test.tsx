@@ -36,9 +36,7 @@ const PRODUCT_COLORS: unknown = JSON.parse(
     [
       "--import",
       "tsx",
-      fileURLToPath(
-        new URL("../../../scripts/read-theme.mjs", import.meta.url),
-      ),
+      fileURLToPath(new URL("../../../scripts/readTheme.ts", import.meta.url)),
     ],
     { encoding: "utf8" },
   ),

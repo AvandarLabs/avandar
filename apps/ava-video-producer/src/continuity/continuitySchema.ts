@@ -204,7 +204,7 @@ const THEMED_FIELD_MESSAGE =
  * Strict film-use grammar shared by long explainers and isolated atlas studies.
  */
 export const continuitySchema = z
-  .object({
+  .strictObject({
     title: copy,
     category: z.enum([
       "motion-motion",
@@ -222,7 +222,6 @@ export const continuitySchema = z
     boxRoughness: z.never({ error: THEMED_FIELD_MESSAGE }).optional(),
     beats: z.array(continuityBeatSchema).min(2).max(12),
   })
-  .strict()
   .superRefine((plan, context) => {
     const issue = (message: string) => {
       return context.addIssue({ code: "custom", message });

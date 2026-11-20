@@ -3,17 +3,17 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fingerprintPlan } from "../scripts/lib/planHelpers/fingerprintPlan";
+import { getPreviewFramesFromPlan } from "../scripts/lib/planHelpers/getPreviewFramesFromPlan";
 import {
-  fingerprintPlan,
-  requireMatchingPreview,
   safeInputFile,
   ensureDirectory,
 } from "../scripts/lib/planHelpers/planHelpers";
-import { previewFrames } from "../scripts/lib/planHelpers/previewFrames";
+import { requireMatchingPreview } from "../scripts/lib/planHelpers/requireMatchingPreview";
 import { fixture, temporary } from "./pipeline-test-helpers";
 
 test("preview samples the composed film on both sides of its transition", () => {
-  const frames = previewFrames(fixture());
+  const frames = getPreviewFramesFromPlan(fixture());
   for (const frame of [29, 30, 31, 36, 42, 59])
     assert.ok(frames.includes(frame), String(frame));
   assert.equal(new Set(frames).size, frames.length);
@@ -23,6 +23,7 @@ test("preview samples the composed film on both sides of its transition", () => 
     }),
   );
 });
+
 test("render requires preview proof matching plan, renderer and asset bytes", async () => {
   return temporary(async (root) => {
     const plan = fixture();
@@ -34,7 +35,11 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
       path.join(root, "src/renderer.tsx"),
       "original renderer",
     );
-    const fingerprint = await fingerprintPlan(root, planPath, plan);
+    const fingerprint = await fingerprintPlan({
+      root,
+      filename: planPath,
+      plan,
+    });
     const manifest = path.join(root, "preview.json");
     await assert.rejects(
       requireMatchingPreview(manifest, fingerprint),
@@ -49,7 +54,7 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
     await assert.rejects(
       requireMatchingPreview(
         manifest,
-        await fingerprintPlan(root, planPath, plan),
+        await fingerprintPlan({ root, filename: planPath, plan }),
       ),
       /changed/i,
     );
@@ -58,7 +63,7 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
     await assert.rejects(
       requireMatchingPreview(
         manifest,
-        await fingerprintPlan(root, planPath, plan),
+        await fingerprintPlan({ root, filename: planPath, plan }),
       ),
       /changed/i,
     );
@@ -66,12 +71,13 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
     await assert.rejects(
       requireMatchingPreview(
         manifest,
-        await fingerprintPlan(root, planPath, plan),
+        await fingerprintPlan({ root, filename: planPath, plan }),
       ),
       /changed/i,
     );
   });
 });
+
 test("input and output guards reject hidden files and symlink escapes before writes", async () => {
   return temporary(async (root) => {
     await fs.writeFile(path.join(root, ".private"), "not narration");

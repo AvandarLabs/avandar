@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { afterDownloads } from "../../../../showcase/download.js";
-import { watchFilms } from "../../../../showcase/watch-films.js";
+import { FilmDownloads } from "../../../../showcase/FilmDownloads/FilmDownloads";
+import { watchFilms } from "../../../../showcase/watchFilms/watchFilms";
 import { createSnapshotFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
 import { useGalleryVideoTheme } from "../../GalleryVideoTheme/useGalleryVideoTheme";
 import { buildHelperFilmId } from "../helperCatalog";
@@ -21,7 +21,7 @@ function useSourceWatch(
     let cancelRefresh: (() => void) | undefined;
     const stopWatching = watchFilms([player.current], () => {
       cancelRefresh?.();
-      cancelRefresh = afterDownloads(() => {
+      cancelRefresh = FilmDownloads.afterDownloads(() => {
         return location.reload();
       });
     });
@@ -75,19 +75,24 @@ export function HelperPreview({ helper }: Props): ReactNode {
   useSourceWatch(helper.id, player);
   const postTheme = useThemePost({ helper, player });
   const title = helper.title;
+  const playerFrame = (
+    // Do not add `sandbox` without `allow-same-origin`: `/live.html` is a
+    // first-party player that reads `sessionStorage` and verifies
+    // `event.origin === location.origin` on `postMessage`.
+    // react-doctor-disable-next-line react-doctor/iframe-missing-sandbox
+    <iframe
+      key={helper.id}
+      ref={player}
+      className={css.player}
+      src={`/live.html?id=${encodeURIComponent(buildHelperFilmId(helper))}`}
+      title={`Live preview of ${title}`}
+      onLoad={postTheme}
+      allowFullScreen
+    />
+  );
   return (
     <section className={css.preview} aria-label="Live preview">
-      <div className={css.stage}>
-        <iframe
-          key={helper.id}
-          ref={player}
-          className={css.player}
-          src={`/live.html?id=${encodeURIComponent(buildHelperFilmId(helper))}`}
-          title={`Live preview of ${title}`}
-          onLoad={postTheme}
-          allowFullScreen
-        />
-      </div>
+      <div className={css.stage}>{playerFrame}</div>
       <p className={css.notice}>
         {
           "Live React preview of the real helper, frame-driven and looping. Pause or scrub with the player controls."

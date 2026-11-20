@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.module.css";
 import { AttributeNameFields } from "./AttributeNameFields";
 import { AttributeValueControls } from "./AttributeValueControls";

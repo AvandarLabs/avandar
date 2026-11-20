@@ -17,7 +17,7 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { copyRootEnvFile } from "../scripts/lib/copyRootEnvFile.mjs";
+import { copyRootEnvFile } from "../scripts/lib/copyRootEnvFile";
 import {
   buildLicenseFixture,
   LICENSE_FIXTURE,
@@ -127,10 +127,10 @@ test("the license guard licenses a command from the root env file alone", async 
   try {
     await Promise.all(
       [
-        "scripts/require-license.mjs",
-        "scripts/lib/readLicense.mjs",
-        "scripts/lib/copyRootEnvFile.mjs",
-        "scripts/lib/product-source.mjs",
+        "scripts/requireLicense.ts",
+        "scripts/lib/getRemotionLicenseFromAppRoot.ts",
+        "scripts/lib/copyRootEnvFile.ts",
+        "scripts/lib/productSourceHelpers.ts",
       ].map(async (filename) => {
         const destination = path.join(appRoot, filename);
         await mkdir(path.dirname(destination), { recursive: true });
@@ -145,7 +145,12 @@ test("the license guard licenses a command from the root env file alone", async 
     delete environment.REMOTION_KEYS_FILE;
     const result = spawnSync(
       process.execPath,
-      [path.join(appRoot, "scripts/require-license.mjs")],
+      // The fixture has no node_modules, so load tsx by its resolved URL.
+      [
+        "--import",
+        import.meta.resolve("tsx"),
+        path.join(appRoot, "scripts/requireLicense.ts"),
+      ],
       { cwd: appRoot, env: environment, encoding: "utf8", timeout: 10_000 },
     );
     assert.equal(result.status, 0, result.stderr);

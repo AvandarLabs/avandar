@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { ATLAS_SECTIONS } from "../getAtlasSection";
 import css from "./AtlasSections.module.css";
 import type { ReactNode } from "react";

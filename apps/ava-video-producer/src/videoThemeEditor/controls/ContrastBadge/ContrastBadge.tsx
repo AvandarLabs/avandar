@@ -1,5 +1,5 @@
 import { Badge } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useTokenEditor } from "../../TokenEditorContext";
 import { getContrastSummaryFromColors } from "../roleValueHelpers/roleValueHelpers";
 import css from "./ContrastBadge.module.css";

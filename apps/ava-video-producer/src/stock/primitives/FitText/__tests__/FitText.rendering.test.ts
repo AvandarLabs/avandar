@@ -95,9 +95,10 @@ test("fitted text takes its colour and line spacing from the data role", () => {
     other: { video: { atomic: { swatch: { text: "#ffeedd" } } } },
   };
   const markup = renderToStaticMarkup(
-    createElement(VideoThemeScope, {
-      patches: [patch],
-      children: createElement(FitText, {
+    createElement(
+      VideoThemeScope,
+      { patches: [patch] },
+      createElement(FitText, {
         text: "one two three four",
         x: 0,
         y: 0,
@@ -105,7 +106,7 @@ test("fitted text takes its colour and line spacing from the data role", () => {
         fontSize: 12,
         maxLines: 4,
       }),
-    }),
+    ),
   );
   assert.match(markup, /fill="#ffeedd"/);
   assert.match(markup, /dy="18"/);

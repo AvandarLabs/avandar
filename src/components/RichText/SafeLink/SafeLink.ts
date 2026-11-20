@@ -1,4 +1,4 @@
-import Link from "@tiptap/extension-link";
+import { Link } from "@tiptap/extension-link";
 import { isSafeLinkHref } from "$/models/RichTextDocument/RichTextDocument";
 
 /** A URI scheme such as `https:` or `javascript:` at the start of input. */

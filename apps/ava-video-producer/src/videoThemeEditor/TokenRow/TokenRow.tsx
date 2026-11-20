@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl";
 import { useTokenEditor } from "../TokenEditorContext";

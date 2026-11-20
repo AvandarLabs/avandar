@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
@@ -9,16 +8,48 @@ import {
   renderFrames,
 } from "@remotion/renderer";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
-import { buildProduct } from "../build-avandar.mjs";
+import { buildProduct } from "../buildProduct/buildProduct";
+import { getSha256FromFile } from "../lib/getSha256FromFile";
+import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
 import { ffmpeg, run, mixAudio, probe } from "../lib/mediaHelpers";
-import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
-import { previewFrames } from "../lib/planHelpers/previewFrames";
-import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
-import { requireLicense } from "../require-license.mjs";
-import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
+import { getPreviewFramesFromPlan } from "../lib/planHelpers/getPreviewFramesFromPlan";
+import {
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+} from "../lib/planHelpers/planHelpers";
+import { requireLicense } from "../requireLicense";
+import {
+  type StockFingerprint,
+  StockFingerprintModule,
+} from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { getDeliveryThemeFromFilm } from "./getDeliveryThemeFromFilm/getDeliveryThemeFromFilm";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
+import type { Storyboard } from "../../src/storyboard/schema/schema";
+
+/** Browser settings every showcase render call shares. */
+const RENDER_OPTIONS = {
+  chromeMode: "headless-shell" as const,
+  chromiumOptions: { headless: true, gl: "angle" as const },
+  logLevel: "error" as const,
+};
+
+/** The film, its working folder, and the bundle and plan it renders from. */
+type FilmRender = {
+  film: Film;
+  directory: string;
+  serveUrl: string;
+  plan: Storyboard | undefined;
+  progress: (message: string) => void;
+};
+
+/** What `delivery.json` records: the film, its video file, and its stock. */
+type DeliveryRecordOptions = {
+  film: Film;
+  directory: string;
+  finalVideoPath: string;
+  stockFingerprint: Readonly<StockFingerprint> | undefined;
+};
 
 async function _prepare(film: Film, directory: string) {
   await fs.mkdir(directory, { recursive: true });
@@ -30,11 +61,16 @@ async function _prepare(film: Film, directory: string) {
     { recursive: true },
   );
   await Promise.all(
-    (film.plan ? assetReferences(film.plan) : []).map(async (asset) => {
-      const target = path.join(publicDir, asset);
-      await fs.mkdir(path.dirname(target), { recursive: true });
-      await fs.copyFile(await publicAsset(appRoot, asset), target);
-    }),
+    (film.plan ? getAssetReferencesFromPlan(film.plan) : []).map(
+      async (asset) => {
+        const target = path.join(publicDir, asset);
+        await fs.mkdir(path.dirname(target), { recursive: true });
+        await fs.copyFile(
+          await getPublicAssetPathFromAsset(appRoot, asset),
+          target,
+        );
+      },
+    ),
   );
   await buildProduct();
   await fs.writeFile(
@@ -42,13 +78,14 @@ async function _prepare(film: Film, directory: string) {
     JSON.stringify(film, null, 2),
   );
   return bundle({
-    webpackOverride: withWorkspaceAliases,
+    webpackOverride: makeWorkspaceWebpackConfigFromConfig,
     entryPoint: path.join(appRoot, "src/showcase/render-entry.tsx"),
     rootDir: appRoot,
     outDir: path.join(directory, "bundle"),
     publicDir,
   });
 }
+
 async function _encode(film: Film, directory: string) {
   const frames = path.join(directory, "frames");
   const first = (await fs.readdir(frames)).sort()[0];
@@ -94,79 +131,79 @@ async function _encode(film: Film, directory: string) {
   );
   return picture;
 }
-/** Capture previews and frames from one immutable bundle, then run the gate. */
-export async function renderFilm(
-  film: Film,
-  id: string,
-  progress: (message: string) => void,
-  expectedStockSourceHash?: string,
-): Promise<string> {
-  const { privateKey } = requireLicense();
-  const stockFingerprint =
-    film.kind === "stock"
-      ? await StockFingerprintModule.fromRequest({
-          root: appRoot,
-          request: film,
-          expectedSourceHash: expectedStockSourceHash,
-        })
-      : undefined;
-  const stockSourceHash = stockFingerprint?.sourceHash;
-  const directory = path.join(appRoot, "out/showcase/exports", id);
-  const serveUrl = await _prepare(film, directory);
-  const options = {
-    chromeMode: "headless-shell" as const,
-    chromiumOptions: { headless: true, gl: "angle" as const },
-    logLevel: "error" as const,
-  };
-  const browser = await openBrowser("chrome", options);
+
+/** The frames the preview check renders before the full render starts. */
+function _getPreviewSamplesFromFilm(
+  film: Readonly<Film>,
+  plan: Readonly<Storyboard> | undefined,
+): number[] {
+  if (plan) {
+    return getPreviewFramesFromPlan(plan);
+  }
+  return film.kind === "stock"
+    ? [...StockFingerprintModule.SAMPLE_PARAMETERS.samples]
+    : [0, 30, Math.floor(film.frames / 2), film.frames - 1];
+}
+
+/** Renders each preview sample as a still under `preview/`, in order. */
+async function _renderPreviewStills(
+  options: Readonly<{
+    render: Readonly<FilmRender>;
+    stillOptions: Omit<
+      Parameters<typeof renderStill>[0],
+      "frame" | "output" | "imageFormat"
+    >;
+    licenseKey: string;
+  }>,
+): Promise<void> {
+  const { render, stillOptions, licenseKey } = options;
+  const { film, directory, progress } = render;
+  await fs.mkdir(path.join(directory, "preview"));
+  // One browser renders the stills in order before the full render.
+  for (const frame of _getPreviewSamplesFromFilm(film, render.plan)) {
+    progress(`Checking preview frame ${frame + 1} of ${film.frames}…`);
+    await renderStill({
+      ...stillOptions,
+      licenseKey,
+      frame,
+      output: path.join(directory, "preview", `${frame}.jpg`),
+      imageFormat: "jpeg",
+    });
+  }
+}
+
+/** Renders the preview stills and then every frame, in one browser. */
+async function _renderPictureFrames(
+  render: Readonly<FilmRender>,
+  privateKey: string,
+): Promise<void> {
+  const { film, directory, serveUrl, progress } = render;
+  const browser = await openBrowser("chrome", RENDER_OPTIONS);
   const inputProps = { film, withAudio: false };
-  // Preview frames and the audio mix follow the plan the film draws.
-  const plan = film.plan
-    ? createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
-        film.id,
-      ])
-    : undefined;
+  const sharedRenderOptions = {
+    serveUrl,
+    inputProps,
+    puppeteerInstance: browser,
+    ...RENDER_OPTIONS,
+    envVariables: {},
+  };
   try {
     const composition = await selectComposition({
-      serveUrl,
+      ...sharedRenderOptions,
       id: "showcase-film",
-      inputProps,
-      puppeteerInstance: browser,
-      ...options,
-      envVariables: {},
     });
-    const samples = plan
-      ? previewFrames(plan)
-      : film.kind === "stock"
-        ? StockFingerprintModule.SAMPLE_PARAMETERS.samples
-        : [0, 30, Math.floor(film.frames / 2), film.frames - 1];
-    await fs.mkdir(path.join(directory, "preview"));
-    for (const frame of samples) {
-      progress(`Checking preview frame ${frame + 1} of ${film.frames}…`);
-      await renderStill({
-        licenseKey: privateKey,
-        serveUrl,
-        composition,
-        inputProps,
-        frame,
-        output: path.join(directory, "preview", `${frame}.jpg`),
-        imageFormat: "jpeg",
-        puppeteerInstance: browser,
-        ...options,
-        envVariables: {},
-      });
-    }
+    await _renderPreviewStills({
+      render,
+      stillOptions: { ...sharedRenderOptions, composition },
+      licenseKey: privateKey,
+    });
     await renderFrames({
-      serveUrl,
+      ...sharedRenderOptions,
       composition,
-      inputProps,
       outputDir: path.join(directory, "frames"),
       imageFormat: "jpeg",
       jpegQuality: 90,
       concurrency: 1,
-      puppeteerInstance: browser,
-      ...options,
-      envVariables: {},
       onStart: () => {
         return progress("Rendering frames…");
       },
@@ -177,12 +214,21 @@ export async function renderFilm(
   } finally {
     await browser.close({ silent: true });
   }
+}
+
+/** Encodes and gates the picture, then adds narration; returns the MP4 path. */
+async function _encodeGateAndMix(
+  render: Readonly<FilmRender>,
+): Promise<string> {
+  const { film, directory, plan, progress } = render;
   progress("Encoding and checking the finished picture…");
   const picture = await _encode(film, directory);
   const gate = await run(
     process.execPath,
     [
-      path.join(appRoot, "scripts/check-frames.mjs"),
+      "--import",
+      "tsx",
+      path.join(appRoot, "scripts/checkFrames.ts"),
       picture,
       ...(film.loop ? [] : ["--standalone"]),
     ],
@@ -190,36 +236,78 @@ export async function renderFilm(
   );
   await fs.writeFile(path.join(directory, "frame-check.txt"), gate);
   progress("Adding narration and preparing download…");
-  const final = path.join(directory, `${film.id}.mp4`);
+  const finalVideoPath = path.join(directory, `${film.id}.mp4`);
   if (plan) {
-    await mixAudio(plan, directory, picture, final);
+    await mixAudio(plan, directory, picture, finalVideoPath);
   } else {
-    await fs.copyFile(picture, final);
+    await fs.copyFile(picture, finalVideoPath);
   }
-  const metadata = await probe(final);
+  return finalVideoPath;
+}
+
+/** Writes `delivery.json`: the film, its theme, gate result, and file hash. */
+async function _writeDeliveryRecord(
+  options: Readonly<DeliveryRecordOptions>,
+): Promise<void> {
+  const { film, finalVideoPath, stockFingerprint } = options;
+  const record = {
+    film: film.id,
+    ...getDeliveryThemeFromFilm(film),
+    ...(stockFingerprint ? { fingerprint: stockFingerprint } : {}),
+    gate: "passed",
+    metadata: await probe(finalVideoPath),
+    sha256: await getSha256FromFile(finalVideoPath),
+  };
   await fs.writeFile(
-    path.join(directory, "delivery.json"),
-    JSON.stringify(
-      {
-        film: film.id,
-        ...getDeliveryThemeFromFilm(film),
-        ...(stockFingerprint ? { fingerprint: stockFingerprint } : {}),
-        gate: "passed",
-        metadata,
-        sha256: createHash("sha256")
-          .update(await fs.readFile(final))
-          .digest("hex"),
-      },
-      null,
-      2,
-    ),
+    path.join(options.directory, "delivery.json"),
+    JSON.stringify(record, null, 2),
   );
+}
+
+/** Capture previews and frames from one immutable bundle, then run the gate. */
+export async function renderFilm({
+  film,
+  id,
+  progress,
+  expectedStockSourceHash,
+}: Readonly<{
+  film: Readonly<Film>;
+  id: string;
+  progress: (message: string) => void;
+  expectedStockSourceHash?: string;
+}>): Promise<string> {
+  const { privateKey } = requireLicense();
+  const stockFingerprint =
+    film.kind === "stock"
+      ? await StockFingerprintModule.fromRequest({
+          root: appRoot,
+          request: film,
+          expectedSourceHash: expectedStockSourceHash,
+        })
+      : undefined;
+  const directory = path.join(appRoot, "out/showcase/exports", id);
+  const serveUrl = await _prepare(film, directory);
+  // Preview frames and the audio mix follow the plan the film draws.
+  const plan = film.plan
+    ? createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
+        film.id,
+      ])
+    : undefined;
+  const render = { film, directory, serveUrl, plan, progress };
+  await _renderPictureFrames(render, privateKey);
+  const finalVideoPath = await _encodeGateAndMix(render);
+  await _writeDeliveryRecord({
+    film,
+    directory,
+    finalVideoPath,
+    stockFingerprint,
+  });
   await fs.rm(path.join(directory, "frames"), { recursive: true });
-  if (stockSourceHash) {
+  if (stockFingerprint?.sourceHash) {
     await StockFingerprintModule.verifySources({
       root: appRoot,
-      sourceHash: stockSourceHash,
+      sourceHash: stockFingerprint.sourceHash,
     });
   }
-  return final;
+  return finalVideoPath;
 }

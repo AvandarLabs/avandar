@@ -41,6 +41,24 @@ test("homepage captions can be hidden without changing product stage geometry", 
   assert.equal(film.source, "apps/ava-video-producer/storyboards/home.json");
 });
 
+/**
+ * Copies the app sources the film catalog imports, so tests can edit the
+ * copy without touching this worktree.
+ */
+async function _copyCatalogSources(root: string): Promise<void> {
+  await Promise.all(
+    ["scripts", "src", "themes"].map((directory) => {
+      return fs.cp(path.join(appRoot, directory), path.join(root, directory), {
+        recursive: true,
+        // Skips generated product bundles, which the catalog never imports.
+        filter: (source) => {
+          return !source.includes(`${path.sep}generated${path.sep}`);
+        },
+      });
+    }),
+  );
+}
+
 async function _withCatalogCopy(
   action: (
     root: string,
@@ -51,20 +69,7 @@ async function _withCatalogCopy(
 ) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-catalog-"));
   try {
-    // The whole source, script, and theme trees, so a new import in a module
-    // the catalog loads never breaks this copy. The generated product bridge
-    // is large and the catalog never imports it.
-    const generated = path.join(appRoot, "src/avandar/generated");
-    await Promise.all(
-      ["src", "scripts", "themes"].map(async (directory) => {
-        await fs.cp(path.join(appRoot, directory), path.join(root, directory), {
-          recursive: true,
-          filter: (source) => {
-            return !source.startsWith(generated);
-          },
-        });
-      }),
-    );
+    await _copyCatalogSources(root);
     await fs.writeFile(
       path.join(root, "package.json"),
       JSON.stringify({ type: "module" }),

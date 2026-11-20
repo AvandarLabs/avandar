@@ -12,7 +12,7 @@ import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle.ts";
 import { hasSpatialFilterCycle } from "$/models/AvaMap/AvaMapConfig/hasSpatialFilterCycle/hasSpatialFilterCycle.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type { Json } from "$/types/database.types.ts";
-// eslint-disable-next-line no-restricted-imports
+// oxlint-disable-next-line no-restricted-imports
 import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 function _assertBufferInvariants(layers: readonly MapLayer.T[]): void {

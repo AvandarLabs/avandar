@@ -1,5 +1,5 @@
 import { assertIsDefined, identity, objectKeys, propEq } from "@avandar/utils";
-import Dexie from "dexie";
+import { Dexie } from "dexie";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { EntityTable, IndexableType, Table, Transaction } from "dexie";
 import type { UnionToIntersection } from "type-fest";
@@ -30,7 +30,7 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
   // we can then intersect them all together. This way we can ensure each
   // model name is associated to its correct model type, rather than being a
   // union of all model types.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   M extends any
     ? {
         [K in M["modelName"]]: DexieModelTable<M>;
@@ -78,7 +78,7 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
   // we use a conditional here intentionally so that if `DBSchema` is a union,
   // it will get distributed. This will keep the union discriminated rather than
   // merged into one single object with each key unioned.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   DBSchema extends any
     ? {
         /** The base unconfigured Dexie DB */

@@ -5,10 +5,9 @@ import {
   CursorMotionHelpers,
 } from "../../CursorMotionHelpers";
 import "../generated/product.css";
-import { useVideoProps } from "../../videoTheme/useVideoTheme";
 import { measuredPath } from "../choreography";
 import targets from "../cursor-targets.json";
-import { AvandarStage } from "../generated/product.js";
+import { AvandarStage } from "../generated/product";
 import { ProductBackdrop } from "./ProductBackdrop";
 import type { ProductSceneRenderer } from "../../storyboard/StoryFilm/StoryFilm";
 import type { ReactNode } from "react";

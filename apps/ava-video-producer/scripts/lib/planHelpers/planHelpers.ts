@@ -1,18 +1,59 @@
-import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { prop, propEq } from "@avandar/utils";
+import { match, P } from "ts-pattern";
 import {
   storyboardSchema,
   assetPathSchema,
-  absoluteCues,
   timeline,
   durationInFrames,
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
-import { verifyProductBuild } from "../product-source.mjs";
-import { productRequirements } from "../productRequirements/productRequirements";
 
+/** Every public asset one shot's scene draws, such as stills and logos. */
+function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
+  return match(shot)
+    .with({ scene: "media" }, (mediaShot) => {
+      return [mediaShot.props.src];
+    })
+    .with({ scene: "typography" }, (typographyShot) => {
+      return typographyShot.props.icon ? [typographyShot.props.icon.src] : [];
+    })
+    .with({ scene: "brand-lockup" }, (lockupShot) => {
+      return [lockupShot.props.logo.src];
+    })
+    .with({ scene: "tilted-window" }, (windowShot) => {
+      return [
+        ...(windowShot.props.windows ?? []).map(prop("src")),
+        ...(windowShot.props.pair ?? []).map(prop("window.src")),
+        ...(windowShot.props.secondary ? [windowShot.props.secondary.src] : []),
+      ];
+    })
+    .with(
+      {
+        scene: P.union(
+          "continuity",
+          "avandar",
+          "title",
+          "graph",
+          "flowchart",
+          "metric",
+          "bar-comparison",
+          "stock",
+        ),
+      },
+      () => {
+        return [];
+      },
+    )
+    .exhaustive();
+}
+
+/**
+ * Reads and validates a storyboard plan from a JSON file, refusing hidden or
+ * non-JSON inputs. The video CLI calls it before planning, previewing, or
+ * rendering a film.
+ */
 export async function readPlan(filename: string): Promise<Storyboard> {
   return storyboardSchema.parse(
     JSON.parse(
@@ -20,11 +61,13 @@ export async function readPlan(filename: string): Promise<Storyboard> {
     ),
   );
 }
+
 /**
- * Resolve public assets without following a symlink outside the public
- * directory.
+ * Resolves a public asset path inside `public/` without following symlinks
+ * outside `public/`. Returns the verified real path for validation, preview
+ * staging, media probing, and showcase bundling.
  */
-export async function publicAsset(
+export async function getPublicAssetPathFromAsset(
   root: string,
   asset: string,
 ): Promise<string> {
@@ -32,7 +75,7 @@ export async function publicAsset(
   const publicRoot = await fs.realpath(path.join(root, "public"));
   const filename = await fs.realpath(path.join(publicRoot, asset));
   if (
-    !filename.startsWith(publicRoot + path.sep) ||
+    !filename.startsWith(`${publicRoot}${path.sep}`) ||
     !(await fs.stat(filename)).isFile()
   ) {
     throw new Error(`Asset must be a file inside public/: ${asset}`);
@@ -42,7 +85,15 @@ export async function publicAsset(
   );
   return filename;
 }
-export function assetReferences(plan: Storyboard): string[] {
+
+/**
+ * Every public asset a plan uses, once each: shot stills and logos,
+ * narration audio, and sound effects. Use it to hash or copy a film's media,
+ * for example when fingerprinting a preview.
+ */
+export function getAssetReferencesFromPlan(
+  plan: Readonly<Storyboard>,
+): string[] {
   return [
     ...new Set([
       ...plan.shots.flatMap(_shotAssetReferences),
@@ -50,81 +101,21 @@ export function assetReferences(plan: Storyboard): string[] {
         return cue.audio ? [cue.audio] : [];
       }),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
-      ...plan.soundEffects.map((sound) => {
-        return sound.src;
-      }),
+      ...plan.soundEffects.map(prop("src")),
     ]),
   ];
 }
-/** Every public asset one shot's scene draws, such as stills and logos. */
-function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
-  switch (shot.scene) {
-    case "media":
-      return [shot.props.src];
-    case "typography":
-      return shot.props.icon ? [shot.props.icon.src] : [];
-    case "brand-lockup":
-      return [shot.props.logo.src];
-    case "tilted-window":
-      return [
-        ...(shot.props.windows ?? []).map((window) => {
-          return window.src;
-        }),
-        ...(shot.props.pair ?? []).map((column) => {
-          return column.window.src;
-        }),
-        ...(shot.props.secondary ? [shot.props.secondary.src] : []),
-      ];
-    default:
-      return [];
-  }
-}
+
 /**
- * Millisecond conversion uses rounded frame boundaries consistently for SRT and
- * VTT.
+ * A Markdown shot list for a plan: each shot's timing, scene, on-screen
+ * summary, and narration, with the plan's evidence notes. The video CLI
+ * writes it beside a plan for review.
  */
-export function timestamp(frame: number, fps: number, separator = ","): string {
-  const milliseconds = Math.round((frame * 1000) / fps);
-  const hours = Math.floor(milliseconds / 3600000);
-  const minutes = Math.floor(milliseconds / 60000) % 60;
-  const seconds = Math.floor(milliseconds / 1000) % 60;
-  const fraction = milliseconds % 1000;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}${separator}${String(fraction).padStart(3, "0")}`;
-}
-export function captionFiles(plan: Storyboard): {
-  srt: string;
-  vtt: string;
-  transcript: string;
-} {
-  const cues = absoluteCues(plan);
-  const srt = cues
-    .map((cue, index) => {
-      return `${index + 1}\n${timestamp(cue.startFrame, plan.fps)} --> ${timestamp(cue.endFrame, plan.fps)}\n${cue.text}\n`;
-    })
-    .join("\n");
-  const vtt =
-    "WEBVTT\n\n" +
-    cues
-      .map((cue) => {
-        return `${cue.id}\n${timestamp(cue.startFrame, plan.fps, ".")} --> ${timestamp(cue.endFrame, plan.fps, ".")}\n${cue.text}\n`;
-      })
-      .join("\n");
-  const transcript = `${plan.title}\n\n${cues
-    .map((cue) => {
-      return cue.text;
-    })
-    .join("\n\n")}\n`;
-  return { srt, vtt, transcript };
-}
-export function shotList(plan: Storyboard): string {
+export function makeShotListFromPlan(plan: Readonly<Storyboard>): string {
   const lines = timeline(plan).map((shot) => {
     const cues = plan.narration
-      .filter((cue) => {
-        return cue.shotId === shot.id;
-      })
-      .map((cue) => {
-        return cue.text;
-      })
+      .filter(propEq("shotId", shot.id))
+      .map(prop("text"))
       .join(" ");
     const summary =
       shot.note ??
@@ -140,65 +131,12 @@ export function shotList(plan: Storyboard): string {
     })
     .join("\n")}\n`;
 }
+
 /**
- * Import manually aligned SRT cues without pretending to perform speech
- * recognition.
+ * Rejects hidden names, `.env` segments, and disallowed extensions before
+ * returning the input file's real path. Used by `readPlan`, `fingerprintPlan`,
+ * and `alignRecording` before reading user-supplied files.
  */
-export function applySrt(
-  plan: Storyboard,
-  srt: string,
-  audio: string,
-): Storyboard {
-  const blocks = srt
-    .replace(/^\uFEFF/, "")
-    .replaceAll("\r\n", "\n")
-    .trim()
-    .split(/\n\s*\n/);
-  if (blocks.length !== plan.narration.length)
-    throw new Error("SRT cue count must match the storyboard narration");
-  const parseTime = (value: string) => {
-    const match = /^(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})$/.exec(value);
-    if (!match || Number(match[2]) > 59 || Number(match[3]) > 59)
-      throw new Error(`Invalid SRT timestamp: ${value}`);
-    return Math.round(
-      (Number(match[1]) * 3600 +
-        Number(match[2]) * 60 +
-        Number(match[3]) +
-        Number(match[4]) / 1000) *
-        plan.fps,
-    );
-  };
-  const shots = timeline(plan);
-  const narration = blocks.map((block, index) => {
-    const lines = block.split("\n");
-    if (/^\d+$/.test(lines[0])) lines.shift();
-    const times = lines.shift()?.split(/\s+-->\s+/);
-    if (!times || times.length !== 2)
-      throw new Error(`Invalid SRT cue ${index + 1}`);
-    const cue = plan.narration[index];
-    const normalize = (value: string) => {
-      return value.replace(/\s+/g, " ").trim();
-    };
-    if (normalize(lines.join(" ")) !== normalize(cue.text))
-      throw new Error(`SRT text differs from narration cue ${cue.id}`);
-    const shot = shots.find((item) => {
-      return item.id === cue.shotId;
-    })!;
-    const { audio: _audio, ...withoutAudio } = cue;
-    return {
-      ...withoutAudio,
-      beatId: undefined,
-      startFrame: parseTime(times[0]) - shot.startFrame,
-      endFrame: parseTime(times[1]) - shot.startFrame,
-    };
-  });
-  return storyboardSchema.parse({
-    ...plan,
-    narration,
-    narrationTrack: { src: audio, startFrame: 0, volume: 1 },
-  });
-}
-/** Reject unexpected and hidden input files before reading any content. */
 export async function safeInputFile(
   filename: string,
   extensions: readonly string[],
@@ -212,8 +150,9 @@ export async function safeInputFile(
       extensions.includes(path.extname(value).toLowerCase())
     );
   };
-  if (!allowed(filename))
+  if (!allowed(filename)) {
     throw new Error("Input file has a hidden name or unsupported extension");
+  }
   const resolved = await fs.realpath(filename);
   if (!allowed(resolved) || !(await fs.stat(resolved)).isFile()) {
     throw new Error(
@@ -222,9 +161,11 @@ export async function safeInputFile(
   }
   return resolved;
 }
+
 /**
- * Create owned output directories one segment at a time, never through
- * symlinks.
+ * Creates owned output directories one segment at a time, never traversing
+ * symlinks, and returns the resolved directory path. Used by `freshStage`,
+ * `alignRecording`, and `scratchTts` when staging build outputs.
  */
 export async function ensureDirectory(
   root: string,
@@ -245,147 +186,16 @@ export async function ensureDirectory(
     try {
       await fs.mkdir(current);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      if (
+        !(error instanceof Error && "code" in error && error.code === "EEXIST")
+      ) {
+        throw error;
+      }
     }
     const stat = await fs.lstat(current);
-    if (stat.isSymbolicLink() || !stat.isDirectory())
+    if (stat.isSymbolicLink() || !stat.isDirectory()) {
       throw new Error("Output directory cannot be a symlink or a file");
-  }
-  return current;
-}
-/** Stream asset hashes so large captured videos are not loaded into memory. */
-export async function fileHash(filename: string): Promise<string> {
-  const hash = createHash("sha256");
-  for await (const chunk of createReadStream(filename)) hash.update(chunk);
-  return hash.digest("hex");
-}
-/** Proof binds a preview to its exact source plan, assets and renderer. */
-export type PlanFingerprint = {
-  sourcePlanSha256: string;
-  parsedPlanSha256: string;
-  assets: Array<{
-    path: string;
-    sha256: string;
-  }>;
-  rendererSha256: string;
-};
-async function _rendererFiles(
-  root: string,
-  directory = "src",
-): Promise<string[]> {
-  const entries = await fs.readdir(path.join(root, directory), {
-    withFileTypes: true,
-  });
-  const files: string[] = [];
-  for (const entry of entries.sort((a, b) => {
-    return a.name.localeCompare(b.name);
-  })) {
-    const relative = `${directory}/${entry.name}`;
-    if (entry.isSymbolicLink())
-      throw new Error("Renderer source cannot contain symlinks");
-    if (entry.isDirectory())
-      files.push(...(await _rendererFiles(root, relative)));
-    else if (
-      /\.(tsx?|[cm]?jsx?|css|json|ya?ml)$/.test(entry.name) &&
-      !entry.name.startsWith(".")
-    )
-      files.push(relative);
-  }
-  return files;
-}
-/**
- * Hash renderer sources and every referenced media asset, not only the JSON.
- */
-export async function fingerprintPlan(
-  root: string,
-  filename: string,
-  plan: Storyboard,
-  assetRoot = root,
-): Promise<PlanFingerprint> {
-  const sourcePlanSha256 = await fileHash(
-    await safeInputFile(filename, [".json"]),
-  );
-  const parsedPlanSha256 = createHash("sha256")
-    .update(JSON.stringify(plan))
-    .digest("hex");
-  const assets = [];
-  for (const asset of assetReferences(plan).sort())
-    assets.push({
-      path: asset,
-      sha256: await fileHash(await publicAsset(assetRoot, asset)),
-    });
-  const files = await _rendererFiles(root);
-  if (productRequirements(plan).needsProduct) {
-    files.push(...(await _rendererFiles(root, "avandar-adapter")));
-    await verifyProductBuild(root);
-    files.push(
-      "src/avandar/generated/build.json",
-      "scripts/build-avandar.mjs",
-      "scripts/lib/product-source.mjs",
-    );
-  }
-  for (const extra of [
-    "remotion.config.ts",
-    "public/fonts/figtree-latin.woff2",
-    "../../pnpm-lock.yaml",
-    "package.json",
-    "scripts/render.sh",
-    "scripts/render-sequence.mjs",
-    "scripts/check-frames.mjs",
-    "scripts/lib/frameGate.mjs",
-    "scripts/lib/plan.ts",
-    "scripts/lib/media.ts",
-    "scripts/yaml/compileYaml.cjs",
-    "scripts/yaml/yamlLoader.cjs",
-  ]) {
-    try {
-      await fs.access(path.join(root, extra));
-      files.push(extra);
-    } catch {
-      /* Optional in isolated tests. */
     }
   }
-  files.push(
-    ...(await _rendererFiles(root, "scripts/video").catch(
-      (error: NodeJS.ErrnoException) => {
-        if (error.code === "ENOENT") {
-          return [];
-        }
-        throw error;
-      },
-    )),
-  );
-  const hash = createHash("sha256");
-  for (const file of files.sort())
-    hash.update(`${file}\0${await fileHash(path.join(root, file))}\n`);
-  return {
-    sourcePlanSha256,
-    parsedPlanSha256,
-    assets,
-    rendererSha256: hash.digest("hex"),
-  };
-}
-/** Refuse a render without a complete preview of the same evidence. */
-export async function requireMatchingPreview(
-  filename: string,
-  fingerprint: PlanFingerprint,
-): Promise<void> {
-  let saved: {
-    complete?: boolean;
-    fingerprint?: PlanFingerprint;
-  };
-  try {
-    saved = JSON.parse(await fs.readFile(filename, "utf8"));
-  } catch {
-    throw new Error(
-      "Run preview before render; its complete manifest is missing",
-    );
-  }
-  if (!saved.complete)
-    throw new Error("The preview did not complete; run preview again");
-  if (JSON.stringify(saved.fingerprint) !== JSON.stringify(fingerprint)) {
-    throw new Error(
-      "Plan, renderer or media changed after preview; regenerate and inspect the preview",
-    );
-  }
+  return current;
 }

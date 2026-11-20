@@ -269,7 +269,7 @@ easing vocabulary to actual product controls. Frame-driven adapters type into
 Avandar's inputs and CodeMirror editor, reveal query drawers, change filtered
 rows, reveal real chart bars, and open record and dashboard views.
 `src/avandar/cursor-targets.json` contains rendered measurements;
-`scripts/measure-avandar.mjs` regenerates them from the review player.
+`scripts/measureAvandar/measureAvandar.ts` regenerates them from the review player.
 Map movement uses the native map camera, with frame-controlled center and zoom.
 Product text and application chrome remain at native scale.
 

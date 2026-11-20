@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useEffect, useState } from "react";
 import { StockGraphic } from "../../../stock/StockGraphic/StockGraphic";
 import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";

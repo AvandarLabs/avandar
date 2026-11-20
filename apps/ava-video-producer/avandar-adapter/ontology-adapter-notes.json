@@ -36,7 +36,7 @@
     "date": "2026-10-18",
     "bridge": "component:build passed with the existing shared license guard, importing 673 product source files. Generated JavaScript and CSS were built, not edited.",
     "focusedTests": "Seven frame-state tests and the three existing fixture provenance tests passed after review corrections. The new defaults/name-selection tests were observed failing against the incorrect prior behavior before the correction.",
-    "scopedLint": "Scoped ESLint, Stylelint, app TypeScript (tsconfig.app.json), and diff whitespace checks passed after review corrections.",
+    "scopedLint": "Scoped oxlint, Stylelint, app TypeScript (tsconfig.app.json), and diff whitespace checks passed after review corrections.",
     "browser": "Initial adapter states were inspected with Playwright MCP before review correction. The source-correct defaults and selected-name states at 338-442 require controller visual verification. No browser was used during this follow-up because the controller owns the active session.",
     "console": "Zero runtime errors. The existing Remotion Player license reminder remains.",
     "evidence": ".temp/feat-motion-catalog/ontology-final-{0,599}.png and attribute-mapping-final-{98,180,400,659}.png are initial-version evidence. The mapping screenshots do not establish the corrected Add field defaults or text-selection behavior.",

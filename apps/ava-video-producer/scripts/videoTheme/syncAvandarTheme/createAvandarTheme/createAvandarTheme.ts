@@ -14,7 +14,14 @@ type Surfaces = Readonly<
 >;
 type SizeScale = Readonly<Record<(typeof SIZE_KEYS)[number], string>>;
 
-/** The Avandar theme values `read-theme.mjs --for-video` prints. */
+/** The `other.video.atomic` fragment the Avandar theme document writes. */
+type AvandarAtomicTokens = {
+  swatch: Record<string, string>;
+  shadow: Record<string, ShadowValue>;
+  easing: Record<"out" | "inOut" | "outBack", readonly number[]>;
+};
+
+/** The Avandar theme values `readTheme.ts --for-video` prints. */
 export type AvandarThemeSource = Readonly<{
   primary: Shades;
   neutral: Shades;
@@ -172,6 +179,31 @@ function _swatches(source: AvandarThemeSource, shadowColor: string) {
 }
 
 /**
+ * The video theme's swatch, shadow, and easing tokens from the product
+ * theme.
+ */
+function _createAtomicTokens(
+  source: Readonly<AvandarThemeSource>,
+  shadows: ReadonlyArray<
+    readonly [string, ReturnType<typeof getShadowFromCss>]
+  >,
+): AvandarAtomicTokens {
+  return {
+    swatch: _swatches(source, shadows[0][1].color),
+    shadow: Object.fromEntries(
+      shadows.map(([key, { shadow }]) => {
+        return [key, shadow];
+      }),
+    ),
+    easing: {
+      out: _cubicBezier(source.easing.out),
+      inOut: _cubicBezier(source.easing.inOut),
+      outBack: _cubicBezier(source.easing.pop),
+    },
+  };
+}
+
+/**
  * `avandar.theme.json`: classic's semantics mapped onto the Avandar palette,
  * surfaces, radii, shadows, font, and easing. Swatches map by meaning: the
  * ground is Avandar's dark body, the line is its dark hairline border, and
@@ -209,22 +241,6 @@ export function createAvandarTheme(
         return [key, `${parseCssPixels(source.radius[key])}px`];
       }),
     ),
-    other: {
-      video: {
-        atomic: {
-          swatch: _swatches(source, shadows[0][1].color),
-          shadow: Object.fromEntries(
-            shadows.map(([key, { shadow }]) => {
-              return [key, shadow];
-            }),
-          ),
-          easing: {
-            out: _cubicBezier(source.easing.out),
-            inOut: _cubicBezier(source.easing.inOut),
-            outBack: _cubicBezier(source.easing.pop),
-          },
-        },
-      },
-    },
+    other: { video: { atomic: _createAtomicTokens(source, shadows) } },
   };
 }

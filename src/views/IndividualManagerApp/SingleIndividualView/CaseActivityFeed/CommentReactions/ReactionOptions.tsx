@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import {
   buildReactionColorVar,
   COMMENT_REACTION_DISPLAY,

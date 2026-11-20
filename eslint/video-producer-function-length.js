@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { builtinRules } from "eslint/use-at-your-own-risk";
+import eslintPlugin from "oxlint-plugin-eslint";
 
 /*
  * Video producer renderers keep every function at 45 lines or fewer, not
- * counting blank lines and full-line comments (the repo rule in CLAUDE.md).
+ * counting blank lines and full-line comments (the repo rule in AGENTS.md).
  *
  * It applies to every renderer directory in
  * apps/ava-video-producer/scripts/videoTheme/themeLiterals/rendererGlobs.json.
@@ -14,12 +14,13 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
  * keyed by `<app-relative file>#<qualified function name>` (see
  * `buildFunctionKey`). The allowlist only shrinks: an entry whose function
  * now fits, or is gone, is reported until it is deleted, and
- * `longFunctionAllowlist.test.ts` caps its size. A new long function is split
- * into helpers rather than added to it.
+ * `long-function-exceptions-match-renderers.integration.test.ts` caps its
+ * size. A new long function is split into helpers rather than added to it.
  */
 
 const APP = "apps/ava-video-producer";
 const APP_URL = new URL(`../${APP}/`, import.meta.url);
+const APP_ROOT = fileURLToPath(APP_URL);
 const RENDERER_GLOBS_FILE = new URL(
   "scripts/videoTheme/themeLiterals/rendererGlobs.json",
   APP_URL,
@@ -36,7 +37,33 @@ export const MAX_LINES_OPTIONS = {
   skipComments: true,
 };
 
-const CORE_RULE = builtinRules.get("max-lines-per-function");
+const CORE_RULE = eslintPlugin.rules["max-lines-per-function"];
+
+function _readJson(url) {
+  return JSON.parse(fs.readFileSync(url, "utf8"));
+}
+
+const RENDERER_GLOBS = _readJson(RENDERER_GLOBS_FILE).filter((glob) => {
+  return !glob.endsWith(".css");
+});
+
+function _isRendererFile(appRelativeFile) {
+  if (
+    appRelativeFile.startsWith("..") ||
+    path.isAbsolute(appRelativeFile) ||
+    appRelativeFile.endsWith(".css") ||
+    path.matchesGlob(appRelativeFile, "**/*.test.*") ||
+    path.matchesGlob(appRelativeFile, "**/__tests__/**")
+  ) {
+    return false;
+  }
+  return RENDERER_GLOBS.reduce((isMatched, glob) => {
+    if (glob.startsWith("!")) {
+      return isMatched && !path.matchesGlob(appRelativeFile, glob.slice(1));
+    }
+    return isMatched || path.matchesGlob(appRelativeFile, glob);
+  }, false);
+}
 
 function _keyName(key) {
   if (key.type === "Identifier" || key.type === "PrivateIdentifier") {
@@ -111,6 +138,25 @@ export function buildFunctionKey(appRelativeFile, node) {
   return `${appRelativeFile}#${names.join(" > ")}`;
 }
 
+/** Overrides `options` and `report` on a rule context while binding methods. */
+function _createRuleContext({ context, report }) {
+  return new Proxy(
+    {},
+    {
+      get(_, property) {
+        if (property === "options") {
+          return [MAX_LINES_OPTIONS];
+        }
+        if (property === "report") {
+          return report;
+        }
+        const value = Reflect.get(context, property, context);
+        return typeof value === "function" ? value.bind(context) : value;
+      },
+    },
+  );
+}
+
 /** Creates listeners that report non-allowlisted function-length violations. */
 function _createCoreListeners({
   context,
@@ -119,19 +165,17 @@ function _createCoreListeners({
   allowlist,
 }) {
   return CORE_RULE.create(
-    Object.create(context, {
-      options: { value: [MAX_LINES_OPTIONS] },
-      report: {
-        value: (descriptor) => {
-          const key = buildFunctionKey(appRelativeFile, descriptor.node);
-          reportedKeys.add(key);
-          if (!allowlist.has(key)) {
-            context.report({
-              ...descriptor,
-              data: { ...descriptor.data, key },
-            });
-          }
-        },
+    _createRuleContext({
+      context,
+      report: (descriptor) => {
+        const key = buildFunctionKey(appRelativeFile, descriptor.node);
+        reportedKeys.add(key);
+        if (!allowlist.has(key)) {
+          context.report({
+            ...descriptor,
+            data: { ...descriptor.data, key },
+          });
+        }
       },
     }),
   );
@@ -141,7 +185,6 @@ function _createCoreListeners({
 function _createRatchetRule(allowlist) {
   return {
     meta: {
-      ...CORE_RULE.meta,
       schema: [],
       messages: {
         exceed:
@@ -152,9 +195,12 @@ function _createRatchetRule(allowlist) {
     },
     create(context) {
       const appRelativeFile = path
-        .relative(fileURLToPath(APP_URL), context.filename)
+        .relative(APP_ROOT, context.filename)
         .split(path.sep)
         .join("/");
+      if (!_isRendererFile(appRelativeFile)) {
+        return {};
+      }
       const reportedKeys = new Set();
       const coreListeners = _createCoreListeners({
         context,
@@ -183,42 +229,16 @@ function _createRatchetRule(allowlist) {
   };
 }
 
-function _readJson(url) {
-  return JSON.parse(fs.readFileSync(url, "utf8"));
-}
-
-const toAppGlob = (glob) => {
-  return `${APP}/${glob}`;
+/** Oxlint JS plugin enforcing the 45-line ratchet across renderer files. */
+const videoProducerFunctionLengthPlugin = {
+  meta: {
+    name: "video-producer",
+  },
+  rules: {
+    "max-lines-per-function": _createRatchetRule(
+      new Set(_readJson(ALLOWLIST_FILE)),
+    ),
+  },
 };
 
-const RENDERER_GLOBS = _readJson(RENDERER_GLOBS_FILE).filter((glob) => {
-  return !glob.endsWith(".css");
-});
-
-/** The function length limit for every renderer directory. */
-export const videoProducerFunctionLength = [
-  {
-    files: RENDERER_GLOBS.filter((glob) => {
-      return !glob.startsWith("!");
-    }).map(toAppGlob),
-    ignores: [
-      ...RENDERER_GLOBS.filter((glob) => {
-        return glob.startsWith("!");
-      }).map((glob) => {
-        return toAppGlob(glob.slice(1));
-      }),
-      `${APP}/**/*.test.*`,
-      `${APP}/**/__tests__/**`,
-    ],
-    plugins: {
-      "video-producer": {
-        rules: {
-          "max-lines-per-function": _createRatchetRule(
-            new Set(_readJson(ALLOWLIST_FILE)),
-          ),
-        },
-      },
-    },
-    rules: { "video-producer/max-lines-per-function": "error" },
-  },
-];
+export default videoProducerFunctionLengthPlugin;

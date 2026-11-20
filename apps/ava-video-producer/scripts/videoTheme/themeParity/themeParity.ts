@@ -1,12 +1,13 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { propEq } from "@avandar/utils";
 import {
   openBrowser,
   renderStill,
   selectComposition,
 } from "@remotion/renderer";
-import { requireLicense } from "../../require-license.mjs";
+import { requireLicense } from "../../requireLicense";
 import {
   bundleShowcaseFilms,
   SHOWCASE_STILL_BROWSER_OPTIONS,
@@ -15,7 +16,10 @@ import {
   appRoot,
   ShowcaseFilms,
 } from "../../showcase/ShowcaseFilms/ShowcaseFilms";
-import { compareRgbaFrames } from "./compareRgbaFrames/compareRgbaFrames";
+import {
+  compareRgbaFrames,
+  type ParityRegion,
+} from "./compareRgbaFrames/compareRgbaFrames";
 import {
   type ParityTarget,
   ParityTargets,
@@ -24,7 +28,7 @@ import { readRgbaFromPng, writePngFromRgba } from "./rgbaPng/rgbaPng";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 const PARITY_ROOT = path.join(appRoot, "out/theme-parity");
-let PARITY_DIRECTORY = PARITY_ROOT;
+let parityDirectory = PARITY_ROOT;
 type ParityStage = "reference" | "current" | "diff";
 type LoadedTarget = Readonly<{
   target: ParityTarget;
@@ -38,13 +42,28 @@ type TargetResult = Readonly<{
   unexplainedPixels: number;
   missingFrames: number;
 }>;
+
+/** How one frame compared: missing, identical, or with differing pixels. */
+type FrameComparison =
+  | { kind: "missing" }
+  | { kind: "same" }
+  | { kind: "different"; unexplainedPixels: number };
+
+/** The frame and regions `_compareFrame` checks against a reference. */
+type FrameComparisonRequest = {
+  targetId: string;
+  frame: number;
+  size: { width: number; height: number };
+  allowedRegions: ParityRegion[];
+};
+
 function _frameFile({
   stage,
   id,
   frame,
 }: Readonly<{ stage: ParityStage; id: string; frame: number }>) {
   return path.join(
-    PARITY_DIRECTORY,
+    parityDirectory,
     stage,
     id,
     `${String(frame).padStart(4, "0")}.png`,
@@ -81,7 +100,7 @@ async function _renderTargets(
     targets.map(({ film }) => {
       return film;
     }),
-    path.join(PARITY_DIRECTORY, "bundle"),
+    path.join(parityDirectory, "bundle"),
   );
   const browser = await openBrowser("chrome", options);
   try {
@@ -118,6 +137,43 @@ async function _renderTargets(
     await browser.close({ silent: true });
   }
 }
+
+/**
+ * Compares one current frame to its reference, writing a diff when they
+ * differ.
+ */
+async function _compareFrame(
+  options: Readonly<FrameComparisonRequest>,
+): Promise<FrameComparison> {
+  const { targetId, frame, size } = options;
+  const reference = await readRgbaFromPng(
+    _frameFile({ stage: "reference", id: targetId, frame }),
+    size,
+  ).catch(() => {
+    return undefined;
+  });
+  if (!reference) {
+    return { kind: "missing" };
+  }
+  const current = await readRgbaFromPng(
+    _frameFile({ stage: "current", id: targetId, frame }),
+    size,
+  );
+  const comparison = compareRgbaFrames({
+    reference,
+    current,
+    ...size,
+    allowedRegions: options.allowedRegions,
+  });
+  if (comparison.differingPixels === 0) {
+    return { kind: "same" };
+  }
+  const diffFile = _frameFile({ stage: "diff", id: targetId, frame });
+  await fs.mkdir(path.dirname(diffFile), { recursive: true });
+  await writePngFromRgba({ file: diffFile, rgba: comparison.diff, size });
+  return { kind: "different", unexplainedPixels: comparison.unexplainedPixels };
+}
+
 async function _compareTarget({
   target,
   film,
@@ -128,49 +184,25 @@ async function _compareTarget({
     id: target.id,
     film,
   });
-  let differingFrames = 0;
-  let unexplainedPixels = 0;
-  let missingFrames = 0;
+  const comparisons: FrameComparison[] = [];
+  // Frames compare one at a time to keep only two decoded frames in memory.
   for (const frame of frames) {
-    const reference = await readRgbaFromPng(
-      _frameFile({ stage: "reference", id: target.id, frame }),
-      size,
-    ).catch(() => {
-      return undefined;
-    });
-    if (!reference) {
-      missingFrames += 1;
-      continue;
-    }
-    const current = await readRgbaFromPng(
-      _frameFile({ stage: "current", id: target.id, frame }),
-      size,
+    comparisons.push(
+      await _compareFrame({ targetId: target.id, frame, size, allowedRegions }),
     );
-    const comparison = compareRgbaFrames({
-      reference,
-      current,
-      ...size,
-      allowedRegions,
-    });
-    if (comparison.differingPixels === 0) {
-      continue;
-    }
-    differingFrames += 1;
-    unexplainedPixels += comparison.unexplainedPixels;
-    const diffFile = _frameFile({ stage: "diff", id: target.id, frame });
-    await fs.mkdir(path.dirname(diffFile), { recursive: true });
-    await writePngFromRgba({ file: diffFile, rgba: comparison.diff, size });
   }
   return {
     id: target.id,
     frames: frames.length,
-    differingFrames,
-    unexplainedPixels,
-    missingFrames,
+    differingFrames: comparisons.filter(propEq("kind", "different")).length,
+    unexplainedPixels: comparisons.reduce((sum, item) => {
+      return sum + (item.kind === "different" ? item.unexplainedPixels : 0);
+    }, 0),
+    missingFrames: comparisons.filter(propEq("kind", "missing")).length,
   };
 }
 async function _writeManifest(targets: readonly LoadedTarget[]) {
-  const file = path.join(PARITY_DIRECTORY, "reference/manifest.json");
+  const file = path.join(parityDirectory, "reference/manifest.json");
   const previous = JSON.parse(
     await fs.readFile(file, "utf8").catch(() => {
       return '{"targets":{}}';
@@ -214,7 +246,7 @@ async function _runThemeParity({
   await Promise.all(
     targets.flatMap(({ target }) => {
       return stages.map((stage) => {
-        return fs.rm(path.join(PARITY_DIRECTORY, stage, target.id), {
+        return fs.rm(path.join(parityDirectory, stage, target.id), {
           recursive: true,
           force: true,
         });
@@ -237,7 +269,7 @@ async function _runThemeParity({
     })
   ) {
     console.error(
-      `Parity failed. Diff images: ${path.relative(appRoot, path.join(PARITY_DIRECTORY, "diff"))}`,
+      `Parity failed. Diff images: ${path.relative(appRoot, path.join(parityDirectory, "diff"))}`,
     );
     process.exitCode = 1;
   }
@@ -251,7 +283,7 @@ const [mode, ...ids] =
     : argv.filter((_, index) => {
         return index !== themeIndex && index !== themeIndex + 1;
       });
-PARITY_DIRECTORY =
+parityDirectory =
   themeId === "classic" ? PARITY_ROOT : path.join(PARITY_ROOT, themeId);
 if ((mode === "capture" || mode === "compare") && themeId) {
   await _runThemeParity({ mode, ids, themeId });

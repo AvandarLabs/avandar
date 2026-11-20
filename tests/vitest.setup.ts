@@ -24,9 +24,9 @@ const noop = (): void => {
 };
 
 function expectToHaveSameMembers(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   received: readonly any[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   expected: readonly any[],
 ) {
   const pass =
@@ -113,13 +113,14 @@ interface CustomMatchers<R = unknown> {
    * Matcher to check if two arrays have the same members, where order deos
    * not matter.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   toHaveSameMembers(expected: readonly any[]): R;
 }
 
 declare module "vitest" {
-  /* eslint-disable @typescript-eslint/no-empty-object-type */
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* oxlint-disable typescript/no-empty-object-type */
+  /* oxlint-disable typescript/no-explicit-any */
   interface Matchers<T = any> extends CustomMatchers<T> {}
-  /* eslint-enable */
+  /* oxlint-enable typescript/no-empty-object-type */
+  /* oxlint-enable typescript/no-explicit-any */
 }

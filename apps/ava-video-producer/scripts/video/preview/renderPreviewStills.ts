@@ -1,5 +1,5 @@
 import { openBrowser, selectComposition } from "@remotion/renderer";
-import { previewFrames } from "../../lib/planHelpers/previewFrames";
+import { getPreviewFramesFromPlan } from "../../lib/planHelpers/getPreviewFramesFromPlan";
 import { getBrowserSettingsFromPlan } from "./getBrowserSettingsFromPlan";
 import { renderPreviewStill } from "./renderPreviewStill";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
@@ -12,6 +12,7 @@ type Props = Readonly<{
   serveUrl: string;
   directory: string;
 }>;
+
 /** Renders every preview frame with one reusable headless browser. */
 export async function renderPreviewStills({
   plan,
@@ -25,7 +26,7 @@ export async function renderPreviewStills({
     chromiumOptions,
     logLevel: "error",
   });
-  const frames = previewFrames(plan);
+  const frames = getPreviewFramesFromPlan(plan);
   const samples: PreviewSample[] = [];
   try {
     const composition = await selectComposition({

@@ -26,6 +26,49 @@ const CAPTION_CUE = 80;
 function _clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
+type KeyedTraversalStep = {
+  key: string;
+  from: NodeTraversalInput["nodes"][number];
+  to: NodeTraversalInput["nodes"][number];
+  stepOffset: number;
+};
+
+function _buildKeyedEdges(
+  edges: NodeTraversalInput["edges"],
+  nodes: NodeTraversalInput["nodes"],
+): KeyedTraversalStep[] {
+  const edgePairCounts = new Map<string, number>();
+  return edges.map(([from, to], stepOffset) => {
+    const pairKey = `${nodes[from].label}->${nodes[to].label}`;
+    const occurrence = edgePairCounts.get(pairKey) ?? 0;
+    edgePairCounts.set(pairKey, occurrence + 1);
+    return {
+      key: `${pairKey}#${occurrence}`,
+      from: nodes[from],
+      to: nodes[to],
+      stepOffset,
+    };
+  });
+}
+
+function _buildKeyedRouteSteps(
+  route: NodeTraversalInput["route"],
+  nodes: NodeTraversalInput["nodes"],
+): KeyedTraversalStep[] {
+  const routePairCounts = new Map<string, number>();
+  return route.slice(0, -1).map((fromIndex, stepOffset) => {
+    const toIndex = route[stepOffset + 1];
+    const pairKey = `${nodes[fromIndex].label}->${nodes[toIndex].label}`;
+    const occurrence = routePairCounts.get(pairKey) ?? 0;
+    routePairCounts.set(pairKey, occurrence + 1);
+    return {
+      key: `${pairKey}#${occurrence}`,
+      from: nodes[fromIndex],
+      to: nodes[toIndex],
+      stepOffset,
+    };
+  });
+}
 /** Draws the bounded authored node-traversal study at an explicit frame. */
 export function NodeTraversal({
   input,
@@ -60,29 +103,31 @@ export function NodeTraversal({
           accent={accent}
         />
       ) : null}
-      {edges.map(([a, b], i) => {
+      {_buildKeyedEdges(edges, nodes).map(({ key, from, to, stepOffset }) => {
         return (
           <DrawPath
-            key={i}
-            d={`M${nodes[a].x} ${nodes[a].y} L${nodes[b].x} ${nodes[b].y}`}
+            key={key}
+            d={`M${from.x} ${from.y} L${to.x} ${to.y}`}
             frame={frame}
-            at={EDGE_CUE + i * motion.stagger.edge}
+            at={EDGE_CUE + stepOffset * motion.stagger.edge}
           />
         );
       })}
-      {route.slice(0, -1).map((a, i) => {
-        return (
-          <Route
-            key={i}
-            from={nodes[a]}
-            to={nodes[route[i + 1]]}
-            progress={_clampUnit(progress - i)}
-            frame={frame}
-            at={ROUTE_LINE_CUE}
-            color={accent}
-          />
-        );
-      })}
+      {_buildKeyedRouteSteps(route, nodes).map(
+        ({ key, from, to, stepOffset }) => {
+          return (
+            <Route
+              key={key}
+              from={from}
+              to={to}
+              progress={_clampUnit(progress - stepOffset)}
+              frame={frame}
+              at={ROUTE_LINE_CUE}
+              color={accent}
+            />
+          );
+        },
+      )}
       {nodes.map((node, i) => {
         const routeIndex = route.indexOf(i);
         return (

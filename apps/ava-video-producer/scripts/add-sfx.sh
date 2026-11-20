@@ -3,7 +3,7 @@
 #
 # Lays UI sound onto an ALREADY RENDERED mp4. Remotion never runs, no frame is
 # redrawn: the video stream is copied byte for byte (-c:v copy), so neither
-# tiled frames nor luminance jumps can come back and check-frames.mjs does not
+# tiled frames nor luminance jumps can come back and checkFrames.ts does not
 # need re-running. One pass, about a second.
 #
 #   in   out/<id>.mp4          (silent, from render.sh)
@@ -33,7 +33,7 @@
 # and a belt rotation with it too and the whole clip sounds identical.
 set -e
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 
 ID="${1:-demo}"
 IN="out/$ID.mp4"

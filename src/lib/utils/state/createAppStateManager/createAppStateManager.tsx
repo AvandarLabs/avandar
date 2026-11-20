@@ -3,11 +3,11 @@ import { createContext, useContext, useMemo, useReducer } from "react";
 
 type GenericActionRegistry<State> = Record<
   string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   (state: State, payload: any) => State
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 type ActionFunctionRecord<ActionRegistry extends GenericActionRegistry<any>> = {
   [ActionType in keyof ActionRegistry]: Parameters<
     ActionRegistry[ActionType]
@@ -87,7 +87,7 @@ type AppStateManager<
   }>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 type ActionPayload<ActionRegistry extends GenericActionRegistry<any>> =
   Parameters<ActionRegistry[keyof ActionRegistry]>[1];
 
@@ -260,9 +260,9 @@ export function createAppStateManager<
 
       const [state, dispatch] = useReducer(
         reducer,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line typescript/no-explicit-any
         reducerInitialState as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line typescript/no-explicit-any
         reducerInitFn as any,
       );
       const appDispatch = useMemo(() => {

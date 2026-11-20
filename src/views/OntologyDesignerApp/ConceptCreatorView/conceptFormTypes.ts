@@ -46,7 +46,7 @@ export type AttributeFormValues = SetRequired<
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore
 // Type test to make sure `AttributeFormValues.mappings` has definitions for
 // all valid mappings

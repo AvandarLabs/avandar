@@ -314,7 +314,7 @@ under random frame seeks, flow layout order, numeric formatting, fixed text
 fitting, media paths/crops, and exact caption boundaries. Run it with:
 
 ```sh
-node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/scenes.test.ts
+node --import tsx --import ./scripts/yaml/registerYaml.ts --test tests/scenes.test.ts
 npm run typecheck
 ```
 

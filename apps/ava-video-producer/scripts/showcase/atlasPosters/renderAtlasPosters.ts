@@ -10,7 +10,7 @@ import {
   isSceneEntry,
 } from "../../../src/continuity/continuityCatalog";
 import { VIDEO_THEME_SLUG_PATTERN } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
-import { requireLicense } from "../../require-license.mjs";
+import { requireLicense } from "../../requireLicense";
 import {
   bundleShowcaseFilms,
   SHOWCASE_STILL_BROWSER_OPTIONS,

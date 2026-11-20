@@ -15,7 +15,7 @@ import type { input as ZodInput, output as ZodOutput, ZodType } from "zod";
  * `index.d.ts`, which broke type-checking for any consumer without zod.
  */
 export type ZodSchemaEqualsTypes<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   Z extends ZodType<any, any>,
   Args extends {
     input: ZodInput<Z>;

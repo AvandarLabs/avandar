@@ -219,13 +219,17 @@ export function filterTokenRows(
 ): readonly TokenRow[] {
   const { rows, filter } = options;
   const query = filter.query.trim().toLowerCase();
+  const allowedTiers = new Set(filter.tiers);
+  const usedTokenSet = filter.usedTokens
+    ? new Set(filter.usedTokens)
+    : undefined;
   return rows.filter((row) => {
     return (
-      filter.tiers.includes(row.tier) &&
-      (!filter.usedTokens ||
+      allowedTiers.has(row.tier) &&
+      (!usedTokenSet ||
         row.tier === "atomic" ||
         row.tier === "mantine" ||
-        filter.usedTokens.includes(row.path)) &&
+        usedTokenSet.has(row.path)) &&
       (!query ||
         row.path.toLowerCase().includes(query) ||
         filter.getText(row).toLowerCase().includes(query))

@@ -9,25 +9,38 @@ import type { ReactNode } from "react";
 
 type Props = Readonly<{
   layers: readonly ShadowLayer[];
+  layerIds: readonly string[];
   onChange: (layers: readonly ShadowLayer[]) => void;
+  onRemove: (index: number) => void;
 }>;
 
 /** The editable layers of a shadow, each with its own remove action. */
-export function ShadowLayers({ layers, onChange }: Props): ReactNode {
-  return layers.map((layer, index) => {
-    const layerNumber = index + 1;
+export function ShadowLayers({
+  layers,
+  layerIds,
+  onChange,
+  onRemove,
+}: Props): ReactNode {
+  const entries = layers.map((layer, position) => {
+    return {
+      id: layerIds[position] ?? `layer-${position + 1}`,
+      layer,
+      position,
+      layerNumber: position + 1,
+    };
+  });
+  return entries.map(({ id, layer, position, layerNumber }) => {
     return (
       <NumberFields
-        // A layer has no identity apart from its position in the stack.
-        key={`layer-${String(layerNumber)}`}
+        key={id}
         legend={`Layer ${layerNumber}`}
         fields={EFFECT_FIELDS.shadow}
         values={layer}
         fallback={DEFAULT_SHADOW_LAYER}
         onChange={(layerValues) => {
           return onChange(
-            layers.map((current, position) => {
-              return position === index
+            layers.map((current, currentIndex) => {
+              return currentIndex === position
                 ? { ...DEFAULT_SHADOW_LAYER, ...layerValues }
                 : current;
             }),
@@ -38,11 +51,7 @@ export function ShadowLayers({ layers, onChange }: Props): ReactNode {
             size="compact-xs"
             variant="subtle"
             onClick={() => {
-              return onChange(
-                layers.filter((_, position) => {
-                  return position !== index;
-                }),
-              );
+              return onRemove(position);
             }}
           >
             {`Remove layer ${layerNumber}`}

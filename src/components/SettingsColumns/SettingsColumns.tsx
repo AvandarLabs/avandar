@@ -1,6 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import { Fieldset, Stack } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/SettingsColumns/SettingsColumns.module.css";
 import type { CSSProperties, ReactNode } from "react";
 

@@ -1,6 +1,6 @@
 import { ActionIcon } from "@mantine/core";
 import { IconArrowBackUp } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { formatTokenValue } from "../../formatTokenValue/formatTokenValue";
 import { useTokenEditor } from "../../TokenEditorContext";
 import { type TokenRow } from "../../tokenRows/tokenRows.types";

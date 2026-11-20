@@ -4,13 +4,14 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { prop } from "@avandar/utils";
 import {
-  findLumaJumps,
-  findTiledFrames,
-  judgeDeclaredCuts,
-  measureFrames,
-  parseGateArguments,
-} from "../scripts/lib/frameGate.mjs";
+  getLumaJumpsFromLuma,
+  getTiledFramesFromMeasurements,
+  makeJudgedCutsFromLuma,
+} from "../scripts/lib/frameGateHelpers/frameGateHelpers";
+import { getFrameMeasurementsFromVideo } from "../scripts/lib/frameGateHelpers/getFrameMeasurementsFromVideo";
+import { makeGateArgumentsFromArgv } from "../scripts/lib/frameGateHelpers/makeGateArgumentsFromArgv";
 
 /** A steady luma track with `values` written over it from `startFrame`. */
 function createLumaTrack(
@@ -29,18 +30,25 @@ function createLumaTrack(
 
 test("gate arguments keep the file apart from the declared cut list", () => {
   assert.deepEqual(
-    parseGateArguments(["--declared-cuts", "601,1021", "film.mp4"]),
+    makeGateArgumentsFromArgv(["--declared-cuts", "601,1021", "film.mp4"]),
     { file: "film.mp4", isStandalone: false, declaredCuts: [601, 1021] },
   );
   assert.deepEqual(
-    parseGateArguments(["film.mp4", "--standalone", "--declared-cuts=12"]),
+    makeGateArgumentsFromArgv([
+      "film.mp4",
+      "--standalone",
+      "--declared-cuts=12",
+    ]),
     { file: "film.mp4", isStandalone: true, declaredCuts: [12] },
   );
-  assert.deepEqual(parseGateArguments(["film.mp4", "--declared-cuts", ""]), {
-    file: "film.mp4",
-    isStandalone: false,
-    declaredCuts: [],
-  });
+  assert.deepEqual(
+    makeGateArgumentsFromArgv(["film.mp4", "--declared-cuts", ""]),
+    {
+      file: "film.mp4",
+      isStandalone: false,
+      declaredCuts: [],
+    },
+  );
   for (const argv of [
     [],
     ["film.mp4", "--declared-cuts", "abc"],
@@ -50,7 +58,7 @@ test("gate arguments keep the file apart from the declared cut list", () => {
   ]) {
     assert.throws(
       () => {
-        return parseGateArguments(argv);
+        return makeGateArgumentsFromArgv(argv);
       },
       /usage/,
       argv.join(" "),
@@ -63,33 +71,30 @@ test("a declared cut that holds its new luma is accepted and leaves no jump", ()
   const luma = createLumaTrack(40, 20, [235, 230, 228, 226, 226, 226]);
   luma.fill(226, 26);
   luma.fill(5, 0, 20);
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "accepted");
   assert.equal(cut.frame, 20);
   assert.equal(Math.round(cut.jump ?? 0), 230);
   assert.equal(Math.round(cut.reversal ?? 0), 9);
-  assert.deepEqual(findLumaJumps(luma, [cut]), []);
+  assert.deepEqual(getLumaJumpsFromLuma(luma, [cut]), []);
 });
 
 test("the same jump without a declaration still fails the gate", () => {
   const luma = createLumaTrack(40, 20, []);
   luma.fill(5, 0, 20);
-  assert.deepEqual(findLumaJumps(luma, []), [{ from: 19, to: 20, jump: 95 }]);
+  assert.deepEqual(getLumaJumpsFromLuma(luma, []), [
+    { from: 19, to: 20, jump: 95 },
+  ]);
 });
 
 test("a declared cut that reverses within ten frames is a flash and fails", () => {
   // Light, a cut to black, and the light back nine frames later.
   const luma = createLumaTrack(40, 20, Array(9).fill(0));
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "flash");
   assert.equal(cut.reversalFrame, 29);
   assert.equal(cut.reversal, 100);
-  assert.deepEqual(
-    findLumaJumps(luma, [cut]).map((jump) => {
-      return jump.to;
-    }),
-    [20, 29],
-  );
+  assert.deepEqual(getLumaJumpsFromLuma(luma, [cut]).map(prop("to")), [20, 29]);
 });
 
 test("a gradual reversal within ten frames is still a flash", () => {
@@ -98,7 +103,7 @@ test("a gradual reversal within ten frames is still a flash", () => {
     20,
     [0, 0, 20, 40, 60, 80, 80, 80, 80, 80, 80],
   );
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "flash");
   assert.equal(cut.reversal, 80);
   assert.equal(cut.reversalFrame, 25);
@@ -109,7 +114,7 @@ test("a reversal measured from the furthest point the cut reaches", () => {
   const luma = createLumaTrack(40, 20, [200, 220, 240, 205]);
   luma.fill(205, 24);
   luma.fill(0, 0, 20);
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "flash");
   assert.equal(cut.reversal, 35);
 });
@@ -117,29 +122,24 @@ test("a reversal measured from the furthest point the cut reaches", () => {
 test("a reversal after ten frames is a new shot, not a flash", () => {
   // Frames 21-30 are the ten after the cut; the light returns on frame 31.
   const luma = createLumaTrack(40, 20, Array(11).fill(0));
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "accepted");
-  assert.deepEqual(
-    findLumaJumps(luma, [cut]).map((jump) => {
-      return jump.to;
-    }),
-    [31],
-  );
+  assert.deepEqual(getLumaJumpsFromLuma(luma, [cut]).map(prop("to")), [31]);
 });
 
 test("a declaration exempts only its own frame, not the frames beside it", () => {
   const luma = createLumaTrack(40, 20, [60, 0]);
   luma.fill(0, 22);
-  const [cut] = judgeDeclaredCuts(luma, [20]);
+  const [cut] = makeJudgedCutsFromLuma(luma, [20]);
   assert.equal(cut.verdict, "accepted");
-  assert.deepEqual(findLumaJumps(luma, [cut]), [
+  assert.deepEqual(getLumaJumpsFromLuma(luma, [cut]), [
     { from: 20, to: 21, jump: 60 },
   ]);
 });
 
 test("a declared cut under the luma limit or outside the video is reported", () => {
   const luma = createLumaTrack(40, 20, Array(20).fill(110));
-  const [quiet, outside, first] = judgeDeclaredCuts(luma, [20, 40, 0]);
+  const [quiet, outside, first] = makeJudgedCutsFromLuma(luma, [20, 40, 0]);
   assert.equal(quiet.verdict, "under-limit");
   assert.equal(outside.verdict, "outside-video");
   assert.equal(first.verdict, "outside-video");
@@ -159,7 +159,7 @@ const MEASURED_CONTRAST = [
 
 test("a window entering a near-uniform field is not a tiled frame", () => {
   assert.deepEqual(
-    findTiledFrames({
+    getTiledFramesFromMeasurements({
       halves: MEASURED_HALVES,
       contrast: MEASURED_CONTRAST,
     }),
@@ -172,9 +172,10 @@ test("a copy-level half match next to a near-uniform frame is still tiled", () =
   const halves = [...MEASURED_HALVES];
   halves[10] = 54.72;
   assert.deepEqual(
-    findTiledFrames({ halves, contrast: MEASURED_CONTRAST }).map((tile) => {
-      return tile.frame;
-    }),
+    getTiledFramesFromMeasurements({
+      halves,
+      contrast: MEASURED_CONTRAST,
+    }).map(prop("frame")),
     [10],
   );
 });
@@ -242,13 +243,11 @@ test("a 2x3 grid of its own frame is caught, including next to a uniform frame",
       "0",
       film,
     ]);
-    const measured = measureFrames(film);
+    const measured = getFrameMeasurementsFromVideo(film);
     assert.equal(measured.halves.length, 18);
     assert.ok(measured.contrast[11] < 120, "frame 11 is near-uniform");
     assert.deepEqual(
-      findTiledFrames(measured).map((tile) => {
-        return tile.frame;
-      }),
+      getTiledFramesFromMeasurements(measured).map(prop("frame")),
       [4, 12],
     );
   } finally {

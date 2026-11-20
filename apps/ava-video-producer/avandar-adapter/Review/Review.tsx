@@ -1,9 +1,9 @@
 import { Player, type PlayerRef } from "@remotion/player";
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { FEATURE_BEATS } from "../../src/avandar/generated/product.js";
+import { FEATURE_BEATS } from "../../src/avandar/generated/product";
 import { Scene } from "./Scene";
-import type { ProductFeature } from "../../src/avandar/generated/product.js";
+import type { ProductFeature } from "../../src/avandar/generated/product";
 import type { ReactNode } from "react";
 
 declare global {

@@ -12,33 +12,79 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { type TestContext } from "node:test";
-import { curateCapture } from "../scripts/curate-capture.mjs";
+import { curateCapture } from "../scripts/curateCapture/curateCapture";
 
 const image = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3ioAAAAASUVORK5CYII=",
   "base64",
 );
-const hash = (value: Buffer | string) => {
+function _hash(value: Buffer | string): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+/** One action a fixture manifest records. */
+type ManifestAction = {
+  id: string;
+  flowId: string;
+  status: string;
+  sourceUrl: string;
+  resultUrl: string;
+  startedAtMs: number;
+  endedAtMs: number;
 };
 
-async function fixture(t: TestContext) {
-  const root = await mkdtemp(join(tmpdir(), "capture-curation-"));
-  t.after(() => {
-    return rm(root, { recursive: true, force: true });
-  });
-  const runDir = "out/captures/fixture-run";
-  const run = join(root, runDir);
-  await mkdir(join(run, "screens"), { recursive: true });
-  await writeFile(join(run, "screens/import-ready.png"), image);
-  const manifest = {
+/** One resource a fixture manifest records. */
+type ManifestResource = {
+  flowId: string;
+  kind: string;
+  id: string;
+  name: string;
+};
+
+/** One checkpoint a fixture manifest records, with its screenshot hash. */
+type ManifestCheckpoint = {
+  id: string;
+  flowId: string;
+  status: string;
+  sourceUrl: string;
+  atMs: number;
+  videoAtMs: number;
+  screenshot: { path: string; sha256: string };
+};
+
+/** The mutable manifest shape each test edits before curating it. */
+type PassedManifest = {
+  schemaVersion: number;
+  runId: string;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
+  features: Array<{ id: string; status: string }>;
+  fixtures: Array<{ path: string; sha256: string; bytes: number }>;
+  actions: ManifestAction[];
+  resources: ManifestResource[];
+  checkpoints: ManifestCheckpoint[];
+};
+
+/** A temporary project holding one run directory and its manifest. */
+type CurationFixture = {
+  root: string;
+  runDir: string;
+  run: string;
+  manifest: PassedManifest;
+  save: () => Promise<void>;
+};
+
+/** A passed one-flow capture manifest whose screenshot matches `image`. */
+function _createPassedManifest(): PassedManifest {
+  return {
     schemaVersion: 1,
     runId: "fixture-run",
     status: "passed",
     startedAt: "2026-10-14T00:00:00Z",
     finishedAt: "2026-10-14T00:01:00Z",
     features: [{ id: "import", status: "passed" }],
-    fixtures: [{ path: "cases.csv", sha256: hash("id\n1\n"), bytes: 5 }],
+    fixtures: [{ path: "cases.csv", sha256: _hash("id\n1\n"), bytes: 5 }],
     actions: [
       {
         id: "save",
@@ -67,10 +113,24 @@ async function fixture(t: TestContext) {
         sourceUrl: "http://localhost:5173/avandar-labs/datasets/fixture",
         atMs: 30,
         videoAtMs: 20,
-        screenshot: { path: "screens/import-ready.png", sha256: hash(image) },
+        screenshot: { path: "screens/import-ready.png", sha256: _hash(image) },
       },
     ],
   };
+}
+
+async function _createCurationFixture(
+  t: TestContext,
+): Promise<CurationFixture> {
+  const root = await mkdtemp(join(tmpdir(), "capture-curation-"));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
+  const runDir = "out/captures/fixture-run";
+  const run = join(root, runDir);
+  await mkdir(join(run, "screens"), { recursive: true });
+  await writeFile(join(run, "screens/import-ready.png"), image);
+  const manifest = _createPassedManifest();
   const save = () => {
     return writeFile(join(run, "manifest.json"), JSON.stringify(manifest));
   };
@@ -79,9 +139,12 @@ async function fixture(t: TestContext) {
 }
 
 test("curation copies verified screenshots and links source evidence without URL queries", async (t) => {
-  const f = await fixture(t);
-  const original = await readFile(join(f.run, "manifest.json"));
-  const result = await curateCapture({ root: f.root, runDir: f.runDir });
+  const fixture = await _createCurationFixture(t);
+  const original = await readFile(join(fixture.run, "manifest.json"));
+  const result = await curateCapture({
+    root: fixture.root,
+    runDir: fixture.runDir,
+  });
   assert.equal(result.screenshots, 1);
   assert.equal(result.backup, null);
   assert.deepEqual(
@@ -89,10 +152,10 @@ test("curation copies verified screenshots and links source evidence without URL
     image,
   );
   const evidence = JSON.parse(await readFile(result.evidencePath, "utf8"));
-  assert.equal(evidence.source.manifestSha256, hash(original));
-  assert.equal(evidence.source.runDirectory, f.runDir);
-  assert.deepEqual(evidence.fixtures, f.manifest.fixtures);
-  assert.deepEqual(evidence.resources, f.manifest.resources);
+  assert.equal(evidence.source.manifestSha256, _hash(original));
+  assert.equal(evidence.source.runDirectory, fixture.runDir);
+  assert.deepEqual(evidence.fixtures, fixture.manifest.fixtures);
+  assert.deepEqual(evidence.resources, fixture.manifest.resources);
   assert.equal(
     evidence.actions[0].sourceUrl,
     "http://localhost:5173/avandar-labs/import",
@@ -101,45 +164,49 @@ test("curation copies verified screenshots and links source evidence without URL
     evidence.screenshots[0].asset,
     "avandar/screens/import-ready.png",
   );
-  assert.equal(evidence.screenshots[0].sha256, hash(image));
-  assert.deepEqual(await readFile(join(f.run, "manifest.json")), original);
+  assert.equal(evidence.screenshots[0].sha256, _hash(image));
+  assert.deepEqual(
+    await readFile(join(fixture.run, "manifest.json")),
+    original,
+  );
 });
 
 test("failed status, flow, action, checkpoint and changed screenshot each reject before curation", async (t) => {
-  const changes = [
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.status = "failed";
+  const changes: Array<(fixture: CurationFixture) => void> = [
+    (fixture) => {
+      fixture.manifest.status = "failed";
     },
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.features[0].status = "failed";
+    (fixture) => {
+      fixture.manifest.features[0].status = "failed";
     },
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.actions[0].status = "failed";
+    (fixture) => {
+      fixture.manifest.actions[0].status = "failed";
     },
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.checkpoints[0].status = "failed";
+    (fixture) => {
+      fixture.manifest.checkpoints[0].status = "failed";
     },
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.checkpoints[0].flowId = "unknown";
+    (fixture) => {
+      fixture.manifest.checkpoints[0].flowId = "unknown";
     },
-    (f: Awaited<ReturnType<typeof fixture>>) => {
-      f.manifest.checkpoints[0].screenshot.sha256 = hash("different bytes");
+    (fixture) => {
+      fixture.manifest.checkpoints[0].screenshot.sha256 =
+        _hash("different bytes");
     },
   ];
   for (const change of changes) {
-    const f = await fixture(t);
-    change(f);
-    await f.save();
+    const fixture = await _createCurationFixture(t);
+    change(fixture);
+    await fixture.save();
     await assert.rejects(
-      curateCapture({ root: f.root, runDir: f.runDir }),
+      curateCapture({ root: fixture.root, runDir: fixture.runDir }),
       /passed|hash mismatch/,
     );
-    await assert.rejects(readdir(join(f.root, "public")), /ENOENT/);
+    await assert.rejects(readdir(join(fixture.root, "public")), /ENOENT/);
   }
 });
 
 test("run and screenshot paths reject traversal, hidden paths, outside roots and symlinks", async (t) => {
-  const f = await fixture(t);
+  const fixture = await _createCurationFixture(t);
   for (const runDir of [
     "../out/captures/fixture-run",
     "out/captures/../captures/fixture-run",
@@ -147,7 +214,7 @@ test("run and screenshot paths reject traversal, hidden paths, outside roots and
     "out/captures/.hidden",
   ]) {
     await assert.rejects(
-      curateCapture({ root: f.root, runDir }),
+      curateCapture({ root: fixture.root, runDir }),
       /plain|relative|traversal/,
     );
   }
@@ -156,75 +223,86 @@ test("run and screenshot paths reject traversal, hidden paths, outside roots and
     "/tmp/outside.png",
     "screens/.hidden.png",
   ]) {
-    f.manifest.checkpoints[0].screenshot.path = capturePath;
-    await f.save();
+    fixture.manifest.checkpoints[0].screenshot.path = capturePath;
+    await fixture.save();
     await assert.rejects(
-      curateCapture({ root: f.root, runDir: f.runDir }),
+      curateCapture({ root: fixture.root, runDir: fixture.runDir }),
       /relative path/,
     );
   }
-  await writeFile(join(f.root, "outside.png"), image);
-  await symlink(join(f.root, "outside.png"), join(f.run, "screens/linked.png"));
-  f.manifest.checkpoints[0].screenshot.path = "screens/linked.png";
-  await f.save();
+  await writeFile(join(fixture.root, "outside.png"), image);
+  await symlink(
+    join(fixture.root, "outside.png"),
+    join(fixture.run, "screens/linked.png"),
+  );
+  fixture.manifest.checkpoints[0].screenshot.path = "screens/linked.png";
+  await fixture.save();
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: f.runDir }),
+    curateCapture({ root: fixture.root, runDir: fixture.runDir }),
     /symbolic links/,
   );
-  await symlink(f.run, join(f.root, "out/captures/linked-run"));
+  await symlink(fixture.run, join(fixture.root, "out/captures/linked-run"));
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: "out/captures/linked-run" }),
+    curateCapture({ root: fixture.root, runDir: "out/captures/linked-run" }),
     /symbolic links/,
   );
-  await assert.rejects(readdir(join(f.root, "public")), /ENOENT/);
+  await assert.rejects(readdir(join(fixture.root, "public")), /ENOENT/);
 });
 
 test("colliding filenames and credential-shaped evidence are rejected", async (t) => {
-  const f = await fixture(t);
-  f.manifest.checkpoints.push({
-    ...f.manifest.checkpoints[0],
+  const fixture = await _createCurationFixture(t);
+  fixture.manifest.checkpoints.push({
+    ...fixture.manifest.checkpoints[0],
     id: "duplicate",
   });
-  await f.save();
+  await fixture.save();
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: f.runDir }),
+    curateCapture({ root: fixture.root, runDir: fixture.runDir }),
     /unique plain image names/,
   );
-  f.manifest.checkpoints.pop();
-  f.manifest.resources[0].name = "Bearer hidden-value";
-  await f.save();
+  fixture.manifest.checkpoints.pop();
+  fixture.manifest.resources[0].name = "Bearer hidden-value";
+  await fixture.save();
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: f.runDir }),
+    curateCapture({ root: fixture.root, runDir: fixture.runDir }),
     /Credential-shaped/,
   );
 });
 
 test("replacement is explicit and preserves the complete previous curated set", async (t) => {
-  const f = await fixture(t);
-  const first = await curateCapture({ root: f.root, runDir: f.runDir });
+  const fixture = await _createCurationFixture(t);
+  const first = await curateCapture({
+    root: fixture.root,
+    runDir: fixture.runDir,
+  });
   const oldEvidence = await readFile(first.evidencePath);
-  await writeFile(join(f.root, "public/avandar/clip.mp4"), "unrelated asset");
+  await writeFile(
+    join(fixture.root, "public/avandar/clip.mp4"),
+    "unrelated asset",
+  );
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: f.runDir }),
+    curateCapture({ root: fixture.root, runDir: fixture.runDir }),
     /--replace/,
   );
   assert.deepEqual(await readFile(first.evidencePath), oldEvidence);
   const nextImage = Buffer.concat([image, Buffer.from("new capture bytes")]);
-  await writeFile(join(f.run, "screens/import-ready.png"), nextImage);
-  f.manifest.checkpoints[0].screenshot.sha256 = hash(nextImage);
-  await f.save();
+  await writeFile(join(fixture.run, "screens/import-ready.png"), nextImage);
+  fixture.manifest.checkpoints[0].screenshot.sha256 = _hash(nextImage);
+  await fixture.save();
   const second = await curateCapture({
-    root: f.root,
-    runDir: f.runDir,
+    root: fixture.root,
+    runDir: fixture.runDir,
     replace: true,
   });
   assert.ok(second.backup);
   assert.deepEqual(
-    await readFile(join(f.root, second.backup, "screens/import-ready.png")),
+    await readFile(
+      join(fixture.root, second.backup, "screens/import-ready.png"),
+    ),
     image,
   );
   assert.deepEqual(
-    await readFile(join(f.root, second.backup, "capture-evidence.json")),
+    await readFile(join(fixture.root, second.backup, "capture-evidence.json")),
     oldEvidence,
   );
   assert.deepEqual(
@@ -232,20 +310,20 @@ test("replacement is explicit and preserves the complete previous curated set", 
     nextImage,
   );
   assert.equal(
-    await readFile(join(f.root, "public/avandar/clip.mp4"), "utf8"),
+    await readFile(join(fixture.root, "public/avandar/clip.mp4"), "utf8"),
     "unrelated asset",
   );
 });
 
 test("curation refuses output symlinks without creating files outside the project", async (t) => {
-  const f = await fixture(t);
+  const fixture = await _createCurationFixture(t);
   const outside = await mkdtemp(join(tmpdir(), "curation-outside-"));
   t.after(() => {
     return rm(outside, { recursive: true, force: true });
   });
-  await symlink(outside, join(f.root, "public"));
+  await symlink(outside, join(fixture.root, "public"));
   await assert.rejects(
-    curateCapture({ root: f.root, runDir: f.runDir }),
+    curateCapture({ root: fixture.root, runDir: fixture.runDir }),
     /symbolic links/,
   );
   assert.deepEqual(await readdir(outside), []);

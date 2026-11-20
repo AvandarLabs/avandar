@@ -37,4 +37,3 @@ src/gallery/theme-colors.json
 
 # Videos are generated on demand. Never track encoded exports.
 *.mp4
-showcase/motion-gallery.js

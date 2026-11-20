@@ -3,7 +3,7 @@ import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useRef } from "react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatContextTray } from "@/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray";

@@ -83,7 +83,7 @@ describe("createSqliteCrudClient", () => {
   // `.insert` / etc. without having to construct a model spec that
   // satisfies the live `RegisteredSupabaseDatabase` constraint —
   // we exercise runtime SQL emission, not the type system.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   type LooseClient = any;
 
   function makeClient(): LooseClient {

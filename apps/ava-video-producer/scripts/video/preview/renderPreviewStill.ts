@@ -5,7 +5,7 @@ import {
   type selectComposition,
 } from "@remotion/renderer";
 import { timeline } from "../../../src/storyboard/schema/schema";
-import { requireLicense } from "../../require-license.mjs";
+import { requireLicense } from "../../requireLicense";
 import { getBrowserSettingsFromPlan } from "./getBrowserSettingsFromPlan";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { VideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";

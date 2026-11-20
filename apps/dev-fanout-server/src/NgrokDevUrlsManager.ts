@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import z from "zod";
+import { z } from "zod";
 
 const NGROK_DEV_URLS_FILE_PATH = "/data/ngrok-dev-urls.json";
 

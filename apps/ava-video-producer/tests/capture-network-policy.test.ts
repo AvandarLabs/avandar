@@ -2,17 +2,18 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   isWorkspaceRoute,
-  requestPolicy,
+  getRequestDecisionFromRequest,
   validateBaseUrl,
-} from "../scripts/capture-lib.mjs";
+} from "../scripts/captureLib/urlSafetyHelpers";
 
 test("capture origins are literal loopback origins, without embedded credentials or routes", () => {
   for (const origin of [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://[::1]:5173",
-  ])
+  ]) {
     assert.equal(validateBaseUrl(origin), origin);
+  }
   for (const origin of [
     "https://avandar.com",
     "http://localhost.evil.test",
@@ -28,47 +29,47 @@ test("capture origins are literal loopback origins, without embedded credentials
     });
   }
   assert.equal(
-    isWorkspaceRoute(
-      "http://localhost:5173/avandar-labs/data-manager",
-      "http://localhost:5173",
-      "avandar-labs",
-    ),
+    isWorkspaceRoute({
+      url: "http://localhost:5173/avandar-labs/data-manager",
+      baseUrl: "http://localhost:5173",
+      workspace: "avandar-labs",
+    }),
     true,
   );
   assert.equal(
-    isWorkspaceRoute(
-      "http://localhost:5173/avandar-labs-other",
-      "http://localhost:5173",
-      "avandar-labs",
-    ),
+    isWorkspaceRoute({
+      url: "http://localhost:5173/avandar-labs-other",
+      baseUrl: "http://localhost:5173",
+      workspace: "avandar-labs",
+    }),
     false,
   );
 });
 
 test("network policy allows local writes and readonly assets, rejects external data and mutations", () => {
   assert.equal(
-    requestPolicy({
+    getRequestDecisionFromRequest({
       url: "http://127.0.0.1:54321/rest/v1/datasets",
       method: "POST",
     }).allow,
     true,
   );
   assert.equal(
-    requestPolicy({
+    getRequestDecisionFromRequest({
       url: "https://tiles.example.test/3/2/1.pbf?key=secret",
       resourceType: "fetch",
     }).allow,
     true,
   );
   assert.equal(
-    requestPolicy({
+    getRequestDecisionFromRequest({
       url: "https://fonts.googleapis.com/css2?family=Geist",
       resourceType: "stylesheet",
     }).allow,
     true,
   );
   assert.equal(
-    requestPolicy({
+    getRequestDecisionFromRequest({
       url: "https://cdn.example.test/extension.wasm",
       resourceType: "fetch",
     }).allow,
@@ -89,11 +90,14 @@ test("network policy allows local writes and readonly assets, rejects external d
     { url: "https://example.test/index.html", resourceType: "document" },
     { url: "https://example.test/api/users", resourceType: "fetch" },
     { url: "wss://example.test/realtime", resourceType: "websocket" },
-  ])
-    assert.equal(requestPolicy(request).allow, false);
+  ]) {
+    assert.equal(getRequestDecisionFromRequest(request).allow, false);
+  }
   assert.equal(
-    requestPolicy({ url: "ws://localhost:5173/", resourceType: "websocket" })
-      .allow,
+    getRequestDecisionFromRequest({
+      url: "ws://localhost:5173/",
+      resourceType: "websocket",
+    }).allow,
     true,
   );
 });
@@ -102,7 +106,11 @@ test("only the exact feedback-widget configuration POST is suppressible", () => 
   const endpoint =
     "https://avandar.featurebase.app/api/v1/feedback/widget/config";
   assert.deepEqual(
-    requestPolicy({ url: endpoint, method: "POST", resourceType: "fetch" }),
+    getRequestDecisionFromRequest({
+      url: endpoint,
+      method: "POST",
+      resourceType: "fetch",
+    }),
     {
       allow: false,
       suppress: true,
@@ -125,7 +133,7 @@ test("only the exact feedback-widget configuration POST is suppressible", () => 
       method: "POST",
     },
   ]) {
-    const decision = requestPolicy(request);
+    const decision = getRequestDecisionFromRequest(request);
     assert.equal(decision.allow, false);
     assert.notEqual("suppress" in decision && decision.suppress, true);
   }

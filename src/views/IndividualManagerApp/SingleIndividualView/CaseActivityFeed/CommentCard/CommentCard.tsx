@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useRef } from "react";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.module.css";
 import { CommentCardBody } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody";

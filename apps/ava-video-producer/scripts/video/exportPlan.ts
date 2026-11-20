@@ -1,9 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { captionFiles, shotList } from "../lib/planHelpers/planHelpers";
+import { makeCaptionFilesFromPlan } from "../lib/planHelpers/makeCaptionFilesFromPlan";
+import { makeShotListFromPlan } from "../lib/planHelpers/planHelpers";
 import { freshStage } from "./freshStage";
 import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
+
 /**
  * Writes the storyboard, shot list, transcript, and caption files for a plan.
  */
@@ -12,12 +14,16 @@ export async function exportPlan(
   workspace: string,
 ): Promise<string> {
   const directory = await freshStage(plan, "plan", workspace);
-  const captions = captionFiles(plan);
+  const captions = makeCaptionFilesFromPlan(plan);
   await writeJson(path.join(directory, "storyboard.json"), plan);
   await writeJson(path.join(directory, "props.json"), { plan });
-  await fs.writeFile(path.join(directory, "shotlist.md"), shotList(plan), {
-    flag: "wx",
-  });
+  await fs.writeFile(
+    path.join(directory, "shotlist.md"),
+    makeShotListFromPlan(plan),
+    {
+      flag: "wx",
+    },
+  );
   for (const [filename, text] of [
     ["transcript.txt", captions.transcript],
     ["captions.srt", captions.srt],

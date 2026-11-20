@@ -171,7 +171,7 @@ function useAutoParseInitialFile(
     },
     // We intentionally exclude `requestFileParse` from deps - it changes
     // on every render but the ref guards single execution.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     [initialFile],
   );
 }

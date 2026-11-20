@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type { $MODEL_NAME$ } from "$/models/$MODEL_PATH_FROM_MODELS_ROOT$/$MODEL_NAME$.ts";
 
 export const $MODEL_NAME$Module = {

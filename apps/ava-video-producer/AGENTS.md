@@ -27,7 +27,7 @@ own translations, so the adapter keeps only the minimum needed to host them:
 - `avandar-adapter/DashboardScreen/DashboardScreen.tsx` reads that `i18n`
   instance with `useLingui` from `@lingui/react` to hand it to the product's
   dashboard config hook.
-- `scripts/build-avandar.mjs` runs `@lingui/babel-plugin-lingui-macro` over the
+- `scripts/buildProduct/compileProductSource.ts` runs `@lingui/babel-plugin-lingui-macro` over the
   product source it compiles, so the product's macros expand.
 
 That is why `@lingui/core`, `@lingui/message-utils`, `@lingui/react`,
@@ -69,7 +69,7 @@ npm run studio                          # preview at localhost:3000, scrub the t
 sh scripts/preview.sh <id>              # stills on every beat + a contact sheet
 sh scripts/render.sh <id> [poster-frame] # render → deliver → gate
 bash scripts/add-sfx.sh <id>            # sound pass over the finished mp4
-node scripts/check-frames.mjs <file>    # the gate on its own
+node --import tsx scripts/checkFrames.ts <file>    # the gate on its own
 npm run typecheck                      # source and tool/test types
 npm test                               # schema, scene, capture, and pipeline checks
 npm run data:validate                  # verify fictional fixtures independently
@@ -81,7 +81,7 @@ npm run video -- validate storyboards/library.json
 npm run video -- plan storyboards/library.json
 npm run video -- preview storyboards/library.json
 npm run video -- render storyboards/library.json
-npm run motion:build                  # build the live Motion Atlas gallery
+npm run motion:build                  # build every showcase page with Vite
 npm run motion -- preview all          # inspect each preset's contact sheet
 npm run motion -- render all           # matching previews, serial render and loop gate
 npm run atlas:posters [id...]          # Compositions and Sample films card posters
@@ -107,7 +107,7 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 - **`src/motion.ts` has no runtime imports.** Its React `CSSProperties` import
   is type-only. Keep the helpers independent of the renderer so they remain portable.
 - **The gate is not optional.** `render.sh` exits non-zero on its failure. Do
-  not loosen the thresholds in `check-frames.mjs` or `scripts/lib/frameGate.mjs`
+  not loosen the thresholds in `checkFrames.ts` or `scripts/lib/frameGateHelpers/`
   to make a render pass. It keeps the frame sequence on a failure so the
   flagged JPEG can be opened. The one sanctioned exception is a storyboard's
   declared cut (`transition: {kind: "cut"}`): `video render` passes its first
@@ -175,9 +175,9 @@ rules for committing, pushing, merging, or publication.
 
 ## Avandar workspace additions
 
-- Never open, print, commit, or copy `.env.local` or the workspace root's `.env.video-producer.local`. They contain credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it. The root file is the source; the license guard (`scripts/lib/copyRootEnvFile.mjs`) copies it to `.env.local`, so never edit the copy by hand. Add new producer keys to the root `.env.video-producer.example`.
+- Never open, print, commit, or copy `.env.local` or the workspace root's `.env.video-producer.local`. They contain credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it. The root file is the source; the license guard (`scripts/lib/copyRootEnvFile.ts`) copies it to `.env.local`, so never edit the copy by hand. Add new producer keys to the root `.env.video-producer.example`.
 - Keep `Config.setDotEnvLocation("remotion.env")`. Never pass `.env.local` to Remotion: environment-file values are exposed to browser code.
-- Every executable producer entry point must call the shared license guard before doing work. `scripts/lib/readLicense.mjs` reads only the public/private pair without populating `process.env`. Keep raw Remotion CLI configuration guarded too. Never add a skip-license environment variable. Tests use inert keys in temporary files and must never submit render telemetry with them.
+- Every executable producer entry point must call the shared license guard before doing work. `scripts/lib/getRemotionLicenseFromAppRoot.ts` reads only the public/private pair without populating `process.env`. Keep raw Remotion CLI configuration guarded too. Never add a skip-license environment variable. Tests use inert keys in temporary files and must never submit render telemetry with them.
 - The starter showcase is intentionally generic. Preserve the original demo and palette when demonstrating upstream behavior; label new studies as additions.
 - `pnpm showcase` serves the gallery, generated browser players, approved plan
   media, and completed downloads through bounded local routes. Never serve the
@@ -195,8 +195,9 @@ rules for committing, pushing, merging, or publication.
   deliveries use `out/motion/deliveries/`. Do not copy generated MP4s into gallery
   assets or rewrite page revision strings.
 - Production player caption choices must match their exports. Motion Atlas
-  downloads must preserve the selected accent and background. Do not imply that
-  product films offer arbitrary brand or background controls.
+  downloads must render with the video theme the preview shows, unsaved edits
+  included. Do not imply that product films offer arbitrary brand or
+  background controls.
 - `TitleStudy`, `MotionLab`, and the library storyboard are examples of the kit itself, not claims about Avandar's UI or features. Label editorial diagrams and synthetic data clearly.
 - Harborfield fixtures are deliberately fictional, authorized demo inputs. Keep **Fictional demonstration data** visible in product footage and exported examples. Preserve blank/missing values and dataset grain; do not turn fixture fields into claims about unimplemented product workflows.
 - Component films render the actual worktree source closure with deterministic fixture state. Do not describe adapter typing, query results, save responses or navigation as a new live product test. Keep source hashes, fixture provenance and remaining product limitations explicit.

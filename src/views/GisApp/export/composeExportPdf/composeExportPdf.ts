@@ -1,4 +1,4 @@
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import { match } from "ts-pattern";
 import { createPdfTextMeasurer } from "@/views/GisApp/export/composeExportPdf/createPdfTextMeasurer/createPdfTextMeasurer";
 import { drawExportFeatureTable } from "@/views/GisApp/export/composeExportPdf/drawExportFeatureTable/drawExportFeatureTable";

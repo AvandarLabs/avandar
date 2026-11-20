@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { downloadFilm } from "../../../../../showcase/download.js";
+import { FilmDownloads } from "../../../../../showcase/FilmDownloads/FilmDownloads";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
 import type { CompositionExportOptions } from "../compositionExportOptions";
 
@@ -32,7 +32,7 @@ export function useCompositionDownload(
     }
     setBusy(true);
     try {
-      await downloadFilm({
+      await FilmDownloads.downloadFilm({
         id,
         options: theme ? { ...appearance, theme } : appearance,
         onStatus: (job) => {

@@ -327,7 +327,7 @@ before you draw anything, and **read the report it prints** — a `!` line means
 that token fell back to this kit's placeholder, and a placeholder purple next
 to a real brand colour looks less like the product than plain grey would. If
 something falls back, find the product's name for it and add it to `ALIASES`
-in `scripts/adopt-theme.mjs` rather than hardcoding a hex in a composition.
+in `scripts/adoptTheme/adoptTheme.ts` rather than hardcoding a hex in a composition.
 
 Two failures to expect. A product whose theme lives in JS rather than CSS —
 `tailwind.config.ts`, a `tokens.ts` — gives the script nothing; read the values
@@ -561,7 +561,7 @@ understood. Debugging guide: `references/render.md`.
    phase must actually be opaque.** A phase that draws panels on a
    transparent root is a sheet with holes in it — the old phase shows through
    the gaps, and the frame the old one unmounts on drops all of its panels at
-   once. That is a full-frame luminance jump, `check-frames.mjs` fails the
+   once. That is a full-frame luminance jump, `checkFrames.ts` fails the
    render, and no amount of easing hides it. Give every phase root its own
    `background`.
 
@@ -591,7 +591,7 @@ It shoots a still on each beat and again 12 frames later, reading the beat
 sheet straight out of the composition. Seconds, against minutes for a render
 that hard rule 1 pins to `--concurrency=1`.
 
-This is not the gate and does not overlap with it. `check-frames.mjs` measures
+This is not the gate and does not overlap with it. `checkFrames.ts` measures
 two numbers per frame — half-against-half similarity, and average luminance.
 A panel over the header, a phase drawn empty, a counter cut off before it
 lands, a pointer pressing the number above the button: none of those move
@@ -623,9 +623,9 @@ sh scripts/render.sh <composition-id> [poster-frame]
 
 It renders `--sequence --image-format jpeg --jpeg-quality 90
 --concurrency=1`, stitches to 1536×960, writes the mp4 and poster, runs
-`check-frames.mjs`, and **fails on its failure**.
+`checkFrames.ts`, and **fails on its failure**.
 
-`check-frames.mjs` is the regression test for hard rules 1 and 5. Do not
+`checkFrames.ts` is the regression test for hard rules 1 and 5. Do not
 "fix" a fail by loosening the detector.
 
 On a failure the frame sequence is **kept**, and the script prints the path.

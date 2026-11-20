@@ -38,6 +38,19 @@ function useHighlightLine(highlight: readonly number[], frame: number): number {
     );
   }, highlight[0]);
 }
+function _buildKeyedCodeLines(lines: CodeFocusInput["lines"]) {
+  const lineSignatureCounts = new Map<string, number>();
+  return lines.map((codeTokens, lineNumber) => {
+    const signature = codeTokens
+      .map((token) => {
+        return `${token.color}:${token.text}`;
+      })
+      .join("|");
+    const occurrence = lineSignatureCounts.get(signature) ?? 0;
+    lineSignatureCounts.set(signature, occurrence + 1);
+    return { key: `${signature}#${occurrence}`, codeTokens, lineNumber };
+  });
+}
 /** Draws the bounded authored code-focus study at an explicit frame. */
 export function CodeFocus({
   input,
@@ -66,16 +79,18 @@ export function CodeFocus({
         {input.showHighlight ? (
           <CodeHighlight line={line} accent={accent} />
         ) : null}
-        {input.lines.map((codeTokens, i) => {
-          return (
-            <CodeLineRow
-              key={i}
-              codeTokens={codeTokens}
-              index={i}
-              accent={accent}
-            />
-          );
-        })}
+        {_buildKeyedCodeLines(input.lines).map(
+          ({ key, codeTokens, lineNumber }) => {
+            return (
+              <CodeLineRow
+                key={key}
+                codeTokens={codeTokens}
+                index={lineNumber}
+                accent={accent}
+              />
+            );
+          },
+        )}
         <CodeFooter footer={input.footer} accent={accent} />
       </CodeWindow>
     </g>

@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useRichTextMembers } from "@/components/RichText/RichTextMembersContext";
 import classes from "@/components/RichText/UserMention/UserMentionChip.module.css";
 import type { ReactNode } from "react";

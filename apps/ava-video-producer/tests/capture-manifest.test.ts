@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   assertSafeManifest,
-  sanitizeText,
-  sourceUrl,
-} from "../scripts/capture-lib.mjs";
+  makeRedactedTextFromValue,
+} from "../scripts/captureLib/sanitizeHelpers";
+import { makeSourceUrlFromUrl } from "../scripts/captureLib/urlSafetyHelpers";
 
 test("manifest sanitization removes credentials and URL queries; secret containers are rejected", () => {
   const jwt =
     "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signaturelongvalue";
-  const text = sanitizeText(
-    `user@example.test password=capture-secret Bearer opaque-secret ${jwt} https://api.test/path?signed=private#fragment`,
-    ["capture-secret"],
-  );
+  const text = makeRedactedTextFromValue({
+    value: `user@example.test password=capture-secret Bearer opaque-secret ${jwt} https://api.test/path?signed=private#fragment`,
+    secrets: ["capture-secret"],
+  });
   for (const secret of [
     "user@example.test",
     "capture-secret",
@@ -20,19 +20,22 @@ test("manifest sanitization removes credentials and URL queries; secret containe
     jwt,
     "signed=private",
     "#fragment",
-  ])
+  ]) {
     assert.equal(text.includes(secret), false);
+  }
   assert.equal(
-    sourceUrl("https://name:pass@example.test/path?token=secret#hash"),
+    makeSourceUrlFromUrl(
+      "https://name:pass@example.test/path?token=secret#hash",
+    ),
     "https://example.test/path",
   );
-  assertSafeManifest(
-    {
+  assertSafeManifest({
+    value: {
       authentication: { status: "passed" },
       sourceUrl: "http://localhost:5173/avandar-labs",
     },
-    ["avandar"],
-  );
+    secrets: ["avandar"],
+  });
   for (const record of [
     { nested: { password: "anything" } },
     { cookies: [] },
@@ -41,7 +44,10 @@ test("manifest sanitization removes credentials and URL queries; secret containe
     { message: "contains capture-secret" },
   ]) {
     assert.throws(() => {
-      return assertSafeManifest(record, ["capture-secret"]);
+      return assertSafeManifest({
+        value: record,
+        secrets: ["capture-secret"],
+      });
     }, /Credential|credential/);
   }
 });

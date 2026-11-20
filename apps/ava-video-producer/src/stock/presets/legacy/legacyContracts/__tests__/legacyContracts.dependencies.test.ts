@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
-import { yamlPlugin } from "../../../../../../scripts/yaml/yamlPlugin/yamlPlugin";
+import { yamlPlugin } from "../../../../../../scripts/yaml/yamlPlugin";
 
 test("content contracts have no transitive renderer or JSX runtime dependency", async () => {
   const bundled = await build({

@@ -9,13 +9,15 @@ const SOURCE_DIRECTORIES: string[] = [
   "src/videoTheme",
   "themes",
   "scripts/stock",
+  "scripts/motion",
   "scripts/yaml",
   "public/fonts",
   "public/stock",
 ];
 const SOURCE_FILES: string[] = [
   "../../packages/shared/utils/package.json",
-  "scripts/lib/withWorkspaceAliases.mjs",
+  "scripts/lib/getAvandarUtilsDirectoryFromRoot.ts",
+  "scripts/lib/makeWorkspaceWebpackConfigFromConfig.ts",
   "tsconfig.json",
   "src/stock-entry.tsx",
   "src/motion.ts",
@@ -24,9 +26,8 @@ const SOURCE_FILES: string[] = [
   "package.json",
   "../../pnpm-lock.yaml",
   "scripts/render.sh",
-  "scripts/render-sequence.mjs",
-  "scripts/check-frames.mjs",
-  "scripts/motion.ts",
+  "scripts/renderSequence.ts",
+  "scripts/checkFrames.ts",
   "scripts/showcase/render.ts",
 ];
 /** Frame samples and fixed canvas geometry used for stock fingerprinting. */

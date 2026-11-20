@@ -1,6 +1,6 @@
 import { useCurrentFrame } from "remotion";
-import { AvandarStage } from "../../src/avandar/generated/product.js";
-import type { ProductFeature } from "../../src/avandar/generated/product.js";
+import { AvandarStage } from "../../src/avandar/generated/product";
+import type { ProductFeature } from "../../src/avandar/generated/product";
 import type { ReactNode } from "react";
 
 /** One product feature, rendered at the player's current frame. */

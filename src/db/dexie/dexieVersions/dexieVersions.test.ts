@@ -1,5 +1,5 @@
 import "fake-indexeddb/auto";
-import Dexie from "dexie";
+import { Dexie } from "dexie";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import {
   AvaDexieVersionManager,

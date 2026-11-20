@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* oxlint-disable typescript/no-namespace */
 import type {
   GoogleSheetsDatasetId,
   GoogleSheetsDatasetModel,

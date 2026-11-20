@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/layouts/AppView/AppViewRail/AppViewRail.module.css";
 import { AppViewRailFact } from "@/components/layouts/AppView/AppViewRail/AppViewRailFact/AppViewRailFact";
 import { AppViewRailGroup } from "@/components/layouts/AppView/AppViewRail/AppViewRailGroup/AppViewRailGroup";

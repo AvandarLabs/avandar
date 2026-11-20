@@ -133,7 +133,7 @@ test("nested renderer, local geography, assets and shared motion edits invalidat
     await [
       "src/stock/presets/Nested/input.ts",
       "src/stock/presets/Nested/Preset.metadata.yaml",
-      "scripts/yaml/compileYaml.cjs",
+      "scripts/yaml/makeEsModuleFromYaml.ts",
       "src/stock/presets/Nested/Renderer.tsx",
       "src/stock/geography/land.json",
       "src/stock/generated/registry.gen.ts",

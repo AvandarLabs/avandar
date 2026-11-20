@@ -30,6 +30,18 @@ const DATASET_IDS = {
   response: uuid<Dataset.Id>("00000000-0000-4000-8000-000000000611"),
   facility: uuid<Dataset.Id>("00000000-0000-4000-8000-000000000612"),
 };
+const CONCEPTS: readonly OntologyConceptProjection[] = [
+  {
+    id: CONCEPT_IDS.response,
+    name: "Response case",
+    description: "Fictional Harborfield response records.",
+  },
+  {
+    id: CONCEPT_IDS.facility,
+    name: "Facility",
+    description: "Fictional Harborfield facilities and available supplies.",
+  },
+];
 type Props = { frame: number; width: number; height: number };
 
 /** Actual concept and attribute inspection, with fixture hydration only. */
@@ -66,19 +78,7 @@ export function OntologyScreen({ frame, width, height }: Props): ReactNode {
 function useOntologyFixture(
   stage: ReturnType<typeof createOntologyStageFromFrame>,
 ): OntologyFixtureProjection {
-  const concepts: readonly OntologyConceptProjection[] = [
-    {
-      id: CONCEPT_IDS.response,
-      name: "Response case",
-      description: "Fictional Harborfield response records.",
-    },
-    {
-      id: CONCEPT_IDS.facility,
-      name: "Facility",
-      description: "Fictional Harborfield facilities and available supplies.",
-    },
-  ];
-  const concept = concepts[stage.conceptKey === "response" ? 0 : 1]!;
+  const concept = CONCEPTS[stage.conceptKey === "response" ? 0 : 1]!;
   const sourceName =
     stage.conceptKey === "response" ? "cases.csv" : "facilities.csv";
   const datasetId = DATASET_IDS[stage.conceptKey];
@@ -102,7 +102,7 @@ function useOntologyFixture(
       },
     ),
   };
-  return { concepts, concept, fullConcept };
+  return { concepts: CONCEPTS, concept, fullConcept };
 }
 
 function useOntologyTargets(

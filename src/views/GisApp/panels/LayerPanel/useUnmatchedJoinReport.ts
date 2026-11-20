@@ -89,8 +89,6 @@ export function useUnmatchedJoinReport({
       fingerprints.add(fingerprint);
       openMatchReport();
     },
-    // useEffectEvent callbacks must not be listed in effect deps.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [eligibleLayerIds, fingerprints, layer, viewState],
   );
 }

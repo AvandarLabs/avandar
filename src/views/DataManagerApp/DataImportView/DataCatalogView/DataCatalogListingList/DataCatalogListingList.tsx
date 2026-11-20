@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";

@@ -37,7 +37,7 @@ jobs:
             test
           requireScope: false
 
-  # ESLint and TypeScript checks.
+  # Lint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15

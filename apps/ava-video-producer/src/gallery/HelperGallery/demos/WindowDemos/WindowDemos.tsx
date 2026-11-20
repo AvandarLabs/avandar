@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { mix } from "../../../../motion";
 import { useWindowStage } from "../../../../scenes/TiltedWindowScene/useWindowStage";
 import { WindowMotion } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
@@ -366,7 +366,6 @@ function BoxOutlines({ activeIndex }: { activeIndex: number }) {
 }
 /** Every window and headline box on the canvas, highlighted in turn. */
 export function WindowBoxesDemo({ frame, frames }: HelperDemoProps): ReactNode {
-  const stage = useWindowStage();
   const activeIndex = Math.floor(frame / 30) % NAMED_BOXES.length;
   const active = NAMED_BOXES[activeIndex];
   return (

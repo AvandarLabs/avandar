@@ -38,7 +38,7 @@ export const SourceDatasetClient = withQueryHooks(
           const updatedDataset = await SourceClient.update({
             id,
             data,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line typescript/no-explicit-any
           } as any);
           return updatedDataset as DatasetSource.T<TSourceType>;
         },

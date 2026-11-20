@@ -1,5 +1,5 @@
 import { Tooltip } from "@avandar/ui";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 

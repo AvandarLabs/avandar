@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "../demos.module.css";
 import { CurvePlot } from "./CurvePlot";
 import type { ReactNode } from "react";

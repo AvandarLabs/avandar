@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { buildReferenceBrief } from "../buildReferenceBrief";
 import { ContentControls } from "../ContentControls/ContentControls";
 import { getReferenceUrlFromPreset } from "../getReferenceUrlFromPreset";

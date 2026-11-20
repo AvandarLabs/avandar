@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { getSceneTransitionStyle } from "../../../../motion-components/getSceneTransitionStyle";
 import { MotionSettings } from "../../../../motion-components/MotionSettings/MotionSettings";
 import css from "../demos.module.css";

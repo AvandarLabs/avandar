@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "../demos.module.css";
 import { FRAME_WIDTH } from "../getElapsed";
 import type { ReactNode } from "react";

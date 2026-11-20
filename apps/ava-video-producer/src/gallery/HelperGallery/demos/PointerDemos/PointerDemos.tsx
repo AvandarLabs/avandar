@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Cursor } from "../../../../chrome/Cursor/Cursor";
 import { useCursorMotion } from "../../../../chrome/useCursorMotion";
 import { CursorMotionHelpers } from "../../../../CursorMotionHelpers";

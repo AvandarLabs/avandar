@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Icon } from "../../MotionGallery/Icon";
 import { usePreviewKeys } from "../../MotionGallery/usePreviewKeys";
 import css from "./AtlasDialog.module.css";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   title: string;
@@ -20,12 +20,16 @@ type Props = {
 };
 
 /** Keeps Tab inside the open dialog, wrapping at either end. */
-function _trapDialogFocus(event: KeyboardEvent<HTMLDialogElement>) {
+function _trapDialogFocus(event: KeyboardEvent) {
   if (event.key !== "Tab") {
     return;
   }
+  const dialogElement = event.currentTarget;
+  if (!(dialogElement instanceof HTMLDialogElement)) {
+    return;
+  }
   const controls = Array.from(
-    event.currentTarget.querySelectorAll<HTMLElement>(
+    dialogElement.querySelectorAll<HTMLElement>(
       'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe, [tabindex="0"]',
     ),
   ).filter((element) => {
@@ -47,11 +51,15 @@ function _trapDialogFocus(event: KeyboardEvent<HTMLDialogElement>) {
 }
 
 /**
- * Opens as a modal on mount, locks page scroll, and restores focus to the
- * card that opened it on close.
+ * Opens as a modal on mount, locks page scroll, traps Tab focus, closes on
+ * backdrop clicks, and restores focus to the card that opened it on close.
  */
-function useModalDialog() {
+function useModalDialog(onClose: () => void) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const latestOnClose = useRef(onClose);
+  useEffect(() => {
+    latestOnClose.current = onClose;
+  });
   useEffect(function lockPageAndOpenDialog() {
     const node = dialog.current;
     const activeElement = document.activeElement;
@@ -63,7 +71,25 @@ function useModalDialog() {
     const priorOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     node?.showModal();
+    const onBackdropClick = (event: MouseEvent) => {
+      if (!node || event.target !== node) {
+        return;
+      }
+      const bounds = node.getBoundingClientRect();
+      if (
+        event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom
+      ) {
+        latestOnClose.current();
+      }
+    };
+    node?.addEventListener("keydown", _trapDialogFocus);
+    node?.addEventListener("click", onBackdropClick);
     return () => {
+      node?.removeEventListener("keydown", _trapDialogFocus);
+      node?.removeEventListener("click", onBackdropClick);
       node?.close();
       document.body.style.overflow = priorOverflow;
       focused?.focus({ preventScroll: true });
@@ -88,32 +114,17 @@ export function AtlasDialog({
   onNext,
   children,
 }: Props): ReactNode {
-  const dialog = useModalDialog();
+  const dialog = useModalDialog(onClose);
   usePreviewKeys({ enabled: true, onPrevious, onNext, onClose, frame: dialog });
   return (
     <dialog
       className="preview-dialog"
       ref={dialog}
-      onKeyDown={_trapDialogFocus}
       aria-labelledby="dialog-title"
       aria-describedby={describedBy}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
-      }}
-      onClick={(event) => {
-        if (event.target !== event.currentTarget) {
-          return;
-        }
-        const bounds = event.currentTarget.getBoundingClientRect();
-        if (
-          event.clientX < bounds.left ||
-          event.clientX > bounds.right ||
-          event.clientY < bounds.top ||
-          event.clientY > bounds.bottom
-        ) {
-          onClose();
-        }
       }}
     >
       <div className={`dialog-header ${css.header}`}>

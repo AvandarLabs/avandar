@@ -13,7 +13,7 @@
  *
  * --ground is the dark field the title card and the loop seam both sit on.
  * Keep it close in luminance to --background if your app UI is dark, or
- * accept a dissolve between them if it is light. check-frames.mjs measures
+ * accept a dissolve between them if it is light. checkFrames.ts measures
  * that seam and fails the render if it strobes. */
 
 :root {

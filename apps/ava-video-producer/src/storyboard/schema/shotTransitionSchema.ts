@@ -16,7 +16,7 @@ const outgoingSchema = z.enum(["frozen", "playing"]);
  * `cut` is a hard cut declared on purpose, with `transitionInFrames` set to
  * 0. It renders exactly like an undeclared hard cut. The difference is the
  * frame gate: the render passes the shot's first frame to
- * `check-frames.mjs`, which then accepts a luminance jump of any size on that
+ * `checkFrames.ts`, which then accepts a luminance jump of any size on that
  * frame, as long as the luminance does not reverse within the next 10 frames.
  * An undeclared hard cut keeps the ordinary per-frame limit.
  *

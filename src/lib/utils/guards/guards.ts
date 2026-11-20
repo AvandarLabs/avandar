@@ -9,11 +9,11 @@ import type { SetRequired } from "type-fest";
  * @returns A predicate that is true if any of the predicates are true.
  * @param predicates
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export function or<T, Predicates extends Array<(value: any) => value is any>>(
   value: T,
   ...predicates: Predicates
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
 ): value is Predicates[number] extends ((value: any) => value is infer R)
   ? T & R
   : never {

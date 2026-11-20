@@ -4,7 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 import { ensureDirectory } from "../../lib/planHelpers/planHelpers";
-import { yamlPlugin } from "../../yaml/yamlPlugin/yamlPlugin";
+import { yamlPlugin } from "../../yaml/yamlPlugin";
 import { StockFingerprintModule } from "../StockFingerprintModule/StockFingerprintModule";
 
 type Contracts = Pick<
@@ -22,6 +22,7 @@ type StockContractGenerationResult = {
   sourceHash: string;
   retain: () => () => Promise<void>;
 };
+
 /** Immutable renderer-free defaults and validators, retained by active jobs. */
 export type StockContractGeneration = Contracts & StockContractGenerationResult;
 type GenerationInput = {
@@ -40,22 +41,14 @@ const pendingLifecycleOperations: Map<string, Promise<unknown>> = new Map<
 >();
 const generations: Map<
   string,
-  {
-    latest: string;
-    entries: Map<string, GenerationState>;
-  }
+  { latest: string; entries: Map<string, GenerationState> }
 > = new Map<
   string,
-  {
-    latest: string;
-    entries: Map<string, GenerationState>;
-  }
+  { latest: string; entries: Map<string, GenerationState> }
 >();
+
 function _enqueueLifecycleOperation<Result>(
-  options: Readonly<{
-    root: string;
-    action: () => Promise<Result>;
-  }>,
+  options: Readonly<{ root: string; action: () => Promise<Result> }>,
 ): Promise<Result> {
   const previous =
     pendingLifecycleOperations.get(options.root) ?? Promise.resolve();
@@ -63,6 +56,7 @@ function _enqueueLifecycleOperation<Result>(
   pendingLifecycleOperations.set(options.root, pending);
   return pending;
 }
+
 async function _cleanup(root: string): Promise<void> {
   const state = generations.get(root)!;
   await Promise.all(
@@ -74,11 +68,9 @@ async function _cleanup(root: string): Promise<void> {
     }),
   );
 }
+
 function _retainGeneration(
-  options: Readonly<{
-    root: string;
-    entry: GenerationState;
-  }>,
+  options: Readonly<{ root: string; entry: GenerationState }>,
 ): () => Promise<void> {
   const { root, entry } = options;
   entry.references += 1;
@@ -96,6 +88,7 @@ function _retainGeneration(
     }
   };
 }
+
 async function _createGeneration(
   options: Readonly<GenerationInput>,
 ): Promise<GenerationState> {
@@ -120,6 +113,7 @@ async function _createGeneration(
   };
   return entry;
 }
+
 async function _loadGeneration(
   options: Readonly<GenerationInput>,
 ): Promise<StockContractGeneration> {
@@ -146,11 +140,13 @@ async function _loadGeneration(
   await _cleanup(root);
   return entry.generation;
 }
+
 /**
  * Directories a stock contract may import from. Content colour fields read
  * the semantic colour roles from the video theme's token catalog.
  */
 const CONTRACT_SOURCE_DIRECTORIES = ["src/stock", "src/videoTheme"] as const;
+
 async function _dependencyHash(
   options: Readonly<{
     root: string;
@@ -175,7 +171,7 @@ async function _dependencyHash(
           );
         },
       );
-      if (!isInsideContractSources || /\.tsx$/.test(filename)) {
+      if (!isInsideContractSources || filename.endsWith(".tsx")) {
         throw new Error(
           "Stock contract dependencies must be renderer-free files inside src/stock or src/videoTheme",
         );
@@ -185,6 +181,7 @@ async function _dependencyHash(
     }, Promise.resolve());
   return hash.update(contents).digest("hex");
 }
+
 async function _buildGeneration(
   root: string,
 ): Promise<StockContractGeneration> {
@@ -215,6 +212,7 @@ async function _buildGeneration(
   await StockFingerprintModule.verifySources({ root, sourceHash });
   return _loadGeneration({ root, hash, contents, sourceHash });
 }
+
 /**
  * Bundle nested contract dependencies into one content-addressed Node module.
  */

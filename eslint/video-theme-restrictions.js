@@ -1,4 +1,7 @@
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import eslintPlugin from "oxlint-plugin-eslint";
 
 /*
  * Video producer renderers draw every colour, type, stroke, corner, opacity,
@@ -14,10 +17,17 @@ import fs from "node:fs";
  */
 
 const APP = "apps/ava-video-producer";
-const RENDERER_GLOBS_FILE = new URL(
-  `../${APP}/scripts/videoTheme/themeLiterals/rendererGlobs.json`,
-  import.meta.url,
+const APP_URL = new URL(`../${APP}/`, import.meta.url);
+const APP_ROOT = fileURLToPath(APP_URL);
+const RENDERER_GLOBS = JSON.parse(
+  fs.readFileSync(
+    new URL("scripts/videoTheme/themeLiterals/rendererGlobs.json", APP_URL),
+    "utf8",
+  ),
 );
+
+const IMPORT_RULE = eslintPlugin.rules["no-restricted-imports"];
+const SYNTAX_RULE = eslintPlugin.rules["no-restricted-syntax"];
 
 /** Attributes whose literal is a theme value unless it is 0 (none). */
 const LITERAL_ATTRIBUTES = [
@@ -28,6 +38,7 @@ const LITERAL_ATTRIBUTES = [
   "fontWeight",
   "letterSpacing",
 ];
+
 /**
  * Opacities, whose 0 and 1 mean hidden and shown, and the dash array, whose
  * 1 is a whole draw-on path, rather than a style.
@@ -40,6 +51,7 @@ const UNIT_RANGE_ATTRIBUTES = [
   "stopOpacity",
   "floodOpacity",
 ];
+
 /** Fitted text sizes are content checked against measured glyph widths. */
 const FITTED_TEXT_COMPONENTS = ["FitText", "LiteralDataText"];
 
@@ -59,6 +71,7 @@ const DURATION_ARGUMENTS = [
   { helper: "pop", position: 3 },
   { helper: "count", position: 4 },
 ];
+
 const LITERAL_MESSAGE =
   "Read this value from a theme token (stroke, corner, alpha, dash, or a text role), not a literal.";
 const DURATION_MESSAGE =
@@ -118,82 +131,124 @@ function _literalAttributeSelectors() {
   });
 }
 
-const RENDERER_RULES = {
-  "no-restricted-imports": [
-    "error",
-    {
-      patterns: [
-        STOCK_PALETTE_PATTERN,
-        {
-          group: ["**/motion"],
-          importNames: ["EASE", "DUR", "STAGGER", "STAGGER_COLUMN"],
-          message:
-            "Read curves, durations, and staggers from the themed motion (useGraphicMotion or useVideoMotion).",
-        },
-        {
-          group: ["**/fonts"],
-          importNames: ["TYPE", "MONO"],
-          message: "Read the face from a text role of the video theme.",
-        },
-        {
-          group: ["**/gallery/palette"],
-          importNames: ["DEFAULT_ACCENT", "DEFAULT_BACKGROUND"],
-          message:
-            "Gallery defaults are content overrides; renderers read the theme.",
-        },
-      ],
-    },
-  ],
-  "no-restricted-syntax": [
-    "error",
-    {
-      selector: "CallExpression[callee.name='ramp'][arguments.length<4]",
-      message:
-        "Pass the theme's curve to ramp(), or use the themed motion's ramp, so easing edits reach it.",
-    },
-    ..._literalAttributeSelectors(),
-    ..._durationSelectors(),
-  ],
-};
+const APP_IMPORT_OPTIONS = [{ patterns: [STOCK_PALETTE_PATTERN] }];
 
-function _restrictionFromGlobs(globs) {
-  const toAppGlob = (glob) => {
-    return `${APP}/${glob}`;
-  };
-  return {
-    files: globs
-      .filter((glob) => {
-        return !glob.startsWith("!") && !glob.endsWith(".css");
-      })
-      .map(toAppGlob),
-    ignores: [
-      ...globs
-        .filter((glob) => {
-          return glob.startsWith("!");
-        })
-        .map((glob) => {
-          return toAppGlob(glob.slice(1));
-        }),
-      `${APP}/**/*.test.*`,
-      `${APP}/**/__tests__/**`,
-      `${APP}/**/*.css`,
+const RENDERER_IMPORT_OPTIONS = [
+  {
+    patterns: [
+      STOCK_PALETTE_PATTERN,
+      {
+        group: ["**/motion"],
+        importNames: ["EASE", "DUR", "STAGGER", "STAGGER_COLUMN"],
+        message:
+          "Read curves, durations, and staggers from the themed motion (useGraphicMotion or useVideoMotion).",
+      },
+      {
+        group: ["**/fonts"],
+        importNames: ["TYPE", "MONO"],
+        message: "Read the face from a text role of the video theme.",
+      },
+      {
+        group: ["**/gallery/palette"],
+        importNames: ["DEFAULT_ACCENT", "DEFAULT_BACKGROUND"],
+        message:
+          "Gallery defaults are content overrides; renderers read the theme.",
+      },
     ],
-    rules: RENDERER_RULES,
-  };
+  },
+];
+
+const RENDERER_SYNTAX_OPTIONS = [
+  {
+    selector: "CallExpression[callee.name='ramp'][arguments.length<4]",
+    message:
+      "Pass the theme's curve to ramp(), or use the themed motion's ramp, so easing edits reach it.",
+  },
+  ..._literalAttributeSelectors(),
+  ..._durationSelectors(),
+];
+
+function _toAppRelativeFile(filename) {
+  return path.relative(APP_ROOT, filename).split(path.sep).join("/");
 }
 
-/**
- * The app-wide stock palette ban, then the renderer restrictions for every
- * renderer directory.
- */
-export const videoThemeRestrictions = [
-  {
-    files: [`${APP}/**/*.{js,jsx,mjs,ts,tsx}`],
-    rules: {
-      "no-restricted-imports": ["error", { patterns: [STOCK_PALETTE_PATTERN] }],
+function _isAppFile(appRelativeFile) {
+  return !appRelativeFile.startsWith("..") && !path.isAbsolute(appRelativeFile);
+}
+
+function _isRendererFile(appRelativeFile) {
+  if (
+    !_isAppFile(appRelativeFile) ||
+    appRelativeFile.endsWith(".css") ||
+    path.matchesGlob(appRelativeFile, "**/*.test.*") ||
+    path.matchesGlob(appRelativeFile, "**/__tests__/**")
+  ) {
+    return false;
+  }
+  return RENDERER_GLOBS.reduce((isMatched, glob) => {
+    if (glob.startsWith("!")) {
+      return isMatched && !path.matchesGlob(appRelativeFile, glob.slice(1));
+    }
+    return (
+      isMatched ||
+      (!glob.endsWith(".css") && path.matchesGlob(appRelativeFile, glob))
+    );
+  }, false);
+}
+
+function _withOptions(context, options) {
+  return new Proxy(
+    {},
+    {
+      get(_, property) {
+        if (property === "options") {
+          return options;
+        }
+        const value = Reflect.get(context, property, context);
+        return typeof value === "function" ? value.bind(context) : value;
+      },
+    },
+  );
+}
+
+/** Oxlint JS plugin enforcing video theme import and syntax restrictions. */
+const videoThemeRestrictionsPlugin = {
+  meta: {
+    name: "video-theme",
+  },
+  rules: {
+    "no-restricted-imports": {
+      meta: {
+        schema: [],
+        messages: IMPORT_RULE.meta.messages,
+      },
+      create(context) {
+        const appRelativeFile = _toAppRelativeFile(context.filename);
+        if (!_isAppFile(appRelativeFile)) {
+          return {};
+        }
+        const options = _isRendererFile(appRelativeFile)
+          ? RENDERER_IMPORT_OPTIONS
+          : APP_IMPORT_OPTIONS;
+        return IMPORT_RULE.create(_withOptions(context, options));
+      },
+    },
+    "no-restricted-syntax": {
+      meta: {
+        schema: [],
+        messages: SYNTAX_RULE.meta.messages,
+      },
+      create(context) {
+        const appRelativeFile = _toAppRelativeFile(context.filename);
+        if (!_isRendererFile(appRelativeFile)) {
+          return {};
+        }
+        return SYNTAX_RULE.create(
+          _withOptions(context, RENDERER_SYNTAX_OPTIONS),
+        );
+      },
     },
   },
-  _restrictionFromGlobs(
-    JSON.parse(fs.readFileSync(RENDERER_GLOBS_FILE, "utf8")),
-  ),
-];
+};
+
+export default videoThemeRestrictionsPlugin;

@@ -10,6 +10,8 @@ type Props = Readonly<{
   onChange: (points: Bezier) => void;
 }>;
 
+const BEZIER_FIELD_NAMES = ["Start x", "Start y", "End x", "End y"] as const;
+
 function _withPoint(points: Bezier, index: number, value: number): Bezier {
   const [x1, y1, x2, y2] = points;
   return [
@@ -26,15 +28,14 @@ export function BezierFields({
   isCameraCurve,
   onChange,
 }: Props): ReactNode {
-  const names = ["Start x", "Start y", "End x", "End y"];
   return (
     <div className={css.bezierFields}>
       {points.map((point, index) => {
         return (
           <RangeNumberInput
-            key={names[index]}
+            key={BEZIER_FIELD_NAMES[index]}
             size="xs"
-            label={names[index]}
+            label={BEZIER_FIELD_NAMES[index]}
             min={isCameraCurve || index % 2 === 0 ? 0 : -1}
             max={isCameraCurve || index % 2 === 0 ? 1 : 2}
             step={0.01}

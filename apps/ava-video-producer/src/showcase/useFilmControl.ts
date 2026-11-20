@@ -10,6 +10,7 @@ import {
   parseFilmControlMessage,
   type FilmControl,
 } from "./filmThemeMessageHelpers/filmThemeMessageHelpers";
+import { postToParentGallery } from "./postToParentGallery";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { PlayerRef } from "@remotion/player";
 
@@ -26,7 +27,6 @@ export type FilmControlOptions = Readonly<{
   loop: boolean;
   previewFrames: number;
   usedTokens: readonly string[];
-  send: (message: object) => void;
   onAppearance: (appearance: ContinuityAppearance) => void;
   onTheme: (snapshot: VideoThemeSnapshot) => void;
   onSpeed: (speed: number) => void;
@@ -34,7 +34,7 @@ export type FilmControlOptions = Readonly<{
 }>;
 
 function _sendOptions(options: FilmControlOptions): void {
-  options.send({
+  postToParentGallery({
     type: "film-options",
     id: options.id,
     options: options.isContinuity
@@ -90,7 +90,9 @@ function _applyTheme(
   options: FilmControlOptions,
 ): void {
   if (!options.isContinuity) {
-    options.send(createUnsupportedFilmThemeError(options.id, requestKey));
+    postToParentGallery(
+      createUnsupportedFilmThemeError(options.id, requestKey),
+    );
     return;
   }
   const { snapshot, message } = createFilmThemeAcknowledgement({
@@ -101,18 +103,14 @@ function _applyTheme(
   if (snapshot) {
     options.onTheme(snapshot);
   }
-  options.send(message);
+  postToParentGallery(message);
 }
 
 /**
  * Posts the film's token usage within the gallery's limits, only when the
  * bounded list differs from the last one sent.
  */
-function useUsedTokensReport(
-  id: string,
-  usedTokens: readonly string[],
-  send: (message: object) => void,
-): void {
+function useUsedTokensReport(id: string, usedTokens: readonly string[]): void {
   const lastSentPaths = useRef<string[]>([]);
   useEffect(
     function reportUsedTokens() {
@@ -127,9 +125,9 @@ function useUsedTokensReport(
         return;
       }
       lastSentPaths.current = message.paths;
-      send(message);
+      postToParentGallery(message);
     },
-    [usedTokens, id, send],
+    [usedTokens, id],
   );
 }
 
@@ -164,7 +162,7 @@ export function useFilmControl(options: FilmControlOptions): void {
     latestOptions.current = options;
   });
   const { isContinuity, appearance, captions, speed, loop } = options;
-  const { usedTokens, id, send } = options;
+  const { usedTokens, id } = options;
   useEffect(
     function reportOptions() {
       _sendOptions(latestOptions.current);
@@ -189,5 +187,5 @@ export function useFilmControl(options: FilmControlOptions): void {
       return window.removeEventListener("message", receive);
     };
   }, []);
-  useUsedTokensReport(id, usedTokens, send);
+  useUsedTokensReport(id, usedTokens);
 }

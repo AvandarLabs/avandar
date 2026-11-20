@@ -5,18 +5,21 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { buildProduct } from "../scripts/build-avandar.mjs";
+import { buildProduct } from "../scripts/buildProduct/buildProduct";
 import {
-  productRoot,
-  productSourcePath,
+  getProductRootFromProducerRoot,
+  getProductSourcePathFromFile,
   verifyProductBuild,
-} from "../scripts/lib/product-source.mjs";
+} from "../scripts/lib/productSourceHelpers";
 
 test("component provenance rejects secrets, private projects and paths outside product source", () => {
   const root = "/repo";
-  assert.equal(productRoot("/repo/apps/ava-video-producer"), root);
   assert.equal(
-    productSourcePath(root, "/repo/src/components/Card.tsx"),
+    getProductRootFromProducerRoot("/repo/apps/ava-video-producer"),
+    root,
+  );
+  assert.equal(
+    getProductSourcePathFromFile(root, "/repo/src/components/Card.tsx"),
     "src/components/Card.tsx",
   );
   for (const filename of [
@@ -27,7 +30,7 @@ test("component provenance rejects secrets, private projects and paths outside p
     "/repo/src/.hidden/key.json",
   ]) {
     assert.throws(() => {
-      productSourcePath(root, filename);
+      getProductSourcePathFromFile(root, filename);
     }, /non-product source/);
   }
 });
@@ -62,7 +65,8 @@ test("a product edit invalidates a previously compiled component preview", async
 
 // Private film assets and outputs must remain beside the private plan.
 test("nested private plans resolve to their project, while sample plans use the app", async () => {
-  const { videoWorkspace } = await import("../scripts/lib/video-workspace.mjs");
+  const { getVideoWorkspaceFromPlanPath: videoWorkspace } =
+    await import("../scripts/lib/getVideoWorkspaceFromPlanPath");
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "private-video-"));
   const app = path.join(root, "apps/ava-video-producer");
   try {

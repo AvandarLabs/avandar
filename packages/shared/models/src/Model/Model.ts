@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* oxlint-disable typescript/no-namespace */
 import { ModelModule } from "@models/Model/ModelModule/ModelModule.ts";
 import type {
   ModelBase,

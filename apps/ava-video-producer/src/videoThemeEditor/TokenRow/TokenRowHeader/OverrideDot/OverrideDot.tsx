@@ -1,6 +1,6 @@
-import clsx from "clsx";
-import { type TokenRow } from "../../../tokenRows/tokenRows.types";
+import { clsx } from "clsx";
 import css from "./OverrideDot.module.css";
+import type { TokenRow } from "../../../tokenRows/tokenRows.types";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ state: TokenRow["overrideState"] }>;

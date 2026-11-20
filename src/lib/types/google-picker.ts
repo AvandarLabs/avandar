@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-misused-new */
+/* oxlint-disable typescript/no-misused-new */
 /**
  * The TypeScript types were transcribed from the API documentation
  * available here:

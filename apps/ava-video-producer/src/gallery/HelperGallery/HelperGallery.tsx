@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { useState } from "react";
 import { AtlasCategoryNav } from "../AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../AtlasLayout/AtlasCollection/AtlasCollection";
@@ -25,6 +26,10 @@ const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => {
   };
 });
 
+function _getCategoryLabelFromId(id: string): string {
+  return HELPER_CATEGORIES.find(propEq("id", id))?.label ?? id;
+}
+
 /**
  * The Helpers section of the Motion Atlas: the shared helpers motions and
  * compositions are built from, as live thumbnail cards by category, each
@@ -36,13 +41,6 @@ export function HelperGallery(): ReactNode {
     return !isReducedMotionPreferred();
   });
   const { selection, open, previous, next } = gallery;
-  const labelOf = (id: string) => {
-    return (
-      HELPER_CATEGORIES.find((category) => {
-        return category.id === id;
-      })?.label ?? id
-    );
-  };
   return (
     <>
       <a className="skip-link" href="#library">
@@ -109,7 +107,7 @@ export function HelperGallery(): ReactNode {
               <HelperCard
                 key={helper.id}
                 helper={helper}
-                category={labelOf(helper.category)}
+                category={_getCategoryLabelFromId(helper.category)}
                 playing={playing && !open}
                 onOpen={gallery.openHelper}
               />
@@ -120,7 +118,7 @@ export function HelperGallery(): ReactNode {
       {open ? (
         <AtlasDialog
           title={open.title}
-          subtitle={labelOf(open.category)}
+          subtitle={_getCategoryLabelFromId(open.category)}
           previousLabel="Previous helper"
           nextLabel="Next helper"
           onClose={gallery.close}

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 npm run typecheck
 npm run video -- preview storyboards/home.json
 TITLE_OFFSET=0 sh scripts/preview.sh title-study 8 30 90 114 174 198

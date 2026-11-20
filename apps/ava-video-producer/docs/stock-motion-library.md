@@ -94,8 +94,8 @@ The [gallery palette](../src/gallery/palette.ts) selects tokens from the current
 Avandar theme. `motion:build` reads `shared/config/Theme.ts`,
 `src/config/Theme/Theme.ts`, and `src/config/Theme/ElevationTheme.ts` directly,
 then bundles only their palette values. `showcase` builds and watches those
-inputs while serving live previews. The same build generates
-`showcase-theme.css` with primary and neutral CSS variables shared by Motion
+inputs while serving live previews. The same build generates the
+`showcase-theme.css` stylesheet with primary and neutral CSS variables shared by Motion
 Atlas, the starter showcase, and Productions. Showcase actions and selected
 states use the product blue, while the existing warm paper surfaces and
 editorial red accents remain part of the showcase's presentation.
@@ -346,8 +346,9 @@ The `--input` JSON document includes the selected preset, schemaVersion, complet
 input and optional palette. Its preset must match the selected CLI ID. The flag
 is rejected for `all` and `list`. The CLI validates before bundling.
 
-The gallery bundle is generated locally with `esbuild`, a project dependency.
-It contains React and the same stock sources used by Remotion. It uses no
+The gallery is built locally with Vite, a project dependency, in the same build
+as every other showcase page. It contains React and the same stock sources used
+by Remotion. It uses no
 external font, asset, or service at runtime. The running showcase watches stock
 source, metadata, theme inputs, and gallery logic and refreshes after successful
 rebuilds. `motion:build` remains available for an explicit local build. Browser
@@ -409,7 +410,7 @@ The Atlas, CLI, and Remotion build read YAML directly. Normal
 showcase rebuilds consume YAML edits, with no catalog export or generated JSON
 copy required. Future embedding jobs can read these same files. The Atlas does
 not generate embeddings. For direct Node test invocations that import catalogs,
-use `node --import ./scripts/yaml/registerYaml.mjs --import tsx --test <test>`
+use `node --import tsx --import ./scripts/yaml/registerYaml.ts --test <test>`
 from this app; package scripts configure this automatically.
 
 Search text uses this semantic order: name, description, intent, creative

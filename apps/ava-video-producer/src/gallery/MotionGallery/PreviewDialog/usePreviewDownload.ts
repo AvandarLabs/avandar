@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { downloadFilm } from "../../../../showcase/download.js";
+import { FilmDownloads } from "../../../../showcase/FilmDownloads/FilmDownloads";
 import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
 import { useGalleryVideoTheme } from "../../GalleryVideoTheme/useGalleryVideoTheme";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
@@ -24,7 +24,7 @@ export function usePreviewDownload({
   const download = async () => {
     setExporting(true);
     try {
-      await downloadFilm({
+      await FilmDownloads.downloadFilm({
         id: `stock-${preset.id}`,
         options: {
           schemaVersion: 1,

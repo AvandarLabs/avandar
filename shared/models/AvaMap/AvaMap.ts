@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* oxlint-disable typescript/no-namespace */
 import type { AvaMapId, AvaMapModel } from "$/models/AvaMap/AvaMap.types.ts";
 
 /** Parsers for persisted AvaMap rows. */

@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useId } from "react";
 import { getHorizontalBlurFilter } from "../../../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
 import { HorizontalBlurFilter } from "../../../../motion-components/HorizontalBlur";

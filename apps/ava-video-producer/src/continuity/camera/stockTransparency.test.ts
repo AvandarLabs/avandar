@@ -19,19 +19,22 @@ function _withBoxRoughness(
     seed: "$atomic.seed.md",
     randomness: "$atomic.randomness.md",
   };
-  return createElement(VideoThemeScope, {
-    patches: [
-      {
-        other: {
-          video: {
-            atomic: { roughness: { testBox: boxRoughness } },
-            semantic: { sketch: { box } },
+  return createElement(
+    VideoThemeScope,
+    {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { roughness: { testBox: boxRoughness } },
+              semantic: { sketch: { box } },
+            },
           },
         },
-      },
-    ],
-    children: element,
-  });
+      ],
+    },
+    element,
+  );
 }
 
 test("overlay graphics omit only their stage ground and retain diagram objects", () => {

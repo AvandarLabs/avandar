@@ -1,5 +1,5 @@
 import { Group, Text } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation";
 import { queryFilterValidationLabel } from "@/views/DataExplorerApp/copy/queryFilterValidationLabel";

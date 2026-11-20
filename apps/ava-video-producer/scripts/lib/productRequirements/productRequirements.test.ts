@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
-import { previewFrames } from "../planHelpers/previewFrames";
+import { getPreviewFramesFromPlan } from "../planHelpers/getPreviewFramesFromPlan";
 import { productRequirements } from "./productRequirements";
 
 const readFilm = (id: string) => {
@@ -18,6 +18,7 @@ const readFilm = (id: string) => {
     ),
   );
 };
+
 test("nested product beats select the product build and entry without affecting motion-only films", () => {
   assert.deepEqual(productRequirements(readFilm("ontology-to-product")), {
     needsProduct: true,
@@ -28,6 +29,7 @@ test("nested product beats select the product build and entry without affecting 
     needsMap: false,
   });
 });
+
 test("preview sampling includes incoming overlap and resolved poses inside a continuity shot", () => {
   const plan = readFilm("qetl-motion");
   const shot = plan.shots[0];
@@ -35,7 +37,7 @@ test("preview sampling includes incoming overlap and resolved poses inside a con
   if (shot.scene !== "continuity") return;
   const incoming =
     shot.props.beats[0].duration - shot.props.beats[1].transition.frames;
-  const frames = previewFrames(plan);
+  const frames = getPreviewFramesFromPlan(plan);
   for (const frame of [
     incoming - 1,
     incoming,

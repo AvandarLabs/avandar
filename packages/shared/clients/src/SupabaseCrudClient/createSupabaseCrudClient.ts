@@ -25,7 +25,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable typescript/no-explicit-any */
 type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
   any,
   any,
@@ -35,7 +35,7 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
   any,
   any
 >;
-/* eslint-enable @typescript-eslint/no-explicit-any */
+/* oxlint-enable typescript/no-explicit-any */
 
 /**
  * Creates a client for a model that maps to a Supabase table.
@@ -122,11 +122,11 @@ export function createSupabaseCrudClient<
           // currently we only support `eq` filters
           match(operator as FilterOperator)
             .with("eq", () => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // oxlint-disable-next-line typescript/no-explicit-any
               newQuery = query.eq(String(column), value as any);
             })
             .with("in", () => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // oxlint-disable-next-line typescript/no-explicit-any
               newQuery = query.in(String(column), value as any);
             })
             .with("is", () => {
@@ -162,7 +162,7 @@ export function createSupabaseCrudClient<
         const { data } = await dbClient
           .from(tableName)
           .select("*")
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .maybeSingle<M["DBRead"]>()
           .throwOnError();
@@ -239,7 +239,7 @@ export function createSupabaseCrudClient<
           const { columnNames, ignoreDuplicates } = params.onConflict;
           const { data: upsertedData } = await dbClient
             .from(tableName)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line typescript/no-explicit-any
             .upsert(params.data as any, {
               onConflict: columnNames.join(","),
               ignoreDuplicates,
@@ -252,7 +252,7 @@ export function createSupabaseCrudClient<
 
         const { data: insertedData } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .insert(params.data as any)
           .select()
           .single<M["DBRead"]>()
@@ -274,7 +274,7 @@ export function createSupabaseCrudClient<
           const { columnNames, ignoreDuplicates } = params.onConflict;
           const { data: upsertedRows } = await dbClient
             .from(tableName)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line typescript/no-explicit-any
             .upsert(params.data as any, {
               onConflict: columnNames.join(","),
               ignoreDuplicates,
@@ -287,7 +287,7 @@ export function createSupabaseCrudClient<
 
         const { data: insertedRows } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .insert(params.data as any)
           .select()
           .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
@@ -302,9 +302,9 @@ export function createSupabaseCrudClient<
       }) => {
         const { data: updatedData } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .update(params.data as any)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .select()
           .single<M["DBRead"]>()
@@ -319,7 +319,7 @@ export function createSupabaseCrudClient<
         await dbClient
           .from(tableName)
           .delete()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .throwOnError();
       },
@@ -331,7 +331,7 @@ export function createSupabaseCrudClient<
         await dbClient
           .from(tableName)
           .delete()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .in(dbTablePrimaryKey, params.ids as any)
           .throwOnError();
       },

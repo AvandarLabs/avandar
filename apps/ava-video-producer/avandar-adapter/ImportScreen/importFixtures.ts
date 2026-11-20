@@ -10,9 +10,17 @@ import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/D
  * detail views.
  */
 export const NAME = "Video - Harborfield cases";
+/**
+ * The saved dataset's description, shown on its upload review and detail
+ * views.
+ */
 export const DESCRIPTION =
   "Fictional Harborfield response-coordination data. Reproducible fixtures from avandar-video-agent/demo-data.";
-// Names from capture-flows/avandar.mjs, with only the task-owned dataset list.
+/**
+ * The data sources the source list shows: the Harborfield fixture dataset
+ * names the capture flows import (`FIXTURE_NAMES` in `ensureDataset`),
+ * without the weekly reports dataset, which the source list does not show.
+ */
 export const SOURCE_NAMES = [
   "Video - Harborfield cases",
   "Video - Harborfield visits",
@@ -24,12 +32,15 @@ const DATE_COLUMNS = new Set(["report_date", "week_start"]);
 
 /** The fictional Harborfield cases rows this screen imports and previews. */
 export const cases = fixtureData.cases;
+/** The fixture case rows' column names, in file order. */
 export const columnNames = Object.keys(cases[0]!);
 
 /**
  * Column metadata inferred from the fixture rows, in the shape the dataset
  * preview and metadata view expect.
  */
+// Fixture records carry only the fields this film shows. Filling the rest of
+// the product type would put invented values on screen, so the cast stays.
 export const columns = columnNames.map((name, index) => {
   return {
     id: `film-case-column-${index}`,
@@ -46,6 +57,8 @@ export const columns = columnNames.map((name, index) => {
 }) as unknown as DatasetColumn.T[];
 
 /** The saved dataset record this screen's "saved" phase displays. */
+// Fixture records carry only the fields this film shows. Filling the rest of
+// the product type would put invented values on screen, so the cast stays.
 export const dataset = {
   __type: "Dataset",
   id: EXPLORER_CASES_DATASET_ID,
@@ -58,6 +71,8 @@ export const dataset = {
 } as unknown as Dataset.T;
 
 /** The CSV source configuration backing `dataset`. */
+// Fixture records carry only the fields this film shows. Filling the rest of
+// the product type would put invented values on screen, so the cast stays.
 export const source = {
   __type: "CsvFileDataset",
   sizeInBytes: 26703,
@@ -70,6 +85,8 @@ export const source = {
 } as unknown as CsvFileDataset.T;
 
 /** The parse metadata shown in the import review's preview controls. */
+// Fixture records carry only the fields this film shows. Filling the rest of
+// the product type would put invented values on screen, so the cast stays.
 export const metadata = {
   sourceType: "csv_file",
   onlineStorageAllowed: true,
