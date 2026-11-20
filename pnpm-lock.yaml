@@ -20164,6 +20164,12 @@ snapshots:
     dependencies:
       is-windows: 1.0.2
 
+  bidi-js@1.1.0:
+    dependencies:
+      buffers: 0.1.1
+      chainsaw: 0.1.0
+      require-from-string: 2.0.2
+
   big-integer@1.6.52: {}
 
   bignumber.js@9.3.1: {}
@@ -20171,13 +20177,7 @@ snapshots:
   binary-extensions@2.3.0: {}
 
   binary@0.3.0:
-    dependencies:
-  bidi-js@1.1.0:
-    dependencies:
-      require-from-string: 2.0.2
-
-      buffers: 0.1.1
-      chainsaw: 0.1.0
+    dependencies: null
 
   bl@4.1.0:
     dependencies:

@@ -1,5 +1,15 @@
 # @avandar/query-hooks
 
+## 0.3.0
+
+### Patch Changes
+
+- chore(lint): replace eslint directives with canonical oxlint rules (605670e)
+
+- Updated dependencies [[`cd8ee49`](https://github.com/AvandarLabs/avandar/commit/cd8ee49aa0a1566581544aec866e5670ebfc9243)]:
+  - @avandar/utils@0.3.0
+  - @avandar/clients@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

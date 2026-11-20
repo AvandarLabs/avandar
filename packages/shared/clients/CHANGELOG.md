@@ -1,5 +1,26 @@
 # @avandar/clients
 
+## 0.3.0
+
+### Minor Changes
+
+- feat(filters): match an empty column with is null (e89d8cc)
+
+- feat(clients): order a page when the caller names columns (f635735)
+
+### Patch Changes
+
+- chore(lint): replace eslint directives with canonical oxlint rules (605670e)
+
+- fix(clients): stop filter iteration from depending on shared columns (b621082)
+
+- [`cd8ee49`](https://github.com/AvandarLabs/avandar/commit/cd8ee49aa0a1566581544aec866e5670ebfc9243) Thanks [@jpsyx](https://github.com/jpsyx)! - `createSupabaseCrudClient` no longer relies on a column every registered table shares when it iterates filters, so it type-checks once a table has no column in common with the rest.
+
+- Updated dependencies []:
+  - @avandar/modules@0.3.0
+  - @avandar/utils@0.3.0
+  - @avandar/logger@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
