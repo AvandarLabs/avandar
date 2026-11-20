@@ -132,8 +132,8 @@ settings.
 Everything 1A to 1E marked done "except for" something lives here, so a
 finished phase stays finished. Each item names where it came from. The
 specs keep their own lists as history. This table is the one to work from.
-Order: after 1F's browser spec, during its week on the demo, and before
-Phase 2.
+Order (Pablo, 2026-11-20): 1G runs before 1F, so the agent becomes the
+default only after these are fixed or consciously dropped.
 
 | # | Group | Item | From |
 |---|---|---|---|
