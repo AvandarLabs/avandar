@@ -5,6 +5,7 @@ import {
   useGraphicShapeScales,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 
@@ -22,21 +23,7 @@ export function JigMakingTool({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const progress = motion.ramp(
-    frame,
-    20,
-    motion.scale(28),
-    motion.travel.easing,
-  );
-  const x =
-    pattern === "two-holes"
-      ? mix(
-          motion.ramp(frame, 32, motion.press.duration, motion.travel.easing),
-          110,
-          150,
-        )
-      : 80 + 22 * progress;
-  const y = pattern === "two-holes" ? 382 : 350 + 22 * progress;
+  const { x, y } = _getToolPoint(frame, pattern, motion);
   return (
     <g>
       <SketchedShape
@@ -62,4 +49,29 @@ export function JigMakingTool({
       />
     </g>
   );
+}
+
+/** The tool stepping between two holes, or sliding along a corner mark. */
+function _getToolPoint(
+  frame: number,
+  pattern: Props["pattern"],
+  motion: VideoMotion,
+) {
+  const progress = motion.ramp(
+    frame,
+    20,
+    motion.scale(28),
+    motion.travel.easing,
+  );
+  return {
+    x:
+      pattern === "two-holes"
+        ? mix(
+            motion.ramp(frame, 32, motion.press.duration, motion.travel.easing),
+            110,
+            150,
+          )
+        : 80 + 22 * progress,
+    y: pattern === "two-holes" ? 382 : 350 + 22 * progress,
+  };
 }

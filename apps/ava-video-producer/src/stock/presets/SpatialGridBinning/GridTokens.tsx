@@ -19,7 +19,7 @@ export function GridTokens({
   accent,
 }: Readonly<Props>): ReactNode {
   const { atomic } = useGraphicTheme();
-  const { color, stroke, sketch } = useGraphicTokens();
+  const { stroke, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const { points } = makeGridSceneFromInputAndFrame({
@@ -29,21 +29,7 @@ export function GridTokens({
   });
   return (
     <g>
-      {input.showPointGhosts
-        ? points.map((point) => {
-            return (
-              <circle
-                key={point.id}
-                data-source-ghost={point.id}
-                cx={point.sourceX}
-                cy={point.sourceY}
-                r={4}
-                fill={color.inactive}
-                opacity={atomic.opacity["35"]}
-              />
-            );
-          })
-        : undefined}
+      {input.showPointGhosts ? <SourceGhosts points={points} /> : undefined}
       {points.map((point) => {
         return (
           <g key={point.id}>
@@ -65,4 +51,27 @@ export function GridTokens({
       })}
     </g>
   );
+}
+
+/** A faint ghost at each point's source position. */
+function SourceGhosts({
+  points,
+}: Readonly<{
+  points: ReturnType<typeof makeGridSceneFromInputAndFrame>["points"];
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { color } = useGraphicTokens();
+  return points.map((point) => {
+    return (
+      <circle
+        key={point.id}
+        data-source-ghost={point.id}
+        cx={point.sourceX}
+        cy={point.sourceY}
+        r={4}
+        fill={color.inactive}
+        opacity={atomic.opacity["35"]}
+      />
+    );
+  });
 }

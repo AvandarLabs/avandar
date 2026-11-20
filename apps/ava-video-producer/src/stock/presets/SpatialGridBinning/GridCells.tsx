@@ -23,44 +23,66 @@ export function GridCells({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const { cells } = makeGridSceneFromInputAndFrame({
     input,
     frame,
     motion,
   });
-  const { columns, rows } = input.grid;
   return (
     <g>
       {cells.map((cell) => {
         return (
           <g key={cell.index}>
-            <StockRect
-              data-cell-shade={cell.index}
-              x={48 + (cell.column * 330) / columns}
-              y={164 + (cell.row * 330) / rows}
-              width={330 / columns}
-              height={330 / rows}
-              fill={accent}
-              fillOpacity={shapes.wash(
-                motion.ramp(frame, SHADE_AT, motion.scale(SHADE_FRAMES)) *
-                  (SHADE_FLOOR +
-                    (cell.count / input.points.length) * SHADE_RANGE),
-              )}
-              stroke={color.line}
-              strokeOpacity={motion.ramp(
-                frame,
-                OUTLINE_AT,
-                motion.scale(OUTLINE_FRAMES),
-              )}
-              strokeWidth={shapes.stroke(stroke.hairline)}
+            <CellShade
+              input={input}
+              cell={cell}
+              frame={frame}
+              accent={accent}
             />
             <GridCell input={input} cell={cell} frame={frame} />
           </g>
         );
       })}
     </g>
+  );
+}
+
+/** A bin, shaded by its share of the points once they are counted. */
+function CellShade({
+  input,
+  cell,
+  frame,
+  accent,
+}: Readonly<{
+  input: Input;
+  cell: ReturnType<typeof makeGridSceneFromInputAndFrame>["cells"][number];
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const { color, stroke } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const { columns, rows } = input.grid;
+  return (
+    <StockRect
+      data-cell-shade={cell.index}
+      x={48 + (cell.column * 330) / columns}
+      y={164 + (cell.row * 330) / rows}
+      width={330 / columns}
+      height={330 / rows}
+      fill={accent}
+      fillOpacity={shapes.wash(
+        motion.ramp(frame, SHADE_AT, motion.scale(SHADE_FRAMES)) *
+          (SHADE_FLOOR + (cell.count / input.points.length) * SHADE_RANGE),
+      )}
+      stroke={color.line}
+      strokeOpacity={motion.ramp(
+        frame,
+        OUTLINE_AT,
+        motion.scale(OUTLINE_FRAMES),
+      )}
+      strokeWidth={shapes.stroke(stroke.hairline)}
+    />
   );
 }

@@ -18,27 +18,10 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         stroke={tokens.color.inactive}
         fill="none"
       />
-      <text
-        x={80}
-        y={480}
-        fill={tokens.color.textMuted}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-      >
-        0
-      </text>
-      <text
-        x={420}
-        y={480}
-        textAnchor="end"
-        fill={tokens.color.textMuted}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-      >
+      <RulerEndLabel x={80}>0</RulerEndLabel>
+      <RulerEndLabel x={420} anchor="end">
         {input.periods[0].receiptsMinor / input.money.minorUnitsPerUnit}
-      </text>
+      </RulerEndLabel>
       {[input.copy.operating, input.copy.distribution, input.copy.retained].map(
         (label, index) => {
           return (
@@ -62,5 +45,31 @@ export function RevenueLegend({ input, accent }: Readonly<Props>): ReactNode {
         },
       )}
     </g>
+  );
+}
+
+/** The ruler's value at one end. */
+function RulerEndLabel({
+  x,
+  anchor,
+  children,
+}: Readonly<{
+  x: number;
+  anchor?: "end";
+  children: ReactNode;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={x}
+      y={480}
+      textAnchor={anchor}
+      fill={tokens.color.textMuted}
+      fontFamily={tokens.text.graphic.data.fontFamily}
+      fontWeight={tokens.text.graphic.data.fontWeight}
+      fontSize={tokens.text.graphic.data.fontSize}
+    >
+      {children}
+    </text>
   );
 }

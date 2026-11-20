@@ -26,6 +26,34 @@ export function DoseToken({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
+  const { destinationX, destinationY } = _getDoseDestination(input, unit);
+  const progress = motion.ramp(
+    frame,
+    36 + index * motion.stagger.list,
+    motion.scale(50),
+    motion.travel.easing,
+  );
+  return (
+    <rect
+      data-dose={unit.id}
+      data-outcome={unit.outcome}
+      data-recipient-id={unit.recipientId ?? undefined}
+      x={mix(progress, 60 + (index % 4) * 48, destinationX)}
+      y={mix(progress, 225 + Math.floor(index / 4) * 60, destinationY)}
+      width={11}
+      height={16}
+      rx={scales.corner(3)}
+      fill={unit.outcome === "discarded" ? tokens.color.highlight : accent}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
+    />
+  );
+}
+
+/**
+ * Where a dose ends up: beside its recipient if administered, else in the
+ * remaining or discarded tray, packed among the doses sharing that place.
+ */
+function _getDoseDestination(input: Input, unit: Props["unit"]) {
   const peers = input.units.filter((item) => {
     return (
       item.outcome === unit.outcome &&
@@ -47,24 +75,5 @@ export function DoseToken({
         Math.floor(position / 6) * 19
       : (unit.outcome === "remaining" ? 220 : 400) +
         Math.floor(position / 6) * 30;
-  const progress = motion.ramp(
-    frame,
-    36 + index * motion.stagger.list,
-    motion.scale(50),
-    motion.travel.easing,
-  );
-  return (
-    <rect
-      data-dose={unit.id}
-      data-outcome={unit.outcome}
-      data-recipient-id={unit.recipientId ?? undefined}
-      x={mix(progress, 60 + (index % 4) * 48, destinationX)}
-      y={mix(progress, 225 + Math.floor(index / 4) * 60, destinationY)}
-      width={11}
-      height={16}
-      rx={scales.corner(3)}
-      fill={unit.outcome === "discarded" ? tokens.color.highlight : accent}
-      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
-    />
-  );
+  return { destinationX, destinationY };
 }

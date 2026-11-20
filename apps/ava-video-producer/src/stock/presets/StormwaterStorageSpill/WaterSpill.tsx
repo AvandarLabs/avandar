@@ -17,18 +17,14 @@ export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const incoming = input.event.incomingM3;
-  const remainder =
-    incoming - (input.event.infiltratedM3 + input.event.dischargedM3);
-  const overflow = remainder - Math.min(input.detentionCapacityM3, remainder);
+  const overflow = _getOverflowVolume(input);
   const progress = motion.ramp(
     frame,
     84,
     motion.scale(24),
     motion.travel.easing,
   );
-  const lip = 380 - Math.min(input.detentionCapacityM3 / incoming, 1) * 140;
-  const crest = input.overflowSide === "left" ? 340 : 620;
-  const outside = input.overflowSide === "left" ? 80 : 880;
+  const { lip, crest, outside } = _getCrestGeometry(input);
   return (
     <g>
       <g data-crest="physical">
@@ -59,4 +55,23 @@ export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
       />
     </g>
   );
+}
+
+/** The water left after infiltration, discharge, and full detention. */
+function _getOverflowVolume(input: Input): number {
+  const remainder =
+    input.event.incomingM3 -
+    (input.event.infiltratedM3 + input.event.dischargedM3);
+  return remainder - Math.min(input.detentionCapacityM3, remainder);
+}
+
+/** The detention lip's height and the crest and outfall on the spill side. */
+function _getCrestGeometry(input: Input) {
+  return {
+    lip:
+      380 -
+      Math.min(input.detentionCapacityM3 / input.event.incomingM3, 1) * 140,
+    crest: input.overflowSide === "left" ? 340 : 620,
+    outside: input.overflowSide === "left" ? 80 : 880,
+  };
 }

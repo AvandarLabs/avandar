@@ -14,22 +14,29 @@ type GetRecordPlacementsResult = {
   firstSnapshot: 0 | 1;
 };
 
-/** Receipt tokens travel to their event bin exactly once. */
-export function getRecordPlacementsFromInputAndFrame({
-  input,
-  frame,
-  motion,
-}: Readonly<{
+type RecordPlacementsArgs = Readonly<{
   input: Input;
   frame: number;
   motion: VideoMotion;
-}>): GetRecordPlacementsResult[] {
-  const ordered = [...input.records].sort((first, second) => {
+}>;
+
+/** Records from the earlier snapshot first, then by ID. */
+function _sortRecordsBySnapshot(records: Input["records"]): Input["records"] {
+  return [...records].sort((first, second) => {
     return (
       first.firstSnapshot - second.firstSnapshot ||
       (first.id < second.id ? -1 : first.id > second.id ? 1 : 0)
     );
   });
+}
+
+/** Receipt tokens travel to their event bin exactly once. */
+export function getRecordPlacementsFromInputAndFrame({
+  input,
+  frame,
+  motion,
+}: RecordPlacementsArgs): GetRecordPlacementsResult[] {
+  const ordered = _sortRecordsBySnapshot(input.records);
   const later = ordered.filter(propEq("firstSnapshot", 1));
   return ordered.map((record) => {
     const bin = input.eventBins.findIndex(propEq("id", record.eventBinId));

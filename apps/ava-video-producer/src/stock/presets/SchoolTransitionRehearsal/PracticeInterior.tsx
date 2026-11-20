@@ -47,19 +47,7 @@ export function PracticeInterior({
         />
       </g>
       {input.showFootprints ? (
-        <g opacity={tokens.alpha.ghost * finalStep} fill={accent}>
-          {Array.from({ length: 7 }, (_, index) => {
-            return (
-              <ellipse
-                key={index}
-                cx={410 + index * 45}
-                cy={420 + (index % 2) * 7}
-                rx={FLOOR_MARK_RADIUS_X}
-                ry={FLOOR_MARK_RADIUS_Y}
-              />
-            );
-          })}
-        </g>
+        <Footprints finalStep={finalStep} accent={accent} />
       ) : undefined}
       <LabelSlots
         labels={[
@@ -67,6 +55,29 @@ export function PracticeInterior({
           [input.stops[1].label, 650, 190, 260, 14, 3],
         ]}
       />
+    </g>
+  );
+}
+
+/** Footprints marking the practised route, fading in on the final step. */
+function Footprints({
+  finalStep,
+  accent,
+}: Readonly<{ finalStep: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g opacity={tokens.alpha.ghost * finalStep} fill={accent}>
+      {Array.from({ length: 7 }, (_, index) => {
+        return (
+          <ellipse
+            key={index}
+            cx={410 + index * 45}
+            cy={420 + (index % 2) * 7}
+            rx={FLOOR_MARK_RADIUS_X}
+            ry={FLOOR_MARK_RADIUS_Y}
+          />
+        );
+      })}
     </g>
   );
 }

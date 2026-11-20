@@ -11,21 +11,28 @@ type GetJigSceneFromFrameResult = {
   activeIndex: number;
 };
 
+type JigSceneArgs = Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>;
+
+/** Each collaborator's station, spread evenly or centred if alone. */
+function _getCollaboratorCenters(input: Input): number[] {
+  return input.collaborators.map((_, index) => {
+    return input.collaborators.length === 1
+      ? 610
+      : 350 + (index * 500) / (input.collaborators.length - 1);
+  });
+}
+
 /** Frame-derived guide position and one application beat per collaborator. */
 export function getJigSceneFromFrame({
   frame,
   input,
   motion,
-}: Readonly<{
-  frame: number;
-  input: Input;
-  motion: VideoMotion;
-}>): GetJigSceneFromFrameResult {
-  const centers = input.collaborators.map((_, index) => {
-    return input.collaborators.length === 1
-      ? 610
-      : 350 + (index * 500) / (input.collaborators.length - 1);
-  });
+}: JigSceneArgs): GetJigSceneFromFrameResult {
+  const centers = _getCollaboratorCenters(input);
   const duration = 73 / input.collaborators.length;
   const activeIndex = Math.min(
     input.collaborators.length - 1,

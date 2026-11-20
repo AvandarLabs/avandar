@@ -62,9 +62,7 @@ export function BookingParticipant({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const request = input.requests[index];
   const personX = mix(scene.use, scene.x + scene.width / 2, 210);
   const personY = mix(scene.use, scene.y - 28, 380);
@@ -80,20 +78,12 @@ export function BookingParticipant({
       <LabelSlots
         labels={[[String(index + 1), personX - 28, personY - 18, 20, 12, 1]]}
       />
-      <g data-request-hand={request.id}>
-        <SketchedShape
-          shape={{
-            kind: "line",
-            x1: personX,
-            y1: personY,
-            x2: handX,
-            y2: handY,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
-      </g>
+      <RequestArm
+        requestId={request.id}
+        person={{ x: personX, y: personY }}
+        hand={{ x: handX, y: handY }}
+        accent={accent}
+      />
       {scene.use === 1 ? (
         <circle
           data-use-person={request.id}
@@ -103,6 +93,40 @@ export function BookingParticipant({
           fill={accent}
         />
       ) : undefined}
+    </g>
+  );
+}
+
+type Point = Readonly<{ x: number; y: number }>;
+
+/** The participant's arm, reaching from their body to their hand. */
+function RequestArm({
+  requestId,
+  person,
+  hand,
+  accent,
+}: Readonly<{
+  requestId: string;
+  person: Point;
+  hand: Point;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-request-hand={requestId}>
+      <SketchedShape
+        shape={{
+          kind: "line",
+          x1: person.x,
+          y1: person.y,
+          x2: hand.x,
+          y2: hand.y,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
     </g>
   );
 }

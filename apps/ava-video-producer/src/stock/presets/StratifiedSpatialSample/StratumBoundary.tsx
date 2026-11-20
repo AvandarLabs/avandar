@@ -28,7 +28,6 @@ export function StratumBoundary({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const [firstX, firstY] = stratum.polygon[0];
   const points = stratum.polygon
     .map(([x, y]) => {
       return `${70 + x * 4.8},${170 + y * 2.7}`;
@@ -55,6 +54,29 @@ export function StratumBoundary({
           strokeWidth={scales.stroke(tokens.stroke.outline)}
         />
       </g>
+      <BoundaryCallout
+        stratum={stratum}
+        index={index}
+        frame={frame}
+        color={color}
+      />
+    </g>
+  );
+}
+
+/** The callout from the boundary's first corner to its key at the map edge. */
+function BoundaryCallout({
+  stratum,
+  index,
+  frame,
+  color,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const [firstX, firstY] = stratum.polygon[0];
+  return (
+    <>
       <SketchedShape
         shape={{
           kind: "path",
@@ -79,6 +101,6 @@ export function StratumBoundary({
       >
         {index + 1}
       </text>
-    </g>
+    </>
   );
 }

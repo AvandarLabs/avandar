@@ -34,13 +34,7 @@ export function SeedContainers({
         />
       </g>
       <g data-seed-jar="">
-        <SketchedShape
-          shape={{ kind: "path", d: "M278 290 V410 H478 V290" }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={tokens.color.inactive}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
+        <OpenContainer d="M278 290 V410 H478 V290" />
       </g>
       <rect
         data-jar-lid=""
@@ -51,15 +45,24 @@ export function SeedContainers({
         fill={tokens.color.inactive}
       />
       <g data-loss-tray="">
-        <SketchedShape
-          shape={{ kind: "path", d: "M508 390 V410 H708 V390" }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={tokens.color.inactive}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
+        <OpenContainer d="M508 390 V410 H708 V390" />
       </g>
       <SeedPlot scene={scene} frame={frame} accent={accent} />
     </g>
+  );
+}
+
+/** An open-topped container's outline. */
+function OpenContainer({ d }: Readonly<{ d: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

@@ -68,22 +68,12 @@ export function getBookingFromFrame({
     propEq<{ id: unknown }, "id", unknown>("id", request.agreedSlotId),
   );
   const hasBooking = request.agreedSlotId !== null;
-  const horizontal = hasBooking
-    ? motion.ramp(
-        frame,
-        36 + index * motion.scaleStagger(3),
-        motion.scale(30),
-        motion.travel.easing,
-      )
-    : 0;
-  const vertical = hasBooking
-    ? motion.ramp(
-        frame,
-        75 + index * motion.scaleStagger(3),
-        motion.scale(24),
-        motion.travel.easing,
-      )
-    : 0;
+  const { horizontal, vertical } = _getBookingTravel({
+    hasBooking,
+    frame,
+    index,
+    motion,
+  });
   const x = mix(
     horizontal,
     390 + requestedIndex * width,
@@ -100,5 +90,31 @@ export function getBookingFromFrame({
     hasBooking,
     vertical,
     use,
+  };
+}
+
+/** A booked request's move across to its agreed slot, then down, 0 to 1. */
+function _getBookingTravel({
+  hasBooking,
+  frame,
+  index,
+  motion,
+}: Readonly<Omit<Props, "input"> & { hasBooking: boolean }>) {
+  if (!hasBooking) {
+    return { horizontal: 0, vertical: 0 };
+  }
+  return {
+    horizontal: motion.ramp(
+      frame,
+      36 + index * motion.scaleStagger(3),
+      motion.scale(30),
+      motion.travel.easing,
+    ),
+    vertical: motion.ramp(
+      frame,
+      75 + index * motion.scaleStagger(3),
+      motion.scale(24),
+      motion.travel.easing,
+    ),
   };
 }

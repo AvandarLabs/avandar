@@ -25,12 +25,7 @@ export function RevenuePeriod({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const distribution = period.distributionActive
-    ? (period.receiptsMinor * input.arrangement.rateBasisPoints) / 10000
-    : 0;
-  const retained =
-    period.receiptsMinor - period.operatingOutflowMinor - distribution;
-  const amounts = [period.operatingOutflowMinor, distribution, retained];
+  const { distribution, retained, amounts } = _getPeriodAmounts(period, input);
   const reveal = motion.ramp(
     frame,
     index === 0 ? 12 : 96,
@@ -64,4 +59,18 @@ export function RevenuePeriod({
       />
     </g>
   );
+}
+
+/** The period's operating outflow, distribution, and retained receipts. */
+function _getPeriodAmounts(period: Props["period"], input: Input) {
+  const distribution = period.distributionActive
+    ? (period.receiptsMinor * input.arrangement.rateBasisPoints) / 10000
+    : 0;
+  const retained =
+    period.receiptsMinor - period.operatingOutflowMinor - distribution;
+  return {
+    distribution,
+    retained,
+    amounts: [period.operatingOutflowMinor, distribution, retained],
+  };
 }

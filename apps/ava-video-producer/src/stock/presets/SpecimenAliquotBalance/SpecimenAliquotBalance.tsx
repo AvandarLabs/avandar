@@ -3,6 +3,7 @@ import { AliquotCaption } from "./AliquotCaption";
 import { AliquotEquation } from "./AliquotEquation";
 import { AliquotLedger } from "./AliquotLedger";
 import { AliquotTube } from "./AliquotTube";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";
@@ -17,17 +18,11 @@ export function SpecimenAliquotBalance({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
+  const fill = (index: number) => {
+    return _getAliquotFill(frame, index, motion);
+  };
   const transferred = input.aliquots.reduce((total, aliquot, index) => {
-    return (
-      total +
-      aliquot.volume *
-        motion.ramp(
-          frame,
-          36 + index * motion.scaleStagger(12),
-          motion.scale(24),
-          motion.entrance.easing,
-        )
-    );
+    return total + aliquot.volume * fill(index);
   }, 0);
   return (
     <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
@@ -47,15 +42,7 @@ export function SpecimenAliquotBalance({
             tube={aliquot}
             parentId={input.parent.id}
             x={250 + index * 130}
-            volume={
-              aliquot.volume *
-              motion.ramp(
-                frame,
-                36 + index * motion.scaleStagger(12),
-                motion.scale(24),
-                motion.entrance.easing,
-              )
-            }
+            volume={aliquot.volume * fill(index)}
             showIdentity={input.showLineage}
             accent={accent}
             isChild
@@ -67,5 +54,19 @@ export function SpecimenAliquotBalance({
         <AliquotEquation input={input} />
       ) : undefined}
     </g>
+  );
+}
+
+/** How far an aliquot's transfer has run, 0 to 1, staggered by tube. */
+function _getAliquotFill(
+  frame: number,
+  index: number,
+  motion: VideoMotion,
+): number {
+  return motion.ramp(
+    frame,
+    36 + index * motion.scaleStagger(12),
+    motion.scale(24),
+    motion.entrance.easing,
   );
 }

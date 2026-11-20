@@ -18,7 +18,6 @@ type Props = { frame: number; input: Input };
 export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const y = mix(motion.reveal(frame, 36), -54, 16);
   return (
     <g data-brief-content="retained">
@@ -46,19 +45,31 @@ export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
                 breakLongWords
               />
             ) : (
-              <SketchedShape
-                shape={{
-                  kind: "path",
-                  d: `M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`,
-                }}
-                profile={tokens.sketch.shape}
-                stroke={tokens.color.inactive}
-                strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-              />
+              <BriefLinePlaceholder y={y} index={index} />
             )}
           </g>
         );
       })}
     </g>
+  );
+}
+
+/** Unlabelled strokes standing in for one line of the brief. */
+function BriefLinePlaceholder({
+  y,
+  index,
+}: Readonly<{ y: number; index: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M36 ${y + 24 + index * 48} h448 M36 ${y + 38 + index * 48} h336`,
+      }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

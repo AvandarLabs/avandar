@@ -17,17 +17,7 @@ export function WideLedgerCaptions({
   frame,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const omitted =
-    input.missingPolicy === "omit-with-ledger"
-      ? input.subjects.reduce((total, subject) => {
-          return (
-            total +
-            subject.values.filter(({ value }) => {
-              return value === null;
-            }).length
-          );
-        }, 0)
-      : 0;
+  const omitted = _countOmittedCells(input);
   const resultHeading = frame < 111 ? input.copy.source : input.copy.result;
   const omissionCaption = `${ledgerMessage.message}: ${omitted}`;
   return (
@@ -57,4 +47,19 @@ export function WideLedgerCaptions({
       </g>
     </g>
   );
+}
+
+/** How many missing cells the ledger records as omitted. */
+function _countOmittedCells(input: Input): number {
+  if (input.missingPolicy !== "omit-with-ledger") {
+    return 0;
+  }
+  return input.subjects.reduce((total, subject) => {
+    return (
+      total +
+      subject.values.filter(({ value }) => {
+        return value === null;
+      }).length
+    );
+  }, 0);
 }

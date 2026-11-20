@@ -31,18 +31,10 @@ export function ShelterTile({
       frame,
       motion,
     });
-  const roleKey = String(
-    ["sleeping", "circulation", "storage", "closed"].indexOf(tile.role) + 1,
-  );
   return (
     <g>
       {!isSleeping ? (
-        <SketchedShape
-          shape={{ kind: "path", d: `M${x} ${y + height}v${lift}h82v${-lift}` }}
-          profile={tokens.sketch.shape}
-          fill={tokens.color.surface}
-          stroke={tokens.color.line}
-        />
+        <CutawayLip x={x} y={y + height} lift={lift} />
       ) : undefined}
       <StockRect
         data-floor-tile={tile.id}
@@ -57,8 +49,36 @@ export function ShelterTile({
         stroke={isSleeping ? accent : tokens.color.highlight}
       />
       {!isSleeping ? (
-        <LabelSlots labels={[[roleKey, x + 32, y + 36, 30, 16, 1]]} />
+        <LabelSlots
+          labels={[
+            [_buildRoleKeyFromRole(tile.role), x + 32, y + 36, 30, 16, 1],
+          ]}
+        />
       ) : undefined}
     </g>
+  );
+}
+
+/** A role's number in the legend's order. */
+function _buildRoleKeyFromRole(role: Props["tile"]["role"]): string {
+  return String(
+    ["sleeping", "circulation", "storage", "closed"].indexOf(role) + 1,
+  );
+}
+
+/** The raised edge that exposes an excluded tile. */
+function CutawayLip({
+  x,
+  y,
+  lift,
+}: Readonly<{ x: number; y: number; lift: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M${x} ${y}v${lift}h82v${-lift}` }}
+      profile={tokens.sketch.shape}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
+    />
   );
 }

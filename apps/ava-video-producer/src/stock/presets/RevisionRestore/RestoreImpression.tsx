@@ -52,19 +52,32 @@ export function RestoreImpression({
       />
       {revision.content.map((line, lineIndex) => {
         return (
-          <SketchedShape
+          <ImpressionLine
             key={lineIndex}
-            shape={{
-              kind: "path",
-              d: `M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`,
-            }}
-            profile={tokens.sketch.shape}
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-            strokeOpacity={atomic.opacity["70"]}
+            d={`M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`}
+            accent={accent}
           />
         );
       })}
     </g>
+  );
+}
+
+/** One line of the snapshot's content, carried on the impression. */
+function ImpressionLine({
+  d,
+  accent,
+}: Readonly<{ d: string; accent: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d }}
+      profile={tokens.sketch.shape}
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      strokeOpacity={atomic.opacity["70"]}
+    />
   );
 }

@@ -17,9 +17,7 @@ export function FoundationBase({
   id,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const joining = motion.ramp(
     frame,
     72,
@@ -51,14 +49,26 @@ export function FoundationBase({
         <g clipPath={`url(#${clipId})`}>
           <FoundationCopy input={input} />
         </g>
-        <SketchedShape
-          shape={{ kind: "path", d: "M80 550 H880" }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          opacity={joining}
-        />
+        <FoundationGroundLine joining={joining} accent={accent} />
       </g>
     </g>
+  );
+}
+
+/** The ground line the pieces join along. */
+function FoundationGroundLine({
+  joining,
+  accent,
+}: Readonly<{ joining: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: "M80 550 H880" }}
+      profile={tokens.sketch.shape}
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      opacity={joining}
+    />
   );
 }

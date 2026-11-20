@@ -19,14 +19,7 @@ export function JigMarkingHand({ input, scene }: Readonly<Props>): ReactNode {
     return null;
   }
   const x = scene.centers[index];
-  const handX =
-    scene.guideX + (input.guide.pattern === "corner-mark" ? 11 : 70);
-  const handY =
-    scene.guideY + (input.guide.pattern === "corner-mark" ? 11 : 32);
-  const tool =
-    input.guide.pattern === "corner-mark"
-      ? `M${handX - 10} ${handY - 10} L${scene.guideX + 22} ${scene.guideY + 22}`
-      : `M${handX + 10} ${handY - 18} L${handX} ${handY}`;
+  const { handX, handY, tool } = _getMarkingHand(input, scene);
   return (
     <g>
       <SketchedShape
@@ -57,4 +50,18 @@ export function JigMarkingHand({ input, scene }: Readonly<Props>): ReactNode {
       />
     </g>
   );
+}
+
+/** The marking hand on the guide, and the tool it holds against the cutout. */
+function _getMarkingHand(input: Input, scene: Props["scene"]) {
+  const isCornerMark = input.guide.pattern === "corner-mark";
+  const handX = scene.guideX + (isCornerMark ? 11 : 70);
+  const handY = scene.guideY + (isCornerMark ? 11 : 32);
+  return {
+    handX,
+    handY,
+    tool: isCornerMark
+      ? `M${handX - 10} ${handY - 10} L${scene.guideX + 22} ${scene.guideY + 22}`
+      : `M${handX + 10} ${handY - 18} L${handX} ${handY}`,
+  };
 }

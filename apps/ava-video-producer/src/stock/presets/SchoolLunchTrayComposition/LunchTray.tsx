@@ -29,17 +29,7 @@ export function LunchTray({
   );
   return (
     <g data-lunch-learner={learner.id} transform={`translate(${x} 0)`}>
-      <FitText
-        text={learner.label}
-        x={0}
-        y={122}
-        width={132}
-        fontSize={14}
-        maxLines={3}
-        anchor="middle"
-        breakLongWords
-        normalizeWhitespace
-      />
+      <LearnerLabel text={learner.label} />
       <PersonGlyph x={0} y={190} size={32} color={accent} />
       <g data-tray-for={learner.id} transform={`translate(0 ${y})`}>
         {input.plannedComponents.map((component, componentIndex) => {
@@ -58,5 +48,21 @@ export function LunchTray({
         })}
       </g>
     </g>
+  );
+}
+
+function LearnerLabel({ text }: Readonly<{ text: string }>): ReactNode {
+  return (
+    <FitText
+      text={text}
+      x={0}
+      y={122}
+      width={132}
+      fontSize={14}
+      maxLines={3}
+      anchor="middle"
+      breakLongWords
+      normalizeWhitespace
+    />
   );
 }

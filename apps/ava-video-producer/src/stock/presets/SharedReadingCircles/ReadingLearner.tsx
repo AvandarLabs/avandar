@@ -31,7 +31,6 @@ export function ReadingLearner({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const { x, y, isCarrying, hasHand, handX, handY, bookId, seatAngle } =
     getReadingLearnerFromInput({
       input,
@@ -46,22 +45,7 @@ export function ReadingLearner({
         data-reader-book={bookId}
         transform={`translate(${x} ${y})`}
       >
-        <g data-reading-seat={learner.id}>
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: getReadingSeatPathFromFrame({
-                frame,
-                angle: seatAngle,
-                motion,
-              }),
-            }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={tokens.color.line}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-        </g>
+        <ReadingSeat learnerId={learner.id} frame={frame} angle={seatAngle} />
         <ReadingPerson
           learnerId={learner.id}
           accent={accent}
@@ -77,6 +61,31 @@ export function ReadingLearner({
         />
       </g>
       <ReadingRosterEntry learner={learner} index={index} />
+    </g>
+  );
+}
+
+/** The learner's seat, turning toward the circle. */
+function ReadingSeat({
+  learnerId,
+  frame,
+  angle,
+}: Readonly<{ learnerId: string; frame: number; angle: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  return (
+    <g data-reading-seat={learnerId}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: getReadingSeatPathFromFrame({ frame, angle, motion }),
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
     </g>
   );
 }

@@ -23,10 +23,7 @@ export function StratumRegion({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const eligible = input.sites.filter(propEq("stratumId", stratum.id));
-  const selected = eligible.filter((site) => {
-    return input.selectedSiteIds.includes(site.id);
-  });
+  const { eligible, selected } = _getStratumSites(input, stratum.id);
   const color = [
     accent,
     tokens.color.accentAlt,
@@ -45,16 +42,7 @@ export function StratumRegion({
         frame={frame}
         color={color}
       />
-      <text
-        x={40 + index * 230}
-        y={88}
-        fill={color}
-        fontSize={tokens.text.graphic.data.fontSize}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-      >
-        {index + 1}
-      </text>
+      <StratumKey index={index} color={color} />
       <LabelSlots
         labels={[
           [stratum.label, 60 + index * 230, 88, 195, 12, 3],
@@ -70,4 +58,35 @@ export function StratumRegion({
       />
     </g>
   );
+}
+
+/** The stratum's number at the head of its caption. */
+function StratumKey({
+  index,
+  color,
+}: Readonly<{ index: number; color: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={40 + index * 230}
+      y={88}
+      fill={color}
+      fontSize={tokens.text.graphic.data.fontSize}
+      fontFamily={tokens.text.graphic.data.fontFamily}
+      fontWeight={tokens.text.graphic.data.fontWeight}
+    >
+      {index + 1}
+    </text>
+  );
+}
+
+/** The stratum's eligible sites, and those of them selected. */
+function _getStratumSites(input: Input, stratumId: string) {
+  const eligible = input.sites.filter(propEq("stratumId", stratumId));
+  return {
+    eligible,
+    selected: eligible.filter((site) => {
+      return input.selectedSiteIds.includes(site.id);
+    }),
+  };
 }

@@ -47,28 +47,45 @@ export function EnvelopeFlaps({
       />
       {frame >= 66 ? <EnvelopeCover opening={opening} /> : undefined}
       {frame >= 56 ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M0 0 L268 ${mix(final * (1 - opening), -84, 134)} L536 0 z`,
-          }}
-          profile={tokens.sketch.shape}
-          data-final-flap="opaque"
-          fill={tokens.color.surface}
-          stroke={accent}
-        />
+        <FinalFlap fold={final * (1 - opening)} accent={accent} />
       ) : undefined}
-      {frame >= 66 && opening === 0 ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: "M0 266 L268 134 L536 266 M0 0 L268 134 L536 0",
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={tokens.color.line}
-        />
-      ) : undefined}
+      {frame >= 66 && opening === 0 ? <FlapCreases /> : undefined}
     </g>
+  );
+}
+
+/** The creases where the closed flaps meet. */
+function FlapCreases(): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: "M0 266 L268 134 L536 266 M0 0 L268 134 L536 0",
+      }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={tokens.color.line}
+    />
+  );
+}
+
+/** The opaque top flap, folding down last to close the cover. */
+function FinalFlap({
+  fold,
+  accent,
+}: Readonly<{ fold: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M0 0 L268 ${mix(fold, -84, 134)} L536 0 z`,
+      }}
+      profile={tokens.sketch.shape}
+      data-final-flap="opaque"
+      fill={tokens.color.surface}
+      stroke={accent}
+    />
   );
 }

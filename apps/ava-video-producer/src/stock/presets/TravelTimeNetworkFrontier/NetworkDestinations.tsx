@@ -46,22 +46,36 @@ export function NetworkDestinations({
               labels={[[node.label, 575, 156 + index * 54, 210, 14, 3]]}
             />
             {input.showCosts ? (
-              <text
-                data-cost-label={node.id}
-                x={890}
-                y={156 + index * 54}
-                fill={tokens.color.text}
-                textAnchor="end"
-                fontSize={tokens.text.graphic.secondary.fontSize}
-                fontFamily={tokens.text.graphic.secondary.fontFamily}
-                fontWeight={tokens.text.graphic.secondary.fontWeight}
-              >
-                {node.cost}
-              </text>
+              <CostLabel node={node} index={index} />
             ) : undefined}
           </g>
         );
       })}
     </g>
+  );
+}
+
+/** The destination's shortest travel cost, right-aligned in the ledger. */
+function CostLabel({
+  node,
+  index,
+}: Readonly<{
+  node: ReturnType<typeof getTravelCostsFromInput>[number];
+  index: number;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      data-cost-label={node.id}
+      x={890}
+      y={156 + index * 54}
+      fill={tokens.color.text}
+      textAnchor="end"
+      fontSize={tokens.text.graphic.secondary.fontSize}
+      fontFamily={tokens.text.graphic.secondary.fontFamily}
+      fontWeight={tokens.text.graphic.secondary.fontWeight}
+    >
+      {node.cost}
+    </text>
   );
 }

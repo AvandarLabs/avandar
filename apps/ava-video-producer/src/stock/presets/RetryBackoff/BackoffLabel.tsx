@@ -30,28 +30,41 @@ export function BackoffLabel({
         fill={tokens.color.surface}
       />
       {input.showAttemptLabels ? (
-        <FitText
-          text={attempt.label}
-          x={slotX + 8}
-          y={440}
-          width={174}
-          fontSize={14}
-          maxLines={3}
-          normalizeWhitespace
-          breakLongWords
-        />
+        <SlotText text={attempt.label} slotX={slotX} y={440} />
       ) : undefined}
-      <FitText
+      <SlotText
         text={input.outcomeLabels[attempt.outcome]}
-        x={slotX + 8}
+        slotX={slotX}
         y={510}
-        width={174}
-        fontSize={14}
-        maxLines={3}
-        normalizeWhitespace
-        breakLongWords
         color={isFinal ? accent : tokens.color.textMuted}
       />
     </g>
+  );
+}
+
+/** One fitted line of text inside an attempt's label slot. */
+function SlotText({
+  text,
+  slotX,
+  y,
+  color,
+}: Readonly<{
+  text: string;
+  slotX: number;
+  y: number;
+  color?: string;
+}>): ReactNode {
+  return (
+    <FitText
+      text={text}
+      x={slotX + 8}
+      y={y}
+      width={174}
+      fontSize={14}
+      maxLines={3}
+      normalizeWhitespace
+      breakLongWords
+      color={color}
+    />
   );
 }

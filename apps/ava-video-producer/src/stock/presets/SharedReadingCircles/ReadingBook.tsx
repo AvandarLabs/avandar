@@ -29,8 +29,6 @@ export function ReadingBook({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const group = input.readingGroups[groupIndex];
   const book = input.books.find(propEq("id", group.bookId))!;
   const { tableX, bookX, bookY } = getReadingGeometryFromInput({
@@ -41,19 +39,7 @@ export function ReadingBook({
   });
   return (
     <g>
-      <SketchedShape
-        shape={{
-          kind: "ellipse",
-          cx: tableX,
-          cy: 330,
-          rx: TABLE_RADIUS_X,
-          ry: TABLE_RADIUS_Y,
-        }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
-      />
+      <ReadingTable tableX={tableX} />
       <PhysicalReadingBook
         bookId={book.id}
         groupIndex={groupIndex}
@@ -70,5 +56,25 @@ export function ReadingBook({
         tableX={tableX}
       />
     </g>
+  );
+}
+
+function ReadingTable({ tableX }: Readonly<{ tableX: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "ellipse",
+        cx: tableX,
+        cy: 330,
+        rx: TABLE_RADIUS_X,
+        ry: TABLE_RADIUS_Y,
+      }}
+      profile={tokens.sketch.shape}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
+    />
   );
 }

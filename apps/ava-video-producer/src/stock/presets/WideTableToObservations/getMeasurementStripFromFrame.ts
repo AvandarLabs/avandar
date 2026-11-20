@@ -46,17 +46,9 @@ export function getMeasurementStripFromFrame({
 }: Readonly<Params>): GetMeasurementStripFromFrameResult {
   const subject = input.subjects[subjectIndex],
     measure = input.measures[measureIndex];
-  const value = subject.values.find(({ measureId }) => {
-    return measureId === measure.id;
-  })!.value;
+  const value = _findMeasureValue(subject, measure.id);
   const sourceIndex = measureIndex * 2 + subjectIndex;
-  const prior = _getOrderedValues(input).slice(0, sourceIndex);
-  const outputIndex =
-    input.missingPolicy === "retain-missing-row"
-      ? sourceIndex
-      : prior.filter((item) => {
-          return item !== null;
-        }).length;
+  const outputIndex = _getOutputIndex(input, sourceIndex);
   const isOmitted =
     value === null && input.missingPolicy === "omit-with-ledger";
   const progress = motion.ramp(
@@ -88,4 +80,28 @@ export function getMeasurementStripFromFrame({
       motion.reveal(frame, 13 + sourceIndex * motion.stagger.list) *
       (isOmitted ? 1 - motion.ramp(frame, 100, motion.scale(10)) : 1),
   };
+}
+
+/**
+ * A strip's row in the long table: its source order, or that order counting
+ * only present values when missing rows are omitted.
+ */
+function _getOutputIndex(input: Input, sourceIndex: number): number {
+  if (input.missingPolicy === "retain-missing-row") {
+    return sourceIndex;
+  }
+  return _getOrderedValues(input)
+    .slice(0, sourceIndex)
+    .filter((item) => {
+      return item !== null;
+    }).length;
+}
+
+function _findMeasureValue(
+  subject: Input["subjects"][number],
+  measureId: string,
+): number | null {
+  return subject.values.find((entry) => {
+    return entry.measureId === measureId;
+  })!.value;
 }

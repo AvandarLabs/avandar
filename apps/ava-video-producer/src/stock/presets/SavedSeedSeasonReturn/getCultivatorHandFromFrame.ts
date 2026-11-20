@@ -23,17 +23,28 @@ function _travel({
   const progress = motion.ramp(frame, at, duration, motion.travel.easing);
   return { x: mix(progress, from.x, to.x), y: mix(progress, from.y, to.y) };
 }
+type SowingHandArgs = Readonly<{
+  scene: ReturnType<typeof getSeedSceneFromFrame>;
+  frame: number;
+  lossEnd: Point;
+  motion: VideoMotion;
+}>;
+
+/** The hand drawing the furrow across the plot. */
+function _getFurrowHand(frame: number, motion: VideoMotion): Hand {
+  return {
+    x: 738 + 180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
+    y: 399,
+    action: "furrow",
+  };
+}
+
 function _getSowingHand({
   scene,
   frame,
   lossEnd,
   motion,
-}: Readonly<{
-  scene: ReturnType<typeof getSeedSceneFromFrame>;
-  frame: number;
-  lossEnd: Point;
-  motion: VideoMotion;
-}>): Hand {
+}: SowingHandArgs): Hand {
   const { sown, remaining, scale } = scene;
   if (sown === 0) {
     return lossEnd;
@@ -49,13 +60,7 @@ function _getSowingHand({
     });
   }
   if (frame <= 116) {
-    return {
-      x:
-        738 +
-        180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
-      y: 399,
-      action: "furrow",
-    };
+    return _getFurrowHand(frame, motion);
   }
   if (frame < 124) {
     return _travel({

@@ -18,28 +18,11 @@ export function RetryBackoff({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const state = getBackoffStateFromInputAndFrame({ motion, frame, input });
   return (
     <g opacity={motion.reveal(frame, 12)}>
-      <FitText
-        text={input.operationLabel}
-        x={40}
-        y={72}
-        width={880}
-        maxLines={2}
-        fontSize={24}
-        normalizeWhitespace
-        breakLongWords
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: "M80 310 H880" }}
-        profile={tokens.sketch.shape}
-        stroke={accent}
-        strokeOpacity={atomic.opacity["24"]}
-      />
+      <OperationHeading label={input.operationLabel} accent={accent} />
       {state.markers.map((marker) => {
         return (
           <BackoffAttempt
@@ -59,5 +42,34 @@ export function RetryBackoff({
         fill={accent}
       />
     </g>
+  );
+}
+
+/** The operation's name over the faint timeline its attempts sit on. */
+function OperationHeading({
+  label,
+  accent,
+}: Readonly<{ label: string; accent: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <>
+      <FitText
+        text={label}
+        x={40}
+        y={72}
+        width={880}
+        maxLines={2}
+        fontSize={24}
+        normalizeWhitespace
+        breakLongWords
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M80 310 H880" }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeOpacity={atomic.opacity["24"]}
+      />
+    </>
   );
 }

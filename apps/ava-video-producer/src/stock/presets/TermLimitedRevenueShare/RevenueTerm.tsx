@@ -29,23 +29,7 @@ export function RevenueTerm({
   const y = input.arrangementLayout === "stacked" ? 240 : 355;
   return (
     <g>
-      <g
-        data-term-turn="true"
-        transform={`translate(${x} ${y}) rotate(${mix(turning, 0, 90)})`}
-      >
-        <SketchedShape
-          shape={{ kind: "path", d: "M-18 0 H18 M0 -18 V18" }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.highlight}
-          strokeWidth={scales.stroke(tokens.stroke.heavy)}
-        />
-        <SketchedShape
-          shape={{ kind: "path", d: "M-16 -18 Q24 -18 24 12" }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.highlight}
-          fill="none"
-        />
-      </g>
+      <TermTurn x={x} y={y} turning={turning} />
       <SketchedShape
         shape={{
           kind: "path",
@@ -68,6 +52,35 @@ export function RevenueTerm({
             4,
           ],
         ]}
+      />
+    </g>
+  );
+}
+
+/** The term boundary's handle, turning a quarter to close the outlet. */
+function TermTurn({
+  x,
+  y,
+  turning,
+}: Readonly<{ x: number; y: number; turning: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g
+      data-term-turn="true"
+      transform={`translate(${x} ${y}) rotate(${mix(turning, 0, 90)})`}
+    >
+      <SketchedShape
+        shape={{ kind: "path", d: "M-18 0 H18 M0 -18 V18" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M-16 -18 Q24 -18 24 12" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        fill="none"
       />
     </g>
   );

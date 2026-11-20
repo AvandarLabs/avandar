@@ -44,20 +44,27 @@ export function UncertaintyReference({
             stroke={tokens.color.highlight}
             fill="none"
           />
-          <FitText
-            text={input.reference.label}
-            x={480}
-            y={182}
-            width={760}
-            fontSize={16}
-            maxLines={2}
-            anchor="middle"
-            breakLongWords
-            normalizeWhitespace
-            color={tokens.color.highlight}
-          />
+          <ReferenceLabel text={input.reference.label} />
         </g>
       ) : undefined}
     </>
+  );
+}
+
+function ReferenceLabel({ text }: Readonly<{ text: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <FitText
+      text={text}
+      x={480}
+      y={182}
+      width={760}
+      fontSize={16}
+      maxLines={2}
+      anchor="middle"
+      breakLongWords
+      normalizeWhitespace
+      color={tokens.color.highlight}
+    />
   );
 }

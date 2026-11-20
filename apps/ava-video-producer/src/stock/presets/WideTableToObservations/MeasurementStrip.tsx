@@ -24,9 +24,7 @@ export function MeasurementStrip({
   subjectIndex,
   measureIndex,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
   const scene = getMeasurementStripFromFrame({
     motion,
     input,
@@ -36,24 +34,10 @@ export function MeasurementStrip({
   });
   return (
     <g opacity={scene.opacity}>
-      <StockRect
-        data-transfer-measurement={`${subjectIndex}:${measureIndex}`}
-        data-observation={
-          !scene.isOmitted
-            ? `${scene.subject.id}:${scene.measure.id}`
-            : undefined
-        }
-        data-missing={scene.value === null ? "true" : undefined}
-        data-subject-id={scene.subject.id}
-        data-measure-id={scene.measure.id}
-        data-source-value={scene.value ?? "missing"}
-        x={scene.x}
-        y={scene.y - 22}
-        width={scene.width}
-        height={76}
-        fill={tokens.color.surface}
-        fillOpacity={atomic.opacity["80"]}
-        stroke={accent}
+      <StripCard
+        scene={scene}
+        cellKey={`${subjectIndex}:${measureIndex}`}
+        accent={accent}
       />
       <MeasurementStripLabels
         scene={scene}
@@ -62,5 +46,38 @@ export function MeasurementStrip({
         measureIndex={measureIndex}
       />
     </g>
+  );
+}
+
+/** The strip's card, keyed to its source cell and resulting observation. */
+function StripCard({
+  scene,
+  cellKey,
+  accent,
+}: Readonly<{
+  scene: ReturnType<typeof getMeasurementStripFromFrame>;
+  cellKey: string;
+  accent: string;
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <StockRect
+      data-transfer-measurement={cellKey}
+      data-observation={
+        !scene.isOmitted ? `${scene.subject.id}:${scene.measure.id}` : undefined
+      }
+      data-missing={scene.value === null ? "true" : undefined}
+      data-subject-id={scene.subject.id}
+      data-measure-id={scene.measure.id}
+      data-source-value={scene.value ?? "missing"}
+      x={scene.x}
+      y={scene.y - 22}
+      width={scene.width}
+      height={76}
+      fill={tokens.color.surface}
+      fillOpacity={atomic.opacity["80"]}
+      stroke={accent}
+    />
   );
 }

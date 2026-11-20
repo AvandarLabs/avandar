@@ -54,6 +54,12 @@ function _createCells({
     };
   });
 }
+type GridSceneArgs = Readonly<{
+  input: Input;
+  frame: number;
+  motion: Pick<VideoMotion, "ramp" | "scale" | "travel" | "stagger">;
+}>;
+
 /**
  * Assign each observation once, then move its token to a distinct ledger slot.
  */
@@ -61,17 +67,23 @@ export function makeGridSceneFromInputAndFrame({
   input,
   frame,
   motion,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  motion: Pick<VideoMotion, "ramp" | "scale" | "travel" | "stagger">;
-}>): {
+}: GridSceneArgs): {
   points: CountToken[];
   cells: CellCount[];
 } {
-  const { columns, rows } = input.grid;
   const assignments = _getAssignments(input);
-  const points = input.points.map((point, index) => {
+  const points = _createCountTokens({ input, frame, motion }, assignments);
+  const cells = _createCells({ input, assignments, points });
+  return { points, cells };
+}
+
+/** Each observation's token, moving from its source into its cell's slot. */
+function _createCountTokens(
+  { input, frame, motion }: GridSceneArgs,
+  assignments: readonly number[],
+): CountToken[] {
+  const { columns, rows } = input.grid;
+  return input.points.map((point, index) => {
     const cell = assignments[index];
     const rank = assignments.slice(0, index).filter((assigned) => {
       return assigned === cell;
@@ -104,6 +116,4 @@ export function makeGridSceneFromInputAndFrame({
       ),
     };
   });
-  const cells = _createCells({ input, assignments, points });
-  return { points, cells };
 }

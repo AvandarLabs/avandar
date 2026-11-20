@@ -27,8 +27,6 @@ export function SampleSite({
   selected,
   showLabel,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const lift = selected
     ? 14 * motion.ramp(frame, 36, motion.scale(72), motion.travel.easing)
@@ -38,13 +36,7 @@ export function SampleSite({
   const railY = 162 + index * 26;
   return (
     <g data-site={site.id} data-selected-site={selected}>
-      <SketchedShape
-        shape={{ kind: "path", d: `M${x} ${y} L628 ${railY}` }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={tokens.color.inactive}
-        strokeOpacity={atomic.opacity["20"]}
-      />
+      <SiteLeader x={x} y={y} railY={railY} />
       <SiteAnchor
         siteId={site.id}
         x={x}
@@ -63,5 +55,24 @@ export function SampleSite({
         <LabelSlots labels={[[site.label, 660, railY + 4, 282, 12, 1]]} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The faint leader from a site to its row on the key rail. */
+function SiteLeader({
+  x,
+  y,
+  railY,
+}: Readonly<{ x: number; y: number; railY: number }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M${x} ${y} L628 ${railY}` }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={tokens.color.inactive}
+      strokeOpacity={atomic.opacity["20"]}
+    />
   );
 }

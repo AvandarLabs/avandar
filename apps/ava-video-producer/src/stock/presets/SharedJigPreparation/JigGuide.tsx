@@ -13,7 +13,6 @@ type Props = { input: Input; scene: ReturnType<typeof getJigSceneFromFrame> };
 /** One reusable guide keeps its label, selected pattern and holding hand. */
 export function JigGuide({ input, scene }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <FitText
@@ -37,10 +36,21 @@ export function JigGuide({ input, scene }: Readonly<Props>): ReactNode {
           color={tokens.color.highlight}
         />
       </g>
+      <GuideCarryArm guideX={scene.guideX} />
+    </g>
+  );
+}
+
+/** The arm and hand holding the guide. */
+function GuideCarryArm({ guideX }: Readonly<{ guideX: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <SketchedShape
         shape={{
           kind: "path",
-          d: `M${scene.guideX} 440 L${scene.guideX - 20} 430 L${scene.guideX} 382`,
+          d: `M${guideX} 440 L${guideX - 20} 430 L${guideX} 382`,
         }}
         profile={tokens.sketch.shape}
         data-carry-arm="true"
@@ -50,11 +60,11 @@ export function JigGuide({ input, scene }: Readonly<Props>): ReactNode {
       />
       <circle
         data-guide-hand="true"
-        cx={scene.guideX}
+        cx={guideX}
         cy={382}
         r={5}
         fill={tokens.color.highlight}
       />
-    </g>
+    </>
   );
 }

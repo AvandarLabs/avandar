@@ -20,12 +20,35 @@ export function VaccinationSessionBalance({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <SessionHeadings input={input} />
       <SessionCarrier frame={frame} accent={accent} />
+      <SessionFurniture />
+      <SessionRecipients input={input} frame={frame} accent={accent} />
+      {input.units.map((unit, index) => {
+        return (
+          <DoseToken
+            key={unit.id}
+            input={input}
+            unit={unit}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      <SessionTotals input={input} frame={frame} />
+    </g>
+  );
+}
+
+/** The session area and the remaining and discarded trays. */
+function SessionFurniture(): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <StockRect
         x={280}
         y={180}
@@ -44,20 +67,6 @@ export function VaccinationSessionBalance({
         fill="none"
         stroke={tokens.color.line}
       />
-      <SessionRecipients input={input} frame={frame} accent={accent} />
-      {input.units.map((unit, index) => {
-        return (
-          <DoseToken
-            key={unit.id}
-            input={input}
-            unit={unit}
-            index={index}
-            frame={frame}
-            accent={accent}
-          />
-        );
-      })}
-      <SessionTotals input={input} frame={frame} />
-    </g>
+    </>
   );
 }

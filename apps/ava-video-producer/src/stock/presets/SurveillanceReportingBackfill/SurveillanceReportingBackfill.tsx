@@ -22,9 +22,6 @@ export function SurveillanceReportingBackfill({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const earlier = input.records.filter(propEq("firstSnapshot", 0)).length;
   return (
     <g data-earlier-total={earlier} data-revised-total={input.records.length}>
@@ -42,17 +39,7 @@ export function SurveillanceReportingBackfill({
           [input.copy.unit, 670, 548, 230, 12, 4],
         ]}
       />
-      <g data-reporting-tab="">
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${mix(motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing), 60, 500)} 198h380`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
-      </g>
+      <ReportingTab frame={frame} accent={accent} />
       <BackfillChart input={input} frame={frame} accent={accent} />
       {input.records.map((record, index) => {
         return (
@@ -65,6 +52,29 @@ export function SurveillanceReportingBackfill({
           />
         );
       })}
+    </g>
+  );
+}
+
+/** The tab sliding from the earlier total to the revised one. */
+function ReportingTab({
+  frame,
+  accent,
+}: Readonly<{ frame: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-reporting-tab="">
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${mix(motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing), 60, 500)} 198h380`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
     </g>
   );
 }

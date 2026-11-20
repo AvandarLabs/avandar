@@ -36,18 +36,11 @@ export function PracticePeople({
         r={7}
         fill={tokens.color.accentAlt}
       />
-      <g data-support-gesture={input.finalStepSupport}>
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${companionX} 390 L${companionX + mix(finalStep, 20, input.finalStepSupport === "alongside" ? 40 : 12)} ${mix(finalStep, 398, input.finalStepSupport === "alongside" ? 385 : 405)}`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.accentAlt}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          fill="none"
-        />
-      </g>
+      <SupportGesture
+        support={input.finalStepSupport}
+        companionX={companionX}
+        finalStep={finalStep}
+      />
       <PersonGlyph x={learnerX} y={390} color={accent} />
       <circle data-learner="" cx={learnerX} cy={376} r={7} fill={accent} />
       <g data-locker-hand="">
@@ -65,6 +58,34 @@ export function PracticePeople({
         />
       </g>
       <PracticeStrip input={input} learnerX={learnerX} accent={accent} />
+    </g>
+  );
+}
+
+/** The companion's arm, alongside the learner or behind on the last step. */
+function SupportGesture({
+  support,
+  companionX,
+  finalStep,
+}: Readonly<{
+  support: Input["finalStepSupport"];
+  companionX: number;
+  finalStep: number;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-support-gesture={support}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${companionX} 390 L${companionX + mix(finalStep, 20, support === "alongside" ? 40 : 12)} ${mix(finalStep, 398, support === "alongside" ? 385 : 405)}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        fill="none"
+      />
     </g>
   );
 }

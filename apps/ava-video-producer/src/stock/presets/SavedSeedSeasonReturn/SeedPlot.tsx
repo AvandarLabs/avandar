@@ -47,25 +47,35 @@ export function SeedPlot({ scene, frame, accent }: Readonly<Props>): ReactNode {
           fill="none"
         />
       </g>
-      {scene.sown > 0 ? (
-        <g data-furrow="">
-          <SketchedShape
-            shape={{
-              kind: "line",
-              x1: 738,
-              y1: 399,
-              x2:
-                738 +
-                180 *
-                  motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
-              y2: 399,
-            }}
-            profile={tokens.sketch.shape}
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-        </g>
-      ) : undefined}
+      {scene.sown > 0 ? <Furrow frame={frame} accent={accent} /> : undefined}
+    </g>
+  );
+}
+
+/** The sowing furrow, drawn across the plot. */
+function Furrow({
+  frame,
+  accent,
+}: Readonly<{ frame: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-furrow="">
+      <SketchedShape
+        shape={{
+          kind: "line",
+          x1: 738,
+          y1: 399,
+          x2:
+            738 +
+            180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
+          y2: 399,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
     </g>
   );
 }
