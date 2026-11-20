@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   copyCatalogParquet,
   getCopyArgsRefusal,
+  getCopyExitCode,
   getCopySetupFromEnv,
   getListingIdFromCachePath,
   getTargetHostFromArgs,
@@ -34,6 +35,10 @@ type FakeProjectOptions = {
   listings?: readonly CatalogParquetListing[];
   hasBucket?: boolean;
   failingUploadPaths?: readonly string[];
+  /** The most rows the fake server returns per page, like `max_rows`. */
+  maxRowsPerPage?: number;
+  /** The listing count the fake reports, when it differs from `listings`. */
+  listingCount?: number;
 };
 
 function _sha256(text: string): string {
@@ -127,11 +132,12 @@ function _createFakeBucket(
         return { data: null, error: { message: "Bucket not found" } };
       }
       const offset = listOptions.offset ?? 0;
+      const limit = Math.min(
+        listOptions.limit,
+        options.maxRowsPerPage ?? listOptions.limit,
+      );
       return {
-        data: _listEntries(objects, prefix).slice(
-          offset,
-          offset + listOptions.limit,
-        ),
+        data: _listEntries(objects, prefix).slice(offset, offset + limit),
         error: null,
       };
     },
@@ -201,10 +207,76 @@ function _createFakeProject(options: FakeProjectOptions) {
       if (options.role === "source") {
         violations.push("source.listListings");
       }
-      return { data: listings.slice(range.from, range.to + 1), error: null };
+      const limit = Math.min(
+        range.to - range.from + 1,
+        options.maxRowsPerPage ?? Infinity,
+      );
+      return {
+        data: listings.slice(range.from, range.from + limit),
+        error: null,
+      };
+    },
+    countListings: async () => {
+      if (options.role === "source") {
+        violations.push("source.countListings");
+      }
+      return { count: options.listingCount ?? listings.length, error: null };
     },
   };
   return { client, objects, uploads, listedPrefixes, violations };
+}
+
+function _cachePartPath(index: number): string {
+  const part = String(index).padStart(5, "0");
+  return `catalog-cache/${LISTING_A}/build-2/part-${part}.parquet`;
+}
+
+/** A source bucket's objects: `count` parts of LISTING_A's build-2 folder. */
+function _cacheParts(count: number): Record<string, string> {
+  return Object.fromEntries(
+    Array.from({ length: count }, (_value, index) => {
+      return [_cachePartPath(index), String(index)];
+    }),
+  );
+}
+
+/** A target listing whose cache folder is another listing's. */
+function _createForeignFolderProjects() {
+  const source = _createFakeProject({
+    role: "source",
+    objects: {
+      [`catalog-cache/${LISTING_B}/build-1/part-00000.parquet`]: "b",
+    },
+  });
+  const target = _createFakeProject({
+    role: "target",
+    listings: [
+      _cacheListing({
+        parquet_cache_folder_path: `catalog-cache/${LISTING_B}/build-1`,
+      }),
+    ],
+  });
+  return [source, target] as const;
+}
+
+/**
+ * Projects where one run copies a part, finds another already there, and
+ * replaces a pipeline object whose bytes differ, taking every write path.
+ */
+function _createEveryPathProjects() {
+  const source = _createFakeProject({
+    role: "source",
+    objects: { ..._cacheParts(2), [PIPELINE_PATH]: "wdi" },
+  });
+  const target = _createFakeProject({
+    role: "target",
+    objects: { [_cachePartPath(0)]: "", [PIPELINE_PATH]: "stale" },
+    listings: [
+      _cacheListing({ parquet_cache_part_count: 2 }),
+      _pipelineListing({ parquet_sha256: _sha256("wdi") }),
+    ],
+  });
+  return [source, target] as const;
 }
 
 function _decode(body: Uint8Array | undefined): string | undefined {
@@ -240,7 +312,7 @@ describe("getListingIdFromCachePath", () => {
 });
 
 describe("copyCatalogParquet prebuilt copies", () => {
-  it("copies only the build folder the listing names, with the cache upload options", async () => {
+  it("copies only the build folder the listing names", async () => {
     const source = _createFakeProject({
       role: "source",
       objects: {
@@ -258,6 +330,22 @@ describe("copyCatalogParquet prebuilt copies", () => {
     expect([...target.objects.keys()]).toEqual([
       `catalog-cache/${LISTING_A}/build-2/part-00000.parquet`,
     ]);
+  });
+
+  it("uploads cache parts as Parquet cached for a year, without upsert", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: {
+        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "new",
+      },
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_cacheListing()],
+    });
+
+    await _copy(source, target);
+
     expect(target.uploads[0]!.options).toEqual({
       contentType: "application/vnd.apache.parquet",
       cacheControl: "31536000",
@@ -288,16 +376,10 @@ describe("copyCatalogParquet prebuilt copies", () => {
   });
 
   it("copies every part of a build folder holding more than one list page", async () => {
-    const objects = Object.fromEntries(
-      Array.from({ length: 1005 }, (_value, index) => {
-        const part = String(index).padStart(5, "0");
-        return [
-          `catalog-cache/${LISTING_A}/build-2/part-${part}.parquet`,
-          part,
-        ];
-      }),
-    );
-    const source = _createFakeProject({ role: "source", objects });
+    const source = _createFakeProject({
+      role: "source",
+      objects: _cacheParts(1005),
+    });
     const target = _createFakeProject({
       role: "target",
       listings: [_cacheListing({ parquet_cache_part_count: 1005 })],
@@ -305,15 +387,30 @@ describe("copyCatalogParquet prebuilt copies", () => {
 
     const counts = await _copy(source, target);
 
-    expect(counts).toMatchObject({ copied: 1005, failed: 0 });
+    expect(counts.copied).toBe(1005);
+  });
+
+  it("copies every part when Storage returns fewer objects per page than asked", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: _cacheParts(7),
+      maxRowsPerPage: 3,
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_cacheListing({ parquet_cache_part_count: 7 })],
+      maxRowsPerPage: 3,
+    });
+
+    const counts = await _copy(source, target);
+
+    expect(counts).toMatchObject({ copied: 7, failed: 0 });
   });
 
   it("counts parts the target already has as present on a re-run", async () => {
     const source = _createFakeProject({
       role: "source",
-      objects: {
-        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "a",
-      },
+      objects: _cacheParts(1),
     });
     const target = _createFakeProject({
       role: "target",
@@ -323,41 +420,45 @@ describe("copyCatalogParquet prebuilt copies", () => {
 
     const rerunCounts = await _copy(source, target);
 
-    expect(rerunCounts).toEqual({
-      listings: 1,
-      copied: 0,
-      alreadyPresent: 1,
-      replaced: 0,
-      failed: 0,
-    });
+    expect(rerunCounts).toMatchObject({ copied: 0, alreadyPresent: 1 });
   });
 
-  it("keeps copying after an upload fails and counts the failure", async () => {
-    const failingPath = `catalog-cache/${LISTING_A}/build-2/part-00000.parquet`;
+  it("copies the other parts when one part's upload fails", async () => {
     const source = _createFakeProject({
       role: "source",
-      objects: {
-        [failingPath]: "a0",
-        [`catalog-cache/${LISTING_A}/build-2/part-00001.parquet`]: "a1",
-      },
+      objects: _cacheParts(2),
     });
     const target = _createFakeProject({
       role: "target",
       listings: [_cacheListing({ parquet_cache_status: "failed" })],
-      failingUploadPaths: [failingPath],
+      failingUploadPaths: [_cachePartPath(0)],
     });
 
     const counts = await _copy(source, target);
 
-    expect(counts).toMatchObject({ copied: 1, failed: 1 });
+    expect(counts.copied).toBe(1);
+  });
+
+  it("counts a part whose upload fails as failed", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: _cacheParts(2),
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_cacheListing({ parquet_cache_status: "failed" })],
+      failingUploadPaths: [_cachePartPath(0)],
+    });
+
+    const counts = await _copy(source, target);
+
+    expect(counts.failed).toBe(1);
   });
 
   it("fails a ready copy that ends with fewer parts in the target than parquet_cache_part_count", async () => {
     const source = _createFakeProject({
       role: "source",
-      objects: {
-        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "a",
-      },
+      objects: _cacheParts(1),
     });
     const target = _createFakeProject({
       role: "target",
@@ -366,34 +467,26 @@ describe("copyCatalogParquet prebuilt copies", () => {
 
     const counts = await _copy(source, target);
 
-    expect(counts).toMatchObject({ copied: 1, failed: 1 });
+    expect(counts.failed).toBe(1);
   });
 
-  it("fails a listing whose cache folder belongs to another listing, copying nothing", async () => {
-    const source = _createFakeProject({
-      role: "source",
-      objects: {
-        [`catalog-cache/${LISTING_B}/build-1/part-00000.parquet`]: "b",
-      },
-    });
-    const target = _createFakeProject({
-      role: "target",
-      listings: [
-        _cacheListing({
-          parquet_cache_folder_path: `catalog-cache/${LISTING_B}/build-1`,
-        }),
-      ],
-    });
-
-    const counts = await _copy(source, target);
+  it("fails a listing whose cache folder belongs to another listing", async () => {
+    const counts = await _copy(..._createForeignFolderProjects());
 
     expect(counts).toMatchObject({ copied: 0, failed: 1 });
+  });
+
+  it("uploads nothing for a listing whose cache folder belongs to another listing", async () => {
+    const [source, target] = _createForeignFolderProjects();
+
+    await _copy(source, target);
+
     expect(target.uploads).toEqual([]);
   });
 });
 
 describe("copyCatalogParquet pipeline_parquet objects", () => {
-  it("copies a pipeline listing's object with the pipeline's upload options", async () => {
+  it("copies a pipeline listing's object to the same path", async () => {
     const source = _createFakeProject({
       role: "source",
       objects: { [PIPELINE_PATH]: "wdi" },
@@ -403,10 +496,23 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
       listings: [_pipelineListing({ parquet_sha256: _sha256("wdi") })],
     });
 
-    const counts = await _copy(source, target);
+    await _copy(source, target);
 
-    expect(counts).toMatchObject({ copied: 1, failed: 0 });
     expect(_decode(target.objects.get(PIPELINE_PATH))).toBe("wdi");
+  });
+
+  it("uploads a pipeline object with the pipeline's cache time, without upsert", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: { [PIPELINE_PATH]: "wdi" },
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_pipelineListing({ parquet_sha256: _sha256("wdi") })],
+    });
+
+    await _copy(source, target);
+
     expect(target.uploads[0]!.options).toEqual({
       contentType: "application/vnd.apache.parquet",
       cacheControl: "3600",
@@ -425,9 +531,8 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
       listings: [_pipelineListing({ parquet_sha256: _sha256("wdi") })],
     });
 
-    const counts = await _copy(source, target);
+    await _copy(source, target);
 
-    expect(counts).toMatchObject({ alreadyPresent: 1, replaced: 0 });
     expect(target.uploads).toEqual([]);
   });
 
@@ -442,9 +547,8 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
       listings: [_pipelineListing({ parquet_sha256: _sha256("wdi") })],
     });
 
-    const counts = await _copy(source, target);
+    await _copy(source, target);
 
-    expect(counts).toMatchObject({ replaced: 1, failed: 0 });
     expect(_decode(target.objects.get(PIPELINE_PATH))).toBe("wdi");
   });
 
@@ -465,7 +569,7 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
     expect(rerunCounts).toMatchObject({ alreadyPresent: 1, replaced: 0 });
   });
 
-  it("fails a source object whose bytes differ from parquet_sha256, writing nothing", async () => {
+  it("writes nothing when the source object's bytes differ from parquet_sha256", async () => {
     const source = _createFakeProject({
       role: "source",
       objects: { [PIPELINE_PATH]: "corrupt" },
@@ -477,8 +581,9 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
 
     const counts = await _copy(source, target);
 
-    expect(counts).toMatchObject({ failed: 1 });
     expect(target.uploads).toEqual([]);
+    // Precondition: the mismatch is reported, not skipped silently.
+    expect(counts.failed).toBe(1);
   });
 
   it.each([
@@ -492,7 +597,7 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
       { storage_object_path: "a/../../b.parquet" },
     ],
   ])(
-    "fails a pipeline listing with %s, writing nothing",
+    "writes nothing for a pipeline listing with %s",
     async (_name, metadata) => {
       const source = _createFakeProject({
         role: "source",
@@ -505,19 +610,79 @@ describe("copyCatalogParquet pipeline_parquet objects", () => {
 
       const counts = await _copy(source, target);
 
-      expect(counts).toMatchObject({ failed: 1 });
       expect(target.uploads).toEqual([]);
+      // Precondition: the listing is reported, not skipped silently.
+      expect(counts.failed).toBe(1);
     },
   );
 });
 
-describe("copyCatalogParquet safety", () => {
-  it("throws before listing the source when the target has no opendata bucket", async () => {
+describe("copyCatalogParquet listings", () => {
+  it("processes every listing when the API returns fewer listings per page than asked", async () => {
+    const listings = Array.from({ length: 7 }, (_value, index) => {
+      return _cacheListing({
+        id: `0b6f6f7e-6a43-4b4e-9d0a-00000000000${index}`,
+        parquet_cache_folder_path: null,
+        parquet_cache_status: null,
+      });
+    });
+    const source = _createFakeProject({ role: "source" });
+    const target = _createFakeProject({
+      role: "target",
+      listings,
+      maxRowsPerPage: 3,
+    });
+
+    const counts = await _copy(source, target);
+
+    expect(counts.listings).toBe(7);
+  });
+
+  it("reports the target's own listing count next to the listings processed", async () => {
     const source = _createFakeProject({
       role: "source",
-      objects: {
-        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "a",
-      },
+      objects: _cacheParts(1),
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_cacheListing()],
+      listingCount: 2,
+    });
+
+    const counts = await _copy(source, target);
+
+    expect(counts).toMatchObject({ listings: 1, targetListings: 2 });
+  });
+});
+
+describe("getCopyExitCode", () => {
+  const cleanCounts = {
+    targetListings: 2,
+    listings: 2,
+    copied: 3,
+    alreadyPresent: 0,
+    replaced: 0,
+    failed: 0,
+  };
+
+  it("exits 0 when every listing was processed and nothing failed", () => {
+    expect(getCopyExitCode(cleanCounts)).toBe(0);
+  });
+
+  it("exits 1 when an object failed", () => {
+    expect(getCopyExitCode({ ...cleanCounts, failed: 1 })).toBe(1);
+  });
+
+  it("exits 1 when the copy processed fewer listings than the target holds", () => {
+    expect(getCopyExitCode({ ...cleanCounts, listings: 1 })).toBe(1);
+  });
+});
+
+describe("copyCatalogParquet safety", () => {
+  it("throws when the target has no opendata bucket", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: _cacheParts(1),
     });
     const target = _createFakeProject({
       role: "target",
@@ -526,6 +691,21 @@ describe("copyCatalogParquet safety", () => {
     });
 
     await expect(_copy(source, target)).rejects.toThrow(/opendata/);
+  });
+
+  it("lists nothing in the source when the target has no opendata bucket", async () => {
+    const source = _createFakeProject({
+      role: "source",
+      objects: _cacheParts(1),
+    });
+    const target = _createFakeProject({
+      role: "target",
+      listings: [_cacheListing()],
+      hasBucket: false,
+    });
+
+    await _copy(source, target).catch(() => {});
+
     expect(source.listedPrefixes).toEqual([]);
   });
 
@@ -539,39 +719,22 @@ describe("copyCatalogParquet safety", () => {
     await expect(_copy(source, target)).rejects.toThrow(/importCatalogData/);
   });
 
-  it("only reads the source, and upserts only a pipeline object whose SHA-256 differs", async () => {
-    const source = _createFakeProject({
-      role: "source",
-      objects: {
-        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "a0",
-        [`catalog-cache/${LISTING_A}/build-2/part-00001.parquet`]: "a1",
-        [PIPELINE_PATH]: "wdi",
-      },
-    });
-    const target = _createFakeProject({
-      role: "target",
-      objects: {
-        [`catalog-cache/${LISTING_A}/build-2/part-00000.parquet`]: "",
-        [PIPELINE_PATH]: "stale",
-      },
-      listings: [
-        _cacheListing({ parquet_cache_part_count: 2 }),
-        _pipelineListing({ parquet_sha256: _sha256("wdi") }),
-      ],
-    });
+  it("makes no call but a read on the source and a read or upload on the target", async () => {
+    const [source, target] = _createEveryPathProjects();
+
+    await _copy(source, target);
+
+    expect([...source.violations, ...target.violations]).toEqual([]);
+  });
+
+  it("upserts only the pipeline object whose SHA-256 differs", async () => {
+    const [source, target] = _createEveryPathProjects();
 
     const counts = await _copy(source, target);
 
     // Precondition: the run copied, found, and replaced an object, so every
     // path through the copy was taken.
-    expect(counts).toEqual({
-      listings: 2,
-      copied: 1,
-      alreadyPresent: 1,
-      replaced: 1,
-      failed: 0,
-    });
-    expect([...source.violations, ...target.violations]).toEqual([]);
+    expect(counts).toMatchObject({ copied: 1, alreadyPresent: 1, replaced: 1 });
     expect(
       target.uploads
         .filter((upload) => {

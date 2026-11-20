@@ -10,10 +10,16 @@ const OPEN_DATA_BUCKET = "opendata";
 /** The bucket folder every prebuilt copy lives under. */
 const CATALOG_CACHE_FOLDER = "catalog-cache";
 
-/** The most objects one Storage list call returns. */
+/**
+ * How many objects one Storage list call asks for. A server may return fewer,
+ * so paging stops only on an empty page.
+ */
 const STORAGE_PAGE_SIZE = 1000;
 
-/** The most listings one target read returns. */
+/**
+ * How many listings one target read asks for. The API's `max_rows` may cap
+ * it lower, so paging stops only on an empty page.
+ */
 const LISTING_PAGE_SIZE = 1000;
 
 /** The content type every pipeline uploads Parquet with. */
@@ -85,9 +91,10 @@ export type CatalogParquetListing = {
 };
 
 /**
- * The part of a Supabase project the copy uses: its `opendata` bucket and a
- * paged read of `data_catalog_listings`. `_createCatalogClient` builds one
- * from a real client, and tests pass fakes that refuse every other call.
+ * The part of a Supabase project the copy uses: its `opendata` bucket, a
+ * paged read of `data_catalog_listings`, and an exact count of its rows.
+ * `_createCatalogClient` builds one from a real client, and tests pass fakes
+ * that refuse every other call.
  */
 export type CatalogParquetClient = {
   storage: { from: (bucket: string) => CatalogStorageBucket };
@@ -95,10 +102,19 @@ export type CatalogParquetClient = {
     data: readonly CatalogParquetListing[] | null;
     error: { message: string } | null;
   }>;
+  countListings: () => PromiseLike<{
+    count: number | null;
+    error: { message: string } | null;
+  }>;
 };
 
-/** What happened to the listings and objects one copy run looked at. */
+/**
+ * What happened to the listings and objects one copy run looked at:
+ * `targetListings` is the target's listing count, and `listings` how many
+ * the copy read and processed.
+ */
 export type CatalogParquetCopyCounts = {
+  targetListings: number;
   listings: number;
   copied: number;
   alreadyPresent: number;
@@ -227,14 +243,15 @@ export function getCopySetupFromEnv(
 
 /**
  * Yields the path of every object under a folder, depth first. Folders come
- * back from `list` with a null `id`, and each folder is paged by `offset`,
- * so at most one page per folder level is held at a time.
+ * back from `list` with a null `id`, and each folder is paged by `offset`
+ * until a page comes back empty, so at most one page per folder level is held
+ * at a time.
  */
 async function* _listObjectPaths(
   bucket: CatalogStorageBucket,
   folderPath: string,
 ): AsyncGenerator<string> {
-  for (let offset = 0; ; offset += STORAGE_PAGE_SIZE) {
+  for (let offset = 0; ;) {
     const { data, error } = await bucket.list(folderPath, {
       limit: STORAGE_PAGE_SIZE,
       offset,
@@ -243,6 +260,10 @@ async function* _listObjectPaths(
       throw new Error(`Could not list ${folderPath}: ${error.message}`);
     }
     const entries = data ?? [];
+    if (entries.length === 0) {
+      return;
+    }
+    offset += entries.length;
     for (const entry of entries) {
       const path = `${folderPath}/${entry.name}`;
       if (entry.id === null) {
@@ -251,17 +272,17 @@ async function* _listObjectPaths(
         yield path;
       }
     }
-    if (entries.length < STORAGE_PAGE_SIZE) {
-      return;
-    }
   }
 }
 
-/** Yields every listing in the target, a page at a time, ordered by id. */
+/**
+ * Yields every listing in the target, ordered by id, a page at a time until
+ * a page comes back empty.
+ */
 async function* _listTargetListings(
   target: CatalogParquetClient,
 ): AsyncGenerator<CatalogParquetListing> {
-  for (let from = 0; ; from += LISTING_PAGE_SIZE) {
+  for (let from = 0; ;) {
     const { data, error } = await target.listListings({
       from,
       to: from + LISTING_PAGE_SIZE - 1,
@@ -270,11 +291,24 @@ async function* _listTargetListings(
       throw new Error(`Could not read the target's listings: ${error.message}`);
     }
     const listings = data ?? [];
-    yield* listings;
-    if (listings.length < LISTING_PAGE_SIZE) {
+    if (listings.length === 0) {
       return;
     }
+    from += listings.length;
+    yield* listings;
   }
+}
+
+async function _countTargetListings(
+  target: CatalogParquetClient,
+): Promise<number> {
+  const { count, error } = await target.countListings();
+  if (error !== null || count === null) {
+    throw new Error(
+      `Could not count the target's listings: ${error?.message ?? "no count"}`,
+    );
+  }
+  return count;
 }
 
 /**
@@ -491,7 +525,7 @@ function _createRecorder(
  *     [--yes-i-know-the-target <target-host>]
  *
  * It prints both hosts, asks for the target host unless the flag names it,
- * refuses any other argument, and exits 1 when any object failed. Node runs
+ * refuses any other argument, and exits as `getCopyExitCode` says. Node runs
  * this file directly, so keep every `$/` import type-only.
  */
 export async function copyCatalogParquet(
@@ -505,6 +539,7 @@ export async function copyCatalogParquet(
   const targetBucket = target.storage.from(OPEN_DATA_BUCKET);
   await _assertTargetHasBucket(targetBucket);
   const counts: CatalogParquetCopyCounts = {
+    targetListings: await _countTargetListings(target),
     listings: 0,
     copied: 0,
     alreadyPresent: 0,
@@ -533,6 +568,15 @@ export async function copyCatalogParquet(
     );
   }
   return counts;
+}
+
+/**
+ * Gets the copy script's exit code from a run's counts: 1 when any object
+ * failed, or when the copy processed a different number of listings than the
+ * target holds, as when a capped page went unnoticed; 0 otherwise.
+ */
+export function getCopyExitCode(counts: CatalogParquetCopyCounts): 0 | 1 {
+  return counts.failed > 0 || counts.listings !== counts.targetListings ? 1 : 0;
 }
 
 async function _isTargetConfirmed(
@@ -577,6 +621,11 @@ function _createCatalogClient(url: string, key: string): CatalogParquetClient {
         .order("id")
         .range(range.from, range.to);
     },
+    countListings: () => {
+      return client
+        .from("data_catalog_listings")
+        .select("id", { count: "exact", head: true });
+    },
   };
 }
 
@@ -609,9 +658,14 @@ async function _main(): Promise<number> {
     },
   });
   console.log(
-    `Listings ${counts.listings}: copied ${counts.copied}, already in the target ${counts.alreadyPresent}, replaced ${counts.replaced}, failed ${counts.failed}.`,
+    `Listings processed ${counts.listings} of the target's ${counts.targetListings}: copied ${counts.copied}, already in the target ${counts.alreadyPresent}, replaced ${counts.replaced}, failed ${counts.failed}.`,
   );
-  return counts.failed > 0 ? 1 : 0;
+  if (counts.listings !== counts.targetListings) {
+    console.error(
+      "The copy processed a different number of listings than the target holds. Re-run it.",
+    );
+  }
+  return getCopyExitCode(counts);
 }
 
 if (

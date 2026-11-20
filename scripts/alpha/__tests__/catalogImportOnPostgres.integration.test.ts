@@ -284,8 +284,15 @@ function _targetCounts(): string {
   );
 }
 
+/**
+ * Starting a cluster and running the real import take a few seconds, more
+ * while other suites run in parallel.
+ */
+const POSTGRES_TEST_TIMEOUT = 30_000;
+
 describe.skipIf(TOOLS === undefined)(
   "importCatalogData.sh on a local Postgres",
+  { timeout: POSTGRES_TEST_TIMEOUT },
   () => {
     beforeAll(async () => {
       clusterDir = mkdtempSync(join(tmpdir(), "catalog-import-pg-"));
@@ -298,6 +305,9 @@ describe.skipIf(TOOLS === undefined)(
         "postgres",
         "-A",
         "trust",
+        // A throwaway cluster needs no durability, and syncing is most of
+        // initdb's time on a busy machine.
+        "--no-sync",
       ]);
       _run(join(TOOLS!.binDir, "pg_ctl"), [
         "-D",
@@ -306,14 +316,14 @@ describe.skipIf(TOOLS === undefined)(
         join(clusterDir, "server.log"),
         "-w",
         "-o",
-        `-p ${port} -c listen_addresses=127.0.0.1 -c unix_socket_directories=''`,
+        `-p ${port} -c listen_addresses=127.0.0.1 -c unix_socket_directories='' -c fsync=off -c synchronous_commit=off -c full_page_writes=off`,
         "start",
       ]);
       _query(`create role ${OWNER} login nosuperuser`, "postgres");
       _query(`alter database postgres owner to ${OWNER}`, "postgres");
       _query(`alter schema public owner to ${OWNER}`, "postgres");
       _query(SCHEMA_SQL);
-    }, 30000);
+    }, POSTGRES_TEST_TIMEOUT);
 
     afterAll(() => {
       if (clusterDir === "") {
@@ -327,13 +337,13 @@ describe.skipIf(TOOLS === undefined)(
         "stop",
       ]);
       rmSync(clusterDir, { recursive: true, force: true });
-    });
+    }, POSTGRES_TEST_TIMEOUT);
 
     beforeEach(() => {
       _query(SEED_SQL);
-    });
+    }, POSTGRES_TEST_TIMEOUT);
 
-    it("replaces the catalog, rewrites Storage URLs, and recounts facets in one committed transaction", () => {
+    it("commits the replaced catalog, rewritten Storage URLs, and recounted facets", () => {
       const run = _runReplace(CATALOG_DUMP);
 
       expect(run.status, run.output).toBe(0);

@@ -80,6 +80,9 @@ USAGE="Usage: importCatalogData.sh <target-db-url> <dump.sql> [--dry-run] [$TARG
 TARGET_URL_PATTERN='^postgres(ql)?://([A-Za-z0-9._-]+)(:[^@/?#]*)?@([A-Za-z0-9.-]+)(:([0-9]+))?/postgres(\?sslmode=(require|verify-ca|verify-full))?$'
 STORAGE_HOST_PATTERN='^[A-Za-z0-9.-]+(:[0-9]+)?$'
 PSQL_BIN="${PSQL_BIN:-psql}"
+# The psql releases that know pg_dump 18's `\restrict`, as check_psql_version
+# enforces them.
+PSQL_VERSIONS="15.14+, 16.10+, 17.6+, or 18+"
 NEW_PSQL="/opt/homebrew/opt/libpq@18/bin/psql"
 FIELD_SEPARATOR=$'\x1f'
 OPEN_DATA_TABLE="public.datasets__open_data"
@@ -123,6 +126,10 @@ trap cleanup EXIT
 # Reads the user, host, and port from the whole URL with one anchored
 # pattern, so the script and libpq cannot see different hosts in it.
 check_target_url() {
+  if [[ "$TARGET_DB_URL" == *connect_timeout=* ]]; then
+    # shellcheck disable=SC2016 # The command is for the reader to run.
+    fail 'the target URL carries connect_timeout, which `supabase branches get` adds. Strip the query first: TARGET_DB_URL="${TARGET_DB_URL%%\?*}"'
+  fi
   [[ "$TARGET_DB_URL" =~ $TARGET_URL_PATTERN ]] ||
     fail "the target URL must be exactly postgresql://<user>:<percent-encoded password>@<host>:<port>/postgres, optionally with ?sslmode=require, verify-ca, or verify-full, and nothing else."
   TARGET_USER="${BASH_REMATCH[2]}"
@@ -170,7 +177,7 @@ check_psql_version() {
     *) minimum=0 ;;
   esac
   if ((${major:-0} < 15 || ${minor:-0} < minimum)); then
-    fail "psql 15.14, 16.10, 17.6, 18, or newer is needed, found '$version_line'. Run with PSQL_BIN=$NEW_PSQL."
+    fail "psql $PSQL_VERSIONS is needed, found '$version_line'. Run with PSQL_BIN=$NEW_PSQL."
   fi
 }
 
@@ -179,7 +186,7 @@ check_psql_version() {
 # also stays read-only through a pooler, and it waits at most LOCK_TIMEOUT
 # for a lock another session holds.
 read_target() {
-  "$PSQL_BIN" "$TARGET_DB_URL" -X -q -t -A -F "$FIELD_SEPARATOR" \
+  "$PSQL_BIN" "$TARGET_DB_URL" -X -P pager=off -q -t -A -F "$FIELD_SEPARATOR" \
     -v ON_ERROR_STOP=1 -1 -c "set transaction read only" \
     -c "set local lock_timeout = '$LOCK_TIMEOUT'" -c "$1"
 }
@@ -504,7 +511,7 @@ print_restore_steps() {
   echo "       \\i '$backup_path'"
   echo "       commit;"
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  echo '  3. Run it with psql 15.14 or newer: psql "$TARGET_DB_URL" -X -v ON_ERROR_STOP=1 --file restore.sql'
+  echo "  3. Run it with psql $PSQL_VERSIONS:"' psql "$TARGET_DB_URL" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'
   if [[ -n "$SET_NULL_TABLES" ]]; then
     echo "  The delete only nulls rows of: $SET_NULL_TABLES. Their backup rows cannot load over them, so restore those columns by hand."
   fi
@@ -667,7 +674,8 @@ run_import() {
   # No --single-transaction: the wrapper carries its own begin and commit,
   # so a client-side error stops psql before `commit` and the server rolls
   # the whole transaction back.
-  "$PSQL_BIN" "$TARGET_DB_URL" -X -q --set ON_ERROR_STOP=1 --file "$wrapper" || report_failed_import
+  "$PSQL_BIN" "$TARGET_DB_URL" -X -P pager=off -q --set ON_ERROR_STOP=1 \
+    --file "$wrapper" || report_failed_import
   print_target_counts "After the import, the target holds, per table:"
   report_orphans_after
 }

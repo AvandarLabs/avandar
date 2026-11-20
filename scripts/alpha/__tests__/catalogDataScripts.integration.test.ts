@@ -29,6 +29,12 @@ const TARGET_ID = "postgres@db.example-ref.supabase.co";
 const SOURCE_STORAGE_HOST = "demo-ref.supabase.co";
 const TARGET_STORAGE_HOST = "example-ref.supabase.co";
 
+/**
+ * Each run starts many fake `psql` processes, so a replace run can take a
+ * few seconds on a busy machine.
+ */
+const SHELL_TEST_OPTIONS = { timeout: 20_000 };
+
 /** Separates the fields of one report row, as `psql -F` does. */
 const FIELD_SEPARATOR = "\u001f";
 
@@ -248,6 +254,15 @@ function _runImport(
   );
 }
 
+/** Imports the Storage-linked dump with a rewrite to the target's Storage. */
+function _runStorageRewrite() {
+  return _runImport(
+    ["--rewrite-storage-host", SOURCE_STORAGE_HOST, TARGET_STORAGE_HOST],
+    {},
+    STORAGE_DUMP,
+  );
+}
+
 /** Runs a replace import of the standard dump with these extra arguments. */
 function _runReplace(
   extraArgs: readonly string[],
@@ -305,15 +320,22 @@ afterEach(() => {
   rmSync(workDir, { recursive: true, force: true });
 });
 
-describe("exportCatalogData.sh", () => {
-  it("dumps only the catalog tables, data only and without disabling triggers", () => {
+describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
+  it("dumps data only, without disabling triggers", () => {
+    const run = _runScript("exportCatalogData.sh", [
+      "postgres://src",
+      join(workDir, "out.sql"),
+    ]);
+
+    expect(run.log).toMatch(/--data-only/);
+    expect(run.log).not.toContain("--disable-triggers");
+  });
+
+  it("dumps exactly the catalog tables", () => {
     const outFile = join(workDir, "out.sql");
 
     const run = _runScript("exportCatalogData.sh", ["postgres://src", outFile]);
 
-    expect(run.status).toBe(0);
-    expect(run.log).toContain("--data-only");
-    expect(run.log).not.toContain("--disable-triggers");
     expect(run.log.match(/--table public\.[a-z_]+/g)).toEqual(
       CATALOG_TABLES.map((table) => {
         return `--table ${table}`;
@@ -354,18 +376,27 @@ describe("exportCatalogData.sh", () => {
     expect(readFileSync(outFile, "utf8")).toBe("keep me");
   });
 
-  it("fails when the dump holds a table outside the catalog, keeping no file", () => {
-    const outFile = join(workDir, "out.sql");
-
+  it("fails when the dump holds a table outside the catalog", () => {
     const run = _runScript(
       "exportCatalogData.sh",
-      ["postgres://src", outFile],
+      ["postgres://src", join(workDir, "out.sql")],
       {
         FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
       },
     );
 
     expect(run.status).toBe(1);
+  });
+
+  it("deletes a rejected dump, leaving no output file", () => {
+    const run = _runScript(
+      "exportCatalogData.sh",
+      ["postgres://src", join(workDir, "out.sql")],
+      {
+        FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
+      },
+    );
+
     expect(run.output).toContain("Deleted the rejected dump");
     expect(
       readdirSync(workDir).filter((name) => {
@@ -395,178 +426,223 @@ describe("exportCatalogData.sh", () => {
   });
 });
 
-describe("importCatalogData.sh target URL and environment", () => {
-  it("starts psql with no PG* variable that could pick another host", () => {
-    const run = _runImport([], {
-      PGHOST: "elsewhere.example.com",
-      PGHOSTADDR: "10.0.0.9",
-      PGPORT: "6543",
-      PGDATABASE: "other",
-      PGUSER: "other",
-      PGSERVICE: "elsewhere",
-      PGSERVICEFILE: join(workDir, "pg_service.conf"),
-      PGOPTIONS: "-c default_transaction_read_only=off",
-    });
-
-    expect(run.status).toBe(0);
-    expect(run.psqlEnv).toBe("");
-  });
-
-  it.each([
-    ["a percent-encoded hostaddr key", `${TARGET_URL}?h%6Fstaddr=10.0.0.9`],
-    [
-      "an @ inside the query string",
-      `${TARGET_URL}?sslmode=require&x=@elsewhere.example.com`,
-    ],
-    ["a host query parameter", `${TARGET_URL}?host=elsewhere.example.com`],
-    ["a service query parameter", `${TARGET_URL}?service=prod`],
-    [
-      "a database other than postgres",
-      TARGET_URL.replace(/\/postgres$/, "/other"),
-    ],
-    ["an IPv6 host", "postgresql://postgres:pw@[::1]:5432/postgres"],
-    [
-      "several hosts",
-      "postgresql://postgres:pw@a.example.com,b.example.com/postgres",
-    ],
-    [
-      "an unencoded @ in the password",
-      "postgresql://postgres:p@ss@db.example-ref.supabase.co/postgres",
-    ],
-  ])("refuses a target URL with %s, without connecting", (_name, url) => {
-    const run = _runScript("importCatalogData.sh", [url, _writeDump()]);
-
-    expect(run.status).toBe(1);
-    expect(run.output).toContain("the target URL must be exactly");
-    expect(run.log).toBe("");
-  });
-
-  it("refuses the transaction pooler's port 6543, without connecting", () => {
-    const run = _runScript("importCatalogData.sh", [
-      TARGET_URL.replace(":5432", ":6543"),
-      _writeDump(),
-    ]);
-
-    expect(run.status).toBe(1);
-    expect(run.output).toContain("transaction pooler");
-    expect(run.log).toBe("");
-  });
-
-  it("accepts a session pooler URL with sslmode=require", () => {
-    const run = _runScript("importCatalogData.sh", [
-      "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require",
-      _writeDump(),
-      "--yes-i-know-the-target",
-      "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
-    ]);
-
-    expect(run.status).toBe(0);
-  });
-
-  it.each([
-    ["14.25", false],
-    ["15.13", false],
-    ["15.14", true],
-    ["16.9", false],
-    ["16.10", true],
-    ["17.5", false],
-    ["17.6", true],
-    ["18.0", true],
-  ])(
-    "accepts psql %s only when it knows \\restrict: %s",
-    (version, isAccepted) => {
+describe(
+  "importCatalogData.sh target URL and environment",
+  SHELL_TEST_OPTIONS,
+  () => {
+    it("starts psql with no PG* variable that could pick another host", () => {
       const run = _runImport([], {
-        FAKE_PSQL_VERSION: `psql (PostgreSQL) ${version}`,
+        PGHOST: "elsewhere.example.com",
+        PGHOSTADDR: "10.0.0.9",
+        PGPORT: "6543",
+        PGDATABASE: "other",
+        PGUSER: "other",
+        PGSERVICE: "elsewhere",
+        PGSERVICEFILE: join(workDir, "pg_service.conf"),
+        PGOPTIONS: "-c default_transaction_read_only=off",
       });
 
-      expect(run.status).toBe(isAccepted ? 0 : 1);
-      if (!isAccepted) {
-        expect(run.output).toContain("/opt/homebrew/opt/libpq@18/bin/psql");
-      }
-    },
-  );
-});
+      expect(run.status).toBe(0);
+      expect(run.psqlEnv).toBe("");
+    });
 
-describe("importCatalogData.sh into an empty target", () => {
-  it("runs the wrapper with ON_ERROR_STOP and without psql's --single-transaction", () => {
-    const run = _runImport();
+    it.each([
+      ["a percent-encoded hostaddr key", `${TARGET_URL}?h%6Fstaddr=10.0.0.9`],
+      [
+        "an @ inside the query string",
+        `${TARGET_URL}?sslmode=require&x=@elsewhere.example.com`,
+      ],
+      ["a host query parameter", `${TARGET_URL}?host=elsewhere.example.com`],
+      ["a service query parameter", `${TARGET_URL}?service=prod`],
+      [
+        "a database other than postgres",
+        TARGET_URL.replace(/\/postgres$/, "/other"),
+      ],
+      ["an IPv6 host", "postgresql://postgres:pw@[::1]:5432/postgres"],
+      [
+        "several hosts",
+        "postgresql://postgres:pw@a.example.com,b.example.com/postgres",
+      ],
+      [
+        "an unencoded @ in the password",
+        "postgresql://postgres:p@ss@db.example-ref.supabase.co/postgres",
+      ],
+    ])("refuses a target URL with %s, without connecting", (_name, url) => {
+      const run = _runScript("importCatalogData.sh", [url, _writeDump()]);
 
-    expect(run.status).toBe(0);
-    expect(run.log).toMatch(/--set ON_ERROR_STOP=1 --file \S+/);
-    expect(run.log).not.toContain("--single-transaction");
-  });
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("the target URL must be exactly");
+      expect(run.log).toBe("");
+    });
 
-  it("loads a private copy of the dump, checks the rows, and refreshes the facet counts between begin and commit", () => {
-    const run = _runImport();
+    it("refuses a connect_timeout query, saying how to strip it, without connecting", () => {
+      const run = _runScript("importCatalogData.sh", [
+        `${TARGET_URL}?connect_timeout=10`,
+        _writeDump(),
+      ]);
 
-    expect(run.wrapper.trim().split("\n")).toEqual([
-      "\\set ON_ERROR_STOP on",
-      "\\pset tuples_only on",
-      "\\pset format unaligned",
-      "begin;",
-      "set local lock_timeout = '10s';",
-      expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
-      "set local lock_timeout = '10s';",
-      ..._rowCountCheckLines(),
-      "select public.data_catalog_facet_counts__refresh();",
-      "commit;",
-    ]);
-    expect(run.wrapper).not.toContain(`'${join(workDir, "catalog.sql")}'`);
-  });
+      expect(run.status).toBe(1);
+      expect(run.output).toContain('TARGET_DB_URL="${TARGET_DB_URL%%\\?*}"');
+      expect(run.log).toBe("");
+    });
 
-  it("prints each table's row count in the target after the import", () => {
-    const run = _runImport();
+    it("refuses the transaction pooler's port 6543, without connecting", () => {
+      const run = _runScript("importCatalogData.sh", [
+        TARGET_URL.replace(":5432", ":6543"),
+        _writeDump(),
+      ]);
 
-    expect(run.output).toMatch(/After the import[\s\S]*listings: 2/);
-  });
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("transaction pooler");
+      expect(run.log).toBe("");
+    });
 
-  it("reports that the failed import rolled back when the counts did not change", () => {
-    const run = _runImport([], { FAKE_IMPORT_EXIT: "3" });
+    it("accepts a session pooler URL with sslmode=require", () => {
+      const run = _runScript("importCatalogData.sh", [
+        "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require",
+        _writeDump(),
+        "--yes-i-know-the-target",
+        "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
+      ]);
 
-    expect(run.status).toBe(1);
-    expect(run.output).toContain("its transaction rolled back");
-  });
+      expect(run.status).toBe(0);
+    });
 
-  it("refuses a target whose catalog tables have rows, without loading the dump", () => {
-    const run = _runImport([], { FAKE_TARGET_ROWS: "6" });
+    it.each([
+      ["14.25", false],
+      ["15.13", false],
+      ["15.14", true],
+      ["16.9", false],
+      ["16.10", true],
+      ["17.5", false],
+      ["17.6", true],
+      ["18.0", true],
+    ])(
+      "accepts psql %s only when it knows \\restrict: %s",
+      (version, isAccepted) => {
+        const run = _runImport([], {
+          FAKE_PSQL_VERSION: `psql (PostgreSQL) ${version}`,
+        });
 
-    expect(run.status).toBe(1);
-    expect(run.output).toContain("already has rows");
-    expect(run.log).not.toContain("--file");
-  });
-
-  it("refuses a confirmation that names another target, without connecting", () => {
-    const run = _runScript("importCatalogData.sh", [
-      TARGET_URL,
-      _writeDump(),
-      "--yes-i-know-the-target",
-      "postgres@db.other-ref.supabase.co",
-    ]);
-
-    expect(run.status).toBe(1);
-    expect(run.output).toContain(`but the target is ${TARGET_ID}`);
-    expect(run.log).toBe("");
-  });
-
-  it("refuses without a confirmation when there is no terminal to ask on", () => {
-    const run = _runScript("importCatalogData.sh", [TARGET_URL, _writeDump()]);
-
-    expect(run.status).toBe(1);
-    expect(run.output).toContain(
-      "no terminal to confirm on. Pass --yes-i-know-the-target",
+        expect(run.status).toBe(isAccepted ? 0 : 1);
+        if (!isAccepted) {
+          expect(run.output).toContain("/opt/homebrew/opt/libpq@18/bin/psql");
+        }
+      },
     );
-    expect(run.log).not.toContain("--file");
-  });
+  },
+);
 
-  it("never prints the target's password", () => {
-    const run = _runImport();
+describe(
+  "importCatalogData.sh into an empty target",
+  SHELL_TEST_OPTIONS,
+  () => {
+    it("runs the wrapper with ON_ERROR_STOP", () => {
+      const run = _runImport();
 
-    expect(run.output).toContain(TARGET_ID);
-    expect(run.output).not.toContain("s3cret-pass");
-  });
-});
+      expect(run.log).toMatch(/--set ON_ERROR_STOP=1 --file \S+/);
+    });
 
-describe("importCatalogData.sh dump checks", () => {
+    it("leaves the transaction to the wrapper, not psql's --single-transaction", () => {
+      const run = _runImport();
+
+      expect(run.log).not.toContain("--single-transaction");
+    });
+
+    it("turns the pager off on every psql call, so none can hold the transaction open", () => {
+      const run = _runImport();
+
+      const calls = run.log.split("\n").filter((line) => {
+        return line.startsWith("postgresql://");
+      });
+      expect(calls.length).toBeGreaterThan(0);
+      expect(
+        calls.filter((line) => {
+          return !line.includes("-X -P pager=off");
+        }),
+      ).toEqual([]);
+    });
+
+    it("writes a wrapper that runs every import step between begin and commit", () => {
+      const run = _runImport();
+
+      expect(run.wrapper.trim().split("\n")).toEqual([
+        "\\set ON_ERROR_STOP on",
+        "\\pset tuples_only on",
+        "\\pset format unaligned",
+        "begin;",
+        "set local lock_timeout = '10s';",
+        expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
+        "set local lock_timeout = '10s';",
+        ..._rowCountCheckLines(),
+        "select public.data_catalog_facet_counts__refresh();",
+        "commit;",
+      ]);
+    });
+
+    it("loads a private copy of the dump, not the file it was given", () => {
+      const run = _runImport();
+
+      expect(run.wrapper).not.toContain(`'${join(workDir, "catalog.sql")}'`);
+    });
+
+    it("prints each table's row count in the target after the import", () => {
+      const run = _runImport();
+
+      expect(run.output).toMatch(/After the import[\s\S]*listings: 2/);
+    });
+
+    it("reports that the failed import rolled back when the counts did not change", () => {
+      const run = _runImport([], { FAKE_IMPORT_EXIT: "3" });
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("its transaction rolled back");
+    });
+
+    it("refuses a target whose catalog tables have rows, without loading the dump", () => {
+      const run = _runImport([], { FAKE_TARGET_ROWS: "6" });
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("already has rows");
+      expect(run.log).not.toContain("--file");
+    });
+
+    it("refuses a confirmation that names another target, without connecting", () => {
+      const run = _runScript("importCatalogData.sh", [
+        TARGET_URL,
+        _writeDump(),
+        "--yes-i-know-the-target",
+        "postgres@db.other-ref.supabase.co",
+      ]);
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain(`but the target is ${TARGET_ID}`);
+      expect(run.log).toBe("");
+    });
+
+    it("refuses without a confirmation when there is no terminal to ask on", () => {
+      const run = _runScript("importCatalogData.sh", [
+        TARGET_URL,
+        _writeDump(),
+      ]);
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain(
+        "no terminal to confirm on. Pass --yes-i-know-the-target",
+      );
+      expect(run.log).not.toContain("--file");
+    });
+
+    it("never prints the target's password", () => {
+      const run = _runImport();
+
+      expect(run.output).toContain(TARGET_ID);
+      expect(run.output).not.toContain("s3cret-pass");
+    });
+  },
+);
+
+describe("importCatalogData.sh dump checks", SHELL_TEST_OPTIONS, () => {
   it.each([
     ["an empty file", ""],
     [
@@ -625,7 +701,7 @@ describe("importCatalogData.sh dump checks", () => {
   });
 });
 
-describe("importCatalogData.sh Storage URLs", () => {
+describe("importCatalogData.sh Storage URLs", SHELL_TEST_OPTIONS, () => {
   it("prints the Storage hosts the dump's listings link to on a dry run", () => {
     const run = _runImport(["--dry-run"], {}, STORAGE_DUMP);
 
@@ -643,15 +719,9 @@ describe("importCatalogData.sh Storage URLs", () => {
     expect(run.log).not.toContain("--file");
   });
 
-  it("rewrites the source Storage host after the load and refuses to commit while it remains", () => {
-    const run = _runImport(
-      ["--rewrite-storage-host", SOURCE_STORAGE_HOST, TARGET_STORAGE_HOST],
-      {},
-      STORAGE_DUMP,
-    );
+  it("rewrites the source Storage host after the load", () => {
+    const lines = _runStorageRewrite().wrapper.split("\n");
 
-    expect(run.status).toBe(0);
-    const lines = run.wrapper.split("\n");
     const loadLine = lines.findIndex((line) => {
       return line.startsWith("\\i ");
     });
@@ -660,11 +730,19 @@ describe("importCatalogData.sh Storage URLs", () => {
         `replace(item.url, 'https://${SOURCE_STORAGE_HOST}/storage/v1/', 'https://${TARGET_STORAGE_HOST}/storage/v1/')`,
       );
     });
+    expect(loadLine).toBeGreaterThan(0);
+    expect(rewriteLine).toBeGreaterThan(loadLine);
+  });
+
+  it("checks that no listing still mentions the source host before commit", () => {
+    const lines = _runStorageRewrite().wrapper.split("\n");
+
+    const rewriteLine = lines.findIndex((line) => {
+      return line.includes(`'https://${SOURCE_STORAGE_HOST}/storage/v1/'`);
+    });
     const guardLine = lines.findIndex((line) => {
       return line.includes(`like '%${SOURCE_STORAGE_HOST}%'`);
     });
-    expect(loadLine).toBeGreaterThan(0);
-    expect(rewriteLine).toBeGreaterThan(loadLine);
     expect(guardLine).toBeGreaterThan(rewriteLine);
     expect(lines.indexOf("commit;")).toBeGreaterThan(guardLine);
   });
@@ -697,8 +775,8 @@ describe("importCatalogData.sh Storage URLs", () => {
   });
 });
 
-describe("importCatalogData.sh --replace-existing", () => {
-  it("rechecks the cascade, deletes children first, loads, and refreshes between begin and commit", () => {
+describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
+  it("writes a replace wrapper that runs every step between begin and commit", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.status).toBe(0);
@@ -740,13 +818,18 @@ describe("importCatalogData.sh --replace-existing", () => {
     );
   });
 
-  it("says which users' datasets the cascade orphans, in the report, the plan, and the final output", () => {
+  it("names the datasets the cascade orphans in the report, the plan, and the prompt note", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     const orphanLines = run.output.split("\n").filter((line) => {
       return line.includes("4 public.datasets rows in 2 workspaces");
     });
     expect(orphanLines).toHaveLength(3);
+  });
+
+  it("counts the orphaned datasets again after the import", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
     expect(run.output).toContain(
       "Open data datasets with no open data details now: 4 public.datasets rows in 2 workspaces.",
     );
@@ -770,24 +853,29 @@ describe("importCatalogData.sh --replace-existing", () => {
     );
   });
 
-  it("refuses without a backup file and prints a pg_dump command naming the target", () => {
-    const run = _runReplace([
-      "--yes-i-know-the-target",
-      TARGET_ID,
-      "--yes-i-know-the-cascade",
-      "4",
-    ]);
+  it("refuses a replace without a backup file", () => {
+    const run = _runReplace(_confirmedReplaceArgs().slice(2));
 
     expect(run.status).toBe(1);
     expect(run.output).toContain("--replace-existing needs --backup-file");
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("prints a pg_dump command that backs up every table the replace touches", () => {
+    const run = _runReplace(_confirmedReplaceArgs().slice(2));
+
     expect(run.output).toContain(
       'pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges',
     );
     expect(run.output).toContain("--table 'public.datasets__open_data'");
+  });
+
+  it("names the suggested backup file after the target host", () => {
+    const run = _runReplace(_confirmedReplaceArgs().slice(2));
+
     expect(run.output).toContain(
       "--file 'catalog-backup-db.example-ref.supabase.co-",
     );
-    expect(run.log).not.toContain("--file");
   });
 
   it("refuses a backup older than 24 hours", () => {
@@ -850,6 +938,14 @@ describe("importCatalogData.sh --replace-existing", () => {
     expect(run.log).not.toContain("--file");
   });
 
+  it("names the psql releases that know \\restrict in the restore steps", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(run.output).toContain(
+      "3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+:",
+    );
+  });
+
   it("prints how to restore the backup before it imports", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
@@ -896,11 +992,16 @@ describe("importCatalogData.sh --replace-existing", () => {
     expect(run.log).not.toContain("--file");
   });
 
-  it("writes nothing on --dry-run and exits 0", () => {
+  it("exits 0 on --dry-run", () => {
     const run = _runReplace(["--dry-run"]);
 
     expect(run.status).toBe(0);
-    expect(run.output).toContain("Dry run");
+  });
+
+  it("writes nothing on --dry-run", () => {
+    const run = _runReplace(["--dry-run"]);
+
+    expect(run.output).toContain("Dry run: nothing was written.");
     expect(run.log).not.toContain("--file");
   });
 });
